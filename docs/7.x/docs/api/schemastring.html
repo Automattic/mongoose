@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v7.6.5: SchemaString</title><link rel="apple-touch-icon" sizes="57x57" href="/docs/7.x/docs/images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="/docs/7.x/docs/images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="/docs/7.x/docs/images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="/docs/7.x/docs/images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="/docs/7.x/docs/images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="/docs/7.x/docs/images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="/docs/7.x/docs/images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="/docs/7.x/docs/images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="/docs/7.x/docs/images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="/docs/7.x/docs/images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="/docs/7.x/docs/images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="/docs/7.x/docs/images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="/docs/7.x/docs/images/favicon/favicon-16x16.png"><link rel="manifest" href="/docs/7.x/docs/images/favicon/manifest.json"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/7.x/docs/css/github.css"><link rel="stylesheet" href="/docs/7.x/docs/css/mongoose5.css"><link rel="stylesheet" href="/docs/7.x/docs/css/carbonads.css"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="/docs/7.x/docs/images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/7.x/docs/css/api.css"><script src="/docs/7.x/docs/js/api-bold-current-nav.js"></script><script src="/docs/7.x/docs/js/convert-old-anchorid.js"></script><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/7.x/docs/css/inlinecpc.css"></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><svg width="100%" height="100%" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/7.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><nav class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/7.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="/docs/7.x/docs/index.html">Version 7.6.5</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Version 8.0.0</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/index.html">Version 7.6.5</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/index.html">Version 6.12.2</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/index.html">Version 5.13.21</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/7.x/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/guides.html">Guides</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/typescript.html">TypeScript</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/mongoose.html">API</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/virtualtype.html">VirtualType</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/migrating_to_7.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/version-support.html">Version Support</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></nav></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/lib/schema/string.js" target="_blank">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v7.6.7: SchemaString</title><link rel="apple-touch-icon" sizes="57x57" href="/docs/7.x/docs/images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="/docs/7.x/docs/images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="/docs/7.x/docs/images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="/docs/7.x/docs/images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="/docs/7.x/docs/images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="/docs/7.x/docs/images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="/docs/7.x/docs/images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="/docs/7.x/docs/images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="/docs/7.x/docs/images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="/docs/7.x/docs/images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="/docs/7.x/docs/images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="/docs/7.x/docs/images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="/docs/7.x/docs/images/favicon/favicon-16x16.png"><link rel="manifest" href="/docs/7.x/docs/images/favicon/manifest.json"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/7.x/docs/css/github.css"><link rel="stylesheet" href="/docs/7.x/docs/css/mongoose5.css"><link rel="stylesheet" href="/docs/7.x/docs/css/carbonads.css"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="/docs/7.x/docs/images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/7.x/docs/css/api.css"><script src="/docs/7.x/docs/js/api-bold-current-nav.js"></script><script src="/docs/7.x/docs/js/convert-old-anchorid.js"></script><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/7.x/docs/css/inlinecpc.css"></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><svg width="100%" height="100%" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/7.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><nav class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/7.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="/docs/7.x/docs/index.html">Version 7.6.7</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Version 8.0.2</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/index.html">Version 7.6.7</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/index.html">Version 6.12.2</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/index.html">Version 5.13.21</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/7.x/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/guides.html">Guides</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/typescript.html">TypeScript</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/mongoose.html">API</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/virtualtype.html">VirtualType</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/migrating_to_7.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/version-support.html">Version Support</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></nav></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/lib/schema/string.js" target="_blank">
 <img src="/docs/7.x/docs/images/pencil.svg" />
 </a><h1>SchemaString</h1><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/7.x/docs/css/inlinecpc.css"><div id="native-direct"></div><script>(function() {
 if (typeof _bsa !== 'undefined' && _bsa) {
@@ -20,11 +20,7 @@ template: `
   </div><hr class="separate-api-elements"><h3 id="SchemaString.checkRequired()"><a href="#SchemaString.checkRequired()"><code>SchemaString.checkRequired()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>fn</code>
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Override the function the required validator uses to check whether a string
 passes the <code>required</code> check.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-comment">// Allow empty strings to pass `required` check</span>
 mongoose.<span class="hljs-property">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">String</span>.<span class="hljs-title function_">checkRequired</span>(<span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> v != <span class="hljs-literal">null</span>);
 
@@ -33,11 +29,7 @@ mongoose.<span class="hljs-property">Schema</span>.<span class="hljs-property">T
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="SchemaString.get()"><a href="#SchemaString.get()"><code>SchemaString.get()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>caster</code>
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Get/set the function used to cast arbitrary values to strings.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-comment">// Throw an error if you pass in an object. Normally, Mongoose allows</span>
 <span class="hljs-comment">// objects with custom `toString()` functions.</span>
 <span class="hljs-keyword">const</span> original = mongoose.<span class="hljs-property">Schema</span>.<span class="hljs-property">Types</span>.<span class="hljs-property">String</span>.<span class="hljs-title function_">cast</span>();
@@ -51,11 +43,7 @@ mongoose.<span class="hljs-property">Schema</span>.<span class="hljs-property">T
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="SchemaString.get()"><a href="#SchemaString.get()"><code>SchemaString.get()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>getter</code>
 <span class="method-type">&laquo;Function&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;this&raquo;</span> </li></ul><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Attaches a getter for all String instances.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-comment">// Make all numbers round down</span>
 mongoose.<span class="hljs-property">Schema</span>.<span class="hljs-property">String</span>.<span class="hljs-title function_">get</span>(<span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> v.<span class="hljs-title function_">toLowerCase</span>());
 
@@ -71,11 +59,7 @@ strings.</p>
   </div><hr class="separate-api-elements"><h3 id="SchemaString.prototype.enum()"><a href="#SchemaString.prototype.enum()"><code>SchemaString.prototype.enum()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[...args]</code>
 <span class="method-type">&laquo;String|Object&raquo;</span> enumeration values</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/7.x/docs/api/error.html#Error.messages">Customized Error Messages</a></span></li><li><span class="method-type"><a href="https://masteringjs.io/tutorials/fundamentals/enum">Enums in JavaScript</a></span></li></ul><div><p>Adds an enum validator</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> states = [<span class="hljs-string">&#x27;opening&#x27;</span>, <span class="hljs-string">&#x27;open&#x27;</span>, <span class="hljs-string">&#x27;closing&#x27;</span>, <span class="hljs-string">&#x27;closed&#x27;</span>]
 <span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">state</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">enum</span>: states }})
 <span class="hljs-keyword">const</span> M = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;M&#x27;</span>, s)
@@ -101,11 +85,7 @@ m.<span class="hljs-title function_">save</span>(<span class="hljs-keyword">func
 })
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="SchemaString.prototype.lowercase()"><a href="#SchemaString.prototype.lowercase()"><code>SchemaString.prototype.lowercase()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</li></ul><div><p>Adds a lowercase <a href="/docs/7.x/docs/api/schematype.html#SchemaType.prototype.set()">setter</a>.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">email</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">lowercase</span>: <span class="hljs-literal">true</span> }})
 <span class="hljs-keyword">const</span> M = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;M&#x27;</span>, s);
 <span class="hljs-keyword">const</span> m = <span class="hljs-keyword">new</span> <span class="hljs-title function_">M</span>({ <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;SomeEmail@example.COM&#x27;</span> });
@@ -113,11 +93,7 @@ m.<span class="hljs-title function_">save</span>(<span class="hljs-keyword">func
 M.<span class="hljs-title function_">find</span>({ <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;SomeEmail@example.com&#x27;</span> }); <span class="hljs-comment">// Queries by &#x27;someemail@example.com&#x27;</span>
 </code></pre>
 <p>Note that <code>lowercase</code> does <strong>not</strong> affect regular expression queries:</p>
-<h4 id="example-1">
-      <a href="#example-1">
-        Example:
-      </a>
-    </h4>
+<h4 id="example-1">Example:</h4>
 <pre><code><span class="hljs-comment">// Still queries for documents whose `email` matches the regular</span>
 <span class="hljs-comment">// expression /SomeEmail/. Mongoose does **not** convert the RegExp</span>
 <span class="hljs-comment">// to lowercase.</span>
@@ -129,11 +105,7 @@ M.<span class="hljs-title function_">find</span>({ <span class="hljs-attr">email
 <span class="method-type">&laquo;String&raquo;</span> optional custom error message</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/7.x/docs/api/error.html#Error.messages">Customized Error Messages</a></span></li></ul><div><p>Sets a regexp validator.</p>
 <p>Any value that does not pass <code>regExp</code>.test(val) will fail validation.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">match</span>: <span class="hljs-regexp">/^a/</span> }})
 <span class="hljs-keyword">const</span> M = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;M&#x27;</span>, s)
 <span class="hljs-keyword">const</span> m = <span class="hljs-keyword">new</span> <span class="hljs-title function_">M</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;I am invalid&#x27;</span> })
@@ -162,11 +134,7 @@ m.<span class="hljs-title function_">validate</span>(<span class="hljs-keyword">
 </li><li class="param"><code>[message]</code>
 <span class="method-type">&laquo;String&raquo;</span> optional custom error message</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/7.x/docs/api/error.html#Error.messages">Customized Error Messages</a></span></li></ul><div><p>Sets a maximum length validator.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">postalCode</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">maxlength</span>: <span class="hljs-number">9</span> })
 <span class="hljs-keyword">const</span> <span class="hljs-title class_">Address</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Address&#x27;</span>, schema)
 <span class="hljs-keyword">const</span> address = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Address</span>({ <span class="hljs-attr">postalCode</span>: <span class="hljs-string">&#x27;9512512345&#x27;</span> })
@@ -191,11 +159,7 @@ address.<span class="hljs-title function_">validate</span>(<span class="hljs-key
 </li><li class="param"><code>[message]</code>
 <span class="method-type">&laquo;String&raquo;</span> optional custom error message</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/7.x/docs/api/error.html#Error.messages">Customized Error Messages</a></span></li></ul><div><p>Sets a minimum length validator.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">postalCode</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">minlength</span>: <span class="hljs-number">5</span> })
 <span class="hljs-keyword">const</span> <span class="hljs-title class_">Address</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Address&#x27;</span>, schema)
 <span class="hljs-keyword">const</span> address = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Address</span>({ <span class="hljs-attr">postalCode</span>: <span class="hljs-string">&#x27;9512&#x27;</span> })
@@ -217,11 +181,7 @@ address.<span class="hljs-title function_">validate</span>(<span class="hljs-key
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="SchemaString.prototype.trim()"><a href="#SchemaString.prototype.trim()"><code>SchemaString.prototype.trim()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</li></ul><div><p>Adds a trim <a href="/docs/7.x/docs/api/schematype.html#SchemaType.prototype.set()">setter</a>.</p>
 <p>The string value will be <a href="https://masteringjs.io/tutorials/fundamentals/trim-string">trimmed</a> when set.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">trim</span>: <span class="hljs-literal">true</span> }});
 <span class="hljs-keyword">const</span> M = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;M&#x27;</span>, s);
 <span class="hljs-keyword">const</span> string = <span class="hljs-string">&#x27; some name &#x27;</span>;
@@ -233,20 +193,12 @@ address.<span class="hljs-title function_">validate</span>(<span class="hljs-key
 M.<span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">name</span>: string });
 </code></pre>
 <p>Note that <code>trim</code> does <strong>not</strong> affect regular expression queries:</p>
-<h4 id="example-1">
-      <a href="#example-1">
-        Example:
-      </a>
-    </h4>
+<h4 id="example-1">Example:</h4>
 <pre><code><span class="hljs-comment">// Mongoose does **not** trim whitespace from the RegExp.</span>
 M.<span class="hljs-title function_">find</span>({ <span class="hljs-attr">name</span>: <span class="hljs-regexp">/ some name /</span> });
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="SchemaString.prototype.uppercase()"><a href="#SchemaString.prototype.uppercase()"><code>SchemaString.prototype.uppercase()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;SchemaType&raquo;</span> this</li></ul><div><p>Adds an uppercase <a href="/docs/7.x/docs/api/schematype.html#SchemaType.prototype.set()">setter</a>.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> s = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">caps</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">uppercase</span>: <span class="hljs-literal">true</span> }})
 <span class="hljs-keyword">const</span> M = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;M&#x27;</span>, s);
 <span class="hljs-keyword">const</span> m = <span class="hljs-keyword">new</span> <span class="hljs-title function_">M</span>({ <span class="hljs-attr">caps</span>: <span class="hljs-string">&#x27;an example&#x27;</span> });
@@ -254,11 +206,7 @@ M.<span class="hljs-title function_">find</span>({ <span class="hljs-attr">name<
 M.<span class="hljs-title function_">find</span>({ <span class="hljs-attr">caps</span>: <span class="hljs-string">&#x27;an example&#x27;</span> }) <span class="hljs-comment">// Matches documents where caps = &#x27;AN EXAMPLE&#x27;</span>
 </code></pre>
 <p>Note that <code>uppercase</code> does <strong>not</strong> affect regular expression queries:</p>
-<h4 id="example-1">
-      <a href="#example-1">
-        Example:
-      </a>
-    </h4>
+<h4 id="example-1">Example:</h4>
 <pre><code><span class="hljs-comment">// Mongoose does **not** convert the RegExp to uppercase.</span>
 M.<span class="hljs-title function_">find</span>({ <span class="hljs-attr">email</span>: <span class="hljs-regexp">/an example/</span> });
 </code></pre>
@@ -269,11 +217,7 @@ function names.</p>
 </li><li class="param"><code>value</code>
 <span class="method-type">&laquo;Any&raquo;</span> value for option</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;undefined,void&raquo;</span> </li></ul><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Sets a default option for all String instances.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-comment">// Make all strings have option `trim` equal to true.</span>
 mongoose.<span class="hljs-property">Schema</span>.<span class="hljs-property">String</span>.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;trim&#x27;</span>, <span class="hljs-literal">true</span>);
 

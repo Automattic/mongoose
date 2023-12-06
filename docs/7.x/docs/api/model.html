@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v7.6.5: Model</title><link rel="apple-touch-icon" sizes="57x57" href="/docs/7.x/docs/images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="/docs/7.x/docs/images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="/docs/7.x/docs/images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="/docs/7.x/docs/images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="/docs/7.x/docs/images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="/docs/7.x/docs/images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="/docs/7.x/docs/images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="/docs/7.x/docs/images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="/docs/7.x/docs/images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="/docs/7.x/docs/images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="/docs/7.x/docs/images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="/docs/7.x/docs/images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="/docs/7.x/docs/images/favicon/favicon-16x16.png"><link rel="manifest" href="/docs/7.x/docs/images/favicon/manifest.json"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/7.x/docs/css/github.css"><link rel="stylesheet" href="/docs/7.x/docs/css/mongoose5.css"><link rel="stylesheet" href="/docs/7.x/docs/css/carbonads.css"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="/docs/7.x/docs/images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/7.x/docs/css/api.css"><script src="/docs/7.x/docs/js/api-bold-current-nav.js"></script><script src="/docs/7.x/docs/js/convert-old-anchorid.js"></script><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/7.x/docs/css/inlinecpc.css"></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><svg width="100%" height="100%" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/7.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><nav class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/7.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="/docs/7.x/docs/index.html">Version 7.6.5</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Version 8.0.0</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/index.html">Version 7.6.5</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/index.html">Version 6.12.2</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/index.html">Version 5.13.21</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/7.x/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/guides.html">Guides</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/typescript.html">TypeScript</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/mongoose.html">API</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/7.x/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/virtualtype.html">VirtualType</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/migrating_to_7.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/version-support.html">Version Support</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></nav></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/lib/model.js" target="_blank">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v7.6.7: Model</title><link rel="apple-touch-icon" sizes="57x57" href="/docs/7.x/docs/images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="/docs/7.x/docs/images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="/docs/7.x/docs/images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="/docs/7.x/docs/images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="/docs/7.x/docs/images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="/docs/7.x/docs/images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="/docs/7.x/docs/images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="/docs/7.x/docs/images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="/docs/7.x/docs/images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="/docs/7.x/docs/images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="/docs/7.x/docs/images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="/docs/7.x/docs/images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="/docs/7.x/docs/images/favicon/favicon-16x16.png"><link rel="manifest" href="/docs/7.x/docs/images/favicon/manifest.json"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/7.x/docs/css/github.css"><link rel="stylesheet" href="/docs/7.x/docs/css/mongoose5.css"><link rel="stylesheet" href="/docs/7.x/docs/css/carbonads.css"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="/docs/7.x/docs/images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/7.x/docs/css/api.css"><script src="/docs/7.x/docs/js/api-bold-current-nav.js"></script><script src="/docs/7.x/docs/js/convert-old-anchorid.js"></script><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/7.x/docs/css/inlinecpc.css"></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><svg width="100%" height="100%" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/7.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><nav class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/7.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="/docs/7.x/docs/index.html">Version 7.6.7</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Version 8.0.2</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/index.html">Version 7.6.7</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/index.html">Version 6.12.2</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/5.x/index.html">Version 5.13.21</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/7.x/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/guides.html">Guides</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/typescript.html">TypeScript</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/mongoose.html">API</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/7.x/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/7.x/docs/api/virtualtype.html">VirtualType</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/migrating_to_7.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/version-support.html">Version Support</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></nav></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/lib/model.js" target="_blank">
 <img src="/docs/7.x/docs/images/pencil.svg" />
 </a><h1>Model</h1><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/7.x/docs/css/inlinecpc.css"><div id="native-direct"></div><script>(function() {
 if (typeof _bsa !== 'undefined' && _bsa) {
@@ -27,11 +27,7 @@ class. You should not use the <code>mongoose.Model</code> class directly. The
 <a href="/docs/7.x/docs/api/mongoose.html#Mongoose.prototype.model()"><code>mongoose.model()</code></a> and
 <a href="/docs/7.x/docs/api/connection.html#Connection.prototype.model()"><code>connection.model()</code></a> functions
 create subclasses of <code>mongoose.Model</code> as shown below.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-comment">// `UserModel` is a &quot;Model&quot;, a subclass of `mongoose.Model`.</span>
 <span class="hljs-keyword">const</span> <span class="hljs-title class_">UserModel</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> }));
 
@@ -58,11 +54,7 @@ create subclasses of <code>mongoose.Model</code> as shown below.</p>
 <ul>
 <li><code>aggregate()</code></li>
 </ul>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-comment">// Find the max balance of all accounts</span>
 <span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Users</span>.<span class="hljs-title function_">aggregate</span>([
   { <span class="hljs-attr">$group</span>: { <span class="hljs-attr">_id</span>: <span class="hljs-literal">null</span>, <span class="hljs-attr">maxBalance</span>: { <span class="hljs-attr">$max</span>: <span class="hljs-string">&#x27;$balance&#x27;</span> }}},
@@ -78,20 +70,12 @@ create subclasses of <code>mongoose.Model</code> as shown below.</p>
   <span class="hljs-title function_">exec</span>();
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(res); <span class="hljs-comment">// [ { maxBalance: 98 } ]</span>
 </code></pre>
-<h4 id="note">
-      <a href="#note">
-        Note:
-      </a>
-    </h4>
+<h4 id="note">Note:</h4>
 <ul>
 <li>Mongoose does <strong>not</strong> cast aggregation pipelines to the model&#39;s schema because <code>$project</code> and <code>$group</code> operators allow redefining the &quot;shape&quot; of the documents at any stage of the pipeline, which may leave documents in an incompatible format. You can use the <a href="https://github.com/AbdelrahmanHafez/mongoose-cast-aggregation">mongoose-cast-aggregation plugin</a> to enable minimal casting for aggregation pipelines.</li>
 <li>The documents returned are plain javascript objects, not mongoose documents (since any shape of document can be returned).</li>
 </ul>
-<h4 id="more-about-aggregations">
-      <a href="#more-about-aggregations">
-        More About Aggregations:
-      </a>
-    </h4>
+<h4 id="more-about-aggregations">More About Aggregations:</h4>
 <ul>
 <li><a href="/docs/7.x/docs/api/aggregate.html">Mongoose <code>Aggregate</code></a></li>
 <li><a href="https://masteringjs.io/tutorials/mongoose/aggregate">An Introduction to Mongoose Aggregate</a></li>
@@ -181,11 +165,7 @@ trip to MongoDB.</p>
 <p>This function does <strong>not</strong> trigger any middleware, neither <code>save()</code>, nor <code>update()</code>.
 If you need to trigger
 <code>save()</code> middleware for every document use <a href="#Model.create()"><code>create()</code></a> instead.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-title class_">Character</span>.<span class="hljs-title function_">bulkWrite</span>([
   {
     <span class="hljs-attr">insertOne</span>: {
@@ -230,11 +210,7 @@ If you need to trigger
 </li><li class="param"><code>options.ignoreCastErrors</code>
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>true</code> will not throw a ValidationError and only return values that were successfully cast.</p>
 </li></ul><div><p>Cast the given POJO to the model&#39;s schema</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> <span class="hljs-title class_">Test</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">num</span>: <span class="hljs-title class_">Number</span> }));
 
 <span class="hljs-keyword">const</span> obj = <span class="hljs-title class_">Test</span>.<span class="hljs-title function_">castObject</span>({ <span class="hljs-attr">num</span>: <span class="hljs-string">&#x27;42&#x27;</span> });
@@ -252,21 +228,13 @@ obj.<span class="hljs-property">num</span>; <span class="hljs-comment">// 42 as 
 <p>This method is deprecated. If you want to count the number of documents in
 a collection, e.g. <code>count({})</code>, use the <a href="#Model.estimatedDocumentCount()"><code>estimatedDocumentCount()</code> function</a>
 instead. Otherwise, use the <a href="#Model.countDocuments()"><code>countDocuments()</code></a> function instead.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> count = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Adventure</span>.<span class="hljs-title function_">count</span>({ <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;jungle&#x27;</span> });
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;there are %d jungle adventures&#x27;</span>, count);
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="Model.countDocuments()"><a href="#Model.countDocuments()"><code>Model.countDocuments()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>filter</code>
 <span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Counts number of documents matching <code>filter</code> in a database collection.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-title class_">Adventure</span>.<span class="hljs-title function_">countDocuments</span>({ <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;jungle&#x27;</span> }, <span class="hljs-keyword">function</span> (<span class="hljs-params">err, count</span>) {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;there are %d jungle adventures&#x27;</span>, count);
 });
@@ -299,11 +267,7 @@ docs.</p>
 <ul>
 <li><code>save()</code></li>
 </ul>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-comment">// Insert one new `Character` document</span>
 <span class="hljs-keyword">await</span> <span class="hljs-title class_">Character</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Jean-Luc Picard&#x27;</span> });
 
@@ -324,11 +288,7 @@ created. Use this method to create the collection explicitly.</p>
 See <a href="https://www.mongodb.com/docs/manual/core/transactions/#transactions-and-operations">https://www.mongodb.com/docs/manual/core/transactions/#transactions-and-operations</a></p>
 <p>Note 2: You don&#39;t have to call this if your schema contains index or unique field.
 In that case, just use <code>Model.init()</code></p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> })
 <span class="hljs-keyword">const</span> <span class="hljs-title class_">User</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, userSchema);
 
@@ -350,18 +310,10 @@ function.</p>
 It returns an object with the property <code>deletedCount</code> containing the number of documents deleted.
 Behaves like <code>remove()</code>, but deletes all documents that match <code>conditions</code>
 regardless of the <code>single</code> option.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">await</span> <span class="hljs-title class_">Character</span>.<span class="hljs-title function_">deleteMany</span>({ <span class="hljs-attr">name</span>: <span class="hljs-regexp">/Stark/</span>, <span class="hljs-attr">age</span>: { <span class="hljs-attr">$gte</span>: <span class="hljs-number">18</span> } }); <span class="hljs-comment">// returns {deletedCount: x} where x is the number of documents deleted.</span>
 </code></pre>
-<h4 id="note">
-      <a href="#note">
-        Note:
-      </a>
-    </h4>
+<h4 id="note">Note:</h4>
 <p>This function triggers <code>deleteMany</code> query hooks. Read the
 <a href="/docs/7.x/docs/middleware.html#naming">middleware docs</a> to learn more.</p>
   </div><hr class="separate-api-elements"><h3 id="Model.deleteOne()"><a href="#Model.deleteOne()"><code>Model.deleteOne()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>conditions</code>
@@ -373,27 +325,15 @@ regardless of the <code>single</code> option.</p>
 It returns an object with the property <code>deletedCount</code> indicating how many documents were deleted.
 Behaves like <code>remove()</code>, but deletes at most one document regardless of the
 <code>single</code> option.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">await</span> <span class="hljs-title class_">Character</span>.<span class="hljs-title function_">deleteOne</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Eddard Stark&#x27;</span> }); <span class="hljs-comment">// returns {deletedCount: 1}</span>
 </code></pre>
-<h4 id="note">
-      <a href="#note">
-        Note:
-      </a>
-    </h4>
+<h4 id="note">Note:</h4>
 <p>This function triggers <code>deleteOne</code> query hooks. Read the
 <a href="/docs/7.x/docs/middleware.html#naming">middleware docs</a> to learn more.</p>
   </div><hr class="separate-api-elements"><h3 id="Model.diffIndexes()"><a href="#Model.diffIndexes()"><code>Model.diffIndexes()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>
 <span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&lt;Object&gt;&raquo;</span> contains the indexes that would be dropped in MongoDB and indexes that would be created in MongoDB as <code>{ toDrop: string[], toCreate: string[] }</code>.</li></ul><div><p>Does a dry-run of <code>Model.syncIndexes()</code>, returning the indexes that <code>syncIndexes()</code> would drop and create if you were to run <code>syncIndexes()</code>.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> { toDrop, toCreate } = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">diffIndexes</span>();
 toDrop; <span class="hljs-comment">// Array of strings containing names of indexes that `syncIndexes()` will drop</span>
 toCreate; <span class="hljs-comment">// Array of strings containing names of indexes that `syncIndexes()` will create</span>
@@ -415,11 +355,7 @@ toCreate; <span class="hljs-comment">// Array of strings containing names of ind
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.mergePlugins=true]</code>
 <span class="method-type">&laquo;Boolean&raquo;</span> By default, Mongoose merges the base schema&#39;s plugins with the discriminator schema&#39;s plugins. Set this option to <code>false</code> to make Mongoose use the discriminator schema&#39;s plugins instead.</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Model&raquo;</span> The newly created discriminator model</li></ul><div><p>Adds a discriminator type.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">function</span> <span class="hljs-title function_">BaseSchema</span>(<span class="hljs-params"></span>) {
   <span class="hljs-title class_">Schema</span>.<span class="hljs-title function_">apply</span>(<span class="hljs-variable language_">this</span>, <span class="hljs-variable language_">arguments</span>);
 
@@ -445,11 +381,7 @@ util.<span class="hljs-title function_">inherits</span>(<span class="hljs-title 
 <span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>[conditions]</code>
 <span class="method-type">&laquo;Object&raquo;</span> optional</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Creates a Query for a <code>distinct</code> operation.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> query = <span class="hljs-title class_">Link</span>.<span class="hljs-title function_">distinct</span>(<span class="hljs-string">&#x27;url&#x27;</span>);
 query.<span class="hljs-title function_">exec</span>();
 </code></pre>
@@ -457,21 +389,13 @@ query.<span class="hljs-title function_">exec</span>();
 <span class="method-type">&laquo;Object&raquo;</span> internal options</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Sends <code>createIndex</code> commands to mongo for each index declared in the schema.
 The <code>createIndex</code> commands are sent in series.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-title class_">Event</span>.<span class="hljs-title function_">ensureIndexes</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) {
   <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> <span class="hljs-title function_">handleError</span>(err);
 });
 </code></pre>
 <p>After completion, an <code>index</code> event is emitted on this <code>Model</code> passing an error if one occurred.</p>
-<h4 id="example-1">
-      <a href="#example-1">
-        Example:
-      </a>
-    </h4>
+<h4 id="example-1">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> eventSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">thing</span>: { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;string&#x27;</span>, <span class="hljs-attr">unique</span>: <span class="hljs-literal">true</span> } })
 <span class="hljs-keyword">const</span> <span class="hljs-title class_">Event</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Event&#x27;</span>, eventSchema);
 
@@ -485,20 +409,12 @@ The <code>createIndex</code> commands are sent in series.</p>
 using <code>countDocuments()</code> for large collections because
 <code>estimatedDocumentCount()</code> uses collection metadata rather than scanning
 the entire collection.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> numAdventures = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Adventure</span>.<span class="hljs-title function_">estimatedDocumentCount</span>();
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="Model.events"><a href="#Model.events"><code>Model.events</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Event emitter that reports any errors that occurred. Useful for global error
 handling.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-title class_">MyModel</span>.<span class="hljs-property">events</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(err.<span class="hljs-property">message</span>));
 
 <span class="hljs-comment">// Prints a &#x27;CastError&#x27; because of the above handler</span>
@@ -511,11 +427,7 @@ handling.</p>
 the given <code>filter</code>, and <code>null</code> otherwise.</p>
 <p>Under the hood, <code>MyModel.exists({ answer: 42 })</code> is equivalent to
 <code>MyModel.findOne({ answer: 42 }).select({ _id: 1 }).lean()</code></p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">await</span> <span class="hljs-title class_">Character</span>.<span class="hljs-title function_">deleteMany</span>({});
 <span class="hljs-keyword">await</span> <span class="hljs-title class_">Character</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Jean-Luc Picard&#x27;</span> });
 
@@ -537,11 +449,7 @@ the given <code>filter</code>, and <code>null</code> otherwise.</p>
 <p>Mongoose casts the <code>filter</code> to match the model&#39;s schema before the command is sent.
 See our <a href="/docs/7.x/docs/tutorials/query_casting.html">query casting tutorial</a> for
 more information on how Mongoose casts <code>filter</code>.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-comment">// find all documents</span>
 <span class="hljs-keyword">await</span> <span class="hljs-title class_">MyModel</span>.<span class="hljs-title function_">find</span>({});
 
@@ -572,11 +480,7 @@ equivalent to <code>findOne({ _id: id })</code>. If you want to query by a docum
 that <code>findOne(undefined)</code> and <code>findOne({ _id: undefined })</code> are equivalent
 to <code>findOne({})</code> and return arbitrary documents. However, mongoose
 translates <code>findById(undefined)</code> into <code>findOne({ _id: null })</code>.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-comment">// Find the adventure with the given `id`, or `null` if not found</span>
 <span class="hljs-keyword">await</span> <span class="hljs-title class_">Adventure</span>.<span class="hljs-title function_">findById</span>(id).<span class="hljs-title function_">exec</span>();
 
@@ -622,11 +526,7 @@ In other words, <code>findByIdAndDelete(id)</code> is a shorthand for
 <ul>
 <li><code>findOneAndRemove()</code></li>
 </ul>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code>A.<span class="hljs-title function_">findByIdAndRemove</span>(id, options)  <span class="hljs-comment">// return Query</span>
 A.<span class="hljs-title function_">findByIdAndRemove</span>(id) <span class="hljs-comment">// returns Query</span>
 A.<span class="hljs-title function_">findByIdAndRemove</span>()           <span class="hljs-comment">// returns Query</span>
@@ -672,26 +572,14 @@ passing any <code>options</code>, and returns the found document (if any).</p>
 <ul>
 <li><code>findOneAndUpdate()</code></li>
 </ul>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code>A.<span class="hljs-title function_">findByIdAndUpdate</span>(id, update, options)  <span class="hljs-comment">// returns Query</span>
 A.<span class="hljs-title function_">findByIdAndUpdate</span>(id, update)           <span class="hljs-comment">// returns Query</span>
 A.<span class="hljs-title function_">findByIdAndUpdate</span>()                     <span class="hljs-comment">// returns Query</span>
 </code></pre>
-<h4 id="note">
-      <a href="#note">
-        Note:
-      </a>
-    </h4>
+<h4 id="note">Note:</h4>
 <p>All top level update keys which are not <code>atomic</code> operation names are treated as set operations:</p>
-<h4 id="example-1">
-      <a href="#example-1">
-        Example:
-      </a>
-    </h4>
+<h4 id="example-1">Example:</h4>
 <pre><code><span class="hljs-title class_">Model</span>.<span class="hljs-title function_">findByIdAndUpdate</span>(id, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;jason bourne&#x27;</span> }, options)
 
 <span class="hljs-comment">// is sent as</span>
@@ -699,11 +587,7 @@ A.<span class="hljs-title function_">findByIdAndUpdate</span>()                 
 </code></pre>
 <p>This helps prevent accidentally overwriting your document with <code>{ name: &#39;jason bourne&#39; }</code>.
 To prevent this behaviour, see the <code>overwrite</code> option</p>
-<h4 id="note-1">
-      <a href="#note-1">
-        Note:
-      </a>
-    </h4>
+<h4 id="note-1">Note:</h4>
 <p><code>findOneAndX</code> and <code>findByIdAndX</code> functions support limited validation. You can
 enable validation by setting the <code>runValidators</code> option.</p>
 <p>If you need full-fledged validation, use the traditional approach of first
@@ -724,11 +608,7 @@ doc.<span class="hljs-property">name</span> = <span class="hljs-string">&#x27;ja
 <p><em>Note:</em> <code>conditions</code> is optional, and if <code>conditions</code> is null or undefined,
 mongoose will send an empty <code>findOne</code> command to MongoDB, which will return
 an arbitrary document. If you&#39;re querying by <code>_id</code>, use <code>findById()</code> instead.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-comment">// Find one adventure whose `country` is &#x27;Croatia&#x27;, otherwise `null`</span>
 <span class="hljs-keyword">await</span> <span class="hljs-title class_">Adventure</span>.<span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">country</span>: <span class="hljs-string">&#x27;Croatia&#x27;</span> }).<span class="hljs-title function_">exec</span>();
 
@@ -767,11 +647,7 @@ an arbitrary document. If you&#39;re querying by <code>_id</code>, use <code>fin
 as opposed to a <code>findOneAndDelete()</code> command. For most mongoose use cases,
 this distinction is purely pedantic. You should use <code>findOneAndDelete()</code>
 unless you have a good reason not to.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code>A.<span class="hljs-title function_">findOneAndDelete</span>(conditions, options)  <span class="hljs-comment">// return Query</span>
 A.<span class="hljs-title function_">findOneAndDelete</span>(conditions) <span class="hljs-comment">// returns Query</span>
 A.<span class="hljs-title function_">findOneAndDelete</span>()           <span class="hljs-comment">// returns Query</span>
@@ -809,11 +685,7 @@ doc.<span class="hljs-property">name</span> = <span class="hljs-string">&#x27;ja
 <ul>
 <li><code>findOneAndRemove()</code></li>
 </ul>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code>A.<span class="hljs-title function_">findOneAndRemove</span>(conditions, options)  <span class="hljs-comment">// return Query</span>
 A.<span class="hljs-title function_">findOneAndRemove</span>(conditions) <span class="hljs-comment">// returns Query</span>
 A.<span class="hljs-title function_">findOneAndRemove</span>()           <span class="hljs-comment">// returns Query</span>
@@ -860,11 +732,7 @@ doc.<span class="hljs-property">name</span> = <span class="hljs-string">&#x27;ja
 <ul>
 <li><code>findOneAndReplace()</code></li>
 </ul>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code>A.<span class="hljs-title function_">findOneAndReplace</span>(filter, replacement, options)  <span class="hljs-comment">// return Query</span>
 A.<span class="hljs-title function_">findOneAndReplace</span>(filter, replacement) <span class="hljs-comment">// returns Query</span>
 A.<span class="hljs-title function_">findOneAndReplace</span>()                    <span class="hljs-comment">// returns Query</span>
@@ -907,37 +775,21 @@ A.<span class="hljs-title function_">findOneAndReplace</span>()                 
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/7.x/docs/tutorials/findoneandupdate.html">Tutorial</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/findAndModify/">mongodb</a></span></li></ul><div><p>Issues a mongodb findOneAndUpdate command.</p>
 <p>Finds a matching document, updates it according to the <code>update</code> arg, passing any <code>options</code>, and returns the found document (if any) to the callback. The query executes if <code>callback</code> is passed else a Query object is returned.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code>A.<span class="hljs-title function_">findOneAndUpdate</span>(conditions, update, options)  <span class="hljs-comment">// returns Query</span>
 A.<span class="hljs-title function_">findOneAndUpdate</span>(conditions, update)           <span class="hljs-comment">// returns Query</span>
 A.<span class="hljs-title function_">findOneAndUpdate</span>()                             <span class="hljs-comment">// returns Query</span>
 </code></pre>
-<h4 id="note">
-      <a href="#note">
-        Note:
-      </a>
-    </h4>
+<h4 id="note">Note:</h4>
 <p>All top level update keys which are not <code>atomic</code> operation names are treated as set operations:</p>
-<h4 id="example-1">
-      <a href="#example-1">
-        Example:
-      </a>
-    </h4>
+<h4 id="example-1">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> query = { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;borne&#x27;</span> };
 <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">findOneAndUpdate</span>(query, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;jason bourne&#x27;</span> }, options)
 
 <span class="hljs-comment">// is sent as</span>
 <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">findOneAndUpdate</span>(query, { <span class="hljs-attr">$set</span>: { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;jason bourne&#x27;</span> }}, options)
 </code></pre>
-<h4 id="note-1">
-      <a href="#note-1">
-        Note:
-      </a>
-    </h4>
+<h4 id="note-1">Note:</h4>
 <p><code>findOneAndX</code> and <code>findByIdAndX</code> functions support limited validation that
 you can enable by setting the <code>runValidators</code> option.</p>
 <p>If you need full-fledged validation, use the traditional approach of first
@@ -955,11 +807,7 @@ doc.<span class="hljs-property">name</span> = <span class="hljs-string">&#x27;ja
 <span class="method-type">&laquo;Boolean&raquo;</span> if true, apply schema setters when hydrating</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Document&raquo;</span> document instance</li></ul><div><p>Shortcut for creating a new Document from existing raw data, pre-saved in the DB.
 The document returned has no paths marked as modified initially.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-comment">// hydrate previous data into a Mongoose document</span>
 <span class="hljs-keyword">const</span> mongooseCandy = <span class="hljs-title class_">Candy</span>.<span class="hljs-title function_">hydrate</span>({ <span class="hljs-attr">_id</span>: <span class="hljs-string">&#x27;54108337212ffb6d459f854c&#x27;</span>, <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;jelly bean&#x27;</span> });
 </code></pre>
@@ -972,11 +820,7 @@ don&#39;t need to call <code>init()</code> to trigger index builds.</p>
 <p>However, you <em>may</em> need to call <code>init()</code>  to get back a promise that will resolve when your indexes are finished.
 Calling <code>await Model.init()</code> is helpful if you need to wait for indexes to build before continuing.
 For example, if you want to wait for unique indexes to build before continuing with a test case.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> eventSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">thing</span>: { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;string&#x27;</span>, <span class="hljs-attr">unique</span>: <span class="hljs-literal">true</span> } })
 <span class="hljs-comment">// This calls `Event.init()` implicitly, so you don&#x27;t need to call</span>
 <span class="hljs-comment">// `Event.init()` on your own.</span>
@@ -1013,11 +857,7 @@ be saved, unless you set
 <ul>
 <li><code>insertMany()</code></li>
 </ul>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">await</span> <span class="hljs-title class_">Movies</span>.<span class="hljs-title function_">insertMany</span>([
   { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Star Wars&#x27;</span> },
   { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;The Empire Strikes Back&#x27;</span> }
@@ -1025,11 +865,7 @@ be saved, unless you set
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="Model.inspect()"><a href="#Model.inspect()"><code>Model.inspect()</code></a></h3><div><p>Helper for console.log. Given a model named &#39;MyModel&#39;, returns the string
 <code>&#39;Model { MyModel }&#39;</code>.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> <span class="hljs-title class_">MyModel</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> }));
 <span class="hljs-title class_">MyModel</span>.<span class="hljs-title function_">inspect</span>(); <span class="hljs-comment">// &#x27;Model { Test }&#x27;</span>
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title class_">MyModel</span>); <span class="hljs-comment">// Prints &#x27;Model { Test }&#x27;</span>
@@ -1069,11 +905,7 @@ build indexes manually.</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Populates document references.</p>
 <p>Changed in Mongoose 6: the model you call <code>populate()</code> on should be the
 &quot;local field&quot; model, <strong>not</strong> the &quot;foreign field&quot; model.</p>
-<h4 id="available-top-level-options">
-      <a href="#available-top-level-options">
-        Available top-level options:
-      </a>
-    </h4>
+<h4 id="available-top-level-options">Available top-level options:</h4>
 <ul>
 <li>path: space delimited path(s) to populate</li>
 <li>select: optional fields to select</li>
@@ -1083,11 +915,7 @@ build indexes manually.</p>
 <li>justOne: optional boolean, if true Mongoose will always set <code>path</code> to a document, or <code>null</code> if no document was found. If false, Mongoose will always set <code>path</code> to an array, which will be empty if no documents are found. Inferred from schema by default.</li>
 <li>strictPopulate: optional boolean, set to <code>false</code> to allow populating paths that aren&#39;t in the schema.</li>
 </ul>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> <span class="hljs-title class_">Dog</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Dog&#x27;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">breed</span>: <span class="hljs-title class_">String</span> }));
 <span class="hljs-keyword">const</span> <span class="hljs-title class_">Person</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Person&#x27;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
   <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>,
@@ -1112,11 +940,7 @@ users[<span class="hljs-number">0</span>].<span class="hljs-property">dog</span>
 <span class="method-type">&laquo;String&raquo;</span> model name</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Model&raquo;</span> </li></ul><div><p>Returns the model instance used to create this document if no <code>name</code> specified.
 If <code>name</code> specified, returns the model with the given <code>name</code>.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Tank</span>({});
 doc.$model() === <span class="hljs-title class_">Tank</span>; <span class="hljs-comment">// true</span>
 <span class="hljs-keyword">await</span> doc.$model(<span class="hljs-string">&#x27;User&#x27;</span>).<span class="hljs-title function_">findById</span>(id);
@@ -1133,21 +957,13 @@ Using <code>Model.collection</code> means you bypass Mongoose middleware, valida
   </div><hr class="separate-api-elements"><h3 id="Model.prototype.collection"><a href="#Model.prototype.collection"><code>Model.prototype.collection</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Collection the model uses.</p>
   </div><hr class="separate-api-elements"><h3 id="Model.prototype.db"><a href="#Model.prototype.db"><code>Model.prototype.db</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Connection the model uses.</p>
   </div><hr class="separate-api-elements"><h3 id="Model.prototype.deleteOne()"><a href="#Model.prototype.deleteOne()"><code>Model.prototype.deleteOne()</code></a></h3><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> Promise</li></ul><div><p>Removes this document from the db. Equivalent to <code>.remove()</code>.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code>product = <span class="hljs-keyword">await</span> product.<span class="hljs-title function_">deleteOne</span>();
 <span class="hljs-keyword">await</span> <span class="hljs-title class_">Product</span>.<span class="hljs-title function_">findById</span>(product.<span class="hljs-property">_id</span>); <span class="hljs-comment">// null</span>
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="Model.prototype.discriminators"><a href="#Model.prototype.discriminators"><code>Model.prototype.discriminators</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Registered discriminators for this model.</p>
   </div><hr class="separate-api-elements"><h3 id="Model.prototype.increment()"><a href="#Model.prototype.increment()"><code>Model.prototype.increment()</code></a></h3><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/7.x/docs/guide.html#versionKey">versionKeys</a></span></li></ul><div><p>Signal that we desire an increment of this documents version.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">findById</span>(id);
 doc.<span class="hljs-title function_">increment</span>();
 <span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">save</span>();
@@ -1156,11 +972,7 @@ doc.<span class="hljs-title function_">increment</span>();
 <span class="method-type">&laquo;String&raquo;</span> model name</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Model&raquo;</span> </li></ul><div><p>Returns the model instance used to create this document if no <code>name</code> specified.
 If <code>name</code> specified, returns the model with the given <code>name</code>.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Tank</span>({});
 doc.$model() === <span class="hljs-title class_">Tank</span>; <span class="hljs-comment">// true</span>
 <span class="hljs-keyword">await</span> doc.$model(<span class="hljs-string">&#x27;User&#x27;</span>).<span class="hljs-title function_">findById</span>(id);
@@ -1188,21 +1000,13 @@ doc.$model() === <span class="hljs-title class_">Tank</span>; <span class="hljs-
 <span class="method-type">&laquo;Boolean&raquo;</span> if <code>false</code> and <a href="/docs/7.x/docs/guide.html#timestamps">timestamps</a> are enabled, skip timestamps for this <code>save()</code>.</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/7.x/docs/middleware.html">middleware</a></span></li></ul><div><p>Saves this document by inserting a new document into the database if <a href="/docs/7.x/docs/api/document.html#Document.prototype.isNew">document.isNew</a> is <code>true</code>,
 or sends an <a href="/docs/7.x/docs/api/document.html#Document.prototype.updateOne()">updateOne</a> operation with just the modified paths if <code>isNew</code> is <code>false</code>.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code>product.<span class="hljs-property">sold</span> = <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>();
 product = <span class="hljs-keyword">await</span> product.<span class="hljs-title function_">save</span>();
 </code></pre>
 <p>If save is successful, the returned promise will fulfill with the document
 saved.</p>
-<h4 id="example-1">
-      <a href="#example-1">
-        Example:
-      </a>
-    </h4>
+<h4 id="example-1">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> newProduct = <span class="hljs-keyword">await</span> product.<span class="hljs-title function_">save</span>();
 newProduct === product; <span class="hljs-comment">// true</span>
 </code></pre>
@@ -1221,11 +1025,7 @@ newProduct === product; <span class="hljs-comment">// true</span>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.translateAliases=null]</code>
 <span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/7.x/docs/queries.html">Query docs</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/UpdateResult.html">UpdateResult</a></span></li></ul><div><p>Replace the existing document with the given document (no atomic operators like <code>$set</code>).</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">replaceOne</span>({ <span class="hljs-attr">_id</span>: <span class="hljs-number">24601</span> }, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Jean Valjean&#x27;</span> });
 res.<span class="hljs-property">matchedCount</span>; <span class="hljs-comment">// Number of documents matched</span>
 res.<span class="hljs-property">modifiedCount</span>; <span class="hljs-comment">// Number of documents modified</span>
@@ -1247,11 +1047,7 @@ for benefits like causal consistency, <a href="https://www.mongodb.com/docs/manu
 and <a href="https://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html">transactions</a>.</p>
 <p>Calling <code>MyModel.startSession()</code> is equivalent to calling <code>MyModel.db.startSession()</code>.</p>
 <p>This function does not trigger any middleware.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> session = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">startSession</span>();
 <span class="hljs-keyword">let</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Ned Stark&#x27;</span> }, <span class="hljs-literal">null</span>, { session });
 <span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">remove</span>();
@@ -1271,11 +1067,7 @@ the model&#39;s schema except the <code>_id</code> index, and build any indexes 
 are in your schema but not in MongoDB.</p>
 <p>See the <a href="https://thecodebarbarian.com/whats-new-in-mongoose-5-2-syncindexes">introductory blog post</a>
 for more information.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">unique</span>: <span class="hljs-literal">true</span> } });
 <span class="hljs-keyword">const</span> <span class="hljs-title class_">Customer</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Customer&#x27;</span>, schema);
 <span class="hljs-keyword">await</span> <span class="hljs-title class_">Customer</span>.<span class="hljs-property">collection</span>.<span class="hljs-title function_">createIndex</span>({ <span class="hljs-attr">age</span>: <span class="hljs-number">1</span> }); <span class="hljs-comment">// Index is not in schema</span>
@@ -1286,11 +1078,7 @@ for more information.</p>
 because index builds are expensive operations, and unexpected index drops can lead to degraded
 performance. Before running <code>syncIndexes()</code>, you can use the <a href="#Model.diffIndexes()"><code>diffIndexes()</code> function</a>
 to check what indexes <code>syncIndexes()</code> will drop and create.</p>
-<h4 id="example-1">
-      <a href="#example-1">
-        Example:
-      </a>
-    </h4>
+<h4 id="example-1">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> { toDrop, toCreate } = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">diffIndexes</span>();
 toDrop; <span class="hljs-comment">// Array of strings containing names of indexes that `syncIndexes()` will drop</span>
 toCreate; <span class="hljs-comment">// Array of strings containing names of indexes that `syncIndexes()` will create</span>
@@ -1300,11 +1088,7 @@ toCreate; <span class="hljs-comment">// Array of strings containing names of ind
 </li><li class="param"><code>[errorOnDuplicates]</code>
 <span class="method-type">&laquo;Boolean&raquo;</span> if true, throw an error if there&#39;s both a key and an alias for that key in <code>fields</code></p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> the translated &#39;pure&#39; fields/conditions</li></ul><div><p>Translate any aliases fields/conditions so the final query or document object is pure</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">await</span> <span class="hljs-title class_">Character</span>.<span class="hljs-title function_">find</span>(<span class="hljs-title class_">Character</span>.<span class="hljs-title function_">translateAliases</span>({
    <span class="hljs-string">&#x27;名&#x27;</span>: <span class="hljs-string">&#x27;Eddard Stark&#x27;</span> <span class="hljs-comment">// Alias for &#x27;name&#x27;</span>
 });
@@ -1313,11 +1097,7 @@ toCreate; <span class="hljs-comment">// Array of strings containing names of ind
 So if <code>n</code> is an alias for <code>name</code>, <code>{ n: &#39;alias&#39;, name: &#39;raw&#39; }</code> will resolve to <code>{ name: &#39;alias&#39; }</code>.
 However, you can set the <code>errorOnDuplicates</code> option to throw an error if there are potentially conflicting paths.
 The <code>translateAliases</code> option for queries uses <code>errorOnDuplicates</code>.</p>
-<h4 id="note">
-      <a href="#note">
-        Note:
-      </a>
-    </h4>
+<h4 id="note">Note:</h4>
 <p>Only translate arguments of object type anything else is returned raw</p>
   </div><hr class="separate-api-elements"><h3 id="Model.updateMany()"><a href="#Model.updateMany()"><code>Model.updateMany()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>filter</code>
 <span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>update</code>
@@ -1338,11 +1118,7 @@ The <code>translateAliases</code> option for queries uses <code>errorOnDuplicate
 the <code>multi</code> option.</p>
 <p><strong>Note</strong> updateMany will <em>not</em> fire update middleware. Use <code>pre(&#39;updateMany&#39;)</code>
 and <code>post(&#39;updateMany&#39;)</code> instead.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">updateMany</span>({ <span class="hljs-attr">name</span>: <span class="hljs-regexp">/Stark$/</span> }, { <span class="hljs-attr">isDeleted</span>: <span class="hljs-literal">true</span> });
 res.<span class="hljs-property">matchedCount</span>; <span class="hljs-comment">// Number of documents matched</span>
 res.<span class="hljs-property">modifiedCount</span>; <span class="hljs-comment">// Number of documents modified</span>
@@ -1372,11 +1148,7 @@ res.<span class="hljs-property">upsertedCount</span>; <span class="hljs-comment"
 <ul>
 <li>Use <code>replaceOne()</code> if you want to overwrite an entire document rather than using atomic operators like <code>$set</code>.</li>
 </ul>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> res = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">updateOne</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Jean-Luc Picard&#x27;</span> }, { <span class="hljs-attr">ship</span>: <span class="hljs-string">&#x27;USS Enterprise&#x27;</span> });
 res.<span class="hljs-property">matchedCount</span>; <span class="hljs-comment">// Number of documents matched</span>
 res.<span class="hljs-property">modifiedCount</span>; <span class="hljs-comment">// Number of documents modified</span>
@@ -1393,11 +1165,7 @@ res.<span class="hljs-property">upsertedCount</span>; <span class="hljs-comment"
 <span class="method-type">&laquo;Object|Array|String&raquo;</span> </li><li class="param"><code>[context]</code>
 <span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise,undefined,void&raquo;</span> </li></ul><div><p>Casts and validates the given object against this model&#39;s schema, passing the
 given <code>context</code> to custom validators.</p>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> <span class="hljs-title class_">Model</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, <span class="hljs-title class_">Schema</span>({
   <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> },
   <span class="hljs-attr">age</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">Number</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> }
@@ -1427,11 +1195,7 @@ does <strong>not</strong> trigger aggregate middleware.</p>
 <li>&#39;end&#39;: Emitted if the underlying stream is closed</li>
 <li>&#39;close&#39;: Emitted if the underlying stream is closed</li>
 </ul>
-<h4 id="example">
-      <a href="#example">
-        Example:
-      </a>
-    </h4>
+<h4 id="example">Example:</h4>
 <pre><code><span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Ned Stark&#x27;</span> });
 <span class="hljs-keyword">const</span> changeStream = <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">watch</span>().<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;change&#x27;</span>, <span class="hljs-function"><span class="hljs-params">change</span> =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(change));
 <span class="hljs-comment">// Will print from the above `console.log()`:</span>

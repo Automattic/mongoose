@@ -1,3 +1,12 @@
+7.6.7 / 2023-12-06
+==================
+ * fix: avoid minimizing single nested subdocs if they are required #14151 #14058
+ * fix(populate): allow deselecting discriminator key when populating #14155 #3230
+ * fix: allow adding discriminators using Schema.prototype.discriminator() to subdocuments after defining parent schema #14131 #14109
+ * fix(schema): avoid creating unnecessary clone of schematype in nested array so nested document arrays use correct constructor #14128 #14101
+ * fix(populate): call transform object with single id instead of array when populating a justOne path under an array #14135 #14073
+ * types: add back mistakenly removed findByIdAndRemove() function signature #14136 #14132
+
 8.0.2 / 2023-11-28
 ==================
  * fix(populate): set populated docs in correct order when populating virtual underneath doc array with justOne #14105

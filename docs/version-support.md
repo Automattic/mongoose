@@ -10,9 +10,7 @@ We ship all new bug fixes and features to 7.x.
 
 ## Mongoose 6
 
-Mongoose 6.x (released August 24, 2021) is currently in legacy support.
-We will continue to ship bug fixes to Mongoose 6 until August 24, 2023.
-After August 24, 2023, we will only ship security fixes, and backport requested fixes to Mongoose 6.
+Mongoose 6.x (released August 24, 2021) is currently only receiving security fixes and requested bug fixes as of August 24, 2023.
 Please open a [bug report on GitHub](https://github.com/Automattic/mongoose/issues/new?assignees=&labels=&template=bug.yml) to request backporting a fix to Mongoose 6.
 
 We are **not** actively backporting any new features from Mongoose 7 into Mongoose 6.

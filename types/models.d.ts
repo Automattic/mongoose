@@ -183,6 +183,10 @@ declare module 'mongoose' {
     /* Cast the given POJO to the model's schema */
     castObject(obj: AnyObject, options?: { ignoreCastErrors?: boolean }): TRawDocType;
 
+    /* Apply defaults to the given document or POJO. */
+    applyDefaults(obj: AnyObject): AnyObject;
+    applyDefaults(obj: TRawDocType): TRawDocType;
+
     /**
      * Sends multiple `insertOne`, `updateOne`, `updateMany`, `replaceOne`,
      * `deleteOne`, and/or `deleteMany` operations to the MongoDB server in one

@@ -794,6 +794,17 @@ describe('document', function() {
       assert.strictEqual(myModel.toObject().foo, void 0);
     });
 
+    it('does not minimize single nested subdocs if they are required (gh-14058) (gh-11247)', async function() {
+      const nestedSchema = Schema({ bar: String }, { _id: false });
+      const schema = Schema({ foo: { type: nestedSchema, required: true } });
+
+      const MyModel = db.model('Test', schema);
+
+      const myModel = await MyModel.create({ foo: {} });
+
+      assert.deepStrictEqual(myModel.toObject().foo, {});
+    });
+
     it('should propogate toObject to implicitly created schemas (gh-13599) (gh-13325)', async function() {
       const transformCalls = [];
       const userSchema = Schema({
@@ -12657,6 +12668,103 @@ describe('document', function() {
     const instance = await Test.create({ type: 1, nestedDiscriminatedTypes: [{ type: 1 }, { type: '3' }] });
     assert.deepStrictEqual(
       instance.nestedDiscriminatedTypes.map(i => i.whoAmI()),
+      ['I am NumberTyped', 'I am StringTyped']
+    );
+  });
+
+  it('handles embedded discriminators defined using Schema.prototype.discriminator after defining schema (gh-14109) (gh-13898)', async function() {
+    const baseNestedDiscriminated = new Schema({
+      type: { type: Number, required: true }
+    }, { discriminatorKey: 'type' });
+
+    class BaseClass {
+      whoAmI() {
+        return 'I am baseNestedDiscriminated';
+      }
+    }
+
+    baseNestedDiscriminated.loadClass(BaseClass);
+
+    class NumberTyped extends BaseClass {
+      whoAmI() {
+        return 'I am NumberTyped';
+      }
+    }
+
+    class StringTyped extends BaseClass {
+      whoAmI() {
+        return 'I am StringTyped';
+      }
+    }
+
+    const containsNestedSchema = new Schema({
+      nestedDiscriminatedTypes: { type: [baseNestedDiscriminated], required: true }
+    });
+
+    // After `containsNestedSchema`, in #13898 test these were before `containsNestedSchema`
+    baseNestedDiscriminated.discriminator(1, new Schema({}).loadClass(NumberTyped));
+    baseNestedDiscriminated.discriminator('3', new Schema({}).loadClass(StringTyped));
+
+    class ContainsNested {
+      whoAmI() {
+        return 'I am ContainsNested';
+      }
+    }
+    containsNestedSchema.loadClass(ContainsNested);
+
+    const Test = db.model('Test', containsNestedSchema);
+    const instance = await Test.create({ type: 1, nestedDiscriminatedTypes: [{ type: 1 }, { type: '3' }] });
+    assert.deepStrictEqual(
+      instance.nestedDiscriminatedTypes.map(i => i.whoAmI()),
+      ['I am NumberTyped', 'I am StringTyped']
+    );
+  });
+
+  it('handles embedded discriminators on nested path defined using Schema.prototype.discriminator (gh-14109) (gh-13898)', async function() {
+    const baseNestedDiscriminated = new Schema({
+      type: { type: Number, required: true }
+    }, { discriminatorKey: 'type' });
+
+    class BaseClass {
+      whoAmI() {
+        return 'I am baseNestedDiscriminated';
+      }
+    }
+
+    baseNestedDiscriminated.loadClass(BaseClass);
+
+    class NumberTyped extends BaseClass {
+      whoAmI() {
+        return 'I am NumberTyped';
+      }
+    }
+
+    class StringTyped extends BaseClass {
+      whoAmI() {
+        return 'I am StringTyped';
+      }
+    }
+
+    const containsNestedSchema = new Schema({
+      nestedDiscriminatedTypes: { type: [baseNestedDiscriminated], required: true }
+    });
+
+    baseNestedDiscriminated.discriminator(1, new Schema({}).loadClass(NumberTyped));
+    baseNestedDiscriminated.discriminator('3', new Schema({}).loadClass(StringTyped));
+
+    const l2Schema = new Schema({ l3: containsNestedSchema });
+    const l1Schema = new Schema({ l2: l2Schema });
+
+    const Test = db.model('Test', l1Schema);
+    const instance = await Test.create({
+      l2: {
+        l3: {
+          nestedDiscriminatedTypes: [{ type: 1 }, { type: '3' }]
+        }
+      }
+    });
+    assert.deepStrictEqual(
+      instance.l2.l3.nestedDiscriminatedTypes.map(i => i.whoAmI()),
       ['I am NumberTyped', 'I am StringTyped']
     );
   });

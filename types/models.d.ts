@@ -183,6 +183,10 @@ declare module 'mongoose' {
     /* Cast the given POJO to the model's schema */
     castObject(obj: AnyObject, options?: { ignoreCastErrors?: boolean }): TRawDocType;
 
+    /* Apply defaults to the given document or POJO. */
+    applyDefaults(obj: AnyObject): AnyObject;
+    applyDefaults(obj: TRawDocType): TRawDocType;
+
     /**
      * Sends multiple `insertOne`, `updateOne`, `updateMany`, `replaceOne`,
      * `deleteOne`, and/or `deleteMany` operations to the MongoDB server in one
@@ -395,6 +399,10 @@ declare module 'mongoose' {
       docs: Array<TRawDocType>,
       options: InsertManyOptions & { rawResult: true; }
     ): Promise<mongodb.InsertManyResult<Require_id<THydratedDocumentType>>>;
+    insertMany(
+      doc: Array<TRawDocType>,
+      options: InsertManyOptions
+    ): Promise<Array<THydratedDocumentType>>;
     insertMany<DocContents = TRawDocType>(
       docs: Array<DocContents | TRawDocType>,
       options: InsertManyOptions & { lean: true; }
@@ -608,11 +616,11 @@ declare module 'mongoose' {
       'findOneAndDelete'
     >;
     findOneAndDelete<ResultDoc = THydratedDocumentType>(
-      filter?: FilterQuery<TRawDocType>,
-      options?: QueryOptions<TRawDocType> & { includeResultMetadata: true }
+      filter: FilterQuery<TRawDocType>,
+      options: QueryOptions<TRawDocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
     findOneAndDelete<ResultDoc = THydratedDocumentType>(
-      filter?: FilterQuery<TRawDocType>,
+      filter?: FilterQuery<TRawDocType> | null,
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
 

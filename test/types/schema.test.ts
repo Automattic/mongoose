@@ -1368,3 +1368,14 @@ function gh13424() {
   const doc = new TestModel({});
   expectType<Types.ObjectId | undefined>(doc.subDocArray[0]._id);
 }
+
+function gh14147() {
+  const affiliateSchema = new Schema({
+    balance: { type: BigInt, default: BigInt(0) }
+  });
+
+  const AffiliateModel = model('Affiliate', affiliateSchema);
+
+  const doc = new AffiliateModel();
+  expectType<bigint>(doc.balance);
+}

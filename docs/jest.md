@@ -86,5 +86,5 @@ Want to learn how to test Mongoose apps correctly? The
 course on Pluralsight has a great section on testing Mongoose apps with [Mocha](http://npmjs.com/package/mocha).
 
 <a href="https://pluralsight.pxf.io/c/1321469/424552/7490?u=https%3A%2F%2Fapp.pluralsight.com%2Flibrary%2Fcourses%2Fnode-js-express-rest-web-services%2Ftable-of-contents">
-  <img src="https://i.imgur.com/KouuaAZ.png">
+  <img src="https://i.imgur.com/KouuaAZ.png" alt="RESTful Web Services with Node.js and Express">
 </a>

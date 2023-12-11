@@ -72,14 +72,11 @@ If you're using [X.509 authentication](https://www.mongodb.com/docs/drivers/node
 ```javascript
 // Do this:
 const username = 'myusername';
-await mongoose.connect(
-  `mongodb://${encodeURIComponent(username)}@127.0.0.1:27017/test`,
-  {
-    tls: true,
-    tlsCAFile: `${__dirname}/rootCA.pem`,
-    authMechanism: 'MONGODB-X509',
-  }
-);
+await mongoose.connect(`mongodb://${encodeURIComponent(username)}@127.0.0.1:27017/test`, {
+  tls: true,
+  tlsCAFile: `${__dirname}/rootCA.pem`,
+  authMechanism: 'MONGODB-X509',
+});
 
 // Not this:
 await mongoose.connect('mongodb://127.0.0.1:27017/test', {
@@ -101,11 +98,10 @@ MongoServerSelectionError: unable to get local issuer certificate
 To connect to a MongoDB Atlas cluster using X.509 authentication the correct option to set is `tlsCertificateKeyFile`. The connection string already specifies the `authSource` and `authMechanism`, however they're included below as `connect()` options for completeness:
 
 ```javascript
-const url =
-  'mongodb+srv://xyz.mongodb.net/test?authSource=%24external&authMechanism=MONGODB-X509';
+const url = 'mongodb+srv://xyz.mongodb.net/test?authSource=%24external&authMechanism=MONGODB-X509';
 await mongoose.connect(url, {
   tls: true,
-  // location of a local .pem file that contains both the client's certificate and key, e.g.
+  // location of a local .pem file that contains both the client's certificate and key
   tlsCertificateKeyFile: '/path/to/certificate.pem',
   authMechanism: 'MONGODB-X509',
   authSource: '$external',

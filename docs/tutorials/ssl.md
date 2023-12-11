@@ -1,4 +1,4 @@
-# TSL/SSL Connections
+# TLS/SSL Connections
 
 Mongoose supports connecting to [MongoDB clusters that require TLS/SSL connections](https://www.mongodb.com/docs/manual/tutorial/configure-ssl/). Setting the either the `tls` or `ssl` option to `true` in [`mongoose.connect()`](../api/mongoose.html#mongoose_Mongoose-connect) or your connection string is enough to connect to a MongoDB cluster using TLS/SSL:
 

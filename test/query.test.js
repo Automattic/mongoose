@@ -4383,4 +4383,33 @@ describe('Query', function() {
       await Error.find().sort('-');
     }, { message: 'Invalid field "" passed to sort()' });
   });
+
+  it('does not apply sibling path defaults if using nested projection (gh-14115)', async function() {
+    const userSchema = new mongoose.Schema({
+      name: String,
+      account: {
+        amount: Number,
+        owner: { type: String, default: () => 'OWNER' },
+        taxIds: [Number]
+      }
+    });
+    const User = db.model('User', userSchema);
+
+    const { _id } = await User.create({
+      name: 'test',
+      account: {
+        amount: 25,
+        owner: 'test',
+        taxIds: [42]
+      }
+    });
+
+    const doc = await User
+      .findOne({ _id }, { name: 1, account: { amount: 1 } })
+      .orFail();
+    assert.strictEqual(doc.name, 'test');
+    assert.strictEqual(doc.account.amount, 25);
+    assert.strictEqual(doc.account.owner, undefined);
+    assert.strictEqual(doc.account.taxIds, undefined);
+  });
 });

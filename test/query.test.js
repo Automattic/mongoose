@@ -4385,6 +4385,11 @@ describe('Query', function() {
   });
 
   it('does not apply sibling path defaults if using nested projection (gh-14115)', async function() {
+    const version = await start.mongodVersion();
+    if (version[0] < 5) {
+      return this.skip();
+    }
+
     const userSchema = new mongoose.Schema({
       name: String,
       account: {

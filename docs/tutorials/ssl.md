@@ -1,16 +1,16 @@
 # TLS/SSL Connections
 
-Mongoose supports connecting to [MongoDB clusters that require TLS/SSL connections](https://www.mongodb.com/docs/manual/tutorial/configure-ssl/). Setting the either the `tls` or `ssl` option to `true` in [`mongoose.connect()`](../api/mongoose.html#mongoose_Mongoose-connect) or your connection string is enough to connect to a MongoDB cluster using TLS/SSL:
+Mongoose supports connecting to [MongoDB clusters that require TLS/SSL connections](https://www.mongodb.com/docs/manual/tutorial/configure-ssl/). Setting the `tls` option to `true` in [`mongoose.connect()`](../api/mongoose.html#mongoose_Mongoose-connect) or your connection string is enough to connect to a MongoDB cluster using TLS/SSL:
 
 ```javascript
-mongoose.connect('mongodb://127.0.0.1:27017/test', { ssl: true });
+mongoose.connect('mongodb://127.0.0.1:27017/test', { tls: true });
 
 // Equivalent:
-mongoose.connect('mongodb://127.0.0.1:27017/test?ssl=true');
+mongoose.connect('mongodb://127.0.0.1:27017/test?tls=true');
 ```
 
-The `ssl` option defaults to `false` for connection strings that start with `mongodb://`. However,
-the `ssl` option defaults to `true` for connection strings that start with `mongodb+srv://`. So if you are using an srv connection string to connect to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas), SSL is enabled by default.
+The `tls` option defaults to `false` for connection strings that start with `mongodb://`. However,
+the `tls` option defaults to `true` for connection strings that start with `mongodb+srv://`. So if you are using an srv connection string to connect to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas), TLS/SSL is enabled by default.
 
 If you try to connect to a MongoDB cluster that requires TLS/SSL without enabling the `tls`/`ssl` option, `mongoose.connect()` will error out with the below error:
 

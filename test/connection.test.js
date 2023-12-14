@@ -1574,4 +1574,17 @@ describe('connections:', function() {
       assert.ok(conn);
     });
   });
+  describe('deno and windows', function() {
+    let m = null;
+    after(async() => {
+      await m.disconnect();
+    });
+    it('should connect to mongo connection string when using windows (gh-13988)', async function() {
+      const config = require('../config.json');
+      m = new mongoose.Mongoose();
+      const opts = Object.preventExtensions({ readPreference: 'secondaryPreferred' });
+      const conn = await m.connect(config.connectionString, opts);
+      assert.ok(conn);
+    });
+  });
 });

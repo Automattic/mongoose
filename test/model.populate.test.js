@@ -10776,4 +10776,87 @@ describe('model: populate:', function() {
       new Date('2015-06-01').toString()
     );
   });
+
+  it('calls transform with single ObjectId when populating justOne path underneath array (gh-14073)', async function() {
+    const mySchema = mongoose.Schema({
+      name: { type: String },
+      items: [{
+        _id: false,
+        name: { type: String },
+        brand: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand' }
+      }]
+    });
+
+    const brandSchema = mongoose.Schema({
+      name: 'String',
+      quantity: Number
+    });
+
+    const myModel = db.model('MyModel', mySchema);
+    const brandModel = db.model('Brand', brandSchema);
+    const { _id: id1 } = await brandModel.create({
+      name: 'test',
+      quantity: 1
+    });
+    const { _id: id2 } = await brandModel.create({
+      name: 'test1',
+      quantity: 1
+    });
+    const { _id: id3 } = await brandModel.create({
+      name: 'test2',
+      quantity: 2
+    });
+    const brands = await brandModel.find();
+    const test = new myModel({ name: 'Test Model' });
+    for (let i = 0; i < brands.length; i++) {
+      test.items.push({ name: `${i}`, brand: brands[i]._id });
+    }
+
+    const id4 = new mongoose.Types.ObjectId();
+    test.items.push({ name: '4', brand: id4 });
+    await test.save();
+
+    const ids = [];
+    await myModel
+      .findOne()
+      .populate([
+        {
+          path: 'items.brand',
+          transform: (doc, id) => {
+            ids.push(id);
+            return doc;
+          }
+        }
+      ]);
+    assert.equal(ids.length, 4);
+    assert.deepStrictEqual(
+      ids.map(id => id?.toHexString()),
+      [id1.toString(), id2.toString(), id3.toString(), id4.toString()]
+    );
+  });
+
+  it('allows deselecting discriminator key when populating (gh-3230) (gh-13760) (gh-13679)', async function() {
+    const Test = db.model(
+      'Test',
+      Schema({ name: String, arr: [{ testRef: { type: 'ObjectId', ref: 'Test2' } }] })
+    );
+
+    const schema = Schema({ name: String });
+    const Test2 = db.model('Test2', schema);
+    const D = Test2.discriminator('D', Schema({ prop: String }));
+
+
+    await Test.deleteMany({});
+    await Test2.deleteMany({});
+    const { _id } = await D.create({ name: 'foo', prop: 'bar' });
+    const test = await Test.create({ name: 'test', arr: [{ testRef: _id }] });
+
+    const doc = await Test
+      .findById(test._id)
+      .populate('arr.testRef', { name: 1, prop: 1, _id: 0, __t: 0 });
+    assert.deepStrictEqual(
+      doc.toObject().arr[0].testRef,
+      { name: 'foo', prop: 'bar' }
+    );
+  });
 });

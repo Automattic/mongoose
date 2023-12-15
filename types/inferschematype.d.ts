@@ -269,7 +269,7 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
                                     PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 ? Types.Decimal128 :
                                       IfEquals<PathValueType, Schema.Types.Decimal128> extends true ? Types.Decimal128 :
                                         IfEquals<PathValueType, Types.Decimal128> extends true ? Types.Decimal128 :
-                                          IfEquals<PathValueType, Schema.Types.BigInt> extends true ? bigint :
+                                          IfEquals<PathValueType, BigInt> extends true ? bigint :
                                             PathValueType extends 'bigint' | 'BigInt' | typeof Schema.Types.BigInt ? bigint :
                                               PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? Buffer :
                                                 IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :

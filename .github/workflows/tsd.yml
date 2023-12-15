@@ -7,8 +7,6 @@ on:
       - 'types/**'
       - 'test/types/**'
   push:
-    branches:
-      - master
     paths:
       - '.github/workflows/tsd.yml'
       - 'package.json'

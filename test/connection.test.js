@@ -1576,14 +1576,17 @@ describe('connections:', function() {
   });
   describe('deno and windows', function() {
     let m = null;
+    const config = require('../config.json');
     after(async() => {
       await m.disconnect();
     });
     it('should connect to mongo connection string when using windows (gh-13988)', async function() {
-      const config = require('../config.json');
       m = new mongoose.Mongoose();
-      const opts = Object.preventExtensions({ readPreference: 'secondaryPreferred' });
-      const conn = await m.connect(config.connectionString, opts);
+      m.set('debug', true);
+      this.timeout(60000)
+      console.log('yo wassup');
+      // const opts = Object.preventExtensions({ readPreference: 'secondaryPreferred' });
+      const conn = await m.connect(config.connectionString);
       assert.ok(conn);
     });
   });

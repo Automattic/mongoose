@@ -598,8 +598,9 @@ declare module 'mongoose' {
       }
       : Element;
   type _IDType = { _id?: boolean | 1 | 0 };
-  type InclusionProjection<T> = NestedPartial<Projector<NestedRequired<DotKeys<T>>, true | 1> & _IDType>;
-  type ExclusionProjection<T> = NestedPartial<Projector<NestedRequired<DotKeys<T>>, false | 0> & _IDType>;
+  type _DiscriminatorKeyType = { __t?: boolean | 1 | 0 };
+  type InclusionProjection<T> = NestedPartial<Projector<NestedRequired<DotKeys<T>>, true | 1> & _IDType & _DiscriminatorKeyType>;
+  type ExclusionProjection<T> = NestedPartial<Projector<NestedRequired<DotKeys<T>>, false | 0> & _IDType & _DiscriminatorKeyType>;
   type ProjectionUnion<T> = InclusionProjection<T> | ExclusionProjection<T>;
 
   type NestedRequired<T> = T extends Array<infer U>
@@ -638,13 +639,6 @@ declare module 'mongoose' {
   ) extends infer D
     ? Extract<D, string>
     : never;
-  type FindDottedPathType<T, Path extends string> = Path extends `${infer K}.${infer R}`
-    ? K extends keyof T
-      ? FindDottedPathType<T[K] extends Array<infer U> ? U : T[K], R>
-      : never
-    : Path extends keyof T
-      ? T[Path]
-      : never;
   type ExtractNestedArrayElement<T> = T extends (infer U)[]
     ? ExtractNestedArrayElement<U>
     : T extends object
@@ -656,7 +650,7 @@ declare module 'mongoose' {
    * It creates dot notation for arrays similar to mongodb. For example { a: { c: { b: number}[] }[] } => 'a.c.b': number, 'a.c': { b: number }[]
    */
   type DotKeys<DocType> = {
-    [key in DotNestedKeys<ExtractNestedArrayElement<DocType>, DotnotationMaximumDepth>]?: FindDottedPathType<NestedRequired<DocType>, key>;
+    [key in DotNestedKeys<ExtractNestedArrayElement<DocType>, DotnotationMaximumDepth>]?: any;
   };
 
   /**
@@ -678,7 +672,7 @@ declare module 'mongoose' {
         }
         : Replacer<T>;
 
-  export type ProjectionType<T> = (ProjectionUnion<ReplaceSpecialTypes<T>> & AnyObject) | string | ((...agrs: any) => any);
+  export type ProjectionType<T, DiscriminatorKey = '__t'> = (ProjectionUnion<ReplaceSpecialTypes<T>> & AnyObject) | string | ((...agrs: any) => any);
   export type SortValues = SortOrder;
 
   export type SortOrder = -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';

@@ -6392,7 +6392,7 @@ describe('Model', function() {
       });
       assert.deepEqual(timestampsOptions, [undefined, undefined]);
     });
-    it('should not modify the object in the $set clause and not error when dealing with timestamps (gh-14164)', async function() {
+    it('should not modify the object in the $set clause and not error when dealing with or without timestamps (gh-14164)', async function() {
       const timeSchema = new Schema({
         name: String,
         properties: { type: Schema.Types.Mixed, default: {} }

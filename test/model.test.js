@@ -6392,6 +6392,47 @@ describe('Model', function() {
       });
       assert.deepEqual(timestampsOptions, [undefined, undefined]);
     });
+    it('should not modify the object in the $set clause and not error when dealing with timestamps (gh-14164)', async function() {
+      const timeSchema = new Schema({
+        name: String,
+        properties: { type: Schema.Types.Mixed, default: {} }
+      }, { timestamps: true });
+      const timelessSchema = new Schema({
+        name: String,
+        properties: { type: Schema.Types.Mixed, default: {} }
+      });
+
+      const Time = db.model('Time', timeSchema);
+      const Timeless = db.model('Timeless', timelessSchema);
+
+      const timeDoc = await Time.create({
+        name: 'Time Test'
+      });
+      timeDoc.properties.color = 'Red';
+      const beforeSet = {};
+      Object.assign(beforeSet, timeDoc);
+      await Time.bulkWrite([{
+        updateOne: {
+          filter: { _id: timeDoc._id },
+          update: { $set: timeDoc }
+        }
+      }]);
+      assert.deepStrictEqual(beforeSet, timeDoc)
+
+      const timelessDoc = await Timeless.create({
+        name: 'Timeless Test'
+      });
+      timelessDoc.properties.color = 'Red';
+      const timelessObj = {};
+      Object.assign(timelessObj, timelessDoc);
+      await Timeless.bulkWrite([{
+        updateOne: {
+          filter: { _id: timelessDoc._id },
+          update: { $set: timelessDoc }
+        }
+      }]);
+      assert.deepStrictEqual(timelessObj, timelessDoc);
+    });
   });
 
   describe('bulkSave() (gh-9673)', function() {

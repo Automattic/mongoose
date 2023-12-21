@@ -6417,7 +6417,7 @@ describe('Model', function() {
           update: { $set: timeDoc }
         }
       }]);
-      assert.deepStrictEqual(beforeSet, timeDoc)
+      assert.deepStrictEqual(beforeSet._doc, timeDoc)
 
       const timelessDoc = await Timeless.create({
         name: 'Timeless Test'

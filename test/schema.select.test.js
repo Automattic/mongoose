@@ -15,17 +15,19 @@ describe('schema select option', function() {
 
   before(function() {
     db = start();
+    mongoose.set('debug', true);
   });
 
   after(async function() {
     await db.close();
+    mongoose.set('debug', false);
   });
 
   beforeEach(() => db.deleteModel(/.*/));
   afterEach(() => require('./util').clearTestData(db));
   afterEach(() => require('./util').stopRemainingOps(db));
 
-  it.only('excluding paths through schematype', async function() {
+  it('excluding paths through schematype', async function() {
     const schema = new Schema({
       thin: Boolean,
       name: { type: String, select: false },

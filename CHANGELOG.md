@@ -1,3 +1,13 @@
+8.0.3 / 2023-12-07
+==================
+ * fix(schema): avoid creating unnecessary clone of schematype in nested array so nested document arrays use correct constructor #14128 #14101
+ * docs(connections): add example of registering connection event handlers #14150
+ * docs(populate): add example of using `refPath` and `ref` functions #14133 #13834
+ * types: handle using BigInt global class in schema definitions #14160 #14147
+ * types: make findOneAndDelete() without options return result doc, not ModifyResult #14153 #14130
+ * types(model): add no-generic override for insertMany() with options #14152 #13999
+ * types: add missing Type for applyDefaults #14159 [jaypea](https://github.com/jaypea)
+
 7.6.7 / 2023-12-06
 ==================
  * fix: avoid minimizing single nested subdocs if they are required #14151 #14058

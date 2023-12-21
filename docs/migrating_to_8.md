@@ -71,6 +71,16 @@ There's a few noteable changes in MongoDB Node driver v6 that affect Mongoose:
 
 1. The `ObjectId` constructor no longer accepts strings of length 12. In Mongoose 7, `new mongoose.Types.ObjectId('12charstring')` was perfectly valid. In Mongoose 8, `new mongoose.Types.ObjectId('12charstring')` throws an error.
 
+1. Deprecated SSL options have been removed
+
+   - `sslCA` -> `tlsCAFile`
+   - `sslCRL` -> `tlsCRLFile`
+   - `sslCert` -> `tlsCertificateKeyFile`
+   - `sslKey` -> `tlsCertificateKeyFile`
+   - `sslPass` -> `tlsCertificateKeyFilePassword`
+   - `sslValidate` -> `tlsAllowInvalidCertificates`
+   - `tlsCertificateFile` -> `tlsCertificateKeyFile`
+
 <h2 id="removed-findoneandremove"><a href="#removed-findoneandremove">Removed <code>findOneAndRemove()</code></a></h2>
 
 In Mongoose 7, `findOneAndRemove()` was an alias for `findOneAndDelete()` that Mongoose supported for backwards compatibility.

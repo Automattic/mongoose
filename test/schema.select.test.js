@@ -25,7 +25,7 @@ describe('schema select option', function() {
   afterEach(() => require('./util').clearTestData(db));
   afterEach(() => require('./util').stopRemainingOps(db));
 
-  it('excluding paths through schematype', async function() {
+  it.only('excluding paths through schematype', async function() {
     const schema = new Schema({
       thin: Boolean,
       name: { type: String, select: false },

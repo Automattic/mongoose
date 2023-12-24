@@ -15,10 +15,12 @@ describe('schema select option', function() {
 
   before(function() {
     db = start();
+    mongoose.set('debug', true);
   });
 
   after(async function() {
     await db.close();
+    mongoose.set('debug', false);
   });
 
   beforeEach(() => db.deleteModel(/.*/));
@@ -53,7 +55,7 @@ describe('schema select option', function() {
     assert.equal(findByIdDocAgain.isSelected('name'), false);
     assert.equal(findByIdDocAgain.isSelected('docs.name'), false);
     assert.strictEqual(undefined, findByIdDocAgain.name);
-    const findUpdateDoc = await Test.findOneAndUpdate({ _id: doc._id });
+    const findUpdateDoc = await Test.findOneAndUpdate({ _id: doc._id }, { name: 'the excluded' });
     assert.equal(findUpdateDoc.isSelected('name'), false);
     assert.equal(findUpdateDoc.isSelected('docs.name'), false);
     assert.strictEqual(undefined, findUpdateDoc.name);

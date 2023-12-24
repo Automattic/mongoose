@@ -2200,4 +2200,34 @@ describe('model: findOneAndUpdate:', function() {
     );
     assert.equal(updated.defaultField, 'some non-default value');
   });
+
+  it('sets CastError path to full path (gh-14114)', async function() {
+    const testSchema = new mongoose.Schema({
+      id: mongoose.Schema.Types.ObjectId,
+      name: String,
+      accessories: [
+        {
+          isEnabled: Boolean,
+          additionals: [
+            {
+              k: String,
+              v: Number
+            }
+          ]
+        }
+      ]
+    });
+    const Test = db.model('Test', testSchema);
+    const err = await Test.findOneAndUpdate(
+      {},
+      {
+        $set: {
+          'accessories.0.additionals.0.k': ['test']
+        }
+      }
+    ).then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'CastError');
+    assert.equal(err.path, 'accessories.0.additionals.0.k');
+  });
 });

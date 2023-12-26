@@ -550,8 +550,8 @@ declare module 'mongoose' {
       'findOneAndDelete'
     >;
     findByIdAndDelete<ResultDoc = THydratedDocumentType>(
-      id?: mongodb.ObjectId | any,
-      options?: QueryOptions<TRawDocType> & { includeResultMetadata: true }
+      id: mongodb.ObjectId | any,
+      options: QueryOptions<TRawDocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
     findByIdAndDelete<ResultDoc = THydratedDocumentType>(
       id?: mongodb.ObjectId | any,

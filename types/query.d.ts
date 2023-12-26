@@ -436,6 +436,10 @@ declare module 'mongoose' {
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
     findByIdAndDelete(
+      id: mongodb.ObjectId | any,
+      options: QueryOptions<DocType> & { includeResultMetadata: true }
+    ): QueryWithHelpers<ModifyResult<DocType>, DocType, THelpers, RawDocType, 'findOneAndDelete'>;
+    findByIdAndDelete(
       id?: mongodb.ObjectId | any,
       options?: QueryOptions<DocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndDelete'>;

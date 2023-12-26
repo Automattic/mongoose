@@ -17,7 +17,7 @@ import {
   ProjectionFields,
   QueryOptions
 } from 'mongoose';
-import { ObjectId } from 'mongodb';
+import { ModifyResult, ObjectId } from 'mongodb';
 import { expectAssignable, expectError, expectNotAssignable, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
 import { AutoTypedSchemaType } from './schema.test';
@@ -525,4 +525,20 @@ function gh14190() {
 
   const doc = await UserModel.findByIdAndDelete('0'.repeat(24));
   expectType<ReturnType<(typeof UserModel)['hydrate']> | null>(doc);
+
+  const res = await UserModel.findByIdAndDelete(
+    '0'.repeat(24),
+    { includeResultMetadata: true }
+  );
+  expectAssignable<
+    ModifyResult<ReturnType<(typeof UserModel)['hydrate']>>
+  >(res);
+
+  const res2 = await UserModel.find().findByIdAndDelete(
+    '0'.repeat(24),
+    { includeResultMetadata: true }
+  );
+  expectAssignable<
+    ModifyResult<ReturnType<(typeof UserModel)['hydrate']>>
+  >(res2);
 }

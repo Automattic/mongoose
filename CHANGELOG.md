@@ -1,3 +1,9 @@
+6.12.4 / 2023-12-27
+===================
+ * fix: upgrade mongodb driver -> 4.17.2
+ * fix(document): avoid treating nested projection as inclusive when applying defaults #14173 #14115
+ * fix: account for null values when assigning isNew property #14172 #13883
+
 6.12.3 / 2023-11-07
 ===================
  * fix(ChangeStream): correctly handle hydrate option when using change stream as stream instead of iterator #14052

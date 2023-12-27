@@ -15,12 +15,10 @@ describe('schema select option', function() {
 
   before(function() {
     db = start();
-    mongoose.set('debug', true);
   });
 
   after(async function() {
     await db.close();
-    mongoose.set('debug', false);
   });
 
   beforeEach(() => db.deleteModel(/.*/));

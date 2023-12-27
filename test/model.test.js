@@ -6410,28 +6410,28 @@ describe('Model', function() {
       });
       timeDoc.properties.color = 'Red';
       const beforeSet = {};
-      Object.assign(beforeSet, timeDoc);
+      Object.assign(beforeSet, timeDoc.toObject());
       await Time.bulkWrite([{
         updateOne: {
           filter: { _id: timeDoc._id },
           update: { $set: timeDoc }
         }
       }]);
-      assert.deepStrictEqual(beforeSet._doc, timeDoc)
+      assert.deepStrictEqual(beforeSet, timeDoc.toObject());
 
       const timelessDoc = await Timeless.create({
         name: 'Timeless Test'
       });
       timelessDoc.properties.color = 'Red';
       const timelessObj = {};
-      Object.assign(timelessObj, timelessDoc);
+      Object.assign(timelessObj, timelessDoc.toObject());
       await Timeless.bulkWrite([{
         updateOne: {
           filter: { _id: timelessDoc._id },
           update: { $set: timelessDoc }
         }
       }]);
-      assert.deepStrictEqual(timelessObj, timelessDoc);
+      assert.deepStrictEqual(timelessObj, timelessDoc.toObject());
     });
   });
 

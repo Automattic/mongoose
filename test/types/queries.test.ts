@@ -534,7 +534,7 @@ function gh14190() {
   );
   expectAssignable<
     ModifyResult<ReturnType<(typeof UserModel)['hydrate']>>
-  >(res);
+      >(res);
 
   const res2 = await UserModel.find().findByIdAndDelete(
     '0'.repeat(24),
@@ -542,5 +542,5 @@ function gh14190() {
   );
   expectAssignable<
     ModifyResult<ReturnType<(typeof UserModel)['hydrate']>>
-  >(res2);
+      >(res2);
 }

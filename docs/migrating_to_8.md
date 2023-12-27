@@ -73,13 +73,13 @@ There's a few noteable changes in MongoDB Node driver v6 that affect Mongoose:
 
 1. Deprecated SSL options have been removed
 
-   - `sslCA` -> `tlsCAFile`
-   - `sslCRL` -> `tlsCRLFile`
-   - `sslCert` -> `tlsCertificateKeyFile`
-   - `sslKey` -> `tlsCertificateKeyFile`
-   - `sslPass` -> `tlsCertificateKeyFilePassword`
-   - `sslValidate` -> `tlsAllowInvalidCertificates`
-   - `tlsCertificateFile` -> `tlsCertificateKeyFile`
+   * `sslCA` -> `tlsCAFile`
+   * `sslCRL` -> `tlsCRLFile`
+   * `sslCert` -> `tlsCertificateKeyFile`
+   * `sslKey` -> `tlsCertificateKeyFile`
+   * `sslPass` -> `tlsCertificateKeyFilePassword`
+   * `sslValidate` -> `tlsAllowInvalidCertificates`
+   * `tlsCertificateFile` -> `tlsCertificateKeyFile`
 
 <h2 id="removed-findoneandremove"><a href="#removed-findoneandremove">Removed <code>findOneAndRemove()</code></a></h2>
 

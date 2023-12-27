@@ -109,9 +109,7 @@ const schema = new Schema();
 schema.path('_id'); // ObjectId { ... }
 ```
 
-When you create a new document with the automatically added
-`_id` property, Mongoose creates a new [`_id` of type ObjectId](https://masteringjs.io/tutorials/mongoose/objectid)
-to your document.
+When you create a new document with the automatically added `_id` property, Mongoose creates a new [`_id` of type ObjectId](https://masteringjs.io/tutorials/mongoose/objectid) to your document.
 
 ```javascript
 const Model = mongoose.model('Test', schema);
@@ -120,13 +118,13 @@ const doc = new Model();
 doc._id instanceof mongoose.Types.ObjectId; // true
 ```
 
-You can also overwrite Mongoose's default `_id` with your
-own `_id`. Just be careful: Mongoose will refuse to save a
-document that doesn't have an `_id`, so you're responsible
-for setting `_id` if you define your own `_id` path.
+You can also overwrite Mongoose's default `_id` with your own `_id`.
+Just be careful: Mongoose will refuse to save a top-level document that doesn't have an `_id`, so you're responsible for setting `_id` if you define your own `_id` path.
 
 ```javascript
-const schema = new Schema({ _id: Number });
+const schema = new Schema({
+  _id: Number // <-- overwrite Mongoose's default `_id`
+});
 const Model = mongoose.model('Test', schema);
 
 const doc = new Model();
@@ -134,6 +132,37 @@ await doc.save(); // Throws "document must have an _id before saving"
 
 doc._id = 1;
 await doc.save(); // works
+```
+
+Mongoose also adds an `_id` property to subdocuments.
+You can disable the `_id` property on your subdocuments as follows.
+Mongoose does allow saving subdocuments without an `_id` property.
+
+```javascript
+const nestedSchema = new Schema(
+  { name: String },
+  { _id: false } // <-- disable `_id`
+);
+const schema = new Schema({
+  subdoc: nestedSchema,
+  docArray: [nestedSchema]
+});
+const Test = mongoose.model('Test', schema);
+
+// Neither `subdoc` nor `docArray.0` will have an `_id`
+await Test.create({
+  subdoc: { name: 'test 1' },
+  docArray: [{ name: 'test 2' }]
+});
+```
+
+Alternatively, you can disable `_id` using the following syntax:
+
+```javascript
+const nestedSchema = new Schema({
+  _id: false, // <-- disable _id
+  name: String
+});
 ```
 
 <h2 id="methods"><a href="#methods">Instance methods</a></h2>

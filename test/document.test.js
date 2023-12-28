@@ -12765,6 +12765,28 @@ describe('document', function() {
     );
   });
 
+  it('handles reusing schema with embedded discriminators defined using Schema.prototype.discriminator (gh-14162)', async function() {
+    const discriminated = new Schema({
+      type: { type: Number, required: true }
+    }, { discriminatorKey: 'type' });
+
+    discriminated.discriminator(1, new Schema({ prop1: String }));
+    discriminated.discriminator(3, new Schema({ prop2: String }));
+
+    const containerSchema = new Schema({ items: [discriminated] });
+    const containerModel = db.model('Test', containerSchema);
+    const containerModel2 = db.model('Test1', containerSchema); // Error: Discriminator with name "1" already exists
+    const doc1 = new containerModel({ items: [{ type: 1, prop1: 'foo' }, { type: 3, prop2: 'bar' }] });
+    const doc2 = new containerModel2({ items: [{ type: 1, prop1: 'baz' }, { type: 3, prop2: 'qux' }] });
+    await doc1.save();
+    await doc2.save();
+
+    doc1.items.push({ type: 3, prop2: 'test1' });
+    doc2.items.push({ type: 3, prop2: 'test1' });
+    await doc1.save();
+    await doc2.save();
+  });
+
   it('can use `collection` as schema name (gh-13956)', async function() {
     const schema = new mongoose.Schema({ name: String, collection: String });
     const Test = db.model('Test', schema);

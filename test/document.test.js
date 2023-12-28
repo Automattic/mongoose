@@ -12414,6 +12414,29 @@ describe('document', function() {
     await doc.save();
     assert.ok(doc);
   });
+
+  it('avoids overwriting dotted paths in mixed path underneath nested path (gh-14178)', async function() {
+    const testSchema = new Schema({
+      __stateBeforeSuspension: {
+        field1: String,
+        field3: { type: Schema.Types.Mixed }
+      }
+    });
+    const Test = db.model('Test', testSchema);
+    const eventObj = new Test({
+      __stateBeforeSuspension: { field1: 'test' }
+    });
+    await eventObj.save();
+    const newO = eventObj.toObject();
+    newO.__stateBeforeSuspension.field3 = { '.ippo': 5 };
+    eventObj.set(newO);
+    await eventObj.save();
+
+    assert.strictEqual(eventObj.__stateBeforeSuspension.field3['.ippo'], 5);
+
+    const fromDb = await Test.findById(eventObj._id).lean().orFail();
+    assert.strictEqual(fromDb.__stateBeforeSuspension.field3['.ippo'], 5);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

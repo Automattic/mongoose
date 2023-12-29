@@ -12775,7 +12775,7 @@ describe('document', function() {
 
     const containerSchema = new Schema({ items: [discriminated] });
     const containerModel = db.model('Test', containerSchema);
-    const containerModel2 = db.model('Test1', containerSchema); // Error: Discriminator with name "1" already exists
+    const containerModel2 = db.model('Test1', containerSchema);
     const doc1 = new containerModel({ items: [{ type: 1, prop1: 'foo' }, { type: 3, prop2: 'bar' }] });
     const doc2 = new containerModel2({ items: [{ type: 1, prop1: 'baz' }, { type: 3, prop2: 'qux' }] });
     await doc1.save();

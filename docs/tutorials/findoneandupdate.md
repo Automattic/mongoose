@@ -6,7 +6,7 @@ However, there are some cases where you need to use [`findOneAndUpdate()`](https
 * [Getting Started](#getting-started)
 * [Atomic Updates](#atomic-updates)
 * [Upsert](#upsert)
-* [The `rawResult` Option](#raw-result)
+* [The `includeResultMetadata` Option](#includeresultmetadata)
 
 ## Getting Started
 
@@ -51,17 +51,17 @@ Using the `upsert` option, you can use `findOneAndUpdate()` as a find-and-[upser
 [require:Tutorial.*findOneAndUpdate.*upsert]
 ```
 
-<h2 id="raw-result">The `rawResult` Option</h2>
+<h2 id="includeresultmetadata">The `includeResultMetadata` Option<h2 id="rawresult"></h2></h2>
 
 Mongoose transforms the result of `findOneAndUpdate()` by default: it
 returns the updated document. That makes it difficult to check whether
 a document was upserted or not. In order to get the updated document
 and check whether MongoDB upserted a new document in the same operation,
-you can set the `rawResult` flag to make Mongoose return the raw result
+you can set the `includeResultMetadata` flag to make Mongoose return the raw result
 from MongoDB.
 
 ```acquit
-[require:Tutorial.*findOneAndUpdate.*rawResult$]
+[require:Tutorial.*findOneAndUpdate.*includeResultMetadata$]
 ```
 
 Here's what the `res` object from the above example looks like:

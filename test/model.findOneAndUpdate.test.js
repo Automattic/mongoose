@@ -1334,7 +1334,6 @@ describe('model: findOneAndUpdate:', function() {
       const opts = {
         new: true,
         upsert: false,
-        passRawResult: false,
         overwrite: false,
         runValidators: true
       };

@@ -100,6 +100,7 @@ docs['docs/lodash.md'] = { title: 'Using Mongoose with Lodash', markdown: true }
 docs['docs/incompatible_packages.md'] = { title: 'Known Incompatible npm Packages', markdown: true };
 docs['docs/check-version.md'] = { title: 'How to Check Your Mongoose Version', markdown: true };
 docs['docs/version-support.md'] = { title: 'Version Support', markdown: true };
+docs['docs/shared-schemas.md'] = { title: 'Sharing Schemas Between Mongoose Projects', markdown: true };
 
 for (const props of Object.values(docs)) {
   props.jobs = jobs;

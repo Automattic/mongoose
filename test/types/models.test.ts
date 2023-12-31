@@ -492,7 +492,7 @@ function gh12100() {
   const TestModel = model('test', schema_with_string_id);
   const obj = new TestModel();
 
-  expectType<string>(obj._id);
+  expectType<string | null>(obj._id);
 })();
 
 (async function gh12094() {
@@ -659,7 +659,7 @@ async function gh13705() {
   const schema = new Schema({ name: String });
   const TestModel = model('Test', schema);
 
-  type ExpectedLeanDoc = (mongoose.FlattenMaps<{ name?: string }> & { _id: mongoose.Types.ObjectId });
+  type ExpectedLeanDoc = (mongoose.FlattenMaps<{ name?: string | null }> & { _id: mongoose.Types.ObjectId });
 
   const findByIdRes = await TestModel.findById('0'.repeat(24), undefined, { lean: true });
   expectType<ExpectedLeanDoc | null>(findByIdRes);
@@ -751,12 +751,99 @@ function gh13957() {
   }
 
   interface ITest {
-    name?: string
+    name: string
   }
-  const schema = new Schema({ name: String });
+  const schema = new Schema({ name: { type: String, required: true } });
   const TestModel = model('Test', schema);
   const repository = new RepositoryBase<ITest>(TestModel);
   expectType<Promise<ITest[]>>(repository.insertMany([{ name: 'test' }]));
+}
+
+function gh13897() {
+  interface IDocument {
+    name: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }
+
+  const documentSchema = new Schema<IDocument>({
+    name: { type: String, required: true }
+  },
+  {
+    timestamps: true
+  });
+
+  const Document = model<IDocument>('Document', documentSchema);
+  const doc = new Document({ name: 'foo' });
+  expectType<Date>(doc.createdAt);
+  expectError(new Document<IDocument>({ name: 'foo' }));
+}
+
+async function gh14026() {
+  interface Foo {
+    bar: string[];
+  }
+
+  const FooModel = mongoose.model<Foo>('Foo', new mongoose.Schema<Foo>({ bar: [String] }));
+
+  const distinctBar = await FooModel.distinct('bar');
+  expectType<string[]>(distinctBar);
+
+  const TestModel = mongoose.model(
+    'Test',
+    new mongoose.Schema({ bar: [String] })
+  );
+
+  expectType<string[]>(await TestModel.distinct('bar'));
+}
+
+async function gh14072() {
+  type Test = {
+    _id: mongoose.Types.ObjectId;
+    num: number;
+    created_at: number;
+    updated_at: number;
+  };
+
+  const schema = new mongoose.Schema<Test>(
+    {
+      num: { type: Number },
+      created_at: { type: Number },
+      updated_at: { type: Number }
+    },
+    {
+      timestamps: {
+        createdAt: 'created_at',
+        updatedAt: 'updated_at',
+        currentTime: () => new Date().valueOf() / 1000
+      }
+    }
+  );
+
+  const M = mongoose.model<Test>('Test', schema);
+  const bulkWriteArray = [
+    {
+      insertOne: {
+        document: { num: 3 }
+      }
+    },
+    {
+      updateOne: {
+        filter: { num: 6 },
+        update: { num: 8 },
+        timestamps: false
+      }
+    },
+    {
+      updateMany: {
+        filter: { num: 5 },
+        update: { num: 10 },
+        timestamps: false
+      }
+    }
+  ];
+
+  await M.bulkWrite(bulkWriteArray);
 }
 
 async function gh14003() {
@@ -765,4 +852,28 @@ async function gh14003() {
 
   await TestModel.validate({ name: 'foo' }, ['name']);
   await TestModel.validate({ name: 'foo' }, { pathsToSkip: ['name'] });
+}
+
+async function gh14114() {
+  const schema = new mongoose.Schema({ name: String });
+  const Test = mongoose.model('Test', schema);
+
+  expectType<ReturnType<(typeof Test)['hydrate']> | null>(
+    await Test.findOneAndDelete({ name: 'foo' })
+  );
+}
+
+async function gh13999() {
+  class RepositoryBase<T> {
+    protected model: mongoose.Model<T>;
+
+    constructor(schemaModel: mongoose.Model<T>) {
+      this.model = schemaModel;
+    }
+
+    async insertMany(elems: T[]): Promise<T[]> {
+      elems = await this.model.insertMany(elems, { session: null });
+      return elems;
+    }
+  }
 }

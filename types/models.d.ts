@@ -26,6 +26,14 @@ declare module 'mongoose' {
   interface MongooseBulkWriteOptions {
     skipValidation?: boolean;
     throwOnValidationError?: boolean;
+    timestamps?: boolean;
+  }
+
+  interface MongooseBulkWritePerWriteOptions {
+    timestamps?: boolean;
+    strict?: boolean;
+    session?: ClientSession;
+    skipValidation?: boolean;
   }
 
   interface InsertManyOptions extends
@@ -158,7 +166,7 @@ declare module 'mongoose' {
     AcceptsDiscriminator,
     IndexManager,
     SessionStarter {
-    new <DocType = TRawDocType>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): THydratedDocumentType;
+    new <DocType = Partial<TRawDocType>>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): THydratedDocumentType;
 
     aggregate<R = any>(pipeline?: PipelineStage[], options?: AggregateOptions): Aggregate<Array<R>>;
     aggregate<R = any>(pipeline: PipelineStage[]): Aggregate<Array<R>>;
@@ -175,6 +183,10 @@ declare module 'mongoose' {
     /* Cast the given POJO to the model's schema */
     castObject(obj: AnyObject, options?: { ignoreCastErrors?: boolean }): TRawDocType;
 
+    /* Apply defaults to the given document or POJO. */
+    applyDefaults(obj: AnyObject): AnyObject;
+    applyDefaults(obj: TRawDocType): TRawDocType;
+
     /**
      * Sends multiple `insertOne`, `updateOne`, `updateMany`, `replaceOne`,
      * `deleteOne`, and/or `deleteMany` operations to the MongoDB server in one
@@ -183,11 +195,17 @@ declare module 'mongoose' {
      * round trip to the MongoDB server.
      */
     bulkWrite<DocContents = TRawDocType>(
-      writes: Array<mongodb.AnyBulkWriteOperation<DocContents extends Document ? any : (DocContents extends {} ? DocContents : any)>>,
+      writes: Array<
+        mongodb.AnyBulkWriteOperation<
+          DocContents extends mongodb.Document ? DocContents : any
+        > & MongooseBulkWritePerWriteOptions>,
       options: mongodb.BulkWriteOptions & MongooseBulkWriteOptions & { ordered: false }
     ): Promise<mongodb.BulkWriteResult & { mongoose?: { validationErrors: Error[] } }>;
     bulkWrite<DocContents = TRawDocType>(
-      writes: Array<mongodb.AnyBulkWriteOperation<DocContents extends Document ? any : (DocContents extends {} ? DocContents : any)>>,
+      writes: Array<
+        mongodb.AnyBulkWriteOperation<
+          DocContents extends mongodb.Document ? DocContents : any
+        > & MongooseBulkWritePerWriteOptions>,
       options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions
     ): Promise<mongodb.BulkWriteResult>;
 
@@ -200,15 +218,6 @@ declare module 'mongoose' {
 
     /** Collection the model uses. */
     collection: Collection;
-
-    /** Creates a `count` query: counts the number of documents that match `filter`. */
-    count(filter?: FilterQuery<TRawDocType>): QueryWithHelpers<
-      number,
-      THydratedDocumentType,
-      TQueryHelpers,
-      TRawDocType,
-      'count'
-    >;
 
     /** Creates a `countDocuments` query: counts the number of documents that match `filter`. */
     countDocuments(
@@ -390,6 +399,10 @@ declare module 'mongoose' {
       docs: Array<TRawDocType>,
       options: InsertManyOptions & { rawResult: true; }
     ): Promise<mongodb.InsertManyResult<Require_id<THydratedDocumentType>>>;
+    insertMany(
+      doc: Array<TRawDocType>,
+      options: InsertManyOptions
+    ): Promise<Array<THydratedDocumentType>>;
     insertMany<DocContents = TRawDocType>(
       docs: Array<DocContents | TRawDocType>,
       options: InsertManyOptions & { lean: true; }
@@ -478,8 +491,11 @@ declare module 'mongoose' {
     translateAliases(raw: any): any;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
-    distinct<ReturnType = any>(field: string, filter?: FilterQuery<TRawDocType>): QueryWithHelpers<
-      Array<ReturnType>,
+    distinct<DocKey extends string, ResultType = unknown>(
+      field: DocKey,
+      filter?: FilterQuery<TRawDocType>
+    ): QueryWithHelpers<
+      Array<DocKey extends keyof TRawDocType ? Unpacked<TRawDocType[DocKey]> : ResultType>,
       THydratedDocumentType,
       TQueryHelpers,
       TRawDocType,
@@ -548,26 +564,10 @@ declare module 'mongoose' {
       'findOneAndDelete'
     >;
     findByIdAndDelete<ResultDoc = THydratedDocumentType>(
-      id?: mongodb.ObjectId | any,
-      options?: QueryOptions<TRawDocType> & { includeResultMetadata: true }
+      id: mongodb.ObjectId | any,
+      options: QueryOptions<TRawDocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
     findByIdAndDelete<ResultDoc = THydratedDocumentType>(
-      id?: mongodb.ObjectId | any,
-      options?: QueryOptions<TRawDocType> | null
-    ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
-
-    /** Creates a `findByIdAndRemove` query, filtering by the given `_id`. */
-    findByIdAndRemove<ResultDoc = THydratedDocumentType>(
-      id: mongodb.ObjectId | any,
-      options: QueryOptions<TRawDocType> & { lean: true }
-    ): QueryWithHelpers<
-      GetLeanResultType<TRawDocType, TRawDocType, 'findOneAndDelete'> | null,
-      ResultDoc,
-      TQueryHelpers,
-      TRawDocType,
-      'findOneAndDelete'
-    >;
-    findByIdAndRemove<ResultDoc = THydratedDocumentType>(
       id?: mongodb.ObjectId | any,
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
@@ -584,11 +584,6 @@ declare module 'mongoose' {
       TRawDocType,
       'findOneAndUpdate'
     >;
-    findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
-      id: mongodb.ObjectId | any,
-      update: UpdateQuery<TRawDocType>,
-      options: QueryOptions<TRawDocType> & { rawResult: true }
-    ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndUpdate'>;
     findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
       id: mongodb.ObjectId | any,
       update: UpdateQuery<TRawDocType>,
@@ -621,19 +616,13 @@ declare module 'mongoose' {
       'findOneAndDelete'
     >;
     findOneAndDelete<ResultDoc = THydratedDocumentType>(
-      filter?: FilterQuery<TRawDocType>,
-      options?: QueryOptions<TRawDocType> & { includeResultMetadata: true }
+      filter: FilterQuery<TRawDocType>,
+      options: QueryOptions<TRawDocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
     findOneAndDelete<ResultDoc = THydratedDocumentType>(
-      filter?: FilterQuery<TRawDocType>,
+      filter?: FilterQuery<TRawDocType> | null,
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
-
-    /** Creates a `findOneAndRemove` query: atomically finds the given document and deletes it. */
-    findOneAndRemove<ResultDoc = THydratedDocumentType>(
-      filter?: FilterQuery<TRawDocType>,
-      options?: QueryOptions<TRawDocType> | null
-    ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndRemove'>;
 
     /** Creates a `findOneAndReplace` query: atomically finds the given document and replaces it with `replacement`. */
     findOneAndReplace<ResultDoc = THydratedDocumentType>(
@@ -647,11 +636,6 @@ declare module 'mongoose' {
       TRawDocType,
       'findOneAndReplace'
     >;
-    findOneAndReplace<ResultDoc = THydratedDocumentType>(
-      filter: FilterQuery<TRawDocType>,
-      replacement: TRawDocType | AnyObject,
-      options: QueryOptions<TRawDocType> & { rawResult: true }
-    ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndReplace'>;
     findOneAndReplace<ResultDoc = THydratedDocumentType>(
       filter: FilterQuery<TRawDocType>,
       replacement: TRawDocType | AnyObject,
@@ -683,7 +667,7 @@ declare module 'mongoose' {
     findOneAndUpdate<ResultDoc = THydratedDocumentType>(
       filter: FilterQuery<TRawDocType>,
       update: UpdateQuery<TRawDocType>,
-      options: QueryOptions<TRawDocType> & { rawResult: true }
+      options: QueryOptions<TRawDocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndUpdate'>;
     findOneAndUpdate<ResultDoc = THydratedDocumentType>(
       filter: FilterQuery<TRawDocType>,

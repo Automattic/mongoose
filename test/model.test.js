@@ -1177,8 +1177,12 @@ describe('Model', function() {
     it('errors when id deselected (gh-3118)', async function() {
       await BlogPost.create({ title: 1 }, { title: 2 });
       const doc = await BlogPost.findOne({ title: 1 }, { _id: 0 });
-      const err = await doc.deleteOne().then(() => null, err => err);
-      assert.equal(err.message, 'No _id found on document!');
+      try {
+        await doc.deleteOne();
+        assert.ok(false);
+      } catch (err) {
+        assert.equal(err.message, 'No _id found on document!');
+      }
     });
 
     it('should not remove any records when deleting by id undefined', async function() {
@@ -2319,7 +2323,7 @@ describe('Model', function() {
       const title = 'interop ad-hoc as promise';
 
       const created = await BlogPost.create({ title: title });
-      const query = BlogPost.count({ title: title });
+      const query = BlogPost.countDocuments({ title: title });
       const found = await query.exec('findOne');
       assert.equal(found.id, created.id);
     });
@@ -5113,10 +5117,6 @@ describe('Model', function() {
       await Model.createCollection();
       const collectionName = Model.collection.name;
 
-      // If the collection is not created, the following will throw
-      // MongoServerError: Collection [mongoose_test.User] not found.
-      await db.collection(collectionName).stats();
-
       await Model.create([{ name: 'alpha' }, { name: 'Zeta' }]);
 
       // Ensure that the default collation is set. Mongoose will set the
@@ -5385,7 +5385,7 @@ describe('Model', function() {
         }
       ]);
 
-      const beforeExpirationCount = await Test.count({});
+      const beforeExpirationCount = await Test.countDocuments({});
       assert.ok(beforeExpirationCount === 12);
 
       let intervalid;
@@ -5399,7 +5399,7 @@ describe('Model', function() {
         // in case it happens faster, to reduce test time
         new Promise(resolve => {
           intervalid = setInterval(async() => {
-            const count = await Test.count({});
+            const count = await Test.countDocuments({});
             if (count === 0) {
               resolve();
             }
@@ -5409,7 +5409,7 @@ describe('Model', function() {
 
       clearInterval(intervalid);
 
-      const afterExpirationCount = await Test.count({});
+      const afterExpirationCount = await Test.countDocuments({});
       assert.equal(afterExpirationCount, 0);
     });
 
@@ -5539,7 +5539,6 @@ describe('Model', function() {
     await doc.deleteOne({ session });
     assert.equal(sessions.length, 1);
     assert.strictEqual(sessions[0], session);
-
   });
 
   it('set $session() before pre validate hooks run on bulkWrite and insertMany (gh-7769)', async function() {
@@ -6392,6 +6391,47 @@ describe('Model', function() {
         return operationObject.timestamps;
       });
       assert.deepEqual(timestampsOptions, [undefined, undefined]);
+    });
+    it('should not modify the object in the $set clause and not error when dealing with or without timestamps (gh-14164)', async function() {
+      const timeSchema = new Schema({
+        name: String,
+        properties: { type: Schema.Types.Mixed, default: {} }
+      }, { timestamps: true });
+      const timelessSchema = new Schema({
+        name: String,
+        properties: { type: Schema.Types.Mixed, default: {} }
+      });
+
+      const Time = db.model('Time', timeSchema);
+      const Timeless = db.model('Timeless', timelessSchema);
+
+      const timeDoc = await Time.create({
+        name: 'Time Test'
+      });
+      timeDoc.properties.color = 'Red';
+      const beforeSet = {};
+      Object.assign(beforeSet, timeDoc.toObject());
+      await Time.bulkWrite([{
+        updateOne: {
+          filter: { _id: timeDoc._id },
+          update: { $set: timeDoc }
+        }
+      }]);
+      assert.deepStrictEqual(beforeSet, timeDoc.toObject());
+
+      const timelessDoc = await Timeless.create({
+        name: 'Timeless Test'
+      });
+      timelessDoc.properties.color = 'Red';
+      const timelessObj = {};
+      Object.assign(timelessObj, timelessDoc.toObject());
+      await Timeless.bulkWrite([{
+        updateOne: {
+          filter: { _id: timelessDoc._id },
+          update: { $set: timelessDoc }
+        }
+      }]);
+      assert.deepStrictEqual(timelessObj, timelessDoc.toObject());
     });
   });
 

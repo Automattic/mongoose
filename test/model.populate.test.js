@@ -10834,4 +10834,29 @@ describe('model: populate:', function() {
       [id1.toString(), id2.toString(), id3.toString(), id4.toString()]
     );
   });
+
+  it('allows deselecting discriminator key when populating (gh-3230) (gh-13760) (gh-13679)', async function() {
+    const Test = db.model(
+      'Test',
+      Schema({ name: String, arr: [{ testRef: { type: 'ObjectId', ref: 'Test2' } }] })
+    );
+
+    const schema = Schema({ name: String });
+    const Test2 = db.model('Test2', schema);
+    const D = Test2.discriminator('D', Schema({ prop: String }));
+
+
+    await Test.deleteMany({});
+    await Test2.deleteMany({});
+    const { _id } = await D.create({ name: 'foo', prop: 'bar' });
+    const test = await Test.create({ name: 'test', arr: [{ testRef: _id }] });
+
+    const doc = await Test
+      .findById(test._id)
+      .populate('arr.testRef', { name: 1, prop: 1, _id: 0, __t: 0 });
+    assert.deepStrictEqual(
+      doc.toObject().arr[0].testRef,
+      { name: 'foo', prop: 'bar' }
+    );
+  });
 });

@@ -90,12 +90,6 @@ schema.pre<Model<ITest>>('insertMany', function(next, docs: Array<ITest>) {
   next();
 });
 
-schema.pre<Query<number, any>>('count', function(next) {});
-schema.post<Query<number, any>>('count', function(count, next) {
-  expectType<number>(count);
-  next();
-});
-
 schema.pre<Query<number, any>>('estimatedDocumentCount', function(next) {});
 schema.post<Query<number, any>>('estimatedDocumentCount', function(count, next) {
   expectType<number>(count);

@@ -161,7 +161,8 @@ let filteredTags = [];
  * @returns number array or undefined
  */
 function parseVersion(str) {
-  const versionReg = /^v?(\d+)\.(\d+)\.(\d+)$/i;
+  // there is no ending "$", because of "rc"-like versions
+  const versionReg = /^v?(\d+)\.(\d+)\.(\d+)/i;
 
   const match = versionReg.exec(str);
 
@@ -176,12 +177,23 @@ function parseVersion(str) {
     return parsed;
   }
 
+  // special case, to not log a warning
+  if (str === "test") {
+    return undefined;
+  }
+
+  console.log(`Failed to parse version! got: ${str}`);
+
   return undefined;
 }
 
+/**
+ * Get versions from git tags and put them into {@link filteredTags}
+ */
 function getVersions() {
   // get all tags from git
-  const res = childProcess.execSync("git tag").toString();
+  // "trim" is used to remove the ending new-line
+  const res = childProcess.execSync("git tag").toString().trim();
 
   filteredTags = res.split('\n')
   // map all gotten tags if they match the regular expression

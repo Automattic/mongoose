@@ -57,7 +57,7 @@ describe('model: validate: ', function() {
     assert.deepEqual(Object.keys(err.errors), ['comments.name']);
 
     obj = { age: '42' };
-    await Model.validate(obj, ['age']);
+    obj = await Model.validate(obj, ['age']);
     assert.strictEqual(obj.age, 42);
   });
 
@@ -106,7 +106,7 @@ describe('model: validate: ', function() {
 
     const test = { docs: ['6132655f2cdb9d94eaebc09b'] };
 
-    const err = await Test.validate(test);
+    const err = await Test.validate(test).then(() => null, err => err);
     assert.ifError(err);
   });
 
@@ -124,7 +124,7 @@ describe('model: validate: ', function() {
     const User = mongoose.model('User', userSchema);
 
     const user = new User({ name: 'test', nameRequired: false });
-    const err = await User.validate(user).catch(err => err);
+    const err = await User.validate(user).then(() => null, err => err);
 
     assert.ifError(err);
 
@@ -181,6 +181,29 @@ describe('model: validate: ', function() {
     await assert.rejects(async() => {
       await Test.validate(test, pathsOrOptions);
     }, { message: 'Validation failed: name: Validator failed for path `name` with value `1`' });
+  });
 
+  it('runs validation on casted paths even if cast error happened', async function() {
+    const Model = mongoose.model('Test', new Schema({
+      invalid1: {
+        type: String,
+        validate: () => false
+      },
+      myNumber: {
+        type: Number,
+        required: true
+      },
+      invalid2: {
+        type: String,
+        validate: () => false
+      }
+    }));
+
+    const err = await Model.validate({ invalid1: 'foo', myNumber: 'not a number', invalid2: 'bar' }).
+      then(() => null, err => err);
+    assert.ok(err);
+    assert.deepEqual(Object.keys(err.errors).sort(), ['invalid1', 'invalid2', 'myNumber']);
+    assert.equal(err.errors['myNumber'].name, 'CastError');
+    assert.equal(err.errors['invalid1'].name, 'ValidatorError');
   });
 });

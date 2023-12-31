@@ -1,6 +1,7 @@
 
 declare module 'mongoose' {
   import mongodb = require('mongodb');
+  import bson = require('bson');
 
   class NativeBuffer extends Buffer {}
 
@@ -99,5 +100,7 @@ declare module 'mongoose' {
       /** Returns this sub-documents parent array. */
       parentArray(): Types.DocumentArray<unknown>;
     }
+
+    class UUID extends bson.UUID {}
   }
 }

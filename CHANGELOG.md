@@ -1,3 +1,34 @@
+8.0.3 / 2023-12-07
+==================
+ * fix(schema): avoid creating unnecessary clone of schematype in nested array so nested document arrays use correct constructor #14128 #14101
+ * docs(connections): add example of registering connection event handlers #14150
+ * docs(populate): add example of using `refPath` and `ref` functions #14133 #13834
+ * types: handle using BigInt global class in schema definitions #14160 #14147
+ * types: make findOneAndDelete() without options return result doc, not ModifyResult #14153 #14130
+ * types(model): add no-generic override for insertMany() with options #14152 #13999
+ * types: add missing Type for applyDefaults #14159 [jaypea](https://github.com/jaypea)
+
+7.6.7 / 2023-12-06
+==================
+ * fix: avoid minimizing single nested subdocs if they are required #14151 #14058
+ * fix(populate): allow deselecting discriminator key when populating #14155 #3230
+ * fix: allow adding discriminators using Schema.prototype.discriminator() to subdocuments after defining parent schema #14131 #14109
+ * fix(schema): avoid creating unnecessary clone of schematype in nested array so nested document arrays use correct constructor #14128 #14101
+ * fix(populate): call transform object with single id instead of array when populating a justOne path under an array #14135 #14073
+ * types: add back mistakenly removed findByIdAndRemove() function signature #14136 #14132
+
+8.0.2 / 2023-11-28
+==================
+ * fix(populate): set populated docs in correct order when populating virtual underneath doc array with justOne #14105
+ * fix(populate): fix curPath to update appropriately #14099 #14098 [csy1204](https://github.com/csy1204)
+ * types: make property names show up in intellisense for UpdateQuery #14123 #14090
+ * types(document): correct return type for doc.deleteOne() re: Mongoose 8 breaking change #14110 #14081
+ * types: correct types for when includeResultMetadata: true is set #14078
+ * types(models): allow specifying timestamps as inline option for bulkWrite() operations #14112 #14072
+ * docs: fix rendering of 7.x server compatibility #14086 [laupow](https://github.com/laupow)
+ * docs(source/api): fix "index.js" -> "mongoose.js" rename #14125
+ * docs(README): update breaking change version #14126
+
 7.6.6 / 2023-11-27
 ==================
  * perf: avoid double-running setter logic when calling `push()` #14120 #11380
@@ -9,6 +40,17 @@
  * types: make property names show up in intellisense for UpdateQuery #14123 #14090
  * types(model): support calling Model.validate() with pathsToSkip option #14088 #14003
  * docs: remove "DEPRECATED" warning mistakenly added to read() tags param #13980
+
+8.0.1 / 2023-11-15
+==================
+ * fix: retain key order with aliases when creating indexes with alias #14042 [meabed](https://github.com/meabed)
+ * fix: handle nonexistent collection with diffIndexes #14029 #14010
+ * types(model+query): correctly remove count from TypeScript types to reflect removal of runtime support #14076 #14067 #14062
+ * types: correct `this` parameter for methods and statics #14028 #14027 [ruxxzebre](https://github.com/ruxxzebre)
+ * types(model+query): unpack arrays in distinct return type #14047 #14026
+ * types: add missing Types.UUID typings #14023 #13103 [k725](https://github.com/k725)
+ * docs: add mongoose 8 to mongodb server compatibility guide #14064
+ * docs: fix typo in queries.md #14065 [MuhibAhmed](https://github.com/MuhibAhmed)
 
 7.6.5 / 2023-11-14
 ==================
@@ -24,6 +66,10 @@
  * fix(document): avoid unmarking modified on nested path if no initial value stored and already modified #14053 #14024
  * fix(document): consistently avoid marking subpaths of nested paths as modified #14053 #14022
 
+8.0.0 / 2023-10-31
+==================
+ * docs: add version support notes for Mongoose 8, including EOL date for Mongoose 6
+
 7.6.4 / 2023-10-30
 ==================
  * fix(connection): retain modified status for documents created outside a transaction during transaction retries #14017 #13973
@@ -36,6 +82,23 @@
 6.12.2 / 2023-10-25
 ===================
  * fix: add fullPath to ValidatorProps #13995 [Freezystem](https://github.com/Freezystem)
+
+8.0.0-rc0 / 2023-10-24
+======================
+ * BREAKING CHANGE: use MongoDB node driver 6, drop support for rawResult option and findOneAndRemove() #13753
+ * BREAKING CHANGE: apply minimize by default when updating document #13843
+ * BREAKING CHANGE: remove `id` setter #13784
+ * BREAKING CHANGE: remove overwrite option for updateOne(), findOneAndUpdate(), etc. #13989 #13578
+ * BREAKING CHANGE: make model.prototype.deleteOne() return query, not promise #13660 #13369
+ * BREAKING CHANGE: remove `Model.count()`, `Query.prototype.count()` #13618 #13598
+ * BREAKING CHANGE: allow null values for string enum #13620 #3044
+ * BREAKING CHANGE: make base schema paths come before discriminator schema paths when running setters, validators, etc. #13846 #13794
+ * BREAKING CHANGE: make Model.validate() use Model.castObject() to cast, and return casted copy of object instead of modifying in place #13287 #12668
+ * BREAKING CHANGE: make internal file names all camelCase #13950 #13909 #13308
+ * BREAKING CHANGE: make create() wait for all documents to finish inserting or error out before throwing an error if ordered = false #13621 #4628
+ * BREAKING CHANGE: refactor out `mongoose/lib/mongoose.js` file to allow importing Mongoose without MongoDB driver #13905
+ * BREAKING CHANGE(types): allow `null` for optional fields #13901
+ * BREAKING CHANGE(types): infer return types types for Model.distinct and Query.distinct #13836 [kaulshashank](https://github.com/kaulshashank)
 
 7.6.3 / 2023-10-17
 ==================

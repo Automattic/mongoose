@@ -791,6 +791,38 @@ describe('model query casting', function() {
     assert.ok(res);
     assert.deepStrictEqual(res.map(doc => doc.arr[1].id), ['two', 'three']);
   });
+
+  it('should not throw a cast error when dealing with an array of objects in combination with $elemMatch and nested $and', async function() {
+    const testSchema = new Schema({
+      arr: [Object]
+    });
+
+    const Test = db.model('Test', testSchema);
+    const obj1 = new Test({ arr: [{ id: 'one', name: 'sample1' }, { id: 'two' }] });
+    await obj1.save();
+
+    const obj2 = new Test({ arr: [{ id: 'two', name: 'sample1' }, { id: 'three' }] });
+    await obj2.save();
+
+    const obj3 = new Test({ arr: [{ id: 'three', name: 'sample1' }, { id: 'four' }] });
+    await obj3.save();
+    const res = await Test.find({
+      arr: {
+        $elemMatch: {
+          $and: [
+            { name: 'sample1' },
+            { $or: [
+              { id: 'one' },
+              { id: 'two' }
+            ] }
+          ]
+        }
+      }
+    }).sort({ _id: 1 });
+    assert.ok(res);
+    assert.equal(res.length, 2);
+    assert.deepStrictEqual(res.map(doc => doc.arr[1].id), ['two', 'three']);
+  });
 });
 
 function _geojsonPoint(coordinates) {

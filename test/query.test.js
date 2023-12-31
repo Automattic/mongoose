@@ -772,12 +772,9 @@ describe('Query', function() {
       query.sort({ a: 1, c: -1, b: 'asc', e: 'descending', f: 'ascending' });
       assert.deepEqual(query.options.sort, { a: 1, c: -1, b: 1, e: -1, f: 1 });
 
-      if (typeof global.Map !== 'undefined') {
-        query = new Query({});
-        query.sort(new global.Map().set('a', 1).set('b', 1));
-        assert.equal(query.options.sort.get('a'), 1);
-        assert.equal(query.options.sort.get('b'), 1);
-      }
+      query = new Query({});
+      query.sort(new Map().set('a', 1).set('b', 1));
+      assert.deepStrictEqual(query.options.sort, { a: 1, b: 1 });
 
       query = new Query({});
       let e;
@@ -1906,10 +1903,9 @@ describe('Query', function() {
       const TestSchema = new Schema({ name: String });
 
       const ops = [
-        'count',
         'find',
         'findOne',
-        'findOneAndRemove',
+        'findOneAndDelete',
         'findOneAndUpdate',
         'replaceOne',
         'updateOne',
@@ -2954,17 +2950,6 @@ describe('Query', function() {
     assert.ok(res);
     assert.ok(res.message.indexOf('time limit') !== -1, res.message);
     delete db.base.options.maxTimeMS;
-  });
-
-  it('throws error with updateOne() and overwrite (gh-7475)', function() {
-    const Model = db.model('Test', Schema({ name: String }));
-
-    return Model.updateOne({}, { name: 'bar' }, { overwrite: true }).then(
-      () => { throw new Error('Should have failed'); },
-      err => {
-        assert.ok(err.message.indexOf('updateOne') !== -1);
-      }
-    );
   });
 
   describe('merge()', function() {
@@ -4149,16 +4134,6 @@ describe('Query', function() {
       () => Q.lean(),
       /Query must have `op` before executing/
     );
-  });
-  it('converts findOneAndUpdate to findOneAndReplace if overwrite set (gh-13550)', async function() {
-    const testSchema = new Schema({
-      name: { type: String }
-    });
-
-    const Test = db.model('Test', testSchema);
-    const q = Test.findOneAndUpdate({}, { name: 'bar' }, { overwrite: true });
-    await q.exec();
-    assert.equal(q.op, 'findOneAndReplace');
   });
 
   it('allows deselecting discriminator key (gh-13760) (gh-13679)', async function() {

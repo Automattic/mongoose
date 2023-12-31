@@ -17,7 +17,7 @@ import {
   ProjectionFields,
   QueryOptions
 } from 'mongoose';
-import { ObjectId } from 'mongodb';
+import { ModifyResult, ObjectId } from 'mongodb';
 import { expectAssignable, expectError, expectNotAssignable, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
 import { AutoTypedSchemaType } from './schema.test';
@@ -72,7 +72,7 @@ Test.find({}, {}, { populate: { path: 'child', model: ChildModel, match: true } 
 
 Test.find().byName('test').byName('test2').orFail().exec().then(console.log);
 
-Test.count({ name: /Test/ }).exec().then((res: number) => console.log(res));
+Test.countDocuments({ name: /Test/ }).exec().then((res: number) => console.log(res));
 Test.findOne({ 'docs.id': 42 }).exec().then(console.log);
 
 // ObjectId casting
@@ -115,10 +115,10 @@ Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true, new: 
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { upsert: true, returnOriginal: false }).then((res: ITest) => {
   res.name = 'test4';
 });
-Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { rawResult: true }).then((res: any) => {
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { includeResultMetadata: true }).then((res: any) => {
   console.log(res.ok);
 });
-Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { new: true, upsert: true, rawResult: true }).then((res: any) => {
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { new: true, upsert: true, includeResultMetadata: true }).then((res: any) => {
   console.log(res.ok);
 });
 
@@ -295,8 +295,9 @@ async function gh11306(): Promise<void> {
   // 3. Create a Model.
   const MyModel = model<User>('User', schema);
 
-  expectType<any[]>(await MyModel.distinct('name'));
-  expectType<string[]>(await MyModel.distinct<string>('name'));
+  expectType<unknown[]>(await MyModel.distinct('notThereInSchema'));
+  expectType<string[]>(await MyModel.distinct('name'));
+  expectType<number[]>(await MyModel.distinct<'overrideTest', number>('overrideTest'));
 }
 
 function autoTypedQuery() {
@@ -392,7 +393,8 @@ async function gh12342_manual() {
 
 async function gh12342_auto() {
   interface Project {
-    name?: string, stars?: number
+    name?: string | null,
+    stars?: number | null
   }
 
   const ProjectSchema = new Schema({
@@ -422,7 +424,7 @@ async function gh11602(): Promise<void> {
   const updateResult = await ModelType.findOneAndUpdate(query, { $inc: { occurence: 1 } }, {
     upsert: true,
     returnDocument: 'after',
-    rawResult: true
+    includeResultMetadata: true
   });
 
   expectError(updateResult.lastErrorObject?.modifiedCount);
@@ -482,8 +484,8 @@ async function gh13224() {
   const UserModel = model('User', userSchema);
 
   const u1 = await UserModel.findOne().select(['name']).orFail();
-  expectType<string | undefined>(u1.name);
-  expectType<number | undefined>(u1.age);
+  expectType<string | undefined | null>(u1.name);
+  expectType<number | undefined | null>(u1.age);
   expectAssignable<Function>(u1.toObject);
 
   const u2 = await UserModel.findOne().select<{ name?: string }>(['name']).orFail();
@@ -517,4 +519,28 @@ function gh13630() {
 
   const x: UpdateQueryKnownOnly<User> = { $set: { name: 'John' } };
   expectAssignable<UpdateQuery<User>>(x);
+}
+
+function gh14190() {
+  const userSchema = new Schema({ name: String, age: Number });
+  const UserModel = model('User', userSchema);
+
+  const doc = await UserModel.findByIdAndDelete('0'.repeat(24));
+  expectType<ReturnType<(typeof UserModel)['hydrate']> | null>(doc);
+
+  const res = await UserModel.findByIdAndDelete(
+    '0'.repeat(24),
+    { includeResultMetadata: true }
+  );
+  expectAssignable<
+    ModifyResult<ReturnType<(typeof UserModel)['hydrate']>>
+      >(res);
+
+  const res2 = await UserModel.find().findByIdAndDelete(
+    '0'.repeat(24),
+    { includeResultMetadata: true }
+  );
+  expectAssignable<
+    ModifyResult<ReturnType<(typeof UserModel)['hydrate']>>
+      >(res2);
 }

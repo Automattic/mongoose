@@ -666,7 +666,7 @@ describe('model: findOneAndUpdate:', function() {
     assert.ok(fruit instanceof mongoose.Document);
   });
 
-  it('return rawResult when doing an upsert & new=false gh-7770', async function() {
+  it('return includeResultMetadata when doing an upsert & new=false gh-7770', async function() {
     const thingSchema = new Schema({
       _id: String,
       flag: {
@@ -678,13 +678,13 @@ describe('model: findOneAndUpdate:', function() {
     const Thing = db.model('Test', thingSchema);
     const key = 'some-new-id';
 
-    const rawResult = await Thing.findOneAndUpdate({ _id: key }, { $set: { flag: false } }, { upsert: true, new: false, rawResult: true }).exec();
-    assert.equal(rawResult.lastErrorObject.updatedExisting, false);
+    const res1 = await Thing.findOneAndUpdate({ _id: key }, { $set: { flag: false } }, { upsert: true, new: false, includeResultMetadata: true }).exec();
+    assert.equal(res1.lastErrorObject.updatedExisting, false);
 
-    const rawResult2 = await Thing.findOneAndUpdate({ _id: key }, { $set: { flag: true } }, { upsert: true, new: false, rawResult: true }).exec();
-    assert.equal(rawResult2.lastErrorObject.updatedExisting, true);
-    assert.equal(rawResult2.value._id, key);
-    assert.equal(rawResult2.value.flag, false);
+    const res2 = await Thing.findOneAndUpdate({ _id: key }, { $set: { flag: true } }, { upsert: true, new: false, includeResultMetadata: true }).exec();
+    assert.equal(res2.lastErrorObject.updatedExisting, true);
+    assert.equal(res2.value._id, key);
+    assert.equal(res2.value.flag, false);
   });
 
 
@@ -1261,13 +1261,13 @@ describe('model: findOneAndUpdate:', function() {
   });
 
   describe('bug fixes', function() {
-    it('passes raw result if rawResult specified (gh-4925)', async function() {
+    it('passes raw result if includeResultMetadata specified (gh-4925)', async function() {
       const testSchema = new mongoose.Schema({
         test: String
       });
 
       const TestModel = db.model('Test', testSchema);
-      const options = { upsert: true, new: true, rawResult: true };
+      const options = { upsert: true, new: true, includeResultMetadata: true };
       const update = { $set: { test: 'abc' } };
 
       const res = await TestModel.findOneAndUpdate({}, update, options).exec();
@@ -2159,30 +2159,13 @@ describe('model: findOneAndUpdate:', function() {
     assert.equal(doc.ok, undefined);
     assert.equal(doc.name, 'Test Testerson');
 
-    let data = await Test.findOneAndUpdate(
+    const data = await Test.findOneAndUpdate(
       { name: 'Test Testerson' },
       { name: 'Test' },
       { new: true, upsert: true, includeResultMetadata: true }
     );
     assert(data.ok);
     assert.equal(data.value.name, 'Test');
-
-    data = await Test.findOneAndUpdate(
-      { name: 'Test Testerson' },
-      { name: 'Test' },
-      { new: true, upsert: true, includeResultMetadata: true, rawResult: true }
-    );
-    assert(data.ok);
-    assert.equal(data.value.name, 'Test');
-
-    await assert.rejects(
-      () => Test.findOneAndUpdate(
-        { name: 'Test Testerson' },
-        { name: 'Test' },
-        { new: true, upsert: true, includeResultMetadata: false, rawResult: true }
-      ),
-      /Cannot set `rawResult` option when `includeResultMetadata` is false/
-    );
   });
 
   it('successfully runs findOneAndUpdate with no update and versionKey set to false (gh-13783)', async function() {
@@ -2216,5 +2199,35 @@ describe('model: findOneAndUpdate:', function() {
       { upsert: true, returnDocument: 'after' }
     );
     assert.equal(updated.defaultField, 'some non-default value');
+  });
+
+  it('sets CastError path to full path (gh-14114)', async function() {
+    const testSchema = new mongoose.Schema({
+      id: mongoose.Schema.Types.ObjectId,
+      name: String,
+      accessories: [
+        {
+          isEnabled: Boolean,
+          additionals: [
+            {
+              k: String,
+              v: Number
+            }
+          ]
+        }
+      ]
+    });
+    const Test = db.model('Test', testSchema);
+    const err = await Test.findOneAndUpdate(
+      {},
+      {
+        $set: {
+          'accessories.0.additionals.0.k': ['test']
+        }
+      }
+    ).then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'CastError');
+    assert.equal(err.path, 'accessories.0.additionals.0.k');
   });
 });

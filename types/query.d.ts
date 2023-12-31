@@ -124,12 +124,7 @@ declare module 'mongoose' {
     overwriteDiscriminatorKey?: boolean;
     projection?: ProjectionType<DocType>;
     /**
-     * @deprecated use includeResultMetadata instead.
-     * if true, returns the raw result from the MongoDB driver
-     */
-    rawResult?: boolean;
-    /**
-     * if ture, includes meta data for the result from the MongoDB driver
+     * if true, returns the full ModifyResult rather than just the document
      */
     includeResultMetadata?: boolean;
     readPreference?: string | mongodb.ReadPreferenceMode;
@@ -264,15 +259,6 @@ declare module 'mongoose' {
     /** Specifies the `comment` option. */
     comment(val: string): this;
 
-    /** Specifies this query as a `count` query. */
-    count(criteria?: FilterQuery<RawDocType>): QueryWithHelpers<
-      number,
-      DocType,
-      THelpers,
-      RawDocType,
-      'count'
-    >;
-
     /** Specifies this query as a `countDocuments` query. */
     countDocuments(
       criteria?: FilterQuery<RawDocType>,
@@ -322,10 +308,10 @@ declare module 'mongoose' {
     deleteOne(): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteOne'>;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
-    distinct<ReturnType = any>(
-      field: string,
+    distinct<DocKey extends string, ResultType = unknown>(
+      field: DocKey,
       filter?: FilterQuery<RawDocType>
-    ): QueryWithHelpers<Array<ReturnType>, DocType, THelpers, RawDocType, 'distinct'>;
+    ): QueryWithHelpers<Array<DocKey extends keyof DocType ? Unpacked<DocType[DocKey]> : ResultType>, DocType, THelpers, RawDocType, 'distinct'>;
 
     /** Specifies a `$elemMatch` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     elemMatch<K = string>(path: K, val: any): this;
@@ -397,17 +383,11 @@ declare module 'mongoose' {
       options?: QueryOptions<DocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndDelete'>;
 
-    /** Creates a `findOneAndRemove` query: atomically finds the given document and deletes it. */
-    findOneAndRemove(
-      filter?: FilterQuery<RawDocType>,
-      options?: QueryOptions<DocType> | null
-    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndRemove'>;
-
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
     findOneAndUpdate(
       filter: FilterQuery<RawDocType>,
       update: UpdateQuery<RawDocType>,
-      options: QueryOptions<DocType> & { rawResult: true }
+      options: QueryOptions<DocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<ModifyResult<DocType>, DocType, THelpers, RawDocType, 'findOneAndUpdate'>;
     findOneAndUpdate(
       filter: FilterQuery<RawDocType>,
@@ -436,6 +416,10 @@ declare module 'mongoose' {
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
     findByIdAndDelete(
+      id: mongodb.ObjectId | any,
+      options: QueryOptions<DocType> & { includeResultMetadata: true }
+    ): QueryWithHelpers<ModifyResult<DocType>, DocType, THelpers, RawDocType, 'findOneAndDelete'>;
+    findByIdAndDelete(
       id?: mongodb.ObjectId | any,
       options?: QueryOptions<DocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndDelete'>;
@@ -444,7 +428,7 @@ declare module 'mongoose' {
     findByIdAndUpdate(
       id: mongodb.ObjectId | any,
       update: UpdateQuery<RawDocType>,
-      options: QueryOptions<DocType> & { rawResult: true }
+      options: QueryOptions<DocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'findOneAndUpdate'>;
     findByIdAndUpdate(
       id: mongodb.ObjectId | any,

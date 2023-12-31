@@ -92,6 +92,46 @@ describe('getRelatedIndexes', () => {
         ]
       );
     });
+    it('with base model that has discriminator, it includes discriminator indexes that only checks for existence', () => {
+      // Arrange
+      const eventSchema = new Schema(
+        { actorId: { type: Schema.Types.ObjectId } },
+        { autoIndex: false }
+      );
+      eventSchema.index({ actorId: 1 },
+        { unique: true,
+          partialFilterExpression: {
+            __t: { $exists: true }
+          }
+        });
+
+      const Event = db.model('Event', eventSchema);
+
+      const clickEventSchema = new Schema(
+        {
+          clickedAt: Date,
+          productCategory: String
+        },
+        { autoIndex: false }
+      );
+      Event.discriminator('ClickEvent', clickEventSchema);
+
+      // Act
+      const filteredSchemaIndexes = getRelatedSchemaIndexes(Event, Event.schema.indexes());
+
+      // Assert
+      assert.deepStrictEqual(
+        filteredSchemaIndexes,
+        [
+          [{ actorId: 1 },
+            { background: true,
+              unique: true,
+              partialFilterExpression: { __t: { $exists: true } }
+            }
+          ]
+        ]
+      );
+    });
     it('with discriminator model, it only gets discriminator indexes', () => {
       // Arrange
       const eventSchema = new Schema(

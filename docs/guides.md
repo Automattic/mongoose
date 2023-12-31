@@ -41,7 +41,7 @@ integrating Mongoose with external tools and frameworks.
 * [Transactions](transactions.html)
 * [MongoDB Driver Deprecation Warnings](deprecations.html)
 * [Testing with Jest](jest.html)
-* [SSL Connections](tutorials/ssl.html)
+* [TLS/SSL Connections](tutorials/ssl.html)
 * [MongoDB Client Side Field Level Encryption](field-level-encryption.html)
 
 ## Other Guides

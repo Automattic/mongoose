@@ -51,7 +51,7 @@ Using the `upsert` option, you can use `findOneAndUpdate()` as a find-and-[upser
 [require:Tutorial.*findOneAndUpdate.*upsert]
 ```
 
-<h2 id="includeresultmetadata">The `includeResultMetadata` Option<h2 id="rawresult"></h2></h2>
+<h2 id="includeresultmetadata">The <code>includeResultMetadata</code> Option<h2 id="rawresult"></h2></h2>
 
 Mongoose transforms the result of `findOneAndUpdate()` by default: it
 returns the updated document. That makes it difficult to check whether

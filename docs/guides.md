@@ -29,6 +29,7 @@ integrating Mongoose with external tools and frameworks.
 * [Custom Casting For Built-in Types](tutorials/custom-casting.html)
 * [Custom SchemaTypes](customschematypes.html)
 * [Advanced Schemas](advanced_schemas.html)
+* [Sharing Schemas Between Mongoose Projects](shared-schemas.html)
 
 ## Integrations
 

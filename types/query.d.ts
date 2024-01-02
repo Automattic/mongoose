@@ -99,82 +99,10 @@ declare module 'mongoose' {
     PopulateOption,
     SessionOption {
     arrayFilters?: { [key: string]: any }[];
-    batchSize?: number;
     collation?: mongodb.CollationOptions;
-    comment?: any;
-    context?: string;
-    explain?: mongodb.ExplainVerbosityLike;
-    fields?: any | string;
     hint?: mongodb.Hint;
-    /**
-     * If truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document.
-     */
-    lean?: boolean | Record<string, any>;
-    limit?: number;
-    maxTimeMS?: number;
-    multi?: boolean;
-    multipleCastError?: boolean;
-    /**
-     * By default, `findOneAndUpdate()` returns the document as it was **before**
-     * `update` was applied. If you set `new: true`, `findOneAndUpdate()` will
-     * instead give you the object after `update` was applied.
-     */
-    new?: boolean;
-
-    overwriteDiscriminatorKey?: boolean;
-    projection?: ProjectionType<DocType>;
-    /**
-     * if true, returns the full ModifyResult rather than just the document
-     */
-    includeResultMetadata?: boolean;
-    readPreference?: string | mongodb.ReadPreferenceMode;
-    /**
-     * An alias for the `new` option. `returnOriginal: false` is equivalent to `new: true`.
-     */
-    returnOriginal?: boolean;
-    /**
-     * Another alias for the `new` option. `returnOriginal` is deprecated so this should be used.
-     */
-    returnDocument?: 'before' | 'after';
-    /**
-     * Set to true to enable `update validators`
-     * (https://mongoosejs.com/docs/validation.html#update-validators). Defaults to false.
-     */
-    runValidators?: boolean;
-    /* Set to `true` to automatically sanitize potentially unsafe user-generated query projections */
-    sanitizeProjection?: boolean;
-    /**
-     * Set to `true` to automatically sanitize potentially unsafe query filters by stripping out query selectors that
-     * aren't explicitly allowed using `mongoose.trusted()`.
-     */
-    sanitizeFilter?: boolean;
-    setDefaultsOnInsert?: boolean;
-    skip?: number;
-    sort?: any;
-    /** overwrites the schema's strict mode option */
-    strict?: boolean | string;
-    /**
-     * equal to `strict` by default, may be `false`, `true`, or `'throw'`. Sets the default
-     * [strictQuery](https://mongoosejs.com/docs/guide.html#strictQuery) mode for schemas.
-     */
-    strictQuery?: boolean | 'throw';
-    tailable?: number;
-    /**
-     * If set to `false` and schema-level timestamps are enabled,
-     * skip timestamps for this update. Note that this allows you to overwrite
-     * timestamps. Does nothing if schema-level timestamps are not set.
-     */
-    timestamps?: boolean | QueryTimestampsConfig;
-    /**
-     * If `true`, convert any aliases in filter, projection, update, and distinct
-     * to their database property names. Defaults to false.
-     */
-    translateAliases?: boolean;
     upsert?: boolean;
-    useBigInt64?: boolean;
     writeConcern?: mongodb.WriteConcern;
-
-    [other: string]: any;
   }
 
   type QueryOpThatReturnsDocument = 'find' | 'findOne' | 'findOneAndUpdate' | 'findOneAndReplace' | 'findOneAndDelete';

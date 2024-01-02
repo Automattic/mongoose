@@ -777,6 +777,12 @@ declare module 'mongoose' {
     toDrop: Array<any>
   }
 
+  interface MongooseBulkWriteOptions {
+    skipValidation?: boolean;
+    strict?: boolean;
+    timestamps?: boolean | 'throw';
+  }
+
   export const Model: Model<any>;
   interface Model<T, TQueryHelpers = {}, TMethods = {}> extends NodeJS.EventEmitter, AcceptsDiscriminator {
     new(doc?: AnyKeys<T> & AnyObject): EnforceDocument<T, TMethods>;
@@ -800,8 +806,8 @@ declare module 'mongoose' {
      * if you use `create()`) because with `bulkWrite()` there is only one round
      * trip to MongoDB.
      */
-    bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions): Promise<mongodb.BulkWriteOpResultObject>;
-    bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions, cb?: Callback<mongodb.BulkWriteOpResultObject>): void;
+    bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions & MongooseBulkWriteOptions): Promise<mongodb.BulkWriteOpResultObject>;
+    bulkWrite(writes: Array<any>, options?: mongodb.CollectionBulkWriteOptions & MongooseBulkWriteOptions, cb?: Callback<mongodb.BulkWriteOpResultObject>): void;
 
     /**
      * Sends multiple `save()` calls in a single `bulkWrite()`. This is faster than

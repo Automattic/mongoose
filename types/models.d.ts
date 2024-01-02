@@ -17,6 +17,8 @@ declare module 'mongoose' {
 
   interface MongooseBulkWriteOptions {
     skipValidation?: boolean;
+    strict?: boolean;
+    timestamps?: boolean | 'throw';
   }
 
   interface InsertManyOptions extends

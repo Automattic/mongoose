@@ -222,7 +222,7 @@ declare module 'mongoose' {
     /** Creates a `countDocuments` query: counts the number of documents that match `filter`. */
     countDocuments(
       filter?: FilterQuery<TRawDocType>,
-      options?: QueryOptions<TRawDocType>
+      options?: (mongodb.CountOptions & MongooseSpecificQueryOptions) | null
     ): QueryWithHelpers<
       number,
       THydratedDocumentType,
@@ -254,7 +254,7 @@ declare module 'mongoose' {
      */
     deleteMany(
       filter?: FilterQuery<TRawDocType>,
-      options?: QueryOptions<TRawDocType>
+      options?: (mongodb.DeleteOptions & Omit<MongooseSpecificQueryOptions, 'lean' | 'timestamps'>) | null
     ): QueryWithHelpers<
       mongodb.DeleteResult,
       THydratedDocumentType,
@@ -279,7 +279,7 @@ declare module 'mongoose' {
      */
     deleteOne(
       filter?: FilterQuery<TRawDocType>,
-      options?: QueryOptions<TRawDocType>
+      options?: (mongodb.DeleteOptions & Omit<MongooseSpecificQueryOptions, 'lean' | 'timestamps'>) | null
     ): QueryWithHelpers<
       mongodb.DeleteResult,
       THydratedDocumentType,
@@ -689,7 +689,7 @@ declare module 'mongoose' {
     replaceOne<ResultDoc = THydratedDocumentType>(
       filter?: FilterQuery<TRawDocType>,
       replacement?: TRawDocType | AnyObject,
-      options?: QueryOptions<TRawDocType> | null
+      options?: (mongodb.ReplaceOptions & MongooseSpecificQueryOptions) | null
     ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, TRawDocType, 'replaceOne'>;
 
     /** Schema the model uses. */
@@ -699,14 +699,14 @@ declare module 'mongoose' {
     updateMany<ResultDoc = THydratedDocumentType>(
       filter?: FilterQuery<TRawDocType>,
       update?: UpdateQuery<TRawDocType> | UpdateWithAggregationPipeline,
-      options?: QueryOptions<TRawDocType> | null
+      options?: (mongodb.UpdateOptions & Omit<MongooseSpecificQueryOptions, 'lean'>) | null
     ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, TRawDocType, 'updateMany'>;
 
     /** Creates a `updateOne` query: updates the first document that matches `filter` with `update`. */
     updateOne<ResultDoc = THydratedDocumentType>(
       filter?: FilterQuery<TRawDocType>,
       update?: UpdateQuery<TRawDocType> | UpdateWithAggregationPipeline,
-      options?: QueryOptions<TRawDocType> | null
+      options?: (mongodb.UpdateOptions & Omit<MongooseSpecificQueryOptions, 'lean'>) | null
     ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, TRawDocType, 'updateOne'>;
 
     /** Creates a Query, applies the passed conditions, and returns the Query. */

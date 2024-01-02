@@ -1,3 +1,9 @@
+5.13.22 / 2024-01-02
+====================
+ * perf(schema): remove unnecessary lookahead in numeric subpath check
+ * fix(document): allow setting nested path to null #14205
+ * types: add skipValidation, strict, timestamps as options for bulkWrite() #8778
+
 5.13.21 / 2023-10-19
 ====================
  * types: fix "near" aggregation operator input type #12954 [Jokero](https://github.com/Jokero)

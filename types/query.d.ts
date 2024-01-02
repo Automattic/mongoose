@@ -110,6 +110,8 @@ declare module 'mongoose' {
      * aren't explicitly allowed using `mongoose.trusted()`.
      */
     sanitizeFilter?: boolean;
+    /* Set to `true` to automatically sanitize potentially unsafe user-generated query projections */
+    sanitizeProjection?: boolean;
     setDefaultsOnInsert?: boolean;
     /** overwrites the schema's strict mode option */
     strict?: boolean | string;

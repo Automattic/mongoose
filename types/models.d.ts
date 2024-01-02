@@ -222,7 +222,7 @@ declare module 'mongoose' {
     /** Creates a `countDocuments` query: counts the number of documents that match `filter`. */
     countDocuments(
       filter?: FilterQuery<TRawDocType>,
-      options?: (mongodb.CountOptions & MongooseSpecificQueryOptions) | null
+      options?: (mongodb.CountOptions & Omit<MongooseSpecificQueryOptions, 'lean' | 'timestamps'>) | null
     ): QueryWithHelpers<
       number,
       THydratedDocumentType,

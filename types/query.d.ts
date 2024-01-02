@@ -104,6 +104,10 @@ declare module 'mongoose' {
     multipleCastError?: boolean;
 
     overwriteDiscriminatorKey?: boolean;
+    /**
+     * Set to true to enable `update validators`
+     * (https://mongoosejs.com/docs/validation.html#update-validators). Defaults to false.
+     */
     runValidators?: boolean;
     /**
      * Set to `true` to automatically sanitize potentially unsafe query filters by stripping out query selectors that

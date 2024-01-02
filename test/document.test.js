@@ -12437,6 +12437,44 @@ describe('document', function() {
     const fromDb = await Test.findById(eventObj._id).lean().orFail();
     assert.strictEqual(fromDb.__stateBeforeSuspension.field3['.ippo'], 5);
   });
+
+  it('handles setting nested path to null (gh-14205)', function() {
+    const schema = new mongoose.Schema({
+      nested: {
+        key1: String,
+        key2: String
+      }
+    });
+
+    const Model = db.model('Test', schema);
+
+    const doc = new Model();
+    doc.init({
+      nested: { key1: 'foo', key2: 'bar' }
+    });
+
+    doc.set({ nested: null });
+    assert.strictEqual(doc.toObject().nested, null);
+  });
+
+  it('handles setting nested path to undefined (gh-14205)', function() {
+    const schema = new mongoose.Schema({
+      nested: {
+        key1: String,
+        key2: String
+      }
+    });
+
+    const Model = db.model('Test', schema);
+
+    const doc = new Model();
+    doc.init({
+      nested: { key1: 'foo', key2: 'bar' }
+    });
+
+    doc.set({ nested: void 0 });
+    assert.strictEqual(doc.toObject().nested, void 0);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

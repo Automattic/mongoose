@@ -12820,6 +12820,98 @@ describe('document', function() {
       ['__stateBeforeSuspension', '__stateBeforeSuspension.jsonField']
     );
   });
+
+  it('should allow null values in list in self assignment (gh-14172) (gh-13859)', async function() {
+    const objSchema = new Schema({
+      date: Date,
+      value: Number
+    });
+
+    const testSchema = new Schema({
+      intArray: [Number],
+      strArray: [String],
+      objArray: [objSchema]
+    });
+    const Test = db.model('Test', testSchema);
+
+    const doc = new Test({
+      intArray: [1, 2, 3, null],
+      strArray: ['b', null, 'c'],
+      objArray: [
+        { date: new Date(1000), value: 1 },
+        null,
+        { date: new Date(3000), value: 3 }
+      ]
+    });
+    await doc.save();
+    doc.intArray = doc.intArray;
+    doc.strArray = doc.strArray;
+    doc.objArray = doc.objArray; // this is the trigger for the error
+    assert.ok(doc);
+    await doc.save();
+    assert.ok(doc);
+  });
+
+  it('avoids overwriting dotted paths in mixed path underneath nested path (gh-14178)', async function() {
+    const testSchema = new Schema({
+      __stateBeforeSuspension: {
+        field1: String,
+        field3: { type: Schema.Types.Mixed }
+      }
+    });
+    const Test = db.model('Test', testSchema);
+    const eventObj = new Test({
+      __stateBeforeSuspension: { field1: 'test' }
+    });
+    await eventObj.save();
+    const newO = eventObj.toObject();
+    newO.__stateBeforeSuspension.field3 = { '.ippo': 5 };
+    eventObj.set(newO);
+    await eventObj.save();
+
+    assert.strictEqual(eventObj.__stateBeforeSuspension.field3['.ippo'], 5);
+
+    const fromDb = await Test.findById(eventObj._id).lean().orFail();
+    assert.strictEqual(fromDb.__stateBeforeSuspension.field3['.ippo'], 5);
+  });
+
+  it('handles setting nested path to null (gh-14205)', function() {
+    const schema = new mongoose.Schema({
+      nested: {
+        key1: String,
+        key2: String
+      }
+    });
+
+    const Model = db.model('Test', schema);
+
+    const doc = new Model();
+    doc.init({
+      nested: { key1: 'foo', key2: 'bar' }
+    });
+
+    doc.set({ nested: null });
+    assert.strictEqual(doc.toObject().nested, null);
+  });
+
+  it('handles setting nested path to undefined (gh-14205)', function() {
+    const schema = new mongoose.Schema({
+      nested: {
+        key1: String,
+        key2: String
+      }
+    });
+
+    const Model = db.model('Test', schema);
+
+    const doc = new Model();
+    doc.init({
+      nested: { key1: 'foo', key2: 'bar' }
+    });
+
+    doc.set({ nested: void 0 });
+    assert.strictEqual(doc.toObject().nested, void 0);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

@@ -179,7 +179,7 @@ declare module 'mongoose' {
      * Returns true if any of the given paths are modified, else false. If no arguments, returns `true` if any path
      * in this document is modified.
      */
-    isModified(path?: string | Array<string>): boolean;
+    isModified(path?: string | Array<string>, options?: { ignoreAtomics?: boolean } | null): boolean;
 
     /** Boolean flag specifying if the document is new. */
     isNew: boolean;

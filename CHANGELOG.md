@@ -1,3 +1,10 @@
+6.12.5 / 2024-01-03
+===================
+ * perf(schema): remove unnecessary lookahead in numeric subpath check
+ * fix(document): allow setting nested path to null #14226
+ * fix(document): avoid flattening dotted paths in mixed path underneath nested path #14198 #14178
+ * fix: add ignoreAtomics option to isModified() for better backwards compatibility with Mongoose 5 #14213
+
 6.12.4 / 2023-12-27
 ===================
  * fix: upgrade mongodb driver -> 4.17.2

@@ -27,11 +27,12 @@ declare module 'mongoose' {
     skipValidation?: boolean;
     throwOnValidationError?: boolean;
     timestamps?: boolean;
+    strict?: boolean | 'throw';
   }
 
   interface MongooseBulkWritePerWriteOptions {
     timestamps?: boolean;
-    strict?: boolean;
+    strict?: boolean | 'throw';
     session?: ClientSession;
     skipValidation?: boolean;
   }

@@ -2328,18 +2328,20 @@ describe('Query', function() {
     });
   });
 
-  it('map (gh-7142)', async function() {
+  it('transform (gh-14236) (gh-7142)', async function() {
     const Model = db.model('Test', new Schema({ name: String }));
 
-
+    let called = 0;
     await Model.create({ name: 'test' });
     const now = new Date();
     const res = await Model.findOne().transform(res => {
       res.loadedAt = now;
+      ++called;
       return res;
     });
 
     assert.equal(res.loadedAt, now);
+    assert.strictEqual(called, 1);
   });
 
   describe('orFail (gh-6841)', function() {

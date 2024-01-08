@@ -1,3 +1,8 @@
+7.6.8 / 2024-01-08
+==================
+ * fix(discriminator): handle reusing schema with embedded discriminators defined using Schema.prototype.discriminator #14202 #14162
+ * fix(ChangeStream): avoid suppressing errors in closed change stream #14206 #14177
+
 6.12.5 / 2024-01-03
 ===================
  * perf(schema): remove unnecessary lookahead in numeric subpath check

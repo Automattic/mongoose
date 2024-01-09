@@ -1379,3 +1379,15 @@ function gh14147() {
   const doc = new AffiliateModel();
   expectType<bigint>(doc.balance);
 }
+
+function gh14235() {
+  interface IUser {
+    name: string;
+    age: number;
+  }
+
+  const userSchema = new Schema<IUser>({ name: String, age: Number });
+
+  userSchema.omit<Omit<IUser, 'age'>>(['age']);
+}
+

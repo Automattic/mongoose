@@ -12769,6 +12769,28 @@ describe('document', function() {
     );
   });
 
+  it('handles reusing schema with embedded discriminators defined using Schema.prototype.discriminator (gh-14162)', async function() {
+    const discriminated = new Schema({
+      type: { type: Number, required: true }
+    }, { discriminatorKey: 'type' });
+
+    discriminated.discriminator(1, new Schema({ prop1: String }));
+    discriminated.discriminator(3, new Schema({ prop2: String }));
+
+    const containerSchema = new Schema({ items: [discriminated] });
+    const containerModel = db.model('Test', containerSchema);
+    const containerModel2 = db.model('Test1', containerSchema);
+    const doc1 = new containerModel({ items: [{ type: 1, prop1: 'foo' }, { type: 3, prop2: 'bar' }] });
+    const doc2 = new containerModel2({ items: [{ type: 1, prop1: 'baz' }, { type: 3, prop2: 'qux' }] });
+    await doc1.save();
+    await doc2.save();
+
+    doc1.items.push({ type: 3, prop2: 'test1' });
+    doc2.items.push({ type: 3, prop2: 'test1' });
+    await doc1.save();
+    await doc2.save();
+  });
+
   it('can use `collection` as schema name (gh-13956)', async function() {
     const schema = new mongoose.Schema({ name: String, collection: String });
     const Test = db.model('Test', schema);
@@ -12801,6 +12823,98 @@ describe('document', function() {
       eventObj.modifiedPaths(),
       ['__stateBeforeSuspension', '__stateBeforeSuspension.jsonField']
     );
+  });
+
+  it('should allow null values in list in self assignment (gh-14172) (gh-13859)', async function() {
+    const objSchema = new Schema({
+      date: Date,
+      value: Number
+    });
+
+    const testSchema = new Schema({
+      intArray: [Number],
+      strArray: [String],
+      objArray: [objSchema]
+    });
+    const Test = db.model('Test', testSchema);
+
+    const doc = new Test({
+      intArray: [1, 2, 3, null],
+      strArray: ['b', null, 'c'],
+      objArray: [
+        { date: new Date(1000), value: 1 },
+        null,
+        { date: new Date(3000), value: 3 }
+      ]
+    });
+    await doc.save();
+    doc.intArray = doc.intArray;
+    doc.strArray = doc.strArray;
+    doc.objArray = doc.objArray; // this is the trigger for the error
+    assert.ok(doc);
+    await doc.save();
+    assert.ok(doc);
+  });
+
+  it('avoids overwriting dotted paths in mixed path underneath nested path (gh-14178)', async function() {
+    const testSchema = new Schema({
+      __stateBeforeSuspension: {
+        field1: String,
+        field3: { type: Schema.Types.Mixed }
+      }
+    });
+    const Test = db.model('Test', testSchema);
+    const eventObj = new Test({
+      __stateBeforeSuspension: { field1: 'test' }
+    });
+    await eventObj.save();
+    const newO = eventObj.toObject();
+    newO.__stateBeforeSuspension.field3 = { '.ippo': 5 };
+    eventObj.set(newO);
+    await eventObj.save();
+
+    assert.strictEqual(eventObj.__stateBeforeSuspension.field3['.ippo'], 5);
+
+    const fromDb = await Test.findById(eventObj._id).lean().orFail();
+    assert.strictEqual(fromDb.__stateBeforeSuspension.field3['.ippo'], 5);
+  });
+
+  it('handles setting nested path to null (gh-14205)', function() {
+    const schema = new mongoose.Schema({
+      nested: {
+        key1: String,
+        key2: String
+      }
+    });
+
+    const Model = db.model('Test', schema);
+
+    const doc = new Model();
+    doc.init({
+      nested: { key1: 'foo', key2: 'bar' }
+    });
+
+    doc.set({ nested: null });
+    assert.strictEqual(doc.toObject().nested, null);
+  });
+
+  it('handles setting nested path to undefined (gh-14205)', function() {
+    const schema = new mongoose.Schema({
+      nested: {
+        key1: String,
+        key2: String
+      }
+    });
+
+    const Model = db.model('Test', schema);
+
+    const doc = new Model();
+    doc.init({
+      nested: { key1: 'foo', key2: 'bar' }
+    });
+
+    doc.set({ nested: void 0 });
+    assert.strictEqual(doc.toObject().nested, void 0);
   });
 });
 

@@ -1,3 +1,22 @@
+7.6.8 / 2024-01-08
+==================
+ * perf(schema): remove unnecessary lookahead in numeric subpath check
+ * fix(discriminator): handle reusing schema with embedded discriminators defined using Schema.prototype.discriminator #14202 #14162
+ * fix(ChangeStream): avoid suppressing errors in closed change stream #14206 #14177
+
+6.12.5 / 2024-01-03
+===================
+ * perf(schema): remove unnecessary lookahead in numeric subpath check
+ * fix(document): allow setting nested path to null #14226
+ * fix(document): avoid flattening dotted paths in mixed path underneath nested path #14198 #14178
+ * fix: add ignoreAtomics option to isModified() for better backwards compatibility with Mongoose 5 #14213
+
+6.12.4 / 2023-12-27
+===================
+ * fix: upgrade mongodb driver -> 4.17.2
+ * fix(document): avoid treating nested projection as inclusive when applying defaults #14173 #14115
+ * fix: account for null values when assigning isNew property #14172 #13883
+
 8.0.3 / 2023-12-07
 ==================
  * fix(schema): avoid creating unnecessary clone of schematype in nested array so nested document arrays use correct constructor #14128 #14101

@@ -3550,6 +3550,7 @@ describe('Model', function() {
           assert.equal(changeData.operationType, 'insert');
           assert.equal(changeData.fullDocument.name, 'Ned Stark');
 
+          await changeStream.close();
           await db.close();
         });
 

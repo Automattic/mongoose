@@ -197,6 +197,43 @@ describe('document modified', function() {
         assert.equal(post.isModified('comments.0.title'), true);
         assert.equal(post.isDirectModified('comments.0.title'), true);
       });
+      it('with push (gh-14024)', async function() {
+        const post = new BlogPost();
+        post.init({
+          title: 'Test',
+          slug: 'test',
+          comments: [{ title: 'Test', date: new Date(), body: 'Test' }]
+        });
+
+        post.comments.push({ title: 'new comment', body: 'test' });
+
+        assert.equal(post.isModified('comments.0.title', { ignoreAtomics: true }), false);
+        assert.equal(post.isModified('comments.0.body', { ignoreAtomics: true }), false);
+        assert.equal(post.get('comments')[0].isModified('body', { ignoreAtomics: true }), false);
+      });
+      it('with push and set (gh-14024)', async function() {
+        const post = new BlogPost();
+        post.init({
+          title: 'Test',
+          slug: 'test',
+          comments: [{ title: 'Test', date: new Date(), body: 'Test' }]
+        });
+
+        post.comments.push({ title: 'new comment', body: 'test' });
+        post.get('comments')[0].set('title', 'Woot');
+
+        assert.equal(post.isModified('comments', { ignoreAtomics: true }), true);
+        assert.equal(post.isModified('comments.0.title', { ignoreAtomics: true }), true);
+        assert.equal(post.isDirectModified('comments.0.title'), true);
+        assert.equal(post.isDirectModified('comments.0.body'), false);
+        assert.equal(post.isModified('comments.0.body', { ignoreAtomics: true }), false);
+
+        assert.equal(post.isModified('comments', { ignoreAtomics: true }), true);
+        assert.equal(post.isModified('comments.0.title', { ignoreAtomics: true }), true);
+        assert.equal(post.isDirectModified('comments.0.title'), true);
+        assert.equal(post.isDirectModified('comments.0.body'), false);
+        assert.equal(post.isModified('comments.0.body', { ignoreAtomics: true }), false);
+      });
       it('with accessors', function() {
         const post = new BlogPost();
         post.init({

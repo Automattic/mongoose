@@ -245,6 +245,8 @@ declare module 'mongoose' {
      */
     createCollection<T extends mongodb.Document>(options?: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'>): Promise<mongodb.Collection<T>>;
 
+    createSearchIndex(description: mongodb.SearchIndexDescription): Promise<string>;
+
     /** Connection the model uses. */
     db: Connection;
 

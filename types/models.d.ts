@@ -300,6 +300,8 @@ declare module 'mongoose' {
       'deleteOne'
     >;
 
+    dropSearchIndex(name: string): Promise<void>;
+
     /**
      * Event emitter that reports any errors that occurred. Useful for global error
      * handling.
@@ -474,6 +476,8 @@ declare module 'mongoose' {
     populate<Paths>(
       doc: any, options: PopulateOptions | Array<PopulateOptions> | string
     ): Promise<MergeType<THydratedDocumentType, Paths>>;
+
+    updateSearchIndex(name: string, definition: AnyObject): Promise<void>;
 
     /** Casts and validates the given object against this model's schema, passing the given `context` to custom validators. */
     validate(): Promise<void>;

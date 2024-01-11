@@ -29,6 +29,7 @@ integrating Mongoose with external tools and frameworks.
 * [Custom Casting For Built-in Types](tutorials/custom-casting.html)
 * [Custom SchemaTypes](customschematypes.html)
 * [Advanced Schemas](advanced_schemas.html)
+* [Sharing Schemas Between Mongoose Projects](shared-schemas.html)
 
 ## Integrations
 
@@ -41,7 +42,7 @@ integrating Mongoose with external tools and frameworks.
 * [Transactions](transactions.html)
 * [MongoDB Driver Deprecation Warnings](deprecations.html)
 * [Testing with Jest](jest.html)
-* [SSL Connections](tutorials/ssl.html)
+* [TLS/SSL Connections](tutorials/ssl.html)
 * [MongoDB Client Side Field Level Encryption](field-level-encryption.html)
 
 ## Other Guides

@@ -2197,7 +2197,7 @@ describe('model: populate:', function() {
     });
 
     describe('in a subdocument', function() {
-      it('works', async function() {
+      it('works (gh-14231)', async function() {
         const docs = await U.find({ name: 'u1' }).populate('comments', { _id: 0 });
 
         let doc = docs[0];
@@ -2229,6 +2229,15 @@ describe('model: populate:', function() {
           assert.equal(typeof d._doc.__v, 'number');
         });
 
+        doc = await U.findOne({ name: 'u1' }).populate('comments', ['-_id']);
+        assert.equal(doc.comments.length, 2);
+        doc.comments.forEach(function(d) {
+          assert.equal(d._id, undefined);
+          assert.equal(Object.keys(d._doc).indexOf('_id'), -1);
+          assert.ok(d.title.length);
+          assert.ok(d.body.length);
+          assert.equal(typeof d._doc.__v, 'number');
+        });
       });
 
       it('with lean', async function() {

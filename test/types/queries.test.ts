@@ -18,7 +18,7 @@ import {
   QueryOptions,
   ProjectionType
 } from 'mongoose';
-import { ObjectId } from 'mongodb';
+import { ModifyResult, ObjectId } from 'mongodb';
 import { expectAssignable, expectError, expectNotAssignable, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
 import { AutoTypedSchemaType } from './schema.test';
@@ -554,4 +554,28 @@ function gh13630() {
 
   const x: UpdateQueryKnownOnly<User> = { $set: { name: 'John' } };
   expectAssignable<UpdateQuery<User>>(x);
+}
+
+function gh14190() {
+  const userSchema = new Schema({ name: String, age: Number });
+  const UserModel = model('User', userSchema);
+
+  const doc = await UserModel.findByIdAndDelete('0'.repeat(24));
+  expectType<ReturnType<(typeof UserModel)['hydrate']> | null>(doc);
+
+  const res = await UserModel.findByIdAndDelete(
+    '0'.repeat(24),
+    { includeResultMetadata: true }
+  );
+  expectAssignable<
+    ModifyResult<ReturnType<(typeof UserModel)['hydrate']>>
+      >(res);
+
+  const res2 = await UserModel.find().findByIdAndDelete(
+    '0'.repeat(24),
+    { includeResultMetadata: true }
+  );
+  expectAssignable<
+    ModifyResult<ReturnType<(typeof UserModel)['hydrate']>>
+      >(res2);
 }

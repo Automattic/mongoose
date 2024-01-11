@@ -2328,18 +2328,20 @@ describe('Query', function() {
     });
   });
 
-  it('map (gh-7142)', async function() {
+  it('transform (gh-14236) (gh-7142)', async function() {
     const Model = db.model('Test', new Schema({ name: String }));
 
-
+    let called = 0;
     await Model.create({ name: 'test' });
     const now = new Date();
     const res = await Model.findOne().transform(res => {
       res.loadedAt = now;
+      ++called;
       return res;
     });
 
     assert.equal(res.loadedAt, now);
+    assert.strictEqual(called, 1);
   });
 
   describe('orFail (gh-6841)', function() {
@@ -4080,6 +4082,7 @@ describe('Query', function() {
       await Error.find().sort('-');
     }, { message: 'Invalid field "" passed to sort()' });
   });
+
   it('allows executing a find() with a subdocument with defaults disabled (gh-13512)', async function() {
     const schema = mongoose.Schema({
       title: String,
@@ -4153,5 +4156,39 @@ describe('Query', function() {
     doc = await Test.findById(_id).select(['-__t', '-age']);
     assert.strictEqual(doc.name, 'test1');
     assert.strictEqual(doc.__t, undefined);
+  });
+
+  it('does not apply sibling path defaults if using nested projection (gh-14115)', async function() {
+    const version = await start.mongodVersion();
+    if (version[0] < 5) {
+      return this.skip();
+    }
+
+    const userSchema = new mongoose.Schema({
+      name: String,
+      account: {
+        amount: Number,
+        owner: { type: String, default: () => 'OWNER' },
+        taxIds: [Number]
+      }
+    });
+    const User = db.model('User', userSchema);
+
+    const { _id } = await User.create({
+      name: 'test',
+      account: {
+        amount: 25,
+        owner: 'test',
+        taxIds: [42]
+      }
+    });
+
+    const doc = await User
+      .findOne({ _id }, { name: 1, account: { amount: 1 } })
+      .orFail();
+    assert.strictEqual(doc.name, 'test');
+    assert.strictEqual(doc.account.amount, 25);
+    assert.strictEqual(doc.account.owner, undefined);
+    assert.strictEqual(doc.account.taxIds, undefined);
   });
 });

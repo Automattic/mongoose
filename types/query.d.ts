@@ -17,7 +17,14 @@ declare module 'mongoose' {
    */
   type FilterQuery<T> = _FilterQuery<T>;
 
-  type MongooseQueryOptions<DocType = unknown> = Pick<QueryOptions<DocType>, 'populate' | 'lean' | 'strict' | 'sanitizeProjection' | 'sanitizeFilter'>;
+  type MongooseQueryOptions<DocType = unknown> = Pick<QueryOptions<DocType>, 'populate' |
+  'lean' |
+  'strict' |
+  'sanitizeProjection' |
+  'sanitizeFilter' |
+  'timestamps' |
+  'translateAliases'
+  >;
 
   type ProjectionFields<DocType> = { [Key in keyof DocType]?: any } & Record<string, any>;
 
@@ -415,6 +422,10 @@ declare module 'mongoose' {
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne'>;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
+    findByIdAndDelete(
+      id: mongodb.ObjectId | any,
+      options: QueryOptions<DocType> & { includeResultMetadata: true }
+    ): QueryWithHelpers<ModifyResult<DocType>, DocType, THelpers, RawDocType, 'findOneAndDelete'>;
     findByIdAndDelete(
       id?: mongodb.ObjectId | any,
       options?: QueryOptions<DocType> | null

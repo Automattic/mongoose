@@ -102,7 +102,7 @@ declare module 'mongoose' {
     updatedAt?: boolean;
   }
 
-  interface QueryOptions<DocType = any> extends
+  interface QueryOptions<DocType = unknown> extends
     PopulateOption,
     SessionOption {
     arrayFilters?: { [key: string]: any }[];
@@ -129,7 +129,7 @@ declare module 'mongoose' {
     new?: boolean;
 
     overwriteDiscriminatorKey?: boolean;
-    projection?: ProjectionType<any>;
+    projection?: ProjectionType<DocType>;
     /**
      * if true, returns the full ModifyResult rather than just the document
      */

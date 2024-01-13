@@ -195,6 +195,14 @@ describe('connections:', function() {
       const newCollectionsNames = collectionsAfterCreation.map(function(c) { return c.name; });
       assert.ok(newCollectionsNames.indexOf('gh5712') !== -1);
     });
+
+    it('listCollections()', async function() {
+      await conn.dropDatabase();
+      await conn.createCollection('test1176');
+
+      const collections = await conn.listCollections();
+      assert.deepStrictEqual(collections.map(coll => coll.name), ['test1176']);
+    });
   });
 
   it('should allow closing a closed connection', async function() {

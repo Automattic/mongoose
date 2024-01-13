@@ -122,6 +122,12 @@ declare module 'mongoose' {
     readonly id: number;
 
     /**
+     * Helper for MongoDB Node driver's `listCollections()`.
+     * Returns an array of collection names.
+     */
+    listCollections(collection: string): Promise<Pick<mongodb.CollectionInfo, 'name' | 'type'>[]>;
+
+    /**
      * A [POJO](https://masteringjs.io/tutorials/fundamentals/pojo) containing
      * a map from model names to models. Contains all models that have been
      * added to this connection using [`Connection#model()`](/docs/api/connection.html#connection_Connection-model).

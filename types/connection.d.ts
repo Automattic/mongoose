@@ -125,7 +125,7 @@ declare module 'mongoose' {
      * Helper for MongoDB Node driver's `listCollections()`.
      * Returns an array of collection names.
      */
-    listCollections(collection: string): Promise<Pick<mongodb.CollectionInfo, 'name' | 'type'>[]>;
+    listCollections(): Promise<Pick<mongodb.CollectionInfo, 'name' | 'type'>[]>;
 
     /**
      * A [POJO](https://masteringjs.io/tutorials/fundamentals/pojo) containing

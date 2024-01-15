@@ -558,6 +558,7 @@ Valid options:
 * [collectionOptions](#collectionOptions)
 * [methods](#methods)
 * [query](#query-helpers)
+* [autoSearchIndex](#autoSearchIndex)
 
 <h2 id="autoIndex"><a href="#autoIndex">option: autoIndex</a></h2>
 
@@ -1452,6 +1453,25 @@ const Test = mongoose.model('Test', schema);
 // Equivalent to `createCollection({ capped: true, max: 1000 })`
 await Test.createCollection();
 ```
+
+<h2 id="autoSearchIndex">
+  <a href="#autoSearchIndex">
+    option: autoSearchIndex
+  </a>
+</h2>
+
+Similar to [`autoIndex`](#autoIndex), except for automatically creates any [Atlas search indexes](https://www.mongodb.com/docs/atlas/atlas-search/create-index/) defined in your schema.
+Unlike `autoIndex`, this option defaults to false.
+
+```javascript
+const schema = new Schema({ name: String }, { autoSearchIndex: true });
+schema.searchIndex({
+  name: 'my-index',
+  definition: { mappings: { dynamic: true } }
+});
+// Will automatically attempt to create the `my-index` search index.
+const Test = mongoose.model('Test', schema);
+``
 
 <h2 id="es6-classes"><a href="#es6-classes">With ES6 Classes</a></h2>
 

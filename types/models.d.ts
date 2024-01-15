@@ -245,6 +245,12 @@ declare module 'mongoose' {
      */
     createCollection<T extends mongodb.Document>(options?: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'>): Promise<mongodb.Collection<T>>;
 
+    /**
+     * Create an [Atlas search index](https://www.mongodb.com/docs/atlas/atlas-search/create-index/).
+     * This function only works when connected to MongoDB Atlas.
+     */
+    createSearchIndex(description: mongodb.SearchIndexDescription): Promise<string>;
+
     /** Connection the model uses. */
     db: Connection;
 
@@ -297,6 +303,12 @@ declare module 'mongoose' {
       TRawDocType,
       'deleteOne'
     >;
+
+    /**
+     * Delete an existing [Atlas search index](https://www.mongodb.com/docs/atlas/atlas-search/create-index/) by name.
+     * This function only works when connected to MongoDB Atlas.
+     */
+    dropSearchIndex(name: string): Promise<void>;
 
     /**
      * Event emitter that reports any errors that occurred. Useful for global error
@@ -472,6 +484,12 @@ declare module 'mongoose' {
     populate<Paths>(
       doc: any, options: PopulateOptions | Array<PopulateOptions> | string
     ): Promise<MergeType<THydratedDocumentType, Paths>>;
+
+    /**
+     * Update an existing [Atlas search index](https://www.mongodb.com/docs/atlas/atlas-search/create-index/).
+     * This function only works when connected to MongoDB Atlas.
+     */
+    updateSearchIndex(name: string, definition: AnyObject): Promise<void>;
 
     /** Casts and validates the given object against this model's schema, passing the given `context` to custom validators. */
     validate(): Promise<void>;

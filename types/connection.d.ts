@@ -48,7 +48,7 @@ declare module 'mongoose' {
     pass?: string;
     /** Set to false to disable automatic index creation for all models associated with this connection. */
     autoIndex?: boolean;
-    /** Set to `true` to make Mongoose automatically call `createCollection()` on every model created on this connection. */
+    /** Set to `false` to disable Mongoose automatically calling `createCollection()` on every model created on this connection. */
     autoCreate?: boolean;
   }
 
@@ -120,6 +120,12 @@ declare module 'mongoose' {
      * you have [multiple connections](/docs/connections.html#multiple_connections).
      */
     readonly id: number;
+
+    /**
+     * Helper for MongoDB Node driver's `listCollections()`.
+     * Returns an array of collection names.
+     */
+    listCollections(): Promise<Pick<mongodb.CollectionInfo, 'name' | 'type'>[]>;
 
     /**
      * A [POJO](https://masteringjs.io/tutorials/fundamentals/pojo) containing

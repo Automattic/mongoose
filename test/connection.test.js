@@ -94,7 +94,7 @@ describe('connections:', function() {
       }));
       await Model.init();
 
-      const res = await conn.db.listCollections().toArray();
+      const res = await conn.listCollections();
       assert.ok(!res.map(c => c.name).includes('gh8814_Conn'));
       await conn.close();
     });
@@ -185,15 +185,24 @@ describe('connections:', function() {
         size: 1024
       });
 
-      const collections = await conn.db.listCollections().toArray();
+      const collections = await conn.listCollections();
 
       const names = collections.map(function(c) { return c.name; });
       assert.ok(names.indexOf('gh5712') !== -1);
       assert.ok(collections[names.indexOf('gh5712')].options.capped);
       await conn.createCollection('gh5712_0');
-      const collectionsAfterCreation = await conn.db.listCollections().toArray();
+      const collectionsAfterCreation = await conn.listCollections();
       const newCollectionsNames = collectionsAfterCreation.map(function(c) { return c.name; });
       assert.ok(newCollectionsNames.indexOf('gh5712') !== -1);
+    });
+
+    it('listCollections()', async function() {
+      await conn.dropDatabase();
+      await conn.createCollection('test1176');
+      await conn.createCollection('test94112');
+
+      const collections = await conn.listCollections();
+      assert.deepStrictEqual(collections.map(coll => coll.name).sort(), ['test1176', 'test94112']);
     });
   });
 

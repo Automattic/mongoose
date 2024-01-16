@@ -70,6 +70,10 @@ expectType<Connection>(conn.useDb('test', {}));
 expectType<Connection>(conn.useDb('test', { noListener: true }));
 expectType<Connection>(conn.useDb('test', { useCache: true }));
 
+expectType<Promise<string[]>>(
+  conn.listCollections().then(collections => collections.map(coll => coll.name))
+);
+
 export function autoTypedModelConnection() {
   const AutoTypedSchema = autoTypedSchema();
   const AutoTypedModel = connection.model('AutoTypeModelConnection', AutoTypedSchema);

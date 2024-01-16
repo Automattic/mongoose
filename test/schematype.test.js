@@ -208,6 +208,37 @@ describe('schematype', function() {
     });
   });
 
+  it('merges default validators (gh-14070)', function() {
+    class TestSchemaType extends mongoose.SchemaType {}
+    TestSchemaType.set('validate', checkIfString);
+
+    const schemaType = new TestSchemaType('test-path', {
+      validate: checkIfLength2
+    });
+
+    assert.equal(schemaType.validators.length, 2);
+    assert.equal(schemaType.validators[0].validator, checkIfString);
+    assert.equal(schemaType.validators[1].validator, checkIfLength2);
+
+    let err = schemaType.doValidateSync([1, 2]);
+    assert.ok(err);
+    assert.equal(err.name, 'ValidatorError');
+
+    err = schemaType.doValidateSync('foo');
+    assert.ok(err);
+    assert.equal(err.name, 'ValidatorError');
+
+    err = schemaType.doValidateSync('ab');
+    assert.ifError(err);
+
+    function checkIfString(v) {
+      return typeof v === 'string';
+    }
+    function checkIfLength2(v) {
+      return v.length === 2;
+    }
+  });
+
   describe('set()', function() {
     describe('SchemaType.set()', function() {
       it('SchemaType.set, is a function', () => {

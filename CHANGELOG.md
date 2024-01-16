@@ -1,3 +1,11 @@
+8.1.0 / 2024-01-16
+==================
+ * feat: upgrade MongoDB driver -> 6.3.0 #14241 #14189 #14108 #14104
+ * feat: add Atlas search index helpers to Models and Schemas #14251 #14232
+ * feat(connection): add listCollections() helper to connections #14257
+ * feat(schematype): merge rather than overwrite default schematype validators #14124 #14070
+ * feat(types): support type hints in InferSchemaType #14008 [JavaScriptBach](https://github.com/JavaScriptBach)
+
 8.0.4 / 2024-01-08
 ==================
  * fix(update): set CastError path to full path if casting update fails #14161 #14114

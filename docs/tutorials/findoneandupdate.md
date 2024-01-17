@@ -89,7 +89,7 @@ Here's what the `res` object from the above example looks like:
 
 ## Updating Discriminator Keys
 
-Mongoose prevents updating the [discriminator key](https://mongoosejs.com/docs/discriminators.html#discriminator-keys) using `findOneAndUpdate()` by default.
+Mongoose prevents updating the [discriminator key](../discriminators.html#discriminator-keys) using `findOneAndUpdate()` by default.
 For example, suppose you have the following discriminator models.
 
 ```javascript

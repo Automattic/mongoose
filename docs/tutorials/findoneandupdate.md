@@ -7,10 +7,18 @@ However, there are some cases where you need to use [`findOneAndUpdate()`](https
 * [Atomic Updates](#atomic-updates)
 * [Upsert](#upsert)
 * [The `rawResult` Option](#raw-result)
+* [Updating Discriminator Keys](#updating-discriminator-keys)
 
 ## Getting Started
 
-As the name implies, `findOneAndUpdate()` finds the first document that matches a given `filter`, applies an `update`, and returns the document. By default, `findOneAndUpdate()` returns the document as it was **before** `update` was applied.
+As the name implies, `findOneAndUpdate()` finds the first document that matches a given `filter`, applies an `update`, and returns the document.
+The `findOneAndUpdate()` function has the following signature:
+
+```javascript
+function findOneAndUpdate(filter, update, options) {}
+```
+
+By default, `findOneAndUpdate()` returns the document as it was **before** `update` was applied.
 
 ```acquit
 [require:Tutorial.*findOneAndUpdate.*basic case]
@@ -77,4 +85,32 @@ Here's what the `res` object from the above example looks like:
      __v: 0,
      age: 29 },
   ok: 1 }
+```
+
+## Updating Discriminator Keys
+
+Mongoose prevents updating the [discriminator key](../discriminators.html#discriminator-keys) using `findOneAndUpdate()` by default.
+For example, suppose you have the following discriminator models.
+
+```javascript
+const eventSchema = new mongoose.Schema({ time: Date });
+const Event = db.model('Event', eventSchema);
+
+const ClickedLinkEvent = Event.discriminator(
+  'ClickedLink',
+  new mongoose.Schema({ url: String })
+);
+
+const SignedUpEvent = Event.discriminator(
+  'SignedUp',
+  new mongoose.Schema({ username: String })
+);
+```
+
+Mongoose will remove `__t` (the default discriminator key) from the `update` parameter, if `__t` is set.
+This is to prevent unintentional updates to the discriminator key; for example, if you're passing untrusted user input to the `update` parameter.
+However, you can tell Mongoose to allow updating the discriminator key by setting the `overwriteDiscriminatorKey` option to `true` as shown below.
+
+```acquit
+[require:use overwriteDiscriminatorKey to change discriminator key]
 ```

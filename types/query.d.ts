@@ -17,13 +17,19 @@ declare module 'mongoose' {
    */
   type FilterQuery<T> = _FilterQuery<T>;
 
-  type MongooseQueryOptions<DocType = unknown> = Pick<QueryOptions<DocType>, 'populate' |
-  'lean' |
-  'strict' |
-  'sanitizeProjection' |
-  'sanitizeFilter' |
-  'timestamps' |
-  'translateAliases'
+  type MongooseQueryOptions<DocType = unknown> = Pick<
+    QueryOptions<DocType>,
+    'lean' |
+    'multipleCastError' |
+    'overwriteDiscriminatorKey' |
+    'populate' |
+    'runValidators' |
+    'sanitizeProjection' |
+    'sanitizeFilter' |
+    'strict' |
+    'strictQuery' |
+    'timestamps' |
+    'translateAliases'
   >;
 
   type ProjectionFields<DocType> = { [Key in keyof DocType]?: any } & Record<string, any>;

@@ -1,3 +1,8 @@
+6.12.6 / 2024-01-22
+===================
+ * fix(collection): correctly handle buffer timeouts with find() #14277
+ * fix(document): allow calling push() with different $position arguments #14254
+
 6.12.5 / 2024-01-03
 ===================
  * perf(schema): remove unnecessary lookahead in numeric subpath check

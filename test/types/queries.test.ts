@@ -544,3 +544,29 @@ function gh14190() {
     ModifyResult<ReturnType<(typeof UserModel)['hydrate']>>
       >(res2);
 }
+
+function mongooseQueryOptions() {
+  const userSchema = new Schema({ name: String, age: Number });
+  const UserModel = model('User', userSchema);
+
+  UserModel.updateOne(
+    { name: 'bar' },
+    { name: 'baz' },
+    {
+      multipleCastError: true,
+      overwriteDiscriminatorKey: true,
+      runValidators: true,
+      sanitizeProjection: true,
+      sanitizeFilter: true,
+      strict: true,
+      strictQuery: 'throw',
+      timestamps: false,
+      translateAliases: false
+    }
+  );
+
+  UserModel.findOne({}, null, {
+    lean: true,
+    populate: 'test'
+  });
+}

@@ -19,6 +19,7 @@ declare module 'mongoose' {
 
   type MongooseQueryOptions<DocType = unknown> = Pick<
     QueryOptions<DocType>,
+    'context' |
     'lean' |
     'multipleCastError' |
     'overwriteDiscriminatorKey' |
@@ -26,6 +27,7 @@ declare module 'mongoose' {
     'runValidators' |
     'sanitizeProjection' |
     'sanitizeFilter' |
+    'setDefaultsOnInsert' |
     'strict' |
     'strictQuery' |
     'timestamps' |

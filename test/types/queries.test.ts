@@ -553,11 +553,13 @@ function mongooseQueryOptions() {
     { name: 'bar' },
     { name: 'baz' },
     {
+      context: 'query',
       multipleCastError: true,
       overwriteDiscriminatorKey: true,
       runValidators: true,
       sanitizeProjection: true,
       sanitizeFilter: true,
+      setDefaultsOnInsert: true,
       strict: true,
       strictQuery: 'throw',
       timestamps: false,

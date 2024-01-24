@@ -7295,6 +7295,13 @@ describe('Model', function() {
     const isCapped = await TestModel.collection.isCapped();
     assert.ok(isCapped);
   });
+
+  it('throws helpful error when calling Model() with string instead of model() (gh-14281)', async function() {
+    assert.throws(
+      () => mongoose.Model('taco'),
+      /First argument to `Model` constructor must be an object/
+    );
+  });
 });
 
 

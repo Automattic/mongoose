@@ -1,3 +1,10 @@
+8.1.1 / 2024-01-24
+==================
+ * fix(model): throw readable error when calling Model() with a string instead of model() #14288 #14281
+ * fix(document): handle setting nested path to spread doc with extra properties #14287 #14269
+ * types(query): add back context and setDefaultsOnInsert as Mongoose-specific query options #14284 #14282
+ * types(query): add missing runValidators back to MongooseQueryOptions #14278 #14275
+
 8.1.0 / 2024-01-16
 ==================
  * feat: upgrade MongoDB driver -> 6.3.0 #14241 #14189 #14108 #14104

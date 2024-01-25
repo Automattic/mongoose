@@ -82,6 +82,11 @@ declare module 'mongoose' {
     createCollection<T extends AnyObject = AnyObject>(name: string, options?: mongodb.CreateCollectionOptions): Promise<mongodb.Collection<T>>;
 
     /**
+     * https://mongoosejs.com/docs/api/connection.html#Connection.prototype.createCollections()
+     */
+    createCollections<T extends AnyObject = AnyObject>(continueOnError?: boolean): Promise<mongodb.Collection<T>>;
+
+    /**
      * Removes the model named `name` from this connection, if it exists. You can
      * use this function to clean up any models you created in your tests to
      * prevent OverwriteModelErrors.

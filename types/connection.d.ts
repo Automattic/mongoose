@@ -84,7 +84,7 @@ declare module 'mongoose' {
     /**
      * https://mongoosejs.com/docs/api/connection.html#Connection.prototype.createCollections()
      */
-    createCollections<T extends AnyObject = AnyObject>(continueOnError?: boolean): Promise<mongodb.Collection<T>>;
+    createCollections(continueOnError?: boolean): Promise<Record<string, Error | mongodb.Collection<any>>>;
 
     /**
      * Removes the model named `name` from this connection, if it exists. You can

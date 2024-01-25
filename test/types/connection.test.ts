@@ -20,7 +20,6 @@ conn.readyState === 99;
 
 expectError(conn.readyState = 0);
 
-expectError(conn.createCollections());
 
 expectType<Connection>(new Connection());
 expectType<Promise<Connection>>(new Connection().asPromise());

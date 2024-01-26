@@ -14,6 +14,7 @@ Below are the [semver](http://semver.org/) ranges representing which versions of
 * MongoDB Server 4.0.x: mongoose `^5.2.0`
 * MongoDB Server 4.2.x: mongoose `^5.7.0`
 * MongoDB Server 4.4.x: mongoose `^5.10.0`
+* MongoDB Server 5.0.x: mongoose `^5.13.0`
 
 Note that Mongoose 5.x dropped support for all versions of MongoDB before 3.0.0. If you need to use MongoDB 2.6 or older, use Mongoose 4.x.
 

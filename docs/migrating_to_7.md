@@ -87,6 +87,7 @@ They always return promises.
 * `Aggregate.prototype.exec`
 * `Aggregate.prototype.explain`
 * `AggregationCursor.prototype.close`
+* `AggregationCursor.prototype.next`
 * `AggregationCursor.prototype.eachAsync`
 * `Connection.prototype.startSession`
 * `Connection.prototype.dropCollection`

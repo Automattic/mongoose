@@ -87,6 +87,8 @@ They always return promises.
 * `Aggregate.prototype.exec`
 * `Aggregate.prototype.explain`
 * `AggregationCursor.prototype.close`
+* `AggregationCursor.prototype.next`
+* `AggregationCursor.prototype.eachAsync`
 * `Connection.prototype.startSession`
 * `Connection.prototype.dropCollection`
 * `Connection.prototype.createCollection`
@@ -138,6 +140,7 @@ They always return promises.
 * `Query.prototype.exec`
 * `QueryCursor.prototype.close`
 * `QueryCursor.prototype.next`
+* `QueryCursor.prototype.eachAsync`
 
 If you are using the above functions with callbacks, we recommend switching to async/await, or promises if async functions don't work for you.
 If you need help refactoring a legacy codebase, [this tool from Mastering JS callbacks to async await](https://masteringjs.io/tutorials/tools/callback-to-async-await) using ChatGPT.

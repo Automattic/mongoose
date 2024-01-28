@@ -22,6 +22,7 @@ declare module 'mongoose' {
     'context' |
     'lean' |
     'multipleCastError' |
+    'new' |
     'overwriteDiscriminatorKey' |
     'populate' |
     'runValidators' |

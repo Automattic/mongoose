@@ -555,6 +555,7 @@ function mongooseQueryOptions() {
     {
       context: 'query',
       multipleCastError: true,
+      new: true,
       overwriteDiscriminatorKey: true,
       runValidators: true,
       sanitizeProjection: true,

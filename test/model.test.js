@@ -7302,6 +7302,19 @@ describe('Model', function() {
       /First argument to `Model` constructor must be an object/
     );
   });
+
+  it('supports recompiling model with new schema additions (gh-14296)', function() {
+    const schema = new mongoose.Schema({ field: String });
+    const TestModel = db.model('Test', schema);
+    TestModel.schema.virtual('myVirtual').get(function() {
+      return this.field + ' from myVirtual';
+    });
+    const doc = new TestModel({ field: 'Hello' });
+    assert.strictEqual(doc.myVirtual, undefined);
+
+    TestModel.recompileSchema();
+    assert.equal(doc.myVirtual, 'Hello from myVirtual');
+  });
 });
 
 

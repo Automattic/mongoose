@@ -141,4 +141,4 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - name: Dependency review
-        uses: actions/dependency-review-action@v3
+        uses: actions/dependency-review-action@v4

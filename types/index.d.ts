@@ -677,5 +677,11 @@ declare module 'mongoose' {
   /* for ts-mongoose */
   export class mquery { }
 
+  export class OverwriteMiddlewareResult {}
+  export function overwriteMiddlewareResult(val: any): OverwriteMiddlewareResult;
+
+  export class SkipWrappedFunction {}
+  export function skipMiddlewareFunction(val: any): SkipWrappedFunction;
+
   export default mongoose;
 }

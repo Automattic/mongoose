@@ -711,6 +711,7 @@ declare module 'mongoose' {
       options?: (mongodb.ReplaceOptions & MongooseQueryOptions<TRawDocType>) | null
     ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, TRawDocType, 'replaceOne'>;
 
+    /** Apply changes made to this model's schema after this model was compiled. */
     recompileSchema(): void;
 
     /** Schema the model uses. */

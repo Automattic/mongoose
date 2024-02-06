@@ -47,6 +47,7 @@ console.log(doc.updatedAt); // 2022-02-26T17:08:13.991Z
 
 // Mongoose also blocks changing `createdAt` and sets its own `updatedAt`
 // on `findOneAndUpdate()`, `updateMany()`, and other query operations
+// **except** `replaceOne()` and `findOneAndReplace()`.
 doc = await User.findOneAndUpdate(
   { _id: doc._id },
   { name: 'test3', createdAt: new Date(0), updatedAt: new Date(0) },
@@ -54,6 +55,35 @@ doc = await User.findOneAndUpdate(
 );
 console.log(doc.createdAt); // 2022-02-26T17:08:13.930Z
 console.log(doc.updatedAt); // 2022-02-26T17:08:14.008Z
+```
+
+Keep in mind that `replaceOne()` and `findOneAndReplace()` overwrite all non-`_id` properties, **including** immutable properties like `createdAt`.
+Calling `replaceOne()` or `findOneAndReplace()` will update the `createdAt` timestamp as shown below.
+
+```javascript
+// `findOneAndReplace()` and `replaceOne()` without timestamps specified in `replacement`
+// sets `createdAt` and `updatedAt` to current time.
+doc = await User.findOneAndReplace(
+  { _id: doc._id },
+  { name: 'test3' },
+  { new: true }
+);
+console.log(doc.createdAt); // 2022-02-26T17:08:14.008Z
+console.log(doc.updatedAt); // 2022-02-26T17:08:14.008Z
+
+// `findOneAndReplace()` and `replaceOne()` with timestamps specified in `replacement`
+// sets `createdAt` and `updatedAt` to the values in `replacement`.
+doc = await User.findOneAndReplace(
+  { _id: doc._id },
+  {
+    name: 'test3',
+    createdAt: new Date('2022-06-01'),
+    updatedAt: new Date('2022-06-01')
+  },
+  { new: true }
+);
+console.log(doc.createdAt); // 2022-06-01T00:00:00.000Z
+console.log(doc.updatedAt); // 2022-06-01T00:00:00.000Z
 ```
 
 ## Alternate Property Names

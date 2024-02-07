@@ -1553,6 +1553,12 @@ describe('connections:', function() {
     });
     assert.deepEqual(m.connections.length, 0);
   });
+  it('should demonstrate the withSession() function (gh-14330)', async function() {
+    const m = new mongoose.Mongoose();
+    await m.connect(/* put mongodb connection string here */);
+    const res = await m.connection.withSession({}, async () => { return new Promise((resolve, reject) => { return resolve('ok')})});;
+    assert.ok(res);
+  });
   describe('createCollections()', function() {
     it('should create collections for all models on the connection with the createCollections() function (gh-13300)', async function() {
       const m = new mongoose.Mongoose();

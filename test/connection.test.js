@@ -1554,8 +1554,11 @@ describe('connections:', function() {
     assert.deepEqual(m.connections.length, 0);
   });
   it('should demonstrate the withSession() function (gh-14330)', async function() {
+    if (!process.env.REPLICA_SET && !process.env.START_REPLICA_SET) {
+      this.skip();
+    }
     const m = new mongoose.Mongoose();
-    await m.connect(/* put mongodb connection string here */);
+    m.connect(start.uri);
     const res = await m.connection.withSession({}, async() => { return new Promise((resolve, reject) => { return resolve('ok');});});
     assert.ok(res);
   });

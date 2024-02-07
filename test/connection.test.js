@@ -1559,7 +1559,7 @@ describe('connections:', function() {
     }
     const m = new mongoose.Mongoose();
     m.connect(start.uri);
-    const res = await m.connection.withSession({}, async() => { return new Promise((resolve, reject) => { return resolve('ok');});});
+    const res = await m.connection.withSession({}, async() => { return new Promise((resolve) => { return resolve('ok');});});
     assert.ok(res);
   });
   describe('createCollections()', function() {

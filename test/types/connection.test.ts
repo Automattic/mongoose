@@ -20,6 +20,10 @@ conn.readyState === 99;
 
 expectError(conn.readyState = 0);
 
+expectType<Promise<Record<string, Error | mongodb.Collection<any>>>>(
+  conn.createCollections()
+);
+
 expectType<Connection>(new Connection());
 expectType<Promise<Connection>>(new Connection().asPromise());
 

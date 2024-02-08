@@ -10868,4 +10868,58 @@ describe('model: populate:', function() {
       { name: 'foo', prop: 'bar' }
     );
   });
+
+  it('calls setter on virtual populated path with populated doc (gh-14285)', async function() {
+    const userSchema = new Schema({
+      email: String,
+      name: 'String'
+    });
+
+    const User = db.model('User', userSchema);
+
+    const user = await User.create({
+      email: 'admin@example.com',
+      name: 'Admin'
+    });
+
+    const personSchema = new Schema({
+      userId: ObjectId,
+      userType: String
+    });
+
+    personSchema.
+      virtual('user', {
+        ref() {
+          return this.userType;
+        },
+        localField: 'userId',
+        foreignField: '_id',
+        justOne: true
+      }).
+      set(function(user) {
+        if (user) {
+          this.userId = user._id;
+          this.userType = user.constructor.modelName;
+        } else {
+          this.userId = null;
+          this.userType = null;
+        }
+
+        return user;
+      });
+
+    const Person = db.model('Person', personSchema);
+
+    const person = new Person({
+      userId: user._id,
+      userType: 'User'
+    });
+
+    await person.save();
+
+    const personFromDb = await Person.findById(person._id).populate('user');
+    assert.equal(personFromDb.user.name, 'Admin');
+    assert.equal(personFromDb.userType, 'User');
+    assert.equal(personFromDb.userId.toHexString(), user._id.toHexString());
+  });
 });

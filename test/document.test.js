@@ -12953,6 +12953,25 @@ describe('document', function() {
     };
     assert.equal(person.address.zip, 54321);
   });
+
+  it('includes virtuals in doc array toString() output if virtuals enabled on toObject (gh-14315)', function() {
+    const schema = new Schema({
+      docArr: [{ childId: mongoose.ObjectId }]
+    });
+    schema.virtual('docArr.child', { ref: 'Child', localField: 'docArr.childId', foreignField: '_id' });
+    schema.set('toObject', { virtuals: true });
+    schema.set('toJSON', { virtuals: true });
+    const Test = db.model('Test', schema);
+    const Child = db.model('Child', new Schema({
+      name: String
+    }));
+
+    const child = new Child({ name: 'test child' });
+    const doc = new Test({ docArr: [{ childId: child._id }] });
+    doc.docArr[0].child = child;
+    assert.ok(doc.docArr.toString().includes('child'), doc.docArr.toString());
+    assert.ok(doc.docArr.toString().includes('test child'), doc.docArr.toString());
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

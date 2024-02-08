@@ -17,7 +17,7 @@ import mongoose, {
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
-import { UpdateOneModel, ChangeStreamInsertDocument, ObjectId } from 'mongodb';
+import { ModifyResult, UpdateOneModel, ChangeStreamInsertDocument, ObjectId } from 'mongodb';
 
 function rawDocSyntax(): void {
   interface ITest {
@@ -684,6 +684,9 @@ async function gh13705() {
 
   const findOneAndUpdateRes = await TestModel.findOneAndUpdate({}, {}, { lean: true });
   expectType<ExpectedLeanDoc | null>(findOneAndUpdateRes);
+
+  const findOneAndUpdateResWithMetadata = await TestModel.findOneAndUpdate({}, {}, { lean: true, includeResultMetadata: true });
+  expectAssignable<ModifyResult<ExpectedLeanDoc>>(findOneAndUpdateResWithMetadata);
 }
 
 async function gh13746() {

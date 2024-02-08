@@ -593,6 +593,17 @@ declare module 'mongoose' {
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
     findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
+      filter: FilterQuery<TRawDocType>,
+      update: UpdateQuery<TRawDocType>,
+      options: QueryOptions<TRawDocType> & { includeResultMetadata: true, lean: true }
+    ): QueryWithHelpers<
+      ModifyResult<TRawDocType>,
+      ResultDoc,
+      TQueryHelpers,
+      TRawDocType,
+      'findOneAndUpdate'
+    >;
+    findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
       id: mongodb.ObjectId | any,
       update: UpdateQuery<TRawDocType>,
       options: QueryOptions<TRawDocType> & { lean: true }
@@ -675,9 +686,9 @@ declare module 'mongoose' {
     findOneAndUpdate<ResultDoc = THydratedDocumentType>(
       filter: FilterQuery<TRawDocType>,
       update: UpdateQuery<TRawDocType>,
-      options: QueryOptions<TRawDocType> & { lean: true }
+      options: QueryOptions<TRawDocType> & { includeResultMetadata: true, lean: true }
     ): QueryWithHelpers<
-      GetLeanResultType<TRawDocType, TRawDocType, 'findOneAndUpdate'> | null,
+      ModifyResult<TRawDocType>,
       ResultDoc,
       TQueryHelpers,
       TRawDocType,
@@ -686,8 +697,14 @@ declare module 'mongoose' {
     findOneAndUpdate<ResultDoc = THydratedDocumentType>(
       filter: FilterQuery<TRawDocType>,
       update: UpdateQuery<TRawDocType>,
-      options: QueryOptions<TRawDocType> & { includeResultMetadata: true }
-    ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndUpdate'>;
+      options: QueryOptions<TRawDocType> & { lean: true }
+    ): QueryWithHelpers<
+      GetLeanResultType<TRawDocType, TRawDocType, 'findOneAndUpdate'> | null,
+      ResultDoc,
+      TQueryHelpers,
+      TRawDocType,
+      'findOneAndUpdate'
+    >;
     findOneAndUpdate<ResultDoc = THydratedDocumentType>(
       filter: FilterQuery<TRawDocType>,
       update: UpdateQuery<TRawDocType>,

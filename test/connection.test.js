@@ -1559,8 +1559,11 @@ describe('connections:', function() {
     }
     const m = new mongoose.Mongoose();
     m.connect(start.uri);
-    const res = await m.connection.withSession({}, async() => { return new Promise((resolve) => { return resolve('ok');});});
-    assert.ok(res);
+    let session = null;
+    await m.connection.withSession(s => {
+      session = s;
+    });
+    assert.ok(session);
   });
   describe('createCollections()', function() {
     it('should create collections for all models on the connection with the createCollections() function (gh-13300)', async function() {

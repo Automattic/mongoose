@@ -111,8 +111,8 @@ describe('model', function() {
       const User = db.model('UserTestHydrate', userSchema);
       const Company = db.model('CompanyTestHyrdrate', companySchema);
 
-      const users = [{ _id: new Schema.ObjectId(), name: 'Val'}];
-      const company = { _id: new Schema.ObjectId(), name: 'Booster', users: [users[0]] };
+      const users = [{ _id: new mongoose.Types.ObjectId(), name: 'Val'}];
+      const company = { _id: new mongoose.Types.ObjectId(), name: 'Booster', users: [users[0]] };
 
       const C = Company.hydrate(company, null, { hydratedPopulatedDocs: true });
       assert.equal(C.users[0].name, 'Val');

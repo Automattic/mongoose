@@ -115,6 +115,7 @@ describe('model', function() {
       const company = { _id: new mongoose.Types.ObjectId(), name: 'Booster', users: [users[0]] };
 
       const C = Company.hydrate(company, null, { hydratedPopulatedDocs: true });
+      console.log('what is C', C);
       assert.equal(C.users[0].name, 'Val');
     });
   });

@@ -10922,4 +10922,50 @@ describe('model: populate:', function() {
     assert.equal(personFromDb.userType, 'User');
     assert.equal(personFromDb.userId.toHexString(), user._id.toHexString());
   });
+
+  it('handles ref() function that returns a model (gh-14249)', async function() {
+    const aSchema = new Schema({
+      name: String
+    });
+
+    const bSchema = new Schema({
+      name: String
+    });
+
+    const CategoryAModel = db.model('Test', aSchema);
+    const CategoryBModel = db.model('Test1', bSchema);
+
+    const testSchema = new Schema({
+      category: String,
+      subdoc: {
+        type: Schema.Types.ObjectId,
+        ref: function() {
+          return this.category === 'catA' ? CategoryAModel : CategoryBModel;
+        }
+      }
+    });
+
+    const parentSchema = new Schema({
+      name: String,
+      children: [testSchema]
+    });
+    const Parent = db.model('Parent', parentSchema);
+
+    const A = await CategoryAModel.create({
+      name: 'A'
+    });
+    const B = await CategoryBModel.create({
+      name: 'B'
+    });
+
+    const doc = await Parent.create({
+      name: 'Parent',
+      children: [{ category: 'catA', subdoc: A._id }, { category: 'catB', subdoc: B._id }]
+    });
+
+    const res = await Parent.findById(doc._id).populate('children.subdoc');
+    assert.equal(res.children.length, 2);
+    assert.equal(res.children[0].subdoc.name, 'A');
+    assert.equal(res.children[1].subdoc.name, 'B');
+  });
 });

@@ -108,10 +108,10 @@ describe('model', function() {
         users: [{ ref: 'User', type: Schema.Types.ObjectId }]
       });
 
-      const User = db.model('UserTestHydrate', userSchema);
+      db.model('UserTestHydrate', userSchema);
       const Company = db.model('CompanyTestHyrdrate', companySchema);
 
-      const users = [{ _id: new mongoose.Types.ObjectId(), name: 'Val'}];
+      const users = [{ _id: new mongoose.Types.ObjectId(), name: 'Val' }];
       const company = { _id: new mongoose.Types.ObjectId(), name: 'Booster', users: [users[0]] };
 
       const C = Company.hydrate(company, null, { hydratedPopulatedDocs: true });

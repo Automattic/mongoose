@@ -880,3 +880,25 @@ async function gh13999() {
     }
   }
 }
+
+function gh4727() {
+  const userSchema = new mongoose.Schema({
+    name: String
+  });
+  const companySchema = new mongoose.Schema({
+    name: String,
+    users: [{ ref: 'User', type: mongoose.Schema.Types.ObjectId }]
+  });
+
+  mongoose.model('UserTestHydrate', userSchema);
+  const Company = mongoose.model('CompanyTestHyrdrate', companySchema);
+
+  const users = [{ _id: new mongoose.Types.ObjectId(), name: 'Val' }];
+  const company = { _id: new mongoose.Types.ObjectId(), name: 'Booster', users: [users[0]] };
+
+  expectType<ReturnType<(typeof Company)['hydrate']> | null>(
+    Company.hydrate(company, null, { hydratedPopulatedDocs: true })
+  );
+
+
+}

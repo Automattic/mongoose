@@ -433,7 +433,6 @@ describe('transactions', function() {
     await db.transaction(async(session) => {
       await doc.save({ session });
 
-      // This is the important bit. Uncomment this to trigger a transaction retry.
       if (attempt === 0) {
         attempt += 1;
         throw new mongoose.mongo.MongoServerError({

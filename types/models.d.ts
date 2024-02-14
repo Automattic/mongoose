@@ -37,6 +37,11 @@ declare module 'mongoose' {
     skipValidation?: boolean;
   }
 
+  interface HydrateOptions {
+    setters?: boolean;
+    hydratedPopulatedDocs?: boolean;
+  }
+
   interface InsertManyOptions extends
     PopulateOption,
     SessionOption {
@@ -371,7 +376,7 @@ declare module 'mongoose' {
      * Shortcut for creating a new Document from existing raw data, pre-saved in the DB.
      * The document returned has no paths marked as modified initially.
      */
-    hydrate(obj: any, projection?: AnyObject, options?: { setters?: boolean }): THydratedDocumentType;
+    hydrate(obj: any, projection?: AnyObject, options?: HydrateOptions): THydratedDocumentType;
 
     /**
      * This function is responsible for building [indexes](https://www.mongodb.com/docs/manual/indexes/),

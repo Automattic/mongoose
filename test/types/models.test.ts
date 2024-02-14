@@ -896,7 +896,7 @@ function gh4727() {
   const users = [{ _id: new mongoose.Types.ObjectId(), name: 'Val' }];
   const company = { _id: new mongoose.Types.ObjectId(), name: 'Booster', users: [users[0]] };
 
-  return Company.hydrate(company, {}, { hydratedPopulatedDocs: true })
+  return Company.hydrate(company, {}, { hydratedPopulatedDocs: true });
 
 
 }

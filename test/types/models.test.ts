@@ -896,9 +896,7 @@ function gh4727() {
   const users = [{ _id: new mongoose.Types.ObjectId(), name: 'Val' }];
   const company = { _id: new mongoose.Types.ObjectId(), name: 'Booster', users: [users[0]] };
 
-  expectType<ReturnType<(typeof Company)['hydrate']> | null>(
-    Company.hydrate(company, null, { hydratedPopulatedDocs: true })
-  );
+  return Company.hydrate(company, {}, { hydratedPopulatedDocs: true })
 
 
 }

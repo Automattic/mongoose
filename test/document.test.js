@@ -12916,6 +12916,62 @@ describe('document', function() {
     doc.set({ nested: void 0 });
     assert.strictEqual(doc.toObject().nested, void 0);
   });
+
+  it('handles setting nested path to spread doc with extra properties (gh-14269)', async function() {
+    const addressSchema = new mongoose.Schema(
+      {
+        street: String,
+        city: String,
+        state: String,
+        zip: Number
+      },
+      { _id: false }
+    );
+    const personSchema = new mongoose.Schema({
+      name: String,
+      age: Number,
+      address: addressSchema
+    });
+
+    const personModel = db.model('Person', personSchema);
+    const person = new personModel({
+      name: 'John',
+      age: 42,
+      address: {
+        street: '123 Fake St',
+        city: 'Springfield',
+        state: 'IL',
+        zip: 12345
+      }
+    });
+
+    await person.save();
+
+    person.address = {
+      ...person.address,
+      zip: 54321
+    };
+    assert.equal(person.address.zip, 54321);
+  });
+
+  it('includes virtuals in doc array toString() output if virtuals enabled on toObject (gh-14315)', function() {
+    const schema = new Schema({
+      docArr: [{ childId: mongoose.ObjectId }]
+    });
+    schema.virtual('docArr.child', { ref: 'Child', localField: 'docArr.childId', foreignField: '_id' });
+    schema.set('toObject', { virtuals: true });
+    schema.set('toJSON', { virtuals: true });
+    const Test = db.model('Test', schema);
+    const Child = db.model('Child', new Schema({
+      name: String
+    }));
+
+    const child = new Child({ name: 'test child' });
+    const doc = new Test({ docArr: [{ childId: child._id }] });
+    doc.docArr[0].child = child;
+    assert.ok(doc.docArr.toString().includes('child'), doc.docArr.toString());
+    assert.ok(doc.docArr.toString().includes('test child'), doc.docArr.toString());
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

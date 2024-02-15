@@ -1471,7 +1471,7 @@ schema.searchIndex({
 });
 // Will automatically attempt to create the `my-index` search index.
 const Test = mongoose.model('Test', schema);
-``
+```
 
 <h2 id="es6-classes"><a href="#es6-classes">With ES6 Classes</a></h2>
 

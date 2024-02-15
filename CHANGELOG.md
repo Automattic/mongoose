@@ -1,3 +1,21 @@
+8.1.2 / 2024-02-08
+==================
+ * fix: include virtuals in document array toString() output if toObject.virtuals set #14335 #14315
+ * fix(document): handle setting nested path to spread doc with extra properties #14287 #14269
+ * fix(populate): call setter on virtual populated path with populated doc instead of undefined #14314
+ * fix(QueryCursor): remove callback parameter of AggregationCursor and QueryCursor #14299 [DevooKim](https://github.com/DevooKim)
+ * types: add typescript support for arbitrary fields for the options parameter of Model functions which are of type MongooseQueryOptions #14342 #14341 [FaizBShah](https://github.com/FaizBShah)
+ * types(model): correct return type for findOneAndUpdate with includeResultMetadata and lean set #14336 #14303
+ * types(connection): add type definition for `createCollections()` #14295 #14279
+ * docs(timestamps): clarify that replaceOne() and findOneAndReplace() overwrite timestamps #14337 #14309
+
+8.1.1 / 2024-01-24
+==================
+ * fix(model): throw readable error when calling Model() with a string instead of model() #14288 #14281
+ * fix(document): handle setting nested path to spread doc with extra properties #14287 #14269
+ * types(query): add back context and setDefaultsOnInsert as Mongoose-specific query options #14284 #14282
+ * types(query): add missing runValidators back to MongooseQueryOptions #14278 #14275
+
 8.1.0 / 2024-01-16
 ==================
  * feat: upgrade MongoDB driver -> 6.3.0 #14241 #14189 #14108 #14104

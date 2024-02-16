@@ -1,3 +1,11 @@
+8.1.3 / 2024-02-16
+==================
+ * fix: avoid corrupting $set-ed arrays when transaction error occurs #14346 #14340
+ * fix(populate): handle ref() functions that return a model instance #14343 #14249
+ * fix: insert version key when using insertMany even if `toObject.versionKey` set to false #14344
+ * fix(cursor): make aggregation cursor support transform option to match query cursor #14348 #14331
+ * docs(document): clarify that transform function option applies to subdocs #13757
+
 8.1.2 / 2024-02-08
 ==================
  * fix: include virtuals in document array toString() output if toObject.virtuals set #14335 #14315

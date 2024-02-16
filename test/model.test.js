@@ -7302,6 +7302,21 @@ describe('Model', function() {
       /First argument to `Model` constructor must be an object/
     );
   });
+
+  it('inserts versionKey even if schema has `toObject.versionKey` set to false (gh-14344)', async function() {
+    const schema = new mongoose.Schema(
+      { name: String },
+      { versionKey: '__v', toObject: { versionKey: false } }
+    );
+
+    const Model = db.model('Test', schema);
+
+    await Model.insertMany([{ name: 'x' }]);
+
+    const doc = await Model.findOne();
+
+    assert.strictEqual(doc.__v, 0);
+  });
 });
 
 

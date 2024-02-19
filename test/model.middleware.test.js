@@ -457,4 +457,137 @@ describe('model middleware', function() {
     assert.equal(preCalled, 1);
     assert.equal(postCalled, 1);
   });
+
+  describe('createCollection middleware', function() {
+    it('calls createCollection hooks', async function() {
+      const schema = new Schema({ name: String }, { autoCreate: true });
+
+      const pre = [];
+      const post = [];
+      schema.pre('createCollection', function() {
+        pre.push(this);
+      });
+      schema.post('createCollection', function() {
+        post.push(this);
+      });
+
+      const Test = db.model('Test', schema);
+      await Test.init();
+      assert.equal(pre.length, 1);
+      assert.equal(pre[0], Test);
+      assert.equal(post.length, 1);
+      assert.equal(post[0], Test);
+    });
+
+    it('allows skipping createCollection from hooks', async function() {
+      const schema = new Schema({ name: String }, { autoCreate: true });
+
+      schema.pre('createCollection', function(next) {
+        next(mongoose.skipMiddlewareFunction());
+      });
+
+      const Test = db.model('CreateCollectionHookTest', schema);
+      await Test.init();
+      const collections = await db.listCollections();
+      assert.equal(collections.length, 0);
+    });
+  });
+
+  describe('bulkWrite middleware', function() {
+    it('calls bulkWrite hooks', async function() {
+      const schema = new Schema({ name: String });
+
+      const pre = [];
+      const post = [];
+      schema.pre('bulkWrite', function(next, ops) {
+        pre.push(ops);
+        next();
+      });
+      schema.post('bulkWrite', function(res) {
+        post.push(res);
+      });
+
+      const Test = db.model('Test', schema);
+      await Test.bulkWrite([{
+        updateOne: {
+          filter: { name: 'foo' },
+          update: { $set: { name: 'bar' } }
+        }
+      }]);
+      assert.equal(pre.length, 1);
+      assert.deepStrictEqual(pre[0], [{
+        updateOne: {
+          filter: { name: 'foo' },
+          update: { $set: { name: 'bar' } }
+        }
+      }]);
+      assert.equal(post.length, 1);
+      assert.equal(post[0].constructor.name, 'BulkWriteResult');
+    });
+
+    it('allows updating ops', async function() {
+      const schema = new Schema({ name: String, prop: String });
+
+      schema.pre('bulkWrite', function(next, ops) {
+        ops[0].updateOne.filter.name = 'baz';
+        next();
+      });
+
+      const Test = db.model('Test', schema);
+      const { _id } = await Test.create({ name: 'baz' });
+      await Test.bulkWrite([{
+        updateOne: {
+          filter: { name: 'foo' },
+          update: { $set: { prop: 'test prop value' } }
+        }
+      }]);
+      const { prop } = await Test.findById(_id).orFail();
+      assert.equal(prop, 'test prop value');
+    });
+
+    it('supports error handlers', async function() {
+      const schema = new Schema({ name: String, prop: String });
+
+      const errors = [];
+      schema.post('bulkWrite', function(err, res, next) {
+        errors.push(err);
+        next();
+      });
+
+      const Test = db.model('Test', schema);
+      const { _id } = await Test.create({ name: 'baz' });
+      await assert.rejects(
+        Test.bulkWrite([{
+          insertOne: {
+            document: {
+              _id
+            }
+          }
+        }]),
+        /duplicate key error/
+      );
+      assert.equal(errors.length, 1);
+      assert.equal(errors[0].name, 'MongoBulkWriteError');
+      assert.ok(errors[0].message.includes('duplicate key error'), errors[0].message);
+    });
+
+    it('supports skipping wrapped function', async function() {
+      const schema = new Schema({ name: String, prop: String });
+
+      schema.pre('bulkWrite', function(next) {
+        next(mongoose.skipMiddlewareFunction('skipMiddlewareFunction test'));
+      });
+
+      const Test = db.model('Test', schema);
+      const { _id } = await Test.create({ name: 'baz' });
+      const res = await Test.bulkWrite([{
+        insertOne: {
+          document: {
+            _id
+          }
+        }
+      }]);
+      assert.strictEqual(res, 'skipMiddlewareFunction test');
+    });
+  });
 });

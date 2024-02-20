@@ -67,13 +67,17 @@ Model middleware is supported for the following model functions.
 Don't confuse model middleware and document middleware: model middleware hooks into *static* functions on a `Model` class, document middleware hooks into *methods* on a `Model` class.
 In model middleware functions, `this` refers to the model.
 
+* [bulkWrite](api/model.html#model_Model-bulkWrite)
+* [createCollection](api/model.html#model_Model-createCollection)
 * [insertMany](api/model.html#model_Model-insertMany)
 
 Here are the possible strings that can be passed to `pre()`
 
 * aggregate
+* bulkWrite
 * count
 * countDocuments
+* createCollection
 * deleteOne
 * deleteMany
 * estimatedDocumentCount

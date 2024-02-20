@@ -1,5 +1,6 @@
 import { Schema, model, Model, Document, SaveOptions, Query, Aggregate, HydratedDocument, PreSaveMiddlewareFunction, ModifyResult } from 'mongoose';
 import { expectError, expectType, expectNotType, expectAssignable } from 'tsd';
+import { AnyBulkWriteOperation, CreateCollectionOptions } from 'mongodb';
 
 const preMiddlewareFn: PreSaveMiddlewareFunction<Document> = function(next, opts) {
   this.$markValid('name');
@@ -87,6 +88,14 @@ schema.pre<Model<ITest>>('insertMany', function(next, doc: ITest) {
 
 schema.pre<Model<ITest>>('insertMany', function(next, docs: Array<ITest>) {
   console.log(this.name, docs);
+  next();
+});
+
+schema.pre<Model<ITest>>('bulkWrite', function(next, ops: Array<AnyBulkWriteOperation<any>>) {
+  next();
+});
+
+schema.pre<Model<ITest>>('createCollection', function(next, opts?: CreateCollectionOptions) {
   next();
 });
 

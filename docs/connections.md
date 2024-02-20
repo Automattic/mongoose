@@ -402,16 +402,24 @@ The `mongoose.createConnection()` function takes the same arguments as
 const conn = mongoose.createConnection('mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]', options);
 ```
 
-This [connection](api/connection.html#connection_Connection) object is then used to
-create and retrieve [models](api/model.html#model_Model). Models are
-**always** scoped to a single connection.
+This [connection](api/connection.html#connection_Connection) object is then used to create and retrieve [models](api/model.html#model_Model).
+Models are **always** scoped to a single connection.
 
 ```javascript
 const UserModel = conn.model('User', userSchema);
 ```
 
-If you use multiple connections, you should make sure you export schemas,
-**not** models. Exporting a model from a file is called the *export model pattern*.
+The `createConnection()` function returns a connection instance, not a promise.
+If you want to use `await` to make sure Mongoose successfully connects to MongoDB, use the [`asPromise()` function](https://mongoosejs.com/docs/api/connection.html#Connection.prototype.asPromise()):
+
+```javascript
+// `asPromise()` returns a promise that resolves to the connection
+// once the connection succeeds, or rejects if connection failed.
+const conn = await mongoose.createConnection(connectionString).asPromise();
+```
+
+If you use multiple connections, you should make sure you export schemas, **not** models.
+Exporting a model from a file is called the *export model pattern*.
 The export model pattern is limited because you can only use one connection.
 
 ```javascript

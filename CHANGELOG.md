@@ -1,3 +1,22 @@
+8.1.3 / 2024-02-16
+==================
+ * fix: avoid corrupting $set-ed arrays when transaction error occurs #14346 #14340
+ * fix(populate): handle ref() functions that return a model instance #14343 #14249
+ * fix: insert version key when using insertMany even if `toObject.versionKey` set to false #14344
+ * fix(cursor): make aggregation cursor support transform option to match query cursor #14348 #14331
+ * docs(document): clarify that transform function option applies to subdocs #13757
+
+8.1.2 / 2024-02-08
+==================
+ * fix: include virtuals in document array toString() output if toObject.virtuals set #14335 #14315
+ * fix(document): handle setting nested path to spread doc with extra properties #14287 #14269
+ * fix(populate): call setter on virtual populated path with populated doc instead of undefined #14314
+ * fix(QueryCursor): remove callback parameter of AggregationCursor and QueryCursor #14299 [DevooKim](https://github.com/DevooKim)
+ * types: add typescript support for arbitrary fields for the options parameter of Model functions which are of type MongooseQueryOptions #14342 #14341 [FaizBShah](https://github.com/FaizBShah)
+ * types(model): correct return type for findOneAndUpdate with includeResultMetadata and lean set #14336 #14303
+ * types(connection): add type definition for `createCollections()` #14295 #14279
+ * docs(timestamps): clarify that replaceOne() and findOneAndReplace() overwrite timestamps #14337 #14309
+
 8.1.1 / 2024-01-24
 ==================
  * fix(model): throw readable error when calling Model() with a string instead of model() #14288 #14281

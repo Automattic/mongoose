@@ -7,6 +7,7 @@
 const start = require('./common');
 
 const assert = require('assert');
+const stream = require('stream');
 
 const Aggregate = require('../lib/aggregate');
 
@@ -1213,6 +1214,32 @@ describe('aggregate: ', function() {
     assert.equal(res.length, 2);
     assert.equal(res[0].test, 'test test');
     assert.equal(res[1].test, 'a test');
+  });
+
+  it('cursor supports transform option (gh-14331)', async function() {
+    const mySchema = new Schema({ name: String });
+    const Test = db.model('Test', mySchema);
+
+    await Test.deleteMany({});
+    await Test.create([{ name: 'Apple' }, { name: 'Apple' }]);
+
+    let resolve;
+    const waitForStream = new Promise(innerResolve => {
+      resolve = innerResolve;
+    });
+    const otherStream = new stream.Writable({
+      write(chunk, encoding, callback) {
+        resolve(chunk.toString());
+        callback();
+      }
+    });
+
+    await Test.
+      aggregate([{ $match: { name: 'Apple' } }]).
+      cursor({ transform: JSON.stringify }).
+      pipe(otherStream);
+    const streamValue = await waitForStream;
+    assert.ok(streamValue.includes('"name":"Apple"'), streamValue);
   });
 
   describe('Mongo 3.6 options', function() {

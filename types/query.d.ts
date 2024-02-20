@@ -32,7 +32,9 @@ declare module 'mongoose' {
     'strictQuery' |
     'timestamps' |
     'translateAliases'
-  >;
+  > & {
+    [other: string]: any;
+  };
 
   type ProjectionFields<DocType> = { [Key in keyof DocType]?: any } & Record<string, any>;
 

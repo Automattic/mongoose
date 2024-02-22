@@ -1,3 +1,10 @@
+8.2.0 / 2024-02-22
+==================
+ * feat(model): add recompileSchema() function to models to allow applying schema changes after compiling #14306 #14296
+ * feat: add middleware for bulkWrite() and createCollection() #14358 #14263 #7893
+ * feat(model): add `hydratedPopulatedDocs` option to make hydrate recursively hydrate populated docs #14352 #4727
+ * feat(connection): add withSession helper #14339 #14330
+
 8.1.3 / 2024-02-16
 ==================
  * fix: avoid corrupting $set-ed arrays when transaction error occurs #14346 #14340

@@ -410,7 +410,7 @@ const UserModel = conn.model('User', userSchema);
 ```
 
 The `createConnection()` function returns a connection instance, not a promise.
-If you want to use `await` to make sure Mongoose successfully connects to MongoDB, use the [`asPromise()` function](https://mongoosejs.com/docs/api/connection.html#Connection.prototype.asPromise()):
+If you want to use `await` to make sure Mongoose successfully connects to MongoDB, use the [`asPromise()` function](api/connection.html#Connection.prototype.asPromise()):
 
 ```javascript
 // `asPromise()` returns a promise that resolves to the connection

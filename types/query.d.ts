@@ -39,7 +39,10 @@ declare module 'mongoose' {
 
   type MongooseBaseQueryOptions<DocType = unknown> = MongooseQueryOptions<DocType, MongooseBaseQueryOptionKeys>;
 
-  type MongooseUpdateQueryOptions<DocType = unknown> = MongooseQueryOptions<DocType,  MongooseBaseQueryOptionKeys | "timestamps">;
+  type MongooseUpdateQueryOptions<DocType = unknown> = MongooseQueryOptions<
+    DocType,
+    MongooseBaseQueryOptionKeys | "timestamps"
+  >;
 
   type ProjectionFields<DocType> = { [Key in keyof DocType]?: any } & Record<string, any>;
 

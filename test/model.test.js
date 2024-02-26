@@ -2537,6 +2537,18 @@ describe('Model', function() {
       assert.ok(!doc.$__.$versionError);
       assert.ok(!doc.$__.saveOptions);
     });
+    it('should only save paths specificed in the `pathsToSave` array (gh-9583)', async function() {
+      const schema = new Schema({ name: String, age: Number, weight: Number, location: String });
+      const Test = db.model('Test', schema);
+      await Test.create({ name: 'Test Testerson', age: 1, weight: 180, location: 'Florida' });
+      const doc = await Test.findOne();
+      doc.name = 'Test';
+      doc.age = 100;
+      await doc.save({ pathsToSave: ['name'] });
+      const check = await Test.findOne();
+      assert.equal(check.name, 'Test');
+      assert.equal(check.age, 1);
+    });
   });
 
 

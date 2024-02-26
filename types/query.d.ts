@@ -208,7 +208,7 @@ declare module 'mongoose' {
      * A QueryCursor exposes a Streams3 interface, as well as a `.next()` function.
      * This is equivalent to calling `.cursor()` with no arguments.
      */
-    [Symbol.asyncIterator](): AsyncIterableIterator<DocType>;
+    [Symbol.asyncIterator](): AsyncIterableIterator<Unpacked<ResultType>>;
 
     /** Executes the query */
     exec(): Promise<ResultType>;
@@ -286,7 +286,7 @@ declare module 'mongoose' {
      * Returns a wrapper around a [mongodb driver cursor](https://mongodb.github.io/node-mongodb-native/4.9/classes/FindCursor.html).
      * A QueryCursor exposes a Streams3 interface, as well as a `.next()` function.
      */
-    cursor(options?: QueryOptions<DocType>): Cursor<DocType, QueryOptions<DocType>>;
+    cursor(options?: QueryOptions<DocType>): Cursor<Unpacked<ResultType>, QueryOptions<DocType>>;
 
     /**
      * Declare and/or execute this query as a `deleteMany()` operation. Works like

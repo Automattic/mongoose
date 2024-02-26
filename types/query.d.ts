@@ -17,24 +17,32 @@ declare module 'mongoose' {
    */
   type FilterQuery<T> = _FilterQuery<T>;
 
-  type MongooseQueryOptions<DocType = unknown> = Pick<
-    QueryOptions<DocType>,
-    'context' |
-    'lean' |
-    'multipleCastError' |
-    'overwriteDiscriminatorKey' |
-    'populate' |
-    'runValidators' |
-    'sanitizeProjection' |
-    'sanitizeFilter' |
-    'setDefaultsOnInsert' |
-    'strict' |
-    'strictQuery' |
-    'timestamps' |
-    'translateAliases'
-  > & {
+  type MongooseBaseQueryOptionKeys =
+    | 'context'
+    | 'multipleCastError'
+    | 'overwriteDiscriminatorKey'
+    | 'populate'
+    | 'runValidators'
+    | 'sanitizeProjection'
+    | 'sanitizeFilter'
+    | 'setDefaultsOnInsert'
+    | 'strict'
+    | 'strictQuery'
+    | 'translateAliases';
+
+  type MongooseQueryOptions<
+    DocType = unknown,
+    Keys extends keyof QueryOptions<DocType> = MongooseBaseQueryOptionKeys | 'timestamps' | 'lean'
+  > = Pick<QueryOptions<DocType>, Keys> & {
     [other: string]: any;
   };
+
+  type MongooseBaseQueryOptions<DocType = unknown> = MongooseQueryOptions<DocType, MongooseBaseQueryOptionKeys>;
+
+  type MongooseUpdateQueryOptions<DocType = unknown> = MongooseQueryOptions<
+    DocType,
+    MongooseBaseQueryOptionKeys | 'timestamps'
+  >;
 
   type ProjectionFields<DocType> = { [Key in keyof DocType]?: any } & Record<string, any>;
 

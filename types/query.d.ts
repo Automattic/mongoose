@@ -18,21 +18,21 @@ declare module 'mongoose' {
   type FilterQuery<T> = _FilterQuery<T>;
 
   type MongooseBaseQueryOptionKeys =
-    | "context"
-    | "multipleCastError"
-    | "overwriteDiscriminatorKey"
-    | "populate"
-    | "runValidators"
-    | "sanitizeProjection"
-    | "sanitizeFilter"
-    | "setDefaultsOnInsert"
-    | "strict"
-    | "strictQuery"
-    | "translateAliases";
+    | 'context'
+    | 'multipleCastError'
+    | 'overwriteDiscriminatorKey'
+    | 'populate'
+    | 'runValidators'
+    | 'sanitizeProjection'
+    | 'sanitizeFilter'
+    | 'setDefaultsOnInsert'
+    | 'strict'
+    | 'strictQuery'
+    | 'translateAliases';
 
   type MongooseQueryOptions<
     DocType = unknown,
-    Keys extends keyof QueryOptions<DocType> = MongooseBaseQueryOptionKeys | "timestamps" | "lean"
+    Keys extends keyof QueryOptions<DocType> = MongooseBaseQueryOptionKeys | 'timestamps' | 'lean'
   > = Pick<QueryOptions<DocType>, Keys> & {
     [other: string]: any;
   };
@@ -41,7 +41,7 @@ declare module 'mongoose' {
 
   type MongooseUpdateQueryOptions<DocType = unknown> = MongooseQueryOptions<
     DocType,
-    MongooseBaseQueryOptionKeys | "timestamps"
+    MongooseBaseQueryOptionKeys | 'timestamps'
   >;
 
   type ProjectionFields<DocType> = { [Key in keyof DocType]?: any } & Record<string, any>;

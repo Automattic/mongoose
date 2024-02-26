@@ -291,7 +291,7 @@ declare module 'mongoose' {
      */
     deleteOne(
       filter?: FilterQuery<TRawDocType>,
-      options?: (mongodb.DeleteOptions & ExcludeKeys<MongooseQueryOptions<TRawDocType>, 'lean' | 'timestamps'>) | null
+      options?: (mongodb.DeleteOptions & MongooseBaseQueryOptions<TRawDocType>) | null
     ): QueryWithHelpers<
       mongodb.DeleteResult,
       THydratedDocumentType,

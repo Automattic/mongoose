@@ -30,10 +30,10 @@ async function gh14374() {
   const ParentModel = model<Parent>(
     'Parent',
     new Schema({
-        child: { type: Schema.Types.ObjectId, ref: 'Child' },
-        name: String
+      child: { type: Schema.Types.ObjectId, ref: 'Child' },
+      name: String
     })
-  )
+  );
 
   interface Child {
     name: string
@@ -41,9 +41,9 @@ async function gh14374() {
   const childSchema: Schema = new Schema({ name: String });
 
   // This does not
-  const cursor = ParentModel.find({}).populate<{ child: Child }>('child').cursor()
+  const cursor = ParentModel.find({}).populate<{ child: Child }>('child').cursor();
   for await (const doc of cursor) {
-      const _t: string = doc.child.name;
+    const _t: string = doc.child.name;
   }
 
 }

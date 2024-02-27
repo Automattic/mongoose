@@ -1546,7 +1546,7 @@ describe('connections:', function() {
       const uri = start.uri.lastIndexOf('?') === -1 ?
         start.uri + '?retryWrites=true&w=majority&readPreference=primaryPreferred' :
         start.uri.slice(0, start.uri.lastIndexOf('?')) + '?retryWrites=true&w=majority&readPreference=primaryPreferred';
-      
+
       const conn = await m.connect(uri, opts);
       assert.ok(conn);
     });

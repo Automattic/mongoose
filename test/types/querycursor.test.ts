@@ -43,7 +43,7 @@ async function gh14374() {
   // This does not
   const cursor = ParentModel.find({}).populate<{ child: Child }>('child').cursor();
   for await (const doc of cursor) {
-    const _t: string = doc.child.name;
+    expectType<Child>(doc.child);
   }
 
 }

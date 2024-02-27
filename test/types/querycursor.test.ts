@@ -40,7 +40,6 @@ async function gh14374() {
   }
   const childSchema: Schema = new Schema({ name: String });
 
-  // This does not
   const cursor = ParentModel.find({}).populate<{ child: Child }>('child').cursor();
   for await (const doc of cursor) {
     const _t: string = doc.child.name;

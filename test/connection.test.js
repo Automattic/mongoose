@@ -1542,7 +1542,12 @@ describe('connections:', function() {
     it('should not throw an error when attempting to mutate unmutable options object gh-13335', async function() {
       const m = new mongoose.Mongoose();
       const opts = Object.preventExtensions({});
-      const conn = await m.connect('mongodb://127.0.0.1:27017/db?retryWrites=true&w=majority&readPreference=secondaryPreferred', opts);
+
+      const uri = start.uri.lastIndexOf('?') === -1 ?
+        start.uri + '?retryWrites=true&w=majority&readPreference=primaryPreferred' :
+        start.uri.slice(0, start.uri.lastIndexOf('?')) + '?retryWrites=true&w=majority&readPreference=primaryPreferred';
+
+      const conn = await m.connect(uri, opts);
       assert.ok(conn);
     });
   });

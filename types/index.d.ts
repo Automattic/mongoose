@@ -420,16 +420,6 @@ declare module 'mongoose' {
         options?: InsertManyOptions & { lean?: boolean }
       ) => void | Promise<void>
     ): this;
-    pre<T = TModelType>(
-      method: 'insertMany' | RegExp,
-      options: SchemaPreOptions,
-      fn: (
-        this: T,
-        next: (err?: CallbackError) => void,
-        docs: any | Array<any>,
-        options?: InsertManyOptions & { lean?: boolean }
-      ) => void | Promise<void>
-    ): this;
     /* method bulkWrite */
     pre<T = TModelType>(
       method: 'bulkWrite' | RegExp,
@@ -440,28 +430,9 @@ declare module 'mongoose' {
         options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions
       ) => void | Promise<void>
     ): this;
-    pre<T = TModelType>(
-      method: 'bulkWrite' | RegExp,
-      options: SchemaPreOptions,
-      fn: (
-        this: T,
-        next: (err?: CallbackError) => void,
-        ops: Array<mongodb.AnyBulkWriteOperation<any> & MongooseBulkWritePerWriteOptions>,
-        options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions
-      ) => void | Promise<void>
-    ): this;
     /* method createCollection */
     pre<T = TModelType>(
       method: 'createCollection' | RegExp,
-      fn: (
-        this: T,
-        next: (err?: CallbackError) => void,
-        options?: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'>
-      ) => void | Promise<void>
-    ): this;
-    pre<T = TModelType>(
-      method: 'createCollection' | RegExp,
-      options: SchemaPreOptions,
       fn: (
         this: T,
         next: (err?: CallbackError) => void,

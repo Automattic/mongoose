@@ -17,7 +17,7 @@ import mongoose, {
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
-import { UpdateOneModel, ChangeStreamInsertDocument, ObjectId } from 'mongodb';
+import { ModifyResult, UpdateOneModel, ChangeStreamInsertDocument, ObjectId } from 'mongodb';
 
 function rawDocSyntax(): void {
   interface ITest {
@@ -684,6 +684,9 @@ async function gh13705() {
 
   const findOneAndUpdateRes = await TestModel.findOneAndUpdate({}, {}, { lean: true });
   expectType<ExpectedLeanDoc | null>(findOneAndUpdateRes);
+
+  const findOneAndUpdateResWithMetadata = await TestModel.findOneAndUpdate({}, {}, { lean: true, includeResultMetadata: true });
+  expectAssignable<ModifyResult<ExpectedLeanDoc>>(findOneAndUpdateResWithMetadata);
 }
 
 async function gh13746() {
@@ -876,4 +879,24 @@ async function gh13999() {
       return elems;
     }
   }
+}
+
+function gh4727() {
+  const userSchema = new mongoose.Schema({
+    name: String
+  });
+  const companySchema = new mongoose.Schema({
+    name: String,
+    users: [{ ref: 'User', type: mongoose.Schema.Types.ObjectId }]
+  });
+
+  mongoose.model('UserTestHydrate', userSchema);
+  const Company = mongoose.model('CompanyTestHyrdrate', companySchema);
+
+  const users = [{ _id: new mongoose.Types.ObjectId(), name: 'Val' }];
+  const company = { _id: new mongoose.Types.ObjectId(), name: 'Booster', users: [users[0]] };
+
+  return Company.hydrate(company, {}, { hydratedPopulatedDocs: true });
+
+
 }

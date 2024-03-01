@@ -37,6 +37,11 @@ declare module 'mongoose' {
     skipValidation?: boolean;
   }
 
+  interface HydrateOptions {
+    setters?: boolean;
+    hydratedPopulatedDocs?: boolean;
+  }
+
   interface InsertManyOptions extends
     PopulateOption,
     SessionOption {
@@ -223,7 +228,7 @@ declare module 'mongoose' {
     /** Creates a `countDocuments` query: counts the number of documents that match `filter`. */
     countDocuments(
       filter?: FilterQuery<TRawDocType>,
-      options?: (mongodb.CountOptions & Omit<MongooseQueryOptions<TRawDocType>, 'lean' | 'timestamps'>) | null
+      options?: (mongodb.CountOptions & MongooseBaseQueryOptions<TRawDocType>) | null
     ): QueryWithHelpers<
       number,
       THydratedDocumentType,
@@ -261,7 +266,7 @@ declare module 'mongoose' {
      */
     deleteMany(
       filter?: FilterQuery<TRawDocType>,
-      options?: (mongodb.DeleteOptions & Omit<MongooseQueryOptions<TRawDocType>, 'lean' | 'timestamps'>) | null
+      options?: (mongodb.DeleteOptions & MongooseBaseQueryOptions<TRawDocType>) | null
     ): QueryWithHelpers<
       mongodb.DeleteResult,
       THydratedDocumentType,
@@ -286,7 +291,7 @@ declare module 'mongoose' {
      */
     deleteOne(
       filter?: FilterQuery<TRawDocType>,
-      options?: (mongodb.DeleteOptions & Omit<MongooseQueryOptions<TRawDocType>, 'lean' | 'timestamps'>) | null
+      options?: (mongodb.DeleteOptions & MongooseBaseQueryOptions<TRawDocType>) | null
     ): QueryWithHelpers<
       mongodb.DeleteResult,
       THydratedDocumentType,
@@ -371,7 +376,7 @@ declare module 'mongoose' {
      * Shortcut for creating a new Document from existing raw data, pre-saved in the DB.
      * The document returned has no paths marked as modified initially.
      */
-    hydrate(obj: any, projection?: AnyObject, options?: { setters?: boolean }): THydratedDocumentType;
+    hydrate(obj: any, projection?: AnyObject, options?: HydrateOptions): THydratedDocumentType;
 
     /**
      * This function is responsible for building [indexes](https://www.mongodb.com/docs/manual/indexes/),
@@ -593,6 +598,17 @@ declare module 'mongoose' {
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
     findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
+      filter: FilterQuery<TRawDocType>,
+      update: UpdateQuery<TRawDocType>,
+      options: QueryOptions<TRawDocType> & { includeResultMetadata: true, lean: true }
+    ): QueryWithHelpers<
+      ModifyResult<TRawDocType>,
+      ResultDoc,
+      TQueryHelpers,
+      TRawDocType,
+      'findOneAndUpdate'
+    >;
+    findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
       id: mongodb.ObjectId | any,
       update: UpdateQuery<TRawDocType>,
       options: QueryOptions<TRawDocType> & { lean: true }
@@ -675,9 +691,9 @@ declare module 'mongoose' {
     findOneAndUpdate<ResultDoc = THydratedDocumentType>(
       filter: FilterQuery<TRawDocType>,
       update: UpdateQuery<TRawDocType>,
-      options: QueryOptions<TRawDocType> & { lean: true }
+      options: QueryOptions<TRawDocType> & { includeResultMetadata: true, lean: true }
     ): QueryWithHelpers<
-      GetLeanResultType<TRawDocType, TRawDocType, 'findOneAndUpdate'> | null,
+      ModifyResult<TRawDocType>,
       ResultDoc,
       TQueryHelpers,
       TRawDocType,
@@ -686,8 +702,14 @@ declare module 'mongoose' {
     findOneAndUpdate<ResultDoc = THydratedDocumentType>(
       filter: FilterQuery<TRawDocType>,
       update: UpdateQuery<TRawDocType>,
-      options: QueryOptions<TRawDocType> & { includeResultMetadata: true }
-    ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndUpdate'>;
+      options: QueryOptions<TRawDocType> & { lean: true }
+    ): QueryWithHelpers<
+      GetLeanResultType<TRawDocType, TRawDocType, 'findOneAndUpdate'> | null,
+      ResultDoc,
+      TQueryHelpers,
+      TRawDocType,
+      'findOneAndUpdate'
+    >;
     findOneAndUpdate<ResultDoc = THydratedDocumentType>(
       filter: FilterQuery<TRawDocType>,
       update: UpdateQuery<TRawDocType>,
@@ -711,6 +733,9 @@ declare module 'mongoose' {
       options?: (mongodb.ReplaceOptions & MongooseQueryOptions<TRawDocType>) | null
     ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, TRawDocType, 'replaceOne'>;
 
+    /** Apply changes made to this model's schema after this model was compiled. */
+    recompileSchema(): void;
+
     /** Schema the model uses. */
     schema: Schema<TRawDocType>;
 
@@ -718,14 +743,14 @@ declare module 'mongoose' {
     updateMany<ResultDoc = THydratedDocumentType>(
       filter?: FilterQuery<TRawDocType>,
       update?: UpdateQuery<TRawDocType> | UpdateWithAggregationPipeline,
-      options?: (mongodb.UpdateOptions & Omit<MongooseQueryOptions<TRawDocType>, 'lean'>) | null
+      options?: (mongodb.UpdateOptions & MongooseUpdateQueryOptions<TRawDocType>) | null
     ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, TRawDocType, 'updateMany'>;
 
     /** Creates a `updateOne` query: updates the first document that matches `filter` with `update`. */
     updateOne<ResultDoc = THydratedDocumentType>(
       filter?: FilterQuery<TRawDocType>,
       update?: UpdateQuery<TRawDocType> | UpdateWithAggregationPipeline,
-      options?: (mongodb.UpdateOptions & Omit<MongooseQueryOptions<TRawDocType>, 'lean'>) | null
+      options?: (mongodb.UpdateOptions & MongooseUpdateQueryOptions<TRawDocType>) | null
     ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, TRawDocType, 'updateOne'>;
 
     /** Creates a Query, applies the passed conditions, and returns the Query. */

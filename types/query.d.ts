@@ -17,21 +17,31 @@ declare module 'mongoose' {
    */
   type FilterQuery<T> = _FilterQuery<T>;
 
-  type MongooseQueryOptions<DocType = unknown> = Pick<
-    QueryOptions<DocType>,
-    'context' |
-    'lean' |
-    'multipleCastError' |
-    'overwriteDiscriminatorKey' |
-    'populate' |
-    'runValidators' |
-    'sanitizeProjection' |
-    'sanitizeFilter' |
-    'setDefaultsOnInsert' |
-    'strict' |
-    'strictQuery' |
-    'timestamps' |
-    'translateAliases'
+  type MongooseBaseQueryOptionKeys =
+    | 'context'
+    | 'multipleCastError'
+    | 'overwriteDiscriminatorKey'
+    | 'populate'
+    | 'runValidators'
+    | 'sanitizeProjection'
+    | 'sanitizeFilter'
+    | 'setDefaultsOnInsert'
+    | 'strict'
+    | 'strictQuery'
+    | 'translateAliases';
+
+  type MongooseQueryOptions<
+    DocType = unknown,
+    Keys extends keyof QueryOptions<DocType> = MongooseBaseQueryOptionKeys | 'timestamps' | 'lean'
+  > = Pick<QueryOptions<DocType>, Keys> & {
+    [other: string]: any;
+  };
+
+  type MongooseBaseQueryOptions<DocType = unknown> = MongooseQueryOptions<DocType, MongooseBaseQueryOptionKeys>;
+
+  type MongooseUpdateQueryOptions<DocType = unknown> = MongooseQueryOptions<
+    DocType,
+    MongooseBaseQueryOptionKeys | 'timestamps'
   >;
 
   type ProjectionFields<DocType> = { [Key in keyof DocType]?: any } & Record<string, any>;
@@ -206,7 +216,7 @@ declare module 'mongoose' {
      * A QueryCursor exposes a Streams3 interface, as well as a `.next()` function.
      * This is equivalent to calling `.cursor()` with no arguments.
      */
-    [Symbol.asyncIterator](): AsyncIterableIterator<DocType>;
+    [Symbol.asyncIterator](): AsyncIterableIterator<Unpacked<ResultType>>;
 
     /** Executes the query */
     exec(): Promise<ResultType>;
@@ -284,7 +294,7 @@ declare module 'mongoose' {
      * Returns a wrapper around a [mongodb driver cursor](https://mongodb.github.io/node-mongodb-native/4.9/classes/FindCursor.html).
      * A QueryCursor exposes a Streams3 interface, as well as a `.next()` function.
      */
-    cursor(options?: QueryOptions<DocType>): Cursor<DocType, QueryOptions<DocType>>;
+    cursor(options?: QueryOptions<DocType>): Cursor<Unpacked<ResultType>, QueryOptions<DocType>>;
 
     /**
      * Declare and/or execute this query as a `deleteMany()` operation. Works like
@@ -645,7 +655,7 @@ declare module 'mongoose' {
 
     /** Specifies which document fields to include or exclude (also known as the query "projection") */
     select<RawDocTypeOverride extends { [P in keyof RawDocType]?: any } = {}>(
-      arg: string | string[] | Record<string, number | boolean | object>
+      arg: string | string[] | Record<string, number | boolean | string | object>
     ): QueryWithHelpers<
       IfEquals<
         RawDocTypeOverride,

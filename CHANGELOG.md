@@ -1,3 +1,10 @@
+6.12.7 / 2024-03-01
+===================
+ * perf(model): make insertMany() lean option skip hydrating Mongoose docs #14376 #14372
+ * perf(document+schema): small optimizations to make init() faster #14383 #14113
+ * fix(connection): don't modify passed options object to `openUri()` #14370 #13376 #13335
+ * fix(ChangeStream): bubble up resumeTokenChanged changeStream event #14355 #14349 [3150](https://github.com/3150)
+
 6.12.6 / 2024-01-22
 ===================
  * fix(collection): correctly handle buffer timeouts with find() #14277

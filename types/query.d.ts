@@ -1,8 +1,17 @@
 declare module 'mongoose' {
   import mongodb = require('mongodb');
 
-  export type ApplyBasicQueryCasting<T> = T | T[] | (T extends (infer U)[] ? U : any) | any;
-  type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>;
+  type StringQueryTypeCasting = string | RegExp;
+  type ObjectIdQueryTypeCasting = Types.ObjectId | string;
+
+  type QueryTypeCasting<T> = T extends string
+    ? StringQueryTypeCasting
+    : T extends Types.ObjectId
+      ? ObjectIdQueryTypeCasting
+      : T;
+
+  export type ApplyBasicQueryCasting<T> = T | T[] | (T extends (infer U)[] ? U : never);
+  type Condition<T> = ApplyBasicQueryCasting<QueryTypeCasting<T>> | QuerySelector<ApplyBasicQueryCasting<QueryTypeCasting<T>>>;
 
   type _FilterQuery<T> = {
     [P in keyof T]?: Condition<T[P]>;

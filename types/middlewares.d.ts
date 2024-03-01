@@ -1,4 +1,5 @@
 declare module 'mongoose' {
+  import Kareem = require('kareem');
 
   type MongooseQueryAndDocumentMiddleware = 'updateOne' | 'deleteOne';
 
@@ -37,13 +38,13 @@ declare module 'mongoose' {
     this: ThisType,
     next: CallbackWithoutResultAndOptionalError,
     opts?: Record<string, any>
-  ) => void | Promise<void> | SkipWrappedFunction;
+  ) => void | Promise<void> | Kareem.SkipWrappedFunction;
   type PreSaveMiddlewareFunction<ThisType = any> = (
     this: ThisType,
     next: CallbackWithoutResultAndOptionalError,
     opts: SaveOptions
-  ) => void | Promise<void> | SkipWrappedFunction;
-  type PostMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, res: ResType, next: CallbackWithoutResultAndOptionalError) => void | Promise<void> | OverwriteMiddlewareResult;
+  ) => void | Promise<void> | Kareem.SkipWrappedFunction;
+  type PostMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, res: ResType, next: CallbackWithoutResultAndOptionalError) => void | Promise<void> | Kareem.OverwriteMiddlewareResult;
   type ErrorHandlingMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: CallbackWithoutResultAndOptionalError) => void;
-  type ErrorHandlingMiddlewareWithOption<ThisType = any, ResType = any> = (this: ThisType, err: NativeError, res: ResType | null, next: CallbackWithoutResultAndOptionalError) => void | Promise<void> | OverwriteMiddlewareResult;
+  type ErrorHandlingMiddlewareWithOption<ThisType = any, ResType = any> = (this: ThisType, err: NativeError, res: ResType | null, next: CallbackWithoutResultAndOptionalError) => void | Promise<void> | Kareem.OverwriteMiddlewareResult;
 }

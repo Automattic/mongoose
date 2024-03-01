@@ -27,6 +27,7 @@
 declare class NativeDate extends global.Date { }
 
 declare module 'mongoose' {
+  import Kareem = require('kareem');
   import events = require('events');
   import mongodb = require('mongodb');
   import mongoose = require('mongoose');
@@ -677,11 +678,9 @@ declare module 'mongoose' {
   /* for ts-mongoose */
   export class mquery { }
 
-  export class OverwriteMiddlewareResult {}
-  export function overwriteMiddlewareResult(val: any): OverwriteMiddlewareResult;
+  export function overwriteMiddlewareResult(val: any): Kareem.OverwriteMiddlewareResult;
 
-  export class SkipWrappedFunction {}
-  export function skipMiddlewareFunction(val: any): SkipWrappedFunction;
+  export function skipMiddlewareFunction(val: any): Kareem.SkipWrappedFunction;
 
   export default mongoose;
 }

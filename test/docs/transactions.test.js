@@ -477,4 +477,20 @@ describe('transactions', function() {
 
     assert.equal(i, 3);
   });
+
+  it('doesnt apply schema write concern to transaction operations (gh-11382)', async function() {
+    db.deleteModel(/Test/);
+    const Test = db.model('Test', Schema({ status: String }, { writeConcern: { w: 'majority' } }));
+
+    await Test.createCollection();
+    await Test.deleteMany({});
+
+    const session = await db.startSession();
+
+    await session.withTransaction(async function() {
+      await Test.findOneAndUpdate({}, { name: 'test' }, { session });
+    });
+
+    await session.endSession();
+  });
 });

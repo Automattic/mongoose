@@ -1,3 +1,10 @@
+7.6.9 / 2024-02-26
+==================
+ * fix(document): handle embedded recursive discriminators on nested path defined using Schema.prototype.discriminator #14256 #14245
+ * types(model): correct return type for findByIdAndDelete() #14233 #14190
+ * docs(connections): add note about using asPromise() with createConnection() for error handling #14364 #14266
+ * docs(model+query+findoneandupdate): add more details about overwriteDiscriminatorKey option to docs #14264 #14246
+
 8.2.0 / 2024-02-22
 ==================
  * feat(model): add recompileSchema() function to models to allow applying schema changes after compiling #14306 #14296

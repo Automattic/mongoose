@@ -324,8 +324,8 @@ function gh11964() {
   let idCondition: Condition<WithId<TestUser>['id']>;
   let filter: FilterQuery<WithId<TestUser>>;
 
-  expectType<typeof idCondition>(id);
-  expectType<typeof filter>({ id });
+  expectAssignable<typeof idCondition>(id);
+  expectAssignable<typeof filter>({ id });
 }
 
 function gh12091() {

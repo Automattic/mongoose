@@ -20,7 +20,7 @@
   "license": "MIT",
   "dependencies": {
     "bson": "^6.2.0",
-    "kareem": "https://api.github.com/repos/mongoosejs/kareem/tarball/vkarpov15/typescript",
+    "kareem": "2.6.0",
     "mongodb": "6.3.0",
     "mpath": "0.9.0",
     "mquery": "5.0.0",

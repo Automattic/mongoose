@@ -1,3 +1,12 @@
+8.2.1 / 2024-03-04
+==================
+ * fix(document): make $clone avoid converting subdocs into POJOs #14395 #14353
+ * fix(connection): avoid unhandled error on createConnection() if on('error') handler registered #14390 #14377
+ * fix(schema): avoid applying default write concern to operations that are in a transaction #14391 #11382
+ * types(querycursor): correct cursor async iterator type with populate() support #14384 #14374
+ * types: missing typescript details on options params of updateMany, updateOne, etc. #14382 #14379 #14378 [FaizBShah](https://github.com/FaizBShah) [sderrow](https://github.com/sderrow)
+ * types: allow Record<string, string> as valid query select argument #14371 [sderrow](https://github.com/sderrow)
+
 7.6.9 / 2024-02-26
 ==================
  * fix(document): handle embedded recursive discriminators on nested path defined using Schema.prototype.discriminator #14256 #14245

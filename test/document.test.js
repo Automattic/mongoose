@@ -12070,6 +12070,27 @@ describe('document', function() {
     assert.strictEqual(clonedDoc.$session(), session);
   });
 
+  it('$clone() with single nested and doc array (gh-14353) (gh-11849)', async function() {
+    const schema = new mongoose.Schema({
+      subdocArray: [{
+        name: String
+      }],
+      subdoc: new mongoose.Schema({ name: String })
+    });
+    const Test = db.model('Test', schema);
+
+    const item = await Test.create({ subdocArray: [{ name: 'test 1' }], subdoc: { name: 'test 2' } });
+
+    const doc = await Test.findById(item._id);
+    const clonedDoc = doc.$clone();
+
+    assert.ok(clonedDoc.subdocArray[0].$__);
+    assert.ok(clonedDoc.subdoc.$__);
+
+    assert.deepEqual(doc.subdocArray[0], clonedDoc.subdocArray[0]);
+    assert.deepEqual(doc.subdoc, clonedDoc.subdoc);
+  });
+
   it('can create document with document array and top-level key named `schema` (gh-12480)', async function() {
     const AuthorSchema = new Schema({
       fullName: { type: 'String', required: true }

@@ -84,6 +84,8 @@ Test.find({ parent: { $in: ['0'.repeat(24)] } });
 Test.find({ name: { $in: ['Test'] } }).exec().then((res: Array<ITest>) => console.log(res));
 Test.find({ tags: 'test' }).exec();
 Test.find({ tags: { $in: ['test'] } }).exec();
+Test.find({ tags: /test/ }).exec();
+Test.find({ tags: { $in: [/test/] } }).exec();
 
 // Implicit `$in`
 Test.find({ name: ['Test1', 'Test2'] }).exec();

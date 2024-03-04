@@ -16,7 +16,7 @@ declare module 'mongoose' {
           ? BufferQueryTypeCasting
           : T;
 
-  export type ApplyBasicQueryCasting<T> = T | T[] | (T extends (infer U)[] ? U : never);
+  export type ApplyBasicQueryCasting<T> = T | T[] | (T extends (infer U)[] ? QueryTypeCasting<U> : never);
   type Condition<T> = ApplyBasicQueryCasting<QueryTypeCasting<T>> | QuerySelector<ApplyBasicQueryCasting<QueryTypeCasting<T>>>;
 
   type _FilterQuery<T> = {

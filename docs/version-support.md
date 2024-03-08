@@ -18,4 +18,4 @@ Mongoose 6.x will no longer receive any updates, security or otherwise, after th
 
 ## Mongoose 5
 
-Mongoose 5.x (released January 17, 2018) is since March 1, 2024 End-of-Life (EOL), it will no longer receive any updates, security or otherwise.
+Mongoose 5.x (released January 17, 2018) is End-of-Life (EOL) since March 1, 2024. Mongoose 5.x will no longer receive any updates, security or otherwise.

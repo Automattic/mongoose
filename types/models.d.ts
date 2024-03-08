@@ -172,7 +172,7 @@ declare module 'mongoose' {
 
   export interface InsertOneModel<TSchema> {
     document: mongodb.OptionalId<TSchema>
-  };
+  }
 
   export interface ReplaceOneModel<TSchema = AnyObject> {
     /** The filter to limit the replaced document. */

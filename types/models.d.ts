@@ -170,7 +170,7 @@ declare module 'mongoose' {
     deleteMany: DeleteManyModel<TSchema>;
   };
 
-  export type InsertOneModel<TSchema> = {
+  export interface InsertOneModel<TSchema> {
     document: mongodb.OptionalId<TSchema>
   };
 

@@ -897,6 +897,22 @@ function gh4727() {
   const company = { _id: new mongoose.Types.ObjectId(), name: 'Booster', users: [users[0]] };
 
   return Company.hydrate(company, {}, { hydratedPopulatedDocs: true });
+}
 
+async function gh14440() {
+  const testSchema = new Schema({
+    dateProperty: { type: Date }
+  });
 
+  const TestModel = model('Test', testSchema);
+
+  const doc = new TestModel();
+  await TestModel.bulkWrite([
+    {
+      updateOne: {
+        filter: { _id: doc._id },
+        update: { dateProperty: (new Date('2023-06-01')).toISOString() }
+      }
+    }
+  ]);
 }

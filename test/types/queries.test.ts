@@ -316,6 +316,19 @@ function gh11964() {
 
   type WithId<T extends object> = T & { id: string };
 
+  class Repository<T extends object> {
+    find(id: string) {
+      const idCondition: Condition<ReturnType<(arg: WithId<T>) => typeof arg.id>> = id;
+      const filter: FilterQuery<WithId<T>> = { id } as FilterQuery<WithId<T>>;
+    }
+  }
+}
+
+function gh14397() {
+  type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>; // redefined here because it's not exported by mongoose
+
+  type WithId<T extends object> = T & { id: string };
+
   type TestUser = {
     name: string;
     age: number;

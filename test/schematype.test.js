@@ -281,4 +281,37 @@ describe('schematype', function() {
       });
     });
   });
+  it('demonstrates the `validateAll()` function (gh-6910)', async function() {
+    const m = new mongoose.Mongoose();
+    await m.connect(start.uri);
+    const validateSchema = new m.Schema({ name: String, password: String });
+    validateSchema.path('name').validate({
+      validator: function(v) {
+        return v.length > 5;
+      },
+      message: 'name must be longer than 5 characters'
+    })
+    validateSchema.path('password').validateAll([
+      { 
+        validator: function(v) {
+          return this.name == v;
+        },
+        message: `password must not equal name`
+      },
+      {
+        validator: function(v) {
+          return v.length > 5
+        },
+        message: `password must be at least six characters`
+      }
+    ]);
+
+    const Test = m.model('Test', validateSchema);
+    await Test.deleteMany({});
+    const check = new Test();
+    check.name = 'Test';
+    check.password = 'test';
+    const test = check.validateSync();
+    assert.ok(true);
+  });
 });

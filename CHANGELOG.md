@@ -1,3 +1,8 @@
+7.6.10 / 2024-03-13
+===================
+ * docs(model): add extra note about lean option for insertMany() skipping casting #14415
+ * docs(mongoose): add options.overwriteModel details to mongoose.model() docs #14422
+
 6.12.7 / 2024-03-01
 ===================
  * perf(model): make insertMany() lean option skip hydrating Mongoose docs #14376 #14372

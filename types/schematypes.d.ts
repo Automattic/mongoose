@@ -285,10 +285,10 @@ declare module 'mongoose' {
     validators: Validator[];
 
     /** Adds validator(s) for this document path. */
-    validate(obj: RegExp | ValidatorFunction | Validator, errorMsg?: string, type?: string): this;
+    validate(obj: RegExp | ValidatorFunction<DocType> | Validator<DocType>, errorMsg?: string, type?: string): this;
 
     /** Adds multiple validators for this document path. */
-    validateAll(validators: Array<RegExp | ValidatorFunction | Validator>): this;
+    validateAll(validators: Array<RegExp | ValidatorFunction<DocType> | Validator<DocType>>): this;
 
     /** Default options for this SchemaType */
     defaultOptions?: Record<string, any>;

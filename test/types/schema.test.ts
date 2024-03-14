@@ -1059,10 +1059,10 @@ function gh12882() {
   });
   type tArrType = InferSchemaType<typeof arrType>;
   expectType<{
-    fooArray: {
+    fooArray: Types.DocumentArray<{
       type: string;
       foo: number;
-    }[]
+    }>
   }>({} as tArrType);
   // Readonly array of strings
   const rArrString = new Schema({
@@ -1110,10 +1110,10 @@ function gh12882() {
   });
   type rTArrType = InferSchemaType<typeof rArrType>;
   expectType<{
-    fooArray: {
+    fooArray: Types.DocumentArray<{
       type: string;
       foo: number;
-    }[]
+    }>
   }>({} as rTArrType);
 }
 

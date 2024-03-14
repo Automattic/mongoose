@@ -93,3 +93,37 @@ async function gh13424() {
   const doc = new TestModel();
   expectType<Types.ObjectId | undefined>(doc.subDocArray[0]._id);
 }
+
+async function gh14367() {
+  const UserSchema = new Schema(
+    {
+      reminders: {
+        type: [
+          {
+            type: { type: Schema.Types.String },
+            date: { type: Schema.Types.Date },
+            toggle: { type: Schema.Types.Boolean },
+            notified: { type: Schema.Types.Boolean }
+          }
+        ],
+        default: [
+          { type: 'vote', date: new Date(), toggle: false, notified: false },
+          { type: 'daily', date: new Date(), toggle: false, notified: false },
+          { type: 'drop', date: new Date(), toggle: false, notified: false },
+          { type: 'claim', date: new Date(), toggle: false, notified: false },
+          { type: 'work', date: new Date(), toggle: false, notified: false }
+        ]
+      },
+      avatar: {
+        type: Schema.Types.String
+      }
+    },
+    { timestamps: true }
+  );
+
+  type IUser = InferSchemaType<typeof UserSchema>;
+  expectType<string | null | undefined>({} as IUser['reminders'][0]['type']);
+  expectType<Date | null | undefined>({} as IUser['reminders'][0]['date']);
+  expectType<boolean | null | undefined>({} as IUser['reminders'][0]['toggle']);
+  expectType<string | null | undefined>({} as IUser['avatar']);
+}

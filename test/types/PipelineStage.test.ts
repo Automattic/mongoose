@@ -532,8 +532,8 @@ const vectorSearchStages: PipelineStage[] = [
   },
   {
     $project: {
-    title: 1,
-    score: { $meta: 'searchScore' }
+      title: 1,
+      score: { $meta: 'searchScore' }
     }
   }
 ];

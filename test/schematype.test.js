@@ -281,7 +281,7 @@ describe('schematype', function() {
       });
     });
   });
-  it('demonstrates the `validateAll()` function (gh-6910)', async function() {
+  it('demonstrates the `validateAll()` function (gh-6910)', function() {
     const validateSchema = new Schema({ name: String, password: String });
     validateSchema.path('name').validate({
       validator: function(v) {

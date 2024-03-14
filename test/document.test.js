@@ -13041,6 +13041,51 @@ describe('document', function() {
     assert.ok(doc.docArr.toString().includes('child'), doc.docArr.toString());
     assert.ok(doc.docArr.toString().includes('test child'), doc.docArr.toString());
   });
+
+  it('minimizes when updating existing documents (gh-13782)', async function() {
+    const schema = new Schema({
+      metadata: {
+        type: {},
+        default: {},
+        required: true,
+        _id: false
+      }
+    }, { minimize: true });
+    const Model = db.model('Test', schema);
+    const m = new Model({ metadata: {} });
+    await m.save();
+
+    const x = await Model.findById(m._id).exec();
+    x.metadata = {};
+    await x.save();
+
+    const { metadata } = await Model.findById(m._id).orFail();
+    assert.strictEqual(metadata, null);
+  });
+
+  it('saves when setting subdocument to empty object (gh-14420) (gh-13782)', async function() {
+    const SubSchema = new mongoose.Schema({
+      name: { type: String },
+      age: Number
+    }, { _id: false });
+
+    const MainSchema = new mongoose.Schema({
+      sub: {
+        type: SubSchema
+      }
+    });
+
+    const MainModel = db.model('Test', MainSchema);
+
+    const doc = new MainModel({ sub: { name: 'Hello World', age: 42 } });
+    await doc.save();
+
+    doc.sub = {};
+    await doc.save();
+
+    const savedDoc = await MainModel.findById(doc.id).orFail();
+    assert.strictEqual(savedDoc.sub, null);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

@@ -282,7 +282,6 @@ describe('schematype', function() {
     });
   });
   it('demonstrates the `validateAll()` function (gh-6910)', async function() {
-
     const validateSchema = new Schema({ name: String, password: String });
     validateSchema.path('name').validate({
       validator: function(v) {
@@ -293,7 +292,7 @@ describe('schematype', function() {
     validateSchema.path('password').validateAll([
       {
         validator: function(v) {
-          return this.name == v;
+          return this.name !== v;
         },
         message: 'password must not equal name'
       },
@@ -305,5 +304,15 @@ describe('schematype', function() {
       }
     ]);
     assert.equal(validateSchema.path('password').validators.length, 2);
+
+    const passwordPath = validateSchema.path('password');
+    assert.throws(
+      () => { throw passwordPath.doValidateSync('john', { name: 'john' }); },
+      /password must not equal name/
+    );
+    assert.throws(
+      () => { throw passwordPath.doValidateSync('short', { name: 'john' }); },
+      /password must be at least six characters/
+    );
   });
 });

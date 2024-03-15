@@ -627,6 +627,12 @@ declare module 'mongoose' {
       QueryOp
     >;
 
+    /** Add pre middleware to this query instance. Doesn't affect other queries. */
+    pre(fn: Function): this;
+
+    /** Add post middleware to this query instance. Doesn't affect other queries. */
+    post(fn: Function): this;
+
     /** Get/set the current projection (AKA fields). Pass `null` to remove the current projection. */
     projection(fields?: ProjectionFields<DocType> | string): ProjectionFields<DocType>;
     projection(fields: null): null;

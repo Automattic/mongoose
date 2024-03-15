@@ -156,6 +156,85 @@ declare module 'mongoose' {
 
   const Model: Model<any>;
 
+  export type AnyBulkWriteOperation<TSchema = AnyObject> = {
+    insertOne: InsertOneModel<TSchema>;
+  } | {
+    replaceOne: ReplaceOneModel<TSchema>;
+  } | {
+    updateOne: UpdateOneModel<TSchema>;
+  } | {
+    updateMany: UpdateManyModel<TSchema>;
+  } | {
+    deleteOne: DeleteOneModel<TSchema>;
+  } | {
+    deleteMany: DeleteManyModel<TSchema>;
+  };
+
+  export interface InsertOneModel<TSchema> {
+    document: mongodb.OptionalId<TSchema>
+  }
+
+  export interface ReplaceOneModel<TSchema = AnyObject> {
+    /** The filter to limit the replaced document. */
+    filter: FilterQuery<TSchema>;
+    /** The document with which to replace the matched document. */
+    replacement: mongodb.WithoutId<TSchema>;
+    /** Specifies a collation. */
+    collation?: mongodb.CollationOptions;
+    /** The index to use. If specified, then the query system will only consider plans using the hinted index. */
+    hint?: mongodb.Hint;
+    /** When true, creates a new document if no document matches the query. */
+    upsert?: boolean;
+  }
+
+  export interface UpdateOneModel<TSchema = AnyObject> {
+    /** The filter to limit the updated documents. */
+    filter: FilterQuery<TSchema>;
+    /** A document or pipeline containing update operators. */
+    update: UpdateQuery<TSchema>;
+    /** A set of filters specifying to which array elements an update should apply. */
+    arrayFilters?: AnyObject[];
+    /** Specifies a collation. */
+    collation?: mongodb.CollationOptions;
+    /** The index to use. If specified, then the query system will only consider plans using the hinted index. */
+    hint?: mongodb.Hint;
+    /** When true, creates a new document if no document matches the query. */
+    upsert?: boolean;
+  }
+
+  export interface UpdateManyModel<TSchema = AnyObject> {
+    /** The filter to limit the updated documents. */
+    filter: FilterQuery<TSchema>;
+    /** A document or pipeline containing update operators. */
+    update: UpdateQuery<TSchema>;
+    /** A set of filters specifying to which array elements an update should apply. */
+    arrayFilters?: AnyObject[];
+    /** Specifies a collation. */
+    collation?: mongodb.CollationOptions;
+    /** The index to use. If specified, then the query system will only consider plans using the hinted index. */
+    hint?: mongodb.Hint;
+    /** When true, creates a new document if no document matches the query. */
+    upsert?: boolean;
+  }
+
+  export interface DeleteOneModel<TSchema = AnyObject> {
+    /** The filter to limit the deleted documents. */
+    filter: FilterQuery<TSchema>;
+    /** Specifies a collation. */
+    collation?: mongodb.CollationOptions;
+    /** The index to use. If specified, then the query system will only consider plans using the hinted index. */
+    hint?: mongodb.Hint;
+  }
+
+  export interface DeleteManyModel<TSchema = AnyObject> {
+    /** The filter to limit the deleted documents. */
+    filter: FilterQuery<TSchema>;
+    /** Specifies a collation. */
+    collation?: mongodb.CollationOptions;
+    /** The index to use. If specified, then the query system will only consider plans using the hinted index. */
+    hint?: mongodb.Hint;
+  }
+
   /**
    * Models are fancy constructors compiled from `Schema` definitions.
    * An instance of a model is called a document.
@@ -201,17 +280,11 @@ declare module 'mongoose' {
      * round trip to the MongoDB server.
      */
     bulkWrite<DocContents = TRawDocType>(
-      writes: Array<
-        mongodb.AnyBulkWriteOperation<
-          DocContents extends mongodb.Document ? DocContents : any
-        > & MongooseBulkWritePerWriteOptions>,
+      writes: Array<AnyBulkWriteOperation<DocContents extends Document ? any : (DocContents extends {} ? DocContents : any)>>,
       options: mongodb.BulkWriteOptions & MongooseBulkWriteOptions & { ordered: false }
     ): Promise<mongodb.BulkWriteResult & { mongoose?: { validationErrors: Error[] } }>;
     bulkWrite<DocContents = TRawDocType>(
-      writes: Array<
-        mongodb.AnyBulkWriteOperation<
-          DocContents extends mongodb.Document ? DocContents : any
-        > & MongooseBulkWritePerWriteOptions>,
+      writes: Array<AnyBulkWriteOperation<DocContents extends Document ? any : (DocContents extends {} ? DocContents : any)>>,
       options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions
     ): Promise<mongodb.BulkWriteResult>;
 

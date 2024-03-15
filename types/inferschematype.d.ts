@@ -229,7 +229,7 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
               ObtainDocumentPathType<Item, TypeKey>[] :
               // If the type key isn't callable, then this is an array of objects, in which case
               // we need to call ObtainDocumentType to correctly infer its type.
-              ObtainDocumentType<Item, any, { typeKey: TypeKey }>[] :
+              Types.DocumentArray<ObtainDocumentType<Item, any, { typeKey: TypeKey }>> :
             IsSchemaTypeFromBuiltinClass<Item> extends true ?
               ObtainDocumentPathType<Item, TypeKey>[] :
               IsItRecordAndNotAny<Item> extends true ?

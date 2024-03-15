@@ -1,3 +1,13 @@
+8.2.2 / 2024-03-15
+==================
+ * fix(model): improve update minimizing to only minimize top-level properties in the update #14437 #14420 #13782
+ * fix: add Null check in case schema.options['type'][0] is undefined #14431 [Atharv-Bobde](https://github.com/Atharv-Bobde)
+ * types: consistently infer array of objects in schema as a DocumentArray #14430 #14367
+ * types: add TypeScript interface for the new PipelineStage - Vector Search - solving issue #14428 #14429 [jkorach](https://github.com/jkorach)
+ * types: add pre and post function types on Query class #14433 #14432 [IICarst](https://github.com/IICarst)
+ * types(model): make bulkWrite() types more flexible to account for casting #14423
+ * docs: update version support documentation for mongoose 5 & 6 #14427 [hasezoey](https://github.com/hasezoey)
+
 7.6.10 / 2024-03-13
 ===================
  * docs(model): add extra note about lean option for insertMany() skipping casting #14415

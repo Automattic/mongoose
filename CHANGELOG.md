@@ -1,3 +1,8 @@
+7.6.10 / 2024-03-13
+===================
+ * docs(model): add extra note about lean option for insertMany() skipping casting #14415
+ * docs(mongoose): add options.overwriteModel details to mongoose.model() docs #14422
+
 8.2.1 / 2024-03-04
 ==================
  * fix(document): make $clone avoid converting subdocs into POJOs #14395 #14353
@@ -7,6 +12,13 @@
  * types: missing typescript details on options params of updateMany, updateOne, etc. #14382 #14379 #14378 [FaizBShah](https://github.com/FaizBShah) [sderrow](https://github.com/sderrow)
  * types: allow Record<string, string> as valid query select argument #14371 [sderrow](https://github.com/sderrow)
 
+6.12.7 / 2024-03-01
+===================
+ * perf(model): make insertMany() lean option skip hydrating Mongoose docs #14376 #14372
+ * perf(document+schema): small optimizations to make init() faster #14383 #14113
+ * fix(connection): don't modify passed options object to `openUri()` #14370 #13376 #13335
+ * fix(ChangeStream): bubble up resumeTokenChanged changeStream event #14355 #14349 [3150](https://github.com/3150)
+
 7.6.9 / 2024-02-26
 ==================
  * fix(document): handle embedded recursive discriminators on nested path defined using Schema.prototype.discriminator #14256 #14245
@@ -14,6 +26,7 @@
  * docs(connections): add note about using asPromise() with createConnection() for error handling #14364 #14266
  * docs(model+query+findoneandupdate): add more details about overwriteDiscriminatorKey option to docs #14264 #14246
 
+<<<<<<< HEAD
 8.2.0 / 2024-02-22
 ==================
  * feat(model): add recompileSchema() function to models to allow applying schema changes after compiling #14306 #14296
@@ -71,6 +84,12 @@
  * docs: update TLS/SSL guide for Mongoose v8 - MongoDB v6 driver deprecations #14170 [andylwelch](https://github.com/andylwelch)
  * docs: update findOneAndUpdate tutorial to use includeResultMetadata #14208 #14207
  * docs: clarify disabling _id on subdocs #14195 #14194
+=======
+6.12.6 / 2024-01-22
+===================
+ * fix(collection): correctly handle buffer timeouts with find() #14277
+ * fix(document): allow calling push() with different $position arguments #14254
+>>>>>>> 7.x
 
 7.6.8 / 2024-01-08
 ==================

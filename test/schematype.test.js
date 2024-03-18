@@ -281,4 +281,38 @@ describe('schematype', function() {
       });
     });
   });
+  it('demonstrates the `validateAll()` function (gh-6910)', function() {
+    const validateSchema = new Schema({ name: String, password: String });
+    validateSchema.path('name').validate({
+      validator: function(v) {
+        return v.length > 5;
+      },
+      message: 'name must be longer than 5 characters'
+    });
+    validateSchema.path('password').validateAll([
+      {
+        validator: function(v) {
+          return this.name !== v;
+        },
+        message: 'password must not equal name'
+      },
+      {
+        validator: function(v) {
+          return v.length > 5;
+        },
+        message: 'password must be at least six characters'
+      }
+    ]);
+    assert.equal(validateSchema.path('password').validators.length, 2);
+
+    const passwordPath = validateSchema.path('password');
+    assert.throws(
+      () => { throw passwordPath.doValidateSync('john', { name: 'john' }); },
+      /password must not equal name/
+    );
+    assert.throws(
+      () => { throw passwordPath.doValidateSync('short', { name: 'john' }); },
+      /password must be at least six characters/
+    );
+  });
 });

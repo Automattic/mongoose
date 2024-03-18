@@ -8172,7 +8172,7 @@ describe('document', function() {
     assert.deepEqual(Object.keys(err.errors), ['age']);
   });
 
-  it('array push with $position (gh-4322)', async function() {
+  it('array push with $position (gh-14244) (gh-4322)', async function() {
     const schema = Schema({
       nums: [Number]
     });
@@ -8196,12 +8196,13 @@ describe('document', function() {
       $each: [0],
       $position: 0
     });
-    assert.throws(() => {
-      doc.nums.push({ $each: [5] });
-    }, /Cannot call.*multiple times/);
-    assert.throws(() => {
-      doc.nums.push(5);
-    }, /Cannot call.*multiple times/);
+    assert.deepStrictEqual(doc.nums.$__getAtomics(), [['$push', { $each: [0], $position: 0 }]]);
+
+    doc.nums.push({ $each: [5] });
+    assert.deepStrictEqual(doc.nums.$__getAtomics(), [['$set', [0, 1, 2, 3, 4, 5]]]);
+
+    doc.nums.push({ $each: [0.5], $position: 1 });
+    assert.deepStrictEqual(doc.nums.$__getAtomics(), [['$set', [0, 0.5, 1, 2, 3, 4, 5]]]);
   });
 
   it('setting a path to a single nested document should update the single nested doc parent (gh-8400)', function() {
@@ -12070,6 +12071,27 @@ describe('document', function() {
     assert.strictEqual(clonedDoc.$session(), session);
   });
 
+  it('$clone() with single nested and doc array (gh-14353) (gh-11849)', async function() {
+    const schema = new mongoose.Schema({
+      subdocArray: [{
+        name: String
+      }],
+      subdoc: new mongoose.Schema({ name: String })
+    });
+    const Test = db.model('Test', schema);
+
+    const item = await Test.create({ subdocArray: [{ name: 'test 1' }], subdoc: { name: 'test 2' } });
+
+    const doc = await Test.findById(item._id);
+    const clonedDoc = doc.$clone();
+
+    assert.ok(clonedDoc.subdocArray[0].$__);
+    assert.ok(clonedDoc.subdoc.$__);
+
+    assert.deepEqual(doc.subdocArray[0], clonedDoc.subdocArray[0]);
+    assert.deepEqual(doc.subdoc, clonedDoc.subdoc);
+  });
+
   it('can create document with document array and top-level key named `schema` (gh-12480)', async function() {
     const AuthorSchema = new Schema({
       fullName: { type: 'String', required: true }
@@ -13019,6 +13041,51 @@ describe('document', function() {
     doc.docArr[0].child = child;
     assert.ok(doc.docArr.toString().includes('child'), doc.docArr.toString());
     assert.ok(doc.docArr.toString().includes('test child'), doc.docArr.toString());
+  });
+
+  it('minimizes when updating existing documents (gh-13782)', async function() {
+    const schema = new Schema({
+      metadata: {
+        type: {},
+        default: {},
+        required: true,
+        _id: false
+      }
+    }, { minimize: true });
+    const Model = db.model('Test', schema);
+    const m = new Model({ metadata: {} });
+    await m.save();
+
+    const x = await Model.findById(m._id).exec();
+    x.metadata = {};
+    await x.save();
+
+    const { metadata } = await Model.findById(m._id).orFail();
+    assert.strictEqual(metadata, null);
+  });
+
+  it('saves when setting subdocument to empty object (gh-14420) (gh-13782)', async function() {
+    const SubSchema = new mongoose.Schema({
+      name: { type: String },
+      age: Number
+    }, { _id: false });
+
+    const MainSchema = new mongoose.Schema({
+      sub: {
+        type: SubSchema
+      }
+    });
+
+    const MainModel = db.model('Test', MainSchema);
+
+    const doc = new MainModel({ sub: { name: 'Hello World', age: 42 } });
+    await doc.save();
+
+    doc.sub = {};
+    await doc.save();
+
+    const savedDoc = await MainModel.findById(doc.id).orFail();
+    assert.strictEqual(savedDoc.sub, null);
   });
 });
 

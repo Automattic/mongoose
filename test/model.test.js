@@ -2553,18 +2553,26 @@ describe('Model', function() {
     });
     it('should have `pathsToSave` work with subdocs (gh-9583)', async function() {
       const locationSchema = new Schema({ state: String, city: String, zip: { type: Number, validate: v => v == null || v.toString().length == 5 } });
-      const schema = new Schema({ name: String, age: Number, weight: { type: Number, validate: v => v == null || v >= 140 }, location: locationSchema });
+      const schema = new Schema({
+        name: String,
+        nickname: String,
+        age: Number,
+        weight: { type: Number, validate: v => v == null || v >= 140 },
+        location: locationSchema
+      });
       const Test = db.model('Test', schema);
-      await Test.create({ name: 'Test Testerson', age: 1, weight: 180, location: { state: 'FL', city: 'Miami', zip: 33330 } });
-      const doc = await Test.findOne();
+      await Test.create({ name: 'Test Testerson', nickname: 'test', age: 1, weight: 180, location: { state: 'FL', city: 'Miami', zip: 33330 } });
+      let doc = await Test.findOne();
       doc.name = 'Test';
+      doc.nickname = 'Test2';
       doc.age = 100;
       doc.weight = 80;
       doc.location.state = 'Ohio';
       doc.location.zip = 0;
       await doc.save({ pathsToSave: ['name', 'location.state'] });
-      const check = await Test.findOne();
+      let check = await Test.findOne();
       assert.equal(check.name, 'Test');
+      assert.equal(check.nickname, 'test');
       assert.equal(check.weight, 180);
       assert.equal(check.age, 1);
       assert.equal(check.location.state, 'Ohio');
@@ -2578,8 +2586,17 @@ describe('Model', function() {
       assert.equal(nestedCheck.location.city, 'Athens');
       assert.equal(nestedCheck.location.zip, 34512);
       assert.equal(nestedCheck.name, 'Quiz');
+
+      doc = await Test.findOne();
+      doc.name = 'foobar';
+      doc.location.city = 'Reynolds';
+      await doc.save({ pathsToSave: ['location'] });
+      check = await Test.findById(doc._id);
+      assert.equal(check.name, 'Quiz');
+      assert.equal(check.location.city, 'Reynolds');
+      assert.equal(check.location.state, 'Georgia');
     });
-    it('should have `pathsToSave` work with doc arrays asdf (gh-9583)', async function() {
+    it('should have `pathsToSave` work with doc arrays (gh-9583)', async function() {
       const locationSchema = new Schema({ state: String, city: String, zip: { type: Number, validate: v => v == null || v.toString().length == 5 } });
       const schema = new Schema({ name: String, age: Number, weight: { type: Number, validate: v => v == null || v >= 140 }, location: [locationSchema] });
       const Test = db.model('Test', schema);
@@ -2590,6 +2607,7 @@ describe('Model', function() {
       doc.weight = 80;
       doc.location[0].state = 'Ohio';
       doc.location[0].zip = 0;
+      doc.location[1].state = 'Ohio';
       await doc.save({ pathsToSave: ['name', 'location.0.state'] });
       const check = await Test.findOne();
       assert.equal(check.name, 'Test');
@@ -2597,6 +2615,7 @@ describe('Model', function() {
       assert.equal(check.age, 1);
       assert.equal(check.location[0].state, 'Ohio');
       assert.equal(check.location[0].zip, 33330);
+      assert.equal(check.location[1].state, 'New York');
       check.location[0] = { state: 'Georgia', city: 'Athens', zip: 34512 };
       check.name = 'Quiz';
       check.age = 50;

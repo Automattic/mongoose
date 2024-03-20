@@ -3202,4 +3202,14 @@ describe('schema', function() {
     const doc = new baseModel({ type: 1, self: [{ type: 1 }] });
     assert.equal(doc.self[0].type, 1);
   });
+  it('should have the correct schema definition with array schemas (gh-14416)', function() {
+    const schema = new Schema({
+      nums: [{ type: Array, of: Number }],
+      tags: [{ type: 'Array', of: String }],
+      subdocs: [{ type: Array, of: Schema({ name: String }) }]
+    });
+    assert.equal(schema.path('nums.$').caster.instance, 'Number'); // actually Mixed
+    assert.equal(schema.path('tags.$').caster.instance, 'String'); // actually Mixed
+    assert.equal(schema.path('subdocs.$').casterConstructor.schema.path('name').instance, 'String'); // actually Mixed
+  });
 });

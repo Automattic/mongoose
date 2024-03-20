@@ -67,5 +67,8 @@ jobs:
           sleep 2
           mongod --version
           echo `pwd`/mongodb-linux-x86_64-ubuntu2004-5.0.14/bin >> $GITHUB_PATH
+      - name: Setup config
+        run: |
+          echo "module.exports = {uri:'mongodb://127.0.0.1:27017/mongoose_test'};" > ./.config.js
       - run: npm run docs:clean
       - run: npm run docs:generate

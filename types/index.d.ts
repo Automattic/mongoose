@@ -275,6 +275,13 @@ declare module 'mongoose' {
     index(fields: IndexDefinition, options?: IndexOptions): this;
 
     /**
+     * Define a search index for this schema.
+     *
+     * @remarks Search indexes are only supported when used against a 7.0+ Mongo Atlas cluster.
+     */
+    searchIndex(description: mongodb.SearchIndexDescription): this;
+
+    /**
      * Returns a list of indexes that this schema declares, via `schema.index()`
      * or by `index: true` in a path's options.
      */

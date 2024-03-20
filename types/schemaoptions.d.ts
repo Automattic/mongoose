@@ -25,6 +25,11 @@ declare module 'mongoose' {
      */
     autoIndex?: boolean;
     /**
+     * Similar to autoIndex, except for automatically creates any Atlas search indexes defined in your
+     * schema. Unlike autoIndex, this option defaults to false.
+     */
+    autoSearchIndex?: boolean;
+    /**
      * If set to `true`, Mongoose will call Model.createCollection() to create the underlying collection
      * in MongoDB if autoCreate is set to true. Calling createCollection() sets the collection's default
      * collation based on the collation option and establishes the collection as a capped collection if

@@ -17,24 +17,32 @@ declare module 'mongoose' {
    */
   type FilterQuery<T> = _FilterQuery<T>;
 
-  type MongooseQueryOptions<DocType = unknown> = Pick<
-    QueryOptions<DocType>,
-    'context' |
-    'lean' |
-    'multipleCastError' |
-    'overwriteDiscriminatorKey' |
-    'populate' |
-    'runValidators' |
-    'sanitizeProjection' |
-    'sanitizeFilter' |
-    'setDefaultsOnInsert' |
-    'strict' |
-    'strictQuery' |
-    'timestamps' |
-    'translateAliases'
-  > & {
+  type MongooseBaseQueryOptionKeys =
+    | 'context'
+    | 'multipleCastError'
+    | 'overwriteDiscriminatorKey'
+    | 'populate'
+    | 'runValidators'
+    | 'sanitizeProjection'
+    | 'sanitizeFilter'
+    | 'setDefaultsOnInsert'
+    | 'strict'
+    | 'strictQuery'
+    | 'translateAliases';
+
+  type MongooseQueryOptions<
+    DocType = unknown,
+    Keys extends keyof QueryOptions<DocType> = MongooseBaseQueryOptionKeys | 'timestamps' | 'lean'
+  > = Pick<QueryOptions<DocType>, Keys> & {
     [other: string]: any;
   };
+
+  type MongooseBaseQueryOptions<DocType = unknown> = MongooseQueryOptions<DocType, MongooseBaseQueryOptionKeys>;
+
+  type MongooseUpdateQueryOptions<DocType = unknown> = MongooseQueryOptions<
+    DocType,
+    MongooseBaseQueryOptionKeys | 'timestamps'
+  >;
 
   type ProjectionFields<DocType> = { [Key in keyof DocType]?: any } & Record<string, any>;
 
@@ -208,7 +216,7 @@ declare module 'mongoose' {
      * A QueryCursor exposes a Streams3 interface, as well as a `.next()` function.
      * This is equivalent to calling `.cursor()` with no arguments.
      */
-    [Symbol.asyncIterator](): AsyncIterableIterator<DocType>;
+    [Symbol.asyncIterator](): AsyncIterableIterator<Unpacked<ResultType>>;
 
     /** Executes the query */
     exec(): Promise<ResultType>;
@@ -286,7 +294,7 @@ declare module 'mongoose' {
      * Returns a wrapper around a [mongodb driver cursor](https://mongodb.github.io/node-mongodb-native/4.9/classes/FindCursor.html).
      * A QueryCursor exposes a Streams3 interface, as well as a `.next()` function.
      */
-    cursor(options?: QueryOptions<DocType>): Cursor<DocType, QueryOptions<DocType>>;
+    cursor(options?: QueryOptions<DocType>): Cursor<Unpacked<ResultType>, QueryOptions<DocType>>;
 
     /**
      * Declare and/or execute this query as a `deleteMany()` operation. Works like
@@ -619,6 +627,12 @@ declare module 'mongoose' {
       QueryOp
     >;
 
+    /** Add pre middleware to this query instance. Doesn't affect other queries. */
+    pre(fn: Function): this;
+
+    /** Add post middleware to this query instance. Doesn't affect other queries. */
+    post(fn: Function): this;
+
     /** Get/set the current projection (AKA fields). Pass `null` to remove the current projection. */
     projection(fields?: ProjectionFields<DocType> | string): ProjectionFields<DocType>;
     projection(fields: null): null;
@@ -715,7 +729,10 @@ declare module 'mongoose' {
     slice(val: number | Array<number>): this;
 
     /** Sets the sort order. If an object is passed, values allowed are `asc`, `desc`, `ascending`, `descending`, `1`, and `-1`. */
-    sort(arg?: string | { [key: string]: SortOrder | { $meta: any } } | [string, SortOrder][] | undefined | null): this;
+    sort(
+      arg?: string | { [key: string]: SortOrder | { $meta: any } } | [string, SortOrder][] | undefined | null,
+      options?: { override?: boolean }
+    ): this;
 
     /** Sets the tailable option (for use with capped collections). */
     tailable(bool?: boolean, opts?: {

@@ -192,9 +192,13 @@ declare module 'mongoose' {
     [other: string]: any;
   }
 
-  interface Validator {
-    message?: string; type?: string; validator?: Function
+  interface Validator<DocType = any> {
+    message?: string;
+    type?: string;
+    validator?: ValidatorFunction<DocType>;
   }
+
+  type ValidatorFunction<DocType = any> = (this: DocType, value: any, validatorProperties?: Validator) => any;
 
   class SchemaType<T = any, DocType = any> {
     /** SchemaType constructor */
@@ -281,7 +285,10 @@ declare module 'mongoose' {
     validators: Validator[];
 
     /** Adds validator(s) for this document path. */
-    validate(obj: RegExp | ((this: DocType, value: any, validatorProperties?: Validator) => any), errorMsg?: string, type?: string): this;
+    validate(obj: RegExp | ValidatorFunction<DocType> | Validator<DocType>, errorMsg?: string, type?: string): this;
+
+    /** Adds multiple validators for this document path. */
+    validateAll(validators: Array<RegExp | ValidatorFunction<DocType> | Validator<DocType>>): this;
 
     /** Default options for this SchemaType */
     defaultOptions?: Record<string, any>;

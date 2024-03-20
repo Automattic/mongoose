@@ -916,6 +916,21 @@ describe('connections:', function() {
     assert.equal(err.name, 'MongooseServerSelectionError');
   });
 
+  it('avoids unhandled error on createConnection() if error handler registered (gh-14377)', async function() {
+    const opts = {
+      serverSelectionTimeoutMS: 100
+    };
+    const uri = 'mongodb://baddomain:27017/test';
+
+    const conn = mongoose.createConnection(uri, opts);
+    await new Promise(resolve => {
+      conn.on('error', err => {
+        assert.equal(err.name, 'MongoServerSelectionError');
+        resolve();
+      });
+    });
+  });
+
   it('`watch()` on a whole collection (gh-8425)', async function() {
     this.timeout(10000);
     if (!process.env.REPLICA_SET) {

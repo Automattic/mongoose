@@ -520,3 +520,20 @@ function gh12269() {
     }
   };
 }
+const vectorSearchStages: PipelineStage[] = [
+  {
+    $vectorSearch: {
+      index: 'title_vector_index',
+      path: 'embedding',
+      queryVector: [0.522, 0.123, 0.487],
+      limit: 5,
+      numCandidates: 100
+    }
+  },
+  {
+    $project: {
+      title: 1,
+      score: { $meta: 'searchScore' }
+    }
+  }
+];

@@ -2,6 +2,17 @@ declare module 'mongoose' {
   type IfAny<IFTYPE, THENTYPE, ELSETYPE = IFTYPE> = 0 extends (1 & IFTYPE) ? THENTYPE : ELSETYPE;
   type IfUnknown<IFTYPE, THENTYPE> = unknown extends IFTYPE ? THENTYPE : IFTYPE;
 
+  /**
+    * @summary Removes keys from a type
+    * @description It helps to exclude keys from a type
+    * @param {T} T A generic type to be checked.
+    * @param {K} K Keys from T that are to be excluded from the generic type
+    * @returns T with the keys in K excluded
+    */
+  type ExcludeKeys<T, K extends keyof T> = {
+    [P in keyof T as P extends K ? never : P]: T[P];
+  };
+
   type Unpacked<T> = T extends (infer U)[] ?
     U :
     T extends ReadonlyArray<infer U> ? U : T;

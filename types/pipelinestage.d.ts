@@ -36,7 +36,8 @@ declare module 'mongoose' {
     | PipelineStage.SortByCount
     | PipelineStage.UnionWith
     | PipelineStage.Unset
-    | PipelineStage.Unwind;
+    | PipelineStage.Unwind
+    | PipelineStage.VectorSearch;
 
   export namespace PipelineStage {
     export interface AddFields {
@@ -308,5 +309,17 @@ declare module 'mongoose' {
       /** [`$unwind` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/unwind/) */
       $unwind: string | { path: string; includeArrayIndex?: string; preserveNullAndEmptyArrays?: boolean }
     }
+    export interface VectorSearch {
+      /** [`$vectorSearch` reference](https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-stage/) */
+      $vectorSearch: {
+        index: string,
+        path: string,
+        queryVector: number[],
+        numCandidates: number,
+        limit: number,
+        filter?: Expression,
+      }
+    }
+
   }
 }

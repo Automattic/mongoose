@@ -965,7 +965,7 @@ describe('document.populate', function() {
       code: 'test code'
     }).save();
 
-    await new CodeUser({
+    await CodeUser.create({
       username: 'TestUser',
       extras: [
         {
@@ -976,7 +976,7 @@ describe('document.populate', function() {
           }
         }
       ]
-    }).save();
+    });
 
     const codeUser = await CodeUser.findOne({ username: 'TestUser' }).populate(
       'extras.config.paymentConfiguration.paymentMethods'

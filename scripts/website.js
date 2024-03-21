@@ -10,7 +10,7 @@ const pug = require('pug');
 const pkg = require('../package.json');
 const transform = require('acquit-require');
 const childProcess = require("child_process");
-
+require('./generateSearch');
 // using "__dirname" and ".." to have a consistent CWD, this script should not be runnable, even when not being in the root of the project
 // also a consistent root path so that it is easy to change later when the script should be moved
 const cwd = path.resolve(__dirname, '..');

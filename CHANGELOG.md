@@ -1,3 +1,9 @@
+8.2.3 / 2024-03-21
+==================
+ * fix(schema): avoid returning string 'nested' as schematype #14453 #14443 #14435
+ * types(schema): add missing search index types #14449 [noseworthy](https://github.com/noseworthy)
+ * types: improve the typing of FilterQuery<T> type to prevent it from only getting typed to any #14436 #14398 #14397
+
 8.2.2 / 2024-03-15
 ==================
  * fix(model): improve update minimizing to only minimize top-level properties in the update #14437 #14420 #13782

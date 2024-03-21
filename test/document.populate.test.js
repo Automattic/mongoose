@@ -1023,7 +1023,7 @@ describe('document.populate', function() {
       code: 'test code'
     });
 
-    await new CodeUser({
+    await CodeUser.create({
       username: 'TestUser',
       extras: {
         config: {
@@ -1032,7 +1032,7 @@ describe('document.populate', function() {
           }
         }
       }
-    }).save();
+    });
 
     const codeUser = await CodeUser.findOne({ username: 'TestUser' }).populate(
       'extras.config.paymentConfiguration.paymentMethods'

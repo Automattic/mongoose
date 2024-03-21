@@ -961,9 +961,9 @@ describe('document.populate', function() {
     const Code = db.model('Code', CodeSchema);
     const CodeUser = db.model('CodeUser', UserSchema);
 
-    const code = await new Code({
+    const code = await Code.create({
       code: 'test code'
-    }).save();
+    });
 
     await CodeUser.create({
       username: 'TestUser',

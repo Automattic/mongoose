@@ -1,8 +1,20 @@
 declare module 'mongoose' {
   import mongodb = require('mongodb');
 
-  export type ApplyBasicQueryCasting<T> = T | T[] | (T extends (infer U)[] ? U : any) | any;
-  type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>;
+  type StringQueryTypeCasting = string | RegExp;
+  type ObjectIdQueryTypeCasting = Types.ObjectId | string;
+  type UUIDQueryTypeCasting = Types.UUID | string;
+
+  type QueryTypeCasting<T> = T extends string
+    ? StringQueryTypeCasting
+    : T extends Types.ObjectId
+      ? ObjectIdQueryTypeCasting
+      : T extends Types.UUID
+        ? UUIDQueryTypeCasting
+        : T | any;
+
+  export type ApplyBasicQueryCasting<T> = T | T[] | (T extends (infer U)[] ? QueryTypeCasting<U> : T);
+  export type Condition<T> = ApplyBasicQueryCasting<QueryTypeCasting<T>> | QuerySelector<ApplyBasicQueryCasting<QueryTypeCasting<T>>>;
 
   type _FilterQuery<T> = {
     [P in keyof T]?: Condition<T[P]>;
@@ -385,7 +397,7 @@ declare module 'mongoose' {
     ): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find'>;
     find(
       filter: FilterQuery<RawDocType>
-    ): QueryWithHelpers<Array<RawDocType>, DocType, THelpers, RawDocType, 'find'>;
+    ): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find'>;
     find(): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find'>;
 
     /** Declares the query a findOne operation. When executed, returns the first found document. */
@@ -481,7 +493,7 @@ declare module 'mongoose' {
     get(path: string): any;
 
     /** Returns the current query filter (also known as conditions) as a POJO. */
-    getFilter(): FilterQuery<RawDocType>;
+    getFilter(): FilterQuery<DocType>;
 
     /** Gets query options. */
     getOptions(): QueryOptions<DocType>;
@@ -490,7 +502,7 @@ declare module 'mongoose' {
     getPopulatedPaths(): Array<string>;
 
     /** Returns the current query filter. Equivalent to `getFilter()`. */
-    getQuery(): FilterQuery<RawDocType>;
+    getQuery(): FilterQuery<DocType>;
 
     /** Returns the current update operations as a JSON object. */
     getUpdate(): UpdateQuery<DocType> | UpdateWithAggregationPipeline | null;

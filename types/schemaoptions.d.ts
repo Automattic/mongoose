@@ -234,7 +234,7 @@ declare module 'mongoose' {
     query?: IfEquals<
     QueryHelpers,
     {},
-    Record<any, <T extends QueryWithHelpers<unknown, THydratedDocumentType>>(this: T, ...args: any) => T>,
+    Record<any, <T extends QueryWithHelpers<unknown, THydratedDocumentType, QueryHelpers, DocType>>(this: T, ...args: any) => T>,
     QueryHelpers
     >
 

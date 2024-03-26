@@ -327,7 +327,7 @@ declare module 'mongoose' {
      * Create an [Atlas search index](https://www.mongodb.com/docs/atlas/atlas-search/create-index/).
      * This function only works when connected to MongoDB Atlas.
      */
-    createSearchIndex(description: mongodb.SearchIndexDescription): Promise<string>;
+    createSearchIndex(description: SearchIndexDescription): Promise<string>;
 
     /** Connection the model uses. */
     db: Connection;

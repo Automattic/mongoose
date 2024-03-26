@@ -12538,6 +12538,38 @@ describe('document', function() {
     assert.equal(purchaseFromDbCart.products[0].product.name, 'Bug');
     assert.equal(purchaseFromDbCart.singleProduct.name, 'Bug');
   });
+
+  it('handles virtuals that are stored as objects but getter returns string with toJSON (gh-14446)', async function() {
+    const childSchema = new mongoose.Schema();
+
+    childSchema.virtual('name')
+      .set(function(values) {
+        for (const [lang, val] of Object.entries(values)) {
+          this.set(`name.${lang}`, val);
+        }
+      })
+      .get(function() {
+        return this.$__getValue(`name.${this.lang}`);
+      });
+
+    childSchema.add({ name: { en: { type: String }, de: { type: String } } });
+
+    const ChildModel = db.model('Child', childSchema);
+    const ParentModel = db.model('Parent', new mongoose.Schema({
+      children: [childSchema]
+    }));
+
+    const child = await ChildModel.create({ name: { en: 'Stephen', de: 'Stefan' } });
+    child.lang = 'en';
+    assert.equal(child.name, 'Stephen');
+
+    const parent = await ParentModel.create({
+      children: [{ name: { en: 'Stephen', de: 'Stefan' } }]
+    });
+    parent.children[0].lang = 'de';
+    const obj = parent.toJSON({ getters: true });
+    assert.equal(obj.children[0].name, 'Stefan');
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

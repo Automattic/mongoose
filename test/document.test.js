@@ -13087,6 +13087,124 @@ describe('document', function() {
     const savedDoc = await MainModel.findById(doc.id).orFail();
     assert.strictEqual(savedDoc.sub, null);
   });
+
+  it('validate supports validateAllPaths', async function() {
+    const schema = new mongoose.Schema({
+      name: {
+        type: String,
+        validate: v => !!v
+      },
+      age: {
+        type: Number,
+        validate: v => v == null || v < 200
+      },
+      subdoc: {
+        type: new Schema({
+          url: String
+        }, { _id: false }),
+        validate: v => v == null || v.url.length > 0
+      },
+      docArr: [{
+        subprop: {
+          type: String,
+          validate: v => v == null || v.length > 0
+        }
+      }]
+    });
+
+    const TestModel = db.model('Test', schema);
+
+    const doc = await TestModel.create({});
+    doc.name = '';
+    doc.age = 201;
+    doc.subdoc = { url: '' };
+    doc.docArr = [{ subprop: '' }];
+    await doc.save({ validateBeforeSave: false });
+    await doc.validate();
+
+    const err = await doc.validate({ validateAllPaths: true }).then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'ValidationError');
+    assert.ok(err.errors['name']);
+    assert.ok(
+      err.errors['name'].message.includes('Validator failed for path `name` with value ``'),
+      err.errors['name'].message
+    );
+    assert.ok(err.errors['age']);
+    assert.ok(
+      err.errors['age'].message.includes('Validator failed for path `age` with value `201`'),
+      err.errors['age'].message
+    );
+    assert.ok(err.errors['subdoc']);
+    assert.ok(
+      err.errors['subdoc'].message.includes('Validator failed for path `subdoc` with value `{ url: \'\' }`'),
+      err.errors['subdoc'].message
+    );
+    assert.ok(err.errors['docArr.0.subprop']);
+    assert.ok(
+      err.errors['docArr.0.subprop'].message.includes('Validator failed for path `subprop` with value ``'),
+      err.errors['docArr.0.subprop'].message
+    );
+  });
+
+  it('validateSync() supports validateAllPaths', async function() {
+    const schema = new mongoose.Schema({
+      name: {
+        type: String,
+        validate: v => !!v
+      },
+      age: {
+        type: Number,
+        validate: v => v == null || v < 200
+      },
+      subdoc: {
+        type: new Schema({
+          url: String
+        }, { _id: false }),
+        validate: v => v == null || v.url.length > 0
+      },
+      docArr: [{
+        subprop: {
+          type: String,
+          validate: v => v == null || v.length > 0
+        }
+      }]
+    });
+
+    const TestModel = db.model('Test', schema);
+
+    const doc = await TestModel.create({});
+    doc.name = '';
+    doc.age = 201;
+    doc.subdoc = { url: '' };
+    doc.docArr = [{ subprop: '' }];
+    await doc.save({ validateBeforeSave: false });
+    await doc.validate();
+
+    const err = await doc.validateSync({ validateAllPaths: true });
+    assert.ok(err);
+    assert.equal(err.name, 'ValidationError');
+    assert.ok(err.errors['name']);
+    assert.ok(
+      err.errors['name'].message.includes('Validator failed for path `name` with value ``'),
+      err.errors['name'].message
+    );
+    assert.ok(err.errors['age']);
+    assert.ok(
+      err.errors['age'].message.includes('Validator failed for path `age` with value `201`'),
+      err.errors['age'].message
+    );
+    assert.ok(err.errors['subdoc']);
+    assert.ok(
+      err.errors['subdoc'].message.includes('Validator failed for path `subdoc` with value `{ url: \'\' }`'),
+      err.errors['subdoc'].message
+    );
+    assert.ok(err.errors['docArr.0.subprop']);
+    assert.ok(
+      err.errors['docArr.0.subprop'].message.includes('Validator failed for path `subprop` with value ``'),
+      err.errors['docArr.0.subprop'].message
+    );
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

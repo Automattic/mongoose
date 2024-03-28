@@ -1,3 +1,9 @@
+8.2.4 / 2024-03-28
+==================
+ * types(query): bring "getFilter" and "getQuery" in-line with "find" and other types #14463 [noseworthy](https://github.com/noseworthy)
+ * types(schema): re-export the defintion for SearchIndexDescription #14464
+ * docs: removed unused hook from docs #14461 [bernardarhia](https://github.com/bernardarhia)
+
 8.2.3 / 2024-03-21
 ==================
  * fix(schema): avoid returning string 'nested' as schematype #14453 #14443 #14435

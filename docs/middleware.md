@@ -52,7 +52,6 @@ In query middleware functions, `this` refers to the query.
 * [findOneAndUpdate](api/query.html#query_Query-findOneAndUpdate)
 * [remove](api/model.html#model_Model-remove)
 * [replaceOne](api/query.html#query_Query-replaceOne)
-* [update](api/query.html#query_Query-update)
 * [updateOne](api/query.html#query_Query-updateOne)
 * [updateMany](api/query.html#query_Query-updateMany)
 * [validate](validation.html#update-validators)
@@ -539,15 +538,14 @@ also define a post `update()` hook that will catch MongoDB duplicate key
 errors.
 
 ```javascript
-// The same E11000 error can occur when you call `update()`
-// This function **must** take 3 parameters. If you use the
-// `passRawResult` function, this function **must** take 4
-// parameters
-schema.post('update', function(error, res, next) {
+// The same E11000 error can occur when you call `updateOne()`
+// This function **must** take 4 parameters.
+
+schema.post('updateOne', function(passRawResult, error, res, next) {
   if (error.name === 'MongoServerError' && error.code === 11000) {
     next(new Error('There was a duplicate key error'));
   } else {
-    next(); // The `update()` call will still error out.
+    next(); // The `updateOne()` call will still error out.
   }
 });
 
@@ -555,7 +553,7 @@ const people = [{ name: 'Axl Rose' }, { name: 'Slash' }];
 await Person.create(people);
 
 // Throws "There was a duplicate key error"
-await Person.update({ name: 'Slash' }, { $set: { name: 'Axl Rose' } });
+await Person.updateOne({ name: 'Slash' }, { $set: { name: 'Axl Rose' } });
 ```
 
 Error handling middleware can transform an error, but it can't remove the

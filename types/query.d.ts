@@ -493,7 +493,7 @@ declare module 'mongoose' {
     get(path: string): any;
 
     /** Returns the current query filter (also known as conditions) as a POJO. */
-    getFilter(): FilterQuery<DocType>;
+    getFilter(): FilterQuery<RawDocType>;
 
     /** Gets query options. */
     getOptions(): QueryOptions<DocType>;
@@ -502,7 +502,7 @@ declare module 'mongoose' {
     getPopulatedPaths(): Array<string>;
 
     /** Returns the current query filter. Equivalent to `getFilter()`. */
-    getQuery(): FilterQuery<DocType>;
+    getQuery(): FilterQuery<RawDocType>;
 
     /** Returns the current update operations as a JSON object. */
     getUpdate(): UpdateQuery<DocType> | UpdateWithAggregationPipeline | null;

@@ -86,4 +86,6 @@ declare module 'mongoose' {
     expires?: number | string;
     weights?: Record<string, number>;
   }
+
+  type SearchIndexDescription = mongodb.SearchIndexDescription;
 }

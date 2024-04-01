@@ -46,7 +46,7 @@
     "dotenv": "16.4.5",
     "dox": "1.0.0",
     "eslint": "8.57.0",
-    "eslint-plugin-markdown": "^3.0.1",
+    "eslint-plugin-markdown": "^4.0.1",
     "eslint-plugin-mocha-no-only": "1.1.1",
     "express": "^4.18.1",
     "fs-extra": "~11.2.0",

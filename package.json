@@ -28,7 +28,7 @@
     "sift": "16.0.1"
   },
   "devDependencies": {
-    "@babel/core": "7.24.0",
+    "@babel/core": "7.24.3",
     "@babel/preset-env": "7.24.0",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
     "@typescript-eslint/parser": "^6.2.1",

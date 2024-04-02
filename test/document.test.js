@@ -805,7 +805,7 @@ describe('document', function() {
       assert.deepStrictEqual(myModel.toObject().foo, {});
     });
 
-    it('should propogate toObject to implicitly created schemas (gh-13599) (gh-13325)', async function() {
+    it('should propagate toObject to implicitly created schemas (gh-13599) (gh-13325)', async function() {
       const transformCalls = [];
       const userSchema = Schema({
         firstName: String,
@@ -1017,7 +1017,7 @@ describe('document', function() {
       assert.equal(foundAlicJson.friends, undefined);
       assert.equal(foundAlicJson.name, 'Alic');
     });
-    it('should propogate toJSON to implicitly created schemas (gh-13599) (gh-13325)', async function() {
+    it('should propagate toJSON to implicitly created schemas (gh-13599) (gh-13325)', async function() {
       const transformCalls = [];
       const userSchema = Schema({
         firstName: String,

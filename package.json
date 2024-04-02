@@ -56,7 +56,7 @@
     "markdownlint-cli2": "^0.12.1",
     "marked": "4.3.0",
     "mkdirp": "^3.0.1",
-    "mocha": "10.3.0",
+    "mocha": "10.4.0",
     "moment": "2.x",
     "mongodb-memory-server": "8.15.1",
     "ncp": "^2.0.0",

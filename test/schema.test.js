@@ -72,6 +72,7 @@ describe('schema', function() {
         },
         b: { $type: String }
       }, { typeKey: '$type' });
+      db.deleteModel(/Test/);
       NestedModel = db.model('Test', NestedSchema);
     });
 
@@ -3201,5 +3202,23 @@ describe('schema', function() {
     const baseModel = db.model('gh14055', base);
     const doc = new baseModel({ type: 1, self: [{ type: 1 }] });
     assert.equal(doc.self[0].type, 1);
+  });
+
+  it('handles discriminator options with Schema.prototype.discriminator (gh-14448)', async function() {
+    const eventSchema = new mongoose.Schema({
+      name: String
+    }, { discriminatorKey: 'kind' });
+    const clickedEventSchema = new mongoose.Schema({ element: String });
+    eventSchema.discriminator(
+      'Test2',
+      clickedEventSchema,
+      { value: 'click' }
+    );
+    const Event = db.model('Test', eventSchema);
+    const ClickedModel = db.model('Test2');
+
+    const doc = await Event.create({ kind: 'click', element: '#hero' });
+    assert.equal(doc.element, '#hero');
+    assert.ok(doc instanceof ClickedModel);
   });
 });

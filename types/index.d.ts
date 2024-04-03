@@ -27,6 +27,7 @@
 declare class NativeDate extends global.Date { }
 
 declare module 'mongoose' {
+  import Kareem = require('kareem');
   import events = require('events');
   import mongodb = require('mongodb');
   import mongoose = require('mongoose');
@@ -397,7 +398,6 @@ declare module 'mongoose' {
     ): this;
     // this = Document
     pre<T = THydratedDocumentType>(method: 'save', fn: PreSaveMiddlewareFunction<T>): this;
-    pre<T = THydratedDocumentType>(method: 'save', options: SchemaPreOptions, fn: PreSaveMiddlewareFunction<T>): this;
     pre<T = THydratedDocumentType>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], fn: PreMiddlewareFunction<T>): this;
     pre<T = THydratedDocumentType>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
     pre<T = THydratedDocumentType>(
@@ -415,20 +415,9 @@ declare module 'mongoose' {
     pre<T = THydratedDocumentType|Query<any, any>>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, fn: PreMiddlewareFunction<T>): this;
     // method aggregate
     pre<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: PreMiddlewareFunction<T>): this;
-    pre<T extends Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
     /* method insertMany */
     pre<T = TModelType>(
       method: 'insertMany' | RegExp,
-      fn: (
-        this: T,
-        next: (err?: CallbackError) => void,
-        docs: any | Array<any>,
-        options?: InsertManyOptions & { lean?: boolean }
-      ) => void | Promise<void>
-    ): this;
-    pre<T = TModelType>(
-      method: 'insertMany' | RegExp,
-      options: SchemaPreOptions,
       fn: (
         this: T,
         next: (err?: CallbackError) => void,
@@ -446,28 +435,9 @@ declare module 'mongoose' {
         options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions
       ) => void | Promise<void>
     ): this;
-    pre<T = TModelType>(
-      method: 'bulkWrite' | RegExp,
-      options: SchemaPreOptions,
-      fn: (
-        this: T,
-        next: (err?: CallbackError) => void,
-        ops: Array<mongodb.AnyBulkWriteOperation<any> & MongooseBulkWritePerWriteOptions>,
-        options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions
-      ) => void | Promise<void>
-    ): this;
     /* method createCollection */
     pre<T = TModelType>(
       method: 'createCollection' | RegExp,
-      fn: (
-        this: T,
-        next: (err?: CallbackError) => void,
-        options?: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'>
-      ) => void | Promise<void>
-    ): this;
-    pre<T = TModelType>(
-      method: 'createCollection' | RegExp,
-      options: SchemaPreOptions,
       fn: (
         this: T,
         next: (err?: CallbackError) => void,
@@ -721,6 +691,10 @@ declare module 'mongoose' {
 
   /* for ts-mongoose */
   export class mquery { }
+
+  export function overwriteMiddlewareResult(val: any): Kareem.OverwriteMiddlewareResult;
+
+  export function skipMiddlewareFunction(val: any): Kareem.SkipWrappedFunction;
 
   export default mongoose;
 }

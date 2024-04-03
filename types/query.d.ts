@@ -741,7 +741,10 @@ declare module 'mongoose' {
     slice(val: number | Array<number>): this;
 
     /** Sets the sort order. If an object is passed, values allowed are `asc`, `desc`, `ascending`, `descending`, `1`, and `-1`. */
-    sort(arg?: string | { [key: string]: SortOrder | { $meta: any } } | [string, SortOrder][] | undefined | null): this;
+    sort(
+      arg?: string | { [key: string]: SortOrder | { $meta: any } } | [string, SortOrder][] | undefined | null,
+      options?: { override?: boolean }
+    ): this;
 
     /** Sets the tailable option (for use with capped collections). */
     tailable(bool?: boolean, opts?: {

@@ -72,7 +72,7 @@ schema.pre<Model<ITest>>('insertMany', function() {
   return Promise.resolve();
 });
 
-schema.pre<Model<ITest>>('insertMany', { document: false, query: false }, function() {
+schema.pre<Model<ITest>>('insertMany', function() {
   console.log(this.name);
 });
 

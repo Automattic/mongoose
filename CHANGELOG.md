@@ -1,3 +1,12 @@
+8.3.0 / 2024-04-03
+==================
+ * feat(document): add validateAllPaths option to validate() and validateSync() #14467 #14414
+ * feat: pathsToSave option to save() function #14385 #9583
+ * feat(query): add options parameter to Query.prototype.sort() #14375 #14365
+ * feat: add function SchemaType.prototype.validateAll #14434 #6910
+ * fix: handle array schema definitions with of keyword #14447 #14416
+ * types: add overwriteMiddlewareResult and skipMiddlewareFunction to types #14328 #14829
+
 8.2.4 / 2024-03-28
 ==================
  * types(query): bring "getFilter" and "getQuery" in-line with "find" and other types #14463 [noseworthy](https://github.com/noseworthy)

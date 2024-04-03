@@ -1,5 +1,6 @@
 8.3.0 / 2024-04-03
 ==================
+ * feat: use mongodb@6.5.0
  * feat(document): add validateAllPaths option to validate() and validateSync() #14467 #14414
  * feat: pathsToSave option to save() function #14385 #9583
  * feat(query): add options parameter to Query.prototype.sort() #14375 #14365

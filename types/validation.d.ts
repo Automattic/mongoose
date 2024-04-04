@@ -6,6 +6,7 @@ declare module 'mongoose' {
     path: string;
     fullPath: string;
     value: any;
+    reason?: Error;
   }
 
   interface ValidatorMessageFn {

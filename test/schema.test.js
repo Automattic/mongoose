@@ -3172,6 +3172,13 @@ describe('schema', function() {
     const res = await Test.findOne({ _id: { $eq: doc._id, $type: 'objectId' } });
     assert.equal(res.name, 'Test Testerson');
   });
+  it('deduplicates idGetter (gh-14457)', function() {
+    const schema = new Schema({ name: String });
+    schema._preCompile();
+    assert.equal(schema.virtual('id').getters.length, 1);
+    schema._preCompile();
+    assert.equal(schema.virtual('id').getters.length, 1);
+  });
 
   it('handles recursive definitions in discriminators (gh-13978)', function() {
     const base = new Schema({

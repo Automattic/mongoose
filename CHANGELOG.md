@@ -10,7 +10,7 @@
 
 8.2.4 / 2024-03-28
 ==================
- * types(query): bring "getFilter" and "getQuery" in-line with "find" and other types #14463
+ * types(query): bring "getFilter" and "getQuery" in-line with "find" and other types #14463 [hasezoey](https://github.com/hasezoey)
  * types(schema): re-export the defintion for SearchIndexDescription #14464 [noseworthy](https://github.com/noseworthy)
  * docs: removed unused hook from docs #14461 [bernardarhia](https://github.com/bernardarhia)
 

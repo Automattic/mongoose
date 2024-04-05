@@ -1580,6 +1580,20 @@ describe('connections:', function() {
     });
     assert.ok(session);
   });
+  it('should demonstrate the listDatabases() function (gh-9048)', async function() {
+    const client = await mongodb.MongoClient.connect(start.uri);
+    const db = mongoose.createConnection().setClient(client);
+    db.useDb(start.databases[1]);
+    const { databases } = await db.listDatabases();
+    assert.ok(databases);
+  });
+  it('should throw an error when no client is present (gh-9048)', async function() {
+    const db = mongoose.createConnection();
+    const db2 = db.useDb(start.databases[1]);
+    assert.rejects(async() => {
+      await db.listDatabases();
+    }, { message: 'No client could be found on the given connection' });
+  });
   describe('createCollections()', function() {
     it('should create collections for all models on the connection with the createCollections() function (gh-13300)', async function() {
       const m = new mongoose.Mongoose();

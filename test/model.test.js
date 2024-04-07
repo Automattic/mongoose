@@ -7419,6 +7419,50 @@ describe('Model', function() {
     assert.equal(doc.myVirtual, 'Hello from myVirtual');
   });
 
+  it('supports recompiling model with new discriminators (gh-14444) (gh-14296)', function() {
+    // Define discriminated schema
+    const decoratorSchema = new Schema({
+      type: { type: String, required: true }
+    }, { discriminatorKey: 'type' });
+
+    class Decorator {
+      whoAmI() { return 'I am BaseDeco'; }
+    }
+    decoratorSchema.loadClass(Decorator);
+
+    // Define discriminated class before model is compiled
+    class Deco1 extends Decorator { whoAmI() { return 'I am Test1'; }}
+    const deco1Schema = new Schema({});
+    deco1Schema.loadClass(Deco1);
+    decoratorSchema.discriminator('Test1', deco1Schema);
+
+    // Define model that uses discriminated schema
+    const shopSchema = new Schema({
+      item: { type: decoratorSchema, required: true }
+    });
+    const shopModel = db.model('Test', shopSchema);
+
+    // Define another discriminated class after the model is compiled
+    class Deco2 extends Decorator { whoAmI() { return 'I am Test2'; }}
+    const deco2Schema = new Schema({});
+    deco2Schema.loadClass(Deco2);
+    decoratorSchema.discriminator('Test2', deco2Schema);
+
+    let instance = new shopModel({ item: { type: 'Test1' } });
+    assert.equal(instance.item.whoAmI(), 'I am Test1');
+
+    instance = new shopModel({ item: { type: 'Test2' } });
+    assert.equal(instance.item.whoAmI(), 'I am BaseDeco');
+
+    shopModel.recompileSchema();
+
+    instance = new shopModel({ item: { type: 'Test1' } });
+    assert.equal(instance.item.whoAmI(), 'I am Test1');
+
+    instance = new shopModel({ item: { type: 'Test2' } });
+    assert.equal(instance.item.whoAmI(), 'I am Test2');
+  });
+
   it('inserts versionKey even if schema has `toObject.versionKey` set to false (gh-14344)', async function() {
     const schema = new mongoose.Schema(
       { name: String },

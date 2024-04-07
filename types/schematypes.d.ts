@@ -193,9 +193,10 @@ declare module 'mongoose' {
   }
 
   interface Validator<DocType = any> {
-    message?: string;
+    message?: string | ((props: ValidatorProps) => string);
     type?: string;
     validator?: ValidatorFunction<DocType>;
+    reason?: Error;
   }
 
   type ValidatorFunction<DocType = any> = (this: DocType, value: any, validatorProperties?: Validator) => any;

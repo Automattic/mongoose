@@ -1,3 +1,13 @@
+8.3.1 / 2024-04-08
+==================
+ * fix(document): make update minimization unset property rather than setting to null #14504 #14445
+ * fix(model): make Model.recompileSchema() also re-apply discriminators #14500 #14444
+ * fix(schema): deduplicate idGetter so creating multiple models with same schema doesn't result in multiple id getters #14492
+ * fix: update kareem -> 2.6.3 for index.d.ts #14508 #14497
+ * fix(mongoose): make setDriver() update mongoose.model() connections and collections #14505
+ * types(validation): support function for validator message property, and add support for accessing validator reason #14499 #14496
+ * docs: remove typo #14501 [epmartini](https://github.com/epmartini)
+
 8.3.0 / 2024-04-03
 ==================
  * feat: use mongodb@6.5.0

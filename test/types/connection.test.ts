@@ -78,6 +78,10 @@ expectType<Promise<string[]>>(
   conn.listCollections().then(collections => collections.map(coll => coll.name))
 );
 
+expectType<Promise<string[]>>(
+  conn.listDatabases().then(dbs => dbs.databases.map(db => db.name))
+);
+
 export function autoTypedModelConnection() {
   const AutoTypedSchema = autoTypedSchema();
   const AutoTypedModel = connection.model('AutoTypeModelConnection', AutoTypedSchema);

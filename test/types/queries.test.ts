@@ -12,7 +12,6 @@ import {
   FilterQuery,
   UpdateQuery,
   UpdateQueryKnownOnly,
-  ApplyBasicQueryCasting,
   QuerySelector,
   InferSchemaType,
   ProjectionFields,
@@ -325,7 +324,7 @@ function gh11964() {
 }
 
 function gh14397() {
-  type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>; // redefined here because it's not exported by mongoose
+  type Condition<T> = T | QuerySelector<T>; // redefined here because it's not exported by mongoose
 
   type WithId<T extends object> = T & { id: string };
 
@@ -591,4 +590,25 @@ function mongooseQueryOptions() {
     lean: true,
     populate: 'test'
   });
+}
+
+function gh14473() {
+  class AbstractSchema {
+    _id: any;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date;
+
+    constructor() {
+      this._id = 4;
+      this.createdAt = new Date();
+      this.updatedAt = new Date();
+      this.deletedAt = new Date();
+    }
+  }
+
+  const generateExists = <D extends AbstractSchema = AbstractSchema>() => {
+    const query: FilterQuery<D> = { deletedAt: { $ne: null } };
+    const query2: FilterQuery<D> = { deletedAt: { $lt: new Date() } };
+  };
 }

@@ -310,7 +310,7 @@ function processFile(props) {
           ctx.type = 'function';
           ctx.isStatic = true;
           ctx.name = tag.string;
-          // extra parameter to make function definitions independant of where "@function" is defined
+          // extra parameter to make function definitions independent of where "@function" is defined
           // like "@static" could have overwritten "ctx.string" again if defined after "@function"
           ctx.isFunction = true;
           break;
@@ -352,7 +352,7 @@ function processFile(props) {
         case 'event':
         case 'param':
           ctx[tag.type] = (ctx[tag.type] || []);
-          // the following is required, because in newer "dox" version "null" is not included in "types" anymore, but a seperate property
+          // the following is required, because in newer "dox" version "null" is not included in "types" anymore, but a separate property
           if (tag.nullable) {
             tag.types.push('null');
           }

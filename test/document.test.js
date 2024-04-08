@@ -805,7 +805,7 @@ describe('document', function() {
       assert.deepStrictEqual(myModel.toObject().foo, {});
     });
 
-    it('should propogate toObject to implicitly created schemas (gh-13599) (gh-13325)', async function() {
+    it('should propagate toObject to implicitly created schemas (gh-13599) (gh-13325)', async function() {
       const transformCalls = [];
       const userSchema = Schema({
         firstName: String,
@@ -1017,7 +1017,7 @@ describe('document', function() {
       assert.equal(foundAlicJson.friends, undefined);
       assert.equal(foundAlicJson.name, 'Alic');
     });
-    it('should propogate toJSON to implicitly created schemas (gh-13599) (gh-13325)', async function() {
+    it('should propagate toJSON to implicitly created schemas (gh-13599) (gh-13325)', async function() {
       const transformCalls = [];
       const userSchema = Schema({
         firstName: String,
@@ -13060,8 +13060,8 @@ describe('document', function() {
     x.metadata = {};
     await x.save();
 
-    const { metadata } = await Model.findById(m._id).orFail();
-    assert.strictEqual(metadata, null);
+    const { metadata } = await Model.findById(m._id).lean().orFail();
+    assert.strictEqual(metadata, undefined);
   });
 
   it('saves when setting subdocument to empty object (gh-14420) (gh-13782)', async function() {
@@ -13085,7 +13085,156 @@ describe('document', function() {
     await doc.save();
 
     const savedDoc = await MainModel.findById(doc.id).orFail();
-    assert.strictEqual(savedDoc.sub, null);
+    assert.strictEqual(savedDoc.sub, undefined);
+  });
+
+  it('validate supports validateAllPaths', async function() {
+    const schema = new mongoose.Schema({
+      name: {
+        type: String,
+        validate: v => !!v
+      },
+      age: {
+        type: Number,
+        validate: v => v == null || v < 200
+      },
+      subdoc: {
+        type: new Schema({
+          url: String
+        }, { _id: false }),
+        validate: v => v == null || v.url.length > 0
+      },
+      docArr: [{
+        subprop: {
+          type: String,
+          validate: v => v == null || v.length > 0
+        }
+      }]
+    });
+
+    const TestModel = db.model('Test', schema);
+
+    const doc = await TestModel.create({});
+    doc.name = '';
+    doc.age = 201;
+    doc.subdoc = { url: '' };
+    doc.docArr = [{ subprop: '' }];
+    await doc.save({ validateBeforeSave: false });
+    await doc.validate();
+
+    const err = await doc.validate({ validateAllPaths: true }).then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'ValidationError');
+    assert.ok(err.errors['name']);
+    assert.ok(
+      err.errors['name'].message.includes('Validator failed for path `name` with value ``'),
+      err.errors['name'].message
+    );
+    assert.ok(err.errors['age']);
+    assert.ok(
+      err.errors['age'].message.includes('Validator failed for path `age` with value `201`'),
+      err.errors['age'].message
+    );
+    assert.ok(err.errors['subdoc']);
+    assert.ok(
+      err.errors['subdoc'].message.includes('Validator failed for path `subdoc` with value `{ url: \'\' }`'),
+      err.errors['subdoc'].message
+    );
+    assert.ok(err.errors['docArr.0.subprop']);
+    assert.ok(
+      err.errors['docArr.0.subprop'].message.includes('Validator failed for path `subprop` with value ``'),
+      err.errors['docArr.0.subprop'].message
+    );
+  });
+
+  it('validateSync() supports validateAllPaths', async function() {
+    const schema = new mongoose.Schema({
+      name: {
+        type: String,
+        validate: v => !!v
+      },
+      age: {
+        type: Number,
+        validate: v => v == null || v < 200
+      },
+      subdoc: {
+        type: new Schema({
+          url: String
+        }, { _id: false }),
+        validate: v => v == null || v.url.length > 0
+      },
+      docArr: [{
+        subprop: {
+          type: String,
+          validate: v => v == null || v.length > 0
+        }
+      }]
+    });
+
+    const TestModel = db.model('Test', schema);
+
+    const doc = await TestModel.create({});
+    doc.name = '';
+    doc.age = 201;
+    doc.subdoc = { url: '' };
+    doc.docArr = [{ subprop: '' }];
+    await doc.save({ validateBeforeSave: false });
+    await doc.validate();
+
+    const err = await doc.validateSync({ validateAllPaths: true });
+    assert.ok(err);
+    assert.equal(err.name, 'ValidationError');
+    assert.ok(err.errors['name']);
+    assert.ok(
+      err.errors['name'].message.includes('Validator failed for path `name` with value ``'),
+      err.errors['name'].message
+    );
+    assert.ok(err.errors['age']);
+    assert.ok(
+      err.errors['age'].message.includes('Validator failed for path `age` with value `201`'),
+      err.errors['age'].message
+    );
+    assert.ok(err.errors['subdoc']);
+    assert.ok(
+      err.errors['subdoc'].message.includes('Validator failed for path `subdoc` with value `{ url: \'\' }`'),
+      err.errors['subdoc'].message
+    );
+    assert.ok(err.errors['docArr.0.subprop']);
+    assert.ok(
+      err.errors['docArr.0.subprop'].message.includes('Validator failed for path `subprop` with value ``'),
+      err.errors['docArr.0.subprop'].message
+    );
+  });
+
+  it('minimize unsets property rather than setting to null (gh-14445)', async function() {
+    const SubSchema = new mongoose.Schema({
+      name: { type: String }
+    }, { _id: false });
+
+    const MainSchema = new mongoose.Schema({
+      name: String,
+      sub: {
+        type: SubSchema,
+        default: {}
+      }
+    });
+
+    const Test = db.model('Test', MainSchema);
+    const doc = new Test({ name: 'foo' });
+    await doc.save();
+
+    const savedDocFirst = await Test.findById(doc.id).orFail();
+    assert.deepStrictEqual(savedDocFirst.toObject({ minimize: false }).sub, {});
+
+    savedDocFirst.name = 'bar';
+    await savedDocFirst.save();
+
+    const lean = await Test.findById(doc.id).lean().orFail();
+    assert.strictEqual(lean.sub, undefined);
+
+    const savedDocSecond = await Test.findById(doc.id).orFail();
+    assert.deepStrictEqual(savedDocSecond.toObject({ minimize: false }).sub, {});
+
   });
 });
 

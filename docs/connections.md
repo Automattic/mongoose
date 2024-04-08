@@ -306,7 +306,7 @@ conn.on('close', () => console.log('close'));
 
 <h2 id="keepAlive"><a href="#keepAlive">A note about keepAlive</a></h2>
 
-Before Mongoose 5.2.0, you needed to enable the `keepAlive` option to initiate [TCP keepalive](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html) to prevent `"connection closed"` errors errors.
+Before Mongoose 5.2.0, you needed to enable the `keepAlive` option to initiate [TCP keepalive](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html) to prevent `"connection closed"` errors.
 However, `keepAlive` has been `true` by default since Mongoose 5.2.0, and the `keepAlive` is deprecated as of Mongoose 7.2.0.
 Please remove `keepAlive` and `keepAliveInitialDelay` options from your Mongoose connections.
 

@@ -3172,6 +3172,13 @@ describe('schema', function() {
     const res = await Test.findOne({ _id: { $eq: doc._id, $type: 'objectId' } });
     assert.equal(res.name, 'Test Testerson');
   });
+  it('deduplicates idGetter (gh-14457)', function() {
+    const schema = new Schema({ name: String });
+    schema._preCompile();
+    assert.equal(schema.virtual('id').getters.length, 1);
+    schema._preCompile();
+    assert.equal(schema.virtual('id').getters.length, 1);
+  });
 
   it('handles recursive definitions in discriminators (gh-13978)', function() {
     const base = new Schema({
@@ -3201,5 +3208,15 @@ describe('schema', function() {
     const baseModel = db.model('gh14055', base);
     const doc = new baseModel({ type: 1, self: [{ type: 1 }] });
     assert.equal(doc.self[0].type, 1);
+  });
+  it('should have the correct schema definition with array schemas (gh-14416)', function() {
+    const schema = new Schema({
+      nums: [{ type: Array, of: Number }],
+      tags: [{ type: 'Array', of: String }],
+      subdocs: [{ type: Array, of: Schema({ name: String }) }]
+    });
+    assert.equal(schema.path('nums.$').caster.instance, 'Number'); // actually Mixed
+    assert.equal(schema.path('tags.$').caster.instance, 'String'); // actually Mixed
+    assert.equal(schema.path('subdocs.$').casterConstructor.schema.path('name').instance, 'String'); // actually Mixed
   });
 });

@@ -1407,3 +1407,20 @@ function gh14235() {
   userSchema.omit<Omit<IUser, 'age'>>(['age']);
 }
 
+function gh14496() {
+  const schema = new Schema({
+    name: {
+      type: String
+    }
+  });
+  schema.path('name').validate({
+    validator: () => {
+      throw new Error('Oops!');
+    },
+    // `errors['name']` will be "Oops!"
+    message: (props) => {
+      expectType<Error | undefined>(props.reason);
+      return 'test';
+    }
+  });
+}

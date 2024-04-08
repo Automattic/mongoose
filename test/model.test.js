@@ -2537,6 +2537,95 @@ describe('Model', function() {
       assert.ok(!doc.$__.$versionError);
       assert.ok(!doc.$__.saveOptions);
     });
+    it('should only save paths specificed in the `pathsToSave` array (gh-9583)', async function() {
+      const schema = new Schema({ name: String, age: Number, weight: { type: Number, validate: v => v == null || v >= 140 }, location: String });
+      const Test = db.model('Test', schema);
+      await Test.create({ name: 'Test Testerson', age: 1, weight: 180, location: 'Florida' });
+      const doc = await Test.findOne();
+      doc.name = 'Test';
+      doc.age = 100;
+      doc.weight = 80;
+      await doc.save({ pathsToSave: ['name'] });
+      const check = await Test.findOne();
+      assert.equal(check.name, 'Test');
+      assert.equal(check.weight, 180);
+      assert.equal(check.age, 1);
+    });
+    it('should have `pathsToSave` work with subdocs (gh-9583)', async function() {
+      const locationSchema = new Schema({ state: String, city: String, zip: { type: Number, validate: v => v == null || v.toString().length == 5 } });
+      const schema = new Schema({
+        name: String,
+        nickname: String,
+        age: Number,
+        weight: { type: Number, validate: v => v == null || v >= 140 },
+        location: locationSchema
+      });
+      const Test = db.model('Test', schema);
+      await Test.create({ name: 'Test Testerson', nickname: 'test', age: 1, weight: 180, location: { state: 'FL', city: 'Miami', zip: 33330 } });
+      let doc = await Test.findOne();
+      doc.name = 'Test';
+      doc.nickname = 'Test2';
+      doc.age = 100;
+      doc.weight = 80;
+      doc.location.state = 'Ohio';
+      doc.location.zip = 0;
+      await doc.save({ pathsToSave: ['name', 'location.state'] });
+      let check = await Test.findOne();
+      assert.equal(check.name, 'Test');
+      assert.equal(check.nickname, 'test');
+      assert.equal(check.weight, 180);
+      assert.equal(check.age, 1);
+      assert.equal(check.location.state, 'Ohio');
+      assert.equal(check.location.zip, 33330);
+      check.location = { state: 'Georgia', city: 'Athens', zip: 34512 };
+      check.name = 'Quiz';
+      check.age = 50;
+      await check.save({ pathsToSave: ['name', 'location'] });
+      const nestedCheck = await Test.findOne();
+      assert.equal(nestedCheck.location.state, 'Georgia');
+      assert.equal(nestedCheck.location.city, 'Athens');
+      assert.equal(nestedCheck.location.zip, 34512);
+      assert.equal(nestedCheck.name, 'Quiz');
+
+      doc = await Test.findOne();
+      doc.name = 'foobar';
+      doc.location.city = 'Reynolds';
+      await doc.save({ pathsToSave: ['location'] });
+      check = await Test.findById(doc._id);
+      assert.equal(check.name, 'Quiz');
+      assert.equal(check.location.city, 'Reynolds');
+      assert.equal(check.location.state, 'Georgia');
+    });
+    it('should have `pathsToSave` work with doc arrays (gh-9583)', async function() {
+      const locationSchema = new Schema({ state: String, city: String, zip: { type: Number, validate: v => v == null || v.toString().length == 5 } });
+      const schema = new Schema({ name: String, age: Number, weight: { type: Number, validate: v => v == null || v >= 140 }, location: [locationSchema] });
+      const Test = db.model('Test', schema);
+      await Test.create({ name: 'Test Testerson', age: 1, weight: 180, location: [{ state: 'FL', city: 'Miami', zip: 33330 }, { state: 'New York', city: 'Albany', zip: 34567 }] });
+      const doc = await Test.findOne();
+      doc.name = 'Test';
+      doc.age = 100;
+      doc.weight = 80;
+      doc.location[0].state = 'Ohio';
+      doc.location[0].zip = 0;
+      doc.location[1].state = 'Ohio';
+      await doc.save({ pathsToSave: ['name', 'location.0.state'] });
+      const check = await Test.findOne();
+      assert.equal(check.name, 'Test');
+      assert.equal(check.weight, 180);
+      assert.equal(check.age, 1);
+      assert.equal(check.location[0].state, 'Ohio');
+      assert.equal(check.location[0].zip, 33330);
+      assert.equal(check.location[1].state, 'New York');
+      check.location[0] = { state: 'Georgia', city: 'Athens', zip: 34512 };
+      check.name = 'Quiz';
+      check.age = 50;
+      await check.save({ pathsToSave: ['name', 'location'] });
+      const nestedCheck = await Test.findOne();
+      assert.equal(nestedCheck.location[0].state, 'Georgia');
+      assert.equal(nestedCheck.location[0].city, 'Athens');
+      assert.equal(nestedCheck.location[0].zip, 34512);
+      assert.equal(nestedCheck.name, 'Quiz');
+    });
   });
 
 
@@ -7328,6 +7417,50 @@ describe('Model', function() {
 
     TestModel.recompileSchema();
     assert.equal(doc.myVirtual, 'Hello from myVirtual');
+  });
+
+  it('supports recompiling model with new discriminators (gh-14444) (gh-14296)', function() {
+    // Define discriminated schema
+    const decoratorSchema = new Schema({
+      type: { type: String, required: true }
+    }, { discriminatorKey: 'type' });
+
+    class Decorator {
+      whoAmI() { return 'I am BaseDeco'; }
+    }
+    decoratorSchema.loadClass(Decorator);
+
+    // Define discriminated class before model is compiled
+    class Deco1 extends Decorator { whoAmI() { return 'I am Test1'; }}
+    const deco1Schema = new Schema({});
+    deco1Schema.loadClass(Deco1);
+    decoratorSchema.discriminator('Test1', deco1Schema);
+
+    // Define model that uses discriminated schema
+    const shopSchema = new Schema({
+      item: { type: decoratorSchema, required: true }
+    });
+    const shopModel = db.model('Test', shopSchema);
+
+    // Define another discriminated class after the model is compiled
+    class Deco2 extends Decorator { whoAmI() { return 'I am Test2'; }}
+    const deco2Schema = new Schema({});
+    deco2Schema.loadClass(Deco2);
+    decoratorSchema.discriminator('Test2', deco2Schema);
+
+    let instance = new shopModel({ item: { type: 'Test1' } });
+    assert.equal(instance.item.whoAmI(), 'I am Test1');
+
+    instance = new shopModel({ item: { type: 'Test2' } });
+    assert.equal(instance.item.whoAmI(), 'I am BaseDeco');
+
+    shopModel.recompileSchema();
+
+    instance = new shopModel({ item: { type: 'Test1' } });
+    assert.equal(instance.item.whoAmI(), 'I am Test1');
+
+    instance = new shopModel({ item: { type: 'Test2' } });
+    assert.equal(instance.item.whoAmI(), 'I am Test2');
   });
 
   it('inserts versionKey even if schema has `toObject.versionKey` set to false (gh-14344)', async function() {

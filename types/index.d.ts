@@ -431,7 +431,7 @@ declare module 'mongoose' {
       fn: (
         this: T,
         next: (err?: CallbackError) => void,
-        ops: Array<mongodb.AnyBulkWriteOperation<any> & MongooseBulkWritePerWriteOptions>,
+        ops: Array<AnyBulkWriteOperation<any>>,
         options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions
       ) => void | Promise<void>
     ): this;

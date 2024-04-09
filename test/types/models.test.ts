@@ -824,7 +824,7 @@ async function gh14072() {
   );
 
   const M = mongoose.model<Test>('Test', schema);
-  const bulkWriteArray = [
+  await M.bulkWrite([
     {
       insertOne: {
         document: { num: 3 }
@@ -844,9 +844,7 @@ async function gh14072() {
         timestamps: false
       }
     }
-  ];
-
-  await M.bulkWrite(bulkWriteArray);
+  ]);
 }
 
 async function gh14003() {

@@ -151,7 +151,7 @@ schema.pre('save', function() {
     then(() => doMoreStuff());
 });
 
-// Or, in Node.js >= 7.6.0:
+// Or, using async functions
 schema.pre('save', async function() {
   await doStuff();
   await doMoreStuff();

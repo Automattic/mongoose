@@ -1,3 +1,9 @@
+6.12.8 / 2024-04-10
+===================
+ * fix(document): handle virtuals that are stored as objects but getter returns string with toJSON #14468 #14446
+ * fix(schematype): consistently set wasPopulated to object with `value` property rather than boolean #14418
+ * docs(model): add extra note about lean option for insertMany() skipping casting #14415 #14376
+
 6.12.7 / 2024-03-01
 ===================
  * perf(model): make insertMany() lean option skip hydrating Mongoose docs #14376 #14372

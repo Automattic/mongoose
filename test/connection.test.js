@@ -1588,7 +1588,6 @@ describe('connections:', function() {
 
     const { databases } = await connection.listDatabases();
     assert.ok(connection.name);
-    console.log(databases);
     assert.ok(databases.map(database => database.name).includes(connection.name));
   });
   describe('createCollections()', function() {

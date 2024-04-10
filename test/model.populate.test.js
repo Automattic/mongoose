@@ -10859,4 +10859,57 @@ describe('model: populate:', function() {
       { name: 'foo', prop: 'bar' }
     );
   });
+
+  it('avoids filtering out `null` values when applying match function (gh-14494)', async function() {
+    const gradeSchema = new mongoose.Schema({
+      studentId: mongoose.Types.ObjectId,
+      classId: mongoose.Types.ObjectId,
+      grade: String
+    });
+
+    const Grade = db.model('Test', gradeSchema);
+
+    const studentSchema = new mongoose.Schema({
+      name: String
+    });
+
+    studentSchema.virtual('grade', {
+      ref: Grade,
+      localField: '_id',
+      foreignField: 'studentId',
+      match: (doc) => ({
+        classId: doc._id
+      }),
+      justOne: true
+    });
+
+    const classSchema = new mongoose.Schema({
+      name: String,
+      students: [studentSchema]
+    });
+
+    const Class = db.model('Test2', classSchema);
+
+    const newClass = await Class.create({
+      name: 'History',
+      students: [{ name: 'Henry' }, { name: 'Robert' }]
+    });
+
+    const studentRobert = newClass.students.find(
+      ({ name }) => name === 'Robert'
+    );
+
+    await Grade.create({
+      studentId: studentRobert._id,
+      classId: newClass._id,
+      grade: 'B'
+    });
+
+    const latestClass = await Class.findOne({ name: 'History' }).populate('students.grade');
+
+    assert.equal(latestClass.students[0].name, 'Henry');
+    assert.equal(latestClass.students[0].grade, null);
+    assert.equal(latestClass.students[1].name, 'Robert');
+    assert.equal(latestClass.students[1].grade.grade, 'B');
+  });
 });

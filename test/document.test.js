@@ -12961,6 +12961,100 @@ describe('document', function() {
     doc.set({ nested: void 0 });
     assert.strictEqual(doc.toObject().nested, void 0);
   });
+
+  it('avoids depopulating populated subdocs underneath document arrays when copying to another document (gh-14418)', async function() {
+    const cartSchema = new mongoose.Schema({
+      products: [
+        {
+          product: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Product'
+          },
+          quantity: Number
+        }
+      ],
+      singleProduct: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product'
+      }
+    });
+    const purchaseSchema = new mongoose.Schema({
+      products: [
+        {
+          product: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Product'
+          },
+          quantity: Number
+        }
+      ],
+      singleProduct: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product'
+      }
+    });
+    const productSchema = new mongoose.Schema({
+      name: String
+    });
+
+    const Cart = db.model('Cart', cartSchema);
+    const Purchase = db.model('Purchase', purchaseSchema);
+    const Product = db.model('Product', productSchema);
+
+    const dbProduct = await Product.create({ name: 'Bug' });
+
+    const dbCart = await Cart.create({
+      products: [
+        {
+          product: dbProduct,
+          quantity: 2
+        }
+      ],
+      singleProduct: dbProduct
+    });
+
+    const foundCart = await Cart.findById(dbCart._id).
+      populate('products.product singleProduct');
+
+    const purchaseFromDbCart = new Purchase({
+      products: foundCart.products,
+      singleProduct: foundCart.singleProduct
+    });
+    assert.equal(purchaseFromDbCart.products[0].product.name, 'Bug');
+    assert.equal(purchaseFromDbCart.singleProduct.name, 'Bug');
+  });
+
+  it('handles virtuals that are stored as objects but getter returns string with toJSON (gh-14446)', async function() {
+    const childSchema = new mongoose.Schema();
+
+    childSchema.virtual('name')
+      .set(function(values) {
+        for (const [lang, val] of Object.entries(values)) {
+          this.set(`name.${lang}`, val);
+        }
+      })
+      .get(function() {
+        return this.$__getValue(`name.${this.lang}`);
+      });
+
+    childSchema.add({ name: { en: { type: String }, de: { type: String } } });
+
+    const ChildModel = db.model('Child', childSchema);
+    const ParentModel = db.model('Parent', new mongoose.Schema({
+      children: [childSchema]
+    }));
+
+    const child = await ChildModel.create({ name: { en: 'Stephen', de: 'Stefan' } });
+    child.lang = 'en';
+    assert.equal(child.name, 'Stephen');
+
+    const parent = await ParentModel.create({
+      children: [{ name: { en: 'Stephen', de: 'Stefan' } }]
+    });
+    parent.children[0].lang = 'de';
+    const obj = parent.toJSON({ getters: true });
+    assert.equal(obj.children[0].name, 'Stefan');
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

@@ -63,6 +63,10 @@ schema.post<ITest>('save', function() {
   console.log(this.name);
 });
 
+schema.post<ITest>('save', async function() {
+  console.log(this.name);
+});
+
 schema.post<ITest>('save', function(err: Error, res: ITest, next: Function) {
   console.log(this.name, err.stack);
 });

@@ -1,3 +1,9 @@
+7.6.11 / 2024-04-11
+===================
+ * fix(populate): avoid match function filtering out null values in populate result #14518
+ * fix(schema): support setting discriminator options in Schema.prototype.discriminator() #14493 #14448
+ * fix(schema): deduplicate idGetter so creating multiple models with same schema doesn't result in multiple id getters #14492 #14457
+
 6.12.8 / 2024-04-10
 ===================
  * fix(document): handle virtuals that are stored as objects but getter returns string with toJSON #14468 #14446

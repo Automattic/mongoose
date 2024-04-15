@@ -1,4 +1,4 @@
-import { Schema, model, Types, InferSchemaType } from 'mongoose';
+import { Schema, model, Model, Types, InferSchemaType } from 'mongoose';
 import { expectError, expectType } from 'tsd';
 
 async function gh10293() {
@@ -126,4 +126,39 @@ async function gh14367() {
   expectType<Date | null | undefined>({} as IUser['reminders'][0]['date']);
   expectType<boolean | null | undefined>({} as IUser['reminders'][0]['toggle']);
   expectType<string | null | undefined>({} as IUser['avatar']);
+}
+
+function gh14469() {
+  interface Names {
+    _id: Types.ObjectId;
+    firstName: string;
+  }
+  // Document definition
+  interface User {
+    names: Names[];
+  }
+
+  // TMethodsAndOverrides
+  type UserDocumentProps = {
+    names: Types.DocumentArray<Names>;
+  };
+  type UserModelType = Model<User, {}, UserDocumentProps>;
+
+  const userSchema = new Schema<User, UserModelType>(
+    {
+      names: [new Schema<Names>({ firstName: String })]
+    },
+    { timestamps: true }
+  );
+
+  // Create model
+  const UserModel = model<User, UserModelType>('User', userSchema);
+
+  const doc = new UserModel({ names: [{ firstName: 'John' }] });
+
+  const jsonDoc = doc?.toJSON();
+  expectType<string>(jsonDoc?.names[0]?.firstName);
+
+  const jsonNames = doc?.names[0]?.toJSON();
+  expectType<string>(jsonNames?.firstName);
 }

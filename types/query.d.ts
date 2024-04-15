@@ -205,6 +205,18 @@ declare module 'mongoose' {
     ? (ResultType extends any[] ? Require_id<FlattenMaps<RawDocType>>[] : Require_id<FlattenMaps<RawDocType>>)
     : ResultType;
 
+  type MergePopulatePaths<RawDocType, ResultType, QueryOp, Paths, TQueryHelpers> = QueryOp extends QueryOpThatReturnsDocument
+    ? ResultType extends null
+      ? ResultType
+      : ResultType extends (infer U)[]
+        ? U extends Document
+          ? HydratedDocument<MergeType<RawDocType, Paths>, Record<string, never>, TQueryHelpers>[]
+          : (MergeType<U, Paths>)[]
+        : ResultType extends Document
+          ? HydratedDocument<MergeType<RawDocType, Paths>, Record<string, never>, TQueryHelpers>
+          : MergeType<ResultType, Paths>
+    : MergeType<ResultType, Paths>;
+
   class Query<ResultType, DocType, THelpers = {}, RawDocType = DocType, QueryOp = 'find'> implements SessionOperation {
     _mongooseOptions: MongooseQueryOptions<DocType>;
 
@@ -608,7 +620,7 @@ declare module 'mongoose' {
       model?: string | Model<any, THelpers>,
       match?: any
     ): QueryWithHelpers<
-      UnpackedIntersection<ResultType, Paths>,
+      MergePopulatePaths<RawDocType, ResultType, QueryOp, Paths, THelpers>,
       DocType,
       THelpers,
       UnpackedIntersection<RawDocType, Paths>,
@@ -617,7 +629,7 @@ declare module 'mongoose' {
     populate<Paths = {}>(
       options: PopulateOptions | (PopulateOptions | string)[]
     ): QueryWithHelpers<
-      UnpackedIntersection<ResultType, Paths>,
+      MergePopulatePaths<RawDocType, ResultType, QueryOp, Paths, THelpers>,
       DocType,
       THelpers,
       UnpackedIntersection<RawDocType, Paths>,

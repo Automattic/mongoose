@@ -373,3 +373,49 @@ async function gh13070() {
   const doc2 = await Child.populate<{ child: IChild }>(doc, 'child');
   const name: string = doc2.child.name;
 }
+
+function gh14441() {
+  interface Parent {
+    child?: Types.ObjectId;
+    name?: string;
+  }
+  const ParentModel = model<Parent>(
+    'Parent',
+    new Schema({
+      child: { type: Schema.Types.ObjectId, ref: 'Child' },
+      name: String
+    })
+  );
+
+  interface Child {
+    name: string;
+  }
+  const childSchema: Schema = new Schema({ name: String });
+  model<Child>('Child', childSchema);
+
+  ParentModel.findOne({})
+    .populate<{ child: Child }>('child')
+    .orFail()
+    .then(doc => {
+      expectType<string>(doc.child.name);
+      const docObject = doc.toObject();
+      expectType<string>(docObject.child.name);
+    });
+
+  ParentModel.findOne({})
+    .populate<{ child: Child }>('child')
+    .lean()
+    .orFail()
+    .then(doc => {
+      expectType<string>(doc.child.name);
+    });
+
+  ParentModel.find({})
+    .populate<{ child: Child }>('child')
+    .orFail()
+    .then(docs => {
+      expectType<string>(docs[0]!.child.name);
+      const docObject = docs[0]!.toObject();
+      expectType<string>(docObject.child.name);
+    });
+}

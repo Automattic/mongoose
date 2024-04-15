@@ -80,7 +80,6 @@
  * docs(connections): add note about using asPromise() with createConnection() for error handling #14364 #14266
  * docs(model+query+findoneandupdate): add more details about overwriteDiscriminatorKey option to docs #14264 #14246
 
-<<<<<<< HEAD
 8.2.0 / 2024-02-22
 ==================
  * feat(model): add recompileSchema() function to models to allow applying schema changes after compiling #14306 #14296
@@ -114,6 +113,11 @@
  * types(query): add back context and setDefaultsOnInsert as Mongoose-specific query options #14284 #14282
  * types(query): add missing runValidators back to MongooseQueryOptions #14278 #14275
 
+6.12.6 / 2024-01-22
+===================
+ * fix(collection): correctly handle buffer timeouts with find() #14277
+ * fix(document): allow calling push() with different $position arguments #14254
+
 8.1.0 / 2024-01-16
 ==================
  * feat: upgrade MongoDB driver -> 6.3.0 #14241 #14189 #14108 #14104
@@ -138,12 +142,6 @@
  * docs: update TLS/SSL guide for Mongoose v8 - MongoDB v6 driver deprecations #14170 [andylwelch](https://github.com/andylwelch)
  * docs: update findOneAndUpdate tutorial to use includeResultMetadata #14208 #14207
  * docs: clarify disabling _id on subdocs #14195 #14194
-=======
-6.12.6 / 2024-01-22
-===================
- * fix(collection): correctly handle buffer timeouts with find() #14277
- * fix(document): allow calling push() with different $position arguments #14254
->>>>>>> 7.x
 
 7.6.8 / 2024-01-08
 ==================

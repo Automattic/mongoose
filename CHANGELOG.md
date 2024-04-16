@@ -1,3 +1,11 @@
+8.3.2 / 2024-04-16
+==================
+ * fix(populate): avoid match function filtering out null values in populate result #14518 #14494
+ * types(query): make FilterQuery props resolve to any for generics support #14510 #14473 #14459
+ * types(DocumentArray): pass DocType generic to Document for correct toJSON() and toObject() return types #14526 #14469
+ * types(models): fix incorrect bulk write options #14513 [emiljanitzek](https://github.com/emiljanitzek)
+ * docs: add documentation for calling schema.post() with async function #14514 #14305
+
 7.6.11 / 2024-04-11
 ===================
  * fix(populate): avoid match function filtering out null values in populate result #14518

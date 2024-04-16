@@ -1,24 +1,7 @@
 declare module 'mongoose' {
   import mongodb = require('mongodb');
 
-  type StringQueryTypeCasting = string | RegExp;
-  type ObjectIdQueryTypeCasting = Types.ObjectId | string;
-  type UUIDQueryTypeCasting = Types.UUID | string;
-
-  type QueryTypeCasting<T> = T extends string
-    ? StringQueryTypeCasting
-    : T extends Types.ObjectId
-      ? ObjectIdQueryTypeCasting
-      : T extends Types.UUID
-        ? UUIDQueryTypeCasting
-        : T | any;
-
-  export type ApplyBasicQueryCasting<T> = T | T[] | (T extends (infer U)[] ? QueryTypeCasting<U> : T);
-  export type Condition<T> = ApplyBasicQueryCasting<QueryTypeCasting<T>> | QuerySelector<ApplyBasicQueryCasting<QueryTypeCasting<T>>>;
-
-  type _FilterQuery<T> = {
-    [P in keyof T]?: Condition<T[P]>;
-  } & RootQuerySelector<T>;
+  export type Condition<T> = T | QuerySelector<T | any> | any;
 
   /**
    * Filter query to select the documents that match the query
@@ -27,7 +10,9 @@ declare module 'mongoose' {
    * { age: { $gte: 30 } }
    * ```
    */
-  type FilterQuery<T> = _FilterQuery<T>;
+  type FilterQuery<T> = {
+    [P in keyof T]?: Condition<T[P]>;
+  } & RootQuerySelector<T>;
 
   type MongooseBaseQueryOptionKeys =
     | 'context'

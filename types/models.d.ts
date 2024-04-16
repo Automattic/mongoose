@@ -23,13 +23,21 @@ declare module 'mongoose' {
     ): U;
   }
 
-  interface MongooseBulkWriteOptions {
+  interface MongooseBulkWriteOptions extends mongodb.BulkWriteOptions {
+    session?: ClientSession;
     skipValidation?: boolean;
     throwOnValidationError?: boolean;
-    timestamps?: boolean;
     strict?: boolean | 'throw';
   }
 
+  interface MongooseBulkSaveOptions extends mongodb.BulkWriteOptions {
+    timestamps?: boolean;
+    session?: ClientSession;
+  }
+
+  /**
+   * @deprecated use AnyBulkWriteOperation instead
+   */
   interface MongooseBulkWritePerWriteOptions {
     timestamps?: boolean;
     strict?: boolean | 'throw';
@@ -200,6 +208,8 @@ declare module 'mongoose' {
     hint?: mongodb.Hint;
     /** When true, creates a new document if no document matches the query. */
     upsert?: boolean;
+    /** When false, do not add timestamps. */
+    timestamps?: boolean;
   }
 
   export interface UpdateManyModel<TSchema = AnyObject> {
@@ -215,6 +225,8 @@ declare module 'mongoose' {
     hint?: mongodb.Hint;
     /** When true, creates a new document if no document matches the query. */
     upsert?: boolean;
+    /** When false, do not add timestamps. */
+    timestamps?: boolean;
   }
 
   export interface DeleteOneModel<TSchema = AnyObject> {
@@ -281,11 +293,11 @@ declare module 'mongoose' {
      */
     bulkWrite<DocContents = TRawDocType>(
       writes: Array<AnyBulkWriteOperation<DocContents extends Document ? any : (DocContents extends {} ? DocContents : any)>>,
-      options: mongodb.BulkWriteOptions & MongooseBulkWriteOptions & { ordered: false }
+      options: MongooseBulkWriteOptions & { ordered: false }
     ): Promise<mongodb.BulkWriteResult & { mongoose?: { validationErrors: Error[] } }>;
     bulkWrite<DocContents = TRawDocType>(
       writes: Array<AnyBulkWriteOperation<DocContents extends Document ? any : (DocContents extends {} ? DocContents : any)>>,
-      options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions
+      options?: MongooseBulkWriteOptions
     ): Promise<mongodb.BulkWriteResult>;
 
     /**
@@ -293,7 +305,7 @@ declare module 'mongoose' {
      * sending multiple `save()` calls because with `bulkSave()` there is only one
      * network round trip to the MongoDB server.
      */
-    bulkSave(documents: Array<Document>, options?: mongodb.BulkWriteOptions & { timestamps?: boolean }): Promise<mongodb.BulkWriteResult>;
+    bulkSave(documents: Array<Document>, options?: MongooseBulkSaveOptions): Promise<mongodb.BulkWriteResult>;
 
     /** Collection the model uses. */
     collection: Collection;

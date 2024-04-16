@@ -72,6 +72,7 @@ describe('schema', function() {
         },
         b: { $type: String }
       }, { typeKey: '$type' });
+      db.deleteModel(/Test/);
       NestedModel = db.model('Test', NestedSchema);
     });
 
@@ -3218,5 +3219,22 @@ describe('schema', function() {
     assert.equal(schema.path('nums.$').caster.instance, 'Number'); // actually Mixed
     assert.equal(schema.path('tags.$').caster.instance, 'String'); // actually Mixed
     assert.equal(schema.path('subdocs.$').casterConstructor.schema.path('name').instance, 'String'); // actually Mixed
+  });
+  it('handles discriminator options with Schema.prototype.discriminator (gh-14448)', async function() {
+    const eventSchema = new mongoose.Schema({
+      name: String
+    }, { discriminatorKey: 'kind' });
+    const clickedEventSchema = new mongoose.Schema({ element: String });
+    eventSchema.discriminator(
+      'Test2',
+      clickedEventSchema,
+      { value: 'click' }
+    );
+    const Event = db.model('Test', eventSchema);
+    const ClickedModel = db.model('Test2');
+
+    const doc = await Event.create({ kind: 'click', element: '#hero' });
+    assert.equal(doc.element, '#hero');
+    assert.ok(doc instanceof ClickedModel);
   });
 });

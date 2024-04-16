@@ -151,7 +151,7 @@ schema.pre('save', function() {
     then(() => doMoreStuff());
 });
 
-// Or, in Node.js >= 7.6.0:
+// Or, using async functions
 schema.pre('save', async function() {
   await doStuff();
   await doMoreStuff();
@@ -250,9 +250,7 @@ schema.post('deleteOne', function(doc) {
 
 <h2 id="post-async"><a href="#post-async">Asynchronous Post Hooks</a></h2>
 
-If your post hook function takes at least 2 parameters, mongoose will
-assume the second parameter is a `next()` function that you will call to
-trigger the next middleware in the sequence.
+If your post hook function takes at least 2 parameters, mongoose will assume the second parameter is a `next()` function that you will call to trigger the next middleware in the sequence.
 
 ```javascript
 // Takes 2 parameters: this is an asynchronous post hook
@@ -267,6 +265,25 @@ schema.post('save', function(doc, next) {
 // Will not execute until the first middleware calls `next()`
 schema.post('save', function(doc, next) {
   console.log('post2');
+  next();
+});
+```
+
+You can also pass an async function to `post()`.
+If you pass an async function that takes at least 2 parameters, you are still responsible for calling `next()`.
+However, you can also pass in an async function that takes less than 2 parameters, and Mongoose will wait for the promise to resolve.
+
+```javascript
+schema.post('save', async function(doc) {
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  console.log('post1');
+  // If less than 2 parameters, no need to call `next()`
+});
+
+schema.post('save', async function(doc, next) {
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  console.log('post1');
+  // If there's a `next` parameter, you need to call `next()`.
   next();
 });
 ```

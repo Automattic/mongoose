@@ -294,6 +294,17 @@ function gh12290() {
   user.isDirectModified('name');
 }
 
+function gh13878() {
+  const schema = new Schema({
+    name: String,
+    age: Number
+  });
+  const User = model('User', schema);
+  const user = new User({ name: 'John', age: 30 });
+  expectType<typeof User>(user.$model());
+  expectType<typeof User>(user.model());
+}
+
 function gh13094() {
   type UserDocumentNever = HydratedDocument<{ name: string }, Record<string, never>>;
 

@@ -3485,6 +3485,30 @@ describe('Model', function() {
           assert.equal(changeData.fullDocument.get('name'), 'Tony Stark');
         });
 
+        it('fullDocument with immediate watcher and hydrate (gh-14049)', async function() {
+          const MyModel = db.model('Test', new Schema({ name: String }));
+
+          const doc = await MyModel.create({ name: 'Ned Stark' });
+
+          const p = new Promise((resolve) => {
+            MyModel.watch([], {
+              fullDocument: 'updateLookup',
+              hydrate: true
+            }).on('change', change => {
+              resolve(change);
+            });
+          });
+
+          await MyModel.updateOne({ _id: doc._id }, { name: 'Tony Stark' });
+
+          const changeData = await p;
+          assert.equal(changeData.operationType, 'update');
+          assert.equal(changeData.fullDocument._id.toHexString(),
+            doc._id.toHexString());
+          assert.ok(changeData.fullDocument.$__);
+          assert.equal(changeData.fullDocument.get('name'), 'Tony Stark');
+        });
+
         it('respects discriminators (gh-11007)', async function() {
           const BaseModel = db.model('Test', new Schema({ name: String }));
           const ChildModel = BaseModel.discriminator('Test1', new Schema({ email: String }));
@@ -3522,6 +3546,7 @@ describe('Model', function() {
           assert.equal(changeData.operationType, 'insert');
           assert.equal(changeData.fullDocument.name, 'Ned Stark');
 
+          await changeStream.close();
           await db.close();
         });
 
@@ -3562,6 +3587,20 @@ describe('Model', function() {
           assert.strictEqual(closedData, true);
 
           await db.close();
+        });
+
+        it('bubbles up resumeTokenChanged events (gh-14349)', async function() {
+          const MyModel = db.model('Test', new Schema({ name: String }));
+
+          const resumeTokenChangedEvent = new Promise(resolve => {
+            changeStream = MyModel.watch();
+            listener = data => resolve(data);
+            changeStream.once('resumeTokenChanged', listener);
+          });
+
+          await MyModel.create({ name: 'test' });
+          const { _data } = await resumeTokenChangedEvent;
+          assert.ok(_data);
         });
       });
 
@@ -4041,6 +4080,49 @@ describe('Model', function() {
         assert.ok(doc.nested[0].updatedAt);
         assert.ok(doc.nested[0].updatedAt.valueOf() >= now.valueOf());
 
+      });
+
+      it('sets version key (gh-13944)', async function() {
+        const userSchema = new Schema({
+          firstName: { type: String, required: true },
+          lastName: { type: String }
+        });
+        const User = db.model('User', userSchema);
+
+        await User.bulkWrite([
+          {
+            updateOne: {
+              filter: { lastName: 'Gibbons' },
+              update: { firstName: 'Peter' },
+              upsert: true
+            }
+          },
+          {
+            insertOne: {
+              document: {
+                firstName: 'Michael',
+                lastName: 'Bolton'
+              }
+            }
+          },
+          {
+            replaceOne: {
+              filter: { lastName: 'Lumbergh' },
+              replacement: { firstName: 'Bill', lastName: 'Lumbergh' },
+              upsert: true
+            }
+          }
+        ], { ordered: false });
+
+        const users = await User.find();
+        assert.deepStrictEqual(
+          users.map(user => user.firstName).sort(),
+          ['Bill', 'Michael', 'Peter']
+        );
+        assert.deepStrictEqual(
+          users.map(user => user.__v),
+          [0, 0, 0]
+        );
       });
 
       it('with single nested and setOnInsert (gh-7534)', function() {
@@ -6237,6 +6319,27 @@ describe('Model', function() {
       const writeOperations = User.buildBulkWriteOperations(users, { skipValidation: true });
 
       assert.equal(writeOperations.length, 3);
+    });
+
+    it('saves changes in discriminators if calling `bulkSave()` on base model (gh-13907)', async() => {
+      const schema = new mongoose.Schema(
+        { value: String },
+        { discriminatorKey: 'type' }
+      );
+      const typeASchema = new mongoose.Schema({ aValue: String });
+      schema.discriminator('A', typeASchema);
+
+      const TestModel = db.model('Test', schema);
+      const testData = { value: 'initValue', type: 'A', aValue: 'initAValue' };
+      const doc = await TestModel.create(testData);
+
+      doc.value = 'updatedValue1';
+      doc.aValue = 'updatedValue2';
+      await TestModel.bulkSave([doc]);
+
+      const findDoc = await TestModel.findById(doc._id);
+      assert.strictEqual(findDoc.value, 'updatedValue1');
+      assert.strictEqual(findDoc.aValue, 'updatedValue2');
     });
 
     it('accepts `timestamps: false` (gh-12059)', async() => {

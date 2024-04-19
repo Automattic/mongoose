@@ -1373,7 +1373,7 @@ describe('Query', function() {
   });
 
   describe('setOptions', function() {
-    it('works', async function() {
+    it('works', function() {
       const q = new Query();
       q.setOptions({ thing: 'cat' });
       q.setOptions({ populate: ['fans'] });
@@ -1397,16 +1397,6 @@ describe('Query', function() {
       assert.equal(q.options.hint.index2, -1);
       assert.equal(q.options.readPreference.mode, 'secondary');
       assert.equal(q.options.readPreference.tags[0].dc, 'eu');
-
-      const Product = db.model('Product', productSchema);
-      const [, doc2] = await Product.create([
-        { numbers: [3, 4, 5] },
-        { strings: 'hi there'.split(' '), w: 'majority' }
-      ]);
-
-      const docs = await Product.find().setOptions({ limit: 1, sort: { _id: -1 }, read: 'n' });
-      assert.equal(docs.length, 1);
-      assert.equal(docs[0].id, doc2.id);
     });
 
     it('populate as array in options (gh-4446)', function() {
@@ -4105,6 +4095,7 @@ describe('Query', function() {
       await Error.find().sort('-');
     }, { message: 'Invalid field "" passed to sort()' });
   });
+
   it('allows executing a find() with a subdocument with defaults disabled (gh-13512)', async function() {
     const schema = mongoose.Schema({
       title: String,
@@ -4188,5 +4179,39 @@ describe('Query', function() {
     doc = await Test.findById(_id).select(['-__t', '-age']);
     assert.strictEqual(doc.name, 'test1');
     assert.strictEqual(doc.__t, undefined);
+  });
+
+  it('does not apply sibling path defaults if using nested projection (gh-14115)', async function() {
+    const version = await start.mongodVersion();
+    if (version[0] < 5) {
+      return this.skip();
+    }
+
+    const userSchema = new mongoose.Schema({
+      name: String,
+      account: {
+        amount: Number,
+        owner: { type: String, default: () => 'OWNER' },
+        taxIds: [Number]
+      }
+    });
+    const User = db.model('User', userSchema);
+
+    const { _id } = await User.create({
+      name: 'test',
+      account: {
+        amount: 25,
+        owner: 'test',
+        taxIds: [42]
+      }
+    });
+
+    const doc = await User
+      .findOne({ _id }, { name: 1, account: { amount: 1 } })
+      .orFail();
+    assert.strictEqual(doc.name, 'test');
+    assert.strictEqual(doc.account.amount, 25);
+    assert.strictEqual(doc.account.owner, undefined);
+    assert.strictEqual(doc.account.taxIds, undefined);
   });
 });

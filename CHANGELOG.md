@@ -1,3 +1,142 @@
+7.6.11 / 2024-04-11
+===================
+ * fix(populate): avoid match function filtering out null values in populate result #14518
+ * fix(schema): support setting discriminator options in Schema.prototype.discriminator() #14493 #14448
+ * fix(schema): deduplicate idGetter so creating multiple models with same schema doesn't result in multiple id getters #14492 #14457
+
+6.12.8 / 2024-04-10
+===================
+ * fix(document): handle virtuals that are stored as objects but getter returns string with toJSON #14468 #14446
+ * fix(schematype): consistently set wasPopulated to object with `value` property rather than boolean #14418
+ * docs(model): add extra note about lean option for insertMany() skipping casting #14415 #14376
+
+7.6.10 / 2024-03-13
+===================
+ * docs(model): add extra note about lean option for insertMany() skipping casting #14415
+ * docs(mongoose): add options.overwriteModel details to mongoose.model() docs #14422
+
+6.12.7 / 2024-03-01
+===================
+ * perf(model): make insertMany() lean option skip hydrating Mongoose docs #14376 #14372
+ * perf(document+schema): small optimizations to make init() faster #14383 #14113
+ * fix(connection): don't modify passed options object to `openUri()` #14370 #13376 #13335
+ * fix(ChangeStream): bubble up resumeTokenChanged changeStream event #14355 #14349 [3150](https://github.com/3150)
+
+7.6.9 / 2024-02-26
+==================
+ * fix(document): handle embedded recursive discriminators on nested path defined using Schema.prototype.discriminator #14256 #14245
+ * types(model): correct return type for findByIdAndDelete() #14233 #14190
+ * docs(connections): add note about using asPromise() with createConnection() for error handling #14364 #14266
+ * docs(model+query+findoneandupdate): add more details about overwriteDiscriminatorKey option to docs #14264 #14246
+
+6.12.6 / 2024-01-22
+===================
+ * fix(collection): correctly handle buffer timeouts with find() #14277
+ * fix(document): allow calling push() with different $position arguments #14254
+
+7.6.8 / 2024-01-08
+==================
+ * perf(schema): remove unnecessary lookahead in numeric subpath check
+ * fix(discriminator): handle reusing schema with embedded discriminators defined using Schema.prototype.discriminator #14202 #14162
+ * fix(ChangeStream): avoid suppressing errors in closed change stream #14206 #14177
+
+6.12.5 / 2024-01-03
+===================
+ * perf(schema): remove unnecessary lookahead in numeric subpath check
+ * fix(document): allow setting nested path to null #14226
+ * fix(document): avoid flattening dotted paths in mixed path underneath nested path #14198 #14178
+ * fix: add ignoreAtomics option to isModified() for better backwards compatibility with Mongoose 5 #14213
+
+6.12.4 / 2023-12-27
+===================
+ * fix: upgrade mongodb driver -> 4.17.2
+ * fix(document): avoid treating nested projection as inclusive when applying defaults #14173 #14115
+ * fix: account for null values when assigning isNew property #14172 #13883
+
+7.6.7 / 2023-12-06
+==================
+ * fix: avoid minimizing single nested subdocs if they are required #14151 #14058
+ * fix(populate): allow deselecting discriminator key when populating #14155 #3230
+ * fix: allow adding discriminators using Schema.prototype.discriminator() to subdocuments after defining parent schema #14131 #14109
+ * fix(schema): avoid creating unnecessary clone of schematype in nested array so nested document arrays use correct constructor #14128 #14101
+ * fix(populate): call transform object with single id instead of array when populating a justOne path under an array #14135 #14073
+ * types: add back mistakenly removed findByIdAndRemove() function signature #14136 #14132
+
+7.6.6 / 2023-11-27
+==================
+ * perf: avoid double-running setter logic when calling `push()` #14120 #11380
+ * fix(populate): set populated docs in correct order when populating virtual underneath doc array with justOne #14105 #14018
+ * fix: bump mongodb driver -> 5.9.1 #14084 #13829 [lorand-horvath](https://github.com/lorand-horvath)
+ * types: allow defining document array using [{ prop: String }] syntax #14095 #13424
+ * types: correct types for when includeResultMetadata: true is set #14078 #13987 [prathamVaidya](https://github.com/prathamVaidya)
+ * types(query): base filters and projections off of RawDocType instead of DocType so autocomplete doesn't show populate #14118 #14077
+ * types: make property names show up in intellisense for UpdateQuery #14123 #14090
+ * types(model): support calling Model.validate() with pathsToSkip option #14088 #14003
+ * docs: remove "DEPRECATED" warning mistakenly added to read() tags param #13980
+
+7.6.5 / 2023-11-14
+==================
+ * fix: handle update validators and single nested doc with numeric paths #14066 #13977
+ * fix: handle recursive schema array in discriminator definition #14068 #14055
+ * fix: diffIndexes treats namespace error as empty #14048 #14029
+ * docs(migrating_to_7): add note about requiring new with ObjectId #14021 #14020
+
+6.12.3 / 2023-11-07
+===================
+ * fix(ChangeStream): correctly handle hydrate option when using change stream as stream instead of iterator #14052
+ * fix(schema): fix dangling reference to virtual in tree after `removeVirtual()` #14019 #13085
+ * fix(document): avoid unmarking modified on nested path if no initial value stored and already modified #14053 #14024
+ * fix(document): consistently avoid marking subpaths of nested paths as modified #14053 #14022
+
+7.6.4 / 2023-10-30
+==================
+ * fix(connection): retain modified status for documents created outside a transaction during transaction retries #14017 #13973
+ * fix(schema): handle recursive schemas in discriminator definitions #14011 #13978
+ * fix: handle casting $or underneath $elemMatch #14007 #13974
+ * fix(populate): allow using options: { strictPopulate: false } to disable strict populate #13863
+ * docs: fix differences between sample codes and documentation #13998 [suzuki](https://github.com/suzuki)
+ * docs: fix missing import and change wrong variable name #13992 [suzuki](https://github.com/suzuki)
+
+6.12.2 / 2023-10-25
+===================
+ * fix: add fullPath to ValidatorProps #13995 [Freezystem](https://github.com/Freezystem)
+
+7.6.3 / 2023-10-17
+==================
+ * fix(populate): handle multiple spaces when specifying paths to populate using space-delimited paths #13984 #13951
+ * fix(update): avoid applying defaults on query filter when upserting with empty update #13983 #13962
+ * fix(model): add versionKey to bulkWrite when inserting or upserting #13981 #13944
+ * docs: fix typo in timestamps docs #13976 [danielcoker](https://github.com/danielcoker)
+
+7.6.2 / 2023-10-13
+==================
+ * perf: avoid storing a separate entry in schema subpaths for every element in an array #13953 #13874
+ * fix(document): avoid triggering setter when initializing Model.prototype.collection to allow defining collection as a schema path name #13968 #13956
+ * fix(model): make bulkSave() save changes in discriminator paths if calling bulkSave() on base model #13959 #13907
+ * fix(document): allow calling $model() with no args for TypeScript #13963 #13878
+ * fix(schema): handle embedded discriminators defined using Schema.prototype.discriminator() #13958 #13898
+ * types(model): make InsertManyResult consistent with return type of insertMany #13965 #13904
+ * types(models): add cleaner type definitions for insertMany() with no generics to prevent errors when using insertMany() in generic classes #13964 #13957
+ * types(schematypes): allow defining map path using type: 'Map' in addition to type: Map #13960 #13755
+
+6.12.1 / 2023-10-12
+===================
+ * fix(mongoose): correctly handle global applyPluginsToChildSchemas option #13945 #13887 [hasezoey](https://github.com/hasezoey)
+ * fix: Document.prototype.isModified support for a string of keys as first parameter #13940 #13674 [k-chop](https://github.com/k-chop)
+
+7.6.1 / 2023-10-09
+==================
+ * fix: bump bson to match mongodb@5.9.0 exactly #13947 [hasezoey](https://github.com/hasezoey)
+ * fix: raw result deprecation message #13954 [simllll](https://github.com/simllll)
+ * type: add types for includeResultMetadata #13955 [simllll](https://github.com/simllll)
+ * perf(npmignore): ignore newer files #13946 [hasezoey](https://github.com/hasezoey)
+ * perf: move mocha config from package.json to mocharc #13948 [hasezoey](https://github.com/hasezoey)
+
+7.6.0 / 2023-10-06
+==================
+ * feat: upgrade mongodb node driver -> 5.9.0 #13927 #13926 [sanguineti](https://github.com/sanguineti)
+ * fix: avoid CastError when passing different value of discriminator key in `$or` #13938 #13906
+
 7.5.4 / 2023-10-04
 ==================
  * fix: avoid stripping out `id` property when `_id` is set #13933 #13892 #13867

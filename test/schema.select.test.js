@@ -56,7 +56,7 @@ describe('schema select option', function() {
     assert.equal(findByIdDocAgain.isSelected('name'), false);
     assert.equal(findByIdDocAgain.isSelected('docs.name'), false);
     assert.strictEqual(undefined, findByIdDocAgain.name);
-    const findUpdateDoc = await Test.findOneAndUpdate({ _id: doc._id });
+    const findUpdateDoc = await Test.findOneAndUpdate({ _id: doc._id }, { name: 'the excluded' });
     assert.equal(findUpdateDoc.isSelected('name'), false);
     assert.equal(findUpdateDoc.isSelected('docs.name'), false);
     assert.strictEqual(undefined, findUpdateDoc.name);

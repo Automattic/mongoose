@@ -793,6 +793,17 @@ describe('document', function() {
       assert.strictEqual(myModel.toObject().foo, void 0);
     });
 
+    it('does not minimize single nested subdocs if they are required (gh-14058) (gh-11247)', async function() {
+      const nestedSchema = Schema({ bar: String }, { _id: false });
+      const schema = Schema({ foo: { type: nestedSchema, required: true } });
+
+      const MyModel = db.model('Test', schema);
+
+      const myModel = await MyModel.create({ foo: {} });
+
+      assert.deepStrictEqual(myModel.toObject().foo, {});
+    });
+
     it('should propogate toObject to implicitly created schemas (gh-13599) (gh-13325)', async function() {
       const transformCalls = [];
       const userSchema = Schema({
@@ -3701,6 +3712,11 @@ describe('document', function() {
 
       assert.deepEqual(
         kitty.modifiedPaths(),
+        ['surnames']
+      );
+
+      assert.deepEqual(
+        kitty.modifiedPaths({ includeChildren: true }),
         ['surnames', 'surnames.docarray']
       );
     });
@@ -8162,7 +8178,7 @@ describe('document', function() {
     assert.deepEqual(Object.keys(err.errors), ['age']);
   });
 
-  it('array push with $position (gh-4322)', async function() {
+  it('array push with $position (gh-14244) (gh-4322)', async function() {
     const schema = Schema({
       nums: [Number]
     });
@@ -8186,12 +8202,13 @@ describe('document', function() {
       $each: [0],
       $position: 0
     });
-    assert.throws(() => {
-      doc.nums.push({ $each: [5] });
-    }, /Cannot call.*multiple times/);
-    assert.throws(() => {
-      doc.nums.push(5);
-    }, /Cannot call.*multiple times/);
+    assert.deepStrictEqual(doc.nums.$__getAtomics(), [['$push', { $each: [0], $position: 0 }]]);
+
+    doc.nums.push({ $each: [5] });
+    assert.deepStrictEqual(doc.nums.$__getAtomics(), [['$set', [0, 1, 2, 3, 4, 5]]]);
+
+    doc.nums.push({ $each: [0.5], $position: 1 });
+    assert.deepStrictEqual(doc.nums.$__getAtomics(), [['$set', [0, 0.5, 1, 2, 3, 4, 5]]]);
   });
 
   it('setting a path to a single nested document should update the single nested doc parent (gh-8400)', function() {
@@ -9196,6 +9213,49 @@ describe('document', function() {
     assert.ok(foo.isModified('nested'));
     assert.ok(foo.isModified('subdoc'));
     assert.ok(foo.isModified('subdoc.bar'));
+  });
+
+  it('does not unmark modified if there is no initial value (gh-9396)', async function() {
+    const IClientSchema = new Schema({
+      jwt: {
+        token_crypt: { type: String, template: false, maxSize: 8 * 1024 },
+        token_salt: { type: String, template: false }
+      }
+    });
+
+    const encrypt = function(doc, path, value) {
+      doc.set(path + '_crypt', value + '_crypt');
+      doc.set(path + '_salt', value + '_salt');
+    };
+
+    const decrypt = function(doc, path) {
+      return doc.get(path + '_crypt').replace('_crypt', '');
+    };
+
+    IClientSchema.virtual('jwt.token')
+      .get(function() {
+        return decrypt(this, 'jwt.token');
+      })
+      .set(function(value) {
+        encrypt(this, 'jwt.token', value);
+      });
+
+
+    const iclient = db.model('Test', IClientSchema);
+    const test = new iclient({
+      jwt: {
+        token: 'firstToken'
+      }
+    });
+
+    await test.save();
+    const entry = await iclient.findById(test._id).orFail();
+    entry.set('jwt.token', 'secondToken');
+    entry.set(entry.toJSON());
+    await entry.save();
+
+    const { jwt } = await iclient.findById(test._id).orFail();
+    assert.strictEqual(jwt.token, 'secondToken');
   });
 
   it('correctly tracks saved state for deeply nested objects (gh-10773) (gh-9396)', async function() {
@@ -12519,6 +12579,481 @@ describe('document', function() {
     doc.set('branding.logo.attachment', { name: 'coolLogo' });
     await doc.save();
     assert.strictEqual(attachmentSchemaPreValidateCalls, 1);
+  });
+
+  it('returns constructor if using $model() with no args (gh-13878)', async function() {
+    const testSchema = new Schema({ name: String });
+    const Test = db.model('Test', testSchema);
+
+    const doc = new Test();
+    assert.strictEqual(doc.$model(), Test);
+  });
+
+  it('avoids creating separate subpaths entry for every element in array (gh-13874)', async function() {
+    const tradeSchema = new mongoose.Schema({ tradeId: Number, content: String });
+
+    const testSchema = new mongoose.Schema(
+      {
+        userId: Number,
+        tradeMap: {
+          type: Map,
+          of: tradeSchema
+        }
+      }
+    );
+
+    const TestModel = db.model('Test', testSchema);
+
+
+    const userId = 100;
+    const user = await TestModel.create({ userId, tradeMap: new Map() });
+
+    // add subDoc
+    for (let id = 1; id <= 10; id++) {
+      const trade = { tradeId: id, content: 'test' };
+      user.tradeMap.set(trade.tradeId.toString(), trade);
+    }
+    await user.save();
+    await TestModel.deleteOne({ userId });
+
+    assert.equal(Object.keys(TestModel.schema.subpaths).length, 3);
+  });
+
+  it('handles embedded discriminators defined using Schema.prototype.discriminator (gh-13898)', async function() {
+    const baseNestedDiscriminated = new Schema({
+      type: { type: Number, required: true }
+    }, { discriminatorKey: 'type' });
+
+    class BaseClass {
+      whoAmI() {
+        return 'I am baseNestedDiscriminated';
+      }
+    }
+    BaseClass.type = 1;
+
+    baseNestedDiscriminated.loadClass(BaseClass);
+
+    class NumberTyped extends BaseClass {
+      whoAmI() {
+        return 'I am NumberTyped';
+      }
+    }
+    NumberTyped.type = 3;
+
+    class StringTyped extends BaseClass {
+      whoAmI() {
+        return 'I am StringTyped';
+      }
+    }
+    StringTyped.type = 4;
+
+    baseNestedDiscriminated.discriminator(1, new Schema({}).loadClass(NumberTyped));
+    baseNestedDiscriminated.discriminator('3', new Schema({}).loadClass(StringTyped));
+
+    const containsNestedSchema = new Schema({
+      nestedDiscriminatedTypes: { type: [baseNestedDiscriminated], required: true }
+    });
+
+    class ContainsNested {
+      whoAmI() {
+        return 'I am ContainsNested';
+      }
+    }
+    containsNestedSchema.loadClass(ContainsNested);
+
+    const Test = db.model('Test', containsNestedSchema);
+    const instance = await Test.create({ type: 1, nestedDiscriminatedTypes: [{ type: 1 }, { type: '3' }] });
+    assert.deepStrictEqual(
+      instance.nestedDiscriminatedTypes.map(i => i.whoAmI()),
+      ['I am NumberTyped', 'I am StringTyped']
+    );
+  });
+
+  it('handles embedded discriminators defined using Schema.prototype.discriminator after defining schema (gh-14109) (gh-13898)', async function() {
+    const baseNestedDiscriminated = new Schema({
+      type: { type: Number, required: true }
+    }, { discriminatorKey: 'type' });
+
+    class BaseClass {
+      whoAmI() {
+        return 'I am baseNestedDiscriminated';
+      }
+    }
+
+    baseNestedDiscriminated.loadClass(BaseClass);
+
+    class NumberTyped extends BaseClass {
+      whoAmI() {
+        return 'I am NumberTyped';
+      }
+    }
+
+    class StringTyped extends BaseClass {
+      whoAmI() {
+        return 'I am StringTyped';
+      }
+    }
+
+    const containsNestedSchema = new Schema({
+      nestedDiscriminatedTypes: { type: [baseNestedDiscriminated], required: true }
+    });
+
+    // After `containsNestedSchema`, in #13898 test these were before `containsNestedSchema`
+    baseNestedDiscriminated.discriminator(1, new Schema({}).loadClass(NumberTyped));
+    baseNestedDiscriminated.discriminator('3', new Schema({}).loadClass(StringTyped));
+
+    class ContainsNested {
+      whoAmI() {
+        return 'I am ContainsNested';
+      }
+    }
+    containsNestedSchema.loadClass(ContainsNested);
+
+    const Test = db.model('Test', containsNestedSchema);
+    const instance = await Test.create({ type: 1, nestedDiscriminatedTypes: [{ type: 1 }, { type: '3' }] });
+    assert.deepStrictEqual(
+      instance.nestedDiscriminatedTypes.map(i => i.whoAmI()),
+      ['I am NumberTyped', 'I am StringTyped']
+    );
+  });
+
+  it('handles embedded discriminators on nested path defined using Schema.prototype.discriminator (gh-14109) (gh-13898)', async function() {
+    const baseNestedDiscriminated = new Schema({
+      type: { type: Number, required: true }
+    }, { discriminatorKey: 'type' });
+
+    class BaseClass {
+      whoAmI() {
+        return 'I am baseNestedDiscriminated';
+      }
+    }
+
+    baseNestedDiscriminated.loadClass(BaseClass);
+
+    class NumberTyped extends BaseClass {
+      whoAmI() {
+        return 'I am NumberTyped';
+      }
+    }
+
+    class StringTyped extends BaseClass {
+      whoAmI() {
+        return 'I am StringTyped';
+      }
+    }
+
+    const containsNestedSchema = new Schema({
+      nestedDiscriminatedTypes: { type: [baseNestedDiscriminated], required: true }
+    });
+
+    baseNestedDiscriminated.discriminator(1, new Schema({}).loadClass(NumberTyped));
+    baseNestedDiscriminated.discriminator('3', new Schema({}).loadClass(StringTyped));
+
+    const l2Schema = new Schema({ l3: containsNestedSchema });
+    const l1Schema = new Schema({ l2: l2Schema });
+
+    const Test = db.model('Test', l1Schema);
+    const instance = await Test.create({
+      l2: {
+        l3: {
+          nestedDiscriminatedTypes: [{ type: 1 }, { type: '3' }]
+        }
+      }
+    });
+    assert.deepStrictEqual(
+      instance.l2.l3.nestedDiscriminatedTypes.map(i => i.whoAmI()),
+      ['I am NumberTyped', 'I am StringTyped']
+    );
+  });
+
+  it('handles reusing schema with embedded discriminators defined using Schema.prototype.discriminator (gh-14162)', async function() {
+    const discriminated = new Schema({
+      type: { type: Number, required: true }
+    }, { discriminatorKey: 'type' });
+
+    discriminated.discriminator(1, new Schema({ prop1: String }));
+    discriminated.discriminator(3, new Schema({ prop2: String }));
+
+    const containerSchema = new Schema({ items: [discriminated] });
+    const containerModel = db.model('Test', containerSchema);
+    const containerModel2 = db.model('Test1', containerSchema);
+    const doc1 = new containerModel({ items: [{ type: 1, prop1: 'foo' }, { type: 3, prop2: 'bar' }] });
+    const doc2 = new containerModel2({ items: [{ type: 1, prop1: 'baz' }, { type: 3, prop2: 'qux' }] });
+    await doc1.save();
+    await doc2.save();
+
+    doc1.items.push({ type: 3, prop2: 'test1' });
+    doc2.items.push({ type: 3, prop2: 'test1' });
+    await doc1.save();
+    await doc2.save();
+  });
+
+  it('handles embedded recursive discriminators on nested path defined using Schema.prototype.discriminator (gh-14245)', async function() {
+    const baseSchema = new Schema({
+      type: { type: Number, required: true }
+    }, { discriminatorKey: 'type' });
+
+    class Base {
+      whoAmI() { return 'I am Base'; }
+    }
+
+    baseSchema.loadClass(Base);
+
+    class NumberTyped extends Base {
+      whoAmI() { return 'I am NumberTyped'; }
+    }
+
+    class StringTyped extends Base {
+      whoAmI() { return 'I am StringTyped'; }
+    }
+
+    const selfRefSchema = new Schema({
+      self: { type: [baseSchema], required: true }
+    });
+
+    class SelfReferenceTyped extends Base {
+      whoAmI() { return 'I am SelfReferenceTyped'; }
+    }
+
+    selfRefSchema.loadClass(SelfReferenceTyped);
+    baseSchema.discriminator(5, selfRefSchema);
+
+    const numberTypedSchema = new Schema({}).loadClass(NumberTyped);
+    const stringTypedSchema = new Schema({}).loadClass(StringTyped);
+    baseSchema.discriminator(1, numberTypedSchema);
+    baseSchema.discriminator(3, stringTypedSchema);
+    const containerSchema = new Schema({ items: [baseSchema] });
+    const containerModel = db.model('Test', containerSchema);
+
+    const instance = await containerModel.create({
+      items: [{ type: 5, self: [{ type: 1 }, { type: 3 }] }]
+    });
+
+    assert.equal(instance.items[0].whoAmI(), 'I am SelfReferenceTyped');
+    assert.deepStrictEqual(instance.items[0].self.map(item => item.whoAmI()), [
+      'I am NumberTyped',
+      'I am StringTyped'
+    ]);
+  });
+
+  it('can use `collection` as schema name (gh-13956)', async function() {
+    const schema = new mongoose.Schema({ name: String, collection: String });
+    const Test = db.model('Test', schema);
+
+    const doc = await Test.create({ name: 'foo', collection: 'bar' });
+    assert.strictEqual(doc.collection, 'bar');
+    doc.collection = 'baz';
+    await doc.save();
+    const { collection } = await Test.findById(doc);
+    assert.strictEqual(collection, 'baz');
+  });
+  it('avoids adding nested paths to markModified() output if adding a new field (gh-14024)', async function() {
+    const eventSchema = new Schema({
+      name: { type: String },
+      __stateBeforeSuspension: {
+        field1: { type: String },
+        field2: { type: String },
+        jsonField: {
+          name: { type: String },
+          name1: { type: String }
+        }
+      }
+    });
+    const Event = db.model('Event', eventSchema);
+    const eventObj = new Event({ name: 'event object', __stateBeforeSuspension: { field1: 'test', jsonField: { name: 'test3' } } });
+    await eventObj.save();
+    const newObject = { field1: 'test', jsonField: { name: 'test3', name1: 'test4' } };
+    eventObj.set('__stateBeforeSuspension', newObject);
+    assert.deepEqual(
+      eventObj.modifiedPaths(),
+      ['__stateBeforeSuspension', '__stateBeforeSuspension.jsonField']
+    );
+  });
+
+  it('should allow null values in list in self assignment (gh-14172) (gh-13859)', async function() {
+    const objSchema = new Schema({
+      date: Date,
+      value: Number
+    });
+
+    const testSchema = new Schema({
+      intArray: [Number],
+      strArray: [String],
+      objArray: [objSchema]
+    });
+    const Test = db.model('Test', testSchema);
+
+    const doc = new Test({
+      intArray: [1, 2, 3, null],
+      strArray: ['b', null, 'c'],
+      objArray: [
+        { date: new Date(1000), value: 1 },
+        null,
+        { date: new Date(3000), value: 3 }
+      ]
+    });
+    await doc.save();
+    doc.intArray = doc.intArray;
+    doc.strArray = doc.strArray;
+    doc.objArray = doc.objArray; // this is the trigger for the error
+    assert.ok(doc);
+    await doc.save();
+    assert.ok(doc);
+  });
+
+  it('avoids overwriting dotted paths in mixed path underneath nested path (gh-14178)', async function() {
+    const testSchema = new Schema({
+      __stateBeforeSuspension: {
+        field1: String,
+        field3: { type: Schema.Types.Mixed }
+      }
+    });
+    const Test = db.model('Test', testSchema);
+    const eventObj = new Test({
+      __stateBeforeSuspension: { field1: 'test' }
+    });
+    await eventObj.save();
+    const newO = eventObj.toObject();
+    newO.__stateBeforeSuspension.field3 = { '.ippo': 5 };
+    eventObj.set(newO);
+    await eventObj.save();
+
+    assert.strictEqual(eventObj.__stateBeforeSuspension.field3['.ippo'], 5);
+
+    const fromDb = await Test.findById(eventObj._id).lean().orFail();
+    assert.strictEqual(fromDb.__stateBeforeSuspension.field3['.ippo'], 5);
+  });
+
+  it('handles setting nested path to null (gh-14205)', function() {
+    const schema = new mongoose.Schema({
+      nested: {
+        key1: String,
+        key2: String
+      }
+    });
+
+    const Model = db.model('Test', schema);
+
+    const doc = new Model();
+    doc.init({
+      nested: { key1: 'foo', key2: 'bar' }
+    });
+
+    doc.set({ nested: null });
+    assert.strictEqual(doc.toObject().nested, null);
+  });
+
+  it('handles setting nested path to undefined (gh-14205)', function() {
+    const schema = new mongoose.Schema({
+      nested: {
+        key1: String,
+        key2: String
+      }
+    });
+
+    const Model = db.model('Test', schema);
+
+    const doc = new Model();
+    doc.init({
+      nested: { key1: 'foo', key2: 'bar' }
+    });
+
+    doc.set({ nested: void 0 });
+    assert.strictEqual(doc.toObject().nested, void 0);
+  });
+
+  it('avoids depopulating populated subdocs underneath document arrays when copying to another document (gh-14418)', async function() {
+    const cartSchema = new mongoose.Schema({
+      products: [
+        {
+          product: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Product'
+          },
+          quantity: Number
+        }
+      ],
+      singleProduct: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product'
+      }
+    });
+    const purchaseSchema = new mongoose.Schema({
+      products: [
+        {
+          product: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Product'
+          },
+          quantity: Number
+        }
+      ],
+      singleProduct: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product'
+      }
+    });
+    const productSchema = new mongoose.Schema({
+      name: String
+    });
+
+    const Cart = db.model('Cart', cartSchema);
+    const Purchase = db.model('Purchase', purchaseSchema);
+    const Product = db.model('Product', productSchema);
+
+    const dbProduct = await Product.create({ name: 'Bug' });
+
+    const dbCart = await Cart.create({
+      products: [
+        {
+          product: dbProduct,
+          quantity: 2
+        }
+      ],
+      singleProduct: dbProduct
+    });
+
+    const foundCart = await Cart.findById(dbCart._id).
+      populate('products.product singleProduct');
+
+    const purchaseFromDbCart = new Purchase({
+      products: foundCart.products,
+      singleProduct: foundCart.singleProduct
+    });
+    assert.equal(purchaseFromDbCart.products[0].product.name, 'Bug');
+    assert.equal(purchaseFromDbCart.singleProduct.name, 'Bug');
+  });
+
+  it('handles virtuals that are stored as objects but getter returns string with toJSON (gh-14446)', async function() {
+    const childSchema = new mongoose.Schema();
+
+    childSchema.virtual('name')
+      .set(function(values) {
+        for (const [lang, val] of Object.entries(values)) {
+          this.set(`name.${lang}`, val);
+        }
+      })
+      .get(function() {
+        return this.$__getValue(`name.${this.lang}`);
+      });
+
+    childSchema.add({ name: { en: { type: String }, de: { type: String } } });
+
+    const ChildModel = db.model('Child', childSchema);
+    const ParentModel = db.model('Parent', new mongoose.Schema({
+      children: [childSchema]
+    }));
+
+    const child = await ChildModel.create({ name: { en: 'Stephen', de: 'Stefan' } });
+    child.lang = 'en';
+    assert.equal(child.name, 'Stephen');
+
+    const parent = await ParentModel.create({
+      children: [{ name: { en: 'Stephen', de: 'Stefan' } }]
+    });
+    parent.children[0].lang = 'de';
+    const obj = parent.toJSON({ getters: true });
+    assert.equal(obj.children[0].name, 'Stefan');
   });
 });
 

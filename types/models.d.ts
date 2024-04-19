@@ -26,13 +26,17 @@ declare module 'mongoose' {
   interface MongooseBulkWriteOptions {
     skipValidation?: boolean;
     throwOnValidationError?: boolean;
+    strict?: boolean;
+    timestamps?: boolean | 'throw';
   }
 
   interface InsertManyOptions extends
     PopulateOption,
     SessionOption {
     limit?: number;
+    // @deprecated, use includeResultMetadata instead
     rawResult?: boolean;
+    includeResultMetadata?: boolean;
     ordered?: boolean;
     lean?: boolean;
     throwOnValidationError?: boolean;
@@ -360,6 +364,34 @@ declare module 'mongoose' {
     init(): Promise<THydratedDocumentType>;
 
     /** Inserts one or more new documents as a single `insertMany` call to the MongoDB server. */
+    insertMany(
+      docs: Array<TRawDocType>
+    ): Promise<Array<THydratedDocumentType>>;
+    insertMany(
+      docs: Array<TRawDocType>,
+      options: InsertManyOptions & { lean: true; }
+    ): Promise<Array<Require_id<TRawDocType>>>;
+    insertMany(
+      doc: Array<TRawDocType>,
+      options: InsertManyOptions & { ordered: false; rawResult: true; }
+    ): Promise<mongodb.InsertManyResult<Require_id<TRawDocType>> & {
+      mongoose: {
+        validationErrors: (CastError | Error.ValidatorError)[];
+        results: Array<
+          Error |
+          Object |
+          THydratedDocumentType
+        >
+      }
+    }>;
+    insertMany(
+      docs: Array<TRawDocType>,
+      options: InsertManyOptions & { lean: true, rawResult: true; }
+    ): Promise<mongodb.InsertManyResult<Require_id<TRawDocType>>>;
+    insertMany(
+      docs: Array<TRawDocType>,
+      options: InsertManyOptions & { rawResult: true; }
+    ): Promise<mongodb.InsertManyResult<Require_id<THydratedDocumentType>>>;
     insertMany<DocContents = TRawDocType>(
       docs: Array<DocContents | TRawDocType>,
       options: InsertManyOptions & { lean: true; }
@@ -373,7 +405,7 @@ declare module 'mongoose' {
       options: InsertManyOptions & { ordered: false; rawResult: true; }
     ): Promise<mongodb.InsertManyResult<Require_id<DocContents>> & {
       mongoose: {
-        validationErrors: Error[];
+        validationErrors: (CastError | Error.ValidatorError)[];
         results: Array<
           Error |
           Object |
@@ -431,8 +463,9 @@ declare module 'mongoose' {
 
     /** Casts and validates the given object against this model's schema, passing the given `context` to custom validators. */
     validate(): Promise<void>;
-    validate(optional: any): Promise<void>;
-    validate(optional: any, pathsToValidate: PathsToValidate): Promise<void>;
+    validate(obj: any): Promise<void>;
+    validate(obj: any, pathsOrOptions: PathsToValidate): Promise<void>;
+    validate(obj: any, pathsOrOptions: { pathsToSkip?: pathsToSkip }): Promise<void>;
 
     /** Watches the underlying collection for changes using [MongoDB change streams](https://www.mongodb.com/docs/manual/changeStreams/). */
     watch<ResultType extends mongodb.Document = any, ChangeType extends mongodb.ChangeStreamDocument = any>(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions & { hydrate?: boolean }): mongodb.ChangeStream<ResultType, ChangeType>;
@@ -517,6 +550,10 @@ declare module 'mongoose' {
       'findOneAndDelete'
     >;
     findByIdAndDelete<ResultDoc = THydratedDocumentType>(
+      id: mongodb.ObjectId | any,
+      options: QueryOptions<TRawDocType> & { includeResultMetadata: true }
+    ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
+    findByIdAndDelete<ResultDoc = THydratedDocumentType>(
       id?: mongodb.ObjectId | any,
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
@@ -585,6 +622,10 @@ declare module 'mongoose' {
       TRawDocType,
       'findOneAndDelete'
     >;
+    findOneAndDelete<ResultDoc = THydratedDocumentType>(
+      filter?: FilterQuery<TRawDocType>,
+      options?: QueryOptions<TRawDocType> & { includeResultMetadata: true }
+    ): QueryWithHelpers<ModifyResult<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'findOneAndDelete'>;
     findOneAndDelete<ResultDoc = THydratedDocumentType>(
       filter?: FilterQuery<TRawDocType>,
       options?: QueryOptions<TRawDocType> | null

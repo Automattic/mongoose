@@ -9,6 +9,7 @@ import mongoose, {
   CallbackError,
   HydratedDocument,
   HydratedDocumentFromSchema,
+  InsertManyResult,
   Query,
   UpdateWriteOpResult,
   AggregateOptions,
@@ -672,9 +673,6 @@ async function gh13705() {
   const findByIdAndDeleteRes = await TestModel.findByIdAndDelete('0'.repeat(24), { lean: true });
   expectType<ExpectedLeanDoc | null>(findByIdAndDeleteRes);
 
-  const findByIdAndRemoveRes = await TestModel.findByIdAndRemove('0'.repeat(24), { lean: true });
-  expectType<ExpectedLeanDoc | null>(findByIdAndRemoveRes);
-
   const findByIdAndUpdateRes = await TestModel.findByIdAndUpdate('0'.repeat(24), {}, { lean: true });
   expectType<ExpectedLeanDoc | null>(findByIdAndUpdateRes);
 
@@ -708,4 +706,63 @@ async function gh13746() {
   expectType<boolean | undefined>(findOneAndUpdateRes.lastErrorObject?.updatedExisting);
   expectType<ObjectId | undefined>(findOneAndUpdateRes.lastErrorObject?.upserted);
   expectType<OkType>(findOneAndUpdateRes.ok);
+
+  const findOneAndDeleteRes = await TestModel.findOneAndDelete({ _id: '0'.repeat(24) }, { includeResultMetadata: true });
+  expectType<boolean | undefined>(findOneAndDeleteRes.lastErrorObject?.updatedExisting);
+  expectType<ObjectId | undefined>(findOneAndDeleteRes.lastErrorObject?.upserted);
+  expectType<OkType>(findOneAndDeleteRes.ok);
+
+  const findByIdAndDeleteRes = await TestModel.findByIdAndDelete('0'.repeat(24), { includeResultMetadata: true });
+  expectType<boolean | undefined>(findByIdAndDeleteRes.lastErrorObject?.updatedExisting);
+  expectType<ObjectId | undefined>(findByIdAndDeleteRes.lastErrorObject?.upserted);
+  expectType<OkType>(findByIdAndDeleteRes.ok);
+}
+
+function gh13904() {
+  const schema = new Schema({ name: String });
+
+  interface ITest {
+    name?: string;
+  }
+  const Test = model<ITest>('Test', schema);
+
+  expectAssignable<Promise<InsertManyResult<ITest>>>(Test.insertMany(
+    [{ name: 'test' }],
+    {
+      ordered: false,
+      rawResult: true
+    }
+  ));
+}
+
+function gh13957() {
+  class RepositoryBase<T> {
+    protected model: mongoose.Model<T>;
+
+    constructor(schemaModel: mongoose.Model<T>) {
+      this.model = schemaModel;
+    }
+
+    // Testing that the following compiles successfully
+    async insertMany(elems: T[]): Promise<T[]> {
+      elems = await this.model.insertMany(elems);
+      return elems;
+    }
+  }
+
+  interface ITest {
+    name?: string
+  }
+  const schema = new Schema({ name: String });
+  const TestModel = model('Test', schema);
+  const repository = new RepositoryBase<ITest>(TestModel);
+  expectType<Promise<ITest[]>>(repository.insertMany([{ name: 'test' }]));
+}
+
+async function gh14003() {
+  const schema = new Schema({ name: String });
+  const TestModel = model('Test', schema);
+
+  await TestModel.validate({ name: 'foo' }, ['name']);
+  await TestModel.validate({ name: 'foo' }, { pathsToSkip: ['name'] });
 }

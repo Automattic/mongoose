@@ -3,7 +3,6 @@
 const assert = require('assert');
 const applyReadConcern = require('../../lib/helpers/schema/applyReadConcern');
 const start = require('../common');
-const { readConcern } = require('mquery/lib/utils');
 const mongoose = start.mongoose;
 
 describe('applyReadConcern', function() {

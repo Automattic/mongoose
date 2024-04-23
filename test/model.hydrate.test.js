@@ -153,7 +153,9 @@ describe('model', function() {
 
       const populated = await User.findOne({ name: 'Alex' }).populate(['stories', 'storiesCount']).lean();
       const hydrated = User.hydrate(
-        JSON.parse(JSON.stringify(populated))
+        JSON.parse(JSON.stringify(populated)),
+        null,
+        { hydratedPopulatedDocs: true }
       );
 
       assert.equal(hydrated.stories[0]._id.toString(), story1._id.toString());

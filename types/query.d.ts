@@ -614,7 +614,28 @@ declare module 'mongoose' {
     polygon(...coordinatePairs: number[][]): this;
 
     /** Specifies paths which should be populated with other documents. */
-    populate<Paths = {}>(
+    populate(
+      path: string | string[],
+      select?: string | any,
+      model?: string | Model<any, THelpers>,
+      match?: any
+    ): QueryWithHelpers<
+      ResultType,
+      DocType,
+      THelpers,
+      RawDocType,
+      QueryOp
+    >;
+    populate(
+      options: PopulateOptions | (PopulateOptions | string)[]
+    ): QueryWithHelpers<
+      ResultType,
+      DocType,
+      THelpers,
+      RawDocType,
+      QueryOp
+    >;
+    populate<Paths>(
       path: string | string[],
       select?: string | any,
       model?: string | Model<any, THelpers>,
@@ -626,7 +647,7 @@ declare module 'mongoose' {
       UnpackedIntersection<RawDocType, Paths>,
       QueryOp
     >;
-    populate<Paths = {}>(
+    populate<Paths>(
       options: PopulateOptions | (PopulateOptions | string)[]
     ): QueryWithHelpers<
       MergePopulatePaths<RawDocType, ResultType, QueryOp, Paths, THelpers>,

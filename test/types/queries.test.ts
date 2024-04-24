@@ -612,3 +612,27 @@ function gh14473() {
     const query2: FilterQuery<D> = { deletedAt: { $lt: new Date() } };
   };
 }
+
+async function gh14525() {
+  type BeAnObject = Record<string, any>;
+
+  interface SomeDoc {
+    something: string;
+    func(this: TestDoc): string;
+  }
+
+  interface PluginExtras {
+    pfunc(): number;
+  }
+
+  type TestDoc = Document<unknown, BeAnObject, SomeDoc> & PluginExtras;
+
+  type ModelType = Model<SomeDoc, BeAnObject, PluginExtras, BeAnObject>;
+
+  const doc = await ({} as ModelType).findOne({}).populate('test').orFail().exec();
+
+  doc.func();
+
+  let doc2 = await ({} as ModelType).create({});
+  doc2 = await ({} as ModelType).findOne({}).populate('test').orFail().exec();
+}

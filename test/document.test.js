@@ -13068,12 +13068,12 @@ describe('document', function() {
       jsonField: JsonFieldSchema
     });
 
-    const blogPostSchema = new Schema({
+    const BlogPostSchema = new Schema({
       comment: CommentSchema
     });
 
     const Comments = db.model('Comments', CommentSchema);
-    const BlogPost = db.model('BlogPost', blogPostSchema);
+    const BlogPost = db.model('BlogPost', BlogPostSchema);
 
     const comment1 = new Comments({});
     comment1.init({

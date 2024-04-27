@@ -12,7 +12,6 @@ import {
   FilterQuery,
   UpdateQuery,
   UpdateQueryKnownOnly,
-  ApplyBasicQueryCasting,
   QuerySelector,
   InferSchemaType,
   ProjectionFields,
@@ -325,7 +324,7 @@ function gh11964() {
 }
 
 function gh14397() {
-  type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>; // redefined here because it's not exported by mongoose
+  type Condition<T> = T | QuerySelector<T>; // redefined here because it's not exported by mongoose
 
   type WithId<T extends object> = T & { id: string };
 
@@ -591,4 +590,49 @@ function mongooseQueryOptions() {
     lean: true,
     populate: 'test'
   });
+}
+
+function gh14473() {
+  class AbstractSchema {
+    _id: any;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date;
+
+    constructor() {
+      this._id = 4;
+      this.createdAt = new Date();
+      this.updatedAt = new Date();
+      this.deletedAt = new Date();
+    }
+  }
+
+  const generateExists = <D extends AbstractSchema = AbstractSchema>() => {
+    const query: FilterQuery<D> = { deletedAt: { $ne: null } };
+    const query2: FilterQuery<D> = { deletedAt: { $lt: new Date() } };
+  };
+}
+
+async function gh14525() {
+  type BeAnObject = Record<string, any>;
+
+  interface SomeDoc {
+    something: string;
+    func(this: TestDoc): string;
+  }
+
+  interface PluginExtras {
+    pfunc(): number;
+  }
+
+  type TestDoc = Document<unknown, BeAnObject, SomeDoc> & PluginExtras;
+
+  type ModelType = Model<SomeDoc, BeAnObject, PluginExtras, BeAnObject>;
+
+  const doc = await ({} as ModelType).findOne({}).populate('test').orFail().exec();
+
+  doc.func();
+
+  let doc2 = await ({} as ModelType).create({});
+  doc2 = await ({} as ModelType).findOne({}).populate('test').orFail().exec();
 }

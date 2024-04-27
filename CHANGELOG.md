@@ -1,3 +1,23 @@
+8.3.2 / 2024-04-16
+==================
+ * fix(populate): avoid match function filtering out null values in populate result #14518 #14494
+ * types(query): make FilterQuery props resolve to any for generics support #14510 #14473 #14459
+ * types(DocumentArray): pass DocType generic to Document for correct toJSON() and toObject() return types #14526 #14469
+ * types(models): fix incorrect bulk write options #14513 [emiljanitzek](https://github.com/emiljanitzek)
+ * docs: add documentation for calling schema.post() with async function #14514 #14305
+
+7.6.11 / 2024-04-11
+===================
+ * fix(populate): avoid match function filtering out null values in populate result #14518
+ * fix(schema): support setting discriminator options in Schema.prototype.discriminator() #14493 #14448
+ * fix(schema): deduplicate idGetter so creating multiple models with same schema doesn't result in multiple id getters #14492 #14457
+
+6.12.8 / 2024-04-10
+===================
+ * fix(document): handle virtuals that are stored as objects but getter returns string with toJSON #14468 #14446
+ * fix(schematype): consistently set wasPopulated to object with `value` property rather than boolean #14418
+ * docs(model): add extra note about lean option for insertMany() skipping casting #14415 #14376
+
 8.3.1 / 2024-04-08
 ==================
  * fix(document): make update minimization unset property rather than setting to null #14504 #14445
@@ -68,7 +88,6 @@
  * docs(connections): add note about using asPromise() with createConnection() for error handling #14364 #14266
  * docs(model+query+findoneandupdate): add more details about overwriteDiscriminatorKey option to docs #14264 #14246
 
-<<<<<<< HEAD
 8.2.0 / 2024-02-22
 ==================
  * feat(model): add recompileSchema() function to models to allow applying schema changes after compiling #14306 #14296
@@ -102,6 +121,11 @@
  * types(query): add back context and setDefaultsOnInsert as Mongoose-specific query options #14284 #14282
  * types(query): add missing runValidators back to MongooseQueryOptions #14278 #14275
 
+6.12.6 / 2024-01-22
+===================
+ * fix(collection): correctly handle buffer timeouts with find() #14277
+ * fix(document): allow calling push() with different $position arguments #14254
+
 8.1.0 / 2024-01-16
 ==================
  * feat: upgrade MongoDB driver -> 6.3.0 #14241 #14189 #14108 #14104
@@ -126,12 +150,6 @@
  * docs: update TLS/SSL guide for Mongoose v8 - MongoDB v6 driver deprecations #14170 [andylwelch](https://github.com/andylwelch)
  * docs: update findOneAndUpdate tutorial to use includeResultMetadata #14208 #14207
  * docs: clarify disabling _id on subdocs #14195 #14194
-=======
-6.12.6 / 2024-01-22
-===================
- * fix(collection): correctly handle buffer timeouts with find() #14277
- * fix(document): allow calling push() with different $position arguments #14254
->>>>>>> 7.x
 
 7.6.8 / 2024-01-08
 ==================
@@ -432,6 +450,7 @@
  * perf: speed up mapOfSubdocs benchmark by 4x by avoiding unnecessary O(n^2) loop in getPathsToValidate() #13614
 
 7.3.4 / 2023-07-12
+==================
  * chore: release 7.4.4 to overwrite accidental publish of 5.13.20 to latest tag
 
 6.11.3 / 2023-07-11

@@ -13055,6 +13055,64 @@ describe('document', function() {
     const obj = parent.toJSON({ getters: true });
     assert.equal(obj.children[0].name, 'Stefan');
   });
+
+  it('isDirectModified on paths underneath direct modified subdoc (gh-14502)', async function() {
+    const JsonFieldSchema = new Schema({
+      fieldA: String,
+      fieldB: String
+    });
+
+    const CommentSchema = new Schema({
+      title: String,
+      body: String,
+      jsonField: JsonFieldSchema
+    });
+
+    const BlogPostSchema = new Schema({
+      comment: CommentSchema
+    });
+
+    const Comments = db.model('Comments', CommentSchema);
+    const BlogPost = db.model('BlogPost', BlogPostSchema);
+
+    const comment1 = new Comments({});
+    comment1.init({
+      title: 'Test',
+      body: 'Test',
+      jsonField: {
+        fieldA: 'field A',
+        fieldB: 'field B'
+      }
+    });
+
+    const update = {
+      title: 'New test',
+      jsonField: {
+        fieldA: 'new Field A'
+      }
+    };
+    Object.assign(comment1, { ...update });
+
+    assert.ok(comment1.isDirectModified('jsonField.fieldA'));
+    assert.ok(comment1.jsonField.isDirectModified('fieldA'));
+
+    const blogPost = new BlogPost({});
+    blogPost.init({
+      comment: {
+        title: 'Test',
+        body: 'Test',
+        jsonField: {
+          fieldA: 'field A',
+          fieldB: 'field B'
+        }
+      }
+    });
+
+    Object.assign(blogPost.comment, { ...update });
+
+    assert.ok(blogPost.isDirectModified('comment.jsonField.fieldA'));
+    assert.ok(blogPost.comment.jsonField.isDirectModified('fieldA'));
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

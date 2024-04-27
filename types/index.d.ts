@@ -217,18 +217,18 @@ declare module 'mongoose' {
     TStaticMethods> = (schema: Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>, opts?: any) => void;
 
   export class Schema<
-    EnforcedDocType = any,
-    TModelType = Model<EnforcedDocType, any, any, any>,
+    RawDocType = any,
+    TModelType = Model<RawDocType, any, any, any>,
     TInstanceMethods = {},
     TQueryHelpers = {},
     TVirtuals = {},
     TStaticMethods = {},
     TSchemaOptions = DefaultSchemaOptions,
     DocType extends ApplySchemaOptions<
-      ObtainDocumentType<DocType, EnforcedDocType, ResolveSchemaOptions<TSchemaOptions>>,
+      ObtainDocumentType<DocType, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
       ResolveSchemaOptions<TSchemaOptions>
     > = ApplySchemaOptions<
-      ObtainDocumentType<any, EnforcedDocType, ResolveSchemaOptions<TSchemaOptions>>,
+      ObtainDocumentType<any, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
       ResolveSchemaOptions<TSchemaOptions>
     >,
     THydratedDocumentType = HydratedDocument<FlatRecord<DocType>, TVirtuals & TInstanceMethods>
@@ -237,10 +237,10 @@ declare module 'mongoose' {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>, EnforcedDocType> | DocType, options?: SchemaOptions<FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
+    constructor(definition?: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType> | DocType, options?: SchemaOptions<FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
 
     /** Adds key path / schema type pairs to this schema. */
-    add(obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | Schema, prefix?: string): this;
+    add(obj: SchemaDefinition<SchemaDefinitionType<RawDocType>> | Schema, prefix?: string): this;
 
     /**
      * Add an alias for `path`. This means getting or setting the `alias`
@@ -308,14 +308,14 @@ declare module 'mongoose' {
     methods: AddThisParameter<TInstanceMethods, THydratedDocumentType> & AnyObject;
 
     /** The original object passed to the schema constructor */
-    obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>, EnforcedDocType>;
+    obj: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType>;
 
     /** Returns a new schema that has the `paths` from the original schema, minus the omitted ones. */
     omit<T = this>(paths: string[], options?: SchemaOptions): T;
 
     /** Gets/sets schema paths. */
     path<ResultType extends SchemaType = SchemaType<any, THydratedDocumentType>>(path: string): ResultType;
-    path<pathGeneric extends keyof EnforcedDocType>(path: pathGeneric): SchemaType<EnforcedDocType[pathGeneric]>;
+    path<pathGeneric extends keyof RawDocType>(path: pathGeneric): SchemaType<RawDocType[pathGeneric]>;
     path(path: string, constructor: any): this;
 
     /** Lists all paths and their type in the schema. */

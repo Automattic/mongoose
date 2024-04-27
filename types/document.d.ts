@@ -16,7 +16,7 @@ declare module 'mongoose' {
    * *  TQueryHelpers - Object with any helpers that should be mixed into the Query type
    * *  DocType - the type of the actual Document created
    */
-  class Document<T = any, TQueryHelpers = any, DocType = any> {
+  class Document<T = unknown, TQueryHelpers = any, DocType = any> {
     constructor(doc?: any);
 
     /** This documents _id. */

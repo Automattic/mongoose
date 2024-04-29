@@ -7463,6 +7463,23 @@ describe('Model', function() {
     assert.equal(instance.item.whoAmI(), 'I am Test2');
   });
 
+  it('overwrites existing discriminators when calling recompileSchema (gh-14527) (gh-14444)', async function() {
+    const shopItemSchema = new mongoose.Schema({}, { discriminatorKey: 'type' });
+    const shopSchema = new mongoose.Schema({
+      items: { type: [shopItemSchema], required: true }
+    });
+
+    const shopItemSubType = new mongoose.Schema({ prop: Number });
+    shopItemSchema.discriminator(2, shopItemSubType);
+    const shopModel = db.model('shop', shopSchema);
+
+    shopModel.recompileSchema();
+    const doc = new shopModel({
+      items: [{ type: 2, prop: 42 }]
+    });
+    assert.equal(doc.items[0].prop, 42);
+  });
+
   it('inserts versionKey even if schema has `toObject.versionKey` set to false (gh-14344)', async function() {
     const schema = new mongoose.Schema(
       { name: String },

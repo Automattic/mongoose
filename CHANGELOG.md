@@ -1,3 +1,13 @@
+8.3.3 / 2024-04-29
+==================
+ * perf(document): add fast path for applying non-nested virtuals to JSON #14543
+ * fix: make hydrate() recursively hydrate virtual populate docs if hydratedPopulatedDocs is set #14533 #14503
+ * fix: improve timestamps option handling in bulkWrite #14546 #14536 [sderrow](https://github.com/sderrow)
+ * fix(model): make recompileSchema() overwrite existing document array discriminators #14527
+ * types(schema): correctly infer Array<Schema.Types.*> #14534 #14367
+ * types(query+populate): apply populate overrides to doc toObject() result #14525 #14441
+ * types: add null to select override return type for findOne #14545 [sderrow](https://github.com/sderrow)
+
 8.3.2 / 2024-04-16
 ==================
  * fix(populate): avoid match function filtering out null values in populate result #14518 #14494

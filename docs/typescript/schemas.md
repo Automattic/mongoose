@@ -72,6 +72,7 @@ The Mongoose `Schema` class in TypeScript has 9 [generic parameters](https://www
   * default: `{}`
 * `TQueryHelpers` - An interface containing query helpers defined on the schema. Defaults to `{}`.
 * `TVirtuals` - An interface containing virtuals defined on the schema. Defaults to `{}`
+* `TStaticMethods` - An interface containing methods on a model. Defaults to `{}`
 * `TSchemaOptions` - The type passed as the 2nd option to `Schema()` constructor. Defaults to `DefaultSchemaOptions`.
 * `DocType` - The inferred document type from the schema.
 * `THydratedDocumentType` - The hydrated document type. This is the default return type for `await Model.findOne()`, `Model.hydrate()`, etc.

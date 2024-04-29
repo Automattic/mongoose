@@ -63,7 +63,7 @@ For example, the above code won't throw an error if `email` is optional in the d
 
 ## Generic parameters
 
-The Mongoose `Schema` class in TypeScript has 4 [generic parameters](https://www.typescriptlang.org/docs/handbook/2/generics.html):
+The Mongoose `Schema` class in TypeScript has 9 [generic parameters](https://www.typescriptlang.org/docs/handbook/2/generics.html):
 
 * `RawDocType` - An interface describing how the data is saved in MongoDB
 * `M` - The Mongoose model type. Can be omitted if there are no query helpers or instance methods to be defined.

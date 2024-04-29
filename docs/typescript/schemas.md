@@ -81,7 +81,18 @@ The Mongoose `Schema` class in TypeScript has 9 [generic parameters](https://www
   <summary>View TypeScript definition</summary>
 
   ```typescript
-  class Schema<RawDocType = any, M = Model<DocType, any, any>, TInstanceMethods = {}, TQueryHelpers = {}> extends events.EventEmitter {
+  export class Schema<
+    RawDocType = any,
+    TModelType = Model<RawDocType, any, any, any>,
+    TInstanceMethods = {},
+    TQueryHelpers = {},
+    TVirtuals = {},
+    TStaticMethods = {},
+    TSchemaOptions = DefaultSchemaOptions,
+    DocType = ...,
+    THydratedDocumentType = HydratedDocument<FlatRecord<DocType>, TVirtuals & TInstanceMethods>
+  >
+    extends events.EventEmitter {
     // ...
   }
   ```

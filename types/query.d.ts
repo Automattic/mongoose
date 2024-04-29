@@ -697,14 +697,13 @@ declare module 'mongoose' {
         RawDocTypeOverride,
         {},
         ResultType,
-        ResultType extends any[] ?
-          ResultType extends HydratedDocument<any>[] ?
-            HydratedDocument<RawDocTypeOverride>[] :
-            RawDocTypeOverride[] :
-              | (ResultType extends HydratedDocument<any>
-                ? HydratedDocument<RawDocTypeOverride>
-                : RawDocTypeOverride)
-              | (null extends ResultType ? null : never)
+        ResultType extends any[]
+          ? ResultType extends HydratedDocument<any>[]
+            ? HydratedDocument<RawDocTypeOverride>[]
+            : RawDocTypeOverride[]
+          : (ResultType extends HydratedDocument<any>
+            ? HydratedDocument<RawDocTypeOverride>
+            : RawDocTypeOverride) | (null extends ResultType ? null : never)
       >,
       DocType,
       THelpers,

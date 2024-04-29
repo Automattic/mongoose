@@ -636,3 +636,38 @@ async function gh14525() {
   let doc2 = await ({} as ModelType).create({});
   doc2 = await ({} as ModelType).findOne({}).populate('test').orFail().exec();
 }
+
+async function gh14545() {
+  type Test = {
+    _id: Types.ObjectId;
+
+    prop: string;
+    another: string;
+
+    createdAt: number;
+    updatedAt: number;
+  };
+
+  const schema = new Schema<Test>({
+    prop: { type: String },
+    another: { type: String },
+    createdAt: { type: Number },
+    updatedAt: { type: Number }
+  });
+
+  type TestDocument = HydratedDocument<Test>;
+  type TestModel = Model<Test, {}, {}, {}, TestDocument>;
+
+  type SlimTest = Pick<Test, '_id' | 'prop'>;
+  type SlimTestDocument = HydratedDocument<SlimTest>;
+
+  const M = model<Test, TestModel>('Test', schema);
+
+  const myDocs = await M.find({}).exec();
+  const myDoc = await M.findOne({}).exec();
+
+  const myProjections = await M.find({}).select<SlimTest>({ prop: 1 }).exec();
+  expectType<SlimTestDocument[]>(myProjections);
+  const myProjection = await M.findOne({}).select<SlimTest>({ prop: 1 }).exec();
+  expectType<SlimTestDocument | null>(myProjection);
+}

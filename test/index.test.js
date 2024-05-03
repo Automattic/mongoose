@@ -839,6 +839,23 @@ describe('mongoose module:', function() {
     assert(entry);
     await mongoose.disconnect();
   });
+  it('`translateAliases` option (gh-14521)', async function() {
+    const mongoose = new Mongoose();
+    mongoose.set('translateAliases', true);
+    const db = await mongoose.connect(start.uri);
+    db.set('translateAliases', true);
+    const schema = new mongoose.Schema({ B: { alias: 'boo', required: true, unique: false, type: String }, F: { alias: 'foo', required: true, unique: false, type: String} });
+    const Movie = db.model('Movie', schema, 'Movie', {
+      overwriteModels: true
+    });
+    const findResult = await Movie.find({
+      boo: 'boo'
+    });
+    assert(findResult);
+    const updateResult = await Movie.updateOne({ boo: 'boo' }, { foo: 'foo' }, { upsert: true });
+    assert(updateResult);
+    await mongoose.disconnect();
+  })
 
   describe('exports', function() {
     function test(mongoose) {

@@ -457,30 +457,10 @@ module.exports = userSchema;
 // module.exports = mongoose.model('User', userSchema);
 ```
 
-If you use the export schema pattern, you still need to create models
-somewhere. There are two common patterns. First is to export a connection
-and register the models on the connection in the file:
-
-```javascript
-// connections/fast.js
-const mongoose = require('mongoose');
-
-const conn = mongoose.createConnection(process.env.MONGODB_URI);
-conn.model('User', require('../schemas/user'));
-
-module.exports = conn;
-
-// connections/slow.js
-const mongoose = require('mongoose');
-
-const conn = mongoose.createConnection(process.env.MONGODB_URI);
-conn.model('User', require('../schemas/user'));
-conn.model('PageView', require('../schemas/pageView'));
-
-module.exports = conn;
-```
-
-Another alternative is to register connections with a dependency injector
+If you use the export schema pattern, you still need to create models somewhere.
+There are two common patterns.
+The first is to create a function that instantiates a new connection and registers all models on that connection.
+With this pattern, you may also register connections with a dependency injector
 or another [inversion of control (IOC) pattern](https://thecodebarbarian.com/using-ramda-as-a-dependency-injector).
 
 ```javascript
@@ -495,6 +475,23 @@ module.exports = function connectionFactory() {
   return conn;
 };
 ```
+
+Exporting a function that creates a new connection is the most flexible pattern.
+However, that pattern can make it tricky to get access to your connection from your route handlers or wherever your business logic is.
+An alternative pattern is to export a connection and register the models on the connection in the file's top-level scope as follows.
+
+```javascript
+// connections/index.js
+const mongoose = require('mongoose');
+
+const conn = mongoose.createConnection(process.env.MONGODB_URI);
+conn.model('User', require('../schemas/user'));
+
+module.exports = conn;
+```
+
+You can create separate files for each connection, like `connections/web.js` and `connections/mobile.js` if you want to create separate connections for your web API backend and your mobile API backend.
+Your business logic can then `require()` or `import` the connection it needs.
 
 <h2 id="connection_pools"><a href="#connection_pools">Connection Pools</a></h2>
 

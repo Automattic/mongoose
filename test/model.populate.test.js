@@ -2976,33 +2976,27 @@ describe('model: populate:', function() {
           return ret;
         }
       });
-
       const Team = db.model('Test', teamSchema);
 
       const userSchema = new Schema({
         username: String
       });
-
       userSchema.set('toJSON', {
         transform: function(doc, ret) {
           return ret;
         }
       });
-
       const User = db.model('User', userSchema);
 
       const user = new User({ username: 'Test' });
-
       await user.save();
 
       const team = new Team({ members: [{ user: user }] });
-
       await team.save();
-
       await team.populate('members.user');
 
+      assert.equal(calls, 0);
       team.toJSON();
-
       assert.equal(calls, 1);
     });
 

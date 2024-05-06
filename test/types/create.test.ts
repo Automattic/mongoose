@@ -40,6 +40,15 @@ Test.create([{ name: 'test' }], { validateBeforeSave: true }).then(docs => {
   expectType<string>(docs[0].name);
 });
 
+Test.create({}).then(doc => {
+  expectType<string>(doc.name);
+});
+
+Test.create([{}]).then(docs => {
+  expectType<string>(docs[0].name);
+});
+
+expectError(Test.create<ITest>({}));
 
 Test.insertMany({ name: 'test' }, {}, (err, docs) => {
   expectType<CallbackError>(err);

@@ -28,6 +28,8 @@ declare module 'mongoose' {
     skipValidation?: boolean;
     throwOnValidationError?: boolean;
     strict?: boolean | 'throw';
+    /** When false, do not add timestamps to documents. Can be overridden at the operation level. */
+    timestamps?: boolean;
   }
 
   interface MongooseBulkSaveOptions extends mongodb.BulkWriteOptions {
@@ -179,7 +181,9 @@ declare module 'mongoose' {
   };
 
   export interface InsertOneModel<TSchema> {
-    document: mongodb.OptionalId<TSchema>
+    document: mongodb.OptionalId<TSchema>;
+    /** When false, do not add timestamps. When true, overrides the `timestamps` option set in the `bulkWrite` options. */
+    timestamps?: boolean;
   }
 
   export interface ReplaceOneModel<TSchema = AnyObject> {
@@ -193,6 +197,8 @@ declare module 'mongoose' {
     hint?: mongodb.Hint;
     /** When true, creates a new document if no document matches the query. */
     upsert?: boolean;
+    /** When false, do not add timestamps. When true, overrides the `timestamps` option set in the `bulkWrite` options. */
+    timestamps?: boolean;
   }
 
   export interface UpdateOneModel<TSchema = AnyObject> {
@@ -208,7 +214,7 @@ declare module 'mongoose' {
     hint?: mongodb.Hint;
     /** When true, creates a new document if no document matches the query. */
     upsert?: boolean;
-    /** When false, do not add timestamps. */
+    /** When false, do not add timestamps. When true, overrides the `timestamps` option set in the `bulkWrite` options. */
     timestamps?: boolean;
   }
 
@@ -225,7 +231,7 @@ declare module 'mongoose' {
     hint?: mongodb.Hint;
     /** When true, creates a new document if no document matches the query. */
     upsert?: boolean;
-    /** When false, do not add timestamps. */
+    /** When false, do not add timestamps. When true, overrides the `timestamps` option set in the `bulkWrite` options. */
     timestamps?: boolean;
   }
 

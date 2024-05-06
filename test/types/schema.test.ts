@@ -1424,3 +1424,21 @@ function gh14496() {
     }
   });
 }
+
+function gh14367() {
+  const UserSchema = new Schema({
+    counts: [Schema.Types.Number],
+    roles: [Schema.Types.String],
+    dates: [Schema.Types.Date],
+    flags: [Schema.Types.Boolean]
+  });
+
+  type IUser = InferSchemaType<typeof UserSchema>;
+
+  const x: IUser = {
+    counts: [12],
+    roles: ['test'],
+    dates: [new Date('2016-06-01')],
+    flags: [true]
+  };
+}

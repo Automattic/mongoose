@@ -735,7 +735,7 @@ describe('document', function() {
         return this.content.toUpperCase();
       });
       postSchema.set('toObject', { virtuals: true });
-      
+
       const User = db.model('User', userSchema);
       const Post = db.model('BlogPost', postSchema);
 

@@ -3718,6 +3718,28 @@ describe('Query', function() {
     }, /Provided object has both field "n" and its alias "name"/);
   });
 
+  it('translateAliases applies before casting (gh-14521) (gh-7511)', async function() {
+    const testSchema = new Schema({
+      name: {
+        type: String,
+        alias: 'n'
+      },
+      age: {
+        type: Number
+      }
+    });
+    const Test = db.model('Test', testSchema);
+
+    const doc = await Test.findOneAndUpdate(
+      { n: 14521 },
+      { age: 7511 },
+      { translateAliases: true, upsert: true, returnDocument: 'after' }
+    );
+
+    assert.strictEqual(doc.name, '14521');
+    assert.strictEqual(doc.age, 7511);
+  });
+
   it('schema level translateAliases option (gh-7511)', async function() {
     const testSchema = new Schema({
       name: {

@@ -1,3 +1,11 @@
+8.3.4 / 2024-05-06
+==================
+ * perf(document): avoid cloning options using spread operator for perf reasons #14565 #14394
+ * fix(query): apply translateAliases before casting to avoid strictMode error when using aliases #14562 #14521
+ * fix(model): consistent top-level timestamps option for bulkWrite operations
+#14546 #14536
+ * docs(connections): improve description of connection creation patterns #14564 #14528
+
 8.3.3 / 2024-04-29
 ==================
  * perf(document): add fast path for applying non-nested virtuals to JSON #14543

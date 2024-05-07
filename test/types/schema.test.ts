@@ -1,4 +1,6 @@
 import {
+  DefaultSchemaOptions,
+  HydratedSingleSubdocument,
   Schema,
   Document,
   HydratedDocument,
@@ -1441,4 +1443,54 @@ function gh14367() {
     dates: [new Date('2016-06-01')],
     flags: [true]
   };
+}
+
+function gh14573() {
+  interface Names {
+    _id: Types.ObjectId;
+    firstName: string;
+  }
+
+  // Document definition
+  interface User {
+    names: Names;
+  }
+
+  // Define property overrides for hydrated documents
+  type THydratedUserDocument = {
+    names?: HydratedSingleSubdocument<Names>;
+  };
+
+  type UserMethods = {
+    getName(): Names | undefined;
+  };
+
+  type UserModelType = Model<User, {}, UserMethods, {}, THydratedUserDocument>;
+
+  const userSchema = new Schema<
+    User,
+    UserModelType,
+    UserMethods,
+    {},
+    {},
+    {},
+    DefaultSchemaOptions,
+    User,
+    THydratedUserDocument
+  >(
+    {
+      names: new Schema<Names>({ firstName: String })
+    },
+    {
+      methods: {
+        getName() {
+          const str: string | undefined = this.names?.firstName;
+          return this.names?.toObject();
+        }
+      }
+    }
+  );
+  const UserModel = model<User, UserModelType>('User', userSchema);
+  const doc = new UserModel({ names: { _id: '0'.repeat(24), firstName: 'foo' } });
+  doc.names?.ownerDocument();
 }

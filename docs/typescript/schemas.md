@@ -220,5 +220,5 @@ async function run() {
 
 Use `HydratedArraySubdocument<RawDocType>` for the type of array subdocuments, and `HydratedSingleSubdocument<RawDocType>` for single subdocuments.
 
-If you are not using [schema methods](../guide.html#methods) or [virtuals](../tutorials/virtuals.html), you can omit the last 7 generic parameters to `Schema()` and just define your schema using  `new mongoose.Schema<IOrder, OrderModelType>(...)`.
+If you are not using [schema methods](../guide.html#methods), middleware, or [virtuals](../tutorials/virtuals.html), you can omit the last 7 generic parameters to `Schema()` and just define your schema using  `new mongoose.Schema<IOrder, OrderModelType>(...)`.
 The THydratedDocumentType parameter for schemas is primarily for setting the value of `this` on methods and virtuals.

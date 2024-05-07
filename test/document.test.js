@@ -722,32 +722,27 @@ describe('document', function() {
         lastName: String,
         password: String
       });
-
       userSchema.virtual('fullName').get(function() {
         return this.firstName + ' ' + this.lastName;
       });
-
       userSchema.set('toObject', { virtuals: false });
 
       const postSchema = new Schema({
         owner: { type: Schema.Types.ObjectId, ref: 'User' },
         content: String
       });
-
       postSchema.virtual('capContent').get(function() {
         return this.content.toUpperCase();
       });
-
       postSchema.set('toObject', { virtuals: true });
+
       const User = db.model('User', userSchema);
       const Post = db.model('BlogPost', postSchema);
 
       const user = new User({ firstName: 'Joe', lastName: 'Smith', password: 'password' });
-
       const savedUser = await user.save();
 
       const post = await Post.create({ owner: savedUser._id, content: 'lorem ipsum' });
-
       const newPost = await Post.findById(post._id).populate('owner').exec();
 
       const obj = newPost.toObject();

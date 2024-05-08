@@ -120,6 +120,10 @@ declare module 'mongoose' {
      * to all queries derived from a model.
      */
     read?: string;
+    /**
+     * Set a default readConcern for all queries at the schema level
+     */
+    readConcern?: { level: 'local' | 'available' | 'majority' | 'snapshot' | 'linearizable' }
     /** Allows setting write concern at the schema level. */
     writeConcern?: WriteConcern;
     /** defaults to true. */

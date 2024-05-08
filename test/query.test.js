@@ -4255,4 +4255,22 @@ describe('Query', function() {
     q.sort({}, { override: true });
     assert.deepStrictEqual(q.getOptions().sort, {});
   });
+
+  it('avoids mutating user-provided query selectors (gh-14567)', async function() {
+    const TestModel = db.model(
+      'Test',
+      Schema({ name: String, age: Number, active: Boolean })
+    );
+
+    await TestModel.create({ name: 'John', age: 21 });
+    await TestModel.create({ name: 'Bob', age: 35 });
+
+    const adultQuery = { age: { $gte: 18 } };
+
+    const docs = await TestModel.find(adultQuery).where('age').lte(25);
+    assert.equal(docs.length, 1);
+    assert.equal(docs[0].name, 'John');
+
+    assert.deepStrictEqual(adultQuery, { age: { $gte: 18 } });
+  });
 });

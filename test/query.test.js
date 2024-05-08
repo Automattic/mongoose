@@ -4054,6 +4054,25 @@ describe('Query', function() {
     });
   });
 
+  it('shallow clones $and, $or if merging with empty filter (gh-14567) (gh-12944)', function() {
+    const TestModel = db.model(
+      'Test',
+      Schema({ name: String, age: Number, active: Boolean })
+    );
+
+    let originalQuery = { $and: [{ active: true }] };
+    let q = TestModel.countDocuments(originalQuery)
+      .and([{ age: { $gte: 18 } }]);
+    assert.deepStrictEqual(originalQuery, { $and: [{ active: true }] });
+    assert.deepStrictEqual(q.getFilter(), { $and: [{ active: true }, { age: { $gte: 18 } }] });
+
+    originalQuery = { $or: [{ active: true }] };
+    q = TestModel.countDocuments(originalQuery)
+      .or([{ age: { $gte: 18 } }]);
+    assert.deepStrictEqual(originalQuery, { $or: [{ active: true }] });
+    assert.deepStrictEqual(q.getFilter(), { $or: [{ active: true }, { age: { $gte: 18 } }] });
+  });
+
   it('should avoid sending empty session to MongoDB server (gh-13052)', async function() {
     const m = new mongoose.Mongoose();
 

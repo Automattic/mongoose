@@ -50,6 +50,9 @@ Test.create([{}]).then(docs => {
 
 expectError(Test.create<ITest>({}));
 
+Test.create<ITest>({ name: 'test' });
+Test.create<ITest>({ _id: new Types.ObjectId('0'.repeat(24)), name: 'test' });
+
 Test.insertMany({ name: 'test' }, {}, (err, docs) => {
   expectType<CallbackError>(err);
   expectType<Types.ObjectId>(docs[0]._id);

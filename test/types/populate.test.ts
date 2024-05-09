@@ -419,3 +419,44 @@ function gh14441() {
       expectType<string>(docObject.child.name);
     });
 }
+
+async function gh14574() {
+  // Document definition
+  interface User {
+    firstName: string;
+    lastName: string;
+    friend?: Types.ObjectId;
+  }
+
+  interface UserMethods {
+    fullName(): string;
+  }
+
+  type UserModelType = mongoose.Model<User, {}, UserMethods>;
+
+  const userSchema = new Schema<User, UserModelType, UserMethods>(
+    {
+      firstName: String,
+      lastName: String,
+      friend: { type: Schema.Types.ObjectId, ref: 'User' }
+    },
+    {
+      methods: {
+        fullName() {
+          return `${this.firstName} ${this.lastName}`;
+        }
+      }
+    }
+  );
+  const userModel = model<User, UserModelType>('User', userSchema);
+
+  const UserModel = () => userModel;
+
+  const user = await UserModel()
+    .findOne({ firstName: 'b' })
+    .populate<{ friend: HydratedDocument<User, UserMethods> }>('friend')
+    .orFail()
+    .exec();
+  expectType<string>(user.fullName());
+  expectType<string>(user.friend.fullName());
+}

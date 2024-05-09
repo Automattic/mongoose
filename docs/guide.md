@@ -559,6 +559,7 @@ Valid options:
 * [methods](#methods)
 * [query](#query-helpers)
 * [autoSearchIndex](#autoSearchIndex)
+* [readConcern](#readConcern)
 
 <h2 id="autoIndex"><a href="#autoIndex">option: autoIndex</a></h2>
 
@@ -1471,6 +1472,24 @@ schema.searchIndex({
 });
 // Will automatically attempt to create the `my-index` search index.
 const Test = mongoose.model('Test', schema);
+```
+
+<h2 id="readConcern">
+  <a href="#readConcern">
+    option: readConcern
+  </a>
+</h2>
+
+[Read concerns](https://www.mongodb.com/docs/manual/reference/read-concern/) are similar to [`writeConcern`](#writeConcern), but for read operations like `find()` and `findOne()`.
+To set a default `readConcern`, pass the `readConcern` option to the schema constructor as follows.
+
+```javascript
+const eventSchema = new mongoose.Schema(
+  { name: String },
+  {
+    readConcern: { level: 'available' } // <-- set default readConcern for all queries
+  }
+);
 ```
 
 <h2 id="es6-classes"><a href="#es6-classes">With ES6 Classes</a></h2>

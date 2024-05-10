@@ -351,6 +351,50 @@ describe('transactions', function() {
     await session.endSession();
   });
 
+  describe('transactionAsyncLocalStorage option', function() {
+    let m;
+    before(async function() {
+      m = new mongoose.Mongoose();
+      m.set('transactionAsyncLocalStorage', true);
+
+      await m.connect(start.uri);
+    });
+
+    after(async function() {
+      await m.disconnect();
+    });
+
+    it('transaction() sets `session` by default if transactionAsyncLocalStorage option is set', async function() {
+      const Test = m.model('Test', m.Schema({ name: String }));
+
+      await Test.createCollection();
+      await Test.deleteMany({});
+
+      const doc = new Test({ name: 'test' });
+      await assert.rejects(
+        () => m.connection.transaction(async() => {
+          await doc.save();
+
+          await Test.updateOne({ name: 'foo' }, { name: 'foo' }, { upsert: true });
+
+          let docs = await Test.aggregate([{ $match: { _id: doc._id } }]);
+          assert.equal(docs.length, 1);
+
+          const docs = await Test.find({ _id: doc._id });
+          assert.equal(docs.length, 1);
+
+          throw new Error('Oops!');
+        }),
+        /Oops!/
+      );
+      let exists = await Test.exists({ _id: doc._id });
+      assert.ok(!exists);
+
+      exists = await Test.exists({ name: 'foo' });
+      assert.ok(!exists);
+    });
+  });
+
   it('transaction() resets $isNew on error', async function() {
     db.deleteModel(/Test/);
     const Test = db.model('Test', Schema({ name: String }));

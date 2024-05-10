@@ -1,8 +1,6 @@
 # Transactions in Mongoose
 
-[Transactions](https://www.mongodb.com/transactions) are new in MongoDB
-4.0 and Mongoose 5.2.0. Transactions let you execute multiple operations
-in isolation and potentially undo all the operations if one of them fails.
+[Transactions](https://www.mongodb.com/transactions) let you execute multiple operations in isolation and potentially undo all the operations if one of them fails.
 This guide will get you started using transactions with Mongoose.
 
 <h2 id="getting-started-with-transactions"><a href="#getting-started-with-transactions">Getting Started with Transactions</a></h2>
@@ -85,6 +83,33 @@ Below is an example of executing an aggregation within a transaction.
 ```acquit
 [require:transactions.*aggregate]
 ```
+
+<h2 id="asynclocalstorage"><a href="#asynclocalstorage">Using AsyncLocalStorage</a></h2>
+
+One major pain point with transactions in Mongoose is that you need to remember to set the `session` option on every operation.
+If you don't, your operation will execute outside of the transaction.
+Mongoose 8.4 is able to set the `session` operation on all operations within a `Connection.prototype.transaction()` executor function using Node's [AsyncLocalStorage API](https://nodejs.org/api/async_context.html#class-asynclocalstorage).
+Set the `transactionAsyncLocalStorage` option using `mongoose.set('transactionAsyncLocalStorage', true)` to enable this feature.
+
+```javascript
+mongoose.set('transactionAsyncLocalStorage', true);
+
+const Test = mongoose.model('Test', mongoose.Schema({ name: String }));
+
+const doc = new Test({ name: 'test' });
+
+// Save a new doc in a transaction that aborts
+await connection.transaction(async() => {
+  await doc.save(); // Notice no session here
+  throw new Error('Oops');
+});
+
+// false, `save()` was rolled back
+await Test.exists({ _id: doc._id });
+```
+
+With `transactionAsyncLocalStorage`, you no longer need to pass sessions to every operation.
+Mongoose will add the session by default under the hood.
 
 <h2 id="advanced-usage"><a href="#advanced-usage">Advanced Usage</a></h2>
 

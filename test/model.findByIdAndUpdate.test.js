@@ -53,9 +53,6 @@ describe('model: findByIdAndUpdate:', function() {
       'shape.side': 4,
       'shape.color': 'white'
     }, { new: true });
-    console.log('doc');
-    console.log(doc);
-    console.log('doc');
 
     assert.equal(doc.shape.kind, 'gh8378_Square');
     assert.equal(doc.shape.name, 'after');

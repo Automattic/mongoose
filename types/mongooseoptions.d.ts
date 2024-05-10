@@ -204,6 +204,13 @@ declare module 'mongoose' {
     toObject?: ToObjectOptions;
 
     /**
+     * Set to true to make Mongoose use Node.js' built-in AsyncLocalStorage (Node >= 16.0.0)
+     * to set `session` option on all operations within a `connection.transaction(fn)` call
+     * by default. Defaults to false.
+     */
+    transactionAsyncLocalStorage?: boolean;
+
+    /**
      * If `true`, convert any aliases in filter, projection, update, and distinct
      * to their database property names. Defaults to false.
      */

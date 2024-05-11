@@ -380,7 +380,12 @@ describe('transactions', function() {
           let docs = await Test.aggregate([{ $match: { _id: doc._id } }]);
           assert.equal(docs.length, 1);
 
-          const docs = await Test.find({ _id: doc._id });
+          docs = await Test.find({ _id: doc._id });
+          assert.equal(docs.length, 1);
+
+          docs = await Promise.all([async() => {
+            return await Test.findOne({ _id: doc._id });
+          }]).then(res => res[0]);
           assert.equal(docs.length, 1);
 
           throw new Error('Oops!');

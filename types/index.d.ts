@@ -68,6 +68,8 @@ declare module 'mongoose' {
   /** Gets mongoose options */
   export function get<K extends keyof MongooseOptions>(key: K): MongooseOptions[K];
 
+  export function omitUndefined<T extends Record<string, any>>(val: T): T;
+
   /* ! ignore */
   export type CompileModelOptions = {
     overwriteModels?: boolean,

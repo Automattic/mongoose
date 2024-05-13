@@ -102,7 +102,7 @@ const doc = new Test({ name: 'test' });
 await connection.transaction(async() => {
   await doc.save(); // Notice no session here
   throw new Error('Oops');
-});
+}).catch(() => {});
 
 // false, `save()` was rolled back
 await Test.exists({ _id: doc._id });

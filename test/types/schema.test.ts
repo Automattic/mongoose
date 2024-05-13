@@ -1503,5 +1503,11 @@ function gh13772() {
   };
   const schema = new Schema(schemaDefinition);
   type RawDocType = InferRawDocType<typeof schemaDefinition>;
-  expectAssignable<{ name?: string, docArr?: Array<{ name?: string }> }>({} as RawDocType);
+  expectAssignable<
+    { name?: string | null, docArr?: Array<{ name?: string | null }> }
+  >({} as RawDocType);
+
+  const TestModel = model('User', schema);
+  const doc = new TestModel();
+  expectAssignable<RawDocType>(doc.toObject());
 }

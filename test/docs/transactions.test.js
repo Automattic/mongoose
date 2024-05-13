@@ -370,7 +370,7 @@ describe('transactions', function() {
       await Test.createCollection();
       await Test.deleteMany({});
 
-      const doc = new Test({ name: 'test' });
+      const doc = new Test({ name: 'test_transactionAsyncLocalStorage' });
       await assert.rejects(
         () => m.connection.transaction(async() => {
           await doc.save();
@@ -383,10 +383,10 @@ describe('transactions', function() {
           docs = await Test.find({ _id: doc._id });
           assert.equal(docs.length, 1);
 
-          docs = await Promise.all([async() => {
+          docs = await async function test() {
             return await Test.findOne({ _id: doc._id });
-          }]).then(res => res[0]);
-          assert.equal(docs.length, 1);
+          }();
+          assert.equal(doc.name, 'test_transactionAsyncLocalStorage');
 
           throw new Error('Oops!');
         }),

@@ -99,5 +99,79 @@ describe('model', function() {
       assert.equal(hydrated.test, 'test');
       assert.deepEqual(hydrated.schema.tree, C.schema.tree);
     });
+    it('should deeply hydrate the document with the `hydratedPopulatedDocs` option (gh-4727)', async function() {
+      const userSchema = new Schema({
+        name: String
+      });
+      const companySchema = new Schema({
+        name: String,
+        users: [{ ref: 'User', type: Schema.Types.ObjectId }]
+      });
+
+      db.model('UserTestHydrate', userSchema);
+      const Company = db.model('CompanyTestHyrdrate', companySchema);
+
+      const users = [{ _id: new mongoose.Types.ObjectId(), name: 'Val' }];
+      const company = { _id: new mongoose.Types.ObjectId(), name: 'Booster', users: [users[0]] };
+
+      const C = Company.hydrate(company, null, { hydratedPopulatedDocs: true });
+      assert.equal(C.users[0].name, 'Val');
+    });
+    it('should hydrate documents in virtual populate (gh-14503)', async function() {
+      const StorySchema = new Schema({
+        userId: {
+          type: Schema.Types.ObjectId,
+          ref: 'User'
+        },
+        title: {
+          type: String
+        }
+      }, { timestamps: true });
+
+      const UserSchema = new Schema({
+        name: String
+      }, { timestamps: true });
+
+      UserSchema.virtual('stories', {
+        ref: 'Story',
+        localField: '_id',
+        foreignField: 'userId'
+      });
+      UserSchema.virtual('storiesCount', {
+        ref: 'Story',
+        localField: '_id',
+        foreignField: 'userId',
+        count: true
+      });
+
+      const User = db.model('User', UserSchema);
+      const Story = db.model('Story', StorySchema);
+
+      const user = await User.create({ name: 'Alex' });
+      const story1 = await Story.create({ title: 'Ticket 1', userId: user._id });
+      const story2 = await Story.create({ title: 'Ticket 2', userId: user._id });
+
+      const populated = await User.findOne({ name: 'Alex' }).populate(['stories', 'storiesCount']).lean();
+      const hydrated = User.hydrate(
+        JSON.parse(JSON.stringify(populated)),
+        null,
+        { hydratedPopulatedDocs: true }
+      );
+
+      assert.equal(hydrated.stories[0]._id.toString(), story1._id.toString());
+      assert(typeof hydrated.stories[0]._id == 'object', typeof hydrated.stories[0]._id);
+      assert(hydrated.stories[0]._id instanceof mongoose.Types.ObjectId);
+      assert(typeof hydrated.stories[0].createdAt == 'object');
+      assert(hydrated.stories[0].createdAt instanceof Date);
+
+      assert.equal(hydrated.stories[1]._id.toString(), story2._id.toString());
+      assert(typeof hydrated.stories[1]._id == 'object');
+
+      assert(hydrated.stories[1]._id instanceof mongoose.Types.ObjectId);
+      assert(typeof hydrated.stories[1].createdAt == 'object');
+      assert(hydrated.stories[1].createdAt instanceof Date);
+
+      assert.strictEqual(hydrated.storiesCount, 2);
+    });
   });
 });

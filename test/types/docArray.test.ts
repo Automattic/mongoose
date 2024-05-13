@@ -1,4 +1,4 @@
-import { Schema, model, Types, InferSchemaType } from 'mongoose';
+import { Schema, model, Model, Types, InferSchemaType } from 'mongoose';
 import { expectError, expectType } from 'tsd';
 
 async function gh10293() {
@@ -76,4 +76,89 @@ function gh13087() {
       coordinates: number[];
     };
   }>>(points);
+}
+
+async function gh13424() {
+  const subDoc = {
+    name: { type: String, required: true },
+    controls: { type: String, required: true }
+  };
+
+  const testSchema = new Schema({
+    question: { type: String, required: true },
+    subDocArray: { type: [subDoc], required: true }
+  });
+  const TestModel = model('Test', testSchema);
+
+  const doc = new TestModel();
+  expectType<Types.ObjectId | undefined>(doc.subDocArray[0]._id);
+}
+
+async function gh14367() {
+  const UserSchema = new Schema(
+    {
+      reminders: {
+        type: [
+          {
+            type: { type: Schema.Types.String },
+            date: { type: Schema.Types.Date },
+            toggle: { type: Schema.Types.Boolean },
+            notified: { type: Schema.Types.Boolean }
+          }
+        ],
+        default: [
+          { type: 'vote', date: new Date(), toggle: false, notified: false },
+          { type: 'daily', date: new Date(), toggle: false, notified: false },
+          { type: 'drop', date: new Date(), toggle: false, notified: false },
+          { type: 'claim', date: new Date(), toggle: false, notified: false },
+          { type: 'work', date: new Date(), toggle: false, notified: false }
+        ]
+      },
+      avatar: {
+        type: Schema.Types.String
+      }
+    },
+    { timestamps: true }
+  );
+
+  type IUser = InferSchemaType<typeof UserSchema>;
+  expectType<string | null | undefined>({} as IUser['reminders'][0]['type']);
+  expectType<Date | null | undefined>({} as IUser['reminders'][0]['date']);
+  expectType<boolean | null | undefined>({} as IUser['reminders'][0]['toggle']);
+  expectType<string | null | undefined>({} as IUser['avatar']);
+}
+
+function gh14469() {
+  interface Names {
+    _id: Types.ObjectId;
+    firstName: string;
+  }
+  // Document definition
+  interface User {
+    names: Names[];
+  }
+
+  // TMethodsAndOverrides
+  type UserDocumentProps = {
+    names: Types.DocumentArray<Names>;
+  };
+  type UserModelType = Model<User, {}, UserDocumentProps>;
+
+  const userSchema = new Schema<User, UserModelType>(
+    {
+      names: [new Schema<Names>({ firstName: String })]
+    },
+    { timestamps: true }
+  );
+
+  // Create model
+  const UserModel = model<User, UserModelType>('User', userSchema);
+
+  const doc = new UserModel({ names: [{ firstName: 'John' }] });
+
+  const jsonDoc = doc?.toJSON();
+  expectType<string>(jsonDoc?.names[0]?.firstName);
+
+  const jsonNames = doc?.names[0]?.toJSON();
+  expectType<string>(jsonNames?.firstName);
 }

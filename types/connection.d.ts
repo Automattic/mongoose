@@ -48,7 +48,7 @@ declare module 'mongoose' {
     pass?: string;
     /** Set to false to disable automatic index creation for all models associated with this connection. */
     autoIndex?: boolean;
-    /** Set to `true` to make Mongoose automatically call `createCollection()` on every model created on this connection. */
+    /** Set to `false` to disable Mongoose automatically calling `createCollection()` on every model created on this connection. */
     autoCreate?: boolean;
   }
 
@@ -80,6 +80,11 @@ declare module 'mongoose' {
      * and [views](https://www.mongodb.com/docs/manual/core/views/) from mongoose.
      */
     createCollection<T extends AnyObject = AnyObject>(name: string, options?: mongodb.CreateCollectionOptions): Promise<mongodb.Collection<T>>;
+
+    /**
+     * https://mongoosejs.com/docs/api/connection.html#Connection.prototype.createCollections()
+     */
+    createCollections(continueOnError?: boolean): Promise<Record<string, Error | mongodb.Collection<any>>>;
 
     /**
      * Removes the model named `name` from this connection, if it exists. You can
@@ -120,6 +125,18 @@ declare module 'mongoose' {
      * you have [multiple connections](/docs/connections.html#multiple_connections).
      */
     readonly id: number;
+
+    /**
+     * Helper for MongoDB Node driver's `listCollections()`.
+     * Returns an array of collection names.
+     */
+    listCollections(): Promise<Pick<mongodb.CollectionInfo, 'name' | 'type'>[]>;
+
+    /**
+     * Helper for MongoDB Node driver's `listDatabases()`.
+     * Returns an array of database names.
+     */
+    listDatabases(): Promise<mongodb.ListDatabasesResult>;
 
     /**
      * A [POJO](https://masteringjs.io/tutorials/fundamentals/pojo) containing
@@ -229,6 +246,8 @@ declare module 'mongoose' {
 
     /** Watches the entire underlying database for changes. Similar to [`Model.watch()`](/docs/api/model.html#model_Model-watch). */
     watch<ResultType extends mongodb.Document = any>(pipeline?: Array<any>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream<ResultType>;
+
+    withSession<T = any>(executor: (session: ClientSession) => Promise<T>): T;
   }
 
 }

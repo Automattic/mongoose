@@ -2197,7 +2197,7 @@ describe('model: populate:', function() {
     });
 
     describe('in a subdocument', function() {
-      it('works', async function() {
+      it('works (gh-14231)', async function() {
         const docs = await U.find({ name: 'u1' }).populate('comments', { _id: 0 });
 
         let doc = docs[0];
@@ -2229,6 +2229,15 @@ describe('model: populate:', function() {
           assert.equal(typeof d._doc.__v, 'number');
         });
 
+        doc = await U.findOne({ name: 'u1' }).populate('comments', ['-_id']);
+        assert.equal(doc.comments.length, 2);
+        doc.comments.forEach(function(d) {
+          assert.equal(d._id, undefined);
+          assert.equal(Object.keys(d._doc).indexOf('_id'), -1);
+          assert.ok(d.title.length);
+          assert.ok(d.body.length);
+          assert.equal(typeof d._doc.__v, 'number');
+        });
       });
 
       it('with lean', async function() {
@@ -2819,7 +2828,28 @@ describe('model: populate:', function() {
 
       assert.equal(blogposts[0].user.name, 'Fan 1');
       assert.equal(blogposts[0].title, 'Test 1');
+    });
 
+    it('handles multiple spaces in between paths to populate (gh-13951)', async function() {
+      const BlogPost = db.model('BlogPost', new Schema({
+        title: String,
+        user: { type: ObjectId, ref: 'User' },
+        fans: [{ type: ObjectId, ref: 'User' }]
+      }));
+      const User = db.model('User', new Schema({ name: String }));
+
+      const fans = await User.create([{ name: 'Fan 1' }]);
+      const posts = [
+        { title: 'Test 1', user: fans[0]._id, fans: [fans[0]._id] }
+      ];
+      await BlogPost.create(posts);
+      const blogPost = await BlogPost.
+        findOne({ title: 'Test 1' }).
+        populate('user   \t fans');
+
+      assert.equal(blogPost.user.name, 'Fan 1');
+      assert.equal(blogPost.fans[0].name, 'Fan 1');
+      assert.equal(blogPost.title, 'Test 1');
     });
 
     it('maps results back to correct document (gh-1444)', async function() {
@@ -2946,33 +2976,27 @@ describe('model: populate:', function() {
           return ret;
         }
       });
-
       const Team = db.model('Test', teamSchema);
 
       const userSchema = new Schema({
         username: String
       });
-
       userSchema.set('toJSON', {
         transform: function(doc, ret) {
           return ret;
         }
       });
-
       const User = db.model('User', userSchema);
 
       const user = new User({ username: 'Test' });
-
       await user.save();
 
       const team = new Team({ members: [{ user: user }] });
-
       await team.save();
-
       await team.populate('members.user');
 
+      assert.equal(calls, 0);
       team.toJSON();
-
       assert.equal(calls, 1);
     });
 
@@ -8238,6 +8262,58 @@ describe('model: populate:', function() {
       assert.deepEqual(populatedRides[1].files, []);
     });
 
+    it('doesnt insert empty document when lean populating a path within an underneath non-existent document array (gh-14098)', async function() {
+      const userSchema = new mongoose.Schema({
+        fullName: String,
+        company: String
+      });
+      const User = db.model('User', userSchema);
+
+      const fileSchema = new mongoose.Schema({
+        _id: String,
+        uploaderId: {
+          type: mongoose.ObjectId,
+          ref: 'User'
+        }
+      }, { toObject: { virtuals: true }, toJSON: { virtuals: true } });
+      fileSchema.virtual('uploadedBy', {
+        ref: 'User',
+        localField: 'uploaderId',
+        foreignField: '_id',
+        justOne: true
+      });
+
+      const contentSchema = new mongoose.Schema({
+        memo: String,
+        files: { type: [fileSchema], default: [] }
+      }, { toObject: { virtuals: true }, toJSON: { virtuals: true }, _id: false });
+
+      const postSchema = new mongoose.Schema({
+        title: String,
+        content: { type: contentSchema }
+      }, { toObject: { virtuals: true }, toJSON: { virtuals: true } });
+      const Post = db.model('Test1', postSchema);
+
+      const user = await User.create({ fullName: 'John Doe', company: 'GitHub' });
+      await Post.create([
+        { title: 'London-Paris' },
+        {
+          title: 'Berlin-Moscow',
+          content: {
+            memo: 'Not Easy',
+            files: [{ _id: '123', uploaderId: user._id }]
+          }
+        }
+      ]);
+      await Post.updateMany({}, { $unset: { 'content.files': 1 } });
+      const populatedRides = await Post.find({}).populate({
+        path: 'content.files.uploadedBy',
+        justOne: true
+      }).lean();
+      assert.equal(populatedRides[0].content.files, undefined);
+      assert.equal(populatedRides[1].content.files, undefined);
+    });
+
     it('sets empty array if populating undefined path (gh-8455)', async function() {
       const TestSchema = new Schema({
         thingIds: [mongoose.ObjectId]
@@ -10309,6 +10385,66 @@ describe('model: populate:', function() {
   });
 
   describe('strictPopulate', function() {
+    it('does not throw an error when using strictPopulate on a nested path (gh-13863)', async function() {
+      const l4Schema = new mongoose.Schema({
+        name: String
+      });
+
+      const l3aSchema = new mongoose.Schema({
+        l4: {
+          type: 'ObjectId',
+          ref: 'L4'
+        }
+      });
+      const l3bSchema = new mongoose.Schema({
+        otherProp: String
+      });
+
+      const l2Schema = new mongoose.Schema({
+        l3a: {
+          type: 'ObjectId',
+          ref: 'L3A'
+        },
+        l3b: {
+          type: 'ObjectId',
+          ref: 'L3B'
+        }
+      });
+
+      const l1Schema = new mongoose.Schema({
+        l2: {
+          type: 'ObjectId',
+          ref: 'L2'
+        }
+      });
+
+      const L1 = db.model('L1', l1Schema);
+      const L2 = db.model('L2', l2Schema);
+      const L3A = db.model('L3A', l3aSchema);
+      const L3B = db.model('L3B', l3bSchema);
+      const L4 = db.model('L4', l4Schema);
+
+      const { _id: l4 } = await L4.create({ name: 'test l4' });
+      const { _id: l3a } = await L3A.create({ l4 });
+      const { _id: l3b } = await L3B.create({ name: 'test l3' });
+      const { _id: l2 } = await L2.create({ l3a, l3b });
+      const { _id: l1 } = await L1.create({ l2 });
+
+      const res = await L1.findById(l1).populate({
+        path: 'l2',
+        populate: {
+          path: 'l3a l3b',
+          populate: {
+            path: 'l4',
+            options: {
+              strictPopulate: false
+            }
+          }
+        }
+      });
+      assert.equal(res.l2.l3a.l4.name, 'test l4');
+      assert.equal(res.l2.l3b.l4, undefined);
+    });
     it('reports full path when throwing `strictPopulate` error with deep populate (gh-10923)', async function() {
       const L2 = db.model('Test', new Schema({ name: String }));
 
@@ -10560,5 +10696,323 @@ describe('model: populate:', function() {
       user.toObject().companies.sort().map(v => v.toString()),
       [company._id.toString(), company2._id.toString()]
     );
+  });
+
+  it('sets populated docs in correct order when populating virtual underneath document array with justOne (gh-14018)', async function() {
+    const shiftSchema = new mongoose.Schema({
+      employeeId: mongoose.Types.ObjectId,
+      startedAt: Date,
+      endedAt: Date
+    });
+    const Shift = db.model('Shift', shiftSchema);
+
+    const employeeSchema = new mongoose.Schema({
+      name: String
+    });
+    employeeSchema.virtual('mostRecentShift', {
+      ref: Shift,
+      localField: '_id',
+      foreignField: 'employeeId',
+      options: {
+        sort: { startedAt: -1 }
+      },
+      justOne: true
+    });
+    const storeSchema = new mongoose.Schema({
+      location: String,
+      employees: [employeeSchema]
+    });
+    const Store = db.model('Store', storeSchema);
+
+    const store = await Store.create({
+      location: 'Tashbaan',
+      employees: [
+        { _id: '0'.repeat(24), name: 'Aravis' },
+        { _id: '1'.repeat(24), name: 'Shasta' }
+      ]
+    });
+
+    const employeeAravis = store.employees
+      .find(({ name }) => name === 'Aravis');
+    const employeeShasta = store.employees
+      .find(({ name }) => name === 'Shasta');
+
+    await Shift.insertMany([
+      { employeeId: employeeAravis._id, startedAt: new Date('2011-06-01'), endedAt: new Date('2011-06-02') },
+      { employeeId: employeeAravis._id, startedAt: new Date('2013-06-01'), endedAt: new Date('2013-06-02') },
+      { employeeId: employeeShasta._id, startedAt: new Date('2015-06-01'), endedAt: new Date('2015-06-02') }
+    ]);
+
+    const storeWithMostRecentShifts = await Store.findOne({ location: 'Tashbaan' })
+      .populate('employees.mostRecentShift')
+      .select('-__v')
+      .exec();
+    assert.equal(
+      storeWithMostRecentShifts.employees[0].mostRecentShift.employeeId.toHexString(),
+      '0'.repeat(24)
+    );
+    assert.equal(
+      storeWithMostRecentShifts.employees[1].mostRecentShift.employeeId.toHexString(),
+      '1'.repeat(24)
+    );
+
+    await Shift.findOne({ employeeId: employeeAravis._id }).sort({ startedAt: 1 }).then((s) => s.deleteOne());
+
+    const storeWithMostRecentShiftsNew = await Store.findOne({ location: 'Tashbaan' })
+      .populate('employees.mostRecentShift')
+      .select('-__v')
+      .exec();
+    assert.equal(
+      storeWithMostRecentShiftsNew.employees[0].mostRecentShift.employeeId.toHexString(),
+      '0'.repeat(24)
+    );
+    assert.equal(
+      storeWithMostRecentShiftsNew.employees[0].mostRecentShift.startedAt.toString(),
+      new Date('2013-06-01').toString()
+    );
+    assert.equal(
+      storeWithMostRecentShiftsNew.employees[1].mostRecentShift.employeeId.toHexString(),
+      '1'.repeat(24)
+    );
+    assert.equal(
+      storeWithMostRecentShiftsNew.employees[1].mostRecentShift.startedAt.toString(),
+      new Date('2015-06-01').toString()
+    );
+  });
+
+  it('calls transform with single ObjectId when populating justOne path underneath array (gh-14073)', async function() {
+    const mySchema = mongoose.Schema({
+      name: { type: String },
+      items: [{
+        _id: false,
+        name: { type: String },
+        brand: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand' }
+      }]
+    });
+
+    const brandSchema = mongoose.Schema({
+      name: 'String',
+      quantity: Number
+    });
+
+    const myModel = db.model('MyModel', mySchema);
+    const brandModel = db.model('Brand', brandSchema);
+    const { _id: id1 } = await brandModel.create({
+      name: 'test',
+      quantity: 1
+    });
+    const { _id: id2 } = await brandModel.create({
+      name: 'test1',
+      quantity: 1
+    });
+    const { _id: id3 } = await brandModel.create({
+      name: 'test2',
+      quantity: 2
+    });
+    const brands = await brandModel.find();
+    const test = new myModel({ name: 'Test Model' });
+    for (let i = 0; i < brands.length; i++) {
+      test.items.push({ name: `${i}`, brand: brands[i]._id });
+    }
+
+    const id4 = new mongoose.Types.ObjectId();
+    test.items.push({ name: '4', brand: id4 });
+    await test.save();
+
+    const ids = [];
+    await myModel
+      .findOne()
+      .populate([
+        {
+          path: 'items.brand',
+          transform: (doc, id) => {
+            ids.push(id);
+            return doc;
+          }
+        }
+      ]);
+    assert.equal(ids.length, 4);
+    assert.deepStrictEqual(
+      ids.map(id => id?.toHexString()),
+      [id1.toString(), id2.toString(), id3.toString(), id4.toString()]
+    );
+  });
+
+  it('allows deselecting discriminator key when populating (gh-3230) (gh-13760) (gh-13679)', async function() {
+    const Test = db.model(
+      'Test',
+      Schema({ name: String, arr: [{ testRef: { type: 'ObjectId', ref: 'Test2' } }] })
+    );
+
+    const schema = Schema({ name: String });
+    const Test2 = db.model('Test2', schema);
+    const D = Test2.discriminator('D', Schema({ prop: String }));
+
+
+    await Test.deleteMany({});
+    await Test2.deleteMany({});
+    const { _id } = await D.create({ name: 'foo', prop: 'bar' });
+    const test = await Test.create({ name: 'test', arr: [{ testRef: _id }] });
+
+    const doc = await Test
+      .findById(test._id)
+      .populate('arr.testRef', { name: 1, prop: 1, _id: 0, __t: 0 });
+    assert.deepStrictEqual(
+      doc.toObject().arr[0].testRef,
+      { name: 'foo', prop: 'bar' }
+    );
+  });
+
+  it('calls setter on virtual populated path with populated doc (gh-14285)', async function() {
+    const userSchema = new Schema({
+      email: String,
+      name: 'String'
+    });
+
+    const User = db.model('User', userSchema);
+
+    const user = await User.create({
+      email: 'admin@example.com',
+      name: 'Admin'
+    });
+
+    const personSchema = new Schema({
+      userId: ObjectId,
+      userType: String
+    });
+
+    personSchema.
+      virtual('user', {
+        ref() {
+          return this.userType;
+        },
+        localField: 'userId',
+        foreignField: '_id',
+        justOne: true
+      }).
+      set(function(user) {
+        if (user) {
+          this.userId = user._id;
+          this.userType = user.constructor.modelName;
+        } else {
+          this.userId = null;
+          this.userType = null;
+        }
+
+        return user;
+      });
+
+    const Person = db.model('Person', personSchema);
+
+    const person = new Person({
+      userId: user._id,
+      userType: 'User'
+    });
+
+    await person.save();
+
+    const personFromDb = await Person.findById(person._id).populate('user');
+    assert.equal(personFromDb.user.name, 'Admin');
+    assert.equal(personFromDb.userType, 'User');
+    assert.equal(personFromDb.userId.toHexString(), user._id.toHexString());
+  });
+
+  it('handles ref() function that returns a model (gh-14249)', async function() {
+    const aSchema = new Schema({
+      name: String
+    });
+
+    const bSchema = new Schema({
+      name: String
+    });
+
+    const CategoryAModel = db.model('Test', aSchema);
+    const CategoryBModel = db.model('Test1', bSchema);
+
+    const testSchema = new Schema({
+      category: String,
+      subdoc: {
+        type: Schema.Types.ObjectId,
+        ref: function() {
+          return this.category === 'catA' ? CategoryAModel : CategoryBModel;
+        }
+      }
+    });
+
+    const parentSchema = new Schema({
+      name: String,
+      children: [testSchema]
+    });
+    const Parent = db.model('Parent', parentSchema);
+
+    const A = await CategoryAModel.create({
+      name: 'A'
+    });
+    const B = await CategoryBModel.create({
+      name: 'B'
+    });
+
+    const doc = await Parent.create({
+      name: 'Parent',
+      children: [{ category: 'catA', subdoc: A._id }, { category: 'catB', subdoc: B._id }]
+    });
+
+    const res = await Parent.findById(doc._id).populate('children.subdoc');
+    assert.equal(res.children.length, 2);
+    assert.equal(res.children[0].subdoc.name, 'A');
+    assert.equal(res.children[1].subdoc.name, 'B');
+  });
+
+  it('avoids filtering out `null` values when applying match function (gh-14494)', async function() {
+    const gradeSchema = new mongoose.Schema({
+      studentId: mongoose.Types.ObjectId,
+      classId: mongoose.Types.ObjectId,
+      grade: String
+    });
+
+    const Grade = db.model('Test', gradeSchema);
+
+    const studentSchema = new mongoose.Schema({
+      name: String
+    });
+
+    studentSchema.virtual('grade', {
+      ref: Grade,
+      localField: '_id',
+      foreignField: 'studentId',
+      match: (doc) => ({
+        classId: doc._id
+      }),
+      justOne: true
+    });
+
+    const classSchema = new mongoose.Schema({
+      name: String,
+      students: [studentSchema]
+    });
+
+    const Class = db.model('Test2', classSchema);
+
+    const newClass = await Class.create({
+      name: 'History',
+      students: [{ name: 'Henry' }, { name: 'Robert' }]
+    });
+
+    const studentRobert = newClass.students.find(
+      ({ name }) => name === 'Robert'
+    );
+
+    await Grade.create({
+      studentId: studentRobert._id,
+      classId: newClass._id,
+      grade: 'B'
+    });
+
+    const latestClass = await Class.findOne({ name: 'History' }).populate('students.grade');
+
+    assert.equal(latestClass.students[0].name, 'Henry');
+    assert.equal(latestClass.students[0].grade, null);
+    assert.equal(latestClass.students[1].name, 'Robert');
+    assert.equal(latestClass.students[1].grade.grade, 'B');
   });
 });

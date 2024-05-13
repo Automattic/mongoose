@@ -4,7 +4,9 @@ declare module 'mongoose' {
 
   interface ValidatorProps {
     path: string;
+    fullPath: string;
     value: any;
+    reason?: Error;
   }
 
   interface ValidatorMessageFn {

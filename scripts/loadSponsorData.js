@@ -51,8 +51,7 @@ async function run() {
 
   const OpenCollectiveSponsor = mongoose.model('OpenCollectiveSponsor', mongoose.Schema({
     openCollectiveId: {
-      type: Number,
-      required: true
+      type: Number
     },
     website: {
       type: String,

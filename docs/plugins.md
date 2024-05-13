@@ -44,7 +44,7 @@ const playerSchema = new Schema({ /* ... */ });
 playerSchema.plugin(loadedAtPlugin);
 ```
 
-We just added last-modified behavior to both our `Game` and `Player` schemas and declared an index on the `lastMod` path of our Games to boot. Not bad for a few lines of code.
+We just added loaded-time behavior to both our `Game` and `Player` schemas and declared an index on the `loadedAt` path of our Games to boot. Not bad for a few lines of code.
 
 <h2 id="global"><a href="#global">Global Plugins</a></h2>
 

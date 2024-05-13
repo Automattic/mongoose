@@ -16,7 +16,7 @@ declare module 'mongoose' {
    * *  TQueryHelpers - Object with any helpers that should be mixed into the Query type
    * *  DocType - the type of the actual Document created
    */
-  class Document<T = any, TQueryHelpers = any, DocType = any> {
+  class Document<T = unknown, TQueryHelpers = any, DocType = any> {
     constructor(doc?: any);
 
     /** This documents _id. */
@@ -75,6 +75,7 @@ declare module 'mongoose' {
 
     /** Returns the model with the given name on this document's associated connection. */
     $model<ModelType = Model<unknown>>(name: string): ModelType;
+    $model<ModelType = Model<DocType>>(): ModelType;
 
     /**
      * A string containing the current operation that Mongoose is executing
@@ -107,7 +108,13 @@ declare module 'mongoose' {
     db: Connection;
 
     /** Removes this document from the db. */
-    deleteOne(options?: QueryOptions): Promise<this>;
+    deleteOne(options?: QueryOptions): QueryWithHelpers<
+      mongodb.DeleteResult,
+      this,
+      TQueryHelpers,
+      DocType,
+      'deleteOne'
+    >;
 
     /**
      * Takes a populated field and returns it to its unpopulated state. If called with
@@ -177,8 +184,8 @@ declare module 'mongoose' {
      * Returns true if any of the given paths are modified, else false. If no arguments, returns `true` if any path
      * in this document is modified.
      */
-    isModified<T extends keyof DocType>(path?: T | Array<T>): boolean;
-    isModified(path?: string | Array<string>): boolean;
+    isModified<T extends keyof DocType>(path?: T | Array<T>, options?: { ignoreAtomics?: boolean } | null): boolean;
+    isModified(path?: string | Array<string>, options?: { ignoreAtomics?: boolean } | null): boolean;
 
     /** Boolean flag specifying if the document is new. */
     isNew: boolean;
@@ -190,6 +197,10 @@ declare module 'mongoose' {
     /** Marks the path as having pending changes to write to the db. */
     markModified<T extends keyof DocType>(path: T, scope?: any): void;
     markModified(path: string, scope?: any): void;
+
+    /** Returns the model with the given name on this document's associated connection. */
+    model<ModelType = Model<unknown>>(name: string): ModelType;
+    model<ModelType = Model<DocType>>(): ModelType;
 
     /** Returns the list of paths that have been modified. */
     modifiedPaths(options?: { includeChildren?: boolean }): Array<string>;

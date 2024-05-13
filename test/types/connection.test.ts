@@ -20,6 +20,10 @@ conn.readyState === 99;
 
 expectError(conn.readyState = 0);
 
+expectType<Promise<Record<string, Error | mongodb.Collection<any>>>>(
+  conn.createCollections()
+);
+
 expectType<Connection>(new Connection());
 expectType<Promise<Connection>>(new Connection().asPromise());
 
@@ -69,6 +73,14 @@ expectType<Connection>(conn.useDb('test'));
 expectType<Connection>(conn.useDb('test', {}));
 expectType<Connection>(conn.useDb('test', { noListener: true }));
 expectType<Connection>(conn.useDb('test', { useCache: true }));
+
+expectType<Promise<string[]>>(
+  conn.listCollections().then(collections => collections.map(coll => coll.name))
+);
+
+expectType<Promise<string[]>>(
+  conn.listDatabases().then(dbs => dbs.databases.map(db => db.name))
+);
 
 export function autoTypedModelConnection() {
   const AutoTypedSchema = autoTypedSchema();

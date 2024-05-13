@@ -29,7 +29,7 @@ const schema = new Schema(
 ```
 
 Note that Mongoose does **not** include virtuals in the returned type from `InferSchemaType`.
-That is because `InferSchemaType` returns the "raw" document interface, which represents the structure of the data stored in MongoDB.
+That is because `InferSchemaType` returns a value similar to the raw document interface, which represents the structure of the data stored in MongoDB.
 
 ```ts
 type User = InferSchemaType<typeof schema>;

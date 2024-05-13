@@ -795,7 +795,7 @@ describe('Query', function() {
         e = err;
       }
       assert.ok(e, 'uh oh. no error was thrown');
-      assert.equal(e.message, 'sort() only takes 1 Argument');
+      assert.equal(e.message, 'sort() takes at most 2 arguments');
 
     });
   });
@@ -1370,7 +1370,7 @@ describe('Query', function() {
   });
 
   describe('setOptions', function() {
-    it('works', async function() {
+    it('works', function() {
       const q = new Query();
       q.setOptions({ thing: 'cat' });
       q.setOptions({ populate: ['fans'] });
@@ -1394,16 +1394,6 @@ describe('Query', function() {
       assert.equal(q.options.hint.index2, -1);
       assert.equal(q.options.readPreference.mode, 'secondary');
       assert.equal(q.options.readPreference.tags[0].dc, 'eu');
-
-      const Product = db.model('Product', productSchema);
-      const [, doc2] = await Product.create([
-        { numbers: [3, 4, 5] },
-        { strings: 'hi there'.split(' '), w: 'majority' }
-      ]);
-
-      const docs = await Product.find().setOptions({ limit: 1, sort: { _id: -1 }, read: 'n' });
-      assert.equal(docs.length, 1);
-      assert.equal(docs[0].id, doc2.id);
     });
 
     it('populate as array in options (gh-4446)', function() {
@@ -2338,18 +2328,20 @@ describe('Query', function() {
     });
   });
 
-  it('map (gh-7142)', async function() {
+  it('transform (gh-14236) (gh-7142)', async function() {
     const Model = db.model('Test', new Schema({ name: String }));
 
-
+    let called = 0;
     await Model.create({ name: 'test' });
     const now = new Date();
     const res = await Model.findOne().transform(res => {
       res.loadedAt = now;
+      ++called;
       return res;
     });
 
     assert.equal(res.loadedAt, now);
+    assert.strictEqual(called, 1);
   });
 
   describe('orFail (gh-6841)', function() {
@@ -2960,17 +2952,6 @@ describe('Query', function() {
     assert.ok(res);
     assert.ok(res.message.indexOf('time limit') !== -1, res.message);
     delete db.base.options.maxTimeMS;
-  });
-
-  it('throws error with updateOne() and overwrite (gh-7475)', function() {
-    const Model = db.model('Test', Schema({ name: String }));
-
-    return Model.updateOne({}, { name: 'bar' }, { overwrite: true }).then(
-      () => { throw new Error('Should have failed'); },
-      err => {
-        assert.ok(err.message.indexOf('updateOne') !== -1);
-      }
-    );
   });
 
   describe('merge()', function() {
@@ -3737,6 +3718,28 @@ describe('Query', function() {
     }, /Provided object has both field "n" and its alias "name"/);
   });
 
+  it('translateAliases applies before casting (gh-14521) (gh-7511)', async function() {
+    const testSchema = new Schema({
+      name: {
+        type: String,
+        alias: 'n'
+      },
+      age: {
+        type: Number
+      }
+    });
+    const Test = db.model('Test', testSchema);
+
+    const doc = await Test.findOneAndUpdate(
+      { n: 14521 },
+      { age: 7511 },
+      { translateAliases: true, upsert: true, returnDocument: 'after' }
+    );
+
+    assert.strictEqual(doc.name, '14521');
+    assert.strictEqual(doc.age, 7511);
+  });
+
   it('schema level translateAliases option (gh-7511)', async function() {
     const testSchema = new Schema({
       name: {
@@ -4051,6 +4054,25 @@ describe('Query', function() {
     });
   });
 
+  it('shallow clones $and, $or if merging with empty filter (gh-14567) (gh-12944)', function() {
+    const TestModel = db.model(
+      'Test',
+      Schema({ name: String, age: Number, active: Boolean })
+    );
+
+    let originalQuery = { $and: [{ active: true }] };
+    let q = TestModel.countDocuments(originalQuery)
+      .and([{ age: { $gte: 18 } }]);
+    assert.deepStrictEqual(originalQuery, { $and: [{ active: true }] });
+    assert.deepStrictEqual(q.getFilter(), { $and: [{ active: true }, { age: { $gte: 18 } }] });
+
+    originalQuery = { $or: [{ active: true }] };
+    q = TestModel.countDocuments(originalQuery)
+      .or([{ age: { $gte: 18 } }]);
+    assert.deepStrictEqual(originalQuery, { $or: [{ active: true }] });
+    assert.deepStrictEqual(q.getFilter(), { $or: [{ active: true }, { age: { $gte: 18 } }] });
+  });
+
   it('should avoid sending empty session to MongoDB server (gh-13052)', async function() {
     const m = new mongoose.Mongoose();
 
@@ -4101,6 +4123,7 @@ describe('Query', function() {
       await Error.find().sort('-');
     }, { message: 'Invalid field "" passed to sort()' });
   });
+
   it('allows executing a find() with a subdocument with defaults disabled (gh-13512)', async function() {
     const schema = mongoose.Schema({
       title: String,
@@ -4156,19 +4179,9 @@ describe('Query', function() {
       /Query must have `op` before executing/
     );
   });
-  it('converts findOneAndUpdate to findOneAndReplace if overwrite set (gh-13550)', async function() {
-    const testSchema = new Schema({
-      name: { type: String }
-    });
 
-    const Test = db.model('Test', testSchema);
-    const q = Test.findOneAndUpdate({}, { name: 'bar' }, { overwrite: true });
-    await q.exec();
-    assert.equal(q.op, 'findOneAndReplace');
-  });
-
-  it('allows deselecting discriminator key (gh-13679)', async function() {
-    const testSchema = new Schema({ name: String });
+  it('allows deselecting discriminator key (gh-13760) (gh-13679)', async function() {
+    const testSchema = new Schema({ name: String, age: Number });
     const Test = db.model('Test', testSchema);
     const Test2 = Test.discriminator('Test2', new Schema({ test: String }));
 
@@ -4176,5 +4189,88 @@ describe('Query', function() {
     const { name, __t } = await Test.findById(_id).select({ __t: 0 });
     assert.strictEqual(name, 'test1');
     assert.strictEqual(__t, undefined);
+
+    let doc = await Test.findById(_id).select({ __t: 0, age: 0 });
+    assert.strictEqual(doc.name, 'test1');
+    assert.strictEqual(doc.__t, undefined);
+
+    doc = await Test.findById(_id).select(['-__t', '-age']);
+    assert.strictEqual(doc.name, 'test1');
+    assert.strictEqual(doc.__t, undefined);
+  });
+
+  it('does not apply sibling path defaults if using nested projection (gh-14115)', async function() {
+    const version = await start.mongodVersion();
+    if (version[0] < 5) {
+      return this.skip();
+    }
+
+    const userSchema = new mongoose.Schema({
+      name: String,
+      account: {
+        amount: Number,
+        owner: { type: String, default: () => 'OWNER' },
+        taxIds: [Number]
+      }
+    });
+    const User = db.model('User', userSchema);
+
+    const { _id } = await User.create({
+      name: 'test',
+      account: {
+        amount: 25,
+        owner: 'test',
+        taxIds: [42]
+      }
+    });
+
+    const doc = await User
+      .findOne({ _id }, { name: 1, account: { amount: 1 } })
+      .orFail();
+    assert.strictEqual(doc.name, 'test');
+    assert.strictEqual(doc.account.amount, 25);
+    assert.strictEqual(doc.account.owner, undefined);
+    assert.strictEqual(doc.account.taxIds, undefined);
+  });
+
+  it('allows overriding sort (gh-14365)', function() {
+    const testSchema = new mongoose.Schema({
+      name: String
+    });
+
+    const Test = db.model('Test', testSchema);
+
+    const q = Test.find().select('name').sort({ name: -1, _id: -1 });
+    assert.deepStrictEqual(q.getOptions().sort, { name: -1, _id: -1 });
+
+    q.sort({ name: 1 }, { override: true });
+    assert.deepStrictEqual(q.getOptions().sort, { name: 1 });
+
+    q.sort(null, { override: true });
+    assert.deepStrictEqual(q.getOptions().sort, {});
+
+    q.sort({ _id: 1 }, { override: true });
+    assert.deepStrictEqual(q.getOptions().sort, { _id: 1 });
+
+    q.sort({}, { override: true });
+    assert.deepStrictEqual(q.getOptions().sort, {});
+  });
+
+  it('avoids mutating user-provided query selectors (gh-14567)', async function() {
+    const TestModel = db.model(
+      'Test',
+      Schema({ name: String, age: Number, active: Boolean })
+    );
+
+    await TestModel.create({ name: 'John', age: 21 });
+    await TestModel.create({ name: 'Bob', age: 35 });
+
+    const adultQuery = { age: { $gte: 18 } };
+
+    const docs = await TestModel.find(adultQuery).where('age').lte(25);
+    assert.equal(docs.length, 1);
+    assert.equal(docs[0].name, 'John');
+
+    assert.deepStrictEqual(adultQuery, { age: { $gte: 18 } });
   });
 });

@@ -1915,4 +1915,26 @@ describe('types array', function() {
       }
     });
   });
+
+  it('calls array setters (gh-11380)', function() {
+    let called = 0;
+    const Test = db.model('Test', new Schema({
+      intArr: [{
+        type: Number,
+        set: v => {
+          ++called;
+          return Math.floor(v);
+        }
+      }]
+    }));
+
+    assert.equal(called, 0);
+    const doc = new Test({ intArr: [3.14] });
+    assert.deepStrictEqual(doc.intArr, [3]);
+    assert.equal(called, 1);
+
+    doc.intArr.push(2.718);
+    assert.deepStrictEqual(doc.intArr, [3, 2]);
+    assert.equal(called, 2);
+  });
 });

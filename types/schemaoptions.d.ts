@@ -25,6 +25,11 @@ declare module 'mongoose' {
      */
     autoIndex?: boolean;
     /**
+     * Similar to autoIndex, except for automatically creates any Atlas search indexes defined in your
+     * schema. Unlike autoIndex, this option defaults to false.
+     */
+    autoSearchIndex?: boolean;
+    /**
      * If set to `true`, Mongoose will call Model.createCollection() to create the underlying collection
      * in MongoDB if autoCreate is set to true. Calling createCollection() sets the collection's default
      * collation based on the collation option and establishes the collection as a capped collection if
@@ -115,6 +120,10 @@ declare module 'mongoose' {
      * to all queries derived from a model.
      */
     read?: string;
+    /**
+     * Set a default readConcern for all queries at the schema level
+     */
+    readConcern?: { level: 'local' | 'available' | 'majority' | 'snapshot' | 'linearizable' }
     /** Allows setting write concern at the schema level. */
     writeConcern?: WriteConcern;
     /** defaults to true. */
@@ -210,7 +219,7 @@ declare module 'mongoose' {
       TStaticMethods,
       {},
       { [name: string]: (this: Model<DocType>, ...args: any[]) => unknown },
-      { [F in keyof TStaticMethods]: TStaticMethods[F] }
+      AddThisParameter<TStaticMethods, Model<DocType>>
     >
 
     /**
@@ -220,7 +229,7 @@ declare module 'mongoose' {
     TInstanceMethods,
     {},
     Record<any, (this: THydratedDocumentType, ...args: any) => unknown>,
-    TInstanceMethods
+    AddThisParameter<TInstanceMethods, THydratedDocumentType> & AnyObject
     >
 
     /**
@@ -229,7 +238,7 @@ declare module 'mongoose' {
     query?: IfEquals<
     QueryHelpers,
     {},
-    Record<any, <T extends QueryWithHelpers<unknown, THydratedDocumentType>>(this: T, ...args: any) => T>,
+    Record<any, <T extends QueryWithHelpers<unknown, THydratedDocumentType, QueryHelpers, DocType>>(this: T, ...args: any) => T>,
     QueryHelpers
     >
 

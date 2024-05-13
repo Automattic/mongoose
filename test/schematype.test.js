@@ -208,6 +208,37 @@ describe('schematype', function() {
     });
   });
 
+  it('merges default validators (gh-14070)', function() {
+    class TestSchemaType extends mongoose.SchemaType {}
+    TestSchemaType.set('validate', checkIfString);
+
+    const schemaType = new TestSchemaType('test-path', {
+      validate: checkIfLength2
+    });
+
+    assert.equal(schemaType.validators.length, 2);
+    assert.equal(schemaType.validators[0].validator, checkIfString);
+    assert.equal(schemaType.validators[1].validator, checkIfLength2);
+
+    let err = schemaType.doValidateSync([1, 2]);
+    assert.ok(err);
+    assert.equal(err.name, 'ValidatorError');
+
+    err = schemaType.doValidateSync('foo');
+    assert.ok(err);
+    assert.equal(err.name, 'ValidatorError');
+
+    err = schemaType.doValidateSync('ab');
+    assert.ifError(err);
+
+    function checkIfString(v) {
+      return typeof v === 'string';
+    }
+    function checkIfLength2(v) {
+      return v.length === 2;
+    }
+  });
+
   describe('set()', function() {
     describe('SchemaType.set()', function() {
       it('SchemaType.set, is a function', () => {
@@ -249,5 +280,39 @@ describe('schematype', function() {
         delete type.defaultOptions.someRandomOption;
       });
     });
+  });
+  it('demonstrates the `validateAll()` function (gh-6910)', function() {
+    const validateSchema = new Schema({ name: String, password: String });
+    validateSchema.path('name').validate({
+      validator: function(v) {
+        return v.length > 5;
+      },
+      message: 'name must be longer than 5 characters'
+    });
+    validateSchema.path('password').validateAll([
+      {
+        validator: function(v) {
+          return this.name !== v;
+        },
+        message: 'password must not equal name'
+      },
+      {
+        validator: function(v) {
+          return v.length > 5;
+        },
+        message: 'password must be at least six characters'
+      }
+    ]);
+    assert.equal(validateSchema.path('password').validators.length, 2);
+
+    const passwordPath = validateSchema.path('password');
+    assert.throws(
+      () => { throw passwordPath.doValidateSync('john', { name: 'john' }); },
+      /password must not equal name/
+    );
+    assert.throws(
+      () => { throw passwordPath.doValidateSync('short', { name: 'john' }); },
+      /password must be at least six characters/
+    );
   });
 });

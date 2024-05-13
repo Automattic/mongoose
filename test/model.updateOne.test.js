@@ -874,22 +874,6 @@ describe('model: updateOne:', function() {
     });
   });
 
-  it('works with $set and overwrite (gh-2515)', async function() {
-    const schema = new Schema({ breakfast: String });
-    const M = db.model('Test', schema);
-
-    let doc = await M.create({ breakfast: 'bacon' });
-    await M.updateOne(
-      { _id: doc._id },
-      { $set: { breakfast: 'eggs' } },
-      { overwrite: true }
-    );
-
-    doc = await M.findOne({ _id: doc._id });
-    assert.equal(doc.breakfast, 'eggs');
-
-  });
-
   it('successfully casts set with nested mixed objects (gh-2796)', async function() {
     const schema = new Schema({ breakfast: {} });
     const M = db.model('Test', schema);
@@ -1244,33 +1228,6 @@ describe('model: updateOne:', function() {
       await Model.updateOne({ _id: doc._id }, { name: 'test' }).exec();
       doc = await Model.findOne({ _id: doc._id });
       assert.equal(doc.name, 'Val');
-    });
-
-    it('casting $push with overwrite (gh-3564)', async function() {
-      const schema = mongoose.Schema({
-        topicId: Number,
-        name: String,
-        followers: [Number]
-      });
-
-      let doc = {
-        topicId: 100,
-        name: 'name',
-        followers: [500]
-      };
-
-      const M = db.model('Test', schema);
-
-      await M.create(doc);
-
-      const update = { $push: { followers: 200 } };
-      const opts = { overwrite: true, new: true, upsert: false, multi: false };
-
-      await M.updateOne({ topicId: doc.topicId }, update, opts);
-      doc = await M.findOne({ topicId: doc.topicId });
-      assert.equal(doc.name, 'name');
-      assert.deepEqual(doc.followers.toObject(), [500, 200]);
-
     });
 
     it('$push with buffer doesnt throw error (gh-3890)', async function() {
@@ -1745,31 +1702,6 @@ describe('model: updateOne:', function() {
       await User.updateOne({ _id: user._id }, { $set: { 'profiles.0.rules': {} } });
       const doc = await User.findOne({ _id: user._id }).lean().exec();
       assert.deepEqual(doc.profiles[0], { rules: {} });
-    });
-
-    it('with overwrite and upsert (gh-4749) (gh-5631)', function() {
-      const schema = new Schema({
-        name: String,
-        meta: { age: { type: Number } }
-      });
-      const User = db.model('User', schema);
-
-      const filter = { name: 'Bar' };
-      const update = { name: 'Bar', meta: { age: 33 } };
-      const options = { overwrite: true, upsert: true };
-      const q2 = User.updateOne(filter, update, options);
-      assert.deepEqual(q2.getUpdate(), {
-        __v: 0,
-        meta: { age: 33 },
-        name: 'Bar'
-      });
-
-      const q3 = User.findOneAndUpdate(filter, update, options);
-      assert.deepEqual(q3.getUpdate(), {
-        __v: 0,
-        meta: { age: 33 },
-        name: 'Bar'
-      });
     });
 
     it('findOneAndUpdate with nested arrays (gh-5032)', async function() {
@@ -3068,6 +3000,22 @@ describe('model: updateOne: ', function() {
     await Test.updateOne({ _id }, { $myKey: 'gh13786' }, { upsert: true });
     const doc = await Test.findById(_id);
     assert.equal(doc.$myKey, 'gh13786');
+  });
+  it('works with update validators and single nested doc with numberic paths (gh-13977)', async function() {
+    const subdoc = new mongoose.Schema({
+      1: { type: String, required: true, validate: () => true }
+    });
+    const schema = new mongoose.Schema({ subdoc });
+    const Test = db.model('Test', schema);
+
+    const _id = new mongoose.Types.ObjectId();
+    await Test.updateOne(
+      { _id },
+      { subdoc: { 1: 'foobar' } },
+      { upsert: true, runValidators: true }
+    );
+    const doc = await Test.findById(_id);
+    assert.equal(doc.subdoc['1'], 'foobar');
   });
 });
 

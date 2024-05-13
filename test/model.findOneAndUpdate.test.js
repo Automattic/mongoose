@@ -1334,7 +1334,6 @@ describe('model: findOneAndUpdate:', function() {
       const opts = {
         new: true,
         upsert: false,
-        passRawResult: false,
         overwrite: false,
         runValidators: true
       };
@@ -2182,5 +2181,52 @@ describe('model: findOneAndUpdate:', function() {
     );
     assert.ok(document);
     assert.equal(document.name, 'test');
+  });
+
+  it('skips adding defaults to filter when passing empty update (gh-13962)', async function() {
+    const schema = new Schema({
+      myField: Number,
+      defaultField: { type: String, default: 'default' }
+    }, { versionKey: false });
+    const Test = db.model('Test', schema);
+
+    await Test.create({ myField: 1, defaultField: 'some non-default value' });
+
+    const updated = await Test.findOneAndUpdate(
+      { myField: 1 },
+      {},
+      { upsert: true, returnDocument: 'after' }
+    );
+    assert.equal(updated.defaultField, 'some non-default value');
+  });
+
+  it('sets CastError path to full path (gh-14114)', async function() {
+    const testSchema = new mongoose.Schema({
+      id: mongoose.Schema.Types.ObjectId,
+      name: String,
+      accessories: [
+        {
+          isEnabled: Boolean,
+          additionals: [
+            {
+              k: String,
+              v: Number
+            }
+          ]
+        }
+      ]
+    });
+    const Test = db.model('Test', testSchema);
+    const err = await Test.findOneAndUpdate(
+      {},
+      {
+        $set: {
+          'accessories.0.additionals.0.k': ['test']
+        }
+      }
+    ).then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'CastError');
+    assert.equal(err.path, 'accessories.0.additionals.0.k');
   });
 });

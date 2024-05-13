@@ -4,12 +4,13 @@ Error.stackTraceLimit = Infinity;
 
 const acquit = require('acquit');
 const fs = require('fs');
+const fsextra = require('fs-extra');
 const path = require('path');
 const pug = require('pug');
 const pkg = require('../package.json');
 const transform = require('acquit-require');
 const childProcess = require("child_process");
-
+require('./generateSearch');
 // using "__dirname" and ".." to have a consistent CWD, this script should not be runnable, even when not being in the root of the project
 // also a consistent root path so that it is easy to change later when the script should be moved
 const cwd = path.resolve(__dirname, '..');
@@ -31,7 +32,7 @@ require('acquit-ignore')();
 const { marked: markdown } = require('marked');
 const highlight = require('highlight.js');
 const { promisify } = require("util");
-const renderer = {
+markdown.use({
   heading: function(text, level, raw, slugger) {
     const slug = slugger.slug(raw);
     return `<h${level} id="${slug}">
@@ -40,7 +41,7 @@ const renderer = {
       </a>
     </h${level}>\n`;
   }
-};
+});
 markdown.setOptions({
   highlight: function(code, language) {
     if (!language) {
@@ -52,29 +53,99 @@ markdown.setOptions({
     return highlight.highlight(code, { language }).value;
   }
 });
-markdown.use({ renderer });
 
-const testPath = path.resolve(cwd, 'test')
+const testPath = path.resolve(cwd, 'test');
 
-const tests = [
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'geojson.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/transactions.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'schema.alias.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'model.middleware.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/date.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/lean.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/cast.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/findoneandupdate.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/custom-casting.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/getters-setters.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/virtuals.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/defaults.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/discriminators.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/promises.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/schematypes.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/validation.test.js')).toString()),
-  ...acquit.parse(fs.readFileSync(path.join(testPath, 'docs/schemas.test.js')).toString())
+/** additional test files to scan, relative to `test/` */
+const additionalTestFiles = [
+  'geojson.test.js',
+  'schema.alias.test.js'
 ];
+/** ignored files from `test/docs/` */
+const ignoredTestFiles = [
+  // ignored because acquit does not like "for await"
+  'asyncIterator.test.js'
+];
+
+/**
+ * Load all test file contents with acquit
+ * @returns {Object[]} acquit ast array
+ */
+function getTests() {
+  const testDocs = path.resolve(testPath, 'docs');
+  const filesToScan = [
+    ...additionalTestFiles.map(v => path.join(testPath, v)),
+    ...fs.readdirSync(testDocs).filter(v => !ignoredTestFiles.includes(v)).map(v => path.join(testDocs, v))
+  ];
+
+  const retArray = [];
+
+  for (const file of filesToScan) {
+    try {
+      retArray.push(acquit.parse(fs.readFileSync(file).toString()));
+    } catch (err) {
+      // add a file path to a acquit error, for better debugging
+      err.filePath = file;
+      throw err;
+    }
+  }
+
+  return retArray.flat();
+}
+
+function deleteAllHtmlFiles() {
+  try {
+    console.log('Delete', path.join(versionObj.versionedPath, 'index.html'));
+    fs.unlinkSync(path.join(versionObj.versionedPath, 'index.html'));
+  } catch (err) {
+    if (err.code !== 'ENOENT') {
+      throw err;
+    }
+  }
+  const foldersToClean = [
+    path.join('.', versionObj.versionedPath, 'docs'),
+    path.join('.', versionObj.versionedPath, 'docs', 'tutorials'),
+    path.join('.', versionObj.versionedPath, 'docs', 'typescript'),
+    path.join('.', versionObj.versionedPath, 'docs', 'api'),
+    path.join('.', versionObj.versionedPath, 'docs', 'source', '_docs'),
+    './tmp'
+  ];
+  for (const folder of foldersToClean) {
+    let files = [];
+
+    try {
+      files = fs.readdirSync(folder);
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        continue;
+      }
+    }
+    for (const file of files) {
+      if (file.endsWith('.html')) {
+        console.log('Delete', path.join(folder, file));
+        fs.unlinkSync(path.join(folder, file));
+      }
+    }
+  }
+}
+
+function moveDocsToTemp() {
+  if (!versionObj.versionedPath) {
+    throw new Error('Cannot move unversioned deploy to /tmp');
+  }
+  try {
+    fs.rmSync('./tmp', { recursive: true });
+  } catch (err) {
+    if (err.code !== 'ENOENT') {
+      throw err;
+    }
+  }
+  const folder = versionObj.versionedPath.replace(/^\//, '');
+  const directory = fs.readdirSync(folder);
+  for (const file of directory) {
+    fsextra.moveSync(`${folder}/${file}`, `./tmp/${file}`);
+  }
+}
 
 /** 
  * Array of array of semver numbers, sorted with highest number first
@@ -90,7 +161,8 @@ let filteredTags = [];
  * @returns number array or undefined
  */
 function parseVersion(str) {
-  const versionReg = /^v?(\d+)\.(\d+)\.(\d+)$/i;
+  // there is no ending "$", because of "rc"-like versions
+  const versionReg = /^v?(\d+)\.(\d+)\.(\d+)/i;
 
   const match = versionReg.exec(str);
 
@@ -105,12 +177,23 @@ function parseVersion(str) {
     return parsed;
   }
 
+  // special case, to not log a warning
+  if (str === "test") {
+    return undefined;
+  }
+
+  console.log(`Failed to parse version! got: ${str}`);
+
   return undefined;
 }
 
+/**
+ * Get versions from git tags and put them into {@link filteredTags}
+ */
 function getVersions() {
   // get all tags from git
-  const res = childProcess.execSync("git tag").toString();
+  // "trim" is used to remove the ending new-line
+  const res = childProcess.execSync("git tag").toString().trim();
 
   filteredTags = res.split('\n')
   // map all gotten tags if they match the regular expression
@@ -210,11 +293,12 @@ const versionObj = (() => {
     currentVersion: getCurrentVersion(),
     latestVersion: getLatestVersion(),
     pastVersions: [
+      getLatestVersionOf(7),
       getLatestVersionOf(6),
       getLatestVersionOf(5),
     ]
   };
-  const versionedDeploy = process.env.DOCS_DEPLOY === "true" ? !(base.currentVersion.listed === base.latestVersion.listed) : false;
+  const versionedDeploy = !!process.env.DOCS_DEPLOY ? !(base.currentVersion.listed === base.latestVersion.listed) : false;
 
   const versionedPath = versionedDeploy ? `/docs/${base.currentVersion.path}` : '';
 
@@ -351,7 +435,7 @@ async function pugify(filename, options, isReload = false) {
   let contents = fs.readFileSync(path.resolve(cwd, inputFile)).toString();
 
   if (options.acquit) {
-    contents = transform(contents, tests);
+    contents = transform(contents, getTests());
 
     contents = contents.replaceAll(/^```acquit$/gmi, "```javascript");
   }
@@ -410,7 +494,7 @@ async function pugify(filename, options, isReload = false) {
   });
 }
 
-// extra function to start watching for file-changes, without having to call this file directly with "watch"
+/** extra function to start watching for file-changes, without having to call this file directly with "watch" */
 function startWatch() {
   Object.entries(docsFilemap.fileMap).forEach(([file, fileValue]) => {
     let watchPath = path.resolve(cwd, file);
@@ -478,7 +562,7 @@ const pathsToCopy = [
   'docs/js',
   'docs/css',
   'docs/images'
-]
+];
 
 /** Copy all static files when versionedDeploy is used */
 async function copyAllRequiredFiles() {
@@ -487,7 +571,6 @@ async function copyAllRequiredFiles() {
     return;
   }
 
-  const fsextra = require('fs-extra');
   await Promise.all(pathsToCopy.map(async v => {
     const resultPath = path.resolve(cwd, path.join('.', versionObj.versionedPath, v));
     await fsextra.copy(v, resultPath);
@@ -504,8 +587,16 @@ exports.cwd = cwd;
 
 // only run the following code if this file is the main module / entry file
 if (isMain) {
-  console.log(`Processing ~${files.length} files`);
-  Promise.all([pugifyAllFiles(), copyAllRequiredFiles()]).then(() => {
-    console.log("Done Processing");
-  })
+  (async function main() {
+    console.log(`Processing ~${files.length} files`);
+
+    await deleteAllHtmlFiles();
+    await pugifyAllFiles();
+    await copyAllRequiredFiles();
+    if (!!process.env.DOCS_DEPLOY && !!versionObj.versionedPath) {
+      await moveDocsToTemp();
+    }
+
+    console.log('Done Processing');
+  })();
 }

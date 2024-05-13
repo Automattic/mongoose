@@ -6,11 +6,19 @@ However, there are some cases where you need to use [`findOneAndUpdate()`](https
 * [Getting Started](#getting-started)
 * [Atomic Updates](#atomic-updates)
 * [Upsert](#upsert)
-* [The `rawResult` Option](#raw-result)
+* [The `includeResultMetadata` Option](#includeresultmetadata)
+* [Updating Discriminator Keys](#updating-discriminator-keys)
 
 ## Getting Started
 
-As the name implies, `findOneAndUpdate()` finds the first document that matches a given `filter`, applies an `update`, and returns the document. By default, `findOneAndUpdate()` returns the document as it was **before** `update` was applied.
+As the name implies, `findOneAndUpdate()` finds the first document that matches a given `filter`, applies an `update`, and returns the document.
+The `findOneAndUpdate()` function has the following signature:
+
+```javascript
+function findOneAndUpdate(filter, update, options) {}
+```
+
+By default, `findOneAndUpdate()` returns the document as it was **before** `update` was applied.
 
 ```acquit
 [require:Tutorial.*findOneAndUpdate.*basic case]
@@ -51,17 +59,17 @@ Using the `upsert` option, you can use `findOneAndUpdate()` as a find-and-[upser
 [require:Tutorial.*findOneAndUpdate.*upsert]
 ```
 
-<h2 id="raw-result">The `rawResult` Option</h2>
+<h2 id="includeresultmetadata">The <code>includeResultMetadata</code> Option<h2 id="rawresult"></h2></h2>
 
 Mongoose transforms the result of `findOneAndUpdate()` by default: it
 returns the updated document. That makes it difficult to check whether
 a document was upserted or not. In order to get the updated document
 and check whether MongoDB upserted a new document in the same operation,
-you can set the `rawResult` flag to make Mongoose return the raw result
+you can set the `includeResultMetadata` flag to make Mongoose return the raw result
 from MongoDB.
 
 ```acquit
-[require:Tutorial.*findOneAndUpdate.*rawResult$]
+[require:Tutorial.*findOneAndUpdate.*includeResultMetadata$]
 ```
 
 Here's what the `res` object from the above example looks like:
@@ -77,4 +85,32 @@ Here's what the `res` object from the above example looks like:
      __v: 0,
      age: 29 },
   ok: 1 }
+```
+
+## Updating Discriminator Keys
+
+Mongoose prevents updating the [discriminator key](../discriminators.html#discriminator-keys) using `findOneAndUpdate()` by default.
+For example, suppose you have the following discriminator models.
+
+```javascript
+const eventSchema = new mongoose.Schema({ time: Date });
+const Event = db.model('Event', eventSchema);
+
+const ClickedLinkEvent = Event.discriminator(
+  'ClickedLink',
+  new mongoose.Schema({ url: String })
+);
+
+const SignedUpEvent = Event.discriminator(
+  'SignedUp',
+  new mongoose.Schema({ username: String })
+);
+```
+
+Mongoose will remove `__t` (the default discriminator key) from the `update` parameter, if `__t` is set.
+This is to prevent unintentional updates to the discriminator key; for example, if you're passing untrusted user input to the `update` parameter.
+However, you can tell Mongoose to allow updating the discriminator key by setting the `overwriteDiscriminatorKey` option to `true` as shown below.
+
+```acquit
+[require:use overwriteDiscriminatorKey to change discriminator key]
 ```

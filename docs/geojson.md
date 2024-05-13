@@ -115,7 +115,7 @@ the city of Denver, Colorado. It then queries for all documents within
 a polygon representing the state of Colorado using
 [the MongoDB `$geoWithin` operator](https://www.mongodb.com/docs/manual/reference/operator/query/geoWithin/).
 
-<img src="https://i.imgur.com/i32pWnC.png">
+<img src="https://i.imgur.com/i32pWnC.png" alt="Colorado GeoJSON Polygon">
 
 ```acquit
 [require:geojson.*driver query]

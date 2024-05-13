@@ -28,7 +28,6 @@ declare module 'mongoose' {
       value: any;
       path: string;
       reason?: NativeError | null;
-      model?: any;
 
       constructor(type: string, value: any, path: string, reason?: NativeError, schemaType?: SchemaType);
     }

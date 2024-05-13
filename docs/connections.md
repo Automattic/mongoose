@@ -267,22 +267,46 @@ connection may emit.
 
 * `connecting`: Emitted when Mongoose starts making its initial connection to the MongoDB server
 * `connected`: Emitted when Mongoose successfully makes its initial connection to the MongoDB server, or when Mongoose reconnects after losing connectivity. May be emitted multiple times if Mongoose loses connectivity.
-* `open`: Emitted after `'connected'` and `onOpen` is executed on all of this connection's models.
-* `disconnecting`: Your app called [`Connection#close()`](api/connection.html#connection_Connection-close) to disconnect from MongoDB
+* `open`: Emitted after `'connected'` and `onOpen` is executed on all of this connection's models. May be emitted multiple times if Mongoose loses connectivity.
+* `disconnecting`: Your app called [`Connection#close()`](api/connection.html#connection_Connection-close) to disconnect from MongoDB. This includes calling `mongoose.disconnect()`, which calls `close()` on all connections.
 * `disconnected`: Emitted when Mongoose lost connection to the MongoDB server. This event may be due to your code explicitly closing the connection, the database server crashing, or network connectivity issues.
 * `close`: Emitted after [`Connection#close()`](api/connection.html#connection_Connection-close) successfully closes the connection. If you call `conn.close()`, you'll get both a 'disconnected' event and a 'close' event.
 * `reconnected`: Emitted if Mongoose lost connectivity to MongoDB and successfully reconnected. Mongoose attempts to [automatically reconnect](https://thecodebarbarian.com/managing-connections-with-the-mongodb-node-driver.html) when it loses connection to the database.
 * `error`: Emitted if an error occurs on a connection, like a `parseError` due to malformed data or a payload larger than [16MB](https://www.mongodb.com/docs/manual/reference/limits/#BSON-Document-Size).
-* `fullsetup`: Emitted when you're connecting to a replica set and Mongoose has successfully connected to the primary and at least one secondary.
-* `all`: Emitted when you're connecting to a replica set and Mongoose has successfully connected to all servers specified in your connection string.
 
-When you're connecting to a single MongoDB server (a "standalone"), Mongoose will emit 'disconnected' if it gets
-disconnected from the standalone server, and 'connected' if it successfully connects to the standalone. In a
-replica set, Mongoose will emit 'disconnected' if it loses connectivity to the replica set primary, and 'connected' if it manages to reconnect to the replica set primary.
+When you're connecting to a single MongoDB server (a ["standalone"](https://www.mongodb.com/docs/cloud-manager/tutorial/deploy-standalone/)), Mongoose will emit `disconnected` if it gets
+disconnected from the standalone server, and `connected` if it successfully connects to the standalone. In a
+[replica set](https://www.mongodb.com/docs/manual/replication/), Mongoose will emit `disconnected` if it loses connectivity to the replica set primary, and `connected` if it manages to reconnect to the replica set primary.
+
+If you are using `mongoose.connect()`, you can use the following to listen to the above events:
+
+```javascript
+mongoose.connection.on('connected', () => console.log('connected'));
+mongoose.connection.on('open', () => console.log('open'));
+mongoose.connection.on('disconnected', () => console.log('disconnected'));
+mongoose.connection.on('reconnected', () => console.log('reconnected'));
+mongoose.connection.on('disconnecting', () => console.log('disconnecting'));
+mongoose.connection.on('close', () => console.log('close'));
+
+mongoose.connect('mongodb://127.0.0.1:27017/mongoose_test');
+```
+
+With `mongoose.createConnection()`, use the following instead:
+
+```javascript
+const conn = mongoose.createConnection('mongodb://127.0.0.1:27017/mongoose_test');
+
+conn.on('connected', () => console.log('connected'));
+conn.on('open', () => console.log('open'));
+conn.on('disconnected', () => console.log('disconnected'));
+conn.on('reconnected', () => console.log('reconnected'));
+conn.on('disconnecting', () => console.log('disconnecting'));
+conn.on('close', () => console.log('close'));
+```
 
 <h2 id="keepAlive"><a href="#keepAlive">A note about keepAlive</a></h2>
 
-Before Mongoose 5.2.0, you needed to enable the `keepAlive` option to initiate [TCP keepalive](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html) to prevent `"connection closed"` errors errors.
+Before Mongoose 5.2.0, you needed to enable the `keepAlive` option to initiate [TCP keepalive](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html) to prevent `"connection closed"` errors.
 However, `keepAlive` has been `true` by default since Mongoose 5.2.0, and the `keepAlive` is deprecated as of Mongoose 7.2.0.
 Please remove `keepAlive` and `keepAliveInitialDelay` options from your Mongoose connections.
 
@@ -402,16 +426,24 @@ The `mongoose.createConnection()` function takes the same arguments as
 const conn = mongoose.createConnection('mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]', options);
 ```
 
-This [connection](api/connection.html#connection_Connection) object is then used to
-create and retrieve [models](api/model.html#model_Model). Models are
-**always** scoped to a single connection.
+This [connection](api/connection.html#connection_Connection) object is then used to create and retrieve [models](api/model.html#model_Model).
+Models are **always** scoped to a single connection.
 
 ```javascript
 const UserModel = conn.model('User', userSchema);
 ```
 
-If you use multiple connections, you should make sure you export schemas,
-**not** models. Exporting a model from a file is called the *export model pattern*.
+The `createConnection()` function returns a connection instance, not a promise.
+If you want to use `await` to make sure Mongoose successfully connects to MongoDB, use the [`asPromise()` function](api/connection.html#Connection.prototype.asPromise()):
+
+```javascript
+// `asPromise()` returns a promise that resolves to the connection
+// once the connection succeeds, or rejects if connection failed.
+const conn = await mongoose.createConnection(connectionString).asPromise();
+```
+
+If you use multiple connections, you should make sure you export schemas, **not** models.
+Exporting a model from a file is called the *export model pattern*.
 The export model pattern is limited because you can only use one connection.
 
 ```javascript
@@ -425,30 +457,10 @@ module.exports = userSchema;
 // module.exports = mongoose.model('User', userSchema);
 ```
 
-If you use the export schema pattern, you still need to create models
-somewhere. There are two common patterns. First is to export a connection
-and register the models on the connection in the file:
-
-```javascript
-// connections/fast.js
-const mongoose = require('mongoose');
-
-const conn = mongoose.createConnection(process.env.MONGODB_URI);
-conn.model('User', require('../schemas/user'));
-
-module.exports = conn;
-
-// connections/slow.js
-const mongoose = require('mongoose');
-
-const conn = mongoose.createConnection(process.env.MONGODB_URI);
-conn.model('User', require('../schemas/user'));
-conn.model('PageView', require('../schemas/pageView'));
-
-module.exports = conn;
-```
-
-Another alternative is to register connections with a dependency injector
+If you use the export schema pattern, you still need to create models somewhere.
+There are two common patterns.
+The first is to create a function that instantiates a new connection and registers all models on that connection.
+With this pattern, you may also register connections with a dependency injector
 or another [inversion of control (IOC) pattern](https://thecodebarbarian.com/using-ramda-as-a-dependency-injector).
 
 ```javascript
@@ -463,6 +475,23 @@ module.exports = function connectionFactory() {
   return conn;
 };
 ```
+
+Exporting a function that creates a new connection is the most flexible pattern.
+However, that pattern can make it tricky to get access to your connection from your route handlers or wherever your business logic is.
+An alternative pattern is to export a connection and register the models on the connection in the file's top-level scope as follows.
+
+```javascript
+// connections/index.js
+const mongoose = require('mongoose');
+
+const conn = mongoose.createConnection(process.env.MONGODB_URI);
+conn.model('User', require('../schemas/user'));
+
+module.exports = conn;
+```
+
+You can create separate files for each connection, like `connections/web.js` and `connections/mobile.js` if you want to create separate connections for your web API backend and your mobile API backend.
+Your business logic can then `require()` or `import` the connection it needs.
 
 <h2 id="connection_pools"><a href="#connection_pools">Connection Pools</a></h2>
 

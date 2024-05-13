@@ -52,7 +52,6 @@ In query middleware functions, `this` refers to the query.
 * [findOneAndUpdate](api/query.html#query_Query-findOneAndUpdate)
 * [remove](api/model.html#model_Model-remove)
 * [replaceOne](api/query.html#query_Query-replaceOne)
-* [update](api/query.html#query_Query-update)
 * [updateOne](api/query.html#query_Query-updateOne)
 * [updateMany](api/query.html#query_Query-updateMany)
 * [validate](validation.html#update-validators)
@@ -67,13 +66,17 @@ Model middleware is supported for the following model functions.
 Don't confuse model middleware and document middleware: model middleware hooks into *static* functions on a `Model` class, document middleware hooks into *methods* on a `Model` class.
 In model middleware functions, `this` refers to the model.
 
+* [bulkWrite](api/model.html#model_Model-bulkWrite)
+* [createCollection](api/model.html#model_Model-createCollection)
 * [insertMany](api/model.html#model_Model-insertMany)
 
 Here are the possible strings that can be passed to `pre()`
 
 * aggregate
+* bulkWrite
 * count
 * countDocuments
+* createCollection
 * deleteOne
 * deleteMany
 * estimatedDocumentCount
@@ -148,7 +151,7 @@ schema.pre('save', function() {
     then(() => doMoreStuff());
 });
 
-// Or, in Node.js >= 7.6.0:
+// Or, using async functions
 schema.pre('save', async function() {
   await doStuff();
   await doMoreStuff();
@@ -247,9 +250,7 @@ schema.post('deleteOne', function(doc) {
 
 <h2 id="post-async"><a href="#post-async">Asynchronous Post Hooks</a></h2>
 
-If your post hook function takes at least 2 parameters, mongoose will
-assume the second parameter is a `next()` function that you will call to
-trigger the next middleware in the sequence.
+If your post hook function takes at least 2 parameters, mongoose will assume the second parameter is a `next()` function that you will call to trigger the next middleware in the sequence.
 
 ```javascript
 // Takes 2 parameters: this is an asynchronous post hook
@@ -264,6 +265,25 @@ schema.post('save', function(doc, next) {
 // Will not execute until the first middleware calls `next()`
 schema.post('save', function(doc, next) {
   console.log('post2');
+  next();
+});
+```
+
+You can also pass an async function to `post()`.
+If you pass an async function that takes at least 2 parameters, you are still responsible for calling `next()`.
+However, you can also pass in an async function that takes less than 2 parameters, and Mongoose will wait for the promise to resolve.
+
+```javascript
+schema.post('save', async function(doc) {
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  console.log('post1');
+  // If less than 2 parameters, no need to call `next()`
+});
+
+schema.post('save', async function(doc, next) {
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  console.log('post1');
+  // If there's a `next` parameter, you need to call `next()`.
   next();
 });
 ```
@@ -535,15 +555,14 @@ also define a post `update()` hook that will catch MongoDB duplicate key
 errors.
 
 ```javascript
-// The same E11000 error can occur when you call `update()`
-// This function **must** take 3 parameters. If you use the
-// `passRawResult` function, this function **must** take 4
-// parameters
-schema.post('update', function(error, res, next) {
+// The same E11000 error can occur when you call `updateOne()`
+// This function **must** take 4 parameters.
+
+schema.post('updateOne', function(passRawResult, error, res, next) {
   if (error.name === 'MongoServerError' && error.code === 11000) {
     next(new Error('There was a duplicate key error'));
   } else {
-    next(); // The `update()` call will still error out.
+    next(); // The `updateOne()` call will still error out.
   }
 });
 
@@ -551,7 +570,7 @@ const people = [{ name: 'Axl Rose' }, { name: 'Slash' }];
 await Person.create(people);
 
 // Throws "There was a duplicate key error"
-await Person.update({ name: 'Slash' }, { $set: { name: 'Axl Rose' } });
+await Person.updateOne({ name: 'Slash' }, { $set: { name: 'Axl Rose' } });
 ```
 
 Error handling middleware can transform an error, but it can't remove the

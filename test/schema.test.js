@@ -72,6 +72,7 @@ describe('schema', function() {
         },
         b: { $type: String }
       }, { typeKey: '$type' });
+      db.deleteModel(/Test/);
       NestedModel = db.model('Test', NestedSchema);
     });
 
@@ -2166,7 +2167,7 @@ describe('schema', function() {
   });
 
   it('SchemaStringOptions line up with schema/string (gh-8256)', function() {
-    const SchemaStringOptions = require('../lib/options/SchemaStringOptions');
+    const SchemaStringOptions = require('../lib/options/schemaStringOptions');
     const keys = Object.keys(SchemaStringOptions.prototype).
       filter(key => key !== 'constructor' && key !== 'populate');
     const functions = Object.keys(Schema.Types.String.prototype).
@@ -3171,5 +3172,90 @@ describe('schema', function() {
     const doc = await Test.create({ name: 'Test Testerson' });
     const res = await Test.findOne({ _id: { $eq: doc._id, $type: 'objectId' } });
     assert.equal(res.name, 'Test Testerson');
+  });
+  it('deduplicates idGetter (gh-14457)', function() {
+    const schema = new Schema({ name: String });
+    schema._preCompile();
+    assert.equal(schema.virtual('id').getters.length, 1);
+    schema._preCompile();
+    assert.equal(schema.virtual('id').getters.length, 1);
+  });
+
+  it('handles recursive definitions in discriminators (gh-13978)', function() {
+    const base = new Schema({
+      type: { type: Number, required: true }
+    }, { discriminatorKey: 'type' });
+
+    const recursive = new Schema({
+      self: { type: base, required: true }
+    });
+
+    base.discriminator(1, recursive);
+    const TestModel = db.model('gh13978', base);
+
+    const doc = new TestModel({ type: 1, self: { type: 1 } });
+    assert.strictEqual(doc.self.type, 1);
+  });
+  it('handles recursive definitions of arrays in discriminators (gh-14055)', function() {
+    const base = new Schema({
+      type: { type: Number, required: true }
+    }, { discriminatorKey: 'type' });
+
+    const recursive = new Schema({
+      self: { type: [base], required: true }
+    });
+
+    base.discriminator(1, recursive);
+    const baseModel = db.model('gh14055', base);
+    const doc = new baseModel({ type: 1, self: [{ type: 1 }] });
+    assert.equal(doc.self[0].type, 1);
+  });
+  it('should have the correct schema definition with array schemas (gh-14416)', function() {
+    const schema = new Schema({
+      nums: [{ type: Array, of: Number }],
+      tags: [{ type: 'Array', of: String }],
+      subdocs: [{ type: Array, of: Schema({ name: String }) }]
+    });
+    assert.equal(schema.path('nums.$').caster.instance, 'Number'); // actually Mixed
+    assert.equal(schema.path('tags.$').caster.instance, 'String'); // actually Mixed
+    assert.equal(schema.path('subdocs.$').casterConstructor.schema.path('name').instance, 'String'); // actually Mixed
+  });
+  it('handles discriminator options with Schema.prototype.discriminator (gh-14448)', async function() {
+    const eventSchema = new mongoose.Schema({
+      name: String
+    }, { discriminatorKey: 'kind' });
+    const clickedEventSchema = new mongoose.Schema({ element: String });
+    eventSchema.discriminator(
+      'Test2',
+      clickedEventSchema,
+      { value: 'click' }
+    );
+    const Event = db.model('Test', eventSchema);
+    const ClickedModel = db.model('Test2');
+
+    const doc = await Event.create({ kind: 'click', element: '#hero' });
+    assert.equal(doc.element, '#hero');
+    assert.ok(doc instanceof ClickedModel);
+  });
+
+  it('supports schema-level readConcern (gh-14511)', async function() {
+    const eventSchema = new mongoose.Schema({
+      name: String
+    }, { readConcern: { level: 'available' } });
+    const Event = db.model('Test', eventSchema);
+
+    let q = Event.find();
+    let options = q._optionsForExec();
+    assert.deepStrictEqual(options.readConcern, { level: 'available' });
+
+    q = Event.find().setOptions({ readConcern: { level: 'local' } });
+    options = q._optionsForExec();
+    assert.deepStrictEqual(options.readConcern, { level: 'local' });
+
+    q = Event.find().setOptions({ readConcern: null });
+    options = q._optionsForExec();
+    assert.deepStrictEqual(options.readConcern, null);
+
+    await q;
   });
 });

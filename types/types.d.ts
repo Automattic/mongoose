@@ -1,6 +1,7 @@
 
 declare module 'mongoose' {
   import mongodb = require('mongodb');
+  import bson = require('bson');
 
   class NativeBuffer extends Buffer {}
 
@@ -59,7 +60,7 @@ declare module 'mongoose' {
 
     class Decimal128 extends mongodb.Decimal128 { }
 
-    class DocumentArray<T> extends Types.Array<T extends Types.Subdocument ? T : Types.Subdocument<InferId<T>> & T> {
+    class DocumentArray<T> extends Types.Array<T extends Types.Subdocument ? T : Types.Subdocument<InferId<T>, any, T> & T> {
       /** DocumentArray constructor */
       constructor(values: AnyObject[]);
 
@@ -82,7 +83,7 @@ declare module 'mongoose' {
     class ObjectId extends mongodb.ObjectId {
     }
 
-    class Subdocument<IdType = any> extends Document<IdType> {
+    class Subdocument<IdType = unknown, TQueryHelpers = any, DocType = any> extends Document<IdType, TQueryHelpers, DocType> {
       $isSingleNested: true;
 
       /** Returns the top level document of this sub-document. */
@@ -99,5 +100,7 @@ declare module 'mongoose' {
       /** Returns this sub-documents parent array. */
       parentArray(): Types.DocumentArray<unknown>;
     }
+
+    class UUID extends bson.UUID {}
   }
 }

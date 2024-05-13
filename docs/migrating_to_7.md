@@ -15,6 +15,7 @@ If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration 
 * [Removed `remove()`](#removed-remove)
 * [Dropped callback support](#dropped-callback-support)
 * [Removed `update()`](#removed-update)
+* [ObjectId requires `new`](#objectid-requires-new)
 * [Discriminator schemas use base schema options by default](#discriminator-schemas-use-base-schema-options-by-default)
 * [Removed `castForQueryWrapper()`, updated `castForQuery()` signature](#removed-castforquerywrapper)
 * [Copy schema options in `Schema.prototype.add()`](#copy-schema-options-in-schema-prototype-add)
@@ -86,6 +87,8 @@ They always return promises.
 * `Aggregate.prototype.exec`
 * `Aggregate.prototype.explain`
 * `AggregationCursor.prototype.close`
+* `AggregationCursor.prototype.next`
+* `AggregationCursor.prototype.eachAsync`
 * `Connection.prototype.startSession`
 * `Connection.prototype.dropCollection`
 * `Connection.prototype.createCollection`
@@ -137,6 +140,7 @@ They always return promises.
 * `Query.prototype.exec`
 * `QueryCursor.prototype.close`
 * `QueryCursor.prototype.next`
+* `QueryCursor.prototype.eachAsync`
 
 If you are using the above functions with callbacks, we recommend switching to async/await, or promises if async functions don't work for you.
 If you need help refactoring a legacy codebase, [this tool from Mastering JS callbacks to async await](https://masteringjs.io/tutorials/tools/callback-to-async-await) using ChatGPT.
@@ -176,6 +180,23 @@ await doc.update(update);
 // After
 await Model.updateOne(filter, update);
 await doc.updateOne(update);
+```
+
+<h2 id="objectid-requires-new"><a href="#objectid-requires-new">ObjectId requires <code>new</code></a></h2>
+
+In Mongoose 6 and older, you could define a new ObjectId without using the `new` keyword:
+
+```javascript
+// Works in Mongoose 6
+// Throws "Class constructor ObjectId cannot be invoked without 'new'" in Mongoose 7
+const oid = mongoose.Types.ObjectId('0'.repeat(24));
+```
+
+In Mongoose 7, `ObjectId` is now a [JavaScript class](https://masteringjs.io/tutorials/fundamentals/class), so you need to use the `new` keyword.
+
+```javascript
+// Works in Mongoose 6 and Mongoose 7
+const oid = new mongoose.Types.ObjectId('0'.repeat(24));
 ```
 
 <h2 id="discriminator-schemas-use-base-schema-options-by-default"><a href="#discriminator-schemas-use-base-schema-options-by-default">Discriminator schemas use base schema options by default</a></h2>

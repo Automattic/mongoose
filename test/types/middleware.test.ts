@@ -1,5 +1,6 @@
-import { Schema, model, Model, Document, SaveOptions, Query, Aggregate, HydratedDocument, PreSaveMiddlewareFunction } from 'mongoose';
+import { Schema, model, Model, Document, SaveOptions, Query, Aggregate, HydratedDocument, PreSaveMiddlewareFunction, ModifyResult, AnyBulkWriteOperation } from 'mongoose';
 import { expectError, expectType, expectNotType, expectAssignable } from 'tsd';
+import { CreateCollectionOptions } from 'mongodb';
 
 const preMiddlewareFn: PreSaveMiddlewareFunction<Document> = function(next, opts) {
   this.$markValid('name');
@@ -62,6 +63,10 @@ schema.post<ITest>('save', function() {
   console.log(this.name);
 });
 
+schema.post<ITest>('save', async function() {
+  console.log(this.name);
+});
+
 schema.post<ITest>('save', function(err: Error, res: ITest, next: Function) {
   console.log(this.name, err.stack);
 });
@@ -71,7 +76,7 @@ schema.pre<Model<ITest>>('insertMany', function() {
   return Promise.resolve();
 });
 
-schema.pre<Model<ITest>>('insertMany', { document: false, query: false }, function() {
+schema.pre<Model<ITest>>('insertMany', function() {
   console.log(this.name);
 });
 
@@ -90,9 +95,11 @@ schema.pre<Model<ITest>>('insertMany', function(next, docs: Array<ITest>) {
   next();
 });
 
-schema.pre<Query<number, any>>('count', function(next) {});
-schema.post<Query<number, any>>('count', function(count, next) {
-  expectType<number>(count);
+schema.pre<Model<ITest>>('bulkWrite', function(next, ops: Array<AnyBulkWriteOperation<any>>) {
+  next();
+});
+
+schema.pre<Model<ITest>>('createCollection', function(next, opts?: CreateCollectionOptions) {
   next();
 });
 
@@ -109,7 +116,17 @@ schema.post<Query<number, any>>('countDocuments', function(count, next) {
 });
 
 schema.post<Query<ITest, ITest>>('findOneAndDelete', function(res, next) {
-  expectType<ITest>(res);
+  expectType<ITest | ModifyResult<ITest> | null>(res);
+  next();
+});
+
+schema.post<Query<ITest, ITest>>('findOneAndUpdate', function(res, next) {
+  expectType<ITest | ModifyResult<ITest> | null>(res);
+  next();
+});
+
+schema.post<Query<ITest, ITest>>('findOneAndReplace', function(res, next) {
+  expectType<ITest | ModifyResult<ITest> | null>(res);
   next();
 });
 

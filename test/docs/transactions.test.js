@@ -396,4 +396,101 @@ describe('transactions', function() {
     assert.equal(docs.length, 1);
     assert.equal(docs[0].name, 'test');
   });
+
+  it('handles resetting array state with $set atomic (gh-13698)', async function() {
+    db.deleteModel(/Test/);
+    const subItemSchema = new mongoose.Schema(
+      {
+        name: { type: String, required: true }
+      },
+      { _id: false }
+    );
+
+    const itemSchema = new mongoose.Schema(
+      {
+        name: { type: String, required: true },
+        subItems: { type: [subItemSchema], required: true }
+      },
+      { _id: false }
+    );
+
+    const schema = new mongoose.Schema({
+      items: { type: [itemSchema], required: true }
+    });
+
+    const Test = db.model('Test', schema);
+
+    const { _id } = await Test.create({
+      items: [
+        { name: 'test1', subItems: [{ name: 'x1' }] },
+        { name: 'test2', subItems: [{ name: 'x2' }] }
+      ]
+    });
+
+    const doc = await Test.findById(_id).orFail();
+    let attempt = 0;
+
+    await db.transaction(async(session) => {
+      await doc.save({ session });
+
+      if (attempt === 0) {
+        attempt += 1;
+        throw new mongoose.mongo.MongoServerError({
+          message: 'Test transient transaction failures & retries',
+          errorLabels: [mongoose.mongo.MongoErrorLabel.TransientTransactionError]
+        });
+      }
+    });
+
+    const { items } = await Test.findById(_id).orFail();
+    assert.ok(Array.isArray(items));
+    assert.equal(items.length, 2);
+    assert.equal(items[0].name, 'test1');
+    assert.equal(items[0].subItems.length, 1);
+    assert.equal(items[0].subItems[0].name, 'x1');
+    assert.equal(items[1].name, 'test2');
+    assert.equal(items[1].subItems.length, 1);
+    assert.equal(items[1].subItems[0].name, 'x2');
+  });
+
+  it('transaction() retains modified status for documents created outside of the transaction then modified inside the transaction (gh-13973)', async function() {
+    db.deleteModel(/Test/);
+    const Test = db.model('Test', Schema({ status: String }));
+
+    await Test.createCollection();
+    await Test.deleteMany({});
+
+    const { _id } = await Test.create({ status: 'test' });
+    const doc = await Test.findById(_id);
+
+    let i = 0;
+    await db.transaction(async(session) => {
+      doc.status = 'test2';
+      assert.ok(doc.$isModified('status'));
+      await doc.save({ session });
+      if (++i < 3) {
+        throw new mongoose.mongo.MongoServerError({
+          errorLabels: ['TransientTransactionError']
+        });
+      }
+    });
+
+    assert.equal(i, 3);
+  });
+
+  it('doesnt apply schema write concern to transaction operations (gh-11382)', async function() {
+    db.deleteModel(/Test/);
+    const Test = db.model('Test', Schema({ status: String }, { writeConcern: { w: 'majority' } }));
+
+    await Test.createCollection();
+    await Test.deleteMany({});
+
+    const session = await db.startSession();
+
+    await session.withTransaction(async function() {
+      await Test.findOneAndUpdate({}, { name: 'test' }, { session });
+    });
+
+    await session.endSession();
+  });
 });

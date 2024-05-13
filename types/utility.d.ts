@@ -2,6 +2,17 @@ declare module 'mongoose' {
   type IfAny<IFTYPE, THENTYPE, ELSETYPE = IFTYPE> = 0 extends (1 & IFTYPE) ? THENTYPE : ELSETYPE;
   type IfUnknown<IFTYPE, THENTYPE> = unknown extends IFTYPE ? THENTYPE : IFTYPE;
 
+  /**
+    * @summary Removes keys from a type
+    * @description It helps to exclude keys from a type
+    * @param {T} T A generic type to be checked.
+    * @param {K} K Keys from T that are to be excluded from the generic type
+    * @returns T with the keys in K excluded
+    */
+  type ExcludeKeys<T, K extends keyof T> = {
+    [P in keyof T as P extends K ? never : P]: T[P];
+  };
+
   type Unpacked<T> = T extends (infer U)[] ?
     U :
     T extends ReadonlyArray<infer U> ? U : T;
@@ -39,5 +50,27 @@ declare module 'mongoose' {
 type IfEquals<T, U, Y = true, N = false> =
     (<G>() => G extends T ? 1 : 0) extends
     (<G>() => G extends U ? 1 : 0) ? Y : N;
+
+/**
+ * @summary Extracts 'this' parameter from a function, if it exists. Otherwise, returns fallback.
+ * @param {T} T Function type to extract 'this' parameter from.
+ * @param {F} F Fallback type to return if 'this' parameter does not exist.
+ */
+type ThisParameter<T, F> = T extends { (this: infer This): void }
+  ? This
+  : F;
+
+/**
+ * @summary Decorates all functions in an object with 'this' parameter.
+ * @param {T} T Object with functions as values to add 'D' parameter to as 'this'. {@link D}
+ * @param {D} D The type to be added as 'this' parameter to all functions in {@link T}.
+ */
+type AddThisParameter<T, D> = {
+  [K in keyof T]: T[K] extends (...args: infer A) => infer R
+    ? ThisParameter<T[K], unknown> extends unknown
+      ? (this: D, ...args: A) => R
+      : T[K]
+    : T[K];
+};
 
 }

@@ -1,7 +1,7 @@
 # Schemas
 
 If you haven't yet done so, please take a minute to read the [quickstart](index.html) to get an idea of how Mongoose works.
-If you are migrating from 6.x to 7.x please take a moment to read the [migration guide](migrating_to_7.html).
+If you are migrating from 7.x to 8.x please take a moment to read the [migration guide](migrating_to_8.html).
 
 <ul class="toc">
   <li><a href="#definition">Defining your schema</a></li>
@@ -109,9 +109,7 @@ const schema = new Schema();
 schema.path('_id'); // ObjectId { ... }
 ```
 
-When you create a new document with the automatically added
-`_id` property, Mongoose creates a new [`_id` of type ObjectId](https://masteringjs.io/tutorials/mongoose/objectid)
-to your document.
+When you create a new document with the automatically added `_id` property, Mongoose creates a new [`_id` of type ObjectId](https://masteringjs.io/tutorials/mongoose/objectid) to your document.
 
 ```javascript
 const Model = mongoose.model('Test', schema);
@@ -120,13 +118,13 @@ const doc = new Model();
 doc._id instanceof mongoose.Types.ObjectId; // true
 ```
 
-You can also overwrite Mongoose's default `_id` with your
-own `_id`. Just be careful: Mongoose will refuse to save a
-document that doesn't have an `_id`, so you're responsible
-for setting `_id` if you define your own `_id` path.
+You can also overwrite Mongoose's default `_id` with your own `_id`.
+Just be careful: Mongoose will refuse to save a top-level document that doesn't have an `_id`, so you're responsible for setting `_id` if you define your own `_id` path.
 
 ```javascript
-const schema = new Schema({ _id: Number });
+const schema = new Schema({
+  _id: Number // <-- overwrite Mongoose's default `_id`
+});
 const Model = mongoose.model('Test', schema);
 
 const doc = new Model();
@@ -134,6 +132,37 @@ await doc.save(); // Throws "document must have an _id before saving"
 
 doc._id = 1;
 await doc.save(); // works
+```
+
+Mongoose also adds an `_id` property to subdocuments.
+You can disable the `_id` property on your subdocuments as follows.
+Mongoose does allow saving subdocuments without an `_id` property.
+
+```javascript
+const nestedSchema = new Schema(
+  { name: String },
+  { _id: false } // <-- disable `_id`
+);
+const schema = new Schema({
+  subdoc: nestedSchema,
+  docArray: [nestedSchema]
+});
+const Test = mongoose.model('Test', schema);
+
+// Neither `subdoc` nor `docArray.0` will have an `_id`
+await Test.create({
+  subdoc: { name: 'test 1' },
+  docArray: [{ name: 'test 2' }]
+});
+```
+
+Alternatively, you can disable `_id` using the following syntax:
+
+```javascript
+const nestedSchema = new Schema({
+  _id: false, // <-- disable _id
+  name: String
+});
 ```
 
 <h2 id="methods"><a href="#methods">Instance methods</a></h2>
@@ -529,6 +558,8 @@ Valid options:
 * [collectionOptions](#collectionOptions)
 * [methods](#methods)
 * [query](#query-helpers)
+* [autoSearchIndex](#autoSearchIndex)
+* [readConcern](#readConcern)
 
 <h2 id="autoIndex"><a href="#autoIndex">option: autoIndex</a></h2>
 
@@ -1422,6 +1453,43 @@ const Test = mongoose.model('Test', schema);
 
 // Equivalent to `createCollection({ capped: true, max: 1000 })`
 await Test.createCollection();
+```
+
+<h2 id="autoSearchIndex">
+  <a href="#autoSearchIndex">
+    option: autoSearchIndex
+  </a>
+</h2>
+
+Similar to [`autoIndex`](#autoIndex), except for automatically creates any [Atlas search indexes](https://www.mongodb.com/docs/atlas/atlas-search/create-index/) defined in your schema.
+Unlike `autoIndex`, this option defaults to false.
+
+```javascript
+const schema = new Schema({ name: String }, { autoSearchIndex: true });
+schema.searchIndex({
+  name: 'my-index',
+  definition: { mappings: { dynamic: true } }
+});
+// Will automatically attempt to create the `my-index` search index.
+const Test = mongoose.model('Test', schema);
+```
+
+<h2 id="readConcern">
+  <a href="#readConcern">
+    option: readConcern
+  </a>
+</h2>
+
+[Read concerns](https://www.mongodb.com/docs/manual/reference/read-concern/) are similar to [`writeConcern`](#writeConcern), but for read operations like `find()` and `findOne()`.
+To set a default `readConcern`, pass the `readConcern` option to the schema constructor as follows.
+
+```javascript
+const eventSchema = new mongoose.Schema(
+  { name: String },
+  {
+    readConcern: { level: 'available' } // <-- set default readConcern for all queries
+  }
+);
 ```
 
 <h2 id="es6-classes"><a href="#es6-classes">With ES6 Classes</a></h2>

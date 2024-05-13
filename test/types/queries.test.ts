@@ -1,4 +1,5 @@
 import {
+  Condition,
   HydratedDocument,
   Schema,
   model,
@@ -11,13 +12,12 @@ import {
   FilterQuery,
   UpdateQuery,
   UpdateQueryKnownOnly,
-  ApplyBasicQueryCasting,
   QuerySelector,
   InferSchemaType,
   ProjectionFields,
   QueryOptions
 } from 'mongoose';
-import { ObjectId } from 'mongodb';
+import { ModifyResult, ObjectId } from 'mongodb';
 import { expectAssignable, expectError, expectNotAssignable, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
 import { AutoTypedSchemaType } from './schema.test';
@@ -72,7 +72,7 @@ Test.find({}, {}, { populate: { path: 'child', model: ChildModel, match: true } 
 
 Test.find().byName('test').byName('test2').orFail().exec().then(console.log);
 
-Test.count({ name: /Test/ }).exec().then((res: number) => console.log(res));
+Test.countDocuments({ name: /Test/ }).exec().then((res: number) => console.log(res));
 Test.findOne({ 'docs.id': 42 }).exec().then(console.log);
 
 // ObjectId casting
@@ -84,9 +84,14 @@ Test.find({ parent: { $in: ['0'.repeat(24)] } });
 Test.find({ name: { $in: ['Test'] } }).exec().then((res: Array<ITest>) => console.log(res));
 Test.find({ tags: 'test' }).exec();
 Test.find({ tags: { $in: ['test'] } }).exec();
+Test.find({ tags: /test/ }).exec();
+Test.find({ tags: { $in: [/test/] } }).exec();
 
 // Implicit `$in`
 Test.find({ name: ['Test1', 'Test2'] }).exec();
+
+// Implicit `$in` for regex string
+Test.find({ name: [/Test1/, /Test2/] });
 
 Test.find({ name: 'test' }, (err: Error | null, docs: ITest[]) => {
   console.log(!!err, docs[0].age);
@@ -307,20 +312,34 @@ function autoTypedQuery() {
 }
 
 function gh11964() {
-  type Condition<T> = ApplyBasicQueryCasting<T> | QuerySelector<ApplyBasicQueryCasting<T>>; // redefined here because it's not exported by mongoose
+  class Repository<T extends { id: string }> {
+    find(id: string) {
+      const idCondition: Condition<T['id']> = id as Condition<T['id']>;
+
+      // `as` is necessary because `T` can be `{ id: never }`,
+      // so we need to explicitly coerce
+      const filter: FilterQuery<T> = { id } as FilterQuery<T>;
+    }
+  }
+}
+
+function gh14397() {
+  type Condition<T> = T | QuerySelector<T>; // redefined here because it's not exported by mongoose
 
   type WithId<T extends object> = T & { id: string };
 
-  class Repository<T extends object> {
-    /* ... */
+  type TestUser = {
+    name: string;
+    age: number;
+  };
 
-    find(id: string) {
-      const idCondition: Condition<WithId<T>>['id'] = id; // error :(
-      const filter: FilterQuery<WithId<T>> = { id }; // error :(
+  const id: string = 'Test Id';
 
-      /* ... */
-    }
-  }
+  let idCondition: Condition<WithId<TestUser>['id']>;
+  let filter: FilterQuery<WithId<TestUser>>;
+
+  expectAssignable<typeof idCondition>(id);
+  expectAssignable<typeof filter>({ id });
 }
 
 function gh12091() {
@@ -393,7 +412,8 @@ async function gh12342_manual() {
 
 async function gh12342_auto() {
   interface Project {
-    name?: string, stars?: number
+    name?: string | null,
+    stars?: number | null
   }
 
   const ProjectSchema = new Schema({
@@ -483,8 +503,8 @@ async function gh13224() {
   const UserModel = model('User', userSchema);
 
   const u1 = await UserModel.findOne().select(['name']).orFail();
-  expectType<string | undefined>(u1.name);
-  expectType<number | undefined>(u1.age);
+  expectType<string | undefined | null>(u1.name);
+  expectType<number | undefined | null>(u1.age);
   expectAssignable<Function>(u1.toObject);
 
   const u2 = await UserModel.findOne().select<{ name?: string }>(['name']).orFail();
@@ -518,4 +538,136 @@ function gh13630() {
 
   const x: UpdateQueryKnownOnly<User> = { $set: { name: 'John' } };
   expectAssignable<UpdateQuery<User>>(x);
+}
+
+function gh14190() {
+  const userSchema = new Schema({ name: String, age: Number });
+  const UserModel = model('User', userSchema);
+
+  const doc = await UserModel.findByIdAndDelete('0'.repeat(24));
+  expectType<ReturnType<(typeof UserModel)['hydrate']> | null>(doc);
+
+  const res = await UserModel.findByIdAndDelete(
+    '0'.repeat(24),
+    { includeResultMetadata: true }
+  );
+  expectAssignable<
+    ModifyResult<ReturnType<(typeof UserModel)['hydrate']>>
+      >(res);
+
+  const res2 = await UserModel.find().findByIdAndDelete(
+    '0'.repeat(24),
+    { includeResultMetadata: true }
+  );
+  expectAssignable<
+    ModifyResult<ReturnType<(typeof UserModel)['hydrate']>>
+      >(res2);
+}
+
+function mongooseQueryOptions() {
+  const userSchema = new Schema({ name: String, age: Number });
+  const UserModel = model('User', userSchema);
+
+  UserModel.updateOne(
+    { name: 'bar' },
+    { name: 'baz' },
+    {
+      context: 'query',
+      multipleCastError: true,
+      overwriteDiscriminatorKey: true,
+      runValidators: true,
+      sanitizeProjection: true,
+      sanitizeFilter: true,
+      setDefaultsOnInsert: true,
+      strict: true,
+      strictQuery: 'throw',
+      timestamps: false,
+      translateAliases: false
+    }
+  );
+
+  UserModel.findOne({}, null, {
+    lean: true,
+    populate: 'test'
+  });
+}
+
+function gh14473() {
+  class AbstractSchema {
+    _id: any;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date;
+
+    constructor() {
+      this._id = 4;
+      this.createdAt = new Date();
+      this.updatedAt = new Date();
+      this.deletedAt = new Date();
+    }
+  }
+
+  const generateExists = <D extends AbstractSchema = AbstractSchema>() => {
+    const query: FilterQuery<D> = { deletedAt: { $ne: null } };
+    const query2: FilterQuery<D> = { deletedAt: { $lt: new Date() } };
+  };
+}
+
+async function gh14525() {
+  type BeAnObject = Record<string, any>;
+
+  interface SomeDoc {
+    something: string;
+    func(this: TestDoc): string;
+  }
+
+  interface PluginExtras {
+    pfunc(): number;
+  }
+
+  type TestDoc = Document<unknown, BeAnObject, SomeDoc> & PluginExtras;
+
+  type ModelType = Model<SomeDoc, BeAnObject, PluginExtras, BeAnObject>;
+
+  const doc = await ({} as ModelType).findOne({}).populate('test').orFail().exec();
+
+  doc.func();
+
+  let doc2 = await ({} as ModelType).create({});
+  doc2 = await ({} as ModelType).findOne({}).populate('test').orFail().exec();
+}
+
+async function gh14545() {
+  type Test = {
+    _id: Types.ObjectId;
+
+    prop: string;
+    another: string;
+
+    createdAt: number;
+    updatedAt: number;
+  };
+
+  const schema = new Schema<Test>({
+    prop: { type: String },
+    another: { type: String },
+    createdAt: { type: Number },
+    updatedAt: { type: Number }
+  });
+
+  type TestDocument = HydratedDocument<Test>;
+  type TestModel = Model<Test, {}, {}, {}, TestDocument>;
+
+  type SlimTest = Pick<Test, '_id' | 'prop'>;
+  type SlimTestDocument = HydratedDocument<SlimTest>;
+
+  const M = model<Test, TestModel>('Test', schema);
+
+  const myDocs = await M.find({}).exec();
+  const myDoc = await M.findOne({}).exec();
+
+  const myProjections = await M.find({}).select<SlimTest>({ prop: 1 }).exec();
+  expectType<SlimTestDocument[]>(myProjections);
+  const myProjection = await M.findOne({}).select<SlimTest>({ prop: 1 }).exec();
+  expectType<SlimTestDocument | null>(myProjection);
 }

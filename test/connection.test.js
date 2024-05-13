@@ -94,7 +94,7 @@ describe('connections:', function() {
       }));
       await Model.init();
 
-      const res = await conn.db.listCollections().toArray();
+      const res = await conn.listCollections();
       assert.ok(!res.map(c => c.name).includes('gh8814_Conn'));
       await conn.close();
     });
@@ -185,15 +185,24 @@ describe('connections:', function() {
         size: 1024
       });
 
-      const collections = await conn.db.listCollections().toArray();
+      const collections = await conn.listCollections();
 
       const names = collections.map(function(c) { return c.name; });
       assert.ok(names.indexOf('gh5712') !== -1);
       assert.ok(collections[names.indexOf('gh5712')].options.capped);
       await conn.createCollection('gh5712_0');
-      const collectionsAfterCreation = await conn.db.listCollections().toArray();
+      const collectionsAfterCreation = await conn.listCollections();
       const newCollectionsNames = collectionsAfterCreation.map(function(c) { return c.name; });
       assert.ok(newCollectionsNames.indexOf('gh5712') !== -1);
+    });
+
+    it('listCollections()', async function() {
+      await conn.dropDatabase();
+      await conn.createCollection('test1176');
+      await conn.createCollection('test94112');
+
+      const collections = await conn.listCollections();
+      assert.deepStrictEqual(collections.map(coll => coll.name).sort(), ['test1176', 'test94112']);
     });
   });
 
@@ -907,6 +916,21 @@ describe('connections:', function() {
     assert.equal(err.name, 'MongooseServerSelectionError');
   });
 
+  it('avoids unhandled error on createConnection() if error handler registered (gh-14377)', async function() {
+    const opts = {
+      serverSelectionTimeoutMS: 100
+    };
+    const uri = 'mongodb://baddomain:27017/test';
+
+    const conn = mongoose.createConnection(uri, opts);
+    await new Promise(resolve => {
+      conn.on('error', err => {
+        assert.equal(err.name, 'MongoServerSelectionError');
+        resolve();
+      });
+    });
+  });
+
   it('`watch()` on a whole collection (gh-8425)', async function() {
     this.timeout(10000);
     if (!process.env.REPLICA_SET) {
@@ -1543,6 +1567,28 @@ describe('connections:', function() {
       createInitialConnection: false
     });
     assert.deepEqual(m.connections.length, 0);
+  });
+  it('should demonstrate the withSession() function (gh-14330)', async function() {
+    if (!process.env.REPLICA_SET && !process.env.START_REPLICA_SET) {
+      this.skip();
+    }
+    const m = new mongoose.Mongoose();
+    m.connect(start.uri);
+    let session = null;
+    await m.connection.withSession(s => {
+      session = s;
+    });
+    assert.ok(session);
+  });
+  it('listDatabases() should return a list of database objects with a name property (gh-9048)', async function() {
+    const connection = await mongoose.createConnection(start.uri).asPromise();
+    // If this test is running in isolation, then the `start.uri` db might not
+    // exist yet, so create this collection (and the associated db) just in case
+    await connection.createCollection('tests').catch(() => {});
+
+    const { databases } = await connection.listDatabases();
+    assert.ok(connection.name);
+    assert.ok(databases.map(database => database.name).includes(connection.name));
   });
   describe('createCollections()', function() {
     it('should create collections for all models on the connection with the createCollections() function (gh-13300)', async function() {

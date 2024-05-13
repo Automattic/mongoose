@@ -4054,6 +4054,25 @@ describe('Query', function() {
     });
   });
 
+  it('shallow clones $and, $or if merging with empty filter (gh-14567) (gh-12944)', function() {
+    const TestModel = db.model(
+      'Test',
+      Schema({ name: String, age: Number, active: Boolean })
+    );
+
+    let originalQuery = { $and: [{ active: true }] };
+    let q = TestModel.countDocuments(originalQuery)
+      .and([{ age: { $gte: 18 } }]);
+    assert.deepStrictEqual(originalQuery, { $and: [{ active: true }] });
+    assert.deepStrictEqual(q.getFilter(), { $and: [{ active: true }, { age: { $gte: 18 } }] });
+
+    originalQuery = { $or: [{ active: true }] };
+    q = TestModel.countDocuments(originalQuery)
+      .or([{ age: { $gte: 18 } }]);
+    assert.deepStrictEqual(originalQuery, { $or: [{ active: true }] });
+    assert.deepStrictEqual(q.getFilter(), { $or: [{ active: true }, { age: { $gte: 18 } }] });
+  });
+
   it('should avoid sending empty session to MongoDB server (gh-13052)', async function() {
     const m = new mongoose.Mongoose();
 
@@ -4235,5 +4254,23 @@ describe('Query', function() {
 
     q.sort({}, { override: true });
     assert.deepStrictEqual(q.getOptions().sort, {});
+  });
+
+  it('avoids mutating user-provided query selectors (gh-14567)', async function() {
+    const TestModel = db.model(
+      'Test',
+      Schema({ name: String, age: Number, active: Boolean })
+    );
+
+    await TestModel.create({ name: 'John', age: 21 });
+    await TestModel.create({ name: 'Bob', age: 35 });
+
+    const adultQuery = { age: { $gte: 18 } };
+
+    const docs = await TestModel.find(adultQuery).where('age').lte(25);
+    assert.equal(docs.length, 1);
+    assert.equal(docs[0].name, 'John');
+
+    assert.deepStrictEqual(adultQuery, { age: { $gte: 18 } });
   });
 });

@@ -164,7 +164,7 @@ This is because Mongoose has numerous features that add paths to your schema tha
 ## Arrays
 
 When you define an array in a document interface, we recommend using vanilla JavaScript arrays, **not** Mongoose's `Types.Array` type or `Types.DocumentArray` type.
-Instead, use the `THydratedDocumentType` generic to define that the hydrated document type has paths of type `Types.Array` and `Types.DocumentArray`.
+Instead, use the `THydratedDocumentType` generic for models and schemas to define that the hydrated document type has paths of type `Types.Array` and `Types.DocumentArray`.
 
 ```typescript
 import mongoose from 'mongoose'
@@ -178,17 +178,27 @@ interface IOrder {
 // for fully hydrated docs returned from `findOne()`, etc.
 type OrderHydratedDocument = mongoose.HydratedDocument<
   IOrder,
-  { tags: mongoose.Types.DocumentArray<{ name: string }> }
+  { tags: mongoose.HydratedArraySubdocument<{ name: string }> }
 >;
 type OrderModelType = mongoose.Model<
   IOrder,
   {},
   {},
   {},
-  OrderHydratedDocument
+  OrderHydratedDocument // THydratedDocumentType
 >;
 
-const orderSchema = new mongoose.Schema<IOrder, OrderModelType>({
+const orderSchema = new mongoose.Schema<
+  IOrder,
+  OrderModelType,
+  {}, // methods
+  {}, // query helpers
+  {}, // virtuals
+  {}, // statics
+  mongoose.DefaultSchemaOptions, // schema options
+  IOrder, // doctype
+  OrderHydratedDocument // THydratedDocumentType
+>({
   tags: [{ name: { type: String, required: true } }]
 });
 const OrderModel = mongoose.model<IOrder, OrderModelType>('Order', orderSchema);
@@ -207,3 +217,8 @@ async function run() {
   leanDoc.tags; // Array<{ name: string }>
 };
 ```
+
+Use `HydratedArraySubdocument<RawDocType>` for the type of array subdocuments, and `HydratedSingleSubdocument<RawDocType>` for single subdocuments.
+
+If you are not using [schema methods](../guide.html#methods), middleware, or [virtuals](../tutorials/virtuals.html), you can omit the last 7 generic parameters to `Schema()` and just define your schema using  `new mongoose.Schema<IOrder, OrderModelType>(...)`.
+The THydratedDocumentType parameter for schemas is primarily for setting the value of `this` on methods and virtuals.

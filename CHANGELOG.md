@@ -1,3 +1,9 @@
+8.3.5 / 2024-05-15
+==================
+ * fix(query): shallow clone $or, $and if merging onto empty query filter #14580 #14567
+ * types(model+query): pass TInstanceMethods to QueryWithHelpers so populated docs have methods #14581 #14574
+ * docs(typescript): clarify that setting THydratedDocumentType on schemas is necessary for correct method context #14575 #14573
+
 8.3.4 / 2024-05-06
 ==================
  * perf(document): avoid cloning options using spread operator for perf reasons #14565 #14394

@@ -160,6 +160,33 @@ describe('cast: ', function() {
     });
   });
 
+  it('casts $comment (gh-14576)', function() {
+    const schema = new Schema({ name: String });
+
+    let res = cast(schema, {
+      $comment: 'test'
+    });
+    assert.deepStrictEqual(res, { $comment: 'test' });
+
+    res = cast(schema, {
+      $comment: 42
+    });
+    assert.deepStrictEqual(res, { $comment: '42' });
+
+    assert.throws(
+      () => cast(schema, {
+        $comment: { name: 'taco' }
+      }),
+      /\$comment/
+    );
+
+    const schema2 = new Schema({ $comment: Number });
+    res = cast(schema2, {
+      $comment: 42
+    });
+    assert.deepStrictEqual(res, { $comment: 42 });
+  });
+
   it('avoids setting stripped out nested schema values to undefined (gh-11291)', function() {
     const nested = new Schema({}, {
       id: false,

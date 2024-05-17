@@ -520,6 +520,34 @@ describe('document', function() {
     docs.toObject({ transform: true });
   });
 
+  it('propagates toObject transform function to all subdocuments (gh-14589)', async function() {
+    const schema = new mongoose.Schema({
+      name: String,
+      docArr: [{ name: String }],
+      subdoc: new mongoose.Schema({ name: String })
+    });
+    const TestModel = db.model('Test', schema);
+
+    const doc = new TestModel({
+      name: 'test',
+      docArr: [{ name: 'test' }],
+      subdoc: { name: 'test' }
+    });
+
+    // pass the transform as an inline option. Deletes `_id` property
+    // from both the top-level document and the subdocument.
+    const obj = doc.toObject({ transform: deleteId });
+
+    assert.equal(obj._id, undefined);
+    assert.equal(obj.subdoc._id, undefined);
+    assert.equal(obj.docArr[0]._id, undefined);
+
+    function deleteId(doc, ret) {
+      delete ret._id;
+      return ret;
+    }
+  });
+
   it('disabling aliases in toObject options (gh-7548)', function() {
     const schema = new mongoose.Schema({
       name: {

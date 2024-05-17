@@ -4062,7 +4062,32 @@ describe('Model', function() {
         assert.ok(doc.createdAt.valueOf() >= now.valueOf());
         assert.ok(doc.updatedAt);
         assert.ok(doc.updatedAt.valueOf() >= now.valueOf());
+      });
 
+      it('throwOnValidationError (gh-14572)', async function() {
+        const schema = new Schema({
+          num: Number
+        });
+
+        const M = db.model('Test', schema);
+
+        const ops = [
+          {
+            insertOne: {
+              document: {
+                num: 'not a number'
+              }
+            }
+          }
+        ];
+
+        const err = await M.bulkWrite(
+          ops,
+          { ordered: false, throwOnValidationError: true }
+        ).then(() => null, err => err);
+        assert.ok(err);
+        assert.equal(err.name, 'MongooseBulkWriteError');
+        assert.equal(err.validationErrors[0].errors['num'].name, 'CastError');
       });
 
       it('with child timestamps and array filters (gh-7032)', async function() {
@@ -6602,14 +6627,14 @@ describe('Model', function() {
     });
 
     it('insertMany should throw an error if there were operations that failed validation, ' +
-        'but all operations that passed validation succeeded (gh-13256)', async function() {
+        'but all operations that passed validation succeeded (gh-14572) (gh-13256)', async function() {
       const userSchema = new Schema({
         age: { type: Number }
       });
 
       const User = db.model('User', userSchema);
 
-      const err = await User.insertMany([
+      let err = await User.insertMany([
         new User({ age: 12 }),
         new User({ age: 12 }),
         new User({ age: 'NaN' })
@@ -6623,7 +6648,20 @@ describe('Model', function() {
       assert.ok(err.results[2] instanceof Error);
       assert.equal(err.results[2].errors['age'].name, 'CastError');
 
-      const docs = await User.find();
+      let docs = await User.find();
+      assert.deepStrictEqual(docs.map(doc => doc.age), [12, 12]);
+
+      err = await User.insertMany([
+        new User({ age: 'NaN' })
+      ], { ordered: false, throwOnValidationError: true })
+        .then(() => null)
+        .catch(err => err);
+
+      assert.ok(err);
+      assert.equal(err.name, 'MongooseBulkWriteError');
+      assert.equal(err.validationErrors[0].errors['age'].name, 'CastError');
+
+      docs = await User.find();
       assert.deepStrictEqual(docs.map(doc => doc.age), [12, 12]);
     });
 

@@ -83,7 +83,7 @@ declare module 'mongoose' {
     class ObjectId extends mongodb.ObjectId {
     }
 
-    class Subdocument<IdType = any, TQueryHelpers = any, DocType = any> extends Document<IdType, TQueryHelpers, DocType> {
+    class Subdocument<IdType = unknown, TQueryHelpers = any, DocType = any> extends Document<IdType, TQueryHelpers, DocType> {
       $isSingleNested: true;
 
       /** Returns the top level document of this sub-document. */

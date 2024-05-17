@@ -1,3 +1,18 @@
+8.4.0 / 2024-05-17
+==================
+ * feat: upgrade mongodb -> 6.6.2 #14584
+ * feat: add transactionAsyncLocalStorage option to opt in to automatically setting session on all transactions #14583 #13889
+ * feat: handle initially null driver when instantiating Mongoose for Rollup support #14577 #12335
+ * feat(mongoose): export omitUndefined() helper #14582 #14569
+ * feat: add Model.listSearchIndexes() #14519 #14450
+ * feat(connection): add listDatabases() function #14506 #9048
+ * feat(schema): add schema-level readConcern option to apply default readConcern for all queries #14579 #14511
+ * fix(error): remove model property from CastError to avoid printing all model properties to console #14568 #14529
+ * fix(model): make bulkWrite() and insertMany() throw if throwOnValidationError set and all ops invalid #14587 #14572
+ * fix(document): ensure transform function passed to toObject() options applies to subdocs #14600 #14589
+ * types: add inferRawDocType helper #13900 #13772
+ * types(document): make document _id type default to unknown instead of any #14541
+
 8.3.5 / 2024-05-15
 ==================
  * fix(query): shallow clone $or, $and if merging onto empty query filter #14580 #14567

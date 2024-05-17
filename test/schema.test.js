@@ -3237,4 +3237,25 @@ describe('schema', function() {
     assert.equal(doc.element, '#hero');
     assert.ok(doc instanceof ClickedModel);
   });
+
+  it('supports schema-level readConcern (gh-14511)', async function() {
+    const eventSchema = new mongoose.Schema({
+      name: String
+    }, { readConcern: { level: 'available' } });
+    const Event = db.model('Test', eventSchema);
+
+    let q = Event.find();
+    let options = q._optionsForExec();
+    assert.deepStrictEqual(options.readConcern, { level: 'available' });
+
+    q = Event.find().setOptions({ readConcern: { level: 'local' } });
+    options = q._optionsForExec();
+    assert.deepStrictEqual(options.readConcern, { level: 'local' });
+
+    q = Event.find().setOptions({ readConcern: null });
+    options = q._optionsForExec();
+    assert.deepStrictEqual(options.readConcern, null);
+
+    await q;
+  });
 });

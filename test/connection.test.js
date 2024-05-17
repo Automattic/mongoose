@@ -1580,6 +1580,16 @@ describe('connections:', function() {
     });
     assert.ok(session);
   });
+  it('listDatabases() should return a list of database objects with a name property (gh-9048)', async function() {
+    const connection = await mongoose.createConnection(start.uri).asPromise();
+    // If this test is running in isolation, then the `start.uri` db might not
+    // exist yet, so create this collection (and the associated db) just in case
+    await connection.createCollection('tests').catch(() => {});
+
+    const { databases } = await connection.listDatabases();
+    assert.ok(connection.name);
+    assert.ok(databases.map(database => database.name).includes(connection.name));
+  });
   describe('createCollections()', function() {
     it('should create collections for all models on the connection with the createCollections() function (gh-13300)', async function() {
       const m = new mongoose.Mongoose();

@@ -6,6 +6,7 @@ import {
   HydratedDocument,
   IndexDefinition,
   IndexOptions,
+  InferRawDocType,
   InferSchemaType,
   InsertManyOptions,
   ObtainDocumentType,
@@ -1493,4 +1494,20 @@ function gh14573() {
   const UserModel = model<User, UserModelType>('User', userSchema);
   const doc = new UserModel({ names: { _id: '0'.repeat(24), firstName: 'foo' } });
   doc.names?.ownerDocument();
+}
+
+function gh13772() {
+  const schemaDefinition = {
+    name: String,
+    docArr: [{ name: String }]
+  };
+  const schema = new Schema(schemaDefinition);
+  type RawDocType = InferRawDocType<typeof schemaDefinition>;
+  expectAssignable<
+    { name?: string | null, docArr?: Array<{ name?: string | null }> }
+  >({} as RawDocType);
+
+  const TestModel = model('User', schema);
+  const doc = new TestModel();
+  expectAssignable<RawDocType>(doc.toObject());
 }

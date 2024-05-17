@@ -69,3 +69,5 @@ function setAsObject() {
 
   expectError(mongoose.set({ invalid: true }));
 }
+
+const x: { name: string } = mongoose.omitUndefined({ name: 'foo' });

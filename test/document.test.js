@@ -12627,6 +12627,41 @@ describe('document', function() {
     doc.set('branding.logo.attachment', { name: 'coolLogo' });
     await doc.save();
     assert.strictEqual(attachmentSchemaPreValidateCalls, 1);
+
+    instance.set('branding.logo.attachment', { name: 'coolOtherLogo' });
+    await instance.save();
+    assert.strictEqual(attachmentSchemaPreValidateCalls, 2);
+  });
+
+  it('fires pre validate hooks on 5 level deep single nested subdoc when modifying after save() (gh-14591)', async function() {
+    let preValidate = [];
+
+    const createSchema = (path, subSchema) => {
+      const schema = new Schema({ [path]: subSchema });
+      schema.pre('validate', function() {
+        preValidate.push(path);
+      });
+      return schema;
+    };
+
+    const e = createSchema('e', { type: String });
+    const d = createSchema('d', { type: e });
+    const c = createSchema('c', { type: d });
+    const b = createSchema('b', { type: c });
+    const a = createSchema('a', { type: b });
+    b.add({ otherProp: String });
+    const NestedModelHooksTestModel = db.model('Test', a);
+
+    const newData = { a: { b: { c: { d: { e: new Date().toString() } } } } };
+    newData.a.otherProp = 'test';
+    const doc = await new NestedModelHooksTestModel(newData).save();
+    preValidate = [];
+    doc.set({ 'a.b.c.d.e': 'updated nested value' });
+    await doc.save();
+    assert.deepStrictEqual(preValidate, ['a', 'b', 'c', 'd', 'e']);
+
+    const fromDb = await NestedModelHooksTestModel.findById(doc._id);
+    assert.strictEqual(fromDb.a.otherProp, 'test');
   });
 
   it('returns constructor if using $model() with no args (gh-13878)', async function() {

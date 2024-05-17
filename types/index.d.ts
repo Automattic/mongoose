@@ -20,6 +20,7 @@
 /// <reference path="./types.d.ts" />
 /// <reference path="./utility.d.ts" />
 /// <reference path="./validation.d.ts" />
+/// <reference path="./inferrawdoctype.d.ts" />
 /// <reference path="./inferschematype.d.ts" />
 /// <reference path="./virtuals.d.ts" />
 /// <reference path="./augmentations.d.ts" />
@@ -67,6 +68,8 @@ declare module 'mongoose' {
 
   /** Gets mongoose options */
   export function get<K extends keyof MongooseOptions>(key: K): MongooseOptions[K];
+
+  export function omitUndefined<T extends Record<string, any>>(val: T): T;
 
   /* ! ignore */
   export type CompileModelOptions = {

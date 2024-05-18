@@ -311,4 +311,42 @@ describe('castArrayFilters', function() {
 
     assert.strictEqual(q.options.arrayFilters[0]['element.number'], 1);
   });
+
+  it('correctly casts array of strings underneath doc array (gh-12565)', function() {
+    const userSchema = new Schema({
+      groups: [{
+        document: 'ObjectId',
+        tags: [String]
+      }]
+    });
+
+    const q = new Query();
+    q.schema = userSchema;
+
+    const groupId = new Types.ObjectId();
+    const filter = {
+      groups: {
+        $elemMatch: {
+          document: groupId,
+          tags: 'tag-to-update'
+        }
+      }
+    };
+    const update = {
+      $set: {
+        'groups.$[group].tags.$[tag]': 42
+      }
+    };
+    const opts = {
+      arrayFilters: [
+        { 'group.document': groupId },
+        { tag: { $eq: 'tag-to-update' } }
+      ]
+    };
+    q.updateOne(filter, update, opts);
+    castArrayFilters(q);
+    q._update = q._castUpdate(q._update, false);
+
+    assert.strictEqual(q.getUpdate().$set['groups.$[group].tags.$[tag]'], '42');
+  });
 });

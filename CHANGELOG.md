@@ -1,3 +1,8 @@
+6.12.9 / 2024-05-24
+===================
+ * fix(cast): cast $comment to string in query filters #14590 #14576
+ * types(model): allow passing strict type checking override to create() #14571 #14548
+
 6.12.8 / 2024-04-10
 ===================
  * fix(document): handle virtuals that are stored as objects but getter returns string with toJSON #14468 #14446

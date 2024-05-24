@@ -157,8 +157,8 @@ declare module 'mongoose' {
         >
       >
   >;
-  export type HydratedSingleSubdocument<DocType, TOverrides = {}> = Types.Subdocument<unknown> & Require_id<DocType> & TOverrides;
-  export type HydratedArraySubdocument<DocType, TOverrides = {}> = Types.ArraySubdocument<unknown> & Require_id<DocType> & TOverrides;
+  export type HydratedSingleSubdocument<DocType, TOverrides = {}> = Types.Subdocument<unknown, Record<string, never>, DocType> & Require_id<DocType> & TOverrides;
+  export type HydratedArraySubdocument<DocType, TOverrides = {}> = Types.ArraySubdocument<unknown, Record<string, never>, DocType> & Require_id<DocType> & TOverrides;
 
   export type HydratedDocumentFromSchema<TSchema extends Schema> = HydratedDocument<
   InferSchemaType<TSchema>,

@@ -1,3 +1,9 @@
+7.6.12 / 2024-05-21
+===================
+ * fix(array): avoid converting to $set when calling pull() on an element in the middle of the array #14531 #14502
+ * fix: bump mongodb driver to 5.9.2 #14561 [lorand-horvath](https://github.com/lorand-horvath)
+ * fix(update): cast array of strings underneath doc array with array filters #14605 #14595
+
 8.4.0 / 2024-05-17
 ==================
  * feat: upgrade mongodb -> 6.6.2 #14584

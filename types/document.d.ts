@@ -1,5 +1,5 @@
-declare module 'mongoose' {
-  import mongodb = require('mongodb');
+declare module "mongoose" {
+  import mongodb = require("mongodb");
 
   /** A list of paths to skip. If set, Mongoose will validate every modified path that is not in this list. */
   type pathsToSkip = string[] | string;
@@ -26,7 +26,10 @@ declare module 'mongoose' {
     __v?: any;
 
     /** Assert that a given path or paths is populated. Throws an error if not populated. */
-    $assertPopulated<Paths = {}>(path: string | string[], values?: Partial<Paths>): Omit<this, keyof Paths> & Paths;
+    $assertPopulated<Paths = {}>(
+      path: string | string[],
+      values?: Partial<Paths>
+    ): Omit<this, keyof Paths> & Paths;
 
     /** Returns a deep clone of this document */
     $clone(): this;
@@ -81,7 +84,7 @@ declare module 'mongoose' {
      * A string containing the current operation that Mongoose is executing
      * on this document. Can be `null`, `'save'`, `'validate'`, or `'remove'`.
      */
-    $op: 'save' | 'validate' | 'remove' | null;
+    $op: "save" | "validate" | "remove" | null;
 
     /**
      * Getter/setter around the session associated with this document. Used to
@@ -91,8 +94,17 @@ declare module 'mongoose' {
     $session(session?: ClientSession | null): ClientSession | null;
 
     /** Alias for `set()`, used internally to avoid conflicts */
-    $set(path: string | Record<string, any>, val: any, type: any, options?: DocumentSetOptions): this;
-    $set(path: string | Record<string, any>, val: any, options?: DocumentSetOptions): this;
+    $set(
+      path: string | Record<string, any>,
+      val: any,
+      type: any,
+      options?: DocumentSetOptions
+    ): this;
+    $set(
+      path: string | Record<string, any>,
+      val: any,
+      options?: DocumentSetOptions
+    ): this;
     $set(value: string | Record<string, any>): this;
 
     /** Set this property to add additional query filters when Mongoose saves this document and `isNew` is false. */
@@ -108,12 +120,14 @@ declare module 'mongoose' {
     db: Connection;
 
     /** Removes this document from the db. */
-    deleteOne(options?: QueryOptions): QueryWithHelpers<
+    deleteOne(
+      options?: QueryOptions
+    ): QueryWithHelpers<
       mongodb.DeleteResult,
       this,
       TQueryHelpers,
       DocType,
-      'deleteOne'
+      "deleteOne"
     >;
 
     /**
@@ -142,7 +156,11 @@ declare module 'mongoose' {
     errors?: Error.ValidationError;
 
     /** Returns the value of a path. */
-    get<T extends keyof DocType>(path: T, type?: any, options?: any): DocType[T];
+    get<T extends keyof DocType>(
+      path: T,
+      type?: any,
+      options?: any
+    ): DocType[T];
     get(path: string, type?: any, options?: any): any;
 
     /**
@@ -158,15 +176,25 @@ declare module 'mongoose' {
     increment(): this;
 
     /**
-    * Initializes the document without setters or marking anything modified.
-    * Called internally after a document is returned from mongodb. Normally,
-    * you do **not** need to call this function on your own.
-    */
+     * Initializes the document without setters or marking anything modified.
+     * Called internally after a document is returned from mongodb. Normally,
+     * you do **not** need to call this function on your own.
+     */
     init(obj: AnyObject, opts?: AnyObject): this;
 
     /** Marks a path as invalid, causing validation to fail. */
-    invalidate<T extends keyof DocType>(path: T, errorMsg: string | NativeError, value?: any, kind?: string): NativeError | null;
-    invalidate(path: string, errorMsg: string | NativeError, value?: any, kind?: string): NativeError | null;
+    invalidate<T extends keyof DocType>(
+      path: T,
+      errorMsg: string | NativeError,
+      value?: any,
+      kind?: string
+    ): NativeError | null;
+    invalidate(
+      path: string,
+      errorMsg: string | NativeError,
+      value?: any,
+      kind?: string
+    ): NativeError | null;
 
     /** Returns true if `path` was directly set and modified, else false. */
     isDirectModified<T extends keyof DocType>(path: T | Array<T>): boolean;
@@ -184,8 +212,14 @@ declare module 'mongoose' {
      * Returns true if any of the given paths are modified, else false. If no arguments, returns `true` if any path
      * in this document is modified.
      */
-    isModified<T extends keyof DocType>(path?: T | Array<T>, options?: { ignoreAtomics?: boolean } | null): boolean;
-    isModified(path?: string | Array<string>, options?: { ignoreAtomics?: boolean } | null): boolean;
+    isModified<T extends keyof DocType>(
+      path?: T | Array<T>,
+      options?: { ignoreAtomics?: boolean } | null
+    ): boolean;
+    isModified(
+      path?: string | Array<string>,
+      options?: { ignoreAtomics?: boolean } | null
+    ): boolean;
 
     /** Boolean flag specifying if the document is new. */
     isNew: boolean;
@@ -219,14 +253,30 @@ declare module 'mongoose' {
     $parent(): Document | undefined;
 
     /** Populates document references. */
-    populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<MergeType<this, Paths>>;
-    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<any>, match?: AnyObject, options?: PopulateOptions): Promise<MergeType<this, Paths>>;
+    populate<Paths = {}>(
+      path: string | PopulateOptions | (string | PopulateOptions)[]
+    ): Promise<MergeType<this, Paths>>;
+    populate<Paths = {}>(
+      path: string,
+      select?: string | AnyObject,
+      model?: Model<any>,
+      match?: AnyObject,
+      options?: PopulateOptions
+    ): Promise<MergeType<this, Paths>>;
 
     /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
     populated(path: string): any;
 
     /** Sends a replaceOne command with this document `_id` as the query selector. */
-    replaceOne(replacement?: AnyObject, options?: QueryOptions | null): Query<any, this>;
+    replaceOne(
+      replacement?: AnyObject,
+      options?: QueryOptions | null
+    ): Query<any, this>;
+
+    /** Removes this document from the db. */
+    remove(options: QueryOptions, callback: Callback): void;
+    remove(callback: Callback): void;
+    remove(options?: QueryOptions): Promise<this>;
 
     /** Saves this document by inserting a new document into the database if [document.isNew](/docs/api/document.html#document_Document-isNew) is `true`, or sends an [updateOne](/docs/api/document.html#document_Document-updateOne) operation with just the modified paths if `isNew` is `false`. */
     save(options?: SaveOptions): Promise<this>;
@@ -235,14 +285,32 @@ declare module 'mongoose' {
     schema: Schema;
 
     /** Sets the value of a path, or many paths. */
-    set<T extends keyof DocType>(path: T, val: DocType[T], type: any, options?: DocumentSetOptions): this;
-    set(path: string | Record<string, any>, val: any, type: any, options?: DocumentSetOptions): this;
-    set(path: string | Record<string, any>, val: any, options?: DocumentSetOptions): this;
+    set<T extends keyof DocType>(
+      path: T,
+      val: DocType[T],
+      type: any,
+      options?: DocumentSetOptions
+    ): this;
+    set(
+      path: string | Record<string, any>,
+      val: any,
+      type: any,
+      options?: DocumentSetOptions
+    ): this;
+    set(
+      path: string | Record<string, any>,
+      val: any,
+      options?: DocumentSetOptions
+    ): this;
     set(value: string | Record<string, any>): this;
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
-    toJSON<T = Require_id<DocType>>(options?: ToObjectOptions & { flattenMaps?: true }): FlattenMaps<T>;
-    toJSON<T = Require_id<DocType>>(options: ToObjectOptions & { flattenMaps: false }): T;
+    toJSON<T = Require_id<DocType>>(
+      options?: ToObjectOptions & { flattenMaps?: true }
+    ): FlattenMaps<T>;
+    toJSON<T = Require_id<DocType>>(
+      options: ToObjectOptions & { flattenMaps: false }
+    ): T;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
     toObject<T = Require_id<DocType>>(options?: ToObjectOptions): Require_id<T>;
@@ -252,16 +320,34 @@ declare module 'mongoose' {
     unmarkModified(path: string): void;
 
     /** Sends an updateOne command with this document `_id` as the query selector. */
-    updateOne(update?: UpdateQuery<this> | UpdateWithAggregationPipeline, options?: QueryOptions | null): Query<any, this>;
+    updateOne(
+      update?: UpdateQuery<this> | UpdateWithAggregationPipeline,
+      options?: QueryOptions | null
+    ): Query<any, this>;
 
     /** Executes registered validation rules for this document. */
-    validate<T extends keyof DocType>(pathsToValidate?: T | T[], options?: AnyObject): Promise<void>;
-    validate(pathsToValidate?: pathsToValidate, options?: AnyObject): Promise<void>;
+    validate<T extends keyof DocType>(
+      pathsToValidate?: T | T[],
+      options?: AnyObject
+    ): Promise<void>;
+    validate(
+      pathsToValidate?: pathsToValidate,
+      options?: AnyObject
+    ): Promise<void>;
     validate(options: { pathsToSkip?: pathsToSkip }): Promise<void>;
 
     /** Executes registered validation rules (skipping asynchronous validators) for this document. */
-    validateSync(options: { pathsToSkip?: pathsToSkip, [k: string]: any }): Error.ValidationError | null;
-    validateSync<T extends keyof DocType>(pathsToValidate?: T | T[], options?: AnyObject): Error.ValidationError | null;
-    validateSync(pathsToValidate?: pathsToValidate, options?: AnyObject): Error.ValidationError | null;
+    validateSync(options: {
+      pathsToSkip?: pathsToSkip;
+      [k: string]: any;
+    }): Error.ValidationError | null;
+    validateSync<T extends keyof DocType>(
+      pathsToValidate?: T | T[],
+      options?: AnyObject
+    ): Error.ValidationError | null;
+    validateSync(
+      pathsToValidate?: pathsToValidate,
+      options?: AnyObject
+    ): Error.ValidationError | null;
   }
 }

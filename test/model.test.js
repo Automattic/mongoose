@@ -6331,14 +6331,14 @@ describe('Model', function() {
 
       const userSchema = new Schema({
         name: { type: String }
-      });
+      }, { shardKey: { a: 1 } });
 
       const User = db.model('User', userSchema);
 
       const users = [
-        new User({ name: 'Hafez1_gh-9673-1' }),
-        new User({ name: 'Hafez2_gh-9673-1' }),
-        new User({ name: 'I am the third name' })
+        new User({ name: 'Hafez1_gh-9673-1', a: 1 }),
+        new User({ name: 'Hafez2_gh-9673-1', a: 2 }),
+        new User({ name: 'I am the third name', a: 3 })
       ];
 
       await users[2].save();
@@ -6349,7 +6349,7 @@ describe('Model', function() {
       const desiredWriteOperations = [
         { insertOne: { document: users[0] } },
         { insertOne: { document: users[1] } },
-        { updateOne: { filter: { _id: users[2]._id }, update: { $set: { name: 'I am the updated third name' } } } }
+        { updateOne: { filter: { _id: users[2]._id, a: 1 }, update: { $set: { name: 'I am the updated third name' } } } }
       ];
 
       assert.deepEqual(

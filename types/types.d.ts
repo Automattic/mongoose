@@ -96,7 +96,7 @@ declare module 'mongoose' {
       $parent(): Document;
     }
 
-    class ArraySubdocument<IdType = any> extends Subdocument<IdType> {
+    class ArraySubdocument<IdType = any, TQueryHelpers = unknown, DocType = unknown> extends Subdocument<IdType, TQueryHelpers, DocType> {
       /** Returns this sub-documents parent array. */
       parentArray(): Types.DocumentArray<unknown>;
     }

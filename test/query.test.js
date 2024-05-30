@@ -4214,4 +4214,19 @@ describe('Query', function() {
     assert.strictEqual(doc.account.owner, undefined);
     assert.strictEqual(doc.account.taxIds, undefined);
   });
+
+  it('avoids mutating $or, $and elements when casting (gh-14610)', async function() {
+    const personSchema = new mongoose.Schema({
+      name: String,
+      age: Number
+    });
+    const Person = db.model('Person', personSchema);
+
+    const filter = [{ name: 'Me', age: '20' }, { name: 'You', age: '50' }];
+    await Person.find({ $or: filter });
+    assert.deepStrictEqual(filter, [{ name: 'Me', age: '20' }, { name: 'You', age: '50' }]);
+
+    await Person.find({ $and: filter });
+    assert.deepStrictEqual(filter, [{ name: 'Me', age: '20' }, { name: 'You', age: '50' }]);
+  });
 });

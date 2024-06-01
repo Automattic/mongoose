@@ -355,7 +355,18 @@ declare module 'mongoose' {
     distinct<DocKey extends string, ResultType = unknown>(
       field: DocKey,
       filter?: FilterQuery<RawDocType>
-    ): QueryWithHelpers<Array<DocKey extends keyof DocType ? Unpacked<DocType[DocKey]> : ResultType>, DocType, THelpers, RawDocType, 'distinct', TInstanceMethods>;
+    ): QueryWithHelpers<
+      Array<
+        DocKey extends keyof WithLevel1NestedPaths<DocType>
+          ? WithoutUndefined<Unpacked<WithLevel1NestedPaths<DocType>[DocKey]>>
+          : ResultType
+      >,
+      DocType,
+      THelpers,
+      RawDocType,
+      'distinct',
+      TInstanceMethods
+    >;
 
     /** Specifies a `$elemMatch` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     elemMatch<K = string>(path: K, val: any): this;

@@ -1,3 +1,10 @@
+8.4.1 / 2024-05-31
+==================
+ * fix: pass options to clone instead of get in applyVirtuals #14606 #14543 [andrews05](https://github.com/andrews05)
+ * fix(document): fire pre validate hooks on 5 level deep single nested subdoc when modifying after save() #14604 #14591
+ * fix: ensure buildBulkWriteOperations target shard if shardKey is set #14622 #14621 [matlpriceshape](https://github.com/matlpriceshape)
+ * types: pass DocType down to subdocuments so HydratedSingleSubdocument and HydratedArraySubdocument toObject() returns correct type #14612 #14601
+
 7.6.12 / 2024-05-21
 ===================
  * fix(array): avoid converting to $set when calling pull() on an element in the middle of the array #14531 #14502

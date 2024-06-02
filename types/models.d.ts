@@ -19,6 +19,7 @@ declare module 'mongoose' {
     skipValidation?: boolean;
     strict?: boolean;
     timestamps?: boolean | 'throw';
+    throwOnValidationError?: boolean;
   }
 
   interface InsertManyOptions extends
@@ -28,6 +29,7 @@ declare module 'mongoose' {
     rawResult?: boolean;
     ordered?: boolean;
     lean?: boolean;
+    throwOnValidationError?: boolean;
   }
 
   type InsertManyResult<T> = mongodb.InsertManyResult<T> & {

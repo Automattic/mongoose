@@ -8,13 +8,12 @@ run().catch(err => {
 });
 
 async function run() {
-  await mongoose.connect('mongodb://127.0.0.1:27017/mongoose_test', {
+  await mongoose.connect('mongodb://127.0.0.1:27017/mongoose_benchmark', {
     serverSelectionTimeoutMS: 5000
   });
 
   const minisMap = new mongoose.Schema(
     {
-      //? Mini reference
       mini: {
         type: Map,
         of: new mongoose.Schema({
@@ -25,8 +24,6 @@ async function run() {
         }),
       },
     },
-    //? Automatic creation of timestamps for creation and updating.
-    //? This will be created on the background by the package
     { timestamps: true }
   );
   const MinisMap = mongoose.model('MinisMap', minisMap);

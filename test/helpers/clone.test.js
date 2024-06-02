@@ -88,7 +88,7 @@ describe('clone', () => {
         $isSingleNested: true,
         toObject(cloneOpts) {
           assert.deepStrictEqual(
-            Object.assign({}, baseOpts, { getters: false }),
+            Object.assign({}, baseOpts),
             cloneOpts
           );
           const obj = JSON.parse(JSON.stringify(base));

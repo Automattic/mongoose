@@ -3,6 +3,11 @@
 [Transactions](https://www.mongodb.com/transactions) let you execute multiple operations in isolation and potentially undo all the operations if one of them fails.
 This guide will get you started using transactions with Mongoose.
 
+<h2 id="note-about-parallelism-in-transactions"><a href="#note-about-parallelism-in-transactions">Note About Parallelism in Transactions</a></h2>
+
+Running operations in parallel is **not supported** during a transaction. The use of `Promise.all`, `Promise.allSettled`, `Promise.race`, etc. to parallelize operations inside a transaction is
+undefined behaviour and should be avoided.
+
 <h2 id="getting-started-with-transactions"><a href="#getting-started-with-transactions">Getting Started with Transactions</a></h2>
 
 If you haven't already, import mongoose:

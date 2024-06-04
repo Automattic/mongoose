@@ -60,7 +60,7 @@
     "mongodb-memory-server": "9.3.0",
     "ncp": "^2.0.0",
     "nyc": "15.1.0",
-    "pug": "3.0.2",
+    "pug": "3.0.3",
     "q": "1.5.1",
     "sinon": "17.0.1",
     "stream-browserify": "3.0.0",

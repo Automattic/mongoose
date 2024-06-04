@@ -61,6 +61,11 @@ await db.transaction(async function setRank(session) {
 doc.isNew;
 ```
 
+<h2 id="note-about-parallelism-in-transactions"><a href="#note-about-parallelism-in-transactions">Note About Parallelism in Transactions</a></h2>
+
+Running operations in parallel is **not supported** during a transaction. The use of `Promise.all`, `Promise.allSettled`, `Promise.race`, etc. to parallelize operations inside a transaction is
+undefined behaviour and should be avoided.
+
 <h2 id="with-mongoose-documents-and-save"><a href="#with-mongoose-documents-and-save">With Mongoose Documents and <code>save()</code></a></h2>
 
 If you get a [Mongoose document](documents.html) from [`findOne()`](api/model.html#model_Model-findOne)

@@ -711,17 +711,18 @@ describe('document', function() {
         name: String,
         email: String
       });
-      const topicSchema = new Schema({
-        title: String,
-        email: String,
-        followers: [userSchema]
-      });
 
       userSchema.options.toObject = {
         transform: function(doc, ret) {
           delete ret.email;
         }
       };
+
+      const topicSchema = new Schema({
+        title: String,
+        email: String,
+        followers: [userSchema]
+      });
 
       topicSchema.options.toObject = {
         transform: function(doc, ret) {
@@ -833,7 +834,10 @@ describe('document', function() {
       const userSchema = Schema({
         firstName: String,
         company: {
-          type: { companyId: { type: Schema.Types.ObjectId }, companyName: String }
+          type: {
+            companyId: { type: Schema.Types.ObjectId },
+            companyName: String
+          }
         }
       }, {
         toObject: {
@@ -849,6 +853,7 @@ describe('document', function() {
 
       const User = db.model('User', userSchema);
       const user = new User({ firstName: 'test', company: { companyName: 'foo' } });
+      assert.equal(transformCalls.length, 0);
       const obj = user.toObject();
       assert.strictEqual(obj.company.details, 42);
       assert.equal(transformCalls.length, 1);
@@ -1045,7 +1050,10 @@ describe('document', function() {
       const userSchema = Schema({
         firstName: String,
         company: {
-          type: { companyId: { type: Schema.Types.ObjectId }, companyName: String }
+          type: {
+            companyId: { type: Schema.Types.ObjectId },
+            companyName: String
+          }
         }
       }, {
         id: false,

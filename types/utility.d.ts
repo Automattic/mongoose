@@ -2,6 +2,26 @@ declare module 'mongoose' {
   type IfAny<IFTYPE, THENTYPE, ELSETYPE = IFTYPE> = 0 extends (1 & IFTYPE) ? THENTYPE : ELSETYPE;
   type IfUnknown<IFTYPE, THENTYPE> = unknown extends IFTYPE ? THENTYPE : IFTYPE;
 
+  type WithLevel1NestedPaths<T, K extends keyof T = keyof T> = {
+    [P in K | NestedPaths<Required<T>, K>]: P extends K
+      ? T[P]
+      : P extends `${infer Key}.${infer Rest}`
+        ? Key extends keyof T
+          ? Rest extends keyof NonNullable<T[Key]>
+            ? NonNullable<T[Key]>[Rest]
+            : never
+          : never
+        : never;
+  };
+
+  type NestedPaths<T, K extends keyof T> = K extends string
+    ? T[K] extends Record<string, any> | null | undefined
+      ? `${K}.${keyof NonNullable<T[K]> & string}`
+      : never
+    : never;
+
+  type WithoutUndefined<T> = T extends undefined ? never : T;
+
   /**
     * @summary Removes keys from a type
     * @description It helps to exclude keys from a type

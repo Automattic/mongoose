@@ -4280,10 +4280,11 @@ describe('model: populate:', function() {
         ]);
         await Parent.create([
           { b: { name: 'test1', referencedModel: 'Test1', aId: as[0]._id } },
-          { b: { name: 'test2', referencedModel: 'Test2', aId: as[1]._id } }
+          { b: { name: 'test2', referencedModel: 'Test2', aId: as[1]._id } },
+          { b: { name: 'test3', referencedModel: 'Test2', aId: '0'.repeat(24) } }
         ]);
         const parents = await Parent.find().populate('b.a').sort({ _id: 1 });
-        assert.deepStrictEqual(parents.map(p => p.b.a.name), ['a1', 'a2']);
+        assert.deepStrictEqual(parents.map(p => p.b.a?.name), ['a1', 'a2', undefined]);
       });
 
       it('with functions for match (gh-7397)', async function() {

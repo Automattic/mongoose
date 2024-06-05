@@ -1,3 +1,9 @@
+7.6.13 / 2024-06-05
+===================
+ * fix(query): shallow clone $or and $and array elements to avoid mutating query filter arguments #14614 #14610
+ * types: pass DocType down to subdocuments so HydratedSingleSubdocument and HydratedArraySubdocument toObject() returns correct type #14612 #14601
+ * docs(migrating_to_7): add id setter to Mongoose 7 migration guide #14645 #13672
+
 7.6.12 / 2024-05-21
 ===================
  * fix(array): avoid converting to $set when calling pull() on an element in the middle of the array #14531 #14502

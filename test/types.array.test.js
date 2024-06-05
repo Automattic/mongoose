@@ -597,6 +597,27 @@ describe('types array', function() {
       doc.a.pull(cat.id);
       assert.equal(doc.a.length, 0);
 
+      assert.ok(doc.getChanges().$pullAll.a);
+    });
+
+    it('registers $pull atomic if pulling from middle (gh-14502)', async function() {
+      const schema = new Schema({
+        a: [{ type: Schema.ObjectId, ref: 'Cat' }]
+      });
+      const A = db.model('Test', schema);
+
+      const oid1 = new mongoose.Types.ObjectId();
+      const oid2 = new mongoose.Types.ObjectId();
+      const oid3 = new mongoose.Types.ObjectId();
+      const a = new A({ a: [oid1, oid2, oid3] });
+      await a.save();
+
+      const doc = await A.findById(a);
+      assert.equal(doc.a.length, 3);
+      doc.a.pull(oid2);
+      assert.equal(doc.a.length, 2);
+
+      assert.ok(doc.getChanges().$pullAll.a);
     });
 
     it('handles pulling with no _id (gh-3341)', async function() {

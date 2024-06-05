@@ -42,7 +42,7 @@ describe('Lean Tutorial', function() {
     const leanDoc = await MyModel.findOne().lean();
 
     v8Serialize(normalDoc).length; // approximately 180
-    v8Serialize(leanDoc).length; // 32, about 5x smaller!
+    v8Serialize(leanDoc).length; // approximately 55, about 3x smaller!
 
     // In case you were wondering, the JSON form of a Mongoose doc is the same
     // as the POJO. This additional memory only affects how much memory your
@@ -50,7 +50,7 @@ describe('Lean Tutorial', function() {
     JSON.stringify(normalDoc).length === JSON.stringify(leanDoc).length; // true
     // acquit:ignore:start
     assert.ok(v8Serialize(normalDoc).length >= 150 && v8Serialize(normalDoc).length <= 200, v8Serialize(normalDoc).length);
-    assert.equal(v8Serialize(leanDoc).length, 32);
+    assert.ok(v8Serialize(leanDoc).length === 55 || v8Serialize(leanDoc).length === 32, v8Serialize(leanDoc).length);
     assert.equal(JSON.stringify(normalDoc).length, JSON.stringify(leanDoc).length);
     // acquit:ignore:end
   });

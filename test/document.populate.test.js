@@ -934,4 +934,64 @@ describe('document.populate', function() {
     assert.ok(foundBook.populated('authorId'));
     assert.ok(foundBook.authorId.populated('websiteId'));
   });
+
+  it('works when populating a nested document inside an array parent (gh-14435)', async function() {
+    const CodeSchema = new Schema({
+      code: String
+    });
+
+    const UserSchema = new Schema({
+      username: String,
+      extras: [
+        new Schema({
+          config: new Schema({
+            paymentConfiguration: {
+              paymentMethods: [
+                {
+                  type: Schema.Types.ObjectId,
+                  ref: 'Code'
+                }
+              ]
+            }
+          })
+        })
+      ]
+    });
+
+    const Code = db.model('Code', CodeSchema);
+    const CodeUser = db.model('CodeUser', UserSchema);
+
+    const code = await Code.create({
+      code: 'test code'
+    });
+
+    await CodeUser.create({
+      username: 'TestUser',
+      extras: [
+        {
+          config: {
+            paymentConfiguration: {
+              paymentMethods: [code._id]
+            }
+          }
+        }
+      ]
+    });
+
+    const codeUser = await CodeUser.findOne({ username: 'TestUser' }).populate(
+      'extras.config.paymentConfiguration.paymentMethods'
+    );
+
+    assert.ok(codeUser.username);
+    assert.strictEqual(codeUser.username, 'TestUser');
+    assert.ok(codeUser.extras);
+    assert.strictEqual(codeUser.extras.length, 1);
+    assert.ok(codeUser.extras[0]);
+    assert.ok(codeUser.extras[0].config);
+    assert.ok(codeUser.extras[0].config.paymentConfiguration);
+    assert.ok(codeUser.extras[0].config.paymentConfiguration.paymentMethods);
+    assert.strictEqual(codeUser.extras[0].config.paymentConfiguration.paymentMethods.length, 1);
+    assert.deepStrictEqual(codeUser.extras[0].config.paymentConfiguration.paymentMethods[0]._id, code._id);
+    assert.strictEqual(codeUser.extras[0].config.paymentConfiguration.paymentMethods[0].code, 'test code');
+  });
 });

@@ -20,6 +20,7 @@
 /// <reference path="./types.d.ts" />
 /// <reference path="./utility.d.ts" />
 /// <reference path="./validation.d.ts" />
+/// <reference path="./inferrawdoctype.d.ts" />
 /// <reference path="./inferschematype.d.ts" />
 /// <reference path="./virtuals.d.ts" />
 /// <reference path="./augmentations.d.ts" />
@@ -27,6 +28,7 @@
 declare class NativeDate extends global.Date { }
 
 declare module 'mongoose' {
+  import Kareem = require('kareem');
   import events = require('events');
   import mongodb = require('mongodb');
   import mongoose = require('mongoose');
@@ -66,6 +68,8 @@ declare module 'mongoose' {
 
   /** Gets mongoose options */
   export function get<K extends keyof MongooseOptions>(key: K): MongooseOptions[K];
+
+  export function omitUndefined<T extends Record<string, any>>(val: T): T;
 
   /* ! ignore */
   export type CompileModelOptions = {
@@ -153,8 +157,8 @@ declare module 'mongoose' {
         >
       >
   >;
-  export type HydratedSingleSubdocument<DocType, TOverrides = {}> = Types.Subdocument<unknown> & Require_id<DocType> & TOverrides;
-  export type HydratedArraySubdocument<DocType, TOverrides = {}> = Types.ArraySubdocument<unknown> & Require_id<DocType> & TOverrides;
+  export type HydratedSingleSubdocument<DocType, TOverrides = {}> = Types.Subdocument<unknown, Record<string, never>, DocType> & Require_id<DocType> & TOverrides;
+  export type HydratedArraySubdocument<DocType, TOverrides = {}> = Types.ArraySubdocument<unknown, Record<string, never>, DocType> & Require_id<DocType> & TOverrides;
 
   export type HydratedDocumentFromSchema<TSchema extends Schema> = HydratedDocument<
   InferSchemaType<TSchema>,
@@ -216,18 +220,18 @@ declare module 'mongoose' {
     TStaticMethods> = (schema: Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>, opts?: any) => void;
 
   export class Schema<
-    EnforcedDocType = any,
-    TModelType = Model<EnforcedDocType, any, any, any>,
+    RawDocType = any,
+    TModelType = Model<RawDocType, any, any, any>,
     TInstanceMethods = {},
     TQueryHelpers = {},
     TVirtuals = {},
     TStaticMethods = {},
     TSchemaOptions = DefaultSchemaOptions,
     DocType extends ApplySchemaOptions<
-      ObtainDocumentType<DocType, EnforcedDocType, ResolveSchemaOptions<TSchemaOptions>>,
+      ObtainDocumentType<DocType, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
       ResolveSchemaOptions<TSchemaOptions>
     > = ApplySchemaOptions<
-      ObtainDocumentType<any, EnforcedDocType, ResolveSchemaOptions<TSchemaOptions>>,
+      ObtainDocumentType<any, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
       ResolveSchemaOptions<TSchemaOptions>
     >,
     THydratedDocumentType = HydratedDocument<FlatRecord<DocType>, TVirtuals & TInstanceMethods>
@@ -236,10 +240,10 @@ declare module 'mongoose' {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>, EnforcedDocType> | DocType, options?: SchemaOptions<FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
+    constructor(definition?: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType> | DocType, options?: SchemaOptions<FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
 
     /** Adds key path / schema type pairs to this schema. */
-    add(obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>> | Schema, prefix?: string): this;
+    add(obj: SchemaDefinition<SchemaDefinitionType<RawDocType>> | Schema, prefix?: string): this;
 
     /**
      * Add an alias for `path`. This means getting or setting the `alias`
@@ -275,6 +279,13 @@ declare module 'mongoose' {
     index(fields: IndexDefinition, options?: IndexOptions): this;
 
     /**
+     * Define a search index for this schema.
+     *
+     * @remarks Search indexes are only supported when used against a 7.0+ Mongo Atlas cluster.
+     */
+    searchIndex(description: SearchIndexDescription): this;
+
+    /**
      * Returns a list of indexes that this schema declares, via `schema.index()`
      * or by `index: true` in a path's options.
      */
@@ -300,14 +311,14 @@ declare module 'mongoose' {
     methods: AddThisParameter<TInstanceMethods, THydratedDocumentType> & AnyObject;
 
     /** The original object passed to the schema constructor */
-    obj: SchemaDefinition<SchemaDefinitionType<EnforcedDocType>, EnforcedDocType>;
+    obj: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType>;
 
     /** Returns a new schema that has the `paths` from the original schema, minus the omitted ones. */
     omit<T = this>(paths: string[], options?: SchemaOptions): T;
 
     /** Gets/sets schema paths. */
     path<ResultType extends SchemaType = SchemaType<any, THydratedDocumentType>>(path: string): ResultType;
-    path<pathGeneric extends keyof EnforcedDocType>(path: pathGeneric): SchemaType<EnforcedDocType[pathGeneric]>;
+    path<pathGeneric extends keyof RawDocType>(path: pathGeneric): SchemaType<RawDocType[pathGeneric]>;
     path(path: string, constructor: any): this;
 
     /** Lists all paths and their type in the schema. */
@@ -373,8 +384,8 @@ declare module 'mongoose' {
     // method aggregate and insertMany with ErrorHandlingMiddlewareFunction
     post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: ErrorHandlingMiddlewareFunction<T, Array<any>>): this;
     post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T, Array<any>>): this;
-    post<T = TModelType>(method: 'insertMany' | RegExp, fn: ErrorHandlingMiddlewareFunction<T>): this;
-    post<T = TModelType>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    post<T = TModelType>(method: 'bulkWrite' | 'createCollection' | 'insertMany' | RegExp, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    post<T = TModelType>(method: 'bulkWrite' | 'createCollection' | 'insertMany' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
 
     /** Defines a pre hook for the model. */
     // this = never since it never happens
@@ -390,7 +401,6 @@ declare module 'mongoose' {
     ): this;
     // this = Document
     pre<T = THydratedDocumentType>(method: 'save', fn: PreSaveMiddlewareFunction<T>): this;
-    pre<T = THydratedDocumentType>(method: 'save', options: SchemaPreOptions, fn: PreSaveMiddlewareFunction<T>): this;
     pre<T = THydratedDocumentType>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], fn: PreMiddlewareFunction<T>): this;
     pre<T = THydratedDocumentType>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
     pre<T = THydratedDocumentType>(
@@ -408,7 +418,6 @@ declare module 'mongoose' {
     pre<T = THydratedDocumentType|Query<any, any>>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, fn: PreMiddlewareFunction<T>): this;
     // method aggregate
     pre<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: PreMiddlewareFunction<T>): this;
-    pre<T extends Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
     /* method insertMany */
     pre<T = TModelType>(
       method: 'insertMany' | RegExp,
@@ -419,14 +428,23 @@ declare module 'mongoose' {
         options?: InsertManyOptions & { lean?: boolean }
       ) => void | Promise<void>
     ): this;
+    /* method bulkWrite */
     pre<T = TModelType>(
-      method: 'insertMany' | RegExp,
-      options: SchemaPreOptions,
+      method: 'bulkWrite' | RegExp,
       fn: (
         this: T,
         next: (err?: CallbackError) => void,
-        docs: any | Array<any>,
-        options?: InsertManyOptions & { lean?: boolean }
+        ops: Array<AnyBulkWriteOperation<any>>,
+        options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions
+      ) => void | Promise<void>
+    ): this;
+    /* method createCollection */
+    pre<T = TModelType>(
+      method: 'createCollection' | RegExp,
+      fn: (
+        this: T,
+        next: (err?: CallbackError) => void,
+        options?: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'>
       ) => void | Promise<void>
     ): this;
 
@@ -676,6 +694,10 @@ declare module 'mongoose' {
 
   /* for ts-mongoose */
   export class mquery { }
+
+  export function overwriteMiddlewareResult(val: any): Kareem.OverwriteMiddlewareResult;
+
+  export function skipMiddlewareFunction(val: any): Kareem.SkipWrappedFunction;
 
   export default mongoose;
 }

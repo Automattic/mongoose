@@ -306,7 +306,7 @@ conn.on('close', () => console.log('close'));
 
 <h2 id="keepAlive"><a href="#keepAlive">A note about keepAlive</a></h2>
 
-Before Mongoose 5.2.0, you needed to enable the `keepAlive` option to initiate [TCP keepalive](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html) to prevent `"connection closed"` errors errors.
+Before Mongoose 5.2.0, you needed to enable the `keepAlive` option to initiate [TCP keepalive](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html) to prevent `"connection closed"` errors.
 However, `keepAlive` has been `true` by default since Mongoose 5.2.0, and the `keepAlive` is deprecated as of Mongoose 7.2.0.
 Please remove `keepAlive` and `keepAliveInitialDelay` options from your Mongoose connections.
 
@@ -426,16 +426,24 @@ The `mongoose.createConnection()` function takes the same arguments as
 const conn = mongoose.createConnection('mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]', options);
 ```
 
-This [connection](api/connection.html#connection_Connection) object is then used to
-create and retrieve [models](api/model.html#model_Model). Models are
-**always** scoped to a single connection.
+This [connection](api/connection.html#connection_Connection) object is then used to create and retrieve [models](api/model.html#model_Model).
+Models are **always** scoped to a single connection.
 
 ```javascript
 const UserModel = conn.model('User', userSchema);
 ```
 
-If you use multiple connections, you should make sure you export schemas,
-**not** models. Exporting a model from a file is called the *export model pattern*.
+The `createConnection()` function returns a connection instance, not a promise.
+If you want to use `await` to make sure Mongoose successfully connects to MongoDB, use the [`asPromise()` function](api/connection.html#Connection.prototype.asPromise()):
+
+```javascript
+// `asPromise()` returns a promise that resolves to the connection
+// once the connection succeeds, or rejects if connection failed.
+const conn = await mongoose.createConnection(connectionString).asPromise();
+```
+
+If you use multiple connections, you should make sure you export schemas, **not** models.
+Exporting a model from a file is called the *export model pattern*.
 The export model pattern is limited because you can only use one connection.
 
 ```javascript
@@ -449,30 +457,10 @@ module.exports = userSchema;
 // module.exports = mongoose.model('User', userSchema);
 ```
 
-If you use the export schema pattern, you still need to create models
-somewhere. There are two common patterns. First is to export a connection
-and register the models on the connection in the file:
-
-```javascript
-// connections/fast.js
-const mongoose = require('mongoose');
-
-const conn = mongoose.createConnection(process.env.MONGODB_URI);
-conn.model('User', require('../schemas/user'));
-
-module.exports = conn;
-
-// connections/slow.js
-const mongoose = require('mongoose');
-
-const conn = mongoose.createConnection(process.env.MONGODB_URI);
-conn.model('User', require('../schemas/user'));
-conn.model('PageView', require('../schemas/pageView'));
-
-module.exports = conn;
-```
-
-Another alternative is to register connections with a dependency injector
+If you use the export schema pattern, you still need to create models somewhere.
+There are two common patterns.
+The first is to create a function that instantiates a new connection and registers all models on that connection.
+With this pattern, you may also register connections with a dependency injector
 or another [inversion of control (IOC) pattern](https://thecodebarbarian.com/using-ramda-as-a-dependency-injector).
 
 ```javascript
@@ -487,6 +475,23 @@ module.exports = function connectionFactory() {
   return conn;
 };
 ```
+
+Exporting a function that creates a new connection is the most flexible pattern.
+However, that pattern can make it tricky to get access to your connection from your route handlers or wherever your business logic is.
+An alternative pattern is to export a connection and register the models on the connection in the file's top-level scope as follows.
+
+```javascript
+// connections/index.js
+const mongoose = require('mongoose');
+
+const conn = mongoose.createConnection(process.env.MONGODB_URI);
+conn.model('User', require('../schemas/user'));
+
+module.exports = conn;
+```
+
+You can create separate files for each connection, like `connections/web.js` and `connections/mobile.js` if you want to create separate connections for your web API backend and your mobile API backend.
+Your business logic can then `require()` or `import` the connection it needs.
 
 <h2 id="connection_pools"><a href="#connection_pools">Connection Pools</a></h2>
 

@@ -1,9 +1,12 @@
 import {
+  DefaultSchemaOptions,
+  HydratedSingleSubdocument,
   Schema,
   Document,
   HydratedDocument,
   IndexDefinition,
   IndexOptions,
+  InferRawDocType,
   InferSchemaType,
   InsertManyOptions,
   ObtainDocumentType,
@@ -1059,10 +1062,10 @@ function gh12882() {
   });
   type tArrType = InferSchemaType<typeof arrType>;
   expectType<{
-    fooArray: {
+    fooArray: Types.DocumentArray<{
       type: string;
       foo: number;
-    }[]
+    }>
   }>({} as tArrType);
   // Readonly array of strings
   const rArrString = new Schema({
@@ -1110,10 +1113,10 @@ function gh12882() {
   });
   type rTArrType = InferSchemaType<typeof rArrType>;
   expectType<{
-    fooArray: {
+    fooArray: Types.DocumentArray<{
       type: string;
       foo: number;
-    }[]
+    }>
   }>({} as rTArrType);
 }
 
@@ -1407,3 +1410,104 @@ function gh14235() {
   userSchema.omit<Omit<IUser, 'age'>>(['age']);
 }
 
+function gh14496() {
+  const schema = new Schema({
+    name: {
+      type: String
+    }
+  });
+  schema.path('name').validate({
+    validator: () => {
+      throw new Error('Oops!');
+    },
+    // `errors['name']` will be "Oops!"
+    message: (props) => {
+      expectType<Error | undefined>(props.reason);
+      return 'test';
+    }
+  });
+}
+
+function gh14367() {
+  const UserSchema = new Schema({
+    counts: [Schema.Types.Number],
+    roles: [Schema.Types.String],
+    dates: [Schema.Types.Date],
+    flags: [Schema.Types.Boolean]
+  });
+
+  type IUser = InferSchemaType<typeof UserSchema>;
+
+  const x: IUser = {
+    counts: [12],
+    roles: ['test'],
+    dates: [new Date('2016-06-01')],
+    flags: [true]
+  };
+}
+
+function gh14573() {
+  interface Names {
+    _id: Types.ObjectId;
+    firstName: string;
+  }
+
+  // Document definition
+  interface User {
+    names: Names;
+  }
+
+  // Define property overrides for hydrated documents
+  type THydratedUserDocument = {
+    names?: HydratedSingleSubdocument<Names>;
+  };
+
+  type UserMethods = {
+    getName(): Names | undefined;
+  };
+
+  type UserModelType = Model<User, {}, UserMethods, {}, THydratedUserDocument>;
+
+  const userSchema = new Schema<
+    User,
+    UserModelType,
+    UserMethods,
+    {},
+    {},
+    {},
+    DefaultSchemaOptions,
+    User,
+    THydratedUserDocument
+  >(
+    {
+      names: new Schema<Names>({ firstName: String })
+    },
+    {
+      methods: {
+        getName() {
+          const str: string | undefined = this.names?.firstName;
+          return this.names?.toObject();
+        }
+      }
+    }
+  );
+  const UserModel = model<User, UserModelType>('User', userSchema);
+  const doc = new UserModel({ names: { _id: '0'.repeat(24), firstName: 'foo' } });
+  doc.names?.ownerDocument();
+}
+
+function gh13772() {
+  const schemaDefinition = {
+    name: String,
+    docArr: [{ name: String }]
+  };
+  const schema = new Schema(schemaDefinition);
+  type RawDocType = InferRawDocType<typeof schemaDefinition>;
+  expectAssignable<
+    { name?: string | null, docArr?: Array<{ name?: string | null }> }
+  >({} as RawDocType);
+
+  const TestModel = model('User', schema);
+  const doc = new TestModel();
+  expectAssignable<RawDocType>(doc.toObject());
+}

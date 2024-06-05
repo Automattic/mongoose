@@ -22,10 +22,10 @@ jobs:
     runs-on: ubuntu-latest
     name: Lint JS-Files
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
       - name: Setup node
-        uses: actions/setup-node@b39b52d1213e96004bfcb1c61a8a6fa8ab84f3e8 # v4.0.1
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version: 18
 
@@ -41,33 +41,33 @@ jobs:
       matrix:
         node: [16, 18, 20]
         os: [ubuntu-20.04, ubuntu-22.04]
-        mongodb: [4.4.18, 5.0.14, 6.0.4]
+        mongodb: [4.4.28, 5.0.25, 6.0.14, 7.0.7]
         include:
           - os: ubuntu-20.04 # customize on which matrix the coverage will be collected on
-            mongodb: 5.0.14
+            mongodb: 5.0.25
             node: 16
             coverage: true
         exclude:
           - os: ubuntu-22.04 # exclude because there are no 4.x mongodb builds for 2204
-            mongodb: 4.4.18
+            mongodb: 4.4.28
           - os: ubuntu-22.04 # exclude because there are no 5.x mongodb builds for 2204
-            mongodb: 5.0.14
+            mongodb: 5.0.25
     name: Node ${{ matrix.node }} MongoDB ${{ matrix.mongodb }} OS ${{ matrix.os }}
     env:
       MONGOMS_VERSION: ${{ matrix.mongodb }}
       MONGOMS_PREFER_GLOBAL_PATH: 1
       FORCE_COLOR: true
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
       - name: Setup node
-        uses: actions/setup-node@b39b52d1213e96004bfcb1c61a8a6fa8ab84f3e8 # v4.0.1
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version: ${{ matrix.node }}
 
       - name: Load MongoDB binary cache
         id: cache-mongodb-binaries
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/mongodb-binaries
           key: ${{ matrix.os }}-${{ matrix.mongodb }}
@@ -90,25 +90,25 @@ jobs:
     runs-on: ubuntu-20.04
     name: Deno tests
     env:
-      MONGOMS_VERSION: 6.0.4
+      MONGOMS_VERSION: 6.0.14
       MONGOMS_PREFER_GLOBAL_PATH: 1
       FORCE_COLOR: true
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - name: Setup node
-        uses: actions/setup-node@b39b52d1213e96004bfcb1c61a8a6fa8ab84f3e8 # v4.0.1
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version: 16
       - name: Load MongoDB binary cache
         id: cache-mongodb-binaries
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/mongodb-binaries
           key: deno-${{ env.MONGOMS_VERSION }}
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: v1.36.x
+          deno-version: v1.37.x
       - run: deno --version
       - run: npm install
       - name: Run Deno tests
@@ -122,9 +122,9 @@ jobs:
     env:
       FORCE_COLOR: true
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - name: Setup node
-        uses: actions/setup-node@b39b52d1213e96004bfcb1c61a8a6fa8ab84f3e8 # v4.0.1
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version: 16
       - run: npm install
@@ -139,6 +139,6 @@ jobs:
       contents: read
     steps:
       - name: Check out repo
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - name: Dependency review
-        uses: actions/dependency-review-action@v3
+        uses: actions/dependency-review-action@v4

@@ -198,15 +198,27 @@ type IsSchemaTypeFromBuiltinClass<T> = T extends (typeof String)
             ? true
             : T extends (typeof Schema.Types.Decimal128)
               ? true
-              : T extends Types.ObjectId
+              : T extends (typeof Schema.Types.String)
                 ? true
-                : T extends Types.Decimal128
+                : T extends (typeof Schema.Types.Number)
                   ? true
-                  : T extends Buffer
+                  : T extends (typeof Schema.Types.Date)
                     ? true
-                    : T extends (typeof Schema.Types.Mixed)
+                    : T extends (typeof Schema.Types.Boolean)
                       ? true
-                      : IfEquals<T, Schema.Types.ObjectId, true, false>;
+                      : T extends (typeof Schema.Types.Buffer)
+                        ? true
+                        : T extends Types.ObjectId
+                          ? true
+                          : T extends Types.Decimal128
+                            ? true
+                            : T extends Buffer
+                              ? true
+                              : T extends NativeDate
+                                ? true
+                                : T extends (typeof Schema.Types.Mixed)
+                                  ? true
+                                  : IfEquals<T, Schema.Types.ObjectId, true, false>;
 
 /**
  * @summary Resolve path type by returning the corresponding type.
@@ -229,7 +241,7 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
               ObtainDocumentPathType<Item, TypeKey>[] :
               // If the type key isn't callable, then this is an array of objects, in which case
               // we need to call ObtainDocumentType to correctly infer its type.
-              ObtainDocumentType<Item, any, { typeKey: TypeKey }>[] :
+              Types.DocumentArray<ObtainDocumentType<Item, any, { typeKey: TypeKey }>> :
             IsSchemaTypeFromBuiltinClass<Item> extends true ?
               ObtainDocumentPathType<Item, TypeKey>[] :
               IsItRecordAndNotAny<Item> extends true ?

@@ -133,6 +133,12 @@ declare module 'mongoose' {
     listCollections(): Promise<Pick<mongodb.CollectionInfo, 'name' | 'type'>[]>;
 
     /**
+     * Helper for MongoDB Node driver's `listDatabases()`.
+     * Returns an array of database names.
+     */
+    listDatabases(): Promise<mongodb.ListDatabasesResult>;
+
+    /**
      * A [POJO](https://masteringjs.io/tutorials/fundamentals/pojo) containing
      * a map from model names to models. Contains all models that have been
      * added to this connection using [`Connection#model()`](/docs/api/connection.html#connection_Connection-model).
@@ -240,6 +246,8 @@ declare module 'mongoose' {
 
     /** Watches the entire underlying database for changes. Similar to [`Model.watch()`](/docs/api/model.html#model_Model-watch). */
     watch<ResultType extends mongodb.Document = any>(pipeline?: Array<any>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream<ResultType>;
+
+    withSession<T = any>(executor: (session: ClientSession) => Promise<T>): T;
   }
 
 }

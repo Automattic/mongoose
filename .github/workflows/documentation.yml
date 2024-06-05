@@ -28,10 +28,10 @@ jobs:
     runs-on: ubuntu-latest
     name: Lint Markdown files
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
       - name: Setup node
-        uses: actions/setup-node@b39b52d1213e96004bfcb1c61a8a6fa8ab84f3e8 # v4.0.1
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version: 16
 
@@ -48,14 +48,27 @@ jobs:
     runs-on: ubuntu-20.04
     name: Test Generating Docs
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
       - run: git fetch --depth=1 --tags # download all tags for documentation
 
       - name: Setup node
-        uses: actions/setup-node@b39b52d1213e96004bfcb1c61a8a6fa8ab84f3e8 # v4.0.1
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version: 16
 
       - run: npm install
+      - name: Setup MongoDB
+        run: |
+          wget -q https://downloads.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-5.0.14.tgz
+          tar xf mongodb-linux-x86_64-ubuntu2004-5.0.14.tgz
+          mkdir -p ./data/db/27017 ./data/db/27000
+          printf "\n--timeout 8000" >> ./test/mocha.opts
+          ./mongodb-linux-x86_64-ubuntu2004-5.0.14/bin/mongod --setParameter ttlMonitorSleepSecs=1 --fork --dbpath ./data/db/27017 --syslog --port 27017
+          sleep 2
+          mongod --version
+          echo `pwd`/mongodb-linux-x86_64-ubuntu2004-5.0.14/bin >> $GITHUB_PATH
+      - name: Setup config
+        run: |
+          echo "module.exports = {uri:'mongodb://127.0.0.1:27017/mongoose_test'};" > ./.config.js
       - run: npm run docs:clean
       - run: npm run docs:generate

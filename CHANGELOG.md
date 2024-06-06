@@ -1,8 +1,17 @@
+6.13.0 / 2024-06-06
+===================
+ * feat(model): add throwOnValidationError option for opting into getting MongooseBulkWriteError if all valid operations succeed in bulkWrite() and insertMany() #14599 #14587 #14572 #13410
+
 7.6.13 / 2024-06-05
 ===================
  * fix(query): shallow clone $or and $and array elements to avoid mutating query filter arguments #14614 #14610
  * types: pass DocType down to subdocuments so HydratedSingleSubdocument and HydratedArraySubdocument toObject() returns correct type #14612 #14601
  * docs(migrating_to_7): add id setter to Mongoose 7 migration guide #14645 #13672
+
+6.12.9 / 2024-05-24
+===================
+ * fix(cast): cast $comment to string in query filters #14590 #14576
+ * types(model): allow passing strict type checking override to create() #14571 #14548
 
 7.6.12 / 2024-05-21
 ===================

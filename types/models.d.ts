@@ -28,7 +28,6 @@ declare module 'mongoose' {
     throwOnValidationError?: boolean;
     strict?: boolean;
     timestamps?: boolean | 'throw';
-    throwOnValidationError?: boolean;
   }
 
   interface InsertManyOptions extends

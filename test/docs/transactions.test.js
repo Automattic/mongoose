@@ -479,7 +479,7 @@ describe('transactions', function() {
     const doc = await Test.findById(_id).orFail();
     let attempt = 0;
 
-    await db.transaction(async(session) => {
+    const res = await db.transaction(async(session) => {
       await doc.save({ session });
 
       if (attempt === 0) {
@@ -489,7 +489,10 @@ describe('transactions', function() {
           errorLabels: [mongoose.mongo.MongoErrorLabel.TransientTransactionError]
         });
       }
+
+      return { answer: 42 };
     });
+    assert.deepStrictEqual(res, { answer: 42 });
 
     const { items } = await Test.findById(_id).orFail();
     assert.ok(Array.isArray(items));

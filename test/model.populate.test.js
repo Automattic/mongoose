@@ -4247,6 +4247,46 @@ describe('model: populate:', function() {
           catch(done);
       });
 
+      it('with functions for ref with subdoc virtual populate (gh-12440) (gh-12363)', async function() {
+        const ASchema = new Schema({
+          name: String
+        });
+
+        const BSchema = new Schema({
+          referencedModel: String,
+          aId: ObjectId
+        });
+
+        BSchema.virtual('a', {
+          ref: function() {
+            return this.referencedModel;
+          },
+          localField: 'aId',
+          foreignField: '_id',
+          justOne: true
+        });
+
+        const ParentSchema = new Schema({
+          b: BSchema
+        });
+
+        const A1 = db.model('Test1', ASchema);
+        const A2 = db.model('Test2', ASchema);
+        const Parent = db.model('Parent', ParentSchema);
+
+        const as = await Promise.all([
+          A1.create({ name: 'a1' }),
+          A2.create({ name: 'a2' })
+        ]);
+        await Parent.create([
+          { b: { name: 'test1', referencedModel: 'Test1', aId: as[0]._id } },
+          { b: { name: 'test2', referencedModel: 'Test2', aId: as[1]._id } },
+          { b: { name: 'test3', referencedModel: 'Test2', aId: '0'.repeat(24) } }
+        ]);
+        const parents = await Parent.find().populate('b.a').sort({ _id: 1 });
+        assert.deepStrictEqual(parents.map(p => p.b.a?.name), ['a1', 'a2', undefined]);
+      });
+
       it('with functions for match (gh-7397)', async function() {
         const ASchema = new Schema({
           name: String,
@@ -6642,8 +6682,8 @@ describe('model: populate:', function() {
       });
 
       clickedSchema.virtual('users_$', {
-        ref: function(doc) {
-          return doc.events[0].users[0].refKey;
+        ref: function(subdoc) {
+          return subdoc.users[0].refKey;
         },
         localField: 'users.ID',
         foreignField: 'employeeId'
@@ -6706,8 +6746,8 @@ describe('model: populate:', function() {
       });
 
       clickedSchema.virtual('users_$', {
-        ref: function(doc) {
-          const refKeys = doc.events[0].users.map(user => user.refKey);
+        ref: function(subdoc) {
+          const refKeys = subdoc.users.map(user => user.refKey);
           return refKeys;
         },
         localField: 'users.ID',

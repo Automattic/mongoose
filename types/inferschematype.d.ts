@@ -96,21 +96,29 @@ type IsPathDefaultUndefined<PathType> = PathType extends { default: undefined } 
  * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
  */
 type IsPathRequired<P, TypeKey extends string = DefaultTypeKey> =
-  P extends { required: true | [true, string | undefined] | { isRequired: true } } | ArrayConstructor | any[]
-    ? true
-    : P extends { required: boolean }
-      ? P extends { required: false }
-        ? false
-        : true
-      : P extends (Record<TypeKey, ArrayConstructor | any[]>)
-        ? IsPathDefaultUndefined<P> extends true
+  // Check for TypeScript types
+  P extends string | number | boolean
+    ? P extends string
+      ? '-not-a-key-22302' extends P // Check if type is `string` rather than a string literal
+        ? P extends null | undefined ? false : true
+        : false
+      : P extends null | undefined ? false : true
+    // Check for schema definition syntax
+    : P extends { required: true | [true, string | undefined] | { isRequired: true } } | ArrayConstructor | any[]
+      ? true
+      : P extends { required: boolean }
+        ? P extends { required: false }
           ? false
           : true
-        : P extends (Record<TypeKey, any>)
-          ? P extends { default: any }
-            ? IfEquals<P['default'], undefined, false, true>
-            : false
-          : false;
+        : P extends (Record<TypeKey, ArrayConstructor | any[]>)
+          ? IsPathDefaultUndefined<P> extends true
+            ? false
+            : true
+          : P extends (Record<TypeKey, any>)
+            ? P extends { default: any }
+              ? IfEquals<P['default'], undefined, false, true>
+              : false
+            : false;
 
 /**
  * @summary Path base type defined by using TypeKey

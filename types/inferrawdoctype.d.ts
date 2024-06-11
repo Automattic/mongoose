@@ -112,5 +112,8 @@ declare module 'mongoose' {
                                                             IfEquals<PathValueType, {}> extends true ? any:
                                                               PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
                                                                 PathValueType extends Record<string, any> ? ObtainDocumentType<PathValueType, any, { typeKey: TypeKey }> :
-                                                                  unknown;
+                                                                  PathValueType extends string ? string :
+                                                                    PathValueType extends number ? number :
+                                                                      PathValueType extends boolean ? boolean :
+                                                                        unknown;
 }

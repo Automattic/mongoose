@@ -433,9 +433,10 @@ describe('document', function() {
       delete ret.oids;
       ret._id = ret._id.toString();
     };
+    delete doc.schema._defaultToObjectOptionsMap;
     clone = doc.toObject();
     assert.equal(doc.id, clone._id);
-    assert.ok(undefined === clone.em);
+    assert.strictEqual(clone.em, undefined);
     assert.ok(undefined === clone.numbers);
     assert.ok(undefined === clone.oids);
     assert.equal(clone.test, 'test');
@@ -452,6 +453,7 @@ describe('document', function() {
       return { myid: ret._id.toString() };
     };
 
+    delete doc.schema._defaultToObjectOptionsMap;
     clone = doc.toObject();
     assert.deepEqual(out, clone);
 
@@ -884,6 +886,7 @@ describe('document', function() {
       };
 
       doc.schema.options.toJSON = { virtuals: true };
+      delete doc.schema._defaultToObjectOptionsMap;
       let clone = doc.toJSON();
       assert.equal(clone.test, 'test');
       assert.ok(clone.oids instanceof Array);
@@ -897,6 +900,7 @@ describe('document', function() {
       delete path.casterConstructor.prototype.toJSON;
 
       doc.schema.options.toJSON = { minimize: false };
+      delete doc.schema._defaultToObjectOptionsMap;
       clone = doc.toJSON();
       assert.equal(clone.nested2.constructor.name, 'Object');
       assert.equal(Object.keys(clone.nested2).length, 1);
@@ -932,6 +936,7 @@ describe('document', function() {
         ret._id = ret._id.toString();
       };
 
+      delete doc.schema._defaultToObjectOptionsMap;
       clone = doc.toJSON();
       assert.equal(clone._id, doc.id);
       assert.ok(undefined === clone.em);
@@ -951,6 +956,7 @@ describe('document', function() {
         return { myid: ret._id.toString() };
       };
 
+      delete doc.schema._defaultToObjectOptionsMap;
       clone = doc.toJSON();
       assert.deepEqual(out, clone);
 

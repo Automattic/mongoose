@@ -493,7 +493,7 @@ declare module 'mongoose' {
   export type NumberSchemaDefinition = typeof Number | 'number' | 'Number' | typeof Schema.Types.Number;
   export type StringSchemaDefinition = typeof String | 'string' | 'String' | typeof Schema.Types.String;
   export type BooleanSchemaDefinition = typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean;
-  export type DateSchemaDefinition = typeof NativeDate | 'date' | 'Date' | typeof Schema.Types.Date;
+  export type DateSchemaDefinition = DateConstructor | 'date' | 'Date' | typeof Schema.Types.Date;
   export type ObjectIdSchemaDefinition = 'ObjectId' | 'ObjectID' | typeof Schema.Types.ObjectId;
 
   export type SchemaDefinitionWithBuiltInClass<T> = T extends number

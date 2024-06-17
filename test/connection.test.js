@@ -206,6 +206,56 @@ describe('connections:', function() {
     });
   });
 
+  describe('events', function() {
+    let conn;
+
+    before(async function() {
+      conn = mongoose.createConnection(start.uri2);
+      await conn.asPromise();
+      await conn.collection('test').deleteMany({});
+      return conn;
+    });
+
+    after(function() {
+      return conn.close();
+    });
+
+    it('operation-start', async function() {
+      const events = [];
+      conn.on('operation-start', ev => events.push(ev));
+
+      await conn.collection('test').findOne({ answer: 42 });
+      assert.equal(events.length, 1);
+      assert.equal(events[0].collectionName, 'test');
+      assert.equal(events[0].method, 'findOne');
+      assert.deepStrictEqual(events[0].params, [{ answer: 42 }]);
+
+      await conn.collection('test').insertOne({ _id: 12, answer: 99 });
+      assert.equal(events.length, 2);
+      assert.equal(events[1].collectionName, 'test');
+      assert.equal(events[1].method, 'insertOne');
+      assert.deepStrictEqual(events[1].params, [{ _id: 12, answer: 99 }]);
+    });
+
+    it('operation-end', async function() {
+      const events = [];
+      conn.on('operation-end', ev => {
+        events.push(ev);
+      });
+
+      await conn.collection('test').insertOne({ _id: 17, answer: 42 });
+      assert.equal(events.length, 1);
+      assert.equal(events[0].collectionName, 'test');
+      assert.equal(events[0].method, 'insertOne');
+
+      await conn.collection('test').findOne({ answer: 42 });
+      assert.equal(events.length, 2);
+      assert.equal(events[1].collectionName, 'test');
+      assert.equal(events[1].method, 'findOne');
+      assert.deepStrictEqual(events[1].result, { _id: 17, answer: 42 });
+    });
+  });
+
   it('should allow closing a closed connection', async function() {
     const db = mongoose.createConnection();
 

@@ -1,3 +1,7 @@
+8.4.3 / 2024-06-17
+==================
+ * fix: remove 0x flamegraph files from release
+
 8.4.2 / 2024-06-17
 ==================
  * perf: more toObject() perf improvements #14623 #14606 #14394

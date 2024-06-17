@@ -37,12 +37,11 @@ describe('toObject()', function() {
 
   beforeEach(function() {
     Stub = function() {
-      const schema = this.$__schema = {
+      this.$__schema = {
         options: { toObject: { minimize: false, virtuals: true } },
-        virtuals: { virtual: 'test' }
+        virtuals: { virtual: { applyGetters: () => 'test' } }
       };
       this._doc = { empty: {} };
-      this.get = function(path) { return schema.virtuals[path]; };
       this.$__ = {};
     };
     Stub.prototype = Object.create(mongoose.Document.prototype);

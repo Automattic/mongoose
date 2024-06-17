@@ -100,15 +100,6 @@ schema.path('date').set(function(v) {
   return v;
 });
 
-/**
- * Method subject to hooks. Simply fires the callback once the hooks are
- * executed.
- */
-
-TestDocument.prototype.hooksTest = function(fn) {
-  fn(null, arguments);
-};
-
 const childSchema = new Schema({ counter: Number });
 
 const parentSchema = new Schema({
@@ -491,6 +482,7 @@ describe('document', function() {
 
     // all done
     delete doc.schema.options.toObject;
+    delete doc.schema._defaultToObjectOptionsMap;
   });
 
   it('toObject transform', async function() {
@@ -994,6 +986,7 @@ describe('document', function() {
 
       // all done
       delete doc.schema.options.toJSON;
+      delete doc.schema._defaultToObjectOptionsMap;
     });
 
     it('jsonifying an object', function() {
@@ -1004,7 +997,7 @@ describe('document', function() {
       // parse again
       const obj = JSON.parse(json);
 
-      assert.equal(obj.test, 'woot');
+      assert.equal(obj.test, 'woot', JSON.stringify(obj));
       assert.equal(obj._id, oidString);
     });
 

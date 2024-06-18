@@ -9,7 +9,7 @@ declare module 'mongoose' {
     | PipelineStage.CollStats
     | PipelineStage.Count
     | PipelineStage.Densify
-    | PipelineStage.Documents    
+    | PipelineStage.Documents
     | PipelineStage.Facet
     | PipelineStage.Fill
     | PipelineStage.GeoNear

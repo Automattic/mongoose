@@ -1180,4 +1180,14 @@ describe('mongoose module:', function() {
       }
     });
   });
+
+  it('setting createInitialConnection after creation deletes existing connection (gh-8302)', async function() {
+    const m = new mongoose.Mongoose();
+    assert.ok(m.connection);
+    m.set('createInitialConnection', false);
+    assert.strictEqual(m.connection, undefined);
+
+    const conn = m.createConnection();
+    assert.equal(conn, m.connection);
+  });
 });

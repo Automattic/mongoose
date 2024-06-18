@@ -1,3 +1,7 @@
+7.7.0 / 2024-06-18
+==================
+ * feat(model): add throwOnValidationError option for opting into getting MongooseBulkWriteError if all valid operations succeed in bulkWrite() and insertMany() #14599 #14587 #14572 #13410
+
 6.13.0 / 2024-06-06
 ===================
  * feat(model): add throwOnValidationError option for opting into getting MongooseBulkWriteError if all valid operations succeed in bulkWrite() and insertMany() #14599 #14587 #14572 #13410

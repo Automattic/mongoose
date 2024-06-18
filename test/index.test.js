@@ -215,7 +215,7 @@ describe('mongoose module:', function() {
 
     mongoose.set('toJSON', { virtuals: true });
 
-    const schema = new Schema({});
+    const schema = new mongoose.Schema({});
     schema.virtual('foo').get(() => 42);
     const M = mongoose.model('Test', schema);
 
@@ -225,7 +225,7 @@ describe('mongoose module:', function() {
 
     assert.equal(doc.toJSON({ virtuals: false }).foo, void 0);
 
-    const schema2 = new Schema({}, { toJSON: { virtuals: true } });
+    const schema2 = new mongoose.Schema({}, { toJSON: { virtuals: true } });
     schema2.virtual('foo').get(() => 'bar');
     const M2 = mongoose.model('Test2', schema2);
 
@@ -239,7 +239,7 @@ describe('mongoose module:', function() {
 
     mongoose.set('toObject', { virtuals: true });
 
-    const schema = new Schema({});
+    const schema = new mongoose.Schema({});
     schema.virtual('foo').get(() => 42);
     const M = mongoose.model('Test', schema);
 

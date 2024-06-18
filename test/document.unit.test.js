@@ -4,6 +4,7 @@
 
 'use strict';
 
+const Schema = require('../lib/schema');
 const start = require('./common');
 
 const assert = require('assert');
@@ -37,12 +38,9 @@ describe('toObject()', function() {
 
   beforeEach(function() {
     Stub = function() {
-      const schema = this.$__schema = {
-        options: { toObject: { minimize: false, virtuals: true } },
-        virtuals: { virtual: 'test' }
-      };
+      this.$__schema = new Schema({}, { toObject: { minimize: false, virtuals: true } });
+      this.$__schema.virtual('virtual').get(function() { return 'test'; });
       this._doc = { empty: {} };
-      this.get = function(path) { return schema.virtuals[path]; };
       this.$__ = {};
     };
     Stub.prototype = Object.create(mongoose.Document.prototype);

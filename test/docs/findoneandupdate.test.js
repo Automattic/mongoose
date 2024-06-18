@@ -40,16 +40,18 @@ describe('Tutorial: findOneAndUpdate()', function() {
       age: Number
     }));
 
-    await Character.create({ name: 'Jean-Luc Picard' });
+    const _id = new mongoose.Types.ObjectId('0'.repeat(24));
+    let doc = await Character.create({ _id, name: 'Jean-Luc Picard' });
+    doc; // { name: 'Jean-Luc Picard', _id: ObjectId('000000000000000000000000') }
 
     const filter = { name: 'Jean-Luc Picard' };
     const update = { age: 59 };
 
-    // `doc` is the document _before_ `update` was applied
-    let doc = await Character.findOneAndUpdate(filter, update);
-    doc.name; // 'Jean-Luc Picard'
-    doc.age; // undefined
+    // The result of `findOneAndUpdate()` is the document _before_ `update` was applied
+    doc = await Character.findOneAndUpdate(filter, update);
+    doc; // { name: 'Jean-Luc Picard', _id: ObjectId('000000000000000000000000') }
     // acquit:ignore:start
+    assert.equal(doc._id.toHexString(), _id.toHexString());
     assert.equal(doc.name, 'Jean-Luc Picard');
     assert.equal(doc.age, undefined);
     // acquit:ignore:end

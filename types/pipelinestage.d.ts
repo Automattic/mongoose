@@ -9,6 +9,7 @@ declare module 'mongoose' {
     | PipelineStage.CollStats
     | PipelineStage.Count
     | PipelineStage.Densify
+    | PipelineStage.Documents
     | PipelineStage.Facet
     | PipelineStage.Fill
     | PipelineStage.GeoNear
@@ -91,6 +92,11 @@ declare module 'mongoose' {
           bounds: number[] | globalThis.Date[] | 'full' | 'partition'
         }
       }
+    }
+
+    export interface Documents {
+      /** [`$documents` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/documents/) */
+      $documents: Record<string, Expression>[]
     }
 
     export interface Fill {
@@ -298,6 +304,7 @@ declare module 'mongoose' {
       $unionWith:
       | string
       | { coll: string; pipeline?: Exclude<PipelineStage, PipelineStage.Out | PipelineStage.Merge>[] }
+      | { coll?: string; pipeline: Exclude<PipelineStage, PipelineStage.Out | PipelineStage.Merge>[] }
     }
 
     export interface Unset {

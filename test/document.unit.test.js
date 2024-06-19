@@ -38,8 +38,10 @@ describe('toObject()', function() {
 
   beforeEach(function() {
     Stub = function() {
-      this.$__schema = new Schema({}, { toObject: { minimize: false, virtuals: true } });
-      this.$__schema.virtual('virtual').get(function() { return 'test'; });
+      this.$__schema = {
+        options: { toObject: { minimize: false, virtuals: true } },
+        virtuals: { virtual: { applyGetters: () => 'test' } }
+      };
       this._doc = { empty: {} };
       this.$__ = {};
     };

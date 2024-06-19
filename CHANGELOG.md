@@ -1,3 +1,16 @@
+8.4.3 / 2024-06-17
+==================
+ * fix: remove 0x flamegraph files from release
+
+8.4.2 / 2024-06-17
+==================
+ * perf: more toObject() perf improvements #14623 #14606 #14394
+ * fix(model): check the value of overwriteModels in options when calling discriminator() #14646 [uditha-g](https://github.com/uditha-g)
+ * fix: avoid throwing TypeError when deleting an null entry on a populated Map #14654 [futurliberta](https://github.com/futurliberta)
+ * fix(connection): fix up some inconsistencies in operation-end event and add to docs #14659 #14648
+ * types: avoid inferring Boolean, Buffer, ObjectId as Date in schema definitions under certain circumstances #14667 #14630
+ * docs: add note about parallelism in transations #14647 [fiws](https://github.com/fiws)
+
 8.4.1 / 2024-05-31
 ==================
  * fix: pass options to clone instead of get in applyVirtuals #14606 #14543 [andrews05](https://github.com/andrews05)

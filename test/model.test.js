@@ -7445,7 +7445,7 @@ describe('Model', function() {
   });
 
   it('supports recompiling model with new schema additions (gh-14296)', function() {
-    const schema = new mongoose.Schema({ field: String });
+    const schema = new mongoose.Schema({ field: String }, { toObject: { virtuals: false } });
     const TestModel = db.model('Test', schema);
     TestModel.schema.virtual('myVirtual').get(function() {
       return this.field + ' from myVirtual';
@@ -7455,6 +7455,12 @@ describe('Model', function() {
 
     TestModel.recompileSchema();
     assert.equal(doc.myVirtual, 'Hello from myVirtual');
+    assert.strictEqual(doc.toObject().myVirtual, undefined);
+
+    doc.schema.options.toObject.virtuals = true;
+    TestModel.recompileSchema();
+    assert.equal(doc.myVirtual, 'Hello from myVirtual');
+    assert.equal(doc.toObject().myVirtual, 'Hello from myVirtual');
   });
 
   it('supports recompiling model with new discriminators (gh-14444) (gh-14296)', function() {

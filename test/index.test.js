@@ -1189,5 +1189,14 @@ describe('mongoose module:', function() {
 
     const conn = m.createConnection();
     assert.equal(conn, m.connection);
+
+    const m2 = new mongoose.Mongoose();
+    assert.ok(m2.connection);
+    m2.set('createInitialConnection', false);
+    assert.strictEqual(m2.connection, undefined);
+
+    await m2.connect(start.uri);
+    assert.ok(m2.connection);
+    await m2.disconnect();
   });
 });

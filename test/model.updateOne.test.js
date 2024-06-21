@@ -3017,6 +3017,37 @@ describe('model: updateOne: ', function() {
     const doc = await Test.findById(_id);
     assert.equal(doc.subdoc['1'], 'foobar');
   });
+  it('handles embedded discriminators with $pull when discriminator key set in filter (gh-14675)', async function() {
+    const LoginSchema = new Schema({}, { discriminatorKey: 'type', _id: false });
+    const UserSchema = new Schema({
+      name: String,
+      login: LoginSchema
+    });
+    UserSchema.path('login').discriminator('ssh-key', new Schema({
+      keys: {
+        type: [{
+          id: { type: String, required: true },
+          publicKey: { type: String, required: true }
+        }],
+        default: []
+      }
+    }, { _id: false }));
+    const User = db.model('Test', UserSchema);
+
+    const { _id } = await User.create({
+      login: {
+        type: 'ssh-key',
+        keys: [{ id: 'my-key', publicKey: 'test' }, { id: 'test2', publicKey: 'foo' }]
+      }
+    });
+    const doc = await User.findOneAndUpdate(
+      { _id, 'login.type': 'ssh-key' },
+      { $pull: { 'login.keys': { id: 'my-key' } } },
+      { new: true }
+    ).exec();
+    assert.equal(doc.login.keys.length, 1);
+    assert.equal(doc.login.keys[0].id, 'test2');
+  });
 });
 
 async function delay(ms) {

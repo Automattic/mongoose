@@ -1180,4 +1180,52 @@ describe('mongoose module:', function() {
       }
     });
   });
+
+  describe('createInitialConnection (gh-8302)', function() {
+    let m;
+
+    beforeEach(function() {
+      m = new mongoose.Mongoose();
+    });
+
+    afterEach(async function() {
+      await m.disconnect();
+    });
+
+    it('should delete existing connection when setting createInitialConnection to false', function() {
+      assert.ok(m.connection);
+      m.set('createInitialConnection', false);
+      assert.strictEqual(m.connection, undefined);
+    });
+
+    it('should create connection when createConnection is called', function() {
+      m.set('createInitialConnection', false);
+      const conn = m.createConnection();
+      assert.equal(conn, m.connection);
+    });
+
+    it('should create a new connection automatically when connect() is called if no existing default connection', async function() {
+      assert.ok(m.connection);
+      m.set('createInitialConnection', false);
+      assert.strictEqual(m.connection, undefined);
+
+      await m.connect(start.uri);
+      assert.ok(m.connection);
+    });
+
+    it('should not delete default connection if it has models', async function() {
+      assert.ok(m.connection);
+      m.model('Test', new m.Schema({ name: String }));
+      m.set('createInitialConnection', false);
+      assert.ok(m.connection);
+    });
+
+    it('should not delete default connection if it is connected', async function() {
+      assert.ok(m.connection);
+      await m.connect(start.uri);
+      m.set('createInitialConnection', false);
+      assert.ok(m.connection);
+      assert.equal(m.connection.readyState, 1);
+    });
+  });
 });

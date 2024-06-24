@@ -1192,7 +1192,7 @@ describe('mongoose module:', function() {
       await m.disconnect();
     });
 
-    it('should delete existing connection when setting createInitialConnection to false (part 1)', function() {
+    it('should delete existing connection when setting createInitialConnection to false', function() {
       assert.ok(m.connection);
       m.set('createInitialConnection', false);
       assert.strictEqual(m.connection, undefined);

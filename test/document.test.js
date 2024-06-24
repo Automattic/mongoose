@@ -2556,6 +2556,88 @@ describe('document', function() {
       // Does not throw
       await Model.create({ name: 'test' });
     });
+
+    it('fully validates modified subdocs (gh-14677)', async function() {
+      const embedSchema = new mongoose.Schema({
+        field1: {
+          type: String,
+          required: true
+        },
+        field2: String
+      });
+      const testSchema = new mongoose.Schema({
+        testField: {
+          type: String,
+          required: true
+        },
+        testArray: [embedSchema],
+      });
+      const TestModel = db.model('Test', testSchema);
+
+      let doc = new TestModel({ testArray: [{ field2: 'test' }] });
+      let err = await doc.validate({ validateModifiedOnly: true }).then(() => null, err => err);
+      assert.ok(err);
+      assert.ok(err.errors['testArray.0.field1']);
+      assert.equal(err.errors['testArray.0.field1'].kind, 'required');
+
+      await TestModel.collection.insertOne(doc.toObject());
+      doc = await TestModel.findById(doc._id).orFail();
+      doc.testArray[0].field2 = 'test modified';
+      err = await doc.validate({ validateModifiedOnly: true }).then(() => null, err => err);
+      assert.ifError(err);
+
+      err = await doc.validate().then(() => null, err => err);
+      assert.ok(err);
+      assert.ok(err.errors['testArray.0.field1']);
+      assert.equal(err.errors['testArray.0.field1'].kind, 'required');
+
+      doc.testArray[0] = { field2: 'test modified 3' };
+      err = await doc.validate({ validateModifiedOnly: true }).then(() => null, err => err);
+      assert.ok(err);
+      assert.ok(err.errors['testArray.0.field1']);
+      assert.equal(err.errors['testArray.0.field1'].kind, 'required');
+    });
+
+    it('fully validates modified single nested subdocs (gh-14677)', async function() {
+      const embedSchema = new mongoose.Schema({
+        field1: {
+          type: String,
+          required: true
+        },
+        field2: String
+      });
+      const testSchema = new mongoose.Schema({
+        testField: {
+          type: String,
+          required: true
+        },
+        subdoc: embedSchema
+      });
+      const TestModel = db.model('Test', testSchema);
+
+      let doc = new TestModel({ subdoc: { field2: 'test' } });
+      let err = await doc.validate({ validateModifiedOnly: true }).then(() => null, err => err);
+      assert.ok(err);
+      assert.ok(err.errors['subdoc.field1']);
+      assert.equal(err.errors['subdoc.field1'].kind, 'required');
+
+      await TestModel.collection.insertOne(doc.toObject());
+      doc = await TestModel.findById(doc._id).orFail();
+      doc.subdoc.field2 = 'test modified';
+      err = await doc.validate({ validateModifiedOnly: true }).then(() => null, err => err);
+      assert.ifError(err);
+
+      err = await doc.validate().then(() => null, err => err);
+      assert.ok(err);
+      assert.ok(err.errors['subdoc.field1']);
+      assert.equal(err.errors['subdoc.field1'].kind, 'required');
+
+      doc.subdoc = { field2: 'test modified 3' };
+      err = await doc.validate({ validateModifiedOnly: true }).then(() => null, err => err);
+      assert.ok(err);
+      assert.ok(err.errors['subdoc.field1']);
+      assert.equal(err.errors['subdoc.field1'].kind, 'required');
+    });
   });
 
   describe('bug fixes', function() {

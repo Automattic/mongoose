@@ -54,6 +54,11 @@ expectType<Promise<void>>(conn.transaction(async(res) => {
   return 'a';
 }, { readConcern: 'majority' }));
 
+expectType<Promise<string>>(conn.withSession(async(res) => {
+  expectType<mongodb.ClientSession>(res);
+  return 'a';
+}));
+
 expectError(conn.user = 'invalid');
 expectError(conn.pass = 'invalid');
 expectError(conn.host = 'invalid');

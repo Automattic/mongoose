@@ -3449,6 +3449,47 @@ describe('Query', function() {
     assert.deepEqual(q._fields, { email: 1 });
   });
 
+  it('sanitizeProjection option with plus paths (gh-14333) (gh-10243)', async function() {
+    const MySchema = Schema({
+      name: String,
+      email: String,
+      password: { type: String, select: false }
+    });
+    const Test = db.model('Test', MySchema);
+
+    await Test.create({ name: 'test', password: 'secret' });
+
+    let q = Test.findOne().select('+password');
+    let doc = await q;
+    assert.deepEqual(q._fields, {});
+    assert.strictEqual(doc.password, 'secret');
+
+    q = Test.findOne().setOptions({ sanitizeProjection: true }).select('+password');
+    doc = await q;
+    assert.deepEqual(q._fields, { password: 0 });
+    assert.strictEqual(doc.password, undefined);
+
+    q = Test.find().select('+password').setOptions({ sanitizeProjection: true });
+    doc = await q;
+    assert.deepEqual(q._fields, { password: 0 });
+    assert.strictEqual(doc.password, undefined);
+
+    q = Test.find().select('name +password').setOptions({ sanitizeProjection: true });
+    doc = await q;
+    assert.deepEqual(q._fields, { name: 1 });
+    assert.strictEqual(doc.password, undefined);
+
+    q = Test.find().select('+name').setOptions({ sanitizeProjection: true });
+    doc = await q;
+    assert.deepEqual(q._fields, { password: 0 });
+    assert.strictEqual(doc.password, undefined);
+
+    q = Test.find().select('password').setOptions({ sanitizeProjection: true });
+    doc = await q;
+    assert.deepEqual(q._fields, { password: 0 });
+    assert.strictEqual(doc.password, undefined);
+  });
+
   it('sanitizeFilter option (gh-3944)', function() {
     const MySchema = Schema({ username: String, pwd: String });
     const Test = db.model('Test', MySchema);

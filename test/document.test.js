@@ -2570,7 +2570,7 @@ describe('document', function() {
           type: String,
           required: true
         },
-        testArray: [embedSchema],
+        testArray: [embedSchema]
       });
       const TestModel = db.model('Test', testSchema);
 

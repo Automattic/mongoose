@@ -1,3 +1,14 @@
+8.4.4 / 2024-06-25
+==================
+ * perf: avoid unnecesary get() call and use faster approach for converting to string #14673 #14394
+ * fix(projection): handle projections on arrays in Model.hydrate() projection option #14686 #14680
+ * fix(document): avoid passing validateModifiedOnly to subdocs so subdocs get fully validating if they're directly modified #14685 #14677
+ * fix: handle casting primitive array with $elemMatch in bulkWrite() #14687 #14678
+ * fix(query): cast $pull using embedded discriminator schema when discriminator key is set in filter #14676 #14675
+ * types(connection): fix return type of withSession() #14690 [tt-public](https://github.com/tt-public)
+ * types: add $documents pipeline stage and fix $unionWith type #14666 [nick-statsig](https://github.com/nick-statsig)
+ * docs(findoneandupdate): improve example that shows findOneAndUpdate() returning doc before updates were applied #14671 #14670
+
 8.4.3 / 2024-06-17
 ==================
  * fix: remove 0x flamegraph files from release

@@ -3,7 +3,7 @@
 Next.js is a popular framework for building full stack applications with React.
 Mongoose works out of the box with Next.js.
 If you're looking to get started, please use [Next.js' official Mongoose sample app](https://github.com/vercel/next.js/tree/canary/examples/with-mongodb-mongoose).
-Furthermore, if you are using Next.js with [Vercel Serverless Functions](https://vercel.com/docs/concepts/functions/serverless-functions), please review [Mongoose's AWS Lambda docs](https://vercel.com/docs/concepts/functions/serverless-functions).
+Furthermore, if you are using Next.js with [Vercel Serverless Functions](https://vercel.com/docs/concepts/functions/serverless-functions), please review [Mongoose's AWS Lambda docs](https://mongoosejs.com/docs/lambda.html).
 
 There are a few common issues when working with Next.js that you should be aware of.
 

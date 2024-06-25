@@ -19,6 +19,8 @@ function findOneAndUpdate(filter, update, options) {}
 ```
 
 By default, `findOneAndUpdate()` returns the document as it was **before** `update` was applied.
+In the following example, `doc` initially only has `name` and `_id` properties.
+`findOneAndUpdate()` adds an `age` property, but the result of `findOneAndUpdate()` does **not** have an `age` property.
 
 ```acquit
 [require:Tutorial.*findOneAndUpdate.*basic case]

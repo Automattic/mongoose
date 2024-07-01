@@ -4470,6 +4470,43 @@ describe('Model', function() {
         assert.equal(err.validationErrors[0].path, 'age');
         assert.equal(err.results[0].path, 'age');
       });
+
+      it('casts $elemMatch filter (gh-14678)', async function() {
+        const schema = new mongoose.Schema({
+          name: String,
+          ids: [String]
+        });
+        const TestModel = db.model('Test', schema);
+
+        const { _id } = await TestModel.create({ ids: ['1'] });
+        await TestModel.bulkWrite([
+          {
+            updateOne: {
+              filter: {
+                ids: {
+                  $elemMatch: {
+                    $in: [1]
+                  }
+                }
+              },
+              update: {
+                $set: {
+                  name: 'test'
+                },
+                $addToSet: {
+                  ids: {
+                    $each: [1, '2', 3]
+                  }
+                }
+              }
+            }
+          }
+        ]);
+
+        const doc = await TestModel.findById(_id).orFail();
+        assert.strictEqual(doc.name, 'test');
+        assert.deepStrictEqual(doc.ids, ['1', '2', '3']);
+      });
     });
 
     it('deleteOne with cast error (gh-5323)', async function() {

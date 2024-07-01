@@ -545,4 +545,33 @@ describe('transactions', function() {
 
     await session.endSession();
   });
+
+  it('allows custom transaction wrappers to store and reset document state with $createModifiedPathsSnapshot (gh-14268)', async function() {
+    db.deleteModel(/Test/);
+    const Test = db.model('Test', Schema({ name: String }, { writeConcern: { w: 'majority' } }));
+
+    await Test.createCollection();
+    await Test.deleteMany({});
+
+    const { _id } = await Test.create({ name: 'foo' });
+    const doc = await Test.findById(_id);
+    doc.name = 'bar';
+    for (let i = 0; i < 2; ++i) {
+      const session = await db.startSession();
+      const snapshot = doc.$createModifiedPathsSnapshot();
+      session.startTransaction();
+
+      await doc.save({ session });
+      if (i === 0) {
+        await session.abortTransaction();
+        doc.$restoreModifiedPathsSnapshot(snapshot);
+      } else {
+        await session.commitTransaction();
+      }
+      await session.endSession();
+    }
+
+    const { name } = await Test.findById(_id);
+    assert.strictEqual(name, 'bar');
+  });
 });

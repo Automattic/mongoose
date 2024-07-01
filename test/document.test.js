@@ -13452,6 +13452,105 @@ describe('document', function() {
     assert.ok(blogPost.isDirectModified('comment.jsonField.fieldA'));
     assert.ok(blogPost.comment.jsonField.isDirectModified('fieldA'));
   });
+
+  it('$clearModifiedPaths (gh-14268)', async function() {
+    const schema = new Schema({
+      name: String,
+      nested: {
+        subprop1: String
+      },
+      subdoc: new Schema({
+        subprop2: String
+      }, { _id: false }),
+      docArr: [new Schema({ subprop3: String }, { _id: false })]
+    });
+    const Test = db.model('Test', schema);
+
+    const doc = new Test({});
+    await doc.save();
+    doc.set({
+      name: 'test1',
+      nested: { subprop1: 'test2' },
+      subdoc: { subprop2: 'test3' },
+      docArr: [{ subprop3: 'test4' }]
+    });
+
+    assert.deepStrictEqual(doc.getChanges().$set, {
+      name: 'test1',
+      nested: { subprop1: 'test2' },
+      subdoc: { subprop2: 'test3' },
+      docArr: [{ subprop3: 'test4' }]
+    });
+    assert.deepStrictEqual(doc.getChanges().$inc, { __v: 1 });
+    doc.$clearModifiedPaths();
+    assert.deepStrictEqual(doc.getChanges(), {});
+
+    await doc.save();
+    const fromDb = await Test.findById(doc._id).lean();
+    assert.deepStrictEqual(fromDb, { _id: doc._id, __v: 0, docArr: [] });
+  });
+
+  it('$createModifiedPathsSnapshot and $restoreModifiedPathsSnapshot (gh-14268)', async function() {
+    const schema = new Schema({
+      name: String,
+      nested: {
+        subprop1: String
+      },
+      subdoc: new Schema({
+        subprop2: String
+      }, { _id: false }),
+      docArr: [new Schema({ subprop3: String }, { _id: false })]
+    });
+    const Test = db.model('Test', schema);
+
+    const doc = new Test({});
+    await doc.save();
+    doc.set({
+      name: 'test1',
+      nested: { subprop1: 'test2' },
+      subdoc: { subprop2: 'test3' },
+      docArr: [{ subprop3: 'test4' }]
+    });
+
+    assert.deepStrictEqual(doc.getChanges().$set, {
+      name: 'test1',
+      nested: { subprop1: 'test2' },
+      subdoc: { subprop2: 'test3' },
+      docArr: [{ subprop3: 'test4' }]
+    });
+    assert.deepStrictEqual(doc.getChanges().$inc, { __v: 1 });
+    assert.deepStrictEqual(doc.subdoc.getChanges(), { $set: { subprop2: 'test3' } });
+    assert.deepStrictEqual(doc.docArr[0].getChanges(), { $set: { subprop3: 'test4' } });
+
+    const snapshot = doc.$createModifiedPathsSnapshot();
+    doc.$clearModifiedPaths();
+
+    assert.deepStrictEqual(doc.getChanges(), {});
+    assert.deepStrictEqual(doc.subdoc.getChanges(), {});
+    assert.deepStrictEqual(doc.docArr[0].getChanges(), {});
+
+    doc.$restoreModifiedPathsSnapshot(snapshot);
+    assert.deepStrictEqual(doc.getChanges().$set, {
+      name: 'test1',
+      nested: { subprop1: 'test2' },
+      subdoc: { subprop2: 'test3' },
+      docArr: [{ subprop3: 'test4' }]
+    });
+    assert.deepStrictEqual(doc.getChanges().$inc, { __v: 1 });
+    assert.deepStrictEqual(doc.subdoc.getChanges(), { $set: { subprop2: 'test3' } });
+    assert.deepStrictEqual(doc.docArr[0].getChanges(), { $set: { subprop3: 'test4' } });
+
+    await doc.save();
+    const fromDb = await Test.findById(doc._id).lean();
+    assert.deepStrictEqual(fromDb, {
+      __v: 1,
+      _id: doc._id,
+      name: 'test1',
+      nested: { subprop1: 'test2' },
+      subdoc: { subprop2: 'test3' },
+      docArr: [{ subprop3: 'test4' }]
+    });
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

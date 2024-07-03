@@ -716,6 +716,11 @@ declare module 'mongoose' {
       options?: QueryOptions<DocType> | null
     ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'replaceOne', TInstanceMethods>;
 
+    /**
+     * Sets this query's `sanitizeProjection` option. With `sanitizeProjection()`, you can pass potentially untrusted user data to `.select()`.
+     */
+    sanitizeProjection(value: boolean): this;
+
     /** Specifies which document fields to include or exclude (also known as the query "projection") */
     select<RawDocTypeOverride extends { [P in keyof RawDocType]?: any } = {}>(
       arg: string | string[] | Record<string, number | boolean | string | object>

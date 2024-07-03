@@ -10,6 +10,8 @@ declare module 'mongoose' {
     [key: string]: any;
   }
 
+  class ModifiedPathsSnapshot {}
+
   /**
    * Generic types for Document:
    * *  T - the type of _id
@@ -28,8 +30,17 @@ declare module 'mongoose' {
     /** Assert that a given path or paths is populated. Throws an error if not populated. */
     $assertPopulated<Paths = {}>(path: string | string[], values?: Partial<Paths>): Omit<this, keyof Paths> & Paths;
 
+    /** Clear the document's modified paths. */
+    $clearModifiedPaths(): this;
+
     /** Returns a deep clone of this document */
     $clone(): this;
+
+    /**
+     * Creates a snapshot of this document's internal change tracking state. You can later
+     * reset this document's change tracking state using `$restoreModifiedPathsSnapshot()`.
+     */
+    $createModifiedPathsSnapshot(): ModifiedPathsSnapshot;
 
     /* Get all subdocs (by bfs) */
     $getAllSubdocs(): Document[];
@@ -82,6 +93,13 @@ declare module 'mongoose' {
      * on this document. Can be `null`, `'save'`, `'validate'`, or `'remove'`.
      */
     $op: 'save' | 'validate' | 'remove' | null;
+
+    /**
+     * Restore this document's change tracking state to the given snapshot.
+     * Note that `$restoreModifiedPathsSnapshot()` does **not** modify the document's
+     * properties, just resets the change tracking state.
+     */
+    $restoreModifiedPathsSnapshot(snapshot: ModifiedPathsSnapshot): this;
 
     /**
      * Getter/setter around the session associated with this document. Used to

@@ -3198,6 +3198,23 @@ describe('document', function() {
       assert.ok(!('names' in doc));
     });
 
+    it('can set array default to null (gh-14717)', async function() {
+      const schema = new Schema({
+        names: {
+          type: [String],
+          default: null
+        }
+      });
+
+      const Model = db.model('Test', schema);
+      const m = new Model();
+      assert.strictEqual(m.names, null);
+      await m.save();
+
+      const doc = await Model.collection.findOne({ _id: m._id });
+      assert.strictEqual(doc.names, null);
+    });
+
     it('validation works when setting array index (gh-3816)', async function() {
       const mySchema = new mongoose.Schema({
         items: [

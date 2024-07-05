@@ -60,7 +60,7 @@ declare module 'mongoose' {
     alias?: string | string[];
 
     /** Function or object describing how to validate this schematype. See [validation docs](https://mongoosejs.com/docs/validation.html). */
-    validate?: SchemaValidator<T> | AnyArray<SchemaValidator<T>>;
+    validate?: SchemaValidator<T, EnforcedDocType> | AnyArray<SchemaValidator<T, EnforcedDocType>>;
 
     /** Allows overriding casting logic for this individual path. If a string, the given string overwrites Mongoose's default cast error message. */
     cast?: string |

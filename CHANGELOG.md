@@ -1,3 +1,8 @@
+8.4.5 / 2024-07-05
+==================
+ * types: correct this for validate.validator schematype option #14720 #14696
+ * docs(model): note that insertMany() with lean skips applying defaults #14723 #14698
+
 8.4.4 / 2024-06-25
 ==================
  * perf: avoid unnecesary get() call and use faster approach for converting to string #14673 #14394

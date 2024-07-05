@@ -18,7 +18,8 @@ import {
   SchemaType,
   Types,
   Query,
-  model
+  model,
+  ValidateOpts
 } from 'mongoose';
 import { expectType, expectError, expectAssignable } from 'tsd';
 import { ObtainDocumentPathType, ResolvePathType } from '../../types/inferschematype';
@@ -1510,4 +1511,47 @@ function gh13772() {
   const TestModel = model('User', schema);
   const doc = new TestModel();
   expectAssignable<RawDocType>(doc.toObject());
+}
+
+function gh14696() {
+  interface User {
+    name: string;
+    isActive: boolean;
+    isActiveAsync: boolean;
+  }
+
+  const x: ValidateOpts<unknown, User> = {
+    validator(v: any) {
+      expectAssignable<User>(this);
+      return !v || this.name === 'super admin';
+    }
+  };
+
+  const userSchema = new Schema<User>({
+    name: {
+      type: String,
+      required: [true, 'Name on card is required']
+    },
+    isActive: {
+      type: Boolean,
+      default: false,
+      validate: {
+        validator(v: any) {
+          expectAssignable<User>(this);
+          return !v || this.name === 'super admin';
+        }
+      }
+    },
+    isActiveAsync: {
+      type: Boolean,
+      default: false,
+      validate: {
+        async validator(v: any) {
+          expectAssignable<User>(this);
+          return !v || this.name === 'super admin';
+        }
+      }
+    }
+  });
+
 }

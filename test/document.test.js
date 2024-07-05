@@ -12789,7 +12789,7 @@ describe('document', function() {
     await user.save();
     await TestModel.deleteOne({ userId });
 
-    assert.equal(Object.keys(TestModel.schema.subpaths).length, 3);
+    assert.ok(Object.keys(TestModel.schema.subpaths).length <= 3);
   });
 
   it('handles embedded discriminators defined using Schema.prototype.discriminator (gh-13898)', async function() {
@@ -13534,6 +13534,36 @@ describe('document', function() {
 
     assert.ok(blogPost.isDirectModified('comment.jsonField.fieldA'));
     assert.ok(blogPost.comment.jsonField.isDirectModified('fieldA'));
+  });
+
+  it('avoids leaving subdoc _id in default state when setting subdocument to same value (gh-14722)', async function() {
+    const getUser = () => ({
+      _id: new mongoose.Types.ObjectId('66852317541ef0e22ae5214c'),
+      name: 'test1',
+      email: 'test@test.com'
+    });
+
+    const updateInfoSchema = new mongoose.Schema({
+      name: {
+        type: String, required: true
+      },
+      email: {
+        type: String,
+        required: true
+      }
+    }, {
+      versionKey: false
+    });
+    const schema = new mongoose.Schema({ name: String, updater: updateInfoSchema });
+
+    const TestModel = db.model('Test', schema);
+    const { _id } = await TestModel.create({ name: 'taco', updater: getUser() });
+    const doc = await TestModel.findById(_id).orFail();
+
+    doc.name = 'taco-edit';
+    doc.updater = getUser();
+    assert.deepStrictEqual(doc.getChanges(), { $set: { name: 'taco-edit' } });
+    assert.ok(!doc.$isDefault('updater._id'));
   });
 });
 

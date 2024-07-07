@@ -13544,6 +13544,7 @@ describe('document', function() {
       preDeleteOne: 0,
       postDeleteOne: 0
     };
+    let postDeleteOneError = null;
     ChildSchema.pre('save', function(next) {
       ++called.preSave;
       next();
@@ -13558,7 +13559,7 @@ describe('document', function() {
     });
     ChildSchema.post('deleteOne', { document: true, query: false }, function(subdoc, next) {
       ++called.postDeleteOne;
-      next();
+      next(postDeleteOneError);
     });
     const ParentSchema = new Schema({ name: String, children: [ChildSchema] });
     const ParentModel = db.model('Parent', ParentSchema);
@@ -13590,6 +13591,14 @@ describe('document', function() {
       preDeleteOne: 1,
       postDeleteOne: 1
     });
+
+    postDeleteOneError = new Error('Test error in post deleteOne hook');
+    const child3 = doc.children[1];
+    child3.deleteOne();
+    await assert.rejects(
+      () => doc.save(),
+      /Test error in post deleteOne hook/
+    );
   });
 });
 

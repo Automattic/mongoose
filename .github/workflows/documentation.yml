@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Lint Markdown files
     steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
       - name: Setup node
         uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-20.04
     name: Test Generating Docs
     steps:
-      - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       - run: git fetch --depth=1 --tags # download all tags for documentation
 
       - name: Setup node

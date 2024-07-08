@@ -13535,6 +13535,71 @@ describe('document', function() {
     assert.ok(blogPost.isDirectModified('comment.jsonField.fieldA'));
     assert.ok(blogPost.comment.jsonField.isDirectModified('fieldA'));
   });
+
+  it('post deleteOne hook (gh-9885)', async function() {
+    const ChildSchema = new Schema({ name: String });
+    const called = {
+      preSave: 0,
+      postSave: 0,
+      preDeleteOne: 0,
+      postDeleteOne: 0
+    };
+    let postDeleteOneError = null;
+    ChildSchema.pre('save', function(next) {
+      ++called.preSave;
+      next();
+    });
+    ChildSchema.post('save', function(subdoc, next) {
+      ++called.postSave;
+      next();
+    });
+    ChildSchema.pre('deleteOne', { document: true, query: false }, function(next) {
+      ++called.preDeleteOne;
+      next();
+    });
+    ChildSchema.post('deleteOne', { document: true, query: false }, function(subdoc, next) {
+      ++called.postDeleteOne;
+      next(postDeleteOneError);
+    });
+    const ParentSchema = new Schema({ name: String, children: [ChildSchema] });
+    const ParentModel = db.model('Parent', ParentSchema);
+
+    const doc = new ParentModel({ name: 'Parent' });
+    await doc.save();
+    assert.deepStrictEqual(called, {
+      preSave: 0,
+      postSave: 0,
+      preDeleteOne: 0,
+      postDeleteOne: 0
+    });
+    doc.children.push({ name: 'Child 1' });
+    doc.children.push({ name: 'Child 2' });
+    doc.children.push({ name: 'Child 3' });
+    await doc.save();
+    assert.deepStrictEqual(called, {
+      preSave: 3,
+      postSave: 3,
+      preDeleteOne: 0,
+      postDeleteOne: 0
+    });
+    const child2 = doc.children[1];
+    child2.deleteOne();
+    await doc.save();
+    assert.deepStrictEqual(called, {
+      preSave: 5,
+      postSave: 5,
+      preDeleteOne: 1,
+      postDeleteOne: 1
+    });
+
+    postDeleteOneError = new Error('Test error in post deleteOne hook');
+    const child3 = doc.children[1];
+    child3.deleteOne();
+    await assert.rejects(
+      () => doc.save(),
+      /Test error in post deleteOne hook/
+    );
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is availabe', function() {

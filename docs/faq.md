@@ -314,7 +314,7 @@ const Kitten = connection.model('Kitten', kittySchema);
 
 <a class="anchor" href="#array-defaults">**Q**</a>. How can I change mongoose's default behavior of initializing an array path to an empty array so that I can require real data on document creation?
 
-**A**. You can set the default of the array to a function that returns `undefined`.
+**A**. You can set the default of the array to `undefined`.
 
 ```javascript
 const CollectionSchema = new Schema({
@@ -329,13 +329,13 @@ const CollectionSchema = new Schema({
 
 <a class="anchor" href="#initialize-array-path-null">**Q**</a>. How can I initialize an array path to `null`?
 
-**A**. You can set the default of the array to a function that returns `null`.
+**A**. You can set the default of the array to [`null`](https://masteringjs.io/tutorials/fundamentals/null).
 
 ```javascript
 const CollectionSchema = new Schema({
   field1: {
     type: [String],
-    default: () => { return null; }
+    default: null
   }
 });
 ```

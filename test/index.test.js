@@ -215,7 +215,7 @@ describe('mongoose module:', function() {
 
     mongoose.set('toJSON', { virtuals: true });
 
-    const schema = new Schema({});
+    const schema = new mongoose.Schema({});
     schema.virtual('foo').get(() => 42);
     const M = mongoose.model('Test', schema);
 
@@ -225,7 +225,7 @@ describe('mongoose module:', function() {
 
     assert.equal(doc.toJSON({ virtuals: false }).foo, void 0);
 
-    const schema2 = new Schema({}, { toJSON: { virtuals: true } });
+    const schema2 = new mongoose.Schema({}, { toJSON: { virtuals: true } });
     schema2.virtual('foo').get(() => 'bar');
     const M2 = mongoose.model('Test2', schema2);
 
@@ -239,7 +239,7 @@ describe('mongoose module:', function() {
 
     mongoose.set('toObject', { virtuals: true });
 
-    const schema = new Schema({});
+    const schema = new mongoose.Schema({});
     schema.virtual('foo').get(() => 42);
     const M = mongoose.model('Test', schema);
 
@@ -1178,6 +1178,54 @@ describe('mongoose module:', function() {
         assert.ok(err.errors['invalid'] instanceof SetOptionError.SetOptionInnerError);
         assert.strictEqual(err.message, 'invalid: "invalid" is not a valid option to set');
       }
+    });
+  });
+
+  describe('createInitialConnection (gh-8302)', function() {
+    let m;
+
+    beforeEach(function() {
+      m = new mongoose.Mongoose();
+    });
+
+    afterEach(async function() {
+      await m.disconnect();
+    });
+
+    it('should delete existing connection when setting createInitialConnection to false', function() {
+      assert.ok(m.connection);
+      m.set('createInitialConnection', false);
+      assert.strictEqual(m.connection, undefined);
+    });
+
+    it('should create connection when createConnection is called', function() {
+      m.set('createInitialConnection', false);
+      const conn = m.createConnection();
+      assert.equal(conn, m.connection);
+    });
+
+    it('should create a new connection automatically when connect() is called if no existing default connection', async function() {
+      assert.ok(m.connection);
+      m.set('createInitialConnection', false);
+      assert.strictEqual(m.connection, undefined);
+
+      await m.connect(start.uri);
+      assert.ok(m.connection);
+    });
+
+    it('should not delete default connection if it has models', async function() {
+      assert.ok(m.connection);
+      m.model('Test', new m.Schema({ name: String }));
+      m.set('createInitialConnection', false);
+      assert.ok(m.connection);
+    });
+
+    it('should not delete default connection if it is connected', async function() {
+      assert.ok(m.connection);
+      await m.connect(start.uri);
+      m.set('createInitialConnection', false);
+      assert.ok(m.connection);
+      assert.equal(m.connection.readyState, 1);
     });
   });
 });

@@ -346,6 +346,19 @@ describe('schema select option', function() {
       assert.equal(d.id, doc.id);
     });
 
+    it('works if only one plus path and only one deselected field', async function() {
+      const MySchema = Schema({
+        name: String,
+        email: String,
+        password: { type: String, select: false }
+      });
+      const Test = db.model('Test', MySchema);
+      const { _id } = await Test.create({ name: 'test', password: 'secret' });
+
+      const doc = await Test.findById(_id).select('+password');
+      assert.strictEqual(doc.password, 'secret');
+    });
+
     it('works with query.slice (gh-1370)', async function() {
       const M = db.model('Test', new Schema({ many: { type: [String], select: false } }));
 

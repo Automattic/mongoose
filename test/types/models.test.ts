@@ -13,7 +13,9 @@ import mongoose, {
   Query,
   UpdateWriteOpResult,
   AggregateOptions,
-  StringSchemaDefinition
+  WithLevel1NestedPaths,
+  NestedPaths,
+  InferSchemaType
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
@@ -913,4 +915,65 @@ async function gh14440() {
       }
     }
   ]);
+}
+
+async function gh12064() {
+  const FooSchema = new Schema({
+    one: { type: String }
+  });
+
+  const MyRecordSchema = new Schema({
+    _id: { type: String },
+    foo: { type: FooSchema },
+    arr: [Number]
+  });
+
+  const MyRecord = model('MyRecord', MyRecordSchema);
+
+  expectType<(string | null)[]>(
+    await MyRecord.distinct('foo.one').exec()
+  );
+  expectType<(string | null)[]>(
+    await MyRecord.find().distinct('foo.one').exec()
+  );
+  expectType<unknown[]>(await MyRecord.distinct('foo.two').exec());
+  expectType<unknown[]>(await MyRecord.distinct('arr.0').exec());
+}
+
+function testWithLevel1NestedPaths() {
+  type Test1 = WithLevel1NestedPaths<{
+    topLevel: number,
+    nested1Level: {
+      l2: string
+    },
+    nested2Level: {
+      l2: { l3: boolean }
+    }
+  }>;
+
+  expectType<{
+    topLevel: number,
+    nested1Level: { l2: string },
+    'nested1Level.l2': string,
+    nested2Level: { l2: { l3: boolean } },
+    'nested2Level.l2': { l3: boolean }
+  }>({} as Test1);
+
+  const FooSchema = new Schema({
+    one: { type: String }
+  });
+
+  const schema = new Schema({
+    _id: { type: String },
+    foo: { type: FooSchema }
+  });
+
+  type InferredDocType = InferSchemaType<typeof schema>;
+
+  type Test2 = WithLevel1NestedPaths<InferredDocType>;
+  expectAssignable<{
+    _id: string | null | undefined,
+    foo?: { one?: string | null | undefined } | null | undefined,
+    'foo.one': string | null | undefined
+  }>({} as Test2);
 }

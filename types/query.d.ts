@@ -355,7 +355,18 @@ declare module 'mongoose' {
     distinct<DocKey extends string, ResultType = unknown>(
       field: DocKey,
       filter?: FilterQuery<RawDocType>
-    ): QueryWithHelpers<Array<DocKey extends keyof DocType ? Unpacked<DocType[DocKey]> : ResultType>, DocType, THelpers, RawDocType, 'distinct', TInstanceMethods>;
+    ): QueryWithHelpers<
+      Array<
+        DocKey extends keyof WithLevel1NestedPaths<DocType>
+          ? WithoutUndefined<Unpacked<WithLevel1NestedPaths<DocType>[DocKey]>>
+          : ResultType
+      >,
+      DocType,
+      THelpers,
+      RawDocType,
+      'distinct',
+      TInstanceMethods
+    >;
 
     /** Specifies a `$elemMatch` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     elemMatch<K = string>(path: K, val: any): this;
@@ -704,6 +715,11 @@ declare module 'mongoose' {
       replacement?: DocType | AnyObject,
       options?: QueryOptions<DocType> | null
     ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'replaceOne', TInstanceMethods>;
+
+    /**
+     * Sets this query's `sanitizeProjection` option. With `sanitizeProjection()`, you can pass potentially untrusted user data to `.select()`.
+     */
+    sanitizeProjection(value: boolean): this;
 
     /** Specifies which document fields to include or exclude (also known as the query "projection") */
     select<RawDocTypeOverride extends { [P in keyof RawDocType]?: any } = {}>(

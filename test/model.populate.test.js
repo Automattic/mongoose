@@ -9449,7 +9449,6 @@ describe('model: populate:', function() {
         children: [{ type: 'ObjectId', ref: 'Child' }]
       }));
 
-
       const children = await Child.create([{ name: 'Luke' }, { name: 'Leia' }]);
 
       let doc = await Parent.create({ children, child: children[0] });

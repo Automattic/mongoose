@@ -1,3 +1,18 @@
+8.5.0 / 2024-07-08
+==================
+ * perf: memoize toJSON / toObject default options #14672
+ * feat(document): add $createModifiedPathsSnapshot(), $restoreModifiedPathsSnapshot(), $clearModifiedPaths() #14699 #14268
+ * feat(query): make sanitizeProjection prevent projecting in paths deselected in the schema #14691
+ * feat: allow setting array default value to null #14717 #6691
+ * feat(mongoose): allow drivers to set global plugins #14682
+ * feat(connection): bubble up monitorCommands events to Mongoose connection if monitorCommands option set #14681 #14611
+ * fix(document): ensure post('deleteOne') hooks are called when calling save() after subdoc.deleteOne() #14732 #9885
+ * fix(query): remove count() and findOneAndRemove() from query chaining #14692 #14689
+ * fix: remove default connection if setting createInitialConnection to false after Mongoose instance created #14679 #8302
+ * types(models+query): infer return type from schema for 1-level deep nested paths #14632
+ * types(connection): make transaction() return type match the executor function #14661 #14656
+ * docs: fix docs links in index.md [mirasayon](https://github.com/mirasayon)
+
 8.4.5 / 2024-07-05
 ==================
  * types: correct this for validate.validator schematype option #14720 #14696

@@ -12,7 +12,7 @@
   }
 </style>
 
-*First be sure you have [MongoDB](http://www.mongodb.org/downloads) and [Node.js](http://nodejs.org/) installed.*
+*First be sure you have [MongoDB](http://www.mongodb.org/try/download/community) and [Node.js](http://nodejs.org/en/download) installed.*
 
 Next install Mongoose from the command line using `npm`:
 

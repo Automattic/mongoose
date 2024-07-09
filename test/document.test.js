@@ -13581,7 +13581,7 @@ describe('document', function() {
     assert.deepStrictEqual(doc.getChanges(), { $set: { name: 'taco-edit' } });
     assert.ok(!doc.$isDefault('updater._id'));
   });
-    
+
   it('$clearModifiedPaths (gh-14268)', async function() {
     const schema = new Schema({
       name: String,

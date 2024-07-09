@@ -45,11 +45,11 @@ expectType<mongodb.Db>(conn.db);
 expectType<mongodb.MongoClient>(conn.getClient());
 expectType<Connection>(conn.setClient(new mongodb.MongoClient('mongodb://127.0.0.1:27017/test')));
 
-expectType<Promise<void>>(conn.transaction(async(res) => {
+expectType<Promise<string>>(conn.transaction(async(res) => {
   expectType<mongodb.ClientSession>(res);
   return 'a';
 }));
-expectType<Promise<void>>(conn.transaction(async(res) => {
+expectType<Promise<string>>(conn.transaction(async(res) => {
   expectType<mongodb.ClientSession>(res);
   return 'a';
 }, { readConcern: 'majority' }));

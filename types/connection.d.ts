@@ -236,7 +236,7 @@ declare module 'mongoose' {
      * async function executes successfully and attempt to retry if
      * there was a retryable error.
      */
-    transaction(fn: (session: mongodb.ClientSession) => Promise<any>, options?: mongodb.TransactionOptions): Promise<void>;
+    transaction<ReturnType = unknown>(fn: (session: mongodb.ClientSession) => Promise<ReturnType>, options?: mongodb.TransactionOptions): Promise<ReturnType>;
 
     /** Switches to a different database using the same connection pool. */
     useDb(name: string, options?: { useCache?: boolean, noListener?: boolean }): Connection;

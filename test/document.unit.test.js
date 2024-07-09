@@ -41,6 +41,7 @@ describe('toObject()', function() {
         options: { toObject: { minimize: false, virtuals: true } },
         virtuals: { virtual: { applyGetters: () => 'test' } }
       };
+      this.$__schema._defaultToObjectOptions = () => this.$__schema.options.toObject;
       this._doc = { empty: {} };
       this.$__ = {};
     };

@@ -34,10 +34,12 @@ describe('driver', function() {
     }
     const driver = {
       Collection,
-      Connection
+      Connection,
+      plugins: [foo]
     };
 
     m.setDriver(driver);
+    assert.deepStrictEqual(m.plugins.slice(mongoose.plugins.length), [[foo, undefined]]);
 
     await m.connect();
 
@@ -45,6 +47,8 @@ describe('driver', function() {
 
     const res = await Test.findOne();
     assert.deepEqual(res.toObject(), { answer: 42 });
+
+    function foo() {}
   });
 
   it('multiple drivers (gh-12638)', async function() {

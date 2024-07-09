@@ -210,7 +210,7 @@ describe('connections:', function() {
     let conn;
 
     before(async function() {
-      conn = mongoose.createConnection(start.uri2);
+      conn = mongoose.createConnection(start.uri2, { monitorCommands: true });
       await conn.asPromise();
       await conn.collection('test').deleteMany({});
       return conn;
@@ -253,6 +253,28 @@ describe('connections:', function() {
       assert.equal(events[1].collectionName, 'test');
       assert.equal(events[1].method, 'findOne');
       assert.deepStrictEqual(events[1].result, { _id: 17, answer: 42 });
+    });
+
+    it('commandStarted, commandFailed, commandSucceeded (gh-14611)', async function() {
+      let events = [];
+      conn.on('commandStarted', event => events.push(event));
+      conn.on('commandFailed', event => events.push(event));
+      conn.on('commandSucceeded', event => events.push(event));
+
+      await conn.collection('test').insertOne({ _id: 14611, answer: 42 });
+      assert.equal(events.length, 2);
+      assert.equal(events[0].constructor.name, 'CommandStartedEvent');
+      assert.equal(events[0].commandName, 'insert');
+      assert.equal(events[1].constructor.name, 'CommandSucceededEvent');
+      assert.equal(events[1].requestId, events[0].requestId);
+
+      events = [];
+      await conn.createCollection('tests', { capped: 1024 }).catch(() => {});
+      assert.equal(events.length, 2);
+      assert.equal(events[0].constructor.name, 'CommandStartedEvent');
+      assert.equal(events[0].commandName, 'create');
+      assert.equal(events[1].constructor.name, 'CommandFailedEvent');
+      assert.equal(events[1].requestId, events[0].requestId);
     });
   });
 

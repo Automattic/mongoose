@@ -91,7 +91,7 @@ async function gh13424() {
   const TestModel = model('Test', testSchema);
 
   const doc = new TestModel();
-  expectType<Types.ObjectId | undefined>(doc.subDocArray[0]._id);
+  expectType<Types.ObjectId>(doc.subDocArray[0]._id);
 }
 
 async function gh14367() {

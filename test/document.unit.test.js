@@ -61,8 +61,6 @@ describe('toObject()', function() {
   it('doesnt crash with empty object (gh-3130)', function() {
     const d = new Stub();
     d._doc = undefined;
-    assert.doesNotThrow(function() {
-      d.toObject();
-    });
+    d.toObject();
   });
 });

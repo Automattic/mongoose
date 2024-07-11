@@ -374,7 +374,7 @@ declare module 'mongoose' {
     ): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find'>;
     find(
       filter: FilterQuery<RawDocType>
-    ): QueryWithHelpers<Array<RawDocType>, DocType, THelpers, RawDocType, 'find'>;
+    ): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find'>;
     find(): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find'>;
 
     /** Declares the query a findOne operation. When executed, returns the first found document. */
@@ -389,7 +389,7 @@ declare module 'mongoose' {
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne'>;
     findOne(
       filter?: FilterQuery<RawDocType>
-    ): QueryWithHelpers<DocType | null, RawDocType, THelpers, RawDocType, 'findOne'>;
+    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne'>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
     findOneAndDelete(

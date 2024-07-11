@@ -13746,7 +13746,7 @@ describe('document', function() {
   });
 });
 
-describe('Check if instance function that is supplied in schema option is availabe', function() {
+describe('Check if instance function that is supplied in schema option is available', function() {
   it('should give an instance function back rather than undefined', function ModelJS() {
     const testSchema = new mongoose.Schema({}, { methods: { instanceFn() { return 'Returned from DocumentInstanceFn'; } } });
     const TestModel = mongoose.model('TestModel', testSchema);

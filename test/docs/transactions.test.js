@@ -399,7 +399,7 @@ describe('transactions', function() {
 
       exists = await Test.exists({ name: 'foo' });
       assert.ok(!exists);
-      
+
       exists = await Test.exists({ name: 'bar' });
       assert.ok(!exists);
 

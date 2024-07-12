@@ -459,6 +459,8 @@ describe('transactions', function() {
           }();
           assert.equal(doc.name, 'test_transactionAsyncLocalStorage');
 
+          await Test.insertMany([{ name: 'bar' }]);
+
           throw new Error('Oops!');
         }),
         /Oops!/
@@ -467,6 +469,9 @@ describe('transactions', function() {
       assert.ok(!exists);
 
       exists = await Test.exists({ name: 'foo' });
+      assert.ok(!exists);
+
+      exists = await Test.exists({ name: 'bar' });
       assert.ok(!exists);
     });
   });

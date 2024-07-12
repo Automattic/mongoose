@@ -88,7 +88,7 @@ Below is an example of executing an aggregation within a transaction.
 
 One major pain point with transactions in Mongoose is that you need to remember to set the `session` option on every operation.
 If you don't, your operation will execute outside of the transaction.
-Mongoose 8.4 is able to set the `session` operation on all operations within a `Connection.prototype.transaction()` executor function using Node's [AsyncLocalStorage API](https://nodejs.org/api/async_context.html#class-asynclocalstorage).
+Mongoose 7.8 is able to set the `session` operation on all operations within a `Connection.prototype.transaction()` executor function using Node's [AsyncLocalStorage API](https://nodejs.org/api/async_context.html#class-asynclocalstorage).
 Set the `transactionAsyncLocalStorage` option using `mongoose.set('transactionAsyncLocalStorage', true)` to enable this feature.
 
 ```javascript

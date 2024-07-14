@@ -13631,6 +13631,7 @@ describe('document', function() {
       docArr: [new Schema({ subprop3: String }, { _id: false })]
     });
     const Test = db.model('Test', schema);
+    await Test.deleteMany({});
 
     const doc = new Test({});
     await doc.save();
@@ -13651,14 +13652,17 @@ describe('document', function() {
     assert.deepStrictEqual(doc.subdoc.getChanges(), { $set: { subprop2: 'test3' } });
     assert.deepStrictEqual(doc.docArr[0].getChanges(), { $set: { subprop3: 'test4' } });
 
+    assert.ok(!doc.$isNew);
     const snapshot = doc.$createModifiedPathsSnapshot();
     doc.$clearModifiedPaths();
+    doc.$isNew = true;
 
     assert.deepStrictEqual(doc.getChanges(), {});
     assert.deepStrictEqual(doc.subdoc.getChanges(), {});
     assert.deepStrictEqual(doc.docArr[0].getChanges(), {});
 
     doc.$restoreModifiedPathsSnapshot(snapshot);
+    assert.ok(!doc.$isNew);
     assert.deepStrictEqual(doc.getChanges().$set, {
       name: 'test1',
       nested: { subprop1: 'test2' },

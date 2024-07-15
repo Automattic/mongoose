@@ -441,7 +441,7 @@ describe('transactions', function() {
       await Test.createCollection();
       await Test.deleteMany({});
 
-      const doc = new Test({ name: 'test_transactionAsyncLocalStorage' });
+      let doc = new Test({ name: 'test_transactionAsyncLocalStorage' });
       await assert.rejects(
         () => m.connection.transaction(async() => {
           await doc.save();
@@ -473,6 +473,17 @@ describe('transactions', function() {
 
       exists = await Test.exists({ name: 'bar' });
       assert.ok(!exists);
+
+      doc = new Test({ name: 'test_transactionAsyncLocalStorage' });
+      await assert.rejects(
+        () => m.connection.transaction(async() => {
+          await doc.save({ session: null });
+          throw new Error('Oops!');
+        }),
+        /Oops!/
+      );
+      exists = await Test.exists({ _id: doc._id });
+      assert.ok(exists);
     });
   });
 });

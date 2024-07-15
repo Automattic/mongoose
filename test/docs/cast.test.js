@@ -125,12 +125,16 @@ describe('Cast Tutorial', function() {
       });
       Character = mongoose.model('Character', schema);
 
-      const query = Character.findOne({ $or: [{ notInSchema: { $lt: 'not a number' } }], $and: [{ name: 'abc' }, { age: { $gt: 18 } }, { notInSchema: { $lt: 'not a number' } }] });
+      const query = Character.findOne({
+        $or: [{ notInSchema: { $lt: 'not a number' } }],
+        $and: [{ name: 'abc' }, { age: { $gt: 18 } }, { notInSchema: { $lt: 'not a number' } }],
+        $nor: [{}] // should be kept
+      });
 
       await query.exec();
       query.getFilter(); // Empty object `{}`, Mongoose removes `notInSchema`
       // acquit:ignore:start
-      assert.deepEqual(query.getFilter(), { $and: [{ name: 'abc' }, { age: { $gt: 18 } }] });
+      assert.deepEqual(query.getFilter(), { $and: [{ name: 'abc' }, { age: { $gt: 18 } }], $nor: [{}] });
       // acquit:ignore:end
     });
 

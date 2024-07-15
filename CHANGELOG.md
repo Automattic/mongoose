@@ -1,3 +1,11 @@
+8.5.1 / 2024-07-12
+==================
+ * perf(model): performance improvements for insertMany() #14724
+ * fix(model): avoid leaving subdoc defaults on top-level doc when setting subdocument to same value #14728 #14722
+ * fix(model): handle transactionAsyncLocalStorage option with insertMany() #14743
+ * types: make _id required on Document type #14735 #14660
+ * types: fix ChangeStream.close to return a Promise<void> like the driver #14740 [orgads](https://github.com/orgads)
+
 8.5.0 / 2024-07-08
 ==================
  * perf: memoize toJSON / toObject default options #14672

@@ -41,17 +41,17 @@ jobs:
       matrix:
         node: [16, 18, 20]
         os: [ubuntu-20.04, ubuntu-22.04]
-        mongodb: [4.4.28, 5.0.25, 6.0.14, 7.0.7]
+        mongodb: [4.4.29, 5.0.26, 6.0.15, 7.0.12]
         include:
           - os: ubuntu-20.04 # customize on which matrix the coverage will be collected on
-            mongodb: 5.0.25
+            mongodb: 5.0.26
             node: 16
             coverage: true
         exclude:
           - os: ubuntu-22.04 # exclude because there are no 4.x mongodb builds for 2204
-            mongodb: 4.4.28
+            mongodb: 4.4.29
           - os: ubuntu-22.04 # exclude because there are no 5.x mongodb builds for 2204
-            mongodb: 5.0.25
+            mongodb: 5.0.26
     name: Node ${{ matrix.node }} MongoDB ${{ matrix.mongodb }} OS ${{ matrix.os }}
     env:
       MONGOMS_VERSION: ${{ matrix.mongodb }}
@@ -90,7 +90,7 @@ jobs:
     runs-on: ubuntu-20.04
     name: Deno tests
     env:
-      MONGOMS_VERSION: 6.0.14
+      MONGOMS_VERSION: 6.0.15
       MONGOMS_PREFER_GLOBAL_PATH: 1
       FORCE_COLOR: true
     steps:

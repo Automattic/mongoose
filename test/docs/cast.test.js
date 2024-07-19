@@ -136,7 +136,7 @@ describe('Cast Tutorial', function() {
       'strictQuery is \'throw\'.');
     // acquit:ignore:end
   });
-  
+
   it('strictQuery removes casted empty objects', async function() {
     mongoose.deleteModel('Character');
     const schema = new mongoose.Schema({ name: String, age: Number }, {

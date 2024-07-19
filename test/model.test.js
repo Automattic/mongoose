@@ -6365,9 +6365,9 @@ describe('Model', function() {
   describe('buildBulkWriteOperations() (gh-9673)', () => {
     it('builds write operations', async() => {
 
-
       const userSchema = new Schema({
-        name: { type: String }
+        name: { type: String },
+        a: { type: Number }
       }, { shardKey: { a: 1 } });
 
       const User = db.model('User', userSchema);
@@ -6386,7 +6386,7 @@ describe('Model', function() {
       const desiredWriteOperations = [
         { insertOne: { document: users[0] } },
         { insertOne: { document: users[1] } },
-        { updateOne: { filter: { _id: users[2]._id, a: 1 }, update: { $set: { name: 'I am the updated third name' } } } }
+        { updateOne: { filter: { _id: users[2]._id, a: 3 }, update: { $set: { name: 'I am the updated third name' } } } }
       ];
 
       assert.deepEqual(

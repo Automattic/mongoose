@@ -1,5 +1,6 @@
 import {
   DefaultSchemaOptions,
+  HydratedArraySubdocument,
   HydratedSingleSubdocument,
   Schema,
   Document,
@@ -1554,4 +1555,18 @@ function gh14696() {
     }
   });
 
+}
+
+function gh14748() {
+  const nestedSchema = new Schema({ name: String });
+
+  const schema = new Schema({
+    arr: [nestedSchema],
+    singleNested: nestedSchema
+  });
+
+  // Cast to single nested subdoc
+  const subdoc = schema.path('singleNested')
+    .cast<HydratedArraySubdocument<{ name: string }>>({ name: 'bar' });
+  expectAssignable<{ name: string }>(subdoc);
 }

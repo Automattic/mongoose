@@ -1,3 +1,8 @@
+7.8.0 / 2024-07-23
+==================
+ * feat: add transactionAsyncLocalStorage option to opt in to automatically setting session on all transactions #14744 #14742 #14583 #13889
+ * types(query): fix usage of "RawDocType" where "DocType" should be passed #14737 [hasezoey](https://github.com/hasezoey)
+
 7.7.0 / 2024-06-18
 ==================
  * feat(model): add throwOnValidationError option for opting into getting MongooseBulkWriteError if all valid operations succeed in bulkWrite() and insertMany() #14599 #14587 #14572 #13410

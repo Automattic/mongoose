@@ -11014,4 +11014,35 @@ describe('model: populate:', function() {
     assert.equal(latestClass.students[1].name, 'Robert');
     assert.equal(latestClass.students[1].grade.grade, 'B');
   });
+
+  it('avoids depopulating manually populated doc as getter value (gh-14759)', async function() {
+    const ownerSchema = new mongoose.Schema({
+      _id: {
+        type: 'ObjectId',
+        get(value) {
+          return value == null ? value : value.toString();
+        }
+      },
+      name: 'String'
+    });
+    const petSchema = new mongoose.Schema({
+      name: 'String',
+      owner: { type: 'ObjectId', ref: 'Owner' }
+    });
+
+    const Owner = db.model('Owner', ownerSchema);
+    const Pet = db.model('Pet', petSchema);
+
+    const ownerId = new mongoose.Types.ObjectId();
+    const owner = new Owner({
+      _id: ownerId,
+      name: 'Alice'
+    });
+    await owner.save();
+    const pet = new Pet({ name: 'Kitty', owner: owner });
+    await pet.save();
+
+    const fromDb = await Pet.findOne({ owner: ownerId }).lean().orFail();
+    assert.ok(fromDb.owner instanceof mongoose.Types.ObjectId);
+  });
 });

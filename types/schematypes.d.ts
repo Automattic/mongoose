@@ -444,7 +444,7 @@ declare module 'mongoose' {
         defaultOptions: Record<string, any>;
       }
 
-      class Subdocument extends SchemaType implements AcceptsDiscriminator {
+      class Subdocument<DocType = unknown> extends SchemaType implements AcceptsDiscriminator {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: string;
 
@@ -456,6 +456,8 @@ declare module 'mongoose' {
 
         discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
         discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
+
+        cast(val: any, doc?: Document<any>, init?: boolean, prev?: any, options?: any): HydratedSingleSubdocument<DocType>;
       }
 
       class String extends SchemaType {

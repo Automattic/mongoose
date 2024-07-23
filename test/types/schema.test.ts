@@ -1565,8 +1565,13 @@ function gh14748() {
     singleNested: nestedSchema
   });
 
-  // Cast to single nested subdoc
   const subdoc = schema.path('singleNested')
     .cast<HydratedArraySubdocument<{ name: string }>>({ name: 'bar' });
   expectAssignable<{ name: string }>(subdoc);
+
+  const subdoc2 = schema.path('singleNested').cast({ name: 'bar' });
+  expectAssignable<{ name: string }>(subdoc2);
+
+  const subdoc3 = schema.path<Schema.Types.Subdocument<{ name: string }>>('singleNested').cast({ name: 'bar' });
+  expectAssignable<{ name: string }>(subdoc3);
 }

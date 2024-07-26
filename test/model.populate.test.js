@@ -11034,15 +11034,18 @@ describe('model: populate:', function() {
     const Pet = db.model('Pet', petSchema);
 
     const ownerId = new mongoose.Types.ObjectId();
-    const owner = new Owner({
+    const owner = await Owner.create({
       _id: ownerId,
       name: 'Alice'
     });
-    await owner.save();
-    const pet = new Pet({ name: 'Kitty', owner: owner });
-    await pet.save();
+    await Pet.create({ name: 'Kitty', owner: owner });
 
     const fromDb = await Pet.findOne({ owner: ownerId }).lean().orFail();
     assert.ok(fromDb.owner instanceof mongoose.Types.ObjectId);
+
+    const pet1 = new Pet({ name: 'Kitty1', owner: owner });
+    const pet2 = new Pet({ name: 'Kitty2', owner: owner });
+    assert.equal(pet1.owner.name, 'Alice');
+    assert.equal(pet2.owner.name, 'Alice');
   });
 });

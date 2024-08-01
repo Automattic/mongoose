@@ -13750,6 +13750,38 @@ describe('document', function() {
       /Test error in post deleteOne hook/
     );
   });
+
+  it('applies virtuals to subschemas if top-level schema has virtuals: true (gh-14771)', function() {
+    const userLabSchema = new mongoose.Schema({
+      capacityLevel: Number
+    });
+
+    userLabSchema.virtual('capacityLevelCeil').get(function() {
+      return Math.ceil(this.capacityLevel);
+    });
+
+    const labPlotSchema = new mongoose.Schema({
+      plotId: Number,
+      lab: userLabSchema
+    });
+
+    const userSchema = new mongoose.Schema({
+      username: String,
+      labPlots: [labPlotSchema]
+    }, { toObject: { virtuals: true }, toJSON: { virtuals: true } });
+
+    const User = db.model('User', userSchema);
+
+    const doc = new User({
+      username: 'test',
+      labPlots: [{
+        plotId: 1,
+        lab: { capacityLevel: 3.14 }
+      }]
+    });
+    assert.strictEqual(doc.toObject().labPlots[0].lab.capacityLevelCeil, 4);
+    assert.strictEqual(doc.toJSON().labPlots[0].lab.capacityLevelCeil, 4);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

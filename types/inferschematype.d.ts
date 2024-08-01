@@ -74,14 +74,25 @@ declare module 'mongoose' {
 
   type ApplySchemaOptions<T, O = DefaultSchemaOptions> = ResolveTimestamps<T, O>;
 
-  type ResolveTimestamps<T, O> = O extends { timestamps: true }
+  type ResolveTimestamps<T, O> = O extends { methods: any } | { statics: any } | { virtuals: any } | { timestamps?: false } ? T
     // For some reason, TypeScript sets all the document properties to unknown
     // if we use methods, statics, or virtuals. So avoid inferring timestamps
     // if any of these are set for now. See gh-12807
-    ? O extends { methods: any } | { statics: any } | { virtuals: any }
-      ? T
-      : { createdAt: NativeDate; updatedAt: NativeDate; } & T
-    : T;
+    : O extends { timestamps: infer TimestampOptions } ? TimestampOptions extends true
+      ? { createdAt: NativeDate; updatedAt: NativeDate; } & T
+      : TimestampOptions extends SchemaTimestampsConfig
+        ? {
+          -readonly [K in keyof Pick<
+            TimestampOptions,
+            'createdAt' | 'updatedAt'
+          > as TimestampOptions[K] extends true
+            ? K
+            : TimestampOptions[K] extends string
+              ? TimestampOptions[K]
+              : never]: NativeDate;
+        } & T
+        : T
+      : T;
 }
 
 type IsPathDefaultUndefined<PathType> = PathType extends { default: undefined } ?

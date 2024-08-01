@@ -3258,4 +3258,24 @@ describe('schema', function() {
 
     await q;
   });
+
+  it('supports casting object to subdocument (gh-14748) (gh-9076)', function() {
+    const nestedSchema = new Schema({ name: String });
+    nestedSchema.methods.getAnswer = () => 42;
+
+    const schema = new Schema({
+      arr: [nestedSchema],
+      singleNested: nestedSchema
+    });
+
+    // Cast to doc array
+    let subdoc = schema.path('arr').cast([{ name: 'foo' }])[0];
+    assert.ok(subdoc instanceof mongoose.Document);
+    assert.equal(subdoc.getAnswer(), 42);
+
+    // Cast to single nested subdoc
+    subdoc = schema.path('singleNested').cast({ name: 'bar' });
+    assert.ok(subdoc instanceof mongoose.Document);
+    assert.equal(subdoc.getAnswer(), 42);
+  });
 });

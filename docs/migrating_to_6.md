@@ -314,7 +314,7 @@ Schema paths declared with `type: { name: String }` become single nested subdocs
 
 ```javascript
 // In Mongoose 6, the below makes `foo` into a subdocument with a `name` property.
-// In Mongoose 5, the below would make `foo` a `Mixed` type, _unless_ you set `typePojoToMixed: true`.
+// In Mongoose 5, the below would make `foo` a `Mixed` type, _unless_ you set `typePojoToMixed: false`.
 const schema = new Schema({
   foo: { type: { name: String } }
 });

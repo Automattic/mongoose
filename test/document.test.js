@@ -3203,16 +3203,22 @@ describe('document', function() {
         names: {
           type: [String],
           default: null
+        },
+        tags: {
+          type: [{ tag: String }],
+          default: null
         }
       });
 
       const Model = db.model('Test', schema);
       const m = new Model();
       assert.strictEqual(m.names, null);
+      assert.strictEqual(m.tags, null);
       await m.save();
 
       const doc = await Model.collection.findOne({ _id: m._id });
       assert.strictEqual(doc.names, null);
+      assert.strictEqual(doc.tags, null);
     });
 
     it('validation works when setting array index (gh-3816)', async function() {

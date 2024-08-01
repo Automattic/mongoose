@@ -1,3 +1,14 @@
+8.5.2 / 2024-07-30
+==================
+ * perf(clone): avoid further unnecessary checks if cloning a primitive value #14762 #14394
+ * fix: allow setting document array default to null #14769 #14717 #6691
+ * fix(model): support session: null option for save() to opt out of automatic session option with transactionAsyncLocalStorage #14744 #14736
+ * fix(model+document): avoid depopulating manually populated doc as getter value #14760 #14759
+ * fix: correct shardkey access in buildBulkWriteOps #14753 #14752 [adf0nt3s](https://github.com/adf0nt3s)
+ * fix(query): handle casting $switch in $expr #14755 #14751
+ * types: allow calling SchemaType.cast() without parent and init parameters #14756 #14748 #9076
+ * docs: fix a wrong example in v6 migration guide #14758 [abdelrahman-elkady](https://github.com/abdelrahman-elkady)
+
 8.5.1 / 2024-07-12
 ==================
  * perf(model): performance improvements for insertMany() #14724

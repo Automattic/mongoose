@@ -338,6 +338,26 @@ describe('transactions', function() {
     assert.deepEqual(fromDb, { name: 'Tyrion Lannister' });
   });
 
+  it('distinct (gh-8006)', async function() {
+    const Character = db.model('gh8006_Character', new Schema({ name: String, rank: String }, { versionKey: false }));
+
+
+    const session = await db.startSession();
+
+    session.startTransaction();
+    await Character.create([{ name: 'Will Riker', rank: 'Commander' }, { name: 'Jean-Luc Picard', rank: 'Captain' }], { session });
+
+    let names = await Character.distinct('name', {}, { session });
+    assert.deepStrictEqual(names.sort(), ['Jean-Luc Picard', 'Will Riker']);
+
+    names = await Character.distinct('name', { rank: 'Captain' }, { session });
+    assert.deepStrictEqual(names.sort(), ['Jean-Luc Picard']);
+
+    // Undo both update and delete since doc should pull from `$session()`
+    await session.abortTransaction();
+    session.endSession();
+  });
+
   it('save() with no changes (gh-8571)', async function() {
     db.deleteModel(/Test/);
     const Test = db.model('Test', Schema({ name: String }));

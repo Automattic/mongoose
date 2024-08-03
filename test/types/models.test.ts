@@ -216,6 +216,7 @@ function find() {
   Project.find({ name: 'Hello' });
 
   // just callback
+  // @ts-expect-error: Callback to find is longer supported
   Project.find((error: CallbackError, result: IProject[]) => console.log(error, result));
 
   // filter + projection
@@ -976,4 +977,30 @@ function testWithLevel1NestedPaths() {
     foo?: { one?: string | null | undefined } | null | undefined,
     'foo.one': string | null | undefined
   }>({} as Test2);
+}
+
+function gh14764TestFilterQueryRestrictions() {
+  const TestModel = model<{ validKey: number }>('Test', new Schema({}));
+  // @ts-expect-error: A key not in the schema should be invalid
+  TestModel.find({ invalidKey: 0 });
+  // @ts-expect-error: A key not in the schema should be invalid for simple root operators
+  TestModel.find({ $and: [{ invalidKey: 0 }] });
+
+  // Any "nested" keys should be valid
+  TestModel.find({ 'validKey.subkey': 0 });
+
+  // And deeply "nested" keys should be valid
+  TestModel.find({ 'validKey.deep.nested.key': 0 });
+  TestModel.find({ validKey: { deep: { nested: { key: 0 } } } });
+
+  // Any Query should be accepted as the root argument (due to merge support)
+  TestModel.find(TestModel.find());
+  // @ts-expect-error: A Query should not be a valid type for a FilterQuery within an op like $and
+  TestModel.find({ $and: [TestModel.find()] });
+
+  const id = new Types.ObjectId();
+  // Any ObjectId should be accepted as the root argument
+  TestModel.find(id);
+  // @ts-expect-error: A ObjectId should not be a valid type for a FilterQuery within an op like $and
+  TestModel.find({ $and: [id] });
 }

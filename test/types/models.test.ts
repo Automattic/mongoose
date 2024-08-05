@@ -981,10 +981,10 @@ function testWithLevel1NestedPaths() {
 
 function gh14764TestFilterQueryRestrictions() {
   const TestModel = model<{ validKey: number }>('Test', new Schema({}));
-  // @ts-expect-error: A key not in the schema should be invalid
-  TestModel.find({ invalidKey: 0 });
-  // @ts-expect-error: A key not in the schema should be invalid for simple root operators
-  TestModel.find({ $and: [{ invalidKey: 0 }] });
+  // A key not in the schema should be invalid
+  expectError(TestModel.find({ invalidKey: 0 }));
+  // A key not in the schema should be invalid for simple root operators
+  expectError(TestModel.find({ $and: [{ invalidKey: 0 }] }));
 
   // Any "nested" keys should be valid
   TestModel.find({ 'validKey.subkey': 0 });
@@ -995,12 +995,12 @@ function gh14764TestFilterQueryRestrictions() {
 
   // Any Query should be accepted as the root argument (due to merge support)
   TestModel.find(TestModel.find());
-  // @ts-expect-error: A Query should not be a valid type for a FilterQuery within an op like $and
-  TestModel.find({ $and: [TestModel.find()] });
+  // A Query should not be a valid type for a FilterQuery within an op like $and
+  expectError(TestModel.find({ $and: [TestModel.find()] }));
 
   const id = new Types.ObjectId();
   // Any ObjectId should be accepted as the root argument
   TestModel.find(id);
-  // @ts-expect-error: A ObjectId should not be a valid type for a FilterQuery within an op like $and
-  TestModel.find({ $and: [id] });
+  // A ObjectId should not be a valid type for a FilterQuery within an op like $and
+  expectError(TestModel.find({ $and: [id] }));
 }

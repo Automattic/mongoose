@@ -215,9 +215,8 @@ function find() {
   Project.find({});
   Project.find({ name: 'Hello' });
 
-  // just callback
-  // @ts-expect-error: Callback to find is longer supported
-  Project.find((error: CallbackError, result: IProject[]) => console.log(error, result));
+  // just callback; this is no longer supported on .find()
+  expectError(Project.find((error: CallbackError, result: IProject[]) => console.log(error, result)));
 
   // filter + projection
   Project.find({}, undefined);

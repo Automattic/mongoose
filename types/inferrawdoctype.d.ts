@@ -10,12 +10,12 @@ declare module 'mongoose' {
   export type InferRawDocType<
     DocDefinition,
     TSchemaOptions extends Record<any, any> = DefaultSchemaOptions
-  > = {
+  > = ApplySchemaOptions<{
     [
     K in keyof (RequiredPaths<DocDefinition, TSchemaOptions['typeKey']> &
     OptionalPaths<DocDefinition, TSchemaOptions['typeKey']>)
     ]: ObtainRawDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']>;
-  };
+  }, TSchemaOptions>;
 
   /**
    * @summary Obtains schema Path type.

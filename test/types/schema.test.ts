@@ -1575,3 +1575,32 @@ function gh14748() {
   const subdoc3 = schema.path<Schema.Types.Subdocument<{ name: string }>>('singleNested').cast({ name: 'bar' });
   expectAssignable<{ name: string }>(subdoc3);
 }
+
+function gh13215() {
+  const schemaDefinition = {
+    userName: { type: String, required: true }
+  } as const;
+  const schemaOptions = {
+    typeKey: 'type',
+    timestamps: {
+      createdAt: 'date',
+      updatedAt: false
+    }
+  } as const;
+
+  type RawDocType = InferRawDocType<
+    typeof schemaDefinition,
+    typeof schemaOptions
+  >;
+  type User = {
+    userName: string;
+  } & {
+    date: Date;
+  };
+
+  expectType<User>({} as RawDocType);
+
+  const schema = new Schema(schemaDefinition, schemaOptions);
+  type SchemaType = InferSchemaType<typeof schema>;
+  expectType<User>({} as SchemaType);
+}

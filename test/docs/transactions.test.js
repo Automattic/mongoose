@@ -341,7 +341,6 @@ describe('transactions', function() {
   it('distinct (gh-8006)', async function() {
     const Character = db.model('gh8006_Character', new Schema({ name: String, rank: String }, { versionKey: false }));
 
-
     const session = await db.startSession();
 
     session.startTransaction();

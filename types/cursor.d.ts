@@ -51,7 +51,7 @@ declare module 'mongoose' {
      * Get the next document from this cursor. Will return `null` when there are
      * no documents left.
      */
-    next(): Promise<DocType>;
+    next(): Promise<DocType | null>;
 
     options: Options;
   }

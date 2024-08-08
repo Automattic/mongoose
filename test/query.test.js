@@ -1088,6 +1088,16 @@ describe('Query', function() {
 
       assert.equal(q.op, 'distinct');
     });
+
+    it('using options parameter for distinct', function() {
+      const q = new Query({});
+      const options = { collation: { locale: 'en', strength: 2 } };
+
+      q.distinct('blah', {}, options);
+
+      assert.equal(q.op, 'distinct');
+      assert.deepEqual(q.options.collation, options.collation);
+    });
   });
 
   describe('findOne', function() {

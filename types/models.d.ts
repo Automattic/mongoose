@@ -621,7 +621,8 @@ declare module 'mongoose' {
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
     distinct<DocKey extends string, ResultType = unknown>(
       field: DocKey,
-      filter?: FilterQuery<TRawDocType>
+      filter?: FilterQuery<TRawDocType>,
+      options?: QueryOptions<TRawDocType>
     ): QueryWithHelpers<
       Array<
         DocKey extends keyof WithLevel1NestedPaths<TRawDocType>

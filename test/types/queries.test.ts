@@ -109,6 +109,7 @@ Test.find({ name: { $gte: 'Test' } }, null, { collation: { locale: 'en-us' } }).
 Test.findOne().orFail(new Error('bar')).then((doc: ITest | null) => console.log('Found! ' + doc));
 
 Test.distinct('name').exec().then((res: Array<any>) => console.log(res[0]));
+Test.distinct('name', {}, { collation: { locale: 'en', strength: 2 } }).exec().then((res: Array<any>) => console.log(res[0]));
 
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test2' }).exec().then((res: ITest | null) => console.log(res));
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test2' }).then((res: ITest | null) => console.log(res));

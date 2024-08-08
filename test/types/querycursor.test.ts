@@ -21,6 +21,8 @@ Test.find().cursor().
   }).
   then(() => console.log('Done!'));
 
+Test.find().cursor().next().then((doc) => expectType<ITest | null>(doc));
+
 async function gh14374() {
   // `Parent` represents the object as it is stored in MongoDB
   interface Parent {

@@ -11048,4 +11048,52 @@ describe('model: populate:', function() {
     assert.equal(pet1.owner.name, 'Alice');
     assert.equal(pet2.owner.name, 'Alice');
   });
+
+  it('makes sure that populate works correctly with duplicate foreignField with lean(); (gh-14794)', async function() {
+    const authorSchema = new mongoose.Schema({
+      group: String,
+      name: String
+    });
+
+    const postSchema = new mongoose.Schema({
+      authorGroup: String,
+      title: String,
+      content: String
+    });
+
+    const Author = db.model('Author', authorSchema);
+    const Post = db.model('Post', postSchema);
+
+    await Author.create({ group: 'AUTH1', name: 'John Doe' });
+    await Author.create({ group: 'AUTH2', name: 'Jane Smith' });
+    await Author.create({ group: 'AUTH2', name: 'Will Jons' });
+
+    await Post.create({
+      authorGroup: 'AUTH1',
+      title: 'First Post',
+      content: 'Content 1'
+    });
+
+    await Post.create({
+      authorGroup: 'AUTH2',
+      title: 'Second Post',
+      content: 'Content 2'
+    });
+
+    const posts = await Post.find()
+      .populate({
+        path: 'authorGroup',
+        model: 'Author',
+        select: { _id: 1, name: 1 },
+        foreignField: 'group'
+      })
+      .select({ _id: 1, authorGroup: 1, title: 1 })
+      .lean();
+
+    for (const post of posts) {
+      assert.ok(post.authorGroup._id instanceof mongoose.Types.ObjectId);
+      assert.ok(typeof post.authorGroup.name === 'string');
+    }
+    assert.equal(posts.length, 2);
+  });
 });

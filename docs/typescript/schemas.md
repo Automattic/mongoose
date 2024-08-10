@@ -32,6 +32,8 @@ There are a few caveats for using automatic type inference:
 2. You need to define your schema in the `new Schema()` call. Don't assign your schema definition to a temporary variable. Doing something like `const schemaDefinition = { name: String }; const schema = new Schema(schemaDefinition);` will not work.
 3. Mongoose adds `createdAt` and `updatedAt` to your schema if you specify the `timestamps` option in your schema, *except* if you also specify `methods`, `virtuals`, or `statics`. There is a [known issue](https://github.com/Automattic/mongoose/issues/12807) with type inference with timestamps and methods/virtuals/statics options. If you use methods, virtuals, and statics, you're responsible for adding `createdAt` and `updatedAt` to your schema definition.
 
+If you must define your schema separately, use [as const](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-4.html#const-assertions) (`const schemaDefinition = { ... } as const;`) to prevent *type widening*. TypeScript will automatically widen types like `required: false` to `required: boolean`, which will cause Mongoose to assume the field is required. Using `as const` forces TypeScript to retain these types.
+
 If you need to explicitly get the raw document type (the value returned from `doc.toObject()`, `await Model.findOne().lean()`, etc.) from your schema definition, you can use Mongoose's `inferRawDocType` helper as follows:
 
 ```ts

@@ -622,6 +622,7 @@ declare module 'mongoose' {
     distinct<DocKey extends string, ResultType = unknown>(
       field: DocKey,
       filter?: RootFilterQuery<TRawDocType>
+      options?: QueryOptions<TRawDocType>
     ): QueryWithHelpers<
       Array<
         DocKey extends keyof WithLevel1NestedPaths<TRawDocType>

@@ -3203,16 +3203,22 @@ describe('document', function() {
         names: {
           type: [String],
           default: null
+        },
+        tags: {
+          type: [{ tag: String }],
+          default: null
         }
       });
 
       const Model = db.model('Test', schema);
       const m = new Model();
       assert.strictEqual(m.names, null);
+      assert.strictEqual(m.tags, null);
       await m.save();
 
       const doc = await Model.collection.findOne({ _id: m._id });
       assert.strictEqual(doc.names, null);
+      assert.strictEqual(doc.tags, null);
     });
 
     it('validation works when setting array index (gh-3816)', async function() {
@@ -13743,6 +13749,38 @@ describe('document', function() {
       () => doc.save(),
       /Test error in post deleteOne hook/
     );
+  });
+
+  it('applies virtuals to subschemas if top-level schema has virtuals: true (gh-14771)', function() {
+    const userLabSchema = new mongoose.Schema({
+      capacityLevel: Number
+    });
+
+    userLabSchema.virtual('capacityLevelCeil').get(function() {
+      return Math.ceil(this.capacityLevel);
+    });
+
+    const labPlotSchema = new mongoose.Schema({
+      plotId: Number,
+      lab: userLabSchema
+    });
+
+    const userSchema = new mongoose.Schema({
+      username: String,
+      labPlots: [labPlotSchema]
+    }, { toObject: { virtuals: true }, toJSON: { virtuals: true } });
+
+    const User = db.model('User', userSchema);
+
+    const doc = new User({
+      username: 'test',
+      labPlots: [{
+        plotId: 1,
+        lab: { capacityLevel: 3.14 }
+      }]
+    });
+    assert.strictEqual(doc.toObject().labPlots[0].lab.capacityLevelCeil, 4);
+    assert.strictEqual(doc.toJSON().labPlots[0].lab.capacityLevelCeil, 4);
   });
 });
 

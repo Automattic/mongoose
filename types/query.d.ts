@@ -227,7 +227,7 @@ declare module 'mongoose' {
           : MergeType<ResultType, Paths>
     : MergeType<ResultType, Paths>;
 
-  class Query<ResultType, DocType, THelpers = {}, RawDocType = DocType, QueryOp = 'find', TInstanceMethods = Record<string, never>> implements SessionOperation {
+  class Query<ResultType, DocType, THelpers = {}, RawDocType = unknown, QueryOp = 'find', TInstanceMethods = Record<string, never>> implements SessionOperation {
     _mongooseOptions: MongooseQueryOptions<DocType>;
 
     /**
@@ -357,7 +357,8 @@ declare module 'mongoose' {
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
     distinct<DocKey extends string, ResultType = unknown>(
       field: DocKey,
-      filter?: RootFilterQuery<RawDocType>
+      filter?: RootFilterQuery<RawDocType>,
+      options?: QueryOptions<DocType>
     ): QueryWithHelpers<
       Array<
         DocKey extends keyof WithLevel1NestedPaths<DocType>
@@ -551,9 +552,19 @@ declare module 'mongoose' {
     j(val: boolean | null): this;
 
     /** Sets the lean option. */
-    lean<
-      LeanResultType = GetLeanResultType<RawDocType, ResultType, QueryOp>
-    >(
+    lean(
+      val?: boolean | any
+    ): QueryWithHelpers<
+      ResultType extends null
+        ? GetLeanResultType<RawDocType, ResultType, QueryOp> | null
+        : GetLeanResultType<RawDocType, ResultType, QueryOp>,
+      DocType,
+      THelpers,
+      RawDocType,
+      QueryOp,
+      TInstanceMethods
+      >;
+    lean<LeanResultType>(
       val?: boolean | any
     ): QueryWithHelpers<
       ResultType extends null

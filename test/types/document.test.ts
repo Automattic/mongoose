@@ -10,7 +10,7 @@ import {
   DefaultSchemaOptions
 } from 'mongoose';
 import { DeleteResult } from 'mongodb';
-import { expectAssignable, expectError, expectType } from 'tsd';
+import { expectAssignable, expectError, expectNotAssignable, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
 import { autoTypedModelConnection } from './connection.test';
 import { AutoTypedSchemaType } from './schema.test';
@@ -42,7 +42,8 @@ void async function main() {
 
   expectType<DeleteResult>(await doc.deleteOne());
   expectType<TestDocument | null>(await doc.deleteOne().findOne());
-  expectType<{ _id: Types.ObjectId, name?: string } | null>(await doc.deleteOne().findOne().lean());
+  expectAssignable<{ _id: Types.ObjectId, name?: string } | null>(await doc.deleteOne().findOne().lean());
+  expectNotAssignable<TestDocument | null>(await doc.deleteOne().findOne().lean());
 }();
 
 

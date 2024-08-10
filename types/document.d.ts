@@ -22,7 +22,7 @@ declare module 'mongoose' {
     constructor(doc?: any);
 
     /** This documents _id. */
-    _id?: T;
+    _id: T;
 
     /** This documents __v. */
     __v?: any;

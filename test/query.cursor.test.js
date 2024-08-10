@@ -900,6 +900,25 @@ describe('QueryCursor', function() {
     assert.ok(err);
     assert.ok(err.message.includes('skipMiddlewareFunction'), err.message);
   });
+
+  it('returns the underlying Node driver cursor with getDriverCursor()', async function() {
+    const schema = new mongoose.Schema({ name: String });
+
+    const Movie = db.model('Movie', schema);
+
+    await Movie.deleteMany({});
+    await Movie.create([
+      { name: 'Kickboxer' },
+      { name: 'Ip Man' },
+      { name: 'Enter the Dragon' }
+    ]);
+
+    const cursor = await Movie.find({}).cursor();
+    assert.ok(!cursor.cursor);
+    const driverCursor = await cursor.getDriverCursor();
+    assert.ok(cursor.cursor);
+    assert.equal(driverCursor, cursor.cursor);
+  });
 });
 
 async function delay(ms) {

@@ -58,8 +58,8 @@ Below is an example of creating a <code>ProjectModel</code> with a <code>byName<
 });
 
 <span class="hljs-title class_">ProjectSchema</span>.<span class="hljs-property">query</span>.<span class="hljs-property">byName</span> = <span class="hljs-keyword">function</span> <span class="hljs-title function_">byName</span>(<span class="hljs-params">
-  <span class="hljs-variable language_">this</span>: QueryWithHelpers&lt;<span class="hljs-built_in">any</span>, HydratedDocument&lt;Project&gt;, ProjectQueryHelpers&gt;,
-  name: <span class="hljs-built_in">string</span>
+  <span class="hljs-attr">this</span>: <span class="hljs-title class_">QueryWithHelpers</span>&lt;<span class="hljs-built_in">any</span>, <span class="hljs-title class_">HydratedDocument</span>&lt;<span class="hljs-title class_">Project</span>&gt;, <span class="hljs-title class_">ProjectQueryHelpers</span>&gt;,
+  <span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span>
 </span>) {
   <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">find</span>({ <span class="hljs-attr">name</span>: name });
 };
@@ -86,7 +86,7 @@ Query Helpers functions can be defined as following:</p>
   <span class="hljs-attr">stars</span>: <span class="hljs-title class_">Number</span>
 }, {
   <span class="hljs-attr">query</span>: {
-    <span class="hljs-title function_">byName</span>(<span class="hljs-params">name: <span class="hljs-built_in">string</span></span>) {
+    <span class="hljs-title function_">byName</span>(<span class="hljs-params"><span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span></span>) {
       <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">find</span>({ name });
     }
   }

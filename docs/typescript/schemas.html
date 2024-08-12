@@ -35,6 +35,7 @@ doc.<span class="hljs-property">avatar</span>; <span class="hljs-comment">// str
 <li>You need to define your schema in the <code>new Schema()</code> call. Don&#39;t assign your schema definition to a temporary variable. Doing something like <code>const schemaDefinition = { name: String }; const schema = new Schema(schemaDefinition);</code> will not work.</li>
 <li>Mongoose adds <code>createdAt</code> and <code>updatedAt</code> to your schema if you specify the <code>timestamps</code> option in your schema, <em>except</em> if you also specify <code>methods</code>, <code>virtuals</code>, or <code>statics</code>. There is a <a href="https://github.com/Automattic/mongoose/issues/12807">known issue</a> with type inference with timestamps and methods/virtuals/statics options. If you use methods, virtuals, and statics, you&#39;re responsible for adding <code>createdAt</code> and <code>updatedAt</code> to your schema definition.</li>
 </ol>
+<p>If you must define your schema separately, use <a href="https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-4.html#const-assertions">as const</a> (<code>const schemaDefinition = { ... } as const;</code>) to prevent <em>type widening</em>. TypeScript will automatically widen types like <code>required: false</code> to <code>required: boolean</code>, which will cause Mongoose to assume the field is required. Using <code>as const</code> forces TypeScript to retain these types.</p>
 <p>If you need to explicitly get the raw document type (the value returned from <code>doc.toObject()</code>, <code>await Model.findOne().lean()</code>, etc.) from your schema definition, you can use Mongoose&#39;s <code>inferRawDocType</code> helper as follows:</p>
 <pre><code class="language-ts"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">Schema</span>, <span class="hljs-title class_">InferRawDocType</span>, model } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mongoose&#x27;</span>;
 
@@ -52,7 +53,7 @@ doc.<span class="hljs-property">avatar</span>; <span class="hljs-comment">// str
 
 <span class="hljs-title function_">useRawDoc</span>(doc.<span class="hljs-title function_">toObject</span>());
 
-<span class="hljs-keyword">function</span> <span class="hljs-title function_">useRawDoc</span>(<span class="hljs-params">doc: RawUserDocument</span>) {
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">useRawDoc</span>(<span class="hljs-params"><span class="hljs-attr">doc</span>: <span class="hljs-title class_">RawUserDocument</span></span>) {
   <span class="hljs-comment">// ...</span>
 }
 </code></pre>

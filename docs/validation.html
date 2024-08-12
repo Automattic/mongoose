@@ -402,7 +402,7 @@ nested objects are not fully fledged paths.</p>
 
 assert.<span class="hljs-title function_">throws</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
   <span class="hljs-comment">// This throws an error, because &#x27;name&#x27; isn&#x27;t a full fledged path</span>
-  personSchema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).required(<span class="hljs-literal">true</span>);
+  personSchema.<span class="hljs-title function_">path</span>(<span class="hljs-string">&#x27;name&#x27;</span>).<span class="hljs-title function_">required</span>(<span class="hljs-literal">true</span>);
 }, <span class="hljs-regexp">/Cannot.*&#x27;required&#x27;/</span>);
 
 <span class="hljs-comment">// To make a nested object required, use a single nested schema</span>

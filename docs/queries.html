@@ -125,7 +125,7 @@ MongoDB. You need to call the
 </code></pre>
 <p>Iterating through a Mongoose query using <a href="https://thecodebarbarian.com/getting-started-with-async-iterators-in-node-js.html">async iterators</a>
 also creates a cursor.</p>
-<pre><code class="language-javascript"><span class="hljs-keyword">for</span> <span class="hljs-keyword">await</span> (<span class="hljs-keyword">const</span> doc <span class="hljs-keyword">of</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">find</span>()) {
+<pre><code class="language-javascript"><span class="hljs-keyword">for</span> <span class="hljs-title function_">await</span> (<span class="hljs-keyword">const</span> doc <span class="hljs-keyword">of</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">find</span>()) {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(doc); <span class="hljs-comment">// Prints documents one at a time</span>
 }
 </code></pre>

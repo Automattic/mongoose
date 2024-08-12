@@ -21,9 +21,17 @@ template: `
   </div><hr class="separate-api-elements"><h3 id="MongooseMap.prototype.set()"><a href="#MongooseMap.prototype.set()"><code>MongooseMap.prototype.set()</code></a></h3><div><p>Overwrites native Map&#39;s <code>set()</code> function to support setters, <code>populate()</code>,
 and change tracking. Note that Mongoose maps <em>only</em> support strings and
 ObjectIds as keys.</p>
+<p>Keys also cannot:</p>
+<ul>
+<li>be named after special properties <code>prototype</code>, <code>constructor</code>, and <code>__proto__</code></li>
+<li>start with a dollar sign (<code>$</code>)</li>
+<li>contain any dots (<code>.</code>)</li>
+</ul>
 <h4 id="example">Example:</h4>
 <pre><code>doc.myMap.set(&#39;test&#39;, 42); // works
 doc.myMap.set({ obj: 42 }, 42); // Throws &quot;Mongoose maps only support string keys&quot;
+doc.myMap.set(10, 42); // Throws &quot;Mongoose maps only support string keys&quot;
+doc.myMap.set(&quot;$test&quot;, 42); // Throws &quot;Mongoose maps do not support keys that start with &quot;$&quot;, got &quot;$test&quot;&quot;
 </code></pre>
   </div><hr class="separate-api-elements"><h3 id="MongooseMap.prototype.toBSON()"><a href="#MongooseMap.prototype.toBSON()"><code>MongooseMap.prototype.toBSON()</code></a></h3><div><p>Converts this map to a native JavaScript Map so the MongoDB driver can serialize it.</p>
   </div><hr class="separate-api-elements"><h3 id="MongooseMap.prototype.toJSON()"><a href="#MongooseMap.prototype.toJSON()"><code>MongooseMap.prototype.toJSON()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>

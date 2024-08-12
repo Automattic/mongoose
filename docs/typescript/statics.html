@@ -14,13 +14,13 @@ Do <strong>not</strong> use <code>Schema.prototype.method()</code> and <code>Sch
   { <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> } },
   {
     <span class="hljs-attr">methods</span>: {
-      <span class="hljs-title function_">updateName</span>(<span class="hljs-params">name: <span class="hljs-built_in">string</span></span>) {
+      <span class="hljs-title function_">updateName</span>(<span class="hljs-params"><span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span></span>) {
         <span class="hljs-variable language_">this</span>.<span class="hljs-property">name</span> = name;
         <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">save</span>();
       }
     },
     <span class="hljs-attr">statics</span>: {
-      <span class="hljs-title function_">createWithName</span>(<span class="hljs-params">name: <span class="hljs-built_in">string</span></span>) {
+      <span class="hljs-title function_">createWithName</span>(<span class="hljs-params"><span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span></span>) {
         <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">create</span>({ name });
       }
     }

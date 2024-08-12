@@ -104,7 +104,7 @@ Statics functions can be defined as following:</p>
   <span class="hljs-attr">firstName</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> },
   <span class="hljs-attr">lastName</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span> }
 });
-schema.<span class="hljs-title function_">static</span>(<span class="hljs-string">&#x27;createWithFullName&#x27;</span>, <span class="hljs-keyword">function</span> <span class="hljs-title function_">createWithFullName</span>(<span class="hljs-params">name: <span class="hljs-built_in">string</span></span>) {
+schema.<span class="hljs-title function_">static</span>(<span class="hljs-string">&#x27;createWithFullName&#x27;</span>, <span class="hljs-keyword">function</span> <span class="hljs-title function_">createWithFullName</span>(<span class="hljs-params"><span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span></span>) {
   <span class="hljs-keyword">const</span> [firstName, lastName] = name.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27; &#x27;</span>);
   <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">create</span>({ firstName, lastName });
 });

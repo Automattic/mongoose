@@ -72,7 +72,7 @@ declare module 'mongoose' {
     readonly config: any;
 
     /** The mongodb.Db instance, set when the connection is opened */
-    readonly db: mongodb.Db;
+    readonly db: mongodb.Db | undefined;
 
     /**
      * Helper for `createCollection()`. Will explicitly create the given collection

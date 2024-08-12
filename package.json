@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.24.7",
-    "@babel/preset-env": "7.24.7",
+    "@babel/preset-env": "7.25.3",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "acquit": "1.3.0",
@@ -49,7 +49,7 @@
     "eslint-plugin-mocha-no-only": "1.2.0",
     "express": "^4.19.2",
     "fs-extra": "~11.2.0",
-    "highlight.js": "11.9.0",
+    "highlight.js": "11.10.0",
     "lodash.isequal": "4.5.0",
     "lodash.isequalwith": "4.4.0",
     "markdownlint-cli2": "^0.13.0",
@@ -67,7 +67,7 @@
     "tsd": "0.31.1",
     "typescript": "5.5.4",
     "uuid": "10.0.0",
-    "webpack": "5.92.1"
+    "webpack": "5.93.0"
   },
   "directories": {
     "lib": "./lib/mongoose"

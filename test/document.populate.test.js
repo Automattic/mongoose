@@ -552,7 +552,7 @@ describe('document.populate', function() {
 
       const docs = await Person.create([{ name: 'Axl Rose' }, { name: 'Slash' }]);
 
-      const band = await Band.create({
+      let band = await Band.create({
         name: 'Guns N\' Roses',
         members: [docs[0]._id, docs[1]],
         lead: docs[0]._id
@@ -561,18 +561,44 @@ describe('document.populate', function() {
       await band.populate('members');
 
       assert.equal(band.members[0].name, 'Axl Rose');
+      assert.ok(band.members.isMongooseArray);
+      assert.ok(band.members.addToSet);
       band.depopulate('members');
       assert.ok(!band.members[0].name);
       assert.equal(band.members[0].toString(), docs[0]._id.toString());
       assert.equal(band.members[1].toString(), docs[1]._id.toString());
+      assert.ok(band.members.isMongooseArray);
+      assert.ok(band.members.addToSet);
+      assert.deepStrictEqual(band.getChanges(), {});
       assert.ok(!band.populated('members'));
       assert.ok(!band.populated('lead'));
-      await band.populate('lead');
 
+      await band.populate('lead');
       assert.equal(band.lead.name, 'Axl Rose');
       band.depopulate('lead');
       assert.ok(!band.lead.name);
+      assert.deepStrictEqual(band.getChanges(), {});
       assert.equal(band.lead.toString(), docs[0]._id.toString());
+
+      const newId = new mongoose.Types.ObjectId();
+      band.lead = newId;
+      assert.deepStrictEqual(band.getChanges(), { $set: { lead: newId } });
+
+      band = await Band.findById(band._id).orFail();
+      await band.populate('members');
+
+      assert.equal(band.members[0].name, 'Axl Rose');
+      assert.ok(band.members.isMongooseArray);
+      assert.ok(band.members.addToSet);
+      band.depopulate('members');
+      assert.ok(!band.members[0].name);
+      assert.equal(band.members[0].toString(), docs[0]._id.toString());
+      assert.equal(band.members[1].toString(), docs[1]._id.toString());
+      assert.ok(band.members.isMongooseArray);
+      assert.ok(band.members.addToSet);
+      assert.deepStrictEqual(band.getChanges(), {});
+      assert.ok(!band.populated('members'));
+      assert.ok(!band.populated('lead'));
     });
 
     it('depopulates all (gh-6073)', async function() {
@@ -706,7 +732,62 @@ describe('document.populate', function() {
       author.depopulate('books');
       assert.ok(author.books);
       assert.strictEqual(author.books.length, 0);
+    });
 
+    it('depopulates after pushing manually populated (gh-2509)', async function() {
+      const Book = db.model(
+        'Book',
+        new mongoose.Schema({
+          name: String,
+          chapters: Number
+        })
+      );
+      const Author = db.model(
+        'Person',
+        new mongoose.Schema({
+          name: String,
+          books: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }], default: [] }
+        })
+      );
+
+      const books = await Book.create([
+        { name: 'Lost Years of Merlin' },
+        { name: 'Seven Songs of Merlin' },
+        { name: 'Fires of Merlin' }
+      ]);
+      let author = new Author({
+        name: 'T.A. Barron',
+        books: [books[0]._id]
+      });
+      await author.save();
+      await author.populate('books');
+      assert.ok(author.books);
+      assert.strictEqual(author.books.length, 1);
+
+      author.books.push(books[1]);
+      author.depopulate('books');
+      assert.ok(author.books);
+      assert.ok(author.books.isMongooseArray);
+      assert.ok(!author.$populated('books'));
+      assert.deepStrictEqual(author.books, [books[0]._id, books[1]._id]);
+      await author.save();
+
+      author = await Author.findById(author._id).orFail();
+      assert.strictEqual(author.books.length, 2);
+      assert.deepStrictEqual(author.books, [books[0]._id, books[1]._id]);
+      await author.populate('books');
+      author.books.pull(books[0]._id);
+      assert.strictEqual(author.books.length, 1);
+      assert.equal(author.books[0].name, 'Seven Songs of Merlin');
+      author.depopulate();
+      assert.ok(author.books);
+      assert.ok(author.books.isMongooseArray);
+      assert.deepStrictEqual(author.books, [books[1]._id]);
+      await author.save();
+
+      author = await Author.findById(author._id).orFail();
+      assert.strictEqual(author.books.length, 1);
+      assert.deepStrictEqual(author.books, [books[1]._id]);
     });
   });
 

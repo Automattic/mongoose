@@ -7575,6 +7575,16 @@ describe('Model', function() {
 
     assert.strictEqual(doc.__v, 0);
   });
+  it('updates the model\'s db property to point to the provided connection instance and vice versa', async function() {
+    const schema = new mongoose.Schema({
+      name: String
+    });
+    const Model = db.model('Test', schema);
+    const connection = start();
+    Model.useConnection(connection);
+    assert.equal(db.models[Model.modelName], undefined);
+    assert(connection.models[Model.modelName]);
+  });
 });
 
 

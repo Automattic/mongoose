@@ -1,3 +1,14 @@
+8.5.3 / 2024-08-13
+==================
+ * fix(document): call required functions on subdocuments underneath nested paths with correct context #14801 #14788
+ * fix(populate): avoid throwing error when no result and `lean()` set #14799 #14794 #14759 [MohOraby](https://github.com/MohOraby)
+ * fix(document): apply virtuals to subdocuments if parent schema has virtuals: true for backwards compatibility #14774 #14771 #14623 #14394
+ * types: make HydratedSingleSubdocument and HydratedArraySubdocument merge types instead of using & #14800 #14793
+ * types: support schema type inference based on schema options timestamps as well #14773 #13215 [ark23CIS](https://github.com/ark23CIS)
+ * types(cursor): indicate that cursor.next() can return null #14798 #14787
+ * types: allow mongoose.connection.db to be undefined #14797 #14789
+ * docs: add schema type widening advice #14790 [JstnMcBrd](https://github.com/JstnMcBrd)
+
 8.5.2 / 2024-07-30
 ==================
  * perf(clone): avoid further unnecessary checks if cloning a primitive value #14762 #14394

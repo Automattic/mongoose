@@ -157,8 +157,37 @@ declare module 'mongoose' {
         >
       >
   >;
-  export type HydratedSingleSubdocument<DocType, TOverrides = {}> = Types.Subdocument<unknown, Record<string, never>, DocType> & Require_id<DocType> & TOverrides;
-  export type HydratedArraySubdocument<DocType, TOverrides = {}> = Types.ArraySubdocument<unknown, Record<string, never>, DocType> & Require_id<DocType> & TOverrides;
+  export type HydratedSingleSubdocument<
+    DocType,
+    TOverrides = {}
+  > = IfAny<
+  DocType,
+  any,
+  TOverrides extends Record<string, never> ?
+    Types.Subdocument<unknown, Record<string, never>, DocType> & Require_id<DocType> :
+    IfAny<
+      TOverrides,
+      Types.Subdocument<unknown, Record<string, never>, DocType> & Require_id<DocType>,
+      Types.Subdocument<unknown, Record<string, never>, DocType> & MergeType<
+        Require_id<DocType>,
+        TOverrides
+      >
+    >
+  >;
+  export type HydratedArraySubdocument<DocType, TOverrides = {}> = IfAny<
+    DocType,
+    any,
+    TOverrides extends Record<string, never> ?
+      Types.ArraySubdocument<unknown, Record<string, never>, DocType> & Require_id<DocType> :
+      IfAny<
+        TOverrides,
+        Types.ArraySubdocument<unknown, Record<string, never>, DocType> & Require_id<DocType>,
+        Types.ArraySubdocument<unknown, Record<string, never>, DocType> & MergeType<
+          Require_id<DocType>,
+          TOverrides
+        >
+      >
+    >;
 
   export type HydratedDocumentFromSchema<TSchema extends Schema> = HydratedDocument<
   InferSchemaType<TSchema>,

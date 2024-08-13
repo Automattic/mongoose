@@ -10805,7 +10805,10 @@ describe('document', function() {
     assert.ok(!band.populated('members'));
     assert.ok(!band.populated('lead'));
     assert.ok(!band.populated('embeddedMembers.member'));
+    assert.ok(band.members.isMongooseArray);
+    assert.ok(band.embeddedMembers.isMongooseArray);
     assert.ok(!band.embeddedMembers[0].member.name);
+    // assert.ok(!band.embeddedMembers[0].$populated('member'));
   });
 
   it('should allow dashes in the path name (gh-10677)', async function() {

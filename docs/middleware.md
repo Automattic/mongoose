@@ -129,7 +129,7 @@ childSchema.pre('findOneAndUpdate', function() {
 });
 ```
 
-<h2 id="pre"><a href="#pre">Pre</a></h2>
+## Pre {#pre}
 
 Pre middleware functions are executed one after another, when each
 middleware calls `next`.
@@ -228,7 +228,7 @@ myDoc.save(function(err) {
 Calling `next()` multiple times is a no-op. If you call `next()` with an
 error `err1` and then throw an error `err2`, mongoose will report `err1`.
 
-<h2 id="post"><a href="#post">Post middleware</a></h2>
+## Post middleware {#post}
 
 [post](api.html#schema_Schema-post) middleware are executed *after*
 the hooked method and all of its `pre` middleware have completed.
@@ -248,7 +248,7 @@ schema.post('deleteOne', function(doc) {
 });
 ```
 
-<h2 id="post-async"><a href="#post-async">Asynchronous Post Hooks</a></h2>
+## Asynchronous Post Hooks {#post-async}
 
 If your post hook function takes at least 2 parameters, mongoose will assume the second parameter is a `next()` function that you will call to trigger the next middleware in the sequence.
 
@@ -288,7 +288,7 @@ schema.post('save', async function(doc, next) {
 });
 ```
 
-<h2 id="defining"><a href="#defining">Define Middleware Before Compiling Models</a></h2>
+## Define Middleware Before Compiling Models {#defining}
 
 Calling `pre()` or `post()` after [compiling a model](models.html#compiling)
 does **not** work in Mongoose in general. For example, the below `pre('save')`
@@ -338,7 +338,7 @@ const schema = new mongoose.Schema({ name: String });
 module.exports = mongoose.model('User', schema);
 ```
 
-<h2 id="order"><a href="#order">Save/Validate Hooks</a></h2>
+## Save/Validate Hooks {#order}
 
 The `save()` function triggers `validate()` hooks, because mongoose
 has a built-in `pre('save')` hook that calls `validate()`. This means
@@ -360,7 +360,7 @@ schema.post('save', function() {
 });
 ```
 
-<h2 id="accessing-parameters-in-middleware"><a href="#accessing-parameters-in-middleware">Accessing Parameters in Middleware</a></h2>
+## Accessing Parameters in Middleware {#accessing-parameters-in-middleware}
 
 Mongoose provides 2 ways to get information about the function call that triggered the middleware.
 For query middleware, we recommend using `this`, which will be a [Mongoose Query instance](api/query.html).
@@ -393,7 +393,7 @@ const doc = new User({ name: 'John', age: 30 });
 await doc.save({ validateModifiedOnly: true });
 ```
 
-<h2 id="naming"><a href="#naming">Naming Conflicts</a></h2>
+## Naming Conflicts {#naming}
 
 Mongoose has both query and document hooks for `deleteOne()`.
 
@@ -447,7 +447,7 @@ await doc.validate();
 await Test.find().validate();
 ```
 
-<h2 id="notes"><a href="#notes">Notes on findAndUpdate() and Query Middleware</a></h2>
+## Notes on findAndUpdate() and Query Middleware {#notes}
 
 Pre and post `save()` hooks are **not** executed on `update()`,
 `findOneAndUpdate()`, etc. You can see a more detailed discussion why in
@@ -514,7 +514,7 @@ await doc.updateOne({ $set: { name: 'test' } }); // Prints "Updating"
 await Model.updateOne({}, { $set: { name: 'test' } });
 ```
 
-<h2 id="error-handling-middleware"><a href="#error-handling-middleware">Error Handling Middleware</a></h2>
+## Error Handling Middleware {#error-handling-middleware}
 
 Middleware execution normally stops the first time a piece of middleware
 calls `next()` with an error. However, there is a special kind of post
@@ -577,7 +577,7 @@ Error handling middleware can transform an error, but it can't remove the
 error. Even if you call `next()` with no error as shown above, the
 function call will still error out.
 
-<h2 id="aggregate"><a href="#aggregate">Aggregation Hooks</a></h2>
+## Aggregation Hooks {#aggregate}
 
 You can also define hooks for the [`Model.aggregate()` function](api/model.html#model_Model-aggregate).
 In aggregation middleware functions, `this` refers to the [Mongoose `Aggregate` object](api/aggregate.html#Aggregate).
@@ -599,7 +599,7 @@ lets you access the MongoDB aggregation pipeline that Mongoose will send to
 the MongoDB server. It is useful for adding stages to the beginning of the
 pipeline from middleware.
 
-<h2 id="synchronous"><a href="#synchronous">Synchronous Hooks</a></h2>
+## Synchronous Hooks {#synchronous}
 
 Certain Mongoose hooks are synchronous, which means they do **not** support
 functions that return promises or receive a `next()` callback. Currently,
@@ -618,7 +618,7 @@ rejections.
 [require:post init hooks.*error]
 ```
 
-<h2 id="next">Next Up</h2>
+## Next Up {#next}
 
 Now that we've covered middleware, let's take a look at Mongoose's approach
 to faking JOINs with its query [population](populate.html) helper.

@@ -12,7 +12,7 @@ env SUPPRESS_JEST_WARNINGS=1 npm test
 
 If you choose to delve into dangerous waters and test Mongoose apps with Jest, here's what you need to know:
 
-<h2 id="recommended-testenvironment"><a href="#recommended-testenvironment">Recommended <code>testEnvironment</code></a></h2>
+## Recommended `testEnvironment` {#recommended-testenvironment}
 
 If you are using Jest `<=26`, do **not** use Jest's default [`jsdom` test environment](https://jestjs.io/docs/en/configuration.html#testenvironment-string) when testing Mongoose apps, *unless* you are explicitly testing an application that only uses [Mongoose's browser library](browser.html). In Jest `>=27`, ["node" is Jest's default `testEnvironment`](https://jestjs.io/ro/blog/2021/05/25/jest-27#flipping-defaults), so this is no longer an issue.
 
@@ -32,7 +32,7 @@ module.exports = {
 };
 ```
 
-<h2 id="timer-mocks"><a href="#timer-mocks">Timer Mocks</a></h2>
+## Timer Mocks {#timer-mocks}
 
 Absolutely do **not** use [timer mocks](https://jestjs.io/docs/en/timer-mocks.html) when testing Mongoose apps.
 This is especially important if you're using Jest `>=25`, which stubs out `process.nextTick()`.
@@ -71,7 +71,7 @@ const sinon = require('sinon');
 sinon.stub(time, 'setTimeout');
 ```
 
-<h2 id="globalsetup-and-globalteardown"><a href="#globalsetup-and-globalteardown"><code>globalSetup</code> and <code>globalTeardown</code></a></h2>
+## globalSetup and globalTeardown {#globalsetup-and-globalteardown}
 
 Do **not** use `globalSetup` to call `mongoose.connect()` or
 `mongoose.createConnection()`. Jest runs `globalSetup` in

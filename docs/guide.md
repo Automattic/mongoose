@@ -526,6 +526,7 @@ schema.set(option, value);
 
 Valid options:
 
+<!-- markdownlint-disable MD051 -->
 * [autoIndex](#autoIndex)
 * [autoCreate](#autoCreate)
 * [bufferCommands](#bufferCommands)
@@ -560,6 +561,7 @@ Valid options:
 * [query](#query-helpers)
 * [autoSearchIndex](#autoSearchIndex)
 * [readConcern](#readConcern)
+<!-- markdownlint-enable MD051 -->
 
 ## option: autoIndex {#autoIndex}
 
@@ -972,8 +974,10 @@ mongoose.set('strictQuery', true);
 
 ## option: toJSON {#toJSON}
 
+<!-- markdownlint-disable MD051 -->
 Exactly the same as the [toObject](#toObject) option but only applies when
 the document's [`toJSON` method](https://thecodebarbarian.com/what-is-the-tojson-function-in-javascript.html) is called.
+<!-- markdownlint-enable MD051 -->
 
 ```javascript
 const schema = new Schema({ name: String });
@@ -1100,7 +1104,9 @@ doc2.set('comments.1.body', 'new comment');
 await doc2.save();
 ```
 
+<!-- markdownlint-disable MD051 -->
 If you need optimistic concurrency support for `save()`, you can set the [`optimisticConcurrency` option](#optimisticConcurrency)
+<!-- markdownlint-enable MD051 -->
 
 Document versioning can also be disabled by setting the `versionKey` to
 `false`.
@@ -1445,8 +1451,10 @@ await Test.createCollection();
 
 ## option: autoSearchIndex {#autoSearchIndex}
 
+<!-- markdownlint-disable MD051 -->
 Similar to [`autoIndex`](#autoIndex), except for automatically creates any [Atlas search indexes](https://www.mongodb.com/docs/atlas/atlas-search/create-index/) defined in your schema.
 Unlike `autoIndex`, this option defaults to false.
+<!-- markdownlint-enable MD051 -->
 
 ```javascript
 const schema = new Schema({ name: String }, { autoSearchIndex: true });
@@ -1460,8 +1468,10 @@ const Test = mongoose.model('Test', schema);
 
 ## option: readConcern {#readConcern}
 
+<!-- markdownlint-disable MD051 -->
 [Read concerns](https://www.mongodb.com/docs/manual/reference/read-concern/) are similar to [`writeConcern`](#writeConcern), but for read operations like `find()` and `findOne()`.
 To set a default `readConcern`, pass the `readConcern` option to the schema constructor as follows.
+<!-- markdownlint-enable MD051 -->
 
 ```javascript
 const eventSchema = new mongoose.Schema(

@@ -324,4 +324,31 @@ describe('utils', function() {
       assert.deepEqual(pojoError.metadata, { hello: 'world' });
     });
   });
+
+  describe('toCollectionName', function() {
+    it('returns the same name for system.profile', function() {
+      assert.equal(utils.toCollectionName('system.profile'), 'system.profile');
+    });
+
+    it('returns the same name for system.indexes', function() {
+      assert.equal(utils.toCollectionName('system.indexes'), 'system.indexes');
+    });
+
+    it('throws an error when name is not a string', function() {
+      assert.throws(() => {
+        utils.toCollectionName(123, () => {});
+      }, /Collection name must be a string/);
+    });
+
+    it('throws an error when name is an empty string', function() {
+      assert.throws(() => {
+        utils.toCollectionName('', () => {});
+      }, /Collection name cannot be empty/);
+    });
+
+    it('uses the pluralize function when provided', function() {
+      const pluralize = (name) => name + 's';
+      assert.equal(utils.toCollectionName('test', pluralize), 'tests');
+    });
+  });
 });

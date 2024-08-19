@@ -19,7 +19,7 @@ const cwd = path.resolve(__dirname, '..');
 // see https://www.markdownguide.org/extended-syntax/#heading-ids
 // Example:
 // # Some Header {#custom-id}
-const CustomIdRefex = /{#([a-z][\w-]*)}(?: *)$/;
+const CustomIdRefex = /{#([a-zA-Z0-9_-]+)}(?: *)$/;
 
 const isMain = require.main === module;
 

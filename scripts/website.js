@@ -15,7 +15,8 @@ const childProcess = require("child_process");
 // also a consistent root path so that it is easy to change later when the script should be moved
 const cwd = path.resolve(__dirname, '..');
 
-// support github-like custom header ids
+// support custom heading ids
+// see https://www.markdownguide.org/extended-syntax/#heading-ids
 // Example:
 // # Some Header {#custom-id}
 const CustomIdRefex = /{#([a-z][\w-]*)}(?: *)$/;

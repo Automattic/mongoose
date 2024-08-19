@@ -47,7 +47,7 @@ const res = await Character.findOneAndUpdate(filter, update, {
 
 `includeResultMetadata` in Mongoose 8 behaves identically to `rawResult`.
 
-## Document.prototype.deleteOne now returns a query {#document-prototype-deleteone-now-returns-a-query}
+## `Document.prototype.deleteOne` now returns a query {#document-prototype-deleteone-now-returns-a-query}
 
 In Mongoose 7, `doc.deleteOne()` returned a promise that resolved to `doc`.
 In Mongoose 8, `doc.deleteOne()` returns a query for easier chaining, as well as consistency with `doc.updateOne()`.

@@ -96,7 +96,7 @@ Use `findOneAndDelete()` instead.
 In Mongoose 7.4, Mongoose introduced an `id` setter that made `doc.id = '0'.repeat(24)` equivalent to `doc._id = '0'.repeat(24)`.
 In Mongoose 8, that setter is now removed.
 
-## null is valid for non-required string enums {#null-is-valid-for-non-required-string-enums}
+## `null` is valid for non-required string enums {#null-is-valid-for-non-required-string-enums}
 
 Before Mongoose 8, setting a string path with an `enum` to `null` would lead to a validation error, even if that path wasn't `required`.
 In Mongoose 8, it is valid to set a string path to `null` if `required` is not set, even with `enum`.

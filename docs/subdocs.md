@@ -272,7 +272,7 @@ await parent.save();
 console.log('the subdocs were removed');
 ```
 
-<h2 id="subdoc-parents">Parents of Subdocs</h2>
+## Parents of Subdocs {#subdoc-parents}
 
 Sometimes, you need to get the parent of a subdoc. You can access the
 parent using the `parent()` function.

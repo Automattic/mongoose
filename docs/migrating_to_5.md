@@ -173,7 +173,7 @@ const cursorWithOptions = MyModel.
   exec();
 ```
 
-## geoNear {#geonear}
+## `geoNear` {#geonear}
 
 `Model.geoNear()` has been removed because the [MongoDB driver no longer supports it](https://github.com/mongodb/node-mongodb-native/blob/4bac63ce7b9e9fff87c31c5a27d78bcdaca12669/etc/notes/CHANGES_3.0.0.md#geonear-command-helper)
 

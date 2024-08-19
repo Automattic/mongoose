@@ -1,3 +1,8 @@
+7.8.1 / 2024-08-19
+==================
+ * fix(query): handle casting $switch in $expr #14761
+ * docs(mongoose): remove out-of-date callback-based example for mongoose.connect() #14811 #14810
+
 7.8.0 / 2024-07-23
 ==================
  * feat: add transactionAsyncLocalStorage option to opt in to automatically setting session on all transactions #14744 #14742 #14583 #13889

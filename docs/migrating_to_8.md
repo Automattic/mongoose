@@ -227,7 +227,7 @@ err; // ValidationError
 await Test.countDocuments();
 ```
 
-## Model.validate() returns copy of object {#model-validate-returns-copy-of-object}
+## `Model.validate()` returns copy of object {#model-validate-returns-copy-of-object}
 
 In Mongoose 7, `Model.validate()` would potentially modify the passed in object.
 Mongoose 8 instead copies the passed in object first.

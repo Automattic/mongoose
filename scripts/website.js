@@ -19,7 +19,7 @@ const cwd = path.resolve(__dirname, '..');
 // see https://www.markdownguide.org/extended-syntax/#heading-ids
 // Example:
 // # Some Header {#custom-id}
-const CustomIdRefex = /{#([a-zA-Z0-9_-]+)}(?: *)$/;
+const CustomIdRegex = /{#([a-zA-Z0-9_-]+)}(?: *)$/;
 
 const isMain = require.main === module;
 
@@ -44,12 +44,12 @@ markdown.use({
     heading: function({ tokens, depth }) {
       let raw = this.parser.parseInline(tokens);
       let slug;
-      const idMatch = CustomIdRefex.exec(raw);
+      const idMatch = CustomIdRegex.exec(raw);
 
       // use custom header id if available, otherwise fallback to default slugger
       if (idMatch) {
         slug = idMatch[1];
-        raw = raw.replace(CustomIdRefex, '');
+        raw = raw.replace(CustomIdRegex, '');
       } else {
         slug = createSlug(raw.trim());
       }

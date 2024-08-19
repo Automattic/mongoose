@@ -447,7 +447,7 @@ await doc.validate();
 await Test.find().validate();
 ```
 
-## Notes on findAndUpdate() and Query Middleware {#notes}
+## Notes on `findAndUpdate()` and Query Middleware {#notes}
 
 Pre and post `save()` hooks are **not** executed on `update()`,
 `findOneAndUpdate()`, etc. You can see a more detailed discussion why in

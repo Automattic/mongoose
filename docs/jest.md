@@ -71,7 +71,7 @@ const sinon = require('sinon');
 sinon.stub(time, 'setTimeout');
 ```
 
-## globalSetup and globalTeardown {#globalsetup-and-globalteardown}
+## `globalSetup` and `globalTeardown` {#globalsetup-and-globalteardown}
 
 Do **not** use `globalSetup` to call `mongoose.connect()` or
 `mongoose.createConnection()`. Jest runs `globalSetup` in

@@ -46,7 +46,7 @@ markdown.use({
       let slug;
       const idMatch = CustomIdRefex.exec(raw);
 
-      // use github-like custom header if available, otherwise fallback to default slugger
+      // use custom header id if available, otherwise fallback to default slugger
       if (idMatch) {
         slug = idMatch[1];
         raw = raw.replace(CustomIdRefex, '');

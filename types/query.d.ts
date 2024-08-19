@@ -431,7 +431,7 @@ declare module 'mongoose' {
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TInstanceMethods>;
     findOne(
       filter?: FilterQuery<RawDocType>
-    ): QueryWithHelpers<DocType | null, RawDocType, THelpers, RawDocType, 'findOne', TInstanceMethods>;
+    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TInstanceMethods>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
     findOneAndDelete(

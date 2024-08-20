@@ -276,7 +276,7 @@ oid._bsontype; // 'ObjectId' in Mongoose 7, 'ObjectID' in older versions of Mong
 Please update any places where you use `_bsontype` to check if an object is an ObjectId.
 This may also affect libraries that use Mongoose.
 
-## Removed mapReduce {#removed-mapreduce}
+## Removed `mapReduce` {#removed-mapreduce}
 
 MongoDB no longer supports `mapReduce`, so Mongoose 7 no longer has a `Model.mapReduce()` function.
 Use the aggregation framework as a replacement for `mapReduce()`.

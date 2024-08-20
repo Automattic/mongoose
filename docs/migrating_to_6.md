@@ -130,7 +130,7 @@ await q;
 await q.clone(); // Can `clone()` the query to allow executing the query again
 ```
 
-## Model.exists(...) now returns a lean document instead of boolean {#model-exists-returns-a-lean-document-instead-of-boolean}
+## `Model.exists(...)` now returns a lean document instead of boolean {#model-exists-returns-a-lean-document-instead-of-boolean}
 
 ```js
 // in Mongoose 5.x, `existingUser` used to be a boolean

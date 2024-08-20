@@ -1,4 +1,5 @@
 import {
+  IsPathRequired,
   IsSchemaTypeFromBuiltinClass,
   RequiredPaths,
   OptionalPaths,
@@ -14,7 +15,9 @@ declare module 'mongoose' {
     [
     K in keyof (RequiredPaths<DocDefinition, TSchemaOptions['typeKey']> &
     OptionalPaths<DocDefinition, TSchemaOptions['typeKey']>)
-    ]: ObtainRawDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']>;
+    ]: IsPathRequired<DocDefinition[K], TSchemaOptions['typeKey']> extends true
+      ? ObtainRawDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']>
+      : ObtainRawDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']> | null;
   }, TSchemaOptions>;
 
   /**

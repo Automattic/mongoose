@@ -1,3 +1,8 @@
+7.8.1 / 2024-08-19
+==================
+ * fix(query): handle casting $switch in $expr #14761
+ * docs(mongoose): remove out-of-date callback-based example for mongoose.connect() #14811 #14810
+
 8.5.3 / 2024-08-13
 ==================
  * fix(document): call required functions on subdocuments underneath nested paths with correct context #14801 #14788
@@ -19,6 +24,11 @@
  * fix(query): handle casting $switch in $expr #14755 #14751
  * types: allow calling SchemaType.cast() without parent and init parameters #14756 #14748 #9076
  * docs: fix a wrong example in v6 migration guide #14758 [abdelrahman-elkady](https://github.com/abdelrahman-elkady)
+
+7.8.0 / 2024-07-23
+==================
+ * feat: add transactionAsyncLocalStorage option to opt in to automatically setting session on all transactions #14744 #14742 #14583 #13889
+ * types(query): fix usage of "RawDocType" where "DocType" should be passed #14737 [hasezoey](https://github.com/hasezoey)
 
 8.5.1 / 2024-07-12
 ==================
@@ -59,6 +69,10 @@
  * types: add $documents pipeline stage and fix $unionWith type #14666 [nick-statsig](https://github.com/nick-statsig)
  * docs(findoneandupdate): improve example that shows findOneAndUpdate() returning doc before updates were applied #14671 #14670
 
+7.7.0 / 2024-06-18
+==================
+ * feat(model): add throwOnValidationError option for opting into getting MongooseBulkWriteError if all valid operations succeed in bulkWrite() and insertMany() #14599 #14587 #14572 #13410
+
 8.4.3 / 2024-06-17
 ==================
  * fix: remove 0x flamegraph files from release
@@ -72,12 +86,27 @@
  * types: avoid inferring Boolean, Buffer, ObjectId as Date in schema definitions under certain circumstances #14667 #14630
  * docs: add note about parallelism in transations #14647 [fiws](https://github.com/fiws)
 
+6.13.0 / 2024-06-06
+===================
+ * feat(model): add throwOnValidationError option for opting into getting MongooseBulkWriteError if all valid operations succeed in bulkWrite() and insertMany() #14599 #14587 #14572 #13410
+
+7.6.13 / 2024-06-05
+===================
+ * fix(query): shallow clone $or and $and array elements to avoid mutating query filter arguments #14614 #14610
+ * types: pass DocType down to subdocuments so HydratedSingleSubdocument and HydratedArraySubdocument toObject() returns correct type #14612 #14601
+ * docs(migrating_to_7): add id setter to Mongoose 7 migration guide #14645 #13672
+
 8.4.1 / 2024-05-31
 ==================
  * fix: pass options to clone instead of get in applyVirtuals #14606 #14543 [andrews05](https://github.com/andrews05)
  * fix(document): fire pre validate hooks on 5 level deep single nested subdoc when modifying after save() #14604 #14591
  * fix: ensure buildBulkWriteOperations target shard if shardKey is set #14622 #14621 [matlpriceshape](https://github.com/matlpriceshape)
  * types: pass DocType down to subdocuments so HydratedSingleSubdocument and HydratedArraySubdocument toObject() returns correct type #14612 #14601
+
+6.12.9 / 2024-05-24
+===================
+ * fix(cast): cast $comment to string in query filters #14590 #14576
+ * types(model): allow passing strict type checking override to create() #14571 #14548
 
 7.6.12 / 2024-05-21
 ===================
@@ -559,6 +588,7 @@
 ==================
  * perf: speed up mapOfSubdocs benchmark by 4x by avoiding unnecessary O(n^2) loop in getPathsToValidate() #13614
  * feat: upgrade to MongoDB Node.js driver 5.7.0 #13591
+ * feat: add `id` setter which allows modifying `_id` by setting `id` (Note this change was reverted in Mongoose 8) #13517
  * feat: support generating custom cast error message with a function #13608 #3162
  * feat(query): support MongoDB driver's includeResultMetadata option for findOneAndUpdate #13584 #13539
  * feat(connection): add Connection.prototype.removeDb() for removing a related connection #13580 #11821

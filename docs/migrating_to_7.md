@@ -16,6 +16,7 @@ If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration 
 * [Dropped callback support](#dropped-callback-support)
 * [Removed `update()`](#removed-update)
 * [ObjectId requires `new`](#objectid-requires-new)
+* [`id` setter](#id-setter)
 * [Discriminator schemas use base schema options by default](#discriminator-schemas-use-base-schema-options-by-default)
 * [Removed `castForQueryWrapper()`, updated `castForQuery()` signature](#removed-castforquerywrapper)
 * [Copy schema options in `Schema.prototype.add()`](#copy-schema-options-in-schema-prototype-add)
@@ -198,6 +199,31 @@ In Mongoose 7, `ObjectId` is now a [JavaScript class](https://masteringjs.io/tut
 // Works in Mongoose 6 and Mongoose 7
 const oid = new mongoose.Types.ObjectId('0'.repeat(24));
 ```
+
+## `id` Setter
+
+Starting in Mongoose 7.4, Mongoose's built-in `id` virtual (which stores the document's `_id` as a string) has a setter which allows modifying the document's `_id` property via `id`.
+
+```javascript
+const doc = await TestModel.findOne();
+
+doc.id = '000000000000000000000000';
+doc._id; // ObjectId('000000000000000000000000')
+```
+
+This can cause surprising behavior if you create a `new TestModel(obj)` where `obj` contains both an `id` and an `_id`, or if you use `doc.set()`
+
+```javascript
+// Because `id` is after `_id`, the `id` will overwrite the `_id`
+const doc = new TestModel({
+  _id: '000000000000000000000000',
+  id: '111111111111111111111111'
+});
+
+doc._id; // ObjectId('111111111111111111111111')
+```
+
+[The `id` setter was later removed in Mongoose 8](/docs/migrating_to_8.html#removed-id-setter) due to compatibility issues.
 
 ## Discriminator schemas use base schema options by default {#discriminator-schemas-use-base-schema-options-by-default}
 

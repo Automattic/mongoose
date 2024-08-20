@@ -3695,11 +3695,10 @@ describe('Model', function() {
 
           await MyModel.create({ name: 'Hodor' });
 
-          const close = changeStream.close();
+          changeStream.close();
           const closedData = await closed;
           assert.strictEqual(closedData, true);
 
-          await close;
           await db.close();
         });
 

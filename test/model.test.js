@@ -7575,16 +7575,29 @@ describe('Model', function() {
 
     assert.strictEqual(doc.__v, 0);
   });
-  it('updates the model\'s db property to point to the provided connection instance and vice versa', async function() {
+  it('updates the model\'s db property to point to the provided connection instance and vice versa asdf', async function() {
     const schema = new mongoose.Schema({
       name: String
     });
     const Model = db.model('Test', schema);
-    const connection = start();
-    Model.useConnection(connection);
+    const connection = start({ uri: start.uri2 });
+    const original = Model.find();
+    assert.equal(original.model.collection.conn.name, 'mongoose_test');
+    await Model.useConnection(connection);
     assert.equal(db.models[Model.modelName], undefined);
     assert(connection.models[Model.modelName]);
+    const res = Model.find();
+    assert.equal(res.model.collection.conn.name, 'mongoose_test_2');
   });
+  it('should throw an error if no connection is passed', async function() {
+    const schema = new mongoose.Schema({
+      name: String
+    });
+    const Model = db.model('Test', schema);
+    assert.throws(() => {
+      Model.useConnection();
+    }, { message: 'Please provide a connection.' })
+  })
 });
 
 

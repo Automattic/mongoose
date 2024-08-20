@@ -37,12 +37,13 @@ describe('model: watch: ', function() {
       const changeData = await changed;
       assert.equal(changeData.operationType, 'insert');
       assert.equal(changeData.fullDocument.name, 'Ned Stark');
+      await changeStream.close();
     });
 
     it('watch() close() prevents buffered watch op from running (gh-7022)', async function() {
       const MyModel = db.model('Test', new Schema({}));
       const changeStream = MyModel.watch();
-      const ready = new global.Promise(resolve => {
+      const ready = new Promise(resolve => {
         changeStream.once('data', () => {
           resolve(true);
         });
@@ -64,7 +65,7 @@ describe('model: watch: ', function() {
       await MyModel.init();
 
       const changeStream = MyModel.watch();
-      const closed = new global.Promise(resolve => {
+      const closed = new Promise(resolve => {
         changeStream.once('close', () => resolve(true));
       });
 

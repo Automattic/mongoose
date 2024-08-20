@@ -1032,6 +1032,8 @@ describe('connections:', function() {
     await nextChange;
     assert.equal(changes.length, 1);
     assert.equal(changes[0].operationType, 'insert');
+
+    await changeStream.close();
     await conn.close();
   });
 

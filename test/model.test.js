@@ -7,6 +7,7 @@ const sinon = require('sinon');
 const start = require('./common');
 
 const assert = require('assert');
+const { once } = require('events');
 const random = require('./util').random;
 const util = require('./util');
 
@@ -3560,14 +3561,21 @@ describe('Model', function() {
         it('fullDocument (gh-11936)', async function() {
           const MyModel = db.model('Test', new Schema({ name: String }));
 
+          const doc = await MyModel.create({ name: 'Ned Stark' });
           const changeStream = await MyModel.watch([], {
             fullDocument: 'updateLookup',
             hydrate: true
           });
+          await changeStream.$driverChangeStreamPromise;
 
-          const doc = await MyModel.create({ name: 'Ned Stark' });
-
-          const p = changeStream.next();
+          const p = new Promise((resolve) => {
+            changeStream.once('change', change => {
+              resolve(change);
+            });
+          });
+          // Need to wait for resume token to be set after the event listener,
+          // otherwise change stream might not pick up the update.
+          await once(changeStream.driverChangeStream, 'resumeTokenChanged');
           await MyModel.updateOne({ _id: doc._id }, { name: 'Tony Stark' });
 
           const changeData = await p;
@@ -3576,6 +3584,8 @@ describe('Model', function() {
             doc._id.toHexString());
           assert.ok(changeData.fullDocument.$__);
           assert.equal(changeData.fullDocument.get('name'), 'Tony Stark');
+
+          await changeStream.close();
         });
 
         it('fullDocument with immediate watcher and hydrate (gh-14049)', async function() {
@@ -3583,15 +3593,22 @@ describe('Model', function() {
 
           const doc = await MyModel.create({ name: 'Ned Stark' });
 
+          let changeStream = null;
           const p = new Promise((resolve) => {
-            MyModel.watch([], {
+            changeStream = MyModel.watch([], {
               fullDocument: 'updateLookup',
               hydrate: true
-            }).on('change', change => {
+            });
+
+            changeStream.on('change', change => {
               resolve(change);
             });
           });
 
+          // Need to wait for cursor to be initialized and for resume token to
+          // be set, otherwise change stream might not pick up the update.
+          await changeStream.$driverChangeStreamPromise;
+          await once(changeStream.driverChangeStream, 'resumeTokenChanged');
           await MyModel.updateOne({ _id: doc._id }, { name: 'Tony Stark' });
 
           const changeData = await p;
@@ -3600,6 +3617,8 @@ describe('Model', function() {
             doc._id.toHexString());
           assert.ok(changeData.fullDocument.$__);
           assert.equal(changeData.fullDocument.get('name'), 'Tony Stark');
+
+          await changeStream.close();
         });
 
         it('respects discriminators (gh-11007)', async function() {
@@ -3654,11 +3673,12 @@ describe('Model', function() {
             setTimeout(resolve, 500, false);
           });
 
-          changeStream.close();
-          await db;
+          const close = changeStream.close();
+          await db.asPromise();
           const readyCalled = await ready;
           assert.strictEqual(readyCalled, false);
 
+          await close;
           await db.close();
         });
 
@@ -3675,10 +3695,11 @@ describe('Model', function() {
 
           await MyModel.create({ name: 'Hodor' });
 
-          changeStream.close();
+          const close = changeStream.close();
           const closedData = await closed;
           assert.strictEqual(closedData, true);
 
+          await close;
           await db.close();
         });
 

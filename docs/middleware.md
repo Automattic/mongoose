@@ -175,7 +175,7 @@ schema.pre('save', function(next) {
 });
 ```
 
-<h3 id="use-cases"><a href="#use-cases">Use Cases</a></h3>
+### Use Cases
 
 Middleware are useful for atomizing model logic. Here are some other ideas:
 
@@ -184,7 +184,7 @@ Middleware are useful for atomizing model logic. Here are some other ideas:
 * asynchronous defaults
 * asynchronous tasks that a certain action triggers
 
-<h3 id="error-handling"><a href="#error-handling">Errors in Pre Hooks</a></h3>
+### Errors in Pre Hooks {#error-handling}
 
 If any pre hook errors out, mongoose will not execute subsequent middleware
 or the hooked function. Mongoose will instead pass an error to the callback

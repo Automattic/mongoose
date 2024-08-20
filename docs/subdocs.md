@@ -313,7 +313,7 @@ doc.level1.level2.parent() === doc.level1; // true
 doc.level1.level2.ownerDocument() === doc; // true
 ```
 
-<h3 id="altsyntaxarrays"><a href="#altsyntaxarrays">Alternate declaration syntax for arrays</a></h3>
+### Alternate declaration syntax for arrays {#altsyntaxarrays}
 
 If you create a schema with an array of objects, Mongoose will automatically convert the object to a schema for you:
 

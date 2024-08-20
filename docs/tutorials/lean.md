@@ -12,7 +12,7 @@ In this tutorial, you'll learn more about the tradeoffs of using `lean()`.
 * [Plugins](#plugins)
 * [BigInts](#bigints)
 
-<h2 id="using-lean"><a href="#using-lean">Using Lean</a></h2>
+## Using Lean
 
 By default, Mongoose queries return an instance of the
 [Mongoose `Document` class](../api/document.html#Document). Documents are much
@@ -53,7 +53,7 @@ and virtuals don't run if you enable `lean`.
 [require:Lean Tutorial.*getters and virtuals]
 ```
 
-<h2 id="lean-and-populate"><a href="#lean-and-populate">Lean and Populate</a></h2>
+## Lean and Populate
 
 [Populate](../populate.html) works with `lean()`. If you
 use both `populate()` and `lean()`, the `lean` option propagates to the
@@ -70,7 +70,7 @@ populated documents as well. In the below example, both the top-level
 [require:Lean Tutorial.*virtual populate]
 ```
 
-<h2 id="when-to-use-lean"><a href="#when-to-use-lean">When to Use Lean</a></h2>
+## When to Use Lean
 
 If you're executing a query and sending the results without modification to,
 say, an [Express response](http://expressjs.com/en/4x/api.html#res), you should

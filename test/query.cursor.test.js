@@ -415,7 +415,8 @@ describe('QueryCursor', function() {
         await cursor.next();
         assert.ok(false);
       } catch (error) {
-        assert.equal(error.name, 'MongoCursorExhaustedError');
+        assert.equal(error.name, 'MongooseError');
+        assert.ok(error.message.includes('closed cursor'), error.message);
       }
     });
   });

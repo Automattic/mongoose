@@ -50,15 +50,15 @@ describe('model: watch: ', function() {
         setTimeout(resolve, 500, false);
       });
 
+      // Change stream may still emit "MongoAPIError: ChangeStream is closed" because change stream
+      // may still poll after close.
+      changeStream.on('error', () => {});
       const close = changeStream.close();
       await db.asPromise();
       const readyCalled = await ready;
       assert.strictEqual(readyCalled, false);
 
       await close;
-      // Change stream may still emit "MongoAPIError: ChangeStream is closed" because change stream
-      // may still poll after close.
-      changeStream.on('error', () => {});
     });
 
     it('watch() close() closes the stream (gh-7022)', async function() {
@@ -74,13 +74,14 @@ describe('model: watch: ', function() {
 
       await MyModel.create({ name: 'Hodor' });
 
+      // Change stream may still emit "MongoAPIError: ChangeStream is closed" because change stream
+      // may still poll after close.
+      changeStream.on('error', () => {});
+
       await changeStream.close();
 
       const closedData = await closed;
       assert.strictEqual(closedData, true);
-      // Change stream may still emit "MongoAPIError: ChangeStream is closed" because change stream
-      // may still poll after close.
-      changeStream.on('error', () => {});
     });
   });
 });

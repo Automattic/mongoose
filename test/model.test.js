@@ -3678,11 +3678,11 @@ describe('Model', function() {
           const readyCalled = await ready;
           assert.strictEqual(readyCalled, false);
 
-          await close;
-          await db.close();
           // Change stream may still emit "MongoAPIError: ChangeStream is closed" because change stream
           // may still poll after close.
           changeStream.on('error', () => {});
+          await close;
+          await db.close();
         });
 
         it('watch() close() closes the stream (gh-7022)', async function() {
@@ -3702,11 +3702,11 @@ describe('Model', function() {
           const closedData = await closed;
           assert.strictEqual(closedData, true);
 
-          await db.close();
-
           // Change stream may still emit "MongoAPIError: ChangeStream is closed" because change stream
           // may still poll after close.
           changeStream.on('error', () => {});
+
+          await db.close();
         });
 
         it('bubbles up resumeTokenChanged events (gh-14349)', async function() {

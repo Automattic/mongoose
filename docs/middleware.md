@@ -31,7 +31,6 @@ In document middleware functions, `this` refers to the document. To access the m
 
 * [validate](api/document.html#document_Document-validate)
 * [save](api/model.html#model_Model-save)
-* [remove](api/model.html#model_Model-remove)
 * [updateOne](api/document.html#document_Document-updateOne)
 * [deleteOne](api/model.html#model_Model-deleteOne)
 * [init](api/document.html#document_Document-init) (note: init hooks are [synchronous](#synchronous))
@@ -51,7 +50,6 @@ In query middleware functions, `this` refers to the query.
 * [findOneAndRemove](api/query.html#query_Query-findOneAndRemove)
 * [findOneAndReplace](api/query.html#query_Query-findOneAndReplace)
 * [findOneAndUpdate](api/query.html#query_Query-findOneAndUpdate)
-* [remove](api/model.html#model_Model-remove)
 * [replaceOne](api/query.html#query_Query-replaceOne)
 * [update](api/query.html#query_Query-update)
 * [updateOne](api/query.html#query_Query-updateOne)
@@ -86,7 +84,6 @@ Here are the possible strings that can be passed to `pre()`
 * findOneAndUpdate
 * init
 * insertMany
-* remove
 * replaceOne
 * save
 * update
@@ -382,11 +379,11 @@ Mongoose has both query and document hooks for `deleteOne()`.
 ```javascript
 schema.pre('deleteOne', function() { console.log('Removing!'); });
 
-// Does **not** print "Removing!". Document middleware for `remove` is not executed by default
+// Does **not** print "Removing!". Document middleware for `deleteOne` is not executed by default
 await doc.deleteOne();
 
 // Prints "Removing!"
-Model.remove();
+await Model.deleteOne();
 ```
 
 You can pass options to [`Schema.pre()`](api.html#schema_Schema-pre)
@@ -400,8 +397,8 @@ schema.pre('deleteOne', { document: true, query: false }, function() {
   console.log('Deleting doc!');
 });
 
-// Only query middleware. This will get called when you do `Model.remove()`
-// but not `doc.remove()`.
+// Only query middleware. This will get called when you do `Model.deleteOne()`
+// but not `doc.deleteOne()`.
 schema.pre('deleteOne', { query: true, document: false }, function() {
   console.log('Deleting!');
 });

@@ -27,7 +27,7 @@ If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration 
   * [Removed `LeanDocument` and support for `extends Document`](#removed-leandocument-and-support-for-extends-document)
   * [New parameters for `HydratedDocument`](#new-parameters-for-hydrateddocument)
 
-<h2 id="strictquery"><a href="#strictquery"><code>strictQuery</code></a></h2>
+## `strictQuery` {#strictquery}
 
 `strictQuery` is now false by default.
 
@@ -41,7 +41,7 @@ const docs = await MyModel.find({ notInSchema: 1 });
 docs;
 ```
 
-<h2 id="removed-remove"><a href="#removed-remove">Removed <code>remove()</code></a></h2>
+## Removed `remove()` {#removed-remove}
 
 The `remove()` method on documents and models has been removed.
 Use `deleteOne()` or `deleteMany()` instead.
@@ -80,7 +80,7 @@ schema.pre('deleteOne', { document: true, query: false }, function() {
 });
 ```
 
-<h2 id="dropped-callback-support"><a href="#dropped-callback-support">Dropped callback support</a></h2>
+## Dropped callback support {#dropped-callback-support}
 
 The following functions no longer accept callbacks.
 They always return promises.
@@ -168,7 +168,7 @@ const [err, session] = await conn.startSession().then(
 );
 ```
 
-<h2 id="removed-update"><a href="#removed-update">Removed <code>update()</code></a></h2>
+## Removed `update()` {#removed-update}
 
 `Model.update()`, `Query.prototype.update()`, and `Document.prototype.update()` have been removed.
 Use `updateOne()` instead.
@@ -183,7 +183,7 @@ await Model.updateOne(filter, update);
 await doc.updateOne(update);
 ```
 
-<h2 id="objectid-requires-new"><a href="#objectid-requires-new">ObjectId requires <code>new</code></a></h2>
+## ObjectId requires `new` {#objectid-requires-new}
 
 In Mongoose 6 and older, you could define a new ObjectId without using the `new` keyword:
 
@@ -200,7 +200,7 @@ In Mongoose 7, `ObjectId` is now a [JavaScript class](https://masteringjs.io/tut
 const oid = new mongoose.Types.ObjectId('0'.repeat(24));
 ```
 
-<h2 id="id-setter"><a href="#id-setter"><code>id</code> Setter</a></h2>
+## `id` Setter
 
 Starting in Mongoose 7.4, Mongoose's built-in `id` virtual (which stores the document's `_id` as a string) has a setter which allows modifying the document's `_id` property via `id`.
 
@@ -225,7 +225,7 @@ doc._id; // ObjectId('111111111111111111111111')
 
 [The `id` setter was later removed in Mongoose 8](/docs/migrating_to_8.html#removed-id-setter) due to compatibility issues.
 
-<h2 id="discriminator-schemas-use-base-schema-options-by-default"><a href="#discriminator-schemas-use-base-schema-options-by-default">Discriminator schemas use base schema options by default</a></h2>
+## Discriminator schemas use base schema options by default {#discriminator-schemas-use-base-schema-options-by-default}
 
 When you use `Model.discriminator()`, Mongoose will now use the discriminator base schema's options by default.
 This means you don't need to explicitly set child schema options to match the base schema's.
@@ -243,7 +243,7 @@ const Test = Base.discriminator('Child', childSchema);
 Test.schema.options.typeKey; // '$type'
 ```
 
-<h2 id="removed-castforquerywrapper"><a href="#removed-castforquerywrapper">Removed <code>castForQueryWrapper</code>, updated <code>castForQuery()</code> signature</a></h2>
+## Removed `castForQueryWrapper`, updated `castForQuery()` signature {#removed-castforquerywrapper}
 
 Mongoose now always calls SchemaType `castForQuery()` method with 3 arguments: `$conditional`, `value`, and `context`.
 If you've implemented a custom schema type that defines its own `castForQuery()` method, you need to update the method as follows.
@@ -269,7 +269,7 @@ MySchemaType.prototype.castForQuery = function($conditional, value, context) {
 };
 ```
 
-<h2 id="copy-schema-options-in-schema-prototype-add"><a href="#copy-schema-options-in-schema-prototype-add">Copy Schema options in <code>Schema.prototype.add()</code></a></h2>
+## Copy Schema options in `Schema.prototype.add()` {#copy-schema-options-in-schema-prototype-add}
 
 Mongoose now copies user defined schema options when adding one schema to another.
 For example, `childSchema` below will get `baseSchema`'s `id` and `toJSON` options.
@@ -289,7 +289,7 @@ childSchema.add(new Schema({}, { toObject: { virtuals: true } }));
 childSchema.options.toObject; // { virtuals: true } in Mongoose 7. undefined in Mongoose 6.
 ```
 
-<h2 id="objectid-bsontype-now-has-lowercase-d"><a href="#objectid-bsontype-now-has-lowercase-d">ObjectId bsontype now has lowercase d</a></h2>
+## ObjectId bsontype now has lowercase d {#objectid-bsontype-now-has-lowercase-d}
 
 The internal `_bsontype` property on ObjectIds is equal to `'ObjectId'` in Mongoose 7, as opposed to `'ObjectID'` in Mongoose 6.
 
@@ -302,7 +302,7 @@ oid._bsontype; // 'ObjectId' in Mongoose 7, 'ObjectID' in older versions of Mong
 Please update any places where you use `_bsontype` to check if an object is an ObjectId.
 This may also affect libraries that use Mongoose.
 
-<h2 id="removed-mapreduce"><a href="#removed-mapreduce">Removed mapReduce</a></h2>
+## Removed `mapReduce` {#removed-mapreduce}
 
 MongoDB no longer supports `mapReduce`, so Mongoose 7 no longer has a `Model.mapReduce()` function.
 Use the aggregation framework as a replacement for `mapReduce()`.
@@ -321,7 +321,7 @@ const o = {
 await MR.mapReduce(o);
 ```
 
-<h2 id="removed-support-for-custom-promise-libraries"><a href="#removed-support-for-custom-promise-libraries">Removed Support for custom promise libraries</a></h2>
+## Removed Support for custom promise libraries {#removed-support-for-custom-promise-libraries}
 
 Mongoose 7 no longer supports plugging in custom promise libraries. So the following no longer makes Mongoose return Bluebird promises in Mongoose 7.
 
@@ -338,9 +338,9 @@ If you want to use Bluebird for all promises globally, you can do the following:
 global.Promise = require('bluebird');
 ```
 
-<h2 id="typescript-specific-changes"><a href="#typescript-specific-changes">TypeScript-specific Changes</a></h2>
+## TypeScript-specific Changes {#typescript-specific-changes}
 
-<h3 id="removed-leandocument-and-support-for-extends-document"><a href="#removed-leandocument-and-support-for-extends-document">Removed <code>LeanDocument</code> and support for <code>extends Document</code></a></h3>
+### Removed `LeanDocument` and support for `extends Document` {#removed-leandocument-and-support-for-extends-document}
 
 Mongoose 7 no longer exports a `LeanDocument` type, and no longer supports passing a document type that `extends Document` into `Model<>`.
 
@@ -361,7 +361,7 @@ const Test = model<ITest>('Test', schema);
 type TestDocument = ReturnType<(typeof Test)['hydrate']>;
 ```
 
-<h3 id="new-parameters-for-hydrateddocument"><a href="#new-parameters-for-hydrateddocument">New Parameters for <code>HydratedDocument</code></a></h3>
+### New Parameters for `HydratedDocument` {#new-parameters-for-hydrateddocument}
 
 Mongoose's `HydratedDocument` type transforms a raw document interface into the type of the hydrated Mongoose document, including virtuals, methods, etc.
 In Mongoose 7, the generic parameters to `HydratedDocument` have changed.

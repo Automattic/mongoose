@@ -9,7 +9,7 @@ Schemas are pluggable, that is, they allow for applying pre-packaged capabilitie
   <li><a href="#official">Officially Supported Plugins</a></li>
 </ul>
 
-<h2 id="example"><a href="#example">Example</a></h2>
+## Example {#example}
 
 Plugins are a tool for reusing logic in multiple schemas. Suppose you have
 several models in your database and want to add a `loadedAt` property
@@ -46,7 +46,7 @@ playerSchema.plugin(loadedAtPlugin);
 
 We just added loaded-time behavior to both our `Game` and `Player` schemas and declared an index on the `loadedAt` path of our Games to boot. Not bad for a few lines of code.
 
-<h2 id="global"><a href="#global">Global Plugins</a></h2>
+## Global Plugins {#global}
 
 Want to register a plugin for all schemas? The mongoose singleton has a
 `.plugin()` function that registers a plugin for every schema. For
@@ -63,7 +63,7 @@ const Game = mongoose.model('Game', gameSchema);
 const Player = mongoose.model('Player', playerSchema);
 ```
 
-<h2 id="apply-plugins-before-compiling-models"><a href="#apply-plugins-before-compiling-models">Apply Plugins Before Compiling Models</a></h2>
+## Apply Plugins Before Compiling Models {#apply-plugins-before-compiling-models}
 
 Because many plugins rely on [middleware](middleware.html), you should make sure to apply plugins **before**
 you call `mongoose.model()` or `conn.model()`. Otherwise, [any middleware the plugin registers won't get applied](middleware.html#defining).
@@ -96,7 +96,7 @@ const Game = mongoose.model('Game', gameSchema);
 gameSchema.plugin(loadedAtPlugin);
 ```
 
-<h2 id="official"><a href="#official">Officially Supported Plugins</a></h2>
+## Officially Supported Plugins {#official}
 
 The Mongoose team maintains several plugins that add cool new features to
 Mongoose. Here's a couple:

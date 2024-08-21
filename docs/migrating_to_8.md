@@ -29,7 +29,7 @@ We also recommend reviewing the [MongoDB Node.js driver's release notes for v6.0
 * [Model constructor properties are all optional in TypeScript](#model-constructor-properties-are-all-optional-in-typescript)
 * [Infer `distinct()` return types from schema](#infer-distinct-return-types-from-schema)
 
-<h2 id="removed-rawresult-option-for-findoneandupdate"><a href="#removed-rawresult-option-for-findoneandupdate">Removed <code>rawResult</code> option for <code>findOneAndUpdate()</code></a></h2>
+## Removed `rawResult` option for `findOneAndUpdate()` {#removed-rawresult-option-for-findoneandupdate}
 
 The `rawResult` option for `findOneAndUpdate()`, `findOneAndReplace()`, and `findOneAndDelete()` has been replaced by the `includeResultMetadata` option.
 
@@ -47,7 +47,7 @@ const res = await Character.findOneAndUpdate(filter, update, {
 
 `includeResultMetadata` in Mongoose 8 behaves identically to `rawResult`.
 
-<h2 id="document-prototype-deleteone-now-returns-a-query"><a href="#document-prototype-deleteone-now-returns-a-query"><code>Document.prototype.deleteOne</code> now returns a query</a></h2>
+## `Document.prototype.deleteOne` now returns a query {#document-prototype-deleteone-now-returns-a-query}
 
 In Mongoose 7, `doc.deleteOne()` returned a promise that resolved to `doc`.
 In Mongoose 8, `doc.deleteOne()` returns a query for easier chaining, as well as consistency with `doc.updateOne()`.
@@ -64,7 +64,7 @@ const q = numberOne.deleteOne();
 const res = await q;
 ```
 
-<h2 id="mongodb-node-driver-6"><a href="#mongodb-node-driver-6">MongoDB Node Driver 6</a></h2>
+## MongoDB Node Driver 6 {#mongodb-node-driver-6}
 
 Mongoose 8 uses [v6.x of the MongoDB Node driver](https://github.com/mongodb/node-mongodb-native/releases/tag/v6.0.0).
 There's a few noteable changes in MongoDB Node driver v6 that affect Mongoose:
@@ -81,22 +81,22 @@ There's a few noteable changes in MongoDB Node driver v6 that affect Mongoose:
    * `sslValidate` -> `tlsAllowInvalidCertificates`
    * `tlsCertificateFile` -> `tlsCertificateKeyFile`
 
-<h2 id="removed-findoneandremove"><a href="#removed-findoneandremove">Removed <code>findOneAndRemove()</code></a></h2>
+## Removed `findOneAndRemove()` {#removed-findoneandremove}
 
 In Mongoose 7, `findOneAndRemove()` was an alias for `findOneAndDelete()` that Mongoose supported for backwards compatibility.
 Mongoose 8 no longer supports `findOneAndRemove()`.
 Use `findOneAndDelete()` instead.
 
-<h2 id="removed-count"><a href="#removed-count">Removed <code>count()</code></a></h2>
+## Removed `count()` {#removed-count}
 
 `Model.count()` and `Query.prototype.count()` were removed in Mongoose 8. Use `Model.countDocuments()` and `Query.prototype.countDocuments()` instead.
 
-<h2 id="removed-id-setter"><a href="#removed-id-setter">Removed id Setter</a></h2>
+## Removed id Setter {#removed-id-setter}
 
 In Mongoose 7.4, Mongoose introduced an `id` setter that made `doc.id = '0'.repeat(24)` equivalent to `doc._id = '0'.repeat(24)`.
 In Mongoose 8, that setter is now removed.
 
-<h2 id="null-is-valid-for-non-required-string-enums"><a href="#null-is-valid-for-non-required-string-enums"><code>null</code> is valid for non-required string enums</a></h2>
+## `null` is valid for non-required string enums {#null-is-valid-for-non-required-string-enums}
 
 Before Mongoose 8, setting a string path with an `enum` to `null` would lead to a validation error, even if that path wasn't `required`.
 In Mongoose 8, it is valid to set a string path to `null` if `required` is not set, even with `enum`.
@@ -115,7 +115,7 @@ const Test = mongoose.model('Test', schema);
 await Test.create({ status: null });
 ```
 
-<h2 id="apply-minimize-when-save-updates-an-existing-document"><a href="#apply-minimize-when-save-updates-an-existing-document">Apply minimize when <code>save()</code> updates an existing document</a></h2>
+## Apply minimize when `save()` updates an existing document {#apply-minimize-when-save-updates-an-existing-document}
 
 In Mongoose 7, Mongoose would only apply minimize when saving a new document, not when updating an existing document.
 
@@ -144,7 +144,7 @@ let rawDoc = await Test.findById(_id).lean();
 rawDoc.nested; // undefined in Mongoose 8, {} in Mongoose 7
 ```
 
-<h2 id="apply-base-schema-paths-before-discriminator-paths"><a href="#apply-base-schema-paths-before-discriminator-paths">Apply base schema paths before discriminator paths</a></h2>
+## Apply base schema paths before discriminator paths {#apply-base-schema-paths-before-discriminator-paths}
 
 This means that, in Mongoose 8, getters and setters on discriminator paths run *after* getters and setters on base paths.
 In Mongoose 7, getters and setters on discriminator paths ran *before* getters and setters on base paths.
@@ -178,7 +178,7 @@ const doc = new D({ name: 'test', otherProp: 'test' });
 console.log(doc.toObject({ getters: true }));
 ```
 
-<h2 id="removed-overwrite-option-for-findoneandupdate"><a href="#removed-overwrite-option-for-findoneandupdate">Removed <code>overwrite</code> option for <code>findOneAndUpdate()</code></a></h2>
+## Removed `overwrite` option for `findOneAndUpdate()` {#removed-overwrite-option-for-findoneandupdate}
 
 Mongoose 7 and earlier supported an `overwrite` option for `findOneAndUpdate()`, `updateOne()`, and `update()`.
 Before Mongoose 7, `overwrite` would skip wrapping the `update` parameter in `$set`, which meant that `findOneAndUpdate()` and `update()` would overwrite the matched document.
@@ -187,7 +187,7 @@ In Mongoose 7, setting `overwrite` would convert `findOneAndUpdate()` to `findOn
 In Mongoose 8, the `overwrite` option is no longer supported.
 If you want to overwrite the entire document, use `findOneAndReplace()` or `replaceOne()`.
 
-<h2 id="changed-behavior-for-findoneandupdate-with-orfail-and-upsert"><a href="#changed-behavior-for-findoneandupdate-with-orfail-and-upsert">Changed behavior for <code>findOneAndUpdate()</code> with <code>orFail()</code> and upsert</a></h2>
+## Changed behavior for `findOneAndUpdate()` with `orFail()` and upsert {#changed-behavior-for-findoneandupdate-with-orfail-and-upsert}
 
 In Mongoose 7, `findOneAndUpdate(filter, update, { upsert: true }).orFail()` would throw a `DocumentNotFoundError` if a new document was upserted.
 In other words, `findOneAndUpdate().orFail()` always threw an error if no document was found, even if a new document was upserted.
@@ -195,7 +195,7 @@ In other words, `findOneAndUpdate().orFail()` always threw an error if no docume
 In Mongoose 8, `findOneAndUpdate(filter, update, { upsert: true }).orFail()` always succeeds.
 `findOneAndUpdate().orFail()` now throws a `DocumentNotFoundError` if there's no document returned, rather than if no document was found.
 
-<h2 id="create-waits-until-all-saves-are-done-before-throwing-any-error"><a href="#create-waits-until-all-saves-are-done-before-throwing-any-error"><code>create()</code> waits until all saves are done before throwing any error</a></h2>
+## Create waits until all saves are done before throwing any error {#create-waits-until-all-saves-are-done-before-throwing-any-error}
 
 In Mongoose 7, `create()` would immediately throw if any `save()` threw an error by default.
 Mongoose 8 instead waits for all `save()` calls to finish before throwing the first error that occurred.
@@ -227,7 +227,7 @@ err; // ValidationError
 await Test.countDocuments();
 ```
 
-<h2 id="model-validate-returns-copy-of-object"><a href="#model-validate-returns-copy-of-object"><code>Model.validate()</code> returns copy of object</a></h2>
+## `Model.validate()` returns copy of object {#model-validate-returns-copy-of-object}
 
 In Mongoose 7, `Model.validate()` would potentially modify the passed in object.
 Mongoose 8 instead copies the passed in object first.
@@ -243,7 +243,7 @@ typeof obj.answer; // 'string' in Mongoose 8, 'number' in Mongoose 7
 typeof res.answer; // 'number' in both Mongoose 7 and Mongoose 8
 ```
 
-<h2 id="allow-null-for-optional-fields-in-typescript"><a href="#allow-null-for-optional-fields-in-typescript">Allow <code>null</code> For Optional Fields in TypeScript</a></h2>
+## Allow `null` For Optional Fields in TypeScript {#allow-null-for-optional-fields-in-typescript}
 
 In Mongoose 8, automatically inferred schema types in TypeScript allow `null` for optional fields.
 In Mongoose 7, optional fields only allowed `undefined`, not `null`.
@@ -259,7 +259,7 @@ const doc = new TestModel();
 doc.name;
 ```
 
-<h2 id="model-constructor-properties-are-all-optional-in-typescript"><a href="#model-constructor-properties-are-all-optional-in-typescript">Model constructor properties are all optional in TypeScript</a></h2>
+## Model constructor properties are all optional in TypeScript {#model-constructor-properties-are-all-optional-in-typescript}
 
 In Mongoose 8, no properties are required on model constructors by default.
 
@@ -292,7 +292,7 @@ const newDoc2 = new TestModel<IDocument>({
 });
 ```
 
-<h2 id="infer-distinct-return-types-from-schema"><a href="#infer-distinct-return-types-from-schema">Infer <code>distinct()</code> return types from schema</a></h2>
+## Infer `distinct()` return types from schema {#infer-distinct-return-types-from-schema}
 
 ```ts
 interface User {

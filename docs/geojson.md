@@ -5,7 +5,7 @@ polygons. [MongoDB has excellent support for geospatial queries](http://thecodeb
 on GeoJSON objects. Let's take a look at how you can use Mongoose to store
 and query GeoJSON objects.
 
-<h2 id="points">Point Schema</h2>
+## Point Schema {#points}
 
 The most simple structure in GeoJSON is a point. Below is an example point
 representing the approximate location of [San Francisco](https://www.google.com/maps/@37.7,-122.5,9z).
@@ -64,7 +64,7 @@ const citySchema = new mongoose.Schema({
 });
 ```
 
-<h2 id="polygons">Polygon Schema</h2>
+## Polygon Schema {#polygons}
 
 GeoJSON polygons let you define an arbitrary shape on a map. For example,
 the below polygon is a GeoJSON rectangle that approximates the border
@@ -106,7 +106,7 @@ const citySchema = new mongoose.Schema({
 });
 ```
 
-<h2 id="querying">Geospatial Queries with Mongoose</h2>
+## Geospatial Queries with Mongoose {#querying}
 
 Mongoose queries support the same [geospatial query operators](http://thecodebarbarian.com/80-20-guide-to-mongodb-geospatial-queries)
 that the MongoDB driver does. For example, the below script saves a
@@ -128,7 +128,7 @@ that's a shorthand for `$geoWithin`.
 [require:geojson.*within helper]
 ```
 
-<h2 id="geospatial-indexes">Geospatial Indexes</h2>
+## Geospatial Indexes {#geospatial-indexes}
 
 MongoDB supports [2dsphere indexes](https://www.mongodb.com/docs/manual/core/2dsphere/)
 for speeding up geospatial queries. Here's how you can define

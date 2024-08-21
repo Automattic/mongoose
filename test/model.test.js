@@ -3509,6 +3509,9 @@ describe('Model', function() {
           }
           changeStream.removeListener('change', listener);
           listener = null;
+          // Change stream may still emit "MongoAPIError: ChangeStream is closed" because change stream
+          // may still poll after close.
+          changeStream.on('error', () => {});
           changeStream.close();
           changeStream = null;
         });
@@ -3658,6 +3661,9 @@ describe('Model', function() {
           assert.equal(changeData.operationType, 'insert');
           assert.equal(changeData.fullDocument.name, 'Ned Stark');
 
+          // Change stream may still emit "MongoAPIError: ChangeStream is closed" because change stream
+          // may still poll after close.
+          changeStream.on('error', () => {});
           await changeStream.close();
           await db.close();
         });

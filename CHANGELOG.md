@@ -1,3 +1,8 @@
+8.5.4 / 2024-08-23
+==================
+ * fix: add empty string check for collection name passed #14806 [Shubham2552](https://github.com/Shubham2552)
+ * docs(model): add 'throw' as valid strict value for bulkWrite() and add some more clarification on throwOnValidationError #14809
+
 7.8.1 / 2024-08-19
 ==================
  * fix(query): handle casting $switch in $expr #14761

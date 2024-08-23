@@ -40,6 +40,19 @@ Test.create([{ name: 'test' }], { validateBeforeSave: true }).then(docs => {
   expectType<string>(docs[0].name);
 });
 
+Test.create({}).then(doc => {
+  expectType<string>(doc.name);
+});
+
+Test.create([{}]).then(docs => {
+  expectType<string>(docs[0].name);
+});
+
+expectError(Test.create<ITest>({}));
+
+Test.create<ITest>({ name: 'test' });
+Test.create<ITest>({ _id: new Types.ObjectId('0'.repeat(24)), name: 'test' });
+
 Test.insertMany({ name: 'test' }, {}).then(docs => {
   expectType<Types.ObjectId>(docs[0]._id);
   expectType<string>(docs[0].name);

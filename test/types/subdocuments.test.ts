@@ -143,6 +143,9 @@ function gh14601() {
     f3: [{ field1: 'test' }]
   });
 
-  const f2obj = item.f2.toObject();
-  expectAssignable<{ _id: Types.ObjectId, field1: string }>(f2obj);
+  const obj = item.toObject();
+
+  const obj2 = item.f2.toObject();
+
+  expectAssignable<{ _id: Types.ObjectId, field1: string }>(obj2);
 }

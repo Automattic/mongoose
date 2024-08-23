@@ -10,10 +10,16 @@ const pug = require('pug');
 const pkg = require('../package.json');
 const transform = require('acquit-require');
 const childProcess = require("child_process");
-require('./generateSearch');
+
 // using "__dirname" and ".." to have a consistent CWD, this script should not be runnable, even when not being in the root of the project
 // also a consistent root path so that it is easy to change later when the script should be moved
 const cwd = path.resolve(__dirname, '..');
+
+// support custom heading ids
+// see https://www.markdownguide.org/extended-syntax/#heading-ids
+// Example:
+// # Some Header {#custom-id}
+const CustomIdRegex = /{#([a-zA-Z0-9_-]+)}(?: *)$/;
 
 const isMain = require.main === module;
 
@@ -29,28 +35,39 @@ try {
 
 require('acquit-ignore')();
 
-const { marked: markdown } = require('marked');
+const markdown = require('marked');
 const highlight = require('highlight.js');
-const { promisify } = require("util");
+const { promisify } = require('util');
+
 markdown.use({
-  heading: function(text, level, raw, slugger) {
-    const slug = slugger.slug(raw);
-    return `<h${level} id="${slug}">
-      <a href="#${slug}">
-        ${text}
-      </a>
-    </h${level}>\n`;
-  }
-});
-markdown.setOptions({
-  highlight: function(code, language) {
-    if (!language) {
-      language = 'javascript';
+  renderer: {
+    heading: function({ tokens, depth }) {
+      let raw = this.parser.parseInline(tokens);
+      let slug;
+      const idMatch = CustomIdRegex.exec(raw);
+
+      // use custom header id if available, otherwise fallback to default slugger
+      if (idMatch) {
+        slug = idMatch[1];
+        raw = raw.replace(CustomIdRegex, '');
+      } else {
+        slug = createSlug(raw.trim());
+      }
+      return `<h${depth} id="${slug}">
+        <a href="#${slug}">
+          ${raw}
+        </a>
+      </h${depth}>\n`;
+    },
+    code: function({ text, lang }) {
+      if (!lang || lang === 'acquit') {
+        lang = 'javascript';
+      }
+      if (lang === 'no-highlight') {
+        return text;
+      }
+      return `<pre><code lang="${lang}">${highlight.highlight(text, { language: lang }).value}</code></pre>`;
     }
-    if (language === 'no-highlight') {
-      return code;
-    }
-    return highlight.highlight(code, { language }).value;
   }
 });
 
@@ -592,6 +609,7 @@ if (isMain) {
   (async function main() {
     console.log(`Processing ~${files.length} files`);
 
+    require('./generateSearch');
     await deleteAllHtmlFiles();
     await pugifyAllFiles();
     await copyAllRequiredFiles();
@@ -601,4 +619,13 @@ if (isMain) {
 
     console.log('Done Processing');
   })();
+}
+
+// Modified from github-slugger
+function createSlug(value) {
+  if (typeof value !== 'string') {
+    return '';
+  }
+  value = value.toLowerCase();
+  return value.replace(/[^a-z0-9-_\s]/, '').replace(/ /g, '-');
 }

@@ -57,7 +57,7 @@ the `Story` model.
   <li><a href="#transform-populated-documents">Transform populated documents</a></li>
 </ul>
 
-<h2 id="saving-refs"><a href="#saving-refs">Saving refs</a></h2>
+## Saving refs {#saving-refs}
 
 Saving refs to other documents works the same way you normally save
 properties, just assign the `_id` value:
@@ -85,7 +85,7 @@ You can set the `ref` option on `ObjectId`, `Number`, `String`, and `Buffer` pat
 However, we recommend using ObjectIds as `_id` properties (and thus ObjectIds for `ref` properties) unless you have a good reason not to.
 That is because MongoDB will set `_id` to an ObjectId if you create a new document without an `_id` property, so if you make your `_id` property a Number, you need to be extra careful not to insert a document without a numeric `_id`.
 
-<h2 id="population"><a href="#population">Population</a></h2>
+## Population {#population}
 
 So far we haven't done anything much different. We've merely created a
 `Person` and a `Story`. Now let's take a look at populating our story's
@@ -108,7 +108,7 @@ Arrays of refs work the same way. Just call the
 [populate](api/query.html#query_Query-populate) method on the query and an
 array of documents will be returned *in place* of the original `_id`s.
 
-<h2 id="setting-populated-fields"><a href="#setting-populated-fields">Setting Populated Fields</a></h2>
+## Setting Populated Fields {#setting-populated-fields}
 
 You can manually populate a property by setting it to a document. The document
 must be an instance of the model your `ref` property refers to.
@@ -119,7 +119,7 @@ story.author = author;
 console.log(story.author.name); // prints "Ian Fleming"
 ```
 
-<h2 id="checking-populated"><a href="#checking-populated">Checking Whether a Field is Populated</a></h2>
+## Checking Whether a Field is Populated {#checking-populated}
 
 You can call the `populated()` function to check whether a field is populated.
 If `populated()` returns a [truthy value](https://masteringjs.io/tutorials/fundamentals/truthy),
@@ -147,7 +147,7 @@ story.author instanceof ObjectId; // true
 story.author._id; // ObjectId, because Mongoose adds a special getter
 ```
 
-<h2 id="doc-not-found"><a href="#doc-not-found">What If There's No Foreign Document?</a></h2>
+## What If There's No Foreign Document? {#doc-not-found}
 
 Mongoose populate doesn't behave like conventional
 [SQL joins](https://www.w3schools.com/sql/sql_join.asp). When there's no
@@ -176,7 +176,7 @@ const story = await Story.findOne({ title: 'Casino Royale' }).populate('authors'
 story.authors; // `[]`
 ```
 
-<h2 id="field-selection"><a href="#field-selection">Field Selection</a></h2>
+## Field Selection {#field-selection}
 
 What if we only want a few specific fields returned for the populated
 documents? This can be accomplished by passing the usual
@@ -194,7 +194,7 @@ console.log('The author is %s', story.author.name);
 console.log('The authors age is %s', story.author.age);
 ```
 
-<h2 id="populating-multiple-paths"><a href="#populating-multiple-paths">Populating Multiple Paths</a></h2>
+## Populating Multiple Paths {#populating-multiple-paths}
 
 What if we wanted to populate multiple paths at the same time?
 
@@ -220,7 +220,7 @@ await Story.
 await Story.find().populate({ path: 'fans', select: 'email' });
 ```
 
-<h2 id="query-conditions"><a href="#query-conditions">Query conditions and other options</a></h2>
+## Query conditions and other options {#query-conditions}
 
 What if we wanted to populate our fans array based on their age and
 select just their names?
@@ -264,7 +264,7 @@ story; // null
 
 If you want to filter stories by their author's name, you should use [denormalization](https://www.mongodb.com/blog/post/6-rules-of-thumb-for-mongodb-schema-design-part-3).
 
-<h2 id="limit-vs-perDocumentLimit"><a href="#limit-vs-perDocumentLimit"><code>limit</code> vs. <code>perDocumentLimit</code></a></h2>
+## `limit` vs. `perDocumentLimit` {#limit-vs-perDocumentLimit}
 
 Populate does support a `limit` option, however, it currently
 does **not** limit on a per-document basis for backwards compatibility. For example,
@@ -316,7 +316,7 @@ stories[1].name; // 'Live and Let Die'
 stories[1].fans.length; // 2
 ```
 
-<h2 id="refs-to-children"><a href="#refs-to-children">Refs to children</a></h2>
+## Refs to children {#refs-to-children}
 
 We may find however, if we use the `author` object, we are unable to get a
 list of the stories. This is because no `story` objects were ever 'pushed'
@@ -364,7 +364,7 @@ them with [sub docs](subdocs.html). Take caution when calling its
 remove method because you'll be removing it from the database, not just
 the array.
 
-<h2 id="populate_an_existing_mongoose_document"><a href="#populate_an_existing_mongoose_document">Populating an existing document</a></h2>
+## Populating an existing document {#populate_an_existing_mongoose_document}
 
 If you have an existing mongoose document and want to populate some of its
 paths, you can use the
@@ -390,7 +390,7 @@ await person.populate(['stories', 'fans']);
 person.populated('fans'); // Array of ObjectIds
 ```
 
-<h2 id="populate_multiple_documents"><a href="#populate_multiple_documents">Populating multiple existing documents</a></h2>
+## Populating multiple existing documents {#populate_multiple_documents}
 
 If we have one or many mongoose documents or even plain objects
 (*like [mapReduce](api/model.html#model_Model-mapReduce) output*), we may
@@ -398,7 +398,7 @@ populate them using the [Model.populate()](api/model.html#model_Model-populate)
 method. This is what `Document#populate()`
 and `Query#populate()` use to populate documents.
 
-<h2 id="deep-populate"><a href="#deep-populate">Populating across multiple levels</a></h2>
+## Populating across multiple levels {#deep-populate}
 
 Say you have a user schema which keeps track of the user's friends.
 
@@ -423,7 +423,7 @@ await User.
   });
 ```
 
-<h2 id="cross-db-populate"><a href="#cross-db-populate">Cross Database Populate</a></h2>
+## Cross Database Populate {#cross-db-populate}
 
 Let's say you have a schema representing events, and a schema representing
 conversations. Each event has a corresponding conversation thread.
@@ -470,7 +470,7 @@ const events = await Event.
   populate({ path: 'conversation', model: Conversation });
 ```
 
-<h2 id="dynamic-refpath"><a href="#dynamic-refpath">Dynamic References via <code>refPath</code></a></h2>
+## Dynamic References via `refPath` {#dynamic-refpath}
 
 Mongoose can also populate from multiple collections based on the value
 of a property in the document. Let's say you're building a schema for
@@ -591,7 +591,7 @@ const commentSchema = new Schema({
 });
 ```
 
-<h2 id="dynamic-ref"><a href="#dynamic-ref">Dynamic References via <code>ref</code></a></h2>
+## Dynamic References via `ref` {#dynamic-ref}
 
 Just like `refPath`, `ref` can also be assigned a function.
 
@@ -609,7 +609,7 @@ const commentSchema = new Schema({
 });
 ```
 
-<h2 id="populate-virtuals"><a href="#populate-virtuals">Populate Virtuals</a></h2>
+## Populate Virtuals {#populate-virtuals}
 
 So far you've only populated based on the `_id` field.
 However, that's sometimes not the right choice.
@@ -706,7 +706,7 @@ authors = await Author.
   exec();
 ```
 
-<h2 id="count"><a href="#count">Populate Virtuals: The Count Option</a></h2>
+## Populate Virtuals: The Count Option {#count}
 
 Populate virtuals also support counting the number of documents with
 matching `foreignField` as opposed to the documents themselves. Set the
@@ -734,7 +734,7 @@ const doc = await Band.findOne({ name: 'Motley Crue' }).
 doc.numMembers; // 2
 ```
 
-<h2 id="match"><a href="#match">Populate Virtuals: The Match Option</a></h2>
+## Populate Virtuals: The Match Option {#match}
 
 Another option for Populate virtuals is `match`.
 This option adds an extra filter condition to the query Mongoose uses to `populate()`:
@@ -796,7 +796,7 @@ await Author.findOne().populate({
 });
 ```
 
-<h2 id="populating-maps"><a href="#populating-maps">Populating Maps</a></h2>
+## Populating Maps {#populating-maps}
 
 [Maps](schematypes.html#maps) are a type that represents an object with arbitrary
 string keys. For example, in the below schema, `members` is a map from strings to ObjectIds.
@@ -866,7 +866,7 @@ You can `populate()` every book's author by populating `books.$*.author`:
 const libraries = await Library.find().populate('books.$*.author');
 ```
 
-<h2 id="populate-middleware"><a href="#populate-middleware">Populate in Middleware</a></h2>
+## Populate in Middleware {#populate-middleware}
 
 You can populate in either pre or post [hooks](http://mongoosejs.com/docs/middleware.html). If you want to
 always populate a certain field, check out the [mongoose-autopopulate plugin](http://npmjs.com/package/mongoose-autopopulate).
@@ -900,7 +900,7 @@ MySchema.post('save', function(doc, next) {
 });
 ```
 
-<h2 id="populating-multiple-paths-middleware"><a href="#populating-multiple-paths-middleware">Populating Multiple Paths in Middleware</a></h2>
+## Populating Multiple Paths in Middleware {#populating-multiple-paths-middleware}
 
 Populating multiple paths in middleware can be helpful when you always want to populate some fields. But, the implementation is just a tiny bit trickier than what you may think. Here's how you may expect it to work:
 
@@ -936,7 +936,7 @@ userSchema.pre('find', function(next) {
 
 Alternatively, you can check out the [mongoose-autopopulate plugin](http://npmjs.com/package/mongoose-autopopulate).
 
-<h2 id="transform-populated-documents"><a href="#transform-populated-documents">Transform populated documents</a></h2>
+## Transform populated documents {#transform-populated-documents}
 
 You can manipulate populated documents using the `transform` option.
 If you specify a `transform` function, Mongoose will call this function on every populated document in the result with two arguments: the populated document, and the original id used to populate the document.

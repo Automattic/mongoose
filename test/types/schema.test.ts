@@ -1604,3 +1604,30 @@ function gh13215() {
   type SchemaType = InferSchemaType<typeof schema>;
   expectType<User>({} as SchemaType);
 }
+
+function gh14825() {
+  const schemaDefinition = {
+    userName: { type: String, required: true }
+  } as const;
+  const schemaOptions = {
+    typeKey: 'type' as const,
+    timestamps: {
+      createdAt: 'date',
+      updatedAt: false
+    }
+  };
+
+  type RawDocType = InferRawDocType<
+    typeof schemaDefinition,
+    typeof schemaOptions
+  >;
+  type User = {
+    userName: string;
+  };
+
+  expectAssignable<User>({} as RawDocType);
+
+  const schema = new Schema(schemaDefinition, schemaOptions);
+  type SchemaType = InferSchemaType<typeof schema>;
+  expectAssignable<User>({} as SchemaType);
+}

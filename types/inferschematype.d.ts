@@ -87,8 +87,8 @@ declare module 'mongoose' {
             'createdAt' | 'updatedAt'
           > as TimestampOptions[K] extends true
             ? K
-            : TimestampOptions[K] extends string
-              ? TimestampOptions[K]
+            : TimestampOptions[K] extends `${infer TimestampValue}`
+              ? TimestampValue
               : never]: NativeDate;
         } & T
         : T

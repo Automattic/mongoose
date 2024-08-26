@@ -1105,7 +1105,7 @@ await doc2.save();
 ```
 
 <!-- markdownlint-disable MD051 -->
-If you need optimistic concurrency support for `save()`, you can set the [`optimisticConcurrency` option](#optimisticConcurrency)
+If you need optimistic concurrency support for `save()`, you can set the [`optimisticConcurrency` option](#optimisticConcurrency).
 <!-- markdownlint-enable MD051 -->
 
 Document versioning can also be disabled by setting the `versionKey` to

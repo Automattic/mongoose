@@ -11073,9 +11073,9 @@ describe('model: populate:', function() {
 
     await owner.save();
 
-    assert.equal(typeof pet._doc.owner.$__.wasPopulated.value, 'object'); // object 😀
-    await pet.populate('owner'); // This breaks it 💥💥💥💥💥💥💥💥💥💥
-    assert.equal(typeof pet._doc.owner.$__.wasPopulated.value, 'object'); // string 🙁
+    assert.equal(typeof pet._doc.owner.$__.wasPopulated.value, 'object');
+    await pet.populate('owner');
+    assert.equal(typeof pet._doc.owner.$__.wasPopulated.value, 'object');
 
     await pet.save();
 

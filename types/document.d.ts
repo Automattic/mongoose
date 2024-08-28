@@ -22,7 +22,7 @@ declare module 'mongoose' {
     constructor(doc?: any);
 
     /** This documents _id. */
-    _id?: T;
+    _id: T;
 
     /** This documents __v. */
     __v?: any;
@@ -259,11 +259,14 @@ declare module 'mongoose' {
     set(value: string | Record<string, any>): this;
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
+    toJSON(options?: ToObjectOptions & { flattenMaps?: true }): FlattenMaps<Require_id<DocType>>;
+    toJSON(options: ToObjectOptions & { flattenMaps: false }): Require_id<DocType>;
     toJSON<T = Require_id<DocType>>(options?: ToObjectOptions & { flattenMaps?: true }): FlattenMaps<T>;
     toJSON<T = Require_id<DocType>>(options: ToObjectOptions & { flattenMaps: false }): T;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
-    toObject<T = Require_id<DocType>>(options?: ToObjectOptions): Require_id<T>;
+    toObject(options?: ToObjectOptions): Require_id<DocType>;
+    toObject<T>(options?: ToObjectOptions): Require_id<T>;
 
     /** Clears the modified state on the specified path. */
     unmarkModified<T extends keyof DocType>(path: T): void;

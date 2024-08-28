@@ -10,9 +10,11 @@ declare module 'mongoose' {
    * { age: { $gte: 30 } }
    * ```
    */
-  type FilterQuery<T> = {
+  type RootFilterQuery<T> = FilterQuery<T> | Query<any, any> | Types.ObjectId;
+
+  type FilterQuery<T> ={
     [P in keyof T]?: Condition<T[P]>;
-  } & RootQuerySelector<T>;
+  } & RootQuerySelector<T> & { _id?: Condition<string>; };
 
   type MongooseBaseQueryOptionKeys =
     | 'context'
@@ -115,8 +117,9 @@ declare module 'mongoose' {
     /** @see https://www.mongodb.com/docs/manual/reference/operator/query/comment/#op._S_comment */
     $comment?: string;
     // we could not find a proper TypeScript generic to support nested queries e.g. 'user.friends.name'
-    // this will mark all unrecognized properties as any (including nested queries)
-    [key: string]: any;
+    // this will mark all unrecognized properties as any (including nested queries) only if
+    // they include a "." (to avoid generically allowing any unexpected keys)
+    [nestedSelector: `${string}.${string}`]: any;
   };
 
   interface QueryTimestampsConfig {
@@ -224,7 +227,7 @@ declare module 'mongoose' {
           : MergeType<ResultType, Paths>
     : MergeType<ResultType, Paths>;
 
-  class Query<ResultType, DocType, THelpers = {}, RawDocType = DocType, QueryOp = 'find', TInstanceMethods = Record<string, never>> implements SessionOperation {
+  class Query<ResultType, DocType, THelpers = {}, RawDocType = unknown, QueryOp = 'find', TInstanceMethods = Record<string, never>> implements SessionOperation {
     _mongooseOptions: MongooseQueryOptions<DocType>;
 
     /**
@@ -303,7 +306,7 @@ declare module 'mongoose' {
 
     /** Specifies this query as a `countDocuments` query. */
     countDocuments(
-      criteria?: FilterQuery<RawDocType>,
+      criteria?: RootFilterQuery<RawDocType>,
       options?: QueryOptions<DocType>
     ): QueryWithHelpers<number, DocType, THelpers, RawDocType, 'countDocuments', TInstanceMethods>;
 
@@ -319,10 +322,10 @@ declare module 'mongoose' {
      * collection, regardless of the value of `single`.
      */
     deleteMany(
-      filter?: FilterQuery<RawDocType>,
+      filter?: RootFilterQuery<RawDocType>,
       options?: QueryOptions<DocType>
     ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteMany', TInstanceMethods>;
-    deleteMany(filter: FilterQuery<RawDocType>): QueryWithHelpers<
+    deleteMany(filter: RootFilterQuery<RawDocType>): QueryWithHelpers<
       any,
       DocType,
       THelpers,
@@ -338,10 +341,10 @@ declare module 'mongoose' {
      * option.
      */
     deleteOne(
-      filter?: FilterQuery<RawDocType>,
+      filter?: RootFilterQuery<RawDocType>,
       options?: QueryOptions<DocType>
     ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteOne', TInstanceMethods>;
-    deleteOne(filter: FilterQuery<RawDocType>): QueryWithHelpers<
+    deleteOne(filter: RootFilterQuery<RawDocType>): QueryWithHelpers<
       any,
       DocType,
       THelpers,
@@ -354,7 +357,8 @@ declare module 'mongoose' {
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
     distinct<DocKey extends string, ResultType = unknown>(
       field: DocKey,
-      filter?: FilterQuery<RawDocType>
+      filter?: RootFilterQuery<RawDocType>,
+      options?: QueryOptions<DocType>
     ): QueryWithHelpers<
       Array<
         DocKey extends keyof WithLevel1NestedPaths<DocType>
@@ -406,52 +410,52 @@ declare module 'mongoose' {
 
     /** Creates a `find` query: gets a list of documents that match `filter`. */
     find(
-      filter: FilterQuery<RawDocType>,
+      filter: RootFilterQuery<RawDocType>,
       projection?: ProjectionType<RawDocType> | null,
       options?: QueryOptions<DocType> | null
     ): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find', TInstanceMethods>;
     find(
-      filter: FilterQuery<RawDocType>,
+      filter: RootFilterQuery<RawDocType>,
       projection?: ProjectionType<RawDocType> | null
     ): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find', TInstanceMethods>;
     find(
-      filter: FilterQuery<RawDocType>
+      filter: RootFilterQuery<RawDocType>
     ): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find', TInstanceMethods>;
     find(): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find', TInstanceMethods>;
 
     /** Declares the query a findOne operation. When executed, returns the first found document. */
     findOne(
-      filter?: FilterQuery<RawDocType>,
+      filter?: RootFilterQuery<RawDocType>,
       projection?: ProjectionType<RawDocType> | null,
       options?: QueryOptions<DocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TInstanceMethods>;
     findOne(
-      filter?: FilterQuery<RawDocType>,
+      filter?: RootFilterQuery<RawDocType>,
       projection?: ProjectionType<RawDocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TInstanceMethods>;
     findOne(
-      filter?: FilterQuery<RawDocType>
+      filter?: RootFilterQuery<RawDocType>
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TInstanceMethods>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
     findOneAndDelete(
-      filter?: FilterQuery<RawDocType>,
+      filter?: RootFilterQuery<RawDocType>,
       options?: QueryOptions<DocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndDelete'>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
     findOneAndUpdate(
-      filter: FilterQuery<RawDocType>,
+      filter: RootFilterQuery<RawDocType>,
       update: UpdateQuery<RawDocType>,
       options: QueryOptions<DocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<ModifyResult<DocType>, DocType, THelpers, RawDocType, 'findOneAndUpdate', TInstanceMethods>;
     findOneAndUpdate(
-      filter: FilterQuery<RawDocType>,
+      filter: RootFilterQuery<RawDocType>,
       update: UpdateQuery<RawDocType>,
       options: QueryOptions<DocType> & { upsert: true } & ReturnsNewDoc
     ): QueryWithHelpers<DocType, DocType, THelpers, RawDocType, 'findOneAndUpdate', TInstanceMethods>;
     findOneAndUpdate(
-      filter?: FilterQuery<RawDocType>,
+      filter?: RootFilterQuery<RawDocType>,
       update?: UpdateQuery<RawDocType>,
       options?: QueryOptions<DocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndUpdate', TInstanceMethods>;
@@ -548,9 +552,19 @@ declare module 'mongoose' {
     j(val: boolean | null): this;
 
     /** Sets the lean option. */
-    lean<
-      LeanResultType = GetLeanResultType<RawDocType, ResultType, QueryOp>
-    >(
+    lean(
+      val?: boolean | any
+    ): QueryWithHelpers<
+      ResultType extends null
+        ? GetLeanResultType<RawDocType, ResultType, QueryOp> | null
+        : GetLeanResultType<RawDocType, ResultType, QueryOp>,
+      DocType,
+      THelpers,
+      RawDocType,
+      QueryOp,
+      TInstanceMethods
+      >;
+    lean<LeanResultType>(
       val?: boolean | any
     ): QueryWithHelpers<
       ResultType extends null
@@ -592,7 +606,7 @@ declare module 'mongoose' {
     maxTimeMS(ms: number): this;
 
     /** Merges another Query or conditions object into this one. */
-    merge(source: Query<any, any> | FilterQuery<RawDocType>): this;
+    merge(source: RootFilterQuery<RawDocType>): this;
 
     /** Specifies a `$mod` condition, filters documents for documents whose `path` property is a number that is equal to `remainder` modulo `divisor`. */
     mod<K = string>(path: K, val: number): this;
@@ -711,7 +725,7 @@ declare module 'mongoose' {
      * not accept any [atomic](https://www.mongodb.com/docs/manual/tutorial/model-data-for-atomic-operations/#pattern) operators (`$set`, etc.)
      */
     replaceOne(
-      filter?: FilterQuery<RawDocType>,
+      filter?: RootFilterQuery<RawDocType>,
       replacement?: DocType | AnyObject,
       options?: QueryOptions<DocType> | null
     ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'replaceOne', TInstanceMethods>;
@@ -819,7 +833,7 @@ declare module 'mongoose' {
      * the `multi` option.
      */
     updateMany(
-      filter?: FilterQuery<RawDocType>,
+      filter?: RootFilterQuery<RawDocType>,
       update?: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline,
       options?: QueryOptions<DocType> | null
     ): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType, 'updateMany', TInstanceMethods>;
@@ -829,7 +843,7 @@ declare module 'mongoose' {
      * `update()`, except it does not support the `multi` or `overwrite` options.
      */
     updateOne(
-      filter?: FilterQuery<RawDocType>,
+      filter?: RootFilterQuery<RawDocType>,
       update?: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline,
       options?: QueryOptions<DocType> | null
     ): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType, 'updateOne', TInstanceMethods>;

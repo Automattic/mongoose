@@ -49,7 +49,7 @@ interface TestStaticMethods {
   findSomething(this: TestModel): Promise<TestDocument>;
 }
 type TestDocument = HydratedDocument<Test, TestVirtuals & TestInstanceMethods>;
-type TestQuery = Query<any, TestDocument, TestQueryHelpers> & TestQueryHelpers;
+type TestQuery = Query<any, TestDocument, TestQueryHelpers, Test> & TestQueryHelpers;
 interface TestQueryHelpers {
   whereSomething(this: TestQuery): this
 }

@@ -1,3 +1,9 @@
+8.5.5 / 2024-08-28
+==================
+ * fix(populate): fix a couple of other places where Mongoose gets the document's _id with getters #14833 #14827 #14759
+ * fix(discriminator): shallow clone Schema.prototype.obj before merging schemas to avoid modifying original obj #14821
+ * types: fix schema type based on timestamps schema options value #14829 #14825 [ark23CIS](https://github.com/ark23CIS)
+
 8.5.4 / 2024-08-23
 ==================
  * fix: add empty string check for collection name passed #14806 [Shubham2552](https://github.com/Shubham2552)

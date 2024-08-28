@@ -6939,6 +6939,31 @@ describe('Model', function() {
       assert.ok(err == null);
 
     });
+    it('should error if no documents were inserted (gh-14763)', async function() {
+      const fooSchema = new mongoose.Schema({
+        bar: { type: Number }
+      }, { optimisticConcurrency: true });
+      const TestModel = db.model('Test', fooSchema);
+
+      const foo = await TestModel.create({
+        bar: 0
+      });
+
+      // update 1
+      foo.bar = 1;
+      await foo.save();
+
+      // parallel update
+      const fooCopy = await TestModel.findById(foo._id);
+      fooCopy.bar = 99;
+      await fooCopy.save();
+
+      foo.bar = 2;
+      const err = await TestModel.bulkSave([foo]).then(() => null, err => err);
+      assert.equal(err.name, 'DocumentNotFoundError');
+      assert.equal(err.numAffected, 1);
+      assert.ok(Array.isArray(err.filter));
+    });
     it('Using bulkSave should not trigger an error (gh-11071)', async function() {
 
       const pairSchema = mongoose.Schema({

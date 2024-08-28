@@ -6939,7 +6939,7 @@ describe('Model', function() {
       assert.ok(err == null);
 
     });
-    it('should error if no documents were inserted (gh-14763)', async function() {
+    it('should error if no documents were inserted or updated (gh-14763)', async function() {
       const fooSchema = new mongoose.Schema({
         bar: { type: Number }
       }, { optimisticConcurrency: true });
@@ -6963,6 +6963,23 @@ describe('Model', function() {
       assert.equal(err.name, 'DocumentNotFoundError');
       assert.equal(err.numAffected, 1);
       assert.ok(Array.isArray(err.filter));
+    });
+    it('should error if there is a validation error', async function() {
+      const fooSchema = new mongoose.Schema({
+        bar: { type: Number }
+      }, { optimisticConcurrency: true });
+      const TestModel = db.model('Test', fooSchema);
+
+      const docs = [
+        new TestModel({ bar: 42 }),
+        new TestModel({ bar: 'taco' })
+      ];
+      const err = await TestModel.bulkSave(docs).then(() => null, err => err);
+      assert.equal(err.name, 'ValidationError');
+
+      // bulkSave() does not save any documents if any documents fail validation
+      const fromDb = await TestModel.find();
+      assert.equal(fromDb.length, 0);
     });
     it('Using bulkSave should not trigger an error (gh-11071)', async function() {
 

@@ -22,6 +22,7 @@ import {
   model,
   ValidateOpts
 } from 'mongoose';
+import { IsPathRequired } from '../../types/inferschematype';
 import { expectType, expectError, expectAssignable } from 'tsd';
 import { ObtainDocumentPathType, ResolvePathType } from '../../types/inferschematype';
 
@@ -1387,7 +1388,7 @@ function gh13424() {
   const TestModel = model('TestModel', new Schema(testSchema));
 
   const doc = new TestModel({});
-  expectType<Types.ObjectId | undefined>(doc.subDocArray[0]._id);
+  expectType<Types.ObjectId>(doc.subDocArray[0]._id);
 }
 
 function gh14147() {
@@ -1502,16 +1503,18 @@ function gh13772() {
   const schemaDefinition = {
     name: String,
     docArr: [{ name: String }]
-  };
+  } as const;
   const schema = new Schema(schemaDefinition);
-  type RawDocType = InferRawDocType<typeof schemaDefinition>;
-  expectAssignable<
-    { name?: string | null, docArr?: Array<{ name?: string | null }> }
-  >({} as RawDocType);
 
   const TestModel = model('User', schema);
+  type RawDocType = InferRawDocType<typeof schemaDefinition>;
+  expectAssignable<
+    { name?: string | null, docArr?: Array<{ name?: string | null }> | null }
+  >({} as RawDocType);
+
   const doc = new TestModel();
   expectAssignable<RawDocType>(doc.toObject());
+  expectAssignable<RawDocType>(doc.toJSON());
 }
 
 function gh14696() {

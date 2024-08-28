@@ -1,3 +1,12 @@
+8.6.0 / 2024-08-28
+==================
+ * feat: upgrade mongodb -> 6.8.0, handle throwing error on closed cursor in Mongoose with `MongooseError` instead of `MongoCursorExhaustedError` #14813
+ * feat(model+query): support options parameter for distinct() #14772 #8006
+ * feat(QueryCursor): add getDriverCursor() function that returns the raw driver cursor #14745
+ * types: change query selector to disallow unknown top-level keys by default #14764 [alex-statsig](https://github.com/alex-statsig)
+ * types: make toObject() and toJSON() not generic by default to avoid type widening #14819 #12883
+ * types: avoid automatically inferring lean result type when assigning to explicitly typed variable #14734
+
 8.5.5 / 2024-08-28
 ==================
  * fix(populate): fix a couple of other places where Mongoose gets the document's _id with getters #14833 #14827 #14759

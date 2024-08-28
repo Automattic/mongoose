@@ -37,18 +37,22 @@ describe('model: watch: ', function() {
       const changeData = await changed;
       assert.equal(changeData.operationType, 'insert');
       assert.equal(changeData.fullDocument.name, 'Ned Stark');
+      await changeStream.close();
     });
 
     it('watch() close() prevents buffered watch op from running (gh-7022)', async function() {
       const MyModel = db.model('Test', new Schema({}));
       const changeStream = MyModel.watch();
-      const ready = new global.Promise(resolve => {
+      const ready = new Promise(resolve => {
         changeStream.once('data', () => {
           resolve(true);
         });
         setTimeout(resolve, 500, false);
       });
 
+      // Change stream may still emit "MongoAPIError: ChangeStream is closed" because change stream
+      // may still poll after close.
+      changeStream.on('error', () => {});
       const close = changeStream.close();
       await db.asPromise();
       const readyCalled = await ready;
@@ -64,11 +68,15 @@ describe('model: watch: ', function() {
       await MyModel.init();
 
       const changeStream = MyModel.watch();
-      const closed = new global.Promise(resolve => {
+      const closed = new Promise(resolve => {
         changeStream.once('close', () => resolve(true));
       });
 
       await MyModel.create({ name: 'Hodor' });
+
+      // Change stream may still emit "MongoAPIError: ChangeStream is closed" because change stream
+      // may still poll after close.
+      changeStream.on('error', () => {});
 
       await changeStream.close();
 

@@ -4541,6 +4541,71 @@ describe('Model', function() {
         assert.strictEqual(doc.name, 'test');
         assert.deepStrictEqual(doc.ids, ['1', '2', '3']);
       });
+
+      it('throwOnValidationError (gh-14572) (gh-13256)', async function() {
+        const schema = new Schema({
+          num: Number
+        });
+
+        const M = db.model('Test', schema);
+
+        const ops = [
+          {
+            insertOne: {
+              document: {
+                num: 'not a number'
+              }
+            }
+          }
+        ];
+
+        const err = await M.bulkWrite(
+          ops,
+          { ordered: false, throwOnValidationError: true }
+        ).then(() => null, err => err);
+        assert.ok(err);
+        assert.equal(err.name, 'MongooseBulkWriteError');
+        assert.equal(err.validationErrors[0].errors['num'].name, 'CastError');
+      });
+
+      it('bulkWrite should throw an error if there were operations that failed validation, ' +
+        'but all operations that passed validation succeeded (gh-13256)', async function() {
+        const userSchema = new Schema({ age: { type: Number } });
+        const User = db.model('User', userSchema);
+
+        const createdUser = await User.create({ name: 'Test' });
+
+        const err = await User.bulkWrite([
+          {
+            updateOne: {
+              filter: { _id: createdUser._id },
+              update: { $set: { age: 'NaN' } },
+              upsert: true
+            }
+          },
+          {
+            updateOne: {
+              filter: { _id: createdUser._id },
+              update: { $set: { age: 13 } },
+              upsert: true
+            }
+          },
+          {
+            updateOne: {
+              filter: { _id: createdUser._id },
+              update: { $set: { age: 12 } },
+              upsert: true
+            }
+          }
+        ], { ordered: false, throwOnValidationError: true })
+          .then(() => null)
+          .catch(err => err);
+
+        assert.ok(err);
+        assert.equal(err.name, 'MongooseBulkWriteError');
+        assert.equal(err.validationErrors[0].path, 'age');
+        assert.equal(err.results[0].path, 'age');
+      });
     });
 
     it('deleteOne with cast error (gh-5323)', async function() {
@@ -7608,6 +7673,45 @@ describe('Model', function() {
     const doc = await Model.findOne();
 
     assert.strictEqual(doc.__v, 0);
+  });
+
+  it('insertMany should throw an error if there were operations that failed validation, ' +
+      'but all operations that passed validation succeeded (gh-13256)', async function() {
+    const userSchema = new Schema({
+      age: { type: Number }
+    });
+
+    const User = db.model('User', userSchema);
+
+    let err = await User.insertMany([
+      new User({ age: 12 }),
+      new User({ age: 12 }),
+      new User({ age: 'NaN' })
+    ], { ordered: false, throwOnValidationError: true })
+      .then(() => null)
+      .catch(err => err);
+
+    assert.ok(err);
+    assert.equal(err.name, 'MongooseBulkWriteError');
+    assert.equal(err.validationErrors[0].errors['age'].name, 'CastError');
+    assert.ok(err.results[2] instanceof Error);
+    assert.equal(err.results[2].errors['age'].name, 'CastError');
+
+    let docs = await User.find();
+    assert.deepStrictEqual(docs.map(doc => doc.age), [12, 12]);
+
+    err = await User.insertMany([
+      new User({ age: 'NaN' })
+    ], { ordered: false, throwOnValidationError: true })
+      .then(() => null)
+      .catch(err => err);
+
+    assert.ok(err);
+    assert.equal(err.name, 'MongooseBulkWriteError');
+    assert.equal(err.validationErrors[0].errors['age'].name, 'CastError');
+
+    docs = await User.find();
+    assert.deepStrictEqual(docs.map(doc => doc.age), [12, 12]);
   });
 });
 

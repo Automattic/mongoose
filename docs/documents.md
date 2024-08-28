@@ -13,7 +13,7 @@ to documents as stored in MongoDB. Each document is an instance of its
   <li><a href="#overwriting">Overwriting</a></li>
 </ul>
 
-<h2 id="documents-vs-models"><a href="#documents-vs-models">Documents vs Models</a></h2>
+## Documents vs Models {#documents-vs-models}
 
 [Document](api/document.html#Document) and [Model](api/model.html#Model) are distinct
 classes in Mongoose. The Model class is a subclass of the Document class.
@@ -33,7 +33,7 @@ In Mongoose, a "document" generally means an instance of a model.
 You should not have to create an instance of the Document class without
 going through a model.
 
-<h2 id="retrieving"><a href="#retrieving">Retrieving</a></h2>
+## Retrieving {#retrieving}
 
 When you load documents from MongoDB using model functions like [`findOne()`](api/model.html#model_Model-findOne),
 you get a Mongoose document back.
@@ -46,7 +46,7 @@ doc instanceof mongoose.Model; // true
 doc instanceof mongoose.Document; // true
 ```
 
-<h2 id="updating-using-save"><a href="#updating-using-save">Updating Using <code>save()</code></a></h2>
+## Updating Using `save()` {#updating-using-save}
 
 Mongoose documents track changes. You can modify a document using vanilla
 JavaScript assignments and Mongoose will convert it into [MongoDB update operators](https://www.mongodb.com/docs/manual/reference/operator/update/).
@@ -81,7 +81,7 @@ doc.name = 'foo';
 await doc.save(); // Throws DocumentNotFoundError
 ```
 
-<h2 id="updating-using-queries"><a href="#updating-using-queries">Updating Using Queries</a></h2>
+## Updating Using Queries {#updating-using-queries}
 
 The [`save()`](api/model.html#model_Model-save) function is generally the right
 way to update a document with Mongoose. With `save()`, you get full
@@ -100,7 +100,7 @@ await MyModel.updateMany({}, { $set: { name: 'foo' } });
 execute `save()` middleware. If you need save middleware and full validation,
 first query for the document and then `save()` it.*
 
-<h2 id="validating"><a href="#validating">Validating</a></h2>
+## Validating {#validating}
 
 Documents are casted and validated before they are saved. Mongoose first casts
 values to the specified type and then validates them. Internally, Mongoose
@@ -136,7 +136,7 @@ await Person.updateOne({}, { age: -1 }, { runValidators: true });
 
 Read the [validation](validation.html) guide for more details.
 
-<h2 id="overwriting"><a href="#overwriting">Overwriting</a></h2>
+## Overwriting {#overwriting}
 
 There are 2 different ways to overwrite a document (replacing all keys in the
 document). One way is to use the

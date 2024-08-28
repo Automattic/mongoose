@@ -82,7 +82,7 @@ async function doStuffWithUser() {
 }
 ```
 
-<h2 id="queries">Async/Await with Mongoose Queries</h2>
+## Async/Await with Mongoose Queries {#queries}
 
 Under the hood, [async/await is syntactic sugar](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Async_await) over the Promise API.
 Due to the surprisingly simple way promises are implemented in JavaScript, the keyword `await` will try to unwrap any object with a property whose key is the string ‘then’ and whose value is a function.

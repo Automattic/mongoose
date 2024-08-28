@@ -35,7 +35,7 @@ See the [mongodb connection string spec](http://www.mongodb.com/docs/manual/refe
   <li><a href="#multi-tenant-connections">Multi Tenant Connections</a></li>
 </ul>
 
-<h2 id="buffering"><a href="#buffering">Operation Buffering</a></h2>
+## Operation Buffering {#buffering}
 
 Mongoose lets you start using your models immediately, without waiting for
 mongoose to establish a connection to MongoDB.
@@ -95,7 +95,7 @@ const Model = mongoose.model('Test', schema);
 await Model.createCollection();
 ```
 
-<h2 id="error-handling"><a href="#error-handling">Error Handling</a></h2>
+## Error Handling {#error-handling}
 
 There are two classes of errors that can occur with a Mongoose connection.
 
@@ -129,7 +129,7 @@ mongoose.connection.on('error', err => {
 Note that Mongoose does not necessarily emit an 'error' event if it loses connectivity to MongoDB. You should
 listen to the `disconnected` event to report when Mongoose is disconnected from MongoDB.
 
-<h2 id="options"><a href="#options">Options</a></h2>
+## Options {#options}
 
 The `connect` method also accepts an `options` object which will be passed
 on to the underlying MongoDB driver.
@@ -158,7 +158,7 @@ Below are some of the options that are important for tuning Mongoose.
 * `serverSelectionTimeoutMS` - The MongoDB driver will try to find a server to send any given operation to, and keep retrying for `serverSelectionTimeoutMS` milliseconds. If not set, the MongoDB driver defaults to using `30000` (30 seconds).
 * `heartbeatFrequencyMS` - The MongoDB driver sends a heartbeat every `heartbeatFrequencyMS` to check on the status of the connection. A heartbeat is subject to `serverSelectionTimeoutMS`, so the MongoDB driver will retry failed heartbeats for up to 30 seconds by default. Mongoose only emits a `'disconnected'` event after a heartbeat has failed, so you may want to decrease this setting to reduce the time between when your server goes down and when Mongoose emits `'disconnected'`. We recommend you do **not** set this setting below 1000, too many heartbeats can lead to performance degradation.
 
-<h2 id="serverselectiontimeoutms"><a href="#serverselectiontimeoutms">serverSelectionTimeoutMS</a></h2>
+## serverSelectionTimeoutMS {#serverselectiontimeoutms}
 
 The `serverSelectionTimeoutMS` option is extremely important: it controls how long the MongoDB Node.js driver will attempt to retry any operation before erroring out.
 This includes initial connection, like `await mongoose.connect()`, as well as any operations that make requests to MongoDB, like `save()` or `find()`.
@@ -208,7 +208,7 @@ for (let i = 0; i < 3; ++i) {
 }
 ```
 
-<h2 id="callback"><a href="#callback">Callback</a></h2>
+## Callback {#callback}
 
 The `connect()` function also accepts a callback parameter and returns a
 [promise](promises.html).
@@ -225,7 +225,7 @@ mongoose.connect(uri, options).then(
 );
 ```
 
-<h2 id="connection-string-options"><a href="#connection-string-options">Connection String Options</a></h2>
+## Connection String Options {#connection-string-options}
 
 You can also specify driver options in your connection string as
 [parameters in the query string](https://en.wikipedia.org/wiki/Query_string)
@@ -258,7 +258,7 @@ are closely associated with the hostname and authentication information.
 * `authSource`        - The database to use when authenticating with `user` and `pass`. In MongoDB, [users are scoped to a database](https://www.mongodb.com/docs/manual/tutorial/manage-users-and-roles/). If you are getting an unexpected login failure, you may need to set this option.
 * `family`            - Whether to connect using IPv4 or IPv6. This option passed to [Node.js' `dns.lookup()`](https://nodejs.org/api/dns.html#dns_dns_lookup_hostname_options_callback) function. If you don't specify this option, the MongoDB driver will try IPv6 first and then IPv4 if IPv6 fails. If your `mongoose.connect(uri)` call takes a long time, try `mongoose.connect(uri, { family: 4 })`
 
-<h2 id="connection-events"><a href="#connection-events">Connection Events</a></h2>
+## Connection Events {#connection-events}
 
 Connections inherit from [Node.js' `EventEmitter` class](https://nodejs.org/api/events.html#events_class_eventemitter),
 and emit events when something happens to the connection, like losing
@@ -304,13 +304,13 @@ conn.on('disconnecting', () => console.log('disconnecting'));
 conn.on('close', () => console.log('close'));
 ```
 
-<h2 id="keepAlive"><a href="#keepAlive">A note about keepAlive</a></h2>
+## A note about keepAlive {#keepAlive}
 
 Before Mongoose 5.2.0, you needed to enable the `keepAlive` option to initiate [TCP keepalive](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html) to prevent `"connection closed"` errors.
 However, `keepAlive` has been `true` by default since Mongoose 5.2.0, and the `keepAlive` is deprecated as of Mongoose 7.2.0.
 Please remove `keepAlive` and `keepAliveInitialDelay` options from your Mongoose connections.
 
-<h2 id="replicaset_connections"><a href="#replicaset_connections">Replica Set Connections</a></h2>
+## Replica Set Connections {#replicaset_connections}
 
 To connect to a replica set you pass a comma delimited list of hosts to
 connect to rather than a single host.
@@ -331,7 +331,7 @@ To connect to a single node replica set, specify the `replicaSet` option.
 mongoose.connect('mongodb://host1:port1/?replicaSet=rsName');
 ```
 
-<h2 id="server-selection"><a href="#server-selection">Server Selection</a></h2>
+## Server Selection {#server-selection}
 
 The underlying MongoDB driver uses a process known as [server selection](https://github.com/mongodb/specifications/blob/master/source/server-selection/server-selection.rst) to connect to MongoDB and send operations to MongoDB.
 If the MongoDB driver can't find a server to send an operation to after `serverSelectionTimeoutMS`,
@@ -366,7 +366,7 @@ mongoose.connect(uri, {
 }).catch(err => console.log(err.reason));
 ```
 
-<h2 id="replicaset-hostnames"><a href="#replicaset-hostnames">Replica Set Host Names</a></h2>
+## Replica Set Host Names {#replicaset-hostnames}
 
 MongoDB replica sets rely on being able to reliably figure out the domain name for each member.  
 On Linux and OSX, the MongoDB server uses the output of the [`hostname` command](https://linux.die.net/man/1/hostname) to figure out the domain name to report to the replica set.
@@ -399,7 +399,7 @@ if (err.name === 'MongooseServerSelectionError') {
 }
 ```
 
-<h2 id="mongos_connections"><a href="#mongos_connections">Multi-mongos support</a></h2>
+## Multi-mongos support {#mongos_connections}
 
 You can also connect to multiple [mongos](https://www.mongodb.com/docs/manual/reference/program/mongos/) instances
 for high availability in a sharded cluster. You do
@@ -410,7 +410,7 @@ for high availability in a sharded cluster. You do
 mongoose.connect('mongodb://mongosA:27501,mongosB:27501', cb);
 ```
 
-<h2 id="multiple_connections"><a href="#multiple_connections">Multiple connections</a></h2>
+## Multiple connections {#multiple_connections}
 
 So far we've seen how to connect to MongoDB using Mongoose's default
 connection. Mongoose creates a *default connection* when you call `mongoose.connect()`.
@@ -493,7 +493,7 @@ module.exports = conn;
 You can create separate files for each connection, like `connections/web.js` and `connections/mobile.js` if you want to create separate connections for your web API backend and your mobile API backend.
 Your business logic can then `require()` or `import` the connection it needs.
 
-<h2 id="connection_pools"><a href="#connection_pools">Connection Pools</a></h2>
+## Connection Pools {#connection_pools}
 
 Each `connection`, whether created with `mongoose.connect` or
 `mongoose.createConnection` are all backed by an internal configurable
@@ -512,7 +512,7 @@ mongoose.createConnection(uri);
 The connection pool size is important because [MongoDB currently can only process one operation per socket](https://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs).
 So `maxPoolSize` functions as a cap on the number of concurrent operations.
 
-<h2 id="multi-tenant-connections"><a href="#multi-tenant-connections">Multi Tenant Connections</a></h2>
+## Multi Tenant Connections {#multi-tenant-connections}
 
 In the context of Mongoose, a multi-tenant architecture typically means a case where multiple different clients talk to MongoDB through a single Mongoose application.
 This typically means each client makes queries and executes updates through a single Mongoose application, but has a distinct MongoDB database within the same MongoDB cluster.
@@ -592,6 +592,6 @@ app.get('/users/:tenantId', function(req, res) {
 app.listen(3000);
 ```
 
-<h2 id="next">Next Up</h2>
+## Next Up {#next}
 
 Now that we've covered connections, let's take a look at [models](models.html).

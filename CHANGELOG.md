@@ -297,7 +297,7 @@
 ==================
  * perf: speed up mapOfSubdocs benchmark by 4x by avoiding unnecessary O(n^2) loop in getPathsToValidate() #13614
  * feat: upgrade to MongoDB Node.js driver 5.7.0 #13591
- * feat: add `id` setter which allows modifying `_id` by setting `id` (Note this change was reverted in Mongoose 8) #13517
+ * BREAKING CHANGE: add `id` setter which allows modifying `_id` by setting `id` (Note this change was originally shipped as a `feat`, but later reverted in Mongoose 8 due to compatibility issues) #13517
  * feat: support generating custom cast error message with a function #13608 #3162
  * feat(query): support MongoDB driver's includeResultMetadata option for findOneAndUpdate #13584 #13539
  * feat(connection): add Connection.prototype.removeDb() for removing a related connection #13580 #11821

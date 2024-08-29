@@ -116,6 +116,7 @@ declare module 'mongoose' {
     $where?: string | Function;
     /** @see https://www.mongodb.com/docs/manual/reference/operator/query/comment/#op._S_comment */
     $comment?: string;
+    $expr?: Record<string, any>;
     // we could not find a proper TypeScript generic to support nested queries e.g. 'user.friends.name'
     // this will mark all unrecognized properties as any (including nested queries) only if
     // they include a "." (to avoid generically allowing any unexpected keys)

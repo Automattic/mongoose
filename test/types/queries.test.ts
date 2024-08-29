@@ -675,6 +675,6 @@ async function gh14545() {
 
 function gh14841() {
   const filter: FilterQuery<{ owners: string[] }> = {
-    $expr: { $lt: [{ $size: "$owners" }, 10] },
+    $expr: { $lt: [{ $size: '$owners' }, 10] }
   };
 }

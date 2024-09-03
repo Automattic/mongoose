@@ -1,3 +1,11 @@
+8.6.1 / 2024-09-03
+==================
+ * fix(document): avoid unnecessary clone() in applyGetters() that was preventing getters from running on 3-level deep subdocuments #14844 #14840 #14835
+ * fix(model): throw error if bulkSave() did not insert or update any documents #14837 #14763
+ * fix(cursor): throw error in ChangeStream constructor if changeStreamThunk() throws a sync error #14846
+ * types(query): add $expr to RootQuerySelector #14845
+ * docs: update populate.md to fix missing match: { } #14847 [makhoulshbeeb](https://github.com/makhoulshbeeb)
+
 8.6.0 / 2024-08-28
 ==================
  * feat: upgrade mongodb -> 6.8.0, handle throwing error on closed cursor in Mongoose with `MongooseError` instead of `MongoCursorExhaustedError` #14813

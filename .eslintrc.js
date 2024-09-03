@@ -60,29 +60,15 @@ module.exports = {
         '@typescript-eslint/ban-types': 'off',
         '@typescript-eslint/no-unused-vars': 'off',
         '@typescript-eslint/explicit-module-boundary-types': 'off',
-        '@typescript-eslint/indent': [
-          'warn',
-          2,
-          {
-            SwitchCase: 1,
-            ignoredNodes: ['TSTypeParameterInstantiation']
-          }
-        ],
         '@typescript-eslint/prefer-optional-chain': 'error',
-        '@typescript-eslint/brace-style': 'error',
         '@typescript-eslint/no-dupe-class-members': 'error',
         '@typescript-eslint/no-redeclare': 'error',
-        '@typescript-eslint/type-annotation-spacing': 'error',
-        '@typescript-eslint/object-curly-spacing': [
-          'error',
-          'always'
-        ],
-        '@typescript-eslint/semi': 'error',
-        '@typescript-eslint/space-before-function-paren': [
-          'error',
-          'never'
-        ],
-        '@typescript-eslint/space-infix-ops': 'off'
+        '@typescript-eslint/space-infix-ops': 'off',
+        '@typescript-eslint/no-require-imports': 'off',
+        '@typescript-eslint/no-empty-object-type': 'off',
+        '@typescript-eslint/no-wrapper-object-types': 'off',
+        '@typescript-eslint/no-unused-expressions': 'off',
+        '@typescript-eslint/no-unsafe-function-type': 'off'
       }
     },
     {

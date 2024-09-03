@@ -33,7 +33,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
         with:
-          node-version: 16
+          node-version: 20
 
       - run: npm install
 
@@ -54,7 +54,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
         with:
-          node-version: 16
+          node-version: 20
 
       - run: npm install
       - name: Setup MongoDB

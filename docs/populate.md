@@ -246,7 +246,7 @@ the story's `author` will be `null`.
 ```javascript
 const story = await Story.
   findOne({ title: 'Casino Royale' }).
-  populate({ path: 'author', name: { $ne: 'Ian Fleming' } }).
+  populate({ path: 'author', match: { name: { $ne: 'Ian Fleming' } } }).
   exec();
 story.author; // `null`
 ```

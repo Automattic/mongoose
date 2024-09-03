@@ -13843,6 +13843,36 @@ describe('document', function() {
     assert.strictEqual(requiredCalls[0], doc.config.prop);
     assert.strictEqual(requiredCalls[1], doc.config.prop);
   });
+
+  it('applies toObject() getters to 3 level deep subdocuments (gh-14840) (gh-14835)', async function() {
+    // Define nested schemas
+    const Level3Schema = new mongoose.Schema({
+      property: {
+        type: String,
+        get: (value) => value ? value.toUpperCase() : value
+      }
+    });
+
+    const Level2Schema = new mongoose.Schema({ level3: Level3Schema });
+    const Level1Schema = new mongoose.Schema({ level2: Level2Schema });
+    const MainSchema = new mongoose.Schema({ level1: Level1Schema });
+    const MainModel = db.model('Test', MainSchema);
+
+    const doc = await MainModel.create({
+      level1: {
+        level2: {
+          level3: {
+            property: 'testValue'
+          }
+        }
+      }
+    });
+
+    // Fetch and convert the document to an object with getters applied
+    const result = await MainModel.findById(doc._id);
+    const objectWithGetters = result.toObject({ getters: true, virtuals: false });
+    assert.strictEqual(objectWithGetters.level1.level2.level3.property, 'TESTVALUE');
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

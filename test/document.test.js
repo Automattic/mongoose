@@ -8177,6 +8177,38 @@ describe('document', function() {
     await person.save();
   });
 
+  it('set() merge option with double nested', async function () {
+    const PersonSchema = new Schema({
+      info: {
+        address: {
+          city: String,
+          country: { type: String, default: "UK" },
+          postcode: String
+        },
+      }
+    });
+
+    const Person = db.model('Person', PersonSchema);
+
+
+    const person = new Person({
+      info: {
+        address: {
+          country: "United States",
+          city: "New York"
+        },
+      }
+    });
+
+    const update = { info: { address: { postcode: "12H" } } };
+
+    person.set(update, undefined, { merge: true });
+  
+    assert.equal(person.info.address.city, "New York");
+    assert.equal(person.info.address.postcode, "12H");
+    assert.equal(person.info.address.country, "United States");
+  });
+
   it('setting single nested subdoc with timestamps (gh-8251)', async function() {
     const ActivitySchema = Schema({ description: String }, { timestamps: true });
     const RequestSchema = Schema({ activity: ActivitySchema });

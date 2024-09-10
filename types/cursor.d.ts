@@ -8,6 +8,7 @@ declare module 'mongoose' {
     parallel?: number;
     batchSize?: number;
     continueOnError?: boolean;
+    signal?: AbortSignal;
   }
 
   class Cursor<DocType = any, Options = never> extends stream.Readable {

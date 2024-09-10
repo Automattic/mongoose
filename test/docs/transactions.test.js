@@ -567,28 +567,23 @@ describe('transactions', function() {
 
   it('transaction() avoids duplicating atomic operations (gh-14848)', async function() {
     db.deleteModel(/Test/);
-    // Define some schemas...
     const subItemSchema = new mongoose.Schema(
-      { 
-        name: { type: String, required: true },
+      {
+        name: { type: String, required: true }
       },
       { _id: false }
     );
-
     const itemSchema = new mongoose.Schema(
       {
         name: { type: String, required: true },
-        subItems: { type: [subItemSchema], required: true },
+        subItems: { type: [subItemSchema], required: true }
       },
       { _id: false }
     );
-
     const schema = new mongoose.Schema({
-      items: { type: [itemSchema], required: true },
+      items: { type: [itemSchema], required: true }
     });
-
-    // ...and a model
-    const Test = db.model("Test", schema);
+    const Test = db.model('Test', schema);
 
 
     await Test.createCollection();
@@ -596,14 +591,14 @@ describe('transactions', function() {
 
     const { _id } = await Test.create({
       items: [
-        { name: "test1", subItems: [{ name: "x1" }] },
-        { name: "test2", subItems: [{ name: "x2" }] },
-      ],
+        { name: 'test1', subItems: [{ name: 'x1' }] },
+        { name: 'test2', subItems: [{ name: 'x2' }] }
+      ]
     });
-    
+
     let doc = await Test.findById(_id);
-    
-    doc.items.push({ name: "test3", subItems: [{ name: "x3" }] });    
+
+    doc.items.push({ name: 'test3', subItems: [{ name: 'x3' }] });
 
     let i = 0;
     await db.transaction(async(session) => {
@@ -616,7 +611,7 @@ describe('transactions', function() {
     });
 
     assert.equal(i, 3);
-    
+
     doc = await Test.findById(_id);
     assert.equal(doc.items.length, 3);
   });

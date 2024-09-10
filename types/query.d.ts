@@ -12,7 +12,7 @@ declare module 'mongoose' {
    */
   type RootFilterQuery<T> = FilterQuery<T> | Query<any, any> | Types.ObjectId;
 
-  type FilterQuery<T> ={
+  type FilterQuery<T> = {
     [P in keyof T]?: Condition<T[P]>;
   } & RootQuerySelector<T> & { _id?: Condition<string>; };
 
@@ -117,10 +117,8 @@ declare module 'mongoose' {
     /** @see https://www.mongodb.com/docs/manual/reference/operator/query/comment/#op._S_comment */
     $comment?: string;
     $expr?: Record<string, any>;
-    // we could not find a proper TypeScript generic to support nested queries e.g. 'user.friends.name'
-    // this will mark all unrecognized properties as any (including nested queries) only if
-    // they include a "." (to avoid generically allowing any unexpected keys)
-    [nestedSelector: `${string}.${string}`]: any;
+    // this will mark all unrecognized properties as any (including nested queries)
+    [key: string]: any;
   };
 
   interface QueryTimestampsConfig {

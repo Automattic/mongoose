@@ -315,4 +315,13 @@ describe('schematype', function() {
       /password must be at least six characters/
     );
   });
+
+  it('supports getEmbeddedSchemaType() (gh-8389)', function() {
+    const schema = new Schema({ name: String, tags: [String] });
+    assert.strictEqual(schema.path('name').getEmbeddedSchemaType(), undefined);
+    const schemaType = schema.path('tags').getEmbeddedSchemaType();
+    assert.ok(schemaType);
+    assert.equal(schemaType.instance, 'String');
+    assert.equal(schemaType.path, 'tags');
+  });
 });

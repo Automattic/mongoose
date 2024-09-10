@@ -8177,14 +8177,14 @@ describe('document', function() {
     await person.save();
   });
 
-  it('set() merge option with double nested', async function () {
+  it('set() merge option with double nested', async function() {
     const PersonSchema = new Schema({
       info: {
         address: {
           city: String,
-          country: { type: String, default: "UK" },
+          country: { type: String, default: 'UK' },
           postcode: String
-        },
+        }
       }
     });
 
@@ -8194,19 +8194,19 @@ describe('document', function() {
     const person = new Person({
       info: {
         address: {
-          country: "United States",
-          city: "New York"
-        },
+          country: 'United States',
+          city: 'New York'
+        }
       }
     });
 
-    const update = { info: { address: { postcode: "12H" } } };
+    const update = { info: { address: { postcode: '12H' } } };
 
     person.set(update, undefined, { merge: true });
-  
-    assert.equal(person.info.address.city, "New York");
-    assert.equal(person.info.address.postcode, "12H");
-    assert.equal(person.info.address.country, "United States");
+
+    assert.equal(person.info.address.city, 'New York');
+    assert.equal(person.info.address.postcode, '12H');
+    assert.equal(person.info.address.country, 'United States');
   });
 
   it('setting single nested subdoc with timestamps (gh-8251)', async function() {

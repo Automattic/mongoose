@@ -1,3 +1,10 @@
+8.6.2 / 2024-09-11
+==================
+ * fix: make set merge deeply nested objects #14870 #14861 [ianHeydoc](https://github.com/ianHeydoc)
+ * types: allow arbitrary keys in query filters again (revert #14764) #14874 #14863 #14862 #14842
+ * types: make SchemaType static setters property accessible in TypeScript #14881 #14879
+ * type(inferrawdoctype): infer Date types as JS dates rather than Mongoose SchemaType Date #14882 #14839
+
 8.6.1 / 2024-09-03
 ==================
  * fix(document): avoid unnecessary clone() in applyGetters() that was preventing getters from running on 3-level deep subdocuments #14844 #14840 #14835

@@ -1634,3 +1634,7 @@ function gh14825() {
   type SchemaType = InferSchemaType<typeof schema>;
   expectAssignable<User>({} as SchemaType);
 }
+
+function gh14879() {
+  Schema.Types.String.setters.push((val?: unknown) => typeof val === 'string' ? val.trim() : val);
+}

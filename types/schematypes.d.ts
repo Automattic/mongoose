@@ -216,6 +216,9 @@ declare module 'mongoose' {
     /** Attaches a getter for all instances of this schema type. */
     static get(getter: (value: any) => any): void;
 
+    /** Array containing default setters for all instances of this SchemaType */
+    static setters: ((val?: unknown, priorVal?: unknown, doc?: Document<unknown>, options?: Record<string, any> | null) => unknown)[];
+
     /** The class that Mongoose uses internally to instantiate this SchemaType's `options` property. */
     OptionsConstructor: SchemaTypeOptions<T>;
 

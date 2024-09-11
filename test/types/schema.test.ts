@@ -1641,3 +1641,7 @@ function gh8389() {
   expectAssignable<SchemaType<any> | undefined>(schema.path('name').getEmbeddedSchemaType());
   expectAssignable<SchemaType<any> | undefined>(schema.path('tags').getEmbeddedSchemaType());
 }
+
+function gh14879() {
+  Schema.Types.String.setters.push((val?: unknown) => typeof val === 'string' ? val.trim() : val);
+}

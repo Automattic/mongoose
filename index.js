@@ -28,6 +28,7 @@ module.exports.modelNames = mongoose.modelNames;
 module.exports.plugin = mongoose.plugin;
 module.exports.connections = mongoose.connections;
 module.exports.version = mongoose.version;
+module.exports.Aggregate = mongoose.Aggregate;
 module.exports.Mongoose = mongoose.Mongoose;
 module.exports.Schema = mongoose.Schema;
 module.exports.SchemaType = mongoose.SchemaType;

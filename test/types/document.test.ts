@@ -359,3 +359,19 @@ function gh13738() {
   expectType<Date>(person.get('dob'));
   expectType<{ theme: string; alerts: { sms: boolean } }>(person.get('settings'));
 }
+
+async function gh12959() {
+  const subdocSchema = new Schema({ foo: { type: 'string', required: true } });
+
+  const schema = new Schema({
+    subdocArray: { type: [subdocSchema], required: true },
+  });
+
+  const Model = model('test', schema);
+
+  const doc = await Model.findById('id').orFail();
+  expectType<Types.ObjectId>(doc._id);
+  expectType<number | undefined>(doc.__v);
+
+  expectError(doc.subdocArray[0].__v);
+}

@@ -24,9 +24,6 @@ declare module 'mongoose' {
     /** This documents _id. */
     _id: T;
 
-    /** This documents __v. */
-    __v?: any;
-
     /** Assert that a given path or paths is populated. Throws an error if not populated. */
     $assertPopulated<Paths = {}>(path: string | string[], values?: Partial<Paths>): Omit<this, keyof Paths> & Paths;
 

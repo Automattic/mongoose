@@ -138,6 +138,10 @@ declare module 'mongoose' {
     ? IfAny<U, T & { _id: Types.ObjectId }, T & Required<{ _id: U }>>
     : T & { _id: Types.ObjectId };
 
+  export type Default__v<T> = T extends { __v?: infer U }
+    ? T
+    : T & { __v?: number };
+
   /** Helper type for getting the hydrated document type from the raw document type. The hydrated document type is what `new MyModel()` returns. */
   export type HydratedDocument<
     DocType,
@@ -147,12 +151,12 @@ declare module 'mongoose' {
     DocType,
     any,
     TOverrides extends Record<string, never> ?
-      Document<unknown, TQueryHelpers, DocType> & Require_id<DocType> :
+      Document<unknown, TQueryHelpers, DocType> & Default__v<Require_id<DocType>> :
       IfAny<
         TOverrides,
-        Document<unknown, TQueryHelpers, DocType> & Require_id<DocType>,
+        Document<unknown, TQueryHelpers, DocType> & Default__v<Require_id<DocType>>,
         Document<unknown, TQueryHelpers, DocType> & MergeType<
-          Require_id<DocType>,
+          Default__v<Require_id<DocType>>,
           TOverrides
         >
       >

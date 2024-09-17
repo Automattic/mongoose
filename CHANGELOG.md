@@ -1,3 +1,7 @@
+6.13.2 / 2024-09-12
+===================
+ * fix(document): make set() respect merge option on deeply nested objects #14870 #14878
+
 7.8.1 / 2024-08-19
 ==================
  * fix(query): handle casting $switch in $expr #14761
@@ -11,6 +15,10 @@
 7.7.0 / 2024-06-18
 ==================
  * feat(model): add throwOnValidationError option for opting into getting MongooseBulkWriteError if all valid operations succeed in bulkWrite() and insertMany() #14599 #14587 #14572 #13410
+
+6.13.1 / 2024-09-06
+===================
+ * fix: remove empty $and, $or, $not that were made empty by scrict mode #14749 #13086 [0x0a0d](https://github.com/0x0a0d)
 
 6.13.0 / 2024-06-06
 ===================

@@ -38,7 +38,7 @@ doc.child;
 ```
 
 <ul class="toc">
-  <li><a href="#what-is-a-subdocument-">What is a Subdocument?</a></li>
+  <li><a href="#what-is-a-subdocument">What is a Subdocument?</a></li>
   <li><a href="#subdocuments-versus-nested-paths">Subdocuments versus Nested Paths</a></li>
   <li><a href="#subdocument-defaults">Subdocument Defaults</a></li>
   <li><a href="#finding-a-subdocument">Finding a Subdocument</a></li>

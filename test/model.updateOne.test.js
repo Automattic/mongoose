@@ -1083,6 +1083,7 @@ describe('model: updateOne:', function() {
       await Model.updateOne({}, update);
       const doc = await Model.findById(_id);
       assert.equal(doc.bar.valueOf(), foo.valueOf());
+      assert.equal(doc.foo, undefined);
     });
 
     it('throws CastError if $rename fails to cast to string (gh-1845)', async function() {

@@ -6994,9 +6994,35 @@ describe('Model', function() {
 
       foo.bar = 2;
       const err = await TestModel.bulkSave([foo]).then(() => null, err => err);
-      assert.equal(err.name, 'DocumentNotFoundError');
-      assert.equal(err.numAffected, 1);
-      assert.ok(Array.isArray(err.filter));
+      assert.equal(err.name, 'MongooseBulkSaveIncompleteError');
+      assert.equal(err.numDocumentsNotUpdated, 1);
+    });
+    it('should error if not all documents were inserted or updated (gh-14763)', async function() {
+      const fooSchema = new mongoose.Schema({
+        bar: { type: Number }
+      }, { optimisticConcurrency: true });
+      const TestModel = db.model('Test', fooSchema);
+
+      const errorDoc = await TestModel.create({ bar: 0 });
+      const okDoc = await TestModel.create({ bar: 0 });
+
+      // update 1
+      errorDoc.bar = 1;
+      await errorDoc.save();
+
+      // parallel update
+      const errorDocCopy = await TestModel.findById(errorDoc._id);
+      errorDocCopy.bar = 99;
+      await errorDocCopy.save();
+
+      errorDoc.bar = 2;
+      okDoc.bar = 2;
+      const err = await TestModel.bulkSave([errorDoc, okDoc]).then(() => null, err => err);
+      assert.equal(err.name, 'MongooseBulkSaveIncompleteError');
+      assert.equal(err.numDocumentsNotUpdated, 1);
+
+      const updatedOkDoc = await TestModel.findById(okDoc._id);
+      assert.equal(updatedOkDoc.bar, 2);
     });
     it('should error if there is a validation error', async function() {
       const fooSchema = new mongoose.Schema({

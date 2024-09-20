@@ -52,6 +52,7 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 * [`toObject()` and `toJSON()` Use Nested Schema `minimize`](#toobject-and-tojson-use-nested-schema-minimize)
 * [TypeScript changes](#typescript-changes)
 * [Removed `reconnectTries` and `reconnectInterval` options](#removed-reconnecttries-and-reconnectinterval-options)
+* [Lodash `.isEmpty()` returns false for ObjectIds](#lodash-object-id)
 
 <h2 id="version-requirements"><a href="#version-requirements">Version Requirements</a></h2>
 
@@ -541,3 +542,19 @@ The `reconnectTries` and `reconnectInterval` options have been removed since the
 
 The MongoDB node driver will always attempt to retry any operation for up to `serverSelectionTimeoutMS`, even if MongoDB is down for a long period of time.
 So, it will never run out of retries or try to reconnect to MongoDB.
+
+
+<h2 id="lodash-object-id"><a href="#lodash-object-id">Lodash <code>.isEmpty()</code> returns true for ObjectIds</h2>
+
+Lodash's `isEmpty()` function returns true for primitives and primitive wrappers. `ObjectId()` is an object wrapper that is treated as a primitive by Mongoose.
+As a result, `isEmpty()` will return `true` for `ObjectId()`.
+
+An ObjectId in mongoose is never empty, so if using lodash here is a workaround when dealing with ObjectIds:
+
+```javascript
+if (!(a instanceof Types.ObjectId) && (_.isEmpty(a) || !Types.ObjectId.isValid(a))) {
+    throw new Error('Error.');
+}
+```
+
+

@@ -553,7 +553,7 @@ An ObjectId in mongoose is never empty, so if using lodash here is a workaround 
 
 ```javascript
 if (!(a instanceof Types.ObjectId) && (_.isEmpty(a) || !Types.ObjectId.isValid(a))) {
-    throw new Error('Error.');
+  throw new Error('Error.');
 }
 ```
 

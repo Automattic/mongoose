@@ -546,14 +546,15 @@ So, it will never run out of retries or try to reconnect to MongoDB.
 
 <h2 id="lodash-object-id"><a href="#lodash-object-id">Lodash <code>.isEmpty()</code> returns true for ObjectIds</h2>
 
-Lodash's `isEmpty()` function returns true for primitives and primitive wrappers. `ObjectId()` is an object wrapper that is treated as a primitive by Mongoose.
-As a result, `isEmpty()` will return `true` for `ObjectId()`.
+Lodash's `isEmpty()` function returns true for primitives and primitive wrappers.
+`ObjectId()` is an object wrapper that is treated as a primitive by Mongoose.
+But starting in Mongoose 6, `_.isEmpty()` will return true for ObjectIds because of Lodash implementation details.
 
-An ObjectId in mongoose is never empty, so if using lodash here is a workaround when dealing with ObjectIds:
+An ObjectId in mongoose is never empty, so if you're using `isEmpty()` you should check for `instanceof ObjectId`.
 
 ```javascript
-if (!(a instanceof Types.ObjectId) && (_.isEmpty(a) || !Types.ObjectId.isValid(a))) {
-  throw new Error('Error.');
+if (!(val instanceof Types.ObjectId) && _.isEmpty(val)) {
+  // Handle empty object here
 }
 ```
 

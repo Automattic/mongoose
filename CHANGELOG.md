@@ -1,3 +1,7 @@
+6.13.3 / 2024-09-23
+===================
+ * docs(migrating_to_6): document that Lodash _.isEmpty() with ObjectId() as a parameter returns true in Mongoose 6 #11152
+
 6.13.2 / 2024-09-12
 ===================
  * fix(document): make set() respect merge option on deeply nested objects #14870 #14878

@@ -5920,7 +5920,7 @@ describe('Model', function() {
 
     const schema = new Schema({ name: String });
 
-    schema.statics.save = async function() {
+    schema.statics.save = function() {
       return 'foo';
     };
 

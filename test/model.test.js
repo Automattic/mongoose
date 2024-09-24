@@ -5891,6 +5891,54 @@ describe('Model', function() {
     assert.equal(called, 1);
   });
 
+  it('custom statics that overwrite model functions dont get hooks by default', async function() {
+
+    const schema = new Schema({ name: String });
+
+    schema.statics.insertMany = function(docs) {
+      return model.insertMany.apply(this, [docs]);
+    };
+
+    let called = 0;
+    schema.pre('insertMany', function(next) {
+      ++called;
+      next();
+    });
+    const Model = db.model('Test', schema);
+
+    const res = await Model.insertMany([
+      { name: 'foo' },
+      { name: 'boo' }
+    ]);
+
+    assert.ok(res[0].name);
+    assert.ok(res[1].name);
+    assert.equal(called, 1);
+  });
+
+  it('custom statics that overwrite document functions dont get hooks by default', async function() {
+
+    const schema = new Schema({ name: String });
+
+    schema.statics.save = async function() {
+      return 'foo';
+    };
+
+    let called = 0;
+    schema.pre('save', function(next) {
+      ++called;
+      next();
+    });
+
+    const Model = db.model('Test', schema);
+
+    const doc = await Model.save();
+
+    assert.ok(doc);
+    assert.equal(doc, 'foo');
+    assert.equal(called, 0);
+  });
+
   it('error handling middleware passes saved doc (gh-7832)', async function() {
     const schema = new Schema({ _id: Number });
 

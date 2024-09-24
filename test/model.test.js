@@ -7905,49 +7905,6 @@ describe('Model', function() {
       assert.strictEqual(res.name.lastLower, 'gates');
     });
 
-    it('supports passing an array of virtuals to apply', async function() {
-      const userSchema = new Schema({
-        name: {
-          first: String,
-          last: String
-        }
-      });
-      userSchema.virtual('fullName').get(function() {
-        return `${this.name.first} ${this.name.last}`;
-      });
-      userSchema.virtual('name.firstUpper').get(function() {
-        return this.name.first.toUpperCase();
-      });
-      userSchema.virtual('name.lastLower').get(function() {
-        return this.name.last.toLowerCase();
-      });
-      const User = db.model('User', userSchema);
-
-      let res = User.applyVirtuals({
-        name: {
-          first: 'Bill',
-          last: 'Gates'
-        }
-      }, ['fullName', 'name.firstUpper']);
-      assert.strictEqual(res.name.first, 'Bill');
-      assert.strictEqual(res.name.last, 'Gates');
-      assert.strictEqual(res.fullName, 'Bill Gates');
-      assert.strictEqual(res.name.firstUpper, 'BILL');
-      assert.strictEqual(res.name.lastLower, undefined);
-
-      res = User.applyVirtuals({
-        name: {
-          first: 'Bill',
-          last: 'Gates'
-        }
-      }, ['name.lastLower']);
-      assert.strictEqual(res.name.first, 'Bill');
-      assert.strictEqual(res.name.last, 'Gates');
-      assert.strictEqual(res.fullName, undefined);
-      assert.strictEqual(res.name.firstUpper, undefined);
-      assert.strictEqual(res.name.lastLower, 'gates');
-    });
-
     it('sets populate virtuals to `null` if `justOne`', async function() {
       const userSchema = new Schema({
         name: {

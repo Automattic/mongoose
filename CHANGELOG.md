@@ -1,3 +1,7 @@
+7.8.2 / 2024-09-25
+==================
+ * fix(projection): avoid setting projection to unknown exclusive/inclusive if elemMatch on a Date, ObjectId, etc. #14894 #14893
+
 8.6.3 / 2024-09-17
 ==================
  * fix: make getters convert uuid to string when calling toObject() and toJSON() #14890 #14869

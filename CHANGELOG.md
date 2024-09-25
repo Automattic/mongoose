@@ -1,3 +1,7 @@
+7.8.2 / 2024-09-25
+==================
+ * fix(projection): avoid setting projection to unknown exclusive/inclusive if elemMatch on a Date, ObjectId, etc. #14894 #14893
+
 6.13.2 / 2024-09-12
 ===================
  * fix(document): make set() respect merge option on deeply nested objects #14870 #14878

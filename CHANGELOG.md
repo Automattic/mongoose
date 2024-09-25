@@ -1,3 +1,17 @@
+7.8.2 / 2024-09-25
+==================
+ * fix(projection): avoid setting projection to unknown exclusive/inclusive if elemMatch on a Date, ObjectId, etc. #14894 #14893
+
+8.6.3 / 2024-09-17
+==================
+ * fix: make getters convert uuid to string when calling toObject() and toJSON() #14890 #14869
+ * fix: fix missing Aggregate re-exports for ESM #14886 [wongsean](https://github.com/wongsean)
+ * types(document): add generic param to depopulate() to allow updating properties #14891 #14876
+
+6.13.2 / 2024-09-12
+===================
+ * fix(document): make set() respect merge option on deeply nested objects #14870 #14878
+
 8.6.2 / 2024-09-11
 ==================
  * fix: make set merge deeply nested objects #14870 #14861 [ianHeydoc](https://github.com/ianHeydoc)
@@ -108,6 +122,7 @@
 ==================
  * feat(model): add throwOnValidationError option for opting into getting MongooseBulkWriteError if all valid operations succeed in bulkWrite() and insertMany() #14599 #14587 #14572 #13410
 
+<<<<<<< HEAD
 8.4.3 / 2024-06-17
 ==================
  * fix: remove 0x flamegraph files from release
@@ -120,6 +135,11 @@
  * fix(connection): fix up some inconsistencies in operation-end event and add to docs #14659 #14648
  * types: avoid inferring Boolean, Buffer, ObjectId as Date in schema definitions under certain circumstances #14667 #14630
  * docs: add note about parallelism in transations #14647 [fiws](https://github.com/fiws)
+=======
+6.13.1 / 2024-09-06
+===================
+ * fix: remove empty $and, $or, $not that were made empty by scrict mode #14749 #13086 [0x0a0d](https://github.com/0x0a0d)
+>>>>>>> 7.x
 
 6.13.0 / 2024-06-06
 ===================
@@ -623,7 +643,7 @@
 ==================
  * perf: speed up mapOfSubdocs benchmark by 4x by avoiding unnecessary O(n^2) loop in getPathsToValidate() #13614
  * feat: upgrade to MongoDB Node.js driver 5.7.0 #13591
- * feat: add `id` setter which allows modifying `_id` by setting `id` (Note this change was reverted in Mongoose 8) #13517
+ * BREAKING CHANGE: add `id` setter which allows modifying `_id` by setting `id` (Note this change was originally shipped as a `feat`, but later reverted in Mongoose 8 due to compatibility issues) #13517
  * feat: support generating custom cast error message with a function #13608 #3162
  * feat(query): support MongoDB driver's includeResultMetadata option for findOneAndUpdate #13584 #13539
  * feat(connection): add Connection.prototype.removeDb() for removing a related connection #13580 #11821

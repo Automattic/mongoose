@@ -1,3 +1,14 @@
+8.7.0 / 2024-09-27
+==================
+ * feat(model): add Model.applyVirtuals() to apply virtuals to a POJO #14905 #14818
+ * feat: upgrade mongodb -> 6.9.0 #14914
+ * feat(query): cast $rename to string #14887 #3027
+ * feat(SchemaType): add getEmbeddedSchemaType() method to SchemaTypes #14880 #8389
+ * fix(model): throw MongooseBulkSaveIncompleteError if bulkSave() didn't completely succeed #14884 #14763
+ * fix(connection): avoid returning readyState = connected if connection state is stale #14812 #14727
+ * fix: depopulate if push() or addToSet() with an ObjectId on a populated array #14883 #1635
+ * types: make __v a number, only set __v on top-level documents #14892
+
 8.6.4 / 2024-09-26
 ==================
  * fix(document): avoid massive perf degradation when saving new doc with 10 level deep subdocs #14910 #14897

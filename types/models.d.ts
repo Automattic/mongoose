@@ -290,6 +290,9 @@ declare module 'mongoose' {
     applyDefaults(obj: AnyObject): AnyObject;
     applyDefaults(obj: TRawDocType): TRawDocType;
 
+    /* Apply virtuals to the given POJO. */
+    applyVirtuals(obj: AnyObject, virtalsToApply?: string[]): AnyObject;
+
     /**
      * Sends multiple `insertOne`, `updateOne`, `updateMany`, `replaceOne`,
      * `deleteOne`, and/or `deleteMany` operations to the MongoDB server in one

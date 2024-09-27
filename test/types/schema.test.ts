@@ -1635,6 +1635,13 @@ function gh14825() {
   expectAssignable<User>({} as SchemaType);
 }
 
+function gh8389() {
+  const schema = new Schema({ name: String, tags: [String] });
+
+  expectAssignable<SchemaType<any> | undefined>(schema.path('name').getEmbeddedSchemaType());
+  expectAssignable<SchemaType<any> | undefined>(schema.path('tags').getEmbeddedSchemaType());
+}
+
 function gh14879() {
   Schema.Types.String.setters.push((val?: unknown) => typeof val === 'string' ? val.trim() : val);
 }

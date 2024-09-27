@@ -119,6 +119,33 @@ story.author = author;
 console.log(story.author.name); // prints "Ian Fleming"
 ```
 
+You can also push documents or POJOs onto a populated array, and Mongoose will add those documents if their `ref` matches.
+
+```javascript
+const fan1 = await Person.create({ name: 'Sean' });
+await Story.updateOne({ title: 'Casino Royale' }, { $push: { fans: { $each: [fan1._id] } } });
+
+const story = await Story.findOne({ title: 'Casino Royale' }).populate('fans');
+story.fans[0].name; // 'Sean'
+
+const fan2 = await Person.create({ name: 'George' });
+story.fans.push(fan2);
+story.fans[1].name; // 'George'
+
+story.fans.push({ name: 'Roger' });
+story.fans[2].name; // 'Roger'
+```
+
+If you push a non-POJO and non-document value, like an ObjectId, Mongoose `>= 8.7.0` will depopulate the entire array.
+
+```javascript
+const fan4 = await Person.create({ name: 'Timothy' });
+story.fans.push(fan4._id); // Push the `_id`, not the full document
+
+story.fans[0].name; // undefined, `fans[0]` is now an ObjectId
+story.fans[0].toString() === fan1._id.toString(); // true
+```
+
 ## Checking Whether a Field is Populated {#checking-populated}
 
 You can call the `populated()` function to check whether a field is populated.

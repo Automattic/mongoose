@@ -1078,9 +1078,29 @@ describe('model: updateOne:', function() {
       const Model = db.model('Test', schema);
 
       const update = { $rename: { foo: 'bar' } };
-      await Model.create({ foo: Date.now() });
-      const res = await Model.updateOne({}, update, { multi: true });
-      assert.equal(res.modifiedCount, 1);
+      const foo = Date.now();
+      const { _id } = await Model.create({ foo });
+      await Model.updateOne({}, update);
+      const doc = await Model.findById(_id);
+      assert.equal(doc.bar.valueOf(), foo.valueOf());
+      assert.equal(doc.foo, undefined);
+    });
+
+    it('throws CastError if $rename fails to cast to string (gh-1845)', async function() {
+      const schema = new Schema({ foo: Date, bar: Date });
+      const Model = db.model('Test', schema);
+
+      let err = await Model.updateOne({}, { $rename: { foo: { prop: 'baz' } } }).then(() => null, err => err);
+      assert.equal(err.name, 'CastError');
+      assert.ok(err.message.includes('foo.$rename'));
+
+      err = await Model.updateOne({}, { $rename: { foo: null } }).then(() => null, err => err);
+      assert.equal(err.name, 'CastError');
+      assert.ok(err.message.includes('foo.$rename'));
+
+      err = await Model.updateOne({}, { $rename: { foo: undefined } }).then(() => null, err => err);
+      assert.equal(err.name, 'CastError');
+      assert.ok(err.message.includes('foo.$rename'));
     });
 
     it('allows objects with positional operator (gh-3185)', async function() {

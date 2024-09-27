@@ -152,7 +152,7 @@ describe('model: populate:', function() {
           assert.equal(doc.fans[6], null);
 
           const _id = construct[id]();
-          doc.fans.addToSet(_id);
+          doc.fans.addToSet({ _id });
           if (Buffer.isBuffer(_id)) {
             assert.equal(doc.fans[7]._id.toString('utf8'), _id.toString('utf8'));
           } else {

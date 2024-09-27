@@ -232,6 +232,9 @@ declare module 'mongoose' {
     /** Adds a getter to this schematype. */
     get(fn: Function): this;
 
+    /** Gets this SchemaType's embedded SchemaType, if any  */
+    getEmbeddedSchemaType<T = any, DocType = any>(): SchemaType<T, DocType> | undefined;
+
     /**
      * Defines this path as immutable. Mongoose prevents you from changing
      * immutable paths unless the parent document has [`isNew: true`](/docs/api/document.html#document_Document-isNew).

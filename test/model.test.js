@@ -7072,9 +7072,35 @@ describe('Model', function() {
 
       foo.bar = 2;
       const err = await TestModel.bulkSave([foo]).then(() => null, err => err);
-      assert.equal(err.name, 'DocumentNotFoundError');
-      assert.equal(err.numAffected, 1);
-      assert.ok(Array.isArray(err.filter));
+      assert.equal(err.name, 'MongooseBulkSaveIncompleteError');
+      assert.equal(err.numDocumentsNotUpdated, 1);
+    });
+    it('should error if not all documents were inserted or updated (gh-14763)', async function() {
+      const fooSchema = new mongoose.Schema({
+        bar: { type: Number }
+      }, { optimisticConcurrency: true });
+      const TestModel = db.model('Test', fooSchema);
+
+      const errorDoc = await TestModel.create({ bar: 0 });
+      const okDoc = await TestModel.create({ bar: 0 });
+
+      // update 1
+      errorDoc.bar = 1;
+      await errorDoc.save();
+
+      // parallel update
+      const errorDocCopy = await TestModel.findById(errorDoc._id);
+      errorDocCopy.bar = 99;
+      await errorDocCopy.save();
+
+      errorDoc.bar = 2;
+      okDoc.bar = 2;
+      const err = await TestModel.bulkSave([errorDoc, okDoc]).then(() => null, err => err);
+      assert.equal(err.name, 'MongooseBulkSaveIncompleteError');
+      assert.equal(err.numDocumentsNotUpdated, 1);
+
+      const updatedOkDoc = await TestModel.findById(okDoc._id);
+      assert.equal(updatedOkDoc.bar, 2);
     });
     it('should error if there is a validation error', async function() {
       const fooSchema = new mongoose.Schema({
@@ -7832,6 +7858,165 @@ describe('Model', function() {
 
     docs = await User.find();
     assert.deepStrictEqual(docs.map(doc => doc.age), [12, 12]);
+  });
+
+  describe('applyVirtuals', function() {
+    it('handles basic top-level virtuals', async function() {
+      const userSchema = new Schema({
+        name: String
+      });
+      userSchema.virtual('lowercase').get(function() {
+        return this.name.toLowerCase();
+      });
+      userSchema.virtual('uppercase').get(function() {
+        return this.name.toUpperCase();
+      });
+      const User = db.model('User', userSchema);
+
+      const res = User.applyVirtuals({ name: 'Taco' });
+      assert.equal(res.name, 'Taco');
+      assert.equal(res.lowercase, 'taco');
+      assert.equal(res.uppercase, 'TACO');
+    });
+
+    it('handles virtuals in subdocuments', async function() {
+      const userSchema = new Schema({
+        name: String
+      });
+      userSchema.virtual('lowercase').get(function() {
+        return this.name.toLowerCase();
+      });
+      userSchema.virtual('uppercase').get(function() {
+        return this.name.toUpperCase();
+      });
+      const groupSchema = new Schema({
+        name: String,
+        leader: userSchema,
+        members: [userSchema]
+      });
+      const Group = db.model('Group', groupSchema);
+
+      const res = Group.applyVirtuals({
+        name: 'Microsoft',
+        leader: { name: 'Bill' },
+        members: [{ name: 'John' }, { name: 'Steve' }]
+      });
+      assert.equal(res.name, 'Microsoft');
+      assert.equal(res.leader.name, 'Bill');
+      assert.equal(res.leader.uppercase, 'BILL');
+      assert.equal(res.leader.lowercase, 'bill');
+      assert.equal(res.members[0].name, 'John');
+      assert.equal(res.members[0].uppercase, 'JOHN');
+      assert.equal(res.members[0].lowercase, 'john');
+      assert.equal(res.members[1].name, 'Steve');
+      assert.equal(res.members[1].uppercase, 'STEVE');
+      assert.equal(res.members[1].lowercase, 'steve');
+    });
+
+    it('handles virtuals on nested paths', async function() {
+      const userSchema = new Schema({
+        name: {
+          first: String,
+          last: String
+        }
+      });
+      userSchema.virtual('name.firstUpper').get(function() {
+        return this.name.first.toUpperCase();
+      });
+      userSchema.virtual('name.lastLower').get(function() {
+        return this.name.last.toLowerCase();
+      });
+      const User = db.model('User', userSchema);
+
+      const res = User.applyVirtuals({
+        name: {
+          first: 'Bill',
+          last: 'Gates'
+        }
+      });
+      assert.equal(res.name.first, 'Bill');
+      assert.equal(res.name.last, 'Gates');
+      assert.equal(res.name.firstUpper, 'BILL');
+      assert.equal(res.name.lastLower, 'gates');
+    });
+
+    it('supports passing an array of virtuals to apply', async function() {
+      const userSchema = new Schema({
+        name: {
+          first: String,
+          last: String
+        }
+      });
+      userSchema.virtual('fullName').get(function() {
+        return `${this.name.first} ${this.name.last}`;
+      });
+      userSchema.virtual('name.firstUpper').get(function() {
+        return this.name.first.toUpperCase();
+      });
+      userSchema.virtual('name.lastLower').get(function() {
+        return this.name.last.toLowerCase();
+      });
+      const User = db.model('User', userSchema);
+
+      let res = User.applyVirtuals({
+        name: {
+          first: 'Bill',
+          last: 'Gates'
+        }
+      }, ['fullName', 'name.firstUpper']);
+      assert.strictEqual(res.name.first, 'Bill');
+      assert.strictEqual(res.name.last, 'Gates');
+      assert.strictEqual(res.fullName, 'Bill Gates');
+      assert.strictEqual(res.name.firstUpper, 'BILL');
+      assert.strictEqual(res.name.lastLower, undefined);
+
+      res = User.applyVirtuals({
+        name: {
+          first: 'Bill',
+          last: 'Gates'
+        }
+      }, ['name.lastLower']);
+      assert.strictEqual(res.name.first, 'Bill');
+      assert.strictEqual(res.name.last, 'Gates');
+      assert.strictEqual(res.fullName, undefined);
+      assert.strictEqual(res.name.firstUpper, undefined);
+      assert.strictEqual(res.name.lastLower, 'gates');
+    });
+
+    it('sets populate virtuals to `null` if `justOne`', async function() {
+      const userSchema = new Schema({
+        name: {
+          first: String,
+          last: String
+        },
+        friendId: {
+          type: 'ObjectId'
+        }
+      });
+      userSchema.virtual('fullName').get(function() {
+        return `${this.name.first} ${this.name.last}`;
+      });
+      userSchema.virtual('friend', {
+        ref: 'User',
+        localField: 'friendId',
+        foreignField: '_id',
+        justOne: true
+      });
+      const User = db.model('User', userSchema);
+
+      const friendId = new mongoose.Types.ObjectId();
+      const res = User.applyVirtuals({
+        name: {
+          first: 'Bill',
+          last: 'Gates'
+        },
+        friendId
+      });
+      assert.strictEqual(res.name.first, 'Bill');
+      assert.strictEqual(res.name.last, 'Gates');
+      assert.strictEqual(res.fullName, 'Bill Gates');
+      assert.strictEqual(res.friend, null);
+    });
   });
 });
 

@@ -47,6 +47,7 @@ jobs:
           - os: ubuntu-20.04 # customize on which matrix the coverage will be collected on
             mongodb: 5.0.26
             node: 16
+            node-driver: latest
             coverage: true
         exclude:
           - os: ubuntu-22.04 # exclude because there are no 4.x mongodb builds for 2204

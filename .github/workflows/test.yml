@@ -42,6 +42,7 @@ jobs:
         node: [16, 18, 20]
         os: [ubuntu-20.04, ubuntu-22.04]
         mongodb: [4.4.29, 5.0.26, 6.0.15, 7.0.12]
+        node-driver: [6.3.0, latest]
         include:
           - os: ubuntu-20.04 # customize on which matrix the coverage will be collected on
             mongodb: 5.0.26
@@ -52,7 +53,7 @@ jobs:
             mongodb: 4.4.29
           - os: ubuntu-22.04 # exclude because there are no 5.x mongodb builds for 2204
             mongodb: 5.0.26
-    name: Node ${{ matrix.node }} MongoDB ${{ matrix.mongodb }} OS ${{ matrix.os }}
+    name: Node ${{ matrix.node }} MongoDB ${{ matrix.mongodb }} OS ${{ matrix.os }} Node driver ${{ matrix.node-driver }}
     env:
       MONGOMS_VERSION: ${{ matrix.mongodb }}
       MONGOMS_PREFER_GLOBAL_PATH: 1
@@ -73,6 +74,7 @@ jobs:
           key: ${{ matrix.os }}-${{ matrix.mongodb }}
 
       - run: npm install
+      - run: npm install mongodb@${{ matrix.node-driver }}
       - name: NPM Test without Coverage
         run: npm test
         if: matrix.coverage != true

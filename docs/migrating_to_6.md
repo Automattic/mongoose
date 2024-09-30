@@ -53,6 +53,7 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 * [TypeScript changes](#typescript-changes)
 * [Removed `reconnectTries` and `reconnectInterval` options](#removed-reconnecttries-and-reconnectinterval-options)
 * [Lodash `.isEmpty()` returns false for ObjectIds](#lodash-object-id)
+* [mongoose.modelSchemas removed](#model-schemas)
 
 <h2 id="version-requirements"><a href="#version-requirements">Version Requirements</a></h2>
 
@@ -556,6 +557,17 @@ An ObjectId in mongoose is never empty, so if you're using `isEmpty()` you shoul
 if (!(val instanceof Types.ObjectId) && _.isEmpty(val)) {
   // Handle empty object here
 }
+```
+<h2 id="model-schemas"><a href="#model-schemas">Removed <code>mongoose.modelSchemas</code></a></h2>
+
+The `mongoose.modelSchemas` property was removed. This may have been used to delete a model schema.
+
+```javascript
+// before
+delete mongoose.modelSchemas.User;
+
+// with Mongoose 6.x
+delete mongoose.deleteModel('User');
 ```
 
 

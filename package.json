@@ -67,7 +67,7 @@
     "tsd": "0.31.1",
     "typescript": "5.5.4",
     "uuid": "10.0.0",
-    "webpack": "5.94.0"
+    "webpack": "5.95.0"
   },
   "directories": {
     "lib": "./lib/mongoose"

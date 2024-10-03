@@ -52,7 +52,7 @@
     "highlight.js": "11.10.0",
     "lodash.isequal": "4.5.0",
     "lodash.isequalwith": "4.4.0",
-    "markdownlint-cli2": "^0.13.0",
+    "markdownlint-cli2": "^0.14.0",
     "marked": "14.1.0",
     "mkdirp": "^3.0.1",
     "mocha": "10.7.3",

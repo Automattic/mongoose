@@ -13952,7 +13952,7 @@ describe('document', function() {
     const doc = await Test.findOne({ professionalId }).lean().orFail();
     assert.ok(doc.professionalId instanceof mongoose.Types.ObjectId);
   });
-    
+
   it('handles buffers stored as EJSON POJO (gh-14911)', async function() {
     const pdfSchema = new mongoose.Schema({
       pdfSettings: {

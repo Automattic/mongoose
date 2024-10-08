@@ -13952,6 +13952,35 @@ describe('document', function() {
     const doc = await Test.findOne({ professionalId }).lean().orFail();
     assert.ok(doc.professionalId instanceof mongoose.Types.ObjectId);
   });
+    
+  it('handles buffers stored as EJSON POJO (gh-14911)', async function() {
+    const pdfSchema = new mongoose.Schema({
+      pdfSettings: {
+        type: {
+          _id: false,
+          fileContent: { type: Buffer, required: true },
+          filePreview: { type: Buffer, required: true },
+          fileName: { type: String, required: true }
+        }
+      }
+    });
+    const PdfModel = db.model('Test', pdfSchema);
+
+    const _id = new mongoose.Types.ObjectId();
+    const buf = { $binary: Buffer.from('hello', 'utf8').toString('base64'), $type: '00' };
+    await PdfModel.collection.insertOne({
+      _id,
+      pdfSettings: {
+        fileContent: buf,
+        filePreview: buf,
+        fileName: 'sample.pdf'
+      }
+    });
+
+    const reloaded = await PdfModel.findById(_id);
+    assert.ok(Buffer.isBuffer(reloaded.pdfSettings.fileContent));
+    assert.strictEqual(reloaded.pdfSettings.fileContent.toString('utf8'), 'hello');
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

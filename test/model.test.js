@@ -8063,6 +8063,8 @@ describe('Model', function() {
       assert.ok(obj.updatedOn instanceof Date);
       assert.ok(obj.createdOn.valueOf() >= startTime.valueOf());
       assert.ok(obj.updatedOn.valueOf() >= startTime.valueOf());
+      assert.ok(!('createdAt' in obj));
+      assert.ok(!('updatedAt' in obj));
     });
 
     it('applies timestamps to subdocs', async function() {

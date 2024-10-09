@@ -13935,9 +13935,6 @@ describe('document', function() {
         },
         firstName: {
           type: String
-        },
-        nested: {
-          test: String
         }
       },
       {

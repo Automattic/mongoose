@@ -1,3 +1,10 @@
+8.7.1 / 2024-10-09
+==================
+ * fix: set flattenObjectIds to false when calling toObject() for internal purposes #14938
+ * fix: add mongodb 8 to test matrix #14937
+ * fix: handle buffers stored in MongoDB as EJSON representation with { $binary } #14932
+ * docs: indicate that Mongoose 8.7 is required for full MongoDB 8 support #14937
+
 8.7.0 / 2024-09-27
 ==================
  * feat(model): add Model.applyVirtuals() to apply virtuals to a POJO #14905 #14818

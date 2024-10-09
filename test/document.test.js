@@ -13927,6 +13927,29 @@ describe('document', function() {
     await savedDoc.save();
   });
 
+  it('avoids flattening objectids on insertMany (gh-14935)', async function() {
+    const TestSchema = new Schema(
+      {
+        professionalId: {
+          type: Schema.Types.ObjectId
+        },
+        firstName: {
+          type: String
+        }
+      },
+      {
+        toObject: { flattenObjectIds: true }
+      }
+    );
+    const Test = db.model('Test', TestSchema);
+
+    const professionalId = new mongoose.Types.ObjectId();
+    await Test.insertMany([{ professionalId, firstName: 'test' }]);
+
+    const doc = await Test.findOne({ professionalId }).lean().orFail();
+    assert.ok(doc.professionalId instanceof mongoose.Types.ObjectId);
+  });
+
   it('handles buffers stored as EJSON POJO (gh-14911)', async function() {
     const pdfSchema = new mongoose.Schema({
       pdfSettings: {

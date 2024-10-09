@@ -13947,7 +13947,7 @@ describe('document', function() {
     const Test = db.model('Test', TestSchema);
 
     const professionalId = new mongoose.Types.ObjectId();
-    await Test.insertMany([{ professionalId, name: 'test' }]);
+    await Test.insertMany([{ professionalId, firstName: 'test' }]);
 
     const doc = await Test.findOne({ professionalId }).lean().orFail();
     assert.ok(doc.professionalId instanceof mongoose.Types.ObjectId);

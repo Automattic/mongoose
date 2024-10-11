@@ -1645,3 +1645,21 @@ function gh8389() {
 function gh14879() {
   Schema.Types.String.setters.push((val?: unknown) => typeof val === 'string' ? val.trim() : val);
 }
+
+async function gh14950() {
+  const SightingSchema = new Schema(
+    {
+      _id: { type: Schema.Types.ObjectId, required: true },
+      location: {
+        type: { type: String, required: true },
+        coordinates: [{ type: Number }]
+      }
+    }
+  );
+
+  const TestModel = model('Test', SightingSchema);
+  const doc = await TestModel.findOne().orFail();
+
+  expectType<string>(doc.location!.type);
+  expectType<number[]>(doc.location!.coordinates);
+}

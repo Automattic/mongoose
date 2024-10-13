@@ -294,6 +294,11 @@ declare module 'mongoose' {
     applyVirtuals(obj: AnyObject, virtalsToApply?: string[]): AnyObject;
 
     /**
+     * Apply this model's timestamps to a given POJO, including subdocument timestamps
+     */
+    applyTimestamps(obj: AnyObject, options?: { isUpdate?: boolean, currentTime?: () => Date }): AnyObject;
+
+    /**
      * Sends multiple `insertOne`, `updateOne`, `updateMany`, `replaceOne`,
      * `deleteOne`, and/or `deleteMany` operations to the MongoDB server in one
      * command. This is faster than sending multiple independent operations (e.g.

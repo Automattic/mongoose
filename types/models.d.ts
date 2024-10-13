@@ -72,8 +72,8 @@ declare module 'mongoose' {
   };
 
   type UpdateWriteOpResult = mongodb.UpdateResult;
-  export type UpdateResult = mongodb.UpdateResult;
-  export type DeleteResult = mongodb.DeleteResult;
+  type UpdateResult = mongodb.UpdateResult;
+  type DeleteResult = mongodb.DeleteResult;
 
   interface MapReduceOptions<T, K, R> {
     map: Function | string;

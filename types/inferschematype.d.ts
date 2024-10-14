@@ -183,8 +183,16 @@ type TypeHint<T> = T extends { __typehint: infer U } ? U: never;
  * @param {TypeKey} TypeKey A generic refers to document definition.
  */
 type ObtainDocumentPathType<PathValueType, TypeKey extends string = DefaultTypeKey> = ResolvePathType<
-PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? PathValueType[TypeKey] : PathValueType,
-PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? Omit<PathValueType, TypeKey> : {},
+  PathValueType extends PathWithTypePropertyBaseType<TypeKey>
+    ? PathValueType[TypeKey] extends PathWithTypePropertyBaseType<TypeKey>
+      ? PathValueType
+      : PathValueType[TypeKey]
+    : PathValueType,
+  PathValueType extends PathWithTypePropertyBaseType<TypeKey>
+    ? PathValueType[TypeKey] extends PathWithTypePropertyBaseType<TypeKey>
+      ? {}
+      : Omit<PathValueType, TypeKey>
+    : {},
 TypeKey,
 TypeHint<PathValueType>
 >;

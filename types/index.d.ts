@@ -252,6 +252,29 @@ declare module 'mongoose' {
     TVirtuals,
     TStaticMethods> = (schema: Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>, opts?: any) => void;
 
+  export class AutoInferredSchema<
+    SchemaDef = unknown,
+    RawDocType = any,
+    TModelType = Model<RawDocType, any, any, any>,
+    TInstanceMethods = {},
+    TQueryHelpers = {},
+    TVirtuals = {},
+    TStaticMethods = {},
+    TSchemaOptions = DefaultSchemaOptions,
+    DocType extends ApplySchemaOptions<
+      ObtainDocumentType<DocType, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
+      ResolveSchemaOptions<TSchemaOptions>
+    > = ApplySchemaOptions<
+      ObtainDocumentType<any, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
+      ResolveSchemaOptions<TSchemaOptions>
+    >,
+    THydratedDocumentType = HydratedDocument<FlatRecord<DocType>, TVirtuals & TInstanceMethods>
+  > extends Schema<RawDocType, TModelType, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods, TSchemaOptions, DocType, THydratedDocumentType> {
+    constructor(definition?: SchemaDef, options?: SchemaOptions<FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
+
+    _schemaDefinition: SchemaDef;
+  }
+
   export class Schema<
     RawDocType = any,
     TModelType = Model<RawDocType, any, any, any>,

@@ -6,6 +6,7 @@ import {
   PathWithTypePropertyBaseType,
   PathEnumOrString
 } from './inferschematype';
+import { InferSchemaType } from 'mongoose';
 
 declare module 'mongoose' {
   export type InferRawDocType<
@@ -35,6 +36,10 @@ declare module 'mongoose' {
     TypeKey
   >;
 
+  type InferRawDocTypeFromSchema<TSchema extends Schema> = TSchema extends AutoInferredSchema
+    ? InferRawDocType<TSchema['_schemaDefinition']>
+    : InferSchemaType<TSchema>;
+
   /**
    * Same as inferSchemaType, except:
    *
@@ -50,11 +55,11 @@ declare module 'mongoose' {
    */
   type ResolveRawPathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}, TypeKey extends string = DefaultSchemaOptions['typeKey']> =
   PathValueType extends Schema ?
-    InferSchemaType<PathValueType> :
+    InferRawDocTypeFromSchema<PathValueType> :
     PathValueType extends (infer Item)[] ?
       IfEquals<Item, never, any[], Item extends Schema ?
         // If Item is a schema, infer its type.
-        Array<InferSchemaType<Item>> :
+        Array<InferRawDocTypeFromSchema<Item>> :
         Item extends Record<TypeKey, any> ?
           Item[TypeKey] extends Function | String ?
             // If Item has a type key that's a string or a callable, it must be a scalar,
@@ -73,7 +78,7 @@ declare module 'mongoose' {
       >:
       PathValueType extends ReadonlyArray<infer Item> ?
         IfEquals<Item, never, any[], Item extends Schema ?
-          Array<InferSchemaType<Item>> :
+          Array<InferRawDocTypeFromSchema<Item>> :
           Item extends Record<TypeKey, any> ?
             Item[TypeKey] extends Function | String ?
               ObtainRawDocumentPathType<Item, TypeKey>[] :

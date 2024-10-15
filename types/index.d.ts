@@ -623,6 +623,9 @@ declare module 'mongoose' {
     /** Additional options like `limit` and `lean`. */
     options?: QueryOptions<DocType> & { match?: AnyObject };
 
+    /** If true and the given `name` is a direct child of an array, apply the virtual to the array rather than the elements. */
+    applyToArray?: boolean;
+
     /** Additional options for plugins */
     [extra: string]: any;
   }

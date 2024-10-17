@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "8.7.1",
+  "version": "8.7.2",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -92,7 +92,7 @@
     "lint": "eslint .",
     "lint-js": "eslint . --ext .js --ext .cjs",
     "lint-ts": "eslint . --ext .ts",
-    "lint-md": "markdownlint-cli2 \"**/*.md\"",
+    "lint-md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#benchmarks\"",
     "build-browser": "(rm ./dist/* || true) && node ./scripts/build-browser.js",
     "prepublishOnly": "npm run build-browser",
     "release": "git pull && git push origin master --tags && npm publish",

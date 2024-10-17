@@ -706,6 +706,18 @@ declare module 'mongoose' {
     [K in keyof T]: FlattenProperty<T[K]>;
   };
 
+  export type BufferToBinary<T> = T extends TreatAsPrimitives ? T : T extends Record<string, any> ? {
+    [K in keyof T]: T[K] extends Buffer
+      ? mongodb.Binary
+      : T[K] extends (Buffer | null | undefined)
+        ? mongodb.Binary | null | undefined
+        : T[K] extends Types.DocumentArray<infer ItemType>
+            ? Types.DocumentArray<BufferToBinary<ItemType>>
+            : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+              ? HydratedSingleSubdocument<SubdocType>
+              : BufferToBinary<T[K]>;
+  } : T;
+
   /**
    * Separate type is needed for properties of union type (for example, Types.DocumentArray | undefined) to apply conditional check to each member of it
    * https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#distributive-conditional-types
@@ -716,7 +728,7 @@ declare module 'mongoose' {
         ? Types.DocumentArray<FlattenMaps<ItemType>> : FlattenMaps<T>;
 
   export type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
-  export type TreatAsPrimitives = actualPrimitives | NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId | Buffer | Function;
+  export type TreatAsPrimitives = actualPrimitives | NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId | Buffer | Function | mongodb.Binary;
 
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
 

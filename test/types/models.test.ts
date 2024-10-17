@@ -14,8 +14,8 @@ import mongoose, {
   UpdateWriteOpResult,
   AggregateOptions,
   WithLevel1NestedPaths,
-  NestedPaths,
-  InferSchemaType
+  InferSchemaType,
+  DeleteResult
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
@@ -514,7 +514,7 @@ function gh12100() {
 function modelRemoveOptions() {
   const cmodel = model('Test', new Schema());
 
-  cmodel.deleteOne({}, {});
+  const res: DeleteResult = await cmodel.deleteOne({}, {});
 }
 
 async function gh12286() {

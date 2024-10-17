@@ -20,8 +20,10 @@ import {
   Types,
   Query,
   model,
-  ValidateOpts
+  ValidateOpts,
+  BufferToBinary
 } from 'mongoose';
+import { Binary } from 'mongodb';
 import { IsPathRequired } from '../../types/inferschematype';
 import { expectType, expectError, expectAssignable } from 'tsd';
 import { ObtainDocumentPathType, ResolvePathType } from '../../types/inferschematype';
@@ -917,7 +919,7 @@ async function gh12593() {
   expectType<Buffer | undefined | null>(doc2.x);
 
   const doc3 = await Test.findOne({}).orFail().lean();
-  expectType<Buffer | undefined | null>(doc3.x);
+  expectType<Binary | undefined | null>(doc3.x);
 
   const arrSchema = new Schema({ arr: [{ type: Schema.Types.UUID }] });
 
@@ -1662,4 +1664,20 @@ async function gh14950() {
 
   expectType<string>(doc.location!.type);
   expectType<number[]>(doc.location!.coordinates);
+}
+
+async function gh14902() {
+  const exampleSchema = new Schema({
+    image: { type: Buffer },
+    subdoc: {
+      type: new Schema({
+        testBuf: Buffer
+      })
+    }
+  });
+  const Test = model('Test', exampleSchema);
+
+  const doc = await Test.findOne().lean().orFail();
+  expectType<Binary | null | undefined>(doc.image);
+  expectType<Binary | null | undefined>(doc.subdoc!.testBuf);
 }

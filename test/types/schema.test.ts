@@ -1667,12 +1667,17 @@ async function gh14950() {
 }
 
 async function gh14902() {
-  const def = {
-    image: { type: Buffer }
-  } as const;
-  const exampleSchema = new Schema(def);
+  const exampleSchema = new Schema({
+    image: { type: Buffer },
+    subdoc: {
+      type: new Schema({
+        testBuf: Buffer
+      })
+    }
+  });
   const Test = model('Test', exampleSchema);
 
   const doc = await Test.findOne().lean().orFail();
   expectType<Binary | null | undefined>(doc.image);
+  expectType<Binary | null | undefined>(doc.subdoc!.testBuf);
 }

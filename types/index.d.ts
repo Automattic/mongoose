@@ -706,12 +706,16 @@ declare module 'mongoose' {
     [K in keyof T]: FlattenProperty<T[K]>;
   };
 
-  export type BufferToBinary<T> = T extends object ? {
+  export type BufferToBinary<T> = T extends TreatAsPrimitives ? T : T extends Record<string, any> ? {
     [K in keyof T]: T[K] extends Buffer
       ? mongodb.Binary
       : T[K] extends (Buffer | null | undefined)
         ? mongodb.Binary | null | undefined
-        : T[K];
+        : T[K] extends Types.DocumentArray<infer ItemType>
+            ? Types.DocumentArray<BufferToBinary<ItemType>>
+            : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+              ? HydratedSingleSubdocument<SubdocType>
+              : BufferToBinary<T[K]>;
   } : T;
 
   /**

@@ -146,9 +146,10 @@ type RequiredPathKeys<T, TypeKey extends string = DefaultTypeKey> = {
  * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
  * @returns a record contains required paths with the corresponding type.
  */
-type RequiredPaths<T, TypeKey extends string = DefaultTypeKey> = {
-  [K in RequiredPathKeys<T, TypeKey>]: T[K];
-};
+type RequiredPaths<T, TypeKey extends string = DefaultTypeKey> = Pick<
+  { -readonly [K in keyof T]: T[K] },
+  RequiredPathKeys<T, TypeKey>
+>;
 
 /**
  * @summary A Utility to obtain schema's optional path keys.
@@ -166,9 +167,10 @@ type OptionalPathKeys<T, TypeKey extends string = DefaultTypeKey> = {
  * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
  * @returns a record contains optional paths with the corresponding type.
  */
-type OptionalPaths<T, TypeKey extends string = DefaultTypeKey> = {
-  [K in OptionalPathKeys<T, TypeKey>]?: T[K];
-};
+type OptionalPaths<T, TypeKey extends string = DefaultTypeKey> = Pick<
+  { -readonly [K in keyof T]?: T[K] },
+  OptionalPathKeys<T, TypeKey>
+>;
 
 /**
  * @summary Allows users to optionally choose their own type for a schema field for stronger typing.

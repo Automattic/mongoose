@@ -200,7 +200,7 @@ In Mongoose 7, `ObjectId` is now a [JavaScript class](https://masteringjs.io/tut
 const oid = new mongoose.Types.ObjectId('0'.repeat(24));
 ```
 
-## `id` Setter
+## `id` Setter {#id-setter}
 
 Starting in Mongoose 7.4, Mongoose's built-in `id` virtual (which stores the document's `_id` as a string) has a setter which allows modifying the document's `_id` property via `id`.
 

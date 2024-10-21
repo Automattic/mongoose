@@ -50,6 +50,12 @@ declare module 'mongoose' {
     autoIndex?: boolean;
     /** Set to `false` to disable Mongoose automatically calling `createCollection()` on every model created on this connection. */
     autoCreate?: boolean;
+    /**
+     * Sanitizes query filters against [query selector injection attacks](
+     * https://thecodebarbarian.com/2014/09/04/defending-against-query-selector-injection-attacks.html
+     * ) by wrapping any nested objects that have a property whose name starts with $ in a $eq.
+     */
+    sanitizeFilter?: boolean;
   }
 
   class Connection extends events.EventEmitter implements SessionStarter {

@@ -718,6 +718,50 @@ declare module 'mongoose' {
               : BufferToBinary<T[K]>;
   } : T;
 
+  export type ObjectIdToString<T> = T extends TreatAsPrimitives ? T : T extends Record<string, any> ? {
+    [K in keyof T]: T[K] extends mongodb.ObjectId
+      ? string
+      : T[K] extends (mongodb.ObjectId | null | undefined)
+        ? string | null | undefined
+        : T[K] extends Types.DocumentArray<infer ItemType>
+            ? Types.DocumentArray<ObjectIdToString<ItemType>>
+            : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+              ? HydratedSingleSubdocument<ObjectIdToString<SubdocType>>
+              : ObjectIdToString<T[K]>;
+  } : T;
+
+  export type DateToString<T> = T extends TreatAsPrimitives ? T : T extends Record<string, any> ? {
+    [K in keyof T]: T[K] extends NativeDate
+      ? string
+      : T[K] extends (NativeDate | null | undefined)
+        ? string | null | undefined
+        : T[K] extends Types.DocumentArray<infer ItemType>
+            ? Types.DocumentArray<DateToString<ItemType>>
+            : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+              ? HydratedSingleSubdocument<DateToString<SubdocType>>
+              : DateToString<T[K]>;
+  } : T;
+
+  export type SubdocsToPOJOs<T> = T extends TreatAsPrimitives ? T : T extends Record<string, any> ? {
+    [K in keyof T]: T[K] extends NativeDate
+      ? string
+      : T[K] extends (NativeDate | null | undefined)
+        ? string | null | undefined
+        : T[K] extends Types.DocumentArray<infer ItemType>
+            ? ItemType
+            : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+              ? SubdocType
+              : SubdocsToPOJOs<T[K]>;
+  } : T;
+
+  export type JSONSerialized<T> = SubdocsToPOJOs<
+    FlattenMaps<
+      ObjectIdToString<
+        DateToString<T>
+      >
+    >
+  >;
+
   /**
    * Separate type is needed for properties of union type (for example, Types.DocumentArray | undefined) to apply conditional check to each member of it
    * https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#distributive-conditional-types

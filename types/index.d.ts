@@ -718,6 +718,18 @@ declare module 'mongoose' {
               : BufferToBinary<T[K]>;
   } : T;
 
+  export type BufferToJSON<T> = T extends TreatAsPrimitives ? T : T extends Record<string, any> ? {
+    [K in keyof T]: T[K] extends Buffer
+      ? { type: 'buffer', data: number[] }
+      : T[K] extends (Buffer | null | undefined)
+        ? { type: 'buffer', data: number[] } | null | undefined
+        : T[K] extends Types.DocumentArray<infer ItemType>
+            ? Types.DocumentArray<BufferToBinary<ItemType>>
+            : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+              ? HydratedSingleSubdocument<SubdocType>
+              : BufferToBinary<T[K]>;
+  } : T;
+
   export type ObjectIdToString<T> = T extends TreatAsPrimitives ? T : T extends Record<string, any> ? {
     [K in keyof T]: T[K] extends mongodb.ObjectId
       ? string
@@ -748,7 +760,7 @@ declare module 'mongoose' {
       : T[K] extends (NativeDate | null | undefined)
         ? string | null | undefined
         : T[K] extends Types.DocumentArray<infer ItemType>
-            ? ItemType
+            ? ItemType[]
             : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
               ? SubdocType
               : SubdocsToPOJOs<T[K]>;
@@ -756,8 +768,10 @@ declare module 'mongoose' {
 
   export type JSONSerialized<T> = SubdocsToPOJOs<
     FlattenMaps<
-      ObjectIdToString<
-        DateToString<T>
+      BufferToJSON<
+        ObjectIdToString<
+          DateToString<T>
+        >
       >
     >
   >;

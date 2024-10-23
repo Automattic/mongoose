@@ -1687,12 +1687,13 @@ async function gh14451() {
   const exampleSchema = new Schema({
     myId: { type: 'ObjectId' },
     myRequiredId: { type: 'ObjectId', required: true },
+    myBuf: { type: Buffer, required: true },
     subdoc: {
       type: new Schema({
         subdocProp: Date
       })
-    }
-    // docArr: [{ nums: [Number], times: [Date] }]
+    },
+    docArr: [{ nums: [Number], times: [{ type: Date }] }]
   });
 
   const Test = model('Test', exampleSchema);
@@ -1701,9 +1702,10 @@ async function gh14451() {
   expectType<{
     myId?: string | undefined | null,
     myRequiredId: string,
+    myBuf: { type: 'buffer', data: number[] },
     subdoc?: {
       subdocProp?: string | undefined | null
     } | null,
-    // docArr: { nums: number[], times: string[] }[]
+    docArr: { nums: number[], times: string[] }[]
   }>({} as TestJSON);
 }

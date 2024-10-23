@@ -18,7 +18,7 @@ const checkFolder = (folder) => {
         }
         continue;
       } else {
-        console.error('File ' + entry + ' is not having a valid file-extension.\n');
+        console.error('File ' + entry + ' does not have a valid extension, must be .d.ts or .gitignore.\n');
         process.exit(1);
       }
     }

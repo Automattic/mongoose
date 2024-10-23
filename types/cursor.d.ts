@@ -27,6 +27,12 @@ declare module 'mongoose' {
     close(): Promise<void>;
 
     /**
+     * Destroy this cursor, closing the underlying cursor. Will stop streaming
+     * and subsequent calls to `next()` will error.
+     */
+    destroy(): this;
+
+    /**
      * Rewind this cursor to its uninitialized state. Any options that are present on the cursor will
      * remain in effect. Iterating this cursor will cause new queries to be sent to the server, even
      * if the resultant data has already been retrieved by this cursor.

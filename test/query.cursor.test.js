@@ -4,6 +4,7 @@
 
 'use strict';
 
+const { once } = require('events');
 const start = require('./common');
 
 const assert = require('assert');
@@ -919,6 +920,21 @@ describe('QueryCursor', function() {
     const driverCursor = await cursor.getDriverCursor();
     assert.ok(cursor.cursor);
     assert.equal(driverCursor, cursor.cursor);
+  });
+
+  it('handles destroy() (gh-14966)', async function() {
+    db.deleteModel(/Test/);
+    const TestModel = db.model('Test', mongoose.Schema({ name: String }));
+
+    const stream = await TestModel.find().cursor();
+    await once(stream, 'cursor');
+    assert.ok(!stream.cursor.closed);
+
+    stream.destroy();
+
+    await once(stream.cursor, 'close');
+    assert.ok(stream.destroyed);
+    assert.ok(stream.cursor.closed);
   });
 });
 

@@ -936,6 +936,19 @@ describe('QueryCursor', function() {
     assert.ok(stream.destroyed);
     assert.ok(stream.cursor.closed);
   });
+
+  it('handles destroy() before cursor is created (gh-14966)', async function() {
+    db.deleteModel(/Test/);
+    const TestModel = db.model('Test', mongoose.Schema({ name: String }));
+
+    const stream = await TestModel.find().cursor();
+    assert.ok(!stream.cursor);
+    stream.destroy();
+
+    await once(stream, 'cursor');
+    assert.ok(stream.destroyed);
+    assert.ok(stream.cursor.closed);
+  });
 });
 
 async function delay(ms) {

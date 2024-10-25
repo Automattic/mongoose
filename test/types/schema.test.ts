@@ -1693,7 +1693,11 @@ async function gh14451() {
         subdocProp: Date
       })
     },
-    docArr: [{ nums: [Number], times: [{ type: Date }] }]
+    docArr: [{ nums: [Number], times: [{ type: Date }] }],
+    myMap: {
+      type: Map,
+      of: String
+    }
   });
 
   const Test = model('Test', exampleSchema);
@@ -1706,6 +1710,7 @@ async function gh14451() {
     subdoc?: {
       subdocProp?: string | undefined | null
     } | null,
-    docArr: { nums: number[], times: string[] }[]
+    docArr: { nums: number[], times: string[] }[],
+    myMap?: Record<string, string> | null | undefined
   }>({} as TestJSON);
 }

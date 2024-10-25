@@ -706,6 +706,9 @@ declare module 'mongoose' {
     [K in keyof T]: FlattenProperty<T[K]>;
   };
 
+  /**
+   * Converts any Buffer properties into mongodb.Binary instances, which is what `lean()` returns
+   */
   export type BufferToBinary<T> = T extends TreatAsPrimitives ? T : T extends Record<string, any> ? {
     [K in keyof T]: T[K] extends Buffer
       ? mongodb.Binary
@@ -717,6 +720,76 @@ declare module 'mongoose' {
               ? HydratedSingleSubdocument<SubdocType>
               : BufferToBinary<T[K]>;
   } : T;
+
+  /**
+   * Converts any Buffer properties into { type: 'buffer', data: [1, 2, 3] } format for JSON serialization
+   */
+  export type BufferToJSON<T> = T extends TreatAsPrimitives ? T : T extends Record<string, any> ? {
+    [K in keyof T]: T[K] extends Buffer
+      ? { type: 'buffer', data: number[] }
+      : T[K] extends (Buffer | null | undefined)
+        ? { type: 'buffer', data: number[] } | null | undefined
+        : T[K] extends Types.DocumentArray<infer ItemType>
+            ? Types.DocumentArray<BufferToBinary<ItemType>>
+            : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+              ? HydratedSingleSubdocument<SubdocType>
+              : BufferToBinary<T[K]>;
+  } : T;
+
+  /**
+   * Converts any ObjectId properties into strings for JSON serialization
+   */
+  export type ObjectIdToString<T> = T extends TreatAsPrimitives ? T : T extends Record<string, any> ? {
+    [K in keyof T]: T[K] extends mongodb.ObjectId
+      ? string
+      : T[K] extends (mongodb.ObjectId | null | undefined)
+        ? string | null | undefined
+        : T[K] extends Types.DocumentArray<infer ItemType>
+            ? Types.DocumentArray<ObjectIdToString<ItemType>>
+            : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+              ? HydratedSingleSubdocument<ObjectIdToString<SubdocType>>
+              : ObjectIdToString<T[K]>;
+  } : T;
+
+  /**
+   * Converts any Date properties into strings for JSON serialization
+   */
+  export type DateToString<T> = T extends TreatAsPrimitives ? T : T extends Record<string, any> ? {
+    [K in keyof T]: T[K] extends NativeDate
+      ? string
+      : T[K] extends (NativeDate | null | undefined)
+        ? string | null | undefined
+        : T[K] extends Types.DocumentArray<infer ItemType>
+            ? Types.DocumentArray<DateToString<ItemType>>
+            : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+              ? HydratedSingleSubdocument<DateToString<SubdocType>>
+              : DateToString<T[K]>;
+  } : T;
+
+  /**
+   * Converts any Mongoose subdocuments (single nested or doc arrays) into POJO equivalents
+   */
+  export type SubdocsToPOJOs<T> = T extends TreatAsPrimitives ? T : T extends Record<string, any> ? {
+    [K in keyof T]: T[K] extends NativeDate
+      ? string
+      : T[K] extends (NativeDate | null | undefined)
+        ? string | null | undefined
+        : T[K] extends Types.DocumentArray<infer ItemType>
+            ? ItemType[]
+            : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+              ? SubdocType
+              : SubdocsToPOJOs<T[K]>;
+  } : T;
+
+  export type JSONSerialized<T> = SubdocsToPOJOs<
+    FlattenMaps<
+      BufferToJSON<
+        ObjectIdToString<
+          DateToString<T>
+        >
+      >
+    >
+  >;
 
   /**
    * Separate type is needed for properties of union type (for example, Types.DocumentArray | undefined) to apply conditional check to each member of it

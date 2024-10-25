@@ -10,6 +10,7 @@ import {
   InferRawDocType,
   InferSchemaType,
   InsertManyOptions,
+  JSONSerialized,
   ObtainDocumentType,
   ObtainSchemaGeneric,
   ResolveSchemaOptions,
@@ -1680,4 +1681,36 @@ async function gh14902() {
   const doc = await Test.findOne().lean().orFail();
   expectType<Binary | null | undefined>(doc.image);
   expectType<Binary | null | undefined>(doc.subdoc!.testBuf);
+}
+
+async function gh14451() {
+  const exampleSchema = new Schema({
+    myId: { type: 'ObjectId' },
+    myRequiredId: { type: 'ObjectId', required: true },
+    myBuf: { type: Buffer, required: true },
+    subdoc: {
+      type: new Schema({
+        subdocProp: Date
+      })
+    },
+    docArr: [{ nums: [Number], times: [{ type: Date }] }],
+    myMap: {
+      type: Map,
+      of: String
+    }
+  });
+
+  const Test = model('Test', exampleSchema);
+
+  type TestJSON = JSONSerialized<InferSchemaType<typeof exampleSchema>>;
+  expectType<{
+    myId?: string | undefined | null,
+    myRequiredId: string,
+    myBuf: { type: 'buffer', data: number[] },
+    subdoc?: {
+      subdocProp?: string | undefined | null
+    } | null,
+    docArr: { nums: number[], times: string[] }[],
+    myMap?: Record<string, string> | null | undefined
+  }>({} as TestJSON);
 }

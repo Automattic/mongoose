@@ -1,3 +1,12 @@
+8.7.3 / 2024-10-25
+==================
+ * fix(cursor): close underlying query cursor when calling destroy() #14982 #14966
+ * types: add JSONSerialized helper that can convert HydratedDocument to JSON output type #14981 #14451
+ * types(model): convert InsertManyResult to interface and remove unnecessary insertedIds override #14977
+ * types(connection): add missing sanitizeFilter option #14975
+ * types: improve goto definition for inferred schema definitions #14968 [forivall](https://github.com/forivall)
+ * docs(migration-guide-v7): correct link to the section "Id Setter" #14973 [rb-ntnx](https://github.com/rb-ntnx)
+
 8.7.2 / 2024-10-17
 ==================
  * fix(document): recursively clear modified subpaths when setting deeply nested subdoc to null #14963 #14952

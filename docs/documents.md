@@ -8,6 +8,7 @@ to documents as stored in MongoDB. Each document is an instance of its
   <li><a href="#documents-vs-models">Documents vs Models</a></li>
   <li><a href="#retrieving">Retrieving</a></li>
   <li><a href="#updating-using-save">Updating Using <code>save()</code></a></li>
+  <li><a href="#setting-nested-properties">Setting Nested Properties</a></li>
   <li><a href="#updating-using-queries">Updating Using Queries</a></li>
   <li><a href="#validating">Validating</a></li>
   <li><a href="#overwriting">Overwriting</a></li>
@@ -79,6 +80,54 @@ await MyModel.deleteOne({ _id: doc._id });
 
 doc.name = 'foo';
 await doc.save(); // Throws DocumentNotFoundError
+```
+
+## Setting Nested Properties
+
+Mongoose documents have a `set()` function that you can use to safely set deeply nested properties.
+
+```javascript
+const schema = new Schema({
+  nested: {
+    subdoc: new Schema({
+      name: String
+    })
+  }
+});
+const TestModel = mongoose.model('Test', schema);
+
+const doc = new TestModel();
+doc.set('nested.subdoc.name', 'John Smith');
+doc.nested.subdoc.name; // 'John Smith'
+```
+
+Mongoose documents also have a `get()` function that lets you safely read deeply nested properties. `get()` lets you avoid having to explicitly check for nullish values, similar to JavaScript's [optional chaining operator `?.`](https://masteringjs.io/tutorials/fundamentals/optional-chaining-array).
+
+```javascript
+const doc2 = new TestModel();
+
+doc2.get('nested.subdoc.name'); // undefined
+doc2.nested?.subdoc?.name; // undefined
+
+doc2.set('nested.subdoc.name', 'Will Smith');
+doc2.get('nested.subdoc.name'); // 'Will Smith'
+```
+
+You can use optional chaining `?.` and nullish coalescing `??` with Mongoose documents.
+However, be careful when using [nullish coalescing assignments `??=`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_assignment) to create nested paths with Mongoose documents.
+
+```javascript
+// The following works fine
+const doc3 = new TestModel();
+doc3.nested.subdoc ??= {};
+doc3.nested.subdoc.name = 'John Smythe';
+
+// The following does **NOT** work.
+// Do not use the following pattern with Mongoose documents.
+const doc4 = new TestModel();
+(doc4.nested.subdoc ??= {}).name = 'Charlie Smith';
+doc.nested.subdoc; // Empty object
+doc.nested.subdoc.name; // undefined.
 ```
 
 ## Updating Using Queries {#updating-using-queries}

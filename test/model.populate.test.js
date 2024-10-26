@@ -2582,6 +2582,91 @@ describe('model: populate:', function() {
       assert.strictEqual(doc.parts[0].contents[1].item.url, 'https://youtube.com');
     });
 
+    it('with refPath and array of ids with parent refPath', async function() {
+      const Child = db.model(
+        'Child',
+        new mongoose.Schema({
+          fetched: Boolean
+        })
+      );
+
+      const Parent = db.model(
+        'Parent',
+        new mongoose.Schema({
+          docArray: [
+            {
+              type: {
+                type: String,
+                enum: ['Child', 'OtherModel']
+              },
+              ids: [
+                {
+                  type: mongoose.Schema.ObjectId,
+                  refPath: 'docArray.type'
+                }
+              ]
+            }
+          ]
+        })
+      );
+      await Child.insertMany([
+        { _id: new mongoose.Types.ObjectId('6671a008596112f0729c2045'), fetched: true },
+        { _id: new mongoose.Types.ObjectId('667195f3596112f0728abe24'), fetched: true },
+        { _id: new mongoose.Types.ObjectId('6671bd39596112f072cda69c'), fetched: true },
+        { _id: new mongoose.Types.ObjectId('6672c351596112f072868565'), fetched: true },
+        { _id: new mongoose.Types.ObjectId('66734edd596112f0727304a2'), fetched: true },
+        { _id: new mongoose.Types.ObjectId('66726eff596112f072f8e834'), fetched: true },
+        { _id: new mongoose.Types.ObjectId('667267ff596112f072ed56b1'), fetched: true }
+      ]);
+      const { _id } = await Parent.create(
+        {
+          docArray: [
+            {},
+            {
+              type: 'Child',
+              ids: [
+                new mongoose.Types.ObjectId('6671a008596112f0729c2045'),
+                new mongoose.Types.ObjectId('667195f3596112f0728abe24'),
+                new mongoose.Types.ObjectId('6671bd39596112f072cda69c'),
+                new mongoose.Types.ObjectId('6672c351596112f072868565')
+              ]
+            },
+            {
+              type: 'Child',
+              ids: [new mongoose.Types.ObjectId('66734edd596112f0727304a2')]
+            },
+            {},
+            {
+              type: 'Child',
+              ids: [new mongoose.Types.ObjectId('66726eff596112f072f8e834')]
+            },
+            {},
+            {
+              type: 'Child',
+              ids: [new mongoose.Types.ObjectId('667267ff596112f072ed56b1')]
+            }
+          ]
+        }
+      );
+
+      const doc = await Parent.findById(_id).populate('docArray.ids').orFail();
+      assert.strictEqual(doc.docArray.length, 7);
+      assert.strictEqual(doc.docArray[0].ids.length, 0);
+      assert.strictEqual(doc.docArray[1].ids.length, 4);
+      assert.ok(doc.docArray[1].ids[0].fetched);
+      assert.ok(doc.docArray[1].ids[1].fetched);
+      assert.ok(doc.docArray[1].ids[2].fetched);
+      assert.ok(doc.docArray[1].ids[3].fetched);
+      assert.strictEqual(doc.docArray[2].ids.length, 1);
+      assert.ok(doc.docArray[2].ids[0].fetched);
+      assert.strictEqual(doc.docArray[3].ids.length, 0);
+      assert.strictEqual(doc.docArray[4].ids.length, 1);
+      assert.ok(doc.docArray[4].ids[0].fetched);
+      assert.strictEqual(doc.docArray[5].ids.length, 0);
+      assert.strictEqual(doc.docArray[6].ids.length, 1);
+      assert.ok(doc.docArray[6].ids[0].fetched);
+    });
+
     it('with nested nonexistant refPath (gh-6457)', async function() {
       const CommentSchema = new Schema({
         text: String,

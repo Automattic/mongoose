@@ -64,12 +64,9 @@ declare module 'mongoose' {
     throwOnValidationError?: boolean;
   }
 
-  type InsertManyResult<T> = mongodb.InsertManyResult<T> & {
-    insertedIds: {
-      [key: number]: InferId<T>;
-    };
+  interface InsertManyResult<T> extends mongodb.InsertManyResult<T> {
     mongoose?: { validationErrors?: Array<Error.CastError | Error.ValidatorError> };
-  };
+  }
 
   type UpdateWriteOpResult = mongodb.UpdateResult;
   type UpdateResult = mongodb.UpdateResult;

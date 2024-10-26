@@ -14021,6 +14021,84 @@ describe('document', function() {
       assert.strictEqual(m.books.last.title, 'The Man With The Golden Gun');
     });
   });
+
+  it('clears modified subpaths when setting deeply nested subdoc to null (gh-14952)', async function() {
+    const currentMilestoneSchema = new Schema(
+      {
+        id: { type: String, required: true }
+      },
+      {
+        _id: false
+      }
+    );
+
+    const milestoneSchema = new Schema(
+      {
+        current: {
+          type: currentMilestoneSchema,
+          required: true
+        }
+      },
+      {
+        _id: false
+      }
+    );
+
+    const campaignSchema = new Schema(
+      {
+        milestones: {
+          type: milestoneSchema,
+          required: false
+        }
+      },
+      {
+        _id: false
+      }
+    );
+    const questSchema = new Schema(
+      {
+        campaign: { type: campaignSchema, required: false }
+      },
+      {
+        _id: false
+      }
+    );
+
+    const parentSchema = new Schema({
+      quests: [questSchema]
+    });
+
+    const ParentModel = db.model('Parent', parentSchema);
+    const doc = new ParentModel({
+      quests: [
+        {
+          campaign: {
+            milestones: {
+              current: {
+                id: 'milestone1'
+              }
+            }
+          }
+        }
+      ]
+    });
+
+    await doc.save();
+
+    // Set the nested schema to null
+    doc.quests[0].campaign.milestones.current = {
+      id: 'milestone1'
+    };
+    doc.quests[0].campaign.milestones.current = {
+      id: ''
+    };
+
+    doc.quests[0].campaign.milestones = null;
+    await doc.save();
+
+    const fromDb = await ParentModel.findById(doc._id).orFail();
+    assert.strictEqual(fromDb.quests[0].campaign.milestones, null);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

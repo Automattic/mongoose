@@ -3520,6 +3520,21 @@ describe('Query', function() {
     assert.ifError(q.error());
     assert.deepEqual(q._conditions, { username: 'val', pwd: { $gt: null } });
   });
+
+  it('sanitizeFilter disables implicit $in (gh-14657)', function() {
+    const schema = new mongoose.Schema({
+      name: {
+        type: String
+      }
+    });
+    const Test = db.model('Test', schema);
+
+    const q = Test.find({ name: ['foobar'] }).setOptions({ sanitizeFilter: true });
+    q._castConditions();
+    assert.ok(q.error());
+    assert.equal(q.error().name, 'CastError');
+  });
+
   it('should not error when $not is used with $size (gh-10716)', async function() {
     const barSchema = Schema({
       bar: String

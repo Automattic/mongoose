@@ -15,8 +15,8 @@ import mongoose, {
   UpdateWriteOpResult,
   AggregateOptions,
   WithLevel1NestedPaths,
-  NestedPaths,
-  InferSchemaType
+  InferSchemaType,
+  DeleteResult
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
@@ -216,7 +216,7 @@ function find() {
   Project.find({});
   Project.find({ name: 'Hello' });
 
-  // just callback
+  // just callback; this is no longer supported on .find()
   Project.find((error: CallbackError, result: IProject[]) => console.log(error, result));
 
   // filter + projection
@@ -515,7 +515,7 @@ function gh12100() {
 function modelRemoveOptions() {
   const cmodel = model('Test', new Schema());
 
-  cmodel.deleteOne({}, {});
+  const res: DeleteResult = await cmodel.deleteOne({}, {});
 }
 
 async function gh12286() {

@@ -1,3 +1,111 @@
+8.7.3 / 2024-10-25
+==================
+ * fix(cursor): close underlying query cursor when calling destroy() #14982 #14966
+ * types: add JSONSerialized helper that can convert HydratedDocument to JSON output type #14981 #14451
+ * types(model): convert InsertManyResult to interface and remove unnecessary insertedIds override #14977
+ * types(connection): add missing sanitizeFilter option #14975
+ * types: improve goto definition for inferred schema definitions #14968 [forivall](https://github.com/forivall)
+ * docs(migration-guide-v7): correct link to the section "Id Setter" #14973 [rb-ntnx](https://github.com/rb-ntnx)
+
+8.7.2 / 2024-10-17
+==================
+ * fix(document): recursively clear modified subpaths when setting deeply nested subdoc to null #14963 #14952
+ * fix(populate): handle array of ids with parent refPath #14965
+ * types: make Buffers into mongodb.Binary in lean result type to match runtime behavior #14967
+ * types: correct schema type inference when using nested typeKey like type: { type: String } #14956 #14950
+ * types: re-export DeleteResult and UpdateResult from MongoDB Node.js driver #14947 #14946
+ * docs(documents): add section on setting deeply nested properties, including warning about nullish coalescing assignment #14972
+ * docs(model): add more info on acknowledged: false, specifically that Mongoose may return that if the update was empty #14957
+
+8.7.1 / 2024-10-09
+==================
+ * fix: set flattenObjectIds to false when calling toObject() for internal purposes #14938
+ * fix: add mongodb 8 to test matrix #14937
+ * fix: handle buffers stored in MongoDB as EJSON representation with { $binary } #14932
+ * docs: indicate that Mongoose 8.7 is required for full MongoDB 8 support #14937
+
+8.7.0 / 2024-09-27
+==================
+ * feat(model): add Model.applyVirtuals() to apply virtuals to a POJO #14905 #14818
+ * feat: upgrade mongodb -> 6.9.0 #14914
+ * feat(query): cast $rename to string #14887 #3027
+ * feat(SchemaType): add getEmbeddedSchemaType() method to SchemaTypes #14880 #8389
+ * fix(model): throw MongooseBulkSaveIncompleteError if bulkSave() didn't completely succeed #14884 #14763
+ * fix(connection): avoid returning readyState = connected if connection state is stale #14812 #14727
+ * fix: depopulate if push() or addToSet() with an ObjectId on a populated array #14883 #1635
+ * types: make __v a number, only set __v on top-level documents #14892
+
+8.6.4 / 2024-09-26
+==================
+ * fix(document): avoid massive perf degradation when saving new doc with 10 level deep subdocs #14910 #14897
+ * fix(model): skip applying static hooks by default if static name conflicts with aggregate middleware #14904 [dragontaek-lee](https://github.com/dragontaek-lee)
+ * fix(model): filter applying static hooks by default if static name conflicts with mongoose middleware #14908 [dragontaek-lee](https://github.com/dragontaek-lee)
+
+7.8.2 / 2024-09-25
+==================
+ * fix(projection): avoid setting projection to unknown exclusive/inclusive if elemMatch on a Date, ObjectId, etc. #14894 #14893
+
+8.6.3 / 2024-09-17
+==================
+ * fix: make getters convert uuid to string when calling toObject() and toJSON() #14890 #14869
+ * fix: fix missing Aggregate re-exports for ESM #14886 [wongsean](https://github.com/wongsean)
+ * types(document): add generic param to depopulate() to allow updating properties #14891 #14876
+
+6.13.2 / 2024-09-12
+===================
+ * fix(document): make set() respect merge option on deeply nested objects #14870 #14878
+
+8.6.2 / 2024-09-11
+==================
+ * fix: make set merge deeply nested objects #14870 #14861 [ianHeydoc](https://github.com/ianHeydoc)
+ * types: allow arbitrary keys in query filters again (revert #14764) #14874 #14863 #14862 #14842
+ * types: make SchemaType static setters property accessible in TypeScript #14881 #14879
+ * type(inferrawdoctype): infer Date types as JS dates rather than Mongoose SchemaType Date #14882 #14839
+
+8.6.1 / 2024-09-03
+==================
+ * fix(document): avoid unnecessary clone() in applyGetters() that was preventing getters from running on 3-level deep subdocuments #14844 #14840 #14835
+ * fix(model): throw error if bulkSave() did not insert or update any documents #14837 #14763
+ * fix(cursor): throw error in ChangeStream constructor if changeStreamThunk() throws a sync error #14846
+ * types(query): add $expr to RootQuerySelector #14845
+ * docs: update populate.md to fix missing match: { } #14847 [makhoulshbeeb](https://github.com/makhoulshbeeb)
+
+8.6.0 / 2024-08-28
+==================
+ * feat: upgrade mongodb -> 6.8.0, handle throwing error on closed cursor in Mongoose with `MongooseError` instead of `MongoCursorExhaustedError` #14813
+ * feat(model+query): support options parameter for distinct() #14772 #8006
+ * feat(QueryCursor): add getDriverCursor() function that returns the raw driver cursor #14745
+ * types: change query selector to disallow unknown top-level keys by default #14764 [alex-statsig](https://github.com/alex-statsig)
+ * types: make toObject() and toJSON() not generic by default to avoid type widening #14819 #12883
+ * types: avoid automatically inferring lean result type when assigning to explicitly typed variable #14734
+
+8.5.5 / 2024-08-28
+==================
+ * fix(populate): fix a couple of other places where Mongoose gets the document's _id with getters #14833 #14827 #14759
+ * fix(discriminator): shallow clone Schema.prototype.obj before merging schemas to avoid modifying original obj #14821
+ * types: fix schema type based on timestamps schema options value #14829 #14825 [ark23CIS](https://github.com/ark23CIS)
+
+8.5.4 / 2024-08-23
+==================
+ * fix: add empty string check for collection name passed #14806 [Shubham2552](https://github.com/Shubham2552)
+ * docs(model): add 'throw' as valid strict value for bulkWrite() and add some more clarification on throwOnValidationError #14809
+
+7.8.1 / 2024-08-19
+==================
+ * fix(query): handle casting $switch in $expr #14761
+ * docs(mongoose): remove out-of-date callback-based example for mongoose.connect() #14811 #14810
+
+8.5.3 / 2024-08-13
+==================
+ * fix(document): call required functions on subdocuments underneath nested paths with correct context #14801 #14788
+ * fix(populate): avoid throwing error when no result and `lean()` set #14799 #14794 #14759 [MohOraby](https://github.com/MohOraby)
+ * fix(document): apply virtuals to subdocuments if parent schema has virtuals: true for backwards compatibility #14774 #14771 #14623 #14394
+ * types: make HydratedSingleSubdocument and HydratedArraySubdocument merge types instead of using & #14800 #14793
+ * types: support schema type inference based on schema options timestamps as well #14773 #13215 [ark23CIS](https://github.com/ark23CIS)
+ * types(cursor): indicate that cursor.next() can return null #14798 #14787
+ * types: allow mongoose.connection.db to be undefined #14797 #14789
+ * docs: add schema type widening advice #14790 [JstnMcBrd](https://github.com/JstnMcBrd)
+
 8.5.2 / 2024-07-30
 ==================
  * perf(clone): avoid further unnecessary checks if cloning a primitive value #14762 #14394
@@ -8,6 +116,11 @@
  * fix(query): handle casting $switch in $expr #14755 #14751
  * types: allow calling SchemaType.cast() without parent and init parameters #14756 #14748 #9076
  * docs: fix a wrong example in v6 migration guide #14758 [abdelrahman-elkady](https://github.com/abdelrahman-elkady)
+
+7.8.0 / 2024-07-23
+==================
+ * feat: add transactionAsyncLocalStorage option to opt in to automatically setting session on all transactions #14744 #14742 #14583 #13889
+ * types(query): fix usage of "RawDocType" where "DocType" should be passed #14737 [hasezoey](https://github.com/hasezoey)
 
 8.5.1 / 2024-07-12
 ==================
@@ -48,6 +161,11 @@
  * types: add $documents pipeline stage and fix $unionWith type #14666 [nick-statsig](https://github.com/nick-statsig)
  * docs(findoneandupdate): improve example that shows findOneAndUpdate() returning doc before updates were applied #14671 #14670
 
+7.7.0 / 2024-06-18
+==================
+ * feat(model): add throwOnValidationError option for opting into getting MongooseBulkWriteError if all valid operations succeed in bulkWrite() and insertMany() #14599 #14587 #14572 #13410
+
+<<<<<<< HEAD
 8.4.3 / 2024-06-17
 ==================
  * fix: remove 0x flamegraph files from release
@@ -60,6 +178,21 @@
  * fix(connection): fix up some inconsistencies in operation-end event and add to docs #14659 #14648
  * types: avoid inferring Boolean, Buffer, ObjectId as Date in schema definitions under certain circumstances #14667 #14630
  * docs: add note about parallelism in transations #14647 [fiws](https://github.com/fiws)
+=======
+6.13.1 / 2024-09-06
+===================
+ * fix: remove empty $and, $or, $not that were made empty by scrict mode #14749 #13086 [0x0a0d](https://github.com/0x0a0d)
+>>>>>>> 7.x
+
+6.13.0 / 2024-06-06
+===================
+ * feat(model): add throwOnValidationError option for opting into getting MongooseBulkWriteError if all valid operations succeed in bulkWrite() and insertMany() #14599 #14587 #14572 #13410
+
+7.6.13 / 2024-06-05
+===================
+ * fix(query): shallow clone $or and $and array elements to avoid mutating query filter arguments #14614 #14610
+ * types: pass DocType down to subdocuments so HydratedSingleSubdocument and HydratedArraySubdocument toObject() returns correct type #14612 #14601
+ * docs(migrating_to_7): add id setter to Mongoose 7 migration guide #14645 #13672
 
 8.4.1 / 2024-05-31
 ==================
@@ -67,6 +200,11 @@
  * fix(document): fire pre validate hooks on 5 level deep single nested subdoc when modifying after save() #14604 #14591
  * fix: ensure buildBulkWriteOperations target shard if shardKey is set #14622 #14621 [matlpriceshape](https://github.com/matlpriceshape)
  * types: pass DocType down to subdocuments so HydratedSingleSubdocument and HydratedArraySubdocument toObject() returns correct type #14612 #14601
+
+6.12.9 / 2024-05-24
+===================
+ * fix(cast): cast $comment to string in query filters #14590 #14576
+ * types(model): allow passing strict type checking override to create() #14571 #14548
 
 7.6.12 / 2024-05-21
 ===================
@@ -548,6 +686,7 @@
 ==================
  * perf: speed up mapOfSubdocs benchmark by 4x by avoiding unnecessary O(n^2) loop in getPathsToValidate() #13614
  * feat: upgrade to MongoDB Node.js driver 5.7.0 #13591
+ * BREAKING CHANGE: add `id` setter which allows modifying `_id` by setting `id` (Note this change was originally shipped as a `feat`, but later reverted in Mongoose 8 due to compatibility issues) #13517
  * feat: support generating custom cast error message with a function #13608 #3162
  * feat(query): support MongoDB driver's includeResultMetadata option for findOneAndUpdate #13584 #13539
  * feat(connection): add Connection.prototype.removeDb() for removing a related connection #13580 #11821

@@ -87,8 +87,8 @@ declare module 'mongoose' {
             'createdAt' | 'updatedAt'
           > as TimestampOptions[K] extends true
             ? K
-            : TimestampOptions[K] extends string
-              ? TimestampOptions[K]
+            : TimestampOptions[K] extends `${infer TimestampValue}`
+              ? TimestampValue
               : never]: NativeDate;
         } & T
         : T
@@ -146,9 +146,10 @@ type RequiredPathKeys<T, TypeKey extends string = DefaultTypeKey> = {
  * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
  * @returns a record contains required paths with the corresponding type.
  */
-type RequiredPaths<T, TypeKey extends string = DefaultTypeKey> = {
-  [K in RequiredPathKeys<T, TypeKey>]: T[K];
-};
+type RequiredPaths<T, TypeKey extends string = DefaultTypeKey> = Pick<
+  { -readonly [K in keyof T]: T[K] },
+  RequiredPathKeys<T, TypeKey>
+>;
 
 /**
  * @summary A Utility to obtain schema's optional path keys.
@@ -166,9 +167,10 @@ type OptionalPathKeys<T, TypeKey extends string = DefaultTypeKey> = {
  * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
  * @returns a record contains optional paths with the corresponding type.
  */
-type OptionalPaths<T, TypeKey extends string = DefaultTypeKey> = {
-  [K in OptionalPathKeys<T, TypeKey>]?: T[K];
-};
+type OptionalPaths<T, TypeKey extends string = DefaultTypeKey> = Pick<
+  { -readonly [K in keyof T]?: T[K] },
+  OptionalPathKeys<T, TypeKey>
+>;
 
 /**
  * @summary Allows users to optionally choose their own type for a schema field for stronger typing.
@@ -183,8 +185,16 @@ type TypeHint<T> = T extends { __typehint: infer U } ? U: never;
  * @param {TypeKey} TypeKey A generic refers to document definition.
  */
 type ObtainDocumentPathType<PathValueType, TypeKey extends string = DefaultTypeKey> = ResolvePathType<
-PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? PathValueType[TypeKey] : PathValueType,
-PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? Omit<PathValueType, TypeKey> : {},
+  PathValueType extends PathWithTypePropertyBaseType<TypeKey>
+    ? PathValueType[TypeKey] extends PathWithTypePropertyBaseType<TypeKey>
+      ? PathValueType
+      : PathValueType[TypeKey]
+    : PathValueType,
+  PathValueType extends PathWithTypePropertyBaseType<TypeKey>
+    ? PathValueType[TypeKey] extends PathWithTypePropertyBaseType<TypeKey>
+      ? {}
+      : Omit<PathValueType, TypeKey>
+    : {},
 TypeKey,
 TypeHint<PathValueType>
 >;
@@ -281,8 +291,8 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
               IfEquals<PathValueType, String> extends true ? PathEnumOrString<Options['enum']> :
                 PathValueType extends NumberSchemaDefinition ? Options['enum'] extends ReadonlyArray<any> ? Options['enum'][number] : number :
                   IfEquals<PathValueType, Schema.Types.Number> extends true ? number :
-                    PathValueType extends DateSchemaDefinition ? Date :
-                      IfEquals<PathValueType, Schema.Types.Date> extends true ? Date :
+                    PathValueType extends DateSchemaDefinition ? NativeDate :
+                      IfEquals<PathValueType, Schema.Types.Date> extends true ? NativeDate :
                         PathValueType extends typeof Buffer | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer :
                           PathValueType extends BooleanSchemaDefinition ? boolean :
                             IfEquals<PathValueType, Schema.Types.Boolean> extends true ? boolean :

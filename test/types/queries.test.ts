@@ -672,3 +672,9 @@ async function gh14545() {
   const myProjection = await M.findOne({}).select<SlimTest>({ prop: 1 }).exec();
   expectType<SlimTestDocument | null>(myProjection);
 }
+
+function gh14841() {
+  const filter: FilterQuery<{ owners: string[] }> = {
+    $expr: { $lt: [{ $size: '$owners' }, 10] }
+  };
+}

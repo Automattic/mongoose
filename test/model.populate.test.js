@@ -2582,6 +2582,91 @@ describe('model: populate:', function() {
       assert.strictEqual(doc.parts[0].contents[1].item.url, 'https://youtube.com');
     });
 
+    it('with refPath and array of ids with parent refPath', async function() {
+      const Child = db.model(
+        'Child',
+        new mongoose.Schema({
+          fetched: Boolean
+        })
+      );
+
+      const Parent = db.model(
+        'Parent',
+        new mongoose.Schema({
+          docArray: [
+            {
+              type: {
+                type: String,
+                enum: ['Child', 'OtherModel']
+              },
+              ids: [
+                {
+                  type: mongoose.Schema.ObjectId,
+                  refPath: 'docArray.type'
+                }
+              ]
+            }
+          ]
+        })
+      );
+      await Child.insertMany([
+        { _id: new mongoose.Types.ObjectId('6671a008596112f0729c2045'), fetched: true },
+        { _id: new mongoose.Types.ObjectId('667195f3596112f0728abe24'), fetched: true },
+        { _id: new mongoose.Types.ObjectId('6671bd39596112f072cda69c'), fetched: true },
+        { _id: new mongoose.Types.ObjectId('6672c351596112f072868565'), fetched: true },
+        { _id: new mongoose.Types.ObjectId('66734edd596112f0727304a2'), fetched: true },
+        { _id: new mongoose.Types.ObjectId('66726eff596112f072f8e834'), fetched: true },
+        { _id: new mongoose.Types.ObjectId('667267ff596112f072ed56b1'), fetched: true }
+      ]);
+      const { _id } = await Parent.create(
+        {
+          docArray: [
+            {},
+            {
+              type: 'Child',
+              ids: [
+                new mongoose.Types.ObjectId('6671a008596112f0729c2045'),
+                new mongoose.Types.ObjectId('667195f3596112f0728abe24'),
+                new mongoose.Types.ObjectId('6671bd39596112f072cda69c'),
+                new mongoose.Types.ObjectId('6672c351596112f072868565')
+              ]
+            },
+            {
+              type: 'Child',
+              ids: [new mongoose.Types.ObjectId('66734edd596112f0727304a2')]
+            },
+            {},
+            {
+              type: 'Child',
+              ids: [new mongoose.Types.ObjectId('66726eff596112f072f8e834')]
+            },
+            {},
+            {
+              type: 'Child',
+              ids: [new mongoose.Types.ObjectId('667267ff596112f072ed56b1')]
+            }
+          ]
+        }
+      );
+
+      const doc = await Parent.findById(_id).populate('docArray.ids').orFail();
+      assert.strictEqual(doc.docArray.length, 7);
+      assert.strictEqual(doc.docArray[0].ids.length, 0);
+      assert.strictEqual(doc.docArray[1].ids.length, 4);
+      assert.ok(doc.docArray[1].ids[0].fetched);
+      assert.ok(doc.docArray[1].ids[1].fetched);
+      assert.ok(doc.docArray[1].ids[2].fetched);
+      assert.ok(doc.docArray[1].ids[3].fetched);
+      assert.strictEqual(doc.docArray[2].ids.length, 1);
+      assert.ok(doc.docArray[2].ids[0].fetched);
+      assert.strictEqual(doc.docArray[3].ids.length, 0);
+      assert.strictEqual(doc.docArray[4].ids.length, 1);
+      assert.ok(doc.docArray[4].ids[0].fetched);
+      assert.strictEqual(doc.docArray[5].ids.length, 0);
+      assert.strictEqual(doc.docArray[6].ids.length, 1);
+      assert.ok(doc.docArray[6].ids[0].fetched);
+    });
+
     it('with nested nonexistant refPath (gh-6457)', async function() {
       const CommentSchema = new Schema({
         text: String,
@@ -11047,5 +11132,151 @@ describe('model: populate:', function() {
     const pet2 = new Pet({ name: 'Kitty2', owner: owner });
     assert.equal(pet1.owner.name, 'Alice');
     assert.equal(pet2.owner.name, 'Alice');
+  });
+
+  it('avoids populating manually populated doc as getter value (gh-14827)', async function() {
+    const ownerSchema = new mongoose.Schema({
+      _id: {
+        type: 'ObjectId',
+        get(value) {
+          return value == null ? value : value.toString();
+        }
+      },
+      name: 'String'
+    });
+    const petSchema = new mongoose.Schema({
+      name: 'String',
+      owner: { type: 'ObjectId', ref: 'Owner' }
+    });
+
+    const Owner = db.model('Owner', ownerSchema);
+    const Pet = db.model('Pet', petSchema);
+
+    const _id = new mongoose.Types.ObjectId();
+    const owner = new Owner({ _id, name: 'Alice' });
+    const pet = new Pet({ name: 'Kitty', owner: owner });
+
+    await owner.save();
+
+    assert.equal(typeof pet._doc.owner.$__.wasPopulated.value, 'object');
+    await pet.populate('owner');
+    assert.equal(typeof pet._doc.owner.$__.wasPopulated.value, 'object');
+
+    await pet.save();
+
+
+    const fromDb = await Pet.findOne({ owner: _id }).lean().orFail();
+    assert.ok(fromDb.owner instanceof mongoose.Types.ObjectId);
+  });
+
+  it('makes sure that populate works correctly with duplicate foreignField with lean(); (gh-14794)', async function() {
+    const authorSchema = new mongoose.Schema({
+      group: String,
+      name: String
+    });
+
+    const postSchema = new mongoose.Schema({
+      authorGroup: String,
+      title: String,
+      content: String
+    });
+
+    const Author = db.model('Author', authorSchema);
+    const Post = db.model('Post', postSchema);
+
+    await Author.create({ group: 'AUTH1', name: 'John Doe' });
+    await Author.create({ group: 'AUTH2', name: 'Jane Smith' });
+    await Author.create({ group: 'AUTH2', name: 'Will Jons' });
+
+    await Post.create({
+      authorGroup: 'AUTH1',
+      title: 'First Post',
+      content: 'Content 1'
+    });
+
+    await Post.create({
+      authorGroup: 'AUTH2',
+      title: 'Second Post',
+      content: 'Content 2'
+    });
+
+    const posts = await Post.find()
+      .populate({
+        path: 'authorGroup',
+        model: 'Author',
+        select: { _id: 1, name: 1 },
+        foreignField: 'group'
+      })
+      .select({ _id: 1, authorGroup: 1, title: 1 })
+      .lean();
+
+    for (const post of posts) {
+      assert.ok(post.authorGroup._id instanceof mongoose.Types.ObjectId);
+      assert.ok(typeof post.authorGroup.name === 'string');
+    }
+    assert.equal(posts.length, 2);
+  });
+
+  it('depopulates if pushing ObjectId to a populated array (gh-1635)', async function() {
+    const ParentModel = db.model('Test', mongoose.Schema({
+      name: String,
+      children: [{ type: 'ObjectId', ref: 'Child' }]
+    }));
+    const ChildModel = db.model('Child', mongoose.Schema({ name: String }));
+
+    const children = await ChildModel.create([{ name: 'Luke' }, { name: 'Leia' }]);
+    const newChild = await ChildModel.create({ name: 'Taco' });
+    const { _id } = await ParentModel.create({ name: 'Anakin', children });
+
+    const doc = await ParentModel.findById(_id).populate('children');
+    doc.children.push(newChild._id);
+
+    assert.ok(doc.children[0] instanceof mongoose.Types.ObjectId);
+    assert.ok(doc.children[1] instanceof mongoose.Types.ObjectId);
+    assert.ok(doc.children[2] instanceof mongoose.Types.ObjectId);
+
+    await doc.save();
+
+    const fromDb = await ParentModel.findById(_id);
+    assert.equal(fromDb.children[0].toHexString(), children[0]._id.toHexString());
+    assert.equal(fromDb.children[1].toHexString(), children[1]._id.toHexString());
+    assert.equal(fromDb.children[2].toHexString(), newChild._id.toHexString());
+  });
+
+  it('handles converting uuid documents to strings when calling toObject() (gh-14869)', async function() {
+    const nodeSchema = new Schema({ _id: { type: 'UUID' }, name: 'String' });
+    const rootSchema = new Schema({
+      _id: { type: 'UUID' },
+      status: 'String',
+      node: [{ type: 'UUID', ref: 'Child' }]
+    });
+
+    const Node = db.model('Child', nodeSchema);
+    const Root = db.model('Parent', rootSchema);
+
+    const node = new Node({
+      _id: '65c7953e-c6e9-4c2f-8328-fe2de7df560d',
+      name: 'test'
+    });
+    await node.save();
+
+    const root = new Root({
+      _id: '05c7953e-c6e9-4c2f-8328-fe2de7df560d',
+      status: 'ok',
+      node: [node._id]
+    });
+    await root.save();
+
+    const foundRoot = await Root.findById(root._id).populate('node');
+
+    let doc = foundRoot.toJSON({ getters: true });
+    assert.strictEqual(doc._id, '05c7953e-c6e9-4c2f-8328-fe2de7df560d');
+    assert.strictEqual(doc.node.length, 1);
+    assert.strictEqual(doc.node[0]._id, '65c7953e-c6e9-4c2f-8328-fe2de7df560d');
+
+    doc = foundRoot.toObject({ getters: true });
+    assert.strictEqual(doc._id, '05c7953e-c6e9-4c2f-8328-fe2de7df560d');
+    assert.strictEqual(doc.node.length, 1);
+    assert.strictEqual(doc.node[0]._id, '65c7953e-c6e9-4c2f-8328-fe2de7df560d');
   });
 });

@@ -2,7 +2,7 @@
 
 There are several [backwards-breaking changes](https://github.com/Automattic/mongoose/wiki/4.0-Release-Notes) to be aware of when migrating from Mongoose 3 to Mongoose 4.
 
-<h2 id="findandmodify-new">`findOneAndUpdate()` new field is now `false` by default</h2>
+## `findOneAndUpdate()` new field is now `false` by default {#findandmodify-new}
 
 Mongoose's `findOneAndUpdate()`, `findOneAndRemove()`,
 `findByIdAndUpdate()`, and `findByIdAndRemove()` functions are just
@@ -25,7 +25,7 @@ MyModel.findOneAndUpdate({}, { $set: { test: 1 } }, { new: true }, callback);
 
 In Mongoose 3, CastError and ValidationError had a `type` field. For instance, user defined validation errors would have a `type` property that contained the string 'user defined'. In Mongoose 4, this property has been renamed to `kind` due to [the V8 JavaScript engine using the Error.type property internally](https://code.google.com/p/v8/issues/detail?id=2397).
 
-<h2 id="promises">Query now has a `.then()` function</h2>
+## Query now has a `.then()` function {#promises}
 
 In mongoose 3, you needed to call `.exec()` on a query chain to get a
 promise back, like `MyModel.find().exec().then();`. Mongoose 4 queries are
@@ -34,7 +34,7 @@ you're using functions like
 [q's `Q.ninvoke()`](https://github.com/kriskowal/q#adapting-node) or
 otherwise returning a mongoose query from a promise.
 
-<h2 id="moreinfo">More Info</h2>
+## More Info {#moreinfo}
 
 Related blog posts:
 

@@ -97,11 +97,7 @@ await Person.
 
 A full list of [Query helper functions can be found in the API docs](api/query.html).
 
-<h2 id="queries-are-not-promises">
-  <a href="#queries-are-not-promises">
-    Queries are Not Promises
-  </a>
-</h2>
+## Queries are Not Promises
 
 Mongoose queries are **not** promises.
 Queries are [thenables](https://masteringjs.io/tutorials/fundamentals/thenable), meaning they have a `.then()` method for [async/await](http://thecodebarbarian.com/common-async-await-design-patterns-in-node.js.html) as a convenience.
@@ -115,14 +111,14 @@ await q.then(() => console.log('Update 2'));
 await q.then(() => console.log('Update 3'));
 ```
 
-<h2 id="refs"><a href="#refs">References to other documents</a></h2>
+## References to other documents {#refs}
 
 There are no joins in MongoDB but sometimes we still want references to
 documents in other collections. This is where [population](populate.html)
 comes in. Read more about how to include documents from other collections in
 your query results [here](api/query.html#query_Query-populate).
 
-<h2 id="streaming"><a href="#streaming">Streaming</a></h2>
+## Streaming {#streaming}
 
 You can [stream](http://nodejs.org/api/stream.html) query results from
 MongoDB. You need to call the
@@ -159,7 +155,7 @@ However, cursors can still time out because of [session idle timeouts](https://w
 So even a cursor with `noCursorTimeout` set will still time out after 30 minutes
 of inactivity. You can read more about working around session idle timeouts in the [MongoDB documentation](https://www.mongodb.com/docs/manual/reference/method/cursor.noCursorTimeout/#session-idle-timeout-overrides-nocursortimeout).
 
-<h2 id="versus-aggregation"><a href="#versus-aggregation">Versus Aggregation</a></h2>
+## Versus Aggregation {#versus-aggregation}
 
 [Aggregation](api/aggregate.html#aggregate_Aggregate) can
 do many of the same things that queries can. For example, below is
@@ -201,7 +197,7 @@ const queryRes = await Person.findOne({ _id: idString });
 const aggRes = await Person.aggregate([{ $match: { _id: idString } }]);
 ```
 
-<h2 id="sorting"><a href="#sorting">Sorting</a></h2>
+## Sorting {#sorting}
 
 [Sorting](/docs/api.html#query_Query-sort) is how you can ensure your query results come back in the desired order.
 
@@ -284,6 +280,6 @@ As you can see, age is sorted from 0 to 2 but when age is equal, sorts by weight
 ];
 ```
 
-<h2 id="next"><a href="#next">Next Up</a></h2>
+## Next Up {#next}
 
 Now that we've covered `Queries`, let's take a look at [Validation](validation.html).

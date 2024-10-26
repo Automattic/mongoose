@@ -19,7 +19,7 @@ const mongoose = require('mongoose/browser');
 import mongoose from 'mongoose/browser';
 ```
 
-<h2 id="usage">Using the Browser Library</h2>
+## Using the Browser Library {#usage}
 
 Mongoose's browser library is very limited. The only use case it supports is validating documents as shown below.
 

@@ -10,6 +10,7 @@ import {
   InferRawDocType,
   InferSchemaType,
   InsertManyOptions,
+  JSONSerialized,
   ObtainDocumentType,
   ObtainSchemaGeneric,
   ResolveSchemaOptions,
@@ -20,8 +21,11 @@ import {
   Types,
   Query,
   model,
-  ValidateOpts
+  ValidateOpts,
+  BufferToBinary
 } from 'mongoose';
+import { Binary } from 'mongodb';
+import { IsPathRequired } from '../../types/inferschematype';
 import { expectType, expectError, expectAssignable } from 'tsd';
 import { ObtainDocumentPathType, ResolvePathType } from '../../types/inferschematype';
 
@@ -916,7 +920,7 @@ async function gh12593() {
   expectType<Buffer | undefined | null>(doc2.x);
 
   const doc3 = await Test.findOne({}).orFail().lean();
-  expectType<Buffer | undefined | null>(doc3.x);
+  expectType<Binary | undefined | null>(doc3.x);
 
   const arrSchema = new Schema({ arr: [{ type: Schema.Types.UUID }] });
 
@@ -1502,16 +1506,18 @@ function gh13772() {
   const schemaDefinition = {
     name: String,
     docArr: [{ name: String }]
-  };
+  } as const;
   const schema = new Schema(schemaDefinition);
-  type RawDocType = InferRawDocType<typeof schemaDefinition>;
-  expectAssignable<
-    { name?: string | null, docArr?: Array<{ name?: string | null }> }
-  >({} as RawDocType);
 
   const TestModel = model('User', schema);
+  type RawDocType = InferRawDocType<typeof schemaDefinition>;
+  expectAssignable<
+    { name?: string | null, docArr?: Array<{ name?: string | null }> | null }
+  >({} as RawDocType);
+
   const doc = new TestModel();
   expectAssignable<RawDocType>(doc.toObject());
+  expectAssignable<RawDocType>(doc.toJSON());
 }
 
 function gh14696() {
@@ -1603,4 +1609,108 @@ function gh13215() {
   const schema = new Schema(schemaDefinition, schemaOptions);
   type SchemaType = InferSchemaType<typeof schema>;
   expectType<User>({} as SchemaType);
+}
+
+function gh14825() {
+  const schemaDefinition = {
+    userName: { type: String, required: true }
+  } as const;
+  const schemaOptions = {
+    typeKey: 'type' as const,
+    timestamps: {
+      createdAt: 'date',
+      updatedAt: false
+    }
+  };
+
+  type RawDocType = InferRawDocType<
+    typeof schemaDefinition,
+    typeof schemaOptions
+  >;
+  type User = {
+    userName: string;
+  };
+
+  expectAssignable<User>({} as RawDocType);
+
+  const schema = new Schema(schemaDefinition, schemaOptions);
+  type SchemaType = InferSchemaType<typeof schema>;
+  expectAssignable<User>({} as SchemaType);
+}
+
+function gh8389() {
+  const schema = new Schema({ name: String, tags: [String] });
+
+  expectAssignable<SchemaType<any> | undefined>(schema.path('name').getEmbeddedSchemaType());
+  expectAssignable<SchemaType<any> | undefined>(schema.path('tags').getEmbeddedSchemaType());
+}
+
+function gh14879() {
+  Schema.Types.String.setters.push((val?: unknown) => typeof val === 'string' ? val.trim() : val);
+}
+
+async function gh14950() {
+  const SightingSchema = new Schema(
+    {
+      _id: { type: Schema.Types.ObjectId, required: true },
+      location: {
+        type: { type: String, required: true },
+        coordinates: [{ type: Number }]
+      }
+    }
+  );
+
+  const TestModel = model('Test', SightingSchema);
+  const doc = await TestModel.findOne().orFail();
+
+  expectType<string>(doc.location!.type);
+  expectType<number[]>(doc.location!.coordinates);
+}
+
+async function gh14902() {
+  const exampleSchema = new Schema({
+    image: { type: Buffer },
+    subdoc: {
+      type: new Schema({
+        testBuf: Buffer
+      })
+    }
+  });
+  const Test = model('Test', exampleSchema);
+
+  const doc = await Test.findOne().lean().orFail();
+  expectType<Binary | null | undefined>(doc.image);
+  expectType<Binary | null | undefined>(doc.subdoc!.testBuf);
+}
+
+async function gh14451() {
+  const exampleSchema = new Schema({
+    myId: { type: 'ObjectId' },
+    myRequiredId: { type: 'ObjectId', required: true },
+    myBuf: { type: Buffer, required: true },
+    subdoc: {
+      type: new Schema({
+        subdocProp: Date
+      })
+    },
+    docArr: [{ nums: [Number], times: [{ type: Date }] }],
+    myMap: {
+      type: Map,
+      of: String
+    }
+  });
+
+  const Test = model('Test', exampleSchema);
+
+  type TestJSON = JSONSerialized<InferSchemaType<typeof exampleSchema>>;
+  expectType<{
+    myId?: string | undefined | null,
+    myRequiredId: string,
+    myBuf: { type: 'buffer', data: number[] },
+    subdoc?: {
+      subdocProp?: string | undefined | null
+    } | null,
+    docArr: { nums: number[], times: string[] }[],
+    myMap?: Record<string, string> | null | undefined
+  }>({} as TestJSON);
 }

@@ -8,7 +8,7 @@ interface Project {
 type ProjectModelType = Model<Project, ProjectQueryHelpers>;
 // Query helpers should return `Query<any, Document<DocType>> & ProjectQueryHelpers`
 // to enable chaining.
-type ProjectModelQuery = Query<any, HydratedDocument<Project>, ProjectQueryHelpers> & ProjectQueryHelpers;
+type ProjectModelQuery = Query<any, HydratedDocument<Project>, ProjectQueryHelpers, any> & ProjectQueryHelpers;
 interface ProjectQueryHelpers {
   byName(this: ProjectModelQuery, name: string): ProjectModelQuery;
 }

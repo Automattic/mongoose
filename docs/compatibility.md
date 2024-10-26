@@ -18,6 +18,7 @@ Below are the [semver](http://semver.org/) ranges representing which versions of
 
 | MongoDB Server |                Mongoose                 |
 | :------------: | :-------------------------------------: |
+|     `8.x`      |                 `^8.7.0`                |
 |     `7.x`      |            `^7.4.0 \| ^8.0.0`           |
 |     `6.x`      |      `^6.5.0 \| ^7.0.0 \| ^8.0.0`       |
 |     `5.x`      | `^5.13.0` \| `^6.0.0 \| ^7.0.0 \| ^8.0.0`|

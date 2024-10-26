@@ -4,6 +4,7 @@
 
 'use strict';
 
+const { once } = require('events');
 const start = require('./common');
 
 const assert = require('assert');
@@ -415,7 +416,8 @@ describe('QueryCursor', function() {
         await cursor.next();
         assert.ok(false);
       } catch (error) {
-        assert.equal(error.name, 'MongoCursorExhaustedError');
+        assert.equal(error.name, 'MongooseError');
+        assert.ok(error.message.includes('closed cursor'), error.message);
       }
     });
   });
@@ -918,6 +920,34 @@ describe('QueryCursor', function() {
     const driverCursor = await cursor.getDriverCursor();
     assert.ok(cursor.cursor);
     assert.equal(driverCursor, cursor.cursor);
+  });
+
+  it('handles destroy() (gh-14966)', async function() {
+    db.deleteModel(/Test/);
+    const TestModel = db.model('Test', mongoose.Schema({ name: String }));
+
+    const stream = await TestModel.find().cursor();
+    await once(stream, 'cursor');
+    assert.ok(!stream.cursor.closed);
+
+    stream.destroy();
+
+    await once(stream.cursor, 'close');
+    assert.ok(stream.destroyed);
+    assert.ok(stream.cursor.closed);
+  });
+
+  it('handles destroy() before cursor is created (gh-14966)', async function() {
+    db.deleteModel(/Test/);
+    const TestModel = db.model('Test', mongoose.Schema({ name: String }));
+
+    const stream = await TestModel.find().cursor();
+    assert.ok(!stream.cursor);
+    stream.destroy();
+
+    await once(stream, 'cursor');
+    assert.ok(stream.destroyed);
+    assert.ok(stream.cursor.closed);
   });
 });
 

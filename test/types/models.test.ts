@@ -2,6 +2,7 @@ import mongoose, {
   Schema,
   Document,
   Model,
+  createConnection,
   connection,
   model,
   Types,
@@ -976,4 +977,14 @@ function testWithLevel1NestedPaths() {
     foo?: { one?: string | null | undefined } | null | undefined,
     'foo.one': string | null | undefined
   }>({} as Test2);
+}
+
+async function gh14802() {
+  const schema = new mongoose.Schema({
+    name: String
+  });
+  const Model = model('Test', schema);
+
+  const conn2 = mongoose.createConnection('mongodb://127.0.0.1:27017/mongoose_test');
+  Model.useConnection(conn2);
 }

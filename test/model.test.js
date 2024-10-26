@@ -7575,29 +7575,49 @@ describe('Model', function() {
 
     assert.strictEqual(doc.__v, 0);
   });
-  it('updates the model\'s db property to point to the provided connection instance and vice versa asdf', async function() {
-    const schema = new mongoose.Schema({
-      name: String
+
+  describe('Model.useConnection() (gh-14802)', function() {
+    it('updates the model\'s db property to point to the provided connection instance and vice versa (gh-14802))', async function() {
+      const schema = new mongoose.Schema({
+        name: String
+      });
+      const Model = db.model('Test', schema);
+      assert.equal(db.model('Test'), Model);
+      const original = Model.find();
+      assert.equal(original.model.collection.conn.name, 'mongoose_test');
+      await Model.create({ name: 'gh-14802 test' });
+      let docs = await original;
+      assert.equal(docs.length, 1);
+      assert.strictEqual(docs[0].name, 'gh-14802 test');
+
+      const connection = start({ uri: start.uri2 });
+      await connection.asPromise();
+      await Model.useConnection(connection);
+      assert.equal(db.models[Model.modelName], undefined);
+      assert(connection.models[Model.modelName]);
+      const query = Model.find();
+      assert.equal(query.model.collection.conn.name, 'mongoose_test_2');
+
+      await Model.deleteMany({});
+      await Model.create({ name: 'gh-14802 test 2' });
+      docs = await query;
+      assert.equal(docs.length, 1);
+      assert.strictEqual(docs[0].name, 'gh-14802 test 2');
+
+      assert.equal(connection.model('Test'), Model);
+      assert.throws(() => db.model('Test'), /MissingSchemaError/);
     });
-    const Model = db.model('Test', schema);
-    const connection = start({ uri: start.uri2 });
-    const original = Model.find();
-    assert.equal(original.model.collection.conn.name, 'mongoose_test');
-    await Model.useConnection(connection);
-    assert.equal(db.models[Model.modelName], undefined);
-    assert(connection.models[Model.modelName]);
-    const res = Model.find();
-    assert.equal(res.model.collection.conn.name, 'mongoose_test_2');
+
+    it('should throw an error if no connection is passed', async function() {
+      const schema = new mongoose.Schema({
+        name: String
+      });
+      const Model = db.model('Test', schema);
+      assert.throws(() => {
+        Model.useConnection();
+      }, { message: 'Please provide a connection.' });
+    });
   });
-  it('should throw an error if no connection is passed', async function() {
-    const schema = new mongoose.Schema({
-      name: String
-    });
-    const Model = db.model('Test', schema);
-    assert.throws(() => {
-      Model.useConnection();
-    }, { message: 'Please provide a connection.' })
-  })
 });
 
 

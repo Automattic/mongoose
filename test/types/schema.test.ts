@@ -2,6 +2,7 @@ import {
   DefaultSchemaOptions,
   HydratedArraySubdocument,
   HydratedSingleSubdocument,
+  HydratedDocumentFromSchema,
   Schema,
   Document,
   HydratedDocument,
@@ -1713,4 +1714,23 @@ async function gh14451() {
     docArr: { nums: number[], times: string[] }[],
     myMap?: Record<string, string> | null | undefined
   }>({} as TestJSON);
+}
+
+async function gh12959() {
+  const subdocSchema = new Schema({ foo: { type: 'string', required: true } });
+
+  const schema = new Schema({
+    subdocArray: { type: [subdocSchema], required: true },
+  });
+
+  type Inferred = InferSchemaType<typeof schema>;
+
+  expectType<Types.ObjectId>({} as Inferred['subdocArray'][number]['_id']);
+
+  type Hydrated = HydratedDocumentFromSchema<typeof schema>;
+  expectType<Types.ObjectId>({} as Hydrated['subdocArray'][number]['_id']);
+
+  const Model = model('Test', schema);
+  const leanDoc = await Model.findOne().orFail().lean();
+  expectType<Types.ObjectId>(leanDoc.subdocArray[0]._id);
 }

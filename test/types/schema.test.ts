@@ -1720,7 +1720,7 @@ async function gh12959() {
   const subdocSchema = new Schema({ foo: { type: 'string', required: true } });
 
   const schema = new Schema({
-    subdocArray: { type: [subdocSchema], required: true },
+    subdocArray: { type: [subdocSchema], required: true }
   });
 
   type Inferred = InferSchemaType<typeof schema>;

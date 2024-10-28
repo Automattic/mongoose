@@ -4962,6 +4962,31 @@ describe('Model', function() {
         assert.strictEqual(indexes[1].background, false);
       });
 
+      it('syncIndexes() supports hideIndexes (gh-14868)', async function() {
+        const opts = { autoIndex: false };
+        const schema = new Schema({ name: String }, opts);
+        schema.index({ name: 1 });
+
+        let M = db.model('Test', schema);
+        await M.syncIndexes({});
+
+        let indexes = await M.listIndexes();
+        assert.deepEqual(indexes[1].key, { name: 1 });
+        assert.ok(!indexes[1].hidden);
+
+        db.deleteModel(/Test/);
+        M = db.model('Test', new Schema({ name: String }, opts));
+        await M.syncIndexes({ hideIndexes: true });
+        indexes = await M.listIndexes();
+        assert.deepEqual(indexes[1].key, { name: 1 });
+        assert.ok(indexes[1].hidden);
+
+        await M.syncIndexes({});
+        indexes = await M.listIndexes();
+        assert.equal(indexes.length, 1);
+        assert.deepEqual(indexes[0].key, { _id: 1 });
+      });
+
       it('should not drop a text index on .syncIndexes() call (gh-10850)', async function() {
         const collation = { collation: { locale: 'simple' } };
         const someSchema = new Schema({

@@ -140,7 +140,7 @@ declare module 'mongoose' {
 
   export type Default__v<T> = T extends { __v?: infer U }
     ? T
-    : T & { __v?: number };
+    : T & { __v: number };
 
   /** Helper type for getting the hydrated document type from the raw document type. The hydrated document type is what `new MyModel()` returns. */
   export type HydratedDocument<

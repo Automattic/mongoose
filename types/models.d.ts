@@ -126,7 +126,7 @@ declare module 'mongoose' {
   }
 
   interface ModifyResult<T> {
-    value: Require_id<T> | null;
+    value: Default__v<Require_id<T>> | null;
     /** see https://www.mongodb.com/docs/manual/reference/command/findAndModify/#lasterrorobject */
     lastErrorObject?: {
       updatedExisting?: boolean;

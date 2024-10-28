@@ -371,7 +371,7 @@ async function gh12959() {
 
   const doc = await Model.findById('id').orFail();
   expectType<Types.ObjectId>(doc._id);
-  expectType<number | undefined>(doc.__v);
+  expectType<number>(doc.__v);
 
   expectError(doc.subdocArray[0].__v);
 }

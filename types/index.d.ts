@@ -25,7 +25,7 @@
 /// <reference path="./virtuals.d.ts" />
 /// <reference path="./augmentations.d.ts" />
 
-declare class NativeDate extends global.Date { }
+declare class NativeDate extends globalThis.Date { }
 
 declare module 'mongoose' {
   import Kareem = require('kareem');

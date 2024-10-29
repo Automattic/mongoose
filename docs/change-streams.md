@@ -21,7 +21,7 @@ await Person.create({ name: 'Axl Rose' });
 
 The above script will print output that looks like:
 
-```no-highlight
+```javascript
 {
   _id: {
     _data: '8262408DAC000000012B022C0100296E5A10042890851837DB4792BE6B235E8B85489F46645F6964006462408DAC6F5C42FF5EE087A20004'

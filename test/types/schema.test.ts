@@ -1714,3 +1714,13 @@ async function gh14451() {
     myMap?: Record<string, string> | null | undefined
   }>({} as TestJSON);
 }
+
+async function gh12959() {
+  const schema = new Schema({ name: String });
+  const TestModel = model('Test', schema);
+
+  const doc = await TestModel.findOne().orFail();
+  expectType<number>(doc.__v);
+  const leanDoc = await TestModel.findOne().lean().orFail();
+  expectType<number>(leanDoc.__v);
+}

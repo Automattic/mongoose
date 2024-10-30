@@ -544,7 +544,7 @@ The MongoDB node driver will always attempt to retry any operation for up to `se
 So, it will never run out of retries or try to reconnect to MongoDB.
 
 
-<h2 id="lodash-object-id"><a href="#lodash-object-id">Lodash <code>.isEmpty()</code> returns true for ObjectIds</h2>
+<h2 id="lodash-object-id"><a href="#lodash-object-id">Lodash <code>.isEmpty()</code> returns true for ObjectIds</a></h2>
 
 Lodash's `isEmpty()` function returns true for primitives and primitive wrappers.
 `ObjectId()` is an object wrapper that is treated as a primitive by Mongoose.

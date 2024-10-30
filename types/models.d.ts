@@ -607,6 +607,13 @@ declare module 'mongoose' {
      */
     updateSearchIndex(name: string, definition: AnyObject): Promise<void>;
 
+    /**
+     * Changes the Connection instance this model uses to make requests to MongoDB.
+     * This function is most useful for changing the Connection that a Model defined using `mongoose.model()` uses
+     * after initialization.
+     */
+    useConnection(connection: Connection): this;
+
     /** Casts and validates the given object against this model's schema, passing the given `context` to custom validators. */
     validate(): Promise<void>;
     validate(obj: any): Promise<void>;

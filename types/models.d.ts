@@ -126,7 +126,7 @@ declare module 'mongoose' {
   }
 
   interface ModifyResult<T> {
-    value: Require_id<T> | null;
+    value: Default__v<Require_id<T>> | null;
     /** see https://www.mongodb.com/docs/manual/reference/command/findAndModify/#lasterrorobject */
     lastErrorObject?: {
       updatedExisting?: boolean;
@@ -291,6 +291,11 @@ declare module 'mongoose' {
 
     /* Apply virtuals to the given POJO. */
     applyVirtuals(obj: AnyObject, virtalsToApply?: string[]): AnyObject;
+
+    /**
+     * Apply this model's timestamps to a given POJO, including subdocument timestamps
+     */
+    applyTimestamps(obj: AnyObject, options?: { isUpdate?: boolean, currentTime?: () => Date }): AnyObject;
 
     /**
      * Sends multiple `insertOne`, `updateOne`, `updateMany`, `replaceOne`,

@@ -24,6 +24,7 @@ declare module 'mongoose' {
     | 'runValidators'
     | 'sanitizeProjection'
     | 'sanitizeFilter'
+    | 'schemaLevelProjections'
     | 'setDefaultsOnInsert'
     | 'strict'
     | 'strictQuery'
@@ -179,6 +180,11 @@ declare module 'mongoose' {
      * aren't explicitly allowed using `mongoose.trusted()`.
      */
     sanitizeFilter?: boolean;
+    /**
+     * Enable or disable schema level projections for this query. Enabled by default.
+     * Set to `false` to include fields with `select: false` in the query result by default.
+     */
+    schemaLevelProjections?: boolean;
     setDefaultsOnInsert?: boolean;
     skip?: number;
     sort?: any;
@@ -211,7 +217,7 @@ declare module 'mongoose' {
   type QueryOpThatReturnsDocument = 'find' | 'findOne' | 'findOneAndUpdate' | 'findOneAndReplace' | 'findOneAndDelete';
 
   type GetLeanResultType<RawDocType, ResultType, QueryOp> = QueryOp extends QueryOpThatReturnsDocument
-    ? (ResultType extends any[] ? Require_id<BufferToBinary<FlattenMaps<RawDocType>>>[] : Require_id<BufferToBinary<FlattenMaps<RawDocType>>>)
+    ? (ResultType extends any[] ? Default__v<Require_id<BufferToBinary<FlattenMaps<RawDocType>>>>[] : Default__v<Require_id<BufferToBinary<FlattenMaps<RawDocType>>>>)
     : ResultType;
 
   type MergePopulatePaths<RawDocType, ResultType, QueryOp, Paths, TQueryHelpers, TInstanceMethods = Record<string, never>> = QueryOp extends QueryOpThatReturnsDocument
@@ -733,6 +739,12 @@ declare module 'mongoose' {
      * Sets this query's `sanitizeProjection` option. With `sanitizeProjection()`, you can pass potentially untrusted user data to `.select()`.
      */
     sanitizeProjection(value: boolean): this;
+
+    /**
+     * Enable or disable schema level projections for this query. Enabled by default.
+     * Set to `false` to include fields with `select: false` in the query result by default.
+     */
+    schemaLevelProjections(value: boolean): this;
 
     /** Specifies which document fields to include or exclude (also known as the query "projection") */
     select<RawDocTypeOverride extends { [P in keyof RawDocType]?: any } = {}>(

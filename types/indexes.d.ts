@@ -57,7 +57,8 @@ declare module 'mongoose' {
   type IndexDefinition = Record<string, IndexDirection>;
 
   interface SyncIndexesOptions extends mongodb.CreateIndexesOptions {
-    continueOnError?: boolean
+    continueOnError?: boolean;
+    hideIndexes?: boolean;
   }
   type ConnectionSyncIndexesResult = Record<string, OneCollectionSyncIndexesResult>;
   type OneCollectionSyncIndexesResult = Array<string> & mongodb.MongoServerError;

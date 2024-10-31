@@ -4962,6 +4962,31 @@ describe('Model', function() {
         assert.strictEqual(indexes[1].background, false);
       });
 
+      it('syncIndexes() supports hideIndexes (gh-14868)', async function() {
+        const opts = { autoIndex: false };
+        const schema = new Schema({ name: String }, opts);
+        schema.index({ name: 1 });
+
+        let M = db.model('Test', schema);
+        await M.syncIndexes({});
+
+        let indexes = await M.listIndexes();
+        assert.deepEqual(indexes[1].key, { name: 1 });
+        assert.ok(!indexes[1].hidden);
+
+        db.deleteModel(/Test/);
+        M = db.model('Test', new Schema({ name: String }, opts));
+        await M.syncIndexes({ hideIndexes: true });
+        indexes = await M.listIndexes();
+        assert.deepEqual(indexes[1].key, { name: 1 });
+        assert.ok(indexes[1].hidden);
+
+        await M.syncIndexes({});
+        indexes = await M.listIndexes();
+        assert.equal(indexes.length, 1);
+        assert.deepEqual(indexes[0].key, { _id: 1 });
+      });
+
       it('should not drop a text index on .syncIndexes() call (gh-10850)', async function() {
         const collation = { collation: { locale: 'simple' } };
         const someSchema = new Schema({
@@ -8016,6 +8041,110 @@ describe('Model', function() {
       assert.strictEqual(res.name.last, 'Gates');
       assert.strictEqual(res.fullName, 'Bill Gates');
       assert.strictEqual(res.friend, null);
+    });
+  });
+
+  describe('applyTimestamps', function() {
+    it('handles basic top-level timestamps', async function() {
+      const startTime = new Date();
+      const userSchema = new Schema({
+        name: String
+      }, { timestamps: true });
+      const User = db.model('User', userSchema);
+
+      const obj = { name: 'test' };
+      User.applyTimestamps(obj);
+      assert.equal(obj.name, 'test');
+      assert.ok(obj.createdAt instanceof Date);
+      assert.ok(obj.updatedAt instanceof Date);
+      assert.ok(obj.createdAt.valueOf() >= startTime.valueOf());
+      assert.ok(obj.updatedAt.valueOf() >= startTime.valueOf());
+    });
+
+    it('no-op if timestamps not set', async function() {
+      const userSchema = new Schema({
+        name: String
+      });
+      const User = db.model('User', userSchema);
+
+      const obj = { name: 'test' };
+      User.applyTimestamps(obj);
+      assert.equal(obj.name, 'test');
+      assert.ok(!('createdAt' in obj));
+      assert.ok(!('updatedAt' in obj));
+    });
+
+    it('handles custom timestamp property names', async function() {
+      const startTime = new Date();
+      const userSchema = new Schema({
+        name: String
+      }, { timestamps: { createdAt: 'createdOn', updatedAt: 'updatedOn' } });
+      const User = db.model('User', userSchema);
+
+      const obj = { name: 'test' };
+      User.applyTimestamps(obj);
+      assert.equal(obj.name, 'test');
+      assert.ok(obj.createdOn instanceof Date);
+      assert.ok(obj.updatedOn instanceof Date);
+      assert.ok(obj.createdOn.valueOf() >= startTime.valueOf());
+      assert.ok(obj.updatedOn.valueOf() >= startTime.valueOf());
+      assert.ok(!('createdAt' in obj));
+      assert.ok(!('updatedAt' in obj));
+    });
+
+    it('applies timestamps to subdocs', async function() {
+      const startTime = new Date();
+      const userSchema = new Schema({
+        name: String,
+        posts: [new Schema({
+          title: String,
+          content: String
+        }, { timestamps: true })],
+        address: new Schema({
+          city: String,
+          country: String
+        }, { timestamps: true })
+      }, { timestamps: true });
+      const User = db.model('User', userSchema);
+
+      const obj = {
+        name: 'test',
+        posts: [{ title: 'Post 1', content: 'Content 1' }],
+        address: { city: 'New York', country: 'USA' }
+      };
+      User.applyTimestamps(obj);
+      assert.equal(obj.name, 'test');
+      assert.ok(obj.createdAt instanceof Date);
+      assert.ok(obj.updatedAt instanceof Date);
+      assert.ok(obj.createdAt.valueOf() >= startTime.valueOf());
+      assert.ok(obj.updatedAt.valueOf() >= startTime.valueOf());
+      assert.ok(obj.posts[0].createdAt instanceof Date);
+      assert.ok(obj.posts[0].updatedAt instanceof Date);
+      assert.ok(obj.address.createdAt instanceof Date);
+      assert.ok(obj.address.updatedAt instanceof Date);
+    });
+
+    it('supports isUpdate and currentTime options', async function() {
+      const userSchema = new Schema({
+        name: String,
+        post: new Schema({
+          title: String,
+          content: String
+        }, { timestamps: true })
+      }, { timestamps: true });
+      const User = db.model('User', userSchema);
+
+      const obj = {
+        name: 'test',
+        post: { title: 'Post 1', content: 'Content 1' }
+      };
+      User.applyTimestamps(obj, { isUpdate: true, currentTime: () => new Date('2023-06-01T18:00:00.000Z') });
+      assert.equal(obj.name, 'test');
+      assert.ok(!('createdAt' in obj));
+      assert.ok(obj.updatedAt instanceof Date);
+      assert.equal(obj.updatedAt.valueOf(), new Date('2023-06-01T18:00:00.000Z').valueOf());
+      assert.ok(!('createdAt' in obj.post));
+      assert.ok(obj.post.updatedAt.valueOf(), new Date('2023-06-01T18:00:00.000Z').valueOf());
     });
   });
 });

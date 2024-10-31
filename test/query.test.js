@@ -3520,6 +3520,21 @@ describe('Query', function() {
     assert.ifError(q.error());
     assert.deepEqual(q._conditions, { username: 'val', pwd: { $gt: null } });
   });
+
+  it('sanitizeFilter disables implicit $in (gh-14657)', function() {
+    const schema = new mongoose.Schema({
+      name: {
+        type: String
+      }
+    });
+    const Test = db.model('Test', schema);
+
+    const q = Test.find({ name: ['foobar'] }).setOptions({ sanitizeFilter: true });
+    q._castConditions();
+    assert.ok(q.error());
+    assert.equal(q.error().name, 'CastError');
+  });
+
   it('should not error when $not is used with $size (gh-10716)', async function() {
     const barSchema = Schema({
       bar: String
@@ -4338,5 +4353,63 @@ describe('Query', function() {
 
     await Person.find({ $and: filter });
     assert.deepStrictEqual(filter, [{ name: 'Me', age: '20' }, { name: 'You', age: '50' }]);
+  });
+
+  describe('schemaLevelProjections (gh-11474)', function() {
+    it('disables schema-level select: false', async function() {
+      const userSchema = new Schema({
+        email: { type: String, required: true },
+        passwordHash: { type: String, select: false, required: true }
+      });
+      const UserModel = db.model('User', userSchema);
+
+      const { _id } = await UserModel.create({ email: 'test', passwordHash: 'gh-11474' });
+
+      const doc = await UserModel.findById(_id).orFail().schemaLevelProjections(false);
+      assert.strictEqual(doc.email, 'test');
+      assert.strictEqual(doc.passwordHash, 'gh-11474');
+    });
+
+    it('disables schema-level select: true', async function() {
+      const userSchema = new Schema({
+        email: { type: String, required: true, select: true },
+        otherProp: String
+      });
+      const UserModel = db.model('User', userSchema);
+
+      const { _id } = await UserModel.create({ email: 'test', otherProp: 'gh-11474 select true' });
+
+      const doc = await UserModel.findById(_id).select('otherProp').orFail().schemaLevelProjections(false);
+      assert.strictEqual(doc.email, undefined);
+      assert.strictEqual(doc.otherProp, 'gh-11474 select true');
+    });
+
+    it('works via setOptions()', async function() {
+      const userSchema = new Schema({
+        email: { type: String, required: true },
+        passwordHash: { type: String, select: false, required: true }
+      });
+      const UserModel = db.model('User', userSchema);
+
+      const { _id } = await UserModel.create({ email: 'test', passwordHash: 'gh-11474' });
+
+      const doc = await UserModel.findById(_id).orFail().setOptions({ schemaLevelProjections: false });
+      assert.strictEqual(doc.email, 'test');
+      assert.strictEqual(doc.passwordHash, 'gh-11474');
+    });
+
+    it('disabled via truthy value', async function() {
+      const userSchema = new Schema({
+        email: { type: String, required: true },
+        passwordHash: { type: String, select: false, required: true }
+      });
+      const UserModel = db.model('User', userSchema);
+
+      const { _id } = await UserModel.create({ email: 'test', passwordHash: 'gh-11474' });
+
+      const doc = await UserModel.findById(_id).orFail().schemaLevelProjections(true);
+      assert.strictEqual(doc.email, 'test');
+      assert.strictEqual(doc.passwordHash, undefined);
+    });
   });
 });

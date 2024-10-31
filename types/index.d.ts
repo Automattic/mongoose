@@ -25,7 +25,7 @@
 /// <reference path="./virtuals.d.ts" />
 /// <reference path="./augmentations.d.ts" />
 
-declare class NativeDate extends global.Date { }
+declare class NativeDate extends globalThis.Date { }
 
 declare module 'mongoose' {
   import Kareem = require('kareem');
@@ -140,7 +140,7 @@ declare module 'mongoose' {
 
   export type Default__v<T> = T extends { __v?: infer U }
     ? T
-    : T & { __v?: number };
+    : T & { __v: number };
 
   /** Helper type for getting the hydrated document type from the raw document type. The hydrated document type is what `new MyModel()` returns. */
   export type HydratedDocument<
@@ -622,6 +622,9 @@ declare module 'mongoose' {
 
     /** Additional options like `limit` and `lean`. */
     options?: QueryOptions<DocType> & { match?: AnyObject };
+
+    /** If true and the given `name` is a direct child of an array, apply the virtual to the array rather than the elements. */
+    applyToArray?: boolean;
 
     /** Additional options for plugins */
     [extra: string]: any;

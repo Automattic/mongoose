@@ -1,3 +1,19 @@
+8.8.0 / 2024-10-31
+==================
+ * feat: upgrade mongodb -> ~6.10 #14991 #14877
+ * feat(query): add schemaLevelProjections option to query to disable schema-level select: false #14986 #11474
+ * feat: allow defining virtuals on arrays, not just array elements #14955 #2326
+ * feat(model): add applyTimestamps() function to apply all schema timestamps, including subdocuments, to a given POJO #14943 #14698
+ * feat(model): add hideIndexes option to syncIndexes() and cleanIndexes() #14987 #14868
+ * fix(query): make sanitizeFilter disable implicit $in #14985 #14657
+ * fix(model): avoid unhandled error if createIndex() throws a sync error #14995
+ * fix(model): avoid throwing TypeError if bulkSave()'s bulkWrite() fails with a non-BulkWriteError #14993
+ * types: added toJSON:flattenObjectIds effect #14989
+ * types: add `__v` to lean() result type and ModifyResult #14990 #12959
+ * types: use globalThis instead of global for NativeDate #14992 #14988
+ * docs(change-streams): fix markdown syntax highlighting for script output example #14994
+
+
 8.7.3 / 2024-10-25
 ==================
  * fix(cursor): close underlying query cursor when calling destroy() #14982 #14966

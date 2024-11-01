@@ -2526,6 +2526,29 @@ describe('model: updateOne: ', function() {
     assert.ok(doc.createdAt.valueOf() >= start);
   });
 
+  it('overwriting immutable createdAt (gh-8619)', async function() {
+    const start = new Date().valueOf();
+    const schema = Schema({
+      createdAt: {
+        type: mongoose.Schema.Types.Date,
+        immutable: true
+      },
+      name: String
+    }, { timestamps: true });
+
+    const Model = db.model('Test', schema);
+
+    await Model.create({ name: 'gh-8619' });
+    let doc = await Model.collection.findOne({ name: 'gh-8619' });
+    assert.ok(doc.createdAt.valueOf() >= start);
+
+    const createdAt = new Date('2011-06-01');
+    assert.ok(createdAt.valueOf() < start.valueOf());
+    await Model.updateOne({ _id: doc._id }, { name: 'gh-8619 update', createdAt }, { overwriteImmutable: true, timestamps: false });
+    doc = await Model.collection.findOne({ name: 'gh-8619 update' });
+    assert.equal(doc.createdAt.valueOf(), createdAt.valueOf());
+  });
+
   it('conditional immutable (gh-8001)', async function() {
     const schema = Schema({
       test: {

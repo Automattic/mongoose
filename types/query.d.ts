@@ -20,6 +20,7 @@ declare module 'mongoose' {
     | 'context'
     | 'multipleCastError'
     | 'overwriteDiscriminatorKey'
+    | 'overwriteImmutable'
     | 'populate'
     | 'runValidators'
     | 'sanitizeProjection'
@@ -154,6 +155,11 @@ declare module 'mongoose' {
     new?: boolean;
 
     overwriteDiscriminatorKey?: boolean;
+    /**
+     * Mongoose removes updated immutable properties from `update` by default (excluding $setOnInsert).
+     * Set `overwriteImmutable` to `true` to allow updating immutable properties using other update operators.
+     */
+    overwriteImmutable?: boolean;
     projection?: ProjectionType<DocType>;
     /**
      * if true, returns the full ModifyResult rather than just the document

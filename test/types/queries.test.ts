@@ -334,7 +334,7 @@ function gh14397() {
     age: number;
   };
 
-  const id: string = 'Test Id';
+  const id = 'Test Id';
 
   let idCondition: Condition<WithId<TestUser>['id']>;
   let filter: FilterQuery<WithId<TestUser>>;

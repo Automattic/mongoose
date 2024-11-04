@@ -145,9 +145,16 @@ if (existingUser) {
 <h2 id="strictquery-is-removed-and-replaced-by-strict"><a href="#strictquery-is-removed-and-replaced-by-strict"><code>strictQuery</code> is now equal to <code>strict</code> by default</a></h2>
 
 ~Mongoose no longer supports a `strictQuery` option. You must now use `strict`.~
-As of Mongoose 6.0.10, we brought back the `strictQuery` option.
-However, `strictQuery` is tied to `strict` by default.
-This means that, by default, Mongoose will filter out query filter properties that are not in the schema.
+As of Mongoose 6.0.10, we brought back the `strictQuery` option. In Mongoose 6, `strictQuery` is set to `strict` by default. This means that, by default, Mongoose will filter out query filter properties that are not in the schema.
+
+However, this behavior was a source of confusion in some cases, so in Mongoose 7, this default changes back to `false`. So if you want to retain the default behavior of Mongoose 5 as well as Mongoose 7 and later, you can also disable `strictQuery` globally to override:
+
+```javascript
+mongoose.set('strictQuery', false);
+```
+In a test suite, it may be useful to set `strictQuery` to `throw`, which will throw exceptions any time a query references schema that doesn't exist, which could help identify a bug in your tests or code.
+
+Here's an example of the effect of `strictQuery`:
 
 ```javascript
 const userSchema = new Schema({ name: String });
@@ -545,7 +552,7 @@ The MongoDB node driver will always attempt to retry any operation for up to `se
 So, it will never run out of retries or try to reconnect to MongoDB.
 
 
-<h2 id="lodash-object-id"><a href="#lodash-object-id">Lodash <code>.isEmpty()</code> returns true for ObjectIds</h2>
+<h2 id="lodash-object-id"><a href="#lodash-object-id">Lodash <code>.isEmpty()</code> returns true for ObjectIds</a></h2>
 
 Lodash's `isEmpty()` function returns true for primitives and primitive wrappers.
 `ObjectId()` is an object wrapper that is treated as a primitive by Mongoose.

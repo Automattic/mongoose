@@ -242,7 +242,7 @@ await User.findOneAndUpdate({}, { $setOnInsert: { updatedAt: new Date() } }, {
 If you need to disable Mongoose's timestamps and update a document's timestamps to a different value using `updateOne()` or `findOneAndUpdate()`, you need to do the following:
 
 1. Set the `timestamps` option to `false` to prevent Mongoose from setting `updatedAt`.
-2. Set `overwriteImmutable` to `false` to allow overwriting `createdAt`, which is an immutable property by default.
+2. Set `overwriteImmutable` to `true` to allow overwriting `createdAt`, which is an immutable property by default.
 
 ```javascript
 const createdAt = new Date('2011-06-01');

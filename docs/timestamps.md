@@ -246,8 +246,8 @@ If you need to disable Mongoose's timestamps and update a document's timestamps 
 
 ```javascript
 const createdAt = new Date('2011-06-01');
-// Update a document's `createdAt` to a custom value. Normally Mongoose would prevent doing this because `createdAt`
-// is immutable.
+// Update a document's `createdAt` to a custom value.
+// Normally Mongoose would prevent doing this because `createdAt` is immutable.
 await Model.updateOne({ _id: doc._id }, { createdAt }, { overwriteImmutable: true, timestamps: false });
 
 doc = await Model.collection.findOne({ _id: doc._id });

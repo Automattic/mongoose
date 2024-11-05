@@ -4412,4 +4412,50 @@ describe('Query', function() {
       assert.strictEqual(doc.passwordHash, undefined);
     });
   });
+
+  it('throws an error if calling find(null), findOne(null), updateOne(null, update), etc. (gh-14948)', async function() {
+    const userSchema = new Schema({
+      name: String
+    });
+    const UserModel = db.model('User', userSchema);
+    await UserModel.deleteMany({});
+    await UserModel.updateOne({ name: 'test' }, { name: 'test' }, { upsert: true });
+
+    await assert.rejects(
+      () => UserModel.find(null),
+      /MongoServerError: Expected field filterto be of type object/
+    );
+    await assert.rejects(
+      () => UserModel.findOne(null),
+      /MongoServerError: Expected field filterto be of type object/
+    );
+    await assert.rejects(
+      () => UserModel.findOneAndUpdate(null, { name: 'test2' }),
+      /MongoInvalidArgumentError: Argument "filter" must be an object/
+    );
+    await assert.rejects(
+      () => UserModel.findOneAndReplace(null, { name: 'test2' }),
+      /MongoInvalidArgumentError: Argument "filter" must be an object/
+    );
+    await assert.rejects(
+      () => UserModel.findOneAndDelete(null),
+      /MongoInvalidArgumentError: Argument "filter" must be an object/
+    );
+    await assert.rejects(
+      () => UserModel.updateOne(null, { name: 'test2' }),
+      /MongoInvalidArgumentError: Selector must be a valid JavaScript object/
+    );
+    await assert.rejects(
+      () => UserModel.updateMany(null, { name: 'test2' }),
+      /MongoInvalidArgumentError: Selector must be a valid JavaScript object/
+    );
+    await assert.rejects(
+      () => UserModel.deleteOne(null),
+      /MongoServerError: BSON field 'delete.deletes.q' is missing but a required field/
+    );
+    await assert.rejects(
+      () => UserModel.deleteMany(null),
+      /MongoServerError: BSON field 'delete.deletes.q' is missing but a required field/
+    );
+  });
 });

@@ -1232,12 +1232,24 @@ async function gh13797() {
   interface IUser {
     name: string;
   }
-  new Schema<IUser>({ name: { type: String, required: function() {
-    expectType<IUser>(this); return true;
-  } } });
-  new Schema<IUser>({ name: { type: String, default: function() {
-    expectType<IUser>(this); return '';
-  } } });
+  new Schema<IUser>({
+    name: {
+      type: String,
+      required: function() {
+        expectType<HydratedDocument<IUser>>(this);
+        return true;
+      }
+    }
+  });
+  new Schema<IUser>({
+    name: {
+      type: String,
+      default: function() {
+        expectType<HydratedDocument<IUser>>(this);
+        return '';
+      }
+    }
+  });
 }
 
 declare const brand: unique symbol;
@@ -1529,12 +1541,17 @@ function gh14696() {
 
   const x: ValidateOpts<unknown, User> = {
     validator(v: any) {
-      expectAssignable<User>(this);
-      return !v || this.name === 'super admin';
+      expectAssignable<User | Query<unknown, User>>(this);
+      return !v || this instanceof Query || (this.name === 'super admin');
     }
   };
 
-  const userSchema = new Schema<User>({
+  interface IUserMethods {
+    isSuperAdmin(): boolean;
+  }
+
+  type UserModelType = Model<User, {}, IUserMethods>;
+  const userSchema = new Schema<User, UserModelType, IUserMethods>({
     name: {
       type: String,
       required: [true, 'Name on card is required']
@@ -1544,8 +1561,14 @@ function gh14696() {
       default: false,
       validate: {
         validator(v: any) {
-          expectAssignable<User>(this);
-          return !v || this.name === 'super admin';
+          expectAssignable<User | Query<unknown, User>>(this);
+          if (!v) {
+            return true;
+          }
+          if (this instanceof Query) {
+            return true;
+          }
+          return this.name === 'super admin' || this.isSuperAdmin();
         }
       }
     },
@@ -1554,8 +1577,8 @@ function gh14696() {
       default: false,
       validate: {
         async validator(v: any) {
-          expectAssignable<User>(this);
-          return !v || this.name === 'super admin';
+          expectAssignable<User | Query<unknown, User>>(this);
+          return !v || this.get('name') === 'super admin';
         }
       }
     }

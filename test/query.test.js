@@ -4423,39 +4423,39 @@ describe('Query', function() {
 
     await assert.rejects(
       () => UserModel.find(null),
-      /MongoServerError: Expected field filterto be of type object/
+      /ObjectParameterError: Parameter "filter" to find\(\) must be an object, got "null"/
     );
     await assert.rejects(
       () => UserModel.findOne(null),
-      /MongoServerError: Expected field filterto be of type object/
+      /ObjectParameterError: Parameter "filter" to findOne\(\) must be an object, got "null"/
     );
     await assert.rejects(
       () => UserModel.findOneAndUpdate(null, { name: 'test2' }),
-      /MongoInvalidArgumentError: Argument "filter" must be an object/
+      /ObjectParameterError: Parameter "filter" to findOneAndUpdate\(\) must be an object, got "null"/
     );
     await assert.rejects(
       () => UserModel.findOneAndReplace(null, { name: 'test2' }),
-      /MongoInvalidArgumentError: Argument "filter" must be an object/
+      /ObjectParameterError: Parameter "filter" to findOneAndReplace\(\) must be an object, got "null"/
     );
     await assert.rejects(
       () => UserModel.findOneAndDelete(null),
-      /MongoInvalidArgumentError: Argument "filter" must be an object/
+      /ObjectParameterError: Parameter "filter" to findOneAndDelete\(\) must be an object, got "null"/
     );
     await assert.rejects(
       () => UserModel.updateOne(null, { name: 'test2' }),
-      /MongoInvalidArgumentError: Selector must be a valid JavaScript object/
+      /ObjectParameterError: Parameter "filter" to updateOne\(\) must be an object, got "null"/
     );
     await assert.rejects(
       () => UserModel.updateMany(null, { name: 'test2' }),
-      /MongoInvalidArgumentError: Selector must be a valid JavaScript object/
+      /ObjectParameterError: Parameter "filter" to updateMany\(\) must be an object, got "null"/
     );
     await assert.rejects(
       () => UserModel.deleteOne(null),
-      /MongoServerError: BSON field 'delete.deletes.q' is missing but a required field/
+      /ObjectParameterError: Parameter "filter" to deleteOne\(\) must be an object, got "null"/
     );
     await assert.rejects(
       () => UserModel.deleteMany(null),
-      /MongoServerError: BSON field 'delete.deletes.q' is missing but a required field/
+      /ObjectParameterError: Parameter "filter" to deleteMany\(\) must be an object, got "null"/
     );
   });
 });

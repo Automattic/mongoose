@@ -1542,7 +1542,7 @@ function gh14696() {
   const x: ValidateOpts<unknown, User> = {
     validator(v: any) {
       expectAssignable<User | Query<unknown, User>>(this);
-      return !v || this instanceof Query || (this.name === 'super admin');
+      return !v || this instanceof Query || this.name === 'super admin';
     }
   };
 
@@ -1565,10 +1565,7 @@ function gh14696() {
           if (!v) {
             return true;
           }
-          if (this instanceof Query) {
-            return true;
-          }
-          return this.name === 'super admin' || this.isSuperAdmin();
+          return this.get('name') === 'super admin' || (!(this instanceof Query) && this.isSuperAdmin());
         }
       }
     },
@@ -1578,6 +1575,10 @@ function gh14696() {
       validate: {
         async validator(v: any) {
           expectAssignable<User | Query<unknown, User>>(this);
+          if (this instanceof Query) {
+            const doc = await this.clone().findOne().orFail();
+            return doc.isSuperAdmin();
+          }
           return !v || this.get('name') === 'super admin';
         }
       }

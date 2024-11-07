@@ -6,58 +6,99 @@ const start = require('./common');
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
-describe('BigInt', function() {
+describe('Int', function() {
   beforeEach(() => mongoose.deleteModel(/Test/));
 
   it('is a valid schema type', function() {
     const schema = new Schema({
-      myBigInt: BigInt
+      myInt32: Schema.Types.Int32
     });
     const Test = mongoose.model('Test', schema);
 
     const doc = new Test({
-      myBigInt: 42n
+      myInt32: 13
     });
-    assert.strictEqual(doc.myBigInt, 42n);
-    assert.equal(typeof doc.myBigInt, 'bigint');
+    assert.strictEqual(doc.myInt32, 13);
+    assert.equal(typeof doc.myInt32, 'number');
   });
 
-  it('casting from strings and numbers', function() {
+  it('casts from strings and numbers', function() {
     const schema = new Schema({
-      bigint1: {
-        type: BigInt
+      int1: {
+        type: Schema.Types.Int32
       },
-      bigint2: 'BigInt'
+      int2: Schema.Types.Int32
     });
     const Test = mongoose.model('Test', schema);
 
     const doc = new Test({
-      bigint1: 42,
-      bigint2: '997'
+      int1: -42,
+      int2: '-997.0'
     });
-    assert.strictEqual(doc.bigint1, 42n);
-    assert.strictEqual(doc.bigint2, 997n);
+    assert.strictEqual(doc.int1, -42);
+    assert.strictEqual(doc.int2, -997);
   });
 
-  it.only('handles cast errors', async function() {
-    const schema = new Schema({
-      bigint: 'BigInt'
-    });
-    const Test = mongoose.model('Test', schema);
+  describe('cast errors', () => {
+    let Test;
 
-    const doc = new Test({
-      bigint: 'foo bar'
+    beforeEach(function() {
+      const schema = new Schema({
+        myInt: Schema.Types.Int32
+      });
+      Test = mongoose.model('Test', schema);
     });
-    assert.strictEqual(doc.bigint, undefined);
 
-    const err = await doc.validate().then(() => null, err => err);
-    assert.ok(err);
-    assert.ok(err.errors['bigint']);
-    assert.equal(err.errors['bigint'].name, 'CastError');
-    assert.equal(
-      err.errors['bigint'].message,
-      'Cast to BigInt failed for value "foo bar" (type string) at path "bigint" because of "SyntaxError"'
-    );
+    describe.only('when a decimal input is provided to an Int32 field', () => {
+      it('throws a CastError', async() => {
+        const doc = new Test({
+          int1: -42.4
+        });
+
+        assert.strictEqual(doc.myInt, undefined);
+
+        const err = await doc.validate().catch(e => e);
+        assert.ok(err);
+        assert.ok(err.errors['myInt']);
+        assert.equal(err.errors['myInt'].name, 'CastError');
+        assert.equal(
+          err.errors['myInt'].message,
+          ''
+        );
+      });
+    });
+
+    describe('when a non-numeric string is provided to an Int32 field', () => {
+      it('throws a CastError', () => {
+        const doc = new Test({
+          int1: 'helloworld'
+        });
+      });
+    });
+
+    describe('when NaN is provided to an Int32 field', () => {
+      it('throws a CastError', () => {
+        const doc = new Test({
+          int1: NaN
+        });
+      });
+    });
+
+    describe('when value above INT32_MAX is provided to an Int32 field', () => {
+      it('throws a CastError', () => {
+        const doc = new Test({
+          int1: 0x7FFFFFFF + 1
+        });
+      });
+    });
+
+    describe('when value below INT32_MIN is provided to an Int32 field', () => {
+      it('throws a CastError', () => {
+        const doc = new Test({
+          int1: -0x80000000 - 1
+        });
+      });
+    });
   });
 
   it('supports required', async function() {
@@ -91,7 +132,7 @@ describe('BigInt', function() {
       db = await start();
 
       const schema = new Schema({
-        myBigInt: BigInt
+        myInt: Schema.Types.Int32
       });
       db.deleteModel(/Test/);
       Test = db.model('Test', schema);
@@ -105,15 +146,15 @@ describe('BigInt', function() {
       await Test.deleteMany({});
     });
 
-    it('is stored as a long in MongoDB', async function() {
-      await Test.create({ myBigInt: 42n });
+    it('is stored as a int32 in MongoDB', async function() {
+      await Test.create({ myInt: '42' });
 
-      const doc = await Test.findOne({ myBigInt: { $type: 'long' } });
+      const doc = await Test.findOne({ myInt: { $type: 'int32' } });
       assert.ok(doc);
-      assert.strictEqual(doc.myBigInt, 42n);
+      assert.strictEqual(doc.myInt, 42);
     });
 
-    it('becomes a bigint with lean using useBigInt64', async function() {
+    it('becomes a int32 with lean using promote Values', async function() {
       await Test.create({ myBigInt: 7n });
 
       const doc = await Test.

@@ -13,7 +13,9 @@ import mongoose, {
   Query,
   UpdateWriteOpResult,
   AggregateOptions,
-  StringSchemaDefinition
+  WithLevel1NestedPaths,
+  InferSchemaType,
+  DeleteResult
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
@@ -213,7 +215,7 @@ function find() {
   Project.find({});
   Project.find({ name: 'Hello' });
 
-  // just callback
+  // just callback; this is no longer supported on .find()
   Project.find((error: CallbackError, result: IProject[]) => console.log(error, result));
 
   // filter + projection
@@ -512,7 +514,7 @@ function gh12100() {
 function modelRemoveOptions() {
   const cmodel = model('Test', new Schema());
 
-  cmodel.deleteOne({}, {});
+  const res: DeleteResult = await cmodel.deleteOne({}, {});
 }
 
 async function gh12286() {
@@ -621,9 +623,9 @@ async function gh13151() {
 
   const TestModel = model<ITest>('Test', TestSchema);
   const test = await TestModel.findOne().lean();
-  expectType<ITest & { _id: Types.ObjectId } | null>(test);
+  expectType<ITest & { _id: Types.ObjectId } & { __v: number } | null>(test);
   if (!test) return;
-  expectType<ITest & { _id: Types.ObjectId }>(test);
+  expectType<ITest & { _id: Types.ObjectId } & { __v: number }>(test);
 }
 
 function gh13206() {
@@ -659,7 +661,7 @@ async function gh13705() {
   const schema = new Schema({ name: String });
   const TestModel = model('Test', schema);
 
-  type ExpectedLeanDoc = (mongoose.FlattenMaps<{ name?: string | null }> & { _id: mongoose.Types.ObjectId });
+  type ExpectedLeanDoc = (mongoose.FlattenMaps<{ name?: string | null }> & { _id: mongoose.Types.ObjectId } & { __v: number });
 
   const findByIdRes = await TestModel.findById('0'.repeat(24), undefined, { lean: true });
   expectType<ExpectedLeanDoc | null>(findByIdRes);
@@ -913,4 +915,65 @@ async function gh14440() {
       }
     }
   ]);
+}
+
+async function gh12064() {
+  const FooSchema = new Schema({
+    one: { type: String }
+  });
+
+  const MyRecordSchema = new Schema({
+    _id: { type: String },
+    foo: { type: FooSchema },
+    arr: [Number]
+  });
+
+  const MyRecord = model('MyRecord', MyRecordSchema);
+
+  expectType<(string | null)[]>(
+    await MyRecord.distinct('foo.one').exec()
+  );
+  expectType<(string | null)[]>(
+    await MyRecord.find().distinct('foo.one').exec()
+  );
+  expectType<unknown[]>(await MyRecord.distinct('foo.two').exec());
+  expectType<unknown[]>(await MyRecord.distinct('arr.0').exec());
+}
+
+function testWithLevel1NestedPaths() {
+  type Test1 = WithLevel1NestedPaths<{
+    topLevel: number,
+    nested1Level: {
+      l2: string
+    },
+    nested2Level: {
+      l2: { l3: boolean }
+    }
+  }>;
+
+  expectType<{
+    topLevel: number,
+    nested1Level: { l2: string },
+    'nested1Level.l2': string,
+    nested2Level: { l2: { l3: boolean } },
+    'nested2Level.l2': { l3: boolean }
+  }>({} as Test1);
+
+  const FooSchema = new Schema({
+    one: { type: String }
+  });
+
+  const schema = new Schema({
+    _id: { type: String },
+    foo: { type: FooSchema }
+  });
+
+  type InferredDocType = InferSchemaType<typeof schema>;
+
+  type Test2 = WithLevel1NestedPaths<InferredDocType>;
+  expectAssignable<{
+    _id: string | null | undefined,
+    foo?: { one?: string | null | undefined } | null | undefined,
+    'foo.one': string | null | undefined
+  }>({} as Test2);
 }

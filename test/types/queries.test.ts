@@ -38,11 +38,11 @@ const schema: Schema<ITest, Model<ITest, QueryHelpers>, {}, QueryHelpers> = new 
   endDate: Date
 });
 
-schema.query._byName = function(name: string): QueryWithHelpers<any, ITest, QueryHelpers> {
+schema.query._byName = function(name: string): QueryWithHelpers<ITest[], ITest, QueryHelpers> {
   return this.find({ name });
 };
 
-schema.query.byName = function(name: string): QueryWithHelpers<any, ITest, QueryHelpers> {
+schema.query.byName = function(name: string): QueryWithHelpers<ITest[], ITest, QueryHelpers> {
   expectError(this.notAQueryHelper());
   return this._byName(name);
 };
@@ -109,6 +109,7 @@ Test.find({ name: { $gte: 'Test' } }, null, { collation: { locale: 'en-us' } }).
 Test.findOne().orFail(new Error('bar')).then((doc: ITest | null) => console.log('Found! ' + doc));
 
 Test.distinct('name').exec().then((res: Array<any>) => console.log(res[0]));
+Test.distinct('name', {}, { collation: { locale: 'en', strength: 2 } }).exec().then((res: Array<any>) => console.log(res[0]));
 
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test2' }).exec().then((res: ITest | null) => console.log(res));
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test2' }).then((res: ITest | null) => console.log(res));
@@ -333,7 +334,7 @@ function gh14397() {
     age: number;
   };
 
-  const id: string = 'Test Id';
+  const id = 'Test Id';
 
   let idCondition: Condition<WithId<TestUser>['id']>;
   let filter: FilterQuery<WithId<TestUser>>;
@@ -670,4 +671,10 @@ async function gh14545() {
   expectType<SlimTestDocument[]>(myProjections);
   const myProjection = await M.findOne({}).select<SlimTest>({ prop: 1 }).exec();
   expectType<SlimTestDocument | null>(myProjection);
+}
+
+function gh14841() {
+  const filter: FilterQuery<{ owners: string[] }> = {
+    $expr: { $lt: [{ $size: '$owners' }, 10] }
+  };
 }

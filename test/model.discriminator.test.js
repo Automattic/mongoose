@@ -620,6 +620,23 @@ describe('model', function() {
         Person.discriminator('Parent2', parentSchema.clone());
       });
 
+      it('clone() does not modify original schema `obj` (gh-14821)', function() {
+        const personSchema = new Schema({
+          name: String
+        }, { discriminatorKey: 'kind' });
+
+        const parentSchema = new Schema({
+          child: String
+        });
+
+        const Person = db.model('Person', personSchema);
+        const Parent = Person.discriminator('Parent', parentSchema.clone());
+
+        assert.ok(!Person.schema.obj.child);
+        assert.ok(!personSchema.obj.child);
+        assert.ok(Parent.schema.obj.child);
+      });
+
       it('clone() allows reusing with different models (gh-5721)', async function() {
         const schema = new mongoose.Schema({
           name: String

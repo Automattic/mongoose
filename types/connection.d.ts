@@ -50,6 +50,12 @@ declare module 'mongoose' {
     autoIndex?: boolean;
     /** Set to `false` to disable Mongoose automatically calling `createCollection()` on every model created on this connection. */
     autoCreate?: boolean;
+    /**
+     * Sanitizes query filters against [query selector injection attacks](
+     * https://thecodebarbarian.com/2014/09/04/defending-against-query-selector-injection-attacks.html
+     * ) by wrapping any nested objects that have a property whose name starts with $ in a $eq.
+     */
+    sanitizeFilter?: boolean;
   }
 
   class Connection extends events.EventEmitter implements SessionStarter {
@@ -72,7 +78,7 @@ declare module 'mongoose' {
     readonly config: any;
 
     /** The mongodb.Db instance, set when the connection is opened */
-    readonly db: mongodb.Db;
+    readonly db: mongodb.Db | undefined;
 
     /**
      * Helper for `createCollection()`. Will explicitly create the given collection
@@ -236,7 +242,7 @@ declare module 'mongoose' {
      * async function executes successfully and attempt to retry if
      * there was a retryable error.
      */
-    transaction(fn: (session: mongodb.ClientSession) => Promise<any>, options?: mongodb.TransactionOptions): Promise<void>;
+    transaction<ReturnType = unknown>(fn: (session: mongodb.ClientSession) => Promise<ReturnType>, options?: mongodb.TransactionOptions): Promise<ReturnType>;
 
     /** Switches to a different database using the same connection pool. */
     useDb(name: string, options?: { useCache?: boolean, noListener?: boolean }): Connection;
@@ -247,7 +253,7 @@ declare module 'mongoose' {
     /** Watches the entire underlying database for changes. Similar to [`Model.watch()`](/docs/api/model.html#model_Model-watch). */
     watch<ResultType extends mongodb.Document = any>(pipeline?: Array<any>, options?: mongodb.ChangeStreamOptions): mongodb.ChangeStream<ResultType>;
 
-    withSession<T = any>(executor: (session: ClientSession) => Promise<T>): T;
+    withSession<T = any>(executor: (session: ClientSession) => Promise<T>): Promise<T>;
   }
 
 }

@@ -5,7 +5,7 @@ that Mongoose users should be aware of. Mongoose provides options to work
 around these deprecation warnings, but you need to test whether these options
 cause any problems for your application. Please [report any issues on GitHub](https://github.com/Automattic/mongoose/issues/new).
 
-<h2 id="summary"><a href="#summary">Summary</a></h2>
+## Summary {#summary}
 
 To fix all deprecation warnings, follow the below steps:
 
@@ -13,7 +13,7 @@ To fix all deprecation warnings, follow the below steps:
 
 Read below for more a more detailed description of each deprecation warning.
 
-<h2 id="rawresult"><a href="#rawresult"><code>rawResult</code></a></h2>
+## `rawResult` {#rawresult}
 
 As of Mongoose 7.4.0, the `rawResult` option to `findOneAndUpdate()` is deprecated.
 You should instead use the `includeResultMetadata` option, which the MongoDB Node.js driver's new option that replaces `rawResult`.

@@ -60,7 +60,7 @@ declare module 'mongoose' {
     alias?: string | string[];
 
     /** Function or object describing how to validate this schematype. See [validation docs](https://mongoosejs.com/docs/validation.html). */
-    validate?: SchemaValidator<T> | AnyArray<SchemaValidator<T>>;
+    validate?: SchemaValidator<T, EnforcedDocType> | AnyArray<SchemaValidator<T, EnforcedDocType>>;
 
     /** Allows overriding casting logic for this individual path. If a string, the given string overwrites Mongoose's default cast error message. */
     cast?: string |
@@ -216,17 +216,24 @@ declare module 'mongoose' {
     /** Attaches a getter for all instances of this schema type. */
     static get(getter: (value: any) => any): void;
 
+    /** Array containing default setters for all instances of this SchemaType */
+    static setters: ((val?: unknown, priorVal?: unknown, doc?: Document<unknown>, options?: Record<string, any> | null) => unknown)[];
+
     /** The class that Mongoose uses internally to instantiate this SchemaType's `options` property. */
     OptionsConstructor: SchemaTypeOptions<T>;
 
     /** Cast `val` to this schema type. Each class that inherits from schema type should implement this function. */
-    cast(val: any, doc: Document<any>, init: boolean, prev?: any, options?: any): any;
+    cast(val: any, doc?: Document<any>, init?: boolean, prev?: any, options?: any): any;
+    cast<ResultType>(val: any, doc?: Document<any>, init?: boolean, prev?: any, options?: any): ResultType;
 
     /** Sets a default value for this SchemaType. */
     default(val: any): any;
 
     /** Adds a getter to this schematype. */
     get(fn: Function): this;
+
+    /** Gets this SchemaType's embedded SchemaType, if any  */
+    getEmbeddedSchemaType<T = any, DocType = any>(): SchemaType<T, DocType> | undefined;
 
     /**
      * Defines this path as immutable. Mongoose prevents you from changing
@@ -443,7 +450,7 @@ declare module 'mongoose' {
         defaultOptions: Record<string, any>;
       }
 
-      class Subdocument extends SchemaType implements AcceptsDiscriminator {
+      class Subdocument<DocType = unknown> extends SchemaType implements AcceptsDiscriminator {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: string;
 
@@ -455,6 +462,8 @@ declare module 'mongoose' {
 
         discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
         discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
+
+        cast(val: any, doc?: Document<any>, init?: boolean, prev?: any, options?: any): HydratedSingleSubdocument<DocType>;
       }
 
       class String extends SchemaType {

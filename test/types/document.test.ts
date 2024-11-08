@@ -10,7 +10,7 @@ import {
   DefaultSchemaOptions
 } from 'mongoose';
 import { DeleteResult } from 'mongodb';
-import { expectAssignable, expectError, expectType } from 'tsd';
+import { expectAssignable, expectError, expectNotAssignable, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
 import { autoTypedModelConnection } from './connection.test';
 import { AutoTypedSchemaType } from './schema.test';
@@ -42,7 +42,8 @@ void async function main() {
 
   expectType<DeleteResult>(await doc.deleteOne());
   expectType<TestDocument | null>(await doc.deleteOne().findOne());
-  expectType<{ _id: Types.ObjectId, name?: string } | null>(await doc.deleteOne().findOne().lean());
+  expectAssignable<{ _id: Types.ObjectId, name?: string } | null>(await doc.deleteOne().findOne().lean());
+  expectNotAssignable<TestDocument | null>(await doc.deleteOne().findOne().lean());
 }();
 
 
@@ -357,4 +358,68 @@ function gh13738() {
   expectType<number>(person.get('age'));
   expectType<Date>(person.get('dob'));
   expectType<{ theme: string; alerts: { sms: boolean } }>(person.get('settings'));
+}
+
+async function gh12959() {
+  const subdocSchema = new Schema({ foo: { type: 'string', required: true } });
+
+  const schema = new Schema({
+    subdocArray: { type: [subdocSchema], required: true }
+  });
+
+  const Model = model('test', schema);
+
+  const doc = await Model.findById('id').orFail();
+  expectType<Types.ObjectId>(doc._id);
+  expectType<number>(doc.__v);
+
+  expectError(doc.subdocArray[0].__v);
+}
+
+async function gh14876() {
+  type CarObjectInterface = {
+    make: string;
+    model: string;
+    year: number;
+    owner: Types.ObjectId;
+  };
+  const carSchema = new Schema<CarObjectInterface>({
+    make: { type: String, required: true },
+    model: { type: String, required: true },
+    year: { type: Number, required: true },
+    owner: { type: Schema.Types.ObjectId, ref: 'User' }
+  });
+
+  type UserObjectInterface = {
+    name: string;
+    age: number;
+  };
+  const userSchema = new Schema<UserObjectInterface>({
+    name: String,
+    age: Number
+  });
+
+  const Car = model<CarObjectInterface>('Car', carSchema);
+  const User = model<UserObjectInterface>('User', userSchema);
+
+  const user = await User.create({ name: 'John', age: 25 });
+  const car = await Car.create({
+    make: 'Toyota',
+    model: 'Camry',
+    year: 2020,
+    owner: user._id
+  });
+
+  const populatedCar = await Car.findById(car._id)
+    .populate<{ owner: UserObjectInterface }>('owner')
+    .exec();
+
+  if (!populatedCar) return;
+
+  console.log(populatedCar.owner.name); // outputs John
+
+  const depopulatedCar = populatedCar.depopulate<{ owner: Types.ObjectId }>('owner');
+
+  expectType<UserObjectInterface>(populatedCar.owner);
+  expectType<Types.ObjectId>(depopulatedCar.owner);
 }

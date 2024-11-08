@@ -25,7 +25,7 @@
 /// <reference path="./virtuals.d.ts" />
 /// <reference path="./augmentations.d.ts" />
 
-declare class NativeDate extends global.Date { }
+declare class NativeDate extends globalThis.Date { }
 
 declare module 'mongoose' {
   import Kareem = require('kareem');
@@ -138,6 +138,10 @@ declare module 'mongoose' {
     ? IfAny<U, T & { _id: Types.ObjectId }, T & Required<{ _id: U }>>
     : T & { _id: Types.ObjectId };
 
+  export type Default__v<T> = T extends { __v?: infer U }
+    ? T
+    : T & { __v: number };
+
   /** Helper type for getting the hydrated document type from the raw document type. The hydrated document type is what `new MyModel()` returns. */
   export type HydratedDocument<
     DocType,
@@ -147,18 +151,47 @@ declare module 'mongoose' {
     DocType,
     any,
     TOverrides extends Record<string, never> ?
-      Document<unknown, TQueryHelpers, DocType> & Require_id<DocType> :
+      Document<unknown, TQueryHelpers, DocType> & Default__v<Require_id<DocType>> :
       IfAny<
         TOverrides,
-        Document<unknown, TQueryHelpers, DocType> & Require_id<DocType>,
+        Document<unknown, TQueryHelpers, DocType> & Default__v<Require_id<DocType>>,
         Document<unknown, TQueryHelpers, DocType> & MergeType<
-          Require_id<DocType>,
+          Default__v<Require_id<DocType>>,
           TOverrides
         >
       >
   >;
-  export type HydratedSingleSubdocument<DocType, TOverrides = {}> = Types.Subdocument<unknown, Record<string, never>, DocType> & Require_id<DocType> & TOverrides;
-  export type HydratedArraySubdocument<DocType, TOverrides = {}> = Types.ArraySubdocument<unknown, Record<string, never>, DocType> & Require_id<DocType> & TOverrides;
+  export type HydratedSingleSubdocument<
+    DocType,
+    TOverrides = {}
+  > = IfAny<
+  DocType,
+  any,
+  TOverrides extends Record<string, never> ?
+    Types.Subdocument<unknown, Record<string, never>, DocType> & Require_id<DocType> :
+    IfAny<
+      TOverrides,
+      Types.Subdocument<unknown, Record<string, never>, DocType> & Require_id<DocType>,
+      Types.Subdocument<unknown, Record<string, never>, DocType> & MergeType<
+        Require_id<DocType>,
+        TOverrides
+      >
+    >
+  >;
+  export type HydratedArraySubdocument<DocType, TOverrides = {}> = IfAny<
+    DocType,
+    any,
+    TOverrides extends Record<string, never> ?
+      Types.ArraySubdocument<unknown, Record<string, never>, DocType> & Require_id<DocType> :
+      IfAny<
+        TOverrides,
+        Types.ArraySubdocument<unknown, Record<string, never>, DocType> & Require_id<DocType>,
+        Types.ArraySubdocument<unknown, Record<string, never>, DocType> & MergeType<
+          Require_id<DocType>,
+          TOverrides
+        >
+      >
+    >;
 
   export type HydratedDocumentFromSchema<TSchema extends Schema> = HydratedDocument<
   InferSchemaType<TSchema>,
@@ -493,7 +526,7 @@ declare module 'mongoose' {
   export type NumberSchemaDefinition = typeof Number | 'number' | 'Number' | typeof Schema.Types.Number;
   export type StringSchemaDefinition = typeof String | 'string' | 'String' | typeof Schema.Types.String;
   export type BooleanSchemaDefinition = typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean;
-  export type DateSchemaDefinition = typeof NativeDate | 'date' | 'Date' | typeof Schema.Types.Date;
+  export type DateSchemaDefinition = DateConstructor | 'date' | 'Date' | typeof Schema.Types.Date;
   export type ObjectIdSchemaDefinition = 'ObjectId' | 'ObjectID' | typeof Schema.Types.ObjectId;
 
   export type SchemaDefinitionWithBuiltInClass<T> = T extends number
@@ -590,6 +623,9 @@ declare module 'mongoose' {
     /** Additional options like `limit` and `lean`. */
     options?: QueryOptions<DocType> & { match?: AnyObject };
 
+    /** If true and the given `name` is a direct child of an array, apply the virtual to the array rather than the elements. */
+    applyToArray?: boolean;
+
     /** Additional options for plugins */
     [extra: string]: any;
   }
@@ -674,6 +710,91 @@ declare module 'mongoose' {
   };
 
   /**
+   * Converts any Buffer properties into mongodb.Binary instances, which is what `lean()` returns
+   */
+  export type BufferToBinary<T> = T extends TreatAsPrimitives ? T : T extends Record<string, any> ? {
+    [K in keyof T]: T[K] extends Buffer
+      ? mongodb.Binary
+      : T[K] extends (Buffer | null | undefined)
+        ? mongodb.Binary | null | undefined
+        : T[K] extends Types.DocumentArray<infer ItemType>
+            ? Types.DocumentArray<BufferToBinary<ItemType>>
+            : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+              ? HydratedSingleSubdocument<SubdocType>
+              : BufferToBinary<T[K]>;
+  } : T;
+
+  /**
+   * Converts any Buffer properties into { type: 'buffer', data: [1, 2, 3] } format for JSON serialization
+   */
+  export type BufferToJSON<T> = T extends TreatAsPrimitives ? T : T extends Record<string, any> ? {
+    [K in keyof T]: T[K] extends Buffer
+      ? { type: 'buffer', data: number[] }
+      : T[K] extends (Buffer | null | undefined)
+        ? { type: 'buffer', data: number[] } | null | undefined
+        : T[K] extends Types.DocumentArray<infer ItemType>
+            ? Types.DocumentArray<BufferToBinary<ItemType>>
+            : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+              ? HydratedSingleSubdocument<SubdocType>
+              : BufferToBinary<T[K]>;
+  } : T;
+
+  /**
+   * Converts any ObjectId properties into strings for JSON serialization
+   */
+  export type ObjectIdToString<T> = T extends TreatAsPrimitives ? T : T extends Record<string, any> ? {
+    [K in keyof T]: T[K] extends mongodb.ObjectId
+      ? string
+      : T[K] extends (mongodb.ObjectId | null | undefined)
+        ? string | null | undefined
+        : T[K] extends Types.DocumentArray<infer ItemType>
+            ? Types.DocumentArray<ObjectIdToString<ItemType>>
+            : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+              ? HydratedSingleSubdocument<ObjectIdToString<SubdocType>>
+              : ObjectIdToString<T[K]>;
+  } : T;
+
+  /**
+   * Converts any Date properties into strings for JSON serialization
+   */
+  export type DateToString<T> = T extends TreatAsPrimitives ? T : T extends Record<string, any> ? {
+    [K in keyof T]: T[K] extends NativeDate
+      ? string
+      : T[K] extends (NativeDate | null | undefined)
+        ? string | null | undefined
+        : T[K] extends Types.DocumentArray<infer ItemType>
+            ? Types.DocumentArray<DateToString<ItemType>>
+            : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+              ? HydratedSingleSubdocument<DateToString<SubdocType>>
+              : DateToString<T[K]>;
+  } : T;
+
+  /**
+   * Converts any Mongoose subdocuments (single nested or doc arrays) into POJO equivalents
+   */
+  export type SubdocsToPOJOs<T> = T extends TreatAsPrimitives ? T : T extends Record<string, any> ? {
+    [K in keyof T]: T[K] extends NativeDate
+      ? string
+      : T[K] extends (NativeDate | null | undefined)
+        ? string | null | undefined
+        : T[K] extends Types.DocumentArray<infer ItemType>
+            ? ItemType[]
+            : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+              ? SubdocType
+              : SubdocsToPOJOs<T[K]>;
+  } : T;
+
+  export type JSONSerialized<T> = SubdocsToPOJOs<
+    FlattenMaps<
+      BufferToJSON<
+        ObjectIdToString<
+          DateToString<T>
+        >
+      >
+    >
+  >;
+
+  /**
    * Separate type is needed for properties of union type (for example, Types.DocumentArray | undefined) to apply conditional check to each member of it
    * https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#distributive-conditional-types
    */
@@ -683,7 +804,7 @@ declare module 'mongoose' {
         ? Types.DocumentArray<FlattenMaps<ItemType>> : FlattenMaps<T>;
 
   export type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
-  export type TreatAsPrimitives = actualPrimitives | NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId | Buffer | Function;
+  export type TreatAsPrimitives = actualPrimitives | NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId | Buffer | Function | mongodb.Binary;
 
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
 

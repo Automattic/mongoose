@@ -3,7 +3,7 @@
 [Transactions](https://www.mongodb.com/transactions) let you execute multiple operations in isolation and potentially undo all the operations if one of them fails.
 This guide will get you started using transactions with Mongoose.
 
-<h2 id="getting-started-with-transactions"><a href="#getting-started-with-transactions">Getting Started with Transactions</a></h2>
+## Getting Started with Transactions {#getting-started-with-transactions}
 
 If you haven't already, import mongoose:
 
@@ -61,12 +61,12 @@ await db.transaction(async function setRank(session) {
 doc.isNew;
 ```
 
-<h2 id="note-about-parallelism-in-transactions"><a href="#note-about-parallelism-in-transactions">Note About Parallelism in Transactions</a></h2>
+## Note About Parallelism in Transactions {#note-about-parallelism-in-transactions}
 
 Running operations in parallel is **not supported** during a transaction. The use of `Promise.all`, `Promise.allSettled`, `Promise.race`, etc. to parallelize operations inside a transaction is
 undefined behaviour and should be avoided.
 
-<h2 id="with-mongoose-documents-and-save"><a href="#with-mongoose-documents-and-save">With Mongoose Documents and <code>save()</code></a></h2>
+## With Mongoose Documents and `save()` {#with-mongoose-documents-and-save}
 
 If you get a [Mongoose document](documents.html) from [`findOne()`](api/model.html#model_Model-findOne)
 or [`find()`](api/model.html#model_Model-find) using a session, the document will
@@ -78,7 +78,7 @@ To get/set the session associated with a given document, use [`doc.$session()`](
 [require:transactions.*save]
 ```
 
-<h2 id="with-the-aggregation-framework"><a href="#with-the-aggregation-framework">With the Aggregation Framework</a></h2>
+## With the Aggregation Framework {#with-the-aggregation-framework}
 
 The `Model.aggregate()` function also supports transactions. Mongoose
 aggregations have a [`session()` helper](api/aggregate.html#aggregate_Aggregate-session)
@@ -89,7 +89,7 @@ Below is an example of executing an aggregation within a transaction.
 [require:transactions.*aggregate]
 ```
 
-<h2 id="asynclocalstorage"><a href="#asynclocalstorage">Using AsyncLocalStorage</a></h2>
+## Using AsyncLocalStorage {#asynclocalstorage}
 
 One major pain point with transactions in Mongoose is that you need to remember to set the `session` option on every operation.
 If you don't, your operation will execute outside of the transaction.
@@ -116,7 +116,7 @@ await Test.exists({ _id: doc._id });
 With `transactionAsyncLocalStorage`, you no longer need to pass sessions to every operation.
 Mongoose will add the session by default under the hood.
 
-<h2 id="advanced-usage"><a href="#advanced-usage">Advanced Usage</a></h2>
+## Advanced Usage {#advanced-usage}
 
 Advanced users who want more fine-grained control over when they commit or abort transactions
 can use `session.startTransaction()` to start a transaction:

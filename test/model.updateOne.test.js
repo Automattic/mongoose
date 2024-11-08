@@ -1078,9 +1078,29 @@ describe('model: updateOne:', function() {
       const Model = db.model('Test', schema);
 
       const update = { $rename: { foo: 'bar' } };
-      await Model.create({ foo: Date.now() });
-      const res = await Model.updateOne({}, update, { multi: true });
-      assert.equal(res.modifiedCount, 1);
+      const foo = Date.now();
+      const { _id } = await Model.create({ foo });
+      await Model.updateOne({}, update);
+      const doc = await Model.findById(_id);
+      assert.equal(doc.bar.valueOf(), foo.valueOf());
+      assert.equal(doc.foo, undefined);
+    });
+
+    it('throws CastError if $rename fails to cast to string (gh-1845)', async function() {
+      const schema = new Schema({ foo: Date, bar: Date });
+      const Model = db.model('Test', schema);
+
+      let err = await Model.updateOne({}, { $rename: { foo: { prop: 'baz' } } }).then(() => null, err => err);
+      assert.equal(err.name, 'CastError');
+      assert.ok(err.message.includes('foo.$rename'));
+
+      err = await Model.updateOne({}, { $rename: { foo: null } }).then(() => null, err => err);
+      assert.equal(err.name, 'CastError');
+      assert.ok(err.message.includes('foo.$rename'));
+
+      err = await Model.updateOne({}, { $rename: { foo: undefined } }).then(() => null, err => err);
+      assert.equal(err.name, 'CastError');
+      assert.ok(err.message.includes('foo.$rename'));
     });
 
     it('allows objects with positional operator (gh-3185)', async function() {
@@ -2506,6 +2526,29 @@ describe('model: updateOne: ', function() {
     assert.ok(doc.createdAt.valueOf() >= start);
   });
 
+  it('overwriting immutable createdAt (gh-8619)', async function() {
+    const start = new Date().valueOf();
+    const schema = Schema({
+      createdAt: {
+        type: mongoose.Schema.Types.Date,
+        immutable: true
+      },
+      name: String
+    }, { timestamps: true });
+
+    const Model = db.model('Test', schema);
+
+    await Model.create({ name: 'gh-8619' });
+    let doc = await Model.collection.findOne({ name: 'gh-8619' });
+    assert.ok(doc.createdAt.valueOf() >= start);
+
+    const createdAt = new Date('2011-06-01');
+    assert.ok(createdAt.valueOf() < start.valueOf());
+    await Model.updateOne({ _id: doc._id }, { name: 'gh-8619 update', createdAt }, { overwriteImmutable: true, timestamps: false });
+    doc = await Model.collection.findOne({ name: 'gh-8619 update' });
+    assert.equal(doc.createdAt.valueOf(), createdAt.valueOf());
+  });
+
   it('conditional immutable (gh-8001)', async function() {
     const schema = Schema({
       test: {
@@ -3016,6 +3059,37 @@ describe('model: updateOne: ', function() {
     );
     const doc = await Test.findById(_id);
     assert.equal(doc.subdoc['1'], 'foobar');
+  });
+  it('handles embedded discriminators with $pull when discriminator key set in filter (gh-14675)', async function() {
+    const LoginSchema = new Schema({}, { discriminatorKey: 'type', _id: false });
+    const UserSchema = new Schema({
+      name: String,
+      login: LoginSchema
+    });
+    UserSchema.path('login').discriminator('ssh-key', new Schema({
+      keys: {
+        type: [{
+          id: { type: String, required: true },
+          publicKey: { type: String, required: true }
+        }],
+        default: []
+      }
+    }, { _id: false }));
+    const User = db.model('Test', UserSchema);
+
+    const { _id } = await User.create({
+      login: {
+        type: 'ssh-key',
+        keys: [{ id: 'my-key', publicKey: 'test' }, { id: 'test2', publicKey: 'foo' }]
+      }
+    });
+    const doc = await User.findOneAndUpdate(
+      { _id, 'login.type': 'ssh-key' },
+      { $pull: { 'login.keys': { id: 'my-key' } } },
+      { new: true }
+    ).exec();
+    assert.equal(doc.login.keys.length, 1);
+    assert.equal(doc.login.keys[0].id, 'test2');
   });
 });
 

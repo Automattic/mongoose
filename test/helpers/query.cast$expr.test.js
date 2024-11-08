@@ -118,4 +118,33 @@ describe('castexpr', function() {
     res = cast$expr({ $eq: [{ $round: ['$value'] }, 2] }, testSchema);
     assert.deepStrictEqual(res, { $eq: [{ $round: ['$value'] }, 2] });
   });
+
+  it('casts $switch (gh-14751)', function() {
+    const testSchema = new Schema({
+      name: String,
+      scores: [Number]
+    });
+    const res = cast$expr({
+      $eq: [
+        {
+          $switch: {
+            branches: [{ case: { $eq: ['$$NOW', '$$NOW'] }, then: true }],
+            default: false
+          }
+        },
+        true
+      ]
+    }, testSchema);
+    assert.deepStrictEqual(res, {
+      $eq: [
+        {
+          $switch: {
+            branches: [{ case: { $eq: ['$$NOW', '$$NOW'] }, then: true }],
+            default: false
+          }
+        },
+        true
+      ]
+    });
+  });
 });

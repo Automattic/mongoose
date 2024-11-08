@@ -338,6 +338,25 @@ describe('transactions', function() {
     assert.deepEqual(fromDb, { name: 'Tyrion Lannister' });
   });
 
+  it('distinct (gh-8006)', async function() {
+    const Character = db.model('gh8006_Character', new Schema({ name: String, rank: String }, { versionKey: false }));
+
+    const session = await db.startSession();
+
+    session.startTransaction();
+    await Character.create([{ name: 'Will Riker', rank: 'Commander' }, { name: 'Jean-Luc Picard', rank: 'Captain' }], { session });
+
+    let names = await Character.distinct('name', {}, { session });
+    assert.deepStrictEqual(names.sort(), ['Jean-Luc Picard', 'Will Riker']);
+
+    names = await Character.distinct('name', { rank: 'Captain' }, { session });
+    assert.deepStrictEqual(names.sort(), ['Jean-Luc Picard']);
+
+    // Undo both update and delete since doc should pull from `$session()`
+    await session.abortTransaction();
+    session.endSession();
+  });
+
   it('save() with no changes (gh-8571)', async function() {
     db.deleteModel(/Test/);
     const Test = db.model('Test', Schema({ name: String }));
@@ -370,7 +389,7 @@ describe('transactions', function() {
       await Test.createCollection();
       await Test.deleteMany({});
 
-      const doc = new Test({ name: 'test_transactionAsyncLocalStorage' });
+      let doc = new Test({ name: 'test_transactionAsyncLocalStorage' });
       await assert.rejects(
         () => m.connection.transaction(async() => {
           await doc.save();
@@ -388,6 +407,8 @@ describe('transactions', function() {
           }();
           assert.equal(doc.name, 'test_transactionAsyncLocalStorage');
 
+          await Test.insertMany([{ name: 'bar' }]);
+
           throw new Error('Oops!');
         }),
         /Oops!/
@@ -397,6 +418,20 @@ describe('transactions', function() {
 
       exists = await Test.exists({ name: 'foo' });
       assert.ok(!exists);
+
+      exists = await Test.exists({ name: 'bar' });
+      assert.ok(!exists);
+
+      doc = new Test({ name: 'test_transactionAsyncLocalStorage' });
+      await assert.rejects(
+        () => m.connection.transaction(async() => {
+          await doc.save({ session: null });
+          throw new Error('Oops!');
+        }),
+        /Oops!/
+      );
+      exists = await Test.exists({ _id: doc._id });
+      assert.ok(exists);
     });
   });
 
@@ -479,7 +514,7 @@ describe('transactions', function() {
     const doc = await Test.findById(_id).orFail();
     let attempt = 0;
 
-    await db.transaction(async(session) => {
+    const res = await db.transaction(async(session) => {
       await doc.save({ session });
 
       if (attempt === 0) {
@@ -489,7 +524,10 @@ describe('transactions', function() {
           errorLabels: [mongoose.mongo.MongoErrorLabel.TransientTransactionError]
         });
       }
+
+      return { answer: 42 };
     });
+    assert.deepStrictEqual(res, { answer: 42 });
 
     const { items } = await Test.findById(_id).orFail();
     assert.ok(Array.isArray(items));
@@ -527,6 +565,57 @@ describe('transactions', function() {
     assert.equal(i, 3);
   });
 
+  it('transaction() avoids duplicating atomic operations (gh-14848)', async function() {
+    db.deleteModel(/Test/);
+    const subItemSchema = new mongoose.Schema(
+      {
+        name: { type: String, required: true }
+      },
+      { _id: false }
+    );
+    const itemSchema = new mongoose.Schema(
+      {
+        name: { type: String, required: true },
+        subItems: { type: [subItemSchema], required: true }
+      },
+      { _id: false }
+    );
+    const schema = new mongoose.Schema({
+      items: { type: [itemSchema], required: true }
+    });
+    const Test = db.model('Test', schema);
+
+
+    await Test.createCollection();
+    await Test.deleteMany({});
+
+    const { _id } = await Test.create({
+      items: [
+        { name: 'test1', subItems: [{ name: 'x1' }] },
+        { name: 'test2', subItems: [{ name: 'x2' }] }
+      ]
+    });
+
+    let doc = await Test.findById(_id);
+
+    doc.items.push({ name: 'test3', subItems: [{ name: 'x3' }] });
+
+    let i = 0;
+    await db.transaction(async(session) => {
+      await doc.save({ session });
+      if (++i < 3) {
+        throw new mongoose.mongo.MongoServerError({
+          errorLabels: ['TransientTransactionError']
+        });
+      }
+    });
+
+    assert.equal(i, 3);
+
+    doc = await Test.findById(_id);
+    assert.equal(doc.items.length, 3);
+  });
+
   it('doesnt apply schema write concern to transaction operations (gh-11382)', async function() {
     db.deleteModel(/Test/);
     const Test = db.model('Test', Schema({ status: String }, { writeConcern: { w: 'majority' } }));
@@ -541,5 +630,34 @@ describe('transactions', function() {
     });
 
     await session.endSession();
+  });
+
+  it('allows custom transaction wrappers to store and reset document state with $createModifiedPathsSnapshot (gh-14268)', async function() {
+    db.deleteModel(/Test/);
+    const Test = db.model('Test', Schema({ name: String }, { writeConcern: { w: 'majority' } }));
+
+    await Test.createCollection();
+    await Test.deleteMany({});
+
+    const { _id } = await Test.create({ name: 'foo' });
+    const doc = await Test.findById(_id);
+    doc.name = 'bar';
+    for (let i = 0; i < 2; ++i) {
+      const session = await db.startSession();
+      const snapshot = doc.$createModifiedPathsSnapshot();
+      session.startTransaction();
+
+      await doc.save({ session });
+      if (i === 0) {
+        await session.abortTransaction();
+        doc.$restoreModifiedPathsSnapshot(snapshot);
+      } else {
+        await session.commitTransaction();
+      }
+      await session.endSession();
+    }
+
+    const { name } = await Test.findById(_id);
+    assert.strictEqual(name, 'bar');
   });
 });

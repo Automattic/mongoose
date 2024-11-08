@@ -1088,6 +1088,16 @@ describe('Query', function() {
 
       assert.equal(q.op, 'distinct');
     });
+
+    it('using options parameter for distinct', function() {
+      const q = new Query({});
+      const options = { collation: { locale: 'en', strength: 2 } };
+
+      q.distinct('blah', {}, options);
+
+      assert.equal(q.op, 'distinct');
+      assert.deepEqual(q.options.collation, options.collation);
+    });
   });
 
   describe('findOne', function() {
@@ -3449,6 +3459,47 @@ describe('Query', function() {
     assert.deepEqual(q._fields, { email: 1 });
   });
 
+  it('sanitizeProjection option with plus paths (gh-14333) (gh-10243)', async function() {
+    const MySchema = Schema({
+      name: String,
+      email: String,
+      password: { type: String, select: false }
+    });
+    const Test = db.model('Test', MySchema);
+
+    await Test.create({ name: 'test', password: 'secret' });
+
+    let q = Test.findOne().select('+password');
+    let doc = await q;
+    assert.deepEqual(q._fields, {});
+    assert.strictEqual(doc.password, 'secret');
+
+    q = Test.findOne().setOptions({ sanitizeProjection: true }).select('+password');
+    doc = await q;
+    assert.deepEqual(q._fields, { password: 0 });
+    assert.strictEqual(doc.password, undefined);
+
+    q = Test.find().select('+password').setOptions({ sanitizeProjection: true });
+    doc = await q;
+    assert.deepEqual(q._fields, { password: 0 });
+    assert.strictEqual(doc.password, undefined);
+
+    q = Test.find().select('name +password').setOptions({ sanitizeProjection: true });
+    doc = await q;
+    assert.deepEqual(q._fields, { name: 1 });
+    assert.strictEqual(doc.password, undefined);
+
+    q = Test.find().select('+name').setOptions({ sanitizeProjection: true });
+    doc = await q;
+    assert.deepEqual(q._fields, { password: 0 });
+    assert.strictEqual(doc.password, undefined);
+
+    q = Test.find().select('password').setOptions({ sanitizeProjection: true });
+    doc = await q;
+    assert.deepEqual(q._fields, { password: 0 });
+    assert.strictEqual(doc.password, undefined);
+  });
+
   it('sanitizeFilter option (gh-3944)', function() {
     const MySchema = Schema({ username: String, pwd: String });
     const Test = db.model('Test', MySchema);
@@ -3469,6 +3520,21 @@ describe('Query', function() {
     assert.ifError(q.error());
     assert.deepEqual(q._conditions, { username: 'val', pwd: { $gt: null } });
   });
+
+  it('sanitizeFilter disables implicit $in (gh-14657)', function() {
+    const schema = new mongoose.Schema({
+      name: {
+        type: String
+      }
+    });
+    const Test = db.model('Test', schema);
+
+    const q = Test.find({ name: ['foobar'] }).setOptions({ sanitizeFilter: true });
+    q._castConditions();
+    assert.ok(q.error());
+    assert.equal(q.error().name, 'CastError');
+  });
+
   it('should not error when $not is used with $size (gh-10716)', async function() {
     const barSchema = Schema({
       bar: String
@@ -4272,5 +4338,78 @@ describe('Query', function() {
     assert.equal(docs[0].name, 'John');
 
     assert.deepStrictEqual(adultQuery, { age: { $gte: 18 } });
+  });
+
+  it('avoids mutating $or, $and elements when casting (gh-14610)', async function() {
+    const personSchema = new mongoose.Schema({
+      name: String,
+      age: Number
+    });
+    const Person = db.model('Person', personSchema);
+
+    const filter = [{ name: 'Me', age: '20' }, { name: 'You', age: '50' }];
+    await Person.find({ $or: filter });
+    assert.deepStrictEqual(filter, [{ name: 'Me', age: '20' }, { name: 'You', age: '50' }]);
+
+    await Person.find({ $and: filter });
+    assert.deepStrictEqual(filter, [{ name: 'Me', age: '20' }, { name: 'You', age: '50' }]);
+  });
+
+  describe('schemaLevelProjections (gh-11474)', function() {
+    it('disables schema-level select: false', async function() {
+      const userSchema = new Schema({
+        email: { type: String, required: true },
+        passwordHash: { type: String, select: false, required: true }
+      });
+      const UserModel = db.model('User', userSchema);
+
+      const { _id } = await UserModel.create({ email: 'test', passwordHash: 'gh-11474' });
+
+      const doc = await UserModel.findById(_id).orFail().schemaLevelProjections(false);
+      assert.strictEqual(doc.email, 'test');
+      assert.strictEqual(doc.passwordHash, 'gh-11474');
+    });
+
+    it('disables schema-level select: true', async function() {
+      const userSchema = new Schema({
+        email: { type: String, required: true, select: true },
+        otherProp: String
+      });
+      const UserModel = db.model('User', userSchema);
+
+      const { _id } = await UserModel.create({ email: 'test', otherProp: 'gh-11474 select true' });
+
+      const doc = await UserModel.findById(_id).select('otherProp').orFail().schemaLevelProjections(false);
+      assert.strictEqual(doc.email, undefined);
+      assert.strictEqual(doc.otherProp, 'gh-11474 select true');
+    });
+
+    it('works via setOptions()', async function() {
+      const userSchema = new Schema({
+        email: { type: String, required: true },
+        passwordHash: { type: String, select: false, required: true }
+      });
+      const UserModel = db.model('User', userSchema);
+
+      const { _id } = await UserModel.create({ email: 'test', passwordHash: 'gh-11474' });
+
+      const doc = await UserModel.findById(_id).orFail().setOptions({ schemaLevelProjections: false });
+      assert.strictEqual(doc.email, 'test');
+      assert.strictEqual(doc.passwordHash, 'gh-11474');
+    });
+
+    it('disabled via truthy value', async function() {
+      const userSchema = new Schema({
+        email: { type: String, required: true },
+        passwordHash: { type: String, select: false, required: true }
+      });
+      const UserModel = db.model('User', userSchema);
+
+      const { _id } = await UserModel.create({ email: 'test', passwordHash: 'gh-11474' });
+
+      const doc = await UserModel.findById(_id).orFail().schemaLevelProjections(true);
+      assert.strictEqual(doc.email, 'test');
+      assert.strictEqual(doc.passwordHash, undefined);
+    });
   });
 });

@@ -453,7 +453,10 @@ describe('model query casting', function() {
       const id = post._id.toString();
 
       await post.save();
-      const doc = await BlogPostB.findOne({ _id: id, comments: { $not: { $elemMatch: { _id: commentId.toString() } } } });
+      const doc = await BlogPostB.findOne({
+        _id: id,
+        comments: { $not: { $elemMatch: { _id: commentId.toString() } } }
+      });
       assert.equal(doc, null);
     });
 

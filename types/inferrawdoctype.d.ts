@@ -1,4 +1,5 @@
 import {
+  IsPathRequired,
   IsSchemaTypeFromBuiltinClass,
   RequiredPaths,
   OptionalPaths,
@@ -10,12 +11,14 @@ declare module 'mongoose' {
   export type InferRawDocType<
     DocDefinition,
     TSchemaOptions extends Record<any, any> = DefaultSchemaOptions
-  > = {
+  > = ApplySchemaOptions<{
     [
     K in keyof (RequiredPaths<DocDefinition, TSchemaOptions['typeKey']> &
     OptionalPaths<DocDefinition, TSchemaOptions['typeKey']>)
-    ]: ObtainRawDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']>;
-  };
+    ]: IsPathRequired<DocDefinition[K], TSchemaOptions['typeKey']> extends true
+      ? ObtainRawDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']>
+      : ObtainRawDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']> | null;
+  }, TSchemaOptions>;
 
   /**
    * @summary Obtains schema Path type.
@@ -88,8 +91,8 @@ declare module 'mongoose' {
             IfEquals<PathValueType, String> extends true ? PathEnumOrString<Options['enum']> :
               PathValueType extends NumberSchemaDefinition ? Options['enum'] extends ReadonlyArray<any> ? Options['enum'][number] : number :
                 IfEquals<PathValueType, Schema.Types.Number> extends true ? number :
-                  PathValueType extends DateSchemaDefinition ? Date :
-                    IfEquals<PathValueType, Schema.Types.Date> extends true ? Date :
+                  PathValueType extends DateSchemaDefinition ? NativeDate :
+                    IfEquals<PathValueType, Schema.Types.Date> extends true ? NativeDate :
                       PathValueType extends typeof Buffer | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer :
                         PathValueType extends BooleanSchemaDefinition ? boolean :
                           IfEquals<PathValueType, Schema.Types.Boolean> extends true ? boolean :

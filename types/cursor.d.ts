@@ -8,6 +8,7 @@ declare module 'mongoose' {
     parallel?: number;
     batchSize?: number;
     continueOnError?: boolean;
+    signal?: AbortSignal;
   }
 
   class Cursor<DocType = any, Options = never> extends stream.Readable {
@@ -24,6 +25,12 @@ declare module 'mongoose' {
      * `next()` will error.
      */
     close(): Promise<void>;
+
+    /**
+     * Destroy this cursor, closing the underlying cursor. Will stop streaming
+     * and subsequent calls to `next()` will error.
+     */
+    destroy(): this;
 
     /**
      * Rewind this cursor to its uninitialized state. Any options that are present on the cursor will
@@ -51,7 +58,7 @@ declare module 'mongoose' {
      * Get the next document from this cursor. Will return `null` when there are
      * no documents left.
      */
-    next(): Promise<DocType>;
+    next(): Promise<DocType | null>;
 
     options: Options;
   }

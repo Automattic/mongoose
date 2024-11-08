@@ -10,6 +10,8 @@ declare module 'mongoose' {
     [key: string]: any;
   }
 
+  class ModifiedPathsSnapshot {}
+
   /**
    * Generic types for Document:
    * *  T - the type of _id
@@ -20,16 +22,22 @@ declare module 'mongoose' {
     constructor(doc?: any);
 
     /** This documents _id. */
-    _id?: T;
-
-    /** This documents __v. */
-    __v?: any;
+    _id: T;
 
     /** Assert that a given path or paths is populated. Throws an error if not populated. */
     $assertPopulated<Paths = {}>(path: string | string[], values?: Partial<Paths>): Omit<this, keyof Paths> & Paths;
 
+    /** Clear the document's modified paths. */
+    $clearModifiedPaths(): this;
+
     /** Returns a deep clone of this document */
     $clone(): this;
+
+    /**
+     * Creates a snapshot of this document's internal change tracking state. You can later
+     * reset this document's change tracking state using `$restoreModifiedPathsSnapshot()`.
+     */
+    $createModifiedPathsSnapshot(): ModifiedPathsSnapshot;
 
     /* Get all subdocs (by bfs) */
     $getAllSubdocs(): Document[];
@@ -84,6 +92,13 @@ declare module 'mongoose' {
     $op: 'save' | 'validate' | 'remove' | null;
 
     /**
+     * Restore this document's change tracking state to the given snapshot.
+     * Note that `$restoreModifiedPathsSnapshot()` does **not** modify the document's
+     * properties, just resets the change tracking state.
+     */
+    $restoreModifiedPathsSnapshot(snapshot: ModifiedPathsSnapshot): this;
+
+    /**
      * Getter/setter around the session associated with this document. Used to
      * automatically set `session` if you `save()` a doc that you got from a
      * query with an associated session.
@@ -120,7 +135,7 @@ declare module 'mongoose' {
      * Takes a populated field and returns it to its unpopulated state. If called with
      * no arguments, then all populated fields are returned to their unpopulated state.
      */
-    depopulate(path?: string | string[]): this;
+    depopulate<Paths = {}>(path?: string | string[]): MergeType<this, Paths>;
 
     /**
      * Returns the list of paths that have been directly modified. A direct
@@ -241,11 +256,21 @@ declare module 'mongoose' {
     set(value: string | Record<string, any>): this;
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
-    toJSON<T = Require_id<DocType>>(options?: ToObjectOptions & { flattenMaps?: true }): FlattenMaps<T>;
+    toJSON(options?: ToObjectOptions & { flattenMaps?: true, flattenObjectIds?: false }): FlattenMaps<Require_id<DocType>>;
+    toJSON(options: ToObjectOptions & { flattenObjectIds: false }): FlattenMaps<Require_id<DocType>>;
+    toJSON(options: ToObjectOptions & { flattenObjectIds: true }): ObjectIdToString<FlattenMaps<Require_id<DocType>>>;
+    toJSON(options: ToObjectOptions & { flattenMaps: false }): Require_id<DocType>;
+    toJSON(options: ToObjectOptions & { flattenMaps: false; flattenObjectIds: true }): ObjectIdToString<Require_id<DocType>>;
+
+    toJSON<T = Require_id<DocType>>(options?: ToObjectOptions & { flattenMaps?: true, flattenObjectIds?: false }): FlattenMaps<T>;
+    toJSON<T = Require_id<DocType>>(options: ToObjectOptions & { flattenObjectIds: false }): FlattenMaps<T>;
+    toJSON<T = Require_id<DocType>>(options: ToObjectOptions & { flattenObjectIds: true }): ObjectIdToString<FlattenMaps<T>>;
     toJSON<T = Require_id<DocType>>(options: ToObjectOptions & { flattenMaps: false }): T;
+    toJSON<T = Require_id<DocType>>(options: ToObjectOptions & { flattenMaps: false; flattenObjectIds: true }): ObjectIdToString<T>;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
-    toObject<T = Require_id<DocType>>(options?: ToObjectOptions): Require_id<T>;
+    toObject(options?: ToObjectOptions): Require_id<DocType>;
+    toObject<T>(options?: ToObjectOptions): Require_id<T>;
 
     /** Clears the modified state on the specified path. */
     unmarkModified<T extends keyof DocType>(path: T): void;

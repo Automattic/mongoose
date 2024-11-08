@@ -4,6 +4,7 @@
 
 'use strict';
 
+const { once } = require('events');
 const start = require('./common');
 
 const assert = require('assert');
@@ -415,7 +416,8 @@ describe('QueryCursor', function() {
         await cursor.next();
         assert.ok(false);
       } catch (error) {
-        assert.equal(error.name, 'MongoCursorExhaustedError');
+        assert.equal(error.name, 'MongooseError');
+        assert.ok(error.message.includes('closed cursor'), error.message);
       }
     });
   });
@@ -899,6 +901,53 @@ describe('QueryCursor', function() {
       then(() => null, err => err);
     assert.ok(err);
     assert.ok(err.message.includes('skipMiddlewareFunction'), err.message);
+  });
+
+  it('returns the underlying Node driver cursor with getDriverCursor()', async function() {
+    const schema = new mongoose.Schema({ name: String });
+
+    const Movie = db.model('Movie', schema);
+
+    await Movie.deleteMany({});
+    await Movie.create([
+      { name: 'Kickboxer' },
+      { name: 'Ip Man' },
+      { name: 'Enter the Dragon' }
+    ]);
+
+    const cursor = await Movie.find({}).cursor();
+    assert.ok(!cursor.cursor);
+    const driverCursor = await cursor.getDriverCursor();
+    assert.ok(cursor.cursor);
+    assert.equal(driverCursor, cursor.cursor);
+  });
+
+  it('handles destroy() (gh-14966)', async function() {
+    db.deleteModel(/Test/);
+    const TestModel = db.model('Test', mongoose.Schema({ name: String }));
+
+    const stream = await TestModel.find().cursor();
+    await once(stream, 'cursor');
+    assert.ok(!stream.cursor.closed);
+
+    stream.destroy();
+
+    await once(stream.cursor, 'close');
+    assert.ok(stream.destroyed);
+    assert.ok(stream.cursor.closed);
+  });
+
+  it('handles destroy() before cursor is created (gh-14966)', async function() {
+    db.deleteModel(/Test/);
+    const TestModel = db.model('Test', mongoose.Schema({ name: String }));
+
+    const stream = await TestModel.find().cursor();
+    assert.ok(!stream.cursor);
+    stream.destroy();
+
+    await once(stream, 'cursor');
+    assert.ok(stream.destroyed);
+    assert.ok(stream.cursor.closed);
   });
 });
 

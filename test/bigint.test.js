@@ -39,7 +39,7 @@ describe('BigInt', function() {
     assert.strictEqual(doc.bigint2, 997n);
   });
 
-  it.only('handles cast errors', async function() {
+  it('handles cast errors', async function() {
     const schema = new Schema({
       bigint: 'BigInt'
     });

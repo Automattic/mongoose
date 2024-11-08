@@ -2,11 +2,12 @@
 
 const assert = require('assert');
 const start = require('./common');
+const BSONInt32 = require('bson').Int32;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
-describe('Int', function() {
+describe('Int32', function() {
   beforeEach(() => mongoose.deleteModel(/Test/));
 
   it('is a valid schema type', function() {
@@ -22,21 +23,55 @@ describe('Int', function() {
     assert.equal(typeof doc.myInt32, 'number');
   });
 
-  it('casts from strings and numbers', function() {
+  it('supports the \'required\' property', async function() {
     const schema = new Schema({
-      int1: {
-        type: Schema.Types.Int32
-      },
-      int2: Schema.Types.Int32
+      int32: {
+        type: Schema.Types.Int32,
+        required: true
+      }
     });
     const Test = mongoose.model('Test', schema);
 
     const doc = new Test({
-      int1: -42,
-      int2: '-997.0'
+      int: null
     });
-    assert.strictEqual(doc.int1, -42);
-    assert.strictEqual(doc.int2, -997);
+
+    const err = await doc.validate().then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(err.errors['int32']);
+    assert.equal(err.errors['int32'].name, 'ValidatorError');
+    assert.equal(
+      err.errors['int32'].message,
+      'Path `int32` is required.'
+    );
+  });
+
+  describe('valid casts', function() {
+    it('casts from string', function() {
+      const schema = new Schema({
+        int1: {
+          type: Schema.Types.Int32
+        }
+      });
+      const Test = mongoose.model('Test', schema);
+
+      const doc = new Test({
+        int1: -42
+      });
+      assert.strictEqual(doc.int1, -42);
+    });
+
+    it('casts from number', function() {
+      const schema = new Schema({
+        int2: Schema.Types.Int32
+      });
+      const Test = mongoose.model('Test', schema);
+
+      const doc = new Test({
+        int2: '-997.0'
+      });
+      assert.strictEqual(doc.int2, -997);
+    });
   });
 
   describe('cast errors', () => {
@@ -49,82 +84,98 @@ describe('Int', function() {
       Test = mongoose.model('Test', schema);
     });
 
-    describe.only('when a decimal input is provided to an Int32 field', () => {
-      it('throws a CastError', async() => {
+    describe('when a non-integer input is provided to an Int32 field', () => {
+      it('throws a CastError upon validation', async() => {
         const doc = new Test({
-          int1: -42.4
+          myInt: -42.4
         });
 
         assert.strictEqual(doc.myInt, undefined);
-
         const err = await doc.validate().catch(e => e);
         assert.ok(err);
         assert.ok(err.errors['myInt']);
         assert.equal(err.errors['myInt'].name, 'CastError');
         assert.equal(
           err.errors['myInt'].message,
-          ''
+          'Cast to Int32 failed for value "-42.4" (type number) at path "myInt"'
         );
       });
     });
 
     describe('when a non-numeric string is provided to an Int32 field', () => {
-      it('throws a CastError', () => {
+      it('throws a CastError upon validation', async() => {
         const doc = new Test({
-          int1: 'helloworld'
+          myInt: 'helloworld'
         });
+
+        assert.strictEqual(doc.myInt, undefined);
+        const err = await doc.validate().catch(e => e);
+        assert.ok(err);
+        assert.ok(err.errors['myInt']);
+        assert.equal(err.errors['myInt'].name, 'CastError');
+        assert.equal(
+          err.errors['myInt'].message,
+          'Cast to Int32 failed for value "helloworld" (type string) at path "myInt"'
+        );
       });
     });
 
     describe('when NaN is provided to an Int32 field', () => {
-      it('throws a CastError', () => {
+      it('throws a CastError upon validation', async() => {
         const doc = new Test({
-          int1: NaN
+          myInt: NaN
         });
+
+        assert.strictEqual(doc.myInt, undefined);
+        const err = await doc.validate().catch(e => e);
+        assert.ok(err);
+        assert.ok(err.errors['myInt']);
+        assert.equal(err.errors['myInt'].name, 'CastError');
+        assert.equal(
+          err.errors['myInt'].message,
+          'Cast to Int32 failed for value "NaN" (type number) at path "myInt"'
+        );
       });
     });
 
     describe('when value above INT32_MAX is provided to an Int32 field', () => {
-      it('throws a CastError', () => {
+      it('throws a CastError upon validation', async() => {
         const doc = new Test({
-          int1: 0x7FFFFFFF + 1
+          myInt: 0x7FFFFFFF + 1
         });
+
+        assert.strictEqual(doc.myInt, undefined);
+        const err = await doc.validate().catch(e => e);
+        assert.ok(err);
+        assert.ok(err.errors['myInt']);
+        assert.equal(err.errors['myInt'].name, 'CastError');
+        assert.equal(
+          err.errors['myInt'].message,
+          'Cast to Int32 failed for value "2147483648" (type number) at path "myInt"'
+        );
       });
     });
 
     describe('when value below INT32_MIN is provided to an Int32 field', () => {
-      it('throws a CastError', () => {
+      it('throws a CastError upon validation', async() => {
         const doc = new Test({
-          int1: -0x80000000 - 1
+          myInt: -0x80000000 - 1
         });
+
+        assert.strictEqual(doc.myInt, undefined);
+        const err = await doc.validate().catch(e => e);
+        assert.ok(err);
+        assert.ok(err.errors['myInt']);
+        assert.equal(err.errors['myInt'].name, 'CastError');
+        assert.equal(
+          err.errors['myInt'].message,
+          'Cast to Int32 failed for value "-2147483649" (type number) at path "myInt"'
+        );
       });
     });
   });
 
-  it('supports required', async function() {
-    const schema = new Schema({
-      bigint: {
-        type: BigInt,
-        required: true
-      }
-    });
-    const Test = mongoose.model('Test', schema);
-
-    const doc = new Test({
-      bigint: null
-    });
-
-    const err = await doc.validate().then(() => null, err => err);
-    assert.ok(err);
-    assert.ok(err.errors['bigint']);
-    assert.equal(err.errors['bigint'].name, 'ValidatorError');
-    assert.equal(
-      err.errors['bigint'].message,
-      'Path `bigint` is required.'
-    );
-  });
-
-  describe('MongoDB integration', function() {
+  describe('mongoDB integration', function() {
     let db;
     let Test;
 
@@ -146,63 +197,102 @@ describe('Int', function() {
       await Test.deleteMany({});
     });
 
-    it('is stored as a int32 in MongoDB', async function() {
-      await Test.create({ myInt: '42' });
+    describe('$type compatibility', function() {
+      it('is queryable as a JS number in MongoDB', async function() {
+        await Test.create({ myInt: '42' });
+        const doc = await Test.findOne({ myInt: { $type: 'number' } });
+        assert.ok(doc);
+        assert.strictEqual(doc.myInt, 42);
+      });
 
-      const doc = await Test.findOne({ myInt: { $type: 'int32' } });
-      assert.ok(doc);
-      assert.strictEqual(doc.myInt, 42);
+      it('is queryable as a BSON Int32 in MongoDB', async function() {
+        await Test.create({ myInt: '42' });
+        const doc = await Test.findOne({ myInt: { $type: 'int' } });
+        assert.ok(doc);
+        assert.strictEqual(doc.myInt, 42);
+      });
+
+      it('is queryable as a BSON Double in MongoDB', async function() {
+        await Test.create({ myInt: '42' });
+        const doc = await Test.findOne({ myInt: { $type: 'double' } });
+        assert.equal(doc, undefined);
+      });
     });
 
-    it('becomes a int32 with lean using promote Values', async function() {
-      await Test.create({ myBigInt: 7n });
+    describe('promoteValues', function() {
+      describe('when promoteValues is false', function() {
+        it('find returns BSON Int32', async function() {
+          await Test.create({ myInt: 7 });
 
-      const doc = await Test.
-        findOne({ myBigInt: 7n }).
-        setOptions({ useBigInt64: true }).
-        lean();
-      assert.ok(doc);
-      assert.strictEqual(doc.myBigInt, 7n);
+          const doc = await Test.findOne({ myInt: 7 })
+            .setOptions({ promoteValues: false });
+          assert.ok(doc);
+          assert.ok(doc.myInt instanceof BSONInt32);
+          assert.equal(doc.myInt.value, 7);
+        });
+      });
+
+      describe('when promoteValues is undefined', function() {
+        it('find returns a JS number', async function() {
+          await Test.create({ myInt: 7 });
+          const doc = await Test.findOne({ myInt: 7 })
+            .setOptions({ promoteValues: undefined });
+          assert.ok(doc);
+          assert.ok(doc);
+          assert.equal(doc.myInt, 7);
+        });
+      });
+
+      describe('when promoteValues is true', function() {
+        it('find returns a JS number', async function() {
+          await Test.create({ myInt: 7 });
+
+          const doc = await Test.findOne({ myInt: 7 })
+            .setOptions({ promoteValues: false });
+          assert.ok(doc);
+          assert.equal(doc.myInt, 7);
+        });
+      });
     });
 
     it('can query with comparison operators', async function() {
       await Test.create([
-        { myBigInt: 1n },
-        { myBigInt: 2n },
-        { myBigInt: 3n },
-        { myBigInt: 4n }
+        { myInt: 1 },
+        { myInt: 2 },
+        { myInt: 3 },
+        { myInt: 4 }
       ]);
 
-      let docs = await Test.find({ myBigInt: { $gte: 3n } }).sort({ myBigInt: 1 });
+      let docs = await Test.find({ myInt: { $gte: 3 } }).sort({ myInt: 1 });
       assert.equal(docs.length, 2);
-      assert.deepStrictEqual(docs.map(doc => doc.myBigInt), [3n, 4n]);
+      assert.deepStrictEqual(docs.map(doc => doc.myInt), [3, 4]);
 
-      docs = await Test.find({ myBigInt: { $lt: 3n } }).sort({ myBigInt: -1 });
+      docs = await Test.find({ myInt: { $lt: 3 } }).sort({ myInt: -1 });
       assert.equal(docs.length, 2);
-      assert.deepStrictEqual(docs.map(doc => doc.myBigInt), [2n, 1n]);
+      assert.deepStrictEqual(docs.map(doc => doc.myInt), [2, 1]);
     });
 
     it('supports populate()', async function() {
       const parentSchema = new Schema({
         child: {
-          type: BigInt,
+          type: Schema.Types.Int32,
           ref: 'Child'
         }
       });
       const childSchema = new Schema({
-        _id: BigInt,
+        _id: Schema.Types.Int32,
         name: String
       });
       const Parent = db.model('Parent', parentSchema);
       const Child = db.model('Child', childSchema);
 
-      const { _id } = await Parent.create({ child: 42n });
-      await Child.create({ _id: 42n, name: 'test-bigint-populate' });
+      const { _id } = await Parent.create({ child: 42 });
+      await Child.create({ _id: 42, name: 'test-int32-populate' });
 
       const doc = await Parent.findById(_id).populate('child');
       assert.ok(doc);
-      assert.equal(doc.child.name, 'test-bigint-populate');
-      assert.equal(doc.child._id, 42n);
+      assert.equal(doc.child.name, 'test-int32-populate');
+      assert.equal(doc.child._id, 42);
     });
   });
 });

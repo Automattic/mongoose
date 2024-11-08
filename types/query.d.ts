@@ -209,6 +209,7 @@ declare module 'mongoose' {
     translateAliases?: boolean;
     upsert?: boolean;
     useBigInt64?: boolean;
+    promoteValues?: boolean;
     writeConcern?: mongodb.WriteConcern;
 
     [other: string]: any;

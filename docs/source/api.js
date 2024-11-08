@@ -40,7 +40,7 @@ const files = [
   'lib/types/subdocument.js',
   'lib/types/arraySubdocument.js',
   'lib/types/buffer.js',
-  'lib/types/decimal128.js',
+  'lib/types/.js',
   'lib/types/map.js',
   'lib/types/array/methods/index.js'
 ];

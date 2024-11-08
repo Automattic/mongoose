@@ -1,3 +1,9 @@
+8.8.1 / 2024-11-08
+==================
+ * perf: make a few micro-optimizations to help speed up findOne() #15022 #14906
+ * fix: apply embedded discriminators to subdoc schemas before compiling top level model so middleware applies correctly #15001 #14961
+ * fix(query): add overwriteImmutable option to allow updating immutable properties without disabling strict mode #15000 #8619
+
 8.8.0 / 2024-10-31
 ==================
  * feat: upgrade mongodb -> ~6.10 #14991 #14877

@@ -4412,4 +4412,50 @@ describe('Query', function() {
       assert.strictEqual(doc.passwordHash, undefined);
     });
   });
+
+  it('throws an error if calling find(null), findOne(null), updateOne(null, update), etc. (gh-14948)', async function() {
+    const userSchema = new Schema({
+      name: String
+    });
+    const UserModel = db.model('User', userSchema);
+    await UserModel.deleteMany({});
+    await UserModel.updateOne({ name: 'test' }, { name: 'test' }, { upsert: true });
+
+    await assert.rejects(
+      () => UserModel.find(null),
+      /ObjectParameterError: Parameter "filter" to find\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.findOne(null),
+      /ObjectParameterError: Parameter "filter" to findOne\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.findOneAndUpdate(null, { name: 'test2' }),
+      /ObjectParameterError: Parameter "filter" to findOneAndUpdate\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.findOneAndReplace(null, { name: 'test2' }),
+      /ObjectParameterError: Parameter "filter" to findOneAndReplace\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.findOneAndDelete(null),
+      /ObjectParameterError: Parameter "filter" to findOneAndDelete\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.updateOne(null, { name: 'test2' }),
+      /ObjectParameterError: Parameter "filter" to updateOne\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.updateMany(null, { name: 'test2' }),
+      /ObjectParameterError: Parameter "filter" to updateMany\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.deleteOne(null),
+      /ObjectParameterError: Parameter "filter" to deleteOne\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.deleteMany(null),
+      /ObjectParameterError: Parameter "filter" to deleteMany\(\) must be an object, got "null"/
+    );
+  });
 });

@@ -209,6 +209,9 @@ declare module 'mongoose' {
     translateAliases?: boolean;
     upsert?: boolean;
     useBigInt64?: boolean;
+    /**
+     * If `false`, will NOT promote [BSON](https://www.mongodb.com/docs/manual/reference/bson-types/values) to their Node.js closest equivalent types.
+     */
     promoteValues?: boolean;
     writeConcern?: mongodb.WriteConcern;
 

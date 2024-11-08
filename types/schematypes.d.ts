@@ -12,6 +12,16 @@ declare module 'mongoose' {
    */
   type Decimal128 = Schema.Types.Decimal128;
 
+
+  /**
+   * The Mongoose Int32 [SchemaType](/docs/schematypes.html). Used for
+   * declaring paths in your schema that should be
+   * 32-bit integers
+   * Do not use this to create a new Int32 instance, use `mongoose.Types.Int32`
+   * instead.
+   */
+  type Int32 = Schema.Types.Int32;
+
   /**
    * The Mongoose Mixed [SchemaType](/docs/schematypes.html). Used for
    * declaring paths in your schema that Mongoose's change tracking, casting,
@@ -382,6 +392,14 @@ declare module 'mongoose' {
       class Decimal128 extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'Decimal128';
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
+      }
+
+      class Int32 extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: 'Int32';
 
         /** Default options for this SchemaType */
         defaultOptions: Record<string, any>;

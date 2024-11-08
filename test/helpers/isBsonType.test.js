@@ -5,6 +5,7 @@ const isBsonType = require('../../lib/helpers/isBsonType');
 
 const Decimal128 = require('mongodb').Decimal128;
 const ObjectId = require('mongodb').ObjectId;
+const Int32 = require('mongodb').Int32;
 
 describe('isBsonType', () => {
   it('true for any object with _bsontype property equal typename', () => {
@@ -29,5 +30,9 @@ describe('isBsonType', () => {
 
   it('true for ObjectId', () => {
     assert.ok(isBsonType(new ObjectId(), 'ObjectId'));
+  });
+
+  it('true for Int32', () => {
+    assert.ok(isBsonType(new Int32(), 'Int32'));
   });
 });

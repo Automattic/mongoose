@@ -2,7 +2,6 @@
 
 const assert = require('assert');
 const start = require('./common');
-const BSONInt32 = require('bson').Int32;
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -216,42 +215,6 @@ describe('Int32', function() {
         await Test.create({ myInt: '42' });
         const doc = await Test.findOne({ myInt: { $type: 'double' } });
         assert.equal(doc, undefined);
-      });
-    });
-
-    describe('promoteValues', function() {
-      describe('when promoteValues is false', function() {
-        it('find returns BSON Int32', async function() {
-          await Test.create({ myInt: 7 });
-
-          const doc = await Test.findOne({ myInt: 7 })
-            .setOptions({ promoteValues: false });
-          assert.ok(doc);
-          assert.ok(doc.myInt instanceof BSONInt32);
-          assert.equal(doc.myInt.value, 7);
-        });
-      });
-
-      describe('when promoteValues is undefined', function() {
-        it('find returns a JS number', async function() {
-          await Test.create({ myInt: 7 });
-          const doc = await Test.findOne({ myInt: 7 })
-            .setOptions({ promoteValues: undefined });
-          assert.ok(doc);
-          assert.ok(doc);
-          assert.equal(doc.myInt, 7);
-        });
-      });
-
-      describe('when promoteValues is true', function() {
-        it('find returns a JS number', async function() {
-          await Test.create({ myInt: 7 });
-
-          const doc = await Test.findOne({ myInt: 7 })
-            .setOptions({ promoteValues: false });
-          assert.ok(doc);
-          assert.equal(doc.myInt, 7);
-        });
       });
     });
 

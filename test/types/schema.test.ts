@@ -425,6 +425,9 @@ export function autoTypedSchema() {
     decimal1?: Types.Decimal128 | null;
     decimal2?: Types.Decimal128 | null;
     decimal3?: Types.Decimal128 | null;
+    int32_1?: Types.Int32 | null;
+    int32_2?: Types.Int32 | null;
+    int32_3?: Types.Int32 | null;
   };
 
   const TestSchema = new Schema({
@@ -471,7 +474,10 @@ export function autoTypedSchema() {
     array8: { type: [String], default: () => undefined },
     decimal1: Schema.Types.Decimal128,
     decimal2: 'Decimal128',
-    decimal3: 'decimal128'
+    decimal3: 'decimal128',
+    int32_1: Schema.Types.Int32,
+    int32_2: 'Int32',
+    int32_3: 'int32'
   });
 
   type InferredTestSchemaType = InferSchemaType<typeof TestSchema>;

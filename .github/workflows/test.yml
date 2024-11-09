@@ -27,7 +27,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
         with:
-          node-version: 18
+          node-version: 22
 
       - run: npm install
 
@@ -39,7 +39,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [16, 18, 20]
+        node: [16, 18, 20, 22]
         os: [ubuntu-20.04, ubuntu-22.04]
         mongodb: [4.4.29, 5.0.26, 6.0.15, 7.0.12, 8.0.0]
         include:
@@ -98,7 +98,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
         with:
-          node-version: 16
+          node-version: 22
       - name: Load MongoDB binary cache
         id: cache-mongodb-binaries
         uses: actions/cache@v4
@@ -126,7 +126,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
         with:
-          node-version: 16
+          node-version: 22
       - run: npm install
       - name: Test
         run: npm run test-rs

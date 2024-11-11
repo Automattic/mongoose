@@ -664,6 +664,29 @@ const student = new Student({ id: 1339 });
 typeof student.id; // 'number'
 ```
 
+There are several types of values that will be successfully cast to a Number.
+
+```javascript
+new Student({ id: '15' }).id; // 15 as a Int32
+new Student({ id: true }).id; // 1 as a Int32
+new Student({ id: false }).id; // 0 as a Int32
+new Student({ id: { valueOf: () => 83 } }).id; // 83 as a Int32
+new Student({ id: '' }).id; // null as a Int32
+```
+
+If you pass an object with a `valueOf()` function that returns a Number, Mongoose will
+call it and assign the returned value to the path.
+
+The values `null` and `undefined` are not cast.
+
+The following inputs will result will all result in a [CastError](validation.html#cast-errors) once validated, meaning that it will not throw on initialization, only when validated:
+- NaN
+- strings that cast to NaN
+- objects that don't have a `valueOf()` function
+- a decimal that must be rounded to be an integer
+- an input that represents a value beyond the bounds of an 32-bit integer
+
+
 ## Getters {#getters}
 
 Getters are like virtuals for paths defined in your schema. For example,

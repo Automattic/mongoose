@@ -8147,6 +8147,46 @@ describe('Model', function() {
       assert.ok(obj.post.updatedAt.valueOf(), new Date('2023-06-01T18:00:00.000Z').valueOf());
     });
   });
+
+  describe('diffIndexes()', function() {
+    it('avoids trying to drop timeseries collections (gh-14984)', async function() {
+      const schema = new mongoose.Schema(
+        {
+          time: {
+            type: Date
+          },
+          deviceId: {
+            type: String
+          }
+        },
+        {
+          timeseries: {
+            timeField: 'time',
+            metaField: 'deviceId',
+            granularity: 'seconds'
+          },
+          autoCreate: false
+        }
+      );
+
+      const TestModel = db.model(
+        'TimeSeriesTest',
+        schema,
+        'gh14984'
+      );
+
+      await db.dropCollection('gh14984').catch(err => {
+        if (err.codeName === 'NamespaceNotFound') {
+          return;
+        }
+        throw err;
+      });
+      await TestModel.createCollection();
+
+      const { toDrop } = await TestModel.diffIndexes();
+      assert.deepStrictEqual(toDrop, []);
+    });
+  });
 });
 
 

@@ -4125,6 +4125,54 @@ describe('Model', function() {
         assert.equal(err.validationErrors[0].errors['num'].name, 'CastError');
       });
 
+      it('handles array filters (gh-14978)', async function() {
+        const embedDiscriminatorSchema = new mongoose.Schema({
+          field1: String
+        });
+
+        const embedSchema = new mongoose.Schema({
+          field: String,
+          key: String
+        }, { discriminatorKey: 'key' });
+        embedSchema.discriminator('Type1', embedDiscriminatorSchema);
+
+        const testSchema = new mongoose.Schema({
+          testArray: [embedSchema]
+        });
+        const TestModel = db.model('Test', testSchema);
+
+        const test = new TestModel({
+          testArray: [{
+            key: 'Type1',
+            field: 'field',
+            field1: 'field1'
+          }]
+        });
+        const r1 = await test.save();
+        assert.equal(r1.testArray[0].field1, 'field1');
+
+        const field1update = 'field1 update';
+        await TestModel.bulkWrite([{
+          updateOne: {
+            filter: { _id: r1._id },
+            update: {
+              $set: {
+                'testArray.$[element].field1': field1update
+              }
+            },
+            arrayFilters: [
+              {
+                'element._id': r1.testArray[0]._id,
+                'element.key': 'Type1'
+              }
+            ]
+          }
+        }]);
+        const r2 = await TestModel.findById(r1._id);
+        assert.equal(r2.testArray[0].field1, field1update);
+
+      });
+
       it('with child timestamps and array filters (gh-7032)', async function() {
         const childSchema = new Schema({ name: String }, { timestamps: true });
 

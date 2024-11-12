@@ -69,6 +69,7 @@ const schema = new Schema({
   mixed: Schema.Types.Mixed,
   _someId: Schema.Types.ObjectId,
   decimal: Schema.Types.Decimal128,
+  double: Schema.Types.Double,
   array: [],
   ofString: [String],
   ofNumber: [Number],
@@ -647,6 +648,44 @@ const Question = mongoose.model('Question', questionSchema);
 const question = new Question({ answer: 42n });
 typeof question.answer; // 'bigint'
 ```
+
+### Double {#double}
+
+Mongoose supports [64-bit IEEE 754-2008 floating point numbers](https://en.wikipedia.org/wiki/IEEE_754-2008_revision) as a SchemaType.
+Int32s are stored as [BSON type "double" in MongoDB](https://www.mongodb.com/docs/manual/reference/bson-types/).
+
+```javascript
+const studentsSchema = new Schema({
+  id: Int32
+});
+const Student = mongoose.model('Student', schema);
+
+const student = new Temperature({ celsius: 1339 });
+typeof student.id; // 'number'
+```
+
+There are several types of values that will be successfully cast to a Double.
+
+```javascript
+new Temperature({ celsius: '1.2e12' }).celsius; // 15 as a Double
+new Temperature({ celsius: true }).celsius; // 1 as a Double
+new Temperature({ celsius: false }).celsius; // 0 as a Double
+new Temperature({ celsius: { valueOf: () => 83.0033 } }).celsius; // 83 as a Double
+new Temperature({ celsius: '' }).celsius; // null as a Double
+```
+
+If you pass an object with a `valueOf()` function that returns a Number, Mongoose will
+call it and assign the returned value to the path.
+
+The values `null` and `undefined` are not cast.
+
+The following inputs will result will all result in a [CastError](validation.html#cast-errors) once validated, meaning that it will not throw on initialization, only when validated:
+
+* strings that do not represent a numeric string, a NaN or a null-ish value
+* numbers in non-decimal or exponential format
+* objects that don't have a `valueOf()` function
+* an input that represents a value outside the bounds of a IEEE 754-2008 floating point
+
 
 ## Getters {#getters}
 

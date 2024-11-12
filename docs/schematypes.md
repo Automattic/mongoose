@@ -682,7 +682,6 @@ The values `null` and `undefined` are not cast.
 The following inputs will result will all result in a [CastError](validation.html#cast-errors) once validated, meaning that it will not throw on initialization, only when validated:
 
 * strings that do not represent a numeric string, a NaN or a null-ish value
-* numbers in non-decimal or exponential format
 * objects that don't have a `valueOf()` function
 * an input that represents a value outside the bounds of a IEEE 754-2008 floating point
 

@@ -12,6 +12,7 @@ import {
   ObtainDocumentType,
   DefaultTypeKey,
   ObjectIdSchemaDefinition,
+  IfAny,
   IfEquals,
   DefaultSchemaOptions,
   IsItRecordAndNotAny
@@ -252,22 +253,22 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
   IfEquals<TypeHint, never,
     PathValueType extends Schema ? InferSchemaType<PathValueType> :
       PathValueType extends (infer Item)[] ?
-        IfEquals<Item, never, any[], Item extends Schema ?
+        IfEquals<Item, never, Types.Array<any>, Item extends Schema ?
           // If Item is a schema, infer its type.
           Types.DocumentArray<InferSchemaType<Item>> :
           Item extends Record<TypeKey, any> ?
             Item[TypeKey] extends Function | String ?
               // If Item has a type key that's a string or a callable, it must be a scalar,
               // so we can directly obtain its path type.
-              ObtainDocumentPathType<Item, TypeKey>[] :
+              Types.Array<ObtainDocumentPathType<Item, TypeKey>> :
               // If the type key isn't callable, then this is an array of objects, in which case
               // we need to call ObtainDocumentType to correctly infer its type.
               Types.DocumentArray<ObtainDocumentType<Item, any, { typeKey: TypeKey }>> :
             IsSchemaTypeFromBuiltinClass<Item> extends true ?
-              ObtainDocumentPathType<Item, TypeKey>[] :
+              Types.Array<ObtainDocumentPathType<Item, TypeKey>> :
               IsItRecordAndNotAny<Item> extends true ?
                 Item extends Record<string, never> ?
-                  ObtainDocumentPathType<Item, TypeKey>[] :
+                  Types.Array<ObtainDocumentPathType<Item, TypeKey>> :
                   Types.DocumentArray<ObtainDocumentType<Item, any, { typeKey: TypeKey }>> :
                 ObtainDocumentPathType<Item, TypeKey>[]
         >:
@@ -276,13 +277,13 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
             Types.DocumentArray<InferSchemaType<Item>> :
             Item extends Record<TypeKey, any> ?
               Item[TypeKey] extends Function | String ?
-                ObtainDocumentPathType<Item, TypeKey>[] :
-                ObtainDocumentType<Item, any, { typeKey: TypeKey }>[]:
+                Types.Array<ObtainDocumentPathType<Item, TypeKey>> :
+                Types.Array<ObtainDocumentType<Item, any, { typeKey: TypeKey }>> :
               IsSchemaTypeFromBuiltinClass<Item> extends true ?
-                ObtainDocumentPathType<Item, TypeKey>[] :
+                Types.Array<ObtainDocumentPathType<Item, TypeKey>> :
                 IsItRecordAndNotAny<Item> extends true ?
                   Item extends Record<string, never> ?
-                    ObtainDocumentPathType<Item, TypeKey>[] :
+                    Types.Array<ObtainDocumentPathType<Item, TypeKey>> :
                     Types.DocumentArray<ObtainDocumentType<Item, any, { typeKey: TypeKey }>> :
                   ObtainDocumentPathType<Item, TypeKey>[]
           >:
@@ -309,7 +310,7 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
                                                   IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
                                                     PathValueType extends MapConstructor | 'Map' ? Map<string, ResolvePathType<Options['of']>> :
                                                       IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ResolvePathType<Options['of']>> :
-                                                        PathValueType extends ArrayConstructor ? any[] :
+                                                        PathValueType extends ArrayConstructor ? Types.Array<any> :
                                                           PathValueType extends typeof Schema.Types.Mixed ? any:
                                                             IfEquals<PathValueType, ObjectConstructor> extends true ? any:
                                                               IfEquals<PathValueType, {}> extends true ? any:

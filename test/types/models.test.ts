@@ -799,6 +799,10 @@ async function gh14026() {
     new mongoose.Schema({ bar: [String] })
   );
 
+  const doc = new TestModel();
+  expectType<Types.Array<string>>(doc.bar);
+  expectType<Types.Array<string>>({} as WithLevel1NestedPaths<typeof doc>['bar']);
+
   expectType<string[]>(await TestModel.distinct('bar'));
 }
 

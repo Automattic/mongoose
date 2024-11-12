@@ -7,6 +7,8 @@ declare module 'mongoose' {
 
   namespace Types {
     class Array<T> extends global.Array<T> {
+      constructor(values: any[]);
+
       /** Pops the array atomically at most one time per document `save()`. */
       $pop(): T;
 

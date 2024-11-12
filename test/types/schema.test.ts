@@ -414,14 +414,14 @@ export function autoTypedSchema() {
     customSchema?: Int8 | null;
     map1?: Map<string, string> | null;
     map2?: Map<string, number> | null;
-    array1: string[];
-    array2: any[];
-    array3: any[];
-    array4: any[];
-    array5: any[];
-    array6: string[];
-    array7?: string[] | null;
-    array8?: string[] | null;
+    array1: Types.Array<string>;
+    array2: Types.Array<any>;
+    array3: Types.Array<any>;
+    array4: Types.Array<any>;
+    array5: Types.Array<any>;
+    array6: Types.Array<string>;
+    array7?: Types.Array<string> | null;
+    array8?: Types.Array<string> | null;
     decimal1?: Types.Decimal128 | null;
     decimal2?: Types.Decimal128 | null;
     decimal3?: Types.Decimal128 | null;
@@ -925,7 +925,7 @@ async function gh12593() {
   const arrSchema = new Schema({ arr: [{ type: Schema.Types.UUID }] });
 
   type ExampleArr = InferSchemaType<typeof arrSchema>;
-  expectType<{ arr: Buffer[] }>({} as ExampleArr);
+  expectType<{ arr: Types.Array<Buffer> }>({} as ExampleArr);
 }
 
 function gh12562() {
@@ -986,7 +986,7 @@ function gh12611() {
   type Props = InferSchemaType<typeof firstSchema>;
   expectType<{
     description: string;
-    skills: Types.ObjectId[];
+    skills: Types.Array<Types.ObjectId>;
     anotherField?: string | null;
   }>({} as Props);
 }
@@ -1048,7 +1048,7 @@ function gh12882() {
   });
   type tArrNum = InferSchemaType<typeof arrNum>;
   expectType<{
-    fooArray: number[]
+    fooArray: Types.Array<number>
   }>({} as tArrNum);
   // Array of object with key named "type"
   const arrType = new Schema({
@@ -1085,7 +1085,7 @@ function gh12882() {
   });
   type rTArrString = InferSchemaType<typeof rArrString>;
   expectType<{
-    fooArray: string[]
+    fooArray: Types.Array<string>
   }>({} as rTArrString);
   // Readonly array of numbers using string definition
   const rArrNum = new Schema({
@@ -1099,7 +1099,7 @@ function gh12882() {
   });
   type rTArrNum = InferSchemaType<typeof rArrNum>;
   expectType<{
-    fooArray: number[]
+    fooArray: Types.Array<number>
   }>({} as rTArrNum);
   // Readonly array of object with key named "type"
   const rArrType = new Schema({
@@ -1445,10 +1445,10 @@ function gh14367() {
   type IUser = InferSchemaType<typeof UserSchema>;
 
   const x: IUser = {
-    counts: [12],
-    roles: ['test'],
-    dates: [new Date('2016-06-01')],
-    flags: [true]
+    counts: new Types.Array<number>([12]),
+    roles: new Types.Array<string>(['test']),
+    dates: new Types.Array<Date>([new Date('2016-06-01')]),
+    flags: new Types.Array<boolean>([true])
   };
 }
 
@@ -1664,7 +1664,7 @@ async function gh14950() {
   const doc = await TestModel.findOne().orFail();
 
   expectType<string>(doc.location!.type);
-  expectType<number[]>(doc.location!.coordinates);
+  expectType<Types.Array<number>>(doc.location!.coordinates);
 }
 
 async function gh14902() {

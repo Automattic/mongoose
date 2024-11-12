@@ -33,9 +33,13 @@ declare module 'mongoose' {
     [P in keyof T as P extends K ? never : P]: T[P];
   };
 
-  type Unpacked<T> = T extends (infer U)[] ?
-    U :
-    T extends ReadonlyArray<infer U> ? U : T;
+  type Unpacked<T> = T extends Types.Array<infer U>
+    ? U
+    : T extends (infer U)[]
+      ? U
+      : T extends ReadonlyArray<infer U>
+        ? U
+        : T;
 
   type UnpackedIntersection<T, U> = T extends null ? null : T extends (infer A)[]
     ? (Omit<A, keyof U> & U)[]

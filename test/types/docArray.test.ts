@@ -73,7 +73,7 @@ function gh13087() {
     name: string;
     location: {
       type: 'Point';
-      coordinates: number[];
+      coordinates: Types.Array<number>;
     };
   }>>(points);
 }

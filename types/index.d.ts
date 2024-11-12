@@ -719,9 +719,11 @@ declare module 'mongoose' {
         ? mongodb.Binary | null | undefined
         : T[K] extends Types.DocumentArray<infer ItemType>
             ? Types.DocumentArray<BufferToBinary<ItemType>>
-            : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
-              ? HydratedSingleSubdocument<SubdocType>
-              : BufferToBinary<T[K]>;
+            : T[K] extends Types.Array<infer ItemType>
+              ? Types.Array<ItemType extends Buffer ? mongodb.Binary : ItemType>
+              : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+                ? HydratedSingleSubdocument<SubdocType>
+                : BufferToBinary<T[K]>;
   } : T;
 
   /**
@@ -733,10 +735,12 @@ declare module 'mongoose' {
       : T[K] extends (Buffer | null | undefined)
         ? { type: 'buffer', data: number[] } | null | undefined
         : T[K] extends Types.DocumentArray<infer ItemType>
-            ? Types.DocumentArray<BufferToBinary<ItemType>>
-            : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
-              ? HydratedSingleSubdocument<SubdocType>
-              : BufferToBinary<T[K]>;
+            ? Types.DocumentArray<BufferToJSON<ItemType>>
+            : T[K] extends Types.Array<infer ItemType>
+              ? Types.Array<ItemType extends Buffer ? { type: 'buffer', data: number[] } : ItemType>
+              : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+                ? HydratedSingleSubdocument<SubdocType>
+                : BufferToJSON<T[K]>;
   } : T;
 
   /**
@@ -749,9 +753,11 @@ declare module 'mongoose' {
         ? string | null | undefined
         : T[K] extends Types.DocumentArray<infer ItemType>
             ? Types.DocumentArray<ObjectIdToString<ItemType>>
-            : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
-              ? HydratedSingleSubdocument<ObjectIdToString<SubdocType>>
-              : ObjectIdToString<T[K]>;
+            : T[K] extends Types.Array<infer ItemType>
+              ? Types.Array<ItemType extends mongodb.ObjectId ? string : ItemType>
+              : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+                ? HydratedSingleSubdocument<ObjectIdToString<SubdocType>>
+                : ObjectIdToString<T[K]>;
   } : T;
 
   /**
@@ -764,9 +770,11 @@ declare module 'mongoose' {
         ? string | null | undefined
         : T[K] extends Types.DocumentArray<infer ItemType>
             ? Types.DocumentArray<DateToString<ItemType>>
-            : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
-              ? HydratedSingleSubdocument<DateToString<SubdocType>>
-              : DateToString<T[K]>;
+            : T[K] extends Types.Array<infer ItemType>
+              ? Types.Array<ItemType extends NativeDate ? string : ItemType>
+              : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+                ? HydratedSingleSubdocument<DateToString<SubdocType>>
+                : DateToString<T[K]>;
   } : T;
 
   /**
@@ -778,10 +786,12 @@ declare module 'mongoose' {
       : T[K] extends (NativeDate | null | undefined)
         ? string | null | undefined
         : T[K] extends Types.DocumentArray<infer ItemType>
-            ? ItemType[]
-            : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
-              ? SubdocType
-              : SubdocsToPOJOs<T[K]>;
+            ? SubdocsToPOJOs<ItemType>[]
+            : T[K] extends Types.Array<infer ItemType>
+              ? ItemType[]
+              : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+                ? SubdocType
+                : SubdocsToPOJOs<T[K]>;
   } : T;
 
   export type JSONSerialized<T> = SubdocsToPOJOs<

@@ -55,6 +55,7 @@ Check out [Mongoose's plugins search](http://plugins.mongoosejs.io) to find plug
 * [Schema](#schemas)
 * [UUID](#uuid)
 * [BigInt](#bigint)
+* [Double](#double)
 
 ### Example
 

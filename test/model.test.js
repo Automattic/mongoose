@@ -8150,6 +8150,12 @@ describe('Model', function() {
 
   describe('diffIndexes()', function() {
     it('avoids trying to drop timeseries collections (gh-14984)', async function() {
+      const version = await start.mongodVersion();
+      if (version[0] < 5) {
+        this.skip();
+        return;
+      }
+
       const schema = new mongoose.Schema(
         {
           time: {

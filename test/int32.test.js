@@ -27,7 +27,7 @@ describe('Int32', function() {
   });
 
   describe('supports the required property', function() {
-    it('when value is null', async function() {
+    it('when vaglue is null', async function() {
       const schema = new Schema({
         int32: {
           type: Schema.Types.Int32,
@@ -180,18 +180,6 @@ describe('Int32', function() {
         myInt: new BSON.Int32(-997)
       });
       assert.strictEqual(doc.myInt, -997);
-    });
-
-    it('casts from Mongoose Schema.Types.Int32', function() {
-      const schema = new Schema({
-        myInt: Schema.Types.Int32
-      });
-      const Test = mongoose.model('Test', schema);
-
-      const doc = new Test({
-        myInt: new mongoose.Types.Int32(53)
-      });
-      assert.strictEqual(doc.myInt, 53);
     });
 
     it('casts from BSON.Long provided its value is within bounds of Int32', function() {
@@ -393,7 +381,7 @@ describe('Int32', function() {
       mongoose.Schema.Types.Int32.cast(defaultCast);
     });
 
-    it('supports cast disabled', () => {
+    it('supports cast disabled', async() => {
       mongoose.Schema.Types.Int32.cast(false);
       const schema = new Schema({
         myInt1: {
@@ -405,11 +393,15 @@ describe('Int32', function() {
       });
       const Test = mongoose.model('Test', schema);
       const doc = new Test({
-        myInt: '52',
+        myInt1: '52',
         myInt2: 52
       });
       assert.strictEqual(doc.myInt1, undefined);
       assert.strictEqual(doc.myInt2, 52);
+
+      const err = await doc.validate().catch(e => e);
+      assert.ok(err);
+      assert.ok(err.errors['myInt1']);
     });
 
     it('supports custom cast', () => {

@@ -680,12 +680,12 @@ call it and assign the returned value to the path.
 The values `null` and `undefined` are not cast.
 
 The following inputs will result will all result in a [CastError](validation.html#cast-errors) once validated, meaning that it will not throw on initialization, only when validated:
-- NaN
-- strings that cast to NaN
-- objects that don't have a `valueOf()` function
-- a decimal that must be rounded to be an integer
-- an input that represents a value beyond the bounds of an 32-bit integer
 
+* NaN
+* strings that cast to NaN
+* objects that don't have a `valueOf()` function
+* a decimal that must be rounded to be an integer
+* an input that represents a value outside the bounds of an 32-bit integer
 
 ## Getters {#getters}
 

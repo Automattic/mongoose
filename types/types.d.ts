@@ -60,8 +60,6 @@ declare module 'mongoose' {
 
     class Decimal128 extends mongodb.Decimal128 { }
 
-    class Int32 extends mongodb.Int32 { }
-
     class DocumentArray<T> extends Types.Array<T extends Types.Subdocument ? T : Types.Subdocument<InferId<T>, any, T> & T> {
       /** DocumentArray constructor */
       constructor(values: AnyObject[]);

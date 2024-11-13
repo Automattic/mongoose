@@ -4157,7 +4157,8 @@ describe('Model', function() {
             filter: { _id: r1._id },
             update: {
               $set: {
-                'testArray.$[element].field1': field1update
+                'testArray.$[element].field1': field1update,
+                'testArray.$[element].nonexistentProp': field1update
               }
             },
             arrayFilters: [
@@ -4168,8 +4169,9 @@ describe('Model', function() {
             ]
           }
         }]);
-        const r2 = await TestModel.findById(r1._id);
+        const r2 = await TestModel.findById(r1._id).lean();
         assert.equal(r2.testArray[0].field1, field1update);
+        assert.strictEqual(r2.testArray[0].nonexistentProp, undefined);
       });
 
       it('with child timestamps and array filters (gh-7032)', async function() {

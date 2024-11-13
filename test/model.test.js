@@ -4170,7 +4170,6 @@ describe('Model', function() {
         }]);
         const r2 = await TestModel.findById(r1._id);
         assert.equal(r2.testArray[0].field1, field1update);
-
       });
 
       it('with child timestamps and array filters (gh-7032)', async function() {

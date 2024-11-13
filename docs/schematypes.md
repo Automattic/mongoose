@@ -685,7 +685,6 @@ The following inputs will result will all result in a [CastError](validation.htm
 * objects that don't have a `valueOf()` function
 * an input that represents a value outside the bounds of a IEEE 754-2008 floating point
 
-
 ## Getters {#getters}
 
 Getters are like virtuals for paths defined in your schema. For example,

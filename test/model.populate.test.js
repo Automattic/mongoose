@@ -11279,4 +11279,89 @@ describe('model: populate:', function() {
     assert.strictEqual(doc.node.length, 1);
     assert.strictEqual(doc.node[0]._id, '65c7953e-c6e9-4c2f-8328-fe2de7df560d');
   });
+
+  it('avoids repopulating if forceRepopulate disabled (gh-14979)', async function() {
+    const ChildSchema = new Schema({ name: String });
+    const ParentSchema = new Schema({
+      children: [{ type: Schema.Types.ObjectId, ref: 'Child' }],
+      child: { type: 'ObjectId', ref: 'Child' }
+    });
+
+    const Child = db.model('Child', ChildSchema);
+    const Parent = db.model('Parent', ParentSchema);
+
+    const child = await Child.create({ name: 'Child test' });
+    let parent = await Parent.create({ child: child._id, children: [child._id] });
+
+    parent = await Parent.findOne({ _id: parent._id }).populate(['child', 'children']).orFail();
+    child.name = 'Child test updated 1';
+    await child.save();
+
+    await parent.populate({ path: 'child', forceRepopulate: false });
+    await parent.populate({ path: 'children', forceRepopulate: false });
+    assert.equal(parent.child.name, 'Child test');
+    assert.equal(parent.children[0].name, 'Child test');
+
+    await Parent.populate([parent], { path: 'child', forceRepopulate: false });
+    await Parent.populate([parent], { path: 'children', forceRepopulate: false });
+    assert.equal(parent.child.name, 'Child test');
+    assert.equal(parent.children[0].name, 'Child test');
+
+    parent.depopulate('child');
+    parent.depopulate('children');
+    await parent.populate({ path: 'child', forceRepopulate: false });
+    await parent.populate({ path: 'children', forceRepopulate: false });
+    assert.equal(parent.child.name, 'Child test updated 1');
+    assert.equal(parent.children[0].name, 'Child test updated 1');
+  });
+
+  it('handles forceRepopulate as a global option (gh-14979)', async function() {
+    const m = new mongoose.Mongoose();
+    m.set('forceRepopulate', false);
+    await m.connect(start.uri);
+    const ChildSchema = new m.Schema({ name: String });
+    const ParentSchema = new m.Schema({
+      children: [{ type: Schema.Types.ObjectId, ref: 'Child' }],
+      child: { type: 'ObjectId', ref: 'Child' }
+    });
+
+    const Child = m.model('Child', ChildSchema);
+    const Parent = m.model('Parent', ParentSchema);
+
+    const child = await Child.create({ name: 'Child test' });
+    let parent = await Parent.create({ child: child._id, children: [child._id] });
+
+    parent = await Parent.findOne({ _id: parent._id }).populate(['child', 'children']).orFail();
+    child.name = 'Child test updated 1';
+    await child.save();
+
+    await parent.populate({ path: 'child' });
+    await parent.populate({ path: 'children' });
+    assert.equal(parent.child.name, 'Child test');
+    assert.equal(parent.children[0].name, 'Child test');
+
+    await Parent.populate([parent], { path: 'child' });
+    await Parent.populate([parent], { path: 'children' });
+    assert.equal(parent.child.name, 'Child test');
+    assert.equal(parent.children[0].name, 'Child test');
+
+    parent.depopulate('child');
+    parent.depopulate('children');
+    await parent.populate({ path: 'child' });
+    await parent.populate({ path: 'children' });
+    assert.equal(parent.child.name, 'Child test updated 1');
+    assert.equal(parent.children[0].name, 'Child test updated 1');
+
+    child.name = 'Child test updated 2';
+    await child.save();
+
+    parent.depopulate('child');
+    parent.depopulate('children');
+    await parent.populate({ path: 'child', forceRepopulate: true });
+    await parent.populate({ path: 'children', forceRepopulate: true });
+    assert.equal(parent.child.name, 'Child test updated 2');
+    assert.equal(parent.children[0].name, 'Child test updated 2');
+
+    await m.disconnect();
+  });
 });

@@ -87,6 +87,9 @@ In Mongoose 7, `findOneAndRemove()` was an alias for `findOneAndDelete()` that M
 Mongoose 8 no longer supports `findOneAndRemove()`.
 Use `findOneAndDelete()` instead.
 
+Similarly, Mongoose 8 no longer supports `findByIdAndRemove()`, which was an alias for `findByIdAndDelete()`.
+Please use `findByIdAndDelete()` instead.
+
 ## Removed `count()` {#removed-count}
 
 `Model.count()` and `Query.prototype.count()` were removed in Mongoose 8. Use `Model.countDocuments()` and `Query.prototype.countDocuments()` instead.

@@ -19,7 +19,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
         with:
-          node-version: 16
+          node-version: 22
       - name: Alignment
         uses: tidelift/alignment-action@8d7700fe795fc01179c1f9fa05b72a089873027d # main
         env:

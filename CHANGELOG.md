@@ -1,6 +1,15 @@
+6.13.4 / 2024-11-15
+===================
+ * fix: save execution stack in query as string #15043 #15039
+ * docs: clarify strictQuery default will flip-flop in "Migrating to 6.x" #14998 [markstos](https://github.com/markstos)
+
 7.8.2 / 2024-09-25
 ==================
  * fix(projection): avoid setting projection to unknown exclusive/inclusive if elemMatch on a Date, ObjectId, etc. #14894 #14893
+
+6.13.3 / 2024-09-23
+===================
+ * docs(migrating_to_6): document that Lodash _.isEmpty() with ObjectId() as a parameter returns true in Mongoose 6 #11152
 
 6.13.2 / 2024-09-12
 ===================

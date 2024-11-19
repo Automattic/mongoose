@@ -11280,7 +11280,7 @@ describe('model: populate:', function() {
     assert.strictEqual(doc.node[0]._id, '65c7953e-c6e9-4c2f-8328-fe2de7df560d');
   });
 
-  it('avoids repopulating if forceRepopulate disabled (gh-14979)', async function() {
+  it('avoids repopulating if forceRepopulate is disabled (gh-14979)', async function() {
     const ChildSchema = new Schema({ name: String });
     const ParentSchema = new Schema({
       children: [{ type: Schema.Types.ObjectId, ref: 'Child' }],

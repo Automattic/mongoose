@@ -3,6 +3,7 @@
 const assert = require('assert');
 const start = require('./common');
 const BSON = require('bson');
+const sinon = require('sinon');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -10,7 +11,7 @@ const Schema = mongoose.Schema;
 const INT32_MAX = 0x7FFFFFFF;
 const INT32_MIN = -0x80000000;
 
-describe('Int32', function() {
+describe.only('Int32', function() {
   beforeEach(() => mongoose.deleteModel(/Test/));
 
   it('is a valid schema type', function() {
@@ -27,7 +28,7 @@ describe('Int32', function() {
   });
 
   describe('supports the required property', function() {
-    it('when vaglue is null', async function() {
+    it('when value is null', async function() {
       const schema = new Schema({
         int32: {
           type: Schema.Types.Int32,
@@ -141,7 +142,7 @@ describe('Int32', function() {
       const Test = mongoose.model('Test', schema);
 
       const doc = new Test({
-        myInt: -42
+        myInt: '-42'
       });
       assert.strictEqual(doc.myInt, -42);
     });
@@ -182,16 +183,40 @@ describe('Int32', function() {
       assert.strictEqual(doc.myInt, -997);
     });
 
-    it('casts from BSON.Long provided its value is within bounds of Int32', function() {
-      const schema = new Schema({
-        myInt: Schema.Types.Int32
+    describe('long', function() {
+      after(function() {
+        sinon.restore();
       });
-      const Test = mongoose.model('Test', schema);
 
-      const doc = new Test({
-        myInt: BSON.Long.fromNumber(-997)
+      it('casts from BSON.Long provided its value is within bounds of Int32', function() {
+        const schema = new Schema({
+          myInt: Schema.Types.Int32
+        });
+        const Test = mongoose.model('Test', schema);
+
+        const doc = new Test({
+          myInt: BSON.Long.fromNumber(-997)
+        });
+        assert.strictEqual(doc.myInt, -997);
       });
-      assert.strictEqual(doc.myInt, -997);
+
+      it('calls Long.toNumber when casting long', function() {
+        // this is a perf optimization, since long.toNumber() is faster than Number(long)
+        const schema = new Schema({
+          myInt: Schema.Types.Int32
+        });
+        const Test = mongoose.model('Test', schema);
+
+        sinon.stub(BSON.Long.prototype, 'toNumber').callsFake(function() {
+          return 2;
+        });
+
+        const doc = new Test({
+          myInt: BSON.Long.fromNumber(-997)
+        });
+
+        assert.strictEqual(doc.myInt, 2);
+      });
     });
 
     it('casts from BSON.Double provided its value is an integer', function() {

@@ -4174,6 +4174,51 @@ describe('Model', function() {
         assert.strictEqual(r2.testArray[0].nonexistentProp, undefined);
       });
 
+      it('handles overwriteDiscriminatorKey (gh-15040)', async function() {
+        const dSchema1 = new mongoose.Schema({
+          field1: String
+        });
+        const dSchema2 = new mongoose.Schema({
+          field2: String
+        });
+        const baseSchema = new mongoose.Schema({
+          field: String,
+          key: String
+        }, { discriminatorKey: 'key' });
+        const type1Key = 'Type1';
+        const type2Key = 'Type2';
+
+        baseSchema.discriminator(type1Key, dSchema1);
+        baseSchema.discriminator(type2Key, dSchema2);
+
+        const TestModel = db.model('Test', baseSchema);
+
+        const test = new TestModel({
+          field: 'base field',
+          key: type1Key,
+          field1: 'field1'
+        });
+        const r1 = await test.save();
+        assert.equal(r1.field1, 'field1');
+        assert.equal(r1.key, type1Key);
+
+        const field2 = 'field2';
+        await TestModel.bulkWrite([{
+          updateOne: {
+            filter: { _id: r1._id },
+            update: {
+              key: type2Key,
+              field2
+            },
+            overwriteDiscriminatorKey: true
+          }
+        }]);
+
+        const r2 = await TestModel.findById(r1._id);
+        assert.equal(r2.key, type2Key);
+        assert.equal(r2.field2, field2);
+      });
+
       it('with child timestamps and array filters (gh-7032)', async function() {
         const childSchema = new Schema({ name: String }, { timestamps: true });
 

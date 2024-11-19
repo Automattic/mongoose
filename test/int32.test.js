@@ -11,7 +11,7 @@ const Schema = mongoose.Schema;
 const INT32_MAX = 0x7FFFFFFF;
 const INT32_MIN = -0x80000000;
 
-describe.only('Int32', function() {
+describe('Int32', function() {
   beforeEach(() => mongoose.deleteModel(/Test/));
 
   it('is a valid schema type', function() {

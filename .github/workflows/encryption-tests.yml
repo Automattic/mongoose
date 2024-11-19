@@ -1,0 +1,74 @@
+on:
+  push:
+    branches: ['main']
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+name: encryption-tests
+
+jobs:
+  ssdlc:
+    permissions:
+      # required for all workflows
+      security-events: write
+      id-token: write
+      contents: write
+    environment: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install mongodb-client-encryption
+        uses: mongodb-client-encryption
+
+      - name: Set-up cluster
+    
+     
+
+      - name: Run tests
+        uses: mongodb-labs/drivers-github-tools/node/get_version_info@v2
+        with:
+          npm_package_name: mongodb
+
+      - name: actions/compress_sign_and_upload
+        uses: mongodb-labs/drivers-github-tools/node/sign_node_package@v2
+        with:
+          aws_role_arn: ${{ secrets.AWS_ROLE_ARN }}
+          aws_region_name: us-east-1
+          aws_secret_id: ${{ secrets.AWS_SECRET_ID }}
+          npm_package_name: mongodb
+          dry_run: ${{ needs.release_please.outputs.release_created == '' }}
+
+      - name: Copy sbom file to release assets
+        shell: bash
+        if: ${{ '' == '' }}
+        run: cp sbom.json ${{ env.S3_ASSETS }}/sbom.json
+
+      # only used for mongodb-client-encryption
+      - name: Augment SBOM and copy to release assets
+        if: ${{ '' != '' }}
+        uses: mongodb-labs/drivers-github-tools/sbom@v2
+        with:
+          silk_asset_group: ''
+          sbom_file_name: sbom.json
+
+      - name: Generate authorized pub report
+        uses: mongodb-labs/drivers-github-tools/full-report@v2
+        with:
+          release_version: ${{ env.package_version }}
+          product_name: mongodb
+          sarif_report_target_ref: 'main'
+          third_party_dependency_tool: n/a
+          dist_filenames: artifacts/*
+          token: ${{ github.token }}
+          sbom_file_name: sbom.json
+          evergreen_project: mongo-node-driver-next
+          evergreen_commit: ${{ env.commit }}
+
+      - uses: mongodb-labs/drivers-github-tools/upload-s3-assets@v2
+        with:
+          version: ${{ env.package_version }}
+          product_name: mongodb
+          dry_run: ${{ needs.release_please.outputs.release_created == '' }}

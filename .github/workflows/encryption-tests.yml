@@ -17,14 +17,15 @@ jobs:
       security-events: write
       id-token: write
       contents: write
-    environment: release
     runs-on: ubuntu-latest
     steps:
       - name: Install mongodb-client-encryption
         uses: mongodb-client-encryption
 
       - name: Set-up cluster
-    
+      - shell: bash
+        
+
      
 
       - name: Run tests

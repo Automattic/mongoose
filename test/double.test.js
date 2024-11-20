@@ -20,12 +20,12 @@ describe('Double', function() {
     const doc = new Test({
       myDouble: 13
     });
-    assert.strictEqual(doc.myDouble, 13);
-    assert.equal(typeof doc.myDouble, 'number');
+    assert.deepStrictEqual(doc.myDouble, new BSON.Double(13));
+    assert.equal(typeof doc.myDouble, 'object');
   });
 
   describe('supports the required property', function() {
-    it('when vaglue is null', async function() {
+    it('when value is null', async function() {
       const schema = new Schema({
         Double: {
           type: Schema.Types.Double,
@@ -83,7 +83,7 @@ describe('Double', function() {
       const doc = new Test({
         myDouble: undefined
       });
-      assert.strictEqual(doc.myDouble, undefined);
+      assert.deepStrictEqual(doc.myDouble, undefined);
     });
 
     it('supports null as input', function() {
@@ -97,7 +97,7 @@ describe('Double', function() {
       const doc = new Test({
         myDouble: null
       });
-      assert.strictEqual(doc.myDouble, null);
+      assert.deepStrictEqual(doc.myDouble, null);
     });
   });
 
@@ -113,7 +113,7 @@ describe('Double', function() {
       const doc = new Test({
         myDouble: '-42.008'
       });
-      assert.strictEqual(doc.myDouble, -42.008);
+      assert.deepStrictEqual(doc.myDouble, new BSON.Double(-42.008));
     });
 
     it('casts from exponential string', function() {
@@ -127,7 +127,7 @@ describe('Double', function() {
       const doc = new Test({
         myDouble: '1.22008e45'
       });
-      assert.strictEqual(doc.myDouble, 1.22008e45);
+      assert.deepStrictEqual(doc.myDouble, new BSON.Double(1.22008e45));
     });
 
     it('casts from infinite string', function() {
@@ -145,8 +145,8 @@ describe('Double', function() {
         myDouble1: 'Infinity',
         myDouble2: '-Infinity'
       });
-      assert.strictEqual(doc.myDouble1, Infinity);
-      assert.strictEqual(doc.myDouble2, -Infinity);
+      assert.deepStrictEqual(doc.myDouble1, new BSON.Double(Infinity));
+      assert.deepStrictEqual(doc.myDouble2, new BSON.Double(-Infinity));
     });
 
     it('casts from NaN string', function() {
@@ -160,7 +160,7 @@ describe('Double', function() {
       const doc = new Test({
         myDouble: 'NaN'
       });
-      assert.strictEqual(doc.myDouble, NaN);
+      assert.deepStrictEqual(doc.myDouble, new BSON.Double('NaN'));
     });
 
     it('casts from number', function() {
@@ -172,7 +172,7 @@ describe('Double', function() {
       const doc = new Test({
         myDouble: 988
       });
-      assert.strictEqual(doc.myDouble, 988);
+      assert.deepStrictEqual(doc.myDouble, new BSON.Double(988));
     });
 
     it('casts from bigint', function() {
@@ -184,7 +184,7 @@ describe('Double', function() {
       const doc = new Test({
         myDouble: -997n
       });
-      assert.strictEqual(doc.myDouble, -997);
+      assert.deepStrictEqual(doc.myDouble, new BSON.Double(-997));
     });
 
     it('casts from BSON.Long', function() {
@@ -196,7 +196,7 @@ describe('Double', function() {
       const doc = new Test({
         myDouble: BSON.Long.fromNumber(-997987)
       });
-      assert.strictEqual(doc.myDouble, -997987);
+      assert.deepStrictEqual(doc.myDouble, new BSON.Double(-997987));
     });
 
     it('casts from BSON.Double', function() {
@@ -208,7 +208,7 @@ describe('Double', function() {
       const doc = new Test({
         myDouble: new BSON.Double(-997983.33)
       });
-      assert.strictEqual(doc.myDouble, -997983.33);
+      assert.deepStrictEqual(doc.myDouble, new BSON.Double(-997983.33));
     });
 
     it('casts boolean true to 1', function() {
@@ -220,7 +220,7 @@ describe('Double', function() {
       const doc = new Test({
         myDouble: true
       });
-      assert.strictEqual(doc.myDouble, 1);
+      assert.deepStrictEqual(doc.myDouble, new BSON.Double(1));
     });
 
     it('casts boolean false to 0', function() {
@@ -232,7 +232,7 @@ describe('Double', function() {
       const doc = new Test({
         myDouble: false
       });
-      assert.strictEqual(doc.myDouble, 0);
+      assert.deepStrictEqual(doc.myDouble, new BSON.Double(0));
     });
 
     it('casts empty string to null', function() {
@@ -244,7 +244,7 @@ describe('Double', function() {
       const doc = new Test({
         myDouble: ''
       });
-      assert.strictEqual(doc.myDouble, null);
+      assert.deepStrictEqual(doc.myDouble, null);
     });
 
     it('supports valueOf() function ', function() {
@@ -256,7 +256,7 @@ describe('Double', function() {
       const doc = new Test({
         myDouble: { a: 'random', b: { c: 'whatever' }, valueOf: () => 83.008 }
       });
-      assert.strictEqual(doc.myDouble, 83.008);
+      assert.deepStrictEqual(doc.myDouble, new BSON.Double(83.008));
     });
   });
 
@@ -276,7 +276,7 @@ describe('Double', function() {
           myDouble: 'helloworld'
         });
 
-        assert.strictEqual(doc.myDouble, undefined);
+        assert.deepStrictEqual(doc.myDouble, undefined);
         const err = await doc.validate().catch(e => e);
         assert.ok(err);
         assert.ok(err.errors['myDouble']);
@@ -309,10 +309,10 @@ describe('Double', function() {
       const Test = mongoose.model('Test', schema);
       const doc = new Test({
         myDouble1: '52',
-        myDouble2: 52
+        myDouble2: new BSON.Double(52)
       });
-      assert.strictEqual(doc.myDouble1, undefined);
-      assert.strictEqual(doc.myDouble2, 52);
+      assert.deepStrictEqual(doc.myDouble1, undefined);
+      assert.deepStrictEqual(doc.myDouble2, new BSON.Double(52));
 
       const err = await doc.validate().catch(e => e);
       assert.ok(err);
@@ -322,7 +322,7 @@ describe('Double', function() {
     it('supports custom cast', () => {
       mongoose.Schema.Types.Double.cast(v => {
         if (isNaN(v)) {
-          return 0;
+          return new BSON.Double(2);
         }
         return defaultCast(v);
       });
@@ -336,7 +336,7 @@ describe('Double', function() {
       const doc = new Test({
         myDouble: NaN
       });
-      assert.strictEqual(doc.myDouble, 0);
+      assert.deepStrictEqual(doc.myDouble, new BSON.Double(2));
     });
   });
 
@@ -367,19 +367,25 @@ describe('Double', function() {
         await Test.create({ myDouble: '42.04' });
         const doc = await Test.findOne({ myDouble: { $type: 'number' } });
         assert.ok(doc);
-        assert.strictEqual(doc.myDouble, 42.04);
+        assert.deepStrictEqual(doc.myDouble, new BSON.Double(42.04));
       });
 
       it('is NOT queryable as a BSON Integer in MongoDB if the value is NOT integer', async function() {
         await Test.create({ myDouble: '42.04' });
         const doc = await Test.findOne({ myDouble: { $type: 'int' } });
-        assert.strictEqual(doc, null);
+        assert.deepStrictEqual(doc, null);
       });
 
-      it('is queryable as a BSON Double in MongoDB', async function() {
+      it('is queryable as a BSON Double in MongoDB when a non-integer is provided', async function() {
         await Test.create({ myDouble: '42.04' });
         const doc = await Test.findOne({ myDouble: { $type: 'double' } });
-        assert.equal(doc.myDouble, 42.04);
+        assert.deepStrictEqual(doc.myDouble, new BSON.Double(42.04));
+      });
+
+      it('is queryable as a BSON Double in MongoDB when an integer is provided', async function() {
+        await Test.create({ myDouble: '42' });
+        const doc = await Test.findOne({ myDouble: { $type: 'double' } });
+        assert.deepStrictEqual(doc.myDouble, new BSON.Double(42));
       });
     });
 
@@ -393,11 +399,11 @@ describe('Double', function() {
 
       let docs = await Test.find({ myDouble: { $gte: 1.710 } }).sort({ myDouble: 1 });
       assert.equal(docs.length, 2);
-      assert.deepStrictEqual(docs.map(doc => doc.myDouble), [1.710, 1.8]);
+      assert.deepStrictEqual(docs.map(doc => doc.myDouble), [new BSON.Double(1.710), new BSON.Double(1.8)]);
 
       docs = await Test.find({ myDouble: { $lt: 1.710 } }).sort({ myDouble: -1 });
       assert.equal(docs.length, 2);
-      assert.deepStrictEqual(docs.map(doc => doc.myDouble), [1.709, 1.2]);
+      assert.deepStrictEqual(docs.map(doc => doc.myDouble), [new BSON.Double(1.709), new BSON.Double(1.2)]);
     });
 
     it('supports populate()', async function() {

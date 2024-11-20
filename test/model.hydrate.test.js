@@ -109,12 +109,13 @@ describe('model', function() {
       });
 
       db.model('UserTestHydrate', userSchema);
-      const Company = db.model('CompanyTestHyrdrate', companySchema);
+      const Company = db.model('CompanyTestHydrate', companySchema);
 
       const users = [{ _id: new mongoose.Types.ObjectId(), name: 'Val' }];
       const company = { _id: new mongoose.Types.ObjectId(), name: 'Booster', users: [users[0]] };
 
       const C = Company.hydrate(company, null, { hydratedPopulatedDocs: true });
+      assert(C.populated('users'));
       assert.equal(C.users[0].name, 'Val');
     });
     it('should hydrate documents in virtual populate (gh-14503)', async function() {

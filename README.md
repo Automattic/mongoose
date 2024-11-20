@@ -16,6 +16,7 @@ The official documentation website is [mongoosejs.com](http://mongoosejs.com/).
 Mongoose 8.0.0 was released on October 31, 2023. You can find more details on [backwards breaking changes in 8.0.0 on our docs site](https://mongoosejs.com/docs/migrating_to_8.html).
 
 ## Support
+## By Mudassir Alam
 
 * [Stack Overflow](http://stackoverflow.com/questions/tagged/mongoose)
 * [Bug Reports](https://github.com/Automattic/mongoose/issues/)

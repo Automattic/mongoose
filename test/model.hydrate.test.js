@@ -159,6 +159,7 @@ describe('model', function() {
         { hydratedPopulatedDocs: true }
       );
 
+      assert(hydrated.populated('stories'));
       assert.equal(hydrated.stories[0]._id.toString(), story1._id.toString());
       assert(typeof hydrated.stories[0]._id == 'object', typeof hydrated.stories[0]._id);
       assert(hydrated.stories[0]._id instanceof mongoose.Types.ObjectId);

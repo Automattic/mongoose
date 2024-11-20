@@ -11,7 +11,7 @@ permissions:
 name: encryption-tests
 
 jobs:
-  ssdlc:
+  set-up:
     permissions:
       # required for all workflows
       security-events: write
@@ -24,52 +24,61 @@ jobs:
 
       - name: Set-up cluster
       - shell: bash
-        
 
-     
-
-      - name: Run tests
-        uses: mongodb-labs/drivers-github-tools/node/get_version_info@v2
+  run-tests:
+    needs:
+      - set-up
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20]
+        os: [ubuntu-latest]
+        mongodb: [8.0.0]
+    #clone drivers-evergreen-tools (will delete itself once the run is over)
+    git clone --depth=1 https://github.com/mongodb-labs/drivers-evergreen-tools.git /data/mci/ead9f9a67ef900991e09bd9589dfee0e/drivers-tools
+    #set path 
+    #calling run orchestration sets up a server on your computer
+    # it outputs relevants uri in expansions.yml
+    # put uri into an environment variable
+    - name: set-up-orchestration
+    - command: subprocess.exec
+      params:
+        binary: bash
+        add_expansions_to_env: true
+        env:
+          # The following is the settings for how we want to launch mongodb
+          MONGODB_VERSION: ${VERSION}
+          TOPOLOGY: ${TOPOLOGY}
+          AUTH: ${AUTH}
+          SSL: ${SSL}
+          ORCHESTRATION_FILE: ${ORCHESTRATION_FILE}
+          REQUIRE_API_VERSION: ${REQUIRE_API_VERSION}
+          LOAD_BALANCER: ${LOAD_BALANCER}
+          COMPRESSOR: ${COMPRESSOR}
+          # These are paths necessary for launching mongodb
+          DRIVERS_TOOLS: ${DRIVERS_TOOLS}
+          MONGODB_BINARIES: ${MONGODB_BINARIES}
+        args:
+          - .github/scripts/run-orchestration.sh
+    name: Encryption tests
+    env:
+      FORCE_COLOR: true
+    steps:
+      - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+      - name: Setup node
+        uses: actions/setup-node@0a44ba7841725637a19e28fa30b79a866c81b0a6 # v4.0.4
         with:
-          npm_package_name: mongodb
-
-      - name: actions/compress_sign_and_upload
-        uses: mongodb-labs/drivers-github-tools/node/sign_node_package@v2
+          node-version: latest
+      - name: Load MongoDB binary cache
+        id: cache-mongodb-binaries
+        uses: actions/cache@v4
         with:
-          aws_role_arn: ${{ secrets.AWS_ROLE_ARN }}
-          aws_region_name: us-east-1
-          aws_secret_id: ${{ secrets.AWS_SECRET_ID }}
-          npm_package_name: mongodb
-          dry_run: ${{ needs.release_please.outputs.release_created == '' }}
-
-      - name: Copy sbom file to release assets
-        shell: bash
-        if: ${{ '' == '' }}
-        run: cp sbom.json ${{ env.S3_ASSETS }}/sbom.json
-
-      # only used for mongodb-client-encryption
-      - name: Augment SBOM and copy to release assets
-        if: ${{ '' != '' }}
-        uses: mongodb-labs/drivers-github-tools/sbom@v2
-        with:
-          silk_asset_group: ''
-          sbom_file_name: sbom.json
-
-      - name: Generate authorized pub report
-        uses: mongodb-labs/drivers-github-tools/full-report@v2
-        with:
-          release_version: ${{ env.package_version }}
-          product_name: mongodb
-          sarif_report_target_ref: 'main'
-          third_party_dependency_tool: n/a
-          dist_filenames: artifacts/*
-          token: ${{ github.token }}
-          sbom_file_name: sbom.json
-          evergreen_project: mongo-node-driver-next
-          evergreen_commit: ${{ env.commit }}
-
-      - uses: mongodb-labs/drivers-github-tools/upload-s3-assets@v2
-        with:
-          version: ${{ env.package_version }}
-          product_name: mongodb
-          dry_run: ${{ needs.release_please.outputs.release_created == '' }}
+          path: ~/.cache/mongodb-binaries
+          key: ${{ matrix.os }}-${{ matrix.mongodb }}
+      - name: Install Dependencies
+        run: npm install
+      - name: Install drivers-evergreen-tools
+      
+      - name: Test
+        run: mocha --exit ./test/encryption/*.test.js

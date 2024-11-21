@@ -1,9 +1,8 @@
 name: Encryption Tests 
 
 on:
-  push:
-    branches: ['main']
-  workflow_dispatch: {}
+  push
+  #workflow_dispatch: {}
 
 permissions:
   contents: write

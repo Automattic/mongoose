@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install mongodb-client-encryption
-        uses: mongodb-client-encryption@v6.1
+        uses: mongodb-js/mongodb-client-encryption@v6.1.0
 
   run-tests:
     needs:

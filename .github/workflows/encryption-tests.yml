@@ -1,4 +1,4 @@
-name: encryption-tests
+name: Encryption Tests 
 
 on:
   push:
@@ -21,8 +21,6 @@ jobs:
     steps:
       - name: Install mongodb-client-encryption
         uses: mongodb-client-encryption
-      - name: Set-up cluster
-      - shell: bash
 
   run-tests:
     needs:
@@ -59,9 +57,8 @@ jobs:
       - name: Install drivers-evergreen-tools
         run: git clone --depth=1 https://github.com/mongodb-labs/drivers-evergreen-tools.git ~/.cache/drivers-evergreen-tools
       - name: Set up cluster
-
-        run: bash .github/workflows/run-orchestration.sh
-        with:
+        run: bash /.github/scripts/run-orchestration.sh
+        env:
           # The following is the settings for how we want to launch mongodb
           MONGODB_VERSION: 8.0.0
           TOPOLOGY: sharded
@@ -73,6 +70,5 @@ jobs:
           # These are paths necessary for launching mongodb
           DRIVERS_TOOLS: ~/.cache/drivers-evergreen-tools
           MONGODB_BINARIES: ~/.cache/mongodb-binaries
-      - 
       - name: Test
         run: mocha --exit ./test/encryption/*.test.js

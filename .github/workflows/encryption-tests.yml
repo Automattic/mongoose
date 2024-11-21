@@ -56,7 +56,7 @@ jobs:
       - name: Install drivers-evergreen-tools
         run: git clone --depth=1 https://github.com/mongodb-labs/drivers-evergreen-tools.git ~/.cache/drivers-evergreen-tools
       - name: Set up cluster
-        run: bash ../scripts/run-orchestration.sh
+        run: bash .github/scripts/run-orchestration.sh
         env:
           # The following is the settings for how we want to launch mongodb
           MONGODB_VERSION: 8.0.0

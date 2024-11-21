@@ -1,3 +1,5 @@
+name: encryption-tests
+
 on:
   push:
     branches: ['main']
@@ -7,30 +9,6 @@ permissions:
   contents: write
   pull-requests: write
   id-token: write
-
-name: encryption-tests
-
-functions:
-  "bootstrap mongo-orchestration":
-    - command: subprocess.exec 
-      params:
-        binary: bash
-        add_expansions_to_env: true
-        env:
-          # The following is the settings for how we want to launch mongodb
-          MONGODB_VERSION: ${VERSION}
-          TOPOLOGY: ${TOPOLOGY}
-          AUTH: ${AUTH}
-          SSL: ${SSL}
-          ORCHESTRATION_FILE: ${ORCHESTRATION_FILE}
-          REQUIRE_API_VERSION: ${REQUIRE_API_VERSION}
-          LOAD_BALANCER: ${LOAD_BALANCER}
-          COMPRESSOR: ${COMPRESSOR}
-          # These are paths necessary for launching mongodb
-          DRIVERS_TOOLS: ${DRIVERS_TOOLS}
-          MONGODB_BINARIES: ${MONGODB_BINARIES}
-        args:
-          - ./workflows/run-orchestration.sh
 
 jobs:
   set-up:

@@ -10,39 +10,9 @@ permissions:
 
 name: encryption-tests
 
-jobs:
-  set-up:
-    permissions:
-      # required for all workflows
-      security-events: write
-      id-token: write
-      contents: write
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install mongodb-client-encryption
-        uses: mongodb-client-encryption
-
-      - name: Set-up cluster
-      - shell: bash
-
-  run-tests:
-    needs:
-      - set-up
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        node: [20]
-        os: [ubuntu-latest]
-        mongodb: [8.0.0]
-    #clone drivers-evergreen-tools (will delete itself once the run is over)
-    git clone --depth=1 https://github.com/mongodb-labs/drivers-evergreen-tools.git /data/mci/ead9f9a67ef900991e09bd9589dfee0e/drivers-tools
-    #set path 
-    #calling run orchestration sets up a server on your computer
-    # it outputs relevants uri in expansions.yml
-    # put uri into an environment variable
-    - name: set-up-orchestration
-    - command: subprocess.exec
+functions:
+  "bootstrap mongo-orchestration":
+    - command: subprocess.exec 
       params:
         binary: bash
         add_expansions_to_env: true
@@ -60,7 +30,37 @@ jobs:
           DRIVERS_TOOLS: ${DRIVERS_TOOLS}
           MONGODB_BINARIES: ${MONGODB_BINARIES}
         args:
-          - .github/scripts/run-orchestration.sh
+          - ./workflows/run-orchestration.sh
+
+jobs:
+  set-up:
+    permissions:
+      # required for all workflows
+      security-events: write
+      id-token: write
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install mongodb-client-encryption
+        uses: mongodb-client-encryption
+      - name: Set-up cluster
+      - shell: bash
+
+  run-tests:
+    needs:
+      - set-up
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20]
+        os: [ubuntu-latest]
+        mongodb: [8.0.0]
+    #clone drivers-evergreen-tools (will delete itself once the run is over)
+    #set path 
+    #calling run orchestration sets up a server on your computer
+    # it outputs relevants uri in expansions.yml
+    # put uri into an environment variable
     name: Encryption tests
     env:
       FORCE_COLOR: true
@@ -79,6 +79,22 @@ jobs:
       - name: Install Dependencies
         run: npm install
       - name: Install drivers-evergreen-tools
-      
+        run: git clone --depth=1 https://github.com/mongodb-labs/drivers-evergreen-tools.git ~/.cache/drivers-evergreen-tools
+      - name: Set up cluster
+
+        run: bash .github/workflows/run-orchestration.sh
+        with:
+          # The following is the settings for how we want to launch mongodb
+          MONGODB_VERSION: 8.0.0
+          TOPOLOGY: sharded
+          AUTH: auth
+          # ORCHESTRATION_FILE: ${ORCHESTRATION_FILE}
+          # REQUIRE_API_VERSION: ${REQUIRE_API_VERSION}
+          # LOAD_BALANCER: ${LOAD_BALANCER}
+          # COMPRESSOR: ${COMPRESSOR}
+          # These are paths necessary for launching mongodb
+          DRIVERS_TOOLS: ~/.cache/drivers-evergreen-tools
+          MONGODB_BINARIES: ~/.cache/mongodb-binaries
+      - 
       - name: Test
         run: mocha --exit ./test/encryption/*.test.js

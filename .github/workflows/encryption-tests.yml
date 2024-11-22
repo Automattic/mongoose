@@ -58,7 +58,7 @@ jobs:
         uses: mongodb-labs/drivers-evergreen-tools@master
         with:
           version: ${{ matrix.mongodb }}
-          topology: sharded 
+          topology: sharded_cluster 
           auth: auth
       - name: Run Tests
         run: mocha --exit ./test/encryption/*.test.js

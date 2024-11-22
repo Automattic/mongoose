@@ -34,6 +34,8 @@ jobs:
           node-version: latest
       - name: Install Dependencies
         run: npm install
+      - name: Install mongodb-client-encryption
+        run: npm install mongodb-client-encryption
       - name: Set up cluster
         id: setup-cluster
         uses: mongodb-labs/drivers-evergreen-tools@master
@@ -44,5 +46,5 @@ jobs:
       - name: Run Tests
         run: npx mocha --exit ./test/encryption/*.test.js
         env:
-          MONGODB_URI: ${{ steps.setup-cluster.outputs.cluster-uri }}
+          MONGOOSE_TEST_URI: ${{ steps.setup-cluster.outputs.cluster-uri }}
           CRYPT_SHARED_LIB_PATH: ${{ steps.setup-cluster.outputs.crypt-shared-lib-path }}

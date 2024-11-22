@@ -23,28 +23,15 @@ jobs:
         node: [20]
         os: [ubuntu-latest]
         mongodb: [8.0.0]
-    #clone drivers-evergreen-tools (will delete itself once the run is over)
-    #set path 
-    #calling run orchestration sets up a server on your computer
-    # it outputs relevants uri in expansions.yml
-    # put uri into an environment variable
     name: Encryption tests
     env:
       FORCE_COLOR: true
     steps:
-      # - name: Install mongodb-client-encryption
-      #  run: npm install mongodb-client-encryption
       - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
       - name: Setup node
         uses: actions/setup-node@0a44ba7841725637a19e28fa30b79a866c81b0a6 # v4.0.4
         with:
           node-version: latest
-      #- name: Load MongoDB binary cache
-      #  id: cache-mongodb-binaries
-      #  uses: actions/cache@v4
-      #  with:
-      #   path: ~/.cache/mongodb-binaries
-      #    key: ${{ matrix.os }}-${{ matrix.mongodb }}
       - name: Install Dependencies
         run: npm install
       - name: Set up cluster
@@ -54,10 +41,8 @@ jobs:
           version: ${{ matrix.mongodb }}
           topology: sharded_cluster 
           auth: auth
-      - name: Install mocha
-        run: brew install mocha
       - name: Run Tests
-        run: mocha --exit ./test/encryption/*.test.js
+        run: npx mocha --exit ./test/encryption/*.test.js
         env:
           MONGODB_URI: ${{ steps.setup-cluster.outputs.cluster-uri }}
           CRYPT_SHARED_LIB_PATH: ${{ steps.setup-cluster.outputs.crypt-shared-lib-path }}

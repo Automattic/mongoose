@@ -10,20 +10,12 @@ permissions:
   id-token: write
 
 jobs:
-  set-up:
+  run-tests:
     permissions:
       # required for all workflows
       security-events: write
       id-token: write
       contents: write
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install mongodb-client-encryption
-        run: npm install mongodb-client-encryption
-
-  run-tests:
-    needs:
-      - set-up
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -40,17 +32,19 @@ jobs:
     env:
       FORCE_COLOR: true
     steps:
+      # - name: Install mongodb-client-encryption
+      #  run: npm install mongodb-client-encryption
       - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
       - name: Setup node
         uses: actions/setup-node@0a44ba7841725637a19e28fa30b79a866c81b0a6 # v4.0.4
         with:
           node-version: latest
-      - name: Load MongoDB binary cache
-        id: cache-mongodb-binaries
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/mongodb-binaries
-          key: ${{ matrix.os }}-${{ matrix.mongodb }}
+      #- name: Load MongoDB binary cache
+      #  id: cache-mongodb-binaries
+      #  uses: actions/cache@v4
+      #  with:
+      #   path: ~/.cache/mongodb-binaries
+      #    key: ${{ matrix.os }}-${{ matrix.mongodb }}
       - name: Install Dependencies
         run: npm install
       - name: Set up cluster
@@ -60,6 +54,8 @@ jobs:
           version: ${{ matrix.mongodb }}
           topology: sharded_cluster 
           auth: auth
+      - name: Install mocha
+        run: brew install mocha
       - name: Run Tests
         run: mocha --exit ./test/encryption/*.test.js
         env:

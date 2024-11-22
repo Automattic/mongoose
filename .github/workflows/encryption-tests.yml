@@ -53,21 +53,15 @@ jobs:
           key: ${{ matrix.os }}-${{ matrix.mongodb }}
       - name: Install Dependencies
         run: npm install
-      - name: Install drivers-evergreen-tools
-        run: git clone --depth=1 https://github.com/mongodb-labs/drivers-evergreen-tools.git ~/.cache/drivers-evergreen-tools
       - name: Set up cluster
-        run: bash .github/scripts/run-orchestration.sh
-        env:
-          # The following is the settings for how we want to launch mongodb
-          MONGODB_VERSION: 8.0.0
-          TOPOLOGY: sharded
-          AUTH: auth
-          # ORCHESTRATION_FILE: ${ORCHESTRATION_FILE}
-          # REQUIRE_API_VERSION: ${REQUIRE_API_VERSION}
-          # LOAD_BALANCER: ${LOAD_BALANCER}
-          # COMPRESSOR: ${COMPRESSOR}
-          # These are paths necessary for launching mongodb
-          DRIVERS_TOOLS: ~/.cache/drivers-evergreen-tools
-          MONGODB_BINARIES: ~/.cache/mongodb-binaries
-      - name: Test
+        id: setup-cluster
+        uses: mongodb-labs/drivers-evergreen-tools@master
+        with:
+          version: ${{ matrix.mongodb }}
+          topology: sharded 
+          auth: auth
+      - name: Run Tests
         run: mocha --exit ./test/encryption/*.test.js
+        env:
+          MONGODB_URI: ${{ steps.setup-cluster.outputs.cluster-uri }}
+          CRYPT_SHARED_LIB_PATH: ${{ steps.setup-cluster.outputs.crypt-shared-lib-path }}

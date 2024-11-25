@@ -1,8 +1,9 @@
 name: Encryption Tests 
 
 on:
-  push
-  #workflow_dispatch: {}
+  push: 
+    branches: ['master']
+  workflow_dispatch: {}
 
 permissions:
   contents: write
@@ -16,13 +17,7 @@ jobs:
       security-events: write
       id-token: write
       contents: write
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        node: [20]
-        os: [ubuntu-latest]
-        mongodb: [8.0.0]
+    runs-on: ubuntu-latest
     name: Encryption tests
     env:
       FORCE_COLOR: true
@@ -40,11 +35,11 @@ jobs:
         id: setup-cluster
         uses: mongodb-labs/drivers-evergreen-tools@master
         with:
-          version: ${{ matrix.mongodb }}
+          version: 8.0.0
           topology: sharded_cluster 
           auth: auth
       - name: Run Tests
-        run: npx mocha --exit ./test/encryption/*.test.js
+        run: npm run encryption-test
         env:
           MONGOOSE_TEST_URI: ${{ steps.setup-cluster.outputs.cluster-uri }}
           CRYPT_SHARED_LIB_PATH: ${{ steps.setup-cluster.outputs.crypt-shared-lib-path }}

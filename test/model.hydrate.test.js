@@ -100,29 +100,54 @@ describe('model', function() {
       assert.deepEqual(hydrated.schema.tree, C.schema.tree);
     });
     it('should deeply hydrate the document with the `hydratedPopulatedDocs` option (gh-4727)', async function() {
-      const userSchema = new Schema({
-        name: String
-      });
-      const companySchema = new Schema({
+      const StorySchema = new Schema({
+        title: {
+          type: String
+        }
+      }, { timestamps: true });
+
+      const UserSchema = new Schema({
         name: String,
-        users: [{ ref: 'User', type: Schema.Types.ObjectId }]
-      });
+        stories: [{
+          type: Schema.Types.ObjectId,
+          ref: 'Story1'
+        }]
+      }, { timestamps: true });
 
-      db.model('UserTestHydrate', userSchema);
-      const Company = db.model('CompanyTestHydrate', companySchema);
+      const User = db.model('User1', UserSchema);
+      const Story = db.model('Story1', StorySchema);
 
-      const users = [{ _id: new mongoose.Types.ObjectId(), name: 'Val' }];
-      const company = { _id: new mongoose.Types.ObjectId(), name: 'Booster', users: [users[0]] };
+      const story1 = await Story.create({ title: 'Ticket 1' });
+      const story2 = await Story.create({ title: 'Ticket 2' });
 
-      const C = Company.hydrate(company, null, { hydratedPopulatedDocs: true });
-      assert(C.populated('users'));
-      assert.equal(C.users[0].name, 'Val');
+      await User.create({ name: 'Alex', stories: [story1, story2] });
+
+      const populated = await User.findOne({ name: 'Alex' }).populate(['stories']).lean();
+      const hydrated = User.hydrate(
+        JSON.parse(JSON.stringify(populated)),
+        null,
+        { hydratedPopulatedDocs: true }
+      );
+
+      assert(hydrated.populated('stories'));
+
+      assert.equal(hydrated.stories[0]._id.toString(), story1._id.toString());
+      assert(typeof hydrated.stories[0]._id == 'object');
+      assert(hydrated.stories[0]._id instanceof mongoose.Types.ObjectId);
+      assert(typeof hydrated.stories[0].createdAt == 'object');
+      assert(hydrated.stories[0].createdAt instanceof Date);
+
+      assert.equal(hydrated.stories[1]._id.toString(), story2._id.toString());
+      assert(typeof hydrated.stories[1]._id == 'object');
+      assert(hydrated.stories[1]._id instanceof mongoose.Types.ObjectId);
+      assert(typeof hydrated.stories[1].createdAt == 'object');
+      assert(hydrated.stories[1].createdAt instanceof Date);
     });
     it('should hydrate documents in virtual populate (gh-14503)', async function() {
       const StorySchema = new Schema({
         userId: {
           type: Schema.Types.ObjectId,
-          ref: 'User'
+          ref: 'User2'
         },
         title: {
           type: String
@@ -134,19 +159,19 @@ describe('model', function() {
       }, { timestamps: true });
 
       UserSchema.virtual('stories', {
-        ref: 'Story',
+        ref: 'Story2',
         localField: '_id',
         foreignField: 'userId'
       });
       UserSchema.virtual('storiesCount', {
-        ref: 'Story',
+        ref: 'Story2',
         localField: '_id',
         foreignField: 'userId',
         count: true
       });
 
-      const User = db.model('User', UserSchema);
-      const Story = db.model('Story', StorySchema);
+      const User = db.model('User2', UserSchema);
+      const Story = db.model('Story2', StorySchema);
 
       const user = await User.create({ name: 'Alex' });
       const story1 = await Story.create({ title: 'Ticket 1', userId: user._id });
@@ -160,15 +185,15 @@ describe('model', function() {
       );
 
       assert(hydrated.populated('stories'));
+
       assert.equal(hydrated.stories[0]._id.toString(), story1._id.toString());
-      assert(typeof hydrated.stories[0]._id == 'object', typeof hydrated.stories[0]._id);
+      assert(typeof hydrated.stories[0]._id == 'object');
       assert(hydrated.stories[0]._id instanceof mongoose.Types.ObjectId);
       assert(typeof hydrated.stories[0].createdAt == 'object');
       assert(hydrated.stories[0].createdAt instanceof Date);
 
       assert.equal(hydrated.stories[1]._id.toString(), story2._id.toString());
       assert(typeof hydrated.stories[1]._id == 'object');
-
       assert(hydrated.stories[1]._id instanceof mongoose.Types.ObjectId);
       assert(typeof hydrated.stories[1].createdAt == 'object');
       assert(hydrated.stories[1].createdAt instanceof Date);

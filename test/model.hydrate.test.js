@@ -100,9 +100,19 @@ describe('model', function() {
       assert.deepEqual(hydrated.schema.tree, C.schema.tree);
     });
     it('should deeply hydrate the document with the `hydratedPopulatedDocs` option (gh-4727)', async function() {
+      const ArticleSchema = new Schema({
+        title: {
+          type: String
+        }
+      }, { timestamps: true });
+
       const StorySchema = new Schema({
         title: {
           type: String
+        },
+        article: {
+          type: Schema.Types.ObjectId,
+          ref: 'Article1'
         }
       }, { timestamps: true });
 
@@ -116,13 +126,18 @@ describe('model', function() {
 
       const User = db.model('User1', UserSchema);
       const Story = db.model('Story1', StorySchema);
+      const Article = db.model('Article1', ArticleSchema);
 
-      const story1 = await Story.create({ title: 'Ticket 1' });
+      const article = await Article.create({ title: 'Cinema' });
+      const story1 = await Story.create({ title: 'Ticket 1', article });
       const story2 = await Story.create({ title: 'Ticket 2' });
 
       await User.create({ name: 'Alex', stories: [story1, story2] });
 
-      const populated = await User.findOne({ name: 'Alex' }).populate(['stories']).lean();
+      const populated = await User.findOne({ name: 'Alex' }).populate({
+        path: 'stories',
+        populate: ['article']
+      }).lean();
       const hydrated = User.hydrate(
         JSON.parse(JSON.stringify(populated)),
         null,
@@ -137,13 +152,29 @@ describe('model', function() {
       assert(typeof hydrated.stories[0].createdAt == 'object');
       assert(hydrated.stories[0].createdAt instanceof Date);
 
+      assert(hydrated.stories[0].populated('article'));
+      assert.equal(hydrated.stories[0].article._id.toString(), article._id.toString());
+      assert(typeof hydrated.stories[0].article._id == 'object');
+      assert(hydrated.stories[0].article._id instanceof mongoose.Types.ObjectId);
+      assert.equal(hydrated.stories[0].article.title, 'Cinema');
+      assert(typeof hydrated.stories[0].article.createdAt == 'object');
+      assert(hydrated.stories[0].article.createdAt instanceof Date);
+
       assert.equal(hydrated.stories[1]._id.toString(), story2._id.toString());
       assert(typeof hydrated.stories[1]._id == 'object');
       assert(hydrated.stories[1]._id instanceof mongoose.Types.ObjectId);
       assert(typeof hydrated.stories[1].createdAt == 'object');
       assert(hydrated.stories[1].createdAt instanceof Date);
+
+      assert(!hydrated.stories[1].article);
     });
     it('should hydrate documents in virtual populate (gh-14503)', async function() {
+      const ArticleSchema = new Schema({
+        title: {
+          type: String
+        }
+      }, { timestamps: true });
+
       const StorySchema = new Schema({
         userId: {
           type: Schema.Types.ObjectId,
@@ -151,6 +182,10 @@ describe('model', function() {
         },
         title: {
           type: String
+        },
+        article: {
+          type: Schema.Types.ObjectId,
+          ref: 'Article2'
         }
       }, { timestamps: true });
 
@@ -172,12 +207,20 @@ describe('model', function() {
 
       const User = db.model('User2', UserSchema);
       const Story = db.model('Story2', StorySchema);
+      const Article = db.model('Article2', ArticleSchema);
 
+      const article = await Article.create({ title: 'Cinema' });
       const user = await User.create({ name: 'Alex' });
-      const story1 = await Story.create({ title: 'Ticket 1', userId: user._id });
+      const story1 = await Story.create({ title: 'Ticket 1', userId: user._id, article });
       const story2 = await Story.create({ title: 'Ticket 2', userId: user._id });
 
-      const populated = await User.findOne({ name: 'Alex' }).populate(['stories', 'storiesCount']).lean();
+      const populated = await User.findOne({ name: 'Alex' }).populate([
+        {
+          path: 'stories',
+          populate: ['article']
+        },
+        'storiesCount'
+      ]).lean();
       const hydrated = User.hydrate(
         JSON.parse(JSON.stringify(populated)),
         null,
@@ -192,11 +235,21 @@ describe('model', function() {
       assert(typeof hydrated.stories[0].createdAt == 'object');
       assert(hydrated.stories[0].createdAt instanceof Date);
 
+      assert(hydrated.stories[0].populated('article'));
+      assert.equal(hydrated.stories[0].article._id.toString(), article._id.toString());
+      assert(typeof hydrated.stories[0].article._id == 'object');
+      assert(hydrated.stories[0].article._id instanceof mongoose.Types.ObjectId);
+      assert.equal(hydrated.stories[0].article.title, 'Cinema');
+      assert(typeof hydrated.stories[0].article.createdAt == 'object');
+      assert(hydrated.stories[0].article.createdAt instanceof Date);
+
       assert.equal(hydrated.stories[1]._id.toString(), story2._id.toString());
       assert(typeof hydrated.stories[1]._id == 'object');
       assert(hydrated.stories[1]._id instanceof mongoose.Types.ObjectId);
       assert(typeof hydrated.stories[1].createdAt == 'object');
       assert(hydrated.stories[1].createdAt instanceof Date);
+
+      assert(!hydrated.stories[1].article);
 
       assert.strictEqual(hydrated.storiesCount, 2);
     });

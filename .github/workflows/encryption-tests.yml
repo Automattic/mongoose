@@ -39,7 +39,7 @@ jobs:
           topology: sharded_cluster 
           auth: auth
       - name: Run Tests
-        run: npm run encryption-test
+        run: npm run test-encryption
         env:
           MONGOOSE_TEST_URI: ${{ steps.setup-cluster.outputs.cluster-uri }}
           CRYPT_SHARED_LIB_PATH: ${{ steps.setup-cluster.outputs.crypt-shared-lib-path }}

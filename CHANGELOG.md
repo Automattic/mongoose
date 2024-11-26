@@ -1,3 +1,7 @@
+6.13.5 / 2024-11-26
+===================
+ * fix: disallow using $where in match
+
 6.13.4 / 2024-11-15
 ===================
  * fix: save execution stack in query as string #15043 #15039

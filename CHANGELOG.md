@@ -1,3 +1,9 @@
+7.8.3 / 2024-11-26
+==================
+ * fix: disallow using $where in match
+ * fix(projection): avoid setting projection to unknown exclusive/inclusive if elemMatch on a Date, ObjectId, etc. #14894 #14893
+ * docs(migrating_to_7): add note about keepAlive to Mongoose 7 migration guide #15032 #13431
+
 6.13.5 / 2024-11-26
 ===================
  * fix: disallow using $where in match

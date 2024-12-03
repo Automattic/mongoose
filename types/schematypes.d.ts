@@ -111,7 +111,7 @@ declare module 'mongoose' {
      * will build a unique index on this path when the
      * model is compiled. [The `unique` option is **not** a validator](/docs/validation.html#the-unique-option-is-not-a-validator).
      */
-    unique?: boolean | number;
+    unique?: boolean | number | [true, string];
 
     /**
      * If [truthy](https://masteringjs.io/tutorials/fundamentals/truthy), Mongoose will

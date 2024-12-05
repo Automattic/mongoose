@@ -80,6 +80,7 @@ The permitted SchemaTypes are:
 * [Decimal128](api/mongoose.html#mongoose_Mongoose-Decimal128)
 * [Map](schematypes.html#maps)
 * [UUID](schematypes.html#uuid)
+* [Int32](schematypes.html#int32)
 
 Read more about [SchemaTypes here](schematypes.html).
 

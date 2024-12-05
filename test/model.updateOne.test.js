@@ -3091,6 +3091,58 @@ describe('model: updateOne: ', function() {
     assert.equal(doc.login.keys.length, 1);
     assert.equal(doc.login.keys[0].id, 'test2');
   });
+
+  it('casts using overwritten discriminator key schema (gh-15051)', async function() {
+    const embedDiscriminatorSchema = new mongoose.Schema({
+      field1: String
+    });
+    const embedDiscriminatorSchema2 = new mongoose.Schema({
+      field2: String
+    });
+    const embedSchema = new mongoose.Schema({
+      field: String,
+      key: String
+    }, { discriminatorKey: 'key' });
+    embedSchema.discriminator('Type1', embedDiscriminatorSchema);
+    embedSchema.discriminator('Type2', embedDiscriminatorSchema2);
+
+    const testSchema = new mongoose.Schema({
+      testArray: [embedSchema]
+    });
+
+    const TestModel = db.model('Test', testSchema);
+    const test = new TestModel({
+      testArray: [{
+        key: 'Type1',
+        field: 'field',
+        field1: 'field1'
+      }]
+    });
+    await test.save();
+
+    const field2update = 'field2 update';
+    await TestModel.updateOne(
+      { _id: test._id },
+      {
+        $set: {
+          'testArray.$[element].key': 'Type2',
+          'testArray.$[element].field2': field2update
+        }
+      },
+      {
+        arrayFilters: [
+          {
+            'element._id': test.testArray[0]._id
+          }
+        ],
+        overwriteDiscriminatorKey: true
+      }
+    );
+
+    const r2 = await TestModel.findById(test._id);
+    assert.equal(r2.testArray[0].key, 'Type2');
+    assert.equal(r2.testArray[0].field2, field2update);
+  });
 });
 
 async function delay(ms) {

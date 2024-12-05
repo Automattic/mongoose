@@ -715,13 +715,16 @@ declare module 'mongoose' {
   export type BufferToBinary<T> = T extends TreatAsPrimitives ? T : T extends Record<string, any> ? {
     [K in keyof T]: T[K] extends Buffer
       ? mongodb.Binary
-      : T[K] extends (Buffer | null | undefined)
-        ? mongodb.Binary | null | undefined
-        : T[K] extends Types.DocumentArray<infer ItemType>
+      : IfEquals<
+        T[K],
+        Buffer | null | undefined,
+        mongodb.Binary | null | undefined,
+        T[K] extends Types.DocumentArray<infer ItemType>
             ? Types.DocumentArray<BufferToBinary<ItemType>>
             : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
               ? HydratedSingleSubdocument<SubdocType>
-              : BufferToBinary<T[K]>;
+              : BufferToBinary<T[K]>
+      >;
   } : T;
 
   /**
@@ -730,13 +733,16 @@ declare module 'mongoose' {
   export type BufferToJSON<T> = T extends TreatAsPrimitives ? T : T extends Record<string, any> ? {
     [K in keyof T]: T[K] extends Buffer
       ? { type: 'buffer', data: number[] }
-      : T[K] extends (Buffer | null | undefined)
-        ? { type: 'buffer', data: number[] } | null | undefined
-        : T[K] extends Types.DocumentArray<infer ItemType>
+      : IfEquals<
+        T[K],
+        Buffer | null | undefined,
+        { type: 'buffer', data: number[] } | null | undefined,
+        T[K] extends Types.DocumentArray<infer ItemType>
             ? Types.DocumentArray<BufferToBinary<ItemType>>
             : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
               ? HydratedSingleSubdocument<SubdocType>
-              : BufferToBinary<T[K]>;
+              : BufferToBinary<T[K]>
+      >
   } : T;
 
   /**
@@ -745,13 +751,16 @@ declare module 'mongoose' {
   export type ObjectIdToString<T> = T extends TreatAsPrimitives ? T : T extends Record<string, any> ? {
     [K in keyof T]: T[K] extends mongodb.ObjectId
       ? string
-      : T[K] extends (mongodb.ObjectId | null | undefined)
-        ? string | null | undefined
-        : T[K] extends Types.DocumentArray<infer ItemType>
+      : IfEquals<
+        T[K],
+        mongodb.ObjectId | null | undefined,
+        string | null | undefined,
+        T[K] extends Types.DocumentArray<infer ItemType>
             ? Types.DocumentArray<ObjectIdToString<ItemType>>
             : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
               ? HydratedSingleSubdocument<ObjectIdToString<SubdocType>>
-              : ObjectIdToString<T[K]>;
+              : ObjectIdToString<T[K]>
+      >
   } : T;
 
   /**
@@ -760,13 +769,16 @@ declare module 'mongoose' {
   export type DateToString<T> = T extends TreatAsPrimitives ? T : T extends Record<string, any> ? {
     [K in keyof T]: T[K] extends NativeDate
       ? string
-      : T[K] extends (NativeDate | null | undefined)
-        ? string | null | undefined
-        : T[K] extends Types.DocumentArray<infer ItemType>
+      : IfEquals<
+        T[K],
+        NativeDate | null | undefined,
+        string | null | undefined,
+        T[K] extends Types.DocumentArray<infer ItemType>
             ? Types.DocumentArray<DateToString<ItemType>>
             : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
               ? HydratedSingleSubdocument<DateToString<SubdocType>>
-              : DateToString<T[K]>;
+              : DateToString<T[K]>
+      >
   } : T;
 
   /**

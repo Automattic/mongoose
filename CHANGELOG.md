@@ -1,3 +1,8 @@
+8.8.4 / 2024-12-05
+==================
+ * fix: cast using overwritten embedded discriminator key when set #15076 #15051
+ * fix: avoid throwing error if saveOptions undefined when invalidating subdoc cache #15062
+
 8.8.3 / 2024-11-26
 ==================
  * fix: disallow using $where in match

@@ -1,3 +1,28 @@
+8.8.4 / 2024-12-05
+==================
+ * fix: cast using overwritten embedded discriminator key when set #15076 #15051
+ * fix: avoid throwing error if saveOptions undefined when invalidating subdoc cache #15062
+
+8.8.3 / 2024-11-26
+==================
+ * fix: disallow using $where in match
+ * perf: cache results from getAllSubdocs() on saveOptions, only loop through known subdoc properties #15055 #15029
+ * fix(model+query): support overwriteDiscriminatorKey for bulkWrite updateOne and updateMany, allow inferring discriminator key from update #15046 #15040 
+
+8.8.2 / 2024-11-18
+==================
+ * fix(model): handle array filters when casting bulkWrite #15036 #14978
+ * fix(model): make diffIndexes() avoid trying to drop default timeseries collection index #15035 #14984
+ * fix: save execution stack in query as string #15039 [durran](https://github.com/durran)
+ * types(cursor): correct asyncIterator and asyncDispose for TypeScript with lib: 'esnext' #15038
+ * docs(migrating_to_8): add note about removing findByIdAndRemove #15024 [dragontaek-lee](https://github.com/dragontaek-lee)
+
+8.8.1 / 2024-11-08
+==================
+ * perf: make a few micro-optimizations to help speed up findOne() #15022 #14906
+ * fix: apply embedded discriminators to subdoc schemas before compiling top level model so middleware applies correctly #15001 #14961
+ * fix(query): add overwriteImmutable option to allow updating immutable properties without disabling strict mode #15000 #8619
+
 8.8.0 / 2024-10-31
 ==================
  * feat: upgrade mongodb -> ~6.10 #14991 #14877

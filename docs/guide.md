@@ -81,6 +81,7 @@ The permitted SchemaTypes are:
 * [Map](schematypes.html#maps)
 * [UUID](schematypes.html#uuid)
 * [Double](schematypes.html#double)
+* [Int32](schematypes.html#int32)
 
 Read more about [SchemaTypes here](schematypes.html).
 

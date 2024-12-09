@@ -56,6 +56,7 @@ Check out [Mongoose's plugins search](http://plugins.mongoosejs.io) to find plug
 * [UUID](#uuid)
 * [BigInt](#bigint)
 * [Double](#double)
+* [Int32](#int32)
 
 ### Example
 
@@ -70,6 +71,7 @@ const schema = new Schema({
   _someId: Schema.Types.ObjectId,
   decimal: Schema.Types.Decimal128,
   double: Schema.Types.Double,
+  int32bit: Schema.Types.Int32,
   array: [],
   ofString: [String],
   ofNumber: [Number],
@@ -674,6 +676,37 @@ new Temperature({ celsius: { valueOf: () => 83.0033 } }).celsius; // 83 as a Dou
 new Temperature({ celsius: '' }).celsius; // null as a Double
 ```
 
+The following inputs will result will all result in a [CastError](validation.html#cast-errors) once validated, meaning that it will not throw on initialization, only when validated:
+
+* strings that do not represent a numeric string, a NaN or a null-ish value
+* objects that don't have a `valueOf()` function
+* an input that represents a value outside the bounds of a IEEE 754-2008 floating point
+
+### Int32 {#int32}
+
+Mongoose supports 32-bit integers as a SchemaType.
+Int32s are stored as [32-bit integers in MongoDB (BSON type "int")](https://www.mongodb.com/docs/manual/reference/bson-types/).
+
+```javascript
+const studentsSchema = new Schema({
+  id: Int32
+});
+const Student = mongoose.model('Student', schema);
+
+const student = new Temperature({ celsius: 1339 });
+typeof student.id; // 'number'
+```
+
+There are several types of values that will be successfully cast to a Number.
+
+```javascript
+new Student({ id: '15' }).id; // 15 as a Int32
+new Student({ id: true }).id; // 1 as a Int32
+new Student({ id: false }).id; // 0 as a Int32
+new Student({ id: { valueOf: () => 83 } }).id; // 83 as a Int32
+new Student({ id: '' }).id; // null as a Int32
+```
+
 If you pass an object with a `valueOf()` function that returns a Number, Mongoose will
 call it and assign the returned value to the path.
 
@@ -681,9 +714,11 @@ The values `null` and `undefined` are not cast.
 
 The following inputs will result will all result in a [CastError](validation.html#cast-errors) once validated, meaning that it will not throw on initialization, only when validated:
 
-* strings that do not represent a numeric string, a NaN or a null-ish value
+* NaN
+* strings that cast to NaN
 * objects that don't have a `valueOf()` function
-* an input that represents a value outside the bounds of a IEEE 754-2008 floating point
+* a decimal that must be rounded to be an integer
+* an input that represents a value outside the bounds of an 32-bit integer
 
 ## Getters {#getters}
 

@@ -63,7 +63,7 @@ declare module 'mongoose' {
   type ConnectionSyncIndexesResult = Record<string, OneCollectionSyncIndexesResult>;
   type OneCollectionSyncIndexesResult = Array<string> & mongodb.MongoServerError;
 
-  interface IndexOptions extends mongodb.CreateIndexesOptions {
+  type IndexOptions = Omit<mongodb.CreateIndexesOptions, 'expires' | 'weights' | 'unique'> & {
     /**
      * `expires` utilizes the `ms` module from [guille](https://github.com/guille/) allowing us to use a friendlier syntax:
      *
@@ -86,7 +86,9 @@ declare module 'mongoose' {
      */
     expires?: number | string;
     weights?: Record<string, number>;
-  }
+
+    unique?: boolean | [true, string]
+  };
 
   type SearchIndexDescription = mongodb.SearchIndexDescription;
 }

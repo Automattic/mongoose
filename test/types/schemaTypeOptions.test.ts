@@ -70,6 +70,7 @@ function defaultOptions() {
   expectType<Record<string, any>>(new Schema.Types.Mixed('none').defaultOptions);
   expectType<Record<string, any>>(new Schema.Types.Number('none').defaultOptions);
   expectType<Record<string, any>>(new Schema.Types.ObjectId('none').defaultOptions);
+  expectType<Record<string, any>>(new Schema.Types.Double('none').defaultOptions);
   expectType<Record<string, any>>(new Schema.Types.Subdocument('none').defaultOptions);
   expectType<Record<string, any>>(new Schema.Types.UUID('none').defaultOptions);
 }

@@ -35,6 +35,13 @@ declare module 'mongoose' {
    */
   type Number = Schema.Types.Number;
 
+
+  /**
+   * The Mongoose Double [SchemaType](/docs/schematypes.html). Used for
+   * declaring paths in your schema that Mongoose should cast to doubles (IEEE 754-2008)/
+   */
+  type Double = Schema.Types.Double;
+
   /**
    * The Mongoose ObjectId [SchemaType](/docs/schematypes.html). Used for
    * declaring paths in your schema that should be
@@ -452,6 +459,14 @@ declare module 'mongoose' {
 
         /** Sets a minimum number validator. */
         min(value: number, message: string): this;
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
+      }
+
+      class Double extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: 'Double';
 
         /** Default options for this SchemaType */
         defaultOptions: Record<string, any>;

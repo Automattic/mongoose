@@ -11,6 +11,7 @@ const Q = require('q');
 const assert = require('assert');
 const mongodb = require('mongodb');
 const MongooseError = require('../lib/error/index');
+const CastError = require('../lib/error/cast');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -1693,5 +1694,96 @@ describe('connections:', function() {
       const conn = await m.connect(start.uri, opts);
       assert.ok(conn);
     });
+  });
+
+  it('connection bulkWrite() ordered (gh-15028)', async function() {
+    const db = start();
+
+    const version = await start.mongodVersion();
+    if (version[0] < 8) {
+      this.skip();
+      return;
+    }
+    const Test = db.model('Test', new Schema({ name: { type: String, required: true } }));
+
+    await Test.deleteMany({});
+    await db.bulkWrite([{ model: 'Test', name: 'insertOne', document: { name: 'test1' } }]);
+    assert.ok(await Test.exists({ name: 'test1' }));
+
+    await db.bulkWrite([{ model: Test, name: 'insertOne', document: { name: 'test2' } }]);
+    assert.ok(await Test.exists({ name: 'test2' }));
+
+    await assert.rejects(
+      () => db.bulkWrite([{ name: 'insertOne', document: { name: 'foo' } }]),
+      /Must specify model in Connection.prototype.bulkWrite\(\) operations/
+    );
+
+    await assert.rejects(
+      () => db.bulkWrite([{ model: Test, document: { name: 'foo' } }]),
+      /Must specify operation name in Connection.prototype.bulkWrite\(\)/
+    );
+    await assert.rejects(
+      () => db.bulkWrite([{ model: Test, name: 'upsertAll', document: { name: 'foo' } }]),
+      /Unrecognized bulkWrite\(\) operation name upsertAll/
+    );
+  });
+
+  it('connection bulkWrite() unordered (gh-15028)', async function() {
+    const db = start();
+
+    const version = await start.mongodVersion();
+    if (version[0] < 8) {
+      this.skip();
+      return;
+    }
+
+    const Test = db.model('Test', new Schema({ name: { type: String, required: true }, num: Number }));
+
+    await Test.deleteMany({});
+    await db.bulkWrite([{ model: 'Test', name: 'insertOne', document: { name: 'test1' } }], { ordered: false });
+    assert.ok(await Test.exists({ name: 'test1' }));
+
+    await db.bulkWrite([{ model: Test, name: 'insertOne', document: { name: 'test2' } }], { ordered: false });
+    assert.ok(await Test.exists({ name: 'test2' }));
+
+    await assert.rejects(
+      () => {
+        return db.bulkWrite([
+          { name: 'insertOne', document: { name: 'foo' } },
+          { model: Test, name: 'insertOne', document: { name: 'test3' } }
+        ], { ordered: false, throwOnValidationError: true });
+      },
+      /Must specify model in Connection.prototype.bulkWrite\(\) operations/
+    );
+    assert.ok(await Test.exists({ name: 'test3' }));
+
+    await assert.rejects(
+      () => db.bulkWrite([
+        { model: Test, document: { name: 'foo' } },
+        { model: Test, name: 'insertOne', document: { name: 'test4' } }
+      ], { ordered: false, throwOnValidationError: true }),
+      /Must specify operation name in Connection.prototype.bulkWrite\(\)/
+    );
+    assert.ok(await Test.exists({ name: 'test4' }));
+
+    await assert.rejects(
+      () => db.bulkWrite([
+        { model: Test, name: 'upsertAll', document: { name: 'foo' } },
+        { model: Test, name: 'insertOne', document: { name: 'test5' } }
+      ], { ordered: false, throwOnValidationError: true }),
+      /Unrecognized bulkWrite\(\) operation name upsertAll/
+    );
+    assert.ok(await Test.exists({ name: 'test5' }));
+
+    const res = await db.bulkWrite([
+      { model: 'Test', name: 'updateOne', filter: { name: 'test5' }, update: { $set: { num: 42 } } },
+      { model: 'Test', name: 'updateOne', filter: { name: 'test4' }, update: { $set: { num: 'not a number' } } }
+    ], { ordered: false });
+    assert.equal(res.matchedCount, 1);
+    assert.equal(res.modifiedCount, 1);
+    assert.equal(res.mongoose.results.length, 2);
+    assert.equal(res.mongoose.results[0], null);
+    assert.ok(res.mongoose.results[1] instanceof CastError);
+    assert.ok(res.mongoose.results[1].message.includes('not a number'));
   });
 });

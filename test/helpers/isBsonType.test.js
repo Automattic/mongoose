@@ -36,7 +36,7 @@ describe('isBsonType', () => {
   it('true for Double', () => {
     assert.ok(isBsonType(new Double(), 'Double'));
   });
-    
+
   it('true for Int32', () => {
     assert.ok(isBsonType(new Int32(), 'Int32'));
   });

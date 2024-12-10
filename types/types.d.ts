@@ -60,19 +60,21 @@ declare module 'mongoose' {
 
     class Decimal128 extends mongodb.Decimal128 { }
 
-    class DocumentArray<T> extends Types.Array<T extends Types.Subdocument ? T : Types.Subdocument<InferId<T>, any, T> & T> {
+    class DocumentArray<T, THydratedDocumentType extends Types.Subdocument<any> = Types.Subdocument<InferId<T>, any, T> & T> extends Types.Array<THydratedDocumentType> {
       /** DocumentArray constructor */
       constructor(values: AnyObject[]);
 
       isMongooseDocumentArray: true;
 
       /** Creates a subdocument casted to this schema. */
-      create(obj: any): T extends Types.Subdocument ? T : Types.Subdocument<InferId<T>> & T;
+      create(obj: any): THydratedDocumentType;
 
       /** Searches array items for the first document with a matching _id. */
-      id(id: any): (T extends Types.Subdocument ? T : Types.Subdocument<InferId<T>> & T) | null;
+      id(id: any): THydratedDocumentType | null;
 
       push(...args: (AnyKeys<T> & AnyObject)[]): number;
+
+      splice(start: number, deleteCount?: number, ...args: (AnyKeys<T> & AnyObject)[]): THydratedDocumentType[];
     }
 
     class Map<V> extends global.Map<string, V> {

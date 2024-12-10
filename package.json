@@ -20,6 +20,7 @@
   "license": "MIT",
   "dependencies": {
     "bson": "^6.7.0",
+    "hugo": "^0.0.3",
     "kareem": "2.6.3",
     "mongodb": "~6.10.0",
     "mongodb-client-encryption": "^6.1.0",
@@ -106,6 +107,7 @@
     "test-rs": "START_REPLICA_SET=1 mocha --timeout 30000 --exit ./test/*.test.js",
     "test-tsd": "node ./test/types/check-types-filename && tsd",
     "test-encryption": "mocha --exit ./test/encryption/*.test.js",
+    "test-encryption-local": "chmod +x scripts/encrypted-cluster.sh && scripts/encrypted-cluster.sh",
     "tdd": "mocha ./test/*.test.js --inspect --watch --recursive --watch-files ./**/*.{js,ts}",
     "test-coverage": "nyc --reporter=html --reporter=text npm test",
     "ts-benchmark": "cd ./benchmarks/typescript/simple && npm install && npm run benchmark | node ../../../scripts/tsc-diagnostics-check"

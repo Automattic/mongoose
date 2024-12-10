@@ -2,7 +2,9 @@ name: Encryption Tests
 
 on:
   push: 
-    branches: ['master', 'NODE-6505/ci-setup']
+    branches: ['master']
+  pull_request:
+    branches: [ 'master' ]
   workflow_dispatch: {}
 
 permissions:

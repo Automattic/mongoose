@@ -44,14 +44,14 @@ describe('basic integration', () => {
             'db.coll': {
               bsonType: 'object',
               encryptMetadata: {
-                keyId: [new mdb.UUID(dataKey)]
+                keyId: [dataKey]
               },
               properties: {
                 a: {
                   encrypt: {
                     bsonType: 'int',
                     algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Random',
-                    keyId: [new mdb.UUID(dataKey)]
+                    keyId: [dataKey]
                   }
                 }
               }
@@ -78,9 +78,11 @@ describe('basic integration', () => {
     await encryptedClient.connect();
     await encryptedClient.db('db').collection('coll').insertOne({ a: 1 });
 
+    const { insertedId } = await encryptedClient.db('db').collection('coll').insertOne({ a: 1 });
+
     // a dummyClient not configured with autoEncryption, returns a encrypted binary type, meaning that encryption succeeded
-    const encryptedCursor = await dummyClient.db('db').collection('coll').find();
-    const encryptedResult = await encryptedCursor.next();
+    const encryptedResult = await dummyClient.db('db').collection('coll').findOne({ _id: insertedId });
+
     assert.ok(encryptedResult);
     assert.ok(encryptedResult.a);
     assert.ok(isBsonType(encryptedResult.a, 'Binary'));

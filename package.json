@@ -20,10 +20,8 @@
   "license": "MIT",
   "dependencies": {
     "bson": "^6.7.0",
-    "hugo": "^0.0.3",
     "kareem": "2.6.3",
     "mongodb": "~6.10.0",
-    "mongodb-client-encryption": "^6.1.0",
     "mpath": "0.9.0",
     "mquery": "5.0.0",
     "ms": "2.1.3",

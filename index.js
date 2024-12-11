@@ -46,6 +46,7 @@ module.exports.Decimal128 = mongoose.Decimal128;
 module.exports.Mixed = mongoose.Mixed;
 module.exports.Date = mongoose.Date;
 module.exports.Number = mongoose.Number;
+module.exports.Double = mongoose.Double;
 module.exports.Error = mongoose.Error;
 module.exports.MongooseError = mongoose.MongooseError;
 module.exports.now = mongoose.now;

@@ -219,27 +219,29 @@ type IsSchemaTypeFromBuiltinClass<T> = T extends (typeof String)
             ? true
             : T extends (typeof Schema.Types.Decimal128)
               ? true
-              : T extends (typeof Schema.Types.String)
+              : T extends (typeof Schema.Types.Int32)
                 ? true
-                : T extends (typeof Schema.Types.Number)
-                  ? true
-                  : T extends (typeof Schema.Types.Date)
+                  : T extends (typeof Schema.Types.String)
                     ? true
-                    : T extends (typeof Schema.Types.Boolean)
+                    : T extends (typeof Schema.Types.Number)
                       ? true
-                      : T extends (typeof Schema.Types.Buffer)
+                      : T extends (typeof Schema.Types.Date)
                         ? true
-                        : T extends Types.ObjectId
+                        : T extends (typeof Schema.Types.Double)
                           ? true
-                          : T extends Types.Decimal128
+                          : T extends (typeof Schema.Types.Boolean)
                             ? true
-                            : T extends Buffer
+                            : T extends Types.ObjectId
                               ? true
-                              : T extends NativeDate
+                              : T extends Types.Decimal128
                                 ? true
-                                : T extends (typeof Schema.Types.Mixed)
+                                : T extends Buffer
                                   ? true
-                                  : IfEquals<T, Schema.Types.ObjectId, true, false>;
+                                  : T extends NativeDate
+                                    ? true
+                                    : T extends (typeof Schema.Types.Mixed)
+                                      ? true
+                                      : IfEquals<T, Schema.Types.ObjectId, true, false>;
 
 /**
  * @summary Resolve path type by returning the corresponding type.
@@ -302,18 +304,18 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
                                     PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 ? Types.Decimal128 :
                                       IfEquals<PathValueType, Schema.Types.Decimal128> extends true ? Types.Decimal128 :
                                         IfEquals<PathValueType, Types.Decimal128> extends true ? Types.Decimal128 :
-                                          IfEquals<PathValueType, Schema.Types.BigInt> extends true ? bigint :
-                                            IfEquals<PathValueType, BigInt> extends true ? bigint :
-                                              PathValueType extends 'bigint' | 'BigInt' | typeof Schema.Types.BigInt | typeof BigInt ? bigint :
-                                                PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? Buffer :
-                                                  IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
-                                                    PathValueType extends MapConstructor | 'Map' ? Map<string, ResolvePathType<Options['of']>> :
-                                                      IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ResolvePathType<Options['of']>> :
-                                                        PathValueType extends ArrayConstructor ? any[] :
-                                                          PathValueType extends typeof Schema.Types.Mixed ? any:
-                                                            IfEquals<PathValueType, ObjectConstructor> extends true ? any:
-                                                              IfEquals<PathValueType, {}> extends true ? any:
-                                                                PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
-                                                                  PathValueType extends Record<string, any> ? ObtainDocumentType<PathValueType, any, { typeKey: TypeKey }> :
-                                                                    unknown,
-    TypeHint>;
+                                            IfEquals<PathValueType, Schema.Types.BigInt> extends true ? bigint :
+                                              IfEquals<PathValueType, BigInt> extends true ? bigint :
+                                                PathValueType extends 'bigint' | 'BigInt' | typeof Schema.Types.BigInt | typeof BigInt ? bigint :
+                                                  PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? Buffer :
+                                                    IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
+                                                      PathValueType extends MapConstructor | 'Map' ? Map<string, ResolvePathType<Options['of']>> :
+                                                        IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ResolvePathType<Options['of']>> :
+                                                          PathValueType extends ArrayConstructor ? any[] :
+                                                            PathValueType extends typeof Schema.Types.Mixed ? any:
+                                                              IfEquals<PathValueType, ObjectConstructor> extends true ? any:
+                                                                IfEquals<PathValueType, {}> extends true ? any:
+                                                                  PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
+                                                                    PathValueType extends Record<string, any> ? ObtainDocumentType<PathValueType, any, { typeKey: TypeKey }> :
+                                                                      unknown,
+  TypeHint>;

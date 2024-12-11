@@ -1,17 +1,25 @@
+# creates a encrypted cluster (sharded on 8.0 server)
 
 export CWD=$(pwd);
 mkdir encrypted-cluster
 cd encrypted-cluster
 
+# note: 
+  # we're using drivers-evergreen-tools which is a repo that handles cluster set-up for us. 
+  # if you'd like to make changes to the cluster settings, edit the exported variables below.
+  # for configuration options for the exported variables, see here: https://github.com/mongodb-labs/drivers-evergreen-tools/blob/master/.evergreen/run-orchestration.sh
+  # after this script is run, the encrypted-cluster/ folder will notably contain the following:
+    # 'mo-expansion.yml' file which contains for your cluster URI and crypt shared library path
+    # 'drivers-evergreen-tools/mongodb/bin' which contain executables for other mongodb libraries such as mongocryptd, mongosh, and mongod
 if [ ! -d "drivers-evergreen-tools/" ]; then
  git clone --depth=1 "https://github.com/mongodb-labs/drivers-evergreen-tools.git"
 fi
 
+# configure cluster settings
 export DRIVERS_TOOLS=$CWD/encrypted-cluster/drivers-evergreen-tools
 export MONGODB_VERSION=8.0
 export AUTH=true
 export MONGODB_BINARIES=$DRIVERS_TOOLS/mongodb/bin
-export NODE_DRIVER=~/dev/node-mongodb-native
 export MONGO_ORCHESTRATION_HOME=$DRIVERS_TOOLS/mo
 export PROJECT_ORCHESTRATION_HOME=$DRIVERS_TOOLS/.evergreen/orchestration
 export TOPOLOGY=sharded_cluster
@@ -24,4 +32,5 @@ cd -
 
 rm expansions.sh 2> /dev/null
 
+# start cluster
 bash $DRIVERS_TOOLS/.evergreen/run-orchestration.sh

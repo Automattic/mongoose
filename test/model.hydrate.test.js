@@ -187,6 +187,7 @@ describe('model', function() {
       });
 
       db.deleteModel(/User/);
+      db.deleteModel(/Company/);
       const User = db.model('User', userSchema);
       const Company = db.model('Company', companySchema);
 

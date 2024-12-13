@@ -12,6 +12,16 @@ declare module 'mongoose' {
    */
   type Decimal128 = Schema.Types.Decimal128;
 
+
+  /**
+   * The Mongoose Int32 [SchemaType](/docs/schematypes.html). Used for
+   * declaring paths in your schema that should be
+   * 32-bit integers
+   * Do not use this to create a new Int32 instance, use `mongoose.Types.Int32`
+   * instead.
+   */
+  type Int32 = Schema.Types.Int32;
+
   /**
    * The Mongoose Mixed [SchemaType](/docs/schematypes.html). Used for
    * declaring paths in your schema that Mongoose's change tracking, casting,
@@ -24,6 +34,13 @@ declare module 'mongoose' {
    * declaring paths in your schema that Mongoose should cast to numbers.
    */
   type Number = Schema.Types.Number;
+
+
+  /**
+   * The Mongoose Double [SchemaType](/docs/schematypes.html). Used for
+   * declaring paths in your schema that Mongoose should cast to doubles (IEEE 754-2008)/
+   */
+  type Double = Schema.Types.Double;
 
   /**
    * The Mongoose ObjectId [SchemaType](/docs/schematypes.html). Used for
@@ -111,7 +128,7 @@ declare module 'mongoose' {
      * will build a unique index on this path when the
      * model is compiled. [The `unique` option is **not** a validator](/docs/validation.html#the-unique-option-is-not-a-validator).
      */
-    unique?: boolean | number;
+    unique?: boolean | number | [true, string];
 
     /**
      * If [truthy](https://masteringjs.io/tutorials/fundamentals/truthy), Mongoose will
@@ -387,6 +404,14 @@ declare module 'mongoose' {
         defaultOptions: Record<string, any>;
       }
 
+      class Int32 extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: 'Int32';
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
+      }
+
       class DocumentArray extends SchemaType implements AcceptsDiscriminator {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'DocumentArray';
@@ -434,6 +459,14 @@ declare module 'mongoose' {
 
         /** Sets a minimum number validator. */
         min(value: number, message: string): this;
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
+      }
+
+      class Double extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: 'Double';
 
         /** Default options for this SchemaType */
         defaultOptions: Record<string, any>;

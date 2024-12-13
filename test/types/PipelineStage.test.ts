@@ -319,10 +319,10 @@ const setWindowFields5: PipelineStage = {
     sortBy: { score: 1 },
     output: {
       minScores: {
-        $firstN: { input: '$score', n: 3 },
+        $firstN: { input: '$score', n: 3 }
       },
       maxScores: {
-        $lastN: { input: '$score', n: 3 },
+        $lastN: { input: '$score', n: 3 }
       }
     }
   }
@@ -454,9 +454,9 @@ const group7: PipelineStage = {
       }
     },
     maxScores: { $maxN: { input: '$score', n: 3 } },
-    minScores: { $minN: { input: '$score', n: 3 } },
+    minScores: { $minN: { input: '$score', n: 3 } }
   }
-}
+};
 
 const stages1: PipelineStage[] = [
   // First Stage

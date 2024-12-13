@@ -309,7 +309,7 @@ declare module 'mongoose' {
     eachPath(fn: (path: string, type: SchemaType) => void): this;
 
     /** Defines an index (most likely compound) for this schema. */
-    index(fields: IndexDefinition, options?: IndexOptions): this;
+    index(fields: IndexDefinition, options?: Omit<IndexOptions, 'unique'> & { unique?: boolean | [true, string] }): this;
 
     /**
      * Define a search index for this schema.

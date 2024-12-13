@@ -1,3 +1,17 @@
+8.9.0 / 2024-12-13
+==================
+ * feat: upgrade mongodb -> 6.12
+ * feat: add int32 schematype #15054 [aditi-khare-mongoDB](https://github.com/aditi-khare-mongoDB)
+ * feat: add double schematype #15061 [aditi-khare-mongoDB](https://github.com/aditi-khare-mongoDB)
+ * feat: allow specifying error message override for duplicate key errors unique: true #15059 #12844
+ * feat(connection): add support for Connection.prototype.bulkWrite() with MongoDB server 8.0 #15058 #15028
+ * feat: add forceRepopulate option for populate() to allow avoiding repopulating already populated docs #15044 #14979
+ * fix(connection): remove heartbeat check in load balanced mode #15089 #15042
+ * fix(query): clone PopulateOptions when setting _localModel to avoid state leaking between subpopulate instances #15082 #15026
+ * types: add splice() to DocumentArray to allow adding partial objects with splice() #15085 #15041
+ * types(aggregate): add $firstN, $lastN, $bottom, $bottomN, $minN and $maxN operators #15087 [mlomnicki](https://github.com/mlomnicki)
+ * docs: Remove merge conflict markers #15090 [sponrad](https://github.com/sponrad)
+
 8.8.4 / 2024-12-05
 ==================
  * fix: cast using overwritten embedded discriminator key when set #15076 #15051

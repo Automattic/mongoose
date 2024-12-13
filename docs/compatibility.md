@@ -16,7 +16,6 @@ You can refer to [this table](https://www.mongodb.com/docs/drivers/node/current/
 
 Below are the [semver](http://semver.org/) ranges representing which versions of mongoose are compatible with the listed versions of MongoDB server.
 
-
 | MongoDB Server |                  Mongoose                      |
 | :------------: | :--------------------------------------------: |
 |     `8.x`      |                   `^8.7.0`                     |

@@ -2251,4 +2251,71 @@ describe('model', function() {
     assert(result);
 
   });
+
+  it('correctly gathers subdocs with discriminators (gh-15088)', async function() {
+    const RequestTriggeredWorkflowSchema = new Schema(
+      {
+        workflow: {
+          type: String
+        }
+      },
+      {
+        timestamps: true
+      }
+    );
+
+    const RequestSchema = new Schema(
+      {
+        status: {
+          type: String
+        },
+        summary: {
+          type: String
+        },
+        triggeredWorkflows: [RequestTriggeredWorkflowSchema]
+      },
+      {
+        discriminatorKey: 'source',
+        timestamps: true
+      }
+    );
+
+    const EmailRequestSchema = new Schema({
+      // Any extra properties that specifically apply to 'email' requests
+    });
+    const FormRequestSchema = new Schema({
+      // Any extra properties that specifically apply to 'form' requests
+    });
+
+    const Request = db.model('Request', RequestSchema);
+
+    Request.discriminator('Request:email', EmailRequestSchema, 'email');
+    Request.discriminator('Request:form', FormRequestSchema, 'form');
+
+    const request = new Request({
+      status: 'new',
+      source: 'form'
+    });
+    await request.save();
+
+    let requestAsReadFromDb = await Request.findById(request._id);
+
+    request.status = 'in progress';
+    await request.save();
+
+    assert.equal(requestAsReadFromDb.$getAllSubdocs().length, 0);
+    const now = new Date();
+    request.triggeredWorkflows.push({
+      workflow: '111111111111111111111111'
+    });
+    assert.equal(request.$getAllSubdocs().length, 1);
+    assert.equal(request.$getAllSubdocs()[0], request.triggeredWorkflows[0]);
+    await request.save();
+
+    requestAsReadFromDb = await Request.findById(request._id);
+    assert.equal(requestAsReadFromDb.$getAllSubdocs().length, 1);
+    assert.equal(requestAsReadFromDb.$getAllSubdocs()[0], requestAsReadFromDb.triggeredWorkflows[0]);
+    assert.ok(requestAsReadFromDb.triggeredWorkflows[0].createdAt.valueOf() >= now.valueOf());
+    assert.ok(requestAsReadFromDb.triggeredWorkflows[0].updatedAt.valueOf() >= now.valueOf());
+  });
 });

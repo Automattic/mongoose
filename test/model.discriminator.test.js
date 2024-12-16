@@ -2317,4 +2317,63 @@ describe('model', function() {
     assert.ok(requestAsReadFromDb.triggeredWorkflows[0].createdAt.valueOf() >= now.valueOf());
     assert.ok(requestAsReadFromDb.triggeredWorkflows[0].updatedAt.valueOf() >= now.valueOf());
   });
+
+  it('triggers save hooks on subdocuments (gh-15092)', async function() {
+    const subdocumentSchema = mongoose.Schema({
+      name: String
+    });
+
+    const subdocumentPreSaveHooks = [];
+    subdocumentSchema.pre('save', function(next) {
+      subdocumentPreSaveHooks.push(this);
+      next();
+    });
+
+    const schema = mongoose.Schema({
+      name: String,
+      subdocuments: [subdocumentSchema]
+    }, { discriminatorKey: 'type' });
+
+    const documentPreSaveHooks = [];
+    schema.pre('save', function(next) {
+      documentPreSaveHooks.push(this);
+      next();
+    });
+
+    const Document = db.model('Document', schema);
+
+    const discriminatorSchema = mongoose.Schema({});
+
+    const discriminatorPreSaveHooks = [];
+    discriminatorSchema.pre('save', function(next) {
+      discriminatorPreSaveHooks.push(this);
+      next();
+    });
+
+    const Discriminator = Document.discriminator('Discriminator', discriminatorSchema);
+
+    const document = new Document({ name: 'Document' });
+    document.subdocuments.push({ name: 'Document Subdocument' });
+    await document.save();
+
+    assert.equal(discriminatorPreSaveHooks.length, 0);
+    assert.equal(subdocumentPreSaveHooks.length, 1);
+    assert.equal(subdocumentPreSaveHooks[0], document.subdocuments[0]);
+    assert.equal(documentPreSaveHooks.length, 1);
+    assert.equal(documentPreSaveHooks[0], document);
+
+    subdocumentPreSaveHooks.length = 0;
+    documentPreSaveHooks.length = 0;
+
+    const discriminator = new Discriminator({ name: 'Discriminator', type: 'Discriminator' });
+    discriminator.subdocuments.push({ name: 'Discriminator Subdocument' });
+    await discriminator.save();
+
+    assert.equal(subdocumentPreSaveHooks.length, 1);
+    assert.equal(subdocumentPreSaveHooks[0], discriminator.subdocuments[0]);
+    assert.equal(discriminatorPreSaveHooks.length, 1);
+    assert.equal(discriminatorPreSaveHooks[0], discriminator);
+    assert.equal(documentPreSaveHooks.length, 1);
+    assert.equal(documentPreSaveHooks[0], discriminator);
+  });
 });

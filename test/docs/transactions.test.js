@@ -344,7 +344,10 @@ describe('transactions', function() {
     const session = await db.startSession();
 
     session.startTransaction();
-    await Character.create([{ name: 'Will Riker', rank: 'Commander' }, { name: 'Jean-Luc Picard', rank: 'Captain' }], { session });
+    await Character.create([
+      { name: 'Will Riker', rank: 'Commander' },
+      { name: 'Jean-Luc Picard', rank: 'Captain' }
+    ], { session, ordered: true });
 
     let names = await Character.distinct('name', {}, { session });
     assert.deepStrictEqual(names.sort(), ['Jean-Luc Picard', 'Will Riker']);
@@ -670,6 +673,7 @@ describe('transactions', function() {
     });
 
     // Create models
+    db.deleteModel(/Test/);
     const Booking = db.model('Test', BookingSchema);
 
     // Define a sample payload

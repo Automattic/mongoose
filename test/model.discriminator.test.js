@@ -2292,11 +2292,10 @@ describe('model', function() {
     Request.discriminator('Request:email', EmailRequestSchema, 'email');
     Request.discriminator('Request:form', FormRequestSchema, 'form');
 
-    const request = new Request({
+    const request = await Request.create({
       status: 'new',
       source: 'form'
     });
-    await request.save();
 
     let requestAsReadFromDb = await Request.findById(request._id);
 

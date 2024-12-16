@@ -456,6 +456,6 @@ async function gh15077() {
 
     const createdFoo = await fooModel.create(newFoo);
 
-    foundFoo = createdFoo.toObject(); // this errors on 8.8.3
+    foundFoo = createdFoo.toObject();
   }
 }

@@ -696,12 +696,15 @@ describe('transactions', function() {
       moreInfo: obj.moreInfo
     }));
 
+    const bookings = await Booking.create(bookingData, { session, ordered: true });
+    assert.equal(bookings.length, 2);
+
     await assert.rejects(
       Booking.create(bookingData, { session }),
       /Cannot call `create\(\)` with a session and multiple documents unless `ordered: true` is set/
     );
 
-    const bookings = await Booking.create(bookingData, { session, ordered: true });
-    assert.equal(bookings.length, 2);
+    await session.abortTransaction();
+    await session.endSession();
   });
 });

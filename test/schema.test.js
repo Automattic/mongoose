@@ -3278,4 +3278,21 @@ describe('schema', function() {
     assert.ok(subdoc instanceof mongoose.Document);
     assert.equal(subdoc.getAnswer(), 42);
   });
+  it('throws "already has an index" error if duplicate index definition (gh-15056)', function() {
+    const ObjectKeySchema = new mongoose.Schema({
+      key: {
+        type: String,
+        required: true,
+        unique: true
+      },
+      type: {
+        type: String,
+        required: false
+      }
+    });
+
+    assert.throws(() => {
+      ObjectKeySchema.index({ key: 1 });
+    }, /MongooseError.*already has an index/);
+  });
 });

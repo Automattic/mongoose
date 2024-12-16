@@ -399,6 +399,10 @@ describe('transactions', function() {
           let docs = await Test.aggregate([{ $match: { _id: doc._id } }]);
           assert.equal(docs.length, 1);
 
+          const aggCursor = TestModel.aggregate([{ $match: { _id: doc._id } }]).cursor();
+          docs = [await aggCursor.next()];
+          assert.equal(docs[0].name, 'test_transactionAsyncLocalStorage');
+
           docs = await Test.find({ _id: doc._id });
           assert.equal(docs.length, 1);
 

@@ -3283,12 +3283,12 @@ describe('schema', function() {
       key: {
         type: String,
         required: true,
-        unique: true,
+        unique: true
       },
       type: {
         type: String,
-        required: false,
-      },
+        required: false
+      }
     });
 
     assert.throws(() => {

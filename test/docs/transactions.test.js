@@ -686,7 +686,7 @@ describe('transactions', function() {
       ]
     };
 
-    const session = await mongoose.startSession();
+    const session = await db.startSession();
     session.startTransaction();
 
     const bookingData = payload.data.map((obj) => ({

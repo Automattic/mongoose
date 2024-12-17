@@ -1,3 +1,8 @@
+5.13.23 / 2024-12-17
+====================
+ * fix(populate): backport security fix for $where in populate #15078
+ * docs: note that mongoose 5.13 is compatible with mongodb 5.0 #14283 [andrewdcato](https://github.com/andrewdcato)
+
 5.13.22 / 2024-01-02
 ====================
  * perf(schema): remove unnecessary lookahead in numeric subpath check

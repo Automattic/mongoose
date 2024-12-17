@@ -96,4 +96,4 @@ However, we recommend using the `.populate<{ child: Child }>` syntax from the fi
 Here's two reasons why:
 
 1. You still need to add an extra check to check if `child instanceof ObjectId`. Otherwise, the TypeScript compiler will fail with `Property name does not exist on type ObjectId`. So using `PopulatedDoc<>` means you need an extra check everywhere you use `doc.child`.
-2. In the `Parent` interface, `child` is a hydrated document, which makes it slow difficult for Mongoose to infer the type of `child` when you use `lean()` or `toObject()`.
+2. In the `Parent` interface, `child` is a hydrated document, which makes it difficult for Mongoose to infer the type of `child` when you use `lean()` or `toObject()`.

@@ -1,11 +1,15 @@
-# creates a encrypted cluster (sharded on 8.0 server)
+# note: in order to use FLE with mongodb, we must
+#  have mongocryptd or the shared library downloaded
+#  have an enterprise server >= 4.2
+
+# this script downloads all tools required to use FLE with mongodb, then starts a cluster of the provided configuration (sharded on 8.0 server)
 
 export CWD=$(pwd);
 mkdir encrypted-cluster
 cd encrypted-cluster
 
 # note: 
-  # we're using drivers-evergreen-tools which is a repo that handles cluster set-up for us. 
+  # we're using drivers-evergreen-tools which is a repo used by MongoDB drivers to start clusters for testing.  
   # if you'd like to make changes to the cluster settings, edit the exported variables below.
   # for configuration options for the exported variables, see here: https://github.com/mongodb-labs/drivers-evergreen-tools/blob/master/.evergreen/run-orchestration.sh
   # after this script is run, the encrypted-cluster/ folder will notably contain the following:

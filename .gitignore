@@ -69,3 +69,4 @@ notes.md
 list.out
 
 encrypted-cluster
+*.pid

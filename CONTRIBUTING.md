@@ -46,7 +46,7 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
   * execute `npm run test-tsd` to run the typescript tests
   * execute `npm run ts-benchmark` to run the typescript benchmark "performance test" for a single time.
   * execute `npm run ts-benchmark-watch` to run the typescript benchmark "performance test" while watching changes on types folder. Note: Make sure to commit all changes before executing this command.
-* in order to run tests that require an encrypted cluster locally, run `npm run test-encryption-local`. Alternatively, you can start an encrypted cluster using the `scripts/start-encrypted-cluster.sh` file.
+* in order to run tests that require an cluster with encryption locally, run `npm run test-encryption-local`. Alternatively, you can start an encrypted cluster using the `scripts/start-cluster-with-encryption.sh` file.
 
 ## Documentation
 

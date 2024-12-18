@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
-# sets up an encrypted mongodb cluster, adds relevant variables to the environment, and runs encryption tests
+# sets up mongodb cluster and encryption configuration, adds relevant variables to the environment, and runs encryption tests
 
 export CWD=$(pwd);
 
-# set up encrypted mongodb cluster if the encrypted-cluster folder does not exist
-# note: for tooling, cluster set-up and configuration look into the 'scripts/start-encrypted-cluster.sh' script
+# set up mongodb cluster and encryption configuration if the encrypted-cluster folder does not exist
+# note: for tooling, cluster set-up and configuration look into the 'scripts/start-cluster-with-encryption.sh' script
 if [ -d "encrypted-cluster" ]; then
   cd encrypted-cluster
 else
-  source $CWD/scripts/start-encrypted-cluster.sh
+  source $CWD/scripts/start-cluster-with-encryption.sh
 fi
 
 # extracts MONGOOSE_TEST_URI and CRYPT_SHARED_LIB_PATH from .yml file into environment variables for this test run

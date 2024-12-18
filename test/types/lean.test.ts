@@ -206,3 +206,34 @@ async function gh13382() {
   const res = await Test.updateOne({}, { name: 'bar' }).lean();
   expectAssignable<{ matchedCount: number, modifiedCount: number }>(res);
 }
+
+async function gh15057() {
+  type Attachment =
+    | {
+        type: 'foo';
+        value?: undefined;
+      }
+    | {
+        type: 'string';
+        value?: string;
+      };
+
+  const TestSchema = new Schema<Attachment>({
+    type: { type: String, required: true },
+    value: { type: String }
+  });
+
+  const AttachmentModel = model<Attachment>('test', TestSchema);
+
+  const main = async() => {
+    const item = await AttachmentModel.findOne().lean();
+
+    if (!item) return;
+
+    doSomeThing(item);
+  };
+
+  const doSomeThing = (item: Attachment) => {
+    console.log(item);
+  };
+}

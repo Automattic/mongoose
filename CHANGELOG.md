@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 8.9.1 / 2024-12-16
 ==================
  * fix(connection): remove heartbeat check in load balanced mode #15089 #15042 #14812

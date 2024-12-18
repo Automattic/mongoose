@@ -339,7 +339,7 @@ If you want to use Bluebird for all promises globally, you can do the following:
 global.Promise = require('bluebird');
 ```
 
-## Deprecated `keepAlive` #{deprecated-keepalive}
+## Deprecated `keepAlive` {#deprecated-keepalive}
 
 Before Mongoose 5.2.0, you needed to enable the `keepAlive` option to initiate [TCP keepalive](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html) to prevent `"connection closed"` errors.
 However, `keepAlive` has been `true` by default since Mongoose 5.2.0, and the `keepAlive` is deprecated as of Mongoose 7.2.0.

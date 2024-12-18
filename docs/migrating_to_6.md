@@ -153,6 +153,7 @@ However, this behavior was a source of confusion in some cases, so in Mongoose 7
 ```javascript
 mongoose.set('strictQuery', false);
 ```
+
 In a test suite, it may be useful to set `strictQuery` to `throw`, which will throw exceptions any time a query references schema that doesn't exist, which could help identify a bug in your tests or code.
 
 Here's an example of the effect of `strictQuery`:
@@ -520,7 +521,7 @@ The `reconnectTries` and `reconnectInterval` options have been removed since the
 The MongoDB node driver will always attempt to retry any operation for up to `serverSelectionTimeoutMS`, even if MongoDB is down for a long period of time.
 So, it will never run out of retries or try to reconnect to MongoDB.
 
-## Lodash `.isEmpty()` returns true for ObjectIds #{lodash-object-id}
+## Lodash `.isEmpty()` returns true for ObjectIds {#lodash-object-id}
 
 Lodash's `isEmpty()` function returns true for primitives and primitive wrappers.
 `ObjectId()` is an object wrapper that is treated as a primitive by Mongoose.
@@ -534,7 +535,7 @@ if (!(val instanceof Types.ObjectId) && _.isEmpty(val)) {
 }
 ```
 
-## Removed `mongoose.modelSchemas` #{model-schemas}
+## Removed `mongoose.modelSchemas` {#model-schemas}
 
 The `mongoose.modelSchemas` property was removed. This may have been used to delete a model schema.
 
@@ -545,7 +546,6 @@ delete mongoose.modelSchemas.User;
 // with Mongoose 6.x
 delete mongoose.deleteModel('User');
 ```
-
 
 ## TypeScript changes
 

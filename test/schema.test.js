@@ -3294,5 +3294,14 @@ describe('schema', function() {
     assert.throws(() => {
       ObjectKeySchema.index({ key: 1 });
     }, /MongooseError.*already has an index/);
+
+    ObjectKeySchema.index({ key: 1, type: 1 });
+    assert.throws(() => {
+      ObjectKeySchema.index({ key: 1, type: 1 });
+    }, /MongooseError.*already has an index/);
+
+    ObjectKeySchema.index({ type: 1, key: 1 });
+    ObjectKeySchema.index({ key: 1, type: -1 });
+    ObjectKeySchema.index({ key: 1, type: 1 }, { unique: true, name: 'special index' });
   });
 });

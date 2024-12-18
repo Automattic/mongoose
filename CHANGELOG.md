@@ -1,3 +1,13 @@
+8.9.1 / 2024-12-16
+==================
+ * fix(connection): remove heartbeat check in load balanced mode #15089 #15042 #14812
+ * fix(discriminator): gather childSchemas when creating discriminator to ensure $getAllSubdocs() can properly get all subdocs #15099 #15088 #15092
+ * fix(model): handle discriminators in castObject() #15096 #15075
+ * fix(schema): throw error if duplicate index definition using unique in schema path and subsequent .index() call #15093 #15056
+ * fix: mark documents that are populated using hydratedPopulatedDocs option as populated in top-level doc #15080 #15048
+ * fix(document+schema): improve error message for get() on invalid path #15098 #15071
+ * docs: remove more callback doc references & some small other changes #15095
+
 8.9.0 / 2024-12-13
 ==================
  * feat: upgrade mongodb -> 6.12

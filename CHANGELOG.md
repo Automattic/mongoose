@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 8.9.1 / 2024-12-16
 ==================
  * fix(connection): remove heartbeat check in load balanced mode #15089 #15042 #14812
@@ -31,7 +32,17 @@
 ==================
  * fix: disallow using $where in match
  * perf: cache results from getAllSubdocs() on saveOptions, only loop through known subdoc properties #15055 #15029
- * fix(model+query): support overwriteDiscriminatorKey for bulkWrite updateOne and updateMany, allow inferring discriminator key from update #15046 #15040 
+ * fix(model+query): support overwriteDiscriminatorKey for bulkWrite updateOne and updateMany, allow inferring discriminator key from update #15046 #15040
+
+7.8.3 / 2024-11-26
+==================
+ * fix: disallow using $where in match
+ * fix(projection): avoid setting projection to unknown exclusive/inclusive if elemMatch on a Date, ObjectId, etc. #14894 #14893
+ * docs(migrating_to_7): add note about keepAlive to Mongoose 7 migration guide #15032 #13431
+
+6.13.5 / 2024-11-26
+===================
+ * fix: disallow using $where in match
 
 8.8.2 / 2024-11-18
 ==================
@@ -40,6 +51,11 @@
  * fix: save execution stack in query as string #15039 [durran](https://github.com/durran)
  * types(cursor): correct asyncIterator and asyncDispose for TypeScript with lib: 'esnext' #15038
  * docs(migrating_to_8): add note about removing findByIdAndRemove #15024 [dragontaek-lee](https://github.com/dragontaek-lee)
+
+6.13.4 / 2024-11-15
+===================
+ * fix: save execution stack in query as string #15043 #15039
+ * docs: clarify strictQuery default will flip-flop in "Migrating to 6.x" #14998 [markstos](https://github.com/markstos)
 
 8.8.1 / 2024-11-08
 ==================
@@ -61,7 +77,6 @@
  * types: add `__v` to lean() result type and ModifyResult #14990 #12959
  * types: use globalThis instead of global for NativeDate #14992 #14988
  * docs(change-streams): fix markdown syntax highlighting for script output example #14994
-
 
 8.7.3 / 2024-10-25
 ==================
@@ -109,6 +124,10 @@
 7.8.2 / 2024-09-25
 ==================
  * fix(projection): avoid setting projection to unknown exclusive/inclusive if elemMatch on a Date, ObjectId, etc. #14894 #14893
+
+6.13.3 / 2024-09-23
+===================
+ * docs(migrating_to_6): document that Lodash _.isEmpty() with ObjectId() as a parameter returns true in Mongoose 6 #11152
 
 8.6.3 / 2024-09-17
 ==================

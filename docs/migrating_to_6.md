@@ -50,9 +50,11 @@ If you're still on Mongoose 4.x, please read the [Mongoose 4.x to 5.x migration 
 * [SchemaType `set` parameters now use `priorValue` as the second parameter instead of `self`](#schematype-set-parameters)
 * [No default model for `Query.prototype.populate()`](#no-default-model-for-query-prototype-populate)
 * [`toObject()` and `toJSON()` Use Nested Schema `minimize`](#toobject-and-tojson-use-nested-schema-minimize)
-* [TypeScript changes](#typescript-changes)
 * [Removed `reconnectTries` and `reconnectInterval` options](#removed-reconnecttries-and-reconnectinterval-options)
 * [MongoDB Driver's New URL Parser Incompatible with Some npm Packages](#mongodb-drivers-new-url-parser-incompatible-with-some-npm-packages)
+* [Lodash `.isEmpty()` returns false for ObjectIds](#lodash-object-id)
+* [mongoose.modelSchemas removed](#model-schemas)
+* [TypeScript changes](#typescript-changes)
 
 ## Version Requirements {#version-requirements}
 
@@ -144,9 +146,16 @@ if (existingUser) {
 ## `strictQuery` is now equal to `strict` by default {#strictquery-is-removed-and-replaced-by-strict}
 
 ~Mongoose no longer supports a `strictQuery` option. You must now use `strict`.~
-As of Mongoose 6.0.10, we brought back the `strictQuery` option.
-However, `strictQuery` is tied to `strict` by default.
-This means that, by default, Mongoose will filter out query filter properties that are not in the schema.
+As of Mongoose 6.0.10, we brought back the `strictQuery` option. In Mongoose 6, `strictQuery` is set to `strict` by default. This means that, by default, Mongoose will filter out query filter properties that are not in the schema.
+
+However, this behavior was a source of confusion in some cases, so in Mongoose 7, this default changes back to `false`. So if you want to retain the default behavior of Mongoose 5 as well as Mongoose 7 and later, you can also disable `strictQuery` globally to override:
+
+```javascript
+mongoose.set('strictQuery', false);
+```
+In a test suite, it may be useful to set `strictQuery` to `throw`, which will throw exceptions any time a query references schema that doesn't exist, which could help identify a bug in your tests or code.
+
+Here's an example of the effect of `strictQuery`:
 
 ```javascript
 const userSchema = new Schema({ name: String });
@@ -504,6 +513,40 @@ The MongoDB Node driver version that Mongoose 6 uses relies on a [URL parser mod
 This can lead to errors like `Invalid URL: mongodb+srv://username:password@development.xyz.mongodb.net/abc` if you use one of the incompatible packages.
 [You can find a list of incompatible packages here](https://mongoosejs.com/docs/incompatible_packages).
 
+## Removed `reconnectTries` and `reconnectInterval` options {#removed-reconnecttries-and-reconnectinterval-options}
+
+The `reconnectTries` and `reconnectInterval` options have been removed since they are no longer necessary.
+
+The MongoDB node driver will always attempt to retry any operation for up to `serverSelectionTimeoutMS`, even if MongoDB is down for a long period of time.
+So, it will never run out of retries or try to reconnect to MongoDB.
+
+## Lodash `.isEmpty()` returns true for ObjectIds #{lodash-object-id}
+
+Lodash's `isEmpty()` function returns true for primitives and primitive wrappers.
+`ObjectId()` is an object wrapper that is treated as a primitive by Mongoose.
+But starting in Mongoose 6, `_.isEmpty()` will return true for ObjectIds because of Lodash implementation details.
+
+An ObjectId in mongoose is never empty, so if you're using `isEmpty()` you should check for `instanceof ObjectId`.
+
+```javascript
+if (!(val instanceof Types.ObjectId) && _.isEmpty(val)) {
+  // Handle empty object here
+}
+```
+
+## Removed `mongoose.modelSchemas` #{model-schemas}
+
+The `mongoose.modelSchemas` property was removed. This may have been used to delete a model schema.
+
+```javascript
+// before
+delete mongoose.modelSchemas.User;
+
+// with Mongoose 6.x
+delete mongoose.deleteModel('User');
+```
+
+
 ## TypeScript changes
 
 The `Schema` class now takes 3 generic params instead of 4. The 3rd generic param, `SchemaDefinitionType`, is now the same as the 1st generic param `DocType`. Replace `new Schema<UserDocument, UserModel, User>(schemaDefinition)` with `new Schema<UserDocument, UserModel>(schemaDefinition)`
@@ -541,10 +584,3 @@ schema.virtual('myVirtual').get(function() {
   this.name; // string
 });
 ```
-
-## Removed `reconnectTries` and `reconnectInterval` options {#removed-reconnecttries-and-reconnectinterval-options}
-
-The `reconnectTries` and `reconnectInterval` options have been removed since they are no longer necessary.
-
-The MongoDB node driver will always attempt to retry any operation for up to `serverSelectionTimeoutMS`, even if MongoDB is down for a long period of time.
-So, it will never run out of retries or try to reconnect to MongoDB.

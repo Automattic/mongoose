@@ -572,7 +572,8 @@ declare module 'mongoose' {
     | typeof Schema.Types.Number
     | typeof Schema.Types.String
     | typeof Schema.Types.Buffer
-    | typeof Schema.Types.ObjectId;
+    | typeof Schema.Types.ObjectId
+    | typeof Schema.Types.UUID;
 
 
   export type InferId<T> = T extends { _id?: any } ? T['_id'] : Types.ObjectId;

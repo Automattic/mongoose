@@ -1,6 +1,6 @@
 'use strict';
 
-const root = 'https://mongoosejs.azurewebsites.net/api';
+const root = 'https://mongoose-js.netlify.app/.netlify/functions';
 
 const defaultVersion = '8.x';
 const versionFromUrl = window.location.pathname.match(/^\/docs\/(\d+\.x)/);

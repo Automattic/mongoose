@@ -308,8 +308,7 @@ async function gh15122() {
         ref: 'Child',
         required: true
       }
-    },
-    { optimisticConcurrency: true }
+    }
   );
 
   parentSchema.virtual('fullName').get(function() {

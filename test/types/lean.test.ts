@@ -1,4 +1,4 @@
-import { Schema, model, Types, InferSchemaType, FlattenMaps } from 'mongoose';
+import { Schema, model, Types, InferSchemaType, FlattenMaps, HydratedDocument, Model, Document, PopulatedDoc } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 
 function gh10345() {
@@ -236,4 +236,90 @@ async function gh15057() {
   const doSomeThing = (item: Attachment) => {
     console.log(item);
   };
+}
+
+async function gh15122() {
+  interface IChild {
+    _id: Types.ObjectId;
+    name: string;
+  }
+
+  type ChildDocumentOverrides = {};
+
+  interface IChildVirtuals {
+    id: string;
+  }
+
+  type ChildInstance = HydratedDocument<
+    IChild,
+    ChildDocumentOverrides & IChildVirtuals
+  >;
+
+  type ChildModelType = Model<
+    IChild,
+    {},
+    ChildDocumentOverrides,
+    IChildVirtuals,
+    ChildInstance
+  >;
+
+
+  interface IParent {
+    _id: Types.ObjectId;
+    name: string;
+    surname: string;
+    child: PopulatedDoc<Document<Types.ObjectId> & IChild>;
+  }
+
+  type ParentDocumentOverrides = {};
+
+  interface IParentVirtuals {
+    id: string;
+    fullName: string;
+  }
+
+  type ParentInstance = HydratedDocument<
+    IParent,
+    ParentDocumentOverrides & IParentVirtuals
+  >;
+
+  type ParentModelType = Model<
+    IParent,
+    {},
+    ParentDocumentOverrides,
+    IParentVirtuals,
+    ParentInstance
+  >;
+
+  const parentSchema = new Schema<IParent, ParentModelType>(
+    {
+      name: {
+        type: String,
+        required: true,
+        trim: true
+      },
+      surname: {
+        type: String,
+        required: true,
+        trim: true
+      },
+      child: {
+        type: 'ObjectId',
+        ref: 'Child',
+        required: true
+      }
+    }
+  );
+
+  parentSchema.virtual('fullName').get(function() {
+    return `${this.name} ${this.surname}`;
+  });
+
+  const Parent = model<IParent, ParentModelType>('Parent', parentSchema);
+
+  const testFn = (parent: IParent) => {};
+  const parentDoc = await Parent.findOne().lean();
+  if (parentDoc) {
+    testFn(parentDoc);
+  }
 }

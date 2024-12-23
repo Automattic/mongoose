@@ -198,5 +198,62 @@ describe('model', function() {
       assert.ok(c.populated('users'));
       assert.ok(c.users[0] instanceof User);
     });
+
+    it('marks deeply nested docs as hydrated (gh-15110)', async function() {
+      const ArticleSchema = new Schema({ title: String });
+
+      const StorySchema = new Schema({
+        title: String,
+        userId: Schema.Types.ObjectId,
+        article: {
+          type: Schema.Types.ObjectId,
+          ref: 'Article'
+        }
+      });
+
+      const UserSchema = new Schema({
+        name: String
+      });
+
+      UserSchema.virtual('stories', {
+        ref: 'Story',
+        localField: '_id',
+        foreignField: 'userId'
+      });
+
+      const User = db.model('User', UserSchema);
+      const Story = db.model('Story', StorySchema);
+      const Article = db.model('Article', ArticleSchema);
+      await Promise.all([
+        User.deleteMany({}),
+        Story.deleteMany({}),
+        Article.deleteMany({})
+      ]);
+
+      const article = await Article.create({ title: 'Cinema' });
+      const user = await User.create({ name: 'Alex' });
+      await Story.create({ title: 'Ticket 1', userId: user._id, article });
+      await Story.create({ title: 'Ticket 2', userId: user._id });
+
+      const populated = await User.findOne({ name: 'Alex' }).populate({
+        path: 'stories',
+        populate: ['article']
+      }).lean();
+
+      const hydrated = User.hydrate(
+        JSON.parse(JSON.stringify(populated)),
+        null,
+        { hydratedPopulatedDocs: true }
+      );
+
+      assert.ok(hydrated.populated('stories'));
+      assert.ok(hydrated.stories[0].populated('article'));
+      assert.equal(hydrated.stories[0].article._id.toString(), article._id.toString());
+      assert.ok(typeof hydrated.stories[0].article._id === 'object');
+      assert.ok(hydrated.stories[0].article._id instanceof mongoose.Types.ObjectId);
+      assert.equal(hydrated.stories[0].article.title, 'Cinema');
+
+      assert.ok(!hydrated.stories[1].article);
+    });
   });
 });

@@ -199,7 +199,7 @@ describe('model', function() {
       assert.ok(c.users[0] instanceof User);
     });
 
-    it('marks deeply nested docs as hydrated (gh-15110)', async function() {
+    it('marks deeply nested docs as hydrated underneath virtuals (gh-15110)', async function() {
       const ArticleSchema = new Schema({ title: String });
 
       const StorySchema = new Schema({
@@ -221,6 +221,9 @@ describe('model', function() {
         foreignField: 'userId'
       });
 
+      db.deleteModel(/User/);
+      db.deleteModel(/Story/);
+      db.deleteModel(/Article/);
       const User = db.model('User', UserSchema);
       const Story = db.model('Story', StorySchema);
       const Article = db.model('Article', ArticleSchema);
@@ -234,6 +237,70 @@ describe('model', function() {
       const user = await User.create({ name: 'Alex' });
       await Story.create({ title: 'Ticket 1', userId: user._id, article });
       await Story.create({ title: 'Ticket 2', userId: user._id });
+
+      const populated = await User.findOne({ name: 'Alex' }).populate({
+        path: 'stories',
+        populate: ['article']
+      }).lean();
+
+      const hydrated = User.hydrate(
+        JSON.parse(JSON.stringify(populated)),
+        null,
+        { hydratedPopulatedDocs: true }
+      );
+
+      assert.ok(hydrated.populated('stories'));
+      assert.ok(hydrated.stories[0].populated('article'));
+      assert.equal(hydrated.stories[0].article._id.toString(), article._id.toString());
+      assert.ok(typeof hydrated.stories[0].article._id === 'object');
+      assert.ok(hydrated.stories[0].article._id instanceof mongoose.Types.ObjectId);
+      assert.equal(hydrated.stories[0].article.title, 'Cinema');
+
+      assert.ok(!hydrated.stories[1].article);
+    });
+
+    it('marks deeply nested docs as hydrated underneath conventional (gh-15110)', async function() {
+      const ArticleSchema = new Schema({
+        title: {
+          type: String
+        }
+      });
+
+      const StorySchema = new Schema({
+        title: {
+          type: String
+        },
+        article: {
+          type: Schema.Types.ObjectId,
+          ref: 'Article'
+        }
+      });
+
+      const UserSchema = new Schema({
+        name: String,
+        stories: [{
+          type: Schema.Types.ObjectId,
+          ref: 'Story'
+        }]
+      });
+
+      db.deleteModel(/User/);
+      db.deleteModel(/Story/);
+      db.deleteModel(/Article/);
+      const User = db.model('User', UserSchema);
+      const Story = db.model('Story', StorySchema);
+      const Article = db.model('Article', ArticleSchema);
+      await Promise.all([
+        User.deleteMany({}),
+        Story.deleteMany({}),
+        Article.deleteMany({})
+      ]);
+
+      const article = await Article.create({ title: 'Cinema' });
+      const story1 = await Story.create({ title: 'Ticket 1', article });
+      const story2 = await Story.create({ title: 'Ticket 2' });
+
+      await User.create({ name: 'Alex', stories: [story1, story2] });
 
       const populated = await User.findOne({ name: 'Alex' }).populate({
         path: 'stories',

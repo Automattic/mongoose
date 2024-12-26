@@ -15,7 +15,7 @@ module.exports = {
     '!.*',
     'node_modules',
     '.git',
-    'encrypted-cluster'
+    'data'
   ],
   overrides: [
     {

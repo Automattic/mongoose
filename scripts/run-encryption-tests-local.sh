@@ -4,12 +4,13 @@
 
 export CWD=$(pwd);
 
-# set up mongodb cluster and encryption configuration if the encrypted-cluster folder does not exist
-# note: for tooling, cluster set-up and configuration look into the 'scripts/start-cluster-with-encryption.sh' script
-if [ -d "encrypted-cluster" ]; then
-  cd encrypted-cluster
+# set up mongodb cluster and encryption configuration if the data/ folder does not exist
+# note: for tooling, cluster set-up and configuration look into the 'scripts/configure-cluster-with-encryption.sh' script
+
+if [ -d "data" ]; then
+  cd data
 else
-  source $CWD/scripts/start-cluster-with-encryption.sh
+  source $CWD/scripts/configure-cluster-with-encryption.sh
 fi
 
 # extracts MONGOOSE_TEST_URI and CRYPT_SHARED_LIB_PATH from .yml file into environment variables for this test run

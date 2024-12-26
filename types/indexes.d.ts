@@ -10,7 +10,7 @@ declare module 'mongoose' {
   function syncIndexes(options?: SyncIndexesOptions): Promise<ConnectionSyncIndexesResult>;
 
   interface IndexManager {
-    /* Deletes all indexes that aren't defined in this model's schema. Used by `syncIndexes()`. */
+    /* Deletes all indexes that aren't defined in this model's schema. Used by `syncIndexes()`. Returns list of dropped index names. */
     cleanIndexes(options?: { toDrop?: string[], hideIndexes?: boolean }): Promise<string[]>;
 
     /**

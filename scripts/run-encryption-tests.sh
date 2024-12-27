@@ -35,4 +35,5 @@ source expansions.sh
 export MONGOOSE_TEST_URI=$MONGODB_URI
 
 # run encryption tests
-npm run test-encryption
+cd ..
+npx mocha --exit ./test/encryption/*.test.js

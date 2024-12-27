@@ -311,8 +311,7 @@ const versionObj = (() => {
     latestVersion: getLatestVersion(),
     pastVersions: [
       getLatestVersionOf(7),
-      getLatestVersionOf(6),
-      getLatestVersionOf(5),
+      getLatestVersionOf(6)
     ]
   };
   const versionedDeploy = !!process.env.DOCS_DEPLOY ? !(base.currentVersion.listed === base.latestVersion.listed) : false;

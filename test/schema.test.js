@@ -19,6 +19,7 @@ const DocumentObjectId = mongoose.Types.ObjectId;
 const vm = require('vm');
 const idGetter = require('../lib/helpers/schema/idGetter');
 const applyPlugins = require('../lib/helpers/schema/applyPlugins');
+const utils = require('../lib/utils');
 
 /**
  * Test Document constructor.
@@ -3279,29 +3280,43 @@ describe('schema', function() {
     assert.equal(subdoc.getAnswer(), 42);
   });
   it('throws "already has an index" error if duplicate index definition (gh-15056)', function() {
-    const ObjectKeySchema = new mongoose.Schema({
-      key: {
-        type: String,
-        required: true,
-        unique: true
-      },
-      type: {
-        type: String,
-        required: false
-      }
-    });
+    sinon.stub(utils, 'warn').callsFake(() => {});
+    try {
+      const ObjectKeySchema = new mongoose.Schema({
+        key: {
+          type: String,
+          required: true,
+          unique: true
+        },
+        type: {
+          type: String,
+          required: false
+        }
+      });
 
-    assert.throws(() => {
       ObjectKeySchema.index({ key: 1 });
-    }, /MongooseError.*already has an index/);
+      assert.equal(utils.warn.getCalls().length, 1);
+      let [message] = utils.warn.getCalls()[0].args;
+      assert.equal(
+        message,
+        'Duplicate schema index on {"key":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.'
+      );
 
-    ObjectKeySchema.index({ key: 1, type: 1 });
-    assert.throws(() => {
       ObjectKeySchema.index({ key: 1, type: 1 });
-    }, /MongooseError.*already has an index/);
+      assert.equal(utils.warn.getCalls().length, 1);
+      ObjectKeySchema.index({ key: 1, type: 1 });
+      assert.equal(utils.warn.getCalls().length, 2);
+      [message] = utils.warn.getCalls()[1].args;
+      assert.equal(
+        message,
+        'Duplicate schema index on {"key":1,"type":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.'
+      );
 
-    ObjectKeySchema.index({ type: 1, key: 1 });
-    ObjectKeySchema.index({ key: 1, type: -1 });
-    ObjectKeySchema.index({ key: 1, type: 1 }, { unique: true, name: 'special index' });
+      ObjectKeySchema.index({ type: 1, key: 1 });
+      ObjectKeySchema.index({ key: 1, type: -1 });
+      ObjectKeySchema.index({ key: 1, type: 1 }, { unique: true, name: 'special index' });
+    } finally {
+      sinon.restore();
+    }
   });
 });

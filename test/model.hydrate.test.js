@@ -261,9 +261,7 @@ describe('model', function() {
 
     it('marks deeply nested docs as hydrated underneath conventional (gh-15110)', async function() {
       const ArticleSchema = new Schema({
-        title: {
-          type: String
-        }
+        title: String
       });
 
       const StorySchema = new Schema({

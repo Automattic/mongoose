@@ -3315,6 +3315,7 @@ describe('schema', function() {
       ObjectKeySchema.index({ type: 1, key: 1 });
       ObjectKeySchema.index({ key: 1, type: -1 });
       ObjectKeySchema.index({ key: 1, type: 1 }, { unique: true, name: 'special index' });
+      assert.equal(utils.warn.getCalls().length, 2);
     } finally {
       sinon.restore();
     }

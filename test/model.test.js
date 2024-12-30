@@ -7777,6 +7777,24 @@ describe('Model', function() {
         TestModel.castObject(square).shape[0],
         { kind: 'Square', propertyPaths: [{ property: '42' }] }
       );
+
+      const square2 = { shape: [{ kind: 'Square', propertyPaths: {} }] };
+      assert.deepStrictEqual(
+        TestModel.castObject(square2).shape[0],
+        { kind: 'Square', propertyPaths: [{}] }
+      );
+    });
+    it('handles castNonArrays when document array is set to non-array value (gh-15075)', function() {
+      const sampleSchema = new mongoose.Schema({
+        sampleArray: {
+          type: [new mongoose.Schema({ name: String })],
+          castNonArrays: false
+        }
+      });
+      const Test = db.model('Test', sampleSchema);
+
+      const obj = { sampleArray: { name: 'Taco' } };
+      assert.throws(() => Test.castObject(obj), /Tried to set nested object field `sampleArray` to primitive value/);
     });
   });
 

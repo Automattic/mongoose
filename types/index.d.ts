@@ -491,7 +491,7 @@ declare module 'mongoose' {
     remove(paths: string | Array<string>): this;
 
     /** Removes index by name or index spec */
-    remove(index: string | AnyObject): this;
+    removeIndex(index: string | AnyObject): this;
 
     /** Returns an Array of path strings that are required by this schema. */
     requiredPaths(invalidate?: boolean): string[];

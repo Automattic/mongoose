@@ -491,9 +491,6 @@ async function gh15111() {
         required: true,
         trim: true
       }
-    },
-    {
-      optimisticConcurrency: true
     }
   );
   const ChildModel = mongoose.model<IChild, ChildModelType>('Child', childSchema);

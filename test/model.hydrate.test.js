@@ -265,9 +265,7 @@ describe('model', function() {
       });
 
       const StorySchema = new Schema({
-        title: {
-          type: String
-        },
+        title: String,
         article: {
           type: Schema.Types.ObjectId,
           ref: 'Article'

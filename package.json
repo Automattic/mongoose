@@ -42,7 +42,7 @@
     "buffer": "^5.6.0",
     "cheerio": "1.0.0",
     "crypto-browserify": "3.12.1",
-    "dotenv": "16.4.5",
+    "dotenv": "16.4.7",
     "dox": "1.0.0",
     "eslint": "8.57.0",
     "eslint-plugin-markdown": "^5.0.0",

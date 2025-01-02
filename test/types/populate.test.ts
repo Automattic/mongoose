@@ -1,4 +1,4 @@
-import mongoose, { Schema, model, Document, PopulatedDoc, Types, HydratedDocument, SchemaTypeOptions } from 'mongoose';
+import mongoose, { Schema, model, Document, PopulatedDoc, Types, HydratedDocument, SchemaTypeOptions, Model } from 'mongoose';
 // Use the mongodb ObjectId to make instanceof calls possible
 import { ObjectId } from 'mongodb';
 import { expectAssignable, expectError, expectType } from 'tsd';
@@ -458,4 +458,97 @@ async function gh14574() {
     .exec();
   expectType<string>(user.fullName());
   expectType<string>(user.friend.fullName());
+}
+
+async function gh15111() {
+  interface IChild {
+    _id: Types.ObjectId;
+    name: string;
+  }
+
+  type ChildDocumentOverrides = {};
+
+  interface IChildVirtuals {
+    id: string;
+  }
+
+  type ChildInstance = HydratedDocument<
+    IChild,
+    ChildDocumentOverrides & IChildVirtuals
+  >;
+
+  type ChildModelType = Model<
+    IChild,
+    {},
+    ChildDocumentOverrides,
+    IChildVirtuals,
+    ChildInstance
+  >;
+  const childSchema = new Schema<IChild, ChildModelType>(
+    {
+      name: {
+        type: 'String',
+        required: true,
+        trim: true
+      }
+    }
+  );
+  const ChildModel = mongoose.model<IChild, ChildModelType>('Child', childSchema);
+
+  interface IParent {
+    _id: Types.ObjectId;
+    name: string;
+    surname: string;
+    child: PopulatedDoc<Document<Types.ObjectId> & IChild>;
+  }
+
+  type ParentDocumentOverrides = {};
+
+  interface IParentVirtuals {
+    id: string;
+    fullName: string;
+  }
+
+  type ParentInstance = HydratedDocument<
+    IParent,
+    ParentDocumentOverrides & IParentVirtuals
+  >;
+
+  type ParentModelType = Model<
+    IParent,
+    {},
+    ParentDocumentOverrides,
+    IParentVirtuals,
+    ParentInstance
+  >;
+  const parentSchema = new Schema<IParent, ParentModelType>(
+    {
+      name: {
+        type: 'String',
+        required: true,
+        trim: true
+      },
+      surname: {
+        type: 'String',
+        required: true,
+        trim: true
+      },
+      child: {
+        type: 'ObjectId',
+        ref: 'Child',
+        required: true
+      }
+    }
+  );
+
+  parentSchema.virtual('fullName').get(function() {
+    return `${this.name} ${this.surname}`;
+  });
+
+  const ParentModel = mongoose.model<IParent, ParentModelType>('Parent', parentSchema);
+
+  const parents = await ParentModel.find().populate<{ child: ChildInstance }>(
+    'child'
+  );
+  expectType<string>(parents[0].fullName);
 }

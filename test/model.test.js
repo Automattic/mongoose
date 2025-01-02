@@ -8004,6 +8004,36 @@ describe('Model', function() {
     assert.equal(doc.items[0].prop, 42);
   });
 
+  it('does not throw with multiple self-referencing discriminator schemas applied to schema (gh-15120)', async function() {
+    const baseSchema = new Schema({
+      type: { type: Number, required: true }
+    }, { discriminatorKey: 'type' });
+
+    const selfRefSchema = new Schema({
+      self: { type: [baseSchema] }
+    });
+
+    const anotherSelfRefSchema = new Schema({
+      self2: { type: [baseSchema] }
+    });
+
+    baseSchema.discriminator(5, selfRefSchema);
+    baseSchema.discriminator(6, anotherSelfRefSchema);
+    const Test = db.model('Test', baseSchema);
+
+    const doc = await Test.create({
+      type: 5,
+      self: {
+        type: 6,
+        self2: null
+      }
+    });
+    assert.strictEqual(doc.type, 5);
+    assert.equal(doc.self.length, 1);
+    assert.strictEqual(doc.self[0].type, 6);
+    assert.strictEqual(doc.self[0].self2, null);
+  });
+
   it('inserts versionKey even if schema has `toObject.versionKey` set to false (gh-14344)', async function() {
     const schema = new mongoose.Schema(
       { name: String },

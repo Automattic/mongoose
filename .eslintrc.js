@@ -14,7 +14,8 @@ module.exports = {
     '**/docs/js/native.js',
     '!.*',
     'node_modules',
-    '.git'
+    '.git',
+    'data'
   ],
   overrides: [
     {

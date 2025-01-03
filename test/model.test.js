@@ -4885,6 +4885,28 @@ describe('Model', function() {
         assert.deepStrictEqual(indexes.map(index => index.name), ['_id_', 'name_1']);
       });
 
+      it('avoids creating collection if autoCreate: false', async() => {
+        const collectionName = generateRandomCollectionName();
+        const userSchema = new Schema(
+          { name: { type: String, index: true } },
+          { autoIndex: false, autoCreate: false, collation: { locale: 'en_US', strength: 2 } }
+        );
+        const User = db.model('User', userSchema, collectionName);
+
+        // Act
+        await User.syncIndexes();
+
+        // Assert
+        const indexes = await User.listIndexes();
+        assert.deepStrictEqual(indexes.map(index => index.name), ['_id_', 'name_1']);
+
+        const collections = await User.db.listCollections();
+        const collection = collections.find(c => c.name === collectionName);
+        assert.ok(collection);
+        // Collation was not applied because autoCreate was false, so Mongoose did not send `createCollection()`
+        assert.ok(!collection.options.collation);
+      });
+
       it('drops indexes that are not present in schema', async() => {
         // Arrange
         const collectionName = generateRandomCollectionName();

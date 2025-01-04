@@ -1,6 +1,6 @@
-# Integrating with MongoDB [Client Side Field Level Encryption](https://www.mongodb.com/docs/manual/core/csfle/)
+# Integrating with MongoDB Client Side Field Level Encryption
 
-Client Side Field Level Encryption, or CSFLE for short, is a tool for storing your data in an encrypted format in MongoDB.
+[Client Side Field Level Encryption](https://www.mongodb.com/docs/manual/core/csfle/), or CSFLE for short, is a tool for storing your data in an encrypted format in MongoDB.
 For example, instead of storing the `name` property as a plain-text string, CSFLE means MongoDB will store your document with `name` as an encrypted buffer.
 The resulting document will look similar to the following to a client that doesn't have access to decrypt the data.
 

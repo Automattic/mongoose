@@ -9,7 +9,7 @@ try {
     process.exit(-1);
   }
 }
-const axios = require('axios');
+
 const fs = require('fs');
 const mongoose = require('../');
 
@@ -79,12 +79,9 @@ async function run() {
   const jobs = await Job.find().select({ logo: 1, company: 1, title: 1, location: 1, description: 1, url: 1 });
   fs.writeFileSync(`${docsDir}/data/jobs.json`, JSON.stringify(jobs, null, '  '));
 
-  const opencollectiveSponsors = await axios.get('https://opencollective.com/mongoose/members.json').
-    then(res => res.data).
-    then(sponsors => {
-      return sponsors.filter(result => result.tier == 'sponsor' && result.isActive);
-    }).
-    catch(() => null);
+  const opencollectiveSponsors = await fetch('https://opencollective.com/mongoose/members.json')
+    .then(res => res.json())
+    .then(res => res.filter(result => result.tier === 'sponsor' && result.isActive));
 
   for (const sponsor of opencollectiveSponsors) {
     const override = await OpenCollectiveSponsor.findOne({ openCollectiveId: sponsor['MemberId'] });

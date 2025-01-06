@@ -8461,6 +8461,37 @@ describe('Model', function() {
       assert.deepStrictEqual(toDrop, []);
     });
   });
+
+  describe('insertOne() (gh-14843)', function() {
+    it('should insert a new document', async function() {
+      const userSchema = new Schema({
+        name: String
+      });
+      const User = db.model('User', userSchema);
+
+      const res = await User.insertOne({ name: 'John' });
+      assert.ok(res instanceof User);
+
+      const doc = await User.findOne({ _id: res._id });
+      assert.equal(doc.name, 'John');
+    });
+
+    it('should support validateBeforeSave: false option', async function() {
+      const userSchema = new Schema({
+        name: {
+          type: String,
+          required: true
+        }
+      });
+      const User = db.model('User', userSchema);
+
+      const res = await User.insertOne({}, { validateBeforeSave: false });
+      assert.ok(res instanceof User);
+
+      const doc = await User.findOne({ _id: res._id });
+      assert.equal(doc.name, undefined);
+    });
+  });
 });
 
 

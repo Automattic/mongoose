@@ -14225,6 +14225,47 @@ describe('document', function() {
     assert.strictEqual(duplicateKeyError.message, 'Email must be unique');
     assert.strictEqual(duplicateKeyError.cause.code, 11000);
   });
+
+  it('supports global transforms per schematype (gh-15084)', async function () {
+    class SchemaCustomType extends mongoose.SchemaType {
+      static schemaName = 'CustomType';
+
+      constructor(key, options) {
+        super(key, options, 'CustomType');
+      }
+
+      cast(value) {
+        if (value === null) return null;
+        return new CustomType(value);
+      }
+    }
+
+    class CustomType {
+      constructor(value) {
+        this.value = value;
+      }
+    }
+
+    mongoose.Schema.Types.CustomType = SchemaCustomType;
+
+    const Model = db.model(
+      'Test',
+      new mongoose.Schema({
+        value: { type: mongoose.Schema.Types.CustomType },
+      }),
+    );
+
+    const _id = new mongoose.Types.ObjectId('0'.repeat(24));
+    const doc = new Model({ _id });
+    doc.value = 1;
+
+    mongoose.Schema.Types.CustomType.set('transform', v => v == null ? v : v.value);
+
+    assert.deepStrictEqual(doc.toJSON(), { _id, value: 1 });
+    assert.deepStrictEqual(doc.toObject(), { _id, value: 1 });
+
+    delete mongoose.Schema.Types.CustomType;
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

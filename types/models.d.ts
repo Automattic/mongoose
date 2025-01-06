@@ -576,6 +576,8 @@ declare module 'mongoose' {
       Array<MergeType<THydratedDocumentType, Omit<DocContents, '_id'>>>
     >;
 
+    insertOne<DocContents = AnyKeys<TRawDocType>>(doc: DocContents | TRawDocType, options?: SaveOptions): Promise<THydratedDocumentType>;
+
     /**
      * List all [Atlas search indexes](https://www.mongodb.com/docs/atlas/atlas-search/create-index/) on this model's collection.
      * This function only works when connected to MongoDB Atlas.

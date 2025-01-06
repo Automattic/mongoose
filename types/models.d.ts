@@ -35,6 +35,7 @@ declare module 'mongoose' {
   interface MongooseBulkSaveOptions extends mongodb.BulkWriteOptions {
     timestamps?: boolean;
     session?: ClientSession;
+    validateBeforeSave?: boolean;
   }
 
   /**

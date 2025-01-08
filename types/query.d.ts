@@ -223,7 +223,7 @@ declare module 'mongoose' {
   type QueryOpThatReturnsDocument = 'find' | 'findOne' | 'findOneAndUpdate' | 'findOneAndReplace' | 'findOneAndDelete';
 
   type GetLeanResultType<RawDocType, ResultType, QueryOp> = QueryOp extends QueryOpThatReturnsDocument
-    ? (ResultType extends any[] ? Default__v<Require_id<BufferToBinary<FlattenMaps<RawDocType>>>>[] : Default__v<Require_id<BufferToBinary<FlattenMaps<RawDocType>>>>)
+    ? (ResultType extends any[] ? Default__v<Require_id<FlattenMaps<BufferToBinary<RawDocType>>>>[] : Default__v<Require_id<FlattenMaps<BufferToBinary<RawDocType>>>>)
     : ResultType;
 
   type MergePopulatePaths<RawDocType, ResultType, QueryOp, Paths, TQueryHelpers, TDocOverrides = Record<string, never>> = QueryOp extends QueryOpThatReturnsDocument

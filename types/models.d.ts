@@ -576,6 +576,11 @@ declare module 'mongoose' {
       Array<MergeType<THydratedDocumentType, Omit<DocContents, '_id'>>>
     >;
 
+    /**
+     * Shortcut for saving one document to the database.
+     * `MyModel.insertOne(obj, options)` is almost equivalent to `new MyModel(obj).save(options)`.
+     * The difference is that `insertOne()` checks if `obj` is already a document, and checks for discriminators.
+     */
     insertOne<DocContents = AnyKeys<TRawDocType>>(doc: DocContents | TRawDocType, options?: SaveOptions): Promise<THydratedDocumentType>;
 
     /**

@@ -104,7 +104,7 @@ module.exports = {
     // 'markdown'
   ],
   parserOptions: {
-    ecmaVersion: 2020
+    ecmaVersion: 2022
   },
   env: {
     node: true,

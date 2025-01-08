@@ -14226,10 +14226,8 @@ describe('document', function() {
     assert.strictEqual(duplicateKeyError.cause.code, 11000);
   });
 
-  it('supports global transforms per schematype (gh-15084)', async function () {
+  it('supports global transforms per schematype (gh-15084)', async function() {
     class SchemaCustomType extends mongoose.SchemaType {
-      static schemaName = 'CustomType';
-
       constructor(key, options) {
         super(key, options, 'CustomType');
       }
@@ -14239,6 +14237,7 @@ describe('document', function() {
         return new CustomType(value);
       }
     }
+    SchemaCustomType.schemaName = 'CustomType';
 
     class CustomType {
       constructor(value) {
@@ -14251,8 +14250,8 @@ describe('document', function() {
     const Model = db.model(
       'Test',
       new mongoose.Schema({
-        value: { type: mongoose.Schema.Types.CustomType },
-      }),
+        value: { type: mongoose.Schema.Types.CustomType }
+      })
     );
 
     const _id = new mongoose.Types.ObjectId('0'.repeat(24));

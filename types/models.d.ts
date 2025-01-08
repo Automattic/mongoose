@@ -577,6 +577,13 @@ declare module 'mongoose' {
     >;
 
     /**
+     * Shortcut for saving one document to the database.
+     * `MyModel.insertOne(obj, options)` is almost equivalent to `new MyModel(obj).save(options)`.
+     * The difference is that `insertOne()` checks if `obj` is already a document, and checks for discriminators.
+     */
+    insertOne<DocContents = AnyKeys<TRawDocType>>(doc: DocContents | TRawDocType, options?: SaveOptions): Promise<THydratedDocumentType>;
+
+    /**
      * List all [Atlas search indexes](https://www.mongodb.com/docs/atlas/atlas-search/create-index/) on this model's collection.
      * This function only works when connected to MongoDB Atlas.
      */

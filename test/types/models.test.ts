@@ -988,3 +988,13 @@ async function gh14802() {
   const conn2 = mongoose.createConnection('mongodb://127.0.0.1:27017/mongoose_test');
   Model.useConnection(conn2);
 }
+
+async function gh14843() {
+  const schema = new mongoose.Schema({
+    name: String
+  });
+  const Model = model('Test', schema);
+
+  const doc = await Model.insertOne({ name: 'taco' });
+  expectType<ReturnType<(typeof Model)['hydrate']>>(doc);
+}

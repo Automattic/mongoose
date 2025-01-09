@@ -3320,4 +3320,123 @@ describe('schema', function() {
       sinon.restore();
     }
   });
+
+  describe('jsonSchema() (gh-11162)', function() {
+    it('handles basic example with only top-level keys', async function() {
+      const schema = new Schema({
+        name: { type: String, required: true },
+        age: Number,
+        ageSource: {
+          type: String,
+          required: function() { return this.age != null; },
+          enum: ['document', 'self-reported']
+        }
+      }, { autoCreate: false, autoIndex: false });
+
+      assert.deepStrictEqual(schema.jsonSchema({ useBsonType: true }), {
+        required: ['name', '_id'],
+        properties: {
+          _id: {
+            bsonType: 'objectId'
+          },
+          name: {
+            bsonType: 'string'
+          },
+          age: {
+            bsonType: ['number', 'null']
+          },
+          ageSource: {
+            bsonType: ['string', 'null'],
+            enum: ['document', 'self-reported', null]
+          }
+        }
+      });
+
+      assert.deepStrictEqual(schema.jsonSchema(), {
+        required: ['name', '_id'],
+        properties: {
+          _id: {
+            type: 'string'
+          },
+          name: {
+            type: 'string'
+          },
+          age: {
+            type: ['number', 'null']
+          },
+          ageSource: {
+            type: ['string', 'null'],
+            enum: ['document', 'self-reported', null]
+          }
+        }
+      });
+
+      const collectionName = 'gh11162';
+      try {
+        await db.createCollection(collectionName, {
+          validator: {
+            $jsonSchema: schema.jsonSchema({ useBsonType: true })
+          }
+        });
+        const Test = db.model('Test', schema, collectionName);
+
+        const doc1 = await Test.create({ name: 'Taco' });
+        assert.equal(doc1.name, 'Taco');
+
+        const doc2 = await Test.create({ name: 'Billy', age: null, ageSource: null });
+        assert.equal(doc2.name, 'Billy');
+        assert.strictEqual(doc2.age, null);
+        assert.strictEqual(doc2.ageSource, null);
+
+        const doc3 = await Test.create({ name: 'John', age: 30, ageSource: 'document' });
+        assert.equal(doc3.name, 'John');
+        assert.equal(doc3.age, 30);
+        assert.equal(doc3.ageSource, 'document');
+
+        await assert.rejects(
+          Test.create([{ name: 'Foobar', age: null, ageSource: 'something else' }], { validateBeforeSave: false }),
+          /MongoServerError: Document failed validation/
+        );
+
+        await assert.rejects(
+          Test.create([{}], { validateBeforeSave: false }),
+          /MongoServerError: Document failed validation/
+        );
+      } finally {
+        await db.dropCollection(collectionName);
+      }
+    });
+
+    it('handles nested paths, subdocuments, and document arrays', async function() {
+      const schema = new Schema({
+        name: {
+          first: String,
+          last: { type: String, required: true }
+        },
+        /* subdoc: new Schema({
+          prop: Number
+        }),
+        docArr: [{ field: Date }] */
+      });
+
+      assert.deepStrictEqual(schema.jsonSchema({ useBsonType: true }), {
+        required: ['_id'],
+        properties: {
+          name: {
+            bsonType: ['object', 'null'],
+            required: ['last'],
+            properties: {
+              first: {
+                bsonType: ['string', 'null']
+              },
+              last: {
+                bsonType: 'string'
+              }
+            }
+          },
+          _id: { bsonType: 'objectId' }
+        }
+      });
+    });
+  });
 });

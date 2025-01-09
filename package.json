@@ -104,7 +104,7 @@
     "test-deno": "deno run --allow-env --allow-read --allow-net --allow-run --allow-sys --allow-write ./test/deno.js",
     "test-rs": "START_REPLICA_SET=1 mocha --timeout 30000 --exit ./test/*.test.js",
     "test-tsd": "node ./test/types/check-types-filename && tsd",
-    "test-encryption": "bash scripts/run-encryption-tests.sh",
+    "test-encryption": "bash scripts/configure-cluster-with-encryption.sh &&  mocha --exit ./test/encryption/*.test.js && npm uninstall mongodb-client-encryption > /dev/null",
     "tdd": "mocha ./test/*.test.js --inspect --watch --recursive --watch-files ./**/*.{js,ts}",
     "test-coverage": "nyc --reporter=html --reporter=text npm test",
     "ts-benchmark": "cd ./benchmarks/typescript/simple && npm install && npm run benchmark | node ../../../scripts/tsc-diagnostics-check"

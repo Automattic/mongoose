@@ -625,12 +625,12 @@ describe('document', function() {
     assert.equal(doc.val, 'test2');
   });
 
-  it('allows you to skip validation on save (gh-2981)', function() {
+  it('allows you to skip validation on save (gh-2981)', async function() {
     const schema = new Schema({ name: { type: String, required: true } });
     const MyModel = db.model('Test', schema);
 
     const doc = new MyModel();
-    return doc.save({ validateBeforeSave: false });
+    await doc.save({ validateBeforeSave: false });
   });
 
   it('doesnt use custom toObject options on save', async function() {
@@ -3088,6 +3088,51 @@ describe('document', function() {
       assert.strictEqual(foundDoc.array[0].isNew, false);
       assert.strictEqual(foundDoc.array[1].isNew, false);
       assert.strictEqual(nestedModel.isNew, false);
+    });
+
+    it('manual populattion with ref function (gh-15138)', async function() {
+      const userSchema = new mongoose.Schema({
+        username: { type: String },
+        phone: { type: mongoose.Schema.Types.ObjectId, ref: 'phones' }
+      });
+
+      const userSchemaWithFunc = new mongoose.Schema({
+        username: { type: String },
+        phone: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: function() {
+            return 'phones';
+          }
+        }
+      });
+
+      const phoneSchema = new mongoose.Schema({
+        phoneNumber: { type: String },
+        extension: { type: String }
+      });
+
+      const User = db.model('users', userSchema);
+      const UserWithFunc = db.model('usersWithFunc', userSchemaWithFunc);
+      const Phone = db.model('phones', phoneSchema);
+
+      const phone = await Phone.create({
+        phoneNumber: '123456789',
+        extension: '123'
+      });
+
+      const user = await User.create({
+        username: 'John Doe',
+        phone
+      });
+
+      const userWithFunc = await UserWithFunc.create({
+        username: 'John Doe',
+        phone
+      });
+
+      assert.ok(user.populated('phone'));
+      assert.ok(userWithFunc.populated('phone'));
+      assert.equal(userWithFunc.phone.extension, '123');
     });
 
     it('manual population with refPath (gh-7070)', async function() {
@@ -12707,6 +12752,16 @@ describe('document', function() {
     assert.equal(updatedPerson?._age, 61);
   });
 
+  it('bulkSave() allows skipping validation with validateBeforeSave (gh-15156)', async() => {
+    const schema = new Schema({ name: { type: String, required: true } });
+    const MyModel = db.model('Test', schema);
+
+    const doc = new MyModel();
+    await MyModel.bulkSave([doc], { validateBeforeSave: false });
+
+    assert.ok(await MyModel.exists({ _id: doc._id }));
+  });
+
   it('handles default embedded discriminator values (gh-13835)', async function() {
     const childAbstractSchema = new Schema(
       { kind: { type: Schema.Types.String, enum: ['concreteKind'], required: true, default: 'concreteKind' } },
@@ -14190,4 +14245,3 @@ describe('Check if instance function that is supplied in schema option is availa
     assert.equal(TestDocument.instanceFn(), 'Returned from DocumentInstanceFn');
   });
 });
-

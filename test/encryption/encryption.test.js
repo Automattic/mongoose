@@ -1,12 +1,31 @@
 'use strict';
 
 const assert = require('assert');
-const mdb = require('mongodb');
+const mongodb = require('mongodb');
+const fs = require('fs');
 const isBsonType = require('../../lib/helpers/isBsonType');
 
 const LOCAL_KEY = Buffer.from('Mng0NCt4ZHVUYUJCa1kxNkVyNUR1QURhZ2h2UzR2d2RrZzh0cFBwM3R6NmdWMDFBMUN3YkQ5aXRRMkhGRGdQV09wOGVNYUMxT2k3NjZKelhaQmRCZGJkTXVyZG9uSjFk', 'base64');
 
 describe('ci', () => {
+
+  const cachedUri = process.env.MONGOOSE_TEST_URI;
+  const cachedLib = process.env.CRYPT_SHARED_LIB_PATH;
+
+  before(function() {
+    const cwd = process.cwd();
+    const file = fs.readFileSync(cwd + '/data/mo-expansion.yml', { encoding: 'utf-8' }).trim().split('\n');
+    const regex = /^(?<key>.*): "(?<value>.*)"$/;
+    const variables = file.map((line) => regex.exec(line.trim()).groups).reduce((acc, { key, value }) => ({ ...acc, [key]: value }), {});
+    process.env.CRYPT_SHARED_LIB_PATH = variables.CRYPT_SHARED_LIB_PATH;
+    process.env.MONGOOSE_TEST_URI = variables.MONGODB_URI;
+  });
+
+  after(function() {
+    process.env.CRYPT_SHARED_LIB_PATH = cachedLib;
+    process.env.MONGOOSE_TEST_URI = cachedUri;
+  });
+
   describe('environmental variables', () => {
     it('MONGOOSE_TEST_URI is set', async function() {
       const uri = process.env.MONGOOSE_TEST_URI;
@@ -26,16 +45,16 @@ describe('ci', () => {
     let unencryptedClient;
 
     beforeEach(async function() {
-      keyVaultClient = new mdb.MongoClient(process.env.MONGOOSE_TEST_URI);
+      keyVaultClient = new mongodb.MongoClient(process.env.MONGOOSE_TEST_URI);
       await keyVaultClient.connect();
       await keyVaultClient.db('keyvault').collection('datakeys');
-      const clientEncryption = new mdb.ClientEncryption(keyVaultClient, {
+      const clientEncryption = new mongodb.ClientEncryption(keyVaultClient, {
         keyVaultNamespace: 'keyvault.datakeys',
         kmsProviders: { local: { key: LOCAL_KEY } }
       });
       dataKey = await clientEncryption.createDataKey('local');
 
-      encryptedClient = new mdb.MongoClient(
+      encryptedClient = new mongodb.MongoClient(
         process.env.MONGOOSE_TEST_URI,
         {
           autoEncryption: {
@@ -66,7 +85,7 @@ describe('ci', () => {
         }
       );
 
-      unencryptedClient = new mdb.MongoClient(process.env.MONGOOSE_TEST_URI);
+      unencryptedClient = new mongodb.MongoClient(process.env.MONGOOSE_TEST_URI);
     });
 
     afterEach(async function() {

@@ -31,7 +31,5 @@ jobs:
           node-version: latest
       - name: Install Dependencies
         run: npm install
-      - name: Install mongodb-client-encryption
-        run: npm install mongodb-client-encryption
       - name: Run Tests
         run: npm run test-encryption

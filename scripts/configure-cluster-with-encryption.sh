@@ -8,6 +8,9 @@ export CWD=$(pwd);
 mkdir data
 cd data
 
+# install encryption dependency
+npm install mongodb-client-encryption > /dev/null
+
 # note: 
   # we're using drivers-evergreen-tools which is a repo used by MongoDB drivers to start clusters for testing.  
   # if you'd like to make changes to the cluster settings, edit the exported variables below.

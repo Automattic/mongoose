@@ -323,3 +323,29 @@ async function gh15122() {
     testFn(parentDoc);
   }
 }
+
+async function gh15158() {
+  type FooBar = {
+    value: string;
+  };
+
+  const createSomeModelAndDoSomething = async <T extends FooBar>() => {
+    const TestSchema = new Schema<T>({
+      value: { type: String }
+    });
+
+    const FooBarModel = model<T>('test', TestSchema);
+
+    const item = await FooBarModel.findOne().lean();
+
+    if (!item) return;
+
+    doSomeThing(item);
+  };
+
+  const doSomeThing = <T extends FooBar>(item: T) => {
+    console.log(item);
+  };
+
+  createSomeModelAndDoSomething();
+}

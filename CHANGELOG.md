@@ -5,7 +5,7 @@
  * fix(model): allow passing validateBeforeSave option to bulkSave() to skip validation #15161 #15156
  * fix(schema): allow multiple self-referencing discriminator schemas using Schema.prototype.discriminator #15142 #15120
  * types: avoid BufferToBinary<> wiping lean types when passed to generic functions #15160 #15158
- * docs: fix <code> in header ids #15159
+ * docs: fix `<code>` in header ids #15159
  * docs: fix header in field-level-encryption.md #15137 [damieng](https://github.com/damieng)
 
 8.9.3 / 2024-12-30

@@ -259,7 +259,7 @@ describe('cast: ', function() {
 
   it('treats unknown operators as passthrough (gh-15170)', function() {
     const schema = new Schema({ x: Boolean });
-    assert.deepEqual(cast(schema, { x: { $someConditional: true } }),
+    assert.deepEqual(cast(schema, { x: { $someConditional: 'true' } }),
       { x: { $someConditional: true } });
   });
 });

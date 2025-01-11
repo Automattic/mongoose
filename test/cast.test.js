@@ -123,6 +123,12 @@ describe('cast: ', function() {
         { x: { $bitsAnyClear: Buffer.from([3]) } });
     });
 
+    it('with int32 (gh-15170)', function() {
+      const schema = new Schema({ x: 'Int32' });
+      assert.deepEqual(cast(schema, { x: { $bitsAnySet: 3 } }),
+        { x: { $bitsAnySet: 3 } });
+    });
+
     it('throws when invalid', function() {
       const schema = new Schema({ x: Number });
       assert.throws(function() {
@@ -249,5 +255,11 @@ describe('cast: ', function() {
       'state.type': { $in: ['FOO'] },
       'state.fieldFoo': '44'
     });
+  });
+
+  it('treats unknown operators as passthrough (gh-15170)', function() {
+    const schema = new Schema({ x: Boolean });
+    assert.deepEqual(cast(schema, { x: { $someConditional: true } }),
+      { x: { $someConditional: true } });
   });
 });

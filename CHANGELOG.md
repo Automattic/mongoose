@@ -1,3 +1,8 @@
+8.9.5 / 2025-01-13
+==================
+ * fix: disallow nested $where in populate match
+ * fix(schema): handle bitwise operators on Int32 #15176 #15170
+
 7.8.4 / 2025-01-13
 ===================
  * fix: disallow nested $where in populate match

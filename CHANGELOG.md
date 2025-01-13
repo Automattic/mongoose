@@ -1,3 +1,11 @@
+7.8.4 / 2025-01-13
+===================
+ * fix: disallow nested $where in populate match
+
+6.13.6 / 2025-01-13
+===================
+ * fix: disallow nested $where in populate match
+
 8.9.4 / 2025-01-09
 ==================
  * fix(document): fix document not applying manual populate when using a function in schema.options.ref #15138 [IchirokuXVI](https://github.com/IchirokuXVI)

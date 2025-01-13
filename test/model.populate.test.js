@@ -4195,21 +4195,34 @@ describe('model: populate:', function() {
         const parent = await Parent.create({ name: 'Anakin', child: child._id });
 
         await assert.rejects(
-          () => Parent.findOne().populate({ path: 'child', match: { $where: 'console.log("oops!");' } }),
+          () => Parent.findOne().populate({ path: 'child', match: () => ({ $where: 'typeof console !== "undefined" ? doesNotExist("foo") : true;' }) }),
           /Cannot use \$where filter with populate\(\) match/
         );
         await assert.rejects(
-          () => Parent.find().populate({ path: 'child', match: { $where: 'console.log("oops!");' } }),
+          () => Parent.find().populate({ path: 'child', match: () => ({ $where: 'typeof console !== "undefined" ? doesNotExist("foo") : true;' }) }),
           /Cannot use \$where filter with populate\(\) match/
         );
         await assert.rejects(
-          () => parent.populate({ path: 'child', match: { $where: 'console.log("oops!");' } }),
+          () => parent.populate({ path: 'child', match: () => ({ $where: 'typeof console !== "undefined" ? doesNotExist("foo") : true;' }) }),
           /Cannot use \$where filter with populate\(\) match/
         );
         await assert.rejects(
-          () => Child.find().populate({ path: 'parent', match: { $where: 'console.log("oops!");' } }),
+          () => Child.find().populate({ path: 'parent', match: () => ({ $where: 'typeof console !== "undefined" ? doesNotExist("foo") : true;' }) }),
           /Cannot use \$where filter with populate\(\) match/
         );
+        await assert.rejects(
+          () => Child.find().populate({ path: 'parent', match: () => ({ $or: [{ $where: 'typeof console !== "undefined" ? doesNotExist("foo") : true;' }] }) }),
+          /Cannot use \$where filter with populate\(\) match/
+        );
+        await assert.rejects(
+          () => Child.find().populate({ path: 'parent', match: () => ({ $and: [{ $where: 'typeof console !== "undefined" ? doesNotExist("foo") : true;' }] }) }),
+          /Cannot use \$where filter with populate\(\) match/
+        );
+
+        class MyClass {}
+        MyClass.prototype.$where = 'typeof console !== "undefined" ? doesNotExist("foo") : true;';
+        // OK because sift only looks through own properties
+        await Child.find().populate({ path: 'parent', match: () => new MyClass() });
       });
 
       it('multiple source docs', function(done) {

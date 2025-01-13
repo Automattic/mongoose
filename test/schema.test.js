@@ -3526,5 +3526,127 @@ describe('schema', function() {
       assert.ok(validate({ _id: 'test', name: { last: 'James' }, subdoc: {} }));
       assert.ok(validate({ _id: 'test', name: { first: 'Mike', last: 'James' }, subdoc: { prop: 42 } }));
     });
+
+    it('handles maps', async function() {
+      const schema = new Schema({
+        props: {
+          type: Map,
+          of: String,
+          required: true
+        },
+        subdocs: {
+          type: Map,
+          of: new Schema({
+            name: String,
+            age: { type: Number, required: true }
+          }, { _id: false })
+        },
+        nested: {
+          myMap: {
+            type: Map,
+            of: Number
+          }
+        }
+      });
+
+      assert.deepStrictEqual(schema.jsonSchema({ useBsonType: true }), {
+        required: ['props', '_id'],
+        properties: {
+          props: {
+            bsonType: 'object',
+            additionalProperties: {
+              bsonType: ['string', 'null']
+            }
+          },
+          subdocs: {
+            bsonType: ['object', 'null'],
+            additionalProperties: {
+              bsonType: ['object', 'null'],
+              required: ['age'],
+              properties: {
+                name: { bsonType: ['string', 'null'] },
+                age: { bsonType: 'number' }
+              }
+            }
+          },
+          nested: {
+            bsonType: ['object', 'null'],
+            properties: {
+              myMap: {
+                bsonType: ['object', 'null'],
+                additionalProperties: {
+                  bsonType: ['number', 'null']
+                }
+              }
+            }
+          },
+          _id: { bsonType: 'objectId' }
+        }
+      });
+
+      await db.createCollection(collectionName, {
+        validator: {
+          $jsonSchema: schema.jsonSchema({ useBsonType: true })
+        }
+      });
+      const Test = db.model('Test', schema, collectionName);
+
+      await Test.create({
+        props: new Map([['key', 'value']]),
+        subdocs: {
+          captain: {
+            name: 'Jean-Luc Picard',
+            age: 59
+          }
+        },
+        nested: {
+          myMap: {
+            answer: 42
+          }
+        }
+      });
+
+      await assert.rejects(
+        Test.create([{
+          props: new Map([['key', 'value']]),
+          subdocs: {
+            captain: {}
+          }
+        }], { validateBeforeSave: false }),
+        /MongoServerError: Document failed validation/
+      );
+
+      const ajv = new Ajv();
+      const validate = ajv.compile(schema.jsonSchema());
+
+      assert.ok(validate({
+        _id: 'test',
+        props: { someKey: 'someValue' },
+        subdocs: {
+          captain: {
+            name: 'Jean-Luc Picard',
+            age: 59
+          }
+        },
+        nested: {
+          myMap: {
+            answer: 42
+          }
+        }
+      }));
+      assert.ok(!validate({
+        props: { key: 'value' },
+        subdocs: {
+          captain: {}
+        }
+      }));
+      assert.ok(!validate({
+        nested: {
+          myMap: {
+            answer: 'not a number'
+          }
+        }
+      }));
+    });
   });
 });

@@ -3322,6 +3322,12 @@ describe('schema', function() {
   });
 
   describe('jsonSchema() (gh-11162)', function() {
+    const collectionName = 'gh11162';
+
+    afterEach(async function() {
+      await db.dropCollection(collectionName);
+    });
+
     it('handles basic example with only top-level keys', async function() {
       const schema = new Schema({
         name: { type: String, required: true },
@@ -3371,45 +3377,41 @@ describe('schema', function() {
         }
       });
 
-      const collectionName = 'gh11162';
-      try {
-        await db.createCollection(collectionName, {
-          validator: {
-            $jsonSchema: schema.jsonSchema({ useBsonType: true })
-          }
-        });
-        const Test = db.model('Test', schema, collectionName);
+      await db.createCollection(collectionName, {
+        validator: {
+          $jsonSchema: schema.jsonSchema({ useBsonType: true })
+        }
+      });
+      const Test = db.model('Test', schema, collectionName);
 
-        const doc1 = await Test.create({ name: 'Taco' });
-        assert.equal(doc1.name, 'Taco');
+      const doc1 = await Test.create({ name: 'Taco' });
+      assert.equal(doc1.name, 'Taco');
 
-        const doc2 = await Test.create({ name: 'Billy', age: null, ageSource: null });
-        assert.equal(doc2.name, 'Billy');
-        assert.strictEqual(doc2.age, null);
-        assert.strictEqual(doc2.ageSource, null);
+      const doc2 = await Test.create({ name: 'Billy', age: null, ageSource: null });
+      assert.equal(doc2.name, 'Billy');
+      assert.strictEqual(doc2.age, null);
+      assert.strictEqual(doc2.ageSource, null);
 
-        const doc3 = await Test.create({ name: 'John', age: 30, ageSource: 'document' });
-        assert.equal(doc3.name, 'John');
-        assert.equal(doc3.age, 30);
-        assert.equal(doc3.ageSource, 'document');
+      const doc3 = await Test.create({ name: 'John', age: 30, ageSource: 'document' });
+      assert.equal(doc3.name, 'John');
+      assert.equal(doc3.age, 30);
+      assert.equal(doc3.ageSource, 'document');
 
-        await assert.rejects(
-          Test.create([{ name: 'Foobar', age: null, ageSource: 'something else' }], { validateBeforeSave: false }),
-          /MongoServerError: Document failed validation/
-        );
+      await assert.rejects(
+        Test.create([{ name: 'Foobar', age: null, ageSource: 'something else' }], { validateBeforeSave: false }),
+        /MongoServerError: Document failed validation/
+      );
 
-        await assert.rejects(
-          Test.create([{}], { validateBeforeSave: false }),
-          /MongoServerError: Document failed validation/
-        );
-      } finally {
-        await db.dropCollection(collectionName);
-      }
+      await assert.rejects(
+        Test.create([{}], { validateBeforeSave: false }),
+        /MongoServerError: Document failed validation/
+      );
     });
 
     it('handles arrays and document arrays', async function() {
       const schema = new Schema({
         tags: [String],
+        coordinates: [[{ type: Number, required: true }]],
         docArr: [new Schema({ field: Date }, { _id: false })]
       });
 
@@ -3422,11 +3424,19 @@ describe('schema', function() {
               bsonType: ['string', 'null']
             }
           },
+          coordinates: {
+            bsonType: ['array', 'null'],
+            items: {
+              bsonType: ['array', 'null'],
+              items: {
+                bsonType: ['number']
+              }
+            }
+          },
           docArr: {
             bsonType: ['array', 'null'],
             items: {
               bsonType: ['object', 'null'],
-              required: [],
               properties: {
                 field: { bsonType: ['date', 'null'] }
               }
@@ -3435,6 +3445,18 @@ describe('schema', function() {
           _id: { bsonType: 'objectId' }
         }
       });
+
+      await db.createCollection(collectionName, {
+        validator: {
+          $jsonSchema: schema.jsonSchema({ useBsonType: true })
+        }
+      });
+      const Test = db.model('Test', schema, collectionName);
+
+      const now = new Date();
+      await Test.create({ tags: ['javascript'], coordinates: [[0, 0]], docArr: [{ field: now }] });
+
+      await Test.create({ tags: 'javascript', coordinates: [[0, 0]], docArr: [{}] });
     });
 
     it('handles nested paths and subdocuments', async function() {
@@ -3461,7 +3483,6 @@ describe('schema', function() {
           },
           subdoc: {
             bsonType: ['object', 'null'],
-            required: [],
             properties: {
               prop: {
                 bsonType: ['number', 'null']
@@ -3471,6 +3492,16 @@ describe('schema', function() {
           _id: { bsonType: 'objectId' }
         }
       });
+
+      await db.createCollection(collectionName, {
+        validator: {
+          $jsonSchema: schema.jsonSchema({ useBsonType: true })
+        }
+      });
+      const Test = db.model('Test', schema, collectionName);
+
+      await Test.create({ name: { last: 'James' }, subdoc: {} });
+      await Test.create({ name: { first: 'Mike', last: 'James' }, subdoc: { prop: 42 } });
     });
   });
 });

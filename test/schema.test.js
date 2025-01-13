@@ -3407,16 +3407,45 @@ describe('schema', function() {
       }
     });
 
-    it('handles nested paths, subdocuments, and document arrays', async function() {
+    it('handles arrays and document arrays', async function() {
+      const schema = new Schema({
+        tags: [String],
+        docArr: [new Schema({ field: Date }, { _id: false })]
+      });
+
+      assert.deepStrictEqual(schema.jsonSchema({ useBsonType: true }), {
+        required: ['_id'],
+        properties: {
+          tags: {
+            bsonType: ['array', 'null'],
+            items: {
+              bsonType: ['string', 'null']
+            }
+          },
+          docArr: {
+            bsonType: ['array', 'null'],
+            items: {
+              bsonType: ['object', 'null'],
+              required: [],
+              properties: {
+                field: { bsonType: ['date', 'null'] }
+              }
+            }
+          },
+          _id: { bsonType: 'objectId' }
+        }
+      });
+    });
+
+    it('handles nested paths and subdocuments', async function() {
       const schema = new Schema({
         name: {
           first: String,
           last: { type: String, required: true }
         },
-        /* subdoc: new Schema({
+        subdoc: new Schema({
           prop: Number
-        }),
-        docArr: [{ field: Date }] */
+        }, { _id: false })
       });
 
       assert.deepStrictEqual(schema.jsonSchema({ useBsonType: true }), {
@@ -3426,11 +3455,16 @@ describe('schema', function() {
             bsonType: ['object', 'null'],
             required: ['last'],
             properties: {
-              first: {
-                bsonType: ['string', 'null']
-              },
-              last: {
-                bsonType: 'string'
+              first: { bsonType: ['string', 'null'] },
+              last: { bsonType: 'string' }
+            }
+          },
+          subdoc: {
+            bsonType: ['object', 'null'],
+            required: [],
+            properties: {
+              prop: {
+                bsonType: ['number', 'null']
               }
             }
           },

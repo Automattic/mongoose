@@ -1,3 +1,7 @@
+6.13.6 / 2025-01-13
+===================
+ * fix: disallow nested $where in populate match
+
 6.13.5 / 2024-11-26
 ===================
  * fix: disallow using $where in match

@@ -35,6 +35,7 @@
     "acquit": "1.3.0",
     "acquit-ignore": "0.2.1",
     "acquit-require": "0.1.1",
+    "ajv": "8.17.1",
     "assert-browserify": "2.0.0",
     "babel-loader": "8.2.5",
     "broken-link-checker": "^0.7.8",

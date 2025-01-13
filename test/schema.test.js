@@ -6,6 +6,7 @@
 
 const start = require('./common');
 
+const Ajv = require('ajv');
 const mongoose = start.mongoose;
 const assert = require('assert');
 const sinon = require('sinon');
@@ -3359,6 +3360,7 @@ describe('schema', function() {
       });
 
       assert.deepStrictEqual(schema.jsonSchema(), {
+        type: 'object',
         required: ['name', '_id'],
         properties: {
           _id: {
@@ -3406,6 +3408,15 @@ describe('schema', function() {
         Test.create([{}], { validateBeforeSave: false }),
         /MongoServerError: Document failed validation/
       );
+
+      const ajv = new Ajv();
+      const validate = ajv.compile(schema.jsonSchema());
+
+      assert.ok(validate({ _id: 'test', name: 'Taco' }));
+      assert.ok(validate({ _id: 'test', name: 'Billy', age: null, ageSource: null }));
+      assert.ok(validate({ _id: 'test', name: 'John', age: 30, ageSource: 'document' }));
+      assert.ok(!validate({ _id: 'test', name: 'Foobar', age: null, ageSource: 'something else' }));
+      assert.ok(!validate({}));
     });
 
     it('handles arrays and document arrays', async function() {
@@ -3457,6 +3468,12 @@ describe('schema', function() {
       await Test.create({ tags: ['javascript'], coordinates: [[0, 0]], docArr: [{ field: now }] });
 
       await Test.create({ tags: 'javascript', coordinates: [[0, 0]], docArr: [{}] });
+
+      const ajv = new Ajv();
+      const validate = ajv.compile(schema.jsonSchema());
+
+      assert.ok(validate({ _id: 'test', tags: ['javascript'], coordinates: [[0, 0]], docArr: [{ field: '2023-07-16' }] }));
+      assert.ok(validate({ _id: 'test', tags: ['javascript'], coordinates: [[0, 0]], docArr: [{}] }));
     });
 
     it('handles nested paths and subdocuments', async function() {
@@ -3502,6 +3519,12 @@ describe('schema', function() {
 
       await Test.create({ name: { last: 'James' }, subdoc: {} });
       await Test.create({ name: { first: 'Mike', last: 'James' }, subdoc: { prop: 42 } });
+
+      const ajv = new Ajv();
+      const validate = ajv.compile(schema.jsonSchema());
+
+      assert.ok(validate({ _id: 'test', name: { last: 'James' }, subdoc: {} }));
+      assert.ok(validate({ _id: 'test', name: { first: 'Mike', last: 'James' }, subdoc: { prop: 42 } }));
     });
   });
 });

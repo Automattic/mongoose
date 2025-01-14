@@ -9,13 +9,13 @@ declare module 'mongoose' {
   const connections: Connection[];
 
   /** Opens Mongoose's default connection to MongoDB, see [connections docs](https://mongoosejs.com/docs/connections.html) */
-  function connect(uri: string, options?: ConnectOptions): Promise<Mongoose>;
+  export function connect(uri: string, options?: ConnectOptions): Promise<Mongoose>;
 
   /** Creates a Connection instance. */
-  function createConnection(uri: string, options?: ConnectOptions): Connection;
-  function createConnection(): Connection;
+  export function createConnection(uri: string, options?: ConnectOptions): Connection;
+  export function createConnection(): Connection;
 
-  function disconnect(): Promise<void>;
+  export function disconnect(): Promise<void>;
 
   /**
    * Connection ready state

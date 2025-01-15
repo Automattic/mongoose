@@ -17,6 +17,7 @@
     "orm",
     "db"
   ],
+  "type": "commonjs",
   "license": "MIT",
   "dependencies": {
     "bson": "^6.10.1",

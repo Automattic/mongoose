@@ -3546,6 +3546,10 @@ describe('schema', function() {
             type: Map,
             of: Number
           }
+        },
+        arrs: {
+          type: Map,
+          of: [String]
         }
       });
 
@@ -3576,6 +3580,18 @@ describe('schema', function() {
                 bsonType: ['object', 'null'],
                 additionalProperties: {
                   bsonType: ['number', 'null']
+                }
+              }
+            }
+          },
+          arrs: {
+            bsonType: ['object', 'null'],
+            additionalProperties: {
+              bsonType: ['array', 'null'],
+              items: {
+                bsonType: ['object', 'null'],
+                additionalProperties: {
+                  bsonType: ['string', 'null']
                 }
               }
             }

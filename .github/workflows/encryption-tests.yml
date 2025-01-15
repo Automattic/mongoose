@@ -33,5 +33,7 @@ jobs:
         run: npm install
       - name: Install mongodb-client-encryption
         run: npm install mongodb-client-encryption
+      - name: Setup Tests
+        run: npm run setup-test-encryption
       - name: Run Tests
         run: npm run test-encryption

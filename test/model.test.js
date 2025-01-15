@@ -4125,6 +4125,100 @@ describe('Model', function() {
         assert.equal(err.validationErrors[0].errors['num'].name, 'CastError');
       });
 
+      it('handles array filters (gh-14978)', async function() {
+        const embedDiscriminatorSchema = new mongoose.Schema({
+          field1: String
+        });
+
+        const embedSchema = new mongoose.Schema({
+          field: String,
+          key: String
+        }, { discriminatorKey: 'key' });
+        embedSchema.discriminator('Type1', embedDiscriminatorSchema);
+
+        const testSchema = new mongoose.Schema({
+          testArray: [embedSchema]
+        });
+        const TestModel = db.model('Test', testSchema);
+
+        const test = new TestModel({
+          testArray: [{
+            key: 'Type1',
+            field: 'field',
+            field1: 'field1'
+          }]
+        });
+        const r1 = await test.save();
+        assert.equal(r1.testArray[0].field1, 'field1');
+
+        const field1update = 'field1 update';
+        await TestModel.bulkWrite([{
+          updateOne: {
+            filter: { _id: r1._id },
+            update: {
+              $set: {
+                'testArray.$[element].field1': field1update,
+                'testArray.$[element].nonexistentProp': field1update
+              }
+            },
+            arrayFilters: [
+              {
+                'element._id': r1.testArray[0]._id,
+                'element.key': 'Type1'
+              }
+            ]
+          }
+        }]);
+        const r2 = await TestModel.findById(r1._id).lean();
+        assert.equal(r2.testArray[0].field1, field1update);
+        assert.strictEqual(r2.testArray[0].nonexistentProp, undefined);
+      });
+
+      it('handles overwriteDiscriminatorKey (gh-15040)', async function() {
+        const dSchema1 = new mongoose.Schema({
+          field1: String
+        });
+        const dSchema2 = new mongoose.Schema({
+          field2: String
+        });
+        const baseSchema = new mongoose.Schema({
+          field: String,
+          key: String
+        }, { discriminatorKey: 'key' });
+        const type1Key = 'Type1';
+        const type2Key = 'Type2';
+
+        baseSchema.discriminator(type1Key, dSchema1);
+        baseSchema.discriminator(type2Key, dSchema2);
+
+        const TestModel = db.model('Test', baseSchema);
+
+        const test = new TestModel({
+          field: 'base field',
+          key: type1Key,
+          field1: 'field1'
+        });
+        const r1 = await test.save();
+        assert.equal(r1.field1, 'field1');
+        assert.equal(r1.key, type1Key);
+
+        const field2 = 'field2';
+        await TestModel.bulkWrite([{
+          updateOne: {
+            filter: { _id: r1._id },
+            update: {
+              key: type2Key,
+              field2
+            },
+            overwriteDiscriminatorKey: true
+          }
+        }]);
+
+        const r2 = await TestModel.findById(r1._id);
+        assert.equal(r2.key, type2Key);
+        assert.equal(r2.field2, field2);
+      });
+
       it('with child timestamps and array filters (gh-7032)', async function() {
         const childSchema = new Schema({ name: String }, { timestamps: true });
 
@@ -7623,6 +7717,108 @@ describe('Model', function() {
       const ret = Test.castObject(obj, { ignoreCastErrors: true });
       assert.deepStrictEqual(ret, { nested: { num: 2 }, docArr: [{ num: 4 }] });
     });
+    it('handles discriminators (gh-15075)', async function() {
+      // Create the base shape schema
+      const shapeSchema = new mongoose.Schema({ name: String }, {
+        discriminatorKey: 'kind',
+        _id: false
+      });
+
+      // Main schema with shape array
+      const schema = new mongoose.Schema({
+        shape: [shapeSchema]
+      });
+
+      // Circle discriminator
+      schema
+        .path('shape')
+        .discriminator('Circle', new mongoose.Schema({
+          radius: {
+            type: mongoose.Schema.Types.Number,
+            required: true
+          }
+        }, { _id: false }));
+
+      // PropertyPath schema for Square
+      const propertyPathSchema = new mongoose.Schema({
+        property: {
+          type: mongoose.Schema.Types.String,
+          required: true
+        },
+        path: {
+          type: mongoose.Schema.Types.String,
+          required: true
+        }
+      }, { _id: false });
+
+      // Square discriminator
+      schema
+        .path('shape')
+        .discriminator(
+          'Square',
+          new mongoose.Schema({
+            propertyPaths: {
+              type: [propertyPathSchema],
+              required: true
+            }
+          }, { _id: false })
+        );
+
+      const TestModel = db.model('Test', schema);
+
+      const circle = { shape: [{ kind: 'Circle', radius: '5' }] };
+      const square = { shape: [{ kind: 'Square', propertyPaths: [{ property: 42 }] }] };
+
+      assert.deepStrictEqual(
+        TestModel.castObject(circle).shape[0],
+        { kind: 'Circle', radius: 5 }
+      );
+      assert.deepStrictEqual(
+        TestModel.castObject(square).shape[0],
+        { kind: 'Square', propertyPaths: [{ property: '42' }] }
+      );
+
+      const square2 = { shape: [{ kind: 'Square', propertyPaths: {} }] };
+      assert.deepStrictEqual(
+        TestModel.castObject(square2).shape[0],
+        { kind: 'Square', propertyPaths: [{}] }
+      );
+    });
+    it('handles castNonArrays when document array is set to non-array value (gh-15075)', function() {
+      const sampleSchema = new mongoose.Schema({
+        sampleArray: {
+          type: [new mongoose.Schema({ name: String })],
+          castNonArrays: false
+        }
+      });
+      const Test = db.model('Test', sampleSchema);
+
+      const obj = { sampleArray: { name: 'Taco' } };
+      assert.throws(() => Test.castObject(obj), /Tried to set nested object field `sampleArray` to primitive value/);
+    });
+    it('handles document arrays (gh-15164)', function() {
+      const barSchema = new mongoose.Schema({
+        foo: {
+          type: mongoose.Schema.Types.String,
+          required: true
+        }
+      }, { _id: false });
+
+      const fooSchema = new mongoose.Schema({
+        bars: {
+          type: [barSchema],
+          required: true
+        }
+      });
+
+      const Test = db.model('Test', fooSchema);
+
+      let obj = Test.castObject({ bars: [] });
+      assert.deepStrictEqual(obj.bars, []);
+
+      obj = Test.castObject({ bars: [{ foo: 'bar' }] });
+      assert.deepStrictEqual(obj.bars, [{ foo: 'bar' }]);
+    });
   });
 
   it('works if passing class that extends Document to `loadClass()` (gh-12254)', async function() {
@@ -7829,6 +8025,36 @@ describe('Model', function() {
       items: [{ type: 2, prop: 42 }]
     });
     assert.equal(doc.items[0].prop, 42);
+  });
+
+  it('does not throw with multiple self-referencing discriminator schemas applied to schema (gh-15120)', async function() {
+    const baseSchema = new Schema({
+      type: { type: Number, required: true }
+    }, { discriminatorKey: 'type' });
+
+    const selfRefSchema = new Schema({
+      self: { type: [baseSchema] }
+    });
+
+    const anotherSelfRefSchema = new Schema({
+      self2: { type: [baseSchema] }
+    });
+
+    baseSchema.discriminator(5, selfRefSchema);
+    baseSchema.discriminator(6, anotherSelfRefSchema);
+    const Test = db.model('Test', baseSchema);
+
+    const doc = await Test.create({
+      type: 5,
+      self: {
+        type: 6,
+        self2: null
+      }
+    });
+    assert.strictEqual(doc.type, 5);
+    assert.equal(doc.self.length, 1);
+    assert.strictEqual(doc.self[0].type, 6);
+    assert.strictEqual(doc.self[0].self2, null);
   });
 
   it('inserts versionKey even if schema has `toObject.versionKey` set to false (gh-14344)', async function() {
@@ -8145,6 +8371,52 @@ describe('Model', function() {
       assert.equal(obj.updatedAt.valueOf(), new Date('2023-06-01T18:00:00.000Z').valueOf());
       assert.ok(!('createdAt' in obj.post));
       assert.ok(obj.post.updatedAt.valueOf(), new Date('2023-06-01T18:00:00.000Z').valueOf());
+    });
+  });
+
+  describe('diffIndexes()', function() {
+    it('avoids trying to drop timeseries collections (gh-14984)', async function() {
+      const version = await start.mongodVersion();
+      if (version[0] < 5) {
+        this.skip();
+        return;
+      }
+
+      const schema = new mongoose.Schema(
+        {
+          time: {
+            type: Date
+          },
+          deviceId: {
+            type: String
+          }
+        },
+        {
+          timeseries: {
+            timeField: 'time',
+            metaField: 'deviceId',
+            granularity: 'seconds'
+          },
+          autoCreate: false
+        }
+      );
+
+      const TestModel = db.model(
+        'TimeSeriesTest',
+        schema,
+        'gh14984'
+      );
+
+      await db.dropCollection('gh14984').catch(err => {
+        if (err.codeName === 'NamespaceNotFound') {
+          return;
+        }
+        throw err;
+      });
+      await TestModel.createCollection();
+
+      const { toDrop } = await TestModel.diffIndexes();
+      assert.deepStrictEqual(toDrop, []);
     });
   });
 });

@@ -2526,6 +2526,29 @@ describe('model: updateOne: ', function() {
     assert.ok(doc.createdAt.valueOf() >= start);
   });
 
+  it('overwriting immutable createdAt (gh-8619)', async function() {
+    const start = new Date().valueOf();
+    const schema = Schema({
+      createdAt: {
+        type: mongoose.Schema.Types.Date,
+        immutable: true
+      },
+      name: String
+    }, { timestamps: true });
+
+    const Model = db.model('Test', schema);
+
+    await Model.create({ name: 'gh-8619' });
+    let doc = await Model.collection.findOne({ name: 'gh-8619' });
+    assert.ok(doc.createdAt.valueOf() >= start);
+
+    const createdAt = new Date('2011-06-01');
+    assert.ok(createdAt.valueOf() < start.valueOf());
+    await Model.updateOne({ _id: doc._id }, { name: 'gh-8619 update', createdAt }, { overwriteImmutable: true, timestamps: false });
+    doc = await Model.collection.findOne({ name: 'gh-8619 update' });
+    assert.equal(doc.createdAt.valueOf(), createdAt.valueOf());
+  });
+
   it('conditional immutable (gh-8001)', async function() {
     const schema = Schema({
       test: {
@@ -3067,6 +3090,58 @@ describe('model: updateOne: ', function() {
     ).exec();
     assert.equal(doc.login.keys.length, 1);
     assert.equal(doc.login.keys[0].id, 'test2');
+  });
+
+  it('casts using overwritten discriminator key schema (gh-15051)', async function() {
+    const embedDiscriminatorSchema = new mongoose.Schema({
+      field1: String
+    });
+    const embedDiscriminatorSchema2 = new mongoose.Schema({
+      field2: String
+    });
+    const embedSchema = new mongoose.Schema({
+      field: String,
+      key: String
+    }, { discriminatorKey: 'key' });
+    embedSchema.discriminator('Type1', embedDiscriminatorSchema);
+    embedSchema.discriminator('Type2', embedDiscriminatorSchema2);
+
+    const testSchema = new mongoose.Schema({
+      testArray: [embedSchema]
+    });
+
+    const TestModel = db.model('Test', testSchema);
+    const test = new TestModel({
+      testArray: [{
+        key: 'Type1',
+        field: 'field',
+        field1: 'field1'
+      }]
+    });
+    await test.save();
+
+    const field2update = 'field2 update';
+    await TestModel.updateOne(
+      { _id: test._id },
+      {
+        $set: {
+          'testArray.$[element].key': 'Type2',
+          'testArray.$[element].field2': field2update
+        }
+      },
+      {
+        arrayFilters: [
+          {
+            'element._id': test.testArray[0]._id
+          }
+        ],
+        overwriteDiscriminatorKey: true
+      }
+    );
+
+    const r2 = await TestModel.findById(test._id);
+    assert.equal(r2.testArray[0].key, 'Type2');
+    assert.equal(r2.testArray[0].field2, field2update);
   });
 });
 

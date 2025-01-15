@@ -23,6 +23,7 @@ If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration 
 * [ObjectId bsontype now has lowercase d](#objectid-bsontype-now-has-lowercase-d)
 * [Removed support for custom promise libraries](#removed-support-for-custom-promise-libraries)
 * [Removed mapReduce](#removed-mapreduce)
+* [Deprecated `keepAlive`](#deprecated-keepalive)
 * [TypeScript-specific changes](#typescript-specific-changes)
   * [Removed `LeanDocument` and support for `extends Document`](#removed-leandocument-and-support-for-extends-document)
   * [New parameters for `HydratedDocument`](#new-parameters-for-hydrateddocument)
@@ -337,6 +338,12 @@ If you want to use Bluebird for all promises globally, you can do the following:
 ```javascript
 global.Promise = require('bluebird');
 ```
+
+## Deprecated `keepAlive` {#deprecated-keepalive}
+
+Before Mongoose 5.2.0, you needed to enable the `keepAlive` option to initiate [TCP keepalive](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html) to prevent `"connection closed"` errors.
+However, `keepAlive` has been `true` by default since Mongoose 5.2.0, and the `keepAlive` is deprecated as of Mongoose 7.2.0.
+Please remove `keepAlive` and `keepAliveInitialDelay` options from your Mongoose connections.
 
 ## TypeScript-specific Changes {#typescript-specific-changes}
 

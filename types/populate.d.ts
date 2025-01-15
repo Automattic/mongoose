@@ -37,6 +37,8 @@ declare module 'mongoose' {
     localField?: string;
     /** Overwrite the schema-level foreign field to populate on if this is a populated virtual. */
     foreignField?: string;
+    /** Set to `false` to prevent Mongoose from repopulating paths that are already populated */
+    forceRepopulate?: boolean;
   }
 
   interface PopulateOption {

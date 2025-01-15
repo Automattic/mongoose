@@ -625,12 +625,12 @@ describe('document', function() {
     assert.equal(doc.val, 'test2');
   });
 
-  it('allows you to skip validation on save (gh-2981)', function() {
+  it('allows you to skip validation on save (gh-2981)', async function() {
     const schema = new Schema({ name: { type: String, required: true } });
     const MyModel = db.model('Test', schema);
 
     const doc = new MyModel();
-    return doc.save({ validateBeforeSave: false });
+    await doc.save({ validateBeforeSave: false });
   });
 
   it('doesnt use custom toObject options on save', async function() {
@@ -3088,6 +3088,51 @@ describe('document', function() {
       assert.strictEqual(foundDoc.array[0].isNew, false);
       assert.strictEqual(foundDoc.array[1].isNew, false);
       assert.strictEqual(nestedModel.isNew, false);
+    });
+
+    it('manual populattion with ref function (gh-15138)', async function() {
+      const userSchema = new mongoose.Schema({
+        username: { type: String },
+        phone: { type: mongoose.Schema.Types.ObjectId, ref: 'phones' }
+      });
+
+      const userSchemaWithFunc = new mongoose.Schema({
+        username: { type: String },
+        phone: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: function() {
+            return 'phones';
+          }
+        }
+      });
+
+      const phoneSchema = new mongoose.Schema({
+        phoneNumber: { type: String },
+        extension: { type: String }
+      });
+
+      const User = db.model('users', userSchema);
+      const UserWithFunc = db.model('usersWithFunc', userSchemaWithFunc);
+      const Phone = db.model('phones', phoneSchema);
+
+      const phone = await Phone.create({
+        phoneNumber: '123456789',
+        extension: '123'
+      });
+
+      const user = await User.create({
+        username: 'John Doe',
+        phone
+      });
+
+      const userWithFunc = await UserWithFunc.create({
+        username: 'John Doe',
+        phone
+      });
+
+      assert.ok(user.populated('phone'));
+      assert.ok(userWithFunc.populated('phone'));
+      assert.equal(userWithFunc.phone.extension, '123');
     });
 
     it('manual population with refPath (gh-7070)', async function() {
@@ -12707,6 +12752,16 @@ describe('document', function() {
     assert.equal(updatedPerson?._age, 61);
   });
 
+  it('bulkSave() allows skipping validation with validateBeforeSave (gh-15156)', async() => {
+    const schema = new Schema({ name: { type: String, required: true } });
+    const MyModel = db.model('Test', schema);
+
+    const doc = new MyModel();
+    await MyModel.bulkSave([doc], { validateBeforeSave: false });
+
+    assert.ok(await MyModel.exists({ _id: doc._id }));
+  });
+
   it('handles default embedded discriminator values (gh-13835)', async function() {
     const childAbstractSchema = new Schema(
       { kind: { type: Schema.Types.String, enum: ['concreteKind'], required: true, default: 'concreteKind' } },
@@ -12994,6 +13049,68 @@ describe('document', function() {
       instance.l2.l3.nestedDiscriminatedTypes.map(i => i.whoAmI()),
       ['I am NumberTyped', 'I am StringTyped']
     );
+  });
+
+  it('handles middleware on embedded discriminators on nested path defined using Schema.prototype.discriminator (gh-14961)', async function() {
+    const eventSchema = new Schema(
+      { message: String },
+      { discriminatorKey: 'kind', _id: false }
+    );
+
+    const clickedSchema = new Schema({
+      element: String
+    }, { _id: false });
+
+    // This is the discriminator which we will use to test middleware
+    const purchasedSchema = new Schema({
+      product: String
+    }, { _id: false });
+
+    let eventSchemaPreValidateCalls = 0;
+    let eventSchemaPreSaveCalls = 0;
+    eventSchema.pre('validate', function() {
+      ++eventSchemaPreValidateCalls;
+    });
+    eventSchema.pre('save', function() {
+      ++eventSchemaPreSaveCalls;
+    });
+
+    let purchasedSchemaPreValidateCalls = 0;
+    let purchasedSchemaPreSaveCalls = 0;
+    purchasedSchema.pre('validate', function() {
+      ++purchasedSchemaPreValidateCalls;
+    });
+    purchasedSchema.pre('save', function() {
+      ++purchasedSchemaPreSaveCalls;
+    });
+
+    eventSchema.discriminator('Clicked', clickedSchema);
+    eventSchema.discriminator('Purchased', purchasedSchema);
+
+    const trackSchema = new Schema({
+      event: eventSchema
+    });
+
+    // Test
+
+    const MyModel = db.model('track', trackSchema);
+    const doc = new MyModel({
+      event: {
+        kind: 'Purchased',
+        message: 'Test',
+        product: 'iPhone'
+      }
+    });
+
+    await doc.save();
+    assert.equal(doc.event.message, 'Test');
+    assert.equal(doc.event.kind, 'Purchased');
+    assert.equal(doc.event.product, 'iPhone');
+
+    assert.strictEqual(eventSchemaPreValidateCalls, 1);
+    assert.strictEqual(eventSchemaPreSaveCalls, 1);
+    assert.strictEqual(purchasedSchemaPreValidateCalls, 1);
+    assert.strictEqual(purchasedSchemaPreSaveCalls, 1);
   });
 
   it('handles reusing schema with embedded discriminators defined using Schema.prototype.discriminator (gh-14162)', async function() {
@@ -14099,6 +14216,25 @@ describe('document', function() {
     const fromDb = await ParentModel.findById(doc._id).orFail();
     assert.strictEqual(fromDb.quests[0].campaign.milestones, null);
   });
+
+  it('handles custom error message for duplicate key errors (gh-12844)', async function() {
+    const schema = new Schema({
+      name: String,
+      email: { type: String, unique: [true, 'Email must be unique'] }
+    });
+    const Model = db.model('Test', schema);
+    await Model.init();
+
+    await Model.create({ email: 'test@example.com' });
+
+    let duplicateKeyError = await Model.create({ email: 'test@example.com' }).catch(err => err);
+    assert.strictEqual(duplicateKeyError.message, 'Email must be unique');
+    assert.strictEqual(duplicateKeyError.cause.code, 11000);
+
+    duplicateKeyError = await Model.updateOne({ name: 'test' }, { email: 'test@example.com' }, { upsert: true }).catch(err => err);
+    assert.strictEqual(duplicateKeyError.message, 'Email must be unique');
+    assert.strictEqual(duplicateKeyError.cause.code, 11000);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {
@@ -14109,4 +14245,3 @@ describe('Check if instance function that is supplied in schema option is availa
     assert.equal(TestDocument.instanceFn(), 'Returned from DocumentInstanceFn');
   });
 });
-

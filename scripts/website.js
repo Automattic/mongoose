@@ -164,11 +164,11 @@ function moveDocsToTemp() {
   }
 }
 
-/** 
+/**
  * Array of array of semver numbers, sorted with highest number first
  * @example
  * [[1,2,3], [0,1,2]]
- * @type {number[][]} 
+ * @type {number[][]}
  */
 let filteredTags = [];
 
@@ -238,16 +238,16 @@ function getVersions() {
  * Stringify a semver number array
  * @param {number[]} arr The array to stringify
  * @param {boolean} dotX If "true", return "5.X" instead of "5.5.5"
- * @returns 
+ * @returns
  */
 function stringifySemverNumber(arr, dotX) {
   if (dotX) {
-    return `${arr[0]}.x`;  
+    return `${arr[0]}.x`;
   }
   return `${arr[0]}.${arr[1]}.${arr[2]}`;
 }
 
-/** 
+/**
  * Get the latest version available
  * @returns {Version}
  */
@@ -311,8 +311,7 @@ const versionObj = (() => {
     latestVersion: getLatestVersion(),
     pastVersions: [
       getLatestVersionOf(7),
-      getLatestVersionOf(6),
-      getLatestVersionOf(5),
+      getLatestVersionOf(6)
     ]
   };
   const versionedDeploy = !!process.env.DOCS_DEPLOY ? !(base.currentVersion.listed === base.latestVersion.listed) : false;
@@ -423,7 +422,7 @@ function mapURLs(block, currentUrl) {
  * @param {String} filename The documentation file path to render
  * @param {import("../docs/source/index").DocsOptions} options The options to use to render the file (api may be overwritten at reload)
  * @param {Boolean} isReload Indicate this is a reload of the file
- * @returns 
+ * @returns
  */
 async function pugify(filename, options, isReload = false) {
   /** Path for the output file */
@@ -503,7 +502,7 @@ async function pugify(filename, options, isReload = false) {
   }
 
   str = mapURLs(str, '/' + path.relative(cwd, docsPath))
-  
+
   await fs.promises.writeFile(newfile, str).catch((err) => {
     console.error('could not write', err.stack);
   }).then(() => {
@@ -625,5 +624,5 @@ function createSlug(value) {
     return '';
   }
   value = value.toLowerCase();
-  return value.replace(/[^a-z0-9-_\s]/, '').replace(/ /g, '-');
+  return value.replace(/<\/?code>/g, '').replace(/[^a-z0-9-_\s]/g, '').replace(/ /g, '-');
 }

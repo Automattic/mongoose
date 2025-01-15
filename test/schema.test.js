@@ -3550,6 +3550,10 @@ describe('schema', function() {
         arrs: {
           type: Map,
           of: [String]
+        },
+        docArrs: {
+          type: Map,
+          of: [new Schema({ name: String }, { _id: false })]
         }
       });
 
@@ -3589,9 +3593,20 @@ describe('schema', function() {
             additionalProperties: {
               bsonType: ['array', 'null'],
               items: {
+                bsonType: ['string', 'null']
+              }
+            }
+          },
+          docArrs: {
+            bsonType: ['object', 'null'],
+            additionalProperties: {
+              bsonType: ['array', 'null'],
+              items: {
                 bsonType: ['object', 'null'],
-                additionalProperties: {
-                  bsonType: ['string', 'null']
+                properties: {
+                  name: {
+                    bsonType: ['string', 'null']
+                  }
                 }
               }
             }
@@ -3619,6 +3634,12 @@ describe('schema', function() {
           myMap: {
             answer: 42
           }
+        },
+        arrs: {
+          key: ['value']
+        },
+        docArrs: {
+          otherKey: [{ name: 'otherValue' }]
         }
       });
 

@@ -3669,6 +3669,12 @@ describe('schema', function() {
           myMap: {
             answer: 42
           }
+        },
+        arrs: {
+          key: ['value']
+        },
+        docArrs: {
+          otherKey: [{ name: 'otherValue' }]
         }
       }));
       assert.ok(!validate({

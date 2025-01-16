@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "8.9.4",
+  "version": "8.9.5",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -17,6 +17,7 @@
     "orm",
     "db"
   ],
+  "type": "commonjs",
   "license": "MIT",
   "dependencies": {
     "bson": "^6.10.1",

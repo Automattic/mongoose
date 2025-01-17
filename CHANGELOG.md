@@ -1,3 +1,16 @@
+8.9.5 / 2025-01-13
+==================
+ * fix: disallow nested $where in populate match CVE-2025-23061
+ * fix(schema): handle bitwise operators on Int32 #15176 #15170
+
+7.8.4 / 2025-01-13
+===================
+ * fix: disallow nested $where in populate match CVE-2025-23061
+
+6.13.6 / 2025-01-13
+===================
+ * fix: disallow nested $where in populate match CVE-2025-23061
+
 8.9.4 / 2025-01-09
 ==================
  * fix(document): fix document not applying manual populate when using a function in schema.options.ref #15138 [IchirokuXVI](https://github.com/IchirokuXVI)

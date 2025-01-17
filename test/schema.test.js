@@ -3810,7 +3810,7 @@ describe('schema', function() {
           }
         }
       });
-    })
+    });
 
     it('handles required enums', function() {
       const RacoonSchema = new Schema({

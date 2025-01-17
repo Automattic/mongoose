@@ -3326,7 +3326,11 @@ describe('schema', function() {
     const collectionName = 'gh11162';
 
     afterEach(async function() {
-      await db.dropCollection(collectionName);
+      await db.dropCollection(collectionName).catch(err => {
+        if (err.message !== 'ns not found') {
+          throw err;
+        }
+      });
     });
 
     it('handles basic example with only top-level keys', async function() {

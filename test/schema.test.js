@@ -3419,6 +3419,86 @@ describe('schema', function() {
       assert.ok(!validate({}));
     });
 
+    it('handles all primitive data types', async function() {
+      const schema = new Schema({
+        num: Number,
+        str: String,
+        bool: Boolean,
+        date: Date,
+        id: mongoose.ObjectId,
+        decimal: mongoose.Types.Decimal128,
+        buf: Buffer,
+        uuid: 'UUID'
+      });
+
+      assert.deepStrictEqual(schema.jsonSchema({ useBsonType: true }), {
+        required: ['_id'],
+        properties: {
+          num: {
+            bsonType: ['number', 'null']
+          },
+          str: {
+            bsonType: ['string', 'null']
+          },
+          bool: {
+            bsonType: ['bool', 'null']
+          },
+          date: {
+            bsonType: ['date', 'null']
+          },
+          id: {
+            bsonType: ['objectId', 'null']
+          },
+          decimal: {
+            bsonType: ['decimal', 'null']
+          },
+          buf: {
+            bsonType: ['binData', 'null']
+          },
+          uuid: {
+            bsonType: ['binData', 'null']
+          },
+          _id: {
+            bsonType: 'objectId'
+          }
+        }
+      });
+
+      assert.deepStrictEqual(schema.jsonSchema(), {
+        type: 'object',
+        required: ['_id'],
+        properties: {
+          num: {
+            type: ['number', 'null']
+          },
+          str: {
+            type: ['string', 'null']
+          },
+          bool: {
+            type: ['boolean', 'null']
+          },
+          date: {
+            type: ['string', 'null']
+          },
+          id: {
+            type: ['string', 'null']
+          },
+          decimal: {
+            type: ['string', 'null']
+          },
+          buf: {
+            type: ['string', 'null']
+          },
+          uuid: {
+            type: ['string', 'null']
+          },
+          _id: {
+            type: 'string'
+          }
+        }
+      });
+    });
+
     it('handles arrays and document arrays', async function() {
       const schema = new Schema({
         tags: [String],
@@ -3690,6 +3770,74 @@ describe('schema', function() {
           }
         }
       }));
+    });
+
+    it('handles map with required element', async function() {
+      const schema = new Schema({
+        props: {
+          type: Map,
+          of: { type: String, required: true }
+        }
+      });
+
+      assert.deepStrictEqual(schema.jsonSchema({ useBsonType: true }), {
+        required: ['_id'],
+        properties: {
+          props: {
+            bsonType: ['object', 'null'],
+            additionalProperties: {
+              bsonType: 'string'
+            }
+          },
+          _id: {
+            bsonType: 'objectId'
+          }
+        }
+      });
+
+      assert.deepStrictEqual(schema.jsonSchema(), {
+        type: 'object',
+        required: ['_id'],
+        properties: {
+          props: {
+            type: ['object', 'null'],
+            additionalProperties: {
+              type: 'string'
+            }
+          },
+          _id: {
+            type: 'string'
+          }
+        }
+      });
+    })
+
+    it('handles required enums', function() {
+      const RacoonSchema = new Schema({
+        name: { type: String, enum: ['Edwald', 'Tobi'], required: true }
+      });
+
+      assert.deepStrictEqual(RacoonSchema.jsonSchema({ useBsonType: true }), {
+        required: ['name', '_id'],
+        properties: {
+          name: {
+            bsonType: 'string',
+            enum: ['Edwald', 'Tobi']
+          },
+          _id: {
+            bsonType: 'objectId'
+          }
+        }
+      });
+    });
+
+    it('throws error on mixed type', function() {
+      const schema = new Schema({
+        mixed: mongoose.Mixed
+      });
+
+      assert.throws(() => schema.jsonSchema({ useBsonType: true }), /unsupported schematype "Mixed"/);
+      assert.throws(() => schema.jsonSchema(), /unsupported schematype "Mixed"/);
     });
   });
 });

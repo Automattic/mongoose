@@ -508,6 +508,8 @@ declare module 'mongoose' {
     statics: { [F in keyof TStaticMethods]: TStaticMethods[F] } &
     { [name: string]: (this: TModelType, ...args: any[]) => unknown };
 
+    toJSONSchema(options?: { useBsonType?: boolean }): Record<string, any>;
+
     /** Creates a virtual type with the given name. */
     virtual<T = HydratedDocument<DocType, TVirtuals & TInstanceMethods, TQueryHelpers>>(
       name: keyof TVirtuals | string,

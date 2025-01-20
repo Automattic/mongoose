@@ -57,3 +57,5 @@ tsconfig.json
 # scripts
 scripts/
 tools/
+
+valnotes.md

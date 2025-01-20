@@ -2,18 +2,18 @@ name: Test
 on:
   pull_request:
     paths:
-      - '.github/workflows/test.yml'
-      - 'package.json'
-      - 'index.js'
-      - 'lib/**'
-      - 'test/**.js'
+      - ".github/workflows/test.yml"
+      - "package.json"
+      - "index.js"
+      - "lib/**"
+      - "test/**.js"
   push:
     paths:
-      - '.github/workflows/test.yml'
-      - 'package.json'
-      - 'index.js'
-      - 'lib/**'
-      - 'test/**.js'
+      - ".github/workflows/test.yml"
+      - "package.json"
+      - "index.js"
+      - "lib/**"
+      - "test/**.js"
 permissions:
   contents: read
 
@@ -85,7 +85,7 @@ jobs:
         with:
           name: coverage
           path: coverage
-  
+
   test-deno:
     runs-on: ubuntu-20.04
     name: Deno tests
@@ -117,7 +117,7 @@ jobs:
   test-replica-sets:
     needs:
       - test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     name: Replica Set tests
     env:
       FORCE_COLOR: true

@@ -1,10 +1,14 @@
+6.13.7 / 2025-01-20
+===================
+ * chore: re-release to force npm audit to pick up 6.x fix for CVE-2025-23061
+
 7.8.4 / 2025-01-13
 ===================
  * fix: disallow nested $where in populate match
 
 6.13.6 / 2025-01-13
 ===================
- * fix: disallow nested $where in populate match
+ * fix: disallow nested $where in populate match CVE-2025-23061
 
 7.8.3 / 2024-11-26
 ==================

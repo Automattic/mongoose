@@ -47,3 +47,4 @@ webpack.base.config.js
 valnotes.md
 
 coverage
+.nyc_output

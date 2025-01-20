@@ -59,3 +59,7 @@ scripts/
 tools/
 
 *.0x
+valnotes.md
+
+coverage
+.nyc_output

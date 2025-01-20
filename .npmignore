@@ -43,3 +43,5 @@ webpack.base.config.js
 .nyc-output
 
 *.tgz
+
+valnotes.md

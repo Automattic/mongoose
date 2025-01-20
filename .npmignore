@@ -45,3 +45,5 @@ webpack.base.config.js
 *.tgz
 
 valnotes.md
+
+coverage

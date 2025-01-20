@@ -105,7 +105,7 @@ jobs:
   test-replica-sets:
     needs:
       - test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     name: Replica Set tests
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
@@ -113,8 +113,6 @@ jobs:
         uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
         with:
           node-version: 16
-      - name: Install libcrypto
-        run: sudo apt-get update && sudo apt-get install -y libssl1.1
       - run: npm install
       - name: Test
         run: npm run test-rs

@@ -61,3 +61,4 @@ tools/
 valnotes.md
 
 coverage
+.nyc_output

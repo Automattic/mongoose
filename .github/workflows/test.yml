@@ -2,18 +2,18 @@ name: Test
 on:
   pull_request:
     paths:
-      - '.github/workflows/test.yml'
-      - 'package.json'
-      - 'index.js'
-      - 'lib/**'
-      - 'test/**.js'
+      - ".github/workflows/test.yml"
+      - "package.json"
+      - "index.js"
+      - "lib/**"
+      - "test/**.js"
   push:
     paths:
-      - '.github/workflows/test.yml'
-      - 'package.json'
-      - 'index.js'
-      - 'lib/**'
-      - 'test/**.js'
+      - ".github/workflows/test.yml"
+      - "package.json"
+      - "index.js"
+      - "lib/**"
+      - "test/**.js"
 permissions:
   contents: read
 
@@ -62,6 +62,8 @@ jobs:
           key: ${{ matrix.os }}-${{ matrix.mongodb }}
 
       - run: npm install
+      - name: Install libcrypto
+        run: sudo apt-get update && sudo apt-get install -y libssl1.1
       - name: NPM Test without Coverage
         run: npm test
         if: matrix.coverage != true
@@ -74,7 +76,7 @@ jobs:
         with:
           name: coverage
           path: coverage
-  
+
   test-deno:
     runs-on: ubuntu-20.04
     name: Deno tests

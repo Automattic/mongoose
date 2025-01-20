@@ -1,15 +1,32 @@
+7.8.6 / 2025-01-20
+===================
+ * chore: remove coverage output from bundle
+
+6.13.8 / 2025-01-20
+===================
+ * chore: remove coverage output from bundle
+
+7.8.5 / 2025-01-20
+===================
+ * chore: re-release to force npm audit to pick up 6.x fix for CVE-2025-23061
+
+6.13.7 / 2025-01-20
+===================
+ * chore: re-release to force npm audit to pick up 6.x fix for CVE-2025-23061
+
 8.9.5 / 2025-01-13
 ==================
- * fix: disallow nested $where in populate match
+ * fix: disallow nested $where in populate match CVE-2025-23061
  * fix(schema): handle bitwise operators on Int32 #15176 #15170
 
 7.8.4 / 2025-01-13
 ===================
- * fix: disallow nested $where in populate match
+ * fix: disallow nested $where in populate match CVE-2025-23061
 
 6.13.6 / 2025-01-13
 ===================
- * fix: disallow nested $where in populate match
+ * fix: disallow nested $where in populate match CVE-2025-23061
+<<<<<<< HEAD
 
 8.9.4 / 2025-01-09
 ==================
@@ -78,6 +95,8 @@
  * fix: disallow using $where in match
  * perf: cache results from getAllSubdocs() on saveOptions, only loop through known subdoc properties #15055 #15029
  * fix(model+query): support overwriteDiscriminatorKey for bulkWrite updateOne and updateMany, allow inferring discriminator key from update #15046 #15040
+=======
+>>>>>>> 7.x
 
 7.8.3 / 2024-11-26
 ==================

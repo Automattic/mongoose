@@ -3432,7 +3432,10 @@ describe('schema', function() {
         id: mongoose.ObjectId,
         decimal: mongoose.Types.Decimal128,
         buf: Buffer,
-        uuid: 'UUID'
+        uuid: 'UUID',
+        bigint: BigInt,
+        double: 'Double',
+        int32: 'Int32'
       });
 
       assert.deepStrictEqual(schema.jsonSchema({ useBsonType: true }), {
@@ -3461,6 +3464,15 @@ describe('schema', function() {
           },
           uuid: {
             bsonType: ['binData', 'null']
+          },
+          bigint: {
+            bsonType: ['long', 'null']
+          },
+          double: {
+            bsonType: ['double', 'null']
+          },
+          int32: {
+            bsonType: ['int', 'null']
           },
           _id: {
             bsonType: 'objectId'
@@ -3496,6 +3508,15 @@ describe('schema', function() {
           uuid: {
             type: ['string', 'null']
           },
+          bigint: {
+            type: ['string', 'null']
+          },
+          double: {
+            type: ['number', 'null']
+          },
+          int32: {
+            type: ['number', 'null']
+          },
           _id: {
             type: 'string'
           }
@@ -3524,7 +3545,7 @@ describe('schema', function() {
             items: {
               bsonType: ['array', 'null'],
               items: {
-                bsonType: ['number']
+                bsonType: 'number'
               }
             }
           },
@@ -3591,6 +3612,30 @@ describe('schema', function() {
             }
           },
           _id: { bsonType: 'objectId' }
+        }
+      });
+
+      assert.deepStrictEqual(schema.jsonSchema(), {
+        required: ['_id'],
+        type: 'object',
+        properties: {
+          name: {
+            type: ['object', 'null'],
+            required: ['last'],
+            properties: {
+              first: { type: ['string', 'null'] },
+              last: { type: 'string' }
+            }
+          },
+          subdoc: {
+            type: ['object', 'null'],
+            properties: {
+              prop: {
+                type: ['number', 'null']
+              }
+            }
+          },
+          _id: { type: 'string' }
         }
       });
 
@@ -3840,8 +3885,8 @@ describe('schema', function() {
         mixed: mongoose.Mixed
       });
 
-      assert.throws(() => schema.jsonSchema({ useBsonType: true }), /unsupported schematype "Mixed"/);
-      assert.throws(() => schema.jsonSchema(), /unsupported schematype "Mixed"/);
+      assert.throws(() => schema.jsonSchema({ useBsonType: true }), /unsupported SchemaType to JSON Schema: Mixed/);
+      assert.throws(() => schema.jsonSchema(), /unsupported SchemaType to JSON Schema: Mixed/);
     });
   });
 });

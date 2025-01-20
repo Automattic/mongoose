@@ -2173,7 +2173,7 @@ describe('schema', function() {
     const keys = Object.keys(SchemaStringOptions.prototype).
       filter(key => key !== 'constructor' && key !== 'populate');
     const functions = Object.keys(Schema.Types.String.prototype).
-      filter(key => ['constructor', 'cast', 'castForQuery', 'checkRequired'].indexOf(key) === -1);
+      filter(key => ['constructor', 'cast', 'castForQuery', 'checkRequired', 'toJSONSchema'].indexOf(key) === -1);
     assert.deepEqual(keys.sort(), functions.sort());
   });
 
@@ -3344,7 +3344,7 @@ describe('schema', function() {
         }
       }, { autoCreate: false, autoIndex: false });
 
-      assert.deepStrictEqual(schema.jsonSchema({ useBsonType: true }), {
+      assert.deepStrictEqual(schema.toJSONSchema({ useBsonType: true }), {
         required: ['name', '_id'],
         properties: {
           _id: {
@@ -3363,7 +3363,7 @@ describe('schema', function() {
         }
       });
 
-      assert.deepStrictEqual(schema.jsonSchema(), {
+      assert.deepStrictEqual(schema.toJSONSchema(), {
         type: 'object',
         required: ['name', '_id'],
         properties: {
@@ -3385,7 +3385,7 @@ describe('schema', function() {
 
       await db.createCollection(collectionName, {
         validator: {
-          $jsonSchema: schema.jsonSchema({ useBsonType: true })
+          $jsonSchema: schema.toJSONSchema({ useBsonType: true })
         }
       });
       const Test = db.model('Test', schema, collectionName);
@@ -3414,7 +3414,7 @@ describe('schema', function() {
       );
 
       const ajv = new Ajv();
-      const validate = ajv.compile(schema.jsonSchema());
+      const validate = ajv.compile(schema.toJSONSchema());
 
       assert.ok(validate({ _id: 'test', name: 'Taco' }));
       assert.ok(validate({ _id: 'test', name: 'Billy', age: null, ageSource: null }));
@@ -3438,7 +3438,7 @@ describe('schema', function() {
         int32: 'Int32'
       });
 
-      assert.deepStrictEqual(schema.jsonSchema({ useBsonType: true }), {
+      assert.deepStrictEqual(schema.toJSONSchema({ useBsonType: true }), {
         required: ['_id'],
         properties: {
           num: {
@@ -3480,7 +3480,7 @@ describe('schema', function() {
         }
       });
 
-      assert.deepStrictEqual(schema.jsonSchema(), {
+      assert.deepStrictEqual(schema.toJSONSchema(), {
         type: 'object',
         required: ['_id'],
         properties: {
@@ -3531,7 +3531,7 @@ describe('schema', function() {
         docArr: [new Schema({ field: Date }, { _id: false })]
       });
 
-      assert.deepStrictEqual(schema.jsonSchema({ useBsonType: true }), {
+      assert.deepStrictEqual(schema.toJSONSchema({ useBsonType: true }), {
         required: ['_id'],
         properties: {
           tags: {
@@ -3564,7 +3564,7 @@ describe('schema', function() {
 
       await db.createCollection(collectionName, {
         validator: {
-          $jsonSchema: schema.jsonSchema({ useBsonType: true })
+          $jsonSchema: schema.toJSONSchema({ useBsonType: true })
         }
       });
       const Test = db.model('Test', schema, collectionName);
@@ -3575,7 +3575,7 @@ describe('schema', function() {
       await Test.create({ tags: 'javascript', coordinates: [[0, 0]], docArr: [{}] });
 
       const ajv = new Ajv();
-      const validate = ajv.compile(schema.jsonSchema());
+      const validate = ajv.compile(schema.toJSONSchema());
 
       assert.ok(validate({ _id: 'test', tags: ['javascript'], coordinates: [[0, 0]], docArr: [{ field: '2023-07-16' }] }));
       assert.ok(validate({ _id: 'test', tags: ['javascript'], coordinates: [[0, 0]], docArr: [{}] }));
@@ -3592,7 +3592,7 @@ describe('schema', function() {
         }, { _id: false })
       });
 
-      assert.deepStrictEqual(schema.jsonSchema({ useBsonType: true }), {
+      assert.deepStrictEqual(schema.toJSONSchema({ useBsonType: true }), {
         required: ['_id'],
         properties: {
           name: {
@@ -3615,7 +3615,7 @@ describe('schema', function() {
         }
       });
 
-      assert.deepStrictEqual(schema.jsonSchema(), {
+      assert.deepStrictEqual(schema.toJSONSchema(), {
         required: ['_id'],
         type: 'object',
         properties: {
@@ -3641,7 +3641,7 @@ describe('schema', function() {
 
       await db.createCollection(collectionName, {
         validator: {
-          $jsonSchema: schema.jsonSchema({ useBsonType: true })
+          $jsonSchema: schema.toJSONSchema({ useBsonType: true })
         }
       });
       const Test = db.model('Test', schema, collectionName);
@@ -3650,7 +3650,7 @@ describe('schema', function() {
       await Test.create({ name: { first: 'Mike', last: 'James' }, subdoc: { prop: 42 } });
 
       const ajv = new Ajv();
-      const validate = ajv.compile(schema.jsonSchema());
+      const validate = ajv.compile(schema.toJSONSchema());
 
       assert.ok(validate({ _id: 'test', name: { last: 'James' }, subdoc: {} }));
       assert.ok(validate({ _id: 'test', name: { first: 'Mike', last: 'James' }, subdoc: { prop: 42 } }));
@@ -3686,7 +3686,7 @@ describe('schema', function() {
         }
       });
 
-      assert.deepStrictEqual(schema.jsonSchema({ useBsonType: true }), {
+      assert.deepStrictEqual(schema.toJSONSchema({ useBsonType: true }), {
         required: ['props', '_id'],
         properties: {
           props: {
@@ -3746,7 +3746,7 @@ describe('schema', function() {
 
       await db.createCollection(collectionName, {
         validator: {
-          $jsonSchema: schema.jsonSchema({ useBsonType: true })
+          $jsonSchema: schema.toJSONSchema({ useBsonType: true })
         }
       });
       const Test = db.model('Test', schema, collectionName);
@@ -3783,7 +3783,7 @@ describe('schema', function() {
       );
 
       const ajv = new Ajv();
-      const validate = ajv.compile(schema.jsonSchema());
+      const validate = ajv.compile(schema.toJSONSchema());
 
       assert.ok(validate({
         _id: 'test',
@@ -3829,7 +3829,7 @@ describe('schema', function() {
         }
       });
 
-      assert.deepStrictEqual(schema.jsonSchema({ useBsonType: true }), {
+      assert.deepStrictEqual(schema.toJSONSchema({ useBsonType: true }), {
         required: ['_id'],
         properties: {
           props: {
@@ -3844,7 +3844,7 @@ describe('schema', function() {
         }
       });
 
-      assert.deepStrictEqual(schema.jsonSchema(), {
+      assert.deepStrictEqual(schema.toJSONSchema(), {
         type: 'object',
         required: ['_id'],
         properties: {
@@ -3866,7 +3866,7 @@ describe('schema', function() {
         name: { type: String, enum: ['Edwald', 'Tobi'], required: true }
       });
 
-      assert.deepStrictEqual(RacoonSchema.jsonSchema({ useBsonType: true }), {
+      assert.deepStrictEqual(RacoonSchema.toJSONSchema({ useBsonType: true }), {
         required: ['name', '_id'],
         properties: {
           name: {
@@ -3885,8 +3885,8 @@ describe('schema', function() {
         mixed: mongoose.Mixed
       });
 
-      assert.throws(() => schema.jsonSchema({ useBsonType: true }), /unsupported SchemaType to JSON Schema: Mixed/);
-      assert.throws(() => schema.jsonSchema(), /unsupported SchemaType to JSON Schema: Mixed/);
+      assert.throws(() => schema.toJSONSchema({ useBsonType: true }), /unsupported SchemaType to JSON Schema: Mixed/);
+      assert.throws(() => schema.toJSONSchema(), /unsupported SchemaType to JSON Schema: Mixed/);
     });
   });
 });

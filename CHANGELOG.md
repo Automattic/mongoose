@@ -1,3 +1,7 @@
+7.8.6 / 2025-01-20
+===================
+ * chore: remove coverage output from bundle
+
 6.13.8 / 2025-01-20
 ===================
  * chore: remove coverage output from bundle

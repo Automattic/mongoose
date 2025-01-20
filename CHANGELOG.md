@@ -1,3 +1,7 @@
+6.13.8 / 2025-01-20
+===================
+ * chore: remove coverage output from bundle
+
 6.13.7 / 2025-01-20
 ===================
  * chore: re-release to force npm audit to pick up 6.x fix for CVE-2025-23061

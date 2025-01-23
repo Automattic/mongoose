@@ -519,7 +519,7 @@ describe('encrypted schema declaration', function() {
         });
       });
 
-      describe('When omit() is used with some all the encrypted fields', function() {
+      describe('When omit() is used with all the encrypted fields', function() {
         it('Then the encryption type is the same as the original schema’s encryption type', function() {
           const originalSchema = new Schema({
             name: { type: String, encrypt: { keyId: KEY_ID, algorithm } },

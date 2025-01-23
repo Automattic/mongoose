@@ -8419,6 +8419,15 @@ describe('Model', function() {
       assert.deepStrictEqual(toDrop, []);
     });
   });
+
+  it('throws error if calling `updateMany()` with no update param (gh-15190)', async function() {
+    const Test = db.model('Test', mongoose.Schema({ foo: String }));
+
+    assert.throws(
+      () => Test.updateMany({ foo: 'bar' }),
+      { message: 'updateMany `update` parameter cannot be nullish' }
+    );
+  });
 });
 
 

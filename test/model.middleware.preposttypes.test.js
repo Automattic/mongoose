@@ -288,8 +288,8 @@ describe('pre/post hooks, type of this', function() {
       await Doc.findOneAndReplace({}, { data: 'valueRep' }).exec();
       await Doc.findOneAndUpdate({}, { data: 'valueUpd' }).exec();
       await Doc.replaceOne({}, { data: 'value' }).exec();
-      await Doc.updateOne({ data: 'value' }).exec();
-      await Doc.updateMany({ data: 'value' }).exec();
+      await Doc.updateOne({}, { data: 'value' }).exec();
+      await Doc.updateMany({}, { data: 'value' }).exec();
 
       // MongooseQueryOrDocumentMiddleware, use Query
       await Doc.deleteOne({}).exec(); await Doc.create({ data: 'value' });

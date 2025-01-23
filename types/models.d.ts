@@ -869,16 +869,19 @@ declare module 'mongoose' {
 
     /** Creates a `updateMany` query: updates all documents that match `filter` with `update`. */
     updateMany<ResultDoc = THydratedDocumentType>(
-      filter?: RootFilterQuery<TRawDocType>,
-      update?: UpdateQuery<TRawDocType> | UpdateWithAggregationPipeline,
+      filter: RootFilterQuery<TRawDocType>,
+      update: UpdateQuery<TRawDocType> | UpdateWithAggregationPipeline,
       options?: (mongodb.UpdateOptions & MongooseUpdateQueryOptions<TRawDocType>) | null
     ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, TRawDocType, 'updateMany', TInstanceMethods & TVirtuals>;
 
     /** Creates a `updateOne` query: updates the first document that matches `filter` with `update`. */
     updateOne<ResultDoc = THydratedDocumentType>(
-      filter?: RootFilterQuery<TRawDocType>,
-      update?: UpdateQuery<TRawDocType> | UpdateWithAggregationPipeline,
+      filter: RootFilterQuery<TRawDocType>,
+      update: UpdateQuery<TRawDocType> | UpdateWithAggregationPipeline,
       options?: (mongodb.UpdateOptions & MongooseUpdateQueryOptions<TRawDocType>) | null
+    ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, TRawDocType, 'updateOne', TInstanceMethods & TVirtuals>;
+    updateOne<ResultDoc = THydratedDocumentType>(
+      update: UpdateQuery<TRawDocType> | UpdateWithAggregationPipeline
     ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, TRawDocType, 'updateOne', TInstanceMethods & TVirtuals>;
 
     /** Creates a Query, applies the passed conditions, and returns the Query. */

@@ -8505,6 +8505,15 @@ describe('Model', function() {
     });
   });
 
+  it('throws error if calling `updateMany()` with no update param (gh-15190)', async function() {
+    const Test = db.model('Test', mongoose.Schema({ foo: String }));
+
+    assert.throws(
+      () => Test.updateMany({ foo: 'bar' }),
+      { message: 'updateMany `update` parameter cannot be nullish' }
+    );
+  });
+    
   describe('insertOne() (gh-14843)', function() {
     it('should insert a new document', async function() {
       const userSchema = new Schema({

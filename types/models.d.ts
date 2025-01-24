@@ -578,6 +578,13 @@ declare module 'mongoose' {
     >;
 
     /**
+     * Shortcut for saving one document to the database.
+     * `MyModel.insertOne(obj, options)` is almost equivalent to `new MyModel(obj).save(options)`.
+     * The difference is that `insertOne()` checks if `obj` is already a document, and checks for discriminators.
+     */
+    insertOne<DocContents = AnyKeys<TRawDocType>>(doc: DocContents | TRawDocType, options?: SaveOptions): Promise<THydratedDocumentType>;
+
+    /**
      * List all [Atlas search indexes](https://www.mongodb.com/docs/atlas/atlas-search/create-index/) on this model's collection.
      * This function only works when connected to MongoDB Atlas.
      */
@@ -607,6 +614,13 @@ declare module 'mongoose' {
      * This function only works when connected to MongoDB Atlas.
      */
     updateSearchIndex(name: string, definition: AnyObject): Promise<void>;
+
+    /**
+     * Changes the Connection instance this model uses to make requests to MongoDB.
+     * This function is most useful for changing the Connection that a Model defined using `mongoose.model()` uses
+     * after initialization.
+     */
+    useConnection(connection: Connection): this;
 
     /** Casts and validates the given object against this model's schema, passing the given `context` to custom validators. */
     validate(): Promise<void>;

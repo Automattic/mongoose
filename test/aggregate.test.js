@@ -1284,4 +1284,17 @@ describe('aggregate: ', function() {
     await p;
     await m.disconnect();
   });
+
+  it('throws error if calling near() with empty coordinates (gh-15188)', async function() {
+    const M = db.model('Test', new Schema({ loc: { type: [Number], index: '2d' } }));
+    assert.throws(() => {
+      const aggregate = new Aggregate([], M);
+      aggregate.near({
+        near: {
+          type: 'Point',
+          coordinates: []
+        }
+      });
+    }, /Aggregate `near\(\)` argument has invalid coordinates, got ""/);
+  });
 });

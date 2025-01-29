@@ -1,3 +1,5 @@
+import * as BSON from 'bson';
+
 declare module 'mongoose' {
 
   /** The Mongoose Date [SchemaType](/docs/schematypes.html). */
@@ -207,6 +209,8 @@ declare module 'mongoose' {
     maxlength?: number | [number, string] | readonly [number, string];
 
     [other: string]: any;
+
+    encrypt?: EncryptSchemaTypeOptions;
   }
 
   interface Validator<DocType = any> {
@@ -217,6 +221,28 @@ declare module 'mongoose' {
   }
 
   type ValidatorFunction<DocType = any> = (this: DocType, value: any, validatorProperties?: Validator) => any;
+
+  export interface EncryptSchemaTypeOptions {
+    /** The id of the  dataKey to use for encryption */
+    keyId: BSON.UUID;
+
+    /**
+     * Specifies the type of queries that the field can be queried on for Queryable Encryption.
+     * Required when `SchemaOptions.encryptionType` is 'queryableEncryption'
+    */
+    queries?: 'equality' | 'range';
+
+    /**
+     * The algorithm to use for encryption.
+     * Required when `SchemaOptions.encryptionType` is 'csfle'
+     */
+    algorithm?:
+      | 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
+      | 'AEAD_AES_256_CBC_HMAC_SHA_512-Random'
+      | 'Indexed'
+      | 'Unindexed'
+      | 'Range';
+  }
 
   class SchemaType<T = any, DocType = any> {
     /** SchemaType constructor */

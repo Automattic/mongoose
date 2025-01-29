@@ -258,6 +258,8 @@ declare module 'mongoose' {
      * @default false
      */
     overwriteModels?: boolean;
+
+    encryptionType?: 'csfle' | 'queryableEncryption';
   }
 
   interface DefaultSchemaOptions {

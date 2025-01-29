@@ -259,6 +259,9 @@ declare module 'mongoose' {
      */
     overwriteModels?: boolean;
 
+    /**
+     *  Required when the schema is encrypted.
+     */
     encryptionType?: 'csfle' | 'queryableEncryption';
   }
 

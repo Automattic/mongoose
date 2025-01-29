@@ -1,3 +1,4 @@
+import { BSON } from 'mongodb';
 import {
   AnyArray,
   Schema,
@@ -73,4 +74,40 @@ function defaultOptions() {
   expectType<Record<string, any>>(new Schema.Types.Double('none').defaultOptions);
   expectType<Record<string, any>>(new Schema.Types.Subdocument('none').defaultOptions);
   expectType<Record<string, any>>(new Schema.Types.UUID('none').defaultOptions);
+}
+
+function encrypt() {
+  const keyId = new BSON.UUID();
+
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId, algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic' };
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId, algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic' };
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId, algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Random' };
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId, algorithm: 'Indexed' };
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId, algorithm: 'Unindexed' };
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId, algorithm: 'Range' };
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId, algorithm: undefined };
+
+  // qe + valid queries
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId, queries: 'equality' };
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId, queries: 'range' };
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId, queries: undefined };
+
+  // empty object
+  expectError<SchemaTypeOptions<string>['encrypt']>({});
+
+  // invalid keyId
+  expectError<SchemaTypeOptions<string>['encrypt']>({ keyId: 'fakeId' });
+
+  // missing keyId
+  expectError<SchemaTypeOptions<string>['encrypt']>({ queries: 'equality' });
+  expectError<SchemaTypeOptions<string>['encrypt']>({ algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic' });
+
+  // invalid algorithm
+  expectError<SchemaTypeOptions<string>['encrypt']>({ keyId, algorithm: 'SHA_FAKE_ALG' });
+
+  // invalid queries
+  expectError<SchemaTypeOptions<string>['encrypt']>({ keyId, queries: 'fakeQueryOption' });
+
+  // invalid input option
+  expectError<SchemaTypeOptions<string>['encrypt']>({ keyId, invalidKey: 'fakeKeyOption' });
 }

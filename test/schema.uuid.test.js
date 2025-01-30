@@ -63,6 +63,8 @@ describe('SchemaUUID', function() {
     const errors = res.errors;
     assert.strictEqual(Object.keys(errors).length, 1);
     assert.ok(errors.x instanceof mongoose.Error.CastError);
+
+    assert.ok(errors.x.reason.message.includes('not a valid UUID string'), errors.x.reason.message);
   });
 
   it('should work with $in and $nin and $all', async function() {

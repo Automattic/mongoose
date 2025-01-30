@@ -5,7 +5,7 @@
 # this script downloads all tools required to use FLE with mongodb, then starts a cluster of the provided configuration (sharded on 8.0 server)
 
 export CWD=$(pwd);
-export DRIVERS_TOOLS_PINNED_COMMIT=259809b8388c68d0adf0e0c8ac8257802e811e69;
+export DRIVERS_TOOLS_PINNED_COMMIT=d8098d27d0a94afe6ed20b01d653404ba6dd3910;
 
 # install extra dependency 
 npm install mongodb-client-encryption

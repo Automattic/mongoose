@@ -29,11 +29,13 @@ describe('ci', () => {
   describe('environmental variables', () => {
     it('MONGOOSE_TEST_URI is set', async function() {
       const uri = process.env.MONGOOSE_TEST_URI;
+      console.log('MONGOOSE_TEST_URI=', uri);
       assert.ok(uri);
     });
 
     it('CRYPT_SHARED_LIB_PATH is set', async function() {
       const shared_library_path = process.env.CRYPT_SHARED_LIB_PATH;
+      console.log('CRYPT_SHARED_LIB_PATH=', shared_library_path);
       assert.ok(shared_library_path);
     });
   });

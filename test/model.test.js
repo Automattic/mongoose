@@ -8513,7 +8513,7 @@ describe('Model', function() {
       { message: 'updateMany `update` parameter cannot be nullish' }
     );
   });
-    
+
   describe('insertOne() (gh-14843)', function() {
     it('should insert a new document', async function() {
       const userSchema = new Schema({

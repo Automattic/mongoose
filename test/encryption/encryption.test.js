@@ -17,6 +17,8 @@ describe('ci', () => {
     const file = fs.readFileSync(cwd + '/data/mo-expansion.yml', { encoding: 'utf-8' }).trim().split('\n');
     const regex = /^(?<key>.*): "(?<value>.*)"$/;
     const variables = file.map((line) => regex.exec(line.trim()).groups).reduce((acc, { key, value }) => ({ ...acc, [key]: value }), {});
+    console.log('File contents', file);
+    console.log('Variables', variables);
     process.env.CRYPT_SHARED_LIB_PATH = variables.CRYPT_SHARED_LIB_PATH;
     process.env.MONGOOSE_TEST_URI = variables.MONGODB_URI;
   });

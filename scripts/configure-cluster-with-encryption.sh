@@ -5,6 +5,7 @@
 # this script downloads all tools required to use FLE with mongodb, then starts a cluster of the provided configuration (sharded on 8.0 server)
 
 export CWD=$(pwd);
+export DRIVERS_TOOLS_PINNED_COMMIT=d8098d27d0a94afe6ed20b01d653404ba6dd3910;
 
 # install extra dependency 
 npm install mongodb-client-encryption
@@ -23,7 +24,9 @@ if [ ! -d "data" ]; then
       # 'mo-expansion.yml' file which contains for your cluster URI and crypt shared library path
       # 'drivers-evergreen-tools/mongodb/bin' which contain executables for other mongodb libraries such as mongocryptd, mongosh, and mongod
   if [ ! -d "drivers-evergreen-tools/" ]; then
-  git clone --depth=1 "https://github.com/mongodb-labs/drivers-evergreen-tools.git"
+    git clone --depth=1 "https://github.com/mongodb-labs/drivers-evergreen-tools.git"
+    # pin stable commit
+    git checkout $DRIVERS_TOOLS_PINNED_COMMIT
   fi
 
   # configure cluster settings

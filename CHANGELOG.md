@@ -1,3 +1,9 @@
+8.9.6 / 2025-01-31
+==================
+ * fix(document): allow setting values to undefined with set(obj) syntax with strict: false #15207 #15192
+ * fix(schema): improve reason for UUID cast error, currently a TypeError #15215 #15202
+ * fix(aggregate): improve error when calling near() with invalid coordinates #15206 #15188
+
 7.8.6 / 2025-01-20
 ===================
  * chore: remove coverage output from bundle

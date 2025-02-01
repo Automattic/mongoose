@@ -1150,4 +1150,36 @@ describe('Map', function() {
     const doc = await CarModel.findById(car._id);
     assert.deepStrictEqual(doc.owners.get('abc').toObject(), [{ name: 'Bill' }]);
   });
+
+  it('handles loading and modifying map of document arrays (gh-15196)', async function() {
+    const schema = new Schema({
+      name: { type: String, required: true },
+      test_map: {
+        type: Map,
+        of: [{
+          _id: false,
+          num: { type: Number, required: true },
+          bool: { type: Boolean, required: true }
+        }]
+      }
+    });
+    const Test = db.model('Test', schema);
+
+    let doc1 = new Test({ name: 'name1', test_map: new Map() });
+    await doc1.save();
+
+    // 1. Refresh the document from the db
+    doc1 = await Test.findOne({ _id: doc1._id });
+
+    // 2. Modify the document (add a new key in the test_map map)
+    doc1.test_map.set('key1', []);
+    await doc1.save();
+
+    // 3. Now, the document is wrong in the db and we cannot access the test_map anymore.
+    doc1 = await Test.findOne({ _id: doc1._id });
+    assert.deepStrictEqual(doc1.toObject().test_map, new Map([['key1', []]]));
+
+    doc1 = await Test.findOne({ _id: doc1._id }).lean();
+    assert.deepStrictEqual(doc1.test_map, { key1: [] });
+  });
 });

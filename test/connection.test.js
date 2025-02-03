@@ -1786,4 +1786,30 @@ describe('connections:', function() {
     assert.ok(res.mongoose.results[1] instanceof CastError);
     assert.ok(res.mongoose.results[1].message.includes('not a number'));
   });
+
+  it('buffers connection helpers', async function() {
+    const m = new mongoose.Mongoose();
+
+    const promise = m.connection.listCollections();
+
+    await new Promise(resolve => setTimeout(resolve, 100));
+    await m.connect(start.uri, { bufferTimeoutMS: 1000 });
+    await promise;
+
+    await m.connection.listCollections();
+
+    await m.disconnect();
+  });
+
+  it('connection helpers buffering times out', async function() {
+    const m = new mongoose.Mongoose();
+    m.set('bufferTimeoutMS', 100);
+
+    // Delayed `assert.rejects()` pattern, because using the usual `await assert.rejects()` pattern _after_ the `setTimeout()`
+    // call below would lead to an unhandled promise rejection.
+    const promise = assert.rejects(m.connection.listCollections(), /Connection operation buffering timed out after 100ms/);
+
+    await new Promise(resolve => setTimeout(resolve, 200));
+    await promise;
+  });
 });

@@ -2977,6 +2977,7 @@ declare module 'mongoose' {
     Expression.LastN |
     Expression.Max |
     Expression.MaxN |
+    Expression.Median |
     Expression.MergeObjects |
     Expression.Min |
     Expression.MinN |

@@ -1805,12 +1805,7 @@ describe('connections:', function() {
     const m = new mongoose.Mongoose();
     m.set('bufferTimeoutMS', 100);
 
-    // Delayed `assert.rejects()` pattern, because using the usual `await assert.rejects()` pattern _after_ the `setTimeout()`
-    // call below would lead to an unhandled promise rejection.
-    const promise = assert.rejects(m.connection.listCollections(), /Connection operation buffering timed out after 100ms/);
-
-    await new Promise(resolve => setTimeout(resolve, 200));
-    await promise;
+    await assert.rejects(m.connection.listCollections(), /Connection operation buffering timed out after 100ms/);
   });
 
   it('supports db-level aggregate on connection (gh-15118)', async function() {

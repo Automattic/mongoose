@@ -829,7 +829,7 @@ declare module 'mongoose' {
         ? Types.DocumentArray<FlattenMaps<ItemType>> : FlattenMaps<T>;
 
   export type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
-  export type TreatAsPrimitives = actualPrimitives | NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId | Buffer | Function | mongodb.Binary;
+  export type TreatAsPrimitives = actualPrimitives | NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId | Buffer | Function | mongodb.Binary | mongodb.ClientSession;
 
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
 

@@ -1812,7 +1812,7 @@ describe('connections:', function() {
     await new Promise(resolve => setTimeout(resolve, 200));
     await promise;
   });
-    
+
   it('supports db-level aggregate on connection (gh-15118)', async function() {
     const db = start();
 

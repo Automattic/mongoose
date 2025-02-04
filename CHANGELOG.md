@@ -1,3 +1,9 @@
+8.9.7 / 2025-02-04
+==================
+ * fix: avoid applying defaults on map embedded paths #15217 #15196
+ * types: add missing $median operator to aggregation types #15233 #15209
+ * docs(document): clarify that toObject() returns a POJO that may contain non-POJO values #15232 #15208
+
 8.9.6 / 2025-01-31
 ==================
  * fix(document): allow setting values to undefined with set(obj) syntax with strict: false #15207 #15192

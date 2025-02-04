@@ -1168,14 +1168,11 @@ describe('Map', function() {
     let doc1 = new Test({ name: 'name1', test_map: new Map() });
     await doc1.save();
 
-    // 1. Refresh the document from the db
     doc1 = await Test.findOne({ _id: doc1._id });
 
-    // 2. Modify the document (add a new key in the test_map map)
     doc1.test_map.set('key1', []);
     await doc1.save();
 
-    // 3. Now, the document is wrong in the db and we cannot access the test_map anymore.
     doc1 = await Test.findOne({ _id: doc1._id });
     assert.deepStrictEqual(doc1.toObject().test_map, new Map([['key1', []]]));
 

@@ -7363,6 +7363,27 @@ describe('document', function() {
     assert.strictEqual(obj.subDoc.timestamp, date);
   });
 
+  it('supports setting values to undefined with strict: false (gh-15192)', async function() {
+    const helloSchema = new mongoose.Schema({
+      name: { type: String, required: true },
+      status: { type: Boolean, required: true },
+      optional: { type: Number }
+    }, { strict: false });
+    const Hello = db.model('Test', helloSchema);
+
+    const obj = new Hello({ name: 'abc', status: true, optional: 1 });
+    const doc = await obj.save();
+
+    doc.set({ optional: undefined });
+
+    assert.ok(doc.isModified());
+
+    await doc.save();
+
+    const { optional } = await Hello.findById(doc._id).orFail();
+    assert.strictEqual(optional, undefined);
+  });
+
   it('handles .set() on doc array within embedded discriminator (gh-7656)', function() {
     const pageElementSchema = new Schema({
       type: { type: String, required: true }

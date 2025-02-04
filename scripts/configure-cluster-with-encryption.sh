@@ -17,16 +17,18 @@ if [ ! -d "data" ]; then
   cd data
 
   # note:
-    # we're using drivers-evergreen-tools which is a repo used by MongoDB drivers to start clusters for testing.
-    # if you'd like to make changes to the cluster settings, edit the exported variables below.
-    # for configuration options for the exported variables, see here: https://github.com/mongodb-labs/drivers-evergreen-tools/blob/master/.evergreen/run-orchestration.sh
-    # after this script is run, the data/ folder will notably contain the following:
-      # 'mo-expansion.yml' file which contains for your cluster URI and crypt shared library path
-      # 'drivers-evergreen-tools/mongodb/bin' which contain executables for other mongodb libraries such as mongocryptd, mongosh, and mongod
+  # we're using drivers-evergreen-tools which is a repo used by MongoDB drivers to start clusters for testing.
+  # if you'd like to make changes to the cluster settings, edit the exported variables below.
+  # for configuration options for the exported variables, see here: https://github.com/mongodb-labs/drivers-evergreen-tools/blob/master/.evergreen/run-orchestration.sh
+  # after this script is run, the data/ folder will notably contain the following:
+  # 'mo-expansion.yml' file which contains for your cluster URI and crypt shared library path
+  # 'drivers-evergreen-tools/mongodb/bin' which contain executables for other mongodb libraries such as mongocryptd, mongosh, and mongod
   if [ ! -d "drivers-evergreen-tools/" ]; then
     git clone "https://github.com/mongodb-labs/drivers-evergreen-tools.git"
     # pin stable commit
+    cd drivers-evergreen-tools
     git checkout $DRIVERS_TOOLS_PINNED_COMMIT
+    cd ..
   fi
 
   # configure cluster settings

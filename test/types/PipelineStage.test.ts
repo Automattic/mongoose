@@ -575,3 +575,12 @@ const vectorSearchStages: PipelineStage[] = [
     }
   }
 ];
+
+function median() {
+  const medianStage: PipelineStage = {
+    $median: {
+      input: ['$test01', '$test02', '$test03'],
+      method: 'approximate'
+    }
+  };
+}

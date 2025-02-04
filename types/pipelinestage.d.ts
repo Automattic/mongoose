@@ -20,6 +20,7 @@ declare module 'mongoose' {
     | PipelineStage.ListSessions
     | PipelineStage.Lookup
     | PipelineStage.Match
+    | PipelineStage.Median
     | PipelineStage.Merge
     | PipelineStage.Out
     | PipelineStage.PlanCacheStats
@@ -185,6 +186,14 @@ declare module 'mongoose' {
     export interface Match {
       /** [`$match` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/match/) */
       $match: FilterQuery<any>;
+    }
+
+    export interface Median {
+      /** [`$median` reference](https://www.mongodb.com/docs/v7.0/reference/operator/aggregation/median/) */
+      $median: {
+        input: number | Expression,
+        method: 'approximate'
+      }
     }
 
     export interface Merge {

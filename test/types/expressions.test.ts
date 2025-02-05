@@ -313,3 +313,7 @@ const filterLimit: Expression.Filter = {
     }
   ];
 })();
+
+function gh15209() {
+  const query: PipelineStage[] = [{ $group: { _id: null, median: { $median: { input: '$value', method: 'approximate' } } } }];
+}

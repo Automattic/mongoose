@@ -2301,6 +2301,18 @@ declare module 'mongoose' {
       }
     }
 
+    export interface Median {
+      /**
+       * Returns an approximation of the median, the 50th percentile, as a scalar value.
+       *
+       * @see https://www.mongodb.com/docs/v7.0/reference/operator/aggregation/median/
+       */
+      $median: {
+        input: number | Expression,
+        method: 'approximate'
+      }
+    }
+
     export interface StdDevPop {
       /**
        * Calculates the population standard deviation of the input values. Use if the values encompass the entire
@@ -2859,6 +2871,7 @@ declare module 'mongoose' {
     Expression.Locf |
     Expression.Max |
     Expression.MaxN |
+    Expression.Median |
     Expression.Min |
     Expression.MinN |
     Expression.Push |
@@ -2891,6 +2904,7 @@ declare module 'mongoose' {
     Expression.ExpMovingAvg |
     Expression.Integral |
     Expression.Max |
+    Expression.Median |
     Expression.Min |
     Expression.StdDevPop |
     Expression.StdDevSamp |
@@ -2963,6 +2977,7 @@ declare module 'mongoose' {
     Expression.LastN |
     Expression.Max |
     Expression.MaxN |
+    Expression.Median |
     Expression.MergeObjects |
     Expression.Min |
     Expression.MinN |

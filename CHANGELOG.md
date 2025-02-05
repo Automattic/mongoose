@@ -1,3 +1,20 @@
+8.10.0 / 2025-02-05
+===================
+ * feat(schema+schematype): add toJSONSchema() method to convert schemas and schematypes to JSON schema #15184 #11162
+ * feat(connection): make connection helpers respect bufferTimeoutMS #15229 #15201
+ * feat(document): support schematype-level transform option #15163 #15084
+ * feat(model): add insertOne() function to insert a single doc #15162 #14843
+ * feat(connection): support Connection.prototype.aggregate() for db-level aggregations #15153
+ * feat(model): make syncIndexes() not call createIndex() on indexes that already exist #15175 #12250
+ * feat(model): useConnection(connection) function #14802
+ * fix(model): disallow updateMany(update) and fix TypeScript types re: updateMany() #15199 #15190
+ * fix(collection): avoid buffering if creating a collection during a connection interruption #15187 #14971
+ * fix(model): throw error if calling create() with multiple docs in a transaction unless ordered: true #15100
+ * fix(model): skip createCollection() in syncIndexes() if autoCreate: false #15155
+ * fix(model): make `hydrate()` handle hydrating deeply nested populated docs with hydratedPopulatedDocs #15130
+ * types(document): make sure toObject() and toJSON() apply versionKey __v #15097
+ * ci(NODE-6505): CI Setup for Encryption Support #15139 [aditi-khare-mongoDB](https://github.com/aditi-khare-mongoDB)
+
 8.9.7 / 2025-02-04
 ==================
  * fix: avoid applying defaults on map embedded paths #15217 #15196

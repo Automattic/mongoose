@@ -64,6 +64,16 @@ describe('collections:', function() {
     });
   });
 
+  it('handles bufferTimeoutMS in schemaUserProvidedOptions', async function() {
+    db = mongoose.createConnection();
+    const collection = db.collection('gh14184');
+    collection.opts.schemaUserProvidedOptions = { bufferTimeoutMS: 100 };
+
+    const err = await collection.find({ foo: 'bar' }, {}).then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(err.message.includes('buffering timed out after 100ms'));
+  });
+
   it('methods should that throw (unimplemented)', function() {
     const collection = new Collection('test', mongoose.connection);
     let thrown = false;

@@ -300,6 +300,8 @@ declare module 'mongoose' {
     /** Declares a full text index. */
     text(bool: boolean): this;
 
+    toJSONSchema(options?: { useBsonType?: boolean }): Record<string, any>;
+
     /** Defines a custom function for transforming this path when converting a document to JSON. */
     transform(fn: (value: any) => any): this;
 

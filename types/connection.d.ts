@@ -59,6 +59,8 @@ declare module 'mongoose' {
   }
 
   class Connection extends events.EventEmitter implements SessionStarter {
+    aggregate<ResultType = unknown>(pipeline?: PipelineStage[] | null, options?: AggregateOptions): Aggregate<Array<ResultType>>;
+
     /** Returns a promise that resolves when this connection successfully connects to MongoDB */
     asPromise(): Promise<this>;
 

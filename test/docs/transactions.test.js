@@ -344,7 +344,10 @@ describe('transactions', function() {
     const session = await db.startSession();
 
     session.startTransaction();
-    await Character.create([{ name: 'Will Riker', rank: 'Commander' }, { name: 'Jean-Luc Picard', rank: 'Captain' }], { session, ordered: true });
+    await Character.create([
+      { name: 'Will Riker', rank: 'Commander' },
+      { name: 'Jean-Luc Picard', rank: 'Captain' }
+    ], { session, ordered: true });
 
     let names = await Character.distinct('name', {}, { session });
     assert.deepStrictEqual(names.sort(), ['Jean-Luc Picard', 'Will Riker']);
@@ -663,5 +666,49 @@ describe('transactions', function() {
 
     const { name } = await Test.findById(_id);
     assert.strictEqual(name, 'bar');
+  });
+
+  it('throws error if using `create()` with multiple docs in a transaction (gh-15091)', async function() {
+    const BookingSchema = new Schema({
+      user: mongoose.Types.ObjectId,
+      slot: mongoose.Types.ObjectId,
+      bookingFor: String,
+      moreInfo: String
+    });
+
+    // Create models
+    db.deleteModel(/Test/);
+    const Booking = db.model('Test', BookingSchema);
+
+    // Define a sample payload
+    const user = { userId: new mongoose.Types.ObjectId() };
+    const payload = {
+      slotId: new mongoose.Types.ObjectId(),
+      data: [
+        { bookingFor: 'Person A', moreInfo: 'Some info' },
+        { bookingFor: 'Person B', moreInfo: 'Other info' }
+      ]
+    };
+
+    const session = await db.startSession();
+    session.startTransaction();
+
+    const bookingData = payload.data.map((obj) => ({
+      user: user.userId,
+      slot: payload.slotId,
+      bookingFor: obj.bookingFor,
+      moreInfo: obj.moreInfo
+    }));
+
+    const bookings = await Booking.create(bookingData, { session, ordered: true });
+    assert.equal(bookings.length, 2);
+
+    await assert.rejects(
+      Booking.create(bookingData, { session }),
+      /Cannot call `create\(\)` with a session and multiple documents unless `ordered: true` is set/
+    );
+
+    await session.abortTransaction();
+    await session.endSession();
   });
 });

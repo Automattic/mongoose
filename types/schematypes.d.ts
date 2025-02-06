@@ -389,10 +389,10 @@ declare module 'mongoose' {
         expires(when: number | string): this;
 
         /** Sets a maximum date validator. */
-        max(value: NativeDate, message: string): this;
+        max(value: NativeDate, message?: string): this;
 
         /** Sets a minimum date validator. */
-        min(value: NativeDate, message: string): this;
+        min(value: NativeDate, message?: string): this;
 
         /** Default options for this SchemaType */
         defaultOptions: Record<string, any>;
@@ -457,10 +457,10 @@ declare module 'mongoose' {
         enum(vals: number[]): this;
 
         /** Sets a maximum number validator. */
-        max(value: number, message: string): this;
+        max(value: number, message?: string): this;
 
         /** Sets a minimum number validator. */
-        min(value: number, message: string): this;
+        min(value: number, message?: string): this;
 
         /** Default options for this SchemaType */
         defaultOptions: Record<string, any>;

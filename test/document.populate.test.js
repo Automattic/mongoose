@@ -1075,4 +1075,44 @@ describe('document.populate', function() {
     assert.deepStrictEqual(codeUser.extras[0].config.paymentConfiguration.paymentMethods[0]._id, code._id);
     assert.strictEqual(codeUser.extras[0].config.paymentConfiguration.paymentMethods[0].code, 'test code');
   });
+
+  it('supports populate with ordered option (gh-15231)', async function() {
+    const docSchema = new Schema({
+      refA: { type: Schema.Types.ObjectId, ref: 'Test1' },
+      refB: { type: Schema.Types.ObjectId, ref: 'Test2' },
+      refC: { type: Schema.Types.ObjectId, ref: 'Test3' }
+    });
+
+    const doc1Schema = new Schema({ name: String });
+    const doc2Schema = new Schema({ title: String });
+    const doc3Schema = new Schema({ content: String });
+
+    const Doc = db.model('Test', docSchema);
+    const Doc1 = db.model('Test1', doc1Schema);
+    const Doc2 = db.model('Test2', doc2Schema);
+    const Doc3 = db.model('Test3', doc3Schema);
+
+    const doc1 = await Doc1.create({ name: 'test 1' });
+    const doc2 = await Doc2.create({ title: 'test 2' });
+    const doc3 = await Doc3.create({ content: 'test 3' });
+
+    const docD = await Doc.create({
+      refA: doc1._id,
+      refB: doc2._id,
+      refC: doc3._id
+    });
+
+    await docD.populate({
+      path: ['refA', 'refB', 'refC'],
+      ordered: true
+    });
+
+    assert.ok(docD.populated('refA'));
+    assert.ok(docD.populated('refB'));
+    assert.ok(docD.populated('refC'));
+
+    assert.equal(docD.refA.name, 'test 1');
+    assert.equal(docD.refB.title, 'test 2');
+    assert.equal(docD.refC.content, 'test 3');
+  });
 });

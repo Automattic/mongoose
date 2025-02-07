@@ -123,8 +123,6 @@
  * fix: disallow using $where in match
  * perf: cache results from getAllSubdocs() on saveOptions, only loop through known subdoc properties #15055 #15029
  * fix(model+query): support overwriteDiscriminatorKey for bulkWrite updateOne and updateMany, allow inferring discriminator key from update #15046 #15040
-=======
->>>>>>> 7.x
 
 7.8.3 / 2024-11-26
 ==================

@@ -1725,3 +1725,11 @@ async function gh12959() {
   const leanDoc = await TestModel.findOne().lean().orFail();
   expectType<number>(leanDoc.__v);
 }
+
+async function gh15236() {
+  const schema = new Schema({
+    myNum: { type: Number }
+  });
+
+  schema.path<Schema.Types.Number>('myNum').min(0);
+}

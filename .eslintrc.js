@@ -18,7 +18,8 @@ module.exports = {
     '**/docs/5.x/*',
     '!.*',
     'node_modules',
-    '.git'
+    '.git',
+    'data'
   ],
   overrides: [
     {
@@ -108,7 +109,7 @@ module.exports = {
     // 'markdown'
   ],
   parserOptions: {
-    ecmaVersion: 2020
+    ecmaVersion: 2022
   },
   env: {
     node: true,

@@ -508,6 +508,8 @@ declare module 'mongoose' {
     statics: { [F in keyof TStaticMethods]: TStaticMethods[F] } &
     { [name: string]: (this: TModelType, ...args: any[]) => unknown };
 
+    toJSONSchema(options?: { useBsonType?: boolean }): Record<string, any>;
+
     /** Creates a virtual type with the given name. */
     virtual<T = HydratedDocument<DocType, TVirtuals & TInstanceMethods, TQueryHelpers>>(
       name: keyof TVirtuals | string,
@@ -827,7 +829,7 @@ declare module 'mongoose' {
         ? Types.DocumentArray<FlattenMaps<ItemType>> : FlattenMaps<T>;
 
   export type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;
-  export type TreatAsPrimitives = actualPrimitives | NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId | Buffer | Function | mongodb.Binary;
+  export type TreatAsPrimitives = actualPrimitives | NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId | Buffer | Function | mongodb.Binary | mongodb.ClientSession;
 
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
 

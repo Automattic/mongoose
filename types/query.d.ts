@@ -850,9 +850,12 @@ declare module 'mongoose' {
      * the `multi` option.
      */
     updateMany(
-      filter?: RootFilterQuery<RawDocType>,
-      update?: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline,
+      filter: RootFilterQuery<RawDocType>,
+      update: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline,
       options?: QueryOptions<DocType> | null
+    ): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType, 'updateMany', TDocOverrides>;
+    updateMany(
+      update: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline
     ): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType, 'updateMany', TDocOverrides>;
 
     /**
@@ -860,9 +863,12 @@ declare module 'mongoose' {
      * `update()`, except it does not support the `multi` or `overwrite` options.
      */
     updateOne(
-      filter?: RootFilterQuery<RawDocType>,
-      update?: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline,
+      filter: RootFilterQuery<RawDocType>,
+      update: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline,
       options?: QueryOptions<DocType> | null
+    ): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType, 'updateOne', TDocOverrides>;
+    updateOne(
+      update: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline
     ): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType, 'updateOne', TDocOverrides>;
 
     /**

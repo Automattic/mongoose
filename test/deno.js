@@ -16,8 +16,6 @@ const fixtures = require('./mocha-fixtures.js')
 await fixtures.mochaGlobalSetup();
 
 const child_args = [
-  // args is required to be set manually, because there is currently no way to get all arguments from deno
-  '--allow-env', '--allow-read', '--allow-net', '--allow-run', '--allow-sys', '--allow-write',
   ...Deno.args,
   resolve(fileURLToPath(import.meta.url), '../deno_mocha.js')
 ];

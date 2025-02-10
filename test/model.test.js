@@ -4174,7 +4174,7 @@ describe('Model', function() {
         assert.strictEqual(r2.testArray[0].nonexistentProp, undefined);
       });
 
-      it('handles overwriteDiscriminatorKey (gh-15040)', async function() {
+      it('handles overwriteDiscriminatorKey (gh-15218) (gh-15040)', async function() {
         const dSchema1 = new mongoose.Schema({
           field1: String
         });
@@ -4202,7 +4202,7 @@ describe('Model', function() {
         assert.equal(r1.field1, 'field1');
         assert.equal(r1.key, type1Key);
 
-        const field2 = 'field2';
+        let field2 = 'field2';
         await TestModel.bulkWrite([{
           updateOne: {
             filter: { _id: r1._id },
@@ -4214,7 +4214,13 @@ describe('Model', function() {
           }
         }]);
 
-        const r2 = await TestModel.findById(r1._id);
+        let r2 = await TestModel.findById(r1._id);
+        assert.equal(r2.key, type2Key);
+        assert.equal(r2.field2, field2);
+
+        field2 = 'field2 updated again';
+        await TestModel.updateOne({ _id: r1._id }, { $set: { key: type2Key, field2 } }, { overwriteDiscriminatorKey: true });
+        r2 = await TestModel.findById(r1._id);
         assert.equal(r2.key, type2Key);
         assert.equal(r2.field2, field2);
       });

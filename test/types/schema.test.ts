@@ -1733,3 +1733,8 @@ async function gh15236() {
 
   schema.path<Schema.Types.Number>('myNum').min(0);
 }
+
+function gh15244() {
+  const schema = new Schema({});
+  schema.discriminator('Name', new Schema({}), { value: 'value' });
+}

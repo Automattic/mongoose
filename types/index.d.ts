@@ -273,10 +273,10 @@ declare module 'mongoose' {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType> | DocType, options?: SchemaOptions<FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
+    constructor(definition?: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType, THydratedDocumentType> | DocType, options?: SchemaOptions<FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
 
     /** Adds key path / schema type pairs to this schema. */
-    add(obj: SchemaDefinition<SchemaDefinitionType<RawDocType>> | Schema, prefix?: string): this;
+    add(obj: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType> | Schema, prefix?: string): this;
 
     /**
      * Add an alias for `path`. This means getting or setting the `alias`

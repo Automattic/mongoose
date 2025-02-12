@@ -1,6 +1,11 @@
 declare module 'mongoose' {
 
-  type SchemaValidator<T, EnforcedDocType> = RegExp | [RegExp, string] | Function | [Function, string] | ValidateOpts<T, EnforcedDocType> | ValidateOpts<T, EnforcedDocType>[];
+  type SchemaValidator<T, EnforcedDocType, THydratedDocumentType> = RegExp
+    | [RegExp, string]
+    | Function
+    | [Function, string]
+    | ValidateOpts<T, THydratedDocumentType>
+    | ValidateOpts<T, THydratedDocumentType>[];
 
   interface ValidatorProps {
     path: string;

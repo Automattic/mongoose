@@ -273,10 +273,10 @@ declare module 'mongoose' {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType> | DocType, options?: SchemaOptions<FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
+    constructor(definition?: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType, THydratedDocumentType> | DocType, options?: SchemaOptions<FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
 
     /** Adds key path / schema type pairs to this schema. */
-    add(obj: SchemaDefinition<SchemaDefinitionType<RawDocType>> | Schema, prefix?: string): this;
+    add(obj: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType> | Schema, prefix?: string): this;
 
     /**
      * Add an alias for `path`. This means getting or setting the `alias`
@@ -297,7 +297,7 @@ declare module 'mongoose' {
     /** Returns a copy of this schema */
     clone<T = this>(): T;
 
-    discriminator<DisSchema = Schema>(name: string | number, schema: DisSchema): this;
+    discriminator<DisSchema = Schema>(name: string | number, schema: DisSchema, options?: DiscriminatorOptions): this;
 
     /** Returns a new schema that has the picked `paths` from this schema. */
     pick<T = this>(paths: string[], options?: SchemaOptions): T;
@@ -541,21 +541,21 @@ declare module 'mongoose' {
           ? DateSchemaDefinition
           : (Function | string);
 
-  export type SchemaDefinitionProperty<T = undefined, EnforcedDocType = any> = SchemaDefinitionWithBuiltInClass<T> |
-  SchemaTypeOptions<T extends undefined ? any : T, EnforcedDocType> |
-    typeof SchemaType |
-  Schema<any, any, any> |
-  Schema<any, any, any>[] |
-  SchemaTypeOptions<T extends undefined ? any : Unpacked<T>, EnforcedDocType>[] |
-  Function[] |
-  SchemaDefinition<T, EnforcedDocType> |
-  SchemaDefinition<Unpacked<T>, EnforcedDocType>[] |
-    typeof Schema.Types.Mixed |
-  MixedSchemaTypeOptions<EnforcedDocType>;
+  export type SchemaDefinitionProperty<T = undefined, EnforcedDocType = any, THydratedDocumentType = HydratedDocument<EnforcedDocType>> = SchemaDefinitionWithBuiltInClass<T>
+    | SchemaTypeOptions<T extends undefined ? any : T, EnforcedDocType, THydratedDocumentType>
+    | typeof SchemaType
+    | Schema<any, any, any>
+    | Schema<any, any, any>[]
+    | SchemaTypeOptions<T extends undefined ? any : Unpacked<T>, EnforcedDocType, THydratedDocumentType>[]
+    | Function[]
+    | SchemaDefinition<T, EnforcedDocType, THydratedDocumentType>
+    | SchemaDefinition<Unpacked<T>, EnforcedDocType, THydratedDocumentType>[]
+    | typeof Schema.Types.Mixed
+    | MixedSchemaTypeOptions<EnforcedDocType>;
 
-  export type SchemaDefinition<T = undefined, EnforcedDocType = any> = T extends undefined
+  export type SchemaDefinition<T = undefined, EnforcedDocType = any, THydratedDocumentType = HydratedDocument<EnforcedDocType>> = T extends undefined
     ? { [path: string]: SchemaDefinitionProperty; }
-    : { [path in keyof T]?: SchemaDefinitionProperty<T[path], EnforcedDocType>; };
+    : { [path in keyof T]?: SchemaDefinitionProperty<T[path], EnforcedDocType, THydratedDocumentType>; };
 
   export type AnyArray<T> = T[] | ReadonlyArray<T>;
   export type ExtractMongooseArray<T> = T extends Types.Array<any> ? AnyArray<Unpacked<T>> : T;

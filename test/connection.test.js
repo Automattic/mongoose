@@ -1637,6 +1637,19 @@ describe('connections:', function() {
     assert.ok(!res.map(c => c.name).includes('gh12940_Conn'));
   });
 
+  it('does not wait for buffering if autoCreate: false (gh-15241)', async function() {
+    const m = new mongoose.Mongoose();
+    m.set('bufferTimeoutMS', 100);
+
+    const schema = new Schema({ name: String }, {
+      autoCreate: false
+    });
+    const Model = m.model('gh15241_Conn', schema);
+
+    // Without gh-15241 changes, this would buffer and fail even though `autoCreate: false`
+    await Model.init();
+  });
+
   it('should not create default connection with createInitialConnection = false (gh-12965)', function() {
     const m = new mongoose.Mongoose({
       createInitialConnection: false

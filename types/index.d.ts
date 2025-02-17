@@ -216,7 +216,7 @@ declare module 'mongoose' {
     getters?: boolean;
     /** remove empty objects (defaults to true) */
     minimize?: boolean;
-    /** If true, the resulting object will only have fields that are defined in the document's schema. By default, `toJSON()` returns all fields in the underlying document from MongoDB, including ones that are not listed in the schema. */
+    /** If true, the resulting object will only have fields that are defined in the document's schema. By default, `toJSON()` & `toObject()` returns all fields in the underlying document from MongoDB, including ones that are not listed in the schema. */
     schemaFieldsOnly?: boolean;
     /** if set, mongoose will call this function to allow you to transform the returned object */
     transform?: boolean | ((

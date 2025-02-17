@@ -204,30 +204,32 @@ declare module 'mongoose' {
   }
 
   export interface ToObjectOptions<THydratedDocumentType = HydratedDocument<unknown>> {
-    /** apply all getters (path and virtual getters) */
-    getters?: boolean;
-    /** apply virtual getters (can override getters option) */
-    virtuals?: boolean | string[];
     /** if `options.virtuals = true`, you can set `options.aliases = false` to skip applying aliases. This option is a no-op if `options.virtuals = false`. */
     aliases?: boolean;
+    /** if true, replace any conventionally populated paths with the original id in the output. Has no affect on virtual populated paths. */
+    depopulate?: boolean;
+    /** if true, convert Maps to POJOs. Useful if you want to `JSON.stringify()` the result of `toObject()`. */
+    flattenMaps?: boolean;
+    /** if true, convert any ObjectIds in the result to 24 character hex strings. */
+    flattenObjectIds?: boolean;
+    /** apply all getters (path and virtual getters) */
+    getters?: boolean;
     /** remove empty objects (defaults to true) */
     minimize?: boolean;
+    /** If true, the resulting object will only have fields that are defined in the document's schema. By default, `toJSON()` & `toObject()` returns all fields in the underlying document from MongoDB, including ones that are not listed in the schema. */
+    schemaFieldsOnly?: boolean;
     /** if set, mongoose will call this function to allow you to transform the returned object */
     transform?: boolean | ((
       doc: THydratedDocumentType,
       ret: Record<string, any>,
       options: ToObjectOptions<THydratedDocumentType>
     ) => any);
-    /** if true, replace any conventionally populated paths with the original id in the output. Has no affect on virtual populated paths. */
-    depopulate?: boolean;
-    /** if false, exclude the version key (`__v` by default) from the output */
-    versionKey?: boolean;
-    /** if true, convert Maps to POJOs. Useful if you want to `JSON.stringify()` the result of `toObject()`. */
-    flattenMaps?: boolean;
-    /** if true, convert any ObjectIds in the result to 24 character hex strings. */
-    flattenObjectIds?: boolean;
     /** If true, omits fields that are excluded in this document's projection. Unless you specified a projection, this will omit any field that has `select: false` in the schema. */
     useProjection?: boolean;
+    /** if false, exclude the version key (`__v` by default) from the output */
+    versionKey?: boolean;
+    /** apply virtual getters (can override getters option) */
+    virtuals?: boolean | string[];
   }
 
   export type DiscriminatorModel<M, T> = T extends Model<infer T, infer TQueryHelpers, infer TInstanceMethods, infer TVirtuals>

@@ -14298,6 +14298,90 @@ describe('document', function() {
     delete mongoose.Schema.Types.CustomType;
   });
 
+  it('supports schemaFieldsOnly option for toObject() (gh-15258)', async function() {
+    const schema = new Schema({ key: String }, { discriminatorKey: 'key' });
+    const subschema1 = new Schema({ field1: String });
+    const subschema2 = new Schema({ field2: String });
+
+    const Discriminator = db.model('Test', schema);
+    Discriminator.discriminator('type1', subschema1);
+    Discriminator.discriminator('type2', subschema2);
+
+    const doc = await Discriminator.create({
+      key: 'type1',
+      field1: 'test value'
+    });
+
+    await Discriminator.updateOne(
+      { _id: doc._id },
+      {
+        key: 'type2',
+        field2: 'test2'
+      },
+      { overwriteDiscriminatorKey: true }
+    );
+
+    const doc2 = await Discriminator.findById(doc).orFail();
+    assert.strictEqual(doc2.field2, 'test2');
+    assert.strictEqual(doc2.field1, undefined);
+
+    const obj = doc2.toObject();
+    assert.strictEqual(obj.field2, 'test2');
+    assert.strictEqual(obj.field1, 'test value');
+
+    const obj2 = doc2.toObject({ schemaFieldsOnly: true });
+    assert.strictEqual(obj.field2, 'test2');
+    assert.strictEqual(obj2.field1, undefined);
+  });
+
+  it('supports schemaFieldsOnly on nested paths, subdocuments, and arrays (gh-15258)', async function() {
+    const subSchema = new Schema({
+      title: String,
+      description: String
+    }, { _id: false });
+    const taskSchema = new Schema({
+      name: String,
+      details: {
+        dueDate: Date,
+        priority: Number
+      },
+      subtask: subSchema,
+      tasks: [subSchema]
+    });
+    const Task = db.model('Test', taskSchema);
+
+    const doc = await Task.create({
+      _id: '0'.repeat(24),
+      name: 'Test Task',
+      details: {
+        dueDate: new Date('2024-01-01'),
+        priority: 1
+      },
+      subtask: {
+        title: 'Subtask 1',
+        description: 'Test Description'
+      },
+      tasks: [{
+        title: 'Array Task 1',
+        description: 'Array Description 1'
+      }]
+    });
+
+    doc._doc.details.extraField = 'extra';
+    doc._doc.subtask.extraField = 'extra';
+    doc._doc.tasks[0].extraField = 'extra';
+
+    const obj = doc.toObject({ schemaFieldsOnly: true });
+    assert.deepStrictEqual(obj, {
+      name: 'Test Task',
+      details: { dueDate: new Date('2024-01-01T00:00:00.000Z'), priority: 1 },
+      subtask: { title: 'Subtask 1', description: 'Test Description' },
+      tasks: [{ title: 'Array Task 1', description: 'Array Description 1' }],
+      _id: new mongoose.Types.ObjectId('0'.repeat(24)),
+      __v: 0
+    });
+  });
+
   it('handles undoReset() on deep recursive subdocuments (gh-15255)', async function() {
     const RecursiveSchema = new mongoose.Schema({});
 

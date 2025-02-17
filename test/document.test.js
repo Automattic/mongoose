@@ -14307,18 +14307,15 @@ describe('document', function() {
     Discriminator.discriminator('type1', subschema1);
     Discriminator.discriminator('type2', subschema2);
 
-    const type1Key = 'type1';
-    const type2Key = 'type2';
-
     const doc = await Discriminator.create({
-      key: type1Key,
+      key: 'type1',
       field1: 'test value'
     });
 
     await Discriminator.updateOne(
       { _id: doc._id },
       {
-        key: type2Key,
+        key: 'type2',
         field2: 'test2'
       },
       { overwriteDiscriminatorKey: true }

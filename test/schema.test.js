@@ -3889,4 +3889,34 @@ describe('schema', function() {
       assert.throws(() => schema.toJSONSchema(), /unsupported SchemaType to JSON Schema: Mixed/);
     });
   });
+
+  it('path() clears existing child schemas (gh-15253)', async function() {
+    const RecursiveSchema = new mongoose.Schema({
+      data: String
+    });
+
+    const s = [RecursiveSchema];
+    RecursiveSchema.path('nested', s);
+    assert.strictEqual(RecursiveSchema.childSchemas.length, 1);
+    RecursiveSchema.path('nested', s);
+    assert.strictEqual(RecursiveSchema.childSchemas.length, 1);
+    RecursiveSchema.path('nested', s);
+    assert.strictEqual(RecursiveSchema.childSchemas.length, 1);
+    RecursiveSchema.path('nested', s);
+    assert.strictEqual(RecursiveSchema.childSchemas.length, 1);
+
+    const generateRecursiveDocument = (depth, curr = 0) => {
+      return {
+        name: `Document of depth ${curr}`,
+        nested: depth > 0 ? new Array(3).fill().map(() => generateRecursiveDocument(depth - 1, curr + 1)) : [],
+        data: Math.random()
+      };
+    };
+
+    const TestModel = db.model('Test', RecursiveSchema);
+    const data = generateRecursiveDocument(6);
+    const doc = new TestModel(data);
+    await doc.save();
+
+  });
 });

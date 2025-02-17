@@ -14325,8 +14325,8 @@ describe('document', function() {
     );
 
     const doc2 = await Discriminator.findById(doc).orFail();
-    assert.strictEqual(doc2.field1, undefined);
     assert.strictEqual(doc2.field2, 'test2');
+    assert.strictEqual(doc2.field1, undefined);
 
     const obj = doc2.toObject();
     assert.strictEqual(obj.field2, 'test2');

@@ -235,13 +235,17 @@ type IsSchemaTypeFromBuiltinClass<T> = T extends (typeof String)
                               ? true
                               : T extends Types.Decimal128
                                 ? true
-                                : T extends Buffer
+                                : T extends NativeDate
                                   ? true
-                                  : T extends NativeDate
+                                  : T extends (typeof Schema.Types.Mixed)
                                     ? true
-                                    : T extends (typeof Schema.Types.Mixed)
+                                    : IfEquals<T, Schema.Types.ObjectId, true, false> extends true
                                       ? true
-                                      : IfEquals<T, Schema.Types.ObjectId, true, false>;
+                                      : unknown extends Buffer
+                                        ? false
+                                        : T extends Buffer
+                                          ? true
+                                          : false;
 
 /**
  * @summary Resolve path type by returning the corresponding type.

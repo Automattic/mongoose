@@ -712,47 +712,53 @@ declare module 'mongoose' {
     [K in keyof T]: FlattenProperty<T[K]>;
   };
 
-  export type BufferToBinaryProperty<T> = T extends Buffer
-    ? mongodb.Binary
-    : T extends Types.DocumentArray<infer ItemType>
-      ? Types.DocumentArray<BufferToBinary<ItemType>>
-      : T extends Types.Subdocument<unknown, unknown, infer SubdocType>
-        ? HydratedSingleSubdocument<BufferToBinary<SubdocType>>
-        : BufferToBinary<T>;
+  export type BufferToBinaryProperty<T> = unknown extends Buffer
+    ? T
+    : T extends Buffer
+      ? mongodb.Binary
+      : T extends Types.DocumentArray<infer ItemType>
+        ? Types.DocumentArray<BufferToBinary<ItemType>>
+        : T extends Types.Subdocument<unknown, unknown, infer SubdocType>
+          ? HydratedSingleSubdocument<BufferToBinary<SubdocType>>
+          : BufferToBinary<T>;
 
   /**
    * Converts any Buffer properties into mongodb.Binary instances, which is what `lean()` returns
    */
-  export type BufferToBinary<T> = T extends Buffer
-    ? mongodb.Binary
-    : T extends Document
-      ? T
-      : T extends TreatAsPrimitives
-        ? T
-        : T extends Record<string, any>
-          ? {
-              [K in keyof T]: BufferToBinaryProperty<T[K]>
-            }
-          : T;
+   export type BufferToBinary<T> = unknown extends Buffer
+     ? T
+     : T extends Buffer
+       ? mongodb.Binary
+       : T extends Document
+         ? T
+         : T extends TreatAsPrimitives
+           ? T
+           : T extends Record<string, any>
+             ? {
+                 [K in keyof T]: BufferToBinaryProperty<T[K]>
+               }
+             : T;
 
   /**
-   * Converts any Buffer properties into { type: 'buffer', data: [1, 2, 3] } format for JSON serialization
-   */
-  export type BufferToJSON<T> = T extends Buffer
-    ? { type: 'buffer', data: number[] }
-    : T extends Document
-      ? T
-      : T extends TreatAsPrimitives
+  * Converts any Buffer properties into { type: 'buffer', data: [1, 2, 3] } format for JSON serialization
+  */
+  export type BufferToJSON<T> = unknown extends Buffer
+    ? T
+    : T extends Buffer
+      ? { type: 'buffer', data: number[] }
+      : T extends Document
         ? T
-        : T extends Record<string, any> ? {
-          [K in keyof T]: T[K] extends Buffer
-            ? { type: 'buffer', data: number[] }
-            : T[K] extends Types.DocumentArray<infer ItemType>
-                ? Types.DocumentArray<BufferToBinary<ItemType>>
-                : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
-                  ? HydratedSingleSubdocument<SubdocType>
-                  : BufferToBinary<T[K]>;
-        } : T;
+        : T extends TreatAsPrimitives
+          ? T
+          : T extends Record<string, any> ? {
+            [K in keyof T]: T[K] extends Buffer
+              ? { type: 'buffer', data: number[] }
+              : T[K] extends Types.DocumentArray<infer ItemType>
+                  ? Types.DocumentArray<BufferToBinary<ItemType>>
+                  : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+                    ? HydratedSingleSubdocument<SubdocType>
+                    : BufferToBinary<T[K]>;
+          } : T;
 
   /**
    * Converts any ObjectId properties into strings for JSON serialization

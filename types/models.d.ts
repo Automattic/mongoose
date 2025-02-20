@@ -308,7 +308,7 @@ declare module 'mongoose' {
     bulkWrite<DocContents = TRawDocType>(
       writes: Array<AnyBulkWriteOperation<DocContents extends Document ? any : (DocContents extends {} ? DocContents : any)>>,
       options: MongooseBulkWriteOptions & { ordered: false }
-    ): Promise<mongodb.BulkWriteResult & { mongoose?: { validationErrors: Error[] } }>;
+    ): Promise<mongodb.BulkWriteResult & { mongoose?: { validationErrors: Error[], results: Array<Error | null> } }>;
     bulkWrite<DocContents = TRawDocType>(
       writes: Array<AnyBulkWriteOperation<DocContents extends Document ? any : (DocContents extends {} ? DocContents : any)>>,
       options?: MongooseBulkWriteOptions

@@ -4121,7 +4121,7 @@ describe('Model', function() {
           { ordered: false, throwOnValidationError: true }
         ).then(() => null, err => err);
         assert.ok(err);
-        assert.equal(err.name, 'MongooseBulkWriteError');
+        assert.equal(err.name, 'MongooseBulkWriteError', err.stack);
         assert.equal(err.validationErrors[0].errors['num'].name, 'CastError');
       });
 
@@ -6492,17 +6492,9 @@ describe('Model', function() {
     assert.deepEqual(
       res,
       {
-        result: {
-          ok: 1,
-          writeErrors: [],
-          writeConcernErrors: [],
-          insertedIds: [],
-          nInserted: 0,
-          nUpserted: 0,
-          nMatched: 0,
-          nModified: 0,
-          nRemoved: 0,
-          upserted: []
+        mongoose: {
+          results: [],
+          validationErrors: []
         },
         insertedCount: 0,
         matchedCount: 0,
@@ -6514,7 +6506,20 @@ describe('Model', function() {
         n: 0
       }
     );
+    assert.deepEqual(res.result, {
+      ok: 1,
+      writeErrors: [],
+      writeConcernErrors: [],
+      insertedIds: [],
+      nInserted: 0,
+      nUpserted: 0,
+      nMatched: 0,
+      nModified: 0,
+      nRemoved: 0,
+      upserted: []
+    });
 
+    assert.equal(typeof res.getWriteErrorAt, 'function');
   });
 
   it('Model.bulkWrite(...) does not throw an error with upsert:true, setDefaultsOnInsert: true (gh-9157)', async function() {
@@ -6554,18 +6559,6 @@ describe('Model', function() {
     assert.deepEqual(
       res,
       {
-        result: {
-          ok: 1,
-          writeErrors: [],
-          writeConcernErrors: [],
-          insertedIds: [],
-          nInserted: 0,
-          nUpserted: 0,
-          nMatched: 0,
-          nModified: 0,
-          nRemoved: 0,
-          upserted: []
-        },
         insertedCount: 0,
         matchedCount: 0,
         modifiedCount: 0,
@@ -6573,9 +6566,30 @@ describe('Model', function() {
         upsertedCount: 0,
         upsertedIds: {},
         insertedIds: {},
-        n: 0
+        n: 0,
+        mongoose: {
+          results: [],
+          validationErrors: []
+        }
       }
     );
+    assert.deepEqual(
+      res.result,
+      {
+        ok: 1,
+        writeErrors: [],
+        writeConcernErrors: [],
+        insertedIds: [],
+        nInserted: 0,
+        nUpserted: 0,
+        nMatched: 0,
+        nModified: 0,
+        nRemoved: 0,
+        upserted: []
+      }
+    );
+
+    assert.equal(typeof res.getWriteErrorAt, 'function');
   });
 
   it('allows calling `create()` after `bulkWrite()` (gh-9350)', async function() {

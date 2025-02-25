@@ -106,22 +106,22 @@ describe('BigInt', function() {
     });
 
     it('is stored as a long in MongoDB', async function() {
-      await Test.create({ myBigInt: 42n });
+      await Test.create({ myBigInt: 9223372036854775807n });
 
       const doc = await Test.findOne({ myBigInt: { $type: 'long' } });
       assert.ok(doc);
-      assert.strictEqual(doc.myBigInt, 42n);
+      assert.strictEqual(doc.myBigInt, 9223372036854775807n);
     });
 
     it('becomes a bigint with lean using useBigInt64', async function() {
-      await Test.create({ myBigInt: 7n });
+      await Test.create({ myBigInt: 9223372036854775807n });
 
       const doc = await Test.
-        findOne({ myBigInt: 7n }).
+        findOne({ myBigInt: 9223372036854775807n }).
         setOptions({ useBigInt64: true }).
         lean();
       assert.ok(doc);
-      assert.strictEqual(doc.myBigInt, 7n);
+      assert.strictEqual(doc.myBigInt, 9223372036854775807n);
     });
 
     it('can query with comparison operators', async function() {

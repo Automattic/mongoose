@@ -39,6 +39,12 @@ declare module 'mongoose' {
     foreignField?: string;
     /** Set to `false` to prevent Mongoose from repopulating paths that are already populated */
     forceRepopulate?: boolean;
+    /**
+     * Set to `true` to execute any populate queries one at a time, as opposed to in parallel.
+     * We recommend setting this option to `true` if using transactions, especially if also populating multiple paths or paths with multiple models.
+     * MongoDB server does **not** support multiple operations in parallel on a single transaction.
+     */
+    ordered?: boolean;
   }
 
   interface PopulateOption {

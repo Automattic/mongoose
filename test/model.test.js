@@ -6,6 +6,7 @@
 const sinon = require('sinon');
 const start = require('./common');
 
+const CastError = require('../lib/error/cast');
 const assert = require('assert');
 const { once } = require('events');
 const random = require('./util').random;
@@ -4707,6 +4708,46 @@ describe('Model', function() {
         assert.equal(err.validationErrors[0].path, 'age');
         assert.equal(err.results[0].path, 'age');
       });
+
+      it('bulkWrite should return both write errors and validation errors in error.results (gh-15265)', async function() {
+        const userSchema = new Schema({ _id: Number, age: { type: Number } });
+        const User = db.model('User', userSchema);
+
+        const createdUser = await User.create({ _id: 1, name: 'Test' });
+
+        const err = await User.bulkWrite([
+          {
+            updateOne: {
+              filter: { _id: createdUser._id },
+              update: { $set: { age: 'NaN' } }
+            }
+          },
+          {
+            insertOne: {
+              document: { _id: 3, age: 14 }
+            }
+          },
+          {
+            insertOne: {
+              document: { _id: 1, age: 13 }
+            }
+          },
+          {
+            insertOne: {
+              document: { _id: 1, age: 14 }
+            }
+          }
+        ], { ordered: false, throwOnValidationError: true })
+          .then(() => null)
+          .catch(err => err);
+
+        assert.ok(err);
+        assert.strictEqual(err.mongoose.results.length, 4);
+        assert.ok(err.mongoose.results[0] instanceof CastError);
+        assert.strictEqual(err.mongoose.results[1], null);
+        assert.equal(err.mongoose.results[2].constructor.name, 'WriteError');
+        assert.equal(err.mongoose.results[3].constructor.name, 'WriteError');
+      });
     });
 
     it('deleteOne with cast error (gh-5323)', async function() {
@@ -7058,6 +7099,41 @@ describe('Model', function() {
 
       docs = await User.find();
       assert.deepStrictEqual(docs.map(doc => doc.age), [12, 12]);
+    });
+
+    it('insertMany should return both write errors and validation errors in error.results (gh-15265)', async function() {
+      const userSchema = new Schema({ _id: Number, age: { type: Number } });
+      const User = db.model('User', userSchema);
+      await User.insertOne({ _id: 1, age: 12 });
+
+      const err = await User.insertMany([
+        { _id: 1, age: 'NaN' },
+        { _id: 3, age: 14 },
+        { _id: 1, age: 13 },
+        { _id: 1, age: 14 }
+      ], { ordered: false }).then(() => null).catch(err => err);
+
+      assert.ok(err);
+      assert.strictEqual(err.results.length, 4);
+      assert.ok(err.results[0] instanceof ValidationError);
+      assert.ok(err.results[1] instanceof User);
+      assert.ok(err.results[2].err);
+      assert.ok(err.results[3].err);
+    });
+
+    it('insertMany should return both write errors and validation errors in error.results with rawResult (gh-15265)', async function() {
+      const userSchema = new Schema({ _id: Number, age: { type: Number } });
+      const User = db.model('User', userSchema);
+
+      const res = await User.insertMany([
+        { _id: 1, age: 'NaN' },
+        { _id: 3, age: 14 }
+      ], { ordered: false, rawResult: true });
+
+      assert.ok(res);
+      assert.strictEqual(res.mongoose.results.length, 2);
+      assert.ok(res.mongoose.results[0] instanceof ValidationError);
+      assert.ok(res.mongoose.results[1] instanceof User);
     });
 
     it('returns writeResult on success', async() => {

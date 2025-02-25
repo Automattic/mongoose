@@ -39,9 +39,9 @@ Keep in mind that the following example is a simple example to help you get star
 The encryption key in the following example is insecure; MongoDB recommends using a [KMS](https://www.mongodb.com/docs/v5.0/core/security-client-side-encryption-key-management/).
 
 ```javascript
-const { ClientEncryption } = require('mongodb-client-encryption');
+const { ClientEncryption } = require('mongodb');
+// const { ClientEncryption } = require('mongodb-client-encryption'); As of version 6, ClientEncryption is moved to main mongodb driver.
 const mongoose = require('mongoose');
-const { Binary } = require('mongodb');
 
 run().catch(err => console.log(err));
 
@@ -66,12 +66,14 @@ async function run() {
       kmsProviders
     }
   }).asPromise();
-  const encryption = new ClientEncryption(conn.client, {
+  const encryption = new ClientEncryption(conn.getClient(), {
     keyVaultNamespace,
     kmsProviders,
   });
 
-  const _key = await encryption.createDataKey('local');
+  const _key = await encryption.createDataKey('local', {
+    keyAltNames: ['exampleKeyName'],
+  });
 }
 ```
 

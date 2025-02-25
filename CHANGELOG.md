@@ -1,3 +1,9 @@
+8.10.2 / 2025-02-25
+===================
+ * fix(model+connection): return MongoDB BulkWriteResult instance even if no valid ops #15266 #15265
+ * fix(debug): avoid printing trusted symbol in debug output #15267 #15263
+ * types: make type inference logic resilient to no Buffer type due to missing @types/node #15261
+
 8.10.1 / 2025-02-14
 ===================
  * perf(document): only call undoReset() 1x/document #15257 #15255

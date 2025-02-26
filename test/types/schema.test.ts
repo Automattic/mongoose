@@ -1738,3 +1738,11 @@ function gh15244() {
   const schema = new Schema({});
   schema.discriminator('Name', new Schema({}), { value: 'value' });
 }
+
+async function schemaDouble() {
+  const schema = new Schema({ balance: 'Double' });
+  const TestModel = model('Test', schema);
+
+  const doc = await TestModel.findOne().orFail();
+  expectType<Types.Double | null | undefined>(doc.balance);
+}

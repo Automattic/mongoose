@@ -104,5 +104,7 @@ declare module 'mongoose' {
     }
 
     class UUID extends bson.UUID {}
+
+    class Double extends bson.Double {}
   }
 }

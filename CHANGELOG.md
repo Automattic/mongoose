@@ -1,3 +1,10 @@
+8.11.0 / 2025-02-26
+===================
+ * feat(model): make bulkWrite results include MongoDB bulk write errors as well as validation errors #15271 #15265
+ * feat(document): add schemaFieldsOnly option to toObject() and toJSON() #15259 #15218
+ * feat: introduce populate ordered option for populating in series rather than in parallel for transactions #15239 #15231 #15210
+ * fix(bigint): throw error when casting BigInt that's outside of the bounds of what MongoDB can safely store #15230 #15200
+
 8.10.2 / 2025-02-25
 ===================
  * fix(model+connection): return MongoDB BulkWriteResult instance even if no valid ops #15266 #15265

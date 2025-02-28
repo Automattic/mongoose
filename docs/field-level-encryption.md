@@ -40,7 +40,6 @@ The encryption key in the following example is insecure; MongoDB recommends usin
 
 ```javascript
 const { ClientEncryption } = require('mongodb');
-// const { ClientEncryption } = require('mongodb-client-encryption'); As of version 6, ClientEncryption is moved to main mongodb driver.
 const mongoose = require('mongoose');
 
 run().catch(err => console.log(err));

@@ -57,7 +57,7 @@
     "mkdirp": "^3.0.1",
     "mocha": "11.1.0",
     "moment": "2.30.1",
-    "mongodb-memory-server": "10.1.3",
+    "mongodb-memory-server": "10.1.4",
     "ncp": "^2.0.0",
     "nyc": "15.1.0",
     "pug": "3.0.3",

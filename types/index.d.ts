@@ -543,17 +543,17 @@ declare module 'mongoose' {
           ? DateSchemaDefinition
           : (Function | string);
 
-  export type SchemaDefinitionProperty<T = undefined, EnforcedDocType = any, THydratedDocumentType = HydratedDocument<EnforcedDocType>> = SchemaDefinitionWithBuiltInClass<T> |
-    SchemaTypeOptions<T extends undefined ? any : T, EnforcedDocType, THydratedDocumentType> |
-    typeof SchemaType |
-    Schema<any, any, any> |
-    Schema<any, any, any>[] |
-    SchemaTypeOptions<T extends undefined ? any : Unpacked<T>, EnforcedDocType, THydratedDocumentType>[] |
-    Function[] |
-    SchemaDefinition<T, EnforcedDocType, THydratedDocumentType> |
-    SchemaDefinition<Unpacked<T>, EnforcedDocType, THydratedDocumentType>[] |
-    typeof Schema.Types.Mixed |
-    MixedSchemaTypeOptions<EnforcedDocType, THydratedDocumentType>;
+  export type SchemaDefinitionProperty<T = undefined, EnforcedDocType = any, THydratedDocumentType = HydratedDocument<EnforcedDocType>> = SchemaDefinitionWithBuiltInClass<T>
+    | SchemaTypeOptions<T extends undefined ? any : T, EnforcedDocType, THydratedDocumentType>
+    | typeof SchemaType
+    | Schema<any, any, any>
+    | Schema<any, any, any>[]
+    | SchemaTypeOptions<T extends undefined ? any : Unpacked<T>, EnforcedDocType, THydratedDocumentType>[]
+    | Function[]
+    | SchemaDefinition<T, EnforcedDocType, THydratedDocumentType>
+    | SchemaDefinition<Unpacked<T>, EnforcedDocType, THydratedDocumentType>[]
+    | typeof Schema.Types.Mixed
+    | MixedSchemaTypeOptions<EnforcedDocType, THydratedDocumentType>;
 
   export type SchemaDefinition<T = undefined, EnforcedDocType = any, THydratedDocumentType = HydratedDocument<EnforcedDocType>> = T extends undefined
     ? { [path: string]: SchemaDefinitionProperty; }

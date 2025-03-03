@@ -1,3 +1,9 @@
+8.12.0 / 2025-03-03
+===================
+ * feat: bump mongodb driver to 6.14
+ * feat: expose "SchemaTypeOptions" in browser #15277 [hasezoey](https://github.com/hasezoey)
+ * docs: update field-level-encryption.md #15272 [dphrag](https://github.com/dphrag)
+
 8.11.0 / 2025-02-26
 ===================
  * feat(model): make bulkWrite results include MongoDB bulk write errors as well as validation errors #15271 #15265

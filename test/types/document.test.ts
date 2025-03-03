@@ -423,3 +423,39 @@ async function gh14876() {
   expectType<UserObjectInterface>(populatedCar.owner);
   expectType<Types.ObjectId>(depopulatedCar.owner);
 }
+
+async function gh15077() {
+  type Foo = {
+    state: 'on' | 'off';
+  };
+
+  const fooSchema = new Schema<Foo>(
+    {
+      state: {
+        type: String,
+        enum: ['on', 'off']
+      }
+    },
+    { timestamps: true }
+  );
+
+  const fooModel = model('foo', fooSchema);
+
+  let foundFoo = await fooModel
+    .findOne({
+      state: 'on'
+    })
+    .lean()
+    .exec();
+
+  if (!foundFoo) {
+    const newFoo = {
+      state: 'on'
+      // extra props but irrelevant
+    };
+
+    const createdFoo = await fooModel.create(newFoo);
+
+    foundFoo = createdFoo.toObject();
+  }
+}

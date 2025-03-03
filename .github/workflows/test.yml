@@ -2,18 +2,18 @@ name: Test
 on:
   pull_request:
     paths:
-      - '.github/workflows/test.yml'
-      - 'package.json'
-      - 'index.js'
-      - 'lib/**'
-      - 'test/**.js'
+      - ".github/workflows/test.yml"
+      - "package.json"
+      - "index.js"
+      - "lib/**"
+      - "test/**.js"
   push:
     paths:
-      - '.github/workflows/test.yml'
-      - 'package.json'
-      - 'index.js'
-      - 'lib/**'
-      - 'test/**.js'
+      - ".github/workflows/test.yml"
+      - "package.json"
+      - "index.js"
+      - "lib/**"
+      - "test/**.js"
 permissions:
   contents: read
 
@@ -25,9 +25,9 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup node
-        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
         with:
-          node-version: 18
+          node-version: 22
 
       - run: npm install
 
@@ -39,7 +39,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [16, 18, 20]
+        node: [16, 18, 20, 22]
         os: [ubuntu-20.04, ubuntu-22.04]
         mongodb: [4.4.29, 5.0.26, 6.0.15, 7.0.12, 8.0.0]
         include:
@@ -61,7 +61,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup node
-        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
         with:
           node-version: ${{ matrix.node }}
 
@@ -85,7 +85,7 @@ jobs:
         with:
           name: coverage
           path: coverage
-  
+
   test-deno:
     runs-on: ubuntu-20.04
     name: Deno tests
@@ -96,9 +96,9 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Setup node
-        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
         with:
-          node-version: 16
+          node-version: 22
       - name: Load MongoDB binary cache
         id: cache-mongodb-binaries
         uses: actions/cache@v4
@@ -108,7 +108,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v2
         with:
-          deno-version: v1.37.x
+          deno-version: v2.1.x
       - run: deno --version
       - run: npm install
       - name: Run Deno tests
@@ -117,16 +117,16 @@ jobs:
   test-replica-sets:
     needs:
       - test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     name: Replica Set tests
     env:
       FORCE_COLOR: true
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Setup node
-        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
         with:
-          node-version: 16
+          node-version: 22
       - run: npm install
       - name: Test
         run: npm run test-rs

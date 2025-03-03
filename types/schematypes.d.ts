@@ -12,6 +12,16 @@ declare module 'mongoose' {
    */
   type Decimal128 = Schema.Types.Decimal128;
 
+
+  /**
+   * The Mongoose Int32 [SchemaType](/docs/schematypes.html). Used for
+   * declaring paths in your schema that should be
+   * 32-bit integers
+   * Do not use this to create a new Int32 instance, use `mongoose.Types.Int32`
+   * instead.
+   */
+  type Int32 = Schema.Types.Int32;
+
   /**
    * The Mongoose Mixed [SchemaType](/docs/schematypes.html). Used for
    * declaring paths in your schema that Mongoose's change tracking, casting,
@@ -24,6 +34,13 @@ declare module 'mongoose' {
    * declaring paths in your schema that Mongoose should cast to numbers.
    */
   type Number = Schema.Types.Number;
+
+
+  /**
+   * The Mongoose Double [SchemaType](/docs/schematypes.html). Used for
+   * declaring paths in your schema that Mongoose should cast to doubles (IEEE 754-2008)/
+   */
+  type Double = Schema.Types.Double;
 
   /**
    * The Mongoose ObjectId [SchemaType](/docs/schematypes.html). Used for
@@ -39,7 +56,7 @@ declare module 'mongoose' {
 
   type DefaultType<T> = T extends Schema.Types.Mixed ? any : Partial<ExtractMongooseArray<T>>;
 
-  class SchemaTypeOptions<T, EnforcedDocType = any, THydratedDocumentType = any> {
+  class SchemaTypeOptions<T, EnforcedDocType = any, THydratedDocumentType = HydratedDocument<EnforcedDocType>> {
     type?:
     T extends string ? StringSchemaDefinition :
       T extends number ? NumberSchemaDefinition :
@@ -111,7 +128,7 @@ declare module 'mongoose' {
      * will build a unique index on this path when the
      * model is compiled. [The `unique` option is **not** a validator](/docs/validation.html#the-unique-option-is-not-a-validator).
      */
-    unique?: boolean | number;
+    unique?: boolean | number | [true, string];
 
     /**
      * If [truthy](https://masteringjs.io/tutorials/fundamentals/truthy), Mongoose will
@@ -283,6 +300,8 @@ declare module 'mongoose' {
     /** Declares a full text index. */
     text(bool: boolean): this;
 
+    toJSONSchema(options?: { useBsonType?: boolean }): Record<string, any>;
+
     /** Defines a custom function for transforming this path when converting a document to JSON. */
     transform(fn: (value: any) => any): this;
 
@@ -370,10 +389,10 @@ declare module 'mongoose' {
         expires(when: number | string): this;
 
         /** Sets a maximum date validator. */
-        max(value: NativeDate, message: string): this;
+        max(value: NativeDate, message?: string): this;
 
         /** Sets a minimum date validator. */
-        min(value: NativeDate, message: string): this;
+        min(value: NativeDate, message?: string): this;
 
         /** Default options for this SchemaType */
         defaultOptions: Record<string, any>;
@@ -382,6 +401,14 @@ declare module 'mongoose' {
       class Decimal128 extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'Decimal128';
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
+      }
+
+      class Int32 extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: 'Int32';
 
         /** Default options for this SchemaType */
         defaultOptions: Record<string, any>;
@@ -430,10 +457,18 @@ declare module 'mongoose' {
         enum(vals: number[]): this;
 
         /** Sets a maximum number validator. */
-        max(value: number, message: string): this;
+        max(value: number, message?: string): this;
 
         /** Sets a minimum number validator. */
-        min(value: number, message: string): this;
+        min(value: number, message?: string): this;
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
+      }
+
+      class Double extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: 'Double';
 
         /** Default options for this SchemaType */
         defaultOptions: Record<string, any>;

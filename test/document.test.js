@@ -12,6 +12,7 @@ const ArraySubdocument = require('../lib/types/arraySubdocument');
 const Query = require('../lib/query');
 const assert = require('assert');
 const idGetter = require('../lib/helpers/schema/idGetter');
+const sinon = require('sinon');
 const util = require('./util');
 const utils = require('../lib/utils');
 
@@ -625,12 +626,12 @@ describe('document', function() {
     assert.equal(doc.val, 'test2');
   });
 
-  it('allows you to skip validation on save (gh-2981)', function() {
+  it('allows you to skip validation on save (gh-2981)', async function() {
     const schema = new Schema({ name: { type: String, required: true } });
     const MyModel = db.model('Test', schema);
 
     const doc = new MyModel();
-    return doc.save({ validateBeforeSave: false });
+    await doc.save({ validateBeforeSave: false });
   });
 
   it('doesnt use custom toObject options on save', async function() {
@@ -3088,6 +3089,51 @@ describe('document', function() {
       assert.strictEqual(foundDoc.array[0].isNew, false);
       assert.strictEqual(foundDoc.array[1].isNew, false);
       assert.strictEqual(nestedModel.isNew, false);
+    });
+
+    it('manual populattion with ref function (gh-15138)', async function() {
+      const userSchema = new mongoose.Schema({
+        username: { type: String },
+        phone: { type: mongoose.Schema.Types.ObjectId, ref: 'phones' }
+      });
+
+      const userSchemaWithFunc = new mongoose.Schema({
+        username: { type: String },
+        phone: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: function() {
+            return 'phones';
+          }
+        }
+      });
+
+      const phoneSchema = new mongoose.Schema({
+        phoneNumber: { type: String },
+        extension: { type: String }
+      });
+
+      const User = db.model('users', userSchema);
+      const UserWithFunc = db.model('usersWithFunc', userSchemaWithFunc);
+      const Phone = db.model('phones', phoneSchema);
+
+      const phone = await Phone.create({
+        phoneNumber: '123456789',
+        extension: '123'
+      });
+
+      const user = await User.create({
+        username: 'John Doe',
+        phone
+      });
+
+      const userWithFunc = await UserWithFunc.create({
+        username: 'John Doe',
+        phone
+      });
+
+      assert.ok(user.populated('phone'));
+      assert.ok(userWithFunc.populated('phone'));
+      assert.equal(userWithFunc.phone.extension, '123');
     });
 
     it('manual population with refPath (gh-7070)', async function() {
@@ -7316,6 +7362,27 @@ describe('document', function() {
 
     assert.strictEqual(obj.timestamp, date);
     assert.strictEqual(obj.subDoc.timestamp, date);
+  });
+
+  it('supports setting values to undefined with strict: false (gh-15192)', async function() {
+    const helloSchema = new mongoose.Schema({
+      name: { type: String, required: true },
+      status: { type: Boolean, required: true },
+      optional: { type: Number }
+    }, { strict: false });
+    const Hello = db.model('Test', helloSchema);
+
+    const obj = new Hello({ name: 'abc', status: true, optional: 1 });
+    const doc = await obj.save();
+
+    doc.set({ optional: undefined });
+
+    assert.ok(doc.isModified());
+
+    await doc.save();
+
+    const { optional } = await Hello.findById(doc._id).orFail();
+    assert.strictEqual(optional, undefined);
   });
 
   it('handles .set() on doc array within embedded discriminator (gh-7656)', function() {
@@ -12707,6 +12774,16 @@ describe('document', function() {
     assert.equal(updatedPerson?._age, 61);
   });
 
+  it('bulkSave() allows skipping validation with validateBeforeSave (gh-15156)', async() => {
+    const schema = new Schema({ name: { type: String, required: true } });
+    const MyModel = db.model('Test', schema);
+
+    const doc = new MyModel();
+    await MyModel.bulkSave([doc], { validateBeforeSave: false });
+
+    assert.ok(await MyModel.exists({ _id: doc._id }));
+  });
+
   it('handles default embedded discriminator values (gh-13835)', async function() {
     const childAbstractSchema = new Schema(
       { kind: { type: Schema.Types.String, enum: ['concreteKind'], required: true, default: 'concreteKind' } },
@@ -14161,6 +14238,190 @@ describe('document', function() {
     const fromDb = await ParentModel.findById(doc._id).orFail();
     assert.strictEqual(fromDb.quests[0].campaign.milestones, null);
   });
+
+  it('handles custom error message for duplicate key errors (gh-12844)', async function() {
+    const schema = new Schema({
+      name: String,
+      email: { type: String, unique: [true, 'Email must be unique'] }
+    });
+    const Model = db.model('Test', schema);
+    await Model.init();
+
+    await Model.create({ email: 'test@example.com' });
+
+    let duplicateKeyError = await Model.create({ email: 'test@example.com' }).catch(err => err);
+    assert.strictEqual(duplicateKeyError.message, 'Email must be unique');
+    assert.strictEqual(duplicateKeyError.cause.code, 11000);
+
+    duplicateKeyError = await Model.updateOne({ name: 'test' }, { email: 'test@example.com' }, { upsert: true }).catch(err => err);
+    assert.strictEqual(duplicateKeyError.message, 'Email must be unique');
+    assert.strictEqual(duplicateKeyError.cause.code, 11000);
+  });
+
+  it('supports global transforms per schematype (gh-15084)', async function() {
+    class SchemaCustomType extends mongoose.SchemaType {
+      constructor(key, options) {
+        super(key, options, 'CustomType');
+      }
+
+      cast(value) {
+        if (value === null) return null;
+        return new CustomType(value);
+      }
+    }
+    SchemaCustomType.schemaName = 'CustomType';
+
+    class CustomType {
+      constructor(value) {
+        this.value = value;
+      }
+    }
+
+    mongoose.Schema.Types.CustomType = SchemaCustomType;
+
+    const Model = db.model(
+      'Test',
+      new mongoose.Schema({
+        value: { type: mongoose.Schema.Types.CustomType }
+      })
+    );
+
+    const _id = new mongoose.Types.ObjectId('0'.repeat(24));
+    const doc = new Model({ _id });
+    doc.value = 1;
+
+    mongoose.Schema.Types.CustomType.set('transform', v => v == null ? v : v.value);
+
+    assert.deepStrictEqual(doc.toJSON(), { _id, value: 1 });
+    assert.deepStrictEqual(doc.toObject(), { _id, value: 1 });
+
+    delete mongoose.Schema.Types.CustomType;
+  });
+
+  it('supports schemaFieldsOnly option for toObject() (gh-15258)', async function() {
+    const schema = new Schema({ key: String }, { discriminatorKey: 'key' });
+    const subschema1 = new Schema({ field1: String });
+    const subschema2 = new Schema({ field2: String });
+
+    const Discriminator = db.model('Test', schema);
+    Discriminator.discriminator('type1', subschema1);
+    Discriminator.discriminator('type2', subschema2);
+
+    const doc = await Discriminator.create({
+      key: 'type1',
+      field1: 'test value'
+    });
+
+    await Discriminator.updateOne(
+      { _id: doc._id },
+      {
+        key: 'type2',
+        field2: 'test2'
+      },
+      { overwriteDiscriminatorKey: true }
+    );
+
+    const doc2 = await Discriminator.findById(doc).orFail();
+    assert.strictEqual(doc2.field2, 'test2');
+    assert.strictEqual(doc2.field1, undefined);
+
+    const obj = doc2.toObject();
+    assert.strictEqual(obj.field2, 'test2');
+    assert.strictEqual(obj.field1, 'test value');
+
+    const obj2 = doc2.toObject({ schemaFieldsOnly: true });
+    assert.strictEqual(obj.field2, 'test2');
+    assert.strictEqual(obj2.field1, undefined);
+  });
+
+  it('supports schemaFieldsOnly on nested paths, subdocuments, and arrays (gh-15258)', async function() {
+    const subSchema = new Schema({
+      title: String,
+      description: String
+    }, { _id: false });
+    const taskSchema = new Schema({
+      name: String,
+      details: {
+        dueDate: Date,
+        priority: Number
+      },
+      subtask: subSchema,
+      tasks: [subSchema]
+    });
+    const Task = db.model('Test', taskSchema);
+
+    const doc = await Task.create({
+      _id: '0'.repeat(24),
+      name: 'Test Task',
+      details: {
+        dueDate: new Date('2024-01-01'),
+        priority: 1
+      },
+      subtask: {
+        title: 'Subtask 1',
+        description: 'Test Description'
+      },
+      tasks: [{
+        title: 'Array Task 1',
+        description: 'Array Description 1'
+      }]
+    });
+
+    doc._doc.details.extraField = 'extra';
+    doc._doc.subtask.extraField = 'extra';
+    doc._doc.tasks[0].extraField = 'extra';
+
+    const obj = doc.toObject({ schemaFieldsOnly: true });
+    assert.deepStrictEqual(obj, {
+      name: 'Test Task',
+      details: { dueDate: new Date('2024-01-01T00:00:00.000Z'), priority: 1 },
+      subtask: { title: 'Subtask 1', description: 'Test Description' },
+      tasks: [{ title: 'Array Task 1', description: 'Array Description 1' }],
+      _id: new mongoose.Types.ObjectId('0'.repeat(24)),
+      __v: 0
+    });
+  });
+
+  it('handles undoReset() on deep recursive subdocuments (gh-15255)', async function() {
+    const RecursiveSchema = new mongoose.Schema({});
+
+    const s = [RecursiveSchema];
+    RecursiveSchema.path('nested', s);
+
+    const generateRecursiveDocument = (depth, curr = 0) => {
+      return {
+        name: `Document of depth ${curr}`,
+        nested: depth > 0 ? new Array(2).fill().map(() => generateRecursiveDocument(depth - 1, curr + 1)) : [],
+        __v: 5
+      };
+    };
+    const TestModel = db.model('Test', RecursiveSchema);
+    const data = generateRecursiveDocument(10);
+    const doc = new TestModel(data);
+    await doc.save();
+
+    sinon.spy(Document.prototype, '$__undoReset');
+
+    try {
+      const d = await TestModel.findById(doc._id);
+      d.increment();
+      d.data = 'asd';
+      // Force a version error by updating the document directly
+      await TestModel.collection.updateOne({ _id: doc._id }, { $inc: { __v: 1 } });
+      const err = await d.save().then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.name, 'VersionError');
+      // `$__undoReset()` should be called 1x per subdoc, plus 1x for top-level doc. Without fix for gh-15255,
+      // this would fail because `$__undoReset()` is called nearly 700k times for only 2046 subdocs
+      assert.strictEqual(Document.prototype.$__undoReset.getCalls().length, d.$getAllSubdocs().length + 1);
+      assert.ok(Document.prototype.$__undoReset.getCalls().find(call => call.thisValue === d), 'top level doc was not reset');
+      for (const subdoc of d.$getAllSubdocs()) {
+        assert.ok(Document.prototype.$__undoReset.getCalls().find(call => call.thisValue === subdoc), `${subdoc.name} was not reset`);
+      }
+    } finally {
+      sinon.restore();
+    }
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {
@@ -14171,4 +14432,3 @@ describe('Check if instance function that is supplied in schema option is availa
     assert.equal(TestDocument.instanceFn(), 'Returned from DocumentInstanceFn');
   });
 });
-

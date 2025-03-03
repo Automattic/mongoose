@@ -14,7 +14,8 @@ module.exports = {
     '**/docs/js/native.js',
     '!.*',
     'node_modules',
-    '.git'
+    '.git',
+    'data'
   ],
   overrides: [
     {
@@ -104,7 +105,7 @@ module.exports = {
     // 'markdown'
   ],
   parserOptions: {
-    ecmaVersion: 2020
+    ecmaVersion: 2022
   },
   env: {
     node: true,

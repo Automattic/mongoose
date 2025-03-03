@@ -101,6 +101,7 @@ movieSchema.index({ title: 'text' }, {
 });
 movieSchema.index({ rating: -1 });
 movieSchema.index({ title: 1 }, { unique: true });
+movieSchema.index({ title: 1 }, { unique: [true, 'Title must be unique'] as const });
 movieSchema.index({ tile: 'ascending' });
 movieSchema.index({ tile: 'asc' });
 movieSchema.index({ tile: 'descending' });
@@ -1747,4 +1748,25 @@ async function gh12959() {
   expectType<number>(doc.__v);
   const leanDoc = await TestModel.findOne().lean().orFail();
   expectType<number>(leanDoc.__v);
+}
+
+async function gh15236() {
+  const schema = new Schema({
+    myNum: { type: Number }
+  });
+
+  schema.path<Schema.Types.Number>('myNum').min(0);
+}
+
+function gh15244() {
+  const schema = new Schema({});
+  schema.discriminator('Name', new Schema({}), { value: 'value' });
+}
+
+async function schemaDouble() {
+  const schema = new Schema({ balance: 'Double' });
+  const TestModel = model('Test', schema);
+
+  const doc = await TestModel.findOne().orFail();
+  expectType<Types.Double | null | undefined>(doc.balance);
 }

@@ -67,3 +67,6 @@ examples/ecommerce-netlify-functions/.netlify/state.json
 
 notes.md
 list.out
+
+data
+*.pid

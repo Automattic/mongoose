@@ -1962,7 +1962,7 @@ describe('Query', function() {
       });
 
       schema.pre('deleteOne', { document: true, query: false }, async function() {
-        await this.constructor.updateOne({ isDeleted: true });
+        await this.updateOne({ isDeleted: true });
         this.$isDeleted(true);
       });
 

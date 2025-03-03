@@ -162,3 +162,20 @@ function gh14469() {
   const jsonNames = doc?.names[0]?.toJSON();
   expectType<string>(jsonNames?.firstName);
 }
+
+function gh15041() {
+  const subDoc = {
+    name: { type: String, required: true },
+    age: { type: Number, required: true }
+  };
+
+  const testSchema = new Schema({
+    subdocArray: { type: [subDoc], required: true }
+  });
+
+  const TestModel = model('Test', testSchema);
+
+  const doc = new TestModel({ subdocArray: [{ name: 'John', age: 30 }] });
+  type TestModelDoc = ReturnType<(typeof TestModel)['hydrate']>
+  expectType<TestModelDoc['subdocArray'][0][]>(doc.subdocArray.splice(0, 1, { name: 'Bill' }));
+}

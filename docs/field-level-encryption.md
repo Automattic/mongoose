@@ -1,6 +1,6 @@
-# Integrating with MongoDB [Client Side Field Level Encryption](https://www.mongodb.com/docs/manual/core/csfle/)
+# Integrating with MongoDB Client Side Field Level Encryption
 
-Client Side Field Level Encryption, or CSFLE for short, is a tool for storing your data in an encrypted format in MongoDB.
+[Client Side Field Level Encryption](https://www.mongodb.com/docs/manual/core/csfle/), or CSFLE for short, is a tool for storing your data in an encrypted format in MongoDB.
 For example, instead of storing the `name` property as a plain-text string, CSFLE means MongoDB will store your document with `name` as an encrypted buffer.
 The resulting document will look similar to the following to a client that doesn't have access to decrypt the data.
 
@@ -39,9 +39,8 @@ Keep in mind that the following example is a simple example to help you get star
 The encryption key in the following example is insecure; MongoDB recommends using a [KMS](https://www.mongodb.com/docs/v5.0/core/security-client-side-encryption-key-management/).
 
 ```javascript
-const { ClientEncryption } = require('mongodb-client-encryption');
+const { ClientEncryption } = require('mongodb');
 const mongoose = require('mongoose');
-const { Binary } = require('mongodb');
 
 run().catch(err => console.log(err));
 
@@ -66,12 +65,14 @@ async function run() {
       kmsProviders
     }
   }).asPromise();
-  const encryption = new ClientEncryption(conn.client, {
+  const encryption = new ClientEncryption(conn.getClient(), {
     keyVaultNamespace,
     kmsProviders,
   });
 
-  const _key = await encryption.createDataKey('local');
+  const _key = await encryption.createDataKey('local', {
+    keyAltNames: ['exampleKeyName'],
+  });
 }
 ```
 

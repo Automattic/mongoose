@@ -6,7 +6,6 @@ If you are migrating from 7.x to 8.x please take a moment to read the [migration
 <ul class="toc">
   <li><a href="#definition">Defining your schema</a></li>
   <li><a href="#models">Creating a model</a></li>
-  <li><a href="#ids">Ids</a></li>
   <li><a href="#methods">Instance methods</a></li>
   <li><a href="#statics">Statics</a></li>
   <li><a href="#query-helpers">Query Helpers</a></li>

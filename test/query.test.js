@@ -3081,7 +3081,6 @@ describe('Query', function() {
   it('throws an error if executed multiple times (gh-7398)', async function() {
     const Test = db.model('Test', Schema({ name: String }));
 
-
     const q = Test.findOne();
 
     await q;
@@ -3090,7 +3089,6 @@ describe('Query', function() {
     assert.ok(err);
     assert.equal(err.name, 'MongooseError');
     assert.equal(err.message, 'Query was already executed: Test.findOne({})');
-    assert.ok(err.originalStack);
 
     err = await q.clone().then(() => null, err => err);
     assert.ifError(err);

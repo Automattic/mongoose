@@ -3314,7 +3314,6 @@ describe('Query', function() {
       quiz_title: String,
       questions: [questionSchema]
     }, { strict: 'throw' });
-    const Quiz = db.model('Test', quizSchema);
 
     const mcqQuestionSchema = new Schema({
       text: String,
@@ -3322,6 +3321,7 @@ describe('Query', function() {
     }, { strict: 'throw' });
 
     quizSchema.path('questions').discriminator('mcq', mcqQuestionSchema);
+    const Quiz = db.model('Test', quizSchema);
 
     const id1 = new mongoose.Types.ObjectId();
     const id2 = new mongoose.Types.ObjectId();

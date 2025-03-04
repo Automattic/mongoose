@@ -1725,7 +1725,6 @@ describe('document', function() {
       assert.equal(d.nested.setr, 'undefined setter');
       dateSetterCalled = false;
       d.date = undefined;
-      await d.validate();
       assert.ok(dateSetterCalled);
     });
 

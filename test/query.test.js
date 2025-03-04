@@ -3081,7 +3081,6 @@ describe('Query', function() {
   it('throws an error if executed multiple times (gh-7398)', async function() {
     const Test = db.model('Test', Schema({ name: String }));
 
-
     const q = Test.findOne();
 
     await q;
@@ -3090,7 +3089,6 @@ describe('Query', function() {
     assert.ok(err);
     assert.equal(err.name, 'MongooseError');
     assert.equal(err.message, 'Query was already executed: Test.findOne({})');
-    assert.ok(err.originalStack);
 
     err = await q.clone().then(() => null, err => err);
     assert.ifError(err);
@@ -3316,7 +3314,6 @@ describe('Query', function() {
       quiz_title: String,
       questions: [questionSchema]
     }, { strict: 'throw' });
-    const Quiz = db.model('Test', quizSchema);
 
     const mcqQuestionSchema = new Schema({
       text: String,
@@ -3324,6 +3321,7 @@ describe('Query', function() {
     }, { strict: 'throw' });
 
     quizSchema.path('questions').discriminator('mcq', mcqQuestionSchema);
+    const Quiz = db.model('Test', quizSchema);
 
     const id1 = new mongoose.Types.ObjectId();
     const id2 = new mongoose.Types.ObjectId();

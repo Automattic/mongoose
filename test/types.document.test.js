@@ -7,11 +7,13 @@
 
 const start = require('./common');
 
-const assert = require('assert');
-const mongoose = start.mongoose;
 const ArraySubdocument = require('../lib/types/arraySubdocument');
 const EventEmitter = require('events').EventEmitter;
 const DocumentArray = require('../lib/types/documentArray');
+const applyHooks = require('../lib/helpers/model/applyHooks');
+const assert = require('assert');
+
+const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 const ValidationError = mongoose.Document.ValidationError;
 
@@ -53,6 +55,8 @@ describe('types.document', function() {
       test: { type: String, required: true },
       work: { type: String, validate: /^good/ }
     }));
+
+    applyHooks(Subdocument, Subdocument.prototype.schema);
 
     RatingSchema = new Schema({
       stars: Number,

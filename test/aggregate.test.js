@@ -1315,7 +1315,7 @@ describe('aggregate: ', function() {
 
     await Test.create({ name: 'test1' });
 
-    assert.rejects(
+    await assert.rejects(
       async() => {
         await Test.aggregate([{ $limit: 1 }], { allowed: false }).exec();
       },

@@ -1323,7 +1323,7 @@ describe('aggregate: ', function() {
     );
 
     const cursor = Test.aggregate([{ $limit: 1 }], { allowed: false }).cursor();
-    assert.rejects(
+    await assert.rejects(
       async() => {
         await cursor.next();
       },

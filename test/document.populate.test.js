@@ -1142,7 +1142,6 @@ describe('document.populate', function() {
     });
 
     const user = await User.findOne();
-    await user.populate('columns.$*.sequence');
     await user.populate('columns.$*');
     assert.deepStrictEqual(user.columns.get('key1').map(subdoc => subdoc.title), ['card1', 'card2']);
     assert.deepStrictEqual(user.columns.get('key2').map(subdoc => subdoc.title), ['card3', 'card4']);

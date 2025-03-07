@@ -658,7 +658,7 @@ Int32s are stored as [BSON type "double" in MongoDB](https://www.mongodb.com/doc
 
 ```javascript
 const studentsSchema = new Schema({
-  id: Int32
+  id: Double
 });
 const Student = mongoose.model('Student', schema);
 

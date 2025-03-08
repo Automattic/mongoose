@@ -654,16 +654,16 @@ typeof question.answer; // 'bigint'
 ### Double {#double}
 
 Mongoose supports [64-bit IEEE 754-2008 floating point numbers](https://en.wikipedia.org/wiki/IEEE_754-2008_revision) as a SchemaType.
-Int32s are stored as [BSON type "double" in MongoDB](https://www.mongodb.com/docs/manual/reference/bson-types/).
+Doubles are stored as [BSON type "double" in MongoDB](https://www.mongodb.com/docs/manual/reference/bson-types/).
 
 ```javascript
-const studentsSchema = new Schema({
-  id: Double
+const temperatureSchema = new Schema({
+  celsius: Double
 });
-const Student = mongoose.model('Student', schema);
+const Temperature = mongoose.model('Temperature', temperatureSchema);
 
-const student = new Temperature({ celsius: 1339 });
-typeof student.id; // 'number'
+const temperature = new Temperature({ celsius: 1339 });
+typeof temperature.celsius; // 'number'
 ```
 
 There are several types of values that will be successfully cast to a Double.
@@ -688,12 +688,12 @@ Mongoose supports 32-bit integers as a SchemaType.
 Int32s are stored as [32-bit integers in MongoDB (BSON type "int")](https://www.mongodb.com/docs/manual/reference/bson-types/).
 
 ```javascript
-const studentsSchema = new Schema({
+const studentSchema = new Schema({
   id: Int32
 });
-const Student = mongoose.model('Student', schema);
+const Student = mongoose.model('Student', studentSchema);
 
-const student = new Temperature({ celsius: 1339 });
+const student = new Student({ id: 1339 });
 typeof student.id; // 'number'
 ```
 

@@ -1115,4 +1115,41 @@ describe('document.populate', function() {
     assert.equal(docD.refB.title, 'test 2');
     assert.equal(docD.refC.content, 'test 3');
   });
+
+  it('handles re-populating map of array of refs (gh-9359)', async function() {
+    const UserSchema = mongoose.Schema({
+      columns: { type: Map, of: [{ type: 'ObjectId', ref: 'Test1' }] }
+    });
+    const CardSchema = mongoose.Schema({
+      title: { type: String },
+      sequence: { type: 'ObjectId', ref: 'Test2' }
+    });
+    const SequenceSchema = mongoose.Schema({
+      foo: { type: String }
+    });
+
+    const Sequence = db.model('Test2', SequenceSchema);
+    const Card = db.model('Test1', CardSchema);
+    const User = db.model('Test', UserSchema);
+
+    const sequence = await Sequence.create({ foo: 'bar' });
+    const card1 = await Card.create({ title: 'card1', sequence });
+    const card2 = await Card.create({ title: 'card2', sequence });
+    const card3 = await Card.create({ title: 'card3' });
+    const card4 = await Card.create({ title: 'card4', sequence });
+    await User.create({
+      columns: { key1: [card1, card2], key2: [card3, card4] }
+    });
+
+    const user = await User.findOne();
+    await user.populate('columns.$*');
+    assert.deepStrictEqual(user.columns.get('key1').map(subdoc => subdoc.title), ['card1', 'card2']);
+    assert.deepStrictEqual(user.columns.get('key2').map(subdoc => subdoc.title), ['card3', 'card4']);
+    await user.populate('columns.$*.sequence');
+    assert.deepStrictEqual(user.columns.get('key1').map(subdoc => subdoc.title), ['card1', 'card2']);
+    assert.deepStrictEqual(user.columns.get('key1').map(subdoc => subdoc.sequence.foo), ['bar', 'bar']);
+    assert.deepStrictEqual(user.columns.get('key2').map(subdoc => subdoc.title), ['card3', 'card4']);
+    assert.deepStrictEqual(user.columns.get('key2').map(subdoc => subdoc.sequence?.foo), [undefined, 'bar']);
+
+  });
 });

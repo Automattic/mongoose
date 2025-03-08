@@ -152,3 +152,10 @@ function gh13060() {
     }
   }]);
 }
+
+async function gh15300() {
+  const schema = new Schema({ status: String });
+  const TestModel = model('Document', schema);
+
+  await TestModel.aggregate().project('a b -_id');
+}

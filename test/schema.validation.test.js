@@ -16,7 +16,6 @@ const ValidatorError = mongoose.Error.ValidatorError;
 const SchemaTypes = Schema.Types;
 const ObjectId = SchemaTypes.ObjectId;
 const Mixed = SchemaTypes.Mixed;
-const DocumentObjectId = mongoose.Types.ObjectId;
 
 describe('schema', function() {
   describe('validation', function() {

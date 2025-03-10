@@ -6502,14 +6502,16 @@ describe('document', function() {
       });
       const Model = db.model('Test', schema);
 
-      await Model.create({
+      let doc = new Model({
         roles: [
           { name: 'admin' },
           { name: 'mod', folders: [{ folderId: 'foo' }] }
         ]
       });
+      await doc.validate().then(() => null, err => console.log(err));
+      await doc.save();
 
-      const doc = await Model.findOne();
+      doc = await Model.findOne();
 
       doc.roles[1].folders.push({ folderId: 'bar' });
 

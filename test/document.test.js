@@ -9750,7 +9750,7 @@ describe('document', function() {
     const schema = Schema({ name: String });
 
     let called = 0;
-    schema.pre(/.*/, { document: true, query: false }, function() {
+    schema.pre(/.*/, { document: true, query: false }, function testPreSave9190() {
       ++called;
     });
     const Model = db.model('Test', schema);
@@ -9765,7 +9765,9 @@ describe('document', function() {
     await Model.countDocuments();
     assert.equal(called, 0);
 
+    console.log('-----');
     const docs = await Model.create([{ name: 'test' }], { validateBeforeSave: false });
+    console.log('------');
     assert.equal(called, 1);
 
     await docs[0].validate();

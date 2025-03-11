@@ -293,7 +293,7 @@ describe('model middleware', function() {
       title: String
     });
 
-    schema.post('save', function() {
+    schema.post('save', function postSaveTestError() {
       throw new Error('woops!');
     });
 

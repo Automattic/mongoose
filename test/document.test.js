@@ -9765,9 +9765,7 @@ describe('document', function() {
     await Model.countDocuments();
     assert.equal(called, 0);
 
-    console.log('-----');
     const docs = await Model.create([{ name: 'test' }], { validateBeforeSave: false });
-    console.log('------');
     assert.equal(called, 1);
 
     await docs[0].validate();

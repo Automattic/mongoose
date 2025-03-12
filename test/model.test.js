@@ -2154,10 +2154,15 @@ describe('Model', function() {
           next();
         });
 
+        let schemaPostSaveCalls = 0;
         const schema = new Schema({ name: String, child: [childSchema] });
         schema.pre('save', function(next) {
           this.name = 'parent';
           next();
+        });
+        schema.post('save', function testSchemaPostSave(err, res, next) {
+          ++schemaPostSaveCalls;
+          next(err);
         });
 
         const S = db.model('Test', schema);
@@ -2165,6 +2170,7 @@ describe('Model', function() {
 
         const err = await s.save().then(() => null, err => err);
         assert.equal(err.message, 'Error 101');
+        assert.equal(schemaPostSaveCalls, 1);
       });
 
       describe('init', function() {

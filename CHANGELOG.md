@@ -1,3 +1,7 @@
+8.12.1 / 2025-03-04
+===================
+ * fix: match bson version with mongodb's bson version #15297 [hasezoey](https://github.com/hasezoey)
+
 8.12.0 / 2025-03-03
 ===================
  * feat: bump mongodb driver to 6.14

@@ -663,7 +663,7 @@ const temperatureSchema = new Schema({
 const Temperature = mongoose.model('Temperature', temperatureSchema);
 
 const temperature = new Temperature({ celsius: 1339 });
-typeof temperature.celsius; // 'number'
+temperature.celsius instanceof bson.Double; // true
 ```
 
 There are several types of values that will be successfully cast to a Double.
@@ -673,7 +673,7 @@ new Temperature({ celsius: '1.2e12' }).celsius; // 15 as a Double
 new Temperature({ celsius: true }).celsius; // 1 as a Double
 new Temperature({ celsius: false }).celsius; // 0 as a Double
 new Temperature({ celsius: { valueOf: () => 83.0033 } }).celsius; // 83 as a Double
-new Temperature({ celsius: '' }).celsius; // null as a Double
+new Temperature({ celsius: '' }).celsius; // null
 ```
 
 The following inputs will result will all result in a [CastError](validation.html#cast-errors) once validated, meaning that it will not throw on initialization, only when validated:

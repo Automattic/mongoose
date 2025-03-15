@@ -2173,7 +2173,7 @@ describe('schema', function() {
     const keys = Object.keys(SchemaStringOptions.prototype).
       filter(key => key !== 'constructor' && key !== 'populate');
     const functions = Object.keys(Schema.Types.String.prototype).
-      filter(key => ['constructor', 'cast', 'castForQuery', 'checkRequired', 'toJSONSchema'].indexOf(key) === -1);
+      filter(key => ['constructor', 'cast', 'castForQuery', 'checkRequired', 'toJSONSchema', 'autoEncryptionType'].indexOf(key) === -1);
     assert.deepEqual(keys.sort(), functions.sort());
   });
 

@@ -151,3 +151,13 @@ To declare a field as encrypted, you must:
 2. Choose an encryption type for the schema and configure the schema for the encryption type
 
 Not all schematypes are supported for CSFLE and QE.  For an overview of valid schema types, refer to MongoDB's documentation.
+
+### Registering Models
+
+Encrypted schemas must be registered on a connection, not the Mongoose global:
+
+```javascript
+
+const connection = mongoose.createConnection();
+const UserModel = connection.model('User', encryptedUserSchema);
+```

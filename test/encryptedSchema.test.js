@@ -22,94 +22,174 @@ function schemaHasEncryptedProperty(schema, path) {
   return path in schema.encryptedFields;
 }
 
-const KEY_ID = new UUID();
+const KEY_ID = '9fbdace3-4e48-412d-88df-3807e8009522';
 const algorithm = 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic';
 
 describe('encrypted schema declaration', function() {
-  describe('Tests that fields of valid schema types can be declared as encrypted schemas', function() {
-    const basicSchemaTypes = [
-      { type: String, name: 'string' },
-      { type: Schema.Types.Boolean, name: 'boolean' },
-      { type: Schema.Types.Buffer, name: 'buffer' },
-      { type: Date, name: 'date' },
-      { type: ObjectId, name: 'objectid' },
-      { type: BigInt, name: 'bigint' },
-      { type: Decimal128, name: 'Decimal128' },
-      { type: Int32, name: 'int32' },
-      { type: Double, name: 'double' }
-    ];
-
-    for (const { type, name } of basicSchemaTypes) {
-      describe(`When a schema is instantiated with an encrypted field of type ${name}`, function() {
+  describe('schemaMap generation tests', function() {
+    for (const { type, name, encryptionType, schemaMap, encryptedFields } of primitiveSchemaMapTests()) {
+      describe(`When a schema is instantiated with an encrypted field of type ${name} for ${encryptionType}`, function() {
         let schema;
+        const encrypt = {
+          keyId: KEY_ID
+        };
+        encryptionType === 'csfle' && (encrypt.algorithm = algorithm);
+
         beforeEach(function() {
           schema = new Schema({
             field: {
-              type, encrypt: { keyId: KEY_ID, algorithm }
+              type, encrypt
             }
           }, {
-            encryptionType: 'csfle'
+            encryptionType
           });
         });
 
         it(`Then the schema has an encrypted property of type ${name}`, function() {
           assert.ok(schemaHasEncryptedProperty(schema, 'field'));
         });
+
+        encryptionType === 'csfle' && it('then the generated schemaMap is correct', function() {
+          assert.deepEqual(schema._buildSchemaMap(), schemaMap);
+        });
+
+        encryptionType === 'qe' && it('then the generated encryptedFieldsMap is correct', function() {
+          assert.deepEqual(schema._buildEncryptedFields(), encryptedFields);
+        });
       });
     }
+  });
 
-    describe('when a schema is instantiated with a nested encrypted schema', function() {
-      let schema;
-      beforeEach(function() {
-        const encryptedSchema = new Schema({
-          encrypted: {
-            type: String, encrypt: { keyId: KEY_ID, algorithm }
-          }
-        }, { encryptionType: 'csfle' });
-        schema = new Schema({
-          field: encryptedSchema
-        }, { encryptionType: 'csfle' });
-      });
-
-
-      it('then the schema has a nested property that is encrypted', function() {
-        assert.ok(schemaHasEncryptedProperty(schema, ['field', 'encrypted']));
-      });
-    });
-
-    describe('when a schema is instantiated with a nested schema object', function() {
-      let schema;
-      beforeEach(function() {
-        schema = new Schema({
-          field: {
+  describe('Tests that fields of valid schema types can be declared as encrypted schemas', function() {
+    const tests = {
+      'nested schema for csfle':
+      {
+        schemaFactory: () => {
+          const encryptedSchema = new Schema({
             encrypted: {
               type: String, encrypt: { keyId: KEY_ID, algorithm }
             }
+          }, { encryptionType: 'csfle' });
+          return new Schema({
+            field: encryptedSchema
+          }, { encryptionType: 'csfle' });
+        }, predicate: (schema) => assert.ok(schemaHasEncryptedProperty(schema, ['field', 'encrypted'])),
+        schemaMap: {
+          bsonType: 'object',
+          properties: {
+            field: {
+              bsonType: 'object',
+              properties: {
+                encrypted: { encrypt: { bsonType: 'string', algorithm, keyId: KEY_ID } }
+              }
+            }
           }
-        }, { encryptionType: 'csfle' });
-      });
-
-      it('then the schema has a nested property that is encrypted', function() {
-        assert.ok(schemaHasEncryptedProperty(schema, ['field', 'encrypted']));
-      });
-    });
-
-    describe('when a schema is instantiated as an Array', function() {
-      let schema;
-      beforeEach(function() {
-        schema = new Schema({
-          encrypted: {
-            type: [Number],
-            encrypt: { keyId: KEY_ID, algorithm }
+        }
+      },
+      'nested schema for qe': {
+        schemaFactory: () => {
+          const encryptedSchema = new Schema({
+            encrypted: {
+              type: String, encrypt: { keyId: KEY_ID }
+            }
+          }, { encryptionType: 'qe' });
+          return new Schema({
+            field: encryptedSchema
+          }, { encryptionType: 'qe' });
+        }, predicate: (schema) => assert.ok(schemaHasEncryptedProperty(schema, ['field', 'encrypted'])),
+        encryptedFields: {
+          fields: [
+            { path: 'field.encrypted', keyId: KEY_ID, bsonType: 'string' }
+          ]
+        }
+      },
+      'nested object for csfle':
+      {
+        schemaFactory: () => {
+          return new Schema({
+            field: {
+              encrypted: {
+                type: String, encrypt: { keyId: KEY_ID, algorithm }
+              }
+            }
+          }, { encryptionType: 'csfle' });
+        }, predicate: (schema) => assert.ok(schemaHasEncryptedProperty(schema, ['field', 'encrypted'])),
+        schemaMap: {
+          bsonType: 'object',
+          properties: {
+            field: {
+              bsonType: 'object',
+              properties: {
+                encrypted: { encrypt: { bsonType: 'string', algorithm, keyId: KEY_ID } }
+              }
+            }
           }
-        }, { encryptionType: 'csfle' });
-      });
+        }
+      },
+      'nested object for qe': {
+        schemaFactory: () => {
+          return new Schema({
+            field: {
+              encrypted: {
+                type: String, encrypt: { keyId: KEY_ID }
+              }
+            }
+          }, { encryptionType: 'qe' });
+        }, predicate: (schema) => assert.ok(schemaHasEncryptedProperty(schema, ['field', 'encrypted'])),
+        encryptedFields: {
+          fields: [
+            { path: 'field.encrypted', keyId: KEY_ID, bsonType: 'string' }
+          ]
+        }
+      },
+      'schema with encrypted array for csfle': {
+        schemaFactory: () => {
+          return new Schema({
+            encrypted: {
+              type: [Number],
+              encrypt: { keyId: KEY_ID, algorithm }
+            }
+          }, { encryptionType: 'csfle' });
+        }, predicate: (schema) => assert.ok(schemaHasEncryptedProperty(schema, ['encrypted'])),
+        schemaMap: {
+          bsonType: 'object',
+          properties: {
+            encrypted: {
+              encrypt: {
+                bsonType: 'array',
+                keyId: KEY_ID,
+                algorithm
+              }
+            }
+          }
+        }
+      },
+      'schema with encrypted array for qe': {
+        schemaFactory: () => {
+          return new Schema({
+            encrypted: {
+              type: [Number],
+              encrypt: { keyId: KEY_ID }
+            }
+          }, { encryptionType: 'qe' });
+        }, predicate: (schema) => assert.ok(schemaHasEncryptedProperty(schema, ['encrypted'])),
+        encryptedFields: {
+          fields: [
+            { path: 'encrypted', keyId: KEY_ID, bsonType: 'array' }
+          ]
+        }
+      }
+    };
 
-      it('then the schema has a nested property that is encrypted', function() {
-        assert.ok(schemaHasEncryptedProperty(schema, 'encrypted'));
-      });
-    });
+    for (const [description, { schemaFactory, predicate, schemaMap, encryptedFields }] of Object.entries(tests)) {
+      it(description, function() {
+        const schema = schemaFactory();
+        predicate(schema);
 
+        schemaMap && assert.deepEqual(schema._buildSchemaMap(), schemaMap);
+        encryptedFields && assert.deepEqual(schema._buildEncryptedFields(), encryptedFields);
+      });
+    }
   });
 
   describe('invalid schema types for encrypted schemas', function() {
@@ -121,7 +201,7 @@ describe('encrypted schema declaration', function() {
               type: Number, encrypt: { keyId: KEY_ID, algorithm }
             }
           }, { encryptionType: 'csfle' });
-        }, /Invalid BSON type/);
+        }, /Invalid BSON type for FLE field: 'field'/);
       });
     });
 
@@ -133,7 +213,7 @@ describe('encrypted schema declaration', function() {
               type: Schema.Types.Mixed, encrypt: { keyId: KEY_ID, algorithm }
             }
           }, { encryptionType: 'csfle' });
-        }, /Invalid BSON type/);
+        }, /Invalid BSON type for FLE field: 'field'/);
       });
     });
 
@@ -159,7 +239,7 @@ describe('encrypted schema declaration', function() {
               type: Int8, encrypt: { keyId: KEY_ID, algorithm }
             }
           }, { encryptionType: 'csfle' });
-        }, /Invalid BSON type/);
+        }, /Invalid BSON type for FLE field: 'field'/);
       });
     });
 
@@ -536,3 +616,476 @@ describe('encrypted schema declaration', function() {
     });
   });
 });
+
+function primitiveSchemaMapTests() {
+  return [
+    {
+      name: 'string',
+      type: String,
+      encryptionType: 'csfle',
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic',
+              bsonType: 'string'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'string',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+            algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
+          }
+        ]
+      }
+    },
+    {
+      name: 'string',
+      type: String,
+      encryptionType: 'qe',
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              bsonType: 'string'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'string',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522'
+          }
+        ]
+      }
+    },
+    {
+      name: 'boolean',
+      type: Schema.Types.Boolean,
+      encryptionType: 'csfle',
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic',
+              bsonType: 'bool'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'bool',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+            algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
+          }
+        ]
+      }
+    },
+    {
+      name: 'boolean',
+      encryptionType: 'qe',
+      type: Schema.Types.Boolean,
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              bsonType: 'bool'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'bool',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522'
+          }
+        ]
+      }
+    },
+    {
+      name: 'buffer',
+      encryptionType: 'csfle',
+      type: Schema.Types.Buffer,
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic',
+              bsonType: 'binData'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'binData',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+            algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
+          }
+        ]
+      }
+    },
+    {
+      name: 'buffer',
+      encryptionType: 'qe',
+      type: Schema.Types.Buffer,
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              bsonType: 'binData'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'binData',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522'
+          }
+        ]
+      }
+    },
+    {
+      name: 'date',
+      encryptionType: 'csfle',
+      type: Date,
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic',
+              bsonType: 'date'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'date',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+            algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
+          }
+        ]
+      }
+    },
+    {
+      name: 'date',
+      encryptionType: 'qe',
+      type: Date,
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              bsonType: 'date'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'date',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522'
+          }
+        ]
+      }
+    },
+    {
+      name: 'objectid',
+      encryptionType: 'csfle',
+      type: ObjectId,
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic',
+              bsonType: 'objectId'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'objectId',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+            algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
+          }
+        ]
+      }
+    },
+    {
+      name: 'objectid',
+      encryptionType: 'qe',
+      type: ObjectId,
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              bsonType: 'objectId'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'objectId',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522'
+          }
+        ]
+      }
+    },
+    {
+      name: 'bigint',
+      encryptionType: 'csfle',
+      type: BigInt,
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic',
+              bsonType: 'long'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'long',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+            algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
+          }
+        ]
+      }
+    },
+    {
+      name: 'bigint',
+      encryptionType: 'qe',
+      type: BigInt,
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              bsonType: 'long'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'long',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522'
+          }
+        ]
+      }
+    },
+    {
+      name: 'Decimal128',
+      encryptionType: 'csfle',
+      type: Decimal128,
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic',
+              bsonType: 'decimal'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'decimal',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+            algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
+          }
+        ]
+      }
+    },
+    {
+      name: 'Decimal128',
+      encryptionType: 'qe',
+      type: Decimal128,
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              bsonType: 'decimal'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'decimal',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522'
+          }
+        ]
+      }
+    },
+    {
+      name: 'int32',
+      encryptionType: 'csfle',
+      type: Int32,
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic',
+              bsonType: 'int'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'int',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+            algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
+          }
+        ]
+      }
+    },
+    {
+      name: 'int32',
+      encryptionType: 'qe',
+      type: Int32,
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              bsonType: 'int'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'int',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522'
+          }
+        ]
+      }
+    },
+    {
+      name: 'double',
+      encryptionType: 'csfle',
+      type: Double,
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic',
+              bsonType: 'double'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'double',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+            algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
+          }
+        ]
+      }
+    },
+    {
+      name: 'double',
+      encryptionType: 'qe',
+      type: Double,
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              bsonType: 'double'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'double',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522'
+          }
+        ]
+      }
+    }
+  ];
+}

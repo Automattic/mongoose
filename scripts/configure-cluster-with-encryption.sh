@@ -8,7 +8,7 @@ export CWD=$(pwd);
 export DRIVERS_TOOLS_PINNED_COMMIT=35d0592c76f4f3d25a5607895eb21b491dd52543;
 
 # install extra dependency
-npm install mongodb-client-encryption
+npm install --no-save mongodb-client-encryption
 
 # set up mongodb cluster and encryption configuration if the data/ folder does not exist
 if [ ! -d "data" ]; then

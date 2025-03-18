@@ -6,6 +6,7 @@ const isBsonType = require('../../lib/helpers/isBsonType');
 const { Schema, createConnection } = require('../../lib');
 const { ObjectId, Double, Int32, Decimal128 } = require('bson');
 const fs = require('fs');
+const mongoose = require('../../lib');
 
 const LOCAL_KEY = Buffer.from('Mng0NCt4ZHVUYUJCa1kxNkVyNUR1QURhZ2h2UzR2d2RrZzh0cFBwM3R6NmdWMDFBMUN3YkQ5aXRRMkhGRGdQV09wOGVNYUMxT2k3NjZKelhaQmRCZGJkTXVyZG9uSjFk', 'base64');
 
@@ -19,20 +20,22 @@ function isEncryptedValue(object, property) {
   assert.ok(value.sub_type === 6, `auto encryption for property ${property} failed: not subtype 6.`);
 }
 
-describe('ci', () => {
-
+describe('encryption integration tests', () => {
   const cachedUri = process.env.MONGOOSE_TEST_URI;
   const cachedLib = process.env.CRYPT_SHARED_LIB_PATH;
 
   before(function() {
     const cwd = process.cwd();
     const file = fs.readFileSync(cwd + '/data/mo-expansion.yml', { encoding: 'utf-8' }).trim().split('\n');
+
+    // matches `key="value"` and extracts key and value.
     const regex = /^(?<key>.*): "(?<value>.*)"$/;
-    const variables = file.map((line) => regex.exec(line.trim()).groups).reduce((acc, { key, value }) => ({ ...acc, [key]: value }), {});
+    const variables = Object.fromEntries(file.map((line) => regex.exec(line.trim()).groups).map(({ key, value }) => [key, value]));
     console.log('File contents', file);
     console.log('Variables', variables);
-    process.env.CRYPT_SHARED_LIB_PATH = variables.CRYPT_SHARED_LIB_PATH;
-    process.env.MONGOOSE_TEST_URI = variables.MONGODB_URI;
+
+    process.env.CRYPT_SHARED_LIB_PATH ??= variables.CRYPT_SHARED_LIB_PATH;
+    process.env.MONGOOSE_TEST_URI ??= variables.MONGODB_URI;
   });
 
   after(function() {
@@ -40,16 +43,23 @@ describe('ci', () => {
     process.env.MONGOOSE_TEST_URI = cachedUri;
   });
 
-  describe('environmental variables', () => {
+  describe('meta: environmental variables are correctly set up', () => {
     it('MONGOOSE_TEST_URI is set', async function() {
       const uri = process.env.MONGOOSE_TEST_URI;
-      console.log('MONGOOSE_TEST_URI=', uri);
       assert.ok(uri);
+    });
+
+    it('MONGOOSE_TEST_URI points to running cluster', async function() {
+      try {
+        const connection = await mongoose.connect(process.env.MONGOOSE_TEST_URI);
+        await connection.disconnect();
+      } catch (error) {
+        throw new Error('Unable to connect to running cluster', { cause: error });
+      }
     });
 
     it('CRYPT_SHARED_LIB_PATH is set', async function() {
       const shared_library_path = process.env.CRYPT_SHARED_LIB_PATH;
-      console.log('CRYPT_SHARED_LIB_PATH=', shared_library_path);
       assert.ok(shared_library_path);
     });
   });
@@ -98,11 +108,11 @@ describe('ci', () => {
       { type: Double, name: 'double', input: new Double(1.5) }
     ];
 
-    for (const { type, name, input, expected } of basicSchemaTypes) {
-      this.afterEach(async function() {
-        await connection?.close();
-      });
+    afterEach(async function() {
+      await connection?.close();
+    });
 
+    for (const { type, name, input, expected } of basicSchemaTypes) {
       // eslint-disable-next-line no-inner-declarations
       async function test() {
         const [{ _id }] = await model.insertMany([{ field: input }]);

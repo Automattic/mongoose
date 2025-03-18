@@ -4,8 +4,8 @@
 
 # this script downloads all tools required to use FLE with mongodb, then starts a cluster of the provided configuration (sharded on 8.0 server)
 
-export CWD=$(pwd);
-export DRIVERS_TOOLS_PINNED_COMMIT=35d0592c76f4f3d25a5607895eb21b491dd52543;
+export CWD=$(pwd)
+export DRIVERS_TOOLS_PINNED_COMMIT=4e18803c074231ec9fc3ace8f966e2c49d9874bb
 
 # install extra dependency
 npm install --no-save mongodb-client-encryption
@@ -33,11 +33,9 @@ if [ ! -d "data" ]; then
 
   # configure cluster settings
   export DRIVERS_TOOLS=$CWD/data/drivers-evergreen-tools
-  export MONGODB_VERSION=8.0
-  export AUTH=true
+  export AUTH=auth
   export MONGODB_BINARIES=$DRIVERS_TOOLS/mongodb/bin
-  export MONGO_ORCHESTRATION_HOME=$DRIVERS_TOOLS/mo
-  export PROJECT_ORCHESTRATION_HOME=$DRIVERS_TOOLS/.evergreen/orchestration
+  export MONGO_ORCHESTRATION_HOME=$DRIVERS_TOOLS/.evergreen/orchestration
   export TOPOLOGY=sharded_cluster
   export SSL=nossl
 
@@ -46,12 +44,12 @@ if [ ! -d "data" ]; then
   mkdir mo
   cd -
 
-  rm expansions.sh 2> /dev/null
+  rm expansions.sh 2>/dev/null
 
   echo 'Configuring Cluster...'
 
   # start cluster
-  (bash $DRIVERS_TOOLS/.evergreen/run-orchestration.sh) 1> /dev/null 2> /dev/null
+  (bash $DRIVERS_TOOLS/.evergreen/run-orchestration.sh) 1>/dev/null 2>/dev/null
 
   echo 'Cluster Configuration Finished!'
 

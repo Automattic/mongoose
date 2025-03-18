@@ -93,4 +93,12 @@ type AddThisParameter<T, D> = {
     : T[K];
 };
 
+  /**
+   * @summary Adds timestamp fields to a type
+   * @description Adds createdAt and updatedAt fields of type Date, or custom timestamp fields if specified
+   * @param {T} T The type to add timestamp fields to
+   * @param {P} P Optional SchemaTimestampsConfig or boolean to customize timestamp field names
+   * @returns T with timestamp fields added
+   */
+  export type WithTimestamps<T, P extends SchemaTimestampsConfig | boolean = true> = ResolveTimestamps<T, { timestamps: P }>;
 }

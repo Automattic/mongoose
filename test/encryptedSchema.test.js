@@ -53,7 +53,7 @@ describe('encrypted schema declaration', function() {
           assert.deepEqual(schema._buildSchemaMap(), schemaMap);
         });
 
-        encryptionType === 'qe' && it('then the generated encryptedFieldsMap is correct', function() {
+        encryptionType === 'queryableEncryption' && it('then the generated encryptedFieldsMap is correct', function() {
           assert.deepEqual(schema._buildEncryptedFields(), encryptedFields);
         });
       });
@@ -61,7 +61,46 @@ describe('encrypted schema declaration', function() {
   });
 
   describe('Tests that fields of valid schema types can be declared as encrypted schemas', function() {
-    it('nested schema for csfle', function() {
+    it('mongoose maps with csfle', function() {
+      const schema = new Schema({
+        field: {
+          type: Schema.Types.Map,
+          of: String,
+          encrypt: { keyId: [KEY_ID], algorithm }
+        }
+      }, { encryptionType: 'csfle' });
+
+      assert.ok(schemaHasEncryptedProperty(schema, 'field'));
+
+      assert.deepEqual(schema._buildSchemaMap(), {
+        bsonType: 'object',
+        properties: {
+          field: { encrypt: {
+            bsonType: 'object', algorithm, keyId: [KEY_ID]
+          } }
+        }
+      });
+    });
+
+    it('mongoose maps with queryableEncryption', function() {
+      const schema = new Schema({
+        field: {
+          type: Schema.Types.Map,
+          of: String,
+          encrypt: { keyId: KEY_ID }
+        }
+      }, { encryptionType: 'queryableEncryption' });
+
+      assert.ok(schemaHasEncryptedProperty(schema, 'field'));
+
+      assert.deepEqual(schema._buildEncryptedFields(), {
+        fields: [
+          { path: 'field', keyId: KEY_ID, bsonType: 'object' }
+        ]
+      });
+    });
+
+    it('subdocument for csfle', function() {
       const encryptedSchema = new Schema({
         encrypted: {
           type: String, encrypt: { keyId: KEY_ID, algorithm }
@@ -85,15 +124,15 @@ describe('encrypted schema declaration', function() {
         }
       });
     });
-    it('nested schema for qe', function() {
+    it('subdocument for queryableEncryption', function() {
       const encryptedSchema = new Schema({
         encrypted: {
           type: String, encrypt: { keyId: KEY_ID }
         }
-      }, { encryptionType: 'qe' });
+      }, { encryptionType: 'queryableEncryption' });
       const schema = new Schema({
         field: encryptedSchema
-      }, { encryptionType: 'qe' });
+      }, { encryptionType: 'queryableEncryption' });
       assert.ok(schemaHasEncryptedProperty(schema, ['field', 'encrypted']));
 
       assert.deepEqual(schema._buildEncryptedFields(), {
@@ -123,14 +162,14 @@ describe('encrypted schema declaration', function() {
         }
       });
     });
-    it('nested object for qe', function() {
+    it('nested object for queryableEncryption', function() {
       const schema = new Schema({
         field: {
           encrypted: {
             type: String, encrypt: { keyId: KEY_ID }
           }
         }
-      }, { encryptionType: 'qe' });
+      }, { encryptionType: 'queryableEncryption' });
       assert.ok(schemaHasEncryptedProperty(schema, ['field', 'encrypted']));
       assert.deepEqual(schema._buildEncryptedFields(), {
         fields: [
@@ -160,13 +199,13 @@ describe('encrypted schema declaration', function() {
         }
       });
     });
-    it('schema with encrypted array for qe', function() {
+    it('schema with encrypted array for queryableEncryption', function() {
       const schema = new Schema({
         encrypted: {
           type: [Number],
           encrypt: { keyId: KEY_ID }
         }
-      }, { encryptionType: 'qe' });
+      }, { encryptionType: 'queryableEncryption' });
       assert.ok(schemaHasEncryptedProperty(schema, ['encrypted']));
       assert.deepEqual(schema._buildEncryptedFields(), {
         fields: [
@@ -633,7 +672,7 @@ function primitiveSchemaMapTests() {
     {
       name: 'string',
       type: String,
-      encryptionType: 'qe',
+      encryptionType: 'queryableEncryption',
       schemaMap: {
         bsonType: 'object',
         properties: {
@@ -684,7 +723,7 @@ function primitiveSchemaMapTests() {
     },
     {
       name: 'boolean',
-      encryptionType: 'qe',
+      encryptionType: 'queryableEncryption',
       type: Schema.Types.Boolean,
       schemaMap: {
         bsonType: 'object',
@@ -736,7 +775,7 @@ function primitiveSchemaMapTests() {
     },
     {
       name: 'buffer',
-      encryptionType: 'qe',
+      encryptionType: 'queryableEncryption',
       type: Schema.Types.Buffer,
       schemaMap: {
         bsonType: 'object',
@@ -788,7 +827,7 @@ function primitiveSchemaMapTests() {
     },
     {
       name: 'date',
-      encryptionType: 'qe',
+      encryptionType: 'queryableEncryption',
       type: Date,
       schemaMap: {
         bsonType: 'object',
@@ -840,7 +879,7 @@ function primitiveSchemaMapTests() {
     },
     {
       name: 'objectid',
-      encryptionType: 'qe',
+      encryptionType: 'queryableEncryption',
       type: ObjectId,
       schemaMap: {
         bsonType: 'object',
@@ -892,7 +931,7 @@ function primitiveSchemaMapTests() {
     },
     {
       name: 'bigint',
-      encryptionType: 'qe',
+      encryptionType: 'queryableEncryption',
       type: BigInt,
       schemaMap: {
         bsonType: 'object',
@@ -944,7 +983,7 @@ function primitiveSchemaMapTests() {
     },
     {
       name: 'Decimal128',
-      encryptionType: 'qe',
+      encryptionType: 'queryableEncryption',
       type: Decimal128,
       schemaMap: {
         bsonType: 'object',
@@ -996,7 +1035,7 @@ function primitiveSchemaMapTests() {
     },
     {
       name: 'int32',
-      encryptionType: 'qe',
+      encryptionType: 'queryableEncryption',
       type: Int32,
       schemaMap: {
         bsonType: 'object',
@@ -1048,7 +1087,7 @@ function primitiveSchemaMapTests() {
     },
     {
       name: 'double',
-      encryptionType: 'qe',
+      encryptionType: 'queryableEncryption',
       type: Double,
       schemaMap: {
         bsonType: 'object',

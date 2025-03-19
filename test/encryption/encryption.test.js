@@ -7,6 +7,7 @@ const { Schema, createConnection } = require('../../lib');
 const { ObjectId, Double, Int32, Decimal128 } = require('bson');
 const fs = require('fs');
 const mongoose = require('../../lib');
+const { Map } = require('../../lib/types');
 
 const LOCAL_KEY = Buffer.from('Mng0NCt4ZHVUYUJCa1kxNkVyNUR1QURhZ2h2UzR2d2RrZzh0cFBwM3R6NmdWMDFBMUN3YkQ5aXRRMkhGRGdQV09wOGVNYUMxT2k3NjZKelhaQmRCZGJkTXVyZG9uSjFk', 'base64');
 
@@ -31,8 +32,6 @@ describe('encryption integration tests', () => {
     // matches `key="value"` and extracts key and value.
     const regex = /^(?<key>.*): "(?<value>.*)"$/;
     const variables = Object.fromEntries(file.map((line) => regex.exec(line.trim()).groups).map(({ key, value }) => [key, value]));
-    console.log('File contents', file);
-    console.log('Variables', variables);
 
     process.env.CRYPT_SHARED_LIB_PATH ??= variables.CRYPT_SHARED_LIB_PATH;
     process.env.MONGOOSE_TEST_URI ??= variables.MONGODB_URI;
@@ -185,6 +184,90 @@ describe('encryption integration tests', () => {
       });
     }
 
+    describe('mongoose Maps', function() {
+      describe('CSFLE', function() {
+        it('encrypts and decrypts', async function() {
+          const schema = new Schema({
+            a: {
+              type: Schema.Types.Map,
+              of: String,
+              encrypt: { keyId: [keyId], algorithm }
+
+            }
+          }, {
+            encryptionType: 'csfle'
+          });
+
+          connection = createConnection();
+          const model = connection.model('Schema', schema);
+          await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+            dbName: 'db', autoEncryption: {
+              keyVaultNamespace: 'keyvault.datakeys',
+              kmsProviders: { local: { key: LOCAL_KEY } },
+              extraOptions: {
+                cryptdSharedLibRequired: true,
+                cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+              }
+            }
+          });
+
+          const [{ _id }] = await model.insertMany([{ a: {
+            name: 'bailey'
+          } }]);
+          const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
+
+          assert.ok(isBsonType(encryptedDoc.a, 'Binary'));
+          assert.ok(encryptedDoc.a.sub_type === 6);
+
+          const doc = await model.findOne({ _id });
+          assert.ok(doc.a instanceof Map);
+          const rawObject = Object.fromEntries(doc.a);
+          assert.deepEqual(rawObject, { name: 'bailey' });
+        });
+      });
+
+      describe('queryable encryption', function() {
+        it('encrypts and decrypts', async function() {
+          const schema = new Schema({
+            a: {
+              type: Schema.Types.Map,
+              of: String,
+              encrypt: { keyId: keyId }
+
+            }
+          }, {
+            encryptionType: 'queryableEncryption'
+          });
+
+          connection = createConnection();
+          const model = connection.model('Schema', schema);
+          await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+            dbName: 'db', autoEncryption: {
+              keyVaultNamespace: 'keyvault.datakeys',
+              kmsProviders: { local: { key: LOCAL_KEY } },
+              extraOptions: {
+                cryptdSharedLibRequired: true,
+                cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+              }
+            }
+          });
+
+          const [{ _id }] = await model.insertMany([{ a: {
+            name: 'bailey'
+          } }]);
+          const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
+
+          assert.ok(isBsonType(encryptedDoc.a, 'Binary'));
+          assert.ok(encryptedDoc.a.sub_type === 6);
+
+          const doc = await model.findOne({ _id });
+          assert.ok(doc.a instanceof Map);
+          const rawObject = Object.fromEntries(doc.a);
+          assert.deepEqual(rawObject, { name: 'bailey' });
+        });
+      });
+    });
+
     describe('nested object schemas', function() {
       const tests = {
         'nested object schemas for CSFLE': {
@@ -310,72 +393,156 @@ describe('encryption integration tests', () => {
     });
 
     describe('array encrypted fields', function() {
-      const tests = {
-        'array fields for CSFLE': {
-          modelFactory: () => {
-            const schema = new Schema({
-              a: {
-                type: [Int32],
-                encrypt: {
-                  keyId: [keyId],
-                  algorithm
-                }
+      describe('primitive array fields for CSFLE', function() {
+        it('encrypts and decrypts', async function() {
+          const schema = new Schema({
+            a: {
+              type: [Int32],
+              encrypt: {
+                keyId: [keyId],
+                algorithm
               }
-            }, {
-              encryptionType: 'csfle'
-            });
-
-            connection = createConnection();
-            model = connection.model('Schema', schema);
-            return { model };
-          }
-        },
-        'array field for QE': {
-          modelFactory: () => {
-            const schema = new Schema({
-              a: {
-                type: [Int32],
-                encrypt: {
-                  keyId
-                }
-              }
-            }, {
-              encryptionType: 'queryableEncryption'
-            });
-
-            connection = createConnection();
-            model = connection.model('Schema', schema);
-            return { model };
-          }
-        }
-      };
-
-      for (const [description, { modelFactory }] of Object.entries(tests)) {
-        describe(description, function() {
-          it('encrypts and decrypts', async function() {
-            const { model } = modelFactory();
-            await connection.openUri(process.env.MONGOOSE_TEST_URI, {
-              dbName: 'db', autoEncryption: {
-                keyVaultNamespace: 'keyvault.datakeys',
-                kmsProviders: { local: { key: LOCAL_KEY } },
-                extraOptions: {
-                  cryptdSharedLibRequired: true,
-                  cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
-                }
-              }
-            });
-
-            const [{ _id }] = await model.insertMany([{ a: [new Int32(3)] }]);
-            const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
-
-            assert.ok(isBsonType(encryptedDoc.a, 'Binary'));
-            assert.ok(encryptedDoc.a.sub_type === 6);
-
-            const doc = await model.findOne({ _id });
-            assert.deepEqual(doc.a, [3]);
+            }
+          }, {
+            encryptionType: 'csfle'
           });
+
+          connection = createConnection();
+          const model = connection.model('Schema', schema);
+          await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+            dbName: 'db', autoEncryption: {
+              keyVaultNamespace: 'keyvault.datakeys',
+              kmsProviders: { local: { key: LOCAL_KEY } },
+              extraOptions: {
+                cryptdSharedLibRequired: true,
+                cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+              }
+            }
+          });
+
+          const [{ _id }] = await model.insertMany([{ a: [new Int32(3)] }]);
+          const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
+
+          assert.ok(isBsonType(encryptedDoc.a, 'Binary'));
+          assert.ok(encryptedDoc.a.sub_type === 6);
+
+          const doc = await model.findOne({ _id });
+          assert.deepEqual(doc.a, [3]);
         });
-      }
+      });
+
+      describe('document array fields for CSFLE', function() {
+        it('encrypts and decrypts', async function() {
+          const nestedSchema = new Schema({ name: String }, { _id: false });
+          const schema = new Schema({
+            a: {
+              type: [nestedSchema],
+              encrypt: {
+                keyId: [keyId],
+                algorithm
+              }
+            }
+          }, {
+            encryptionType: 'csfle'
+          });
+
+          connection = createConnection();
+          const model = connection.model('Schema', schema);
+          await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+            dbName: 'db', autoEncryption: {
+              keyVaultNamespace: 'keyvault.datakeys',
+              kmsProviders: { local: { key: LOCAL_KEY } },
+              extraOptions: {
+                cryptdSharedLibRequired: true,
+                cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+              }
+            }
+          });
+
+          const [{ _id }] = await model.insertMany([{ a: [{ name: 'bailey' }] }]);
+          const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
+
+          assert.ok(isBsonType(encryptedDoc.a, 'Binary'));
+          assert.ok(encryptedDoc.a.sub_type === 6);
+
+          const doc = await model.findOne({ _id }, {}, { lean: true });
+          assert.deepEqual(doc.a, [{ name: 'bailey' }]);
+        });
+      });
+
+      describe('primitive array field for QE', function() {
+        it('encrypts and decrypts', async function() {
+          const schema = new Schema({
+            a: {
+              type: [Int32],
+              encrypt: {
+                keyId
+              }
+            }
+          }, {
+            encryptionType: 'queryableEncryption'
+          });
+
+          connection = createConnection();
+          const model = connection.model('Schema', schema); await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+            dbName: 'db', autoEncryption: {
+              keyVaultNamespace: 'keyvault.datakeys',
+              kmsProviders: { local: { key: LOCAL_KEY } },
+              extraOptions: {
+                cryptdSharedLibRequired: true,
+                cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+              }
+            }
+          });
+
+          const [{ _id }] = await model.insertMany([{ a: [new Int32(3)] }]);
+          const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
+
+          assert.ok(isBsonType(encryptedDoc.a, 'Binary'));
+          assert.ok(encryptedDoc.a.sub_type === 6);
+
+          const doc = await model.findOne({ _id });
+          assert.deepEqual(doc.a, [3]);
+        });
+      });
+
+      describe('document array fields for QE', function() {
+        it('encrypts and decrypts', async function() {
+          const nestedSchema = new Schema({ name: String }, { _id: false });
+          const schema = new Schema({
+            a: {
+              type: [nestedSchema],
+              encrypt: {
+                keyId
+              }
+            }
+          }, {
+            encryptionType: 'queryableEncryption'
+          });
+
+          connection = createConnection();
+          const model = connection.model('Schema', schema);
+          await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+            dbName: 'db', autoEncryption: {
+              keyVaultNamespace: 'keyvault.datakeys',
+              kmsProviders: { local: { key: LOCAL_KEY } },
+              extraOptions: {
+                cryptdSharedLibRequired: true,
+                cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+              }
+            }
+          });
+
+          const [{ _id }] = await model.insertMany([{ a: [{ name: 'bailey' }] }]);
+          const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
+
+          assert.ok(isBsonType(encryptedDoc.a, 'Binary'));
+          assert.ok(encryptedDoc.a.sub_type === 6);
+
+          const doc = await model.findOne({ _id }, {}, { lean: true });
+          assert.deepEqual(doc.a, [{ name: 'bailey' }]);
+        });
+      });
     });
 
     describe('multiple encrypted fields in a model', function() {

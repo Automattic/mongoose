@@ -797,6 +797,133 @@ describe('encryption integration tests', () => {
         });
       });
 
+      describe('duplicate keys in discriminators', function() {
+        beforeEach(async function() {
+          connection = createConnection();
+        });
+        describe('csfle', function() {
+          it('throws on duplicate keys declared on different discriminators', async function() {
+            const schema = new Schema({
+              name: {
+                type: String, encrypt: { keyId: [keyId], algorithm }
+              }
+            }, {
+              encryptionType: 'csfle'
+            });
+            model = connection.model('Schema', schema);
+            discrim1 = model.discriminator('Test', new Schema({
+              age: {
+                type: Int32, encrypt: { keyId: [keyId], algorithm }
+              }
+            }, {
+              encryptionType: 'csfle'
+            }));
+
+            discrim2 = model.discriminator('Test2', new Schema({
+              age: {
+                type: Int32, encrypt: { keyId: [keyId], algorithm }
+              }
+            }, {
+              encryptionType: 'csfle'
+            }));
+
+            const error = await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+              dbName: 'db', autoEncryption: {
+                keyVaultNamespace: 'keyvault.datakeys',
+                kmsProviders: { local: { key: LOCAL_KEY } },
+                extraOptions: {
+                  cryptdSharedLibRequired: true,
+                  cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+                }
+              }
+            }).catch(e => e);
+
+            assert.ok(error instanceof Error);
+            assert.match(error.message, /Cannot have duplicate keys in discriminators with encryption/);
+          });
+          it('throws on duplicate keys declared on root and child discriminators', async function() {
+            const schema = new Schema({
+              name: {
+                type: String, encrypt: { keyId: [keyId], algorithm }
+              }
+            }, {
+              encryptionType: 'csfle'
+            });
+            model = connection.model('Schema', schema);
+            assert.throws(() => model.discriminator('Test', new Schema({
+              name: {
+                type: String, encrypt: { keyId: [keyId], algorithm }
+              }
+            }, {
+              encryptionType: 'csfle'
+            })),
+            /cannot declare an encrypted field on child schema overriding base schema\. key=name/
+            );
+          });
+        });
+
+        describe('queryable encryption', function() {
+          it('throws on duplicate keys declared on different discriminators', async function() {
+            const schema = new Schema({
+              name: {
+                type: String, encrypt: { keyId }
+              }
+            }, {
+              encryptionType: 'queryableEncryption'
+            });
+            model = connection.model('Schema', schema);
+            discrim1 = model.discriminator('Test', new Schema({
+              age: {
+                type: Int32, encrypt: { keyId: keyId2 }
+              }
+            }, {
+              encryptionType: 'queryableEncryption'
+            }));
+
+            discrim2 = model.discriminator('Test2', new Schema({
+              age: {
+                type: Int32, encrypt: { keyId: keyId3 }
+              }
+            }, {
+              encryptionType: 'queryableEncryption'
+            }));
+
+            const error = await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+              dbName: 'db', autoEncryption: {
+                keyVaultNamespace: 'keyvault.datakeys',
+                kmsProviders: { local: { key: LOCAL_KEY } },
+                extraOptions: {
+                  cryptdSharedLibRequired: true,
+                  cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+                }
+              }
+            }).catch(e => e);
+
+            assert.ok(error instanceof Error);
+            assert.match(error.message, /Cannot have duplicate keys in discriminators with encryption/);
+          });
+          it('throws on duplicate keys declared on root and child discriminators', async function() {
+            const schema = new Schema({
+              name: {
+                type: String, encrypt: { keyId }
+              }
+            }, {
+              encryptionType: 'queryableEncryption'
+            });
+            model = connection.model('Schema', schema);
+            assert.throws(() => model.discriminator('Test', new Schema({
+              name: {
+                type: String, encrypt: { keyId: keyId2 }
+              }
+            }, {
+              encryptionType: 'queryableEncryption'
+            })),
+            /cannot declare an encrypted field on child schema overriding base schema\. key=name/
+            );
+          });
+        });
+      });
+
     });
   });
 });

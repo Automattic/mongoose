@@ -166,7 +166,7 @@ const UserModel = connection.model('User', encryptedUserSchema);
 
 CSFLE/QE in Mongoose work by generating the encryption schema that the MongoDB driver expects for each encrypted model on the connection.  This happens automatically the model's connection is established.
 
-Queryable encryption and csfle requires all the same configuration as outlined in <>, except for the schemaMap or encryptedFieldsMap options.
+Queryable encryption and CSFLE requires all the same configuration as outlined in <>, except for the schemaMap or encryptedFieldsMap options.
 
 ```javascript
 const keyVaultNamespace = 'client.encryption';

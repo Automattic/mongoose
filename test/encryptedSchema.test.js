@@ -61,135 +61,119 @@ describe('encrypted schema declaration', function() {
   });
 
   describe('Tests that fields of valid schema types can be declared as encrypted schemas', function() {
-    const tests = {
-      'nested schema for csfle':
-      {
-        schemaFactory: () => {
-          const encryptedSchema = new Schema({
-            encrypted: {
-              type: String, encrypt: { keyId: KEY_ID, algorithm }
-            }
-          }, { encryptionType: 'csfle' });
-          return new Schema({
-            field: encryptedSchema
-          }, { encryptionType: 'csfle' });
-        }, predicate: (schema) => assert.ok(schemaHasEncryptedProperty(schema, ['field', 'encrypted'])),
-        schemaMap: {
-          bsonType: 'object',
-          properties: {
-            field: {
-              bsonType: 'object',
-              properties: {
-                encrypted: { encrypt: { bsonType: 'string', algorithm, keyId: KEY_ID } }
-              }
-            }
-          }
+    it('nested schema for csfle', function() {
+      const encryptedSchema = new Schema({
+        encrypted: {
+          type: String, encrypt: { keyId: KEY_ID, algorithm }
         }
-      },
-      'nested schema for qe': {
-        schemaFactory: () => {
-          const encryptedSchema = new Schema({
-            encrypted: {
-              type: String, encrypt: { keyId: KEY_ID }
-            }
-          }, { encryptionType: 'qe' });
-          return new Schema({
-            field: encryptedSchema
-          }, { encryptionType: 'qe' });
-        }, predicate: (schema) => assert.ok(schemaHasEncryptedProperty(schema, ['field', 'encrypted'])),
-        encryptedFields: {
-          fields: [
-            { path: 'field.encrypted', keyId: KEY_ID, bsonType: 'string' }
-          ]
-        }
-      },
-      'nested object for csfle':
-      {
-        schemaFactory: () => {
-          return new Schema({
-            field: {
-              encrypted: {
-                type: String, encrypt: { keyId: KEY_ID, algorithm }
-              }
-            }
-          }, { encryptionType: 'csfle' });
-        }, predicate: (schema) => assert.ok(schemaHasEncryptedProperty(schema, ['field', 'encrypted'])),
-        schemaMap: {
-          bsonType: 'object',
-          properties: {
-            field: {
-              bsonType: 'object',
-              properties: {
-                encrypted: { encrypt: { bsonType: 'string', algorithm, keyId: KEY_ID } }
-              }
-            }
-          }
-        }
-      },
-      'nested object for qe': {
-        schemaFactory: () => {
-          return new Schema({
-            field: {
-              encrypted: {
-                type: String, encrypt: { keyId: KEY_ID }
-              }
-            }
-          }, { encryptionType: 'qe' });
-        }, predicate: (schema) => assert.ok(schemaHasEncryptedProperty(schema, ['field', 'encrypted'])),
-        encryptedFields: {
-          fields: [
-            { path: 'field.encrypted', keyId: KEY_ID, bsonType: 'string' }
-          ]
-        }
-      },
-      'schema with encrypted array for csfle': {
-        schemaFactory: () => {
-          return new Schema({
-            encrypted: {
-              type: [Number],
-              encrypt: { keyId: KEY_ID, algorithm }
-            }
-          }, { encryptionType: 'csfle' });
-        }, predicate: (schema) => assert.ok(schemaHasEncryptedProperty(schema, ['encrypted'])),
-        schemaMap: {
-          bsonType: 'object',
-          properties: {
-            encrypted: {
-              encrypt: {
-                bsonType: 'array',
-                keyId: KEY_ID,
-                algorithm
-              }
-            }
-          }
-        }
-      },
-      'schema with encrypted array for qe': {
-        schemaFactory: () => {
-          return new Schema({
-            encrypted: {
-              type: [Number],
-              encrypt: { keyId: KEY_ID }
-            }
-          }, { encryptionType: 'qe' });
-        }, predicate: (schema) => assert.ok(schemaHasEncryptedProperty(schema, ['encrypted'])),
-        encryptedFields: {
-          fields: [
-            { path: 'encrypted', keyId: KEY_ID, bsonType: 'array' }
-          ]
-        }
-      }
-    };
+      }, { encryptionType: 'csfle' });
+      const schema = new Schema({
+        field: encryptedSchema
+      }, { encryptionType: 'csfle' });
 
-    for (const [description, { schemaFactory, predicate, schemaMap, encryptedFields }] of Object.entries(tests)) {
-      it(description, function() {
-        const schema = schemaFactory();
-        predicate(schema);
+      assert.ok(schemaHasEncryptedProperty(schema, ['field', 'encrypted']));
 
-        schemaMap && assert.deepEqual(schema._buildSchemaMap(), schemaMap);
-        encryptedFields && assert.deepEqual(schema._buildEncryptedFields(), encryptedFields);
+      assert.deepEqual(schema._buildSchemaMap(), {
+        bsonType: 'object',
+        properties: {
+          field: {
+            bsonType: 'object',
+            properties: {
+              encrypted: { encrypt: { bsonType: 'string', algorithm, keyId: KEY_ID } }
+            }
+          }
+        }
       });
-    }
+    });
+    it('nested schema for qe', function() {
+      const encryptedSchema = new Schema({
+        encrypted: {
+          type: String, encrypt: { keyId: KEY_ID }
+        }
+      }, { encryptionType: 'qe' });
+      const schema = new Schema({
+        field: encryptedSchema
+      }, { encryptionType: 'qe' });
+      assert.ok(schemaHasEncryptedProperty(schema, ['field', 'encrypted']));
+
+      assert.deepEqual(schema._buildEncryptedFields(), {
+        fields: [
+          { path: 'field.encrypted', keyId: KEY_ID, bsonType: 'string' }
+        ]
+      });
+    });
+    it('nested object for csfle', function() {
+      const schema = new Schema({
+        field: {
+          encrypted: {
+            type: String, encrypt: { keyId: KEY_ID, algorithm }
+          }
+        }
+      }, { encryptionType: 'csfle' });
+      assert.ok(schemaHasEncryptedProperty(schema, ['field', 'encrypted']));
+      assert.deepEqual(schema._buildSchemaMap(), {
+        bsonType: 'object',
+        properties: {
+          field: {
+            bsonType: 'object',
+            properties: {
+              encrypted: { encrypt: { bsonType: 'string', algorithm, keyId: KEY_ID } }
+            }
+          }
+        }
+      });
+    });
+    it('nested object for qe', function() {
+      const schema = new Schema({
+        field: {
+          encrypted: {
+            type: String, encrypt: { keyId: KEY_ID }
+          }
+        }
+      }, { encryptionType: 'qe' });
+      assert.ok(schemaHasEncryptedProperty(schema, ['field', 'encrypted']));
+      assert.deepEqual(schema._buildEncryptedFields(), {
+        fields: [
+          { path: 'field.encrypted', keyId: KEY_ID, bsonType: 'string' }
+        ]
+      });
+    });
+    it('schema with encrypted array for csfle', function() {
+      const schema = new Schema({
+        encrypted: {
+          type: [Number],
+          encrypt: { keyId: KEY_ID, algorithm }
+        }
+      }, { encryptionType: 'csfle' });
+      assert.ok(schemaHasEncryptedProperty(schema, ['encrypted']));
+
+      assert.deepEqual(schema._buildSchemaMap(), {
+        bsonType: 'object',
+        properties: {
+          encrypted: {
+            encrypt: {
+              bsonType: 'array',
+              keyId: KEY_ID,
+              algorithm
+            }
+          }
+        }
+      });
+    });
+    it('schema with encrypted array for qe', function() {
+      const schema = new Schema({
+        encrypted: {
+          type: [Number],
+          encrypt: { keyId: KEY_ID }
+        }
+      }, { encryptionType: 'qe' });
+      assert.ok(schemaHasEncryptedProperty(schema, ['encrypted']));
+      assert.deepEqual(schema._buildEncryptedFields(), {
+        fields: [
+          { path: 'encrypted', keyId: KEY_ID, bsonType: 'array' }
+        ]
+      });
+    });
   });
 
   describe('invalid schema types for encrypted schemas', function() {

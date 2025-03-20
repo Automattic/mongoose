@@ -14423,6 +14423,20 @@ describe('document', function() {
       sinon.restore();
     }
   });
+
+  describe('async stack traces (gh-15317)', function() {
+    it('works with save() validation errors', async function() {
+      const userSchema = new mongoose.Schema({
+        name: { type: String, required: true, validate: v => v.length > 3 },
+        age: Number
+      });
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'A' });
+      const err = await doc.save().then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.ok(err.stack.includes('document.test.js'), err.stack);
+    });
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

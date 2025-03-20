@@ -320,7 +320,7 @@ describe('model middleware', function() {
 
     schema.pre('save', function(next) {
       next();
-      // This error will not get reported, because you already called next()
+      // Error takes precedence over next()
       throw new Error('woops!');
     });
 
@@ -333,8 +333,10 @@ describe('model middleware', function() {
 
     const test = new TestMiddleware({ title: 'Test' });
 
-    await test.save();
-    assert.equal(called, 1);
+    const err = await test.save().then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.message, 'woops!');
+    assert.equal(called, 0);
   });
 
   it('validate + remove', async function() {

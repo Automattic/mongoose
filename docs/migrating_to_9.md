@@ -36,3 +36,17 @@ try {
   // Handle validation error
 }
 ```
+
+## Errors in middleware functions take priority over `next()` calls
+
+In Mongoose 8.x, if a middleware function threw an error after calling `next()`, that error would be ignored.
+
+```javascript
+schema.pre('save', function(next) {
+  next();
+  // In Mongoose 8, this error will not get reported, because you already called next()
+  throw new Error('woops!');
+});
+```
+
+In Mongoose 9, errors in the middleware function take priority, so the above `save()` would throw an error.

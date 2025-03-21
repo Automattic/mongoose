@@ -1300,4 +1300,34 @@ describe('aggregate: ', function() {
       });
     }, /Aggregate `near\(\)` argument has invalid coordinates, got ""/);
   });
+
+  it('cursor() errors out if schema pre aggregate hook throws an error (gh-15279)', async function() {
+    const schema = new Schema({ name: String });
+
+    schema.pre('aggregate', function(next) {
+      if (!this.options.allowed) {
+        throw new Error('Unauthorized aggregate operation: only allowed operations are permitted');
+      }
+      next();
+    });
+
+    const Test = db.model('Test', schema);
+
+    await Test.create({ name: 'test1' });
+
+    await assert.rejects(
+      async() => {
+        await Test.aggregate([{ $limit: 1 }], { allowed: false }).exec();
+      },
+      err => err.message === 'Unauthorized aggregate operation: only allowed operations are permitted'
+    );
+
+    const cursor = Test.aggregate([{ $limit: 1 }], { allowed: false }).cursor();
+    await assert.rejects(
+      async() => {
+        await cursor.next();
+      },
+      err => err.message === 'Unauthorized aggregate operation: only allowed operations are permitted'
+    );
+  });
 });

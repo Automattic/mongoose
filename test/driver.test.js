@@ -13,7 +13,7 @@ describe('driver', function() {
 
     class Collection {
       findOne(filter, options) { // eslint-disable-line no-unused-vars
-        return Promise.resolve({ answer: 42 });
+        return Promise.resolve({ answer: 42, date: '2023-10-01' });
       }
     }
     class Connection extends EventEmitter {
@@ -35,7 +35,21 @@ describe('driver', function() {
     const driver = {
       Collection,
       Connection,
-      plugins: [foo]
+      plugins: [foo],
+      Types: {
+        DateString: class DateString extends mongoose.SchemaType {
+          constructor(key, options) {
+            super(key, options, 'DateString');
+          }
+
+          cast(val) {
+            if (typeof val !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(val)) {
+              throw new Error('DateString must be in format yyyy-mm-dd');
+            }
+            return val;
+          }
+        }
+      }
     };
 
     m.setDriver(driver);
@@ -43,10 +57,12 @@ describe('driver', function() {
 
     await m.connect();
 
-    const Test = m.model('Test', m.Schema({ answer: Number }));
+    const Test = m.model('Test', m.Schema({ answer: Number, date: 'DateString' }));
 
     const res = await Test.findOne();
-    assert.deepEqual(res.toObject(), { answer: 42 });
+    assert.deepEqual(res.toObject(), { answer: 42, date: '2023-10-01' });
+
+    await assert.rejects(Test.create({ answer: 12, date: '2025-01' }), /path "date"/);
 
     function foo() {}
   });

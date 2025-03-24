@@ -1,3 +1,8 @@
+8.13.0 / 2025-03-24
+===================
+ * feat: bump mongodb driver -> 6.15.0
+ * feat: support custom types exported from driver #15321
+
 8.12.2 / 2025-03-21
 ===================
  * fix(document): avoid stripping out fields in discriminator schema after select: false field #15322 #15308

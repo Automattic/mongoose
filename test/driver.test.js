@@ -36,7 +36,7 @@ describe('driver', function() {
       Collection,
       Connection,
       plugins: [foo],
-      Types: {
+      SchemaTypes: {
         DateString: class DateString extends mongoose.SchemaType {
           constructor(key, options) {
             super(key, options, 'DateString');

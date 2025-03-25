@@ -1746,3 +1746,12 @@ async function schemaDouble() {
   const doc = await TestModel.findOne().orFail();
   expectType<Types.Double | null | undefined>(doc.balance);
 }
+
+async function schemaTypeDefinition() {
+  const myNum = new Schema.Types.Number('myNum', { required: true, min: 0 });
+  const schema = new Schema({ myNum });
+  const TestModel = model('Test', schema);
+
+  const doc = new TestModel({ myNum: 2 });
+  expectType<number | null | undefined>(doc.myNum);
+}

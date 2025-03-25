@@ -546,6 +546,7 @@ declare module 'mongoose' {
   export type SchemaDefinitionProperty<T = undefined, EnforcedDocType = any, THydratedDocumentType = HydratedDocument<EnforcedDocType>> = SchemaDefinitionWithBuiltInClass<T>
     | SchemaTypeOptions<T extends undefined ? any : T, EnforcedDocType, THydratedDocumentType>
     | typeof SchemaType
+    | SchemaType
     | Schema<any, any, any>
     | Schema<any, any, any>[]
     | SchemaTypeOptions<T extends undefined ? any : Unpacked<T>, EnforcedDocType, THydratedDocumentType>[]

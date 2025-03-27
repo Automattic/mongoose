@@ -1746,3 +1746,34 @@ async function schemaDouble() {
   const doc = await TestModel.findOne().orFail();
   expectType<Types.Double | null | undefined>(doc.balance);
 }
+
+function gh15301() {
+  interface IUser {
+    time: { hours: number, minutes: number }
+  }
+  const userSchema = new Schema<IUser>({
+    time: {
+      type: new Schema(
+        {
+          hours: { type: Number, required: true },
+          minutes: { type: Number, required: true }
+        },
+        { _id: false }
+      ),
+      required: true
+    }
+  });
+
+  const timeStringToObject = (time) => {
+    if (typeof time !== 'string') return time;
+    const [hours, minutes] = time.split(':');
+    return { hours: parseInt(hours), minutes: parseInt(minutes) };
+  };
+
+  userSchema.pre('init', function(rawDoc) {
+    expectType<IUser>(rawDoc);
+    if (typeof rawDoc.time === 'string') {
+      rawDoc.time = timeStringToObject(rawDoc.time);
+    }
+  });
+}

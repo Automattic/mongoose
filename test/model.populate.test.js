@@ -11450,8 +11450,7 @@ describe('model: populate:', function() {
     const Category = db.model('Category', categorySchema);
     const Announcement = db.model('Announcement', announcementSchema);
 
-    const category = new Category({ name: 'Tech', desc: 'Technology News' });
-    await category.save();
+    const category = await Category.create({ name: 'Tech', desc: 'Technology News' });
 
     const announcement = new Announcement({
       title: 'New Tech Release',

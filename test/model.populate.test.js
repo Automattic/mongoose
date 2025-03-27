@@ -11452,13 +11452,12 @@ describe('model: populate:', function() {
 
     const category = await Category.create({ name: 'Tech', desc: 'Technology News' });
 
-    const announcement = new Announcement({
+    const announcement = await Announcement.create({
       title: 'New Tech Release',
       content: 'Details about the new tech release',
       validUntil: new Date(),
       categories: [category._id]
     });
-    await announcement.save();
 
     const populatedCategory = await Category.findOne({ _id: category._id }).populate('announcements');
     assert.strictEqual(populatedCategory.announcements.length, 1);

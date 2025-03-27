@@ -11452,7 +11452,7 @@ describe('model: populate:', function() {
 
     const category = await Category.create({ name: 'Tech', desc: 'Technology News' });
 
-    const announcement = await Announcement.create({
+    await Announcement.create({
       title: 'New Tech Release',
       content: 'Details about the new tech release',
       validUntil: new Date(),

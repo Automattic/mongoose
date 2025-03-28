@@ -1777,7 +1777,7 @@ function gh15301() {
     }
   });
 }
-      
+
 function defaultReturnsUndefined() {
   const schema = new Schema<{ arr: number[] }>({
     arr: {

@@ -3,7 +3,7 @@ declare module 'mongoose' {
 
   type MongooseQueryAndDocumentMiddleware = 'updateOne' | 'deleteOne';
 
-  type MongooseDistinctDocumentMiddleware = 'save' | 'validate';
+  type MongooseDistinctDocumentMiddleware = 'save' | 'init' | 'validate';
   type MongooseDocumentMiddleware = MongooseDistinctDocumentMiddleware | MongooseQueryAndDocumentMiddleware;
 
   type MongooseRawResultQueryMiddleware = 'findOneAndUpdate' | 'findOneAndReplace' | 'findOneAndDelete';

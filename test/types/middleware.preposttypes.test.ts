@@ -832,4 +832,49 @@ schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct
   expectNotType<Query<any, any>>(res);
 });
 
+schema.pre(['save', 'updateOne', 'deleteOne', 'validate'], function() {
+  expectType<Query<any, any>|HydratedDocument<IDocument>>(this);
+});
+
+schema.post(['save', 'updateOne', 'deleteOne', 'validate'], function(res) {
+  expectType<Query<any, any>|HydratedDocument<IDocument>>(this);
+  expectNotType<Query<any, any>>(res);
+});
+
+schema.pre(['save', 'updateOne', 'deleteOne', 'validate'], { document: false, query: true }, function() {
+  expectType<Query<any, any>>(this);
+});
+
+schema.post(['save', 'updateOne', 'deleteOne', 'validate'], { document: false, query: true }, function(res) {
+  expectType<Query<any, any>>(this);
+  expectNotType<Query<any, any>>(res);
+});
+
+schema.pre(['save', 'updateOne', 'deleteOne', 'validate'], { document: true, query: false }, function() {
+  expectType<HydratedDocument<IDocument>>(this);
+});
+
+schema.post(['save', 'updateOne', 'deleteOne', 'validate'], { document: true, query: false }, function(res) {
+  expectType<HydratedDocument<IDocument>>(this);
+  expectNotType<Query<any, any>>(res);
+});
+
+schema.pre(['save', 'updateOne', 'deleteOne', 'validate'], { document: true, query: true }, function() {
+  expectType<Query<any, any>|HydratedDocument<IDocument>>(this);
+});
+
+schema.post(['save', 'updateOne', 'deleteOne', 'validate'], { document: true, query: true }, function(res) {
+  expectType<Query<any, any>|HydratedDocument<IDocument>>(this);
+  expectNotType<Query<any, any>>(res);
+});
+
+schema.pre(['save', 'updateOne', 'deleteOne', 'validate'], { document: false, query: false }, function() {
+  expectType<never>(this);
+});
+
+schema.post(['save', 'updateOne', 'deleteOne', 'validate'], { document: false, query: false }, function(res) {
+  expectType<never>(this);
+  expectNotType<Query<any, any>>(res);
+});
+
 /* end of generated tests */

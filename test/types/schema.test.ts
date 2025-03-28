@@ -1777,3 +1777,12 @@ function gh15301() {
     }
   });
 }
+      
+function defaultReturnsUndefined() {
+  const schema = new Schema<{ arr: number[] }>({
+    arr: {
+      type: [Number],
+      default: () => void 0
+    }
+  });
+}

@@ -1747,11 +1747,11 @@ async function schemaDouble() {
   expectType<Types.Double | null | undefined>(doc.balance);
 }
 
-async function schemaTypeDefinition() {
-  const myNum = new Schema.Types.Number('myNum', { required: true, min: 0 });
-  const schema = new Schema({ myNum });
-  const TestModel = model('Test', schema);
-
-  const doc = new TestModel({ myNum: 2 });
-  expectType<number | null | undefined>(doc.myNum);
+function defaultReturnsUndefined() {
+  const schema = new Schema<{ arr: number[] }>({
+    arr: {
+      type: [Number],
+      default: () => void 0
+    }
+  });
 }

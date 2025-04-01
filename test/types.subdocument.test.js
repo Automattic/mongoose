@@ -97,4 +97,13 @@ describe('types.subdocument', function() {
       assert.ok(doc.child.isModified('id'));
     });
   });
+
+  it('respects schematype-level minimize (gh-15313)', function() {
+    const MySubSchema = new Schema({}, { _id: false });
+    const MySchema = new Schema({ myfield: { type: MySubSchema, minimize: false } });
+    const MyModel = db.model('MyModel', MySchema);
+
+    const doc = new MyModel({ myfield: {} });
+    assert.deepStrictEqual(doc.toObject().myfield, {});
+  });
 });

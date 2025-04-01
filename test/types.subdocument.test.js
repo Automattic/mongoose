@@ -99,11 +99,14 @@ describe('types.subdocument', function() {
   });
 
   it('respects schematype-level minimize (gh-15313)', function() {
-    const MySubSchema = new Schema({}, { _id: false });
+    const MySubSchema = new Schema({}, { strict: false, _id: false });
     const MySchema = new Schema({ myfield: { type: MySubSchema, minimize: false } });
     const MyModel = db.model('MyModel', MySchema);
 
     const doc = new MyModel({ myfield: {} });
     assert.deepStrictEqual(doc.toObject().myfield, {});
+
+    const doc2 = new MyModel({ myfield: { empty: {} } });
+    assert.deepStrictEqual(doc2.toObject().myfield, { empty: {} });
   });
 });

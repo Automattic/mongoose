@@ -1770,3 +1770,12 @@ async function schemaDouble() {
   const doc = await TestModel.findOne().orFail();
   expectType<Types.Double | null | undefined>(doc.balance);
 }
+
+function defaultReturnsUndefined() {
+  const schema = new Schema<{ arr: number[] }>({
+    arr: {
+      type: [Number],
+      default: () => void 0
+    }
+  });
+}

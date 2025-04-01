@@ -14423,6 +14423,39 @@ describe('document', function() {
       sinon.restore();
     }
   });
+
+  it('handles selected paths on root discriminator (gh-15308)', async function() {
+    const CarSchema = new mongoose.Schema(
+      {
+        make: {
+          type: String,
+          enum: ['mercedes']
+        }
+      },
+      {
+        discriminatorKey: 'make'
+      }
+    );
+    const MercedesSchema = new mongoose.Schema({
+      vin: {
+        type: String,
+        select: false
+      },
+      sunroof: Boolean
+    });
+    const CarModel = db.model('Car', CarSchema);
+    CarModel.discriminator('Car:mercedes', MercedesSchema, 'mercedes');
+
+    const newCar = await CarModel.create({
+      make: 'mercedes',
+      vin: 'someFakeVin',
+      sunroof: true
+    });
+
+    const car = await CarModel.findById(newCar._id);
+    assert.strictEqual(car.vin, undefined);
+    assert.strictEqual(car.sunroof, true);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

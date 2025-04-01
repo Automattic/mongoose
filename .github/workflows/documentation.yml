@@ -45,7 +45,7 @@ jobs:
       #   run: npm run lint-js
 
   test-documentation:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     name: Test Generating Docs
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2

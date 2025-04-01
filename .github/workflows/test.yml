@@ -40,18 +40,13 @@ jobs:
       fail-fast: false
       matrix:
         node: [16, 18, 20, 22]
-        os: [ubuntu-20.04, ubuntu-22.04]
-        mongodb: [4.4.29, 5.0.26, 6.0.15, 7.0.12, 8.0.0]
+        os: [ubuntu-22.04, ubuntu-24.04]
+        mongodb: [6.0.15, 7.0.12, 8.0.0]
         include:
-          - os: ubuntu-20.04 # customize on which matrix the coverage will be collected on
-            mongodb: 5.0.26
-            node: 16
+          - os: ubuntu-22.04 # customize on which matrix the coverage will be collected on
+            mongodb: 6.0.15
+            node: 22
             coverage: true
-        exclude:
-          - os: ubuntu-22.04 # exclude because there are no 4.x mongodb builds for 2204
-            mongodb: 4.4.29
-          - os: ubuntu-22.04 # exclude because there are no 5.x mongodb builds for 2204
-            mongodb: 5.0.26
     name: Node ${{ matrix.node }} MongoDB ${{ matrix.mongodb }} OS ${{ matrix.os }}
     env:
       MONGOMS_VERSION: ${{ matrix.mongodb }}
@@ -87,7 +82,7 @@ jobs:
           path: coverage
 
   test-deno:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     name: Deno tests
     env:
       MONGOMS_VERSION: 6.0.15
@@ -117,7 +112,7 @@ jobs:
   test-replica-sets:
     needs:
       - test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     name: Replica Set tests
     env:
       FORCE_COLOR: true

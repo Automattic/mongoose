@@ -36,3 +36,34 @@ try {
   // Handle validation error
 }
 ```
+
+## Errors in middleware functions take priority over `next()` calls
+
+In Mongoose 8.x, if a middleware function threw an error after calling `next()`, that error would be ignored.
+
+```javascript
+schema.pre('save', function(next) {
+  next();
+  // In Mongoose 8, this error will not get reported, because you already called next()
+  throw new Error('woops!');
+});
+```
+
+In Mongoose 9, errors in the middleware function take priority, so the above `save()` would throw an error.
+
+## `next()` no longer supports passing arguments to the next middleware
+
+Previously, you could call `next(null, 'new arg')` in a hook and the args to the next middleware would get overwritten by 'new arg'.
+
+```javascript
+schema.pre('save', function(next, options) {
+  options; // options passed to `save()`
+  next(null, 'new arg');
+});
+
+schema.pre('save', function(next, arg) {
+  arg; // In Mongoose 8, this would be 'new arg', overwrote the options passed to `save()`
+});
+```
+
+In Mongoose 9, `next(null, 'new arg')` doesn't overwrite the args to the next middleware.

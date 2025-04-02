@@ -14424,8 +14424,8 @@ describe('document', function() {
     }
   });
 
-  describe('async stack traces (gh-15317)', function () {
-    it('works with save() validation errors', async function () {
+  describe('async stack traces (gh-15317)', function() {
+    it('works with save() validation errors', async function() {
       const userSchema = new mongoose.Schema({
         name: { type: String, required: true, validate: v => v.length > 3 },
         age: Number

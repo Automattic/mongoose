@@ -1024,7 +1024,7 @@ describe('encryption integration tests', () => {
             }, {
               encryptionType: 'csfle'
             })),
-            /cannot declare an encrypted field on child schema overriding base schema\. key=name/
+            /encrypted fields cannot be declared on both the base schema and the child schema in a discriminator\. path=name/
             );
           });
         });
@@ -1085,12 +1085,45 @@ describe('encryption integration tests', () => {
             }, {
               encryptionType: 'queryableEncryption'
             })),
-            /cannot declare an encrypted field on child schema overriding base schema\. key=name/
+            /encrypted fields cannot be declared on both the base schema and the child schema in a discriminator\. path=name/
             );
           });
         });
       });
 
+      describe('Nested Schema overrides nested path', function() {
+        beforeEach(async function() {
+          connection = createConnection();
+        });
+
+        it('nested objects throw an error', async function() {
+          model = connection.model('Schema', new Schema({
+            name: {
+              first: { type: String, encrypt: { keyId: [keyId], algorithm } }
+            }
+          }, { encryptionType: 'csfle' }));
+
+          assert.throws(() => {
+            model.discriminator('Test', new Schema({
+              name: { first: Number } // Different type, no encryption, stored as same field in MDB
+            }));
+          });
+        });
+
+        it('nested schemas throw an error', async function() {
+          model = connection.model('Schema', new Schema({
+            name: {
+              first: { type: String, encrypt: { keyId: [keyId], algorithm } }
+            }
+          }, { encryptionType: 'csfle' }));
+
+          assert.throws(() => {
+            model.discriminator('Test', new Schema({
+              name: new Schema({ first: Number }) // Different type, no encryption, stored as same field in MDB
+            }));
+          });
+        });
+      });
     });
   });
 });

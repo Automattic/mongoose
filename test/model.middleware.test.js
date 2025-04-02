@@ -333,9 +333,7 @@ describe('model middleware', function() {
 
     const test = new TestMiddleware({ title: 'Test' });
 
-    const err = await test.save().then(() => null, err => err);
-    assert.ok(err);
-    assert.equal(err.message, 'woops!');
+    await assert.rejects(test.save(), /woops!/);
     assert.equal(called, 0);
   });
 

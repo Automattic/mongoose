@@ -63,6 +63,9 @@ describe('encryption integration tests', () => {
     });
   });
 
+  const algorithm = 'AEAD_AES_256_CBC_HMAC_SHA_512-Random';
+
+
   let keyId, keyId2, keyId3;
   let utilClient;
 
@@ -90,7 +93,6 @@ describe('encryption integration tests', () => {
   });
 
   describe('Tests that fields of valid schema types can be declared as encrypted schemas', function() {
-    const algorithm = 'AEAD_AES_256_CBC_HMAC_SHA_512-Random';
     let connection;
     let schema;
     let model;
@@ -1124,6 +1126,46 @@ describe('encryption integration tests', () => {
           });
         });
       });
+    });
+  });
+
+  describe('Encryption can be configured on the default mongoose connection', function() {
+    afterEach(async function() {
+      mongoose.deleteModel('Schema');
+      await mongoose.disconnect();
+
+    });
+    it('encrypts and decrypts', async function() {
+      const schema = new Schema({
+        a: {
+          type: Schema.Types.Int32,
+          encrypt: { keyId: [keyId], algorithm }
+
+        }
+      }, {
+        encryptionType: 'csfle'
+      });
+
+      const model = mongoose.model('Schema', schema);
+      await mongoose.connect(process.env.MONGOOSE_TEST_URI, {
+        dbName: 'db', autoEncryption: {
+          keyVaultNamespace: 'keyvault.datakeys',
+          kmsProviders: { local: { key: LOCAL_KEY } },
+          extraOptions: {
+            cryptdSharedLibRequired: true,
+            cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+          }
+        }
+      });
+
+      const [{ _id }] = await model.insertMany([{ a: 2 }]);
+      const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
+
+      assert.ok(isBsonType(encryptedDoc.a, 'Binary'));
+      assert.ok(encryptedDoc.a.sub_type === 6);
+
+      const doc = await model.findOne({ _id });
+      assert.deepEqual(doc.a, 2);
     });
   });
 });

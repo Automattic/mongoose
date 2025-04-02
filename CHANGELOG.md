@@ -1,3 +1,8 @@
+8.13.1 / 2025-03-28
+===================
+ * fix(populate): handle virtual populate on array of UUIDs #15329 #15315
+ * types: allow default function returning undefined with DocType override #15328
+
 8.13.0 / 2025-03-24
 ===================
  * feat: bump mongodb driver -> 6.15.0

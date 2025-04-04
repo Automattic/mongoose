@@ -173,6 +173,9 @@ declare module 'mongoose' {
     /** The maximum value allowed for this path. Only allowed for numbers and dates. */
     max?: number | NativeDate | [number, string] | [NativeDate, string] | readonly [number, string] | readonly [NativeDate, string];
 
+    /** Set to false to disable minimizing empty single nested subdocuments by default */
+    minimize?: boolean;
+
     /** Defines a TTL index on this path. Only allowed for dates. */
     expires?: string | number;
 

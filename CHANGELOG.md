@@ -1,3 +1,7 @@
+8.13.2 / 2025-04-03
+===================
+ * fix: avoid double calling validators on paths in document arrays underneath subdocuments #15338 #15335
+
 8.13.1 / 2025-03-28
 ===================
  * fix(populate): handle virtual populate on array of UUIDs #15329 #15315

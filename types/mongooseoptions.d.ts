@@ -215,5 +215,13 @@ declare module 'mongoose' {
      * to their database property names. Defaults to false.
      */
     translateAliases?: boolean;
+
+    /**
+     * Mongoose queries currently store an `_executionStack` property that stores the stack trace
+     * of where the query was originally executed for debugging `Query was already executed` errors.
+     * This behavior can cause performance issues with bundlers and source maps. Set this option to
+     * `true` to disable Mongoose query stack trace collection.
+     */
+    skipOriginalStackTraces?: boolean;
   }
 }

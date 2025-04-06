@@ -197,7 +197,7 @@ declare module 'mongoose' {
 
   export type HydratedDocumentFromSchema<TSchema extends Schema> = HydratedDocument<
   InferSchemaType<TSchema>,
-  ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+  ObtainSchemaGeneric<TSchema, 'TInstanceMethods'> & ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
   ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
   ObtainSchemaGeneric<TSchema, 'TVirtuals'>
   >;

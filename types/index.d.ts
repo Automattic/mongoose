@@ -90,7 +90,8 @@ declare module 'mongoose' {
   HydratedDocument<
   InferSchemaType<TSchema>,
   ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>
+  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+  ObtainSchemaGeneric<TSchema, 'TVirtuals'>
   >,
   TSchema
   > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
@@ -146,16 +147,17 @@ declare module 'mongoose' {
   export type HydratedDocument<
     DocType,
     TOverrides = {},
-    TQueryHelpers = {}
+    TQueryHelpers = {},
+    TVirtuals = {}
   > = IfAny<
     DocType,
     any,
     TOverrides extends Record<string, never> ?
-      Document<unknown, TQueryHelpers, DocType> & Default__v<Require_id<DocType>> :
+      Document<unknown, TQueryHelpers, DocType, TVirtuals> & Default__v<Require_id<DocType>> :
       IfAny<
         TOverrides,
-        Document<unknown, TQueryHelpers, DocType> & Default__v<Require_id<DocType>>,
-        Document<unknown, TQueryHelpers, DocType> & MergeType<
+        Document<unknown, TQueryHelpers, DocType, TVirtuals> & Default__v<Require_id<DocType>>,
+        Document<unknown, TQueryHelpers, DocType, TVirtuals> & MergeType<
           Default__v<Require_id<DocType>>,
           TOverrides
         >
@@ -196,7 +198,8 @@ declare module 'mongoose' {
   export type HydratedDocumentFromSchema<TSchema extends Schema> = HydratedDocument<
   InferSchemaType<TSchema>,
   ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>
+  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+  ObtainSchemaGeneric<TSchema, 'TVirtuals'>
   >;
 
   export interface TagSet {
@@ -269,7 +272,7 @@ declare module 'mongoose' {
       ObtainDocumentType<any, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
       ResolveSchemaOptions<TSchemaOptions>
     >,
-    THydratedDocumentType = HydratedDocument<FlatRecord<DocType>, TVirtuals & TInstanceMethods>
+    THydratedDocumentType = HydratedDocument<FlatRecord<DocType>, TVirtuals & TInstanceMethods, {}, TVirtuals>
   >
     extends events.EventEmitter {
     /**

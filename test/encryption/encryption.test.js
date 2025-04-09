@@ -1090,39 +1090,138 @@ describe('encryption integration tests', () => {
             /encrypted fields cannot be declared on both the base schema and the child schema in a discriminator\. path=name/
             );
           });
+
+          it('throws on duplicate keys declared on root and child discriminators, parent with fle, child without', async function() {
+            const schema = new Schema({
+              name: {
+                type: String, encrypt: { keyId }
+              }
+            }, {
+              encryptionType: 'queryableEncryption'
+            });
+            model = connection.model('Schema', schema);
+            assert.throws(() => model.discriminator('Test', new Schema({
+              name: {
+                type: String
+              }
+            })),
+            /encrypted fields cannot have the same path as a non-encrypted field for discriminators. path=name/
+            );
+          });
+
+          it('throws on duplicate keys declared on root and child discriminators, child with fle, parent without', async function() {
+            const schema = new Schema({
+              name: String
+            });
+            model = connection.model('Schema', schema);
+            assert.throws(() => model.discriminator('Test', new Schema({
+              name: {
+                type: String, encrypt: { keyId: [keyId], algorithm } }
+            }, {
+              encryptionType: 'queryableEncryption'
+            })),
+            /encrypted fields cannot have the same path as a non-encrypted field for discriminators. path=name/
+            );
+          });
         });
       });
 
-      describe('Nested Schema overrides nested path', function() {
+      describe('Nested paths in discriminators with conflicting definitions for the same key', function() {
         beforeEach(async function() {
           connection = createConnection();
         });
 
-        it('nested objects throw an error', async function() {
-          model = connection.model('Schema', new Schema({
-            name: {
-              first: { type: String, encrypt: { keyId: [keyId], algorithm } }
-            }
-          }, { encryptionType: 'csfle' }));
+        describe('same definition on parent and child', function() {
+          it('throws an error', function() {
+            model = connection.model('Schema', new Schema({
+              name: {
+                first: { type: String, encrypt: { keyId: [keyId], algorithm } }
+              }
+            }, { encryptionType: 'csfle' }));
 
-          assert.throws(() => {
-            model.discriminator('Test', new Schema({
-              name: { first: Number } // Different type, no encryption, stored as same field in MDB
-            }));
+            assert.throws(() => {
+              model.discriminator('Test', new Schema({
+                name: { first: { type: String, encrypt: { keyId: [keyId], algorithm } } } // Different type, no encryption, stored as same field in MDB
+              }, { encryptionType: 'csfle' }));
+            }, /encrypted fields cannot be declared on both the base schema and the child schema in a discriminator. path/);
           });
         });
 
-        it('nested schemas throw an error', async function() {
-          model = connection.model('Schema', new Schema({
-            name: {
-              first: { type: String, encrypt: { keyId: [keyId], algorithm } }
-            }
-          }, { encryptionType: 'csfle' }));
+        describe('child overrides parent\'s encryption', function() {
+          it('throws an error', function() {
+            model = connection.model('Schema', new Schema({
+              name: {
+                first: { type: String, encrypt: { keyId: [keyId], algorithm } }
+              }
+            }, { encryptionType: 'csfle' }));
 
-          assert.throws(() => {
-            model.discriminator('Test', new Schema({
-              name: new Schema({ first: Number }) // Different type, no encryption, stored as same field in MDB
-            }));
+            assert.throws(() => {
+              model.discriminator('Test', new Schema({
+                name: { first: Number } // Different type, no encryption, stored as same field in MDB
+              }));
+            }, /encrypted fields cannot have the same path as a non-encrypted field for discriminators. path=name/);
+          });
+        });
+      });
+
+      describe('Nested schemas in discriminators with conflicting definitions for the same key', function() {
+        beforeEach(async function() {
+          connection = createConnection();
+        });
+
+        describe('same definition on parent and child', function() {
+          it('throws an error', function() {
+            model = connection.model('Schema', new Schema({
+              name: new Schema({
+                first: { type: String, encrypt: { keyId: [keyId], algorithm } }
+              }, { encryptionType: 'csfle' })
+            }, { encryptionType: 'csfle' }));
+
+            assert.throws(() => {
+              model.discriminator('Test', new Schema({
+                name: new Schema({
+                  first: { type: String, encrypt: { keyId: [keyId], algorithm } }
+                }, { encryptionType: 'csfle' }) // Different type, no encryption, stored as same field in MDB
+              }, { encryptionType: 'csfle' }));
+            }, /encrypted fields cannot be declared on both the base schema and the child schema in a discriminator. path/);
+          });
+        });
+
+        describe('child overrides parent\'s encryption', function() {
+          it('throws an error', function() {
+            model = connection.model('Schema', new Schema({
+              name: new Schema({
+                first: { type: String, encrypt: { keyId: [keyId], algorithm } }
+              }, { encryptionType: 'csfle' })
+            }, { encryptionType: 'csfle' }));
+
+            assert.throws(() => {
+              model.discriminator('Test', new Schema({
+                name: new Schema({
+                  first: Number
+                })
+              }));
+            }, /encrypted fields cannot have the same path as a non-encrypted field for discriminators. path=name.first/);
+          });
+        });
+
+        describe('multiple levels of nesting', function() {
+          it('throws an error', function() {
+            model = connection.model('Schema', new Schema({
+              name: new Schema({
+                first: new Schema({
+                  first: { type: String, encrypt: { keyId: [keyId], algorithm } }
+                }, { encryptionType: 'csfle' })
+              }, { encryptionType: 'csfle' })
+            }, { encryptionType: 'csfle' }));
+
+            assert.throws(() => {
+              model.discriminator('Test', new Schema({
+                name: new Schema({
+                  first: { type: String, encrypt: { keyId: [keyId], algorithm } }
+                }, { encryptionType: 'csfle' }) // Different type, no encryption, stored as same field in MDB
+              }, { encryptionType: 'csfle' }));
+            }, /encrypted fields cannot have the same path as a non-encrypted field for discriminators. path=name.first/);
           });
         });
       });

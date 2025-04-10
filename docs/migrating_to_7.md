@@ -158,7 +158,7 @@ conn.startSession(function(err, session) {
 // After
 const session = await conn.startSession();
 // Or:
-conn.startSession().then(sesson => { /* ... */ });
+conn.startSession().then(session => { /* ... */ });
 
 // With error handling
 try {

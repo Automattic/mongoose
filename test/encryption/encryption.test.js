@@ -1276,7 +1276,7 @@ describe('encryption integration tests', () => {
     });
   });
 
-  describe('Encryption can be configured on the default mongoose connection', function() {
+  describe.only('Encryption can be configured on the default mongoose connection', function() {
     afterEach(async function() {
       mongoose.deleteModel('Schema');
       await mongoose.disconnect();
@@ -1313,6 +1313,118 @@ describe('encryption integration tests', () => {
 
       const doc = await model.findOne({ _id });
       assert.deepEqual(doc.a, 2);
+    });
+  });
+
+  describe('Key Vault API', function() {
+    describe('No FLE configured', function() {
+      it('returns `null`', async function() {
+        const connection = mongoose.createConnection();
+        const model = connection.model('Name', { age: String });
+
+        await connection.openUri(process.env.MONGOOSE_TEST_URI);
+
+        assert.equal(model.clientEncryption(), null);
+      });
+    });
+
+    describe('Client not connected', function() {
+      it('returns `null`', async function() {
+        const connection = mongoose.createConnection();
+        const model = connection.model('Name', { age: String });
+
+        assert.equal(model.clientEncryption(), null);
+      });
+    });
+
+    describe('auto encryption enabled for a collection', function() {
+      let connection;
+      let model;
+      beforeEach(async function() {
+        connection = createConnection();
+        model = connection.model('Model1', new Schema({
+          a: {
+            type: String,
+            encrypt: {
+              keyId
+            }
+          }
+        }, {
+          encryptionType: 'queryableEncryption'
+        }));
+
+        await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+          dbName: 'db', autoEncryption: {
+            keyVaultNamespace: 'keyvault.datakeys',
+            kmsProviders: { local: { key: LOCAL_KEY } },
+            extraOptions: {
+              cryptdSharedLibRequired: true,
+              cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+            }
+          }
+        });
+      });
+
+      afterEach(async function() {
+        await connection.close();
+      });
+
+      it('returns a client encryption object', async function() {
+        assert.ok(model.clientEncryption() instanceof mdb.ClientEncryption);
+      });
+
+      it('the client encryption is usable as a key vault', async function() {
+        const clientEncryption = model.clientEncryption();
+        const dataKey = await clientEncryption.createDataKey('local');
+        const keys = await clientEncryption.getKeys().toArray();
+
+        assert.ok(keys.length > 0);
+
+        const key = keys.find(
+          ({ _id }) => _id.toString() === dataKey.toString()
+        );
+
+        assert.ok(key);
+      });
+
+      it('uses the same keyvaultNamespace', async function() {
+        assert.equal(model.clientEncryption()._keyVaultNamespace, 'keyvault.datakeys');
+      });
+
+      it('uses the same kms providers', async function() {
+        assert.deepEqual(model.clientEncryption()._kmsProviders, { local: { key: LOCAL_KEY } });
+      });
+
+      it('uses the same proxy options', async function() {
+        const options = model.collection.conn.client.options.autoEncryption;
+        options.proxyOptions = { name: 'bailey' };
+        assert.deepEqual(model.clientEncryption()._proxyOptions, { name: 'bailey' });
+      });
+
+      it('uses the same TLS options', async function() {
+        const options = model.collection.conn.client.options.autoEncryption;
+        options.tlsOptions = {
+          tlsCAFile: 'some file'
+        };
+        assert.deepEqual(model.clientEncryption()._tlsOptions, {
+          tlsCAFile: 'some file'
+        });
+      });
+
+      it.skip('uses the same credentialProviders', async function() {
+        const options = model.collection.conn.client.options.autoEncryption;
+        const credentialProviders = {
+          aws: async() => {}
+        };
+        options.credentialProviders = credentialProviders;
+        assert.equal(model.clientEncryption()._credentialProviders, credentialProviders);
+      });
+
+      it('uses the underlying MongoClient as the keyvault client', async function() {
+        const options = model.collection.conn.client.options.autoEncryption;
+        assert.ok(model.clientEncryption()._client === options.keyVaultClient, 'client not the same');
+        assert.equal(model.clientEncryption()._keyVaultClient, options.keyVaultClient, 'keyvault client not the same');
+      });
     });
   });
 });

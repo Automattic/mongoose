@@ -1276,7 +1276,7 @@ describe('encryption integration tests', () => {
     });
   });
 
-  describe.only('Encryption can be configured on the default mongoose connection', function() {
+  describe('Encryption can be configured on the default mongoose connection', function() {
     afterEach(async function() {
       mongoose.deleteModel('Schema');
       await mongoose.disconnect();

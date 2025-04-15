@@ -151,3 +151,68 @@ To declare a field as encrypted, you must:
 2. Choose an encryption type for the schema and configure the schema for the encryption type
 
 Not all schematypes are supported for CSFLE and QE.  For an overview of valid schema types, refer to MongoDB's documentation.
+
+### Registering Models
+
+Encrypted schemas must be registered on a connection, not the Mongoose global:
+
+```javascript
+
+const connection = mongoose.createConnection();
+const UserModel = connection.model('User', encryptedUserSchema);
+```
+
+### Connecting and configuring encryption options
+
+CSFLE/QE in Mongoose work by generating the encryption schema that the MongoDB driver expects for each encrypted model on the connection.  This happens automatically the model's connection is established.
+
+Queryable encryption and CSFLE requires all the same configuration as outlined in <>, except for the schemaMap or encryptedFieldsMap options.
+
+```javascript
+const keyVaultNamespace = 'client.encryption';
+const kmsProviders = { local: { key } };
+await connection.openUri(`mongodb://localhost:27017`, {
+  // Configure auto encryption
+  autoEncryption: {
+    keyVaultNamespace: 'datakeys.datakeys',
+    kmsProviders
+  }
+});
+```
+
+Once the connection is established, Mongoose's operations will work as usual.  Writes are encrypted automatically by the MongoDB driver prior to sending them to the server and reads are decrypted by the driver after fetching documents from the server.
+
+### Discriminators
+
+Discriminators are supported for encrypted models as well:
+
+```javascript
+const connection = createConnection();
+
+const schema = new Schema({
+  name: {
+    type: String, encrypt: { keyId }
+  }
+}, {
+  encryptionType: 'queryableEncryption'
+});
+
+const Model = connection.model('BaseUserModel', schema);
+const ModelWithAge = model.discriminator('ModelWithAge', new Schema({
+  age: {
+    type: Int32, encrypt: { keyId: keyId2 }
+  }
+}, {
+  encryptionType: 'queryableEncryption'
+}));
+
+const ModelWithBirthday = model.discriminator('ModelWithBirthday', new Schema({
+  dob: {
+    type: Int32, encrypt: { keyId: keyId3 }
+  }
+}, {
+  encryptionType: 'queryableEncryption'
+}));
+```
+
+When generating encryption schemas, Mongoose merges all discriminators together for the all discriminators declared on the same namespace.  As a result, discriminators that declare the same key with different types are not supported.  Furthermore, all discriminators must share the same encryption type - it is not possible to configure discriminators on the same model for both CSFLE and QE.

@@ -13,6 +13,9 @@ const { readFile } = require('fs/promises');
 
 const LOCAL_KEY = Buffer.from('Mng0NCt4ZHVUYUJCa1kxNkVyNUR1QURhZ2h2UzR2d2RrZzh0cFBwM3R6NmdWMDFBMUN3YkQ5aXRRMkhGRGdQV09wOGVNYUMxT2k3NjZKelhaQmRCZGJkTXVyZG9uSjFk', 'base64');
 
+const { UUID } = require('mongodb/lib/bson');
+
+
 const exists = path => {
   try {
     fs.statSync(path);
@@ -37,6 +40,18 @@ describe('encryption integration tests', () => {
   let cryptSharedLibPath;
   /** @type { string } */
   let clusterUri;
+
+  const autoEncryptionOptions = () => ({
+    dbName: 'db', autoEncryption: {
+      keyVaultNamespace: 'keyvault.datakeys',
+      kmsProviders: { local: { key: LOCAL_KEY } },
+      extraOptions: {
+        cryptdSharedLibRequired: true,
+        cryptSharedLibPath: cryptSharedLibPath
+      }
+    }
+  });
+
   before(async function() {
     const expansionFile = join(__dirname, '../..', 'fle-cluster-config.json');
     if (!exists(expansionFile)) {
@@ -151,16 +166,7 @@ describe('encryption integration tests', () => {
 
           connection = createConnection();
           model = connection.model('Schema', schema);
-          await connection.openUri(clusterUri, {
-            dbName: 'db', autoEncryption: {
-              keyVaultNamespace: 'keyvault.datakeys',
-              kmsProviders: { local: { key: LOCAL_KEY } },
-              extraOptions: {
-                cryptdSharedLibRequired: true,
-                cryptSharedLibPath: cryptSharedLibPath
-              }
-            }
-          });
+          await connection.openUri(clusterUri, autoEncryptionOptions());
         });
 
         it(`${name} encrypts and decrypts`, test);
@@ -178,16 +184,7 @@ describe('encryption integration tests', () => {
 
           connection = createConnection();
           model = connection.model('Schema', schema);
-          await connection.openUri(clusterUri, {
-            dbName: 'db', autoEncryption: {
-              keyVaultNamespace: 'keyvault.datakeys',
-              kmsProviders: { local: { key: LOCAL_KEY } },
-              extraOptions: {
-                cryptdSharedLibRequired: true,
-                cryptSharedLibPath: cryptSharedLibPath
-              }
-            }
-          });
+          await connection.openUri(clusterUri, autoEncryptionOptions());
         });
 
         it(`${name} encrypts and decrypts`, test);
@@ -210,16 +207,7 @@ describe('encryption integration tests', () => {
 
           connection = createConnection();
           const model = connection.model('Schema', schema);
-          await connection.openUri(clusterUri, {
-            dbName: 'db', autoEncryption: {
-              keyVaultNamespace: 'keyvault.datakeys',
-              kmsProviders: { local: { key: LOCAL_KEY } },
-              extraOptions: {
-                cryptdSharedLibRequired: true,
-                cryptSharedLibPath: cryptSharedLibPath
-              }
-            }
-          });
+          await connection.openUri(clusterUri, autoEncryptionOptions());
 
           const [{ _id }] = await model.insertMany([{ a: {
             name: 'bailey'
@@ -251,16 +239,7 @@ describe('encryption integration tests', () => {
 
           connection = createConnection();
           const model = connection.model('Schema', schema);
-          await connection.openUri(clusterUri, {
-            dbName: 'db', autoEncryption: {
-              keyVaultNamespace: 'keyvault.datakeys',
-              kmsProviders: { local: { key: LOCAL_KEY } },
-              extraOptions: {
-                cryptdSharedLibRequired: true,
-                cryptSharedLibPath: cryptSharedLibPath
-              }
-            }
-          });
+          await connection.openUri(clusterUri, autoEncryptionOptions());
 
           const [{ _id }] = await model.insertMany([{ a: {
             name: 'bailey'
@@ -378,16 +357,7 @@ describe('encryption integration tests', () => {
           it('encrypts and decrypts', async function() {
             const { model } = modelFactory();
 
-            await connection.openUri(clusterUri, {
-              dbName: 'db', autoEncryption: {
-                keyVaultNamespace: 'keyvault.datakeys',
-                kmsProviders: { local: { key: LOCAL_KEY } },
-                extraOptions: {
-                  cryptdSharedLibRequired: true,
-                  cryptSharedLibPath: cryptSharedLibPath
-                }
-              }
-            });
+            await connection.openUri(clusterUri, autoEncryptionOptions());
 
             const [{ _id }] = await model.insertMany([{ a: { b: { c: 'hello' } } }]);
             const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
@@ -419,16 +389,7 @@ describe('encryption integration tests', () => {
 
           connection = createConnection();
           const model = connection.model('Schema', schema);
-          await connection.openUri(clusterUri, {
-            dbName: 'db', autoEncryption: {
-              keyVaultNamespace: 'keyvault.datakeys',
-              kmsProviders: { local: { key: LOCAL_KEY } },
-              extraOptions: {
-                cryptdSharedLibRequired: true,
-                cryptSharedLibPath: cryptSharedLibPath
-              }
-            }
-          });
+          await connection.openUri(clusterUri, autoEncryptionOptions());
 
           const [{ _id }] = await model.insertMany([{ a: [new Int32(3)] }]);
           const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
@@ -458,16 +419,7 @@ describe('encryption integration tests', () => {
 
           connection = createConnection();
           const model = connection.model('Schema', schema);
-          await connection.openUri(clusterUri, {
-            dbName: 'db', autoEncryption: {
-              keyVaultNamespace: 'keyvault.datakeys',
-              kmsProviders: { local: { key: LOCAL_KEY } },
-              extraOptions: {
-                cryptdSharedLibRequired: true,
-                cryptSharedLibPath: cryptSharedLibPath
-              }
-            }
-          });
+          await connection.openUri(clusterUri, autoEncryptionOptions());
 
           const [{ _id }] = await model.insertMany([{ a: [{ name: 'bailey' }] }]);
           const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
@@ -494,16 +446,7 @@ describe('encryption integration tests', () => {
           });
 
           connection = createConnection();
-          const model = connection.model('Schema', schema); await connection.openUri(clusterUri, {
-            dbName: 'db', autoEncryption: {
-              keyVaultNamespace: 'keyvault.datakeys',
-              kmsProviders: { local: { key: LOCAL_KEY } },
-              extraOptions: {
-                cryptdSharedLibRequired: true,
-                cryptSharedLibPath: cryptSharedLibPath
-              }
-            }
-          });
+          const model = connection.model('Schema', schema); await connection.openUri(clusterUri, autoEncryptionOptions());
 
           const [{ _id }] = await model.insertMany([{ a: [new Int32(3)] }]);
           const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
@@ -532,16 +475,7 @@ describe('encryption integration tests', () => {
 
           connection = createConnection();
           const model = connection.model('Schema', schema);
-          await connection.openUri(clusterUri, {
-            dbName: 'db', autoEncryption: {
-              keyVaultNamespace: 'keyvault.datakeys',
-              kmsProviders: { local: { key: LOCAL_KEY } },
-              extraOptions: {
-                cryptdSharedLibRequired: true,
-                cryptSharedLibPath: cryptSharedLibPath
-              }
-            }
-          });
+          await connection.openUri(clusterUri, autoEncryptionOptions());
 
           const [{ _id }] = await model.insertMany([{ a: [{ name: 'bailey' }] }]);
           const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
@@ -622,16 +556,7 @@ describe('encryption integration tests', () => {
         describe(description, function() {
           it('encrypts and decrypts', async function() {
             const { model } = modelFactory();
-            await connection.openUri(clusterUri, {
-              dbName: 'db', autoEncryption: {
-                keyVaultNamespace: 'keyvault.datakeys',
-                kmsProviders: { local: { key: LOCAL_KEY } },
-                extraOptions: {
-                  cryptdSharedLibRequired: true,
-                  cryptSharedLibPath: cryptSharedLibPath
-                }
-              }
-            });
+            await connection.openUri(clusterUri, autoEncryptionOptions());
 
             const [{ _id }] = await model.insertMany([{ a: 'hello', b: 1n, c: { d: 'world' } }]);
             const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
@@ -713,16 +638,7 @@ describe('encryption integration tests', () => {
         describe(description, function() {
           it('encrypts and decrypts', async function() {
             const { model1, model2 } = modelFactory();
-            await connection.openUri(clusterUri, {
-              dbName: 'db', autoEncryption: {
-                keyVaultNamespace: 'keyvault.datakeys',
-                kmsProviders: { local: { key: LOCAL_KEY } },
-                extraOptions: {
-                  cryptdSharedLibRequired: true,
-                  cryptSharedLibPath: cryptSharedLibPath
-                }
-              }
-            });
+            await connection.openUri(clusterUri, autoEncryptionOptions());
 
             {
               const [{ _id }] = await model1.insertMany([{ a: 'hello' }]);
@@ -774,16 +690,7 @@ describe('encryption integration tests', () => {
         }, {
           encryptionType: 'csfle'
         }));
-        await connection.openUri(clusterUri, {
-          dbName: 'db', autoEncryption: {
-            keyVaultNamespace: 'keyvault.datakeys',
-            kmsProviders: { local: { key: LOCAL_KEY } },
-            extraOptions: {
-              cryptdSharedLibRequired: true,
-              cryptSharedLibPath: cryptSharedLibPath
-            }
-          }
-        });
+        await connection.openUri(clusterUri, autoEncryptionOptions());
 
         {
           const [{ _id }] = await model1.insertMany([{ a: 'hello' }]);
@@ -841,16 +748,7 @@ describe('encryption integration tests', () => {
           }));
 
 
-          await connection.openUri(clusterUri, {
-            dbName: 'db', autoEncryption: {
-              keyVaultNamespace: 'keyvault.datakeys',
-              kmsProviders: { local: { key: LOCAL_KEY } },
-              extraOptions: {
-                cryptdSharedLibRequired: true,
-                cryptSharedLibPath: cryptSharedLibPath
-              }
-            }
-          });
+          await connection.openUri(clusterUri, autoEncryptionOptions());
         });
         it('encrypts', async function() {
           {
@@ -922,16 +820,7 @@ describe('encryption integration tests', () => {
             encryptionType: 'queryableEncryption'
           }));
 
-          await connection.openUri(clusterUri, {
-            dbName: 'db', autoEncryption: {
-              keyVaultNamespace: 'keyvault.datakeys',
-              kmsProviders: { local: { key: LOCAL_KEY } },
-              extraOptions: {
-                cryptdSharedLibRequired: true,
-                cryptSharedLibPath: cryptSharedLibPath
-              }
-            }
-          });
+          await connection.openUri(clusterUri, autoEncryptionOptions());
         });
         it('encrypts', async function() {
           {
@@ -1004,16 +893,7 @@ describe('encryption integration tests', () => {
               encryptionType: 'csfle'
             }));
 
-            const error = await connection.openUri(clusterUri, {
-              dbName: 'db', autoEncryption: {
-                keyVaultNamespace: 'keyvault.datakeys',
-                kmsProviders: { local: { key: LOCAL_KEY } },
-                extraOptions: {
-                  cryptdSharedLibRequired: true,
-                  cryptSharedLibPath: cryptSharedLibPath
-                }
-              }
-            }).catch(e => e);
+            const error = await connection.openUri(clusterUri, autoEncryptionOptions()).catch(e => e);
 
             assert.ok(error instanceof Error);
             assert.match(error.message, /Cannot have duplicate keys in discriminators with encryption/);
@@ -1065,16 +945,7 @@ describe('encryption integration tests', () => {
               encryptionType: 'queryableEncryption'
             }));
 
-            const error = await connection.openUri(clusterUri, {
-              dbName: 'db', autoEncryption: {
-                keyVaultNamespace: 'keyvault.datakeys',
-                kmsProviders: { local: { key: LOCAL_KEY } },
-                extraOptions: {
-                  cryptdSharedLibRequired: true,
-                  cryptSharedLibPath: cryptSharedLibPath
-                }
-              }
-            }).catch(e => e);
+            const error = await connection.openUri(clusterUri, autoEncryptionOptions()).catch(e => e);
 
             assert.ok(error instanceof Error);
             assert.match(error.message, /Cannot have duplicate keys in discriminators with encryption/);
@@ -1254,16 +1125,7 @@ describe('encryption integration tests', () => {
       });
 
       const model = mongoose.model('Schema', schema);
-      await mongoose.connect(clusterUri, {
-        dbName: 'db', autoEncryption: {
-          keyVaultNamespace: 'keyvault.datakeys',
-          kmsProviders: { local: { key: LOCAL_KEY } },
-          extraOptions: {
-            cryptdSharedLibRequired: true,
-            cryptSharedLibPath: cryptSharedLibPath
-          }
-        }
-      });
+      await mongoose.connect(clusterUri, autoEncryptionOptions());
 
       const [{ _id }] = await model.insertMany([{ a: 2 }]);
       const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
@@ -1294,16 +1156,7 @@ describe('encryption integration tests', () => {
       });
 
       const model = mongoose.model('Schema', schema);
-      await mongoose.connect(clusterUri, {
-        dbName: 'db', autoEncryption: {
-          keyVaultNamespace: 'keyvault.datakeys',
-          kmsProviders: { local: { key: LOCAL_KEY } },
-          extraOptions: {
-            cryptdSharedLibRequired: true,
-            cryptSharedLibPath: cryptSharedLibPath
-          }
-        }
-      });
+      await mongoose.connect(clusterUri, autoEncryptionOptions());
 
       const [{ _id }] = await model.insertMany([{ a: 2 }]);
       const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
@@ -1322,7 +1175,7 @@ describe('encryption integration tests', () => {
         const connection = mongoose.createConnection();
         const model = connection.model('Name', { age: String });
 
-        await connection.openUri(process.env.MONGOOSE_TEST_URI);
+        await connection.openUri(clusterUri);
 
         assert.equal(model.clientEncryption(), null);
       });
@@ -1353,77 +1206,263 @@ describe('encryption integration tests', () => {
           encryptionType: 'queryableEncryption'
         }));
 
-        await connection.openUri(process.env.MONGOOSE_TEST_URI, {
-          dbName: 'db', autoEncryption: {
-            keyVaultNamespace: 'keyvault.datakeys',
-            kmsProviders: { local: { key: LOCAL_KEY } },
-            extraOptions: {
-              cryptdSharedLibRequired: true,
-              cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
-            }
-          }
+        await connection.openUri(clusterUri, autoEncryptionOptions());
+
+        afterEach(async function() {
+          await connection.close();
+        });
+
+        it('returns a client encryption object', async function() {
+          assert.ok(model.clientEncryption() instanceof mdb.ClientEncryption);
+        });
+
+        it('the client encryption is usable as a key vault', async function() {
+          const clientEncryption = model.clientEncryption();
+          const dataKey = await clientEncryption.createDataKey('local');
+          const keys = await clientEncryption.getKeys().toArray();
+
+          assert.ok(keys.length > 0);
+
+          const key = keys.find(
+            ({ _id }) => _id.toString() === dataKey.toString()
+          );
+
+          assert.ok(key);
+        });
+
+        it('uses the same keyvaultNamespace', async function() {
+          assert.equal(model.clientEncryption()._keyVaultNamespace, 'keyvault.datakeys');
+        });
+
+        it('uses the same kms providers', async function() {
+          assert.deepEqual(model.clientEncryption()._kmsProviders, { local: { key: LOCAL_KEY } });
+        });
+
+        it('uses the same proxy options', async function() {
+          const options = model.collection.conn.client.options.autoEncryption;
+          options.proxyOptions = { name: 'bailey' };
+          assert.deepEqual(model.clientEncryption()._proxyOptions, { name: 'bailey' });
+        });
+
+        it('uses the same TLS options', async function() {
+          const options = model.collection.conn.client.options.autoEncryption;
+          options.tlsOptions = {
+            tlsCAFile: 'some file'
+          };
+          assert.deepEqual(model.clientEncryption()._tlsOptions, {
+            tlsCAFile: 'some file'
+          });
+        });
+
+        it.skip('uses the same credentialProviders', async function() {
+          const options = model.collection.conn.client.options.autoEncryption;
+          const credentialProviders = {
+            aws: async() => {}
+          };
+          options.credentialProviders = credentialProviders;
+          assert.equal(model.clientEncryption()._credentialProviders, credentialProviders);
+        });
+
+        it('uses the underlying MongoClient as the keyvault client', async function() {
+          const options = model.collection.conn.client.options.autoEncryption;
+          assert.ok(model.clientEncryption()._client === options.keyVaultClient, 'client not the same');
+          assert.equal(model.clientEncryption()._keyVaultClient, options.keyVaultClient, 'keyvault client not the same');
         });
       });
+    });
+
+    describe('auto index creation', function() {
+      let connection;
 
       afterEach(async function() {
-        await connection.close();
+        await connection?.close();
       });
 
-      it('returns a client encryption object', async function() {
-        assert.ok(model.clientEncryption() instanceof mdb.ClientEncryption);
-      });
+      describe('CSFLE', function() {
+        it('automatically creates indexes for CSFLE models', async function() {
+          connection = mongoose.createConnection();
+          const schema = new Schema({
+            name: { type: String, encrypt: { keyId: [keyId], algorithm } },
+            age: Number
+          }, { encryptionType: 'csfle' });
+          schema.index({ age: 1 });
+          const model = connection.model(new UUID().toHexString(), schema);
+          await connection.openUri(clusterUri, autoEncryptionOptions());
 
-      it('the client encryption is usable as a key vault', async function() {
-        const clientEncryption = model.clientEncryption();
-        const dataKey = await clientEncryption.createDataKey('local');
-        const keys = await clientEncryption.getKeys().toArray();
+          await model.init();
 
-        assert.ok(keys.length > 0);
-
-        const key = keys.find(
-          ({ _id }) => _id.toString() === dataKey.toString()
-        );
-
-        assert.ok(key);
-      });
-
-      it('uses the same keyvaultNamespace', async function() {
-        assert.equal(model.clientEncryption()._keyVaultNamespace, 'keyvault.datakeys');
-      });
-
-      it('uses the same kms providers', async function() {
-        assert.deepEqual(model.clientEncryption()._kmsProviders, { local: { key: LOCAL_KEY } });
-      });
-
-      it('uses the same proxy options', async function() {
-        const options = model.collection.conn.client.options.autoEncryption;
-        options.proxyOptions = { name: 'bailey' };
-        assert.deepEqual(model.clientEncryption()._proxyOptions, { name: 'bailey' });
-      });
-
-      it('uses the same TLS options', async function() {
-        const options = model.collection.conn.client.options.autoEncryption;
-        options.tlsOptions = {
-          tlsCAFile: 'some file'
-        };
-        assert.deepEqual(model.clientEncryption()._tlsOptions, {
-          tlsCAFile: 'some file'
+          const indexes = await model.listIndexes();
+          assert.ok(indexes.find(({ name }) => name === 'age_1'));
         });
       });
 
-      it.skip('uses the same credentialProviders', async function() {
-        const options = model.collection.conn.client.options.autoEncryption;
-        const credentialProviders = {
-          aws: async() => {}
-        };
-        options.credentialProviders = credentialProviders;
-        assert.equal(model.clientEncryption()._credentialProviders, credentialProviders);
+
+      describe('Queryable Encryption', function() {
+        it('automatically creates indexes for QE models', async function() {
+          connection = mongoose.createConnection();
+          const schema = new Schema({
+            name: { type: String, encrypt: { keyId } },
+            age: Number
+          }, { encryptionType: 'queryableEncryption' });
+          schema.index({ age: 1 });
+          const model = connection.model(new UUID().toHexString(), schema);
+          await connection.openUri(clusterUri, autoEncryptionOptions());
+
+          await model.init();
+
+          const indexes = await model.listIndexes();
+          assert.ok(indexes.find(({ name }) => name === 'age_1'));
+        });
+
+
+      });
+    });
+
+    describe('auto collection creation', function() {
+      let connection;
+
+      afterEach(async function() {
+        await connection?.close();
       });
 
-      it('uses the underlying MongoClient as the keyvault client', async function() {
-        const options = model.collection.conn.client.options.autoEncryption;
-        assert.ok(model.clientEncryption()._client === options.keyVaultClient, 'client not the same');
-        assert.equal(model.clientEncryption()._keyVaultClient, options.keyVaultClient, 'keyvault client not the same');
+      describe('CSFLE', function() {
+        it('automatically creates the model\'s collection', async function() {
+          connection = mongoose.createConnection();
+          const schema = new Schema({
+            name: { type: String, encrypt: { keyId: [keyId], algorithm } },
+            age: Number
+          }, { encryptionType: 'csfle', autoCreate: true });
+
+          const model = connection.model(new UUID().toHexString(), schema);
+
+          await connection.openUri(clusterUri, autoEncryptionOptions());
+
+          await model.init();
+
+          const collections = await connection.db.listCollections({}, { readPreference: 'primary' }).toArray();
+          assert.equal(collections.length, 1);
+        });
+      });
+
+      describe('Queryable Encryption', function() {
+        it('automatically creates the model\'s collection', async function() {
+          connection = mongoose.createConnection();
+          const schema = new Schema({
+            name: { type: String, encrypt: { keyId: keyId } }
+          }, { encryptionType: 'queryableEncryption', autoCreate: true });
+
+          const model = connection.model(new UUID().toHexString(), schema);
+
+          await connection.openUri(clusterUri, autoEncryptionOptions());
+
+
+          await model.init();
+
+          const collections = await utilClient.db('db').listCollections().toArray();
+          assert.equal(collections.length, 3);
+        });
+      });
+    });
+
+    describe('read operations', function() {
+      let connection;
+
+      afterEach(async function() {
+        await connection?.close();
+      });
+
+      describe('CSFLE', function() {
+        it('encrypted documents can be read', async function() {
+          connection = mongoose.createConnection();
+          const schema = new Schema({
+            name: { type: String, encrypt: { keyId: [keyId], algorithm } },
+            age: Number
+          }, { encryptionType: 'csfle', autoCreate: true });
+
+          const model = connection.model(new UUID().toHexString(), schema);
+
+          await connection.openUri(clusterUri, autoEncryptionOptions());
+
+          await model.insertMany([
+            { name: 'bailey', age: 1 },
+            { name: 'john', age: 2 }
+          ]);
+
+          assert.equal((await model.find()).length, 2);
+          assert.deepEqual(await model.findOne({ age: 1 }, { _id: 0, name: 1 }, { lean: true }), { name: 'bailey' });
+        });
+
+        it('deterministically encrypted fields can be equality queried', async function() {
+          connection = mongoose.createConnection();
+          const schema = new Schema({
+            name: { type: String, encrypt: { keyId: [keyId], algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic' } },
+            age: Number
+          }, { encryptionType: 'csfle', autoCreate: true });
+
+          const model = connection.model(new UUID().toHexString(), schema);
+
+          await connection.openUri(clusterUri, autoEncryptionOptions());
+
+          await model.insertMany([
+            { name: 'bailey', age: 1 },
+            { name: 'john', age: 2 }
+          ]);
+
+          assert.equal((await model.find()).length, 2);
+          assert.deepEqual(await model.findOne({ name: 'bailey' }, { _id: 0, name: 1 }, { lean: true }), { name: 'bailey' });
+        });
+      });
+
+      describe('QE encrypted queries', function() {
+        describe('when a field is configured for equality queries', function() {
+          it('can be queried with mongoose', async function() {
+            connection = mongoose.createConnection();
+            const schema = new Schema({
+              name: { type: String, encrypt: { keyId, queries: { queryType: 'equality' } } }
+            }, { encryptionType: 'queryableEncryption' });
+            const model = connection.model(new UUID().toHexString(), schema);
+            await connection.openUri(clusterUri, autoEncryptionOptions());
+
+            await model.insertMany([{ name: 'bailey' }, { name: 'john' }]);
+
+            const doc = await model.findOne({ name: 'bailey' });
+            assert.ok(doc);
+          });
+        });
+
+        describe('when a field is not configured for equality queries', function() {
+          it('cannot be queried directly', async function() {
+            connection = mongoose.createConnection();
+            const schema = new Schema({
+              name: { type: String, encrypt: { keyId } }
+            }, { encryptionType: 'queryableEncryption' });
+            const model = connection.model(new UUID().toHexString(), schema);
+            await connection.openUri(clusterUri, autoEncryptionOptions());
+
+            await model.insertMany([{ name: { toString: function() { 'asdf';} } }, { name: 'john' }]);
+
+            await assert.rejects(() => {
+              return model.findOne({ name: 'bailey' });
+            }, /Can only execute encrypted equality queries with an encrypted equality index/);
+          });
+        });
+
+        it('queried documents can be modified and saved', async function() {
+          connection = mongoose.createConnection();
+          const schema = new Schema({
+            name: { type: String, encrypt: { keyId, queries: { queryType: 'equality' } } }
+          }, { encryptionType: 'queryableEncryption' });
+          const model = connection.model(new UUID().toHexString(), schema);
+          await connection.openUri(clusterUri, autoEncryptionOptions());
+
+          await model.insertMany([{ name: 'bailey' }, { name: 'john' }]);
+
+          const doc = await model.findOne({ name: 'bailey' });
+          doc.name = 'new name!';
+          await doc.save();
+
+          assert.ok(model.findOne({ name: 'new name!' }));
+        });
       });
     });
   });

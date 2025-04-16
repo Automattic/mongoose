@@ -83,7 +83,7 @@ declare module 'mongoose' {
               IsItRecordAndNotAny<Item> extends true ?
                 Item extends Record<string, never> ?
                   ObtainRawDocumentPathType<Item, TypeKey>[] :
-                  Array<InferRawDocType<Item>>> :
+                  Array<InferRawDocType<Item>> :
                 ObtainRawDocumentPathType<Item, TypeKey>[]
         >:
         PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']> :

@@ -106,6 +106,7 @@ They always return promises.
 * `Model.aggregate`
 * `Model.bulkWrite`
 * `Model.cleanIndexes`
+* `Model.count`
 * `Model.countDocuments`
 * `Model.create`
 * `Model.createCollection`
@@ -130,6 +131,7 @@ They always return promises.
 * `Model.syncIndexes`
 * `Model.updateMany`
 * `Model.updateOne`
+* `Query.prototype.count`
 * `Query.prototype.find`
 * `Query.prototype.findOne`
 * `Query.prototype.findOneAndDelete`
@@ -156,7 +158,7 @@ conn.startSession(function(err, session) {
 // After
 const session = await conn.startSession();
 // Or:
-conn.startSession().then(sesson => { /* ... */ });
+conn.startSession().then(session => { /* ... */ });
 
 // With error handling
 try {

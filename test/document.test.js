@@ -14455,6 +14455,53 @@ describe('document', function() {
     assert.strictEqual(car.vin, undefined);
     assert.strictEqual(car.sunroof, true);
   });
+
+  it('avoids double validating document arrays underneath single nested (gh-15335)', async function() {
+    let arraySubdocValidateCalls = 0;
+    let strValidateCalls = 0;
+
+    const embeddedSchema = new mongoose.Schema({
+      arrObj: {
+        type: [{
+          name: {
+            type: String,
+            validate: {
+              validator: () => {
+                ++arraySubdocValidateCalls;
+                return true;
+              }
+            }
+          }
+        }]
+      },
+      arrStr: {
+        type: [{
+          type: String,
+          validate: {
+            validator: () => {
+              ++strValidateCalls;
+              return true;
+            }
+          }
+        }]
+      }
+    });
+
+    const TestModel = db.model('Test', new Schema({ child: embeddedSchema }));
+    await TestModel.create({
+      child: {
+        arrObj: [
+          {
+            name: 'arrObj'
+          }
+        ],
+        arrStr: ['arrStr']
+      }
+    });
+    assert.strictEqual(arraySubdocValidateCalls, 1);
+    assert.strictEqual(strValidateCalls, 1);
+
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

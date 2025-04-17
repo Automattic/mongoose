@@ -9,7 +9,18 @@ const fs = require('fs');
 const mongoose = require('../../lib');
 const { Map } = require('../../lib/types');
 
+const { stop, start } = require('../../scripts/setup-encryption-tests');
+
 const LOCAL_KEY = Buffer.from('Mng0NCt4ZHVUYUJCa1kxNkVyNUR1QURhZ2h2UzR2d2RrZzh0cFBwM3R6NmdWMDFBMUN3YkQ5aXRRMkhGRGdQV09wOGVNYUMxT2k3NjZKelhaQmRCZGJkTXVyZG9uSjFk', 'base64');
+
+const exists = path => {
+  try {
+    fs.statSync(path);
+    return true;
+  } catch {
+    return false;
+  }
+};
 
 /**
  * @param {object} object
@@ -25,19 +36,29 @@ describe('encryption integration tests', () => {
   const cachedUri = process.env.MONGOOSE_TEST_URI;
   const cachedLib = process.env.CRYPT_SHARED_LIB_PATH;
 
-  before(function() {
+  before(async function() {
+    this.timeout(0);
     const cwd = process.cwd();
-    const file = fs.readFileSync(cwd + '/data/mo-expansion.yml', { encoding: 'utf-8' }).trim().split('\n');
+    if (!exists(cwd + '/mo-expansion.yml')) {
+      const { uri, cryptShared } = await start();
+      process.env.CRYPT_SHARED_LIB_PATH = cryptShared;
+      process.env.MONGOOSE_TEST_URI = uri;
+    } else {
+      const file = fs.readFileSync(cwd + '/mo-expansion.yml', { encoding: 'utf-8' }).trim().split('\n');
 
-    // matches `key="value"` and extracts key and value.
-    const regex = /^(?<key>.*): "(?<value>.*)"$/;
-    const variables = Object.fromEntries(file.map((line) => regex.exec(line.trim()).groups).map(({ key, value }) => [key, value]));
+      const regex = /^(?<key>.*): "(?<value>.*)"$/;
+      const variables = Object.fromEntries(file.map((line) => regex.exec(line.trim()).groups).map(({ key, value }) => [key, value]));
 
-    process.env.CRYPT_SHARED_LIB_PATH ??= variables.CRYPT_SHARED_LIB_PATH;
-    process.env.MONGOOSE_TEST_URI ??= variables.MONGODB_URI;
+      process.env.CRYPT_SHARED_LIB_PATH = variables.CRYPT_SHARED_LIB_PATH;
+      process.env.MONGOOSE_TEST_URI = variables.MONGODB_URI;
+    }
   });
 
-  after(function() {
+  after(async function() {
+    if (!exists(process.cwd() + '/mo-expansion.yml')) {
+      await stop();
+    }
+
     process.env.CRYPT_SHARED_LIB_PATH = cachedLib;
     process.env.MONGOOSE_TEST_URI = cachedUri;
   });

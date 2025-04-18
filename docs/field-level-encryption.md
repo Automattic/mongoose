@@ -219,7 +219,7 @@ When generating encryption schemas, Mongoose merges all discriminators together 
 
 ## Managing Data Keys
 
-Mongoose provides a convenient API to obtain a [ClientEncryption](https://mongodb.github.io/node-mongodb-native/Next/classes/ClientEncryption.html) 
+Mongoose provides a convenient API to obtain a [ClientEncryption](https://mongodb.github.io/node-mongodb-native/Next/classes/ClientEncryption.html)
 object configured to manage data keys in the key vault.  A client encryption can be obtained with the `Model.clientEncryption()` helper:
 
 ```javascript

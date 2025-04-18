@@ -11,6 +11,7 @@ you should be aware of when migrating from Mongoose 6.x to Mongoose 7.x.
 
 If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration guide](migrating_to_6.html) and upgrade to Mongoose 6.x first.
 
+* [Version Requirements](#version-requirements)
 * [`strictQuery`](#strictquery)
 * [Removed `remove()`](#removed-remove)
 * [Dropped callback support](#dropped-callback-support)
@@ -27,6 +28,12 @@ If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration 
 * [TypeScript-specific changes](#typescript-specific-changes)
   * [Removed `LeanDocument` and support for `extends Document`](#removed-leandocument-and-support-for-extends-document)
   * [New parameters for `HydratedDocument`](#new-parameters-for-hydrateddocument)
+
+<h2 id="version-requirements"><a href="#version-requirements">Version Requirements</a></h2>
+
+Mongoose now requires Node.js >= 14.0.0 and MongoDB Node Driver >= 5.0.0.
+
+See [the MongoDB Node Driver migration guide](https://github.com/mongodb/node-mongodb-native/blob/main/etc/notes/CHANGES_5.0.0.md) for detailed info.
 
 <h2 id="strictquery"><a href="#strictquery"><code>strictQuery</code></a></h2>
 

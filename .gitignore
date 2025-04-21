@@ -69,5 +69,4 @@ notes.md
 list.out
 
 data
-*.pid
-mo-expansion*
+fle-cluster-config.json

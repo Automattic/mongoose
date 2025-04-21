@@ -10,11 +10,8 @@ async function main() {
   const runnerDir = join(resolve(__dirname), '../data');
   const serverVersion = '8.0';
 
-  const { uri, cryptShared } = await run();
-  await writeFile('mo-expansion.yml',
-    `CRYPT_SHARED_LIB_PATH: "${cryptShared}"
-MONGODB_URI: "${uri}"`
-  );
+  const configuration = await run();
+  await writeFile('fle-cluster-config.json', JSON.stringify(configuration, null, 2));
 
   async function downloadCryptShared() {
     const crypt_shared_dir = await downloadMongoDb(join(runnerDir, 'crypt'), serverVersion, {
@@ -37,7 +34,8 @@ MONGODB_URI: "${uri}"`
       enterprise: true
     });
 
-    await start({ id: 'encryption-test-cluster', binDir, topology: 'replset', runnerDir, tmpDir: tmpdir() });
+    await start({ id: 'encryption-test-cluster', binDir, topology:
+      'sharded', runnerDir, tmpDir: tmpdir() });
 
     for await (const instance of instances({ runnerDir })) {
       if (instance.id === 'encryption-test-cluster') return {

@@ -8,8 +8,7 @@ const { ObjectId, Double, Int32, Decimal128 } = require('bson');
 const fs = require('fs');
 const mongoose = require('../../lib');
 const { Map } = require('../../lib/types');
-
-const { stop, start } = require('../../scripts/setup-encryption-tests');
+const { join } = require('path');
 
 const LOCAL_KEY = Buffer.from('Mng0NCt4ZHVUYUJCa1kxNkVyNUR1QURhZ2h2UzR2d2RrZzh0cFBwM3R6NmdWMDFBMUN3YkQ5aXRRMkhGRGdQV09wOGVNYUMxT2k3NjZKelhaQmRCZGJkTXVyZG9uSjFk', 'base64');
 
@@ -33,34 +32,19 @@ function isEncryptedValue(object, property) {
 }
 
 describe('encryption integration tests', () => {
-  const cachedUri = process.env.MONGOOSE_TEST_URI;
-  const cachedLib = process.env.CRYPT_SHARED_LIB_PATH;
-
   before(async function() {
-    this.timeout(0);
-    const cwd = process.cwd();
-    if (!exists(cwd + '/mo-expansion.yml')) {
-      const { uri, cryptShared } = await start();
-      process.env.CRYPT_SHARED_LIB_PATH = cryptShared;
-      process.env.MONGOOSE_TEST_URI = uri;
-    } else {
-      const file = fs.readFileSync(cwd + '/mo-expansion.yml', { encoding: 'utf-8' }).trim().split('\n');
-
-      const regex = /^(?<key>.*): "(?<value>.*)"$/;
-      const variables = Object.fromEntries(file.map((line) => regex.exec(line.trim()).groups).map(({ key, value }) => [key, value]));
-
-      process.env.CRYPT_SHARED_LIB_PATH = variables.CRYPT_SHARED_LIB_PATH;
-      process.env.MONGOOSE_TEST_URI = variables.MONGODB_URI;
-    }
-  });
-
-  after(async function() {
-    if (!exists(process.cwd() + '/mo-expansion.yml')) {
-      await stop();
+    const expansionFile = join(__dirname, '../..', 'mo-expansion.yml');
+    if (!exists(expansionFile)) {
+      throw new Error('must setup a cluster using `npm run setup-test-encryption`.');
     }
 
-    process.env.CRYPT_SHARED_LIB_PATH = cachedLib;
-    process.env.MONGOOSE_TEST_URI = cachedUri;
+    const lines = fs.readFileSync(expansionFile, { encoding: 'utf-8' }).trim().split('\n');
+
+    const regex = /^(?<key>.*): "(?<value>.*)"$/;
+    const variables = Object.fromEntries(lines.map((line) => regex.exec(line.trim()).groups).map(({ key, value }) => [key, value]));
+
+    process.env.CRYPT_SHARED_LIB_PATH = variables.CRYPT_SHARED_LIB_PATH;
+    process.env.MONGOOSE_TEST_URI = variables.MONGODB_URI;
   });
 
   describe('meta: environmental variables are correctly set up', () => {

@@ -5,63 +5,48 @@ const { rm, readdir, writeFile } = require('fs/promises');
 const { tmpdir } = require('os');
 const { join, resolve } = require('path');
 
-async function getCryptShared() {
-  const crypt_shared_dir = await downloadMongoDb('./data/crypt', '8.0', {
-    enterprise: true,
-    crypt_shared: true
-  });
-
-  for (const direntry of await readdir(crypt_shared_dir)) {
-    if (/crypt/.test(direntry)) {
-      return join(crypt_shared_dir, direntry);
-    }
-  }
-}
-
-const runnerDir = join(resolve(__dirname), '../data');
-const id = 'my-cluster';
-
-async function run() {
-  await rm(runnerDir, { recursive: true }).catch(e => {});
-
-  const cryptShared = await getCryptShared();
-  const binDir = await downloadMongoDb('./data', '8.0', {
-    enterprise: true
-  });
-
-  const tmpDir = tmpdir();
-
-  await start({ id, binDir, topology: 'replset', runnerDir, tmpDir });
-
-  for await (const instance of instances({ runnerDir })) {
-    if (instance.id === id) return {
-      cryptShared, uri: instance.connectionString
-    };
-  }
-
-  throw new Error('unable to find new instance.');
-}
-
-async function stop() {
-  await require('mongodb-runner').stop({
-    runnerDir,
-    id
-  });
-}
 
 async function main() {
+  const runnerDir = join(resolve(__dirname), '../data');
+  const serverVersion = '8.0';
+
   const { uri, cryptShared } = await run();
   await writeFile('mo-expansion.yml',
-    `
-        CRYPT_SHARED_LIB_PATH: "${cryptShared}"
-        MONGODB_URI: "${uri}"
-        `
+    `CRYPT_SHARED_LIB_PATH: "${cryptShared}"
+MONGODB_URI: "${uri}"`
   );
+
+  async function downloadCryptShared() {
+    const crypt_shared_dir = await downloadMongoDb(join(runnerDir, 'crypt'), serverVersion, {
+      enterprise: true,
+      crypt_shared: true
+    });
+
+    for (const dirEntry of await readdir(crypt_shared_dir)) {
+      if (/crypt/.test(dirEntry)) {
+        return join(crypt_shared_dir, dirEntry);
+      }
+    }
+  }
+
+  async function run() {
+    await rm(runnerDir, { recursive: true }).catch(() => {});
+
+    const cryptShared = await downloadCryptShared();
+    const binDir = await downloadMongoDb(runnerDir, serverVersion, {
+      enterprise: true
+    });
+
+    await start({ id: 'encryption-test-cluster', binDir, topology: 'replset', runnerDir, tmpDir: tmpdir() });
+
+    for await (const instance of instances({ runnerDir })) {
+      if (instance.id === 'encryption-test-cluster') return {
+        cryptShared, uri: instance.connectionString
+      };
+    }
+
+    throw new Error('Unable to location newly configured instance of mongod - should never happen.');
+  }
 }
 
-if (require.main === module) {
-  main();
-}
-else {
-  module.exports = { start: run, stop };
-}
+main();

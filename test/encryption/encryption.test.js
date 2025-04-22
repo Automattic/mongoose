@@ -1269,14 +1269,11 @@ describe('encryption integration tests', () => {
           assert.equal(model.clientEncryption()._keyVaultClient, options.keyVaultClient, 'keyvault client not the same');
         });
       });
-    });
 
+
+    });
     describe('auto index creation', function() {
       let connection;
-
-      afterEach(async function() {
-        await connection?.close();
-      });
 
       describe('CSFLE', function() {
         it('automatically creates indexes for CSFLE models', async function() {
@@ -1313,141 +1310,130 @@ describe('encryption integration tests', () => {
           const indexes = await model.listIndexes();
           assert.ok(indexes.find(({ name }) => name === 'age_1'));
         });
-
-
       });
     });
 
-    describe('auto collection creation', function() {
+
+    describe('Queryable Encryption', function() {
       let connection;
 
-      afterEach(async function() {
-        await connection?.close();
+      it('automatically creates indexes for QE models', async function() {
+        connection = mongoose.createConnection();
+        const schema = new Schema({
+          name: { type: String, encrypt: { keyId } },
+          age: Number
+        }, { encryptionType: 'queryableEncryption' });
+        schema.index({ age: 1 });
+        const model = connection.model(new UUID().toHexString(), schema);
+        await connection.openUri(clusterUri, autoEncryptionOptions());
+
+        await model.init();
+
+        const indexes = await model.listIndexes();
+        assert.ok(indexes.find(({ name }) => name === 'age_1'));
       });
 
-      describe('CSFLE', function() {
-        it('automatically creates the model\'s collection', async function() {
-          connection = mongoose.createConnection();
-          const schema = new Schema({
-            name: { type: String, encrypt: { keyId: [keyId], algorithm } },
-            age: Number
-          }, { encryptionType: 'csfle', autoCreate: true });
 
-          const model = connection.model(new UUID().toHexString(), schema);
+    });
+  });
 
-          await connection.openUri(clusterUri, autoEncryptionOptions());
+  describe('auto collection creation', function() {
+    let connection;
 
-          await model.init();
+    afterEach(async function() {
+      await connection?.close();
+    });
 
-          const collections = await connection.db.listCollections({}, { readPreference: 'primary' }).toArray();
-          assert.equal(collections.length, 1);
-        });
-      });
+    describe('CSFLE', function() {
+      it('automatically creates the model\'s collection', async function() {
+        connection = mongoose.createConnection();
+        const schema = new Schema({
+          name: { type: String, encrypt: { keyId: [keyId], algorithm } },
+          age: Number
+        }, { encryptionType: 'csfle', autoCreate: true });
 
-      describe('Queryable Encryption', function() {
-        it('automatically creates the model\'s collection', async function() {
-          connection = mongoose.createConnection();
-          const schema = new Schema({
-            name: { type: String, encrypt: { keyId: keyId } }
-          }, { encryptionType: 'queryableEncryption', autoCreate: true });
+        const model = connection.model(new UUID().toHexString(), schema);
 
-          const model = connection.model(new UUID().toHexString(), schema);
+        await connection.openUri(clusterUri, autoEncryptionOptions());
+        await model.init();
 
-          await connection.openUri(clusterUri, autoEncryptionOptions());
-
-
-          await model.init();
-
-          const collections = await utilClient.db('db').listCollections().toArray();
-          assert.equal(collections.length, 3);
-        });
+        const collections = await connection.db.listCollections({}, { readPreference: 'primary' }).toArray();
+        assert.equal(collections.length, 1);
       });
     });
 
-    describe('read operations', function() {
-      let connection;
+    describe('Queryable Encryption', function() {
+      it('automatically creates the model\'s collection', async function() {
+        connection = mongoose.createConnection();
+        const schema = new Schema({
+          name: { type: String, encrypt: { keyId: keyId } }
+        }, { encryptionType: 'queryableEncryption', autoCreate: true });
 
-      afterEach(async function() {
-        await connection?.close();
+        const model = connection.model(new UUID().toHexString(), schema);
+
+        await connection.openUri(clusterUri, autoEncryptionOptions());
+
+
+        await model.init();
+
+        const collections = await utilClient.db('db').listCollections().toArray();
+        assert.equal(collections.length, 3);
+      });
+    });
+  });
+
+  describe('read operations', function() {
+    let connection;
+
+    afterEach(async function() {
+      await connection?.close();
+    });
+
+    describe('CSFLE', function() {
+      it('encrypted documents can be read', async function() {
+        connection = mongoose.createConnection();
+        const schema = new Schema({
+          name: { type: String, encrypt: { keyId: [keyId], algorithm } },
+          age: Number
+        }, { encryptionType: 'csfle', autoCreate: true });
+
+        const model = connection.model(new UUID().toHexString(), schema);
+
+        await connection.openUri(clusterUri, autoEncryptionOptions());
+
+        await model.insertMany([
+          { name: 'bailey', age: 1 },
+          { name: 'john', age: 2 }
+        ]);
+
+        assert.equal((await model.find()).length, 2);
+        assert.deepEqual(await model.findOne({ age: 1 }, { _id: 0, name: 1 }, { lean: true }), { name: 'bailey' });
       });
 
-      describe('CSFLE', function() {
-        it('encrypted documents can be read', async function() {
-          connection = mongoose.createConnection();
-          const schema = new Schema({
-            name: { type: String, encrypt: { keyId: [keyId], algorithm } },
-            age: Number
-          }, { encryptionType: 'csfle', autoCreate: true });
+      it('deterministically encrypted fields can be equality queried', async function() {
+        connection = mongoose.createConnection();
+        const schema = new Schema({
+          name: { type: String, encrypt: { keyId: [keyId], algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic' } },
+          age: Number
+        }, { encryptionType: 'csfle', autoCreate: true });
 
-          const model = connection.model(new UUID().toHexString(), schema);
+        const model = connection.model(new UUID().toHexString(), schema);
 
-          await connection.openUri(clusterUri, autoEncryptionOptions());
+        await connection.openUri(clusterUri, autoEncryptionOptions());
 
-          await model.insertMany([
-            { name: 'bailey', age: 1 },
-            { name: 'john', age: 2 }
-          ]);
+        await model.insertMany([
+          { name: 'bailey', age: 1 },
+          { name: 'john', age: 2 }
+        ]);
 
-          assert.equal((await model.find()).length, 2);
-          assert.deepEqual(await model.findOne({ age: 1 }, { _id: 0, name: 1 }, { lean: true }), { name: 'bailey' });
-        });
-
-        it('deterministically encrypted fields can be equality queried', async function() {
-          connection = mongoose.createConnection();
-          const schema = new Schema({
-            name: { type: String, encrypt: { keyId: [keyId], algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic' } },
-            age: Number
-          }, { encryptionType: 'csfle', autoCreate: true });
-
-          const model = connection.model(new UUID().toHexString(), schema);
-
-          await connection.openUri(clusterUri, autoEncryptionOptions());
-
-          await model.insertMany([
-            { name: 'bailey', age: 1 },
-            { name: 'john', age: 2 }
-          ]);
-
-          assert.equal((await model.find()).length, 2);
-          assert.deepEqual(await model.findOne({ name: 'bailey' }, { _id: 0, name: 1 }, { lean: true }), { name: 'bailey' });
-        });
+        assert.equal((await model.find()).length, 2);
+        assert.deepEqual(await model.findOne({ name: 'bailey' }, { _id: 0, name: 1 }, { lean: true }), { name: 'bailey' });
       });
+    });
 
-      describe('QE encrypted queries', function() {
-        describe('when a field is configured for equality queries', function() {
-          it('can be queried with mongoose', async function() {
-            connection = mongoose.createConnection();
-            const schema = new Schema({
-              name: { type: String, encrypt: { keyId, queries: { queryType: 'equality' } } }
-            }, { encryptionType: 'queryableEncryption' });
-            const model = connection.model(new UUID().toHexString(), schema);
-            await connection.openUri(clusterUri, autoEncryptionOptions());
-
-            await model.insertMany([{ name: 'bailey' }, { name: 'john' }]);
-
-            const doc = await model.findOne({ name: 'bailey' });
-            assert.ok(doc);
-          });
-        });
-
-        describe('when a field is not configured for equality queries', function() {
-          it('cannot be queried directly', async function() {
-            connection = mongoose.createConnection();
-            const schema = new Schema({
-              name: { type: String, encrypt: { keyId } }
-            }, { encryptionType: 'queryableEncryption' });
-            const model = connection.model(new UUID().toHexString(), schema);
-            await connection.openUri(clusterUri, autoEncryptionOptions());
-
-            await model.insertMany([{ name: { toString: function() { 'asdf';} } }, { name: 'john' }]);
-
-            await assert.rejects(() => {
-              return model.findOne({ name: 'bailey' });
-            }, /Can only execute encrypted equality queries with an encrypted equality index/);
-          });
-        });
-
-        it('queried documents can be modified and saved', async function() {
+    describe('QE encrypted queries', function() {
+      describe('when a field is configured for equality queries', function() {
+        it('can be queried with mongoose', async function() {
           connection = mongoose.createConnection();
           const schema = new Schema({
             name: { type: String, encrypt: { keyId, queries: { queryType: 'equality' } } }
@@ -1458,11 +1444,43 @@ describe('encryption integration tests', () => {
           await model.insertMany([{ name: 'bailey' }, { name: 'john' }]);
 
           const doc = await model.findOne({ name: 'bailey' });
-          doc.name = 'new name!';
-          await doc.save();
-
-          assert.ok(model.findOne({ name: 'new name!' }));
+          assert.ok(doc);
         });
+      });
+
+      describe('when a field is not configured for equality queries', function() {
+        it('cannot be queried directly', async function() {
+          connection = mongoose.createConnection();
+          const schema = new Schema({
+            name: { type: String, encrypt: { keyId } }
+          }, { encryptionType: 'queryableEncryption' });
+          const model = connection.model(new UUID().toHexString(), schema);
+          await connection.openUri(clusterUri, autoEncryptionOptions());
+
+          await model.insertMany([{ name: { toString: function() { 'asdf';} } }, { name: 'john' }]);
+
+          await assert.rejects(() => {
+            return model.findOne({ name: 'bailey' });
+          }, /Can only execute encrypted equality queries with an encrypted equality index/);
+        });
+      });
+
+      it('queried documents can be modified and saved', async function() {
+        connection = mongoose.createConnection();
+        const schema = new Schema({
+          name: { type: String, encrypt: { keyId, queries: { queryType: 'equality' } } }
+        }, { encryptionType: 'queryableEncryption' });
+        const model = connection.model(new UUID().toHexString(), schema);
+        await connection.openUri(clusterUri, autoEncryptionOptions());
+        await model.init();
+        await model.insertMany([{ name: 'bailey' }, { name: 'john' }]);
+
+        const doc = await model.findOne({ name: 'bailey' });
+        doc.name = 'new name!';
+
+        await doc.save();
+
+        assert.ok(await model.findOne({ name: 'new name!' }));
       });
     });
   });

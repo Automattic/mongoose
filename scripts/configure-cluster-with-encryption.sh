@@ -49,7 +49,7 @@ if [ ! -d "data" ]; then
   echo 'Configuring Cluster...'
 
   # start cluster
-  (bash $DRIVERS_TOOLS/.evergreen/run-orchestration.sh) 1>/dev/null 2>/dev/null
+  (bash $DRIVERS_TOOLS/.evergreen/run-orchestration.sh)
 
   echo 'Cluster Configuration Finished!'
 

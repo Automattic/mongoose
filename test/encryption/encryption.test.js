@@ -1432,9 +1432,6 @@ describe('encryption integration tests', () => {
     });
 
     describe('QE encrypted queries', function() {
-      beforeEach(function() {
-        this.timeout(5_000);
-      });
       describe('when a field is configured for equality queries', function() {
         it('can be queried with mongoose', async function() {
           connection = mongoose.createConnection();
@@ -1443,6 +1440,7 @@ describe('encryption integration tests', () => {
           }, { encryptionType: 'queryableEncryption' });
           const model = connection.model(new UUID().toHexString(), schema);
           await connection.openUri(clusterUri, autoEncryptionOptions());
+          await model.init();
 
           await model.insertMany([{ name: 'bailey' }, { name: 'john' }]);
 
@@ -1461,7 +1459,7 @@ describe('encryption integration tests', () => {
           await connection.openUri(clusterUri, autoEncryptionOptions());
           await model.init();
 
-          await model.insertMany([{ name: { toString: function() { 'asdf';} } }, { name: 'john' }]);
+          await model.insertMany([{ name: 'bailey' }, { name: 'john' }]);
 
           await assert.rejects(() => {
             return model.findOne({ name: 'bailey' });

@@ -22,7 +22,7 @@ declare module 'mongoose' {
 
   /**
    * @summary Obtains schema Path type.
-   * @description Obtains Path type by separating path type from other options and calling {@link ResolvePathType}
+   * @description Obtains Path type by separating path type from other options and calling {@link ResolveRawPathType}
    * @param {PathValueType} PathValueType Document definition path type.
    * @param {TypeKey} TypeKey A generic refers to document definition.
    */
@@ -61,14 +61,14 @@ declare module 'mongoose' {
             // so we can directly obtain its path type.
             ObtainRawDocumentPathType<Item, TypeKey>[] :
             // If the type key isn't callable, then this is an array of objects, in which case
-            // we need to call ObtainDocumentType to correctly infer its type.
-            Array<ObtainDocumentType<Item, any, { typeKey: TypeKey }>> :
+            // we need to call InferRawDocType to correctly infer its type.
+            Array<InferRawDocType<Item>> :
           IsSchemaTypeFromBuiltinClass<Item> extends true ?
             ObtainRawDocumentPathType<Item, TypeKey>[] :
             IsItRecordAndNotAny<Item> extends true ?
               Item extends Record<string, never> ?
                 ObtainRawDocumentPathType<Item, TypeKey>[] :
-                Array<ObtainDocumentType<Item, any, { typeKey: TypeKey }>> :
+                Array<InferRawDocType<Item>> :
               ObtainRawDocumentPathType<Item, TypeKey>[]
       >:
       PathValueType extends ReadonlyArray<infer Item> ?
@@ -77,13 +77,13 @@ declare module 'mongoose' {
           Item extends Record<TypeKey, any> ?
             Item[TypeKey] extends Function | String ?
               ObtainRawDocumentPathType<Item, TypeKey>[] :
-              ObtainDocumentType<Item, any, { typeKey: TypeKey }>[]:
+              InferRawDocType<Item>[]:
             IsSchemaTypeFromBuiltinClass<Item> extends true ?
               ObtainRawDocumentPathType<Item, TypeKey>[] :
               IsItRecordAndNotAny<Item> extends true ?
                 Item extends Record<string, never> ?
                   ObtainRawDocumentPathType<Item, TypeKey>[] :
-                  Array<ObtainDocumentType<Item, any, { typeKey: TypeKey }>> :
+                  Array<InferRawDocType<Item>> :
                 ObtainRawDocumentPathType<Item, TypeKey>[]
         >:
         PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']> :
@@ -114,6 +114,6 @@ declare module 'mongoose' {
                                                           IfEquals<PathValueType, ObjectConstructor> extends true ? any:
                                                             IfEquals<PathValueType, {}> extends true ? any:
                                                               PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
-                                                                PathValueType extends Record<string, any> ? ObtainDocumentType<PathValueType, any, { typeKey: TypeKey }> :
+                                                                PathValueType extends Record<string, any> ? InferRawDocType<PathValueType> :
                                                                   unknown;
 }

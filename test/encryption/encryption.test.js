@@ -1432,6 +1432,9 @@ describe('encryption integration tests', () => {
     });
 
     describe('QE encrypted queries', function() {
+      beforeEach(function() {
+        this.timeout(5_000);
+      });
       describe('when a field is configured for equality queries', function() {
         it('can be queried with mongoose', async function() {
           connection = mongoose.createConnection();

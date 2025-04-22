@@ -14422,6 +14422,86 @@ describe('document', function() {
       sinon.restore();
     }
   });
+
+  it('handles selected paths on root discriminator (gh-15308)', async function() {
+    const CarSchema = new mongoose.Schema(
+      {
+        make: {
+          type: String,
+          enum: ['mercedes']
+        }
+      },
+      {
+        discriminatorKey: 'make'
+      }
+    );
+    const MercedesSchema = new mongoose.Schema({
+      vin: {
+        type: String,
+        select: false
+      },
+      sunroof: Boolean
+    });
+    const CarModel = db.model('Car', CarSchema);
+    CarModel.discriminator('Car:mercedes', MercedesSchema, 'mercedes');
+
+    const newCar = await CarModel.create({
+      make: 'mercedes',
+      vin: 'someFakeVin',
+      sunroof: true
+    });
+
+    const car = await CarModel.findById(newCar._id);
+    assert.strictEqual(car.vin, undefined);
+    assert.strictEqual(car.sunroof, true);
+  });
+
+  it('avoids double validating document arrays underneath single nested (gh-15335)', async function() {
+    let arraySubdocValidateCalls = 0;
+    let strValidateCalls = 0;
+
+    const embeddedSchema = new mongoose.Schema({
+      arrObj: {
+        type: [{
+          name: {
+            type: String,
+            validate: {
+              validator: () => {
+                ++arraySubdocValidateCalls;
+                return true;
+              }
+            }
+          }
+        }]
+      },
+      arrStr: {
+        type: [{
+          type: String,
+          validate: {
+            validator: () => {
+              ++strValidateCalls;
+              return true;
+            }
+          }
+        }]
+      }
+    });
+
+    const TestModel = db.model('Test', new Schema({ child: embeddedSchema }));
+    await TestModel.create({
+      child: {
+        arrObj: [
+          {
+            name: 'arrObj'
+          }
+        ],
+        arrStr: ['arrStr']
+      }
+    });
+    assert.strictEqual(arraySubdocValidateCalls, 1);
+    assert.strictEqual(strValidateCalls, 1);
+
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

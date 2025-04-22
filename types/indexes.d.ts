@@ -68,7 +68,7 @@ declare module 'mongoose' {
 
   type IndexOptions = Omit<mongodb.CreateIndexesOptions, 'expires' | 'weights' | 'unique'> & {
     /**
-     * `expires` utilizes the `ms` module from [guille](https://github.com/guille/) allowing us to use a friendlier syntax:
+     * `expires` utilizes the `ms` module from [vercel](https://github.com/vercel/ms) allowing us to use a friendlier syntax:
      *
      * @example
      * ```js

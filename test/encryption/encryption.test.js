@@ -1208,115 +1208,95 @@ describe('encryption integration tests', () => {
 
         await connection.openUri(clusterUri, autoEncryptionOptions());
 
-        afterEach(async function() {
-          await connection.close();
-        });
 
-        it('returns a client encryption object', async function() {
-          assert.ok(model.clientEncryption() instanceof mdb.ClientEncryption);
-        });
+      });
+      afterEach(async function() {
+        await connection.close();
+      });
 
-        it('the client encryption is usable as a key vault', async function() {
-          const clientEncryption = model.clientEncryption();
-          const dataKey = await clientEncryption.createDataKey('local');
-          const keys = await clientEncryption.getKeys().toArray();
+      it('returns a client encryption object', async function() {
+        assert.ok(model.clientEncryption() instanceof mdb.ClientEncryption);
+      });
 
-          assert.ok(keys.length > 0);
+      it('the client encryption is usable as a key vault', async function() {
+        const clientEncryption = model.clientEncryption();
+        const dataKey = await clientEncryption.createDataKey('local');
+        const keys = await clientEncryption.getKeys().toArray();
 
-          const key = keys.find(
-            ({ _id }) => _id.toString() === dataKey.toString()
-          );
+        assert.ok(keys.length > 0);
 
-          assert.ok(key);
-        });
+        const key = keys.find(
+          ({ _id }) => _id.toString() === dataKey.toString()
+        );
 
-        it('uses the same keyvaultNamespace', async function() {
-          assert.equal(model.clientEncryption()._keyVaultNamespace, 'keyvault.datakeys');
-        });
+        assert.ok(key);
+      });
 
-        it('uses the same kms providers', async function() {
-          assert.deepEqual(model.clientEncryption()._kmsProviders, { local: { key: LOCAL_KEY } });
-        });
+      it('uses the same keyvaultNamespace', async function() {
+        assert.equal(model.clientEncryption()._keyVaultNamespace, 'keyvault.datakeys');
+      });
 
-        it('uses the same proxy options', async function() {
-          const options = model.collection.conn.client.options.autoEncryption;
-          options.proxyOptions = { name: 'bailey' };
-          assert.deepEqual(model.clientEncryption()._proxyOptions, { name: 'bailey' });
-        });
+      it('uses the same kms providers', async function() {
+        assert.deepEqual(model.clientEncryption()._kmsProviders, { local: { key: LOCAL_KEY } });
+      });
 
-        it('uses the same TLS options', async function() {
-          const options = model.collection.conn.client.options.autoEncryption;
-          options.tlsOptions = {
-            tlsCAFile: 'some file'
-          };
-          assert.deepEqual(model.clientEncryption()._tlsOptions, {
-            tlsCAFile: 'some file'
-          });
-        });
+      it('uses the same proxy options', async function() {
+        const options = model.collection.conn.client.options.autoEncryption;
+        options.proxyOptions = { name: 'bailey' };
+        assert.deepEqual(model.clientEncryption()._proxyOptions, { name: 'bailey' });
+      });
 
-        it.skip('uses the same credentialProviders', async function() {
-          const options = model.collection.conn.client.options.autoEncryption;
-          const credentialProviders = {
-            aws: async() => {}
-          };
-          options.credentialProviders = credentialProviders;
-          assert.equal(model.clientEncryption()._credentialProviders, credentialProviders);
-        });
-
-        it('uses the underlying MongoClient as the keyvault client', async function() {
-          const options = model.collection.conn.client.options.autoEncryption;
-          assert.ok(model.clientEncryption()._client === options.keyVaultClient, 'client not the same');
-          assert.equal(model.clientEncryption()._keyVaultClient, options.keyVaultClient, 'keyvault client not the same');
+      it('uses the same TLS options', async function() {
+        const options = model.collection.conn.client.options.autoEncryption;
+        options.tlsOptions = {
+          tlsCAFile: 'some file'
+        };
+        assert.deepEqual(model.clientEncryption()._tlsOptions, {
+          tlsCAFile: 'some file'
         });
       });
 
+      it.skip('uses the same credentialProviders', async function() {
+        const options = model.collection.conn.client.options.autoEncryption;
+        const credentialProviders = {
+          aws: async() => {}
+        };
+        options.credentialProviders = credentialProviders;
+        assert.equal(model.clientEncryption()._credentialProviders, credentialProviders);
+      });
 
+      it('uses the underlying MongoClient as the keyvault client', async function() {
+        const options = model.collection.conn.client.options.autoEncryption;
+        assert.ok(model.clientEncryption()._client === options.keyVaultClient, 'client not the same');
+        assert.equal(model.clientEncryption()._keyVaultClient, options.keyVaultClient, 'keyvault client not the same');
+      });
     });
-    describe('auto index creation', function() {
-      let connection;
 
-      describe('CSFLE', function() {
-        it('automatically creates indexes for CSFLE models', async function() {
-          connection = mongoose.createConnection();
-          const schema = new Schema({
-            name: { type: String, encrypt: { keyId: [keyId], algorithm } },
-            age: Number
-          }, { encryptionType: 'csfle' });
-          schema.index({ age: 1 });
-          const model = connection.model(new UUID().toHexString(), schema);
-          await connection.openUri(clusterUri, autoEncryptionOptions());
+  });
 
-          await model.init();
+  describe('auto index creation', function() {
+    let connection;
 
-          const indexes = await model.listIndexes();
-          assert.ok(indexes.find(({ name }) => name === 'age_1'));
-        });
-      });
+    describe('CSFLE', function() {
+      it('automatically creates indexes for CSFLE models', async function() {
+        connection = mongoose.createConnection();
+        const schema = new Schema({
+          name: { type: String, encrypt: { keyId: [keyId], algorithm } },
+          age: Number
+        }, { encryptionType: 'csfle' });
+        schema.index({ age: 1 });
+        const model = connection.model(new UUID().toHexString(), schema);
+        await connection.openUri(clusterUri, autoEncryptionOptions());
 
+        await model.init();
 
-      describe('Queryable Encryption', function() {
-        it('automatically creates indexes for QE models', async function() {
-          connection = mongoose.createConnection();
-          const schema = new Schema({
-            name: { type: String, encrypt: { keyId } },
-            age: Number
-          }, { encryptionType: 'queryableEncryption' });
-          schema.index({ age: 1 });
-          const model = connection.model(new UUID().toHexString(), schema);
-          await connection.openUri(clusterUri, autoEncryptionOptions());
-
-          await model.init();
-
-          const indexes = await model.listIndexes();
-          assert.ok(indexes.find(({ name }) => name === 'age_1'));
-        });
+        const indexes = await model.listIndexes();
+        assert.ok(indexes.find(({ name }) => name === 'age_1'));
       });
     });
 
 
     describe('Queryable Encryption', function() {
-      let connection;
-
       it('automatically creates indexes for QE models', async function() {
         connection = mongoose.createConnection();
         const schema = new Schema({
@@ -1332,10 +1312,9 @@ describe('encryption integration tests', () => {
         const indexes = await model.listIndexes();
         assert.ok(indexes.find(({ name }) => name === 'age_1'));
       });
-
-
     });
   });
+
 
   describe('auto collection creation', function() {
     let connection;

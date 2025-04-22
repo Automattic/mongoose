@@ -1456,6 +1456,7 @@ describe('encryption integration tests', () => {
           }, { encryptionType: 'queryableEncryption' });
           const model = connection.model(new UUID().toHexString(), schema);
           await connection.openUri(clusterUri, autoEncryptionOptions());
+          await model.init();
 
           await model.insertMany([{ name: { toString: function() { 'asdf';} } }, { name: 'john' }]);
 

@@ -8,8 +8,19 @@ const { ObjectId, Double, Int32, Decimal128 } = require('bson');
 const fs = require('fs');
 const mongoose = require('../../lib');
 const { Map } = require('../../lib/types');
+const { join } = require('path');
+const { readFile } = require('fs/promises');
 
 const LOCAL_KEY = Buffer.from('Mng0NCt4ZHVUYUJCa1kxNkVyNUR1QURhZ2h2UzR2d2RrZzh0cFBwM3R6NmdWMDFBMUN3YkQ5aXRRMkhGRGdQV09wOGVNYUMxT2k3NjZKelhaQmRCZGJkTXVyZG9uSjFk', 'base64');
+
+const exists = path => {
+  try {
+    fs.statSync(path);
+    return true;
+  } catch {
+    return false;
+  }
+};
 
 /**
  * @param {object} object
@@ -22,43 +33,40 @@ function isEncryptedValue(object, property) {
 }
 
 describe('encryption integration tests', () => {
-  const cachedUri = process.env.MONGOOSE_TEST_URI;
-  const cachedLib = process.env.CRYPT_SHARED_LIB_PATH;
+  /** @type { string } */
+  let cryptSharedLibPath;
+  /** @type { string } */
+  let clusterUri;
+  before(async function() {
+    const expansionFile = join(__dirname, '../..', 'fle-cluster-config.json');
+    if (!exists(expansionFile)) {
+      throw new Error('must setup a cluster using `npm run setup-test-encryption`.');
+    }
 
-  before(function() {
-    const cwd = process.cwd();
-    const file = fs.readFileSync(cwd + '/data/mo-expansion.yml', { encoding: 'utf-8' }).trim().split('\n');
+    /**  @type { { uri: string, cryptShared: string }} */
+    const configuration = JSON.parse(await readFile(expansionFile, { encoding: 'utf-8' }));
 
-    // matches `key="value"` and extracts key and value.
-    const regex = /^(?<key>.*): "(?<value>.*)"$/;
-    const variables = Object.fromEntries(file.map((line) => regex.exec(line.trim()).groups).map(({ key, value }) => [key, value]));
-
-    process.env.CRYPT_SHARED_LIB_PATH ??= variables.CRYPT_SHARED_LIB_PATH;
-    process.env.MONGOOSE_TEST_URI ??= variables.MONGODB_URI;
-  });
-
-  after(function() {
-    process.env.CRYPT_SHARED_LIB_PATH = cachedLib;
-    process.env.MONGOOSE_TEST_URI = cachedUri;
+    cryptSharedLibPath = configuration.cryptShared;
+    clusterUri = configuration.uri;
   });
 
   describe('meta: environmental variables are correctly set up', () => {
-    it('MONGOOSE_TEST_URI is set', async function() {
-      const uri = process.env.MONGOOSE_TEST_URI;
+    it('clusterUri is set', async function() {
+      const uri = clusterUri;
       assert.ok(uri);
     });
 
-    it('MONGOOSE_TEST_URI points to running cluster', async function() {
+    it('clusterUri points to running cluster', async function() {
       try {
-        const connection = await mongoose.connect(process.env.MONGOOSE_TEST_URI);
+        const connection = await mongoose.connect(clusterUri);
         await connection.disconnect();
       } catch (error) {
         throw new Error('Unable to connect to running cluster', { cause: error });
       }
     });
 
-    it('CRYPT_SHARED_LIB_PATH is set', async function() {
-      const shared_library_path = process.env.CRYPT_SHARED_LIB_PATH;
+    it('cryptSharedLibPath is set', async function() {
+      const shared_library_path = cryptSharedLibPath;
       assert.ok(shared_library_path);
     });
   });
@@ -70,7 +78,7 @@ describe('encryption integration tests', () => {
   let utilClient;
 
   beforeEach(async function() {
-    const keyVaultClient = new mdb.MongoClient(process.env.MONGOOSE_TEST_URI);
+    const keyVaultClient = new mdb.MongoClient(clusterUri);
     await keyVaultClient.connect();
     await keyVaultClient.db('keyvault').collection('datakeys');
     const clientEncryption = new mdb.ClientEncryption(keyVaultClient, {
@@ -82,7 +90,7 @@ describe('encryption integration tests', () => {
     keyId3 = await clientEncryption.createDataKey('local');
     await keyVaultClient.close();
 
-    utilClient = new mdb.MongoClient(process.env.MONGOOSE_TEST_URI);
+    utilClient = new mdb.MongoClient(clusterUri);
   });
 
   afterEach(async function() {
@@ -143,13 +151,13 @@ describe('encryption integration tests', () => {
 
           connection = createConnection();
           model = connection.model('Schema', schema);
-          await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+          await connection.openUri(clusterUri, {
             dbName: 'db', autoEncryption: {
               keyVaultNamespace: 'keyvault.datakeys',
               kmsProviders: { local: { key: LOCAL_KEY } },
               extraOptions: {
                 cryptdSharedLibRequired: true,
-                cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+                cryptSharedLibPath: cryptSharedLibPath
               }
             }
           });
@@ -170,13 +178,13 @@ describe('encryption integration tests', () => {
 
           connection = createConnection();
           model = connection.model('Schema', schema);
-          await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+          await connection.openUri(clusterUri, {
             dbName: 'db', autoEncryption: {
               keyVaultNamespace: 'keyvault.datakeys',
               kmsProviders: { local: { key: LOCAL_KEY } },
               extraOptions: {
                 cryptdSharedLibRequired: true,
-                cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+                cryptSharedLibPath: cryptSharedLibPath
               }
             }
           });
@@ -202,13 +210,13 @@ describe('encryption integration tests', () => {
 
           connection = createConnection();
           const model = connection.model('Schema', schema);
-          await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+          await connection.openUri(clusterUri, {
             dbName: 'db', autoEncryption: {
               keyVaultNamespace: 'keyvault.datakeys',
               kmsProviders: { local: { key: LOCAL_KEY } },
               extraOptions: {
                 cryptdSharedLibRequired: true,
-                cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+                cryptSharedLibPath: cryptSharedLibPath
               }
             }
           });
@@ -243,13 +251,13 @@ describe('encryption integration tests', () => {
 
           connection = createConnection();
           const model = connection.model('Schema', schema);
-          await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+          await connection.openUri(clusterUri, {
             dbName: 'db', autoEncryption: {
               keyVaultNamespace: 'keyvault.datakeys',
               kmsProviders: { local: { key: LOCAL_KEY } },
               extraOptions: {
                 cryptdSharedLibRequired: true,
-                cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+                cryptSharedLibPath: cryptSharedLibPath
               }
             }
           });
@@ -370,13 +378,13 @@ describe('encryption integration tests', () => {
           it('encrypts and decrypts', async function() {
             const { model } = modelFactory();
 
-            await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+            await connection.openUri(clusterUri, {
               dbName: 'db', autoEncryption: {
                 keyVaultNamespace: 'keyvault.datakeys',
                 kmsProviders: { local: { key: LOCAL_KEY } },
                 extraOptions: {
                   cryptdSharedLibRequired: true,
-                  cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+                  cryptSharedLibPath: cryptSharedLibPath
                 }
               }
             });
@@ -411,13 +419,13 @@ describe('encryption integration tests', () => {
 
           connection = createConnection();
           const model = connection.model('Schema', schema);
-          await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+          await connection.openUri(clusterUri, {
             dbName: 'db', autoEncryption: {
               keyVaultNamespace: 'keyvault.datakeys',
               kmsProviders: { local: { key: LOCAL_KEY } },
               extraOptions: {
                 cryptdSharedLibRequired: true,
-                cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+                cryptSharedLibPath: cryptSharedLibPath
               }
             }
           });
@@ -450,13 +458,13 @@ describe('encryption integration tests', () => {
 
           connection = createConnection();
           const model = connection.model('Schema', schema);
-          await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+          await connection.openUri(clusterUri, {
             dbName: 'db', autoEncryption: {
               keyVaultNamespace: 'keyvault.datakeys',
               kmsProviders: { local: { key: LOCAL_KEY } },
               extraOptions: {
                 cryptdSharedLibRequired: true,
-                cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+                cryptSharedLibPath: cryptSharedLibPath
               }
             }
           });
@@ -486,13 +494,13 @@ describe('encryption integration tests', () => {
           });
 
           connection = createConnection();
-          const model = connection.model('Schema', schema); await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+          const model = connection.model('Schema', schema); await connection.openUri(clusterUri, {
             dbName: 'db', autoEncryption: {
               keyVaultNamespace: 'keyvault.datakeys',
               kmsProviders: { local: { key: LOCAL_KEY } },
               extraOptions: {
                 cryptdSharedLibRequired: true,
-                cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+                cryptSharedLibPath: cryptSharedLibPath
               }
             }
           });
@@ -524,13 +532,13 @@ describe('encryption integration tests', () => {
 
           connection = createConnection();
           const model = connection.model('Schema', schema);
-          await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+          await connection.openUri(clusterUri, {
             dbName: 'db', autoEncryption: {
               keyVaultNamespace: 'keyvault.datakeys',
               kmsProviders: { local: { key: LOCAL_KEY } },
               extraOptions: {
                 cryptdSharedLibRequired: true,
-                cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+                cryptSharedLibPath: cryptSharedLibPath
               }
             }
           });
@@ -614,13 +622,13 @@ describe('encryption integration tests', () => {
         describe(description, function() {
           it('encrypts and decrypts', async function() {
             const { model } = modelFactory();
-            await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+            await connection.openUri(clusterUri, {
               dbName: 'db', autoEncryption: {
                 keyVaultNamespace: 'keyvault.datakeys',
                 kmsProviders: { local: { key: LOCAL_KEY } },
                 extraOptions: {
                   cryptdSharedLibRequired: true,
-                  cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+                  cryptSharedLibPath: cryptSharedLibPath
                 }
               }
             });
@@ -705,13 +713,13 @@ describe('encryption integration tests', () => {
         describe(description, function() {
           it('encrypts and decrypts', async function() {
             const { model1, model2 } = modelFactory();
-            await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+            await connection.openUri(clusterUri, {
               dbName: 'db', autoEncryption: {
                 keyVaultNamespace: 'keyvault.datakeys',
                 kmsProviders: { local: { key: LOCAL_KEY } },
                 extraOptions: {
                   cryptdSharedLibRequired: true,
-                  cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+                  cryptSharedLibPath: cryptSharedLibPath
                 }
               }
             });
@@ -766,13 +774,13 @@ describe('encryption integration tests', () => {
         }, {
           encryptionType: 'csfle'
         }));
-        await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+        await connection.openUri(clusterUri, {
           dbName: 'db', autoEncryption: {
             keyVaultNamespace: 'keyvault.datakeys',
             kmsProviders: { local: { key: LOCAL_KEY } },
             extraOptions: {
               cryptdSharedLibRequired: true,
-              cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+              cryptSharedLibPath: cryptSharedLibPath
             }
           }
         });
@@ -833,13 +841,13 @@ describe('encryption integration tests', () => {
           }));
 
 
-          await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+          await connection.openUri(clusterUri, {
             dbName: 'db', autoEncryption: {
               keyVaultNamespace: 'keyvault.datakeys',
               kmsProviders: { local: { key: LOCAL_KEY } },
               extraOptions: {
                 cryptdSharedLibRequired: true,
-                cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+                cryptSharedLibPath: cryptSharedLibPath
               }
             }
           });
@@ -914,13 +922,13 @@ describe('encryption integration tests', () => {
             encryptionType: 'queryableEncryption'
           }));
 
-          await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+          await connection.openUri(clusterUri, {
             dbName: 'db', autoEncryption: {
               keyVaultNamespace: 'keyvault.datakeys',
               kmsProviders: { local: { key: LOCAL_KEY } },
               extraOptions: {
                 cryptdSharedLibRequired: true,
-                cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+                cryptSharedLibPath: cryptSharedLibPath
               }
             }
           });
@@ -996,13 +1004,13 @@ describe('encryption integration tests', () => {
               encryptionType: 'csfle'
             }));
 
-            const error = await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+            const error = await connection.openUri(clusterUri, {
               dbName: 'db', autoEncryption: {
                 keyVaultNamespace: 'keyvault.datakeys',
                 kmsProviders: { local: { key: LOCAL_KEY } },
                 extraOptions: {
                   cryptdSharedLibRequired: true,
-                  cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+                  cryptSharedLibPath: cryptSharedLibPath
                 }
               }
             }).catch(e => e);
@@ -1057,13 +1065,13 @@ describe('encryption integration tests', () => {
               encryptionType: 'queryableEncryption'
             }));
 
-            const error = await connection.openUri(process.env.MONGOOSE_TEST_URI, {
+            const error = await connection.openUri(clusterUri, {
               dbName: 'db', autoEncryption: {
                 keyVaultNamespace: 'keyvault.datakeys',
                 kmsProviders: { local: { key: LOCAL_KEY } },
                 extraOptions: {
                   cryptdSharedLibRequired: true,
-                  cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+                  cryptSharedLibPath: cryptSharedLibPath
                 }
               }
             }).catch(e => e);
@@ -1246,13 +1254,13 @@ describe('encryption integration tests', () => {
       });
 
       const model = mongoose.model('Schema', schema);
-      await mongoose.connect(process.env.MONGOOSE_TEST_URI, {
+      await mongoose.connect(clusterUri, {
         dbName: 'db', autoEncryption: {
           keyVaultNamespace: 'keyvault.datakeys',
           kmsProviders: { local: { key: LOCAL_KEY } },
           extraOptions: {
             cryptdSharedLibRequired: true,
-            cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+            cryptSharedLibPath: cryptSharedLibPath
           }
         }
       });
@@ -1286,13 +1294,13 @@ describe('encryption integration tests', () => {
       });
 
       const model = mongoose.model('Schema', schema);
-      await mongoose.connect(process.env.MONGOOSE_TEST_URI, {
+      await mongoose.connect(clusterUri, {
         dbName: 'db', autoEncryption: {
           keyVaultNamespace: 'keyvault.datakeys',
           kmsProviders: { local: { key: LOCAL_KEY } },
           extraOptions: {
             cryptdSharedLibRequired: true,
-            cryptSharedLibPath: process.env.CRYPT_SHARED_LIB_PATH
+            cryptSharedLibPath: cryptSharedLibPath
           }
         }
       });

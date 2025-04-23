@@ -258,7 +258,7 @@ cursor.<span class="hljs-title function_">next</span>(<span class="hljs-keyword"
 <span class="method-type">&laquo;Object|Query&raquo;</span> mongodb selector</p>
 </li><li class="param"><code>[options]</code>
 <span class="method-type">&laquo;Object&raquo;</span> optional see <a href="#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/DeleteResult.html">DeleteResult</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#deleteMany">deleteMany</a></span></li></ul><div><p>Declare and/or execute this query as a <code>deleteMany()</code> operation. Works like
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/6.15/interfaces/DeleteResult.html">DeleteResult</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/6.15/classes/Collection.html#deleteMany">deleteMany</a></span></li></ul><div><p>Declare and/or execute this query as a <code>deleteMany()</code> operation. Works like
 remove, except it deletes <em>every</em> document that matches <code>filter</code> in the
 collection, regardless of the value of <code>single</code>.</p>
 <p>This function triggers <code>deleteMany</code> middleware.</p>
@@ -267,13 +267,12 @@ collection, regardless of the value of <code>single</code>.</p>
           Example:
         </a>
       </h4>
-<pre><code lang="javascript"><span class="hljs-keyword">await</span> <span class="hljs-title class_">Character</span>.<span class="hljs-title function_">deleteMany</span>({ <span class="hljs-attr">name</span>: <span class="hljs-regexp">/Stark/</span>, <span class="hljs-attr">age</span>: { <span class="hljs-attr">$gte</span>: <span class="hljs-number">18</span> } });</code></pre><p>This function calls the MongoDB driver&#39;s <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#deleteMany"><code>Collection#deleteMany()</code> function</a>.
+<pre><code lang="javascript"><span class="hljs-keyword">await</span> <span class="hljs-title class_">Character</span>.<span class="hljs-title function_">deleteMany</span>({ <span class="hljs-attr">name</span>: <span class="hljs-regexp">/Stark/</span>, <span class="hljs-attr">age</span>: { <span class="hljs-attr">$gte</span>: <span class="hljs-number">18</span> } });</code></pre><p>This function calls the MongoDB driver&#39;s <a href="https://mongodb.github.io/node-mongodb-native/6.15/classes/Collection.html#deleteMany"><code>Collection#deleteMany()</code> function</a>.
 The returned <a href="/docs/queries.html">promise</a> resolves to an
-object that contains 3 properties:</p>
+object that contains 2 properties:</p>
 <ul>
-<li><code>ok</code>: <code>1</code> if no errors occurred</li>
+<li><code>acknowledged</code>: boolean</li>
 <li><code>deletedCount</code>: the number of documents deleted</li>
-<li><code>n</code>: the number of documents deleted. Equal to <code>deletedCount</code>.</li>
 </ul>
 <h4 id="example">
         <a href="#example">
@@ -286,7 +285,7 @@ res.<span class="hljs-property">deletedCount</span>;</code></pre>  </div><hr cla
 <span class="method-type">&laquo;Object|Query&raquo;</span> mongodb selector</p>
 </li><li class="param"><code>[options]</code>
 <span class="method-type">&laquo;Object&raquo;</span> optional see <a href="#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/DeleteResult.html">DeleteResult</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#deleteOne">deleteOne</a></span></li></ul><div><p>Declare and/or execute this query as a <code>deleteOne()</code> operation. Works like
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> this</li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/6.15/interfaces/DeleteResult.html">DeleteResult</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/6.15/classes/Collection.html#deleteOne">deleteOne</a></span></li></ul><div><p>Declare and/or execute this query as a <code>deleteOne()</code> operation. Works like
 remove, except it deletes at most one document regardless of the <code>single</code>
 option.</p>
 <p>This function triggers <code>deleteOne</code> middleware.</p>
@@ -295,13 +294,12 @@ option.</p>
           Example:
         </a>
       </h4>
-<pre><code lang="javascript"><span class="hljs-keyword">await</span> <span class="hljs-title class_">Character</span>.<span class="hljs-title function_">deleteOne</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Eddard Stark&#x27;</span> });</code></pre><p>This function calls the MongoDB driver&#39;s <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#deleteOne"><code>Collection#deleteOne()</code> function</a>.
+<pre><code lang="javascript"><span class="hljs-keyword">await</span> <span class="hljs-title class_">Character</span>.<span class="hljs-title function_">deleteOne</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Eddard Stark&#x27;</span> });</code></pre><p>This function calls the MongoDB driver&#39;s <a href="https://mongodb.github.io/node-mongodb-native/6.15/classes/Collection.html#deleteOne"><code>Collection#deleteOne()</code> function</a>.
 The returned <a href="/docs/queries.html">promise</a> resolves to an
-object that contains 3 properties:</p>
+object that contains 2 properties:</p>
 <ul>
-<li><code>ok</code>: <code>1</code> if no errors occurred</li>
+<li><code>acknowledged</code>: boolean</li>
 <li><code>deletedCount</code>: the number of documents deleted</li>
-<li><code>n</code>: the number of documents deleted. Equal to <code>deletedCount</code>.</li>
 </ul>
 <h4 id="example">
         <a href="#example">

@@ -154,3 +154,20 @@ function schemaInstanceMethodsAndQueryHelpersOnConnection() {
 
   const TestModel = connection.model<User, UserModel, UserQueryHelpers>('User', userSchema);
 }
+
+async function gh15359() {
+  const res = await conn.bulkWrite([{ model: 'Test', name: 'insertOne', document: { name: 'test1' } }]);
+  expectType<number>(res.insertedCount);
+  expectError(res.mongoose.validationErrors);
+
+  const res2 = await conn.bulkWrite([{ model: 'Test', name: 'insertOne', document: { name: 'test2' } }], { ordered: false });
+  expectType<number>(res2.insertedCount);
+  expectType<Error[] | undefined>(res2.mongoose?.validationErrors);
+
+  const res3 = await conn.bulkWrite([
+    { model: 'Test', name: 'updateOne', filter: { name: 'test5' }, update: { $set: { num: 42 } } },
+    { model: 'Test', name: 'updateOne', filter: { name: 'test4' }, update: { $set: { num: 'not a number' } } }
+  ], { ordered: false });
+  expectType<number>(res3.insertedCount);
+  expectType<Error[] | undefined>(res3.mongoose?.validationErrors);
+}

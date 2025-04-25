@@ -1,3 +1,14 @@
+8.14.0 / 2025-04-25
+===================
+ * feat: upgrade MongoDB driver -> 6.16 #15371
+ * feat: implement Query findById methods #15337 [sderrow](https://github.com/sderrow)
+ * feat(subdocument): support schematype-level minimize option to disable minimizing empty subdocuments #15336 #15313
+ * feat: add skipOriginalStackTraces option to avoid stack trace performance overhead #15345 #15194
+ * fix(model): disallow Model.findOneAndUpdate(update) and fix TypeScript types re: findOneAndUpdate #15365 #15363
+ * types: correctly recurse in InferRawDocType #15357 #14954 [JavaScriptBach](https://github.com/JavaScriptBach)
+ * types: include virtuals in toJSON and toObject output if virtuals: true set #15346 #15316
+ * types: make init hooks types accurately reflect runtime behavior #15331 #15301
+
 8.13.3 / 2025-04-24
 ===================
  * fix: export MongooseBulkSaveIncompleteError #15370 #15369

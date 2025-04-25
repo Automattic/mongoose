@@ -1705,7 +1705,8 @@ describe('connections:', function() {
     const Test = db.model('Test', new Schema({ name: { type: String, required: true } }));
 
     await Test.deleteMany({});
-    await db.bulkWrite([{ model: 'Test', name: 'insertOne', document: { name: 'test1' } }]);
+    const res = await db.bulkWrite([{ model: 'Test', name: 'insertOne', document: { name: 'test1' } }]);
+    assert.equal(res.insertedCount, 1);
     assert.ok(await Test.exists({ name: 'test1' }));
 
     await db.bulkWrite([{ model: Test, name: 'insertOne', document: { name: 'test2' } }]);

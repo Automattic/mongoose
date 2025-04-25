@@ -124,7 +124,7 @@ declare module 'mongoose' {
     pipeline(): PipelineStage[];
 
     /** Appends a new $project operator to this aggregate pipeline. */
-    project(arg: PipelineStage.Project['$project']): this;
+    project(arg: PipelineStage.Project['$project'] | string): this;
 
     /** Sets the readPreference option for the aggregation query. */
     read(pref: mongodb.ReadPreferenceLike): this;

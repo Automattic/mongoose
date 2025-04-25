@@ -4412,4 +4412,47 @@ describe('Query', function() {
       assert.strictEqual(doc.passwordHash, undefined);
     });
   });
+
+  describe('findById(andUpdate/andDelete)', function() {
+    let Person;
+    let _id;
+    const targetName = 'Charlie';
+
+    beforeEach(async function() {
+      const schema = new Schema({ name: String, age: Number });
+      Person = db.model('Person', schema);
+
+      const people = await Person.create([
+        { name: 'Alice', age: 10 },
+        { name: 'Bob', age: 20 },
+        { name: targetName, age: 30 },
+        { name: 'Dave', age: 40 }
+      ]);
+      _id = people[2]._id;
+    });
+
+    it('findById returns null for undefined', async function() {
+      const queryUndefined = await Person.find({}).findById(undefined);
+      assert.strictEqual(queryUndefined, null);
+    });
+
+    it('findById returns document for valid _id', async function() {
+      const target = await Person.find({}).findById(_id);
+      assert.strictEqual(target?.name, targetName);
+    });
+
+    it('findByIdAndUpdate updates and returns the updated document', async function() {
+      const updatedAge = 50;
+      const updatedTarget = await Person.find({}).findByIdAndUpdate(_id, { age: updatedAge }, { new: true });
+      assert.strictEqual(updatedTarget?.age, updatedAge);
+    });
+
+    it('findByIdAndDelete deletes and returns the deleted document', async function() {
+      const deletedTarget = await Person.find({}).findByIdAndDelete(_id);
+      assert.strictEqual(deletedTarget?.name, targetName);
+
+      const target = await Person.find({}).findById(_id);
+      assert.strictEqual(target, null);
+    });
+  });
 });

@@ -97,7 +97,7 @@ declare module 'mongoose' {
      * The default value for this path. If a function, Mongoose executes the function
      * and uses the return value as the default.
      */
-    default?: DefaultType<T> | ((this: EnforcedDocType, doc: any) => DefaultType<T>) | null;
+    default?: DefaultType<T> | ((this: EnforcedDocType, doc: any) => DefaultType<T> | null | undefined) | null;
 
     /**
      * The model that `populate()` should use if populating this path.
@@ -172,6 +172,9 @@ declare module 'mongoose' {
 
     /** The maximum value allowed for this path. Only allowed for numbers and dates. */
     max?: number | NativeDate | [number, string] | [NativeDate, string] | readonly [number, string] | readonly [NativeDate, string];
+
+    /** Set to false to disable minimizing empty single nested subdocuments by default */
+    minimize?: boolean;
 
     /** Defines a TTL index on this path. Only allowed for dates. */
     expires?: string | number;

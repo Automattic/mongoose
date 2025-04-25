@@ -7,6 +7,7 @@
 const start = require('./common');
 
 const assert = require('assert');
+const { randomUUID } = require('crypto');
 const utils = require('../lib/utils');
 const util = require('./util');
 const MongooseError = require('../lib/error/mongooseError');
@@ -11422,5 +11423,44 @@ describe('model: populate:', function() {
     assert.equal(parent.children[0].name, 'Child test updated 2');
 
     await m.disconnect();
+  });
+
+  it('handles populating UUID fields (gh-15315)', async function() {
+    const categorySchema = new Schema({
+      _id: { type: 'UUID', default: () => randomUUID() },
+      name: { type: String, required: true },
+      desc: { type: String, required: true }
+    });
+
+    categorySchema.virtual('announcements', {
+      ref: 'Announcement',
+      localField: '_id',
+      foreignField: 'categories'
+    });
+
+    const announcementSchema = new Schema({
+      _id: { type: 'UUID', default: () => randomUUID() },
+      title: { type: String, required: true },
+      content: { type: String, required: true },
+      validUntil: { type: Date, required: true },
+      important: { type: Boolean, default: false },
+      categories: [{ type: 'UUID', ref: 'Category' }]
+    });
+
+    const Category = db.model('Category', categorySchema);
+    const Announcement = db.model('Announcement', announcementSchema);
+
+    const category = await Category.create({ name: 'Tech', desc: 'Technology News' });
+
+    await Announcement.create({
+      title: 'New Tech Release',
+      content: 'Details about the new tech release',
+      validUntil: new Date(),
+      categories: [category._id]
+    });
+
+    const populatedCategory = await Category.findOne({ _id: category._id }).populate('announcements');
+    assert.strictEqual(populatedCategory.announcements.length, 1);
+    assert.strictEqual(populatedCategory.announcements[0].title, 'New Tech Release');
   });
 });

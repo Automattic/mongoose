@@ -1,3 +1,47 @@
+8.14.0 / 2025-04-25
+===================
+ * feat: upgrade MongoDB driver -> 6.16 #15371
+ * feat: implement Query findById methods #15337 [sderrow](https://github.com/sderrow)
+ * feat(subdocument): support schematype-level minimize option to disable minimizing empty subdocuments #15336 #15313
+ * feat: add skipOriginalStackTraces option to avoid stack trace performance overhead #15345 #15194
+ * fix(model): disallow Model.findOneAndUpdate(update) and fix TypeScript types re: findOneAndUpdate #15365 #15363
+ * types: correctly recurse in InferRawDocType #15357 #14954 [JavaScriptBach](https://github.com/JavaScriptBach)
+ * types: include virtuals in toJSON and toObject output if virtuals: true set #15346 #15316
+ * types: make init hooks types accurately reflect runtime behavior #15331 #15301
+
+8.13.3 / 2025-04-24
+===================
+ * fix: export MongooseBulkSaveIncompleteError #15370 #15369
+ * fix: clone POJOs and arrays when casting query filter to avoid mutating objects #15367 #15364
+ * types(connection): add Connection.prototype.bulkWrite() to types #15368 #15359
+ * docs: add version requirements to v7 migration docs #15361 [SethFalco](https://github.com/SethFalco)
+ * docs: update links in deleteOne & deleteMany API def #15360 [Elliot67](https://github.com/Elliot67)
+ * docs: adds Model#count to list of fns callback removed from #15349 [SethFalco](https://github.com/SethFalco)
+
+8.13.2 / 2025-04-03
+===================
+ * fix: avoid double calling validators on paths in document arrays underneath subdocuments #15338 #15335
+
+8.13.1 / 2025-03-28
+===================
+ * fix(populate): handle virtual populate on array of UUIDs #15329 #15315
+ * types: allow default function returning undefined with DocType override #15328
+
+8.13.0 / 2025-03-24
+===================
+ * feat: bump mongodb driver -> 6.15.0
+ * feat: support custom types exported from driver #15321
+
+8.12.2 / 2025-03-21
+===================
+ * fix(document): avoid stripping out fields in discriminator schema after select: false field #15322 #15308
+ * fix(AggregationCursor): make next() error if schema pre('aggregate') middleware throws error #15293 #15279
+ * fix(populate): correctly get schematypes when deep populating under a map #15302 #9359
+ * fix(model): avoid returning null from bulkSave() if error doesn't have writeErrors property #15323
+ * types: add WithTimestamps utility type #15318 [baruchiro](https://github.com/baruchiro)
+ * docs: update references to the ms module in date schema documentation #15319 [baruchiro](https://github.com/baruchiro)
+ * docs: fix typo in schematypes.md #15305 [skyran1278](https://github.com/skyran1278)
+
 8.12.1 / 2025-03-04
 ===================
  * fix: match bson version with mongodb's bson version #15297 [hasezoey](https://github.com/hasezoey)

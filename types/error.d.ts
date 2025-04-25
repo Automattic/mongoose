@@ -129,5 +129,12 @@ declare module 'mongoose' {
       name: 'StrictPopulateError';
       path: string;
     }
+
+    export class MongooseBulkSaveIncompleteError extends MongooseError {
+      name: 'MongooseBulkSaveIncompleteError';
+      modelName: string;
+      bulkWriteResult: mongodb.BulkWriteResult;
+      numDocumentsNotUpdated: number;
+    }
   }
 }

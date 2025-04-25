@@ -11,6 +11,7 @@ you should be aware of when migrating from Mongoose 6.x to Mongoose 7.x.
 
 If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration guide](migrating_to_6.html) and upgrade to Mongoose 6.x first.
 
+* [Version Requirements](#version-requirements)
 * [`strictQuery`](#strictquery)
 * [Removed `remove()`](#removed-remove)
 * [Dropped callback support](#dropped-callback-support)
@@ -27,6 +28,12 @@ If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration 
 * [TypeScript-specific changes](#typescript-specific-changes)
   * [Removed `LeanDocument` and support for `extends Document`](#removed-leandocument-and-support-for-extends-document)
   * [New parameters for `HydratedDocument`](#new-parameters-for-hydrateddocument)
+
+## Version Requirements {#version-requirements}
+
+Mongoose now requires Node.js >= 14.0.0 and MongoDB Node Driver >= 5.0.0.
+
+See [the MongoDB Node Driver migration guide](https://github.com/mongodb/node-mongodb-native/blob/main/etc/notes/CHANGES_5.0.0.md) for detailed info.
 
 ## `strictQuery` {#strictquery}
 
@@ -106,6 +113,7 @@ They always return promises.
 * `Model.aggregate`
 * `Model.bulkWrite`
 * `Model.cleanIndexes`
+* `Model.count`
 * `Model.countDocuments`
 * `Model.create`
 * `Model.createCollection`
@@ -130,6 +138,7 @@ They always return promises.
 * `Model.syncIndexes`
 * `Model.updateMany`
 * `Model.updateOne`
+* `Query.prototype.count`
 * `Query.prototype.find`
 * `Query.prototype.findOne`
 * `Query.prototype.findOneAndDelete`
@@ -156,7 +165,7 @@ conn.startSession(function(err, session) {
 // After
 const session = await conn.startSession();
 // Or:
-conn.startSession().then(sesson => { /* ... */ });
+conn.startSession().then(session => { /* ... */ });
 
 // With error handling
 try {

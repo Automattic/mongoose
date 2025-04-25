@@ -58,11 +58,33 @@ declare module 'mongoose' {
     sanitizeFilter?: boolean;
   }
 
+  export type AnyConnectionBulkWriteModel<TSchema extends AnyObject> = Omit<mongodb.ClientInsertOneModel<TSchema>, 'namespace'>
+    | Omit<mongodb.ClientReplaceOneModel<TSchema>, 'namespace'>
+    | Omit<mongodb.ClientUpdateOneModel<TSchema>, 'namespace'>
+    | Omit<mongodb.ClientUpdateManyModel<TSchema>, 'namespace'>
+    | Omit<mongodb.ClientDeleteOneModel<TSchema>, 'namespace'>
+    | Omit<mongodb.ClientDeleteManyModel<TSchema>, 'namespace'>;
+
+  export type ConnectionBulkWriteModel<SchemaMap extends Record<string, AnyObject> = Record<string, AnyObject>> = {
+      [ModelName in keyof SchemaMap]: AnyConnectionBulkWriteModel<SchemaMap[ModelName]> & {
+          model: ModelName;
+      };
+  }[keyof SchemaMap];
+
   class Connection extends events.EventEmitter implements SessionStarter {
     aggregate<ResultType = unknown>(pipeline?: PipelineStage[] | null, options?: AggregateOptions): Aggregate<Array<ResultType>>;
 
     /** Returns a promise that resolves when this connection successfully connects to MongoDB */
     asPromise(): Promise<this>;
+
+    bulkWrite<TSchemaMap extends Record<string, AnyObject>>(
+      ops: Array<ConnectionBulkWriteModel<TSchemaMap>>,
+      options: mongodb.ClientBulkWriteOptions & { ordered: false }
+    ): Promise<mongodb.ClientBulkWriteResult & { mongoose?: { validationErrors: Error[], results: Array<Error | mongodb.WriteError | null> } }>;
+    bulkWrite<TSchemaMap extends Record<string, AnyObject>>(
+      ops: Array<ConnectionBulkWriteModel<TSchemaMap>>,
+      options?: mongodb.ClientBulkWriteOptions
+    ): Promise<mongodb.ClientBulkWriteResult>;
 
     /** Closes the connection */
     close(force?: boolean): Promise<void>;

@@ -727,7 +727,7 @@ declare module 'mongoose' {
   type SpecialTypes = DateSchemaDefinition | Date | globalThis.Date | DateConstructor | Types.Buffer | Types.Decimal128 | Types.Buffer | BooleanSchemaDefinition | NumberSchemaDefinition;
   type Replacer<T> = T extends SpecialTypes ? string : T;
   /**
-   * Date type is like a Primitiv type for us and we do not want to project something inside it.
+   * Date type is like a Primitive type for us and we do not want to project something inside it.
    * ObjectId is also similar.
    */
   type ReplaceSpecialTypes<T> = T extends SpecialTypes

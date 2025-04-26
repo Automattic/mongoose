@@ -732,7 +732,7 @@ declare module 'mongoose' {
     : T extends object
       ? { [K in keyof T]: ExtractNestedArrayElement<T[K]> }
       : T;
-  type DotnotationMaximumDepth = 4;
+  type DotnotationMaximumDepth = 3;
   /**
    * Create dot path for nested objects
    * It creates dot notation for arrays similar to mongodb. For example { a: { c: { b: number}[] }[] } => 'a.c.b': number, 'a.c': { b: number }[]

@@ -21,7 +21,7 @@ describe('parallelLimit', function() {
       return finished;
     };
 
-    const results = await parallelLimit(params, async (param, index) => {
+    const results = await parallelLimit(params, async(param, index) => {
       if (index === 2) {
         assert.equal(started, 2);
         assert.ok(finished > 0);

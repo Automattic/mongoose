@@ -67,3 +67,44 @@ schema.pre('save', function(next, arg) {
 ```
 
 In Mongoose 9, `next(null, 'new arg')` doesn't overwrite the args to the next middleware.
+
+## Subdocument `deleteOne()` hooks execute only when subdocument is deleted
+
+Currently, calling `deleteOne()` on a subdocument will execute the `deleteOne()` hooks on the subdocument regardless of whether the subdocument is actually deleted.
+
+```javascript
+const SubSchema = new Schema({
+  myValue: {
+    type: String
+  }
+}, {});
+let count = 0;
+SubSchema.pre('deleteOne', { document: true, query: false }, function(next) {
+  count++;
+  next();
+});
+const schema = new Schema({
+  foo: {
+    type: String,
+    required: true
+  },
+  mySubdoc: {
+    type: [SubSchema],
+    required: true
+  }
+}, { minimize: false, collection: 'test' });
+
+const Model = db.model('TestModel', schema);
+
+const newModel = {
+  foo: 'bar',
+  mySubdoc: [{ myValue: 'some value' }]
+};
+const doc = await Model.create(newModel);
+
+// In Mongoose 8, the following would trigger the `deleteOne` hook, even if `doc` is not saved or deleted.
+doc.mySubdoc[0].deleteOne();
+
+// In Mongoose 9, you would need to either `save()` or `deleteOne()` on `doc` to trigger the subdocument `deleteOne` hook.
+await doc.save();
+```

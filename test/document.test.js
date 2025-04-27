@@ -14539,6 +14539,22 @@ describe('document', function() {
       assert.ok(err.stack.includes('asyncPreUpdateOneErrors'), err.stack);
     });
 
+    it('works with updateOne server errors', async function updateOneServerErrors() {
+      const userSchema = new mongoose.Schema({
+        name: { type: String, unique: true },
+        age: Number
+      });
+      const User = db.model('User', userSchema);
+      await User.init();
+      const doc = new User({ name: 'A' });
+      await doc.save();
+      await User.create({ name: 'B' });
+      const err = await doc.updateOne({ name: 'B' }).then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.name, 'MongoServerError');
+      assert.ok(err.stack.includes('updateOneServerErrors'), err.stack);
+    });
+
     it('works with async post updateOne errors', async function asyncPostUpdateOneErrors() {
       const userSchema = new mongoose.Schema({
         name: String,

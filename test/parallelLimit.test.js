@@ -4,46 +4,33 @@ const assert = require('assert');
 const parallelLimit = require('../lib/helpers/parallelLimit');
 
 describe('parallelLimit', function() {
-  it('works with zero functions', function(done) {
-    parallelLimit([], 1, (err, res) => {
-      assert.ifError(err);
-      assert.deepEqual(res, []);
-      done();
-    });
+  it('works with zero functions', async function() {
+    const results = await parallelLimit([], value => Promise.resolve(value), 1);
+    assert.deepEqual(results, []);
   });
 
-  it('executes functions in parallel', function(done) {
+  it('executes functions in parallel', async function() {
     let started = 0;
     let finished = 0;
-    const fns = [
-      cb => {
-        ++started;
-        setTimeout(() => {
-          ++finished;
-          setTimeout(cb, 0);
-        }, 100);
-      },
-      cb => {
-        ++started;
-        setTimeout(() => {
-          ++finished;
-          setTimeout(cb, 0);
-        }, 100);
-      },
-      cb => {
+    const params = [1, 2, 3];
+
+    const fn = async() => {
+      ++started;
+      await new Promise(resolve => setTimeout(resolve, 10));
+      ++finished;
+      return finished;
+    };
+
+    const results = await parallelLimit(params, async (param, index) => {
+      if (index === 2) {
         assert.equal(started, 2);
         assert.ok(finished > 0);
-        ++started;
-        ++finished;
-        setTimeout(cb, 0);
       }
-    ];
+      return fn();
+    }, 2);
 
-    parallelLimit(fns, 2, (err) => {
-      assert.ifError(err);
-      assert.equal(started, 3);
-      assert.equal(finished, 3);
-      done();
-    });
+    assert.equal(started, 3);
+    assert.equal(finished, 3);
+    assert.deepStrictEqual(results, [1, 2, 3]);
   });
 });

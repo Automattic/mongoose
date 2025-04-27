@@ -10139,6 +10139,7 @@ describe('document', function() {
     };
     const document = await Model.create(newModel);
     document.mySubdoc[0].deleteOne();
+    // Set timeout to make sure that we aren't calling the deleteOne hooks synchronously
     await new Promise(resolve => setTimeout(resolve, 10));
     assert.equal(count, 0);
     await document.save().catch((error) => {

@@ -10139,6 +10139,8 @@ describe('document', function() {
     };
     const document = await Model.create(newModel);
     document.mySubdoc[0].deleteOne();
+    await new Promise(resolve => setTimeout(resolve, 10));
+    assert.equal(count, 0);
     await document.save().catch((error) => {
       console.error(error);
     });
@@ -14454,6 +14456,26 @@ describe('document', function() {
       assert.ok(err.stack.includes('asyncPreSaveErrors'), err.stack);
     });
 
+    it('works with async pre save errors on subdocuments', async function asyncSubdocPreSaveErrors() {
+      const addressSchema = new mongoose.Schema({
+        street: String
+      });
+      addressSchema.pre('save', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('subdoc pre save error');
+      });
+      const userSchema = new mongoose.Schema({
+        name: String,
+        address: addressSchema
+      });
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'A', address: { street: 'Main St' } });
+      const err = await doc.save().then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'subdoc pre save error');
+      assert.ok(err.stack.includes('asyncSubdocPreSaveErrors'), err.stack);
+    });
+
     it('works with save server errors', async function saveServerErrors() {
       const userSchema = new mongoose.Schema({
         name: { type: String, unique: true },
@@ -14571,6 +14593,27 @@ describe('document', function() {
       assert.ok(err instanceof Error);
       assert.equal(err.message, 'post updateOne error');
       assert.ok(err.stack.includes('asyncPostUpdateOneErrors'), err.stack);
+    });
+
+    it('works with async pre deleteOne errors on subdocuments', async function asyncSubdocPreDeleteOneErrors() {
+      const addressSchema = new mongoose.Schema({
+        street: String
+      });
+      addressSchema.post('deleteOne', { document: true, query: false }, async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('subdoc pre deleteOne error');
+      });
+      const userSchema = new mongoose.Schema({
+        name: String,
+        address: addressSchema
+      });
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'A', address: { street: 'Main St' } });
+      await doc.save();
+      const err = await doc.deleteOne().then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'subdoc pre deleteOne error');
+      assert.ok(err.stack.includes('asyncSubdocPreDeleteOneErrors'), err.stack);
     });
 
     it('works with async pre find errors', async function asyncPreFindErrors() {

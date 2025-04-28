@@ -109,9 +109,101 @@ doc.mySubdoc[0].deleteOne();
 await doc.save();
 ```
 
+## Hooks for custom methods and statics no longer support callbacks
+
+Previously, you could use Mongoose middleware with custom methods and statics that took callbacks.
+In Mongoose 9, this is no longer supported.
+If you want to use Mongoose middleware with a custom method or static, that custom method or static must be an async function or return a Promise.
+
+```javascript
+const mySchema = new Schema({
+  name: String
+});
+
+// This is an example of a custom method that uses callbacks. While this method by itself still works in Mongoose 9,
+// Mongoose 9 no longer supports hooks for this method.
+mySchema.methods.foo = async function(cb) {
+  return cb(null, this.name);
+};
+mySchema.statics.bar = async function(cb) {
+  return cb(null, 'bar');
+};
+
+// This is no longer supported because `foo()` and `bar()` use callbacks.
+mySchema.pre('foo', function() {
+  console.log('foo pre hook');
+});
+mySchema.pre('bar', function() {
+  console.log('bar pre hook');
+});
+
+// The following code has a custom method and a custom static that use async functions.
+// The following works correctly in Mongoose 9: `pre('bar')` is executed when you call `bar()` and
+// `pre('qux')` is executed when you call `qux()`.
+mySchema.methods.baz = async function baz(arg) {
+  return arg;
+};
+mySchema.pre('baz', async function baz() {
+  console.log('baz pre hook');
+});
+mySchema.statics.qux = async function qux(arg) {
+  return arg;
+};
+mySchema.pre('qux', async function qux() {
+  console.log('qux pre hook');
+});
+```
+
+## Removed `promiseOrCallback`
+
+Mongoose 9 removed the `promiseOrCallback` helper function.
+
+```javascript
+const { promiseOrCallback } = require('mongoose');
+
+promiseOrCallback; // undefined in Mongoose 9
+```
+
+## In `isAsync` middleware `next()` errors take priority over `done()` errors
+
+Due to Mongoose middleware now relying on promises and async/await, `next()` errors take priority over `done()` errors.
+If you use `isAsync` middleware, any errors in `next()` will be thrown first, and `done()` errors will only be thrown if there are no `next()` errors.
+
+```javascript
+const schema = new Schema({});
+
+schema.pre('save', true, function(next, done) {
+  execed.first = true;
+  setTimeout(
+    function() {
+      done(new Error('first done() error'));
+    },
+    5);
+
+  next();
+});
+
+schema.pre('save', true, function(next, done) {
+  execed.second = true;
+  setTimeout(
+    function() {
+      next(new Error('second next() error'));
+      done(new Error('second done() error'));
+    },
+    25);
+});
+
+// In Mongoose 8, with the above middleware, `save()` would error with 'first done() error'
+// In Mongoose 9, with the above middleware, `save()` will error with 'second next() error'
+```
+
 ## Removed `skipOriginalStackTraces` option
 
 In Mongoose 8, Mongoose queries store an `_executionStack` property that stores the stack trace of where the query was originally executed for debugging `Query was already executed` errors.
 This behavior can cause performance issues with bundlers and source maps.
 `skipOriginalStackTraces` was added to work around this behavior.
 In Mongoose 9, this option is no longer necessary because Mongoose no longer stores the original stack trace.
+
+## Node.js version support
+
+Mongoose 9 requires Node.js 18 or higher.

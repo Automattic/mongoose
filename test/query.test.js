@@ -4411,7 +4411,7 @@ describe('Query', function() {
     });
   });
 
-  it('throws an error if calling find(null), findOne(null), updateOne(null, update), etc. (gh-14948)', async function () {
+  it('throws an error if calling find(null), findOne(null), updateOne(null, update), etc. (gh-14948)', async function() {
     const userSchema = new Schema({
       name: String
     });

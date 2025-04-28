@@ -108,3 +108,35 @@ doc.mySubdoc[0].deleteOne();
 // In Mongoose 9, you would need to either `save()` or `deleteOne()` on `doc` to trigger the subdocument `deleteOne` hook.
 await doc.save();
 ```
+
+## Hooks for custom methods no longer support callbacks
+
+Previously, you could use Mongoose middleware with custom methods that took callbacks.
+In Mongoose 9, this is no longer supported.
+If you want to use Mongoose middleware with a custom method, that custom method must be an async function or return a Promise.
+
+```javascript
+const mySchema = new Schema({
+  name: String
+});
+
+// This is an example of a custom method that uses callbacks. While this method by itself still works in Mongoose 9,
+// Mongoose 9 no longer supports hooks for this method.
+mySchema.methods.foo = async function(cb) {
+  return cb(null, this.name);
+};
+
+// This is no longer supported because `foo()` uses callbacks.
+mySchema.pre('foo', function() {
+  console.log('foo pre hook');
+});
+
+// The following is a custom method that uses async functions. The following works correctly in Mongoose 9: `pre('bar')`
+// is executed when you call `bar()`.
+mySchema.methods.bar = async function bar(arg) {
+  return arg;
+};
+mySchema.pre('bar', async function bar() {
+  console.log('bar pre hook');
+});
+```

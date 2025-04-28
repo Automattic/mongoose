@@ -4534,19 +4534,23 @@ describe('document', function() {
       assert.equal(p.children[0].grandchild.foo(), 'bar');
     });
 
-    it('hooks/middleware for custom methods (gh-6385) (gh-7456)', async function() {
+    it('hooks/middleware for custom methods (gh-6385) (gh-7456)', async function hooksForCustomMethods() {
       const mySchema = new Schema({
         name: String
       });
 
-      mySchema.methods.foo = function(cb) {
-        return cb(null, this.name);
+      mySchema.methods.foo = function() {
+        return Promise.resolve(this.name);
       };
       mySchema.methods.bar = function() {
         return this.name;
       };
       mySchema.methods.baz = function(arg) {
         return Promise.resolve(arg);
+      };
+      mySchema.methods.qux = async function qux() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('error!');
       };
 
       let preFoo = 0;
@@ -4565,6 +4569,15 @@ describe('document', function() {
       });
       mySchema.post('baz', function() {
         ++postBaz;
+      });
+
+      let preQux = 0;
+      let postQux = 0;
+      mySchema.pre('qux', function() {
+        ++preQux;
+      });
+      mySchema.post('qux', function() {
+        ++postQux;
       });
 
       const MyModel = db.model('Test', mySchema);
@@ -4588,6 +4601,12 @@ describe('document', function() {
       assert.equal(await doc.baz('foobar'), 'foobar');
       assert.equal(preBaz, 1);
       assert.equal(preBaz, 1);
+
+      const err = await doc.qux().then(() => null, err => err);
+      assert.equal(err.message, 'error!');
+      assert.ok(err.stack.includes('hooksForCustomMethods'));
+      assert.equal(preQux, 1);
+      assert.equal(postQux, 0);
     });
 
     it('custom methods with promises (gh-6385)', async function() {

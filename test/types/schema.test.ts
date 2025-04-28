@@ -120,7 +120,7 @@ expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: false }); // tes
 // Using `SchemaDefinition`
 interface IProfile {
   age: number;
-}Buffer
+}
 const ProfileSchemaDef: SchemaDefinition<IProfile> = { age: Number };
 export const ProfileSchema = new Schema<IProfile, Model<IProfile>>(ProfileSchemaDef);
 

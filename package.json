@@ -112,7 +112,7 @@
   "main": "./index.js",
   "types": "./types/index.d.ts",
   "engines": {
-    "node": ">=16.20.1"
+    "node": ">=18.0.0"
   },
   "bugs": {
     "url": "https://github.com/Automattic/mongoose/issues/new"

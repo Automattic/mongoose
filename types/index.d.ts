@@ -32,6 +32,7 @@ declare module 'mongoose' {
   import events = require('events');
   import mongodb = require('mongodb');
   import mongoose = require('mongoose');
+  import bson = require('bson');
 
   export type Mongoose = typeof mongoose;
 
@@ -766,6 +767,25 @@ declare module 'mongoose' {
                     : BufferToBinary<T[K]>;
           } : T;
 
+    /**
+    * Converts any Buffer properties into { type: 'buffer', data: [1, 2, 3] } format for JSON serialization
+    */
+    export type UUIDToJSON<T> = T extends bson.UUID
+      ? string
+      : T extends Document
+        ? T
+        : T extends TreatAsPrimitives
+          ? T
+          : T extends Record<string, any> ? {
+            [K in keyof T]: T[K] extends bson.UUID
+              ? string
+              : T[K] extends Types.DocumentArray<infer ItemType>
+                  ? Types.DocumentArray<UUIDToJSON<ItemType>>
+                  : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+                    ? HydratedSingleSubdocument<SubdocType>
+                    : UUIDToJSON<T[K]>;
+          } : T;
+
   /**
    * Converts any ObjectId properties into strings for JSON serialization
    */
@@ -825,7 +845,9 @@ declare module 'mongoose' {
     FlattenMaps<
       BufferToJSON<
         ObjectIdToString<
-          DateToString<T>
+          UUIDToJSON<
+            DateToString<T>
+          >
         >
       >
     >

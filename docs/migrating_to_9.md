@@ -222,6 +222,8 @@ await test.save();
 test.uuid; // string in Mongoose 8, bson.UUID instance in Mongoose 9
 ```
 
+With this change, UUIDs will be represented in hex string format in JSON, even if `getters: true` is not set.
+
 If you want to convert UUIDs to strings via a getter by default, you can use `mongoose.Schema.Types.UUID.get()`:
 
 ```javascript

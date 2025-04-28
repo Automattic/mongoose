@@ -1722,7 +1722,8 @@ async function gh14451() {
     myMap: {
       type: Map,
       of: String
-    }
+    },
+    myUUID: 'UUID'
   });
 
   const Test = model('Test', exampleSchema);
@@ -1736,7 +1737,8 @@ async function gh14451() {
       subdocProp?: string | undefined | null
     } | null,
     docArr: { nums: number[], times: string[] }[],
-    myMap?: Record<string, string> | null | undefined
+    myMap?: Record<string, string> | null | undefined,
+    myUUID?: string | null | undefined
   }>({} as TestJSON);
 }
 

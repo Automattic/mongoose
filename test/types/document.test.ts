@@ -459,3 +459,19 @@ async function gh15077() {
     foundFoo = createdFoo.toObject();
   }
 }
+
+async function gh15316() {
+  const schema = new Schema({
+    name: { type: String, required: true }
+  }, {
+    virtuals: {
+      upper: { get() { return this.name.toUpperCase(); } }
+    }
+  });
+  const TestModel = model('Test', schema);
+
+  const doc = new TestModel({ name: 'taco' });
+
+  expectType<string>(doc.toJSON({ virtuals: true }).upper);
+  expectType<string>(doc.toObject({ virtuals: true }).upper);
+}

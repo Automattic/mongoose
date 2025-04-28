@@ -109,11 +109,11 @@ doc.mySubdoc[0].deleteOne();
 await doc.save();
 ```
 
-## Hooks for custom methods no longer support callbacks
+## Hooks for custom methods and statics no longer support callbacks
 
-Previously, you could use Mongoose middleware with custom methods that took callbacks.
+Previously, you could use Mongoose middleware with custom methods and statics that took callbacks.
 In Mongoose 9, this is no longer supported.
-If you want to use Mongoose middleware with a custom method, that custom method must be an async function or return a Promise.
+If you want to use Mongoose middleware with a custom method or static, that custom method or static must be an async function or return a Promise.
 
 ```javascript
 const mySchema = new Schema({
@@ -125,18 +125,41 @@ const mySchema = new Schema({
 mySchema.methods.foo = async function(cb) {
   return cb(null, this.name);
 };
+mySchema.statics.bar = async function(cb) {
+  return cb(null, 'bar');
+};
 
-// This is no longer supported because `foo()` uses callbacks.
+// This is no longer supported because `foo()` and `bar()` use callbacks.
 mySchema.pre('foo', function() {
   console.log('foo pre hook');
 });
-
-// The following is a custom method that uses async functions. The following works correctly in Mongoose 9: `pre('bar')`
-// is executed when you call `bar()`.
-mySchema.methods.bar = async function bar(arg) {
-  return arg;
-};
-mySchema.pre('bar', async function bar() {
+mySchema.pre('bar', function() {
   console.log('bar pre hook');
 });
+
+// The following code has a custom method and a custom static that use async functions.
+// The following works correctly in Mongoose 9: `pre('bar')` is executed when you call `bar()` and
+// `pre('qux')` is executed when you call `qux()`.
+mySchema.methods.baz = async function baz(arg) {
+  return arg;
+};
+mySchema.pre('baz', async function baz() {
+  console.log('baz pre hook');
+});
+mySchema.statics.qux = async function qux(arg) {
+  return arg;
+};
+mySchema.pre('qux', async function qux() {
+  console.log('qux pre hook');
+});
+```
+
+## Removed `promiseOrCallback`
+
+Mongoose 9 removed the `promiseOrCallback` helper function.
+
+```javascript
+const { promiseOrCallback } = require('mongoose');
+
+promiseOrCallback; // undefined in Mongoose 9
 ```

@@ -416,6 +416,36 @@ describe('model middleware', function() {
     assert.equal(postCalled, 1);
   });
 
+  it('static hooks async stack traces (gh-15317) (gh-5982)', async function staticHookAsyncStackTrace() {
+    const schema = new Schema({
+      name: String
+    });
+
+    schema.statics.findByName = function() {
+      return this.find({ otherProp: { $notAnOperator: 'value' } });
+    };
+
+    let preCalled = 0;
+    schema.pre('findByName', function() {
+      ++preCalled;
+    });
+
+    let postCalled = 0;
+    schema.post('findByName', function() {
+      ++postCalled;
+    });
+
+    const Model = db.model('Test', schema);
+
+    await Model.create({ name: 'foo' });
+
+    const err = await Model.findByName('foo').then(() => null, err => err);
+    assert.equal(err.name, 'MongoServerError');
+    assert.ok(err.stack.includes('staticHookAsyncStackTrace'));
+    assert.equal(preCalled, 1);
+    assert.equal(postCalled, 0);
+  });
+
   it('deleteOne hooks (gh-7538)', async function() {
     const schema = new Schema({
       name: String

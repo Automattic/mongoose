@@ -203,3 +203,7 @@ In Mongoose 8, Mongoose queries store an `_executionStack` property that stores 
 This behavior can cause performance issues with bundlers and source maps.
 `skipOriginalStackTraces` was added to work around this behavior.
 In Mongoose 9, this option is no longer necessary because Mongoose no longer stores the original stack trace.
+
+## Node.js version support
+
+Mongoose 9 requires Node.js 18 or higher.

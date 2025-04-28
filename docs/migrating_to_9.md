@@ -196,3 +196,10 @@ schema.pre('save', true, function(next, done) {
 // In Mongoose 8, with the above middleware, `save()` would error with 'first done() error'
 // In Mongoose 9, with the above middleware, `save()` will error with 'second next() error'
 ```
+
+## Removed `skipOriginalStackTraces` option
+
+In Mongoose 8, Mongoose queries store an `_executionStack` property that stores the stack trace of where the query was originally executed for debugging `Query was already executed` errors.
+This behavior can cause performance issues with bundlers and source maps.
+`skipOriginalStackTraces` was added to work around this behavior.
+In Mongoose 9, this option is no longer necessary because Mongoose no longer stores the original stack trace.

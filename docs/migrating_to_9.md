@@ -164,7 +164,7 @@ const { promiseOrCallback } = require('mongoose');
 promiseOrCallback; // undefined in Mongoose 9
 ```
 
-## In isAsync middleware `next()` errors take priority over `done()` errors
+## In `isAsync` middleware `next()` errors take priority over `done()` errors
 
 Due to Mongoose middleware now relying on promises and async/await, `next()` errors take priority over `done()` errors.
 If you use `isAsync` middleware, any errors in `next()` will be thrown first, and `done()` errors will only be thrown if there are no `next()` errors.

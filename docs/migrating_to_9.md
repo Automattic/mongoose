@@ -207,3 +207,32 @@ In Mongoose 9, this option is no longer necessary because Mongoose no longer sto
 ## Node.js version support
 
 Mongoose 9 requires Node.js 18 or higher.
+
+## UUID's are now MongoDB UUID objects
+
+Mongoose 9 now returns UUID objects as instances of `bson.UUID`. In Mongoose 8, UUIDs were Mongoose Buffers that were converted to strings via a getter.
+
+```javascript
+const schema = new Schema({ uuid: 'UUID' });
+const TestModel = mongoose.model('Test', schema);
+
+const test = new TestModel({ uuid: new bson.UUID() });
+await test.save();
+
+test.uuid; // string in Mongoose 8, bson.UUID instance in Mongoose 9
+```
+
+If you want to convert UUIDs to strings via a getter by default, you can use `mongoose.Schema.Types.UUID.get()`:
+
+```javascript
+// Configure all UUIDs to have a getter which converts the UUID to a string
+mongoose.Schema.Types.UUID.get(v => v == null ? v : v.toString());
+
+const schema = new Schema({ uuid: 'UUID' });
+const TestModel = mongoose.model('Test', schema);
+
+const test = new TestModel({ uuid: new bson.UUID() });
+await test.save();
+
+test.uuid; // string
+```

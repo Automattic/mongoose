@@ -11343,7 +11343,7 @@ describe('model: populate:', function() {
     assert.equal(fromDb.children[2].toHexString(), newChild._id.toHexString());
   });
 
-  it('handles converting uuid documents to strings when calling toObject() (gh-14869)', async function() {
+  it('handles populating uuids (gh-14869)', async function() {
     const nodeSchema = new Schema({ _id: { type: 'UUID' }, name: 'String' });
     const rootSchema = new Schema({
       _id: { type: 'UUID' },
@@ -11370,14 +11370,14 @@ describe('model: populate:', function() {
     const foundRoot = await Root.findById(root._id).populate('node');
 
     let doc = foundRoot.toJSON({ getters: true });
-    assert.strictEqual(doc._id, '05c7953e-c6e9-4c2f-8328-fe2de7df560d');
+    assert.strictEqual(doc._id.toString(), '05c7953e-c6e9-4c2f-8328-fe2de7df560d');
     assert.strictEqual(doc.node.length, 1);
-    assert.strictEqual(doc.node[0]._id, '65c7953e-c6e9-4c2f-8328-fe2de7df560d');
+    assert.strictEqual(doc.node[0]._id.toString(), '65c7953e-c6e9-4c2f-8328-fe2de7df560d');
 
     doc = foundRoot.toObject({ getters: true });
-    assert.strictEqual(doc._id, '05c7953e-c6e9-4c2f-8328-fe2de7df560d');
+    assert.strictEqual(doc._id.toString(), '05c7953e-c6e9-4c2f-8328-fe2de7df560d');
     assert.strictEqual(doc.node.length, 1);
-    assert.strictEqual(doc.node[0]._id, '65c7953e-c6e9-4c2f-8328-fe2de7df560d');
+    assert.strictEqual(doc.node[0]._id.toString(), '65c7953e-c6e9-4c2f-8328-fe2de7df560d');
   });
 
   it('avoids repopulating if forceRepopulate is disabled (gh-14979)', async function() {

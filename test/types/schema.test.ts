@@ -24,7 +24,7 @@ import {
   ValidateOpts,
   BufferToBinary
 } from 'mongoose';
-import { Binary } from 'mongodb';
+import { Binary, UUID } from 'mongodb';
 import { IsPathRequired } from '../../types/inferschematype';
 import { expectType, expectError, expectAssignable } from 'tsd';
 import { ObtainDocumentPathType, ResolvePathType } from '../../types/inferschematype';
@@ -120,7 +120,7 @@ expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: false }); // tes
 // Using `SchemaDefinition`
 interface IProfile {
   age: number;
-}
+}Buffer
 const ProfileSchemaDef: SchemaDefinition<IProfile> = { age: Number };
 export const ProfileSchema = new Schema<IProfile, Model<IProfile>>(ProfileSchemaDef);
 
@@ -910,23 +910,23 @@ async function gh12593() {
   const testSchema = new Schema({ x: { type: Schema.Types.UUID } });
 
   type Example = InferSchemaType<typeof testSchema>;
-  expectType<{ x?: Buffer | null }>({} as Example);
+  expectType<{ x?: UUID | null }>({} as Example);
 
   const Test = model('Test', testSchema);
 
   const doc = await Test.findOne({ x: '4709e6d9-61fd-435e-b594-d748eb196d8f' }).orFail();
-  expectType<Buffer | undefined | null>(doc.x);
+  expectType<UUID | undefined | null>(doc.x);
 
   const doc2 = new Test({ x: '4709e6d9-61fd-435e-b594-d748eb196d8f' });
-  expectType<Buffer | undefined | null>(doc2.x);
+  expectType<UUID | undefined | null>(doc2.x);
 
   const doc3 = await Test.findOne({}).orFail().lean();
-  expectType<Binary | undefined | null>(doc3.x);
+  expectType<UUID | undefined | null>(doc3.x);
 
   const arrSchema = new Schema({ arr: [{ type: Schema.Types.UUID }] });
 
   type ExampleArr = InferSchemaType<typeof arrSchema>;
-  expectType<{ arr: Buffer[] }>({} as ExampleArr);
+  expectType<{ arr: UUID[] }>({} as ExampleArr);
 }
 
 function gh12562() {

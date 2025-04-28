@@ -216,3 +216,30 @@ const ModelWithBirthday = model.discriminator('ModelWithBirthday', new Schema({
 ```
 
 When generating encryption schemas, Mongoose merges all discriminators together for the all discriminators declared on the same namespace.  As a result, discriminators that declare the same key with different types are not supported.  Furthermore, all discriminators must share the same encryption type - it is not possible to configure discriminators on the same model for both CSFLE and QE.
+
+## Managing Data Keys
+
+Mongoose provides a convenient API to obtain a [ClientEncryption](https://mongodb.github.io/node-mongodb-native/Next/classes/ClientEncryption.html)
+object configured to manage data keys in the key vault.  A client encryption can be obtained with the `Model.clientEncryption()` helper:
+
+```javascript
+const connection = createConnection();
+
+const schema = new Schema({
+  name: {
+    type: String, encrypt: { keyId }
+  }
+}, {
+  encryptionType: 'queryableEncryption'
+});
+
+const Model = connection.model('BaseUserModel', schema);
+await connection.openUri(`mongodb://localhost:27017`, {
+  autoEncryption: {
+    keyVaultNamespace: 'datakeys.datakeys',
+    kmsProviders: { local: '....' }
+  }
+});
+
+const clientEncryption = Model.clientEncryption();
+```

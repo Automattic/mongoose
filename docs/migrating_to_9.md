@@ -163,3 +163,36 @@ const { promiseOrCallback } = require('mongoose');
 
 promiseOrCallback; // undefined in Mongoose 9
 ```
+
+## In isAsync middleware `next()` errors take priority over `done()` errors
+
+Due to Mongoose middleware now relying on promises and async/await, `next()` errors take priority over `done()` errors.
+If you use `isAsync` middleware, any errors in `next()` will be thrown first, and `done()` errors will only be thrown if there are no `next()` errors.
+
+```javascript
+const schema = new Schema({});
+
+schema.pre('save', true, function(next, done) {
+  execed.first = true;
+  setTimeout(
+    function() {
+      done(new Error('first done() error'));
+    },
+    5);
+
+  next();
+});
+
+schema.pre('save', true, function(next, done) {
+  execed.second = true;
+  setTimeout(
+    function() {
+      next(new Error('second next() error'));
+      done(new Error('second done() error'));
+    },
+    25);
+});
+
+// In Mongoose 8, with the above middleware, `save()` would error with 'first done() error'
+// In Mongoose 9, with the above middleware, `save()` will error with 'second next() error'
+```

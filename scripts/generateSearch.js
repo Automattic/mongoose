@@ -37,85 +37,89 @@ const contentSchema = new mongoose.Schema({
 contentSchema.index({ title: 'text', body: 'text' });
 const Content = mongoose.model('Content', contentSchema, 'Content');
 
-const contents = [];
+function generateContents() {
+  const contents = [];
 
-for (const [filename, file] of Object.entries(docsFilemap.fileMap)) {
-  if (file.api) {
-    for (const prop of file.props) {
-      const content = new Content({
-        title: `API: ${prop.name}`,
-        body: prop.description,
-        url: `${filename}#${prop.anchorId}`
-      });
-      const err = content.validateSync();
-      if (err != null) {
-        console.error(content);
-        throw err;
+  for (const [filename, file] of Object.entries(docsFilemap.fileMap)) {
+    if (file.api) {
+      for (const prop of file.props) {
+        const content = new Content({
+          title: `API: ${prop.name}`,
+          body: prop.description,
+          url: `${filename}#${prop.anchorId}`
+        });
+        const err = content.validateSync();
+        if (err != null) {
+          console.error(content);
+          throw err;
+        }
+        contents.push(content);
       }
+    } else if (file.markdown) {
+      let text = fs.readFileSync(filename, 'utf8');
+      text = markdown.parse(text);
+
+      const content = new Content({
+        title: file.title,
+        body: text,
+        url: filename.replace('.md', '.html').replace(/^docs/, '')
+      });
+
+      content.validateSync();
+
+      const $ = cheerio.load(text);
+
       contents.push(content);
+
+      // Break up individual h3's into separate content for more fine grained search
+      $('h3').each((index, el) => {
+        el = $(el);
+        const title = el.text();
+        const html = el.nextUntil('h3').html();
+        const content = new Content({
+          title: `${file.title}: ${title}`,
+          body: html,
+          url: `${filename.replace('.md', '.html').replace(/^docs/, '')}#${el.prop('id')}`
+        });
+
+        content.validateSync();
+        contents.push(content);
+      });
+    } else if (file.guide) {
+      let text = fs.readFileSync(filename, 'utf8');
+      text = text.substring(text.indexOf('block content') + 'block content\n'.length);
+      text = pug.render(`div\n${text}`, { filters: { markdown }, filename });
+
+      const content = new Content({
+        title: file.title,
+        body: text,
+        url: filename.replace('.pug', '.html').replace(/^docs/, '')
+      });
+
+      content.validateSync();
+
+      const $ = cheerio.load(text);
+
+      contents.push(content);
+
+      // Break up individual h3's into separate content for more fine grained search
+      $('h3').each((index, el) => {
+        el = $(el);
+        const title = el.text();
+        const html = el.nextUntil('h3').html();
+        const content = new Content({
+          title: `${file.title}: ${title}`,
+          body: html,
+          url: `${filename.replace('.pug', '.html').replace(/^docs/, '')}#${el.prop('id')}`
+        });
+
+        content.validateSync();
+        contents.push(content);
+      });
     }
-  } else if (file.markdown) {
-    let text = fs.readFileSync(filename, 'utf8');
-    text = markdown.parse(text);
-
-    const content = new Content({
-      title: file.title,
-      body: text,
-      url: filename.replace('.md', '.html').replace(/^docs/, '')
-    });
-
-    content.validateSync();
-
-    const $ = cheerio.load(text);
-
-    contents.push(content);
-
-    // Break up individual h3's into separate content for more fine grained search
-    $('h3').each((index, el) => {
-      el = $(el);
-      const title = el.text();
-      const html = el.nextUntil('h3').html();
-      const content = new Content({
-        title: `${file.title}: ${title}`,
-        body: html,
-        url: `${filename.replace('.md', '.html').replace(/^docs/, '')}#${el.prop('id')}`
-      });
-
-      content.validateSync();
-      contents.push(content);
-    });
-  } else if (file.guide) {
-    let text = fs.readFileSync(filename, 'utf8');
-    text = text.substring(text.indexOf('block content') + 'block content\n'.length);
-    text = pug.render(`div\n${text}`, { filters: { markdown }, filename });
-
-    const content = new Content({
-      title: file.title,
-      body: text,
-      url: filename.replace('.pug', '.html').replace(/^docs/, '')
-    });
-
-    content.validateSync();
-
-    const $ = cheerio.load(text);
-
-    contents.push(content);
-
-    // Break up individual h3's into separate content for more fine grained search
-    $('h3').each((index, el) => {
-      el = $(el);
-      const title = el.text();
-      const html = el.nextUntil('h3').html();
-      const content = new Content({
-        title: `${file.title}: ${title}`,
-        body: html,
-        url: `${filename.replace('.pug', '.html').replace(/^docs/, '')}#${el.prop('id')}`
-      });
-
-      content.validateSync();
-      contents.push(content);
-    });
   }
+
+  return contents;
 }
 
 run().catch(async error => {
@@ -132,6 +136,9 @@ async function run() {
   await Content.init();
 
   await Content.deleteMany({ version });
+
+  const contents = generateContents();
+
   let count = 0;
   for (const content of contents) {
     if (version === '8.x') {

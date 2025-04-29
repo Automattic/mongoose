@@ -41,6 +41,9 @@ describe('Lean Tutorial', function() {
     // To enable the `lean` option for a query, use the `lean()` function.
     const leanDoc = await MyModel.findOne().lean();
 
+    // acquit:ignore:start
+    delete normalDoc.$__.middleware; // To make v8Serialize() not crash because it can't clone functions
+    // acquit:ignore:end
     v8Serialize(normalDoc).length; // approximately 180
     v8Serialize(leanDoc).length; // approximately 55, about 3x smaller!
 

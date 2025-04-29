@@ -1,14 +1,7 @@
 'use strict';
 
-let config;
-try {
-  config = require('../.config.js');
-} finally {
-  if (!config || !config.uri) {
-    console.error('No Config or config.URI given, please create a .config.js file with those values in the root of the repository');
-    process.exit(-1);
-  }
-}
+const isMain = require.main === module;
+
 const cheerio = require('cheerio');
 const docsFilemap = require('../docs/source');
 const fs = require('fs');
@@ -122,14 +115,7 @@ function generateContents() {
   return contents;
 }
 
-run().catch(async error => {
-  console.error(error.stack);
-
-  // ensure the script exists in case of error
-  await mongoose.disconnect();
-});
-
-async function run() {
+async function generateSearch(config) {
   await mongoose.connect(config.uri, { dbName: 'mongoose' });
 
   // wait for the index to be created
@@ -181,5 +167,35 @@ async function run() {
 
   console.log(`Added ${contents.length} Search Content`);
 
-  process.exit(0);
+  // this likely should not be done as part of this script, but by the caller,
+  // but this script is currently the only one that connects in the website generation.
+  await mongoose.disconnect();
+}
+
+function getConfig() {
+  const config = require('../.config.js');
+
+  if (!config || !config.uri) {
+    throw new Error('No Config or config.URI given, please create a .config.js file with those values in the root of the repository');
+  }
+
+  return config;
+}
+
+module.exports.generateSearch = generateSearch;
+module.exports.getConfig = getConfig;
+
+// only run the following code if this file is the main module / entry file
+if (isMain) {
+  (async function main() {
+    const config = getConfig();
+    try {
+      await generateSearch(config);
+    } catch (error) {
+      console.error(error);
+      process.exit(-1);
+    } finally {
+      await mongoose.disconnect();
+    }
+  })();
 }

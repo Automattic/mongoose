@@ -326,11 +326,6 @@ describe('model: findOneAndUpdate:', function() {
     assert.equal(query._update.$set.date.toString(), now.toString());
     assert.strictEqual('aaron', query._conditions.author);
 
-    query = M.findOneAndUpdate({ $set: { date: now } });
-    assert.strictEqual(undefined, query.options.new);
-    assert.equal(query._update.$set.date.toString(), now.toString());
-    assert.strictEqual(undefined, query._conditions.author);
-
     query = M.findOneAndUpdate();
     assert.strictEqual(undefined, query.options.new);
     assert.equal(query._update, undefined);

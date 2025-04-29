@@ -466,10 +466,14 @@ declare module 'mongoose' {
       options: QueryOptions<DocType> & { upsert: true } & ReturnsNewDoc
     ): QueryWithHelpers<DocType, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
     findOneAndUpdate(
-      filter?: RootFilterQuery<RawDocType>,
-      update?: UpdateQuery<RawDocType>,
+      filter: RootFilterQuery<RawDocType>,
+      update: UpdateQuery<RawDocType>,
       options?: QueryOptions<DocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
+    findOneAndUpdate(
+      update: UpdateQuery<RawDocType>
+    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
+    findOneAndUpdate(): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
 
     /** Declares the query a findById operation. When executed, returns the document with the given `_id`. */
     findById(

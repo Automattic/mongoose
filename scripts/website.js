@@ -506,7 +506,7 @@ async function pugify(filename, options, isReload = false) {
   await fs.promises.writeFile(newfile, str).catch((err) => {
     console.error('could not write', err.stack);
   }).then(() => {
-    console.log('%s : rendered ', new Date(), newfile);
+    console.log('%s : rendered %s', (new Date()).toISOString(), newfile);
   });
 }
 

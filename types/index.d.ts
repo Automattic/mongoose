@@ -768,7 +768,7 @@ declare module 'mongoose' {
           } : T;
 
     /**
-    * Converts any Buffer properties into { type: 'buffer', data: [1, 2, 3] } format for JSON serialization
+    * Converts any Buffer properties into "{ type: 'buffer', data: [1, 2, 3] }" format for JSON serialization
     */
     export type UUIDToJSON<T> = T extends bson.UUID
       ? string

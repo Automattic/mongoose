@@ -139,7 +139,11 @@ async function run() {
 
   const contents = generateContents();
 
-  let count = 0;
+  const promises = [];
+  let lastPrint = 0;
+
+  let doneCount = 0;
+  console.log('Search Content to save:', contents.length);
   for (const content of contents) {
     if (version === '8.x') {
       let url = content.url.startsWith('/') ? content.url : `/${content.url}`;
@@ -154,9 +158,19 @@ async function run() {
       }
       content.url = `/docs/${version}${url}`;
     }
-    console.log(`${++count} / ${contents.length}`);
-    await content.save();
+    const promise = content.save().then(() => {
+      doneCount += 1;
+      const nowDate = Date.now();
+      // only print every 2 seconds, or if it is the first or last element
+      if (nowDate - lastPrint > 2000 || doneCount === contents.length || doneCount === 1) {
+        lastPrint = nowDate;
+        console.log(`${doneCount} / ${contents.length}`);
+      }
+    });
+    promises.push(promise);
   }
+
+  await Promise.allSettled(promises);
 
   const results = await Content.
     find({ $text: { $search: 'validate' }, version }, { score: { $meta: 'textScore' } }).
@@ -165,7 +179,7 @@ async function run() {
 
   console.log(results.map(res => res.url));
 
-  console.log(`Added ${contents.length} Content`);
+  console.log(`Added ${contents.length} Search Content`);
 
   process.exit(0);
 }

@@ -40,7 +40,7 @@ jobs:
       fail-fast: false
       matrix:
         node: [14, 16, 18, 20]
-        os: [ubuntu-20.04, ubuntu-22.04]
+        os: [ubuntu-22.04]
         mongodb: [4.4.28, 5.0.25, 6.0.14, 7.0.7]
         include:
           - os: ubuntu-20.04 # customize on which matrix the coverage will be collected on
@@ -81,7 +81,7 @@ jobs:
         if: matrix.coverage == true
 
   test-deno:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     name: Deno tests
     env:
       MONGOMS_VERSION: 6.0.14
@@ -92,7 +92,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
         with:
-          node-version: 16
+          node-version: 20
       - name: Load MongoDB binary cache
         id: cache-mongodb-binaries
         uses: actions/cache@v3
@@ -111,7 +111,7 @@ jobs:
   test-replica-sets:
     needs:
       - test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     name: Replica Set tests
     env:
       FORCE_COLOR: true
@@ -120,7 +120,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
         with:
-          node-version: 16
+          node-version: 20
       - run: npm install
       - name: Test
         run: npm run test-rs

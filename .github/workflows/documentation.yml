@@ -10,7 +10,7 @@ on:
       - 'website.js'
       - 'CHANGELOG.md'
   push:
-    branches:
+    branches:ubuntu
       - master
     paths:
       - '.github/workflows/documentation.yml'
@@ -45,7 +45,7 @@ jobs:
       #   run: npm run lint-js
 
   test-documentation:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     name: Test Generating Docs
     steps:
       - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
@@ -54,7 +54,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
         with:
-          node-version: 16
+          node-version: 20
 
       - run: npm install
       - run: npm run docs:clean

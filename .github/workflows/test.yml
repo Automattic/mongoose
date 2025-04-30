@@ -42,11 +42,6 @@ jobs:
         node: [14, 16, 18, 20]
         os: [ubuntu-22.04]
         mongodb: [4.4.28, 5.0.25, 6.0.14, 7.0.7]
-        include:
-          - os: ubuntu-20.04 # customize on which matrix the coverage will be collected on
-            mongodb: 5.0.25
-            node: 16
-            coverage: true
         exclude:
           - os: ubuntu-22.04 # exclude because there are no 4.x mongodb builds for 2204
             mongodb: 4.4.28

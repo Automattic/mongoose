@@ -29,8 +29,7 @@
     "sift": "17.1.3"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^8.31.1",
-    "@typescript-eslint/parser": "^8.31.1",
+    "typescript-eslint": "^8.31.1",
     "acquit": "1.3.0",
     "acquit-ignore": "0.2.1",
     "acquit-require": "0.1.1",
@@ -80,9 +79,9 @@
     "docs:prepare:publish:6x": "git checkout 6.x && git merge 6.x && npm run docs:clean:stable && env DOCS_DEPLOY=true npm run docs:generate && mv ./docs/6.x ./tmp && git checkout gh-pages && npm run docs:copy:tmp:6x",
     "docs:prepare:publish:7x": "env DOCS_DEPLOY=true npm run docs:generate && git checkout gh-pages && rimraf ./docs/7.x && mv ./tmp ./docs/7.x",
     "docs:check-links": "blc http://127.0.0.1:8089 -ro",
-    "lint": "ESLINT_USE_FLAT_CONFIG=false eslint .",
-    "lint-js": "ESLINT_USE_FLAT_CONFIG=false eslint . --ext .js --ext .cjs",
-    "lint-ts": "ESLINT_USE_FLAT_CONFIG=false eslint . --ext .ts",
+    "lint": "eslint .",
+    "lint-js": "eslint . --ext .js --ext .cjs",
+    "lint-ts": "eslint . --ext .ts",
     "lint-md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#benchmarks\"",
     "release": "git pull && git push origin master --tags && npm publish",
     "release-5x": "git pull origin 5.x && git push origin 5.x && git push origin 5.x --tags && npm publish --tag 5x",

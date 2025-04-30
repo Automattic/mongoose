@@ -1,7 +1,5 @@
-'use strict';
-
-import { createRequire } from "node:module";
-import process from "node:process";
+import { createRequire } from 'node:module';
+import process from 'node:process';
 
 // Workaround for Mocha getting terminal width, which currently requires `--unstable`
 Object.defineProperty(process.stdout, 'getWindowSize', {
@@ -10,7 +8,7 @@ Object.defineProperty(process.stdout, 'getWindowSize', {
   }
 });
 
-import { parse } from "https://deno.land/std/flags/mod.ts"
+import { parse } from 'https://deno.land/std/flags/mod.ts';
 const args = parse(Deno.args);
 
 Error.stackTraceLimit = 100;
@@ -49,6 +47,6 @@ for (const file of files) {
 }
 
 mocha.run(function(failures) {
-  process.exitCode = failures ? 1 : 0;  // exit with non-zero status if there were failures
+  process.exitCode = failures ? 1 : 0; // exit with non-zero status if there were failures
   process.exit(process.exitCode);
 });

@@ -52,7 +52,7 @@ Router.post('/login', async function({ body }, res) {
 
     const token = user.genAuthToken();
     res.status(201).json({ token });
-  } catch (err) {
+  } catch {
     res.status(501).send('Server Error');
   }
 });
@@ -77,7 +77,7 @@ Router.post('/update', auth, async function({ userId, body }, res) {
     }
 
     res.status(200).json({ user: updatedUser });
-  } catch (err) {
+  } catch {
     res.status(500).send('Server Error');
   }
 });
@@ -90,7 +90,7 @@ Router.delete('/delete', auth, async function({ userId }, res) {
     await User.findByIdAndRemove({ _id: userId });
     await Todo.deleteMany({ userId });
     res.status(200).send({ msg: 'User deleted' });
-  } catch (err) {
+  } catch {
     res.status(501).send('Server Error');
   }
 });

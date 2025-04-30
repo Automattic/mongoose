@@ -29,7 +29,7 @@ function getTypeName(obj) {
     } else {
       try {
         return this.constructor.name;
-      } catch (err) {
+      } catch {
         return 'unknown';
       }
     }

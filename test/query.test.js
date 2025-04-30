@@ -571,7 +571,7 @@ describe('Query', function() {
 
       try {
         q.find();
-      } catch (err) {
+      } catch {
         threw = true;
       }
 

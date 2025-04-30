@@ -1,3 +1,8 @@
+7.8.7 / 2025-04-30
+==================
+ *  types(aggregate): allow calling project() with a string #15304 #15300
+ *  docs: update deleteOne & deleteMany API def #15360 [Elliot67](https://github.com/Elliot67) [SethFalco](https://github.com/SethFalco)
+
 7.8.6 / 2025-01-20
 ===================
  * chore: remove coverage output from bundle

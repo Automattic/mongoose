@@ -615,7 +615,10 @@ if (isMain) {
     }
 
     console.log('Done Processing');
-  })();
+  })().catch((err) => {
+    console.error('Website Generation failed:', err);
+    process.exit(-1);
+  });
 }
 
 // Modified from github-slugger

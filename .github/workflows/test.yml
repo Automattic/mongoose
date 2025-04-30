@@ -79,12 +79,6 @@ jobs:
       - name: NPM Test with Coverage
         run: npm run test-coverage
         if: matrix.coverage == true
-      - name: Archive code coverage results
-        uses: actions/upload-artifact@v3
-        if: matrix.coverage == true
-        with:
-          name: coverage
-          path: coverage
 
   test-deno:
     runs-on: ubuntu-20.04

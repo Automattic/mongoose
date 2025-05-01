@@ -74,12 +74,6 @@ jobs:
       - name: NPM Test with Coverage
         run: npm run test-coverage
         if: matrix.coverage == true
-      - name: Archive code coverage results
-        uses: actions/upload-artifact@v4
-        if: matrix.coverage == true
-        with:
-          name: coverage
-          path: coverage
 
   test-deno:
     runs-on: ubuntu-22.04
@@ -93,7 +87,11 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4.3.0
         with:
+<<<<<<< HEAD
           node-version: 22
+=======
+          node-version: 20
+>>>>>>> 7.x
       - name: Load MongoDB binary cache
         id: cache-mongodb-binaries
         uses: actions/cache@v4
@@ -121,7 +119,11 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4.3.0
         with:
+<<<<<<< HEAD
           node-version: 22
+=======
+          node-version: 20
+>>>>>>> 7.x
       - run: npm install
       - name: Test
         run: npm run test-rs

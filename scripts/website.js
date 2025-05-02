@@ -506,7 +506,7 @@ async function pugify(filename, options, isReload = false) {
   await fs.promises.writeFile(newfile, str).catch((err) => {
     console.error('could not write', err.stack);
   }).then(() => {
-    console.log('%s : rendered ', new Date(), newfile);
+    console.log('%s : rendered %s', (new Date()).toISOString(), newfile);
   });
 }
 
@@ -606,12 +606,23 @@ if (isMain) {
   (async function main() {
     console.log(`Processing ~${files.length} files`);
 
-    require('./generateSearch');
+    const generateSearch = require('./generateSearch');
+    let generateSearchPromise;
+    try {
+      const config = generateSearch.getConfig();
+      generateSearchPromise = generateSearch.generateSearch(config);
+    } catch (err) {
+      console.error("Generating Search failed:", err);
+    }
     await deleteAllHtmlFiles();
     await pugifyAllFiles();
     await copyAllRequiredFiles();
     if (!!process.env.DOCS_DEPLOY && !!versionObj.versionedPath) {
       await moveDocsToTemp();
+    }
+
+    if (!!generateSearchPromise) {
+      await generateSearchPromise;
     }
 
     console.log('Done Processing');

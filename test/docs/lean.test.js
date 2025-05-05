@@ -42,7 +42,11 @@ describe('Lean Tutorial', function() {
     const leanDoc = await MyModel.findOne().lean();
 
     // acquit:ignore:start
-    delete normalDoc.$__.middleware; // To make v8Serialize() not crash because it can't clone functions
+    // The `normalDoc.$__.middleware` property is an internal Mongoose object that stores middleware functions.
+    // These functions cannot be cloned by `v8.serialize()`, which causes the method to throw an error.
+    // Since this test only compares the serialized size of the document, it is safe to delete this property
+    // to prevent the crash. This operation does not affect the document's data or behavior in this context.
+    delete normalDoc.$__.middleware;
     // acquit:ignore:end
     v8Serialize(normalDoc).length; // approximately 180
     v8Serialize(leanDoc).length; // approximately 55, about 3x smaller!

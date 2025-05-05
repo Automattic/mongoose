@@ -4455,4 +4455,58 @@ describe('Query', function() {
       assert.strictEqual(target, null);
     });
   });
+
+  describe('findOneAndUpdate with strictFilter', function() {
+    let Person;
+    let _id;
+
+    beforeEach(async function() {
+      try {
+        const schema = new Schema({ name: String });
+        Person = db.model('Person', schema);
+        await Person.deleteMany({})
+        const person = await Person.create({ name: 'Alice' });
+        _id = person._id;
+      } catch (err) {
+        throw err;
+      }
+    });
+
+    it('throws error for empty filter when strictFilter is true', async function() {
+      await assert.rejects(
+        () => Person.findOneAndUpdate({}, { name: 'Updated' }, { strictFilter: true }),
+        /Empty filter not allowed in findOneAndUpdate with strictFilter enabled/
+      );
+    });
+    
+
+    it('updates first document when strictFilter is false', async function() {
+      const updated = await Person.findOneAndUpdate({}, { name: 'Updated' }, { new: true });
+      assert.strictEqual(updated.name, 'Updated');
+      const person = await Person.findById(_id);
+      assert.strictEqual(person.name, 'Updated');
+    });
+
+    it('updates with non-empty filter when strictFilter is true', async function() {
+      const updated = await Person.findOneAndUpdate(
+        { _id },
+        { name: 'Updated Alice' },
+        { strictFilter: true, new: true }
+      );
+      assert.strictEqual(updated.name, 'Updated Alice');
+      const person = await Person.findById(_id);
+      assert.strictEqual(person.name, 'Updated Alice');
+    });
+
+    it('handles undefined filter with strictFilter true', async function() {
+      const updated = await Person.findOneAndUpdate(
+        undefined,
+        { name: 'Updated' },
+        { strictFilter: true, new: true }
+      );
+      assert.strictEqual(updated.name, 'Updated');
+      const person = await Person.findById(_id);
+      assert.strictEqual(person.name, 'Updated');
+    });
+  });
 });

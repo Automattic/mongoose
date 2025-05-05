@@ -1317,6 +1317,13 @@ describe('encryption integration tests', () => {
 
         const collections = await connection.db.listCollections({}, { readPreference: 'primary' }).map(({ name }) => name).toArray();
 
+        collections.sort((a, b) => {
+          // depending on what letter name starts with, `name` might come before the two queryable encryption collections or after them.
+          // this method always puts the `name` collection first, and the two QE collections after it.
+          if (!a.includes('enxcol_')) return -1;
+
+          return a.localeCompare(b);
+        });
         assert.deepEqual(collections, [
           name,
           `enxcol_.${name}.ecoc`,

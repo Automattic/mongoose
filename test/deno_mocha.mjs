@@ -38,7 +38,7 @@ const files = fs.readdirSync(testDir).
   concat(fs.readdirSync(path.join(testDir, 'docs')).map(file => path.join('docs', file))).
   concat(fs.readdirSync(path.join(testDir, 'helpers')).map(file => path.join('helpers', file)));
 
-const ignoreFiles = new Set(['browser.test.js']);
+const ignoreFiles = new Set([]);
 
 for (const file of files) {
   if (!file.endsWith('.test.js') || ignoreFiles.has(file)) {

@@ -107,9 +107,10 @@ declare module 'mongoose' {
     /**
      * Optimistic concurrency is a strategy to ensure the document you're updating didn't change between when you
      * loaded it using find() or findOne(), and when you update it using save(). Set to `true` to enable
-     * optimistic concurrency.
+     * optimistic concurrency. Set to string array to enable optimistic concurrency for only certain fields,
+     * or `{ exclude: string[] }` to define a list of fields to ignore for optimistic concurrency.
      */
-    optimisticConcurrency?: boolean;
+    optimisticConcurrency?: boolean | string[] | { exclude: string[] };
     /**
      * If `plugin()` called with tags, Mongoose will only apply plugins to schemas that have
      * a matching tag in `pluginTags`

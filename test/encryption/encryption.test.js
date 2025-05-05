@@ -15,15 +15,19 @@ const LOCAL_KEY = Buffer.from('Mng0NCt4ZHVUYUJCa1kxNkVyNUR1QURhZ2h2UzR2d2RrZzh0c
 
 const { UUID } = require('mongodb/lib/bson');
 
-
-const exists = path => {
+/**
+ * @param { string } path
+ *
+ * @returns { boolean }
+ */
+function exists(path) {
   try {
     fs.statSync(path);
     return true;
   } catch {
     return false;
   }
-};
+}
 
 /**
  * @param {object} object
@@ -42,7 +46,8 @@ describe('encryption integration tests', () => {
   let clusterUri;
 
   const autoEncryptionOptions = () => ({
-    dbName: 'db', autoEncryption: {
+    dbName: 'db',
+    autoEncryption: {
       keyVaultNamespace: 'keyvault.datakeys',
       kmsProviders: { local: { key: LOCAL_KEY } },
       extraOptions: {
@@ -58,7 +63,7 @@ describe('encryption integration tests', () => {
       throw new Error('must setup a cluster using `npm run setup-test-encryption`.');
     }
 
-    /**  @type { { uri: string, cryptShared: string }} */
+    /**  @type {{ uri: string, cryptShared: string }} */
     const configuration = JSON.parse(await readFile(expansionFile, { encoding: 'utf-8' }));
 
     cryptSharedLibPath = configuration.cryptShared;
@@ -142,8 +147,7 @@ describe('encryption integration tests', () => {
         const [{ _id }] = await model.insertMany([{ field: input }]);
         const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
 
-        assert.ok(isBsonType(encryptedDoc.field, 'Binary'));
-        assert.ok(encryptedDoc.field.sub_type === 6);
+        isEncryptedValue(encryptedDoc, 'field');
 
         const doc = await model.findOne({ _id });
         if (Buffer.isBuffer(input)) {
@@ -214,8 +218,7 @@ describe('encryption integration tests', () => {
           } }]);
           const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
 
-          assert.ok(isBsonType(encryptedDoc.a, 'Binary'));
-          assert.ok(encryptedDoc.a.sub_type === 6);
+          isEncryptedValue(encryptedDoc, 'a');
 
           const doc = await model.findOne({ _id });
           assert.ok(doc.a instanceof Map);
@@ -246,8 +249,7 @@ describe('encryption integration tests', () => {
           } }]);
           const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
 
-          assert.ok(isBsonType(encryptedDoc.a, 'Binary'));
-          assert.ok(encryptedDoc.a.sub_type === 6);
+          isEncryptedValue(encryptedDoc, 'a');
 
           const doc = await model.findOne({ _id });
           assert.ok(doc.a instanceof Map);
@@ -277,7 +279,6 @@ describe('encryption integration tests', () => {
             connection = createConnection();
             model = connection.model('Schema', schema);
             return { model };
-
           }
         },
         'nested object schemas for QE': {
@@ -298,7 +299,6 @@ describe('encryption integration tests', () => {
             connection = createConnection();
             model = connection.model('Schema', schema);
             return { model };
-
           }
         },
         'nested schemas for csfle': {
@@ -323,7 +323,6 @@ describe('encryption integration tests', () => {
             connection = createConnection();
             model = connection.model('Schema', schema);
             return { model };
-
           }
         },
         'nested schemas for QE': {
@@ -347,7 +346,6 @@ describe('encryption integration tests', () => {
             connection = createConnection();
             model = connection.model('Schema', schema);
             return { model };
-
           }
         }
       };
@@ -362,8 +360,7 @@ describe('encryption integration tests', () => {
             const [{ _id }] = await model.insertMany([{ a: { b: { c: 'hello' } } }]);
             const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
 
-            assert.ok(isBsonType(encryptedDoc.a.b.c, 'Binary'));
-            assert.ok(encryptedDoc.a.b.c.sub_type === 6);
+            isEncryptedValue(encryptedDoc.a.b, 'c');
 
             const doc = await model.findOne({ _id });
             assert.deepEqual(doc.a.b.c, 'hello');
@@ -394,8 +391,7 @@ describe('encryption integration tests', () => {
           const [{ _id }] = await model.insertMany([{ a: [new Int32(3)] }]);
           const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
 
-          assert.ok(isBsonType(encryptedDoc.a, 'Binary'));
-          assert.ok(encryptedDoc.a.sub_type === 6);
+          isEncryptedValue(encryptedDoc, 'a');
 
           const doc = await model.findOne({ _id });
           assert.deepEqual(doc.a, [3]);
@@ -424,8 +420,7 @@ describe('encryption integration tests', () => {
           const [{ _id }] = await model.insertMany([{ a: [{ name: 'bailey' }] }]);
           const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
 
-          assert.ok(isBsonType(encryptedDoc.a, 'Binary'));
-          assert.ok(encryptedDoc.a.sub_type === 6);
+          isEncryptedValue(encryptedDoc, 'a');
 
           const doc = await model.findOne({ _id }, {}, { lean: true });
           assert.deepEqual(doc.a, [{ name: 'bailey' }]);
@@ -451,8 +446,7 @@ describe('encryption integration tests', () => {
           const [{ _id }] = await model.insertMany([{ a: [new Int32(3)] }]);
           const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
 
-          assert.ok(isBsonType(encryptedDoc.a, 'Binary'));
-          assert.ok(encryptedDoc.a.sub_type === 6);
+          isEncryptedValue(encryptedDoc, 'a');
 
           const doc = await model.findOne({ _id });
           assert.deepEqual(doc.a, [3]);
@@ -480,8 +474,7 @@ describe('encryption integration tests', () => {
           const [{ _id }] = await model.insertMany([{ a: [{ name: 'bailey' }] }]);
           const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
 
-          assert.ok(isBsonType(encryptedDoc.a, 'Binary'));
-          assert.ok(encryptedDoc.a.sub_type === 6);
+          isEncryptedValue(encryptedDoc, 'a');
 
           const doc = await model.findOne({ _id }, {}, { lean: true });
           assert.deepEqual(doc.a, [{ name: 'bailey' }]);
@@ -561,11 +554,10 @@ describe('encryption integration tests', () => {
             const [{ _id }] = await model.insertMany([{ a: 'hello', b: 1n, c: { d: 'world' } }]);
             const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
 
-            assert.ok(isBsonType(encryptedDoc.a, 'Binary'));
-            assert.ok(encryptedDoc.a.sub_type === 6);
+            isEncryptedValue(encryptedDoc, 'a');
             assert.ok(typeof encryptedDoc.b === 'number');
-            assert.ok(isBsonType(encryptedDoc.c.d, 'Binary'));
-            assert.ok(encryptedDoc.c.d.sub_type === 6);
+
+            isEncryptedValue(encryptedDoc.c, 'd');
 
             const doc = await model.findOne({ _id }, {});
             assert.deepEqual(doc.a, 'hello');
@@ -644,8 +636,7 @@ describe('encryption integration tests', () => {
               const [{ _id }] = await model1.insertMany([{ a: 'hello' }]);
               const encryptedDoc = await utilClient.db('db').collection('model1').findOne({ _id });
 
-              assert.ok(isBsonType(encryptedDoc.a, 'Binary'));
-              assert.ok(encryptedDoc.a.sub_type === 6);
+              isEncryptedValue(encryptedDoc, 'a');
 
               const doc = await model1.findOne({ _id });
               assert.deepEqual(doc.a, 'hello');
@@ -655,8 +646,7 @@ describe('encryption integration tests', () => {
               const [{ _id }] = await model2.insertMany([{ b: 'world' }]);
               const encryptedDoc = await utilClient.db('db').collection('model2').findOne({ _id });
 
-              assert.ok(isBsonType(encryptedDoc.b, 'Binary'));
-              assert.ok(encryptedDoc.b.sub_type === 6);
+              isEncryptedValue(encryptedDoc, 'b');
 
               const doc = await model2.findOne({ _id });
               assert.deepEqual(doc.b, 'world');
@@ -696,8 +686,7 @@ describe('encryption integration tests', () => {
           const [{ _id }] = await model1.insertMany([{ a: 'hello' }]);
           const encryptedDoc = await utilClient.db('db').collection('model1').findOne({ _id });
 
-          assert.ok(isBsonType(encryptedDoc.a, 'Binary'));
-          assert.ok(encryptedDoc.a.sub_type === 6);
+          isEncryptedValue(encryptedDoc, 'a');
 
           const doc = await model1.findOne({ _id });
           assert.deepEqual(doc.a, 'hello');
@@ -707,8 +696,7 @@ describe('encryption integration tests', () => {
           const [{ _id }] = await model2.insertMany([{ b: 'world' }]);
           const encryptedDoc = await utilClient.db('db').collection('model2').findOne({ _id });
 
-          assert.ok(isBsonType(encryptedDoc.b, 'Binary'));
-          assert.ok(encryptedDoc.b.sub_type === 6);
+          isEncryptedValue(encryptedDoc, 'b');
 
           const doc = await model2.findOne({ _id });
           assert.deepEqual(doc.b, 'world');
@@ -1111,7 +1099,6 @@ describe('encryption integration tests', () => {
     afterEach(async function() {
       mongoose.deleteModel('Schema');
       await mongoose.disconnect();
-
     });
     it('encrypts and decrypts', async function() {
       const schema = new Schema({
@@ -1130,39 +1117,7 @@ describe('encryption integration tests', () => {
       const [{ _id }] = await model.insertMany([{ a: 2 }]);
       const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
 
-      assert.ok(isBsonType(encryptedDoc.a, 'Binary'));
-      assert.ok(encryptedDoc.a.sub_type === 6);
-
-      const doc = await model.findOne({ _id });
-      assert.deepEqual(doc.a, 2);
-    });
-  });
-
-  describe('Encryption can be configured on the default mongoose connection', function() {
-    afterEach(async function() {
-      mongoose.deleteModel('Schema');
-      await mongoose.disconnect();
-
-    });
-    it('encrypts and decrypts', async function() {
-      const schema = new Schema({
-        a: {
-          type: Schema.Types.Int32,
-          encrypt: { keyId: [keyId], algorithm }
-
-        }
-      }, {
-        encryptionType: 'csfle'
-      });
-
-      const model = mongoose.model('Schema', schema);
-      await mongoose.connect(clusterUri, autoEncryptionOptions());
-
-      const [{ _id }] = await model.insertMany([{ a: 2 }]);
-      const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
-
-      assert.ok(isBsonType(encryptedDoc.a, 'Binary'));
-      assert.ok(encryptedDoc.a.sub_type === 6);
+      isEncryptedValue(encryptedDoc, 'a');
 
       const doc = await model.findOne({ _id });
       assert.deepEqual(doc.a, 2);
@@ -1170,9 +1125,16 @@ describe('encryption integration tests', () => {
   });
 
   describe('Key Vault API', function() {
+    let connection;
+    let model;
+
+    afterEach(async function() {
+      await connection.close();
+    });
+
     describe('No FLE configured', function() {
       it('returns `null`', async function() {
-        const connection = mongoose.createConnection();
+        connection = mongoose.createConnection();
         const model = connection.model('Name', { age: String });
 
         await connection.openUri(clusterUri);
@@ -1183,7 +1145,7 @@ describe('encryption integration tests', () => {
 
     describe('Client not connected', function() {
       it('returns `null`', async function() {
-        const connection = mongoose.createConnection();
+        connection = mongoose.createConnection();
         const model = connection.model('Name', { age: String });
 
         assert.equal(model.clientEncryption(), null);
@@ -1191,8 +1153,6 @@ describe('encryption integration tests', () => {
     });
 
     describe('auto encryption enabled for a collection', function() {
-      let connection;
-      let model;
       beforeEach(async function() {
         connection = createConnection();
         model = connection.model('Model1', new Schema({
@@ -1207,11 +1167,6 @@ describe('encryption integration tests', () => {
         }));
 
         await connection.openUri(clusterUri, autoEncryptionOptions());
-
-
-      });
-      afterEach(async function() {
-        await connection.close();
       });
 
       it('returns a client encryption object', async function() {
@@ -1256,12 +1211,13 @@ describe('encryption integration tests', () => {
         });
       });
 
-      it.skip('uses the same credentialProviders', async function() {
+      it('uses the same credentialProviders', async function() {
         const options = model.collection.conn.client.options.autoEncryption;
         const credentialProviders = {
           aws: async() => {}
         };
         options.credentialProviders = credentialProviders;
+        options.kmsProviders = { aws: {} };
         assert.equal(model.clientEncryption()._credentialProviders, credentialProviders);
       });
 
@@ -1326,37 +1282,45 @@ describe('encryption integration tests', () => {
     describe('CSFLE', function() {
       it('automatically creates the model\'s collection', async function() {
         connection = mongoose.createConnection();
+        const name = new UUID().toHexString();
+
         const schema = new Schema({
           name: { type: String, encrypt: { keyId: [keyId], algorithm } },
           age: Number
-        }, { encryptionType: 'csfle', autoCreate: true });
+        }, { encryptionType: 'csfle', autoCreate: true, collection: name });
 
-        const model = connection.model(new UUID().toHexString(), schema);
+        const model = connection.model(name, schema);
 
-        await connection.openUri(clusterUri, autoEncryptionOptions());
+        await connection.openUri(clusterUri, { ... autoEncryptionOptions(), dbName: name });
         await model.init();
 
-        const collections = await connection.db.listCollections({}, { readPreference: 'primary' }).toArray();
-        assert.equal(collections.length, 1);
+        const collections = await connection.db.listCollections({}, { readPreference: 'primary' }).map(({ name }) => name).toArray();
+        assert.deepEqual(collections, [name]);
       });
     });
 
     describe('Queryable Encryption', function() {
       it('automatically creates the model\'s collection', async function() {
         connection = mongoose.createConnection();
+        const name = new UUID().toHexString();
+
         const schema = new Schema({
           name: { type: String, encrypt: { keyId: keyId } }
-        }, { encryptionType: 'queryableEncryption', autoCreate: true });
+        }, { encryptionType: 'queryableEncryption', autoCreate: true, collection: name });
 
-        const model = connection.model(new UUID().toHexString(), schema);
+        const model = connection.model(name, schema);
 
-        await connection.openUri(clusterUri, autoEncryptionOptions());
-
+        await connection.openUri(clusterUri, { ... autoEncryptionOptions(), dbName: name });
 
         await model.init();
 
-        const collections = await utilClient.db('db').listCollections().toArray();
-        assert.equal(collections.length, 3);
+        const collections = await connection.db.listCollections({}, { readPreference: 'primary' }).map(({ name }) => name).toArray();
+
+        assert.deepEqual(collections, [
+          name,
+          `enxcol_.${name}.ecoc`,
+          `enxcol_.${name}.esc`
+        ]);
       });
     });
   });

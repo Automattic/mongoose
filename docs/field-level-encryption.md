@@ -164,9 +164,9 @@ const UserModel = connection.model('User', encryptedUserSchema);
 
 ### Connecting and configuring encryption options
 
-CSFLE/QE in Mongoose work by generating the encryption schema that the MongoDB driver expects for each encrypted model on the connection.  This happens automatically the model's connection is established.
+CSFLE/QE in Mongoose work by generating the encryption schema that the MongoDB driver expects for each encrypted model on the connection.  This happens automatically when the model's connection is established.
 
-Queryable encryption and CSFLE requires all the same configuration as outlined in <>, except for the schemaMap or encryptedFieldsMap options.
+Queryable encryption and CSFLE requires all the same configuration as outlined in the [MongoDB encryption in-use documentation](https://www.mongodb.com/docs/manual/core/security-in-use-encryption/), except for the schemaMap or encryptedFieldsMap options.
 
 ```javascript
 const keyVaultNamespace = 'client.encryption';
@@ -215,7 +215,7 @@ const ModelWithBirthday = model.discriminator('ModelWithBirthday', new Schema({
 }));
 ```
 
-When generating encryption schemas, Mongoose merges all discriminators together for the all discriminators declared on the same namespace.  As a result, discriminators that declare the same key with different types are not supported.  Furthermore, all discriminators must share the same encryption type - it is not possible to configure discriminators on the same model for both CSFLE and QE.
+When generating encryption schemas, Mongoose merges all discriminators together for all of the discriminators declared on the same namespace.  As a result, discriminators that declare the same key with different types are not supported.  Furthermore, all discriminators must share the same encryption type - it is not possible to configure discriminators on the same model for both CSFLE and QE.
 
 ## Managing Data Keys
 

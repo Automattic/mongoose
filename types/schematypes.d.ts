@@ -226,7 +226,7 @@ declare module 'mongoose' {
   type ValidatorFunction<DocType = any> = (this: DocType, value: any, validatorProperties?: Validator) => any;
 
   interface QueryEncryptionEncryptOptions {
-    /** The id of the  dataKey to use for encryption.  Must be a BSON binary subtype 4 (UUID). */
+    /** The id of the dataKey to use for encryption.  Must be a BSON binary subtype 4 (UUID). */
     keyId: BSON.Binary;
 
     /**
@@ -236,7 +236,7 @@ declare module 'mongoose' {
   }
 
   interface ClientSideEncryptionEncryptOptions {
-    /** The id of the  dataKey to use for encryption.  Must be a BSON binary subtype 4 (UUID). */
+    /** The id of the dataKey to use for encryption.  Must be a BSON binary subtype 4 (UUID). */
     keyId: [BSON.Binary];
 
     /**

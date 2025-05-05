@@ -1,10 +1,10 @@
 'use strict';
+
 const { downloadMongoDb } = require('@mongodb-js/mongodb-downloader');
 const { instances, start } = require('mongodb-runner');
 const { rm, readdir, writeFile } = require('fs/promises');
 const { tmpdir } = require('os');
 const { join, resolve } = require('path');
-
 
 async function main() {
   const runnerDir = join(resolve(__dirname), '../data');
@@ -38,12 +38,14 @@ async function main() {
       'sharded', runnerDir, tmpDir: tmpdir() });
 
     for await (const instance of instances({ runnerDir })) {
-      if (instance.id === 'encryption-test-cluster') return {
-        cryptShared, uri: instance.connectionString
-      };
+      if (instance.id === 'encryption-test-cluster') {
+        return {
+          cryptShared, uri: instance.connectionString
+        };
+      }
     }
 
-    throw new Error('Unable to location newly configured instance of mongod - should never happen.');
+    throw new Error('Unable to locate newly configured instance of mongod - should never happen.');
   }
 }
 

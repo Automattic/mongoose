@@ -1,4 +1,3 @@
-
 'use strict';
 
 const assert = require('assert');
@@ -13,7 +12,7 @@ const Schema = mongoose.Schema;
  *
  * @param {import('../lib').Schema} object
  * @param {Array<string> | string} path
- * @returns
+ * @returns { boolean }
  */
 function schemaHasEncryptedProperty(schema, path) {
   path = [path].flat();
@@ -240,7 +239,7 @@ describe('encrypted schema declaration', function() {
       });
     });
 
-    describe('When a schema is instantiated with a custom schema type plugin', function() {
+    describe('When a schema is instantiated with a custom schema type plugin that does not have a encryption type', function() {
       class Int8 extends mongoose.SchemaType {
         constructor(key, options) {
           super(key, options, 'Int8');
@@ -266,6 +265,33 @@ describe('encrypted schema declaration', function() {
       });
     });
 
+    describe('When a schema is instantiated with a custom schema type plugin that does have a encryption type', function() {
+      class Int8 extends mongoose.SchemaType {
+        constructor(key, options) {
+          super(key, options, 'Int8');
+        }
+
+        autoEncryptionType() {
+          return 'int';
+        }
+      }
+
+      beforeEach(function() {
+        // Don't forget to add `Int8` to the type registry
+        mongoose.Schema.Types.Int8 = Int8;
+      });
+      afterEach(function() {
+        delete mongoose.Schema.Types.Int8;
+      });
+
+      it('No error is thrown', function() {
+        new Schema({
+          field: {
+            type: Int8, encrypt: { keyId: KEY_ID, algorithm }
+          }
+        }, { encryptionType: 'csfle' });
+      });
+    });
   });
 
   describe('options.encryptionType', function() {
@@ -741,6 +767,58 @@ function primitiveSchemaMapTests() {
           {
             path: 'field',
             bsonType: 'bool',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522'
+          }
+        ]
+      }
+    },
+    {
+      name: 'uuid',
+      encryptionType: 'csfle',
+      type: Schema.Types.UUID,
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic',
+              bsonType: 'binData'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'binData',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+            algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
+          }
+        ]
+      }
+    },
+    {
+      name: 'uuid',
+      encryptionType: 'queryableEncryption',
+      type: Schema.Types.UUID,
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              bsonType: 'binData'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'binData',
             keyId: '9fbdace3-4e48-412d-88df-3807e8009522'
           }
         ]

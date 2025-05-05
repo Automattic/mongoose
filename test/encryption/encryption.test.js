@@ -129,6 +129,7 @@ describe('encryption integration tests', () => {
       { type: String, name: 'string', input: 3, expected: 3 },
       { type: Schema.Types.Boolean, name: 'boolean', input: true, expected: true },
       { type: Schema.Types.Buffer, name: 'buffer', input: Buffer.from([1, 2, 3]) },
+      { type: Schema.Types.UUID, name: 'uuid', input: new UUID('53ca5a3e-19cd-405d-8ef7-5d88823939d9'), expected: '53ca5a3e-19cd-405d-8ef7-5d88823939d9' },
       { type: Date, name: 'date', input: new Date(12, 12, 2012), expected: new Date(12, 12, 2012) },
       { type: ObjectId, name: 'objectid', input: new ObjectId() },
       { type: BigInt, name: 'bigint', input: 3n },

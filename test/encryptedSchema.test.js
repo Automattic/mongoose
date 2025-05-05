@@ -265,7 +265,7 @@ describe('encrypted schema declaration', function() {
       });
     });
 
-    describe.only('When a schema is instantiated with a custom schema type plugin that does have a encryption type', function() {
+    describe('When a schema is instantiated with a custom schema type plugin that does have a encryption type', function() {
       class Int8 extends mongoose.SchemaType {
         constructor(key, options) {
           super(key, options, 'Int8');
@@ -767,6 +767,58 @@ function primitiveSchemaMapTests() {
           {
             path: 'field',
             bsonType: 'bool',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522'
+          }
+        ]
+      }
+    },
+    {
+      name: 'uuid',
+      encryptionType: 'csfle',
+      type: Schema.Types.UUID,
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic',
+              bsonType: 'binData'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'binData',
+            keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+            algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
+          }
+        ]
+      }
+    },
+    {
+      name: 'uuid',
+      encryptionType: 'queryableEncryption',
+      type: Schema.Types.UUID,
+      schemaMap: {
+        bsonType: 'object',
+        properties: {
+          field: {
+            encrypt: {
+              keyId: '9fbdace3-4e48-412d-88df-3807e8009522',
+              bsonType: 'binData'
+            }
+          }
+        }
+      },
+      encryptedFields: {
+        fields: [
+          {
+            path: 'field',
+            bsonType: 'binData',
             keyId: '9fbdace3-4e48-412d-88df-3807e8009522'
           }
         ]

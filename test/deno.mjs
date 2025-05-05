@@ -17,7 +17,7 @@ await fixtures.mochaGlobalSetup();
 
 const child_args = [
   ...Deno.args,
-  resolve(fileURLToPath(import.meta.url), '../deno_mocha.js')
+  resolve(fileURLToPath(import.meta.url), '../deno_mocha.mjs')
 ];
 
 const child = spawn(process.execPath, child_args, { stdio: 'inherit' });

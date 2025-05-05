@@ -3192,6 +3192,7 @@ describe('Model', function() {
 
     });
 
+    // the following causes "MongoServerError: ns not found" errors in mongodb 6.0.x
     it.skip('Compound index with 2dsphere field without value is saved', async function() {
       const PersonSchema = new Schema({
         name: String,
@@ -3223,9 +3224,9 @@ describe('Model', function() {
       assert.equal(personDoc.loc, undefined);
 
       await Person.collection.drop();
-
     });
 
+    // the following causes "MongoServerError: ns not found" errors in mongodb 6.0.x
     it.skip('Compound index on field earlier declared with 2dsphere index is saved', async function() {
       const PersonSchema = new Schema({
         name: String,
@@ -3258,7 +3259,6 @@ describe('Model', function() {
       assert.equal(personDoc.loc, undefined);
 
       await Person.collection.drop();
-
     });
   });
 

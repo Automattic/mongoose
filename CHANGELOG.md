@@ -1,3 +1,14 @@
+7.8.7 / 2025-04-30
+==================
+ *  types(aggregate): allow calling project() with a string #15304 #15300
+ *  docs: update deleteOne & deleteMany API def #15360 [Elliot67](https://github.com/Elliot67) [SethFalco](https://github.com/SethFalco)
+
+8.14.1 / 2025-04-29
+===================
+ * fix: correct change tracking with maps of arrays of primitives and maps of maps #15374 #15350
+ * fix(populate): consistently convert Buffer representation of UUID to hex string to avoid confusing populate assignment #15383 #15382
+ *  docs: add TypeScript Query guide with info on lean() + transform() #15377 #15311
+
 8.14.0 / 2025-04-25
 ===================
  * feat: upgrade MongoDB driver -> 6.16 #15371

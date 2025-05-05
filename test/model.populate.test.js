@@ -11503,4 +11503,41 @@ describe('model: populate:', function() {
     assert.strictEqual(populatedCategory.announcements.length, 1);
     assert.strictEqual(populatedCategory.announcements[0].title, 'New Tech Release');
   });
+
+  it('handles virtual populated UUID array field (gh-15316)', async function() {
+    const RoleSchema = Schema({
+      _id: { type: 'UUID', required: true },
+      name: String
+    });
+
+    const MemberSchema = Schema({
+      _id: { type: 'UUID', required: true },
+      _role_ids: [{
+        type: 'UUID',
+        ref: 'Role',
+        required: true
+      }]
+    });
+
+    MemberSchema.virtual('roles', {
+      ref: 'Role',
+      localField: '_role_ids',
+      foreignField: '_id'
+    });
+
+    const Role = db.model('Role', RoleSchema);
+    const Member = db.model('Member', MemberSchema);
+
+    const role1 = await Role.create({ _id: randomUUID(), name: 'admin' });
+    const role2 = await Role.create({ _id: randomUUID(), name: 'user' });
+
+    const memberId = randomUUID();
+    await Member.create({ _id: memberId, _role_ids: [role1._id, role2._id] });
+
+    const populated = await Member.findOne({ _id: memberId }).populate('roles');
+    assert.deepStrictEqual(
+      populated.roles.sort((a, b) => a.name.localeCompare(b.name)).map(role => role.name),
+      ['admin', 'user']
+    );
+  });
 });

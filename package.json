@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "typescript-eslint": "^8.31.1",
-    "acquit": "git+https://github.com/hasezoey/acquit.git#0e98e3292212dae9f25c889fb3a46f3d6688ca55",
+    "acquit": "1.4.0",
     "acquit-ignore": "0.2.1",
     "acquit-require": "0.1.1",
     "ajv": "8.17.1",

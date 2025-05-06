@@ -33,7 +33,7 @@ Router.post('/create', auth, clearCache, async function({ userId, body }, res) {
     });
     await todo.save();
     res.status(201).json({ todo });
-  } catch (err) {
+  } catch {
     res.status(501).send('Server Error');
   }
 });
@@ -52,7 +52,7 @@ Router.post('/update', auth, async function({ userId, body }, res) {
 
     await updatedTodo.save();
     res.status(200).json({ todo: updatedTodo });
-  } catch (err) {
+  } catch {
     res.status(501).send('Server Error');
   }
 });
@@ -65,7 +65,7 @@ Router.delete('/delete', auth, async function({ userId, body: { todoId } }, res)
   try {
     await Todo.findOneAndDelete({ $and: [{ userId }, { _id: todoId }] });
     res.status(200).send({ msg: 'Todo deleted' });
-  } catch (err) {
+  } catch {
     res.status(501).send('Server Error');
   }
 });

@@ -906,7 +906,7 @@ describe('document', function() {
       let str;
       try {
         str = JSON.stringify(arr);
-      } catch (_) {
+      } catch {
         err = true;
       }
       assert.equal(err, false);

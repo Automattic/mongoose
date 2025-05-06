@@ -558,7 +558,7 @@ describe('Model', function() {
       let post;
       try {
         post = new BlogPost({ date: 'Test', meta: { date: 'Test' } });
-      } catch (e) {
+      } catch {
         threw = true;
       }
 
@@ -566,7 +566,7 @@ describe('Model', function() {
 
       try {
         post.set('title', 'Test');
-      } catch (e) {
+      } catch {
         threw = true;
       }
 
@@ -591,7 +591,7 @@ describe('Model', function() {
             date: 'Test'
           }
         });
-      } catch (e) {
+      } catch {
         threw = true;
       }
 
@@ -599,7 +599,7 @@ describe('Model', function() {
 
       try {
         post.set('meta.date', 'Test');
-      } catch (e) {
+      } catch {
         threw = true;
       }
 
@@ -657,7 +657,7 @@ describe('Model', function() {
         post.get('comments').push({
           date: 'Bad date'
         });
-      } catch (e) {
+      } catch {
         threw = true;
       }
 
@@ -1313,7 +1313,7 @@ describe('Model', function() {
           JSON.stringify(meta);
           getter1 = JSON.stringify(post.get('meta'));
           getter2 = JSON.stringify(post.meta);
-        } catch (err) {
+        } catch {
           threw = true;
         }
 
@@ -2403,7 +2403,7 @@ describe('Model', function() {
       let threw = false;
       try {
         new P({ path: 'i should not throw' });
-      } catch (err) {
+      } catch {
         threw = true;
       }
 

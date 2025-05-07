@@ -150,7 +150,7 @@ await connection.openUri(`mongodb://localhost:27017`, {
 const clientEncryption = Model.clientEncryption();
 ```
 
-## Setting Up Field Level Encryption with Mongoose
+## Manual FLE in Mongoose
 
 First, you need to install the [mongodb-client-encryption npm package](https://www.npmjs.com/package/mongodb-client-encryption).
 This is MongoDB's official package for setting up encryption keys.

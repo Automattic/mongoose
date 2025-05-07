@@ -873,7 +873,7 @@ describe('encryption integration tests', () => {
                   type: Int32, encrypt: { keyId: [keyId], algorithm }
                 }
               });
-              model.discriminator('Test', clonedSchema)
+              model.discriminator('Test', clonedSchema);
             }, /encrypted fields cannot be declared on both the base schema and the child schema in a discriminator/);
           });
         });
@@ -895,7 +895,7 @@ describe('encryption integration tests', () => {
                   type: Int32, encrypt: { keyId: [keyId], algorithm }
                 }
               });
-              model.discriminator('Test', clonedSchema)
+              model.discriminator('Test', clonedSchema);
             }, /encrypted fields cannot be declared on both the base schema and the child schema in a discriminator/);
           });
         });

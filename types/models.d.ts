@@ -919,5 +919,11 @@ declare module 'mongoose' {
       'find',
       TInstanceMethods & TVirtuals
     >;
+
+    /**
+     * If auto encryption is enabled, returns a ClientEncryption instance that is configured with the same settings that
+     * Mongoose's underlying MongoClient is using.  If the client has not yet been configured, returns null.
+     */
+    clientEncryption(): mongodb.ClientEncryption | null;
   }
 }

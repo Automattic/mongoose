@@ -16,9 +16,9 @@ const LOCAL_KEY = Buffer.from('Mng0NCt4ZHVUYUJCa1kxNkVyNUR1QURhZ2h2UzR2d2RrZzh0c
 const { UUID } = require('mongodb/lib/bson');
 
 /**
- * @param { string } path
+ * @param {string} path
  *
- * @returns { boolean }
+ * @returns {boolean}
  */
 function exists(path) {
   try {
@@ -852,6 +852,55 @@ describe('encryption integration tests', () => {
         });
       });
 
+      describe('cloned parent schema before declaring discriminator', function() {
+        beforeEach(async function() {
+          connection = createConnection();
+        });
+        describe('csfle', function() {
+          it('throws on duplicate keys declared on different discriminators', async function() {
+            const schema = new Schema({
+              name: {
+                type: String, encrypt: { keyId: [keyId], algorithm }
+              }
+            }, {
+              encryptionType: 'csfle'
+            });
+            model = connection.model('Schema', schema);
+
+            assert.throws(() => {
+              const clonedSchema = schema.clone().add({
+                age: {
+                  type: Int32, encrypt: { keyId: [keyId], algorithm }
+                }
+              });
+              model.discriminator('Test', clonedSchema);
+            }, /encrypted fields cannot be declared on both the base schema and the child schema in a discriminator/);
+          });
+        });
+
+        describe('queryable encryption', function() {
+          it('throws on duplicate keys declared on different discriminators', async function() {
+            const schema = new Schema({
+              name: {
+                type: String, encrypt: { keyId }
+              }
+            }, {
+              encryptionType: 'queryableEncryption'
+            });
+            model = connection.model('Schema', schema);
+
+            assert.throws(() => {
+              const clonedSchema = schema.clone().add({
+                age: {
+                  type: Int32, encrypt: { keyId: [keyId], algorithm }
+                }
+              });
+              model.discriminator('Test', clonedSchema);
+            }, /encrypted fields cannot be declared on both the base schema and the child schema in a discriminator/);
+          });
+        });
+      });
+
       describe('duplicate keys in discriminators', function() {
         beforeEach(async function() {
           connection = createConnection();
@@ -1130,7 +1179,7 @@ describe('encryption integration tests', () => {
     let model;
 
     afterEach(async function() {
-      await connection.close();
+      await connection?.close();
     });
 
     describe('No FLE configured', function() {
@@ -1319,7 +1368,7 @@ describe('encryption integration tests', () => {
 
         collections.sort((a, b) => {
           // depending on what letter name starts with, `name` might come before the two queryable encryption collections or after them.
-          // this method always puts the `name` collection first, and the two QE collections after it.
+          // this sort function always puts the `name` collection first, and the two QE collections after it.
           if (!a.includes('enxcol_')) return -1;
 
           return a.localeCompare(b);

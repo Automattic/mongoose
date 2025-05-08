@@ -817,12 +817,6 @@ describe('aggregate: ', function() {
 
     it('explain()', async function() {
       const aggregate = new Aggregate([], db.model('Employee'));
-      const version = await start.mongodVersion();
-
-      const mongo26 = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
-      if (!mongo26) {
-        return;
-      }
 
       const output = await aggregate.
         match({ sal: { $lt: 16000 } }).
@@ -868,16 +862,13 @@ describe('aggregate: ', function() {
       const match = { $match: { sal: { $gt: 15000 } } };
       const pref = 'primaryPreferred';
       const aggregate = m.aggregate([match]).read(pref);
-      const mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
       const mongo32_or_greater = version[0] > 3 || (version[0] === 3 && version[1] >= 2);
 
       assert.equal(aggregate.options.readPreference.mode, pref);
-      if (mongo26_or_greater) {
-        aggregate.allowDiskUse(true);
-        aggregate.option({ maxTimeMS: 1000 });
-        assert.equal(aggregate.options.allowDiskUse, true);
-        assert.equal(aggregate.options.maxTimeMS, 1000);
-      }
+      aggregate.allowDiskUse(true);
+      aggregate.option({ maxTimeMS: 1000 });
+      assert.equal(aggregate.options.allowDiskUse, true);
+      assert.equal(aggregate.options.maxTimeMS, 1000);
 
       if (mongo32_or_greater) {
         aggregate.readConcern('m');

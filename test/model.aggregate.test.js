@@ -30,8 +30,6 @@ describe('model aggregate', function() {
   const project = { $project: { maxAge: 1, _id: 0 } };
   let db, A, maxAge;
 
-  let mongo26_or_greater = false;
-
   before(async function() {
     db = start();
     A = db.model('Test', userSchema);
@@ -49,14 +47,6 @@ describe('model aggregate', function() {
     }
 
     await A.create(docs);
-
-    const version = await start.mongodVersion();
-
-    mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
-
-    if (!mongo26_or_greater) {
-      console.log('not testing mongodb 2.6 features');
-    }
   });
 
   after(async function() {
@@ -114,10 +104,6 @@ describe('model aggregate', function() {
     });
 
     it('can use helper for $out', async function() {
-      if (!mongo26_or_greater) {
-        return;
-      }
-
       const outputCollection = 'aggregate_output_' + random();
       await A.aggregate()
         .group(group.$group)

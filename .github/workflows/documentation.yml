@@ -10,7 +10,7 @@ on:
       - 'website.js'
       - 'CHANGELOG.md'
   push:
-    branches:ubuntu
+    branches:
       - master
     paths:
       - '.github/workflows/documentation.yml'

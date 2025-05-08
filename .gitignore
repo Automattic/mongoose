@@ -59,6 +59,9 @@ package-lock.json
 # yarn package-lock
 yarn.lock
 
+# deno lock
+deno.lock
+
 # npm pack output
 mongoose.tgz
 mongoose-*.tgz

@@ -1,7 +1,14 @@
+8.14.2 / 2025-05-08
+===================
+ * fix(query): handle casting array filter paths underneath array filter paths with embedded discriminators #15388 #15386
+ * docs(typescript): correct schema and model generic params in TS virtuals docs #15391
+ * docs+types(schema): add alternative optimisticConcurrency syntaxes to docs + types #15405 #10591
+ * chore: add Node 24 to CI matrix #15408 [stscoundrel](https://github.com/stscoundrel)
+
 7.8.7 / 2025-04-30
 ==================
- *  types(aggregate): allow calling project() with a string #15304 #15300
- *  docs: update deleteOne & deleteMany API def #15360 [Elliot67](https://github.com/Elliot67) [SethFalco](https://github.com/SethFalco)
+ * types(aggregate): allow calling project() with a string #15304 #15300
+ * docs: update deleteOne & deleteMany API def #15360 [Elliot67](https://github.com/Elliot67) [SethFalco](https://github.com/SethFalco)
 
 8.14.1 / 2025-04-29
 ===================

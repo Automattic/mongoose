@@ -612,7 +612,7 @@ if (isMain) {
       const config = generateSearch.getConfig();
       generateSearchPromise = generateSearch.generateSearch(config);
     } catch (err) {
-      console.error("Generating Search failed:", err);
+      console.error('Generating Search failed:', err);
     }
     await deleteAllHtmlFiles();
     await pugifyAllFiles();
@@ -621,7 +621,7 @@ if (isMain) {
       await moveDocsToTemp();
     }
 
-    if (!!generateSearchPromise) {
+    if (generateSearchPromise) {
       await generateSearchPromise;
     }
 

@@ -1782,13 +1782,13 @@ function gh15301() {
 function gh15412() {
   const ScheduleEntrySchema = new Schema({
     startDate: { type: Date, required: true },
-    endDate: { type: Date, required: false },
+    endDate: { type: Date, required: false }
   });
   const ScheduleEntry = model('ScheduleEntry', ScheduleEntrySchema);
 
-  type ScheduleEntryDoc = ReturnType<typeof ScheduleEntry["hydrate"]>
+  type ScheduleEntryDoc = ReturnType<typeof ScheduleEntry['hydrate']>
 
-  ScheduleEntrySchema.post('init', function (this: ScheduleEntryDoc, _res: any, next: CallbackWithoutResultAndOptionalError) {
+  ScheduleEntrySchema.post('init', function(this: ScheduleEntryDoc, _res: any, next: CallbackWithoutResultAndOptionalError) {
     expectType<Date>(this.startDate);
     expectType<Date | null | undefined>(this.endDate);
     next();

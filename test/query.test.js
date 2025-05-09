@@ -3128,7 +3128,7 @@ describe('Query', function() {
     const Model = db.model('Test', schema);
 
     return Model.updateOne({}, { name: 'bar' }).exec().
-      then(() => assert.deepEqual(priorVals, [null]));
+      then(() => assert.deepEqual(priorVals, [undefined]));
   });
 
   describe('clone', function() {

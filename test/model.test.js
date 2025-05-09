@@ -6780,7 +6780,7 @@ describe('Model', function() {
       await users[2].save();
       users[2].name = 'I am the updated third name';
 
-      const writeOperations = User.buildBulkWriteOperations(users);
+      const writeOperations = await User.buildBulkWriteOperations(users);
 
       const desiredWriteOperations = [
         { insertOne: { document: users[0] } },
@@ -6795,7 +6795,7 @@ describe('Model', function() {
 
     });
 
-    it('throws an error when one document is invalid', () => {
+    it('throws an error when one document is invalid', async() => {
       const userSchema = new Schema({
         name: { type: String, minLength: 5 }
       });
@@ -6810,11 +6810,10 @@ describe('Model', function() {
 
       let err;
       try {
-        User.buildBulkWriteOperations(users);
+        await User.buildBulkWriteOperations(users);
       } catch (error) {
         err = error;
       }
-
 
       assert.ok(err);
     });
@@ -6827,10 +6826,8 @@ describe('Model', function() {
       const User = db.model('User', userSchema);
 
 
-      assert.throws(
-        function() {
-          User.buildBulkWriteOperations(null);
-        },
+      assert.rejects(
+        User.buildBulkWriteOperations(null),
         /bulkSave expects an array of documents to be passed/
       );
     });
@@ -6842,17 +6839,15 @@ describe('Model', function() {
       const User = db.model('User', userSchema);
 
 
-      assert.throws(
-        function() {
-          User.buildBulkWriteOperations([
-            new User({ name: 'Hafez' }),
-            { name: 'I am not a document' }
-          ]);
-        },
+      assert.rejects(
+        User.buildBulkWriteOperations([
+          new User({ name: 'Hafez' }),
+          { name: 'I am not a document' }
+        ]),
         /documents\.1 was not a mongoose document/
       );
     });
-    it('skips validation when given `skipValidation` true', () => {
+    it('skips validation when given `skipValidation` true', async() => {
       const userSchema = new Schema({
         name: { type: String, minLength: 5 }
       });
@@ -6865,7 +6860,7 @@ describe('Model', function() {
         new User({ name: 'b' })
       ];
 
-      const writeOperations = User.buildBulkWriteOperations(users, { skipValidation: true });
+      const writeOperations = await User.buildBulkWriteOperations(users, { skipValidation: true });
 
       assert.equal(writeOperations.length, 3);
     });
@@ -6904,7 +6899,7 @@ describe('Model', function() {
       userToUpdate.name = 'John Doe';
 
       // Act
-      const writeOperations = User.buildBulkWriteOperations([newUser, userToUpdate], { timestamps: false, skipValidation: true });
+      const writeOperations = await User.buildBulkWriteOperations([newUser, userToUpdate], { timestamps: false, skipValidation: true });
 
       // Assert
       const timestampsOptions = writeOperations.map(writeOperationContainer => {
@@ -6926,7 +6921,7 @@ describe('Model', function() {
       userToUpdate.name = 'John Doe';
 
       // Act
-      const writeOperations = User.buildBulkWriteOperations([newUser, userToUpdate], { timestamps: true, skipValidation: true });
+      const writeOperations = await User.buildBulkWriteOperations([newUser, userToUpdate], { timestamps: true, skipValidation: true });
 
       // Assert
       const timestampsOptions = writeOperations.map(writeOperationContainer => {
@@ -6948,7 +6943,7 @@ describe('Model', function() {
       userToUpdate.name = 'John Doe';
 
       // Act
-      const writeOperations = User.buildBulkWriteOperations([newUser, userToUpdate], { skipValidation: true });
+      const writeOperations = await User.buildBulkWriteOperations([newUser, userToUpdate], { skipValidation: true });
 
       // Assert
       const timestampsOptions = writeOperations.map(writeOperationContainer => {
@@ -7060,6 +7055,63 @@ describe('Model', function() {
         ]
       );
 
+    });
+
+    it('saves documents with embedded discriminators (gh-15410)', async function() {
+      const requirementSchema = new Schema({
+        kind: { type: String, required: true },
+        quantity: Number,
+        notes: String
+      }, { _id: false, discriminatorKey: 'kind' });
+
+      const componentRequirementSchema = new Schema({
+        componentTest: 'ObjectId'
+      }, { _id: false });
+
+      const toolRequirementSchema = new Schema({
+        toolTest: 'ObjectId'
+      }, { _id: false });
+
+      const subRowSchema = new Schema({
+        requirements: [requirementSchema]
+      }, { _id: false });
+
+      const rowSchema = new Schema({
+        rows: [subRowSchema]
+      }, { _id: false });
+
+      const orderSchema = new Schema({
+        code: String,
+        rows: [rowSchema]
+      }, { timestamps: true });
+
+      const Requirement = requirementSchema;
+      Requirement.discriminators = {};
+      Requirement.discriminators['ComponentRequirement'] = componentRequirementSchema;
+      Requirement.discriminators['ToolRequirement'] = toolRequirementSchema;
+
+      subRowSchema.path('requirements').discriminator('ComponentRequirement', componentRequirementSchema);
+      subRowSchema.path('requirements').discriminator('ToolRequirement', toolRequirementSchema);
+
+      const Order = db.model('Order', orderSchema);
+
+      const order = await Order.create({
+        code: 'test-2',
+        rows: [{
+          rows: [{
+            requirements: [
+              { kind: 'ComponentRequirement', quantity: 1 },
+              { kind: 'ToolRequirement', quantity: 1 }
+            ]
+          }]
+        }]
+      });
+
+      const newObjectId = new mongoose.Types.ObjectId();
+      order.rows[0].rows[0].requirements[1].set({ toolTest: newObjectId.toString() });
+      await Order.bulkSave([order]);
+      const reread = await Order.findById(order._id).lean();
+      assert.strictEqual(reread.rows[0].rows[0].requirements[1].toolTest?.toHexString(), newObjectId.toHexString());
     });
 
     it('insertMany should throw an error if there were operations that failed validation, ' +

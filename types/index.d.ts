@@ -657,9 +657,112 @@ declare module 'mongoose' {
 
   export type ReturnsNewDoc = { new: true } | { returnOriginal: false } | { returnDocument: 'after' };
 
-  export type ProjectionElementType = number | string;
-  export type ProjectionType<T> = { [P in keyof T]?: ProjectionElementType } | AnyObject | string;
+  type ArrayOperators = { $slice: number | [number, number]; $elemMatch?: undefined } | { $elemMatch: object; $slice?: undefined };
+  /**
+   * This Type Assigns `Element | undefined` recursively to the `T` type.
+   * if it is an array it will do this to the element of the array, if it is an object it will do this for the properties of the object.
+   * `Element` is the truthy or falsy values that are going to be used as the value of the projection.(1 | true or 0 | false)
+   * For the elements of the array we will use: `Element | `undefined` | `ArrayOperators`
+   * @example
+   * type CalculatedType = Projector<{ a: string, b: number, c: { d: string }, d: string[] }, true>
+   * type CalculatedType = {
+        a?: true | undefined;
+        b?: true | undefined;
+        c?: true | {
+            d?: true | undefined;
+        } | undefined;
+        d?: true | ArrayOperators | undefined;
+    }
+  */
+  type Projector<T, Element> = T extends Array<infer U>
+    ? Projector<U, Element> | ArrayOperators
+    : T extends object
+      ? {
+        [K in keyof T]?: T[K] extends object ? Projector<T[K], Element> | Element : Element;
+      }
+      : Element;
+  type _IDType = { _id?: boolean | 1 | 0 };
+  type InclusionProjection<T> = NestedPartial<Projector<NestedRequired<DotKeys<T>>, true | 1> & _IDType>;
+  type ExclusionProjection<T> = NestedPartial<Projector<NestedRequired<DotKeys<T>>, false | 0> & _IDType>;
+  type ProjectionUnion<T> = InclusionProjection<T> | ExclusionProjection<T>;
 
+  type NestedRequired<T> = T extends Array<infer U>
+    ? Array<NestedRequired<U>>
+    : T extends object
+      ? {
+        [K in keyof T]-?: NestedRequired<T[K]>;
+      }
+      : T;
+  type NestedPartial<T> = T extends Array<infer U>
+    ? Array<NestedPartial<U>>
+    : T extends object
+      ? {
+        [K in keyof T]?: NestedPartial<T[K]>;
+      }
+      : T;
+
+  /** https://stackoverflow.com/questions/58434389/typescript-deep-keyof-of-a-nested-object/58436959#58436959 for dot nested implementation it is used and then modified */
+  type DotPrefix<T extends string> = T extends '' ? '' : `.${T}`;
+
+  /** https://stackoverflow.com/questions/75419012/how-do-i-limit-the-level-of-nesting-on-a-recursive-type-in-typescript */
+  type Length<T extends unknown[]> = T extends { length: infer L } ? L : never;
+  type BuildTuple<L extends number, T extends unknown[] = []> = T extends { length: L } ? T : BuildTuple<L, [...T, unknown]>;
+  type MinusOne<N extends number> = BuildTuple<N> extends [...infer U, unknown] ? Length<U> : never;
+
+  /**
+   * Generates a union from dot path in object
+   * We have to give it the Depth to prevent infinite recursion and also prevent slow compilation when the object is too much nested
+   */
+  type DotNestedKeys<T, Depth extends number> = (
+    Depth extends 0
+      ? never
+      : T extends object
+        ? { [K in Exclude<keyof T, symbol>]: `${K}` | `${K}${DotPrefix<DotNestedKeys<T[K], MinusOne<Depth>>>}` }[Exclude<keyof T, symbol>]
+        : ''
+  ) extends infer D
+    ? Extract<D, string>
+    : never;
+  type FindDottedPathType<T, Path extends string> = Path extends `${infer K}.${infer R}`
+    ? K extends keyof T
+      ? FindDottedPathType<T[K] extends Array<infer U> ? U : T[K], R>
+      : never
+    : Path extends keyof T
+      ? T[Path]
+      : never;
+  type ExtractNestedArrayElement<T> = T extends (infer U)[]
+    ? ExtractNestedArrayElement<U>
+    : T extends object
+      ? { [K in keyof T]: ExtractNestedArrayElement<T[K]> }
+      : T;
+  type DotnotationMaximumDepth = 3;
+  /**
+   * Create dot path for nested objects
+   * It creates dot notation for arrays similar to mongodb. For example { a: { c: { b: number}[] }[] } => 'a.c.b': number, 'a.c': { b: number }[]
+   */
+  type DotKeys<DocType> = {
+    [key in DotNestedKeys<ExtractNestedArrayElement<DocType>, DotnotationMaximumDepth>]?: FindDottedPathType<NestedRequired<DocType>, key>;
+  };
+
+  /**
+   * This types are equivalent to primary types
+   */
+  type SpecialTypes = DateSchemaDefinition | Date | globalThis.Date | DateConstructor | Types.Buffer | Types.Decimal128 | Types.Buffer | BooleanSchemaDefinition | NumberSchemaDefinition;
+  type Replacer<T> = T extends SpecialTypes ? string : T;
+  /**
+   * Date type is like a Primitive type for us and we do not want to project something inside it.
+   * ObjectId is also similar.
+   */
+  type ReplaceSpecialTypes<T> = T extends SpecialTypes
+    ? Replacer<T>
+    : T extends Array<infer U>
+      ? Array<ReplaceSpecialTypes<U>>
+      : T extends object
+        ? {
+          [K in keyof T]?: ReplaceSpecialTypes<T[K]>;
+        }
+        : Replacer<T>;
+
+  export type ProjectionType<T> = (ProjectionUnion<ReplaceSpecialTypes<T>> & AnyObject) | string | ((...agrs: any) => any);
   export type SortValues = SortOrder;
 
   export type SortOrder = -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';

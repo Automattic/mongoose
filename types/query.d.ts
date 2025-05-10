@@ -160,7 +160,7 @@ declare module 'mongoose' {
      * Set `overwriteImmutable` to `true` to allow updating immutable properties using other update operators.
      */
     overwriteImmutable?: boolean;
-    projection?: ProjectionType<DocType>;
+    projection?: { [P in keyof DocType]?: number | string } | AnyObject | string;
     /**
      * if true, returns the full ModifyResult rather than just the document
      */

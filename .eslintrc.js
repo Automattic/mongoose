@@ -7,7 +7,6 @@ module.exports = {
   ignorePatterns: [
     'tools',
     'dist',
-    'website.js',
     'test/files/*',
     'benchmarks',
     '*.min.js',

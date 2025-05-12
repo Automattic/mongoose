@@ -9,7 +9,6 @@ const start = require('./common');
 const Document = require('../lib/document');
 const EventEmitter = require('events').EventEmitter;
 const ArraySubdocument = require('../lib/types/arraySubdocument');
-const Query = require('../lib/query');
 const assert = require('assert');
 const idGetter = require('../lib/helpers/schema/idGetter');
 const sinon = require('sinon');
@@ -1203,38 +1202,6 @@ describe('document', function() {
     });
   });
 
-  describe.skip('#update', function() {
-    it('returns a Query', function() {
-      const mg = new mongoose.Mongoose();
-      const M = mg.model('Test', { s: String });
-      const doc = new M();
-      assert.ok(doc.update() instanceof Query);
-    });
-    it('calling update on document should relay to its model (gh-794)', async function() {
-      const Docs = new Schema({ text: String });
-      const docs = db.model('Test', Docs);
-      const d = new docs({ text: 'A doc' });
-      let called = false;
-      await d.save();
-
-      const oldUpdate = docs.update;
-      docs.update = function(query, operation) {
-        assert.equal(Object.keys(query).length, 1);
-        assert.equal(d._id, query._id);
-        assert.equal(Object.keys(operation).length, 1);
-        assert.equal(Object.keys(operation.$set).length, 1);
-        assert.equal(operation.$set.text, 'A changed doc');
-        called = true;
-        docs.update = oldUpdate;
-        oldUpdate.apply(docs, arguments);
-      };
-
-      await d.update({ $set: { text: 'A changed doc' } });
-
-      assert.equal(called, true);
-    });
-  });
-
   it('toObject should not set undefined values to null', function() {
     const doc = new TestDocument();
     const obj = doc.toObject();
@@ -1749,13 +1716,13 @@ describe('document', function() {
         }
       }));
       const doc = new Model({ name: 'test', profile: { age: 29 } });
-      assert.deepEqual(names, [null]);
-      assert.deepEqual(profiles, [null]);
+      assert.deepEqual(names, [undefined]);
+      assert.deepEqual(profiles, [undefined]);
 
       doc.name = 'test2';
       doc.profile = { age: 30 };
-      assert.deepEqual(names, [null, 'test']);
-      assert.deepEqual(profiles, [null, { age: 29 }]);
+      assert.deepEqual(names, [undefined, 'test']);
+      assert.deepEqual(profiles, [undefined, { age: 29 }]);
     });
 
     describe('on nested paths', function() {
@@ -10500,8 +10467,9 @@ describe('document', function() {
         assert.equal(user.init, 12);
       });
     });
-    xdescribe('Document#collection', () => {
-      it('is available as `$collection`', async() => {
+
+    describe('Document#collection', function() {
+      it('is available as `$collection`', async function() {
         const userSchema = new Schema({ name: String });
         const User = db.model('User', userSchema);
 
@@ -10754,8 +10722,7 @@ describe('document', function() {
     });
 
     // skip until gh-10367 is implemented
-    xit('support `pathsToSkip` option for `Model.validate()`', async() => {
-
+    it.skip('support `pathsToSkip` option for `Model.validate()`', async function() {
       const User = getUserModel();
       const err1 = await User.validate({}, { pathsToSkip: ['age'] });
       assert.deepEqual(Object.keys(err1.errors), ['name']);

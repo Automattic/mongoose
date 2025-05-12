@@ -349,4 +349,52 @@ describe('castArrayFilters', function() {
 
     assert.strictEqual(q.getUpdate().$set['groups.$[group].tags.$[tag]'], '42');
   });
+
+  it('casts paths underneath embedded discriminators (gh-15386)', async function() {
+    const eventSchema = new Schema({ message: String }, { discriminatorKey: 'kind', _id: false });
+    const batchSchema = new Schema({ events: [eventSchema] });
+
+    const docArray = batchSchema.path('events');
+    docArray.discriminator('Clicked', new Schema({ element: { type: String, required: true } }, { _id: false }));
+
+    const productSchema = new Schema({
+      name: String,
+      price: Number
+    });
+
+    docArray.discriminator(
+      'Purchased',
+      new Schema({
+        products: {
+          type: [productSchema],
+          required: true
+        }
+      })
+    );
+
+    const q = new Query();
+    q.schema = batchSchema;
+
+    const filter = {};
+    const update = {
+      $set: {
+        'events.$[event].products.$[product].price': '20'
+      }
+    };
+    const purchasedId = new Types.ObjectId();
+    const productId = new Types.ObjectId();
+    const opts = {
+      arrayFilters: [
+        { 'event._id': purchasedId, 'event.kind': 'Purchased' },
+        { 'product._id': productId.toString() }
+      ]
+    };
+
+    q.updateOne(filter, update, opts);
+    castArrayFilters(q);
+    q._update = q._castUpdate(q._update, false);
+
+    assert.strictEqual(q.getOptions().arrayFilters[1]['product._id'].toHexString(), productId.toHexString());
+    assert.strictEqual(q.getUpdate().$set['events.$[event].products.$[product].price'], 20);
+  });
 });

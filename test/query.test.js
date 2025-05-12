@@ -1498,9 +1498,9 @@ describe('Query', function() {
           then(() => Product.find().sort({ _id: 1 }).countDocuments({}).exec());
       });
 
-      it.skip('ignores count when passed to sort', function() {
+      it('ignores count when passed to sort', function() {
         const Product = db.model('Product', productSchema);
-        return Product.find().count({}).sort({ _id: 1 }).exec();
+        return Product.find().countDocuments({}).sort({ _id: 1 }).exec();
       });
     });
 
@@ -3128,7 +3128,7 @@ describe('Query', function() {
     const Model = db.model('Test', schema);
 
     return Model.updateOne({}, { name: 'bar' }).exec().
-      then(() => assert.deepEqual(priorVals, [null]));
+      then(() => assert.deepEqual(priorVals, [undefined]));
   });
 
   describe('clone', function() {

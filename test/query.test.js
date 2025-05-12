@@ -4464,7 +4464,7 @@ describe('Query', function() {
     beforeEach(async function() {
       this.timeout(15000);
 
-      try {  
+      try {
         const schema = new Schema({ name: String, email: String });
         Person = db.model('Person', schema, null, { cache: false });
 
@@ -4935,4 +4935,4 @@ describe('Query', function() {
       });
     });
   });
-  });
+});

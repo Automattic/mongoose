@@ -4,20 +4,30 @@ declare module 'mongoose' {
 
   type WithLevel1NestedPaths<T, K extends keyof T = keyof T> = {
     [P in K | NestedPaths<Required<T>, K>]: P extends K
-      ? T[P]
+      ? NonNullable<T[P]>
       : P extends `${infer Key}.${infer Rest}`
         ? Key extends keyof T
-          ? Rest extends keyof NonNullable<T[Key]>
-            ? NonNullable<T[Key]>[Rest]
-            : never
+          ? T[Key] extends (infer U)[]
+            ? Rest extends keyof NonNullable<U>
+              ? NonNullable<U>[Rest]
+              : never
+            : Rest extends keyof NonNullable<T[Key]>
+              ? NonNullable<T[Key]>[Rest]
+              : never
           : never
         : never;
   };
 
   type NestedPaths<T, K extends keyof T> = K extends string
-    ? T[K] extends Record<string, any> | null | undefined
-      ? `${K}.${keyof NonNullable<T[K]> & string}`
-      : never
+    ? T[K] extends TreatAsPrimitives
+      ? never
+      : T[K] extends Array<infer U>
+        ? U extends Record<string, any>
+          ? `${K}.${keyof NonNullable<U> & string}`
+          : never
+        : T[K] extends Record<string, any> | null | undefined
+          ? `${K}.${keyof NonNullable<T[K]> & string}`
+          : never
     : never;
 
   type WithoutUndefined<T> = T extends undefined ? never : T;

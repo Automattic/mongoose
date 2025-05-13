@@ -14,7 +14,8 @@ module.exports = {
     '!.*',
     'node_modules',
     '.git',
-    'data'
+    'data',
+    '.config'
   ],
   overrides: [
     {

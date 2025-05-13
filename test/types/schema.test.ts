@@ -25,8 +25,7 @@ import {
   BufferToBinary,
   CallbackWithoutResultAndOptionalError
 } from 'mongoose';
-import { Binary } from 'mongodb';
-import { IsPathRequired } from '../../types/inferschematype';
+import { Binary, BSON } from 'mongodb';
 import { expectType, expectError, expectAssignable } from 'tsd';
 import { ObtainDocumentPathType, ResolvePathType } from '../../types/inferschematype';
 
@@ -591,6 +590,16 @@ const batchSchema2 = new Schema({ name: String }, { discriminatorKey: 'kind', st
   return 1;
 } } });
 batchSchema2.discriminator('event', eventSchema2);
+
+
+function encryptionType() {
+  const keyId = new BSON.UUID();
+  expectError<Schema>(new Schema({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'newFakeEncryptionType' }));
+  expectError<Schema>(new Schema({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 1 }));
+
+  expectType<Schema>(new Schema({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'queryableEncryption' }));
+  expectType<Schema>(new Schema({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'csfle' }));
+}
 
 function gh11828() {
   interface IUser {

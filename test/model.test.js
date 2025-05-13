@@ -6780,7 +6780,7 @@ describe('Model', function() {
       await users[2].save();
       users[2].name = 'I am the updated third name';
 
-      const writeOperations = await User.buildBulkWriteOperations(users);
+      const writeOperations = User.buildBulkWriteOperations(users);
 
       const desiredWriteOperations = [
         { insertOne: { document: users[0] } },
@@ -6795,7 +6795,7 @@ describe('Model', function() {
 
     });
 
-    it('throws an error when one document is invalid', async() => {
+    it('throws an error when one document is invalid', () => {
       const userSchema = new Schema({
         name: { type: String, minLength: 5 }
       });
@@ -6808,14 +6808,10 @@ describe('Model', function() {
         new User({ name: 'b' })
       ];
 
-      let err;
-      try {
-        await User.buildBulkWriteOperations(users);
-      } catch (error) {
-        err = error;
-      }
-
-      assert.ok(err);
+      assert.throws(
+        () => User.buildBulkWriteOperations(users),
+        /name: Path `name` \(`a`\) is shorter than the minimum allowed length/
+      );
     });
 
     it('throws an error if documents is not an array', function() {
@@ -6826,8 +6822,8 @@ describe('Model', function() {
       const User = db.model('User', userSchema);
 
 
-      assert.rejects(
-        User.buildBulkWriteOperations(null),
+      assert.throws(
+        () => User.buildBulkWriteOperations(null),
         /bulkSave expects an array of documents to be passed/
       );
     });
@@ -6838,16 +6834,15 @@ describe('Model', function() {
 
       const User = db.model('User', userSchema);
 
-
-      assert.rejects(
-        User.buildBulkWriteOperations([
+      assert.throws(
+        () => User.buildBulkWriteOperations([
           new User({ name: 'Hafez' }),
           { name: 'I am not a document' }
         ]),
         /documents\.1 was not a mongoose document/
       );
     });
-    it('skips validation when given `skipValidation` true', async() => {
+    it('skips validation when given `skipValidation` true', () => {
       const userSchema = new Schema({
         name: { type: String, minLength: 5 }
       });
@@ -6860,7 +6855,7 @@ describe('Model', function() {
         new User({ name: 'b' })
       ];
 
-      const writeOperations = await User.buildBulkWriteOperations(users, { skipValidation: true });
+      const writeOperations = User.buildBulkWriteOperations(users, { skipValidation: true });
 
       assert.equal(writeOperations.length, 3);
     });

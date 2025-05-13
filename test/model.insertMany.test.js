@@ -646,4 +646,38 @@ describe('insertMany()', function() {
 
     await Money.insertMany([{ amount: '123.45' }]);
   });
+
+  it('async stack traces with server error (gh-15317)', async function insertManyWithServerError() {
+    const schema = new mongoose.Schema({
+      name: { type: String, unique: true }
+    });
+    const User = db.model('Test', schema);
+    await User.init();
+
+    const err = await User.insertMany([
+      { name: 'A' },
+      { name: 'A' }
+    ]).then(() => null, err => err);
+    assert.equal(err.name, 'MongoBulkWriteError');
+    assert.ok(err.stack.includes('insertManyWithServerError'));
+  });
+
+  it('async stack traces with post insertMany error (gh-15317)', async function postInsertManyError() {
+    const schema = new mongoose.Schema({
+      name: { type: String }
+    });
+    schema.post('insertMany', async function() {
+      await new Promise(resolve => setTimeout(resolve, 10));
+      throw new Error('postInsertManyError');
+    });
+    const User = db.model('Test', schema);
+    await User.init();
+
+    const err = await User.insertMany([
+      { name: 'A' },
+      { name: 'A' }
+    ]).then(() => null, err => err);
+    assert.equal(err.message, 'postInsertManyError');
+    assert.ok(err.stack.includes('postInsertManyError'));
+  });
 });

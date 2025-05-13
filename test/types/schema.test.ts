@@ -25,7 +25,7 @@ import {
   BufferToBinary,
   CallbackWithoutResultAndOptionalError
 } from 'mongoose';
-import { Binary } from 'mongodb';
+import { Binary, UUID } from 'mongodb';
 import { IsPathRequired } from '../../types/inferschematype';
 import { expectType, expectError, expectAssignable } from 'tsd';
 import { ObtainDocumentPathType, ResolvePathType } from '../../types/inferschematype';
@@ -911,23 +911,23 @@ async function gh12593() {
   const testSchema = new Schema({ x: { type: Schema.Types.UUID } });
 
   type Example = InferSchemaType<typeof testSchema>;
-  expectType<{ x?: Buffer | null }>({} as Example);
+  expectType<{ x?: UUID | null }>({} as Example);
 
   const Test = model('Test', testSchema);
 
   const doc = await Test.findOne({ x: '4709e6d9-61fd-435e-b594-d748eb196d8f' }).orFail();
-  expectType<Buffer | undefined | null>(doc.x);
+  expectType<UUID | undefined | null>(doc.x);
 
   const doc2 = new Test({ x: '4709e6d9-61fd-435e-b594-d748eb196d8f' });
-  expectType<Buffer | undefined | null>(doc2.x);
+  expectType<UUID | undefined | null>(doc2.x);
 
   const doc3 = await Test.findOne({}).orFail().lean();
-  expectType<Binary | undefined | null>(doc3.x);
+  expectType<UUID | undefined | null>(doc3.x);
 
   const arrSchema = new Schema({ arr: [{ type: Schema.Types.UUID }] });
 
   type ExampleArr = InferSchemaType<typeof arrSchema>;
-  expectType<{ arr: Buffer[] }>({} as ExampleArr);
+  expectType<{ arr: UUID[] }>({} as ExampleArr);
 }
 
 function gh12562() {
@@ -1234,12 +1234,24 @@ async function gh13797() {
   interface IUser {
     name: string;
   }
-  new Schema<IUser>({ name: { type: String, required: function() {
-    expectType<IUser>(this); return true;
-  } } });
-  new Schema<IUser>({ name: { type: String, default: function() {
-    expectType<IUser>(this); return '';
-  } } });
+  new Schema<IUser>({
+    name: {
+      type: String,
+      required: function() {
+        expectType<HydratedDocument<IUser>>(this);
+        return true;
+      }
+    }
+  });
+  new Schema<IUser>({
+    name: {
+      type: String,
+      default: function() {
+        expectType<HydratedDocument<IUser>>(this);
+        return '';
+      }
+    }
+  });
 }
 
 declare const brand: unique symbol;
@@ -1531,12 +1543,17 @@ function gh14696() {
 
   const x: ValidateOpts<unknown, User> = {
     validator(v: any) {
-      expectAssignable<User>(this);
-      return !v || this.name === 'super admin';
+      expectAssignable<User | Query<unknown, User>>(this);
+      return !v || this instanceof Query || this.name === 'super admin';
     }
   };
 
-  const userSchema = new Schema<User>({
+  interface IUserMethods {
+    isSuperAdmin(): boolean;
+  }
+
+  type UserModelType = Model<User, {}, IUserMethods>;
+  const userSchema = new Schema<User, UserModelType, IUserMethods>({
     name: {
       type: String,
       required: [true, 'Name on card is required']
@@ -1546,8 +1563,11 @@ function gh14696() {
       default: false,
       validate: {
         validator(v: any) {
-          expectAssignable<User>(this);
-          return !v || this.name === 'super admin';
+          expectAssignable<User | Query<unknown, User>>(this);
+          if (!v) {
+            return true;
+          }
+          return this.get('name') === 'super admin' || (!(this instanceof Query) && this.isSuperAdmin());
         }
       }
     },
@@ -1556,8 +1576,12 @@ function gh14696() {
       default: false,
       validate: {
         async validator(v: any) {
-          expectAssignable<User>(this);
-          return !v || this.name === 'super admin';
+          expectAssignable<User | Query<unknown, User>>(this);
+          if (this instanceof Query) {
+            const doc = await this.clone().findOne().orFail();
+            return doc.isSuperAdmin();
+          }
+          return !v || this.get('name') === 'super admin';
         }
       }
     }
@@ -1699,7 +1723,8 @@ async function gh14451() {
     myMap: {
       type: Map,
       of: String
-    }
+    },
+    myUUID: 'UUID'
   });
 
   const Test = model('Test', exampleSchema);
@@ -1713,7 +1738,8 @@ async function gh14451() {
       subdocProp?: string | undefined | null
     } | null,
     docArr: { nums: number[], times: string[] }[],
-    myMap?: Record<string, string> | null | undefined
+    myMap?: Record<string, string> | null | undefined,
+    myUUID?: string | null | undefined
   }>({} as TestJSON);
 }
 

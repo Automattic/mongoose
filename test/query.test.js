@@ -571,7 +571,7 @@ describe('Query', function() {
 
       try {
         q.find();
-      } catch (err) {
+      } catch {
         threw = true;
       }
 
@@ -3081,7 +3081,6 @@ describe('Query', function() {
   it('throws an error if executed multiple times (gh-7398)', async function() {
     const Test = db.model('Test', Schema({ name: String }));
 
-
     const q = Test.findOne();
 
     await q;
@@ -3090,7 +3089,6 @@ describe('Query', function() {
     assert.ok(err);
     assert.equal(err.name, 'MongooseError');
     assert.equal(err.message, 'Query was already executed: Test.findOne({})');
-    assert.ok(err.originalStack);
 
     err = await q.clone().then(() => null, err => err);
     assert.ifError(err);
@@ -3316,7 +3314,6 @@ describe('Query', function() {
       quiz_title: String,
       questions: [questionSchema]
     }, { strict: 'throw' });
-    const Quiz = db.model('Test', quizSchema);
 
     const mcqQuestionSchema = new Schema({
       text: String,
@@ -3324,6 +3321,7 @@ describe('Query', function() {
     }, { strict: 'throw' });
 
     quizSchema.path('questions').discriminator('mcq', mcqQuestionSchema);
+    const Quiz = db.model('Test', quizSchema);
 
     const id1 = new mongoose.Types.ObjectId();
     const id2 = new mongoose.Types.ObjectId();
@@ -4411,6 +4409,52 @@ describe('Query', function() {
       assert.strictEqual(doc.email, 'test');
       assert.strictEqual(doc.passwordHash, undefined);
     });
+  });
+
+  it('throws an error if calling find(null), findOne(null), updateOne(null, update), etc. (gh-14948)', async function() {
+    const userSchema = new Schema({
+      name: String
+    });
+    const UserModel = db.model('User', userSchema);
+    await UserModel.deleteMany({});
+    await UserModel.updateOne({ name: 'test' }, { name: 'test' }, { upsert: true });
+
+    await assert.rejects(
+      () => UserModel.find(null),
+      /ObjectParameterError: Parameter "filter" to find\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.findOne(null),
+      /ObjectParameterError: Parameter "filter" to findOne\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.findOneAndUpdate(null, { name: 'test2' }),
+      /ObjectParameterError: Parameter "filter" to findOneAndUpdate\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.findOneAndReplace(null, { name: 'test2' }),
+      /ObjectParameterError: Parameter "filter" to findOneAndReplace\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.findOneAndDelete(null),
+      /ObjectParameterError: Parameter "filter" to findOneAndDelete\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.updateOne(null, { name: 'test2' }),
+      /ObjectParameterError: Parameter "filter" to updateOne\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.updateMany(null, { name: 'test2' }),
+      /ObjectParameterError: Parameter "filter" to updateMany\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.deleteOne(null),
+      /ObjectParameterError: Parameter "filter" to deleteOne\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.deleteMany(null),
+      /ObjectParameterError: Parameter "filter" to deleteMany\(\) must be an object, got "null"/
+    );
   });
 
   describe('findById(andUpdate/andDelete)', function() {

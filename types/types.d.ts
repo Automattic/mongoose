@@ -70,7 +70,7 @@ declare module 'mongoose' {
       create(obj: any): THydratedDocumentType;
 
       /** Searches array items for the first document with a matching _id. */
-      id(id: any): THydratedDocumentType | null;
+      id(id: ObjectId | string | number | Buffer): THydratedDocumentType | null;
 
       push(...args: (AnyKeys<T> & AnyObject)[]): number;
 

@@ -1715,13 +1715,13 @@ describe('document', function() {
         }
       }));
       const doc = new Model({ name: 'test', profile: { age: 29 } });
-      assert.deepEqual(names, [null]);
-      assert.deepEqual(profiles, [null]);
+      assert.deepEqual(names, [undefined]);
+      assert.deepEqual(profiles, [undefined]);
 
       doc.name = 'test2';
       doc.profile = { age: 30 };
-      assert.deepEqual(names, [null, 'test']);
-      assert.deepEqual(profiles, [null, { age: 29 }]);
+      assert.deepEqual(names, [undefined, 'test']);
+      assert.deepEqual(profiles, [undefined, { age: 29 }]);
     });
 
     describe('on nested paths', function() {

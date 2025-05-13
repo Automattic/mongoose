@@ -7080,10 +7080,9 @@ describe('Model', function() {
         rows: [rowSchema]
       }, { timestamps: true });
 
-      const Requirement = requirementSchema;
-      Requirement.discriminators = {};
-      Requirement.discriminators['ComponentRequirement'] = componentRequirementSchema;
-      Requirement.discriminators['ToolRequirement'] = toolRequirementSchema;
+      requirementSchema.discriminators = {};
+      requirementSchema.discriminators['ComponentRequirement'] = componentRequirementSchema;
+      requirementSchema.discriminators['ToolRequirement'] = toolRequirementSchema;
 
       subRowSchema.path('requirements').discriminator('ComponentRequirement', componentRequirementSchema);
       subRowSchema.path('requirements').discriminator('ToolRequirement', toolRequirementSchema);

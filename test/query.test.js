@@ -1498,9 +1498,9 @@ describe('Query', function() {
           then(() => Product.find().sort({ _id: 1 }).countDocuments({}).exec());
       });
 
-      it.skip('ignores count when passed to sort', function() {
+      it('ignores count when passed to sort', function() {
         const Product = db.model('Product', productSchema);
-        return Product.find().count({}).sort({ _id: 1 }).exec();
+        return Product.find().countDocuments({}).sort({ _id: 1 }).exec();
       });
     });
 
@@ -3128,7 +3128,7 @@ describe('Query', function() {
     const Model = db.model('Test', schema);
 
     return Model.updateOne({}, { name: 'bar' }).exec().
-      then(() => assert.deepEqual(priorVals, [null]));
+      then(() => assert.deepEqual(priorVals, [undefined]));
   });
 
   describe('clone', function() {
@@ -4410,6 +4410,529 @@ describe('Query', function() {
       const doc = await UserModel.findById(_id).orFail().schemaLevelProjections(true);
       assert.strictEqual(doc.email, 'test');
       assert.strictEqual(doc.passwordHash, undefined);
+    });
+  });
+
+  describe('findById(andUpdate/andDelete)', function() {
+    let Person;
+    let _id;
+    const targetName = 'Charlie';
+
+    beforeEach(async function() {
+      const schema = new Schema({ name: String, age: Number });
+      Person = db.model('Person', schema);
+
+      const people = await Person.create([
+        { name: 'Alice', age: 10 },
+        { name: 'Bob', age: 20 },
+        { name: targetName, age: 30 },
+        { name: 'Dave', age: 40 }
+      ]);
+      _id = people[2]._id;
+    });
+
+    it('findById returns null for undefined', async function() {
+      const queryUndefined = await Person.find({}).findById(undefined);
+      assert.strictEqual(queryUndefined, null);
+    });
+
+    it('findById returns document for valid _id', async function() {
+      const target = await Person.find({}).findById(_id);
+      assert.strictEqual(target?.name, targetName);
+    });
+
+    it('findByIdAndUpdate updates and returns the updated document', async function() {
+      const updatedAge = 50;
+      const updatedTarget = await Person.find({}).findByIdAndUpdate(_id, { age: updatedAge }, { new: true });
+      assert.strictEqual(updatedTarget?.age, updatedAge);
+    });
+
+    it('findByIdAndDelete deletes and returns the deleted document', async function() {
+      const deletedTarget = await Person.find({}).findByIdAndDelete(_id);
+      assert.strictEqual(deletedTarget?.name, targetName);
+
+      const target = await Person.find({}).findById(_id);
+      assert.strictEqual(target, null);
+    });
+  });
+
+
+  describe('Query with requireFilter', function() {
+    let Person;
+    let _id;
+
+    beforeEach(async function() {
+      this.timeout(15000);
+
+      try {
+        const schema = new Schema({ name: String, email: String });
+        Person = db.model('Person', schema, null, { cache: false });
+
+        await Person.deleteMany({});
+
+        const person = await Person.create({ name: 'Alice', email: 'alice@example.com' });
+        _id = person._id;
+      } catch (err) {
+        console.error('beforeEach error:', err);
+        throw err;
+      }
+    });
+
+    describe('findOneAndUpdate', function() {
+      it('throws error for empty filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.findOneAndUpdate({}, { name: 'Updated' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for null filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.findOneAndUpdate(null, { name: 'Updated' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for non-object filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.findOneAndUpdate(123, { name: 'Updated' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for empty $and filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.findOneAndUpdate({ $and: [{}] }, { name: 'Updated' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for empty $or filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.findOneAndUpdate({ $or: [{}] }, { name: 'Updated' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for empty $nor filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.findOneAndUpdate({ $nor: [{}] }, { name: 'Updated' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('updates with non-empty filter when requireFilter is true', async function() {
+        const updated = await Person.findOneAndUpdate(
+          { _id },
+          { name: 'Updated Alice' },
+          { requireFilter: true, new: true }
+        );
+        assert.strictEqual(updated.name, 'Updated Alice');
+      });
+
+      it('updates first document with empty filter when requireFilter is false', async function() {
+        const updated = await Person.findOneAndUpdate(
+          {},
+          { name: 'Updated' },
+          { requireFilter: false, new: true }
+        );
+        assert.strictEqual(updated.name, 'Updated');
+      });
+    });
+
+    describe('findOneAndReplace', function() {
+      it('throws error for empty filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.findOneAndReplace({}, { name: 'Replaced', email: 'replaced@example.com' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for null filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.findOneAndReplace(null, { name: 'Replaced', email: 'replaced@example.com' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for non-object filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.findOneAndReplace(123, { name: 'Replaced', email: 'replaced@example.com' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for empty $and filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.findOneAndReplace({ $and: [{}] }, { name: 'Replaced', email: 'replaced@example.com' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for empty $or filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.findOneAndReplace({ $or: [{}] }, { name: 'Replaced', email: 'replaced@example.com' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for empty $nor filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.findOneAndReplace({ $nor: [{}] }, { name: 'Replaced', email: 'replaced@example.com' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('replaces with non-empty filter when requireFilter is true', async function() {
+        const replaced = await Person.findOneAndReplace(
+          { _id },
+          { name: 'Replaced Alice', email: 'replaced@example.com' },
+          { requireFilter: true, new: true }
+        );
+        assert.strictEqual(replaced.name, 'Replaced Alice');
+        assert.strictEqual(replaced.email, 'replaced@example.com');
+      });
+
+      it('replaces first document with empty filter when requireFilter is false', async function() {
+        const replaced = await Person.findOneAndReplace(
+          {},
+          { name: 'Replaced', email: 'replaced@example.com' },
+          { requireFilter: false, new: true }
+        );
+        assert.strictEqual(replaced.name, 'Replaced');
+      });
+    });
+
+    describe('findOneAndDelete', function() {
+      it('throws error for empty filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.findOneAndDelete({}, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for null filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.findOneAndDelete(null, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for non-object filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.findOneAndDelete(123, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for empty $and filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.findOneAndDelete({ $and: [{}] }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for empty $or filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.findOneAndDelete({ $or: [{}] }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for empty $nor filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.findOneAndDelete({ $nor: [{}] }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('deletes with non-empty filter when requireFilter is true', async function() {
+        const deleted = await Person.findOneAndDelete(
+          { _id },
+          { requireFilter: true }
+        );
+        assert.strictEqual(deleted.name, 'Alice');
+        const count = await Person.countDocuments();
+        assert.strictEqual(count, 0);
+      });
+
+      it('deletes first document with empty filter when requireFilter is false', async function() {
+        const deleted = await Person.findOneAndDelete(
+          {},
+          { requireFilter: false }
+        );
+        assert.strictEqual(deleted.name, 'Alice');
+        const count = await Person.countDocuments();
+        assert.strictEqual(count, 0);
+      });
+    });
+
+    describe('updateOne', function() {
+      it('throws error for empty filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.updateOne({}, { name: 'Updated' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for null filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.updateOne(null, { name: 'Updated' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for non-object filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.updateOne(123, { name: 'Updated' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for empty $and filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.updateOne({ $and: [{}] }, { name: 'Updated' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for empty $or filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.updateOne({ $or: [{}] }, { name: 'Updated' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for empty $nor filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.updateOne({ $nor: [{}] }, { name: 'Updated' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('updates with non-empty filter when requireFilter is true', async function() {
+        const result = await Person.updateOne(
+          { _id },
+          { name: 'Updated Alice' },
+          { requireFilter: true }
+        );
+        assert.strictEqual(result.modifiedCount, 1);
+        const person = await Person.findById(_id);
+        assert.strictEqual(person.name, 'Updated Alice');
+      });
+
+      it('updates first document with empty filter when requireFilter is false', async function() {
+        const result = await Person.updateOne(
+          {},
+          { name: 'Updated' },
+          { requireFilter: false }
+        );
+        assert.strictEqual(result.modifiedCount, 1);
+        const person = await Person.findById(_id);
+        assert.strictEqual(person.name, 'Updated');
+      });
+    });
+
+    describe('updateMany', function() {
+      beforeEach(async function() {
+        await Person.create({ name: 'Bob', email: 'bob@example.com' });
+      });
+
+      it('throws error for empty filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.updateMany({}, { name: 'Updated' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for null filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.updateMany(null, { name: 'Updated' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for non-object filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.updateMany(123, { name: 'Updated' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for empty $and filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.updateMany({ $and: [{}] }, { name: 'Updated' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for empty $or filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.updateMany({ $or: [{}] }, { name: 'Updated' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for empty $nor filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.updateMany({ $nor: [{}] }, { name: 'Updated' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('updates with non-empty filter when requireFilter is true', async function() {
+        const result = await Person.updateMany(
+          { name: { $in: ['Alice', 'Bob'] } },
+          { name: 'Updated Person' },
+          { requireFilter: true }
+        );
+        assert.strictEqual(result.modifiedCount, 2);
+        const persons = await Person.find({ name: 'Updated Person' });
+        assert.strictEqual(persons.length, 2);
+      });
+
+      it('updates all documents with empty filter when requireFilter is false', async function() {
+        const result = await Person.updateMany(
+          {},
+          { name: 'Updated' },
+          { requireFilter: false }
+        );
+        assert.strictEqual(result.modifiedCount, 2);
+        const persons = await Person.find({ name: 'Updated' });
+        assert.strictEqual(persons.length, 2);
+      });
+    });
+
+    describe('deleteOne', function() {
+      it('throws error for empty filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.deleteOne({}, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for null filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.deleteOne(null, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for non-object filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.deleteOne(123, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for empty $and filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.deleteOne({ $and: [{}] }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for empty $or filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.deleteOne({ $or: [{}] }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for empty $nor filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.deleteOne({ $nor: [{}] }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('deletes with non-empty filter when requireFilter is true', async function() {
+        const result = await Person.deleteOne(
+          { _id },
+          { requireFilter: true }
+        );
+        assert.strictEqual(result.deletedCount, 1);
+        const count = await Person.countDocuments();
+        assert.strictEqual(count, 0);
+      });
+
+      it('deletes first document with empty filter when requireFilter is false', async function() {
+        const result = await Person.deleteOne(
+          {},
+          { requireFilter: false }
+        );
+        assert.strictEqual(result.deletedCount, 1);
+        const count = await Person.countDocuments();
+        assert.strictEqual(count, 0);
+      });
+    });
+
+    describe('deleteMany', function() {
+      beforeEach(async function() {
+        await Person.create({ name: 'Bob', email: 'bob@example.com' });
+      });
+
+      it('throws error for empty filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.deleteMany({}, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for null filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.deleteMany(null, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for non-object filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.deleteMany(123, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for empty $and filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.deleteMany({ $and: [{}] }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for empty $or filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.deleteMany({ $or: [{}] }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('throws error for empty $nor filter when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.deleteMany({ $nor: [{}] }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+      });
+
+      it('deletes with non-empty filter when requireFilter is true', async function() {
+        const result = await Person.deleteMany(
+          { name: { $in: ['Alice', 'Bob'] } },
+          { requireFilter: true }
+        );
+        assert.strictEqual(result.deletedCount, 2);
+        const count = await Person.countDocuments();
+        assert.strictEqual(count, 0);
+      });
+
+      it('deletes all documents with empty filter when requireFilter is false', async function() {
+        const result = await Person.deleteMany(
+          {},
+          { requireFilter: false }
+        );
+        assert.strictEqual(result.deletedCount, 2);
+        const count = await Person.countDocuments();
+        assert.strictEqual(count, 0);
+      });
     });
   });
 });

@@ -1179,4 +1179,64 @@ describe('Map', function() {
     doc1 = await Test.findOne({ _id: doc1._id }).lean();
     assert.deepStrictEqual(doc1.test_map, { key1: [] });
   });
+
+  it('handles modifying array in map of primitives (gh-15350)', async function() {
+    const DocSchema = new mongoose.Schema({
+      map: {
+        type: Map,
+        of: [{ type: Number }],
+        default: new Map()
+      }
+    });
+    const Doc = db.model('Test', DocSchema);
+
+    const doc = await Doc.create({});
+    assert.ok(doc.map instanceof Map);
+    assert.equal(doc.map.size, 0);
+
+    doc.map.set('key', [1, 2]);
+    await doc.save();
+    assert.deepEqual(Array.from(doc.map.get('key')), [1, 2]);
+
+    const list = doc.map.get('key');
+    list.push(3);
+    assert.deepStrictEqual(doc.getChanges().$push, { 'map.key': { $each: [3] } });
+    await doc.save();
+
+    const fromDb = await Doc.findById(doc._id);
+    assert.deepEqual(Array.from(fromDb.map.get('key')), [1, 2, 3]);
+  });
+
+  it('handles maps of maps of numbers (gh-15350)', async function() {
+    const DocSchema = new mongoose.Schema({
+      map: {
+        type: Map,
+        of: {
+          type: Map,
+          of: Number
+        },
+        default: new Map()
+      }
+    });
+    const Doc = db.model('Test', DocSchema);
+
+    const doc = await Doc.create({});
+    assert.ok(doc.map instanceof Map);
+    assert.equal(doc.map.size, 0);
+
+    const innerMap = new Map();
+    innerMap.set('inner', 42);
+    doc.map.set('outer', innerMap);
+    await doc.save();
+
+    assert.equal(doc.map.get('outer').get('inner'), 42);
+
+    doc.map.get('outer').set('inner2', 43);
+    assert.deepStrictEqual(doc.getChanges(), { $set: { 'map.outer.inner2': 43 } });
+    await doc.save();
+
+    const fromDb = await Doc.findById(doc._id);
+    assert.equal(fromDb.map.get('outer').get('inner'), 42);
+    assert.equal(fromDb.map.get('outer').get('inner2'), 43);
+  });
 });

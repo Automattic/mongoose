@@ -90,7 +90,8 @@ declare module 'mongoose' {
   HydratedDocument<
   InferSchemaType<TSchema>,
   ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>
+  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+  ObtainSchemaGeneric<TSchema, 'TVirtuals'>
   >,
   TSchema
   > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
@@ -146,16 +147,17 @@ declare module 'mongoose' {
   export type HydratedDocument<
     DocType,
     TOverrides = {},
-    TQueryHelpers = {}
+    TQueryHelpers = {},
+    TVirtuals = {}
   > = IfAny<
     DocType,
     any,
     TOverrides extends Record<string, never> ?
-      Document<unknown, TQueryHelpers, DocType> & Default__v<Require_id<DocType>> :
+      Document<unknown, TQueryHelpers, DocType, TVirtuals> & Default__v<Require_id<DocType>> :
       IfAny<
         TOverrides,
-        Document<unknown, TQueryHelpers, DocType> & Default__v<Require_id<DocType>>,
-        Document<unknown, TQueryHelpers, DocType> & MergeType<
+        Document<unknown, TQueryHelpers, DocType, TVirtuals> & Default__v<Require_id<DocType>>,
+        Document<unknown, TQueryHelpers, DocType, TVirtuals> & MergeType<
           Default__v<Require_id<DocType>>,
           TOverrides
         >
@@ -195,8 +197,9 @@ declare module 'mongoose' {
 
   export type HydratedDocumentFromSchema<TSchema extends Schema> = HydratedDocument<
   InferSchemaType<TSchema>,
-  ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>
+  ObtainSchemaGeneric<TSchema, 'TInstanceMethods'> & ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+  ObtainSchemaGeneric<TSchema, 'TVirtuals'>
   >;
 
   export interface TagSet {
@@ -269,7 +272,7 @@ declare module 'mongoose' {
       ObtainDocumentType<any, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
       ResolveSchemaOptions<TSchemaOptions>
     >,
-    THydratedDocumentType = HydratedDocument<FlatRecord<DocType>, TVirtuals & TInstanceMethods>
+    THydratedDocumentType = HydratedDocument<FlatRecord<DocType>, TVirtuals & TInstanceMethods, {}, TVirtuals>
   >
     extends events.EventEmitter {
     /**
@@ -384,6 +387,8 @@ declare module 'mongoose' {
     post<T = THydratedDocumentType>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], fn: PostMiddlewareFunction<T, T>): this;
     post<T = THydratedDocumentType>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], options: SchemaPostOptions & SchemaPostOptions, fn: PostMiddlewareFunction<T, T>): this;
     post<T = THydratedDocumentType>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: SchemaPostOptions & { document: true, query: false }, fn: PostMiddlewareFunction<T, T>): this;
+    post<T = THydratedDocumentType>(method: 'init', fn: PostMiddlewareFunction<T, T>): this;
+
     // this = Query
     post<T = Query<any, any>>(method: MongooseRawResultQueryMiddleware|MongooseRawResultQueryMiddleware[], fn: PostMiddlewareFunction<T, null | QueryResultType<T> | ModifyResult<QueryResultType<T>>>): this;
     post<T = Query<any, any>>(method: MongooseDefaultQueryMiddleware|MongooseDefaultQueryMiddleware[], fn: PostMiddlewareFunction<T, QueryResultType<T>>): this;
@@ -436,6 +441,7 @@ declare module 'mongoose' {
     ): this;
     // this = Document
     pre<T = THydratedDocumentType>(method: 'save', fn: PreSaveMiddlewareFunction<T>): this;
+    pre<T = THydratedDocumentType, U = RawDocType>(method: 'init', fn: (this: T, doc: U) => void): this;
     pre<T = THydratedDocumentType>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], fn: PreMiddlewareFunction<T>): this;
     pre<T = THydratedDocumentType>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
     pre<T = THydratedDocumentType>(

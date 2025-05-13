@@ -21,7 +21,9 @@ import {
   Types,
   Query,
   model,
-  ValidateOpts
+  ValidateOpts,
+  BufferToBinary,
+  CallbackWithoutResultAndOptionalError
 } from 'mongoose';
 import { Binary, BSON } from 'mongodb';
 import { expectType, expectError, expectAssignable } from 'tsd';
@@ -1753,6 +1755,53 @@ async function schemaDouble() {
 
   const doc = await TestModel.findOne().orFail();
   expectType<Types.Double | null | undefined>(doc.balance);
+}
+
+function gh15301() {
+  interface IUser {
+    time: { hours: number, minutes: number }
+  }
+  const userSchema = new Schema<IUser>({
+    time: {
+      type: new Schema(
+        {
+          hours: { type: Number, required: true },
+          minutes: { type: Number, required: true }
+        },
+        { _id: false }
+      ),
+      required: true
+    }
+  });
+
+  const timeStringToObject = (time) => {
+    if (typeof time !== 'string') return time;
+    const [hours, minutes] = time.split(':');
+    return { hours: parseInt(hours), minutes: parseInt(minutes) };
+  };
+
+  userSchema.pre('init', function(rawDoc) {
+    expectType<IUser>(rawDoc);
+    if (typeof rawDoc.time === 'string') {
+      rawDoc.time = timeStringToObject(rawDoc.time);
+    }
+  });
+}
+
+function gh15412() {
+  const ScheduleEntrySchema = new Schema({
+    startDate: { type: Date, required: true },
+    endDate: { type: Date, required: false }
+  });
+  const ScheduleEntry = model('ScheduleEntry', ScheduleEntrySchema);
+
+  type ScheduleEntryDoc = ReturnType<typeof ScheduleEntry['hydrate']>
+
+  ScheduleEntrySchema.post('init', function(this: ScheduleEntryDoc, _res: any, next: CallbackWithoutResultAndOptionalError) {
+    expectType<Date>(this.startDate);
+    expectType<Date | null | undefined>(this.endDate);
+    next();
+  });
 }
 
 function defaultReturnsUndefined() {

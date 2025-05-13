@@ -1,3 +1,41 @@
+8.14.2 / 2025-05-08
+===================
+ * fix(query): handle casting array filter paths underneath array filter paths with embedded discriminators #15388 #15386
+ * docs(typescript): correct schema and model generic params in TS virtuals docs #15391
+ * docs+types(schema): add alternative optimisticConcurrency syntaxes to docs + types #15405 #10591
+ * chore: add Node 24 to CI matrix #15408 [stscoundrel](https://github.com/stscoundrel)
+
+7.8.7 / 2025-04-30
+==================
+ * types(aggregate): allow calling project() with a string #15304 #15300
+ * docs: update deleteOne & deleteMany API def #15360 [Elliot67](https://github.com/Elliot67) [SethFalco](https://github.com/SethFalco)
+
+8.14.1 / 2025-04-29
+===================
+ * fix: correct change tracking with maps of arrays of primitives and maps of maps #15374 #15350
+ * fix(populate): consistently convert Buffer representation of UUID to hex string to avoid confusing populate assignment #15383 #15382
+ *  docs: add TypeScript Query guide with info on lean() + transform() #15377 #15311
+
+8.14.0 / 2025-04-25
+===================
+ * feat: upgrade MongoDB driver -> 6.16 #15371
+ * feat: implement Query findById methods #15337 [sderrow](https://github.com/sderrow)
+ * feat(subdocument): support schematype-level minimize option to disable minimizing empty subdocuments #15336 #15313
+ * feat: add skipOriginalStackTraces option to avoid stack trace performance overhead #15345 #15194
+ * fix(model): disallow Model.findOneAndUpdate(update) and fix TypeScript types re: findOneAndUpdate #15365 #15363
+ * types: correctly recurse in InferRawDocType #15357 #14954 [JavaScriptBach](https://github.com/JavaScriptBach)
+ * types: include virtuals in toJSON and toObject output if virtuals: true set #15346 #15316
+ * types: make init hooks types accurately reflect runtime behavior #15331 #15301
+
+8.13.3 / 2025-04-24
+===================
+ * fix: export MongooseBulkSaveIncompleteError #15370 #15369
+ * fix: clone POJOs and arrays when casting query filter to avoid mutating objects #15367 #15364
+ * types(connection): add Connection.prototype.bulkWrite() to types #15368 #15359
+ * docs: add version requirements to v7 migration docs #15361 [SethFalco](https://github.com/SethFalco)
+ * docs: update links in deleteOne & deleteMany API def #15360 [Elliot67](https://github.com/Elliot67)
+ * docs: adds Model#count to list of fns callback removed from #15349 [SethFalco](https://github.com/SethFalco)
+
 8.13.2 / 2025-04-03
 ===================
  * fix: avoid double calling validators on paths in document arrays underneath subdocuments #15338 #15335

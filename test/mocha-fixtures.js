@@ -4,7 +4,7 @@ const mms = require('mongodb-memory-server');
 
 /*
 
-Note: dont use any mocha-specific things in this file, it may or may not be called without mocha (see deno.js)
+Note: dont use any mocha-specific things in this file, it may or may not be called without mocha (see deno.mjs)
 
 */
 

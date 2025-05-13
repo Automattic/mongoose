@@ -1,22 +1,22 @@
 import mongoose, {
-  Schema,
-  Document,
-  Model,
-  createConnection,
-  connection,
-  model,
-  Types,
-  UpdateQuery,
+  AggregateOptions,
   CallbackError,
+  DeleteResult,
+  Document,
   HydratedDocument,
   HydratedDocumentFromSchema,
-  InsertManyResult,
-  Query,
-  UpdateWriteOpResult,
-  AggregateOptions,
-  WithLevel1NestedPaths,
   InferSchemaType,
-  DeleteResult
+  InsertManyResult,
+  Model,
+  Query,
+  Schema,
+  Types,
+  UpdateQuery,
+  UpdateWriteOpResult,
+  WithLevel1NestedPaths,
+  createConnection,
+  connection,
+  model
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
@@ -997,4 +997,20 @@ async function gh14843() {
 
   const doc = await Model.insertOne({ name: 'taco' });
   expectType<ReturnType<(typeof Model)['hydrate']>>(doc);
+}
+
+async function gh15369() {
+  const schema = new mongoose.Schema({
+    name: String
+  });
+  const Model = model('Test', schema);
+
+  try {
+    await Model.bulkSave([]);
+  } catch (error) {
+    if (error instanceof mongoose.Error.MongooseBulkSaveIncompleteError) {
+      console.log('Bulk save error');
+    }
+    throw error;
+  }
 }

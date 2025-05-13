@@ -72,9 +72,9 @@ interface UserVirtuals {
   fullName: string;
 }
 
-type UserModel = Model<UserDoc, {}, UserVirtuals>; // <-- add virtuals here...
+type UserModel = Model<UserDoc, {}, {}, UserVirtuals>; // <-- add virtuals here...
 
-const schema = new Schema<UserDoc, UserModel, UserVirtuals>({ // <-- and here
+const schema = new Schema<UserDoc, UserModel, {}, {}, UserVirtuals>({ // <-- and here
   firstName: String,
   lastName: String
 });

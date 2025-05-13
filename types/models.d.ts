@@ -263,7 +263,7 @@ declare module 'mongoose' {
     TQueryHelpers = {},
     TInstanceMethods = {},
     TVirtuals = {},
-    THydratedDocumentType = HydratedDocument<TRawDocType, TVirtuals & TInstanceMethods, TQueryHelpers>,
+    THydratedDocumentType = HydratedDocument<TRawDocType, TVirtuals & TInstanceMethods, TQueryHelpers, TVirtuals>,
     TSchema = any> extends
     NodeJS.EventEmitter,
     AcceptsDiscriminator,

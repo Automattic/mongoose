@@ -1,3 +1,9 @@
+8.14.3 / 2025-05-13
+===================
+ * types(schema): allow post('init') #15413 #15412 #15333
+ * types: fix signature of DocumentArray.id #15414 [Sainan](https://github.com/Sainan)
+ * docs: fix typo - change 'prodecure' to 'procedure' #15419 [0xEbrahim](https://github.com/0xEbrahim)
+
 8.14.2 / 2025-05-08
 ===================
  * fix(query): handle casting array filter paths underneath array filter paths with embedded discriminators #15388 #15386

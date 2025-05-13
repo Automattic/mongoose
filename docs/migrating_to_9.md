@@ -238,3 +238,29 @@ await test.save();
 
 test.uuid; // string
 ```
+
+## TypeScript
+
+### FilterQuery Properties No Longer Resolve to any
+
+In Mongoose 9, the `FilterQuery` type, which is the type of the first param to `Model.find()`, `Model.findOne()`, etc. now enforces stronger types for top-level keys.
+
+```typescript
+const schema = new Schema({ age: Number });
+const TestModel = mongoose.model('Test', schema);
+
+TestModel.find({ age: 'not a number' }); // Works in Mongoose 8, TS error in Mongoose 9
+TestModel.find({ age: { $notAnOperator: 42 } }); // Works in Mongoose 8, TS error in Mongoose 9
+```
+
+This change is backwards breaking if you use generics when creating queries as shown in the following example.
+If you run into the following issue or any similar issues, you can use `as FilterQuery`.
+
+```typescript
+// From https://stackoverflow.com/questions/56505560/how-to-fix-ts2322-could-be-instantiated-with-a-different-subtype-of-constraint:
+// "Never assign a concrete type to a generic type parameter, consider it as read-only!"
+// This function is generally something you shouldn't do in TypeScript, can work around it with `as` though.
+function findById<ModelType extends {_id: Types.ObjectId | string}>(model: Model<ModelType>, _id: Types.ObjectId | string) {
+  return model.find({_id: _id} as FilterQuery<ModelType>); // In Mongoose 8, this `as` was not required
+}
+```

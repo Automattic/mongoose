@@ -26,7 +26,7 @@ declare module 'mongoose' {
    * { age: { $gte: 30 } }
    * ```
    */
-  type RootFilterQuery<T> = FilterQuery<T> | Query<any, any> | Types.ObjectId;
+  type RootFilterQuery<T> = FilterQuery<T>;
 
   type FilterQuery<T> = { [P in keyof T]?: Condition<T[P]>; } & RootQuerySelector<T>;
 

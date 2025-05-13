@@ -4452,6 +4452,7 @@ describe('Query', function() {
       assert.strictEqual(deletedTarget?.name, targetName);
 
       const target = await Person.find({}).findById(_id);
+
       assert.strictEqual(target, null);
     });
   });

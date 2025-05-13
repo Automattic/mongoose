@@ -610,7 +610,7 @@ function gh14473() {
 
   const generateExists = <D extends AbstractSchema = AbstractSchema>() => {
     const query: FilterQuery<D> = { deletedAt: { $ne: null } };
-    const query2: FilterQuery<D> = { deletedAt: { $lt: new Date() } };
+    const query2: FilterQuery<D> = { deletedAt: { $lt: new Date() } } as FilterQuery<D>;
   };
 }
 

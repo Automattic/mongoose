@@ -8,10 +8,46 @@ This guide describes Mongoose's recommended approach to working with Mongoose in
 
 To get started with Mongoose in TypeScript, you need to:
 
-1. Create an interface representing a document in MongoDB.
-2. Create a [Schema](guide.html) corresponding to the document interface.
-3. Create a Model.
-4. [Connect to MongoDB](connections.html).
+1. Create a [Schema](guide.html).
+2. Create a Model.
+3. [Connect to MongoDB](connections.html).
+
+```typescript
+import { Schema, model, connect } from 'mongoose';
+
+// 1Create a Schema corresponding to the document interface.
+const userSchema = new Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  avatar: String
+});
+
+// 2. Create a Model.
+const User = model('User', userSchema);
+
+run().catch(err => console.log(err));
+
+async function run() {
+  // 4. Connect to MongoDB
+  await connect('mongodb://127.0.0.1:27017/test');
+
+  const user = new User({
+    name: 'Bill',
+    email: 'bill@initech.com',
+    avatar: 'https://i.imgur.com/dM7Thhn.png'
+  });
+  await user.save();
+
+  const email: string = user.email;
+  console.log(email); // 'bill@initech.com'
+}
+```
+
+## Using Generics
+
+By default, Mongoose automatically infers the shape of your documents based on your schema definition.
+However, if you modify your schema after your `new Schema()` call (like with plugins) then Mongoose's inferred type may be incorrect.
+For cases where Mongoose's automatic schema type inference is incorrect, you can define a raw document interface that tells Mongoose the type of documents in your database as follows.
 
 ```typescript
 import { Schema, model, connect } from 'mongoose';
@@ -67,8 +103,6 @@ const user: HydratedDocument<IUser> = new User({
 });
 ```
 
-## ObjectIds and Other Mongoose Types
-
 To define a property of type `ObjectId`, you should use `Types.ObjectId` in the TypeScript document interface. You should use `'ObjectId'` or `Schema.Types.ObjectId` in your schema definition.
 
 ```ts
@@ -106,4 +140,4 @@ However, before you do, please [open an issue on Mongoose's GitHub page](https:/
 
 ## Next Up
 
-Now that you've seen the basics of how to use Mongoose in TypeScript, let's take a look at [statics in TypeScript](typescript/statics-and-methods.html).
+Now that you've seen the basics of how to use Mongoose in TypeScript, let's take a look at [methods in TypeScript](typescript/statics-and-methods.html).

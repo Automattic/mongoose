@@ -1,4 +1,4 @@
-# Release prodecure
+# Release procedure
 
 ## mongoose release procedure
 

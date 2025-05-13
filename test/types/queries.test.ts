@@ -684,6 +684,6 @@ function gh14510() {
   // "Never assign a concrete type to a generic type parameter, consider it as read-only!"
   // This function is generally something you shouldn't do in TypeScript, can work around it with `as` though.
   function findById<ModelType extends {_id: Types.ObjectId | string}>(model: Model<ModelType>, _id: Types.ObjectId | string) {
-    return model.find({_id: _id} as FilterQuery<ModelType>);
+    return model.find({ _id: _id } as FilterQuery<ModelType>);
   }
 }

@@ -28,7 +28,7 @@ const User = model('User', userSchema);
 run().catch(err => console.log(err));
 
 async function run() {
-  // 4. Connect to MongoDB
+  // 3. Connect to MongoDB
   await connect('mongodb://127.0.0.1:27017/test');
 
   const user = new User({

@@ -6894,7 +6894,7 @@ describe('Model', function() {
       userToUpdate.name = 'John Doe';
 
       // Act
-      const writeOperations = await User.buildBulkWriteOperations([newUser, userToUpdate], { timestamps: false, skipValidation: true });
+      const writeOperations = User.buildBulkWriteOperations([newUser, userToUpdate], { timestamps: false, skipValidation: true });
 
       // Assert
       const timestampsOptions = writeOperations.map(writeOperationContainer => {
@@ -6916,7 +6916,7 @@ describe('Model', function() {
       userToUpdate.name = 'John Doe';
 
       // Act
-      const writeOperations = await User.buildBulkWriteOperations([newUser, userToUpdate], { timestamps: true, skipValidation: true });
+      const writeOperations = User.buildBulkWriteOperations([newUser, userToUpdate], { timestamps: true, skipValidation: true });
 
       // Assert
       const timestampsOptions = writeOperations.map(writeOperationContainer => {
@@ -6938,7 +6938,7 @@ describe('Model', function() {
       userToUpdate.name = 'John Doe';
 
       // Act
-      const writeOperations = await User.buildBulkWriteOperations([newUser, userToUpdate], { skipValidation: true });
+      const writeOperations = User.buildBulkWriteOperations([newUser, userToUpdate], { skipValidation: true });
 
       // Assert
       const timestampsOptions = writeOperations.map(writeOperationContainer => {

@@ -688,7 +688,7 @@ declare module 'mongoose' {
   type ExclusionProjection<T> = IsItRecordAndNotAny<T> extends true ? Projector<WithLevel1NestedPaths<T>, false | 0> & _IDType : AnyObject;
   type ProjectionUnion<T> = InclusionProjection<T> | ExclusionProjection<T>;
 
-  export type ProjectionType<T> = (ProjectionUnion<T> & AnyObject) | string | ((...agrs: any) => any);
+  export type ProjectionType<T> = (ProjectionUnion<T> & AnyObject) | string | ((...args: any) => any);
   export type SortValues = SortOrder;
 
   export type SortOrder = -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';

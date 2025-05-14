@@ -15,7 +15,7 @@ To get started with Mongoose in TypeScript, you need to:
 ```typescript
 import { Schema, model, connect } from 'mongoose';
 
-// 1Create a Schema corresponding to the document interface.
+// 1. Create a Schema corresponding to the document interface.
 const userSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },

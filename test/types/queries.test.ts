@@ -610,7 +610,7 @@ function gh14473() {
 
   const generateExists = <D extends AbstractSchema = AbstractSchema>() => {
     const query: FilterQuery<D> = { deletedAt: { $ne: null } };
-    const query2: FilterQuery<D> = { deletedAt: { $lt: new Date() } };
+    const query2: FilterQuery<D> = { deletedAt: { $lt: new Date() } } as FilterQuery<D>;
   };
 }
 
@@ -677,4 +677,13 @@ function gh14841() {
   const filter: FilterQuery<{ owners: string[] }> = {
     $expr: { $lt: [{ $size: '$owners' }, 10] }
   };
+}
+
+function gh14510() {
+  // From https://stackoverflow.com/questions/56505560/how-to-fix-ts2322-could-be-instantiated-with-a-different-subtype-of-constraint:
+  // "Never assign a concrete type to a generic type parameter, consider it as read-only!"
+  // This function is generally something you shouldn't do in TypeScript, can work around it with `as` though.
+  function findById<ModelType extends {_id: Types.ObjectId | string}>(model: Model<ModelType>, _id: Types.ObjectId | string) {
+    return model.find({ _id: _id } as FilterQuery<ModelType>);
+  }
 }

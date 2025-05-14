@@ -97,16 +97,6 @@ Test.find({ name: ['Test1', 'Test2'] }).exec();
 // Implicit `$in` for regex string
 Test.find({ name: [/Test1/, /Test2/] });
 
-Test.find({ name: 'test' }, (err: Error | null, docs: ITest[]) => {
-  console.log(!!err, docs[0].age);
-});
-
-Test.findOne({ name: 'test' }, (err: Error | null, doc: ITest | null) => {
-  if (doc != null) {
-    console.log(!!err, doc.age);
-  }
-});
-
 Test.find({ name: { $gte: 'Test' } }, null, { collation: { locale: 'en-us' } }).exec().
   then((res: Array<ITest>) => console.log(res[0].name));
 

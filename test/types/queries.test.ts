@@ -21,7 +21,6 @@ import {
 import { ModifyResult, ObjectId } from 'mongodb';
 import { expectAssignable, expectError, expectNotAssignable, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
-import { AutoTypedSchemaType } from './schema.test';
 
 interface QueryHelpers {
   _byName(this: QueryWithHelpers<any, ITest, QueryHelpers>, name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;
@@ -187,6 +186,7 @@ Test.find({}, { child: 1 }); // Dot notation should be able to use a combination
 expectError(Test.find({}, { 'docs.profiles': { name: 'aa' } })); // should support a combination of dot notation and objects
 expectError(Test.find({}, { endDate: { toString: 1 } }));
 expectError(Test.find({}, { tags: { trim: 1 } }));
+expectError(Test.find({}, { child: { toJSON: 1 } }));
 
 // Manual Casting using ProjectionType
 Test.find({}, { docs: { unknownParams: 1 } } as ProjectionType<ITest>);

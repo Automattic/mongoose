@@ -4,7 +4,15 @@ declare module 'mongoose' {
 
   type WithLevel1NestedPaths<T, K extends keyof T = keyof T> = {
     [P in K | NestedPaths<Required<T>, K>]: P extends K
-      ? NonNullable<T[P]>
+      // Handle top-level paths
+      // First, drill into documents so we don't end up surfacing `$assertPopulated`, etc.
+      ? Extract<NonNullable<T[P]>, Document> extends never
+        // If not a document, then return the type. Otherwise, get the DocType.
+        ? NonNullable<T[P]>
+        : Extract<NonNullable<T[P]>, Document> extends Document<any, any, infer DocType, any>
+          ? DocType
+          : never
+      // Handle nested paths
       : P extends `${infer Key}.${infer Rest}`
         ? Key extends keyof T
           ? T[Key] extends (infer U)[]
@@ -21,13 +29,19 @@ declare module 'mongoose' {
   type NestedPaths<T, K extends keyof T> = K extends string
     ? T[K] extends TreatAsPrimitives
       ? never
-      : T[K] extends Array<infer U>
-        ? U extends Record<string, any>
-          ? `${K}.${keyof NonNullable<U> & string}`
-          : never
-        : T[K] extends Record<string, any> | null | undefined
-          ? `${K}.${keyof NonNullable<T[K]> & string}`
-          : never
+      : Extract<NonNullable<T[K]>, Document> extends never
+          ? T[K] extends Array<infer U>
+            ? U extends Record<string, any>
+              ? `${K}.${keyof NonNullable<U> & string}`
+              : never
+            : T[K] extends Record<string, any> | null | undefined
+              ? `${K}.${keyof NonNullable<T[K]> & string}`
+              : never
+          : Extract<NonNullable<T[K]>, Document> extends Document<any, any, infer DocType, any>
+            ? DocType extends Record<string, any>
+              ? `${K}.${keyof NonNullable<DocType> & string}`
+              : never
+            : never
     : never;
 
   type WithoutUndefined<T> = T extends undefined ? never : T;

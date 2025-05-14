@@ -684,8 +684,8 @@ declare module 'mongoose' {
         }
         : Element;
   type _IDType = { _id?: boolean | 1 | 0 };
-  type InclusionProjection<T> = IsItRecordAndNotAny<T> extends true ? Projector<WithLevel1NestedPaths<T>, true | 1> & _IDType : AnyObject;
-  type ExclusionProjection<T> = IsItRecordAndNotAny<T> extends true ? Projector<WithLevel1NestedPaths<T>, false | 0> & _IDType : AnyObject;
+  export type InclusionProjection<T> = IsItRecordAndNotAny<T> extends true ? Projector<WithLevel1NestedPaths<T>, true | 1> & _IDType : AnyObject;
+  export type ExclusionProjection<T> = IsItRecordAndNotAny<T> extends true ? Projector<WithLevel1NestedPaths<T>, false | 0> & _IDType : AnyObject;
 
   export type ProjectionType<T> = (InclusionProjection<T> & AnyObject) | (ExclusionProjection<T> & AnyObject) | string;
   export type SortValues = SortOrder;

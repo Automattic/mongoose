@@ -1,7 +1,7 @@
 # Statics in TypeScript
 
 To use Mongoose's automatic type inference to define types for your [statics](../guide.html#statics) and [methods](../guide.html#methods), you should define your methods and statics using the `methods` and `statics` schema options as follows.
-Do **not** use `Schema.prototype.method()` and `Schema.prototype.static()`, Mongoose's automatic type inference will not find
+Do **not** use `Schema.prototype.method()` and `Schema.prototype.static()`, Mongoose's automatic type inference will not be able to find it.
 
 ```typescript
 const userSchema = new mongoose.Schema(

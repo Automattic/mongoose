@@ -1,5 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v8.14.3: Field Level Encryption</title><link rel="apple-touch-icon" sizes="57x57" href="/docs/images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="/docs/images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="/docs/images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="/docs/images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="/docs/images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="/docs/images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="/docs/images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="/docs/images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="/docs/images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="/docs/images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="/docs/images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="/docs/images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="/docs/images/favicon/favicon-16x16.png"><link rel="manifest" href="/docs/images/favicon/manifest.json"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="stylesheet" href="/docs/css/carbonads.css"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="/docs/images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/js/native.js"></script><style>p { line-height: 1.5em }
-</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><svg width="100%" height="100%" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><nav class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="/docs/index.html">Version 8.14.3</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/index.html">Version 7.8.7</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/index.html">Version 6.13.8</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">API</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_8.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/version-support.html">Version Support</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></nav></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/field-level-encryption.md" target="_blank">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v8.15.0: Field Level Encryption</title><link rel="apple-touch-icon" sizes="57x57" href="/docs/images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="/docs/images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="/docs/images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="/docs/images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="/docs/images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="/docs/images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="/docs/images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="/docs/images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="/docs/images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="/docs/images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="/docs/images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="/docs/images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="/docs/images/favicon/favicon-16x16.png"><link rel="manifest" href="/docs/images/favicon/manifest.json"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/github.css"><link rel="stylesheet" href="/docs/css/mongoose5.css"><link rel="stylesheet" href="/docs/css/carbonads.css"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="/docs/images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/js/native.js"></script><style>p { line-height: 1.5em }
+</style></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><svg width="100%" height="100%" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><nav class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="/docs/index.html">Version 8.15.0</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/index.html">Version 7.8.7</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/index.html">Version 6.13.8</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">API</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_8.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/version-support.html">Version Support</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></nav></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/field-level-encryption.md" target="_blank">
 <img src="/docs/images/pencil.svg" />
 </a><h1 id="integrating-with-mongodb-client-side-field-level-encryption">
         <a href="#integrating-with-mongodb-client-side-field-level-encryption">
@@ -22,12 +22,132 @@ The resulting document will look similar to the following to a client that doesn
   <span class="hljs-string">&quot;name&quot;</span> : <span class="hljs-title class_">BinData</span>(<span class="hljs-number">6</span>,<span class="hljs-string">&quot;ASrIv7XfokKwiCUJEjckOdgCG+u6IqavcOWX8hINz29MLvcKDZ4nnjCnPFZG+0ftVxMdWgzu6Vdh7ys1uIK1WiaPN0SqpmmtL2rPoqT9gfhADpGDmI60+vm0bJepXNY1Gv0=&quot;</span>),
   <span class="hljs-string">&quot;__v&quot;</span> : <span class="hljs-number">0</span>
 }</code></pre><p>You can read more about CSFLE on the <a href="https://www.mongodb.com/docs/manual/core/csfle/">MongoDB CSFLE documentation</a> and <a href="https://www.mongodb.com/developer/languages/javascript/client-side-field-level-encryption-csfle-mongodb-node/">this blog post about CSFLE in Node.js</a>.</p>
-<p>Note that Mongoose does <strong>not</strong> currently have any Mongoose-specific APIs for CSFLE.
-Mongoose defers all CSFLE-related work to the MongoDB Node.js driver, so the <a href="https://mongodb.github.io/node-mongodb-native/5.6/interfaces/AutoEncryptionOptions.html"><code>autoEncryption</code> option</a> for <code>mongoose.connect()</code> and <code>mongoose.createConnection()</code> is where you put all CSFLE-related configuration.
-Mongoose schemas currently don&#39;t support CSFLE configuration.</p>
-<h2 id="setting-up-field-level-encryption-with-mongoose">
-        <a href="#setting-up-field-level-encryption-with-mongoose">
-          Setting Up Field Level Encryption with Mongoose
+<h2 id="automatic-fle-in-mongoose">
+        <a href="#automatic-fle-in-mongoose">
+          Automatic FLE in Mongoose
+        </a>
+      </h2>
+<p>Mongoose supports the declaration of encrypted schemas - schemas that, when connected to a model, utilize MongoDB&#39;s Client Side
+Field Level Encryption or Queryable Encryption under the hood.  Mongoose automatically generates either an <code>encryptedFieldsMap</code> or a
+<code>schemaMap</code> when instantiating a MongoClient and encrypts fields on write and decrypts fields on reads.</p>
+<h3 id="encryption-types">
+        <a href="#encryption-types">
+          Encryption types
+        </a>
+      </h3>
+<p>MongoDB has two different automatic encryption implementations: client side field level encryption (CSFLE) and queryable encryption (QE).<br>See <a href="https://www.mongodb.com/docs/v7.3/core/queryable-encryption/about-qe-csfle/#choosing-an-in-use-encryption-approach">choosing an in-use encryption approach</a>.</p>
+<h3 id="declaring-encrypted-schemas">
+        <a href="#declaring-encrypted-schemas">
+          Declaring Encrypted Schemas
+        </a>
+      </h3>
+<p>The following schema declares two properties, <code>name</code> and <code>ssn</code>.  <code>ssn</code> is encrypted using queryable encryption, and
+is configured for equality queries:</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> encryptedUserSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ 
+  <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">ssn</span>: { 
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, 
+    <span class="hljs-comment">// 1</span>
+    <span class="hljs-attr">encrypt</span>: { 
+      <span class="hljs-attr">keyId</span>: <span class="hljs-string">&#x27;&lt;uuid string of key id&gt;&#x27;</span>,
+      <span class="hljs-attr">queries</span>: <span class="hljs-string">&#x27;equality&#x27;</span>
+    }
+  }
+  <span class="hljs-comment">// 2</span>
+}, { <span class="hljs-attr">encryptionType</span>: <span class="hljs-string">&#x27;queryableEncryption&#x27;</span> });</code></pre><p>To declare a field as encrypted, you must:</p>
+<ol>
+<li>Annotate the field with encryption metadata in the schema definition</li>
+<li>Choose an encryption type for the schema and configure the schema for the encryption type</li>
+</ol>
+<p>Not all schematypes are supported for CSFLE and QE.  For an overview of supported BSON types, refer to MongoDB&#39;s documentation.</p>
+<h3 id="registering-models">
+        <a href="#registering-models">
+          Registering Models
+        </a>
+      </h3>
+<p>Encrypted schemas can be registered on the global mongoose object or on a specific connection, so long as models are registered before the connection
+is established:</p>
+<pre><code lang="javascript"><span class="hljs-comment">// specific connection</span>
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">GlobalUserModel</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, encryptedUserSchema);
+
+<span class="hljs-comment">// specific connection</span>
+<span class="hljs-keyword">const</span> connection = mongoose.<span class="hljs-title function_">createConnection</span>();
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">UserModel</span> = connection.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, encryptedUserSchema);</code></pre><h3 id="connecting-and-configuring-encryption-options">
+        <a href="#connecting-and-configuring-encryption-options">
+          Connecting and configuring encryption options
+        </a>
+      </h3>
+<p>Field level encryption in Mongoose works by generating the encryption schema that the MongoDB driver expects for each encrypted model on the connection.  This happens automatically when the model&#39;s connection is established.</p>
+<p>Queryable encryption and CSFLE require all the same configuration as outlined in the <a href="https://www.mongodb.com/docs/manual/core/security-in-use-encryption/">MongoDB encryption in-use documentation</a>, except for the schemaMap or encryptedFieldsMap options.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> keyVaultNamespace = <span class="hljs-string">&#x27;client.encryption&#x27;</span>;
+<span class="hljs-keyword">const</span> kmsProviders = { <span class="hljs-attr">local</span>: { key } };
+<span class="hljs-keyword">await</span> connection.<span class="hljs-title function_">openUri</span>(<span class="hljs-string">`mongodb://localhost:27017`</span>, {
+  <span class="hljs-comment">// Configure auto encryption</span>
+  <span class="hljs-attr">autoEncryption</span>: {
+    <span class="hljs-attr">keyVaultNamespace</span>: <span class="hljs-string">&#x27;datakeys.datakeys&#x27;</span>,
+    kmsProviders
+  }
+});</code></pre><p>Once the connection is established, Mongoose&#39;s operations will work as usual.  Writes are encrypted automatically by the MongoDB driver prior to sending them to the server and reads are decrypted by the driver after fetching documents from the server.</p>
+<h3 id="discriminators">
+        <a href="#discriminators">
+          Discriminators
+        </a>
+      </h3>
+<p>Discriminators are supported for encrypted models as well:</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> connection = <span class="hljs-title function_">createConnection</span>();
+
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">encrypt</span>: { keyId }
+  }
+}, {
+  <span class="hljs-attr">encryptionType</span>: <span class="hljs-string">&#x27;queryableEncryption&#x27;</span>
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Model</span> = connection.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;BaseUserModel&#x27;</span>, schema);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">ModelWithAge</span> = model.<span class="hljs-title function_">discriminator</span>(<span class="hljs-string">&#x27;ModelWithAge&#x27;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">age</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">Int32</span>, <span class="hljs-attr">encrypt</span>: { <span class="hljs-attr">keyId</span>: keyId2 }
+  }
+}, {
+  <span class="hljs-attr">encryptionType</span>: <span class="hljs-string">&#x27;queryableEncryption&#x27;</span>
+}));
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">ModelWithBirthday</span> = model.<span class="hljs-title function_">discriminator</span>(<span class="hljs-string">&#x27;ModelWithBirthday&#x27;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">dob</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">Int32</span>, <span class="hljs-attr">encrypt</span>: { <span class="hljs-attr">keyId</span>: keyId3 }
+  }
+}, {
+  <span class="hljs-attr">encryptionType</span>: <span class="hljs-string">&#x27;queryableEncryption&#x27;</span>
+}));</code></pre><p>When generating encryption schemas, Mongoose merges all discriminators together for all of the discriminators declared on the same namespace.  As a result, discriminators that declare the same key with different types are not supported.  Furthermore, all discriminators for the same namespace must share the same encryption type - it is not possible to configure discriminators on the same model for both CSFLE and Queryable Encryption.</p>
+<h2 id="managing-data-keys">
+        <a href="#managing-data-keys">
+          Managing Data Keys
+        </a>
+      </h2>
+<p>Mongoose provides a convenient API to obtain a <a href="https://mongodb.github.io/node-mongodb-native/Next/classes/ClientEncryption.html">ClientEncryption</a>
+object configured to manage data keys in the key vault.  A client encryption can be obtained with the <code>Model.clientEncryption()</code> helper:</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> connection = <span class="hljs-title function_">createConnection</span>();
+
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">encrypt</span>: { keyId }
+  }
+}, {
+  <span class="hljs-attr">encryptionType</span>: <span class="hljs-string">&#x27;queryableEncryption&#x27;</span>
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Model</span> = connection.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;BaseUserModel&#x27;</span>, schema);
+<span class="hljs-keyword">await</span> connection.<span class="hljs-title function_">openUri</span>(<span class="hljs-string">`mongodb://localhost:27017`</span>, {
+  <span class="hljs-attr">autoEncryption</span>: {
+    <span class="hljs-attr">keyVaultNamespace</span>: <span class="hljs-string">&#x27;datakeys.datakeys&#x27;</span>,
+    <span class="hljs-attr">kmsProviders</span>: { <span class="hljs-attr">local</span>: <span class="hljs-string">&#x27;....&#x27;</span> }
+  }
+});
+
+<span class="hljs-keyword">const</span> clientEncryption = <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">clientEncryption</span>();</code></pre><h2 id="manual-fle-in-mongoose">
+        <a href="#manual-fle-in-mongoose">
+          Manual FLE in Mongoose
         </a>
       </h2>
 <p>First, you need to install the <a href="https://www.npmjs.com/package/mongodb-client-encryption">mongodb-client-encryption npm package</a>.

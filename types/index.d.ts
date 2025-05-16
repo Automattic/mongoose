@@ -657,9 +657,37 @@ declare module 'mongoose' {
 
   export type ReturnsNewDoc = { new: true } | { returnOriginal: false } | { returnDocument: 'after' };
 
-  export type ProjectionElementType = number | string;
-  export type ProjectionType<T> = { [P in keyof T]?: ProjectionElementType } | AnyObject | string;
+  type ArrayOperators = { $slice: number | [number, number]; $elemMatch?: never } | { $elemMatch: Record<string, any>; $slice?: never };
+  /**
+   * This Type Assigns `Element | undefined` recursively to the `T` type.
+   * if it is an array it will do this to the element of the array, if it is an object it will do this for the properties of the object.
+   * `Element` is the truthy or falsy values that are going to be used as the value of the projection.(1 | true or 0 | false)
+   * For the elements of the array we will use: `Element | `undefined` | `ArrayOperators`
+   * @example
+   * type CalculatedType = Projector<{ a: string, b: number, c: { d: string }, d: string[] }, true>
+   * type CalculatedType = {
+        a?: true | undefined;
+        b?: true | undefined;
+        c?: true | {
+            d?: true | undefined;
+        } | undefined;
+        d?: true | ArrayOperators | undefined;
+    }
+  */
+  type Projector<T, Element> = T extends Array<infer U>
+    ? Projector<U, Element> | ArrayOperators
+    : T extends TreatAsPrimitives
+      ? Element
+      : T extends Record<string, any>
+        ? {
+          [K in keyof T]?: T[K] extends Record<string, any> ? Projector<T[K], Element> | Element : Element;
+        }
+        : Element;
+  type _IDType = { _id?: boolean | 1 | 0 };
+  export type InclusionProjection<T> = IsItRecordAndNotAny<T> extends true ? Projector<WithLevel1NestedPaths<T>, true | 1> & _IDType : AnyObject;
+  export type ExclusionProjection<T> = IsItRecordAndNotAny<T> extends true ? Projector<WithLevel1NestedPaths<T>, false | 0> & _IDType : AnyObject;
 
+  export type ProjectionType<T> = (InclusionProjection<T> & AnyObject) | (ExclusionProjection<T> & AnyObject) | string;
   export type SortValues = SortOrder;
 
   export type SortOrder = -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';

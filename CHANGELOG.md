@@ -1,3 +1,12 @@
+8.15.0 / 2025-05-16
+===================
+ * feat: CSFLE support #15390 [baileympearson](https://github.com/baileympearson)
+ * feat: add strictFilter option to findOneAndUpdate (#14913) #15402 #14913 [muazahmed-dev](https://github.com/muazahmed-dev)
+ * feat(error): set cause to MongoDB error reason on ServerSelection errors #15420 #15416
+ * fix(model): make bulkSave() rely on document.validateSync() to validate docs and skip bulkWrite casting #15415 #15410
+ * types: stricter projection typing with 1-level deep nesting #15418 #15327 #13840 [pshaddel](https://github.com/pshaddel)
+ * docs: emphasize automatic type inference in TypeScript intro and statics/methods, remove duplicated statics.md #15421
+
 8.14.3 / 2025-05-13
 ===================
  * types(schema): allow post('init') #15413 #15412 #15333

@@ -60,7 +60,7 @@ declare module 'mongoose' {
 
     class Decimal128 extends mongodb.Decimal128 { }
 
-    class DocumentArray<T, THydratedDocumentType extends Types.Subdocument<any> = Types.Subdocument<InferId<T>, any, T> & T> extends Types.Array<THydratedDocumentType> {
+    class DocumentArray<T, THydratedDocumentType extends Types.Subdocument<any, any, T> = Types.Subdocument<InferId<T>, any, T> & T> extends Types.Array<THydratedDocumentType> {
       /** DocumentArray constructor */
       constructor(values: AnyObject[]);
 
@@ -85,7 +85,7 @@ declare module 'mongoose' {
     class ObjectId extends mongodb.ObjectId {
     }
 
-    class Subdocument<IdType = unknown, TQueryHelpers = any, DocType = any> extends Document<IdType, TQueryHelpers, DocType> {
+    class Subdocument<IdType = any, TQueryHelpers = any, DocType = any> extends Document<IdType, TQueryHelpers, DocType> {
       $isSingleNested: true;
 
       /** Returns the top level document of this sub-document. */

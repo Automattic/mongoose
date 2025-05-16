@@ -225,10 +225,6 @@ function find() {
   Project.find({}, { name: 1 });
   Project.find({}, { name: 0 });
 
-  // filter + callback
-  Project.find({}, (error: CallbackError, result: IProject[]) => console.log(error, result));
-  Project.find({ name: 'Hello' }, (error: CallbackError, result: IProject[]) => console.log(error, result));
-
   // filter + projection + options
   Project.find({}, undefined, { limit: 5 });
   Project.find({}, null, { limit: 5 });

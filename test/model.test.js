@@ -6814,15 +6814,10 @@ describe('Model', function() {
         new User({ name: 'b' })
       ];
 
-      let err;
-      try {
-        User.buildBulkWriteOperations(users);
-      } catch (error) {
-        err = error;
-      }
-
-
-      assert.ok(err);
+      assert.throws(
+        () => User.buildBulkWriteOperations(users),
+        /name: Path `name` \(`a`\) is shorter than the minimum allowed length/
+      );
     });
 
     it('throws an error if documents is not an array', function() {
@@ -6834,9 +6829,7 @@ describe('Model', function() {
 
 
       assert.throws(
-        function() {
-          User.buildBulkWriteOperations(null);
-        },
+        () => User.buildBulkWriteOperations(null),
         /bulkSave expects an array of documents to be passed/
       );
     });
@@ -6847,14 +6840,11 @@ describe('Model', function() {
 
       const User = db.model('User', userSchema);
 
-
       assert.throws(
-        function() {
-          User.buildBulkWriteOperations([
-            new User({ name: 'Hafez' }),
-            { name: 'I am not a document' }
-          ]);
-        },
+        () => User.buildBulkWriteOperations([
+          new User({ name: 'Hafez' }),
+          { name: 'I am not a document' }
+        ]),
         /documents\.1 was not a mongoose document/
       );
     });
@@ -7066,6 +7056,62 @@ describe('Model', function() {
         ]
       );
 
+    });
+
+    it('saves documents with embedded discriminators (gh-15410)', async function() {
+      const requirementSchema = new Schema({
+        kind: { type: String, required: true },
+        quantity: Number,
+        notes: String
+      }, { _id: false, discriminatorKey: 'kind' });
+
+      const componentRequirementSchema = new Schema({
+        componentTest: 'ObjectId'
+      }, { _id: false });
+
+      const toolRequirementSchema = new Schema({
+        toolTest: 'ObjectId'
+      }, { _id: false });
+
+      const subRowSchema = new Schema({
+        requirements: [requirementSchema]
+      }, { _id: false });
+
+      const rowSchema = new Schema({
+        rows: [subRowSchema]
+      }, { _id: false });
+
+      const orderSchema = new Schema({
+        code: String,
+        rows: [rowSchema]
+      }, { timestamps: true });
+
+      requirementSchema.discriminators = {};
+      requirementSchema.discriminators['ComponentRequirement'] = componentRequirementSchema;
+      requirementSchema.discriminators['ToolRequirement'] = toolRequirementSchema;
+
+      subRowSchema.path('requirements').discriminator('ComponentRequirement', componentRequirementSchema);
+      subRowSchema.path('requirements').discriminator('ToolRequirement', toolRequirementSchema);
+
+      const Order = db.model('Order', orderSchema);
+
+      const order = await Order.create({
+        code: 'test-2',
+        rows: [{
+          rows: [{
+            requirements: [
+              { kind: 'ComponentRequirement', quantity: 1 },
+              { kind: 'ToolRequirement', quantity: 1 }
+            ]
+          }]
+        }]
+      });
+
+      const newObjectId = new mongoose.Types.ObjectId();
+      order.rows[0].rows[0].requirements[1].set({ toolTest: newObjectId.toString() });
+      await Order.bulkSave([order]);
+      const reread = await Order.findById(order._id).lean();
+      assert.strictEqual(reread.rows[0].rows[0].requirements[1].toolTest?.toHexString(), newObjectId.toHexString());
     });
 
     it('insertMany should throw an error if there were operations that failed validation, ' +

@@ -15,12 +15,12 @@ import {
   QuerySelector,
   InferSchemaType,
   ProjectionFields,
-  QueryOptions
+  QueryOptions,
+  ProjectionType
 } from 'mongoose';
 import { ModifyResult, ObjectId } from 'mongodb';
 import { expectAssignable, expectError, expectNotAssignable, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
-import { AutoTypedSchemaType } from './schema.test';
 
 interface QueryHelpers {
   _byName(this: QueryWithHelpers<any, ITest, QueryHelpers>, name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;
@@ -54,6 +54,9 @@ interface ISubdoc {
   myId?: Types.ObjectId;
   id?: number;
   tags?: string[];
+  profiles: {
+    name?: string
+  }
 }
 
 interface ITest {
@@ -92,16 +95,6 @@ Test.find({ name: ['Test1', 'Test2'] }).exec();
 
 // Implicit `$in` for regex string
 Test.find({ name: [/Test1/, /Test2/] });
-
-Test.find({ name: 'test' }, (err: Error | null, docs: ITest[]) => {
-  console.log(!!err, docs[0].age);
-});
-
-Test.findOne({ name: 'test' }, (err: Error | null, doc: ITest | null) => {
-  if (doc != null) {
-    console.log(!!err, doc.age);
-  }
-});
 
 Test.find({ name: { $gte: 'Test' } }, null, { collation: { locale: 'en-us' } }).exec().
   then((res: Array<ITest>) => console.log(res[0].name));
@@ -160,6 +153,43 @@ const p1: Record<string, number> = Test.find().projection('age docs.id');
 const p2: Record<string, number> | null = Test.find().projection();
 const p3: null = Test.find().projection(null);
 
+expectError(Test.find({ }, { name: 'ss' })); // Only 0 and 1 are allowed
+expectError(Test.find({ }, { name: 3 })); // Only 0 and 1 are allowed
+expectError(Test.find({ }, { name: true, age: false, endDate: true, tags: 1 })); // Exclusion in a inclusion projection is not allowed
+expectError(Test.find({ }, { name: true, age: false, endDate: true })); // Inclusion in a exclusion projection is not allowed
+expectError(Test.find({ }, { name: false, age: false, tags: false, child: { name: false }, docs: { myId: false, id: true } })); // Inclusion in a exclusion projection is not allowed in nested objects and arrays
+expectError(Test.find({ }, { tags: { something: 1 } })); // array of strings or numbers should only be allowed to be a boolean or 1 and 0
+Test.find({}, { name: true, age: true, endDate: true, tags: 1, child: { name: true }, docs: { myId: true, id: true } }); // This should be allowed
+Test.find({}, { name: 1, age: 1, endDate: 1, tags: 1, child: { name: 1 }, docs: { myId: 1, id: 1 } }); // This should be allowed
+Test.find({}, { _id: 0, name: 1, age: 1, endDate: 1, tags: 1, child: 1, docs: 1 }); // _id is an exception and should be allowed to be excluded
+Test.find({}, { name: 0, age: 0, endDate: 0, tags: 0, child: 0, docs: 0 }); // This should be allowed
+Test.find({}, { name: 0, age: 0, endDate: 0, tags: 0, child: { name: 0 }, docs: { myId: 0, id: 0 } }); // This should be allowed
+Test.find({}, { name: 1, age: 1, _id: 0 }); // This should be allowed since _id is an exception
+Test.find({}, { someOtherField: 1 }); // This should be allowed since it's not a field in the schema
+expectError(Test.find({}, { name: { $slice: 1 } })); // $slice should only be allowed on arrays
+Test.find({}, { tags: { $slice: 1 } }); // $slice should be allowed on arrays
+Test.find({}, { tags: { $slice: [1, 2] } }); // $slice with the format of [ <number to skip>, <number to return> ] should also be allowed on arrays
+expectError(Test.find({}, { age: { $elemMatch: {} } })); // $elemMatch should not be allowed on non arrays
+Test.find({}, { docs: { $elemMatch: { id: 'aa' } } }); // $elemMatch should be allowed on arrays
+expectError(Test.find({}, { tags: { $slice: 1, $elemMatch: {} } })); // $elemMatch and $slice should not be allowed together
+Test.find({}, { age: 1, tags: { $slice: 5 } }); // $slice should be allowed in inclusion projection
+Test.find({}, { age: 0, tags: { $slice: 5 } }); // $slice should be allowed in exclusion projection
+Test.find({}, { age: 1, tags: { $elemMatch: {} } }); // $elemMatch should be allowed in inclusion projection
+Test.find({}, { age: 0, tags: { $elemMatch: {} } }); // $elemMatch should be allowed in exclusion projection
+expectError(Test.find({}, { 'docs.id': 11 })); // Dot notation should be allowed and does not accept any
+expectError(Test.find({}, { docs: { id: '1' } })); // Dot notation should be able to use a combination with objects
+Test.find({}, { docs: { id: false } }); // Dot notation should be allowed with valid values - should correctly handle arrays
+Test.find({}, { docs: { id: true } }); // Dot notation should be allowed with valid values - should correctly handle arrays
+Test.find({ docs: { $elemMatch: { id: 1 } } }, { 'docs.$': 1 }); // $ projection should be allowed
+Test.find({}, { child: 1 }); // Dot notation should be able to use a combination with objects
+// Test.find({}, { 'docs.profiles': { name: 1 } }); // 3 levels deep not supported
+expectError(Test.find({}, { 'docs.profiles': { name: 'aa' } })); // should support a combination of dot notation and objects
+expectError(Test.find({}, { endDate: { toString: 1 } }));
+expectError(Test.find({}, { tags: { trim: 1 } }));
+expectError(Test.find({}, { child: { toJSON: 1 } }));
+
+// Manual Casting using ProjectionType
+Test.find({}, { docs: { unknownParams: 1 } } as ProjectionType<ITest>);
 // Sorting
 Test.find().sort();
 Test.find().sort('-name');

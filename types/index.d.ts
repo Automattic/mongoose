@@ -260,7 +260,7 @@ declare module 'mongoose' {
 
   export class AutoInferredSchema<
     SchemaDef = unknown,
-    RawDocType = any,
+    RawDocType = InferRawDocType<SchemaDef>,
     TModelType = Model<RawDocType, any, any, any>,
     TInstanceMethods = {},
     TQueryHelpers = {},
@@ -276,9 +276,7 @@ declare module 'mongoose' {
     >,
     THydratedDocumentType = HydratedDocument<FlatRecord<DocType>, TVirtuals & TInstanceMethods>
   > extends Schema<RawDocType, TModelType, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods, TSchemaOptions, DocType, THydratedDocumentType> {
-    constructor(definition?: SchemaDef, options?: SchemaOptions<FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
-
-    _schemaDefinition: SchemaDef;
+    constructor(definition: SchemaDef, options?: SchemaOptions<FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
   }
 
   export class Schema<

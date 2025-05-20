@@ -4,11 +4,11 @@
 let sponsors = [];
 try {
   sponsors = require('../data/sponsors.json');
-} catch (err) {}
+} catch {}
 let jobs = [];
 try {
   jobs = require('../data/jobs.json');
-} catch (err) {}
+} catch {}
 
 const api = require('./api');
 

@@ -200,3 +200,60 @@ function gh13601() {
     expectAssignable<Document>(this);
   });
 }
+
+function gh15242() {
+  type PostPersisted = {
+    title: string,
+    postTime: Date
+  };
+
+  type ValidatorThis = DocumentValidatorThis | QueryValidatorThis;
+  type DocumentValidatorThis = HydratedDocument<PostPersisted>;
+  type QueryValidatorThis = Query<unknown, PostRecord>;
+
+  const PostSchema = new Schema<PostPersisted>({
+    title: { type: String, required: true },
+    postTime: {
+      type: Date,
+      required: true,
+      validate: {
+        validator: async function(this: ValidatorThis, postTime: Date): Promise<boolean> {
+          return true;
+        }
+      }
+    }
+  });
+
+  type PostRecord = HydratedDocument<PostPersisted>;
+  const PostModel = model<PostPersisted>('Post', PostSchema);
+}
+
+function gh15242WithVirtuals() {
+  type PostPersisted = {
+    title: string,
+    postTime: Date
+  };
+
+  type ValidatorThis = DocumentValidatorThis | QueryValidatorThis;
+  type DocumentValidatorThis = HydratedDocument<PostPersisted, { myVirtual: number }>;
+  type QueryValidatorThis = Query<PostRecord, PostRecord>;
+
+  const PostSchema = new Schema({
+    title: { type: String, required: true },
+    postTime: {
+      type: Date,
+      required: true,
+      validate: {
+        validator: async function(this: ValidatorThis, postTime: Date): Promise<boolean> {
+          if (!(this instanceof Query)) {
+            expectType<number>(this.myVirtual);
+          }
+          return true;
+        }
+      }
+    }
+  }, { virtuals: { myVirtual: { get() { return 42; } } } });
+
+  type PostRecord = HydratedDocument<PostPersisted, { myVirtual: number }>;
+  const PostModel = model<PostPersisted>('Post', PostSchema);
+}

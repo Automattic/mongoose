@@ -11,8 +11,10 @@ declare module 'mongoose' {
     signal?: AbortSignal;
   }
 
-  class Cursor<DocType = any, Options = never> extends stream.Readable {
-    [Symbol.asyncIterator](): AsyncIterableIterator<DocType>;
+  class Cursor<DocType = any, Options = never, NextResultType = DocType | null> extends stream.Readable {
+    [Symbol.asyncIterator](): Cursor<IteratorResult<DocType>, Options, IteratorResult<DocType>>;
+
+    [Symbol.asyncDispose](): Promise<void>;
 
     /**
      * Adds a [cursor flag](https://mongodb.github.io/node-mongodb-native/4.9/classes/FindCursor.html#addCursorFlag).
@@ -25,6 +27,12 @@ declare module 'mongoose' {
      * `next()` will error.
      */
     close(): Promise<void>;
+
+    /**
+     * Destroy this cursor, closing the underlying cursor. Will stop streaming
+     * and subsequent calls to `next()` will error.
+     */
+    destroy(): this;
 
     /**
      * Rewind this cursor to its uninitialized state. Any options that are present on the cursor will
@@ -52,7 +60,7 @@ declare module 'mongoose' {
      * Get the next document from this cursor. Will return `null` when there are
      * no documents left.
      */
-    next(): Promise<DocType | null>;
+    next(): Promise<NextResultType>;
 
     options: Options;
   }

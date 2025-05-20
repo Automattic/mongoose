@@ -4,6 +4,7 @@
 
 'use strict';
 
+const { once } = require('events');
 const start = require('./common');
 
 const assert = require('assert');
@@ -904,6 +905,10 @@ describe('QueryCursor', function() {
 
   it('returns the underlying Node driver cursor with getDriverCursor()', async function() {
     const schema = new mongoose.Schema({ name: String });
+    // Add some middleware to ensure the cursor hasn't been created yet when `cursor()` is called.
+    schema.pre('find', async function() {
+      await new Promise(resolve => setTimeout(resolve, 10));
+    });
 
     const Movie = db.model('Movie', schema);
 
@@ -919,6 +924,36 @@ describe('QueryCursor', function() {
     const driverCursor = await cursor.getDriverCursor();
     assert.ok(cursor.cursor);
     assert.equal(driverCursor, cursor.cursor);
+  });
+
+  it('handles destroy() (gh-14966)', async function() {
+    db.deleteModel(/Test/);
+    const TestModel = db.model('Test', mongoose.Schema({ name: String }));
+
+    const stream = await TestModel.find().cursor();
+    assert.ok(stream.cursor);
+    assert.ok(!stream.cursor.closed);
+
+    stream.destroy();
+
+    await once(stream.cursor, 'close');
+    assert.ok(stream.destroyed);
+    assert.ok(stream.cursor.closed);
+  });
+
+  it('handles destroy() before cursor is created (gh-14966)', async function() {
+    db.deleteModel(/Test/);
+    const schema = mongoose.Schema({ name: String });
+    schema.pre('find', () => new Promise(resolve => setTimeout(resolve, 10)));
+    const TestModel = db.model('Test', schema);
+
+    const stream = await TestModel.find().cursor();
+    assert.ok(!stream.cursor);
+    stream.destroy();
+
+    await once(stream, 'cursor');
+    assert.ok(stream.destroyed);
+    assert.ok(stream.cursor.closed);
   });
 });
 

@@ -4,20 +4,44 @@ declare module 'mongoose' {
 
   type WithLevel1NestedPaths<T, K extends keyof T = keyof T> = {
     [P in K | NestedPaths<Required<T>, K>]: P extends K
-      ? T[P]
+      // Handle top-level paths
+      // First, drill into documents so we don't end up surfacing `$assertPopulated`, etc.
+      ? Extract<NonNullable<T[P]>, Document> extends never
+        // If not a document, then return the type. Otherwise, get the DocType.
+        ? NonNullable<T[P]>
+        : Extract<NonNullable<T[P]>, Document> extends Document<any, any, infer DocType, any>
+          ? DocType
+          : never
+      // Handle nested paths
       : P extends `${infer Key}.${infer Rest}`
         ? Key extends keyof T
-          ? Rest extends keyof NonNullable<T[Key]>
-            ? NonNullable<T[Key]>[Rest]
-            : never
+          ? T[Key] extends (infer U)[]
+            ? Rest extends keyof NonNullable<U>
+              ? NonNullable<U>[Rest]
+              : never
+            : Rest extends keyof NonNullable<T[Key]>
+              ? NonNullable<T[Key]>[Rest]
+              : never
           : never
         : never;
   };
 
   type NestedPaths<T, K extends keyof T> = K extends string
-    ? T[K] extends Record<string, any> | null | undefined
-      ? `${K}.${keyof NonNullable<T[K]> & string}`
-      : never
+    ? T[K] extends TreatAsPrimitives
+      ? never
+      : Extract<NonNullable<T[K]>, Document> extends never
+          ? T[K] extends Array<infer U>
+            ? U extends Record<string, any>
+              ? `${K}.${keyof NonNullable<U> & string}`
+              : never
+            : T[K] extends Record<string, any> | null | undefined
+              ? `${K}.${keyof NonNullable<T[K]> & string}`
+              : never
+          : Extract<NonNullable<T[K]>, Document> extends Document<any, any, infer DocType, any>
+            ? DocType extends Record<string, any>
+              ? `${K}.${keyof NonNullable<DocType> & string}`
+              : never
+            : never
     : never;
 
   type WithoutUndefined<T> = T extends undefined ? never : T;
@@ -93,4 +117,12 @@ type AddThisParameter<T, D> = {
     : T[K];
 };
 
+  /**
+   * @summary Adds timestamp fields to a type
+   * @description Adds createdAt and updatedAt fields of type Date, or custom timestamp fields if specified
+   * @param {T} T The type to add timestamp fields to
+   * @param {P} P Optional SchemaTimestampsConfig or boolean to customize timestamp field names
+   * @returns T with timestamp fields added
+   */
+  export type WithTimestamps<T, P extends SchemaTimestampsConfig | boolean = true> = ResolveTimestamps<T, { timestamps: P }>;
 }

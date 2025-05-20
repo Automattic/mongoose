@@ -36,8 +36,8 @@ describe('SchemaUUID', function() {
   it('basic functionality should work', async function() {
     const doc = new Model({ x: '09190f70-3d30-11e5-8814-0f4df9a59c41' });
     assert.ifError(doc.validateSync());
-    assert.ok(typeof doc.x === 'string');
-    assert.strictEqual(doc.x, '09190f70-3d30-11e5-8814-0f4df9a59c41');
+    assert.ok(doc.x instanceof mongoose.Types.UUID);
+    assert.strictEqual(doc.x.toString(), '09190f70-3d30-11e5-8814-0f4df9a59c41');
     await doc.save();
 
     const query = Model.findOne({ x: '09190f70-3d30-11e5-8814-0f4df9a59c41' });
@@ -45,8 +45,8 @@ describe('SchemaUUID', function() {
 
     const res = await query;
     assert.ifError(res.validateSync());
-    assert.ok(typeof res.x === 'string');
-    assert.strictEqual(res.x, '09190f70-3d30-11e5-8814-0f4df9a59c41');
+    assert.ok(res.x instanceof mongoose.Types.UUID);
+    assert.strictEqual(res.x.toString(), '09190f70-3d30-11e5-8814-0f4df9a59c41');
 
     // check that the data is actually a buffer in the database with the correct subtype
     const col = db.client.db(db.name).collection(Model.collection.name);
@@ -54,6 +54,11 @@ describe('SchemaUUID', function() {
     assert.ok(rawDoc);
     assert.ok(rawDoc.x instanceof bson.Binary);
     assert.strictEqual(rawDoc.x.sub_type, 4);
+
+    const rawDoc2 = await col.findOne({ x: new bson.UUID('09190f70-3d30-11e5-8814-0f4df9a59c41') });
+    assert.ok(rawDoc2);
+    assert.ok(rawDoc2.x instanceof bson.UUID);
+    assert.strictEqual(rawDoc2.x.sub_type, 4);
   });
 
   it('should throw error in case of invalid string', function() {
@@ -63,6 +68,8 @@ describe('SchemaUUID', function() {
     const errors = res.errors;
     assert.strictEqual(Object.keys(errors).length, 1);
     assert.ok(errors.x instanceof mongoose.Error.CastError);
+
+    assert.ok(errors.x.reason.message.includes('not a valid UUID string'), errors.x.reason.message);
   });
 
   it('should work with $in and $nin and $all', async function() {
@@ -78,9 +85,9 @@ describe('SchemaUUID', function() {
     assert.strictEqual(foundDocIn.length, 1);
     assert.ok(foundDocIn[0].y);
     assert.strictEqual(foundDocIn[0].y.length, 3);
-    assert.strictEqual(foundDocIn[0].y[0], 'f8010af3-bc2c-45e6-85c6-caa30c4a7d34');
-    assert.strictEqual(foundDocIn[0].y[1], 'c6f59133-4f84-45a8-bc1d-8f172803e4fe');
-    assert.strictEqual(foundDocIn[0].y[2], 'df1309e0-58c5-427a-b22f-6c0fc445ccc0');
+    assert.strictEqual(foundDocIn[0].y[0].toString(), 'f8010af3-bc2c-45e6-85c6-caa30c4a7d34');
+    assert.strictEqual(foundDocIn[0].y[1].toString(), 'c6f59133-4f84-45a8-bc1d-8f172803e4fe');
+    assert.strictEqual(foundDocIn[0].y[2].toString(), 'df1309e0-58c5-427a-b22f-6c0fc445ccc0');
 
     // test $nin
     const foundDocNin = await Model.find({ y: { $nin: ['f8010af3-bc2c-45e6-85c6-caa30c4a7d34'] } });
@@ -88,9 +95,9 @@ describe('SchemaUUID', function() {
     assert.strictEqual(foundDocNin.length, 1);
     assert.ok(foundDocNin[0].y);
     assert.strictEqual(foundDocNin[0].y.length, 3);
-    assert.strictEqual(foundDocNin[0].y[0], '13d51406-cd06-4fc2-93d1-4fad9b3eecd7');
-    assert.strictEqual(foundDocNin[0].y[1], 'f004416b-e02a-4212-ac77-2d3fcf04898b');
-    assert.strictEqual(foundDocNin[0].y[2], '5b544b71-8988-422b-a4df-bf691939fe4e');
+    assert.strictEqual(foundDocNin[0].y[0].toString(), '13d51406-cd06-4fc2-93d1-4fad9b3eecd7');
+    assert.strictEqual(foundDocNin[0].y[1].toString(), 'f004416b-e02a-4212-ac77-2d3fcf04898b');
+    assert.strictEqual(foundDocNin[0].y[2].toString(), '5b544b71-8988-422b-a4df-bf691939fe4e');
 
     // test for $all
     const foundDocAll = await Model.find({ y: { $all: ['13d51406-cd06-4fc2-93d1-4fad9b3eecd7', 'f004416b-e02a-4212-ac77-2d3fcf04898b'] } });
@@ -98,9 +105,9 @@ describe('SchemaUUID', function() {
     assert.strictEqual(foundDocAll.length, 1);
     assert.ok(foundDocAll[0].y);
     assert.strictEqual(foundDocAll[0].y.length, 3);
-    assert.strictEqual(foundDocAll[0].y[0], '13d51406-cd06-4fc2-93d1-4fad9b3eecd7');
-    assert.strictEqual(foundDocAll[0].y[1], 'f004416b-e02a-4212-ac77-2d3fcf04898b');
-    assert.strictEqual(foundDocAll[0].y[2], '5b544b71-8988-422b-a4df-bf691939fe4e');
+    assert.strictEqual(foundDocAll[0].y[0].toString(), '13d51406-cd06-4fc2-93d1-4fad9b3eecd7');
+    assert.strictEqual(foundDocAll[0].y[1].toString(), 'f004416b-e02a-4212-ac77-2d3fcf04898b');
+    assert.strictEqual(foundDocAll[0].y[2].toString(), '5b544b71-8988-422b-a4df-bf691939fe4e');
   });
 
   it('should not convert to string nullish UUIDs (gh-13032)', async function() {
@@ -150,6 +157,21 @@ describe('SchemaUUID', function() {
     await pop.save();
   });
 
+  it('works with lean', async function() {
+    const userSchema = new mongoose.Schema({
+      _id: { type: 'UUID' },
+      name: String
+    });
+    const User = db.model('User', userSchema);
+
+    const u1 = await User.create({ _id: randomUUID(), name: 'admin' });
+
+    const lean = await User.findById(u1._id).lean().orFail();
+    assert.equal(lean.name, 'admin');
+    assert.ok(lean._id instanceof mongoose.Types.UUID);
+    assert.equal(lean._id.toString(), u1._id.toString());
+  });
+
   it('handles built-in UUID type (gh-13103)', async function() {
     const schema = new Schema({
       _id: {
@@ -163,12 +185,12 @@ describe('SchemaUUID', function() {
     const uuid = new mongoose.Types.UUID();
     let { _id } = await Test.create({ _id: uuid });
     assert.ok(_id);
-    assert.equal(typeof _id, 'string');
+    assert.ok(_id instanceof mongoose.Types.UUID);
     assert.equal(_id, uuid.toString());
 
     ({ _id } = await Test.findById(uuid));
     assert.ok(_id);
-    assert.equal(typeof _id, 'string');
+    assert.ok(_id instanceof mongoose.Types.UUID);
     assert.equal(_id, uuid.toString());
   });
 
@@ -200,11 +222,56 @@ describe('SchemaUUID', function() {
     const exists = await Test.findOne({ 'doc_map.role_1': { $type: 'binData' } });
     assert.ok(exists);
 
-    assert.equal(typeof user.get('doc_map.role_1'), 'string');
+    assert.ok(user.get('doc_map.role_1') instanceof mongoose.Types.UUID);
   });
 
-  // the following are TODOs based on SchemaUUID.prototype.$conditionalHandlers which are not tested yet
-  it('should work with $bits* operators');
-  it('should work with $all operator');
-  it('should work with $lt, $lte, $gt, $gte operators');
+  it('should work with $bits* operators', async function() {
+    const schema = new Schema({
+      uuid: mongoose.Schema.Types.UUID
+    });
+    db.deleteModel(/Test/);
+    const Test = db.model('Test', schema);
+
+    const uuid = new mongoose.Types.UUID('ff' + '0'.repeat(30));
+    await Test.create({ uuid });
+
+    let doc = await Test.findOne({ uuid: { $bitsAllSet: [0, 4] } });
+    assert.ok(doc);
+    doc = await Test.findOne({ uuid: { $bitsAllSet: 2 ** 15 } });
+    assert.ok(!doc);
+
+    doc = await Test.findOne({ uuid: { $bitsAnySet: 3 } });
+    assert.ok(doc);
+    doc = await Test.findOne({ uuid: { $bitsAnySet: [8] } });
+    assert.ok(!doc);
+
+    doc = await Test.findOne({ uuid: { $bitsAnyClear: [0, 32] } });
+    assert.ok(doc);
+    doc = await Test.findOne({ uuid: { $bitsAnyClear: 7 } });
+    assert.ok(!doc);
+
+    doc = await Test.findOne({ uuid: { $bitsAllClear: [16, 17, 18] } });
+    assert.ok(doc);
+    doc = await Test.findOne({ uuid: { $bitsAllClear: 3 } });
+    assert.ok(!doc);
+  });
+
+  it('should work with $all operator', async function() {
+    const schema = new Schema({
+      uuids: [mongoose.Schema.Types.UUID]
+    });
+    db.deleteModel(/Test/);
+    const Test = db.model('Test', schema);
+
+    const uuid1 = new mongoose.Types.UUID();
+    const uuid2 = new mongoose.Types.UUID();
+    const uuid3 = new mongoose.Types.UUID();
+    await Test.create({ uuids: [uuid1, uuid2] });
+
+    let doc = await Test.findOne({ uuids: { $all: [uuid1, uuid2] } });
+    assert.ok(doc);
+
+    doc = await Test.findOne({ uuids: { $all: [uuid1, uuid3] } });
+    assert.ok(!doc);
+  });
 });

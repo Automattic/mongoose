@@ -10,6 +10,9 @@ declare module 'mongoose' {
   function syncIndexes(options?: SyncIndexesOptions): Promise<ConnectionSyncIndexesResult>;
 
   interface IndexManager {
+    /* Deletes all indexes that aren't defined in this model's schema. Used by `syncIndexes()`. Returns list of dropped index names. */
+    cleanIndexes(options?: { toDrop?: string[], hideIndexes?: boolean }): Promise<string[]>;
+
     /**
      * Similar to `ensureIndexes()`, except for it uses the [`createIndex`](https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#createIndex)
      * function.
@@ -57,14 +60,15 @@ declare module 'mongoose' {
   type IndexDefinition = Record<string, IndexDirection>;
 
   interface SyncIndexesOptions extends mongodb.CreateIndexesOptions {
-    continueOnError?: boolean
+    continueOnError?: boolean;
+    hideIndexes?: boolean;
   }
   type ConnectionSyncIndexesResult = Record<string, OneCollectionSyncIndexesResult>;
   type OneCollectionSyncIndexesResult = Array<string> & mongodb.MongoServerError;
 
-  interface IndexOptions extends mongodb.CreateIndexesOptions {
+  type IndexOptions = Omit<mongodb.CreateIndexesOptions, 'expires' | 'weights' | 'unique'> & {
     /**
-     * `expires` utilizes the `ms` module from [guille](https://github.com/guille/) allowing us to use a friendlier syntax:
+     * `expires` utilizes the `ms` module from [vercel](https://github.com/vercel/ms) allowing us to use a friendlier syntax:
      *
      * @example
      * ```js
@@ -85,7 +89,9 @@ declare module 'mongoose' {
      */
     expires?: number | string;
     weights?: Record<string, number>;
-  }
+
+    unique?: boolean | [true, string]
+  };
 
   type SearchIndexDescription = mongodb.SearchIndexDescription;
 }

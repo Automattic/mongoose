@@ -146,9 +146,10 @@ type RequiredPathKeys<T, TypeKey extends string = DefaultTypeKey> = {
  * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
  * @returns a record contains required paths with the corresponding type.
  */
-type RequiredPaths<T, TypeKey extends string = DefaultTypeKey> = {
-  [K in RequiredPathKeys<T, TypeKey>]: T[K];
-};
+type RequiredPaths<T, TypeKey extends string = DefaultTypeKey> = Pick<
+  { -readonly [K in keyof T]: T[K] },
+  RequiredPathKeys<T, TypeKey>
+>;
 
 /**
  * @summary A Utility to obtain schema's optional path keys.
@@ -166,9 +167,10 @@ type OptionalPathKeys<T, TypeKey extends string = DefaultTypeKey> = {
  * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
  * @returns a record contains optional paths with the corresponding type.
  */
-type OptionalPaths<T, TypeKey extends string = DefaultTypeKey> = {
-  [K in OptionalPathKeys<T, TypeKey>]?: T[K];
-};
+type OptionalPaths<T, TypeKey extends string = DefaultTypeKey> = Pick<
+  { -readonly [K in keyof T]?: T[K] },
+  OptionalPathKeys<T, TypeKey>
+>;
 
 /**
  * @summary Allows users to optionally choose their own type for a schema field for stronger typing.
@@ -183,8 +185,16 @@ type TypeHint<T> = T extends { __typehint: infer U } ? U: never;
  * @param {TypeKey} TypeKey A generic refers to document definition.
  */
 type ObtainDocumentPathType<PathValueType, TypeKey extends string = DefaultTypeKey> = ResolvePathType<
-PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? PathValueType[TypeKey] : PathValueType,
-PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? Omit<PathValueType, TypeKey> : {},
+  PathValueType extends PathWithTypePropertyBaseType<TypeKey>
+    ? PathValueType[TypeKey] extends PathWithTypePropertyBaseType<TypeKey>
+      ? PathValueType
+      : PathValueType[TypeKey]
+    : PathValueType,
+  PathValueType extends PathWithTypePropertyBaseType<TypeKey>
+    ? PathValueType[TypeKey] extends PathWithTypePropertyBaseType<TypeKey>
+      ? {}
+      : Omit<PathValueType, TypeKey>
+    : {},
 TypeKey,
 TypeHint<PathValueType>
 >;
@@ -209,27 +219,35 @@ type IsSchemaTypeFromBuiltinClass<T> = T extends (typeof String)
             ? true
             : T extends (typeof Schema.Types.Decimal128)
               ? true
-              : T extends (typeof Schema.Types.String)
+              : T extends (typeof Schema.Types.Int32)
                 ? true
-                : T extends (typeof Schema.Types.Number)
-                  ? true
-                  : T extends (typeof Schema.Types.Date)
+                  : T extends (typeof Schema.Types.String)
                     ? true
-                    : T extends (typeof Schema.Types.Boolean)
+                    : T extends (typeof Schema.Types.Number)
                       ? true
-                      : T extends (typeof Schema.Types.Buffer)
+                      : T extends (typeof Schema.Types.Date)
                         ? true
-                        : T extends Types.ObjectId
+                        : T extends (typeof Schema.Types.Double)
                           ? true
-                          : T extends Types.Decimal128
+                          : T extends (typeof Schema.Types.Boolean)
                             ? true
-                            : T extends Buffer
+                            : T extends Types.ObjectId
                               ? true
-                              : T extends NativeDate
+                              : T extends Types.Decimal128
                                 ? true
-                                : T extends (typeof Schema.Types.Mixed)
+                                : T extends NativeDate
                                   ? true
-                                  : IfEquals<T, Schema.Types.ObjectId, true, false>;
+                                  : T extends (typeof Schema.Types.Mixed)
+                                    ? true
+                                    : IfEquals<T, Schema.Types.ObjectId, true, false> extends true
+                                      ? true
+                                      : unknown extends Buffer
+                                        ? false
+                                        : T extends Buffer
+                                          ? true
+                                          : T extends Types.UUID
+                                            ? true
+                                            : false;
 
 /**
  * @summary Resolve path type by returning the corresponding type.
@@ -292,18 +310,19 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
                                     PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 ? Types.Decimal128 :
                                       IfEquals<PathValueType, Schema.Types.Decimal128> extends true ? Types.Decimal128 :
                                         IfEquals<PathValueType, Types.Decimal128> extends true ? Types.Decimal128 :
-                                          IfEquals<PathValueType, Schema.Types.BigInt> extends true ? bigint :
-                                            IfEquals<PathValueType, BigInt> extends true ? bigint :
-                                              PathValueType extends 'bigint' | 'BigInt' | typeof Schema.Types.BigInt | typeof BigInt ? bigint :
-                                                PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? Buffer :
-                                                  IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
-                                                    PathValueType extends MapConstructor | 'Map' ? Map<string, ResolvePathType<Options['of']>> :
-                                                      IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ResolvePathType<Options['of']>> :
-                                                        PathValueType extends ArrayConstructor ? any[] :
-                                                          PathValueType extends typeof Schema.Types.Mixed ? any:
-                                                            IfEquals<PathValueType, ObjectConstructor> extends true ? any:
-                                                              IfEquals<PathValueType, {}> extends true ? any:
-                                                                PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
-                                                                  PathValueType extends Record<string, any> ? ObtainDocumentType<PathValueType, any, { typeKey: TypeKey }> :
-                                                                    unknown,
-    TypeHint>;
+                                            IfEquals<PathValueType, Schema.Types.BigInt> extends true ? bigint :
+                                              IfEquals<PathValueType, BigInt> extends true ? bigint :
+                                                PathValueType extends 'bigint' | 'BigInt' | typeof Schema.Types.BigInt | typeof BigInt ? bigint :
+                                                  PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? Types.UUID :
+                                                    PathValueType extends 'double' | 'Double' | typeof Schema.Types.Double ? Types.Double :
+                                                      IfEquals<PathValueType, Schema.Types.UUID> extends true ? Types.UUID :
+                                                        PathValueType extends MapConstructor | 'Map' ? Map<string, ResolvePathType<Options['of']>> :
+                                                          IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ResolvePathType<Options['of']>> :
+                                                            PathValueType extends ArrayConstructor ? any[] :
+                                                              PathValueType extends typeof Schema.Types.Mixed ? any:
+                                                                IfEquals<PathValueType, ObjectConstructor> extends true ? any:
+                                                                  IfEquals<PathValueType, {}> extends true ? any:
+                                                                    PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
+                                                                      PathValueType extends Record<string, any> ? ObtainDocumentType<PathValueType, any, { typeKey: TypeKey }> :
+                                                                        unknown,
+  TypeHint>;

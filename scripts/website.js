@@ -9,7 +9,7 @@ const path = require('path');
 const pug = require('pug');
 const pkg = require('../package.json');
 const transform = require('acquit-require');
-const childProcess = require("child_process");
+const childProcess = require('child_process');
 
 // using "__dirname" and ".." to have a consistent CWD, this script should not be runnable, even when not being in the root of the project
 // also a consistent root path so that it is easy to change later when the script should be moved
@@ -26,12 +26,12 @@ const isMain = require.main === module;
 let jobs = [];
 try {
   jobs = require('../docs/data/jobs.json');
-} catch (err) {}
+} catch {}
 
 let opencollectiveSponsors = [];
 try {
   opencollectiveSponsors = require('../docs/data/opencollective.json');
-} catch (err) {}
+} catch {}
 
 require('acquit-ignore')();
 
@@ -164,11 +164,11 @@ function moveDocsToTemp() {
   }
 }
 
-/** 
+/**
  * Array of array of semver numbers, sorted with highest number first
  * @example
  * [[1,2,3], [0,1,2]]
- * @type {number[][]} 
+ * @type {number[][]}
  */
 let filteredTags = [];
 
@@ -183,8 +183,8 @@ function parseVersion(str) {
 
   const match = versionReg.exec(str);
 
-  if (!!match) {
-    const parsed = [parseInt(match[1]), parseInt(match[2]), parseInt(match[3])]
+  if (match) {
+    const parsed = [parseInt(match[1]), parseInt(match[2]), parseInt(match[3])];
 
     // fallback just in case some number did not parse
     if (Number.isNaN(parsed[0]) || Number.isNaN(parsed[1]) || Number.isNaN(parsed[2])) {
@@ -195,7 +195,7 @@ function parseVersion(str) {
   }
 
   // special case, to not log a warning
-  if (str === "test") {
+  if (str === 'test') {
     return undefined;
   }
 
@@ -210,27 +210,27 @@ function parseVersion(str) {
 function getVersions() {
   // get all tags from git
   // "trim" is used to remove the ending new-line
-  const res = childProcess.execSync("git tag").toString().trim();
+  const res = childProcess.execSync('git tag').toString().trim();
 
   filteredTags = res.split('\n')
   // map all gotten tags if they match the regular expression
-  .map(parseVersion)
+    .map(parseVersion)
   // filter out all null / undefined / falsy values
-  .filter(v => !!v)
+    .filter(v => !!v)
   // sort tags with latest (highest) first
-  .sort((a, b) => {
-    if (a[0] === b[0]) {
-      if (a[1] === b[1]) {
-        return b[2] - a[2];
+    .sort((a, b) => {
+      if (a[0] === b[0]) {
+        if (a[1] === b[1]) {
+          return b[2] - a[2];
+        }
+        return b[1] - a[1];
       }
-      return b[1] - a[1];
-    }
-    return b[0] - a[0];
-  });
+      return b[0] - a[0];
+    });
 
   if (filteredTags.length === 0) {
-    console.error("no tags found!");
-    filteredTags.push([0,0,0]);
+    console.error('no tags found!');
+    filteredTags.push([0, 0, 0]);
   }
 }
 
@@ -238,16 +238,16 @@ function getVersions() {
  * Stringify a semver number array
  * @param {number[]} arr The array to stringify
  * @param {boolean} dotX If "true", return "5.X" instead of "5.5.5"
- * @returns 
+ * @returns
  */
 function stringifySemverNumber(arr, dotX) {
   if (dotX) {
-    return `${arr[0]}.x`;  
+    return `${arr[0]}.x`;
   }
   return `${arr[0]}.${arr[1]}.${arr[2]}`;
 }
 
-/** 
+/**
  * Get the latest version available
  * @returns {Version}
  */
@@ -269,7 +269,7 @@ function getLatestVersionOf(version) {
     foundVersion = [0, 0, 0];
   }
 
-  return {listed: stringifySemverNumber(foundVersion), path: stringifySemverNumber(foundVersion, true)};
+  return { listed: stringifySemverNumber(foundVersion), path: stringifySemverNumber(foundVersion, true) };
 }
 
 /**
@@ -281,11 +281,11 @@ function getCurrentVersion() {
 
   // i dont think this will ever happen, but just in case
   if (!pkg.version) {
-    console.log("no version from package?");
+    console.log('no version from package?');
     versionToUse = getLatestVersion();
   }
 
-  return {listed: versionToUse, path: stringifySemverNumber(parseVersion(versionToUse), true) };
+  return { listed: versionToUse, path: stringifySemverNumber(parseVersion(versionToUse), true) };
 }
 
 // execute function to get all tags from git
@@ -311,11 +311,10 @@ const versionObj = (() => {
     latestVersion: getLatestVersion(),
     pastVersions: [
       getLatestVersionOf(7),
-      getLatestVersionOf(6),
-      getLatestVersionOf(5),
+      getLatestVersionOf(6)
     ]
   };
-  const versionedDeploy = !!process.env.DOCS_DEPLOY ? !(base.currentVersion.listed === base.latestVersion.listed) : false;
+  const versionedDeploy = process.env.DOCS_DEPLOY ? !(base.currentVersion.listed === base.latestVersion.listed) : false;
 
   const versionedPath = versionedDeploy ? `/docs/${base.currentVersion.path}` : '';
 
@@ -329,7 +328,7 @@ const versionObj = (() => {
 // Create api dir if it doesn't already exist
 try {
   fs.mkdirSync(path.join(cwd, './docs/api'));
-} catch (err) {} // eslint-disable-line no-empty
+} catch {}
 
 const docsFilemap = require('../docs/source/index');
 const files = Object.keys(docsFilemap.fileMap);
@@ -381,12 +380,12 @@ function mapURLs(block, currentUrl) {
   while ((match = mongooseComRegex.exec(block)) !== null) {
     // console.log("match", match);
     // cant just use "match.index" byitself, because of the extra "href=\"" condition, which is not factored in in "match.index"
-    let startIndex = match.index + match[0].length - match[1].length;
+    const startIndex = match.index + match[0].length - match[1].length;
     out += block.slice(lastIndex, startIndex);
     lastIndex = startIndex + match[1].length;
 
     // somewhat primitive gathering of the url, but should be enough for now
-    let fullUrl = /^\/[^"]+/.exec(block.slice(lastIndex-1));
+    const fullUrl = /^\/[^"]+/.exec(block.slice(lastIndex - 1));
 
     let noPrefix = false;
 
@@ -394,7 +393,7 @@ function mapURLs(block, currentUrl) {
       // extra processing to only use "#otherId" instead of using full url for the same page
       // at least firefox does not make a difference between a full path and just "#", but it makes debugging paths easier
       if (fullUrl[0].startsWith(currentUrl)) {
-        let indexMatch = /#/.exec(fullUrl);
+        const indexMatch = /#/.exec(fullUrl);
 
         if (indexMatch) {
           lastIndex += indexMatch.index - 1;
@@ -405,10 +404,10 @@ function mapURLs(block, currentUrl) {
 
     if (!noPrefix) {
       // map all to the versioned-path, unless a explicit version is given
-      if (!versionedDocs.test(block.slice(lastIndex, lastIndex+10))) {
-        out += versionObj.versionedPath + "/";
+      if (!versionedDocs.test(block.slice(lastIndex, lastIndex + 10))) {
+        out += versionObj.versionedPath + '/';
       } else {
-        out += "/";
+        out += '/';
       }
     }
   }
@@ -423,14 +422,14 @@ function mapURLs(block, currentUrl) {
  * @param {String} filename The documentation file path to render
  * @param {import("../docs/source/index").DocsOptions} options The options to use to render the file (api may be overwritten at reload)
  * @param {Boolean} isReload Indicate this is a reload of the file
- * @returns 
+ * @returns
  */
 async function pugify(filename, options, isReload = false) {
   /** Path for the output file */
   let newfile = undefined;
   options = options || {};
   options.package = pkg;
-  const isAPI = options.api && !filename.endsWith('docs/api.pug');
+  // const isAPI = options.api && !filename.endsWith('docs/api.pug');
 
   const _editLink = 'https://github.com/Automattic/mongoose/blob/master' +
     filename.replace(cwd, '');
@@ -444,7 +443,7 @@ async function pugify(filename, options, isReload = false) {
     if (isReload) {
       apiReq.parseFile(options.file);
       // overwrite original options because of reload
-      options = {...options, ...apiReq.docs.get(options.file)};
+      options = { ...options, ...apiReq.docs.get(options.file) };
     }
     inputFile = path.resolve(cwd, 'docs/api_split.pug');
   }
@@ -454,7 +453,7 @@ async function pugify(filename, options, isReload = false) {
   if (options.acquit) {
     contents = transform(contents, getTests());
 
-    contents = contents.replaceAll(/^```acquit$/gmi, "```javascript");
+    contents = contents.replaceAll(/^```acquit$/gmi, '```javascript');
   }
   if (options.markdown) {
     const lines = contents.split('\n');
@@ -487,7 +486,7 @@ async function pugify(filename, options, isReload = false) {
 
   if (versionObj.versionedDeploy) {
     newfile = path.resolve(cwd, path.join('.', versionObj.versionedPath), path.relative(cwd, newfile));
-    await fs.promises.mkdir(path.dirname(newfile), {recursive:true});
+    await fs.promises.mkdir(path.dirname(newfile), { recursive: true });
   }
 
   options.outputUrl = newfile.replace(cwd, '');
@@ -498,16 +497,16 @@ async function pugify(filename, options, isReload = false) {
 
   let str = await pugRender(contents, options).catch(console.error);
 
-  if (typeof str !== "string") {
+  if (typeof str !== 'string') {
     return;
   }
 
-  str = mapURLs(str, '/' + path.relative(cwd, docsPath))
-  
+  str = mapURLs(str, '/' + path.relative(cwd, docsPath));
+
   await fs.promises.writeFile(newfile, str).catch((err) => {
     console.error('could not write', err.stack);
   }).then(() => {
-    console.log('%s : rendered ', new Date(), newfile);
+    console.log('%s : rendered %s', (new Date()).toISOString(), newfile);
   });
 }
 
@@ -535,20 +534,20 @@ function startWatch() {
     }
   });
 
-  fs.watchFile(path.join(cwd, 'docs/api_split.pug'), {interval: 1000}, (cur, prev) => {
+  fs.watchFile(path.join(cwd, 'docs/api_split.pug'), { interval: 1000 }, (cur, prev) => {
     if (cur.mtime > prev.mtime) {
       console.log('docs/api_split.pug modified, reloading all api files');
-      Promise.all(files.filter(v=> v.startsWith('docs/api')).map(async (file) => {
+      Promise.all(files.filter(v => v.startsWith('docs/api')).map(async(file) => {
         const filename = path.join(cwd, file);
         await pugify(filename, docsFilemap.fileMap[file], true);
       }));
     }
   });
 
-  fs.watchFile(path.join(cwd, 'docs/api_split.pug'), {interval: 1000}, (cur, prev) => {
+  fs.watchFile(path.join(cwd, 'docs/api_split.pug'), { interval: 1000 }, (cur, prev) => {
     if (cur.mtime > prev.mtime) {
       console.log('docs/api_split.pug modified, reloading all api files');
-      Promise.all(files.filter(v=> v.startsWith('docs/api')).map(async (file) => {
+      Promise.all(files.filter(v => v.startsWith('docs/api')).map(async(file) => {
         const filename = path.join(cwd, file);
         await pugify(filename, docsFilemap.fileMap[file]);
       }));
@@ -562,7 +561,7 @@ function startWatch() {
  * @param {Boolean} isReload Indicate this is a reload of all files
  */
 async function pugifyAllFiles(noWatch, isReload = false) {
-  await Promise.all(files.map(async (file) => {
+  await Promise.all(files.map(async(file) => {
     const filename = path.join(cwd, file);
     await pugify(filename, docsFilemap.fileMap[file], isReload);
   }));
@@ -591,7 +590,7 @@ async function copyAllRequiredFiles() {
   await Promise.all(pathsToCopy.map(async v => {
     const resultPath = path.resolve(cwd, path.join('.', versionObj.versionedPath, v));
     await fsextra.copy(v, resultPath);
-  }))
+  }));
 }
 
 exports.default = pugify;
@@ -607,7 +606,14 @@ if (isMain) {
   (async function main() {
     console.log(`Processing ~${files.length} files`);
 
-    require('./generateSearch');
+    const generateSearch = require('./generateSearch');
+    let generateSearchPromise;
+    try {
+      const config = generateSearch.getConfig();
+      generateSearchPromise = generateSearch.generateSearch(config);
+    } catch (err) {
+      console.error('Generating Search failed:', err);
+    }
     await deleteAllHtmlFiles();
     await pugifyAllFiles();
     await copyAllRequiredFiles();
@@ -615,8 +621,15 @@ if (isMain) {
       await moveDocsToTemp();
     }
 
+    if (generateSearchPromise) {
+      await generateSearchPromise;
+    }
+
     console.log('Done Processing');
-  })();
+  })().catch((err) => {
+    console.error('Website Generation failed:', err);
+    process.exit(-1);
+  });
 }
 
 // Modified from github-slugger
@@ -625,5 +638,5 @@ function createSlug(value) {
     return '';
   }
   value = value.toLowerCase();
-  return value.replace(/[^a-z0-9-_\s]/, '').replace(/ /g, '-');
+  return value.replace(/<\/?code>/g, '').replace(/[^a-z0-9-_\s]/g, '').replace(/ /g, '-');
 }

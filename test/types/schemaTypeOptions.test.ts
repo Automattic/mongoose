@@ -1,3 +1,4 @@
+import { BSON } from 'mongodb';
 import {
   AnyArray,
   Schema,
@@ -64,11 +65,47 @@ function defaultOptions() {
   expectType<Record<string, any>>(new Schema.Types.Buffer('none').defaultOptions);
   expectType<Record<string, any>>(new Schema.Types.Date('none').defaultOptions);
   expectType<Record<string, any>>(new Schema.Types.Decimal128('none').defaultOptions);
+  expectType<Record<string, any>>(new Schema.Types.Int32('none').defaultOptions);
   expectType<Record<string, any>>(new Schema.Types.DocumentArray('none').defaultOptions);
   expectType<Record<string, any>>(new Schema.Types.Map('none').defaultOptions);
   expectType<Record<string, any>>(new Schema.Types.Mixed('none').defaultOptions);
   expectType<Record<string, any>>(new Schema.Types.Number('none').defaultOptions);
   expectType<Record<string, any>>(new Schema.Types.ObjectId('none').defaultOptions);
+  expectType<Record<string, any>>(new Schema.Types.Double('none').defaultOptions);
   expectType<Record<string, any>>(new Schema.Types.Subdocument('none').defaultOptions);
   expectType<Record<string, any>>(new Schema.Types.UUID('none').defaultOptions);
+}
+
+function encrypt() {
+  const uuid = new BSON.UUID();
+  const binary = new BSON.Binary();
+
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic' };
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Random' };
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, algorithm: undefined };
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId: [uuid], algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Random' };
+
+  // qe + valid queries
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, queries: 'equality' };
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, queries: 'range' };
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, queries: undefined };
+
+  // empty object
+  expectError<SchemaTypeOptions<string>['encrypt']>({});
+
+  // invalid keyId
+  expectError<SchemaTypeOptions<string>['encrypt']>({ keyId: 'fakeId' });
+
+  // missing keyId
+  expectError<SchemaTypeOptions<string>['encrypt']>({ queries: 'equality' });
+  expectError<SchemaTypeOptions<string>['encrypt']>({ algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic' });
+
+  // invalid algorithm
+  expectError<SchemaTypeOptions<string>['encrypt']>({ keyId: uuid, algorithm: 'SHA_FAKE_ALG' });
+
+  // invalid queries
+  expectError<SchemaTypeOptions<string>['encrypt']>({ keyId: uuid, queries: 'fakeQueryOption' });
+
+  // invalid input option
+  expectError<SchemaTypeOptions<string>['encrypt']>({ keyId: uuid, invalidKey: 'fakeKeyOption' });
 }

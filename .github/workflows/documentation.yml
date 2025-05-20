@@ -28,12 +28,12 @@ jobs:
     runs-on: ubuntu-latest
     name: Lint Markdown files
     steps:
-      - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Setup node
-        uses: actions/setup-node@0a44ba7841725637a19e28fa30b79a866c81b0a6 # v4.0.4
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4.3.0
         with:
-          node-version: 20
+          node-version: 22
 
       - run: npm install
 
@@ -45,28 +45,28 @@ jobs:
       #   run: npm run lint-js
 
   test-documentation:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     name: Test Generating Docs
     steps:
-      - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # v4.2.0
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - run: git fetch --depth=1 --tags # download all tags for documentation
 
       - name: Setup node
-        uses: actions/setup-node@0a44ba7841725637a19e28fa30b79a866c81b0a6 # v4.0.4
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e # v4.3.0
         with:
-          node-version: 20
+          node-version: 22
 
       - run: npm install
       - name: Setup MongoDB
         run: |
-          wget -q https://downloads.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-5.0.14.tgz
-          tar xf mongodb-linux-x86_64-ubuntu2004-5.0.14.tgz
+          wget -q https://downloads.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2204-6.0.20.tgz
+          tar xf mongodb-linux-x86_64-ubuntu2204-6.0.20.tgz
           mkdir -p ./data/db/27017 ./data/db/27000
           printf "\n--timeout 8000" >> ./test/mocha.opts
-          ./mongodb-linux-x86_64-ubuntu2004-5.0.14/bin/mongod --setParameter ttlMonitorSleepSecs=1 --fork --dbpath ./data/db/27017 --syslog --port 27017
+          ./mongodb-linux-x86_64-ubuntu2204-6.0.20/bin/mongod --setParameter ttlMonitorSleepSecs=1 --fork --dbpath ./data/db/27017 --syslog --port 27017
           sleep 2
-          mongod --version
-          echo `pwd`/mongodb-linux-x86_64-ubuntu2004-5.0.14/bin >> $GITHUB_PATH
+          ./mongodb-linux-x86_64-ubuntu2204-6.0.20/bin/mongod --version
+          echo `pwd`/mongodb-linux-x86_64-ubuntu2204-6.0.20/bin >> $GITHUB_PATH
       - name: Setup config
         run: |
           echo "module.exports = {uri:'mongodb://127.0.0.1:27017/mongoose_test'};" > ./.config.js

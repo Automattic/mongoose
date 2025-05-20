@@ -34,5 +34,4 @@ And Next.js forces ESM mode.
 ## Next.js Edge Runtime
 
 Mongoose does **not** currently support [Next.js Edge Runtime](https://nextjs.org/docs/app/building-your-application/rendering/edge-and-nodejs-runtimes#edge-runtime).
-While you can import Mongoose in Edge Runtime, you'll get [Mongoose's browser library](browser.html).
 There is no way for Mongoose to connect to MongoDB in Edge Runtime, because [Edge Runtime currently doesn't support Node.js `net` API](https://edge-runtime.vercel.app/features/available-apis#unsupported-apis), which is what the MongoDB Node Driver uses to connect to MongoDB.

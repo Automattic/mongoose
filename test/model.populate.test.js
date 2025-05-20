@@ -7,6 +7,7 @@
 const start = require('./common');
 
 const assert = require('assert');
+const { randomUUID } = require('crypto');
 const utils = require('../lib/utils');
 const util = require('./util');
 const MongooseError = require('../lib/error/mongooseError');
@@ -2582,6 +2583,91 @@ describe('model: populate:', function() {
       assert.strictEqual(doc.parts[0].contents[1].item.url, 'https://youtube.com');
     });
 
+    it('with refPath and array of ids with parent refPath', async function() {
+      const Child = db.model(
+        'Child',
+        new mongoose.Schema({
+          fetched: Boolean
+        })
+      );
+
+      const Parent = db.model(
+        'Parent',
+        new mongoose.Schema({
+          docArray: [
+            {
+              type: {
+                type: String,
+                enum: ['Child', 'OtherModel']
+              },
+              ids: [
+                {
+                  type: mongoose.Schema.ObjectId,
+                  refPath: 'docArray.type'
+                }
+              ]
+            }
+          ]
+        })
+      );
+      await Child.insertMany([
+        { _id: new mongoose.Types.ObjectId('6671a008596112f0729c2045'), fetched: true },
+        { _id: new mongoose.Types.ObjectId('667195f3596112f0728abe24'), fetched: true },
+        { _id: new mongoose.Types.ObjectId('6671bd39596112f072cda69c'), fetched: true },
+        { _id: new mongoose.Types.ObjectId('6672c351596112f072868565'), fetched: true },
+        { _id: new mongoose.Types.ObjectId('66734edd596112f0727304a2'), fetched: true },
+        { _id: new mongoose.Types.ObjectId('66726eff596112f072f8e834'), fetched: true },
+        { _id: new mongoose.Types.ObjectId('667267ff596112f072ed56b1'), fetched: true }
+      ]);
+      const { _id } = await Parent.create(
+        {
+          docArray: [
+            {},
+            {
+              type: 'Child',
+              ids: [
+                new mongoose.Types.ObjectId('6671a008596112f0729c2045'),
+                new mongoose.Types.ObjectId('667195f3596112f0728abe24'),
+                new mongoose.Types.ObjectId('6671bd39596112f072cda69c'),
+                new mongoose.Types.ObjectId('6672c351596112f072868565')
+              ]
+            },
+            {
+              type: 'Child',
+              ids: [new mongoose.Types.ObjectId('66734edd596112f0727304a2')]
+            },
+            {},
+            {
+              type: 'Child',
+              ids: [new mongoose.Types.ObjectId('66726eff596112f072f8e834')]
+            },
+            {},
+            {
+              type: 'Child',
+              ids: [new mongoose.Types.ObjectId('667267ff596112f072ed56b1')]
+            }
+          ]
+        }
+      );
+
+      const doc = await Parent.findById(_id).populate('docArray.ids').orFail();
+      assert.strictEqual(doc.docArray.length, 7);
+      assert.strictEqual(doc.docArray[0].ids.length, 0);
+      assert.strictEqual(doc.docArray[1].ids.length, 4);
+      assert.ok(doc.docArray[1].ids[0].fetched);
+      assert.ok(doc.docArray[1].ids[1].fetched);
+      assert.ok(doc.docArray[1].ids[2].fetched);
+      assert.ok(doc.docArray[1].ids[3].fetched);
+      assert.strictEqual(doc.docArray[2].ids.length, 1);
+      assert.ok(doc.docArray[2].ids[0].fetched);
+      assert.strictEqual(doc.docArray[3].ids.length, 0);
+      assert.strictEqual(doc.docArray[4].ids.length, 1);
+      assert.ok(doc.docArray[4].ids[0].fetched);
+      assert.strictEqual(doc.docArray[5].ids.length, 0);
+      assert.strictEqual(doc.docArray[6].ids.length, 1);
+      assert.ok(doc.docArray[6].ids[0].fetched);
+    });
+
     it('with nested nonexistant refPath (gh-6457)', async function() {
       const CommentSchema = new Schema({
         text: String,
@@ -3556,6 +3642,65 @@ describe('model: populate:', function() {
         assert.deepEqual(band.members.map(b => b.name).sort(), ['AA', 'AB']);
       });
 
+      it('match prevents using $where', async function() {
+        const ParentSchema = new Schema({
+          name: String,
+          child: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Child'
+          },
+          children: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Child'
+          }]
+        });
+
+        const ChildSchema = new Schema({
+          name: String
+        });
+        ChildSchema.virtual('parent', {
+          ref: 'Parent',
+          localField: '_id',
+          foreignField: 'parent'
+        });
+
+        const Parent = db.model('Parent', ParentSchema);
+        const Child = db.model('Child', ChildSchema);
+
+        const child = await Child.create({ name: 'Luke' });
+        const parent = await Parent.create({ name: 'Anakin', child: child._id });
+
+        await assert.rejects(
+          () => Parent.findOne().populate({ path: 'child', match: () => ({ $where: 'typeof console !== "undefined" ? doesNotExist("foo") : true;' }) }),
+          /Cannot use \$where filter with populate\(\) match/
+        );
+        await assert.rejects(
+          () => Parent.find().populate({ path: 'child', match: () => ({ $where: 'typeof console !== "undefined" ? doesNotExist("foo") : true;' }) }),
+          /Cannot use \$where filter with populate\(\) match/
+        );
+        await assert.rejects(
+          () => parent.populate({ path: 'child', match: () => ({ $where: 'typeof console !== "undefined" ? doesNotExist("foo") : true;' }) }),
+          /Cannot use \$where filter with populate\(\) match/
+        );
+        await assert.rejects(
+          () => Child.find().populate({ path: 'parent', match: () => ({ $where: 'typeof console !== "undefined" ? doesNotExist("foo") : true;' }) }),
+          /Cannot use \$where filter with populate\(\) match/
+        );
+        await assert.rejects(
+          () => Child.find().populate({ path: 'parent', match: () => ({ $or: [{ $where: 'typeof console !== "undefined" ? doesNotExist("foo") : true;' }] }) }),
+          /Cannot use \$where filter with populate\(\) match/
+        );
+        await assert.rejects(
+          () => Child.find().populate({ path: 'parent', match: () => ({ $and: [{ $where: 'typeof console !== "undefined" ? doesNotExist("foo") : true;' }] }) }),
+          /Cannot use \$where filter with populate\(\) match/
+        );
+
+        class MyClass {}
+        MyClass.prototype.$where = 'typeof console !== "undefined" ? doesNotExist("foo") : true;';
+        // OK because sift only looks through own properties
+        await Child.find().populate({ path: 'parent', match: () => new MyClass() });
+      });
+
       it('multiple source docs', async function() {
         const PersonSchema = new Schema({
           name: String,
@@ -4245,6 +4390,46 @@ describe('model: populate:', function() {
             done();
           }).
           catch(done);
+      });
+
+      it('with functions for ref with subdoc virtual populate (gh-12440) (gh-12363)', async function() {
+        const ASchema = new Schema({
+          name: String
+        });
+
+        const BSchema = new Schema({
+          referencedModel: String,
+          aId: ObjectId
+        });
+
+        BSchema.virtual('a', {
+          ref: function() {
+            return this.referencedModel;
+          },
+          localField: 'aId',
+          foreignField: '_id',
+          justOne: true
+        });
+
+        const ParentSchema = new Schema({
+          b: BSchema
+        });
+
+        const A1 = db.model('Test1', ASchema);
+        const A2 = db.model('Test2', ASchema);
+        const Parent = db.model('Parent', ParentSchema);
+
+        const as = await Promise.all([
+          A1.create({ name: 'a1' }),
+          A2.create({ name: 'a2' })
+        ]);
+        await Parent.create([
+          { b: { name: 'test1', referencedModel: 'Test1', aId: as[0]._id } },
+          { b: { name: 'test2', referencedModel: 'Test2', aId: as[1]._id } },
+          { b: { name: 'test3', referencedModel: 'Test2', aId: '0'.repeat(24) } }
+        ]);
+        const parents = await Parent.find().populate('b.a').sort({ _id: 1 });
+        assert.deepStrictEqual(parents.map(p => p.b.a?.name), ['a1', 'a2', undefined]);
       });
 
       it('with functions for match (gh-7397)', async function() {
@@ -6642,8 +6827,8 @@ describe('model: populate:', function() {
       });
 
       clickedSchema.virtual('users_$', {
-        ref: function(doc) {
-          return doc.events[0].users[0].refKey;
+        ref: function(subdoc) {
+          return subdoc.users[0].refKey;
         },
         localField: 'users.ID',
         foreignField: 'employeeId'
@@ -6706,8 +6891,8 @@ describe('model: populate:', function() {
       });
 
       clickedSchema.virtual('users_$', {
-        ref: function(doc) {
-          const refKeys = doc.events[0].users.map(user => user.refKey);
+        ref: function(subdoc) {
+          const refKeys = subdoc.users.map(user => user.refKey);
           return refKeys;
         },
         localField: 'users.ID',
@@ -11158,7 +11343,7 @@ describe('model: populate:', function() {
     assert.equal(fromDb.children[2].toHexString(), newChild._id.toHexString());
   });
 
-  it('handles converting uuid documents to strings when calling toObject() (gh-14869)', async function() {
+  it('handles populating uuids (gh-14869)', async function() {
     const nodeSchema = new Schema({ _id: { type: 'UUID' }, name: 'String' });
     const rootSchema = new Schema({
       _id: { type: 'UUID' },
@@ -11185,13 +11370,174 @@ describe('model: populate:', function() {
     const foundRoot = await Root.findById(root._id).populate('node');
 
     let doc = foundRoot.toJSON({ getters: true });
-    assert.strictEqual(doc._id, '05c7953e-c6e9-4c2f-8328-fe2de7df560d');
+    assert.strictEqual(doc._id.toString(), '05c7953e-c6e9-4c2f-8328-fe2de7df560d');
     assert.strictEqual(doc.node.length, 1);
-    assert.strictEqual(doc.node[0]._id, '65c7953e-c6e9-4c2f-8328-fe2de7df560d');
+    assert.strictEqual(doc.node[0]._id.toString(), '65c7953e-c6e9-4c2f-8328-fe2de7df560d');
 
     doc = foundRoot.toObject({ getters: true });
-    assert.strictEqual(doc._id, '05c7953e-c6e9-4c2f-8328-fe2de7df560d');
+    assert.strictEqual(doc._id.toString(), '05c7953e-c6e9-4c2f-8328-fe2de7df560d');
     assert.strictEqual(doc.node.length, 1);
-    assert.strictEqual(doc.node[0]._id, '65c7953e-c6e9-4c2f-8328-fe2de7df560d');
+    assert.strictEqual(doc.node[0]._id.toString(), '65c7953e-c6e9-4c2f-8328-fe2de7df560d');
+  });
+
+  it('avoids repopulating if forceRepopulate is disabled (gh-14979)', async function() {
+    const ChildSchema = new Schema({ name: String });
+    const ParentSchema = new Schema({
+      children: [{ type: Schema.Types.ObjectId, ref: 'Child' }],
+      child: { type: 'ObjectId', ref: 'Child' }
+    });
+
+    const Child = db.model('Child', ChildSchema);
+    const Parent = db.model('Parent', ParentSchema);
+
+    const child = await Child.create({ name: 'Child test' });
+    let parent = await Parent.create({ child: child._id, children: [child._id] });
+
+    parent = await Parent.findOne({ _id: parent._id }).populate(['child', 'children']).orFail();
+    child.name = 'Child test updated 1';
+    await child.save();
+
+    await parent.populate({ path: 'child', forceRepopulate: false });
+    await parent.populate({ path: 'children', forceRepopulate: false });
+    assert.equal(parent.child.name, 'Child test');
+    assert.equal(parent.children[0].name, 'Child test');
+
+    await Parent.populate([parent], { path: 'child', forceRepopulate: false });
+    await Parent.populate([parent], { path: 'children', forceRepopulate: false });
+    assert.equal(parent.child.name, 'Child test');
+    assert.equal(parent.children[0].name, 'Child test');
+
+    parent.depopulate('child');
+    parent.depopulate('children');
+    await parent.populate({ path: 'child', forceRepopulate: false });
+    await parent.populate({ path: 'children', forceRepopulate: false });
+    assert.equal(parent.child.name, 'Child test updated 1');
+    assert.equal(parent.children[0].name, 'Child test updated 1');
+  });
+
+  it('handles forceRepopulate as a global option (gh-14979)', async function() {
+    const m = new mongoose.Mongoose();
+    m.set('forceRepopulate', false);
+    await m.connect(start.uri);
+    const ChildSchema = new m.Schema({ name: String });
+    const ParentSchema = new m.Schema({
+      children: [{ type: Schema.Types.ObjectId, ref: 'Child' }],
+      child: { type: 'ObjectId', ref: 'Child' }
+    });
+
+    const Child = m.model('Child', ChildSchema);
+    const Parent = m.model('Parent', ParentSchema);
+
+    const child = await Child.create({ name: 'Child test' });
+    let parent = await Parent.create({ child: child._id, children: [child._id] });
+
+    parent = await Parent.findOne({ _id: parent._id }).populate(['child', 'children']).orFail();
+    child.name = 'Child test updated 1';
+    await child.save();
+
+    await parent.populate({ path: 'child' });
+    await parent.populate({ path: 'children' });
+    assert.equal(parent.child.name, 'Child test');
+    assert.equal(parent.children[0].name, 'Child test');
+
+    await Parent.populate([parent], { path: 'child' });
+    await Parent.populate([parent], { path: 'children' });
+    assert.equal(parent.child.name, 'Child test');
+    assert.equal(parent.children[0].name, 'Child test');
+
+    parent.depopulate('child');
+    parent.depopulate('children');
+    await parent.populate({ path: 'child' });
+    await parent.populate({ path: 'children' });
+    assert.equal(parent.child.name, 'Child test updated 1');
+    assert.equal(parent.children[0].name, 'Child test updated 1');
+
+    child.name = 'Child test updated 2';
+    await child.save();
+
+    parent.depopulate('child');
+    parent.depopulate('children');
+    await parent.populate({ path: 'child', forceRepopulate: true });
+    await parent.populate({ path: 'children', forceRepopulate: true });
+    assert.equal(parent.child.name, 'Child test updated 2');
+    assert.equal(parent.children[0].name, 'Child test updated 2');
+
+    await m.disconnect();
+  });
+
+  it('handles populating UUID fields (gh-15315)', async function() {
+    const categorySchema = new Schema({
+      _id: { type: 'UUID', default: () => randomUUID() },
+      name: { type: String, required: true },
+      desc: { type: String, required: true }
+    });
+
+    categorySchema.virtual('announcements', {
+      ref: 'Announcement',
+      localField: '_id',
+      foreignField: 'categories'
+    });
+
+    const announcementSchema = new Schema({
+      _id: { type: 'UUID', default: () => randomUUID() },
+      title: { type: String, required: true },
+      content: { type: String, required: true },
+      validUntil: { type: Date, required: true },
+      important: { type: Boolean, default: false },
+      categories: [{ type: 'UUID', ref: 'Category' }]
+    });
+
+    const Category = db.model('Category', categorySchema);
+    const Announcement = db.model('Announcement', announcementSchema);
+
+    const category = await Category.create({ name: 'Tech', desc: 'Technology News' });
+
+    await Announcement.create({
+      title: 'New Tech Release',
+      content: 'Details about the new tech release',
+      validUntil: new Date(),
+      categories: [category._id]
+    });
+
+    const populatedCategory = await Category.findOne({ _id: category._id }).populate('announcements');
+    assert.strictEqual(populatedCategory.announcements.length, 1);
+    assert.strictEqual(populatedCategory.announcements[0].title, 'New Tech Release');
+  });
+
+  it('handles virtual populated UUID array field (gh-15316)', async function() {
+    const RoleSchema = Schema({
+      _id: { type: 'UUID', required: true },
+      name: String
+    });
+
+    const MemberSchema = Schema({
+      _id: { type: 'UUID', required: true },
+      _role_ids: [{
+        type: 'UUID',
+        ref: 'Role',
+        required: true
+      }]
+    });
+
+    MemberSchema.virtual('roles', {
+      ref: 'Role',
+      localField: '_role_ids',
+      foreignField: '_id'
+    });
+
+    const Role = db.model('Role', RoleSchema);
+    const Member = db.model('Member', MemberSchema);
+
+    const role1 = await Role.create({ _id: randomUUID(), name: 'admin' });
+    const role2 = await Role.create({ _id: randomUUID(), name: 'user' });
+
+    const memberId = randomUUID();
+    await Member.create({ _id: memberId, _role_ids: [role1._id, role2._id] });
+
+    const populated = await Member.findOne({ _id: memberId }).populate('roles');
+    assert.deepStrictEqual(
+      populated.roles.sort((a, b) => a.name.localeCompare(b.name)).map(role => role.name),
+      ['admin', 'user']
+    );
   });
 });

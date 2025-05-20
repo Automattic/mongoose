@@ -11,6 +11,7 @@ you should be aware of when migrating from Mongoose 6.x to Mongoose 7.x.
 
 If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration guide](migrating_to_6.html) and upgrade to Mongoose 6.x first.
 
+* [Version Requirements](#version-requirements)
 * [`strictQuery`](#strictquery)
 * [Removed `remove()`](#removed-remove)
 * [Dropped callback support](#dropped-callback-support)
@@ -23,9 +24,16 @@ If you're still on Mongoose 5.x, please read the [Mongoose 5.x to 6.x migration 
 * [ObjectId bsontype now has lowercase d](#objectid-bsontype-now-has-lowercase-d)
 * [Removed support for custom promise libraries](#removed-support-for-custom-promise-libraries)
 * [Removed mapReduce](#removed-mapreduce)
+* [Deprecated `keepAlive`](#deprecated-keepalive)
 * [TypeScript-specific changes](#typescript-specific-changes)
   * [Removed `LeanDocument` and support for `extends Document`](#removed-leandocument-and-support-for-extends-document)
   * [New parameters for `HydratedDocument`](#new-parameters-for-hydrateddocument)
+
+## Version Requirements {#version-requirements}
+
+Mongoose now requires Node.js >= 14.0.0 and MongoDB Node Driver >= 5.0.0.
+
+See [the MongoDB Node Driver migration guide](https://github.com/mongodb/node-mongodb-native/blob/main/etc/notes/CHANGES_5.0.0.md) for detailed info.
 
 ## `strictQuery` {#strictquery}
 
@@ -105,6 +113,7 @@ They always return promises.
 * `Model.aggregate`
 * `Model.bulkWrite`
 * `Model.cleanIndexes`
+* `Model.count`
 * `Model.countDocuments`
 * `Model.create`
 * `Model.createCollection`
@@ -129,6 +138,7 @@ They always return promises.
 * `Model.syncIndexes`
 * `Model.updateMany`
 * `Model.updateOne`
+* `Query.prototype.count`
 * `Query.prototype.find`
 * `Query.prototype.findOne`
 * `Query.prototype.findOneAndDelete`
@@ -155,7 +165,7 @@ conn.startSession(function(err, session) {
 // After
 const session = await conn.startSession();
 // Or:
-conn.startSession().then(sesson => { /* ... */ });
+conn.startSession().then(session => { /* ... */ });
 
 // With error handling
 try {
@@ -200,7 +210,7 @@ In Mongoose 7, `ObjectId` is now a [JavaScript class](https://masteringjs.io/tut
 const oid = new mongoose.Types.ObjectId('0'.repeat(24));
 ```
 
-## `id` Setter
+## `id` Setter {#id-setter}
 
 Starting in Mongoose 7.4, Mongoose's built-in `id` virtual (which stores the document's `_id` as a string) has a setter which allows modifying the document's `_id` property via `id`.
 
@@ -337,6 +347,12 @@ If you want to use Bluebird for all promises globally, you can do the following:
 ```javascript
 global.Promise = require('bluebird');
 ```
+
+## Deprecated `keepAlive` {#deprecated-keepalive}
+
+Before Mongoose 5.2.0, you needed to enable the `keepAlive` option to initiate [TCP keepalive](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html) to prevent `"connection closed"` errors.
+However, `keepAlive` has been `true` by default since Mongoose 5.2.0, and the `keepAlive` is deprecated as of Mongoose 7.2.0.
+Please remove `keepAlive` and `keepAliveInitialDelay` options from your Mongoose connections.
 
 ## TypeScript-specific Changes {#typescript-specific-changes}
 

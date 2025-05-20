@@ -287,11 +287,14 @@ describe('aggregate: ', function() {
     it('works', function() {
       const aggregate = new Aggregate();
 
-      assert.equal(aggregate.near({ a: 1 }), aggregate);
-      assert.deepEqual(aggregate._pipeline, [{ $geoNear: { a: 1 } }]);
+      assert.equal(aggregate.near({ near: { type: 'Point', coordinates: [1, 2] } }), aggregate);
+      assert.deepEqual(aggregate._pipeline, [{ $geoNear: { near: { type: 'Point', coordinates: [1, 2] } } }]);
 
-      aggregate.near({ b: 2 });
-      assert.deepEqual(aggregate._pipeline, [{ $geoNear: { a: 1 } }, { $geoNear: { b: 2 } }]);
+      aggregate.near({ near: { type: 'Point', coordinates: [3, 4] } });
+      assert.deepEqual(aggregate._pipeline, [
+        { $geoNear: { near: { type: 'Point', coordinates: [1, 2] } } },
+        { $geoNear: { near: { type: 'Point', coordinates: [3, 4] } } }
+      ]);
     });
 
     it('works with discriminators (gh-3304)', function() {
@@ -308,19 +311,19 @@ describe('aggregate: ', function() {
 
       aggregate._model = stub;
 
-      assert.equal(aggregate.near({ a: 1 }), aggregate);
+      assert.equal(aggregate.near({ near: { type: 'Point', coordinates: [1, 2] } }), aggregate);
       // Run exec so we apply discriminator pipeline
       Aggregate._prepareDiscriminatorPipeline(aggregate._pipeline, stub.schema);
       assert.deepEqual(aggregate._pipeline,
-        [{ $geoNear: { a: 1, query: { __t: 'subschema' } } }]);
+        [{ $geoNear: { near: { type: 'Point', coordinates: [1, 2] }, query: { __t: 'subschema' } } }]);
 
       aggregate = new Aggregate();
       aggregate._model = stub;
 
-      aggregate.near({ b: 2, query: { x: 1 } });
+      aggregate.near({ near: { type: 'Point', coordinates: [3, 4] }, query: { x: 1 } });
       Aggregate._prepareDiscriminatorPipeline(aggregate._pipeline, stub.schema);
       assert.deepEqual(aggregate._pipeline,
-        [{ $geoNear: { b: 2, query: { x: 1, __t: 'subschema' } } }]);
+        [{ $geoNear: { near: { type: 'Point', coordinates: [3, 4] }, query: { x: 1, __t: 'subschema' } } }]);
     });
   });
 
@@ -814,12 +817,6 @@ describe('aggregate: ', function() {
 
     it('explain()', async function() {
       const aggregate = new Aggregate([], db.model('Employee'));
-      const version = await start.mongodVersion();
-
-      const mongo26 = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
-      if (!mongo26) {
-        return;
-      }
 
       const output = await aggregate.
         match({ sal: { $lt: 16000 } }).
@@ -865,16 +862,13 @@ describe('aggregate: ', function() {
       const match = { $match: { sal: { $gt: 15000 } } };
       const pref = 'primaryPreferred';
       const aggregate = m.aggregate([match]).read(pref);
-      const mongo26_or_greater = version[0] > 2 || (version[0] === 2 && version[1] >= 6);
       const mongo32_or_greater = version[0] > 3 || (version[0] === 3 && version[1] >= 2);
 
       assert.equal(aggregate.options.readPreference.mode, pref);
-      if (mongo26_or_greater) {
-        aggregate.allowDiskUse(true);
-        aggregate.option({ maxTimeMS: 1000 });
-        assert.equal(aggregate.options.allowDiskUse, true);
-        assert.equal(aggregate.options.maxTimeMS, 1000);
-      }
+      aggregate.allowDiskUse(true);
+      aggregate.option({ maxTimeMS: 1000 });
+      assert.equal(aggregate.options.allowDiskUse, true);
+      assert.equal(aggregate.options.maxTimeMS, 1000);
 
       if (mongo32_or_greater) {
         aggregate.readConcern('m');
@@ -1283,5 +1277,48 @@ describe('aggregate: ', function() {
 
     await p;
     await m.disconnect();
+  });
+
+  it('throws error if calling near() with empty coordinates (gh-15188)', async function() {
+    const M = db.model('Test', new Schema({ loc: { type: [Number], index: '2d' } }));
+    assert.throws(() => {
+      const aggregate = new Aggregate([], M);
+      aggregate.near({
+        near: {
+          type: 'Point',
+          coordinates: []
+        }
+      });
+    }, /Aggregate `near\(\)` argument has invalid coordinates, got ""/);
+  });
+
+  it('cursor() errors out if schema pre aggregate hook throws an error (gh-15279)', async function() {
+    const schema = new Schema({ name: String });
+
+    schema.pre('aggregate', function(next) {
+      if (!this.options.allowed) {
+        throw new Error('Unauthorized aggregate operation: only allowed operations are permitted');
+      }
+      next();
+    });
+
+    const Test = db.model('Test', schema);
+
+    await Test.create({ name: 'test1' });
+
+    await assert.rejects(
+      async() => {
+        await Test.aggregate([{ $limit: 1 }], { allowed: false }).exec();
+      },
+      err => err.message === 'Unauthorized aggregate operation: only allowed operations are permitted'
+    );
+
+    const cursor = Test.aggregate([{ $limit: 1 }], { allowed: false }).cursor();
+    await assert.rejects(
+      async() => {
+        await cursor.next();
+      },
+      err => err.message === 'Unauthorized aggregate operation: only allowed operations are permitted'
+    );
   });
 });

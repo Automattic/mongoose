@@ -41,7 +41,7 @@ html(lang='en')
                   - if (versions.currentVersion.listed !== versions.latestVersion.listed)
                     li.pure-menu-item
                       a.pure-menu-link(href=`${versions.latestVersion.path}/docs/index.html`) Version #{versions.latestVersion.listed}
-                  each pastVersion in versions.pastVersions 
+                  each pastVersion in versions.pastVersions
                     li.pure-menu-item
                       a.pure-menu-link(href=`/docs/${pastVersion.path}/index.html`) Version #{pastVersion.listed}
               li.pure-menu-item.search
@@ -106,9 +106,13 @@ html(lang='en')
                         li.pure-menu-item.sub-item
                           a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/statics-and-methods.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/statics-and-methods.html` ? 'selected' : '') Statics and Methods
                         li.pure-menu-item.sub-item
+                          a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/queries.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/queries.html` ? 'selected' : '') Queries
+                        li.pure-menu-item.sub-item
                           a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/query-helpers.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/query-helpers.html` ? 'selected' : '') Query Helpers
                         li.pure-menu-item.sub-item
                           a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/populate.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/populate.html` ? 'selected' : '') Populate
+                        li.pure-menu-item.sub-item
+                          a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/virtuals.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/virtuals.html` ? 'selected' : '') Virtuals
                         li.pure-menu-item.sub-item
                           a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/subdocuments.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/subdocuments.html` ? 'selected' : '') Subdocuments
               li.pure-menu-item

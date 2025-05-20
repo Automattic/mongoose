@@ -1,3 +1,5 @@
+import * as BSON from 'bson';
+
 declare module 'mongoose' {
 
   /** The Mongoose Date [SchemaType](/docs/schematypes.html). */
@@ -12,6 +14,16 @@ declare module 'mongoose' {
    */
   type Decimal128 = Schema.Types.Decimal128;
 
+
+  /**
+   * The Mongoose Int32 [SchemaType](/docs/schematypes.html). Used for
+   * declaring paths in your schema that should be
+   * 32-bit integers
+   * Do not use this to create a new Int32 instance, use `mongoose.Types.Int32`
+   * instead.
+   */
+  type Int32 = Schema.Types.Int32;
+
   /**
    * The Mongoose Mixed [SchemaType](/docs/schematypes.html). Used for
    * declaring paths in your schema that Mongoose's change tracking, casting,
@@ -24,6 +36,13 @@ declare module 'mongoose' {
    * declaring paths in your schema that Mongoose should cast to numbers.
    */
   type Number = Schema.Types.Number;
+
+
+  /**
+   * The Mongoose Double [SchemaType](/docs/schematypes.html). Used for
+   * declaring paths in your schema that Mongoose should cast to doubles (IEEE 754-2008)/
+   */
+  type Double = Schema.Types.Double;
 
   /**
    * The Mongoose ObjectId [SchemaType](/docs/schematypes.html). Used for
@@ -39,7 +58,7 @@ declare module 'mongoose' {
 
   type DefaultType<T> = T extends Schema.Types.Mixed ? any : Partial<ExtractMongooseArray<T>>;
 
-  class SchemaTypeOptions<T, EnforcedDocType = any> {
+  class SchemaTypeOptions<T, EnforcedDocType = any, THydratedDocumentType = HydratedDocument<EnforcedDocType>> {
     type?:
     T extends string ? StringSchemaDefinition :
       T extends number ? NumberSchemaDefinition :
@@ -48,19 +67,19 @@ declare module 'mongoose' {
             T extends Map<any, any> ? SchemaDefinition<typeof Map> :
               T extends Buffer ? SchemaDefinition<typeof Buffer> :
                 T extends Types.ObjectId ? ObjectIdSchemaDefinition :
-                  T extends Types.ObjectId[] ? AnyArray<ObjectIdSchemaDefinition> | AnyArray<SchemaTypeOptions<ObjectId, EnforcedDocType>> :
-                    T extends object[] ? (AnyArray<Schema<any, any, any>> | AnyArray<SchemaDefinition<Unpacked<T>>> | AnyArray<SchemaTypeOptions<Unpacked<T>, EnforcedDocType>>) :
-                      T extends string[] ? AnyArray<StringSchemaDefinition> | AnyArray<SchemaTypeOptions<string, EnforcedDocType>> :
-                        T extends number[] ? AnyArray<NumberSchemaDefinition> | AnyArray<SchemaTypeOptions<number, EnforcedDocType>> :
-                          T extends boolean[] ? AnyArray<BooleanSchemaDefinition> | AnyArray<SchemaTypeOptions<boolean, EnforcedDocType>> :
-                            T extends Function[] ? AnyArray<Function | string> | AnyArray<SchemaTypeOptions<Unpacked<T>, EnforcedDocType>> :
-                              T | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<T> | Function | AnyArray<Function>;
+                  T extends Types.ObjectId[] ? AnyArray<ObjectIdSchemaDefinition> | AnyArray<SchemaTypeOptions<ObjectId, EnforcedDocType, THydratedDocumentType>> :
+                    T extends object[] ? (AnyArray<Schema<any, any, any>> | AnyArray<SchemaDefinition<Unpacked<T>, EnforcedDocType, THydratedDocumentType>> | AnyArray<SchemaTypeOptions<Unpacked<T>, EnforcedDocType, THydratedDocumentType>>) :
+                      T extends string[] ? AnyArray<StringSchemaDefinition> | AnyArray<SchemaTypeOptions<string, EnforcedDocType, THydratedDocumentType>> :
+                        T extends number[] ? AnyArray<NumberSchemaDefinition> | AnyArray<SchemaTypeOptions<number, EnforcedDocType, THydratedDocumentType>> :
+                          T extends boolean[] ? AnyArray<BooleanSchemaDefinition> | AnyArray<SchemaTypeOptions<boolean, EnforcedDocType, THydratedDocumentType>> :
+                            T extends Function[] ? AnyArray<Function | string> | AnyArray<SchemaTypeOptions<Unpacked<T>, EnforcedDocType, THydratedDocumentType>> :
+                              T | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<T, EnforcedDocType, THydratedDocumentType> | Function | AnyArray<Function>;
 
     /** Defines a virtual with the given name that gets/sets this path. */
     alias?: string | string[];
 
     /** Function or object describing how to validate this schematype. See [validation docs](https://mongoosejs.com/docs/validation.html). */
-    validate?: SchemaValidator<T, EnforcedDocType> | AnyArray<SchemaValidator<T, EnforcedDocType>>;
+    validate?: SchemaValidator<T, THydratedDocumentType> | AnyArray<SchemaValidator<T, THydratedDocumentType>>;
 
     /** Allows overriding casting logic for this individual path. If a string, the given string overwrites Mongoose's default cast error message. */
     cast?: string |
@@ -74,13 +93,13 @@ declare module 'mongoose' {
      * path cannot be set to a nullish value. If a function, Mongoose calls the
      * function and only checks for nullish values if the function returns a truthy value.
      */
-    required?: boolean | ((this: EnforcedDocType) => boolean) | [boolean, string] | [(this: EnforcedDocType) => boolean, string];
+    required?: boolean | ((this: THydratedDocumentType) => boolean) | [boolean, string] | [(this: THydratedDocumentType) => boolean, string];
 
     /**
      * The default value for this path. If a function, Mongoose executes the function
      * and uses the return value as the default.
      */
-    default?: DefaultType<T> | ((this: EnforcedDocType, doc: any) => DefaultType<T>) | null;
+    default?: DefaultType<T> | ((this: THydratedDocumentType, doc: THydratedDocumentType) => DefaultType<T> | null | undefined) | null;
 
     /**
      * The model that `populate()` should use if populating this path.
@@ -111,7 +130,7 @@ declare module 'mongoose' {
      * will build a unique index on this path when the
      * model is compiled. [The `unique` option is **not** a validator](/docs/validation.html#the-unique-option-is-not-a-validator).
      */
-    unique?: boolean | number;
+    unique?: boolean | number | [true, string];
 
     /**
      * If [truthy](https://masteringjs.io/tutorials/fundamentals/truthy), Mongoose will
@@ -156,6 +175,9 @@ declare module 'mongoose' {
     /** The maximum value allowed for this path. Only allowed for numbers and dates. */
     max?: number | NativeDate | [number, string] | [NativeDate, string] | readonly [number, string] | readonly [NativeDate, string];
 
+    /** Set to false to disable minimizing empty single nested subdocuments by default */
+    minimize?: boolean;
+
     /** Defines a TTL index on this path. Only allowed for dates. */
     expires?: string | number;
 
@@ -190,6 +212,11 @@ declare module 'mongoose' {
     maxlength?: number | [number, string] | readonly [number, string];
 
     [other: string]: any;
+
+    /**
+     * If set, configures the field for automatic encryption.
+     */
+    encrypt?: EncryptSchemaTypeOptions;
   }
 
   interface Validator<DocType = any> {
@@ -200,6 +227,28 @@ declare module 'mongoose' {
   }
 
   type ValidatorFunction<DocType = any> = (this: DocType, value: any, validatorProperties?: Validator) => any;
+
+  interface QueryEncryptionEncryptOptions {
+    /** The id of the dataKey to use for encryption.  Must be a BSON binary subtype 4 (UUID). */
+    keyId: BSON.Binary;
+
+    /**
+     * Specifies the type of queries that the field can be queried on the encrypted field.
+    */
+    queries?: 'equality' | 'range';
+  }
+
+  interface ClientSideEncryptionEncryptOptions {
+    /** The id of the dataKey to use for encryption.  Must be a BSON binary subtype 4 (UUID). */
+    keyId: [BSON.Binary];
+
+    /**
+     * The algorithm to use for encryption.
+     */
+    algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic' | 'AEAD_AES_256_CBC_HMAC_SHA_512-Random';
+  }
+
+  export type EncryptSchemaTypeOptions = QueryEncryptionEncryptOptions | ClientSideEncryptionEncryptOptions;
 
   class SchemaType<T = any, DocType = any> {
     /** SchemaType constructor */
@@ -282,6 +331,8 @@ declare module 'mongoose' {
 
     /** Declares a full text index. */
     text(bool: boolean): this;
+
+    toJSONSchema(options?: { useBsonType?: boolean }): Record<string, any>;
 
     /** Defines a custom function for transforming this path when converting a document to JSON. */
     transform(fn: (value: any) => any): this;
@@ -370,10 +421,10 @@ declare module 'mongoose' {
         expires(when: number | string): this;
 
         /** Sets a maximum date validator. */
-        max(value: NativeDate, message: string): this;
+        max(value: NativeDate, message?: string): this;
 
         /** Sets a minimum date validator. */
-        min(value: NativeDate, message: string): this;
+        min(value: NativeDate, message?: string): this;
 
         /** Default options for this SchemaType */
         defaultOptions: Record<string, any>;
@@ -382,6 +433,14 @@ declare module 'mongoose' {
       class Decimal128 extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'Decimal128';
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
+      }
+
+      class Int32 extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: 'Int32';
 
         /** Default options for this SchemaType */
         defaultOptions: Record<string, any>;
@@ -430,10 +489,18 @@ declare module 'mongoose' {
         enum(vals: number[]): this;
 
         /** Sets a maximum number validator. */
-        max(value: number, message: string): this;
+        max(value: number, message?: string): this;
 
         /** Sets a minimum number validator. */
-        min(value: number, message: string): this;
+        min(value: number, message?: string): this;
+
+        /** Default options for this SchemaType */
+        defaultOptions: Record<string, any>;
+      }
+
+      class Double extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: 'Double';
 
         /** Default options for this SchemaType */
         defaultOptions: Record<string, any>;

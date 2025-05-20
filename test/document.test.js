@@ -9,9 +9,9 @@ const start = require('./common');
 const Document = require('../lib/document');
 const EventEmitter = require('events').EventEmitter;
 const ArraySubdocument = require('../lib/types/arraySubdocument');
-const Query = require('../lib/query');
 const assert = require('assert');
 const idGetter = require('../lib/helpers/schema/idGetter');
+const sinon = require('sinon');
 const util = require('./util');
 const utils = require('../lib/utils');
 
@@ -625,12 +625,12 @@ describe('document', function() {
     assert.equal(doc.val, 'test2');
   });
 
-  it('allows you to skip validation on save (gh-2981)', function() {
+  it('allows you to skip validation on save (gh-2981)', async function() {
     const schema = new Schema({ name: { type: String, required: true } });
     const MyModel = db.model('Test', schema);
 
     const doc = new MyModel();
-    return doc.save({ validateBeforeSave: false });
+    await doc.save({ validateBeforeSave: false });
   });
 
   it('doesnt use custom toObject options on save', async function() {
@@ -906,7 +906,7 @@ describe('document', function() {
       let str;
       try {
         str = JSON.stringify(arr);
-      } catch (_) {
+      } catch {
         err = true;
       }
       assert.equal(err, false);
@@ -1199,38 +1199,6 @@ describe('document', function() {
         then(function(child) {
           assert.equal(child.values.toy.color, 'brown');
         });
-    });
-  });
-
-  describe.skip('#update', function() {
-    it('returns a Query', function() {
-      const mg = new mongoose.Mongoose();
-      const M = mg.model('Test', { s: String });
-      const doc = new M();
-      assert.ok(doc.update() instanceof Query);
-    });
-    it('calling update on document should relay to its model (gh-794)', async function() {
-      const Docs = new Schema({ text: String });
-      const docs = db.model('Test', Docs);
-      const d = new docs({ text: 'A doc' });
-      let called = false;
-      await d.save();
-
-      const oldUpdate = docs.update;
-      docs.update = function(query, operation) {
-        assert.equal(Object.keys(query).length, 1);
-        assert.equal(d._id, query._id);
-        assert.equal(Object.keys(operation).length, 1);
-        assert.equal(Object.keys(operation.$set).length, 1);
-        assert.equal(operation.$set.text, 'A changed doc');
-        called = true;
-        docs.update = oldUpdate;
-        oldUpdate.apply(docs, arguments);
-      };
-
-      await d.update({ $set: { text: 'A changed doc' } });
-
-      assert.equal(called, true);
     });
   });
 
@@ -1724,7 +1692,6 @@ describe('document', function() {
       assert.equal(d.nested.setr, 'undefined setter');
       dateSetterCalled = false;
       d.date = undefined;
-      await d.validate();
       assert.ok(dateSetterCalled);
     });
 
@@ -1748,13 +1715,13 @@ describe('document', function() {
         }
       }));
       const doc = new Model({ name: 'test', profile: { age: 29 } });
-      assert.deepEqual(names, [null]);
-      assert.deepEqual(profiles, [null]);
+      assert.deepEqual(names, [undefined]);
+      assert.deepEqual(profiles, [undefined]);
 
       doc.name = 'test2';
       doc.profile = { age: 30 };
-      assert.deepEqual(names, [null, 'test']);
-      assert.deepEqual(profiles, [null, { age: 29 }]);
+      assert.deepEqual(names, [undefined, 'test']);
+      assert.deepEqual(profiles, [undefined, { age: 29 }]);
     });
 
     describe('on nested paths', function() {
@@ -3088,6 +3055,51 @@ describe('document', function() {
       assert.strictEqual(foundDoc.array[0].isNew, false);
       assert.strictEqual(foundDoc.array[1].isNew, false);
       assert.strictEqual(nestedModel.isNew, false);
+    });
+
+    it('manual populattion with ref function (gh-15138)', async function() {
+      const userSchema = new mongoose.Schema({
+        username: { type: String },
+        phone: { type: mongoose.Schema.Types.ObjectId, ref: 'phones' }
+      });
+
+      const userSchemaWithFunc = new mongoose.Schema({
+        username: { type: String },
+        phone: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: function() {
+            return 'phones';
+          }
+        }
+      });
+
+      const phoneSchema = new mongoose.Schema({
+        phoneNumber: { type: String },
+        extension: { type: String }
+      });
+
+      const User = db.model('users', userSchema);
+      const UserWithFunc = db.model('usersWithFunc', userSchemaWithFunc);
+      const Phone = db.model('phones', phoneSchema);
+
+      const phone = await Phone.create({
+        phoneNumber: '123456789',
+        extension: '123'
+      });
+
+      const user = await User.create({
+        username: 'John Doe',
+        phone
+      });
+
+      const userWithFunc = await UserWithFunc.create({
+        username: 'John Doe',
+        phone
+      });
+
+      assert.ok(user.populated('phone'));
+      assert.ok(userWithFunc.populated('phone'));
+      assert.equal(userWithFunc.phone.extension, '123');
     });
 
     it('manual population with refPath (gh-7070)', async function() {
@@ -4489,19 +4501,23 @@ describe('document', function() {
       assert.equal(p.children[0].grandchild.foo(), 'bar');
     });
 
-    it('hooks/middleware for custom methods (gh-6385) (gh-7456)', async function() {
+    it('hooks/middleware for custom methods (gh-6385) (gh-7456)', async function hooksForCustomMethods() {
       const mySchema = new Schema({
         name: String
       });
 
-      mySchema.methods.foo = function(cb) {
-        return cb(null, this.name);
+      mySchema.methods.foo = function() {
+        return Promise.resolve(this.name);
       };
       mySchema.methods.bar = function() {
         return this.name;
       };
       mySchema.methods.baz = function(arg) {
         return Promise.resolve(arg);
+      };
+      mySchema.methods.qux = async function qux() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('error!');
       };
 
       let preFoo = 0;
@@ -4520,6 +4536,15 @@ describe('document', function() {
       });
       mySchema.post('baz', function() {
         ++postBaz;
+      });
+
+      let preQux = 0;
+      let postQux = 0;
+      mySchema.pre('qux', function() {
+        ++preQux;
+      });
+      mySchema.post('qux', function() {
+        ++postQux;
       });
 
       const MyModel = db.model('Test', mySchema);
@@ -4543,6 +4568,12 @@ describe('document', function() {
       assert.equal(await doc.baz('foobar'), 'foobar');
       assert.equal(preBaz, 1);
       assert.equal(preBaz, 1);
+
+      const err = await doc.qux().then(() => null, err => err);
+      assert.equal(err.message, 'error!');
+      assert.ok(err.stack.includes('hooksForCustomMethods'));
+      assert.equal(preQux, 1);
+      assert.equal(postQux, 0);
     });
 
     it('custom methods with promises (gh-6385)', async function() {
@@ -6457,14 +6488,16 @@ describe('document', function() {
       });
       const Model = db.model('Test', schema);
 
-      await Model.create({
+      let doc = new Model({
         roles: [
           { name: 'admin' },
           { name: 'mod', folders: [{ folderId: 'foo' }] }
         ]
       });
+      await doc.validate().then(() => null, err => console.log(err));
+      await doc.save();
 
-      const doc = await Model.findOne();
+      doc = await Model.findOne();
 
       doc.roles[1].folders.push({ folderId: 'bar' });
 
@@ -7316,6 +7349,27 @@ describe('document', function() {
 
     assert.strictEqual(obj.timestamp, date);
     assert.strictEqual(obj.subDoc.timestamp, date);
+  });
+
+  it('supports setting values to undefined with strict: false (gh-15192)', async function() {
+    const helloSchema = new mongoose.Schema({
+      name: { type: String, required: true },
+      status: { type: Boolean, required: true },
+      optional: { type: Number }
+    }, { strict: false });
+    const Hello = db.model('Test', helloSchema);
+
+    const obj = new Hello({ name: 'abc', status: true, optional: 1 });
+    const doc = await obj.save();
+
+    doc.set({ optional: undefined });
+
+    assert.ok(doc.isModified());
+
+    await doc.save();
+
+    const { optional } = await Hello.findById(doc._id).orFail();
+    assert.strictEqual(optional, undefined);
   });
 
   it('handles .set() on doc array within embedded discriminator (gh-7656)', function() {
@@ -9682,7 +9736,7 @@ describe('document', function() {
     const schema = Schema({ name: String });
 
     let called = 0;
-    schema.pre(/.*/, { document: true, query: false }, function() {
+    schema.pre(/.*/, { document: true, query: false }, function testPreSave9190() {
       ++called;
     });
     const Model = db.model('Test', schema);
@@ -10071,6 +10125,9 @@ describe('document', function() {
     };
     const document = await Model.create(newModel);
     document.mySubdoc[0].deleteOne();
+    // Set timeout to make sure that we aren't calling the deleteOne hooks synchronously
+    await new Promise(resolve => setTimeout(resolve, 10));
+    assert.equal(count, 0);
     await document.save().catch((error) => {
       console.error(error);
     });
@@ -10433,8 +10490,9 @@ describe('document', function() {
         assert.equal(user.init, 12);
       });
     });
-    xdescribe('Document#collection', () => {
-      it('is available as `$collection`', async() => {
+
+    describe('Document#collection', function() {
+      it('is available as `$collection`', async function() {
         const userSchema = new Schema({ name: String });
         const User = db.model('User', userSchema);
 
@@ -10687,8 +10745,7 @@ describe('document', function() {
     });
 
     // skip until gh-10367 is implemented
-    xit('support `pathsToSkip` option for `Model.validate()`', async() => {
-
+    it.skip('support `pathsToSkip` option for `Model.validate()`', async function() {
       const User = getUserModel();
       const err1 = await User.validate({}, { pathsToSkip: ['age'] });
       assert.deepEqual(Object.keys(err1.errors), ['name']);
@@ -12707,6 +12764,16 @@ describe('document', function() {
     assert.equal(updatedPerson?._age, 61);
   });
 
+  it('bulkSave() allows skipping validation with validateBeforeSave (gh-15156)', async() => {
+    const schema = new Schema({ name: { type: String, required: true } });
+    const MyModel = db.model('Test', schema);
+
+    const doc = new MyModel();
+    await MyModel.bulkSave([doc], { validateBeforeSave: false });
+
+    assert.ok(await MyModel.exists({ _id: doc._id }));
+  });
+
   it('handles default embedded discriminator values (gh-13835)', async function() {
     const childAbstractSchema = new Schema(
       { kind: { type: Schema.Types.String, enum: ['concreteKind'], required: true, default: 'concreteKind' } },
@@ -12994,6 +13061,68 @@ describe('document', function() {
       instance.l2.l3.nestedDiscriminatedTypes.map(i => i.whoAmI()),
       ['I am NumberTyped', 'I am StringTyped']
     );
+  });
+
+  it('handles middleware on embedded discriminators on nested path defined using Schema.prototype.discriminator (gh-14961)', async function() {
+    const eventSchema = new Schema(
+      { message: String },
+      { discriminatorKey: 'kind', _id: false }
+    );
+
+    const clickedSchema = new Schema({
+      element: String
+    }, { _id: false });
+
+    // This is the discriminator which we will use to test middleware
+    const purchasedSchema = new Schema({
+      product: String
+    }, { _id: false });
+
+    let eventSchemaPreValidateCalls = 0;
+    let eventSchemaPreSaveCalls = 0;
+    eventSchema.pre('validate', function() {
+      ++eventSchemaPreValidateCalls;
+    });
+    eventSchema.pre('save', function() {
+      ++eventSchemaPreSaveCalls;
+    });
+
+    let purchasedSchemaPreValidateCalls = 0;
+    let purchasedSchemaPreSaveCalls = 0;
+    purchasedSchema.pre('validate', function() {
+      ++purchasedSchemaPreValidateCalls;
+    });
+    purchasedSchema.pre('save', function() {
+      ++purchasedSchemaPreSaveCalls;
+    });
+
+    eventSchema.discriminator('Clicked', clickedSchema);
+    eventSchema.discriminator('Purchased', purchasedSchema);
+
+    const trackSchema = new Schema({
+      event: eventSchema
+    });
+
+    // Test
+
+    const MyModel = db.model('track', trackSchema);
+    const doc = new MyModel({
+      event: {
+        kind: 'Purchased',
+        message: 'Test',
+        product: 'iPhone'
+      }
+    });
+
+    await doc.save();
+    assert.equal(doc.event.message, 'Test');
+    assert.equal(doc.event.kind, 'Purchased');
+    assert.equal(doc.event.product, 'iPhone');
+
+    assert.strictEqual(eventSchemaPreValidateCalls, 1);
+    assert.strictEqual(eventSchemaPreSaveCalls, 1);
+    assert.strictEqual(purchasedSchemaPreValidateCalls, 1);
+    assert.strictEqual(purchasedSchemaPreSaveCalls, 1);
   });
 
   it('handles reusing schema with embedded discriminators defined using Schema.prototype.discriminator (gh-14162)', async function() {
@@ -13978,6 +14107,672 @@ describe('document', function() {
     assert.ok(Buffer.isBuffer(reloaded.pdfSettings.fileContent));
     assert.strictEqual(reloaded.pdfSettings.fileContent.toString('utf8'), 'hello');
   });
+
+  describe('gh-2306', function() {
+    it('allow define virtual on non-object path', function() {
+      const schema = new mongoose.Schema({ num: Number, str: String, nums: [Number] });
+      schema.path('nums').virtual('last').get(function() {
+        return this[this.length - 1];
+      });
+      schema.virtual('nums.first', { applyToArray: true }).get(function() {
+        return this[0];
+      });
+      schema.virtual('nums.selectedIndex', { applyToArray: true })
+        .get(function() {
+          return this.__selectedIndex;
+        })
+        .set(function(v) {
+          this.__selectedIndex = v;
+        });
+      const M = db.model('gh2306', schema);
+      const m = new M({ num: 2, str: 'a', nums: [1, 2, 3] });
+
+      assert.strictEqual(m.nums.last, 3);
+      assert.strictEqual(m.nums.first, 1);
+
+      assert.strictEqual(m.nums.selectedIndex, undefined);
+      m.nums.selectedIndex = 42;
+      assert.strictEqual(m.nums.__selectedIndex, 42);
+    });
+
+    it('works on document arrays', function() {
+      const schema = new mongoose.Schema({ books: [{ title: String, author: String }] });
+      schema.path('books').virtual('last').get(function() {
+        return this[this.length - 1];
+      });
+      schema.virtual('books.first', { applyToArray: true }).get(function() {
+        return this[0];
+      });
+      const M = db.model('Test', schema);
+      const m = new M({ books: [{ title: 'Casino Royale', author: 'Ian Fleming' }, { title: 'The Man With The Golden Gun', author: 'Ian Fleming' }] });
+
+      assert.strictEqual(m.books.first.title, 'Casino Royale');
+      assert.strictEqual(m.books.last.title, 'The Man With The Golden Gun');
+    });
+  });
+
+  it('clears modified subpaths when setting deeply nested subdoc to null (gh-14952)', async function() {
+    const currentMilestoneSchema = new Schema(
+      {
+        id: { type: String, required: true }
+      },
+      {
+        _id: false
+      }
+    );
+
+    const milestoneSchema = new Schema(
+      {
+        current: {
+          type: currentMilestoneSchema,
+          required: true
+        }
+      },
+      {
+        _id: false
+      }
+    );
+
+    const campaignSchema = new Schema(
+      {
+        milestones: {
+          type: milestoneSchema,
+          required: false
+        }
+      },
+      {
+        _id: false
+      }
+    );
+    const questSchema = new Schema(
+      {
+        campaign: { type: campaignSchema, required: false }
+      },
+      {
+        _id: false
+      }
+    );
+
+    const parentSchema = new Schema({
+      quests: [questSchema]
+    });
+
+    const ParentModel = db.model('Parent', parentSchema);
+    const doc = new ParentModel({
+      quests: [
+        {
+          campaign: {
+            milestones: {
+              current: {
+                id: 'milestone1'
+              }
+            }
+          }
+        }
+      ]
+    });
+
+    await doc.save();
+
+    // Set the nested schema to null
+    doc.quests[0].campaign.milestones.current = {
+      id: 'milestone1'
+    };
+    doc.quests[0].campaign.milestones.current = {
+      id: ''
+    };
+
+    doc.quests[0].campaign.milestones = null;
+    await doc.save();
+
+    const fromDb = await ParentModel.findById(doc._id).orFail();
+    assert.strictEqual(fromDb.quests[0].campaign.milestones, null);
+  });
+
+  it('handles custom error message for duplicate key errors (gh-12844)', async function() {
+    const schema = new Schema({
+      name: String,
+      email: { type: String, unique: [true, 'Email must be unique'] }
+    });
+    const Model = db.model('Test', schema);
+    await Model.init();
+
+    await Model.create({ email: 'test@example.com' });
+
+    let duplicateKeyError = await Model.create({ email: 'test@example.com' }).catch(err => err);
+    assert.strictEqual(duplicateKeyError.message, 'Email must be unique');
+    assert.strictEqual(duplicateKeyError.cause.code, 11000);
+
+    duplicateKeyError = await Model.updateOne({ name: 'test' }, { email: 'test@example.com' }, { upsert: true }).catch(err => err);
+    assert.strictEqual(duplicateKeyError.message, 'Email must be unique');
+    assert.strictEqual(duplicateKeyError.cause.code, 11000);
+  });
+
+  it('supports global transforms per schematype (gh-15084)', async function() {
+    class SchemaCustomType extends mongoose.SchemaType {
+      constructor(key, options) {
+        super(key, options, 'CustomType');
+      }
+
+      cast(value) {
+        if (value === null) return null;
+        return new CustomType(value);
+      }
+    }
+    SchemaCustomType.schemaName = 'CustomType';
+
+    class CustomType {
+      constructor(value) {
+        this.value = value;
+      }
+    }
+
+    mongoose.Schema.Types.CustomType = SchemaCustomType;
+
+    const Model = db.model(
+      'Test',
+      new mongoose.Schema({
+        value: { type: mongoose.Schema.Types.CustomType }
+      })
+    );
+
+    const _id = new mongoose.Types.ObjectId('0'.repeat(24));
+    const doc = new Model({ _id });
+    doc.value = 1;
+
+    mongoose.Schema.Types.CustomType.set('transform', v => v == null ? v : v.value);
+
+    assert.deepStrictEqual(doc.toJSON(), { _id, value: 1 });
+    assert.deepStrictEqual(doc.toObject(), { _id, value: 1 });
+
+    delete mongoose.Schema.Types.CustomType;
+  });
+
+  it('supports schemaFieldsOnly option for toObject() (gh-15258)', async function() {
+    const schema = new Schema({ key: String }, { discriminatorKey: 'key' });
+    const subschema1 = new Schema({ field1: String });
+    const subschema2 = new Schema({ field2: String });
+
+    const Discriminator = db.model('Test', schema);
+    Discriminator.discriminator('type1', subschema1);
+    Discriminator.discriminator('type2', subschema2);
+
+    const doc = await Discriminator.create({
+      key: 'type1',
+      field1: 'test value'
+    });
+
+    await Discriminator.updateOne(
+      { _id: doc._id },
+      {
+        key: 'type2',
+        field2: 'test2'
+      },
+      { overwriteDiscriminatorKey: true }
+    );
+
+    const doc2 = await Discriminator.findById(doc).orFail();
+    assert.strictEqual(doc2.field2, 'test2');
+    assert.strictEqual(doc2.field1, undefined);
+
+    const obj = doc2.toObject();
+    assert.strictEqual(obj.field2, 'test2');
+    assert.strictEqual(obj.field1, 'test value');
+
+    const obj2 = doc2.toObject({ schemaFieldsOnly: true });
+    assert.strictEqual(obj.field2, 'test2');
+    assert.strictEqual(obj2.field1, undefined);
+  });
+
+  it('supports schemaFieldsOnly on nested paths, subdocuments, and arrays (gh-15258)', async function() {
+    const subSchema = new Schema({
+      title: String,
+      description: String
+    }, { _id: false });
+    const taskSchema = new Schema({
+      name: String,
+      details: {
+        dueDate: Date,
+        priority: Number
+      },
+      subtask: subSchema,
+      tasks: [subSchema]
+    });
+    const Task = db.model('Test', taskSchema);
+
+    const doc = await Task.create({
+      _id: '0'.repeat(24),
+      name: 'Test Task',
+      details: {
+        dueDate: new Date('2024-01-01'),
+        priority: 1
+      },
+      subtask: {
+        title: 'Subtask 1',
+        description: 'Test Description'
+      },
+      tasks: [{
+        title: 'Array Task 1',
+        description: 'Array Description 1'
+      }]
+    });
+
+    doc._doc.details.extraField = 'extra';
+    doc._doc.subtask.extraField = 'extra';
+    doc._doc.tasks[0].extraField = 'extra';
+
+    const obj = doc.toObject({ schemaFieldsOnly: true });
+    assert.deepStrictEqual(obj, {
+      name: 'Test Task',
+      details: { dueDate: new Date('2024-01-01T00:00:00.000Z'), priority: 1 },
+      subtask: { title: 'Subtask 1', description: 'Test Description' },
+      tasks: [{ title: 'Array Task 1', description: 'Array Description 1' }],
+      _id: new mongoose.Types.ObjectId('0'.repeat(24)),
+      __v: 0
+    });
+  });
+
+  it('handles undoReset() on deep recursive subdocuments (gh-15255)', async function() {
+    const RecursiveSchema = new mongoose.Schema({});
+
+    const s = [RecursiveSchema];
+    RecursiveSchema.path('nested', s);
+
+    const generateRecursiveDocument = (depth, curr = 0) => {
+      return {
+        name: `Document of depth ${curr}`,
+        nested: depth > 0 ? new Array(2).fill().map(() => generateRecursiveDocument(depth - 1, curr + 1)) : [],
+        __v: 5
+      };
+    };
+    const TestModel = db.model('Test', RecursiveSchema);
+    const data = generateRecursiveDocument(10);
+    const doc = new TestModel(data);
+    await doc.save();
+
+    sinon.spy(Document.prototype, '$__undoReset');
+
+    try {
+      const d = await TestModel.findById(doc._id);
+      d.increment();
+      d.data = 'asd';
+      // Force a version error by updating the document directly
+      await TestModel.collection.updateOne({ _id: doc._id }, { $inc: { __v: 1 } });
+      const err = await d.save().then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.name, 'VersionError');
+      // `$__undoReset()` should be called 1x per subdoc, plus 1x for top-level doc. Without fix for gh-15255,
+      // this would fail because `$__undoReset()` is called nearly 700k times for only 2046 subdocs
+      assert.strictEqual(Document.prototype.$__undoReset.getCalls().length, d.$getAllSubdocs().length + 1);
+      assert.ok(Document.prototype.$__undoReset.getCalls().find(call => call.thisValue === d), 'top level doc was not reset');
+      for (const subdoc of d.$getAllSubdocs()) {
+        assert.ok(Document.prototype.$__undoReset.getCalls().find(call => call.thisValue === subdoc), `${subdoc.name} was not reset`);
+      }
+    } finally {
+      sinon.restore();
+    }
+  });
+
+  describe('async stack traces (gh-15317)', function() {
+    it('works with save() validation errors', async function asyncSaveValidationErrors() {
+      const userSchema = new mongoose.Schema({
+        name: { type: String, required: true, validate: v => v.length > 3 },
+        age: Number
+      });
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'A' });
+      const err = await doc.save().then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.ok(err.stack.includes('asyncSaveValidationErrors'), err.stack);
+    });
+
+    it('works with async pre save errors', async function asyncPreSaveErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      userSchema.pre('save', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('pre save error');
+      });
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'A' });
+      const err = await doc.save().then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'pre save error');
+      assert.ok(err.stack.includes('asyncPreSaveErrors'), err.stack);
+    });
+
+    it('works with async pre save errors on subdocuments', async function asyncSubdocPreSaveErrors() {
+      const addressSchema = new mongoose.Schema({
+        street: String
+      });
+      addressSchema.pre('save', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('subdoc pre save error');
+      });
+      const userSchema = new mongoose.Schema({
+        name: String,
+        address: addressSchema
+      });
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'A', address: { street: 'Main St' } });
+      const err = await doc.save().then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'subdoc pre save error');
+      assert.ok(err.stack.includes('asyncSubdocPreSaveErrors'), err.stack);
+    });
+
+    it('works with save server errors', async function saveServerErrors() {
+      const userSchema = new mongoose.Schema({
+        name: { type: String, unique: true },
+        age: Number
+      });
+      const User = db.model('User', userSchema);
+      await User.init();
+
+      await User.create({ name: 'A' });
+      const doc = new User({ name: 'A' });
+      const err = await doc.save().then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.name, 'MongoServerError');
+      assert.ok(err.stack.includes('saveServerErrors'), err.stack);
+    });
+
+    it('works with async pre save errors with bulkSave()', async function asyncPreBulkSaveErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      userSchema.pre('save', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('pre bulk save error');
+      });
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'A' });
+      const err = await User.bulkSave([doc]).then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'pre bulk save error');
+      assert.ok(err.stack.includes('asyncPreBulkSaveErrors'), err.stack);
+    });
+
+    it('works with async pre validate errors', async function asyncPreValidateErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      userSchema.pre('validate', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('pre validate error');
+      });
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'A' });
+      const err = await doc.save().then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'pre validate error');
+      assert.ok(err.stack.includes('asyncPreValidateErrors'), err.stack);
+    });
+
+    it('works with async post save errors', async function asyncPostSaveErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      userSchema.post('save', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('post save error');
+      });
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'A' });
+      const err = await doc.save().then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'post save error');
+      assert.ok(err.stack.includes('asyncPostSaveErrors'), err.stack);
+    });
+
+    it('works with async pre updateOne errors', async function asyncPreUpdateOneErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      userSchema.pre('updateOne', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('pre updateOne error');
+      });
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'A' });
+      await doc.save();
+      const err = await doc.updateOne({ name: 'B' }).then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'pre updateOne error');
+      assert.ok(err.stack.includes('asyncPreUpdateOneErrors'), err.stack);
+    });
+
+    it('works with updateOne server errors', async function updateOneServerErrors() {
+      const userSchema = new mongoose.Schema({
+        name: { type: String, unique: true },
+        age: Number
+      });
+      const User = db.model('User', userSchema);
+      await User.init();
+      const doc = new User({ name: 'A' });
+      await doc.save();
+      await User.create({ name: 'B' });
+      const err = await doc.updateOne({ name: 'B' }).then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.name, 'MongoServerError');
+      assert.ok(err.stack.includes('updateOneServerErrors'), err.stack);
+    });
+
+    it('works with async post updateOne errors', async function asyncPostUpdateOneErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      userSchema.post('updateOne', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('post updateOne error');
+      });
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'A' });
+      await doc.save();
+      const err = await doc.updateOne({ name: 'B' }).then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'post updateOne error');
+      assert.ok(err.stack.includes('asyncPostUpdateOneErrors'), err.stack);
+    });
+
+    it('works with async pre deleteOne errors on subdocuments', async function asyncSubdocPreDeleteOneErrors() {
+      const addressSchema = new mongoose.Schema({
+        street: String
+      });
+      addressSchema.post('deleteOne', { document: true, query: false }, async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('subdoc pre deleteOne error');
+      });
+      const userSchema = new mongoose.Schema({
+        name: String,
+        address: addressSchema
+      });
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'A', address: { street: 'Main St' } });
+      await doc.save();
+      const err = await doc.deleteOne().then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'subdoc pre deleteOne error');
+      assert.ok(err.stack.includes('asyncSubdocPreDeleteOneErrors'), err.stack);
+    });
+
+    it('works with async pre find errors', async function asyncPreFindErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      userSchema.pre('find', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('pre find error');
+      });
+      const User = db.model('User', userSchema);
+      const err = await User.find().then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'pre find error');
+      assert.ok(err.stack.includes('asyncPreFindErrors'), err.stack);
+    });
+
+    it('works with async post find errors', async function asyncPostFindErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      userSchema.post('find', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('post find error');
+      });
+      const User = db.model('User', userSchema);
+      const err = await User.find().then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'post find error');
+      assert.ok(err.stack.includes('asyncPostFindErrors'), err.stack);
+    });
+
+    it('works with find server errors', async function asyncPostFindErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      const User = db.model('User', userSchema);
+      // Fails on the MongoDB server because $notAnOperator is not a valid operator
+      const err = await User.find({ someProp: { $notAnOperator: 'value' } }).then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.name, 'MongoServerError');
+      assert.ok(err.stack.includes('asyncPostFindErrors'), err.stack);
+    });
+
+    it('works with async pre aggregate errors', async function asyncPreAggregateErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      userSchema.pre('aggregate', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('pre aggregate error');
+      });
+      const User = db.model('User', userSchema);
+      const err = await User.aggregate([{ $match: {} }]).then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'pre aggregate error');
+      assert.ok(err.stack.includes('asyncPreAggregateErrors'), err.stack);
+    });
+
+    it('works with async post aggregate errors', async function asyncPostAggregateErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      userSchema.post('aggregate', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('post aggregate error');
+      });
+      const User = db.model('User', userSchema);
+      const err = await User.aggregate([{ $match: {} }]).then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'post aggregate error');
+      assert.ok(err.stack.includes('asyncPostAggregateErrors'), err.stack);
+    });
+
+    it('works with aggregate server errors', async function asyncAggregateServerErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      const User = db.model('User', userSchema);
+      // Fails on the MongoDB server because $notAnOperator is not a valid pipeline stage
+      const err = await User.aggregate([{ $notAnOperator: {} }]).then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.name, 'MongoServerError');
+      assert.ok(err.stack.includes('asyncAggregateServerErrors'), err.stack);
+    });
+  });
+
+  it('handles selected paths on root discriminator (gh-15308)', async function() {
+    const CarSchema = new mongoose.Schema(
+      {
+        make: {
+          type: String,
+          enum: ['mercedes']
+        }
+      },
+      {
+        discriminatorKey: 'make'
+      }
+    );
+    const MercedesSchema = new mongoose.Schema({
+      vin: {
+        type: String,
+        select: false
+      },
+      sunroof: Boolean
+    });
+    const CarModel = db.model('Car', CarSchema);
+    CarModel.discriminator('Car:mercedes', MercedesSchema, 'mercedes');
+
+    const newCar = await CarModel.create({
+      make: 'mercedes',
+      vin: 'someFakeVin',
+      sunroof: true
+    });
+
+    const car = await CarModel.findById(newCar._id);
+    assert.strictEqual(car.vin, undefined);
+    assert.strictEqual(car.sunroof, true);
+  });
+
+  it('avoids double validating document arrays underneath single nested (gh-15335)', async function() {
+    let arraySubdocValidateCalls = 0;
+    let strValidateCalls = 0;
+
+    const embeddedSchema = new mongoose.Schema({
+      arrObj: {
+        type: [{
+          name: {
+            type: String,
+            validate: {
+              validator: () => {
+                ++arraySubdocValidateCalls;
+                return true;
+              }
+            }
+          }
+        }]
+      },
+      arrStr: {
+        type: [{
+          type: String,
+          validate: {
+            validator: () => {
+              ++strValidateCalls;
+              return true;
+            }
+          }
+        }]
+      }
+    });
+
+    const TestModel = db.model('Test', new Schema({ child: embeddedSchema }));
+    await TestModel.create({
+      child: {
+        arrObj: [
+          {
+            name: 'arrObj'
+          }
+        ],
+        arrStr: ['arrStr']
+      }
+    });
+    assert.strictEqual(arraySubdocValidateCalls, 1);
+    assert.strictEqual(strValidateCalls, 1);
+
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {
@@ -13988,4 +14783,3 @@ describe('Check if instance function that is supplied in schema option is availa
     assert.equal(TestDocument.instanceFn(), 'Returned from DocumentInstanceFn');
   });
 });
-

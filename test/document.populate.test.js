@@ -1075,4 +1075,81 @@ describe('document.populate', function() {
     assert.deepStrictEqual(codeUser.extras[0].config.paymentConfiguration.paymentMethods[0]._id, code._id);
     assert.strictEqual(codeUser.extras[0].config.paymentConfiguration.paymentMethods[0].code, 'test code');
   });
+
+  it('supports populate with ordered option (gh-15231)', async function() {
+    const docSchema = new Schema({
+      refA: { type: Schema.Types.ObjectId, ref: 'Test1' },
+      refB: { type: Schema.Types.ObjectId, ref: 'Test2' },
+      refC: { type: Schema.Types.ObjectId, ref: 'Test3' }
+    });
+
+    const doc1Schema = new Schema({ name: String });
+    const doc2Schema = new Schema({ title: String });
+    const doc3Schema = new Schema({ content: String });
+
+    const Doc = db.model('Test', docSchema);
+    const Doc1 = db.model('Test1', doc1Schema);
+    const Doc2 = db.model('Test2', doc2Schema);
+    const Doc3 = db.model('Test3', doc3Schema);
+
+    const doc1 = await Doc1.create({ name: 'test 1' });
+    const doc2 = await Doc2.create({ title: 'test 2' });
+    const doc3 = await Doc3.create({ content: 'test 3' });
+
+    const docD = await Doc.create({
+      refA: doc1._id,
+      refB: doc2._id,
+      refC: doc3._id
+    });
+
+    await docD.populate({
+      path: ['refA', 'refB', 'refC'],
+      ordered: true
+    });
+
+    assert.ok(docD.populated('refA'));
+    assert.ok(docD.populated('refB'));
+    assert.ok(docD.populated('refC'));
+
+    assert.equal(docD.refA.name, 'test 1');
+    assert.equal(docD.refB.title, 'test 2');
+    assert.equal(docD.refC.content, 'test 3');
+  });
+
+  it('handles re-populating map of array of refs (gh-9359)', async function() {
+    const UserSchema = mongoose.Schema({
+      columns: { type: Map, of: [{ type: 'ObjectId', ref: 'Test1' }] }
+    });
+    const CardSchema = mongoose.Schema({
+      title: { type: String },
+      sequence: { type: 'ObjectId', ref: 'Test2' }
+    });
+    const SequenceSchema = mongoose.Schema({
+      foo: { type: String }
+    });
+
+    const Sequence = db.model('Test2', SequenceSchema);
+    const Card = db.model('Test1', CardSchema);
+    const User = db.model('Test', UserSchema);
+
+    const sequence = await Sequence.create({ foo: 'bar' });
+    const card1 = await Card.create({ title: 'card1', sequence });
+    const card2 = await Card.create({ title: 'card2', sequence });
+    const card3 = await Card.create({ title: 'card3' });
+    const card4 = await Card.create({ title: 'card4', sequence });
+    await User.create({
+      columns: { key1: [card1, card2], key2: [card3, card4] }
+    });
+
+    const user = await User.findOne();
+    await user.populate('columns.$*');
+    assert.deepStrictEqual(user.columns.get('key1').map(subdoc => subdoc.title), ['card1', 'card2']);
+    assert.deepStrictEqual(user.columns.get('key2').map(subdoc => subdoc.title), ['card3', 'card4']);
+    await user.populate('columns.$*.sequence');
+    assert.deepStrictEqual(user.columns.get('key1').map(subdoc => subdoc.title), ['card1', 'card2']);
+    assert.deepStrictEqual(user.columns.get('key1').map(subdoc => subdoc.sequence.foo), ['bar', 'bar']);
+    assert.deepStrictEqual(user.columns.get('key2').map(subdoc => subdoc.title), ['card3', 'card4']);
+    assert.deepStrictEqual(user.columns.get('key2').map(subdoc => subdoc.sequence?.foo), [undefined, 'bar']);
+
+  });
 });

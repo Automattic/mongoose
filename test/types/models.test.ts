@@ -1,21 +1,22 @@
 import mongoose, {
-  Schema,
-  Document,
-  Model,
-  connection,
-  model,
-  Types,
-  UpdateQuery,
+  AggregateOptions,
   CallbackError,
+  DeleteResult,
+  Document,
   HydratedDocument,
   HydratedDocumentFromSchema,
-  InsertManyResult,
-  Query,
-  UpdateWriteOpResult,
-  AggregateOptions,
-  WithLevel1NestedPaths,
   InferSchemaType,
-  DeleteResult
+  InsertManyResult,
+  Model,
+  Query,
+  Schema,
+  Types,
+  UpdateQuery,
+  UpdateWriteOpResult,
+  WithLevel1NestedPaths,
+  createConnection,
+  connection,
+  model
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
@@ -223,10 +224,6 @@ function find() {
   Project.find({}, null);
   Project.find({}, { name: 1 });
   Project.find({}, { name: 0 });
-
-  // filter + callback
-  Project.find({}, (error: CallbackError, result: IProject[]) => console.log(error, result));
-  Project.find({ name: 'Hello' }, (error: CallbackError, result: IProject[]) => console.log(error, result));
 
   // filter + projection + options
   Project.find({}, undefined, { limit: 5 });
@@ -623,9 +620,9 @@ async function gh13151() {
 
   const TestModel = model<ITest>('Test', TestSchema);
   const test = await TestModel.findOne().lean();
-  expectType<ITest & { _id: Types.ObjectId } | null>(test);
+  expectType<ITest & { _id: Types.ObjectId } & { __v: number } | null>(test);
   if (!test) return;
-  expectType<ITest & { _id: Types.ObjectId }>(test);
+  expectType<ITest & { _id: Types.ObjectId } & { __v: number }>(test);
 }
 
 function gh13206() {
@@ -661,7 +658,7 @@ async function gh13705() {
   const schema = new Schema({ name: String });
   const TestModel = model('Test', schema);
 
-  type ExpectedLeanDoc = (mongoose.FlattenMaps<{ name?: string | null }> & { _id: mongoose.Types.ObjectId });
+  type ExpectedLeanDoc = (mongoose.FlattenMaps<{ name?: string | null }> & { _id: mongoose.Types.ObjectId } & { __v: number });
 
   const findByIdRes = await TestModel.findById('0'.repeat(24), undefined, { lean: true });
   expectType<ExpectedLeanDoc | null>(findByIdRes);
@@ -976,4 +973,40 @@ function testWithLevel1NestedPaths() {
     foo?: { one?: string | null | undefined } | null | undefined,
     'foo.one': string | null | undefined
   }>({} as Test2);
+}
+
+async function gh14802() {
+  const schema = new mongoose.Schema({
+    name: String
+  });
+  const Model = model('Test', schema);
+
+  const conn2 = mongoose.createConnection('mongodb://127.0.0.1:27017/mongoose_test');
+  Model.useConnection(conn2);
+}
+
+async function gh14843() {
+  const schema = new mongoose.Schema({
+    name: String
+  });
+  const Model = model('Test', schema);
+
+  const doc = await Model.insertOne({ name: 'taco' });
+  expectType<ReturnType<(typeof Model)['hydrate']>>(doc);
+}
+
+async function gh15369() {
+  const schema = new mongoose.Schema({
+    name: String
+  });
+  const Model = model('Test', schema);
+
+  try {
+    await Model.bulkSave([]);
+  } catch (error) {
+    if (error instanceof mongoose.Error.MongooseBulkSaveIncompleteError) {
+      console.log('Bulk save error');
+    }
+    throw error;
+  }
 }

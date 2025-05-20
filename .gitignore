@@ -59,6 +59,9 @@ index.html
 # yarn package-lock
 yarn.lock
 
+# deno lock
+deno.lock
+
 # npm pack output
 mongoose.tgz
 mongoose-*.tgz
@@ -67,3 +70,6 @@ examples/ecommerce-netlify-functions/.netlify/state.json
 
 notes.md
 list.out
+
+data
+fle-cluster-config.json

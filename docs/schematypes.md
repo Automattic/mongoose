@@ -55,6 +55,8 @@ Check out [Mongoose's plugins search](http://plugins.mongoosejs.io) to find plug
 * [Schema](#schemas)
 * [UUID](#uuid)
 * [BigInt](#bigint)
+* [Double](#double)
+* [Int32](#int32)
 
 ### Example
 
@@ -68,6 +70,8 @@ const schema = new Schema({
   mixed: Schema.Types.Mixed,
   _someId: Schema.Types.ObjectId,
   decimal: Schema.Types.Decimal128,
+  double: Schema.Types.Double,
+  int32bit: Schema.Types.Int32,
   array: [],
   ofString: [String],
   ofNumber: [Number],
@@ -646,6 +650,75 @@ const Question = mongoose.model('Question', questionSchema);
 const question = new Question({ answer: 42n });
 typeof question.answer; // 'bigint'
 ```
+
+### Double {#double}
+
+Mongoose supports [64-bit IEEE 754-2008 floating point numbers](https://en.wikipedia.org/wiki/IEEE_754-2008_revision) as a SchemaType.
+Doubles are stored as [BSON type "double" in MongoDB](https://www.mongodb.com/docs/manual/reference/bson-types/).
+
+```javascript
+const temperatureSchema = new Schema({
+  celsius: Double
+});
+const Temperature = mongoose.model('Temperature', temperatureSchema);
+
+const temperature = new Temperature({ celsius: 1339 });
+temperature.celsius instanceof bson.Double; // true
+```
+
+There are several types of values that will be successfully cast to a Double.
+
+```javascript
+new Temperature({ celsius: '1.2e12' }).celsius; // 15 as a Double
+new Temperature({ celsius: true }).celsius; // 1 as a Double
+new Temperature({ celsius: false }).celsius; // 0 as a Double
+new Temperature({ celsius: { valueOf: () => 83.0033 } }).celsius; // 83 as a Double
+new Temperature({ celsius: '' }).celsius; // null
+```
+
+The following inputs will result will all result in a [CastError](validation.html#cast-errors) once validated, meaning that it will not throw on initialization, only when validated:
+
+* strings that do not represent a numeric string, a NaN or a null-ish value
+* objects that don't have a `valueOf()` function
+* an input that represents a value outside the bounds of a IEEE 754-2008 floating point
+
+### Int32 {#int32}
+
+Mongoose supports 32-bit integers as a SchemaType.
+Int32s are stored as [32-bit integers in MongoDB (BSON type "int")](https://www.mongodb.com/docs/manual/reference/bson-types/).
+
+```javascript
+const studentSchema = new Schema({
+  id: Int32
+});
+const Student = mongoose.model('Student', studentSchema);
+
+const student = new Student({ id: 1339 });
+typeof student.id; // 'number'
+```
+
+There are several types of values that will be successfully cast to a Number.
+
+```javascript
+new Student({ id: '15' }).id; // 15 as a Int32
+new Student({ id: true }).id; // 1 as a Int32
+new Student({ id: false }).id; // 0 as a Int32
+new Student({ id: { valueOf: () => 83 } }).id; // 83 as a Int32
+new Student({ id: '' }).id; // null as a Int32
+```
+
+If you pass an object with a `valueOf()` function that returns a Number, Mongoose will
+call it and assign the returned value to the path.
+
+The values `null` and `undefined` are not cast.
+
+The following inputs will result will all result in a [CastError](validation.html#cast-errors) once validated, meaning that it will not throw on initialization, only when validated:
+
+* NaN
+* strings that cast to NaN
+* objects that don't have a `valueOf()` function
+* a decimal that must be rounded to be an integer
+* an input that represents a value outside the bounds of an 32-bit integer
 
 ## Getters {#getters}
 

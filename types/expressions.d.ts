@@ -1150,6 +1150,21 @@ declare module 'mongoose' {
       $first: Expression;
     }
 
+    export interface FirstN {
+      /**
+       * $firstN can be used as an aggregation accumulator or array operator.
+       * As an aggregation accumulator, it returns an aggregation of the first n elements within a group.
+       * As an array operator, it returns the specified number of elements from the beginning of an array.
+       *
+       * @version 5.2
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/firstN/#mongodb-expression-exp.-first
+       */
+      $firstN: {
+        input: Expression
+        n: Expression,
+      };
+    }
+
     export interface In {
       /**
        * Returns a boolean indicating whether a specified value is in an array.
@@ -1188,6 +1203,21 @@ declare module 'mongoose' {
        * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/last/#mongodb-expression-exp.-last
        */
       $last: Expression;
+    }
+
+    export interface LastN {
+      /**
+       * $lastN can be used as an aggregation accumulator or array operator.
+       * As an aggregation accumulator, it an aggregation of the last n elements within a group.
+       * As an array operator, it returns the specified number of elements from the end of an array.
+       *
+       * @version 5.2
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/lastN/#mongodb-group-grp.-lastN
+       */
+      $lastN: {
+        input: Expression
+        n: Expression,
+      };
     }
 
     export interface LinearFill {
@@ -2000,6 +2030,34 @@ declare module 'mongoose' {
       $avg: Expression;
     }
 
+    export interface Bottom {
+      /**
+       * Returns the bottom element within a group according to the specified sort order.
+       *
+       * @version 5.2
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/bottom/#mongodb-group-grp.-bottom
+       */
+      $bottom: {
+        sortBy: AnyObject,
+        output: Expression
+      };
+    }
+
+    export interface BottomN {
+      /**
+       * Returns an aggregation of the bottom n elements within a group, according to the specified sort order.
+       * If the group contains fewer than n elements, $bottomN returns all elements in the group.
+       *
+       * @version 5.2
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/bottomN/#mongodb-group-grp.-bottomN
+       */
+      $bottomN: {
+        n: Expression,
+        sortBy: AnyObject,
+        output: Expression
+      };
+    }
+
     export interface Count {
       /**
        * Returns the number of documents in a group.
@@ -2158,6 +2216,20 @@ declare module 'mongoose' {
       $max: Expression | Expression[];
     }
 
+    export interface MaxN {
+      /**
+       * Returns an aggregation of the maxmimum value n elements within a group.
+       * If the group contains fewer than n elements, $maxN returns all elements in the group.
+       *
+       * @version 5.2
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/maxN/#mongodb-group-grp.-maxN
+       */
+      $maxN: {
+        input: Expression
+        n: Expression,
+      };
+    }
+
     export interface Min {
       /**
        * Returns the minimum value. $min compares both value and type, using the specified BSON comparison order for
@@ -2167,6 +2239,20 @@ declare module 'mongoose' {
        * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/min/#mongodb-expression-exp.-min
        */
       $min: Expression | Expression[];
+    }
+
+    export interface MinN {
+      /**
+       * Returns an aggregation of the minimum value n elements within a group.
+       * If the group contains fewer than n elements, $minN returns all elements in the group.
+       *
+       * @version 5.2
+       * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/minN/#mongodb-group-grp.-minN
+       */
+      $minN: {
+        input: Expression
+        n: Expression,
+      };
     }
 
     export interface Push {
@@ -2212,6 +2298,18 @@ declare module 'mongoose' {
          * $setWindowFields stage window. The implicit window contains all the documents in the partition.
          */
         default?: Expression;
+      }
+    }
+
+    export interface Median {
+      /**
+       * Returns an approximation of the median, the 50th percentile, as a scalar value.
+       *
+       * @see https://www.mongodb.com/docs/v7.0/reference/operator/aggregation/median/
+       */
+      $median: {
+        input: number | Expression,
+        method: 'approximate'
       }
     }
 
@@ -2605,6 +2703,8 @@ declare module 'mongoose' {
   export type ArrayExpressionOperatorReturningArray =
     Expression.ConcatArrays |
     Expression.Filter |
+    Expression.FirstN |
+    Expression.LastN |
     Expression.Map |
     Expression.ObjectToArray |
     Expression.Range |
@@ -2763,12 +2863,17 @@ declare module 'mongoose' {
     Expression.DocumentNumber |
     Expression.ExpMovingAvg |
     Expression.First |
+    Expression.FirstN |
     Expression.Integral |
     Expression.Last |
+    Expression.LastN |
     Expression.LinearFill |
     Expression.Locf |
     Expression.Max |
+    Expression.MaxN |
+    Expression.Median |
     Expression.Min |
+    Expression.MinN |
     Expression.Push |
     Expression.Rank |
     Expression.Shift |
@@ -2783,6 +2888,10 @@ declare module 'mongoose' {
 
   export type WindowOperatorReturningArray =
     Expression.AddToSet |
+    Expression.FirstN |
+    Expression.LastN |
+    Expression.MaxN |
+    Expression.MinN |
     Expression.Push;
 
   export type WindowOperatorReturningNumber =
@@ -2795,6 +2904,7 @@ declare module 'mongoose' {
     Expression.ExpMovingAvg |
     Expression.Integral |
     Expression.Max |
+    Expression.Median |
     Expression.Min |
     Expression.StdDevPop |
     Expression.StdDevSamp |
@@ -2858,12 +2968,19 @@ declare module 'mongoose' {
     Expression.Accumulator |
     Expression.AddToSet |
     Expression.Avg |
+    Expression.Bottom |
+    Expression.BottomN |
     Expression.Count |
     Expression.First |
+    Expression.FirstN |
     Expression.Last |
+    Expression.LastN |
     Expression.Max |
+    Expression.MaxN |
+    Expression.Median |
     Expression.MergeObjects |
     Expression.Min |
+    Expression.MinN |
     Expression.Push |
     Expression.StdDevPop |
     Expression.StdDevSamp |

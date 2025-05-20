@@ -371,7 +371,7 @@ async function gh12959() {
 
   const doc = await Model.findById('id').orFail();
   expectType<Types.ObjectId>(doc._id);
-  expectType<number | undefined>(doc.__v);
+  expectType<number>(doc.__v);
 
   expectError(doc.subdocArray[0].__v);
 }
@@ -422,4 +422,56 @@ async function gh14876() {
 
   expectType<UserObjectInterface>(populatedCar.owner);
   expectType<Types.ObjectId>(depopulatedCar.owner);
+}
+
+async function gh15077() {
+  type Foo = {
+    state: 'on' | 'off';
+  };
+
+  const fooSchema = new Schema<Foo>(
+    {
+      state: {
+        type: String,
+        enum: ['on', 'off']
+      }
+    },
+    { timestamps: true }
+  );
+
+  const fooModel = model('foo', fooSchema);
+
+  let foundFoo = await fooModel
+    .findOne({
+      state: 'on'
+    })
+    .lean()
+    .exec();
+
+  if (!foundFoo) {
+    const newFoo = {
+      state: 'on'
+      // extra props but irrelevant
+    };
+
+    const createdFoo = await fooModel.create(newFoo);
+
+    foundFoo = createdFoo.toObject();
+  }
+}
+
+async function gh15316() {
+  const schema = new Schema({
+    name: { type: String, required: true }
+  }, {
+    virtuals: {
+      upper: { get() { return this.name.toUpperCase(); } }
+    }
+  });
+  const TestModel = model('Test', schema);
+
+  const doc = new TestModel({ name: 'taco' });
+
+  expectType<string>(doc.toJSON({ virtuals: true }).upper);
+  expectType<string>(doc.toObject({ virtuals: true }).upper);
 }

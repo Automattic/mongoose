@@ -38,9 +38,11 @@ Define a separate `THydratedDocumentType` and pass it as the 5th generic param t
 `THydratedDocumentType` controls what type Mongoose uses for "hydrated documents", that is, what `await UserModel.findOne()`, `UserModel.hydrate()`, and `new UserModel()` return.
 
 ```ts
+import { HydratedSingleSubdocument } from 'mongoose';
+
 // Define property overrides for hydrated documents
 type THydratedUserDocument = {
-  names?: mongoose.Types.Subdocument<Names>
+  names?: HydratedSingleSubdocument<Names>
 }
 type UserModelType = mongoose.Model<User, {}, {}, {}, THydratedUserDocument>;
 
@@ -51,6 +53,7 @@ const UserModel = mongoose.model<User, UserModelType>('User', userSchema);
 
 const doc = new UserModel({ names: { _id: '0'.repeat(24), firstName: 'foo' } });
 doc.names!.ownerDocument(); // Works, `names` is a subdocument!
+doc.names!.firstName; // 'foo'
 ```
 
 ## Subdocument Arrays
@@ -81,4 +84,5 @@ const UserModel = model<User, UserModelType>('User', new Schema<User, UserModelT
 
 const doc = new UserModel({});
 doc.names[0].ownerDocument(); // Works!
+doc.names[0].firstName; // string
 ```

@@ -7,7 +7,7 @@ interface ITest {
   map3: Map<string, number>
 }
 
-const schema: Schema = new Schema<ITest>({
+const schema = new Schema<any, ITest>({
   map1: {
     type: Map,
     of: Number
@@ -50,7 +50,7 @@ function gh10575() {
     property3: string;
   }
 
-  const BaseSchema: Schema<IBase> = new Schema({ prop1: String, prop2: String });
+  const BaseSchema: Schema<any, IBase> = new Schema<any, IBase>({ prop1: String, prop2: String });
 
   const Model1Schema: Schema<IModel1> = BaseSchema.clone() as any;
   Model1Schema.add({ property1: Number, property2: Number });

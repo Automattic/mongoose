@@ -109,13 +109,13 @@ type ThisParameter<T, F> = T extends { (this: infer This): void }
  * @param {T} T Object with functions as values to add 'D' parameter to as 'this'. {@link D}
  * @param {D} D The type to be added as 'this' parameter to all functions in {@link T}.
  */
-type AddThisParameter<T, D> = {
+type AddThisParameter<T, D> = IfAny<T, any, {
   [K in keyof T]: T[K] extends (...args: infer A) => infer R
     ? ThisParameter<T[K], unknown> extends unknown
       ? (this: D, ...args: A) => R
       : T[K]
     : T[K];
-};
+}>;
 
   /**
    * @summary Adds timestamp fields to a type

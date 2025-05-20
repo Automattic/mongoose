@@ -97,11 +97,11 @@ declare module 'mongoose' {
   TSchema
   > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
-  export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
+  export function model<T>(name: string, schema?: Schema<any, T, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
 
   export function model<T, U, TQueryHelpers = {}>(
     name: string,
-    schema?: Schema<T, any, any, TQueryHelpers, any, any, any>,
+    schema?: Schema<any, T, U, any, TQueryHelpers, any, any, any>,
     collection?: string,
     options?: CompileModelOptions
   ): U;
@@ -256,9 +256,9 @@ declare module 'mongoose' {
     TInstanceMethods,
     TQueryHelpers,
     TVirtuals,
-    TStaticMethods> = (schema: Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>, opts?: any) => void;
+    TStaticMethods> = (schema: Schema<any, DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>, opts?: any) => void;
 
-  export class AutoInferredSchema<
+  export class Schema<
     SchemaDef = unknown,
     RawDocType = InferRawDocType<SchemaDef>,
     TModelType = Model<RawDocType, any, any, any>,
@@ -275,35 +275,15 @@ declare module 'mongoose' {
       ResolveSchemaOptions<TSchemaOptions>
     >,
     THydratedDocumentType = HydratedDocument<FlatRecord<DocType>, TVirtuals & TInstanceMethods>
-  > extends Schema<RawDocType, TModelType, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods, TSchemaOptions, DocType, THydratedDocumentType> {
-    constructor(definition: SchemaDef, options?: SchemaOptions<FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
-  }
-
-  export class Schema<
-    RawDocType = any,
-    TModelType = Model<RawDocType, any, any, any>,
-    TInstanceMethods = {},
-    TQueryHelpers = {},
-    TVirtuals = {},
-    TStaticMethods = {},
-    TSchemaOptions = DefaultSchemaOptions,
-    DocType extends ApplySchemaOptions<
-      ObtainDocumentType<DocType, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
-      ResolveSchemaOptions<TSchemaOptions>
-    > = ApplySchemaOptions<
-      ObtainDocumentType<any, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
-      ResolveSchemaOptions<TSchemaOptions>
-    >,
-    THydratedDocumentType = HydratedDocument<FlatRecord<DocType>, TVirtuals & TInstanceMethods, {}, TVirtuals>
   >
     extends events.EventEmitter {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType, THydratedDocumentType> | DocType, options?: SchemaOptions<FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
+    constructor(definition: SchemaDef, options?: SchemaOptions<FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
 
     /** Adds key path / schema type pairs to this schema. */
-    add(obj: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType> | Schema, prefix?: string): this;
+    add(obj: AnyObject, prefix?: string): this;
 
     /**
      * Add an alias for `path`. This means getting or setting the `alias`
@@ -371,7 +351,7 @@ declare module 'mongoose' {
     methods: AddThisParameter<TInstanceMethods, THydratedDocumentType> & AnyObject;
 
     /** The original object passed to the schema constructor */
-    obj: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType>;
+    obj: SchemaDef;
 
     /** Returns a new schema that has the `paths` from the original schema, minus the omitted ones. */
     omit<T = this>(paths: string[], options?: SchemaOptions): T;

@@ -194,11 +194,11 @@ declare module 'mongoose' {
     TSchema> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
     model<T, U, TQueryHelpers = {}>(
       name: string,
-      schema?: Schema<T, any, any, TQueryHelpers, any, any, any>,
+      schema?: Schema<any, T, any, any, TQueryHelpers, any, any, any>,
       collection?: string,
       options?: CompileModelOptions
     ): U;
-    model<T>(name: string, schema?: Schema<T, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
+    model<T>(name: string, schema?: Schema<any, T, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
 
     /** Returns an array of model names created on this connection. */
     modelNames(): Array<string>;

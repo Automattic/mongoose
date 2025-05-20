@@ -7,7 +7,7 @@ async function gh10293() {
     arrayOfArray: string[][]; // <-- Array of Array
   }
 
-  const testSchema = new Schema<ITest>({
+  const testSchema = new Schema<unknown, ITest>({
     name: {
       type: String,
       required: true

@@ -1,4 +1,4 @@
-import { InferRawDocType, Schema, AutoInferredSchema } from 'mongoose';
+import { InferRawDocType, Schema } from 'mongoose';
 import { expectType, expectError } from 'tsd';
 
 function gh14839() {
@@ -18,10 +18,10 @@ function gh14839() {
       type: Date,
       required: true
     },
-    subdoc: new AutoInferredSchema({
+    subdoc: new Schema({
       name: { type: String, required: true }
     }),
-    docArr: [new AutoInferredSchema({ test: { type: String, required: true } })]
+    docArr: [new Schema({ test: { type: String, required: true } })]
   };
 
   type UserType = InferRawDocType<typeof schemaDefinition>;
@@ -51,13 +51,13 @@ function gh14954() {
       type: Date,
       required: true
     },
-    subdoc: new AutoInferredSchema({
+    subdoc: new Schema({
       name: { type: String, required: true },
-      l2: new AutoInferredSchema({
+      l2: new Schema({
         myProp: { type: Number, required: true }
       })
     }),
-    docArr: [new AutoInferredSchema({ test: { type: String, required: true } })]
+    docArr: [new Schema({ test: { type: String, required: true } })]
   };
 
   type UserType = InferRawDocType<typeof schemaDefinition>;

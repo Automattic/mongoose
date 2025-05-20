@@ -1,7 +1,7 @@
-import { Schema, model, Model, Types } from 'mongoose';
+import { Schema, model, Model, Types, InferRawDocTypeFromSchema, InferRawDocType } from 'mongoose';
 import { expectType } from 'tsd';
 
-const schema = new Schema({ name: { type: 'String' } });
+const schema = new Schema({ name: { type: String } });
 
 const Test = model('Test', schema);
 

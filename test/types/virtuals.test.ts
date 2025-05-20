@@ -21,13 +21,13 @@ interface PetVirtuals {
   owner: IPerson;
 }
 
-const personSchema = new Schema<IPerson & Document, Model<IPerson & Document>, IPerson>({
+const personSchema = new Schema<unknown, IPerson & Document, Model<IPerson & Document>, IPerson>({
   _id: { type: Number, required: true },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true }
 });
 
-const petSchema = new Schema<IPet & Document, Model<IPet & Document>, IPet>({
+const petSchema = new Schema<unknown, IPet & Document, Model<IPet & Document>, IPet>({
   name: { type: String, required: true },
   ownerId: { type: Number, required: true },
   isDeleted: { type: Boolean, default: false }
@@ -78,7 +78,7 @@ const Pet = model<IPet>('Pet', petSchema);
 })();
 
 function gh11543() {
-  const personSchema = new Schema<IPerson, Model<IPerson, {}, {}, PetVirtuals>, {}, {}, PetVirtuals>({
+  const personSchema = new Schema<unknown, IPerson, Model<IPerson, {}, {}, PetVirtuals>, {}, {}, PetVirtuals>({
     _id: { type: Number, required: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true }

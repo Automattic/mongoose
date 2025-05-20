@@ -84,17 +84,17 @@ declare module 'mongoose' {
     collection?: string,
     options?: CompileModelOptions
   ): Model<
-  InferSchemaType<TSchema>,
-  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
-  ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-  ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
-  HydratedDocument<
-  InferSchemaType<TSchema>,
-  ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
-  ObtainSchemaGeneric<TSchema, 'TVirtuals'>
-  >,
-  TSchema
+    InferSchemaType<TSchema>,
+    ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+    ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+    ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+    HydratedDocument<
+      InferSchemaType<TSchema>,
+      ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+      ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+      ObtainSchemaGeneric<TSchema, 'TVirtuals'>
+    >,
+    TSchema
   > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
   export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
@@ -154,23 +154,23 @@ declare module 'mongoose' {
     DocType,
     any,
     TOverrides extends Record<string, never> ?
-      Document<unknown, TQueryHelpers, DocType, TVirtuals> & Default__v<Require_id<DocType>> :
-      IfAny<
-        TOverrides,
-        Document<unknown, TQueryHelpers, DocType, TVirtuals> & Default__v<Require_id<DocType>>,
-        Document<unknown, TQueryHelpers, DocType, TVirtuals> & MergeType<
-          Default__v<Require_id<DocType>>,
-          TOverrides
-        >
+    Document<unknown, TQueryHelpers, DocType, TVirtuals> & Default__v<Require_id<DocType>> :
+    IfAny<
+      TOverrides,
+      Document<unknown, TQueryHelpers, DocType, TVirtuals> & Default__v<Require_id<DocType>>,
+      Document<unknown, TQueryHelpers, DocType, TVirtuals> & MergeType<
+        Default__v<Require_id<DocType>>,
+        TOverrides
       >
+    >
   >;
   export type HydratedSingleSubdocument<
     DocType,
     TOverrides = {}
   > = IfAny<
-  DocType,
-  any,
-  TOverrides extends Record<string, never> ?
+    DocType,
+    any,
+    TOverrides extends Record<string, never> ?
     Types.Subdocument<unknown, Record<string, never>, DocType> & Require_id<DocType> :
     IfAny<
       TOverrides,
@@ -185,22 +185,22 @@ declare module 'mongoose' {
     DocType,
     any,
     TOverrides extends Record<string, never> ?
-      Types.ArraySubdocument<unknown, Record<string, never>, DocType> & Require_id<DocType> :
-      IfAny<
-        TOverrides,
-        Types.ArraySubdocument<unknown, Record<string, never>, DocType> & Require_id<DocType>,
-        Types.ArraySubdocument<unknown, Record<string, never>, DocType> & MergeType<
-          Require_id<DocType>,
-          TOverrides
-        >
+    Types.ArraySubdocument<unknown, Record<string, never>, DocType> & Require_id<DocType> :
+    IfAny<
+      TOverrides,
+      Types.ArraySubdocument<unknown, Record<string, never>, DocType> & Require_id<DocType>,
+      Types.ArraySubdocument<unknown, Record<string, never>, DocType> & MergeType<
+        Require_id<DocType>,
+        TOverrides
       >
-    >;
+    >
+  >;
 
   export type HydratedDocumentFromSchema<TSchema extends Schema> = HydratedDocument<
-  InferSchemaType<TSchema>,
-  ObtainSchemaGeneric<TSchema, 'TInstanceMethods'> & ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
-  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
-  ObtainSchemaGeneric<TSchema, 'TVirtuals'>
+    InferSchemaType<TSchema>,
+    ObtainSchemaGeneric<TSchema, 'TInstanceMethods'> & ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+    ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+    ObtainSchemaGeneric<TSchema, 'TVirtuals'>
   >;
 
   export interface TagSet {
@@ -239,14 +239,14 @@ declare module 'mongoose' {
   export type DiscriminatorModel<M, T> = T extends Model<infer T, infer TQueryHelpers, infer TInstanceMethods, infer TVirtuals>
     ?
     M extends Model<infer M, infer MQueryHelpers, infer MInstanceMethods, infer MVirtuals>
-      ? Model<Omit<M, keyof T> & T, MQueryHelpers | TQueryHelpers, MInstanceMethods | TInstanceMethods, MVirtuals | TVirtuals>
-      : M
+    ? Model<Omit<M, keyof T> & T, MQueryHelpers | TQueryHelpers, MInstanceMethods | TInstanceMethods, MVirtuals | TVirtuals>
+    : M
     : M;
 
   export type DiscriminatorSchema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods, DisSchema> =
     DisSchema extends Schema<infer DisSchemaEDocType, infer DisSchemaM, infer DisSchemaInstanceMethods, infer DisSchemaQueryhelpers, infer DisSchemaVirtuals, infer DisSchemaStatics>
-      ? Schema<MergeType<DocType, DisSchemaEDocType>, DiscriminatorModel<DisSchemaM, M>, DisSchemaInstanceMethods | TInstanceMethods, DisSchemaQueryhelpers | TQueryHelpers, DisSchemaVirtuals | TVirtuals, DisSchemaStatics & TStaticMethods>
-      : Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>;
+    ? Schema<MergeType<DocType, DisSchemaEDocType>, DiscriminatorModel<DisSchemaM, M>, DisSchemaInstanceMethods | TInstanceMethods, DisSchemaQueryhelpers | TQueryHelpers, DisSchemaVirtuals | TVirtuals, DisSchemaStatics & TStaticMethods>
+    : Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>;
 
   type QueryResultType<T> = T extends Query<infer ResultType, any> ? ResultType : never;
 
@@ -257,6 +257,8 @@ declare module 'mongoose' {
     TQueryHelpers,
     TVirtuals,
     TStaticMethods> = (schema: Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>, opts?: any) => void;
+
+  type InferParam<T, K> = K extends keyof T ? T[K] : {};
 
   export class Schema<
     RawDocType = any,
@@ -283,6 +285,37 @@ declare module 'mongoose' {
 
     /** Adds key path / schema type pairs to this schema. */
     add(obj: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType> | Schema, prefix?: string): this;
+
+    static fromDefinition<
+      MySchemaDef,
+      MySchemaOptions extends SchemaOptions<
+        InferRawDocType<MySchemaDef>,
+        InferParam<MySchemaOptions, 'methods'>,
+        {},
+        {},
+        InferParam<MySchemaOptions, 'virtuals'>,
+        HydratedDocument<InferRawDocType<MySchemaDef>, InferParam<MySchemaOptions, 'methods'>, {}, InferParam<MySchemaOptions, 'virtuals'>>
+      >,
+      TMethods = InferParam<MySchemaOptions, 'methods'>,
+      TVirtuals = InferParam<MySchemaOptions, 'virtuals'>,
+      TStatics = InferParam<MySchemaOptions, 'statics'>
+    >(
+      schemaDefinition: MySchemaDef,
+      options: MySchemaOptions
+    ): Schema<
+      InferRawDocType<MySchemaDef>,
+      Model<
+        InferRawDocType<MySchemaDef>,
+        {},
+        TMethods,
+        TVirtuals
+      > & TStatics,
+      TMethods,
+      {},
+      TVirtuals,
+      TStatics,
+      MySchemaOptions
+    >;
 
     /**
      * Add an alias for `path`. This means getting or setting the `alias`

@@ -319,10 +319,11 @@ declare module 'mongoose' {
     export interface VectorSearch {
       /** [`$vectorSearch` reference](https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-stage/) */
       $vectorSearch: {
+        exact?: boolean;
         index: string,
         path: string,
         queryVector: number[],
-        numCandidates: number,
+        numCandidates?: number,
         limit: number,
         filter?: Expression,
       }

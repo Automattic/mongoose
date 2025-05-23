@@ -2358,7 +2358,7 @@ describe('Query', function() {
     const Model = db.model('Test', new Schema({ name: String }));
 
     await Model.create({ name: 'test' });
-    const cursor = Model.find().transform(doc => doc?.name.toUpperCase() ?? null).cursor();
+    const cursor = Model.find().transform(doc => doc.name.toUpperCase()).cursor();
     const names = [];
     for await (const name of cursor) {
       names.push(name);

@@ -2354,6 +2354,19 @@ describe('Query', function() {
     assert.strictEqual(called, 1);
   });
 
+  it('transform with for/await and cursor', async function() {
+    const Model = db.model('Test', new Schema({ name: String }));
+
+    await Model.create({ name: 'test' });
+    const cursor = Model.find().transform(doc => doc.name.toUpperCase()).cursor();
+    const names = [];
+    for await (const name of cursor) {
+      names.push(name);
+    }
+
+    assert.deepStrictEqual(names, ['TEST']);
+  });
+
   describe('orFail (gh-6841)', function() {
     let Model;
 

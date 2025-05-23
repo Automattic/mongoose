@@ -187,6 +187,8 @@ expectError(Test.find({}, { 'docs.profiles': { name: 'aa' } })); // should suppo
 expectError(Test.find({}, { endDate: { toString: 1 } }));
 expectError(Test.find({}, { tags: { trim: 1 } }));
 expectError(Test.find({}, { child: { toJSON: 1 } }));
+Test.find({}, { age: 1, _id: 0 });
+Test.find({}, { name: 0, age: 0, _id: 1 });
 
 // Manual Casting using ProjectionType
 Test.find({}, { docs: { unknownParams: 1 } } as ProjectionType<ITest>);

@@ -106,6 +106,7 @@ They always return promises.
 * `Connection.prototype.close`
 * `Connection.prototype.destroy`
 * `Document.prototype.populate`
+* `Document.prototype.save`
 * `Document.prototype.validate`
 * `Mongoose.prototype.connect`
 * `Mongoose.prototype.createConnection`

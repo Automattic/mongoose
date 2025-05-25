@@ -684,10 +684,16 @@ declare module 'mongoose' {
         }
         : Element;
   type _IDType = { _id?: boolean | 1 | 0 };
-  export type InclusionProjection<T> = IsItRecordAndNotAny<T> extends true ? Projector<WithLevel1NestedPaths<T>, true | 1> & _IDType : AnyObject;
-  export type ExclusionProjection<T> = IsItRecordAndNotAny<T> extends true ? Projector<WithLevel1NestedPaths<T>, false | 0> & _IDType : AnyObject;
+  export type InclusionProjection<T> = IsItRecordAndNotAny<T> extends true
+    ? Omit<Projector<WithLevel1NestedPaths<T>, true | 1>, '_id'> & _IDType
+    : AnyObject;
+  export type ExclusionProjection<T> = IsItRecordAndNotAny<T> extends true
+    ? Omit<Projector<WithLevel1NestedPaths<T>, false | 0>, '_id'> & _IDType
+    : AnyObject;
 
-  export type ProjectionType<T> = (InclusionProjection<T> & AnyObject) | (ExclusionProjection<T> & AnyObject) | string;
+  export type ProjectionType<T> = (InclusionProjection<T> & AnyObject)
+    | (ExclusionProjection<T> & AnyObject)
+    | string;
   export type SortValues = SortOrder;
 
   export type SortOrder = -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';

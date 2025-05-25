@@ -11,7 +11,7 @@
     }
 </style>
 
-Mongoose relies on the [MongoDB Node.js Driver](http://mongodb.github.io/node-mongodb-native/) to talk to MongoDB.  
+Mongoose relies on the [MongoDB Node.js Driver](http://mongodb.github.io/node-mongodb-native/) to talk to MongoDB.
 You can refer to [this table](https://www.mongodb.com/docs/drivers/node/current/compatibility/) for up-to-date information as to which version of the MongoDB driver supports which version of MongoDB.
 
 Below are the [semver](http://semver.org/) ranges representing which versions of mongoose are compatible with the listed versions of MongoDB server.
@@ -29,5 +29,7 @@ Below are the [semver](http://semver.org/) ranges representing which versions of
 |    `3.0.x`     | `^3.8.22 \| ^4.0.0 \| ^5.0.0` |
 |    `2.6.x`     |      `^3.8.8 \| ^4.0.0`       |
 |    `2.4.x`     |      `^3.8.0 \| ^4.0.0`       |
+
+Mongoose `^6.5.0` also works with MongoDB server 7.x. But not all new MongoDB server 7.x features are supported by Mongoose 6.x.
 
 Note that Mongoose `5.x` dropped support for all versions of MongoDB before `3.0.0`. If you need to use MongoDB `2.6` or older, use Mongoose `4.x`.

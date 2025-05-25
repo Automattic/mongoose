@@ -40,7 +40,7 @@ jobs:
       fail-fast: false
       matrix:
         node: [12, 14, 16, 18]
-        os: [ubuntu-20.04]
+        os: [ubuntu-22.04]
         mongodb: [4.0.28, 5.0.8, 6.0.0]
     name: Node ${{ matrix.node }} MongoDB ${{ matrix.mongodb }} OS ${{ matrix.os }}
     env:
@@ -68,15 +68,9 @@ jobs:
       - name: NPM Test with Coverage
         run: npm run test-coverage
         if: matrix.coverage == true
-      - name: Archive code coverage results
-        uses: actions/upload-artifact@v3
-        if: matrix.coverage == true
-        with:
-          name: coverage
-          path: coverage
 
   test-deno:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     name: Deno tests
     env:
       MONGOMS_VERSION: 6.0.0
@@ -105,7 +99,7 @@ jobs:
   test-replica-sets:
     needs:
       - test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     name: Replica Set tests
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0

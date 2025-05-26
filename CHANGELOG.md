@@ -1,3 +1,9 @@
+8.15.1 / 2025-05-26
+===================
+ * types: correct handling of _id in ProjectionType #15432 #15418
+ * types: fix definition of VectorSearch.$vectorSearch #15429 [chriskrycho](https://github.com/chriskrycho)
+ * docs: add Document#save to list of function with callbacks removed #15433 [SethFalco](https://github.com/SethFalco)
+
 8.15.0 / 2025-05-16
 ===================
  * feat: CSFLE support #15390 [baileympearson](https://github.com/baileympearson)

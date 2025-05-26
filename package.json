@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "8.15.0",
+  "version": "8.15.1",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",

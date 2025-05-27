@@ -1,4 +1,4 @@
-import { createConnection, Schema, Collection, Connection, ConnectionSyncIndexesResult, Model, connection, HydratedDocument, Query } from 'mongoose';
+import { createConnection, Schema, Collection, Connection, ConnectionSyncIndexesResult, Model, connection, HydratedDocument, Query, model } from 'mongoose';
 import * as mongodb from 'mongodb';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';

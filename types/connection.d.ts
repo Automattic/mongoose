@@ -175,7 +175,6 @@ declare module 'mongoose' {
      */
     readonly models: Readonly<{ [index: string]: Model<any> }>;
 
-    /** Defines or retrieves a model. */
     model<TSchema extends Schema = any>(
       name: string,
       schema?: TSchema,
@@ -185,20 +184,24 @@ declare module 'mongoose' {
     InferSchemaType<TSchema>,
     ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
     ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-    {},
+    ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
     HydratedDocument<
     InferSchemaType<TSchema>,
-    ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-    ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>
+    ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+    ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+    ObtainSchemaGeneric<TSchema, 'TVirtuals'>
     >,
-    TSchema> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
+    TSchema
+    > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
+
+    model<T>(name: string, schema?: Schema<any, T, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
+
     model<T, U, TQueryHelpers = {}>(
       name: string,
-      schema?: Schema<any, T, any, any, TQueryHelpers, any, any, any>,
+      schema?: Schema<any, T, U, any, TQueryHelpers, any, any, any>,
       collection?: string,
       options?: CompileModelOptions
     ): U;
-    model<T>(name: string, schema?: Schema<any, T, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
 
     /** Returns an array of model names created on this connection. */
     modelNames(): Array<string>;

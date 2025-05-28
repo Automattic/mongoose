@@ -108,13 +108,13 @@ type IsPathDefaultUndefined<PathType> = PathType extends { default: undefined } 
  * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
  */
 type IsPathRequired<P, TypeKey extends string = DefaultTypeKey> =
-  P extends { required: true | (string | boolean)[] | { isRequired: true } } | ArrayConstructor | any[]
+  P extends { required: true | (boolean | string)[] | { isRequired: true } } | ArrayConstructor | any[] | ReadonlyArray<any>
     ? true
     : P extends { required: boolean }
       ? P extends { required: false }
         ? false
         : true
-      : P extends (Record<TypeKey, ArrayConstructor | any[]>)
+      : P extends (Record<TypeKey, ArrayConstructor | any[] | ReadonlyArray<any>>)
         ? IsPathDefaultUndefined<P> extends true
           ? false
           : true

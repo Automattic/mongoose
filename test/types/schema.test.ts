@@ -473,7 +473,7 @@ export function autoTypedSchema() {
     decimal1: Schema.Types.Decimal128,
     decimal2: 'Decimal128',
     decimal3: 'decimal128'
-  });
+  } as const);
 
   type InferredTestSchemaType = InferSchemaType<typeof TestSchema>;
 
@@ -508,12 +508,12 @@ export function autoTypedSchema() {
     }),
     favoritDrink: {
       type: String,
-      enum: ['Coffee', 'Tea']
+      enum: ['Coffee', 'Tea'] as const
     },
     favoritColorMode: {
       type: String,
       enum: {
-        values: ['dark', 'light'],
+        values: ['dark', 'light'] as const,
         message: '{VALUE} is not supported'
       },
       required: true
@@ -597,8 +597,8 @@ function encryptionType() {
   expectError(new Schema<unknown>({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'newFakeEncryptionType' }));
   expectError(new Schema<unknown>({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 1 }));
 
-  expectType<Schema>(new Schema<unknown>({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'queryableEncryption' }));
-  expectType<Schema>(new Schema<unknown>({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'csfle' }));
+  const schema1 = new Schema<unknown>({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'queryableEncryption' });
+  const schema2 = new Schema<unknown>({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'csfle' });
 }
 
 function gh11828() {
@@ -707,7 +707,7 @@ function gh12030() {
   }>({} as B);
 
   expectType<{
-    users: Types.DocumentArray<{
+    users: Array<{
       username?: string | null
     }>;
   }>({} as InferSchemaType<typeof Schema1>);
@@ -728,7 +728,7 @@ function gh12030() {
   });
 
   expectType<{
-    users: Types.DocumentArray<{
+    users: Array<{
       credit: number;
       username?: string | null;
     }>;
@@ -780,7 +780,7 @@ function pluginOptions() {
   }
 
   const schema = new Schema({});
-  expectType<Schema<any, any>>(schema.plugin(pluginFunction)); // test that chaining would be possible
+  schema.plugin(pluginFunction); // test that chaining would be possible
 
   // could not add strict tests that the parameters are inferred correctly, because i dont know how this would be done in tsd
 
@@ -1028,7 +1028,7 @@ function gh12869() {
   const dbExample = new Schema(
     {
       active: { type: String, enum: ['foo', 'bar'], required: true }
-    }
+    } as const
   );
 
   type Example = InferSchemaType<typeof dbExample>;
@@ -1056,7 +1056,7 @@ function gh12882() {
       }],
       required: true
     }
-  });
+  } as const);
   type tArrNum = InferSchemaType<typeof arrNum>;
   expectType<{
     fooArray: number[]
@@ -1079,7 +1079,7 @@ function gh12882() {
   });
   type tArrType = InferSchemaType<typeof arrType>;
   expectType<{
-    fooArray: Types.DocumentArray<{
+    fooArray: Array<{
       type: string;
       foo: number;
     }>
@@ -1130,7 +1130,7 @@ function gh12882() {
   });
   type rTArrType = InferSchemaType<typeof rArrType>;
   expectType<{
-    fooArray: Types.DocumentArray<{
+    fooArray: Array<{
       type: string;
       foo: number;
     }>

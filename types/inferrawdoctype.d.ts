@@ -6,6 +6,7 @@ import {
   PathWithTypePropertyBaseType,
   PathEnumOrString
 } from './inferschematype';
+import { UUID } from 'mongodb';
 
 declare module 'mongoose' {
   export type InferRawDocType<
@@ -105,7 +106,7 @@ declare module 'mongoose' {
                                         IfEquals<PathValueType, Schema.Types.BigInt> extends true ? bigint :
                                           IfEquals<PathValueType, BigInt> extends true ? bigint :
                                             PathValueType extends 'bigint' | 'BigInt' | typeof Schema.Types.BigInt | typeof BigInt ? bigint :
-                                              PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? Buffer :
+                                              PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? UUID :
                                                 IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
                                                   PathValueType extends MapConstructor | 'Map' ? Map<string, ResolveRawPathType<Options['of']>> :
                                                     IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ResolveRawPathType<Options['of']>> :

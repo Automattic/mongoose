@@ -176,7 +176,7 @@ declare module 'mongoose' {
     readonly models: Readonly<{ [index: string]: Model<any> }>;
 
     /** Defines or retrieves a model. */
-    model<TSchema extends Schema = any>(
+    model<TSchema extends Schema<any, any>>(
       name: string,
       schema?: TSchema,
       collection?: string,
@@ -194,11 +194,11 @@ declare module 'mongoose' {
     TSchema> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
     model<T, U, TQueryHelpers = {}>(
       name: string,
-      schema?: Schema<T, any, any, TQueryHelpers, any, any, any>,
+      schema?: Schema<any, T, U, any, TQueryHelpers, any, any, any>,
       collection?: string,
       options?: CompileModelOptions
     ): U;
-    model<T>(name: string, schema?: Schema<T, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
+    model<T>(name: string, schema?: Schema<any, T, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
 
     /** Returns an array of model names created on this connection. */
     modelNames(): Array<string>;
@@ -219,7 +219,7 @@ declare module 'mongoose' {
     readonly port: number;
 
     /** Declares a plugin executed on all schemas you pass to `conn.model()` */
-    plugin<S extends Schema = Schema, O = AnyObject>(fn: (schema: S, opts?: any) => void, opts?: O): Connection;
+    plugin<S extends Schema<any> = Schema<any>, O = AnyObject>(fn: (schema: S, opts?: any) => void, opts?: O): Connection;
 
     /** The plugins that will be applied to all models created on this connection. */
     plugins: Array<any>;

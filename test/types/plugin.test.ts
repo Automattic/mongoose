@@ -1,6 +1,6 @@
 import { connection, HydratedDocument, Model, Query, Schema } from 'mongoose';
 
-function pluginVirtuals(schema: Schema<Test, any, any, any, TestVirtuals>): void {
+function pluginVirtuals(schema: Schema<any, Test, any, any, any, TestVirtuals>): void {
   schema.virtual('fullName').get(function(this: TestDocument) {
     return `${this.firstName} ${this.lastName}`;
   });
@@ -9,19 +9,19 @@ function pluginVirtuals(schema: Schema<Test, any, any, any, TestVirtuals>): void
   });
 }
 
-function pluginQueryHelpers(schema: Schema<Test, any, any, TestQueryHelpers>): void {
+function pluginQueryHelpers(schema: Schema<any, Test, any, any, TestQueryHelpers>): void {
   schema.query.whereSomething = function() {
     return this.where({ name: 'something' });
   };
 }
 
-function pluginMethods(schema: Schema<Test, any, TestInstanceMethods>): void {
+function pluginMethods(schema: Schema<any, Test, any, TestInstanceMethods>): void {
   schema.methods.doSomething = function() {
     return 'test';
   };
 }
 
-function pluginStatics(schema: Schema<Test, TestModel, any, TestQueryHelpers, any, TestStaticMethods>): void {
+function pluginStatics(schema: Schema<any, Test, TestModel, any, TestQueryHelpers, any, TestStaticMethods>): void {
   schema.statics.findSomething = function() {
     return this.findOne().orFail().exec();
   };
@@ -54,12 +54,12 @@ interface TestQueryHelpers {
   whereSomething(this: TestQuery): this
 }
 type TestModel = Model<Test, TestQueryHelpers, TestInstanceMethods, TestVirtuals> & TestStaticMethods;
-const testSchema = new Schema<Test, TestModel, TestInstanceMethods, TestQueryHelpers, TestVirtuals, TestStaticMethods>({
+const testSchema = new Schema<any, Test, TestModel, TestInstanceMethods, TestQueryHelpers, TestVirtuals, TestStaticMethods>({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true }
 });
 
-function pluginGeneric(schema: Schema): void {
+function pluginGeneric(schema: Schema<any>): void {
   schema.static('test', function() {
     return 0;
   });

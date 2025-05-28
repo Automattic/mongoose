@@ -78,7 +78,7 @@ declare module 'mongoose' {
     connection?: Connection
   };
 
-  export function model<TSchema extends Schema = any>(
+  export function model<TSchema extends Schema<any> = any>(
     name: string,
     schema?: TSchema,
     collection?: string,
@@ -97,11 +97,11 @@ declare module 'mongoose' {
   TSchema
   > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
-  export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
+  export function model<T>(name: string, schema?: Schema<any, T, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
 
   export function model<T, U, TQueryHelpers = {}>(
     name: string,
-    schema?: Schema<T, any, any, TQueryHelpers, any, any, any>,
+    schema?: Schema<any, T, U, any, TQueryHelpers, any, any, any>,
     collection?: string,
     options?: CompileModelOptions
   ): U;
@@ -119,7 +119,7 @@ declare module 'mongoose' {
   export { mongodb as mongo };
 
   /** Declares a global plugin executed on all Schemas. */
-  export function plugin(fn: (schema: Schema, opts?: any) => void, opts?: any): Mongoose;
+  export function plugin(fn: (schema: Schema<any>, opts?: any) => void, opts?: any): Mongoose;
 
   /** Getter/setter around function for pluralizing collection names. */
   export function pluralize(fn?: ((str: string) => string) | null): ((str: string) => string) | null;
@@ -196,7 +196,7 @@ declare module 'mongoose' {
       >
     >;
 
-  export type HydratedDocumentFromSchema<TSchema extends Schema> = HydratedDocument<
+  export type HydratedDocumentFromSchema<TSchema extends Schema<any>> = HydratedDocument<
   InferSchemaType<TSchema>,
   ObtainSchemaGeneric<TSchema, 'TInstanceMethods'> & ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
   ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
@@ -256,33 +256,36 @@ declare module 'mongoose' {
     TInstanceMethods,
     TQueryHelpers,
     TVirtuals,
-    TStaticMethods> = (schema: Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>, opts?: any) => void;
+    TStaticMethods> = (schema: Schema<unknown, DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>, opts?: any) => void;
 
   export class Schema<
-    RawDocType = any,
+    TSchemaDefinition,
+    RawDocType = InferRawDocType<TSchemaDefinition>,
     TModelType = Model<RawDocType, any, any, any>,
     TInstanceMethods = {},
     TQueryHelpers = {},
     TVirtuals = {},
     TStaticMethods = {},
     TSchemaOptions = DefaultSchemaOptions,
-    DocType extends ApplySchemaOptions<
-      ObtainDocumentType<DocType, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
-      ResolveSchemaOptions<TSchemaOptions>
-    > = ApplySchemaOptions<
-      ObtainDocumentType<any, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
-      ResolveSchemaOptions<TSchemaOptions>
-    >,
-    THydratedDocumentType = HydratedDocument<FlatRecord<DocType>, TVirtuals & TInstanceMethods, {}, TVirtuals>
-  >
-    extends events.EventEmitter {
+    THydratedDocumentType = HydratedDocument<RawDocType, TInstanceMethods & TVirtuals, TQueryHelpers, TVirtuals>
+  > extends events.EventEmitter {
     /**
      * Create a new schema
      */
-    constructor(definition?: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType, THydratedDocumentType> | DocType, options?: SchemaOptions<FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
+    constructor(
+      definition: TSchemaDefinition,
+      options?: SchemaOptions<
+        RawDocType,
+        TInstanceMethods,
+        TQueryHelpers,
+        TStaticMethods,
+        TVirtuals,
+        THydratedDocumentType
+      >
+    );
 
     /** Adds key path / schema type pairs to this schema. */
-    add(obj: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType> | Schema, prefix?: string): this;
+    add(obj: AnyObject, prefix?: string): this;
 
     /**
      * Add an alias for `path`. This means getting or setting the `alias`
@@ -295,7 +298,7 @@ declare module 'mongoose' {
      * and their corresponding compiled models. Each element of the array is
      * an object with 2 properties: `schema` and `model`.
      */
-    childSchemas: { schema: Schema, model: any }[];
+    childSchemas: { schema: Schema<unknown>, model: any }[];
 
     /** Removes all indexes on this schema */
     clearIndexes(): this;
@@ -303,13 +306,13 @@ declare module 'mongoose' {
     /** Returns a copy of this schema */
     clone<T = this>(): T;
 
-    discriminator<DisSchema = Schema>(name: string | number, schema: DisSchema, options?: DiscriminatorOptions): this;
+    discriminator<DisSchema = Schema<unknown>>(name: string | number, schema: DisSchema, options?: DiscriminatorOptions): this;
 
     /** Returns a new schema that has the picked `paths` from this schema. */
     pick<T = this>(paths: string[], options?: SchemaOptions): T;
 
     /** Object containing discriminators defined on this schema */
-    discriminators?: { [name: string]: Schema };
+    discriminators?: { [name: string]: Schema<unknown> };
 
     /** Iterates the schemas paths similar to Array#forEach. */
     eachPath(fn: (path: string, type: SchemaType) => void): this;
@@ -350,7 +353,7 @@ declare module 'mongoose' {
     methods: AddThisParameter<TInstanceMethods, THydratedDocumentType> & AnyObject;
 
     /** The original object passed to the schema constructor */
-    obj: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType>;
+    obj: TSchemaDefinition;
 
     /** Returns a new schema that has the `paths` from the original schema, minus the omitted ones. */
     omit<T = this>(paths: string[], options?: SchemaOptions): T;
@@ -369,7 +372,7 @@ declare module 'mongoose' {
     pathType(path: string): string;
 
     /** Registers a plugin for this schema. */
-    plugin<PFunc extends PluginFunction<DocType, TModelType, any, any, any, any>, POptions extends Parameters<PFunc>[1] = Parameters<PFunc>[1]>(fn: PFunc, opts?: POptions): this;
+    plugin<PFunc extends PluginFunction<RawDocType, TModelType, any, any, any, any>, POptions extends Parameters<PFunc>[1] = Parameters<PFunc>[1]>(fn: PFunc, opts?: POptions): this;
 
     /** Defines a post hook for the model. */
 
@@ -520,9 +523,9 @@ declare module 'mongoose' {
     toJSONSchema(options?: { useBsonType?: boolean }): Record<string, any>;
 
     /** Creates a virtual type with the given name. */
-    virtual<T = HydratedDocument<DocType, TVirtuals & TInstanceMethods, TQueryHelpers>>(
+    virtual<T = HydratedDocument<RawDocType, TVirtuals & TInstanceMethods, TQueryHelpers>>(
       name: keyof TVirtuals | string,
-      options?: VirtualTypeOptions<T, DocType>
+      options?: VirtualTypeOptions<T, RawDocType>
     ): VirtualType<T>;
 
     /** Object of currently defined virtuals on this schema */

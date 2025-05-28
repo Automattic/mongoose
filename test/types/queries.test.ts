@@ -27,10 +27,10 @@ interface QueryHelpers {
   byName(this: QueryWithHelpers<any, ITest, QueryHelpers>, name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;
 }
 
-const childSchema: Schema = new Schema({ name: String });
+const childSchema = new Schema({ name: String });
 const ChildModel = model<Child>('Child', childSchema);
 
-const schema: Schema<ITest, Model<ITest, QueryHelpers>, {}, QueryHelpers> = new Schema({
+const schema = new Schema<unknown, ITest, Model<ITest, QueryHelpers>, {}, QueryHelpers>({
   name: { type: 'String' },
   tags: [String],
   child: { type: 'ObjectId', ref: 'Child' },
@@ -286,7 +286,7 @@ async function gh11156(): Promise<void> {
     age: number;
   }
 
-  const schema = new Schema<IUser>({
+  const schema = new Schema<unknown, IUser>({
     name: String,
     age: Number
   });
@@ -304,7 +304,7 @@ async function gh11041(): Promise<void> {
   }
 
   // 2. Create a Schema corresponding to the document interface.
-  const schema = new Schema<User>({
+  const schema = new Schema<unknown, User>({
     name: { type: String, required: true },
     email: { type: String, required: true },
     avatar: String
@@ -324,7 +324,7 @@ async function gh11306(): Promise<void> {
   }
 
   // 2. Create a Schema corresponding to the document interface.
-  const schema = new Schema<User>({
+  const schema = new Schema<unknown, User>({
     name: { type: String, required: true },
     email: { type: String, required: true },
     avatar: String
@@ -379,7 +379,7 @@ function gh12091() {
   interface IUser{
     friendsNames: string[];
   }
-  const userSchema = new Schema<IUser>({
+  const userSchema = new Schema<unknown, IUser>({
     friendsNames: [String]
   });
 
@@ -419,10 +419,11 @@ async function gh12342_manual() {
   type ProjectModelType = Model<Project, ProjectQueryHelpers>;
 
   const ProjectSchema = new Schema<
-  Project,
-  Model<Project, ProjectQueryHelpers>,
-  {},
-  ProjectQueryHelpers
+    unknown,
+    Project,
+    Model<Project, ProjectQueryHelpers>,
+    {},
+    ProjectQueryHelpers
   >({
     name: String,
     stars: Number
@@ -681,7 +682,7 @@ async function gh14545() {
     updatedAt: number;
   };
 
-  const schema = new Schema<Test>({
+  const schema = new Schema<unknown, Test>({
     prop: { type: String },
     another: { type: String },
     createdAt: { type: Number },

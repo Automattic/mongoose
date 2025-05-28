@@ -361,8 +361,8 @@ declare module 'mongoose' {
 
         static options: { castNonArrays: boolean; };
 
-        discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
-        discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
+        discriminator<T, U>(name: string | number, schema: Schema<unknown, T, U>, value?: string): U;
+        discriminator<D>(name: string | number, schema: Schema<unknown>, value?: string): Model<D>;
 
         /** The schematype embedded in this array */
         caster?: SchemaType;
@@ -452,11 +452,11 @@ declare module 'mongoose' {
 
         static options: { castNonArrays: boolean; };
 
-        discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
+        discriminator<D>(name: string | number, schema: Schema<unknown>, value?: string): Model<D>;
         discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
 
         /** The schema used for documents in this array */
-        schema: Schema;
+        schema: Schema<unknown>;
 
         /** The constructor used for subdocuments in this array */
         caster?: typeof Types.Subdocument;
@@ -522,13 +522,13 @@ declare module 'mongoose' {
         static schemaName: string;
 
         /** The document's schema */
-        schema: Schema;
+        schema: Schema<unknown>;
 
         /** Default options for this SchemaType */
         defaultOptions: Record<string, any>;
 
-        discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
-        discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
+        discriminator<T, U>(name: string | number, schema: Schema<unknown, T, U>, value?: string): U;
+        discriminator<D>(name: string | number, schema: Schema<unknown>, value?: string): Model<D>;
 
         cast(val: any, doc?: Document<any>, init?: boolean, prev?: any, options?: any): HydratedSingleSubdocument<DocType>;
       }

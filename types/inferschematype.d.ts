@@ -49,16 +49,17 @@ declare module 'mongoose' {
    * // result
    * type UserType = {userName?: string}
    */
-  export type InferSchemaType<TSchema> = IfAny<TSchema, any, ObtainSchemaGeneric<TSchema, 'DocType'>>;
+  export type InferSchemaType<TSchema> = IfAny<TSchema, any, ObtainSchemaGeneric<TSchema, 'EnforcedDocType'>>;
 
   /**
    * @summary Obtains schema Generic type by using generic alias.
    * @param {TSchema} TSchema A generic of schema type instance.
    * @param {alias} alias Targeted generic alias.
    */
-  type ObtainSchemaGeneric<TSchema, alias extends 'EnforcedDocType' | 'M' | 'TInstanceMethods' | 'TQueryHelpers' | 'TVirtuals' | 'TStaticMethods' | 'TSchemaOptions' | 'DocType'> =
-   TSchema extends Schema<infer EnforcedDocType, infer M, infer TInstanceMethods, infer TQueryHelpers, infer TVirtuals, infer TStaticMethods, infer TSchemaOptions, infer DocType>
+  type ObtainSchemaGeneric<TSchema, alias extends 'TSchemaDefinition' | 'EnforcedDocType' | 'M' | 'TInstanceMethods' | 'TQueryHelpers' | 'TVirtuals' | 'TStaticMethods' | 'TSchemaOptions' | 'THydratedDocumentType'> =
+   TSchema extends Schema<infer TSchemaDefinition, infer EnforcedDocType, infer M, infer TInstanceMethods, infer TQueryHelpers, infer TVirtuals, infer TStaticMethods, infer TSchemaOptions, infer THydratedDocumentType>
      ? {
+       TSchemaDefinition: TSchemaDefinition;
        EnforcedDocType: EnforcedDocType;
        M: M;
        TInstanceMethods: TInstanceMethods;
@@ -66,7 +67,7 @@ declare module 'mongoose' {
        TVirtuals: TVirtuals;
        TStaticMethods: TStaticMethods;
        TSchemaOptions: TSchemaOptions;
-       DocType: DocType;
+      THydratedDocumentType: THydratedDocumentType;
      }[alias]
      : unknown;
 
@@ -107,7 +108,7 @@ type IsPathDefaultUndefined<PathType> = PathType extends { default: undefined } 
  * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
  */
 type IsPathRequired<P, TypeKey extends string = DefaultTypeKey> =
-  P extends { required: true | [true, string | undefined] | { isRequired: true } } | ArrayConstructor | any[]
+  P extends { required: true | (string | boolean)[] | { isRequired: true } } | ArrayConstructor | any[]
     ? true
     : P extends { required: boolean }
       ? P extends { required: false }
@@ -258,9 +259,9 @@ type IsSchemaTypeFromBuiltinClass<T> = T extends (typeof String)
  */
 type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}, TypeKey extends string = DefaultSchemaOptions['typeKey'], TypeHint = never> =
   IfEquals<TypeHint, never,
-    PathValueType extends Schema ? InferSchemaType<PathValueType> :
+    PathValueType extends Schema<any> ? InferSchemaType<PathValueType> :
       PathValueType extends (infer Item)[] ?
-        IfEquals<Item, never, any[], Item extends Schema ?
+        IfEquals<Item, never, any[], Item extends Schema<any> ?
           // If Item is a schema, infer its type.
           Types.DocumentArray<InferSchemaType<Item>> :
           Item extends Record<TypeKey, any> ?
@@ -280,7 +281,7 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
                 ObtainDocumentPathType<Item, TypeKey>[]
         >:
         PathValueType extends ReadonlyArray<infer Item> ?
-          IfEquals<Item, never, any[], Item extends Schema ?
+          IfEquals<Item, never, any[], Item extends Schema<any> ?
             Types.DocumentArray<InferSchemaType<Item>> :
             Item extends Record<TypeKey, any> ?
               Item[TypeKey] extends Function | String ?

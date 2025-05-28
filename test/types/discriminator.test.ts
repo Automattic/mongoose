@@ -1,6 +1,6 @@
 import mongoose, { Document, Model, Schema, SchemaDefinition, SchemaOptions, Types, model } from 'mongoose';
 
-const schema: Schema = new Schema({ name: { type: 'String' } });
+const schema = new Schema({ name: { type: 'String' } });
 
 interface IBaseTest {
   name?: string;
@@ -47,7 +47,7 @@ function test(): void {
 
   const cardDbSchemaOptions: SchemaOptions = { discriminatorKey: 'type' };
 
-  const cardDbSchema: Schema = new Schema(
+  const cardDbSchema = new Schema(
     cardDbBaseSchemaDefinition,
     cardDbSchemaOptions
   );
@@ -60,7 +60,7 @@ function test(): void {
 
   const landDbAdditionalPropertiesSchemaDefinition: SchemaDefinition = {};
 
-  const landDbSchema: Schema = new Schema(
+  const landDbSchema = new Schema(
     landDbAdditionalPropertiesSchemaDefinition
   );
 

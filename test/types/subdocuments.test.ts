@@ -9,9 +9,9 @@ import {
 } from 'mongoose';
 import { expectAssignable } from 'tsd';
 
-const childSchema: Schema = new Schema({ name: String });
+const childSchema = new Schema({ name: String });
 
-const schema: Schema = new Schema({
+const schema = new Schema({
   child1: childSchema,
   child2: {
     type: childSchema,
@@ -47,7 +47,7 @@ async function gh10597(): Promise<void> {
     name: string;
     events: IGameEventDocument[]
   }
-  const schema = new Schema<IGameDocument>({ name: String, events: [{ description: String }] });
+  const schema = new Schema<unknown, IGameDocument>({ name: String, events: [{ description: String }] });
 
   const GameModel = model<IGameDocument>('Game', schema);
 
@@ -66,7 +66,7 @@ function gh10674() {
 
   type FooModel = Model<Foo>;
 
-  const FooSchema = new Schema<Foo, FooModel, Foo>(
+  const FooSchema = new Schema<unknown, Foo, FooModel, Foo>(
     {
       bar: { type: String },
       schedule: {

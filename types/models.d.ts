@@ -13,12 +13,12 @@ declare module 'mongoose' {
     /** Adds a discriminator type. */
     discriminator<D>(
       name: string | number,
-      schema: Schema,
+      schema: Schema<any>,
       value?: string | number | ObjectId | DiscriminatorOptions
     ): Model<D>;
     discriminator<T, U>(
       name: string | number,
-      schema: Schema<T, U>,
+      schema: Schema<any, T, U>,
       value?: string | number | ObjectId | DiscriminatorOptions
     ): U;
   }
@@ -879,7 +879,7 @@ declare module 'mongoose' {
     recompileSchema(): void;
 
     /** Schema the model uses. */
-    schema: Schema<TRawDocType>;
+    schema: Schema<unknown, TRawDocType>;
 
     /** Creates a `updateMany` query: updates all documents that match `filter` with `update`. */
     updateMany<ResultDoc = THydratedDocumentType>(

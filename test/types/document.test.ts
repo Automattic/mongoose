@@ -243,7 +243,6 @@ async function gh11960() {
     {},
     {},
     DefaultSchemaOptions,
-    Parent,
     ParentDocument
   >({
     username: { type: String },

@@ -78,23 +78,23 @@ declare module 'mongoose' {
     connection?: Connection
   };
 
-  export function model<TSchema extends Schema<any> = any>(
+  export function model<TSchema extends Schema<any, any> = any>(
     name: string,
     schema?: TSchema,
     collection?: string,
     options?: CompileModelOptions
   ): Model<
-  InferSchemaType<TSchema>,
-  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
-  ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-  ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
-  HydratedDocument<
-  InferSchemaType<TSchema>,
-  ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
-  ObtainSchemaGeneric<TSchema, 'TVirtuals'>
-  >,
-  TSchema
+    InferSchemaType<TSchema>,
+    ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+    ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+    ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+    HydratedDocument<
+      InferSchemaType<TSchema>,
+      ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+      ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+      ObtainSchemaGeneric<TSchema, 'TVirtuals'>
+    >,
+    TSchema
   > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
   export function model<T>(name: string, schema?: Schema<any, T, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
@@ -196,11 +196,11 @@ declare module 'mongoose' {
       >
     >;
 
-  export type HydratedDocumentFromSchema<TSchema extends Schema<any>> = HydratedDocument<
-  InferSchemaType<TSchema>,
-  ObtainSchemaGeneric<TSchema, 'TInstanceMethods'> & ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
-  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
-  ObtainSchemaGeneric<TSchema, 'TVirtuals'>
+  export type HydratedDocumentFromSchema<TSchema extends Schema<any, any>> = HydratedDocument<
+    InferSchemaType<TSchema>,
+    ObtainSchemaGeneric<TSchema, 'TInstanceMethods'> & ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+    ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+    ObtainSchemaGeneric<TSchema, 'TVirtuals'>
   >;
 
   export interface TagSet {

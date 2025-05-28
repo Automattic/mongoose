@@ -40,7 +40,7 @@ interface Actor {
   age: number
 }
 const actorSchema =
-  new Schema<Actor & Document, Model<Actor & Document>, Actor>({ name: { type: String }, age: { type: Number } });
+  new Schema<unknown, Actor & Document, Model<Actor & Document>, Actor>({ name: { type: String }, age: { type: Number } });
 
 interface Movie {
   title?: string,
@@ -52,7 +52,7 @@ interface Movie {
   actors: Actor[]
 }
 
-const movieSchema = new Schema<Document & Movie, Model<Document & Movie>>({
+const movieSchema = new Schema<unknown, Document & Movie, Model<Document & Movie>>({
   title: {
     type: String,
     index: 'text'
@@ -122,7 +122,7 @@ interface IProfile {
   age: number;
 }
 const ProfileSchemaDef: SchemaDefinition<IProfile> = { age: Number };
-export const ProfileSchema = new Schema<IProfile, Model<IProfile>>(ProfileSchemaDef);
+export const ProfileSchema = new Schema<unknown, IProfile, Model<IProfile>>(ProfileSchemaDef);
 
 interface IUser {
   email: string;
@@ -133,7 +133,7 @@ const ProfileSchemaDef2: SchemaDefinition<IProfile> = {
   age: Schema.Types.Number
 };
 
-const ProfileSchema2: Schema<IProfile, Model<IProfile>> = new Schema<IProfile>(ProfileSchemaDef2);
+const ProfileSchema2 = new Schema<unknown, IProfile, Model<IProfile>>(ProfileSchemaDef2);
 
 const UserSchemaDef: SchemaDefinition<IUser> = {
   email: String,
@@ -178,7 +178,7 @@ function gh10287() {
     testProp: string;
   }
 
-  const subSchema = new Schema<Document & SubSchema, Model<Document & SubSchema>, SubSchema>({
+  const subSchema = new Schema<unknown, Document & SubSchema, Model<Document & SubSchema>, SubSchema>({
     testProp: Schema.Types.String
   });
 
@@ -186,11 +186,11 @@ function gh10287() {
     subProp: SubSchema
   }
 
-  const mainSchema1 = new Schema<Document & MainSchema, Model<Document & MainSchema>, MainSchema>({
+  const mainSchema1 = new Schema<unknown, Document & MainSchema, Model<Document & MainSchema>, MainSchema>({
     subProp: subSchema
   });
 
-  const mainSchema2 = new Schema<Document & MainSchema, Model<Document & MainSchema>, MainSchema>({
+  const mainSchema2 = new Schema<unknown, Document & MainSchema, Model<Document & MainSchema>, MainSchema>({
     subProp: {
       type: subSchema
     }
@@ -198,7 +198,7 @@ function gh10287() {
 }
 
 function gh10370() {
-  const movieSchema = new Schema<Document & Movie, Model<Document & Movie>, Movie>({
+  const movieSchema = new Schema<unknown, Document & Movie, Model<Document & Movie>, Movie>({
     actors: {
       type: [actorSchema]
     }
@@ -209,7 +209,7 @@ function gh10409() {
   interface Something {
     field: Date;
   }
-  const someSchema = new Schema<Something, Model<Something>, Something>({
+  const someSchema = new Schema<unknown, Something, Model<Something>, Something>({
     field: { type: Date }
   });
 }
@@ -221,7 +221,7 @@ function gh10605() {
       value: number
     };
   }
-  const schema = new Schema<ITest>({
+  const schema = new Schema<unknown, ITest>({
     arrayField: [String],
     object: {
       type: {
@@ -238,7 +238,7 @@ function gh10605_2() {
     someObject: Array<{ id: string }>
   }
 
-  const testSchema = new Schema<ITestSchema>({
+  const testSchema = new Schema<unknown, ITestSchema>({
     someObject: { type: [{ id: String }] }
   });
 }
@@ -248,7 +248,7 @@ function gh10731() {
     keywords: string[];
   }
 
-  const productSchema = new Schema<IProduct>({
+  const productSchema = new Schema<unknown, IProduct>({
     keywords: {
       type: [
         {
@@ -275,7 +275,7 @@ function gh10789() {
     addresses: IAddress[];
   }
 
-  const addressSchema = new Schema<IAddress>({
+  const addressSchema = new Schema<unknown, IAddress>({
     city: {
       type: String,
       required: true
@@ -290,7 +290,7 @@ function gh10789() {
     }
   });
 
-  const userSchema = new Schema<IUser>({
+  const userSchema = new Schema<unknown, IUser>({
     name: {
       type: String,
       required: true
@@ -312,7 +312,7 @@ function gh11439() {
     collection: string
   };
 
-  const bookSchema = new Schema<Book>({
+  const bookSchema = new Schema<unknown, Book>({
     collection: String
   }, {
     suppressReservedKeysWarning: true
@@ -325,7 +325,7 @@ function gh11448() {
     age: number;
   }
 
-  const userSchema = new Schema<IUser>({ name: String, age: Number });
+  const userSchema = new Schema<unknown, IUser>({ name: String, age: Number });
 
   userSchema.pick<Pick<IUser, 'age'>>(['age']);
 }
@@ -335,7 +335,7 @@ function gh11435(): void {
     ids: Types.Array<Types.ObjectId>;
   }
 
-  const schema = new Schema<User>({
+  const schema = new Schema<unknown, User>({
     ids: {
       type: [{ type: Schema.Types.ObjectId, ref: 'Something' }],
       default: []
@@ -355,7 +355,7 @@ function gh10900(): void {
     menuStatus: TMenuStatus;
   }
 
-  const patientSchema = new Schema<IUserProp>({
+  const patientSchema = new Schema<unknown, IUserProp>({
     menuStatus: { type: Schema.Types.Mixed, default: {} }
   });
 }
@@ -578,8 +578,8 @@ export type AutoTypedSchemaType = {
 };
 
 // discriminator
-const eventSchema = new Schema<{ message: string }>({ message: String }, { discriminatorKey: 'kind' });
-const batchSchema = new Schema<{ name: string }>({ name: String }, { discriminatorKey: 'kind' });
+const eventSchema = new Schema<unknown, { message: string }>({ message: String }, { discriminatorKey: 'kind' });
+const batchSchema = new Schema<unknown, { name: string }>({ name: String }, { discriminatorKey: 'kind' });
 batchSchema.discriminator('event', eventSchema);
 
 // discriminator statics
@@ -594,11 +594,11 @@ batchSchema2.discriminator('event', eventSchema2);
 
 function encryptionType() {
   const keyId = new BSON.UUID();
-  expectError<Schema>(new Schema({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'newFakeEncryptionType' }));
-  expectError<Schema>(new Schema({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 1 }));
+  expectError(new Schema<unknown>({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'newFakeEncryptionType' }));
+  expectError(new Schema<unknown>({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 1 }));
 
-  expectType<Schema>(new Schema({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'queryableEncryption' }));
-  expectType<Schema>(new Schema({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'csfle' }));
+  expectType<Schema>(new Schema<unknown>({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'queryableEncryption' }));
+  expectType<Schema>(new Schema<unknown>({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'csfle' }));
 }
 
 function gh11828() {
@@ -616,7 +616,7 @@ function gh11828() {
     }
   };
 
-  new Schema<IUser>({
+  new Schema<unknown, IUser>({
     name: { type: String, default: () => 'Hafez' },
     age: { type: Number, default: () => 27 },
     bornAt: { type: Date, default: () => new Date() },
@@ -634,7 +634,7 @@ function gh11997() {
     name: string;
   }
 
-  const userSchema = new Schema<IUser>({
+  const userSchema = new Schema<unknown, IUser>({
     name: { type: String, default: () => 'Hafez' }
   });
   userSchema.index({ name: 1 }, { weights: { name: 1 } });
@@ -664,7 +664,7 @@ function gh11987() {
     organization: Types.ObjectId;
   }
 
-  const userSchema = new Schema<IUser>({
+  const userSchema = new Schema<unknown, IUser>({
     name: { type: String, required: true },
     email: { type: String, required: true },
     organization: { type: Schema.Types.ObjectId, ref: 'Organization' }
@@ -775,12 +775,12 @@ function pluginOptions() {
     option2: number;
   }
 
-  function pluginFunction(schema: Schema<any>, options: SomePluginOptions) {
+  function pluginFunction(schema: Schema<any, any>, options: SomePluginOptions) {
     return; // empty function, to satisfy lint option
   }
 
   const schema = new Schema({});
-  expectType<Schema<any>>(schema.plugin(pluginFunction)); // test that chaining would be possible
+  expectType<Schema<any, any>>(schema.plugin(pluginFunction)); // test that chaining would be possible
 
   // could not add strict tests that the parameters are inferred correctly, because i dont know how this would be done in tsd
 
@@ -1216,7 +1216,7 @@ function gh13800() {
   type UserModel = Model<IUser, {}, IUserMethods>;
 
   // Typed Schema
-  const schema = new Schema<IUser, UserModel, IUserMethods>({
+  const schema = new Schema<unknown, IUser, UserModel, IUserMethods>({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true }
   });
@@ -1243,7 +1243,7 @@ async function gh13797() {
   interface IUser {
     name: string;
   }
-  new Schema<IUser>({
+  new Schema<unknown, IUser>({
     name: {
       type: String,
       required: function() {
@@ -1252,7 +1252,7 @@ async function gh13797() {
       }
     }
   });
-  new Schema<IUser>({
+  new Schema<unknown, IUser>({
     name: {
       type: String,
       default: function() {
@@ -1293,7 +1293,7 @@ function gh14028_methods() {
   type UserModel = Model<IUser, {}, IUserMethods>;
 
   // Define methods on schema
-  const schema = new Schema<IUser, UserModel, IUserMethods>({
+  const schema = new Schema<unknown, IUser, UserModel, IUserMethods>({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     age: { type: Number, required: true }
@@ -1323,7 +1323,7 @@ function gh14028_methods() {
   expectType<IUserMethods['isAdult']>(schema.methods.isAdult);
 
   // Define methods outside of schema
-  const schema2 = new Schema<IUser, UserModel, IUserMethods>({
+  const schema2 = new Schema<unknown, IUser, UserModel, IUserMethods>({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     age: { type: Number, required: true }
@@ -1346,7 +1346,7 @@ function gh14028_methods() {
 
   type UserModelWithoutMethods = Model<IUser>;
   // Skip InstanceMethods
-  const schema3 = new Schema<IUser, UserModelWithoutMethods>({
+  const schema3 = new Schema<unknown, IUser, UserModelWithoutMethods>({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     age: { type: Number, required: true }
@@ -1380,7 +1380,7 @@ function gh14028_statics() {
   type UserModel = Model<IUser, {}>;
 
   // Define statics on schema
-  const schema = new Schema<IUser, UserModel, {}, {}, {}, IUserStatics>({
+  const schema = new Schema<unknown, IUser, UserModel, {}, {}, {}, IUserStatics>({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     age: { type: Number, required: true }
@@ -1434,7 +1434,7 @@ function gh14235() {
     age: number;
   }
 
-  const userSchema = new Schema<IUser>({ name: String, age: Number });
+  const userSchema = new Schema<unknown, IUser>({ name: String, age: Number });
 
   userSchema.omit<Omit<IUser, 'age'>>(['age']);
 }
@@ -1498,6 +1498,7 @@ function gh14573() {
   type UserModelType = Model<User, {}, UserMethods, {}, THydratedUserDocument>;
 
   const userSchema = new Schema<
+    unknown,
     User,
     UserModelType,
     UserMethods,
@@ -1505,11 +1506,10 @@ function gh14573() {
     {},
     {},
     DefaultSchemaOptions,
-    User,
     THydratedUserDocument
   >(
     {
-      names: new Schema<Names>({ firstName: String })
+      names: new Schema<unknown, Names>({ firstName: String })
     },
     {
       methods: {
@@ -1562,7 +1562,7 @@ function gh14696() {
   }
 
   type UserModelType = Model<User, {}, IUserMethods>;
-  const userSchema = new Schema<User, UserModelType, IUserMethods>({
+  const userSchema = new Schema<unknown, User, UserModelType, IUserMethods>({
     name: {
       type: String,
       required: [true, 'Name on card is required']
@@ -1787,7 +1787,7 @@ function gh15301() {
   interface IUser {
     time: { hours: number, minutes: number }
   }
-  const userSchema = new Schema<IUser>({
+  const userSchema = new Schema<unknown, IUser>({
     time: {
       type: new Schema(
         {
@@ -1831,7 +1831,7 @@ function gh15412() {
 }
 
 function defaultReturnsUndefined() {
-  const schema = new Schema<{ arr: number[] }>({
+  const schema = new Schema<unknown, { arr: number[] }>({
     arr: {
       type: [Number],
       default: () => void 0

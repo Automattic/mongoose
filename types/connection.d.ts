@@ -182,16 +182,17 @@ declare module 'mongoose' {
       collection?: string,
       options?: CompileModelOptions
     ): Model<
-    InferSchemaType<TSchema>,
-    ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
-    ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-    {},
-    HydratedDocument<
-    InferSchemaType<TSchema>,
-    ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-    ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>
-    >,
-    TSchema> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
+      InferSchemaType<TSchema>,
+      ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+      ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+      {},
+      HydratedDocument<
+        InferSchemaType<TSchema>,
+        ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+        ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>
+      >,
+      TSchema
+    > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
     model<T, U, TQueryHelpers = {}>(
       name: string,
       schema?: Schema<any, T, U, any, TQueryHelpers, any, any, any>,

@@ -437,7 +437,7 @@ async function gh12342_manual() {
   };
 
   // 2nd param to `model()` is the Model class to return.
-  const ProjectModel = model<Project, ProjectModelType>('Project', schema);
+  const ProjectModel = model<Project, ProjectModelType>('Project', ProjectSchema);
 
   expectType<HydratedDocument<Project>[]>(
     await ProjectModel.findOne().where('stars').gt(1000).byName('mongoose')

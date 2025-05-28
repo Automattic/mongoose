@@ -89,7 +89,7 @@ declare module 'mongoose' {
     ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
     ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
     HydratedDocument<
-      InferSchemaType<TSchema>,
+      ApplySchemaOptions<InferSchemaType<TSchema>, ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>>,
       ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
       ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
       ObtainSchemaGeneric<TSchema, 'TVirtuals'>
@@ -267,7 +267,7 @@ declare module 'mongoose' {
     TVirtuals = {},
     TStaticMethods = {},
     TSchemaOptions = DefaultSchemaOptions,
-    THydratedDocumentType = HydratedDocument<RawDocType, TInstanceMethods & TVirtuals, TQueryHelpers, TVirtuals>
+    THydratedDocumentType = HydratedDocument<ApplySchemaOptions<RawDocType, TSchemaOptions>, TInstanceMethods & TVirtuals, TQueryHelpers, TVirtuals>
   > extends events.EventEmitter {
     /**
      * Create a new schema
@@ -281,7 +281,7 @@ declare module 'mongoose' {
         TStaticMethods,
         TVirtuals,
         THydratedDocumentType
-      >
+      > | TSchemaOptions
     );
 
     /** Adds key path / schema type pairs to this schema. */

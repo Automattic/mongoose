@@ -23,7 +23,8 @@ import {
   model,
   ValidateOpts,
   BufferToBinary,
-  CallbackWithoutResultAndOptionalError
+  CallbackWithoutResultAndOptionalError,
+  ResolveTimestamps
 } from 'mongoose';
 import { BSON, Binary, UUID } from 'mongodb';
 import { expectType, expectError, expectAssignable } from 'tsd';
@@ -1642,8 +1643,13 @@ function gh13215() {
   expectType<User>({} as RawDocType);
 
   const schema = new Schema(schemaDefinition, schemaOptions);
-  type SchemaType = InferSchemaType<typeof schema>;
-  expectType<User>({} as SchemaType);
+  const TestModel = model('Test', schema);
+  type MyOpts = ObtainSchemaGeneric<typeof schema, 'TSchemaOptions'>;
+
+  const doc = new TestModel();
+  expectType<Date>(doc.date);
+  expectError(doc.createdAt);
+  expectError(doc.updatedAt);
 }
 
 function gh14825() {

@@ -107,14 +107,15 @@ declare module 'mongoose' {
                                           IfEquals<PathValueType, BigInt> extends true ? bigint :
                                             PathValueType extends 'bigint' | 'BigInt' | typeof Schema.Types.BigInt | typeof BigInt ? bigint :
                                               PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? UUID :
-                                                IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
-                                                  PathValueType extends MapConstructor | 'Map' ? Map<string, ResolveRawPathType<Options['of']>> :
-                                                    IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ResolveRawPathType<Options['of']>> :
-                                                      PathValueType extends ArrayConstructor ? any[] :
-                                                        PathValueType extends typeof Schema.Types.Mixed ? any:
-                                                          IfEquals<PathValueType, ObjectConstructor> extends true ? any:
-                                                            IfEquals<PathValueType, {}> extends true ? any:
-                                                              PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
-                                                                PathValueType extends Record<string, any> ? InferRawDocType<PathValueType> :
-                                                                  unknown;
+                                                PathValueType extends 'double' | 'Double' | typeof Schema.Types.Double ? Types.Double :
+                                                  IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
+                                                    PathValueType extends MapConstructor | 'Map' ? Map<string, ResolveRawPathType<Options['of']>> :
+                                                      IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ResolveRawPathType<Options['of']>> :
+                                                        PathValueType extends ArrayConstructor ? any[] :
+                                                          PathValueType extends typeof Schema.Types.Mixed ? any:
+                                                            IfEquals<PathValueType, ObjectConstructor> extends true ? any:
+                                                              IfEquals<PathValueType, {}> extends true ? any:
+                                                                PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
+                                                                  PathValueType extends Record<string, any> ? InferRawDocType<PathValueType> :
+                                                                    unknown;
 }

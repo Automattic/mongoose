@@ -1734,7 +1734,7 @@ async function gh14451() {
       of: String
     },
     myUUID: 'UUID'
-  });
+  } as const);
 
   const Test = model('Test', exampleSchema);
 
@@ -1776,7 +1776,7 @@ function gh15244() {
 }
 
 async function schemaDouble() {
-  const schema = new Schema({ balance: 'Double' });
+  const schema = new Schema({ balance: 'Double' } as const);
   const TestModel = model('Test', schema);
 
   const doc = await TestModel.findOne().orFail();
@@ -1818,7 +1818,7 @@ function gh15412() {
   const ScheduleEntrySchema = new Schema({
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: false }
-  });
+  } as const);
   const ScheduleEntry = model('ScheduleEntry', ScheduleEntrySchema);
 
   type ScheduleEntryDoc = ReturnType<typeof ScheduleEntry['hydrate']>

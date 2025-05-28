@@ -19,7 +19,7 @@ const Drink = model('Drink', new Schema({
   name: String
 }));
 
-const schema: Schema = new Schema({
+const schema = new Schema({
   name: { type: 'String', required: true },
   address: new Schema({ city: { type: String, required: true } }),
   favoritDrink: {
@@ -83,7 +83,7 @@ function testMethods(): void {
 
   type User = Model<IUser, {}, IUserMethods>;
 
-  const schema = new Schema<IUser, User>({ first: String, last: String });
+  const schema = new Schema<unknown, IUser, User>({ first: String, last: String });
   schema.methods.fullName = function(): string {
     return this.first + ' ' + this.last;
   };
@@ -100,7 +100,7 @@ function testRequiredId(): void {
     label: string;
   }
 
-  const FooSchema = new Schema<IFoo, Model<IFoo>, IFoo>({
+  const FooSchema = new Schema<unknown, IFoo, Model<IFoo>, IFoo>({
     _id: String,
     label: { type: String }
   });
@@ -128,7 +128,7 @@ async function gh11117(): Promise<void> {
     someNumber: number;
     someString: string;
   }
-  const fooSchema = new Schema<Foo, Model<Foo>>({
+  const fooSchema = new Schema<unknown, Foo, Model<Foo>>({
     someDate: { required: true, type: Date },
     someId: { required: true, type: Schema.Types.ObjectId },
     someNumber: { required: true, type: Number },
@@ -155,7 +155,7 @@ function gh11085(): void {
     email: string;
   }
 
-  const userSchema = new Schema<User>({
+  const userSchema = new Schema<unknown, User>({
     username: String,
     email: String
   });
@@ -173,7 +173,7 @@ function gh11435() {
   interface Item {
     name: string;
   }
-  const ItemSchema = new Schema<Item>({ name: String });
+  const ItemSchema = new Schema<unknown, Item>({ name: String });
 
   ItemSchema.pre('validate', function preValidate() {
     expectType<Model<unknown>>(this.$model('Item1'));
@@ -235,15 +235,16 @@ async function gh11960() {
   type ParentModelType = Model<Parent, {}, {}, {}, ParentDocument>;
 
   const ParentSchema = new Schema<
-  Parent,
-  ParentModelType,
-  {},
-  {},
-  {},
-  {},
-  DefaultSchemaOptions,
-  Parent,
-  ParentDocument
+    unknown,
+    Parent,
+    ParentModelType,
+    {},
+    {},
+    {},
+    {},
+    DefaultSchemaOptions,
+    Parent,
+    ParentDocument
   >({
     username: { type: String },
     map: { type: Map, of: String },
@@ -287,7 +288,7 @@ function gh12290() {
     name: string;
     age: number;
   }
-  const schema = new Schema<IUser>({
+  const schema = new Schema<unknown, IUser>({
     name: String,
     age: Number
   });
@@ -340,7 +341,7 @@ function gh13738() {
     }
   }
 
-  const schema = new Schema<IPerson>({
+  const schema = new Schema<unknown, IPerson>({
     age: Number,
     dob: Date,
     settings: {
@@ -383,7 +384,7 @@ async function gh14876() {
     year: number;
     owner: Types.ObjectId;
   };
-  const carSchema = new Schema<CarObjectInterface>({
+  const carSchema = new Schema<unknown, CarObjectInterface>({
     make: { type: String, required: true },
     model: { type: String, required: true },
     year: { type: Number, required: true },
@@ -394,7 +395,7 @@ async function gh14876() {
     name: string;
     age: number;
   };
-  const userSchema = new Schema<UserObjectInterface>({
+  const userSchema = new Schema<unknown, UserObjectInterface>({
     name: String,
     age: Number
   });
@@ -429,7 +430,7 @@ async function gh15077() {
     state: 'on' | 'off';
   };
 
-  const fooSchema = new Schema<Foo>(
+  const fooSchema = new Schema<unknown, Foo>(
     {
       state: {
         type: String,

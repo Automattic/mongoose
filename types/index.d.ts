@@ -273,7 +273,7 @@ declare module 'mongoose' {
      * Create a new schema
      */
     constructor(
-      definition: TSchemaDefinition,
+      definition?: TSchemaDefinition,
       options?: SchemaOptions<
         RawDocType,
         TInstanceMethods,

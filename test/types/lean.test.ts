@@ -167,6 +167,8 @@ async function gh13345_2() {
     url: { required: true, type: String }
   });
 
+  type X = typeof imageSchema extends Schema<any, any> ? InferSchemaType<typeof imageSchema> : never;
+
   const placeSchema = new Schema({
     images: { required: true, type: [imageSchema] }
   });
@@ -175,6 +177,7 @@ async function gh13345_2() {
 
   const PlaceModel = model('Place', placeSchema);
 
+  const p = await PlaceModel.findOne();
   const place = await PlaceModel.findOne().lean().orFail().exec();
   expectAssignable<FlattenMaps<Place>>(place);
   expectType<Record<string, string>>(place.images[0].description);

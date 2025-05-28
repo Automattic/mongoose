@@ -33,7 +33,7 @@ function rawDocSyntax(): void {
 
   type TestModel = Model<ITest, {}, ITestMethods>;
 
-  const TestSchema = new Schema<ITest, TestModel>({
+  const TestSchema = new Schema<unknown, ITest, TestModel>({
     foo: { type: String, required: true }
   });
 
@@ -53,7 +53,7 @@ function tAndDocSyntax(): void {
     foo: string;
   }
 
-  const TestSchema = new Schema<ITest & Document>({
+  const TestSchema = new Schema<unknown, ITest & Document>({
     foo: { type: String, required: true }
   });
 
@@ -69,7 +69,7 @@ async function insertManyTest() {
     foo: string;
   }
 
-  const TestSchema = new Schema<ITest>({
+  const TestSchema = new Schema<unknown, ITest>({
     foo: { type: String, required: true }
   });
 
@@ -91,7 +91,7 @@ function gh13930() {
     foo: string;
   }
 
-  const TestSchema = new Schema<ITest>({
+  const TestSchema = new Schema<unknown, ITest>({
     foo: { type: String, required: true }
   });
 
@@ -109,7 +109,7 @@ function gh10074() {
 
   type IDogDocument = IDog & Document;
 
-  const DogSchema = new Schema<IDogDocument>(
+  const DogSchema = new Schema<unknown, IDogDocument>(
     {
       breed: { type: String },
       name: { type: String },
@@ -169,9 +169,10 @@ interface ProjectModel extends Model<IProject, {}, IProjectInstanceMethods> {
 }
 
 const projectSchema = new Schema<
-IProject,
-ProjectModel,
-IProjectInstanceMethods
+  unknown,
+  IProject,
+  ProjectModel,
+  IProjectInstanceMethods
 >({ name: String });
 
 projectSchema.pre('save', function() {
@@ -407,7 +408,7 @@ function gh11911() {
     name?: string;
   }
 
-  const animalSchema = new Schema<IAnimal>({
+  const animalSchema = new Schema<unknown, IAnimal>({
     name: { type: String }
   });
 
@@ -426,7 +427,7 @@ function gh12059() {
     name?: string;
   }
 
-  const animalSchema = new Schema<IAnimal>({
+  const animalSchema = new Schema<unknown, IAnimal>({
     name: { type: String }
   });
 
@@ -454,7 +455,7 @@ function schemaInstanceMethodsAndQueryHelpers() {
   }
   type UserModel = Model<User, UserQueryHelpers, UserInstanceMethods> & UserStaticMethods;
 
-  const userSchema = new Schema<User, UserModel, UserInstanceMethods, UserQueryHelpers, any, UserStaticMethods>({
+  const userSchema = new Schema<unknown, User, UserModel, UserInstanceMethods, UserQueryHelpers, any, UserStaticMethods>({
     name: String
   }, {
     statics: {
@@ -508,7 +509,7 @@ function gh12100() {
 })();
 
 
-function modelRemoveOptions() {
+async function modelRemoveOptions() {
   const cmodel = model('Test', new Schema());
 
   const res: DeleteResult = await cmodel.deleteOne({}, {});
@@ -518,7 +519,7 @@ async function gh12286() {
   interface IUser{
     name: string;
   }
-  const schema = new Schema<IUser>({
+  const schema = new Schema<unknown, IUser>({
     name: { type: String, required: true }
   });
 
@@ -536,7 +537,7 @@ function gh12332() {
   interface IUser{
     age: number
   }
-  const schema = new Schema<IUser>({ age: Number });
+  const schema = new Schema<unknown, IUser>({ age: Number });
 
   const User = model<IUser>('User', schema);
 
@@ -548,7 +549,7 @@ async function gh12347() {
   interface IUser{
     name: string;
   }
-  const schema = new Schema<IUser>({
+  const schema = new Schema<unknown, IUser>({
     name: { type: String, required: true }
   });
 
@@ -768,7 +769,7 @@ function gh13897() {
     updatedAt: Date;
   }
 
-  const documentSchema = new Schema<IDocument>({
+  const documentSchema = new Schema<unknown, IDocument>({
     name: { type: String, required: true }
   },
   {
@@ -786,7 +787,7 @@ async function gh14026() {
     bar: string[];
   }
 
-  const FooModel = mongoose.model<Foo>('Foo', new mongoose.Schema<Foo>({ bar: [String] }));
+  const FooModel = mongoose.model<Foo>('Foo', new Schema<unknown, Foo>({ bar: [String] }));
 
   const distinctBar = await FooModel.distinct('bar');
   expectType<string[]>(distinctBar);
@@ -807,7 +808,7 @@ async function gh14072() {
     updated_at: number;
   };
 
-  const schema = new mongoose.Schema<Test>(
+  const schema = new Schema<unknown, Test>(
     {
       num: { type: Number },
       created_at: { type: Number },

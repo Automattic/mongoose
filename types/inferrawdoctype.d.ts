@@ -49,10 +49,10 @@ declare module 'mongoose' {
    * @returns Number, "Number" or "number" will be resolved to number type.
    */
   type ResolveRawPathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}, TypeKey extends string = DefaultSchemaOptions['typeKey']> =
-  PathValueType extends Schema<any> ?
+  PathValueType extends Schema<any, any> ?
     InferSchemaType<PathValueType> :
     PathValueType extends (infer Item)[] ?
-      IfEquals<Item, never, any[], Item extends Schema<any> ?
+      IfEquals<Item, never, any[], Item extends Schema<any, any> ?
         // If Item is a schema, infer its type.
         Array<InferSchemaType<Item>> :
         Item extends Record<TypeKey, any> ?
@@ -72,7 +72,7 @@ declare module 'mongoose' {
               ObtainRawDocumentPathType<Item, TypeKey>[]
       >:
       PathValueType extends ReadonlyArray<infer Item> ?
-        IfEquals<Item, never, any[], Item extends Schema<any> ?
+        IfEquals<Item, never, any[], Item extends Schema<any, any> ?
           Array<InferSchemaType<Item>> :
           Item extends Record<TypeKey, any> ?
             Item[TypeKey] extends Function | String ?

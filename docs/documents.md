@@ -17,7 +17,7 @@ to documents as stored in MongoDB. Each document is an instance of its
 ## Documents vs Models {#documents-vs-models}
 
 [Document](api/document.html#Document) and [Model](api/model.html#Model) are distinct
-classes in Mongoose. The Model class is a subclass of the Document class.
+classes in Mongoose. The Document class is a subclass of the Modal class.
 When you use the [Model constructor](api/model.html#Model), you create a
 new document.
 

@@ -3143,6 +3143,52 @@ describe('model: updateOne: ', function() {
     assert.equal(r2.testArray[0].key, 'Type2');
     assert.equal(r2.testArray[0].field2, field2update);
   });
+
+  it('only calls validators under single nested subdocs once (gh-15436)', async function() {
+    let validateDetailsCalls = 0;
+    let validateNameCalls = 0;
+
+    const kittySchema = new mongoose.Schema({
+      informations: {
+        type: {
+          details: {
+            validate: function() {
+              validateDetailsCalls++;
+              return true;
+            },
+            type: {
+              name: {
+                type: String,
+                validate: function() {
+                  validateNameCalls++;
+                  return true;
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+
+    const Kitten = db.model('Test', kittySchema);
+
+    // Update the document with validation enabled
+    await Kitten.updateOne(
+      { _id: new mongoose.Types.ObjectId() },
+      {
+        informations: {
+          details: {
+            name: 'Zohra'
+          }
+        }
+      },
+      { runValidators: true }
+    );
+
+    // Assert that each validator was only called once
+    assert.equal(validateDetailsCalls, 1);
+    assert.equal(validateNameCalls, 1);
+  });
 });
 
 async function delay(ms) {

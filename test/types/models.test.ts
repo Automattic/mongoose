@@ -1010,3 +1010,26 @@ async function gh15369() {
     throw error;
   }
 }
+
+async function gh15437() {
+  interface Person {
+    name: string;
+    age: number;
+    address: string;
+  }
+
+  const schema = new mongoose.Schema({
+    name: String,
+    age: Number,
+    address: String
+  });
+  const PersonModel = model<Person>('Person', schema);
+
+  const data = { name: 'John Doe', age: 30, address: '123 Main St' };
+
+  // Test hydrating with string projection
+  const doc1 = PersonModel.hydrate(data, 'name age');
+  expectType<string>(doc1.name);
+  expectType<number>(doc1.age);
+  expectAssignable<undefined | null | string>(doc1.address);
+}

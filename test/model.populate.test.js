@@ -11510,14 +11510,23 @@ describe('model: populate:', function() {
 
     const Prompt = db.model('Prompt', promptSchema);
 
+    const projectRubricParameterSchema = new Schema({
+      evaluationPromptId: { type: Schema.Types.ObjectId, ref: 'Prompt' },
+      sectionsToBeEvaluated: [String]
+    });
+
+    projectRubricParameterSchema.virtual('rubric.parameters.$*.evaluationPrompt', {
+      ref: 'Prompt',
+      localField: 'rubric.parameters.$*.evaluationPromptId',
+      foreignField: '_id',
+      justOne: true
+    });
+
     // Rubric schema
     const projectRubricSchema = new Schema({
       parameters: {
         type: Map,
-        of: {
-          evaluationPromptId: { type: Schema.Types.ObjectId, ref: 'Prompt' },
-          sectionsToBeEvaluated: [String]
-        }
+        of: projectRubricParameterSchema
       }
     });
     // Submission schema
@@ -11562,6 +11571,9 @@ describe('model: populate:', function() {
     const populated = await Submission.findById(submission._id).populate([
       'rubric.parameters.$*.evaluationPrompt'
     ]);
+
+    assert.strictEqual(populated.rubric.parameters.get('param1').evaluationPrompt.name, 'Test Prompt');
+
     const obj = JSON.parse(JSON.stringify(populated));
     assert.strictEqual(obj.rubric.parameters.param1.evaluationPrompt.name, 'Test Prompt');
     assert.strictEqual(obj.rubric.parameters.param2.evaluationPrompt.name, 'Test Prompt 2');
@@ -11581,7 +11593,7 @@ describe('model: populate:', function() {
       parameters: {
         type: Map,
         of: {
-          evaluationPromptId: { type: Schema.Types.ObjectId, ref: 'Prompt' },
+          evaluationPromptIds: [{ type: Schema.Types.ObjectId, ref: 'Prompt' }],
           sectionsToBeEvaluated: [String]
         }
       }
@@ -11630,8 +11642,7 @@ describe('model: populate:', function() {
       'rubric.parameters.$*.evaluationPrompts'
     ]);
     const obj = JSON.parse(JSON.stringify(populated));
-    console.log(populated.rubric)
     assert.deepStrictEqual(obj.rubric.parameters.param1.evaluationPrompts.map(prompt => prompt.name), ['Test Prompt', 'Test Prompt 2']);
-    assert.strictEqual(obj.rubric.parameters.param2.evaluationPrompts.name, ['Test Prompt 3']);
+    assert.deepStrictEqual(obj.rubric.parameters.param2.evaluationPrompts.map(prompt => prompt.name), ['Test Prompt 3']);
   });
 });

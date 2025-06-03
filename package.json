@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.27.4",
-    "@babel/preset-env": "7.27.1",
+    "@babel/preset-env": "7.27.2",
     "@mongodb-js/mongodb-downloader": "^0.3.9",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
     "@typescript-eslint/parser": "^8.19.1",

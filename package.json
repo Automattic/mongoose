@@ -34,7 +34,7 @@
     "@mongodb-js/mongodb-downloader": "^0.3.9",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
     "@typescript-eslint/parser": "^8.19.1",
-    "acquit": "1.3.0",
+    "acquit": "1.4.0",
     "acquit-ignore": "0.2.1",
     "acquit-require": "0.1.1",
     "ajv": "8.17.1",

@@ -814,7 +814,7 @@ site for compatible types like
 and
 [mongoose-function](https://github.com/aheckmann/mongoose-function).
 
-Read more about creating custom SchemaTypes [here](customschematypes.html).
+Read more about creating custom SchemaTypes in our [Custom SchemaTypes guide](customschematypes.html).
 
 ## The `schema.path()` Function {#path}
 

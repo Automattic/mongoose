@@ -4,12 +4,14 @@ const start = require('./common');
 
 let mongoose2;
 
-describe('multi instance', function() {
-  try {
-    mongoose2 = require('mongoose-separate-require-instance');
-  } catch (err) {
-    return this.skip();
-  }
+describe('multiple require instance', function() {
+  before(function() {
+    try {
+      mongoose2 = require('mongoose-separate-require-instance');
+    } catch (err) {
+      return this.skip();
+    }
+  });
 
   let db;
   beforeEach(function() {

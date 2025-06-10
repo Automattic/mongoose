@@ -1319,4 +1319,32 @@ describe('Map', function() {
     // Assert
     assert.strictEqual(error, null);
   });
+
+  it('throws an error when validation fails with nested maps', async function() {
+    // Arrange
+    const userSchema = new Schema({
+      a: {
+        b: {
+          c: {
+            type: Schema.Types.Map,
+            of: new Schema({
+              e: { type: Number, required: true }
+            })
+          }
+        }
+      }
+    });
+    const User = db.model('User', userSchema);
+
+    const user = new User({
+      a: { b: { c: { d: { } } } }
+    });
+
+    // Act
+    const error = await user.validate().then(() => null, err => err);
+
+    // Assert
+    assert.ok(error);
+    assert.strictEqual(error.errors['a.b.c.d.e'].message.includes('Path `e`'), true);
+  });
 });

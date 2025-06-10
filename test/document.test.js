@@ -14469,6 +14469,33 @@ describe('document', function() {
     assert.strictEqual(strValidateCalls, 1);
 
   });
+
+  it('triggers VersionError when using push() to an array', async function() {
+    const schema = new Schema({ texts: [{ text: String, _id: false }], test: String });
+    const Test = db.model('Test', schema);
+
+    const doc = new Test({ texts: [{ text: 'test' }], test: 'Test' });
+    await doc.save();
+    await Test.collection.updateOne({ _id: doc._id }, { $unset: { texts: 1 } });
+
+    // Get two instances of the same document to create a version conflict
+    const doc1 = await Test.findById(doc._id);
+    const doc2 = await Test.findById(doc._id);
+
+    // Modify and save the first instance
+    doc1.texts.push({ text: 'name1' });
+    await doc1.save();
+
+    // Try to modify and save the second instance
+    // This should cause a VersionError because `texts` gets a default value of `[]`.
+    doc2.test = null;
+
+    // Should throw VersionError because doc1 was saved with a new version number
+    const err = await doc2.save().then(() => null, err => err);
+    assert.ok(err);
+    assert.strictEqual(err.name, 'VersionError');
+    assert.ok(err.message.includes('texts'));
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

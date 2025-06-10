@@ -1239,4 +1239,84 @@ describe('Map', function() {
     assert.equal(fromDb.map.get('outer').get('inner'), 42);
     assert.equal(fromDb.map.get('outer').get('inner2'), 43);
   });
+
+  it('handles deeply nested maps with numbers (gh-15447)', async function() {
+    // Arrange
+    const userSchema = new Schema({
+      a: {
+        b: {
+          c: {
+            type: Schema.Types.Map,
+            of: new Schema({
+              e: { type: Number, required: true }
+            })
+          }
+        }
+      }
+    });
+    const User = db.model('User', userSchema);
+
+    const user = new User({
+      a: {
+        b: {
+          c: {
+            d: {
+              e: 2
+            }
+          }
+        }
+      }
+    });
+
+    // Act
+    const error = await user.validate().then(() => null, err => err);
+
+    // Assert
+    assert.strictEqual(error, null);
+  });
+
+  it('handles deeply nested maps with even more nesting depth (gh-15447)', async function() {
+    // Arrange
+    const userSchema = new Schema({
+      a: {
+        b: {
+          c: {
+            d: {
+              type: Schema.Types.Map,
+              of: new Schema({
+                e: { type: String, required: true },
+                f: { type: Number, default: 100 }
+              })
+            }
+          }
+        }
+      }
+    });
+    const User = db.model('User', userSchema);
+
+    const user = new User({
+      a: {
+        b: {
+          c: {
+            d: {
+              item1: {
+                e: 'test string',
+                f: 42
+              },
+              item2: {
+                e: 'another string'
+                // f will use default value
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // Act
+    const error = await user.validate().then(() => null, err => err);
+
+    // Assert
+    assert.strictEqual(error, null);
+  });
 });

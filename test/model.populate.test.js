@@ -11515,13 +11515,6 @@ describe('model: populate:', function() {
       sectionsToBeEvaluated: [String]
     });
 
-    projectRubricParameterSchema.virtual('rubric.parameters.$*.evaluationPrompt', {
-      ref: 'Prompt',
-      localField: 'rubric.parameters.$*.evaluationPromptId',
-      foreignField: '_id',
-      justOne: true
-    });
-
     // Rubric schema
     const projectRubricSchema = new Schema({
       parameters: {
@@ -11568,9 +11561,9 @@ describe('model: populate:', function() {
     });
 
     // Attempt population
-    const populated = await Submission.findById(submission._id).populate([
-      'rubric.parameters.$*.evaluationPrompt'
-    ]);
+    const populated = await Submission.findById(submission._id).populate(
+      { path: 'rubric.parameters.$*.evaluationPrompt' }
+    );
 
     assert.strictEqual(populated.rubric.parameters.get('param1').evaluationPrompt.name, 'Test Prompt');
 

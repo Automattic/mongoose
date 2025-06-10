@@ -68,6 +68,8 @@ jobs:
           key: ${{ matrix.os }}-${{ matrix.mongodb }}
 
       - run: npm install
+      # Create ./node_modules/mongoose-separate-require-instance for testing multiple require instances
+      - run: npm run create-separate-require-instance
       - name: NPM Test without Coverage
         run: npm test
         if: matrix.coverage != true

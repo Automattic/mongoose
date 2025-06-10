@@ -102,6 +102,7 @@
     "release-6x": "git pull origin 6.x && git push origin 6.x && git push origin 6.x --tags && npm publish --tag 6x",
     "mongo": "node ./tools/repl.js",
     "publish-7x": "npm publish --tag 7x",
+    "create-separate-require-instance": "rm -rf ./node_modules/mongoose-separate-require-instance && node ./scripts/create-tarball && tar -xzf mongoose.tgz -C ./node_modules && mv ./node_modules/package ./node_modules/mongoose-separate-require-instance",
     "test": "mocha --exit ./test/*.test.js",
     "test-deno": "deno run --allow-env --allow-read --allow-net --allow-run --allow-sys --allow-write ./test/deno.mjs",
     "test-rs": "START_REPLICA_SET=1 mocha --timeout 30000 --exit ./test/*.test.js",

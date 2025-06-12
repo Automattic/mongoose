@@ -325,7 +325,7 @@ return a cursor.
 
 ## API Docs
 
-Find the API docs [here](http://mongoosejs.com/docs/api/mongoose.html), generated using [dox](https://github.com/tj/dox)
+[Mongoose API documentation](http://mongoosejs.com/docs/api/mongoose.html), generated using [dox](https://github.com/tj/dox)
 and [acquit](https://github.com/vkarpov15/acquit).
 
 ## Related Projects

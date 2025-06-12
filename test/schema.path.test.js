@@ -30,7 +30,6 @@ describe('Schema.prototype.path()', function() {
 
     assert.equal(schema.path('myMap.key.name').instance, 'String');
     assert.equal(schema.path('myMap.key.age').instance, 'Number');
-    assert.equal(schema.path('myMap.key.age').instance, 'Number');
   });
 
   it('gets paths underneath maps of maps', function() {

@@ -14469,6 +14469,85 @@ describe('document', function() {
     assert.strictEqual(strValidateCalls, 1);
 
   });
+
+  it('triggers VersionError when using push() to an array', async function() {
+    const schema = new Schema({ texts: [{ text: String, _id: false }], test: String });
+    const Test = db.model('Test', schema);
+
+    const doc = new Test({ texts: [{ text: 'test' }], test: 'Test' });
+    await doc.save();
+    await Test.collection.updateOne({ _id: doc._id }, { $unset: { texts: 1 } });
+
+    // Get two instances of the same document to create a version conflict
+    const doc1 = await Test.findById(doc._id);
+    const doc2 = await Test.findById(doc._id);
+
+    // Modify and save the first instance
+    doc1.texts.push({ text: 'name1' });
+    await doc1.save();
+
+    // Try to modify and save the second instance
+    // This should cause a VersionError because `texts` gets a default value of `[]`.
+    doc2.test = null;
+
+    // Should throw VersionError because doc1 was saved with a new version number
+    const err = await doc2.save().then(() => null, err => err);
+    assert.ok(err);
+    assert.strictEqual(err.name, 'VersionError');
+    assert.ok(err.message.includes('texts'));
+  });
+
+  it('handles direct map manipulation with nested set() calls (gh-15461)', async function() {
+    const MetaSchema = new mongoose.Schema({
+      items: {
+        type: Map,
+        of: new mongoose.Schema({
+          field: { type: String, required: true },
+          arr: { type: [Number] }
+        }, { _id: false }),
+        default: new Map()
+      },
+      nested: {
+        type: Map,
+        of: new mongoose.Schema({ map: { type: Map, of: Number } }, { _id: false }),
+        default: new Map()
+      }
+    });
+    const MetaModel = db.model('MetaModel', MetaSchema);
+    await MetaModel.create({
+      items: new Map([
+        ['m1', { field: 'field1', arr: [1, 2], num: 2 }],
+        ['m2', { field: 'field2', arr: [] }]
+      ]),
+      nested: new Map([
+        [
+          'key',
+          { map: new Map([['k7', 7], ['k8', 8], ['k9', 9]]) }
+        ],
+        ['key2', { map: new Map([['k7', 7]]) }]
+      ])
+    });
+    const item = await MetaModel.findOne();
+
+    item.set('items.m1.field', 'changed');
+    item.set('items.m2.field', 'replaced');
+    item.set('items.m2.arr', [1]);
+    item.set('items.m3', { field: 'field3', arr: [4] });
+    item.set('nested.inserted', { map: new Map([['a1', 1]]) });
+    item.set('nested.inserted2.map', new Map([['a1', 1]]));
+
+    await item.save();
+
+    // Verify changes were saved
+    const updatedItem = await MetaModel.findOne();
+    assert.strictEqual(updatedItem.items.get('m1').field, 'changed');
+    assert.strictEqual(updatedItem.items.get('m2').field, 'replaced');
+    assert.deepStrictEqual(updatedItem.items.get('m2').arr, [1]);
+    assert.strictEqual(updatedItem.items.get('m3').field, 'field3');
+    assert.deepStrictEqual(updatedItem.items.get('m3').arr, [4]);
+    assert.strictEqual(updatedItem.nested.get('inserted').map.get('a1'), 1);
+    assert.strictEqual(updatedItem.nested.get('inserted2').map.get('a1'), 1);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

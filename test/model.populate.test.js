@@ -11500,4 +11500,142 @@ describe('model: populate:', function() {
       ['admin', 'user']
     );
   });
+
+  it('handles populating virtual underneath map of subdocs (gh-15439)', async function() {
+    // Prompt schema
+    const promptSchema = new Schema({
+      name: String,
+      model: String
+    });
+
+    const Prompt = db.model('Prompt', promptSchema);
+
+    const projectRubricParameterSchema = new Schema({
+      evaluationPromptId: { type: Schema.Types.ObjectId, ref: 'Prompt' },
+      sectionsToBeEvaluated: [String]
+    });
+
+    // Rubric schema
+    const projectRubricSchema = new Schema({
+      parameters: {
+        type: Map,
+        of: projectRubricParameterSchema
+      }
+    });
+    // Submission schema
+    const submissionSchema = new Schema({
+      rubric: projectRubricSchema
+    });
+
+    submissionSchema.virtual('rubric.parameters.$*.evaluationPrompt', {
+      ref: 'Prompt',
+      localField: 'rubric.parameters.$*.evaluationPromptId',
+      foreignField: '_id',
+      justOne: true
+    });
+
+    submissionSchema.set('toObject', { virtuals: true });
+    submissionSchema.set('toJSON', { virtuals: true });
+
+    const Submission = db.model('Submission', submissionSchema);
+
+    // Seed data
+    const prompts = await Prompt.create([
+      { name: 'Test Prompt', model: 'gpt-4' },
+      { name: 'Test Prompt 2', model: 'gpt-4' }
+    ]);
+
+    const submission = await Submission.create({
+      rubric: {
+        parameters: {
+          param1: {
+            evaluationPromptId: prompts[0]._id,
+            sectionsToBeEvaluated: ['intro']
+          },
+          param2: {
+            evaluationPromptId: prompts[1]._id,
+            sectionsToBeEvaluated: ['intro']
+          }
+        }
+      }
+    });
+
+    // Attempt population
+    const populated = await Submission.findById(submission._id).populate(
+      { path: 'rubric.parameters.$*.evaluationPrompt' }
+    );
+
+    assert.strictEqual(populated.rubric.parameters.get('param1').evaluationPrompt.name, 'Test Prompt');
+
+    const obj = JSON.parse(JSON.stringify(populated));
+    assert.strictEqual(obj.rubric.parameters.param1.evaluationPrompt.name, 'Test Prompt');
+    assert.strictEqual(obj.rubric.parameters.param2.evaluationPrompt.name, 'Test Prompt 2');
+  });
+
+  it('handles populating virtual of arrays underneath map of subdocs (gh-15439)', async function() {
+    // Prompt schema
+    const promptSchema = new Schema({
+      name: String,
+      model: String
+    });
+
+    const Prompt = db.model('Prompt', promptSchema);
+
+    // Rubric schema
+    const projectRubricSchema = new Schema({
+      parameters: {
+        type: Map,
+        of: {
+          evaluationPromptIds: [{ type: Schema.Types.ObjectId, ref: 'Prompt' }],
+          sectionsToBeEvaluated: [String]
+        }
+      }
+    });
+    // Submission schema
+    const submissionSchema = new Schema({
+      rubric: projectRubricSchema
+    });
+
+    submissionSchema.virtual('rubric.parameters.$*.evaluationPrompts', {
+      ref: 'Prompt',
+      localField: 'rubric.parameters.$*.evaluationPromptIds',
+      foreignField: '_id',
+      justOne: false
+    });
+
+    submissionSchema.set('toObject', { virtuals: true });
+    submissionSchema.set('toJSON', { virtuals: true });
+
+    const Submission = db.model('Submission', submissionSchema);
+
+    // Seed data
+    const prompts = await Prompt.create([
+      { name: 'Test Prompt', model: 'gpt-4' },
+      { name: 'Test Prompt 2', model: 'gpt-4' },
+      { name: 'Test Prompt 3', model: 'gpt-4' }
+    ]);
+
+    const submission = await Submission.create({
+      rubric: {
+        parameters: {
+          param1: {
+            evaluationPromptIds: [prompts[0]._id, prompts[1]._id],
+            sectionsToBeEvaluated: ['intro']
+          },
+          param2: {
+            evaluationPromptIds: [prompts[2]._id],
+            sectionsToBeEvaluated: ['intro']
+          }
+        }
+      }
+    });
+
+    // Attempt population
+    const populated = await Submission.findById(submission._id).populate([
+      'rubric.parameters.$*.evaluationPrompts'
+    ]);
+    const obj = JSON.parse(JSON.stringify(populated));
+    assert.deepStrictEqual(obj.rubric.parameters.param1.evaluationPrompts.map(prompt => prompt.name), ['Test Prompt', 'Test Prompt 2']);
+    assert.deepStrictEqual(obj.rubric.parameters.param2.evaluationPrompts.map(prompt => prompt.name), ['Test Prompt 3']);
+  });
 });

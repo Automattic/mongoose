@@ -114,4 +114,26 @@ describe('getVirtual', function() {
     assert.equal(res.virtual.options.ref, 'Users');
     assert.equal(res.nestedSchemaPath, 'events');
   });
+
+  it('handles virtuals defined under map (gh-15439)', function() {
+    const subSchema = new Schema({
+      name: String,
+      friends: [Number]
+    });
+    subSchema.virtual('friends_$', {
+      ref: 'User',
+      localField: 'users.$*.friends',
+      foreignField: 'userId'
+    });
+
+    const schema = new Schema({
+      users: {
+        type: Map,
+        of: subSchema
+      }
+    });
+
+    const res = getVirtual(schema, 'users.$*.friends_$');
+    assert.equal(res.virtual.options.ref, 'User');
+  });
 });

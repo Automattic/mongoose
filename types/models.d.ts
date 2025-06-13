@@ -356,6 +356,12 @@ declare module 'mongoose' {
      */
     createSearchIndex(description: SearchIndexDescription): Promise<string>;
 
+    /**
+     * Creates all [Atlas search indexes](https://www.mongodb.com/docs/atlas/atlas-search/create-index/) defined in this model's schema.
+     * This function only works when connected to MongoDB Atlas.
+     */
+    createSearchIndexes(): Promise<string[]>;
+
     /** Connection the model uses. */
     db: Connection;
 

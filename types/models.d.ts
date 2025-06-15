@@ -482,7 +482,7 @@ declare module 'mongoose' {
      * Shortcut for creating a new Document from existing raw data, pre-saved in the DB.
      * The document returned has no paths marked as modified initially.
      */
-    hydrate(obj: any, projection?: AnyObject, options?: HydrateOptions): THydratedDocumentType;
+    hydrate(obj: any, projection?: ProjectionType<TRawDocType>, options?: HydrateOptions): THydratedDocumentType;
 
     /**
      * This function is responsible for building [indexes](https://www.mongodb.com/docs/manual/indexes/),

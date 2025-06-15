@@ -205,7 +205,7 @@ dog.findSimilarTypes((err, dogs) => {
 ```
 
 * Overwriting a default mongoose document method may lead to unpredictable results. See [this](api/schema.html#schema_Schema-reserved) for more details.
-* The example above uses the `Schema.methods` object directly to save an instance method. You can also use the `Schema.method()` helper as described [here](api/schema.html#schema_Schema-method).
+* The example above uses the `Schema.methods` object directly to save an instance method. You can also use the [`Schema.method()` helper](api/schema.html#schema_Schema-method).
 * Do **not** declare methods using ES6 arrow functions (`=>`). Arrow functions [explicitly prevent binding `this`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this), so your method will **not** have access to the document and the above examples will not work.
 
 ## Statics {#statics}
@@ -827,8 +827,8 @@ The alias of each pref is also permitted so instead of having to type out
 The read option also allows us to specify *tag sets*. These tell the
 [driver](https://github.com/mongodb/node-mongodb-native/) from which members
 of the replica-set it should attempt to read. Read more about tag sets
-[here](http://www.mongodb.com/docs/manual/applications/replication/#tag-sets) and
-[here](https://www.mongodb.com/docs/manual/core/read-preference).
+in the [MongoDB documentation on replica set tag sets](http://www.mongodb.com/docs/manual/applications/replication/#tag-sets) and
+in the [MongoDB core documentation on read preference](https://www.mongodb.com/docs/manual/core/read-preference).
 
 *NOTE: you may also specify the driver read preference [strategy](https://www.mongodb.com/docs/manual/core/read-preference/#read-preference-modes)
 option when connecting:*

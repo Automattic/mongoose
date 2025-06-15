@@ -113,10 +113,9 @@ await q.then(() => console.log('Update 3'));
 
 ## References to other documents {#refs}
 
-There are no joins in MongoDB but sometimes we still want references to
-documents in other collections. This is where [population](populate.html)
-comes in. Read more about how to include documents from other collections in
-your query results [here](api/query.html#query_Query-populate).
+There are no joins in MongoDB but sometimes we still want references to documents in other collections.
+This is where [population](populate.html) comes in.
+Read more about how to include documents from other collections in your query results in the [population documentation](api/query.html#query_Query-populate).
 
 ## Streaming {#streaming}
 

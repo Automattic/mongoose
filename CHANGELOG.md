@@ -1,3 +1,12 @@
+8.15.2 / 2025-06-12
+===================
+ * fix(document+schema): improve handling for setting paths underneath maps, including maps of maps #15477 #15461
+ * fix: report default paths in VersionError message because they can can cause VersionError #15464
+ * fix(updateValidators): ensure update validators only call validators underneath single nested paths once #15446 #15436
+ * fix: fix validation for deeply nested maps of subdocuments #15469 #15447 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(DocumentArray): correctly set parent if instantiated with schema from another Mongoose instance #15471 #15466
+ * types(model): use ProjectionType for Model.hydrate() #15447 #15443
+
 8.15.1 / 2025-05-26
 ===================
  * types: correct handling of _id in ProjectionType #15432 #15418

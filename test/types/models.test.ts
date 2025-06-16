@@ -659,7 +659,7 @@ async function gh13705() {
   const schema = new Schema({ name: String });
   const TestModel = model('Test', schema);
 
-  type ExpectedLeanDoc = (mongoose.FlattenMaps<{ name?: string | null }> & { _id: mongoose.Types.ObjectId } & { __v: number });
+  type ExpectedLeanDoc = (mongoose.FlattenMaps<{ name?: string | null, _id: mongoose.Types.ObjectId }> & { _id: mongoose.Types.ObjectId } & { __v: number });
 
   const findByIdRes = await TestModel.findById('0'.repeat(24), undefined, { lean: true });
   expectType<ExpectedLeanDoc | null>(findByIdRes);

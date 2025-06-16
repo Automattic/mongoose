@@ -194,7 +194,8 @@ function autoTypedDocument() {
   expectType<AutoTypedSchemaType['schema']['favoritColorMode']>(AutoTypeModelInstance.favoritColorMode);
 
   // Document-Methods-tests
-  expectType<ReturnType<AutoTypedSchemaType['methods']['instanceFn']>>(new AutoTypedModel().instanceFn());
+  const doc = new AutoTypedModel();
+  expectType<ReturnType<AutoTypedSchemaType['methods']['instanceFn']>>(doc.instanceFn());
 
 }
 
@@ -207,7 +208,8 @@ function autoTypedDocumentConnection() {
   expectType<AutoTypedSchemaType['schema']['favoritColorMode']>(AutoTypeModelInstance.favoritColorMode);
 
   // Document-Methods-tests
-  expectType<ReturnType<AutoTypedSchemaType['methods']['instanceFn']>>(new AutoTypedModel().instanceFn());
+  const doc = new AutoTypedModel();
+  expectType<ReturnType<AutoTypedSchemaType['methods']['instanceFn']>>(doc.instanceFn());
 
 }
 

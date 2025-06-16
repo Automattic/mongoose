@@ -1,5 +1,5 @@
-import { Schema, model, Model, Types, InferSchemaType } from 'mongoose';
-import { expectError, expectType } from 'tsd';
+import { Schema, model, Model, Types, InferSchemaType, InferHydratedDocType } from 'mongoose';
+import { expectAssignable, expectError, expectType } from 'tsd';
 
 async function gh10293() {
   interface ITest {
@@ -54,13 +54,15 @@ function gh13087() {
     location: { required: true, type: locationSchema }
   });
 
-  const routeSchema = new Schema({
+  const schemaDefinition = {
     points: { type: [pointSchema] }
-  });
+  } as const;
 
-  type Route = InferSchemaType<typeof routeSchema>;
+  const routeSchema = new Schema(schemaDefinition);
 
-  function getTestRouteData(): Route {
+  type Route = InferHydratedDocType<typeof schemaDefinition>;
+
+  function getTestRouteData(): Pick<Route, 'points'> {
     return {
       points: new Types.DocumentArray([
         { name: 'Test', location: { type: 'Point', coordinates: [1, 2] } }
@@ -69,10 +71,10 @@ function gh13087() {
   }
 
   const { points } = getTestRouteData();
-  expectType<Types.DocumentArray<{
+  expectAssignable<Types.DocumentArray<{
     name: string;
     location: {
-      type: 'Point';
+      type: string;
       coordinates: number[];
     };
   }>>(points);
@@ -167,11 +169,13 @@ function gh15041() {
   const subDoc = {
     name: { type: String, required: true },
     age: { type: Number, required: true }
-  };
+  } as const;
 
-  const testSchema = new Schema({
+  const schemaDefinition = {
     subdocArray: { type: [subDoc], required: true }
-  });
+  } as const;
+
+  const testSchema = new Schema(schemaDefinition);
 
   const TestModel = model('Test', testSchema);
 

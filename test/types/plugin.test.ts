@@ -1,4 +1,4 @@
-import { connection, HydratedDocument, Model, Query, Schema } from 'mongoose';
+import { connection, HydratedDocument, Model, Query, Schema, Types } from 'mongoose';
 
 function pluginVirtuals(schema: Schema<any, Test, any, any, any, TestVirtuals>): void {
   schema.virtual('fullName').get(function(this: TestDocument) {
@@ -38,7 +38,7 @@ function pluginStatics(schema: Schema<any, Test, TestModel, any, TestQueryHelper
   });
 }
 
-type Test = { firstName: string; lastName: string };
+type Test = { _id: Types.ObjectId, firstName: string; lastName: string };
 type TestVirtuals = {
   fullName: string;
 };

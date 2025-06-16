@@ -20,6 +20,7 @@
 /// <reference path="./types.d.ts" />
 /// <reference path="./utility.d.ts" />
 /// <reference path="./validation.d.ts" />
+/// <reference path="./inferhydrateddoctype.d.ts" />
 /// <reference path="./inferrawdoctype.d.ts" />
 /// <reference path="./inferschematype.d.ts" />
 /// <reference path="./virtuals.d.ts" />
@@ -267,7 +268,15 @@ declare module 'mongoose' {
     TVirtuals = {},
     TStaticMethods = {},
     TSchemaOptions = DefaultSchemaOptions,
-    THydratedDocumentType = HydratedDocument<ApplySchemaOptions<RawDocType, TSchemaOptions>, TInstanceMethods & TVirtuals, TQueryHelpers, TVirtuals>
+    THydratedDocumentType extends AnyObject = HydratedDocument<
+      ApplySchemaOptions<
+        IsItRecordAndNotAny<TSchemaDefinition> extends true ? InferHydratedDocType<TSchemaDefinition> : RawDocType,
+        TSchemaOptions
+      >,
+      TInstanceMethods & TVirtuals,
+      TQueryHelpers,
+      TVirtuals
+    >
   > extends events.EventEmitter {
     /**
      * Create a new schema

@@ -1,3 +1,8 @@
+8.16.0 / 2025-06-16
+===================
+ * feat(model): add Model.createSearchIndexes() #15470 #15465
+ * feat: upgrade MongoDB driver -> 6.17.0 #15468 [gmstavros](https://github.com/gmstavros)
+
 8.15.2 / 2025-06-12
 ===================
  * fix(document+schema): improve handling for setting paths underneath maps, including maps of maps #15477 #15461

@@ -31,8 +31,16 @@ declare module 'mongoose' {
     PathValueType,
     TypeKey extends string = DefaultTypeKey
   > = ResolveHydratedPathType<
-    PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? PathValueType[TypeKey] : PathValueType,
-    PathValueType extends PathWithTypePropertyBaseType<TypeKey> ? Omit<PathValueType, TypeKey> : {},
+    PathValueType extends PathWithTypePropertyBaseType<TypeKey>
+      ? PathValueType[TypeKey] extends PathWithTypePropertyBaseType<TypeKey>
+        ? PathValueType
+        : PathValueType[TypeKey]
+      : PathValueType,
+    PathValueType extends PathWithTypePropertyBaseType<TypeKey>
+      ? PathValueType[TypeKey] extends PathWithTypePropertyBaseType<TypeKey>
+        ? {}
+        : Omit<PathValueType, TypeKey>
+      : {},
     TypeKey
   >;
 

@@ -1,4 +1,4 @@
-import { Document, Model, Schema, model, InferSchemaType, ObtainSchemaGeneric } from 'mongoose';
+import { Document, Model, Schema, model, InferSchemaType, ObtainSchemaGeneric, Types } from 'mongoose';
 import { expectType } from 'tsd';
 
 interface IPerson {
@@ -101,7 +101,7 @@ async function autoTypedVirtuals() {
     virtuals: {
       domain: {
         get() {
-          expectType<Document<any, any, { email: string }> & AutoTypedSchemaType>(this);
+          expectType<Document<any, any, { email: string } & { _id: Types.ObjectId }> & AutoTypedSchemaType>(this);
           return this.email.slice(this.email.indexOf('@') + 1);
         },
         set() {

@@ -7,7 +7,7 @@ async function gh10293() {
     arrayOfArray: string[][]; // <-- Array of Array
   }
 
-  const testSchema = new Schema<unknown, ITest>({
+  const testSchema = new Schema<any, ITest>({
     name: {
       type: String,
       required: true
@@ -146,9 +146,9 @@ function gh14469() {
   };
   type UserModelType = Model<User, {}, UserDocumentProps>;
 
-  const userSchema = new Schema<unknown, User, UserModelType>(
+  const userSchema = new Schema<any, User, UserModelType>(
     {
-      names: [new Schema<unknown, Names>({ firstName: String })]
+      names: [new Schema<any, Names>({ firstName: String })]
     },
     { timestamps: true }
   );

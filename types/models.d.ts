@@ -879,7 +879,7 @@ declare module 'mongoose' {
     recompileSchema(): void;
 
     /** Schema the model uses. */
-    schema: Schema<unknown, TRawDocType>;
+    schema: Schema<any, TRawDocType>;
 
     /** Creates a `updateMany` query: updates all documents that match `filter` with `update`. */
     updateMany<ResultDoc = THydratedDocumentType>(

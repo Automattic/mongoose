@@ -83,7 +83,7 @@ function testMethods(): void {
 
   type User = Model<IUser, {}, IUserMethods>;
 
-  const schema = new Schema<unknown, IUser, User>({ first: String, last: String });
+  const schema = new Schema<any, IUser, User>({ first: String, last: String });
   schema.methods.fullName = function(): string {
     return this.first + ' ' + this.last;
   };
@@ -100,7 +100,7 @@ function testRequiredId(): void {
     label: string;
   }
 
-  const FooSchema = new Schema<unknown, IFoo, Model<IFoo>, IFoo>({
+  const FooSchema = new Schema<any, IFoo, Model<IFoo>, IFoo>({
     _id: String,
     label: { type: String }
   });
@@ -128,7 +128,7 @@ async function gh11117(): Promise<void> {
     someNumber: number;
     someString: string;
   }
-  const fooSchema = new Schema<unknown, Foo, Model<Foo>>({
+  const fooSchema = new Schema<any, Foo, Model<Foo>>({
     someDate: { required: true, type: Date },
     someId: { required: true, type: Schema.Types.ObjectId },
     someNumber: { required: true, type: Number },
@@ -155,7 +155,7 @@ function gh11085(): void {
     email: string;
   }
 
-  const userSchema = new Schema<unknown, User>({
+  const userSchema = new Schema<any, User>({
     username: String,
     email: String
   });
@@ -173,7 +173,7 @@ function gh11435() {
   interface Item {
     name: string;
   }
-  const ItemSchema = new Schema<unknown, Item>({ name: String });
+  const ItemSchema = new Schema<any, Item>({ name: String });
 
   ItemSchema.pre('validate', function preValidate() {
     expectType<Model<unknown>>(this.$model('Item1'));
@@ -237,7 +237,7 @@ async function gh11960() {
   type ParentModelType = Model<Parent, {}, {}, {}, ParentDocument>;
 
   const ParentSchema = new Schema<
-    unknown,
+    {},
     Parent,
     ParentModelType,
     {},
@@ -289,7 +289,7 @@ function gh12290() {
     name: string;
     age: number;
   }
-  const schema = new Schema<unknown, IUser>({
+  const schema = new Schema<any, IUser>({
     name: String,
     age: Number
   });
@@ -342,7 +342,7 @@ function gh13738() {
     }
   }
 
-  const schema = new Schema<unknown, IPerson>({
+  const schema = new Schema<any, IPerson>({
     age: Number,
     dob: Date,
     settings: {
@@ -385,7 +385,7 @@ async function gh14876() {
     year: number;
     owner: Types.ObjectId;
   };
-  const carSchema = new Schema<unknown, CarObjectInterface>({
+  const carSchema = new Schema<any, CarObjectInterface>({
     make: { type: String, required: true },
     model: { type: String, required: true },
     year: { type: Number, required: true },
@@ -396,7 +396,7 @@ async function gh14876() {
     name: string;
     age: number;
   };
-  const userSchema = new Schema<unknown, UserObjectInterface>({
+  const userSchema = new Schema<any, UserObjectInterface>({
     name: String,
     age: Number
   });
@@ -431,7 +431,7 @@ async function gh15077() {
     state: 'on' | 'off';
   };
 
-  const fooSchema = new Schema<unknown, Foo>(
+  const fooSchema = new Schema<any, Foo>(
     {
       state: {
         type: String,

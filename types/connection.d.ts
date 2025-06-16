@@ -182,14 +182,17 @@ declare module 'mongoose' {
       collection?: string,
       options?: CompileModelOptions
     ): Model<
-      InferSchemaType<TSchema>,
+      IsItRecordAndNotAny<ObtainSchemaGeneric<TSchema, 'TSchemaDefinition'>> extends true
+        ? InferRawDocType<ObtainSchemaGeneric<TSchema, 'TSchemaDefinition'>>
+        : ObtainSchemaGeneric<TSchema, 'EnforcedDocType'>,
       ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
       ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
       {},
       HydratedDocument<
-        InferSchemaType<TSchema>,
-        ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-        ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>
+        ObtainSchemaGeneric<TSchema, 'THydratedDocumentType'>,
+        ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+        ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+        ObtainSchemaGeneric<TSchema, 'TVirtuals'>
       >,
       TSchema
     > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;

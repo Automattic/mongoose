@@ -137,7 +137,7 @@ function gh11480(): void {
     name: string;
   };
 
-  const UserSchema = new Schema<unknown, IUserSchema>({ name: { type: String } });
+  const UserSchema = new Schema<any, IUserSchema>({ name: { type: String } });
 
   UserSchema.pre('save', function(next) {
     expectNotType<any>(this);
@@ -152,7 +152,7 @@ function gh12583() {
     avatar?: string;
   }
 
-  const userSchema = new Schema<unknown, IUser>({
+  const userSchema = new Schema<any, IUser>({
     name: { type: String, required: true },
     email: { type: String, required: true },
     avatar: String
@@ -172,7 +172,7 @@ function gh11257() {
     avatar?: string;
   }
 
-  const schema = new Schema<unknown, User>({
+  const schema = new Schema<any, User>({
     name: { type: String, required: true },
     email: { type: String, required: true },
     avatar: String
@@ -211,7 +211,7 @@ function gh15242() {
   type DocumentValidatorThis = HydratedDocument<PostPersisted>;
   type QueryValidatorThis = Query<unknown, PostRecord>;
 
-  const PostSchema = new Schema<unknown, PostPersisted>({
+  const PostSchema = new Schema<any, PostPersisted>({
     title: { type: String, required: true },
     postTime: {
       type: Date,

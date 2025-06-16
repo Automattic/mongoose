@@ -99,7 +99,7 @@ declare module 'mongoose' {
      * The default value for this path. If a function, Mongoose executes the function
      * and uses the return value as the default.
      */
-    default?: DefaultType<T> | ((this: THydratedDocumentType, doc: THydratedDocumentType) => DefaultType<T> | null | undefined) | null;
+    default?: DefaultType<T> | ((this: THydratedDocumentType) => DefaultType<T> | null | undefined) | null;
 
     /**
      * The model that `populate()` should use if populating this path.
@@ -361,8 +361,8 @@ declare module 'mongoose' {
 
         static options: { castNonArrays: boolean; };
 
-        discriminator<T, U>(name: string | number, schema: Schema<unknown, T, U>, value?: string): U;
-        discriminator<D>(name: string | number, schema: Schema<unknown>, value?: string): Model<D>;
+        discriminator<T, U>(name: string | number, schema: Schema<any, T, U>, value?: string): U;
+        discriminator<D>(name: string | number, schema: Schema<any>, value?: string): Model<D>;
 
         /** The schematype embedded in this array */
         caster?: SchemaType;
@@ -452,11 +452,11 @@ declare module 'mongoose' {
 
         static options: { castNonArrays: boolean; };
 
-        discriminator<D>(name: string | number, schema: Schema<unknown>, value?: string): Model<D>;
-        discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
+        discriminator<D>(name: string | number, schema: Schema<any>, value?: string): Model<D>;
+        discriminator<T, U>(name: string | number, schema: Schema<any, T, U>, value?: string): U;
 
         /** The schema used for documents in this array */
-        schema: Schema<unknown>;
+        schema: Schema<any>;
 
         /** The constructor used for subdocuments in this array */
         caster?: typeof Types.Subdocument;
@@ -522,13 +522,13 @@ declare module 'mongoose' {
         static schemaName: string;
 
         /** The document's schema */
-        schema: Schema<unknown>;
+        schema: Schema<any>;
 
         /** Default options for this SchemaType */
         defaultOptions: Record<string, any>;
 
-        discriminator<T, U>(name: string | number, schema: Schema<unknown, T, U>, value?: string): U;
-        discriminator<D>(name: string | number, schema: Schema<unknown>, value?: string): Model<D>;
+        discriminator<T, U>(name: string | number, schema: Schema<any, T, U>, value?: string): U;
+        discriminator<D>(name: string | number, schema: Schema<any>, value?: string): Model<D>;
 
         cast(val: any, doc?: Document<any>, init?: boolean, prev?: any, options?: any): HydratedSingleSubdocument<DocType>;
       }

@@ -56,12 +56,12 @@ interface IStory {
   fans?: PopulatedDoc<IPerson>[];
 }
 
-const personSchema = new Schema<unknown, IPerson>({
+const personSchema = new Schema<any, IPerson>({
   name: String,
   stories: [{ type: Schema.Types.ObjectId, ref: 'Story' }]
 });
 
-const storySchema = new Schema<unknown, IStory>({
+const storySchema = new Schema<any, IStory>({
   title: String,
   author: { type: Schema.Types.ObjectId, ref: 'Person' },
   fans: [{ type: Schema.Types.ObjectId, ref: 'Person' }]
@@ -137,7 +137,7 @@ function gh11321(): void {
     name?: string
   }
 
-  const parentSchema = new Schema<unknown, Parent>({
+  const parentSchema = new Schema<any, Parent>({
     child: { type: 'ObjectId', ref: 'Child' },
     name: String
   });
@@ -162,14 +162,14 @@ function gh11503() {
   interface Friend {
     blocked: boolean
   }
-  const FriendSchema = new Schema<unknown, Friend>({
+  const FriendSchema = new Schema<any, Friend>({
     blocked: Boolean
   });
 
   interface IUser {
     friends: Types.ObjectId[];
   }
-  const userSchema = new Schema<unknown, IUser>({
+  const userSchema = new Schema<any, IUser>({
     friends: [{ type: Schema.Types.ObjectId, ref: 'friends' }]
   });
   const User = model<IUser>('friends', userSchema);
@@ -195,7 +195,7 @@ function gh11544() {
   interface IUser {
     friends: Types.ObjectId[];
   }
-  const userSchema = new Schema<unknown, IUser>({
+  const userSchema = new Schema<any, IUser>({
     friends: [{ type: Schema.Types.ObjectId, ref: 'friends' }]
   });
   const User = model<IUser>('friends', userSchema);
@@ -213,7 +213,7 @@ function gh11862() {
 
   const t: SchemaTypeOptions<mongoose.Types.ObjectId> = { type: 'ObjectId', refPath: 'userType' };
 
-  const userSchema = new Schema<unknown, IUser>({
+  const userSchema = new Schema<any, IUser>({
     userType: String,
     friend: { type: 'ObjectId', refPath: 'userType' }
   });
@@ -433,7 +433,7 @@ async function gh14574() {
 
   type UserModelType = mongoose.Model<User, {}, UserMethods>;
 
-  const userSchema = new Schema<unknown, User, UserModelType, UserMethods>(
+  const userSchema = new Schema<any, User, UserModelType, UserMethods>(
     {
       firstName: String,
       lastName: String,
@@ -484,7 +484,7 @@ async function gh15111() {
     IChildVirtuals,
     ChildInstance
   >;
-  const childSchema = new Schema<unknown, IChild, ChildModelType>(
+  const childSchema = new Schema<any, IChild, ChildModelType>(
     {
       name: {
         type: 'String',
@@ -521,7 +521,7 @@ async function gh15111() {
     IParentVirtuals,
     ParentInstance
   >;
-  const parentSchema = new Schema<unknown, IParent, ParentModelType>(
+  const parentSchema = new Schema<any, IParent, ParentModelType>(
     {
       name: {
         type: 'String',

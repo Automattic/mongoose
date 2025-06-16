@@ -13,7 +13,7 @@ interface ProjectQueryHelpers {
   byName(this: ProjectModelQuery, name: string): ProjectModelQuery;
 }
 
-const schema = new Schema<unknown, Project, ProjectModelType, {}, ProjectQueryHelpers>({
+const schema = new Schema<any, Project, ProjectModelType, {}, ProjectQueryHelpers>({
   name: { type: String, required: true },
   stars: { type: Number, required: true }
 });

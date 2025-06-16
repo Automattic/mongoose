@@ -16,7 +16,8 @@ import mongoose, {
   WithLevel1NestedPaths,
   createConnection,
   connection,
-  model
+  model,
+  ObtainSchemaGeneric
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
@@ -33,7 +34,7 @@ function rawDocSyntax(): void {
 
   type TestModel = Model<ITest, {}, ITestMethods>;
 
-  const TestSchema = new Schema<unknown, ITest, TestModel>({
+  const TestSchema = new Schema<any, ITest, TestModel>({
     foo: { type: String, required: true }
   });
 
@@ -53,7 +54,7 @@ function tAndDocSyntax(): void {
     foo: string;
   }
 
-  const TestSchema = new Schema<unknown, ITest & Document>({
+  const TestSchema = new Schema<any, ITest & Document>({
     foo: { type: String, required: true }
   });
 
@@ -69,7 +70,7 @@ async function insertManyTest() {
     foo: string;
   }
 
-  const TestSchema = new Schema<unknown, ITest>({
+  const TestSchema = new Schema<any, ITest>({
     foo: { type: String, required: true }
   });
 
@@ -91,7 +92,7 @@ function gh13930() {
     foo: string;
   }
 
-  const TestSchema = new Schema<unknown, ITest>({
+  const TestSchema = new Schema<any, ITest>({
     foo: { type: String, required: true }
   });
 
@@ -109,7 +110,7 @@ function gh10074() {
 
   type IDogDocument = IDog & Document;
 
-  const DogSchema = new Schema<unknown, IDogDocument>(
+  const DogSchema = new Schema<any, IDogDocument>(
     {
       breed: { type: String },
       name: { type: String },
@@ -169,7 +170,7 @@ interface ProjectModel extends Model<IProject, {}, IProjectInstanceMethods> {
 }
 
 const projectSchema = new Schema<
-  unknown,
+  {},
   IProject,
   ProjectModel,
   IProjectInstanceMethods
@@ -408,7 +409,7 @@ function gh11911() {
     name?: string;
   }
 
-  const animalSchema = new Schema<unknown, IAnimal>({
+  const animalSchema = new Schema<any, IAnimal>({
     name: { type: String }
   });
 
@@ -427,7 +428,7 @@ function gh12059() {
     name?: string;
   }
 
-  const animalSchema = new Schema<unknown, IAnimal>({
+  const animalSchema = new Schema<any, IAnimal>({
     name: { type: String }
   });
 
@@ -455,7 +456,7 @@ function schemaInstanceMethodsAndQueryHelpers() {
   }
   type UserModel = Model<User, UserQueryHelpers, UserInstanceMethods> & UserStaticMethods;
 
-  const userSchema = new Schema<unknown, User, UserModel, UserInstanceMethods, UserQueryHelpers, any, UserStaticMethods>({
+  const userSchema = new Schema<any, User, UserModel, UserInstanceMethods, UserQueryHelpers, any, UserStaticMethods>({
     name: String
   }, {
     statics: {
@@ -519,7 +520,7 @@ async function gh12286() {
   interface IUser{
     name: string;
   }
-  const schema = new Schema<unknown, IUser>({
+  const schema = new Schema<any, IUser>({
     name: { type: String, required: true }
   });
 
@@ -537,7 +538,7 @@ function gh12332() {
   interface IUser{
     age: number
   }
-  const schema = new Schema<unknown, IUser>({ age: Number });
+  const schema = new Schema<any, IUser>({ age: Number });
 
   const User = model<IUser>('User', schema);
 
@@ -549,7 +550,7 @@ async function gh12347() {
   interface IUser{
     name: string;
   }
-  const schema = new Schema<unknown, IUser>({
+  const schema = new Schema<any, IUser>({
     name: { type: String, required: true }
   });
 
@@ -592,7 +593,9 @@ function findWithId() {
 }
 
 function gh12573ModelAny() {
-  const TestModel = model<any>('Test', new Schema({}));
+  const schema = new Schema({});
+  type X = ObtainSchemaGeneric<any, 'TSchemaDefinition'>;
+  const TestModel = model<any>('Test', schema);
   const doc = new TestModel();
   expectType<any>(doc);
   const { fieldA } = doc;
@@ -769,7 +772,7 @@ function gh13897() {
     updatedAt: Date;
   }
 
-  const documentSchema = new Schema<unknown, IDocument>({
+  const documentSchema = new Schema<any, IDocument>({
     name: { type: String, required: true }
   },
   {
@@ -787,7 +790,7 @@ async function gh14026() {
     bar: string[];
   }
 
-  const FooModel = mongoose.model<Foo>('Foo', new Schema<unknown, Foo>({ bar: [String] }));
+  const FooModel = mongoose.model<Foo>('Foo', new Schema<any, Foo>({ bar: [String] }));
 
   const distinctBar = await FooModel.distinct('bar');
   expectType<string[]>(distinctBar);
@@ -808,7 +811,7 @@ async function gh14072() {
     updated_at: number;
   };
 
-  const schema = new Schema<unknown, Test>(
+  const schema = new Schema<any, Test>(
     {
       num: { type: Number },
       created_at: { type: Number },

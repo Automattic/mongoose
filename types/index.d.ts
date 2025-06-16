@@ -85,12 +85,14 @@ declare module 'mongoose' {
     collection?: string,
     options?: CompileModelOptions
   ): Model<
-    InferSchemaType<TSchema>,
+    IsItRecordAndNotAny<ObtainSchemaGeneric<TSchema, 'TSchemaDefinition'>> extends true
+      ? InferRawDocType<ObtainSchemaGeneric<TSchema, 'TSchemaDefinition'>>
+      : ObtainSchemaGeneric<TSchema, 'EnforcedDocType'>,
     ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
     ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
     ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
     HydratedDocument<
-      ApplySchemaOptions<InferSchemaType<TSchema>, ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>>,
+      ObtainSchemaGeneric<TSchema, 'THydratedDocumentType'>,
       ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
       ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
       ObtainSchemaGeneric<TSchema, 'TVirtuals'>
@@ -198,7 +200,7 @@ declare module 'mongoose' {
     >;
 
   export type HydratedDocumentFromSchema<TSchema extends Schema<any, any>> = HydratedDocument<
-    InferSchemaType<TSchema>,
+    ObtainSchemaGeneric<TSchema, 'THydratedDocumentType'>,
     ObtainSchemaGeneric<TSchema, 'TInstanceMethods'> & ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
     ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
     ObtainSchemaGeneric<TSchema, 'TVirtuals'>
@@ -247,7 +249,7 @@ declare module 'mongoose' {
   export type DiscriminatorSchema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods, DisSchema> =
     DisSchema extends Schema<infer DisSchemaEDocType, infer DisSchemaM, infer DisSchemaInstanceMethods, infer DisSchemaQueryhelpers, infer DisSchemaVirtuals, infer DisSchemaStatics>
       ? Schema<MergeType<DocType, DisSchemaEDocType>, DiscriminatorModel<DisSchemaM, M>, DisSchemaInstanceMethods | TInstanceMethods, DisSchemaQueryhelpers | TQueryHelpers, DisSchemaVirtuals | TVirtuals, DisSchemaStatics & TStaticMethods>
-      : Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>;
+      : Schema<any, DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>;
 
   type QueryResultType<T> = T extends Query<infer ResultType, any> ? ResultType : never;
 
@@ -257,10 +259,10 @@ declare module 'mongoose' {
     TInstanceMethods,
     TQueryHelpers,
     TVirtuals,
-    TStaticMethods> = (schema: Schema<unknown, DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>, opts?: any) => void;
+    TStaticMethods> = (schema: Schema<any, DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>, opts?: any) => void;
 
   export class Schema<
-    TSchemaDefinition,
+    TSchemaDefinition extends SchemaDefinition,
     RawDocType = InferRawDocType<TSchemaDefinition>,
     TModelType = Model<RawDocType, any, any, any>,
     TInstanceMethods = {},
@@ -282,7 +284,7 @@ declare module 'mongoose' {
      * Create a new schema
      */
     constructor(
-      definition?: TSchemaDefinition,
+      definition?: TSchemaDefinition | SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType, THydratedDocumentType>,
       options?: SchemaOptions<
         RawDocType,
         TInstanceMethods,
@@ -307,7 +309,7 @@ declare module 'mongoose' {
      * and their corresponding compiled models. Each element of the array is
      * an object with 2 properties: `schema` and `model`.
      */
-    childSchemas: { schema: Schema<unknown>, model: any }[];
+    childSchemas: { schema: Schema<any>, model: any }[];
 
     /** Removes all indexes on this schema */
     clearIndexes(): this;
@@ -315,13 +317,13 @@ declare module 'mongoose' {
     /** Returns a copy of this schema */
     clone<T = this>(): T;
 
-    discriminator<DisSchema = Schema<unknown>>(name: string | number, schema: DisSchema, options?: DiscriminatorOptions): this;
+    discriminator<DisSchema = Schema<any>>(name: string | number, schema: DisSchema, options?: DiscriminatorOptions): this;
 
     /** Returns a new schema that has the picked `paths` from this schema. */
     pick<T = this>(paths: string[], options?: SchemaOptions): T;
 
     /** Object containing discriminators defined on this schema */
-    discriminators?: { [name: string]: Schema<unknown> };
+    discriminators?: { [name: string]: Schema<any> };
 
     /** Iterates the schemas paths similar to Array#forEach. */
     eachPath(fn: (path: string, type: SchemaType) => void): this;

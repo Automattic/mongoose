@@ -11,7 +11,7 @@ interface ITestMethods {
 
 type ITestModel = Model<ITest, {}, ITestMethods>;
 
-const TestSchema = new Schema<unknown, ITest, ITestModel, ITestMethods>({
+const TestSchema = new Schema<any, ITest, ITestModel, ITestMethods>({
   foo: { type: String, required: true }
 });
 

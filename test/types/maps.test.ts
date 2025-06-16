@@ -7,7 +7,7 @@ interface ITest {
   map3: Map<string, number>
 }
 
-const schema = new Schema<unknown, ITest>({
+const schema = new Schema<any, ITest>({
   map1: {
     type: Map,
     of: Number
@@ -50,12 +50,12 @@ function gh10575() {
     property3: string;
   }
 
-  const BaseSchema: Schema<unknown, IBase> = new Schema({ prop1: String, prop2: String });
+  const BaseSchema: Schema<any, IBase> = new Schema({ prop1: String, prop2: String });
 
-  const Model1Schema: Schema<unknown, IModel1> = BaseSchema.clone() as any;
+  const Model1Schema: Schema<any, IModel1> = BaseSchema.clone() as any;
   Model1Schema.add({ property1: Number, property2: Number });
 
-  const Model2Schema: Schema<unknown, IModel2> = BaseSchema.clone() as any;
+  const Model2Schema: Schema<any, IModel2> = BaseSchema.clone() as any;
   Model2Schema.add({ property3: String });
 
   const Model1 = model<IModel1, Model<IModel1>>('m1', Model1Schema);

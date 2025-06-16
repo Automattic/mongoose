@@ -69,7 +69,7 @@ declare module 'mongoose' {
        TSchemaOptions: TSchemaOptions;
       THydratedDocumentType: THydratedDocumentType;
      }[alias]
-     : unknown;
+     : IfAny<TSchema, any, unknown>;
 
   type ResolveSchemaOptions<T> = MergeType<DefaultSchemaOptions, T>;
 

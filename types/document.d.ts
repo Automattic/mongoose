@@ -247,7 +247,7 @@ declare module 'mongoose' {
     save(options?: SaveOptions): Promise<this>;
 
     /** The document's schema. */
-    schema: Schema<unknown>;
+    schema: Schema<any>;
 
     /** Sets the value of a path, or many paths. */
     set<T extends keyof DocType>(path: T, val: DocType[T], type: any, options?: DocumentSetOptions): this;

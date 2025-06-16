@@ -10,7 +10,7 @@ expectType<Connection>(createConnection('mongodb://127.0.0.1:27017/test', { appN
 const conn = createConnection();
 
 expectAssignable<Model<{ name: string }, any, any, any>>(
-  conn.model('Test', new Schema<unknown, { name: string }>({ name: { type: String } }))
+  conn.model('Test', new Schema<any, { name: string }>({ name: { type: String } }))
 );
 expectType<Model<{ name: string }>>(conn.model<{ name: string }>('Test', new Schema({ name: { type: String } })));
 
@@ -134,7 +134,7 @@ function schemaInstanceMethodsAndQueryHelpersOnConnection() {
   }
   type UserModel = Model<User, UserQueryHelpers, UserInstanceMethods> & UserStaticMethods;
 
-  const userSchema = new Schema<unknown, User, UserModel, UserInstanceMethods, UserQueryHelpers, any, UserStaticMethods>({
+  const userSchema = new Schema<any, User, UserModel, UserInstanceMethods, UserQueryHelpers, any, UserStaticMethods>({
     name: String
   }, {
     statics: {

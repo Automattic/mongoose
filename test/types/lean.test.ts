@@ -34,7 +34,7 @@ function gh10345() {
 }
 
 async function gh11761() {
-  const thingSchema = new Schema<unknown, { name: string }>({
+  const thingSchema = new Schema<any, { name: string }>({
     name: Schema.Types.String
   });
 
@@ -66,7 +66,7 @@ async function gh11118(): Promise<void> {
     avatar?: string;
   }
 
-  const schema = new Schema<unknown, User>({
+  const schema = new Schema<any, User>({
     name: { type: String, required: true },
     email: { type: String, required: true },
     avatar: String
@@ -87,7 +87,7 @@ async function _11767() {
     answers: string[];
     correct: number;
   }
-  const QuestionSchema = new Schema<unknown, Question>({
+  const QuestionSchema = new Schema<any, Question>({
     text: String,
     answers: [String],
     correct: Number
@@ -97,7 +97,7 @@ async function _11767() {
     dateTaken: Date;
     questions: Question[];
   }
-  const ExamSchema = new Schema<unknown, Exam>({
+  const ExamSchema = new Schema<any, Exam>({
     element: String,
     dateTaken: Date,
     questions: [QuestionSchema]
@@ -221,7 +221,7 @@ async function gh15057() {
         value?: string;
       };
 
-  const TestSchema = new Schema<unknown, Attachment>({
+  const TestSchema = new Schema<any, Attachment>({
     type: { type: String, required: true },
     value: { type: String }
   });
@@ -294,7 +294,7 @@ async function gh15122() {
     ParentInstance
   >;
 
-  const parentSchema = new Schema<unknown, IParent, ParentModelType>(
+  const parentSchema = new Schema<any, IParent, ParentModelType>(
     {
       name: {
         type: String,
@@ -333,7 +333,7 @@ async function gh15158() {
   };
 
   const createSomeModelAndDoSomething = async <T extends FooBar>() => {
-    const TestSchema = new Schema<unknown, T>({
+    const TestSchema = new Schema<any, T>({
       value: { type: String }
     });
 

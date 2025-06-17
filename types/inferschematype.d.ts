@@ -75,8 +75,8 @@ declare module 'mongoose' {
 
   type ApplySchemaOptions<T, O = DefaultSchemaOptions> = ResolveTimestamps<T, O>;
 
-  type ResolveTimestamps<T, O> = O extends { timestamps?: false } ? T
-    : O extends { timestamps: infer TimestampOptions } ? TimestampOptions extends true
+  type ResolveTimestamps<T, O> = O extends { timestamps: infer TimestampOptions }
+    ? TimestampOptions extends true
       ? { createdAt: NativeDate; updatedAt: NativeDate; } & T
       : TimestampOptions extends SchemaTimestampsConfig
         ? {
@@ -90,7 +90,7 @@ declare module 'mongoose' {
               : never]: NativeDate;
         } & T
         : T
-      : T;
+    : T;
 }
 
 type IsPathDefaultUndefined<PathType> = PathType extends { default: undefined } ?

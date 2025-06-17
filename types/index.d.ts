@@ -269,7 +269,7 @@ declare module 'mongoose' {
     TQueryHelpers = {},
     TVirtuals = {},
     TStaticMethods = {},
-    TSchemaOptions = DefaultSchemaOptions,
+    TSchemaOptions extends SchemaOptions<any> = Record<string, never>,
     THydratedDocumentType extends AnyObject = HydratedDocument<
       ApplySchemaOptions<
         IsItRecordAndNotAny<TSchemaDefinition> extends true ? InferHydratedDocType<TSchemaDefinition> : RawDocType,

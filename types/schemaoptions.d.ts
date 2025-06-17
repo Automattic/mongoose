@@ -227,10 +227,10 @@ declare module 'mongoose' {
      * Document instance methods.
      */
     methods?: IfEquals<
-    TInstanceMethods,
-    {},
-    Record<any, (this: THydratedDocumentType, ...args: any) => unknown>,
-    AddThisParameter<TInstanceMethods, THydratedDocumentType> & AnyObject
+      TInstanceMethods,
+      {},
+      { [name: string]: (this: THydratedDocumentType, ...args: any) => unknown },
+      AddThisParameter<TInstanceMethods, THydratedDocumentType>
     >
 
     /**

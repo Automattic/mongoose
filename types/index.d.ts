@@ -295,6 +295,17 @@ declare module 'mongoose' {
       > | TSchemaOptions
     );
 
+    static create<TSchemaDefinition extends SchemaDefinition, TSchemaOptions extends SchemaOptions>(def: TSchemaDefinition, options?: TSchemaOptions): Schema<
+      TSchemaDefinition,
+      InferRawDocType<TSchemaDefinition>,
+      Model<InferRawDocType<TSchemaDefinition>, any, any, any>,
+      TSchemaOptions extends { methods: infer M } ? M : {},
+      TSchemaOptions extends { query: any } ? TSchemaOptions['query'] : {},
+      TSchemaOptions extends { virtuals: any } ? TSchemaOptions['virtuals'] : {},
+      TSchemaOptions extends { statics: any } ? TSchemaOptions['statics'] : {},
+      TSchemaOptions
+    >;
+
     /** Adds key path / schema type pairs to this schema. */
     add(obj: AnyObject, prefix?: string): this;
 

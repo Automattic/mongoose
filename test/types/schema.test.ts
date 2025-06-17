@@ -880,7 +880,7 @@ function gh12242() {
 }
 
 function testInferTimestamps() {
-  const schema = Schema.create({
+  const schema = new Schema({
     name: String
   }, { timestamps: true });
 
@@ -889,7 +889,7 @@ function testInferTimestamps() {
   expectType<Date>(doc1.createdAt);
   expectType<Date>(doc1.updatedAt);
 
-  const schema2 = Schema.create({
+  const schema2 = new Schema({
     name: String
   }, {
     timestamps: true,
@@ -1301,7 +1301,7 @@ async function gh13797() {
     }
   } as const;
 
-  const schema = Schema.create({
+  const schema = new Schema({
     name: {
       type: String,
       required: function() {
@@ -1311,7 +1311,7 @@ async function gh13797() {
     }
   });
   const TM = model('Test', schema);
-  Schema.create({
+  new Schema({
     name: {
       type: String,
       default: function() {

@@ -262,7 +262,7 @@ declare module 'mongoose' {
     TStaticMethods> = (schema: Schema<any, DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>, opts?: any) => void;
 
   export class Schema<
-    TSchemaDefinition extends SchemaDefinition,
+    TSchemaDefinition extends Record<string, SchemaDefinitionProperty<undefined, InferRawDocType<TSchemaDefinition>, THydratedDocumentType>>,
     RawDocType = InferRawDocType<TSchemaDefinition>,
     TModelType = Model<RawDocType, any, any, any>,
     TInstanceMethods = {},
@@ -588,7 +588,7 @@ declare module 'mongoose' {
     | MixedSchemaTypeOptions<EnforcedDocType, THydratedDocumentType>;
 
   export type SchemaDefinition<T = undefined, EnforcedDocType = any, THydratedDocumentType = HydratedDocument<EnforcedDocType>> = T extends undefined
-    ? { [path: string]: SchemaDefinitionProperty; }
+    ? { [path: string]: SchemaDefinitionProperty<unknown, EnforcedDocType, THydratedDocumentType>; }
     : { [path in keyof T]?: SchemaDefinitionProperty<T[path], EnforcedDocType, THydratedDocumentType>; };
 
   export type AnyArray<T> = T[] | ReadonlyArray<T>;

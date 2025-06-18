@@ -1,4 +1,4 @@
-import { InferRawDocType } from 'mongoose';
+import { InferRawDocType, Types } from 'mongoose';
 import { expectType, expectError } from 'tsd';
 
 function gh14839() {
@@ -21,5 +21,5 @@ function gh14839() {
   };
 
   type UserType = InferRawDocType< typeof schemaDefinition>;
-  expectType<{ email: string, password: string, dateOfBirth: Date }>({} as UserType);
+  expectType<{ email: string, password: string, dateOfBirth: Date } & { _id: Types.ObjectId }>({} as UserType);
 }

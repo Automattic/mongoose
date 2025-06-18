@@ -20,6 +20,7 @@
 /// <reference path="./types.d.ts" />
 /// <reference path="./utility.d.ts" />
 /// <reference path="./validation.d.ts" />
+/// <reference path="./inferhydrateddoctype.d.ts" />
 /// <reference path="./inferrawdoctype.d.ts" />
 /// <reference path="./inferschematype.d.ts" />
 /// <reference path="./virtuals.d.ts" />
@@ -272,13 +273,62 @@ declare module 'mongoose' {
       ObtainDocumentType<any, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
       ResolveSchemaOptions<TSchemaOptions>
     >,
-    THydratedDocumentType = HydratedDocument<FlatRecord<DocType>, TVirtuals & TInstanceMethods, {}, TVirtuals>
+    THydratedDocumentType = HydratedDocument<FlatRecord<DocType>, TVirtuals & TInstanceMethods, {}, TVirtuals>,
+    TSchemaDefinition = SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType, THydratedDocumentType>
   >
     extends events.EventEmitter {
     /**
      * Create a new schema
      */
     constructor(definition?: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType, THydratedDocumentType> | DocType, options?: SchemaOptions<FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
+
+    static create<
+      TSchemaDefinition extends SchemaDefinition<undefined, RawDocType, THydratedDocumentType>,
+      TSchemaOptions extends DefaultSchemaOptions,
+      RawDocType extends ApplySchemaOptions<
+        InferRawDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>,
+        ResolveSchemaOptions<TSchemaOptions>
+      >,
+      THydratedDocumentType extends AnyObject = HydratedDocument<InferHydratedDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>>
+    >(def: TSchemaDefinition): Schema<
+      RawDocType,
+      Model<RawDocType, any, any, any>,
+      TSchemaOptions extends { methods: infer M } ? M : {},
+      TSchemaOptions extends { query: any } ? TSchemaOptions['query'] : {},
+      TSchemaOptions extends { virtuals: any } ? TSchemaOptions['virtuals'] : {},
+      TSchemaOptions extends { statics: any } ? TSchemaOptions['statics'] : {},
+      TSchemaOptions,
+      ApplySchemaOptions<
+        ObtainDocumentType<any, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
+        ResolveSchemaOptions<TSchemaOptions>
+      >,
+      THydratedDocumentType,
+      TSchemaDefinition
+    >;
+
+    static create<
+      TSchemaDefinition extends SchemaDefinition<undefined, RawDocType, THydratedDocumentType>,
+      TSchemaOptions extends SchemaOptions<InferRawDocType<TSchemaDefinition>>,
+      RawDocType extends ApplySchemaOptions<
+        InferRawDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>,
+        ResolveSchemaOptions<TSchemaOptions>
+      >,
+      THydratedDocumentType extends AnyObject = HydratedDocument<InferRawDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>>
+    >(def: TSchemaDefinition, options: TSchemaOptions): Schema<
+      RawDocType,
+      Model<RawDocType, any, any, any>,
+      TSchemaOptions extends { methods: infer M } ? M : {},
+      TSchemaOptions extends { query: any } ? TSchemaOptions['query'] : {},
+      TSchemaOptions extends { virtuals: any } ? TSchemaOptions['virtuals'] : {},
+      TSchemaOptions extends { statics: any } ? TSchemaOptions['statics'] : {},
+      TSchemaOptions,
+      ApplySchemaOptions<
+        ObtainDocumentType<any, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
+        ResolveSchemaOptions<TSchemaOptions>
+      >,
+      THydratedDocumentType,
+      TSchemaDefinition
+    >;
 
     /** Adds key path / schema type pairs to this schema. */
     add(obj: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType> | Schema, prefix?: string): this;

@@ -1615,7 +1615,7 @@ function gh13215() {
     date: Date;
   };
 
-  expectType<User>({} as RawDocType);
+  expectType<User & { _id: Types.ObjectId }>({} as RawDocType);
 
   const schema = new Schema(schemaDefinition, schemaOptions);
   type SchemaType = InferSchemaType<typeof schema>;

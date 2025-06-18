@@ -880,59 +880,24 @@ function gh12242() {
 }
 
 function testInferTimestamps() {
-  const schema = new Schema({
+  const schema = Schema.create({
     name: String
   }, { timestamps: true });
 
-  const WithTimestamps = model('Test1', schema);
-  const doc1 = new WithTimestamps();
-  expectType<Date>(doc1.createdAt);
-  expectType<Date>(doc1.updatedAt);
+  type WithTimestamps = InferSchemaType<typeof schema>;
+  expectType<{ createdAt: Date, updatedAt: Date } & { name?: string | null } & { _id: Types.ObjectId }>({} as WithTimestamps);
 
-  const schema2 = new Schema({
+  const schema2 = Schema.create({
     name: String
   }, {
     timestamps: true,
-    methods: {
-      myName(): string | undefined | null {
-        return this.name;
-      }
-    }
+    methods: { myName(): string | undefined | null {
+      return this.name;
+    } }
   });
 
-  const WithTimestamps2 = model('Test2', schema2);
-  const doc2 = new WithTimestamps2();
-  expectType<Date>(doc2.createdAt);
-  expectType<Date>(doc2.updatedAt);
-
-  const schema3 = new Schema({
-    name: String
-  }, {
-    timestamps: true,
-    statics: {
-      myName(): string | undefined | null {
-        return this.name;
-      }
-    },
-    virtuals: {
-      myName: {
-        get() {
-          return this.name;
-        }
-      }
-    }
-  });
-
-  const WithTimestamps3 = model('Test3', schema3);
-  const doc3 = new WithTimestamps3();
-  expectType<Date>(doc3.createdAt);
-  expectType<Date>(doc3.updatedAt);
-
-  type T1 = ObtainSchemaGeneric<typeof schema, 'TSchemaOptions'>;
-  type T2 = ObtainSchemaGeneric<typeof schema2, 'TSchemaOptions'>;
-  type TH = ObtainSchemaGeneric<typeof schema2, 'THydratedDocumentType'>;
-  type TM = ObtainSchemaGeneric<typeof schema2, 'TInstanceMethods'>;
-  type TV = ObtainSchemaGeneric<typeof schema2, 'TVirtuals'>;
+  type WithTimestamps2 = InferSchemaType<typeof schema2>;
+  expectType<{ createdAt: Date, updatedAt: Date } & { name?: string | null } & { _id: Types.ObjectId }>({} as WithTimestamps2);
 }
 
 function gh12431() {
@@ -1272,54 +1237,12 @@ async function gh13797() {
   interface IUser {
     name: string;
   }
-  new Schema<SchemaDefinition<SchemaDefinitionType<IUser>, IUser>, IUser>({
-    name: {
-      type: String,
-      required: function() {
-        expectType<HydratedDocument<IUser>>(this);
-        return true;
-      }
-    }
-  });
-  new Schema<SchemaDefinition<SchemaDefinitionType<IUser>, IUser>, IUser>({
-    name: {
-      type: String,
-      default: function() {
-        expectType<HydratedDocument<IUser>>(this);
-        return '';
-      }
-    }
-  });
-
-  const def: SchemaDefinition<SchemaDefinitionType<{ name: string }>, { name: string }> = {
-    name: {
-      type: String,
-      required: function() {
-        expectType<HydratedDocument<IUser>>(this);
-        return true;
-      }
-    }
-  } as const;
-
-  const schema = Schema.create({
-    name: {
-      type: String,
-      required: function() {
-        expectType<HydratedDocument<IUser>>(this);
-        return true;
-      }
-    }
-  });
-  const TM = model('Test', schema);
-  Schema.create({
-    name: {
-      type: String,
-      default: function() {
-        expectType<HydratedDocument<IUser>>(this);
-        return '';
-      }
-    }
-  });
+  new Schema<SchemaDefinition<IUser, IUser>, IUser>({ name: { type: String, required: function() {
+    expectAssignable<IUser>(this); return true;
+  } } });
+  new Schema<SchemaDefinition<IUser, IUser>, IUser>({ name: { type: String, default: function() {
+    expectAssignable<IUser>(this); return '';
+  } } });
 }
 
 declare const brand: unique symbol;

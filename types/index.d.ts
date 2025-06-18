@@ -262,7 +262,7 @@ declare module 'mongoose' {
     TStaticMethods> = (schema: Schema<any, DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>, opts?: any) => void;
 
   export class Schema<
-    TSchemaDefinition extends Record<string, SchemaDefinitionProperty<undefined, InferRawDocType<TSchemaDefinition>, THydratedDocumentType>>,
+    TSchemaDefinition extends Record<string, SchemaDefinitionProperty<undefined, RawDocType, THydratedDocumentType>>,
     RawDocType = InferRawDocType<TSchemaDefinition>,
     TModelType = Model<RawDocType, any, any, any>,
     TInstanceMethods = {},
@@ -297,8 +297,8 @@ declare module 'mongoose' {
 
     static create<
       TSchemaDefinition extends SchemaDefinition<undefined, RawDocType, THydratedDocumentType>,
-      TSchemaOptions extends SchemaOptions,
-      RawDocType extends InferRawDocType<TSchemaDefinition>,
+      TSchemaOptions extends SchemaOptions<InferRawDocType<TSchemaDefinition>>,
+      RawDocType extends ApplySchemaOptions<InferRawDocType<TSchemaDefinition>, TSchemaOptions>,
       THydratedDocumentType extends AnyObject = HydratedDocument<InferRawDocType<TSchemaDefinition>>
     >(def: TSchemaDefinition, options?: TSchemaOptions): Schema<
       TSchemaDefinition,

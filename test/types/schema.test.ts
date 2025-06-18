@@ -1301,7 +1301,7 @@ async function gh13797() {
     }
   } as const;
 
-  const schema = new Schema({
+  const schema = Schema.create({
     name: {
       type: String,
       required: function() {
@@ -1311,7 +1311,7 @@ async function gh13797() {
     }
   });
   const TM = model('Test', schema);
-  new Schema({
+  Schema.create({
     name: {
       type: String,
       default: function() {

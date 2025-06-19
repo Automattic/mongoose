@@ -3,15 +3,15 @@
 /**
  * Test dependencies.
  */
-const sinon = require('sinon');
 const start = require('./common');
 
 const CastError = require('../lib/error/cast');
 const assert = require('assert');
+const model = require('../lib/model');
 const { once } = require('events');
 const random = require('./util').random;
 const util = require('./util');
-const model = require('../lib/model');
+const sinon = require('sinon');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -8691,6 +8691,33 @@ describe('Model', function() {
       const doc = await User.findOne({ _id: res._id });
       assert.equal(doc.name, undefined);
     });
+  });
+
+  it('createSearchIndexes creates an index for each search index in schema (gh-15465)', async function() {
+    const sinon = require('sinon');
+    const schema = new mongoose.Schema({
+      name: String,
+      description: String
+    });
+
+    schema.searchIndex({ name: 'test', definition: { mappings: { dynamic: true } } });
+
+    const TestModel = db.model('Test', schema);
+
+    const createSearchIndexStub = sinon.stub(TestModel, 'createSearchIndex').resolves({ acknowledged: true });
+
+    try {
+      const results = await TestModel.createSearchIndexes();
+
+      assert.equal(createSearchIndexStub.callCount, 1);
+      assert.equal(results.length, 1);
+      assert.deepEqual(results, [{ acknowledged: true }]);
+
+      // Verify that createSearchIndex was called with the correct arguments
+      assert.ok(createSearchIndexStub.firstCall.calledWithMatch({ name: 'test', definition: { mappings: { dynamic: true } } }));
+    } finally {
+      sinon.restore();
+    }
   });
 });
 

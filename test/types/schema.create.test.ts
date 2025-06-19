@@ -23,7 +23,7 @@ import {
   model,
   ValidateOpts,
   CallbackWithoutResultAndOptionalError,
-  InferHydratedDocType,
+  InferHydratedDocType
 } from 'mongoose';
 import { Binary, BSON, UUID } from 'mongodb';
 import { expectType, expectError, expectAssignable } from 'tsd';
@@ -773,11 +773,11 @@ function gh12030() {
   });
 
   expectType<{
-    track?: ({
+    track?:({
       backupCount: number;
       count: number;
     } & { _id: Types.ObjectId }) | null;
-  } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema6>);
+      } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema6>);
 
 }
 

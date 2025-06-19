@@ -56,8 +56,8 @@ declare module 'mongoose' {
    * @param {TSchema} TSchema A generic of schema type instance.
    * @param {alias} alias Targeted generic alias.
    */
-  type ObtainSchemaGeneric<TSchema, alias extends 'EnforcedDocType' | 'M' | 'TInstanceMethods' | 'TQueryHelpers' | 'TVirtuals' | 'TStaticMethods' | 'TSchemaOptions' | 'DocType'> =
-   TSchema extends Schema<infer EnforcedDocType, infer M, infer TInstanceMethods, infer TQueryHelpers, infer TVirtuals, infer TStaticMethods, infer TSchemaOptions, infer DocType>
+  type ObtainSchemaGeneric<TSchema, alias extends 'EnforcedDocType' | 'M' | 'TInstanceMethods' | 'TQueryHelpers' | 'TVirtuals' | 'TStaticMethods' | 'TSchemaOptions' | 'DocType' | 'THydratedDocumentType' | 'TSchemaDefinition'> =
+   TSchema extends Schema<infer EnforcedDocType, infer M, infer TInstanceMethods, infer TQueryHelpers, infer TVirtuals, infer TStaticMethods, infer TSchemaOptions, infer DocType, infer THydratedDocumentType, infer TSchemaDefinition>
      ? {
        EnforcedDocType: EnforcedDocType;
        M: M;
@@ -67,6 +67,8 @@ declare module 'mongoose' {
        TStaticMethods: TStaticMethods;
        TSchemaOptions: TSchemaOptions;
        DocType: DocType;
+       THydratedDocumentType: THydratedDocumentType;
+       TSchemaDefinition: TSchemaDefinition;
      }[alias]
      : unknown;
 

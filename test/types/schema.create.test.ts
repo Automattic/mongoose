@@ -22,8 +22,8 @@ import {
   Query,
   model,
   ValidateOpts,
-  BufferToBinary,
-  CallbackWithoutResultAndOptionalError
+  CallbackWithoutResultAndOptionalError,
+  InferHydratedDocType,
 } from 'mongoose';
 import { Binary, BSON, UUID } from 'mongodb';
 import { expectType, expectError, expectAssignable } from 'tsd';
@@ -426,7 +426,7 @@ export function autoTypedSchema() {
     decimal1?: Types.Decimal128 | null;
     decimal2?: Types.Decimal128 | null;
     decimal3?: Types.Decimal128 | null;
-  };
+  } & { _id: Types.ObjectId };
 
   const TestSchema = Schema.create({
     string1: String,
@@ -709,7 +709,7 @@ function gh12030() {
   expectType<{
     users: Array<{
       username?: string | null
-    }>;
+    } & { _id: Types.ObjectId }>;
   } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema1>);
 
   const Schema2 = Schema.create({
@@ -734,18 +734,30 @@ function gh12030() {
     } & { _id: Types.ObjectId }>;
   } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema3>);
 
+  type HydratedDoc3 = ObtainSchemaGeneric<typeof Schema3, 'THydratedDocumentType'>;
+  expectType<
+    HydratedDocument<{
+      users: Types.DocumentArray<
+        { credit: number; username?: string | null; } & { _id: Types.ObjectId },
+        Types.Subdocument<Types.ObjectId, unknown, { credit: number; username?: string | null; } & { _id: Types.ObjectId }> & { credit: number; username?: string | null; } & { _id: Types.ObjectId }
+      >;
+    } & { _id: Types.ObjectId }>
+  >({} as HydratedDoc3);
+  expectType<
+    Types.Subdocument<Types.ObjectId, unknown, { credit: number; username?: string | null; } & { _id: Types.ObjectId }> & { credit: number; username?: string | null; } & { _id: Types.ObjectId }
+  >({} as HydratedDoc3['users'][0]);
 
   const Schema4 = Schema.create({
     data: { type: { role: String }, default: {} }
-  });
+  } as const);
 
-  expectType<{ data: { role?: string | null } } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema4>);
+  expectType<{ data: { role?: string | null } & { _id: Types.ObjectId } } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema4>);
 
   const Schema5 = Schema.create({
     data: { type: { role: Object }, default: {} }
   });
 
-  expectType<{ data: { role?: any } } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema5>);
+  expectType<{ data: { role?: any } & { _id: Types.ObjectId } } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema5>);
 
   const Schema6 = Schema.create({
     track: {
@@ -761,11 +773,11 @@ function gh12030() {
   });
 
   expectType<{
-    track?: {
+    track?: ({
       backupCount: number;
       count: number;
-    } | null;
-  }>({} as InferSchemaType<typeof Schema6>);
+    } & { _id: Types.ObjectId }) | null;
+  } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema6>);
 
 }
 
@@ -780,7 +792,7 @@ function pluginOptions() {
   }
 
   const schema = Schema.create({});
-  expectType<Schema<any>>(schema.plugin(pluginFunction)); // test that chaining would be possible
+  expectAssignable<Schema<any>>(schema.plugin(pluginFunction)); // test that chaining would be possible
 
   // could not add strict tests that the parameters are inferred correctly, because i dont know how this would be done in tsd
 
@@ -819,7 +831,7 @@ function gh12205() {
   expectType<Types.ObjectId>(doc.client);
 
   type ICampaign = InferSchemaType<typeof campaignSchema>;
-  expectType<{ client: Types.ObjectId }>({} as ICampaign);
+  expectType<{ client: Types.ObjectId } & { _id: Types.ObjectId }>({} as ICampaign);
 
   type A = ObtainDocumentType<{ client: { type: Schema.Types.ObjectId, required: true } }>;
   expectType<{ client: Types.ObjectId }>({} as A);
@@ -1261,10 +1273,12 @@ function gh14002() {
   }
 
   const userIdTypeHint = 'placeholder' as UserId;
-  const schema = Schema.create({
-    userId: { type: String, required: true, __typehint: userIdTypeHint }
-  });
-  expectType<IUser>({} as InferSchemaType<typeof schema>);
+  const schemaDef = {
+    userId: { type: String, required: true, __rawDocTypeHint: userIdTypeHint, __hydratedDocTypeHint: userIdTypeHint }
+  } as const;
+  const schema = Schema.create(schemaDef);
+  expectType<IUser & { _id: Types.ObjectId }>({} as InferSchemaType<typeof schema>);
+  expectType<UserId>({} as InferHydratedDocType<typeof schemaDef>['userId']);
 }
 
 function gh14028_methods() {
@@ -1621,6 +1635,8 @@ function gh13215() {
   const schema = Schema.create(schemaDefinition, schemaOptions);
   type SchemaType = InferSchemaType<typeof schema>;
   expectType<User>({} as SchemaType);
+  type HydratedDoc = ObtainSchemaGeneric<typeof schema, 'THydratedDocumentType'>;
+  expectType<HydratedDocument<User>>({} as HydratedDoc);
 }
 
 function gh14825() {

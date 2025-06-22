@@ -22,10 +22,10 @@ import {
   Query,
   model,
   ValidateOpts,
-  BufferToBinary,
-  CallbackWithoutResultAndOptionalError
+  CallbackWithoutResultAndOptionalError,
+  InferHydratedDocType
 } from 'mongoose';
-import { BSON, Binary, UUID } from 'mongodb';
+import { Binary, BSON, UUID } from 'mongodb';
 import { expectType, expectError, expectAssignable } from 'tsd';
 import { ObtainDocumentPathType, ResolvePathType } from '../../types/inferschematype';
 
@@ -344,9 +344,9 @@ function gh11435(): void {
 }
 
 // timeSeries
-new Schema({}, { expires: '5 seconds' });
-expectError(new Schema({}, { expireAfterSeconds: '5 seconds' }));
-new Schema({}, { expireAfterSeconds: 5 });
+Schema.create({}, { expires: '5 seconds' });
+expectError(Schema.create({}, { expireAfterSeconds: '5 seconds' }));
+Schema.create({}, { expireAfterSeconds: 5 });
 
 function gh10900(): void {
   type TMenuStatus = Record<string, 'EXPANDED' | 'COLLAPSED'>[];
@@ -426,9 +426,9 @@ export function autoTypedSchema() {
     decimal1?: Types.Decimal128 | null;
     decimal2?: Types.Decimal128 | null;
     decimal3?: Types.Decimal128 | null;
-  };
+  } & { _id: Types.ObjectId };
 
-  const TestSchema = new Schema({
+  const TestSchema = Schema.create({
     string1: String,
     string2: 'String',
     string3: 'string',
@@ -473,30 +473,30 @@ export function autoTypedSchema() {
     decimal1: Schema.Types.Decimal128,
     decimal2: 'Decimal128',
     decimal3: 'decimal128'
-  });
+  } as const);
 
   type InferredTestSchemaType = InferSchemaType<typeof TestSchema>;
 
   expectType<TestSchemaType>({} as InferredTestSchemaType);
 
-  const SchemaWithCustomTypeKey = new Schema({
+  const SchemaWithCustomTypeKey = Schema.create({
     name: {
       customTypeKey: String,
       required: true
     }
   }, {
     typeKey: 'customTypeKey'
-  });
+  } as const);
 
   expectType<string>({} as InferSchemaType<typeof SchemaWithCustomTypeKey>['name']);
 
-  const AutoTypedSchema = new Schema({
+  const AutoTypedSchema = Schema.create({
     userName: {
       type: String,
       required: [true, 'userName is required']
     },
     description: String,
-    nested: new Schema({
+    nested: Schema.create({
       age: {
         type: Number,
         required: true
@@ -523,7 +523,7 @@ export function autoTypedSchema() {
     },
     nestedArray: {
       type: [
-        new Schema({
+        Schema.create({
           date: { type: Date, required: true },
           messages: Number
         })
@@ -583,10 +583,10 @@ const batchSchema = new Schema<{ name: string }>({ name: String }, { discriminat
 batchSchema.discriminator('event', eventSchema);
 
 // discriminator statics
-const eventSchema2 = new Schema({ message: String }, { discriminatorKey: 'kind', statics: { static1: function() {
+const eventSchema2 = Schema.create({ message: String }, { discriminatorKey: 'kind', statics: { static1: function() {
   return 0;
 } } });
-const batchSchema2 = new Schema({ name: String }, { discriminatorKey: 'kind', statics: { static2: function() {
+const batchSchema2 = Schema.create({ name: String }, { discriminatorKey: 'kind', statics: { static2: function() {
   return 1;
 } } });
 batchSchema2.discriminator('event', eventSchema2);
@@ -594,11 +594,11 @@ batchSchema2.discriminator('event', eventSchema2);
 
 function encryptionType() {
   const keyId = new BSON.UUID();
-  expectError<Schema>(new Schema({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'newFakeEncryptionType' }));
-  expectError<Schema>(new Schema({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 1 }));
+  expectError<Schema>(Schema.create({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'newFakeEncryptionType' }));
+  expectError<Schema>(Schema.create({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 1 }));
 
-  expectType<Schema>(new Schema({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'queryableEncryption' }));
-  expectType<Schema>(new Schema({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'csfle' }));
+  expectType<Schema>(Schema.create({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'queryableEncryption' }));
+  expectType<Schema>(Schema.create({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'csfle' }));
 }
 
 function gh11828() {
@@ -645,7 +645,7 @@ function gh12003() {
     versionKey: false
   };
 
-  const BaseSchema = new Schema({
+  const BaseSchema = Schema.create({
     name: String
   }, baseSchemaOptions);
 
@@ -654,7 +654,7 @@ function gh12003() {
   type TSchemaOptions = ResolveSchemaOptions<ObtainSchemaGeneric<typeof BaseSchema, 'TSchemaOptions'>>;
   expectType<'type'>({} as TSchemaOptions['typeKey']);
 
-  expectType<{ name?: string | null }>({} as BaseSchemaType);
+  expectType<{ name?: string | null } & { _id: Types.ObjectId }>({} as BaseSchemaType);
 }
 
 function gh11987() {
@@ -676,7 +676,7 @@ function gh11987() {
 }
 
 function gh12030() {
-  const Schema1 = new Schema({
+  const Schema1 = Schema.create({
     users: [
       {
         username: { type: String }
@@ -707,20 +707,20 @@ function gh12030() {
   }>({} as B);
 
   expectType<{
-    users: Types.DocumentArray<{
+    users: Array<{
       username?: string | null
-    }>;
-  }>({} as InferSchemaType<typeof Schema1>);
+    } & { _id: Types.ObjectId }>;
+  } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema1>);
 
-  const Schema2 = new Schema({
+  const Schema2 = Schema.create({
     createdAt: { type: Date, default: Date.now }
   });
 
-  expectType<{ createdAt: Date }>({} as InferSchemaType<typeof Schema2>);
+  expectType<{ createdAt: Date } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema2>);
 
-  const Schema3 = new Schema({
+  const Schema3 = Schema.create({
     users: [
-      new Schema({
+      Schema.create({
         username: { type: String },
         credit: { type: Number, default: 0 }
       })
@@ -728,26 +728,38 @@ function gh12030() {
   });
 
   expectType<{
-    users: Types.DocumentArray<{
+    users: Array<{
       credit: number;
       username?: string | null;
-    }>;
-  }>({} as InferSchemaType<typeof Schema3>);
+    } & { _id: Types.ObjectId }>;
+  } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema3>);
 
+  type HydratedDoc3 = ObtainSchemaGeneric<typeof Schema3, 'THydratedDocumentType'>;
+  expectType<
+    HydratedDocument<{
+      users: Types.DocumentArray<
+        { credit: number; username?: string | null; } & { _id: Types.ObjectId },
+        Types.Subdocument<Types.ObjectId, unknown, { credit: number; username?: string | null; } & { _id: Types.ObjectId }> & { credit: number; username?: string | null; } & { _id: Types.ObjectId }
+      >;
+    } & { _id: Types.ObjectId }>
+  >({} as HydratedDoc3);
+  expectType<
+    Types.Subdocument<Types.ObjectId, unknown, { credit: number; username?: string | null; } & { _id: Types.ObjectId }> & { credit: number; username?: string | null; } & { _id: Types.ObjectId }
+  >({} as HydratedDoc3['users'][0]);
 
-  const Schema4 = new Schema({
+  const Schema4 = Schema.create({
     data: { type: { role: String }, default: {} }
-  });
+  } as const);
 
-  expectType<{ data: { role?: string | null } }>({} as InferSchemaType<typeof Schema4>);
+  expectType<{ data: { role?: string | null } & { _id: Types.ObjectId } } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema4>);
 
-  const Schema5 = new Schema({
+  const Schema5 = Schema.create({
     data: { type: { role: Object }, default: {} }
   });
 
-  expectType<{ data: { role?: any } }>({} as InferSchemaType<typeof Schema5>);
+  expectType<{ data: { role?: any } & { _id: Types.ObjectId } } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema5>);
 
-  const Schema6 = new Schema({
+  const Schema6 = Schema.create({
     track: {
       backupCount: {
         type: Number,
@@ -761,11 +773,11 @@ function gh12030() {
   });
 
   expectType<{
-    track?: {
+    track?:({
       backupCount: number;
       count: number;
-    } | null;
-  }>({} as InferSchemaType<typeof Schema6>);
+    } & { _id: Types.ObjectId }) | null;
+      } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema6>);
 
 }
 
@@ -779,8 +791,8 @@ function pluginOptions() {
     return; // empty function, to satisfy lint option
   }
 
-  const schema = new Schema({});
-  expectType<Schema<any>>(schema.plugin(pluginFunction)); // test that chaining would be possible
+  const schema = Schema.create({});
+  expectAssignable<Schema<any>>(schema.plugin(pluginFunction)); // test that chaining would be possible
 
   // could not add strict tests that the parameters are inferred correctly, because i dont know how this would be done in tsd
 
@@ -805,7 +817,7 @@ function pluginOptions() {
 }
 
 function gh12205() {
-  const campaignSchema = new Schema(
+  const campaignSchema = Schema.create(
     {
       client: {
         type: new Types.ObjectId(),
@@ -819,7 +831,7 @@ function gh12205() {
   expectType<Types.ObjectId>(doc.client);
 
   type ICampaign = InferSchemaType<typeof campaignSchema>;
-  expectType<{ client: Types.ObjectId }>({} as ICampaign);
+  expectType<{ client: Types.ObjectId } & { _id: Types.ObjectId }>({} as ICampaign);
 
   type A = ObtainDocumentType<{ client: { type: Schema.Types.ObjectId, required: true } }>;
   expectType<{ client: Types.ObjectId }>({} as A);
@@ -836,38 +848,38 @@ function gh12205() {
 
 
 function gh12450() {
-  const ObjectIdSchema = new Schema({
+  const ObjectIdSchema = Schema.create({
     user: { type: Schema.Types.ObjectId }
   });
 
   expectType<{
     user?: Types.ObjectId | null;
-  }>({} as InferSchemaType<typeof ObjectIdSchema>);
+  } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof ObjectIdSchema>);
 
-  const Schema2 = new Schema({
+  const Schema2 = Schema.create({
     createdAt: { type: Date, required: true },
     decimalValue: { type: Schema.Types.Decimal128, required: true }
   });
 
-  expectType<{ createdAt: Date, decimalValue: Types.Decimal128 }>({} as InferSchemaType<typeof Schema2>);
+  expectType<{ createdAt: Date, decimalValue: Types.Decimal128 } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema2>);
 
-  const Schema3 = new Schema({
+  const Schema3 = Schema.create({
     createdAt: { type: Date, required: true },
     decimalValue: { type: Schema.Types.Decimal128 }
   });
 
-  expectType<{ createdAt: Date, decimalValue?: Types.Decimal128 | null }>({} as InferSchemaType<typeof Schema3>);
+  expectType<{ createdAt: Date, decimalValue?: Types.Decimal128 | null } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema3>);
 
-  const Schema4 = new Schema({
+  const Schema4 = Schema.create({
     createdAt: { type: Date },
     decimalValue: { type: Schema.Types.Decimal128 }
   });
 
-  expectType<{ createdAt?: Date | null, decimalValue?: Types.Decimal128 | null }>({} as InferSchemaType<typeof Schema4>);
+  expectType<{ createdAt?: Date | null, decimalValue?: Types.Decimal128 | null } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema4>);
 }
 
 function gh12242() {
-  const dbExample = new Schema(
+  const dbExample = Schema.create(
     {
       active: { type: Number, enum: [0, 1] as const, required: true }
     }
@@ -878,7 +890,7 @@ function gh12242() {
 }
 
 function testInferTimestamps() {
-  const schema = new Schema({
+  const schema = Schema.create({
     name: String
   }, { timestamps: true });
 
@@ -887,9 +899,9 @@ function testInferTimestamps() {
   // an error "Parameter type { createdAt: Date; updatedAt: Date; name?: string | undefined; }
   // is not identical to argument type { createdAt: NativeDate; updatedAt: NativeDate; } &
   // { name?: string | undefined; }"
-  expectType<{ createdAt: Date, updatedAt: Date } & { name?: string | null }>({} as WithTimestamps);
+  expectType<{ createdAt: Date, updatedAt: Date } & { name?: string | null } & { _id: Types.ObjectId }>({} as WithTimestamps);
 
-  const schema2 = new Schema({
+  const schema2 = Schema.create({
     name: String
   }, {
     timestamps: true,
@@ -903,24 +915,24 @@ function testInferTimestamps() {
   // an error "Parameter type { createdAt: Date; updatedAt: Date; name?: string | undefined; }
   // is not identical to argument type { createdAt: NativeDate; updatedAt: NativeDate; } &
   // { name?: string | undefined; }"
-  expectType<{ name?: string | null }>({} as WithTimestamps2);
+  expectType<{ name?: string | null } & { _id: Types.ObjectId }>({} as WithTimestamps2);
 }
 
 function gh12431() {
-  const testSchema = new Schema({
+  const testSchema = Schema.create({
     testDate: { type: Date },
     testDecimal: { type: Schema.Types.Decimal128 }
   });
 
   type Example = InferSchemaType<typeof testSchema>;
-  expectType<{ testDate?: Date | null, testDecimal?: Types.Decimal128 | null }>({} as Example);
+  expectType<{ testDate?: Date | null, testDecimal?: Types.Decimal128 | null } & { _id: Types.ObjectId }>({} as Example);
 }
 
 async function gh12593() {
-  const testSchema = new Schema({ x: { type: Schema.Types.UUID } });
+  const testSchema = Schema.create({ x: { type: Schema.Types.UUID } });
 
   type Example = InferSchemaType<typeof testSchema>;
-  expectType<{ x?: UUID | null }>({} as Example);
+  expectType<{ x?: UUID | null } & { _id: Types.ObjectId }>({} as Example);
 
   const Test = model('Test', testSchema);
 
@@ -933,15 +945,15 @@ async function gh12593() {
   const doc3 = await Test.findOne({}).orFail().lean();
   expectType<UUID | undefined | null>(doc3.x);
 
-  const arrSchema = new Schema({ arr: [{ type: Schema.Types.UUID }] });
+  const arrSchema = Schema.create({ arr: [{ type: Schema.Types.UUID }] });
 
   type ExampleArr = InferSchemaType<typeof arrSchema>;
-  expectType<{ arr: UUID[] }>({} as ExampleArr);
+  expectType<{ arr: UUID[] } & { _id: Types.ObjectId }>({} as ExampleArr);
 }
 
 function gh12562() {
   const emailRegExp = /@/;
-  const userSchema = new Schema(
+  const userSchema = Schema.create(
     {
       email: {
         type: String,
@@ -965,7 +977,7 @@ function gh12562() {
 }
 
 function gh12590() {
-  const UserSchema = new Schema({
+  const UserSchema = Schema.create({
     _password: String
   });
 
@@ -989,7 +1001,7 @@ function gh12611() {
     skills: { type: [Schema.Types.ObjectId], ref: 'Skill', default: [] }
   } as const;
 
-  const firstSchema = new Schema({
+  const firstSchema = Schema.create({
     ...reusableFields,
     anotherField: String
   });
@@ -999,24 +1011,24 @@ function gh12611() {
     description: string;
     skills: Types.ObjectId[];
     anotherField?: string | null;
-  }>({} as Props);
+  } & { _id: Types.ObjectId }>({} as Props);
 }
 
 function gh12782() {
   const schemaObj = { test: { type: String, required: true } };
-  const schema = new Schema(schemaObj);
+  const schema = Schema.create(schemaObj);
   type Props = InferSchemaType<typeof schema>;
   expectType<{
     test: string
-  }>({} as Props);
+  } & { _id: Types.ObjectId }>({} as Props);
 }
 
 function gh12816() {
-  const schema = new Schema({}, { overwriteModels: true });
+  const schema = Schema.create({}, { overwriteModels: true });
 }
 
 function gh12869() {
-  const dbExampleConst = new Schema(
+  const dbExampleConst = Schema.create(
     {
       active: { type: String, enum: ['foo', 'bar'] as const, required: true }
     }
@@ -1025,10 +1037,10 @@ function gh12869() {
   type ExampleConst = InferSchemaType<typeof dbExampleConst>;
   expectType<'foo' | 'bar'>({} as ExampleConst['active']);
 
-  const dbExample = new Schema(
+  const dbExample = Schema.create(
     {
       active: { type: String, enum: ['foo', 'bar'], required: true }
-    }
+    } as const
   );
 
   type Example = InferSchemaType<typeof dbExample>;
@@ -1037,7 +1049,7 @@ function gh12869() {
 
 function gh12882() {
   // Array of strings
-  const arrString = new Schema({
+  const arrString = Schema.create({
     fooArray: {
       type: [{
         type: String,
@@ -1048,7 +1060,7 @@ function gh12882() {
   });
   type tArrString = InferSchemaType<typeof arrString>;
   // Array of numbers using string definition
-  const arrNum = new Schema({
+  const arrNum = Schema.create({
     fooArray: {
       type: [{
         type: 'Number',
@@ -1056,13 +1068,13 @@ function gh12882() {
       }],
       required: true
     }
-  });
+  } as const);
   type tArrNum = InferSchemaType<typeof arrNum>;
   expectType<{
     fooArray: number[]
-  }>({} as tArrNum);
+  } & { _id: Types.ObjectId }>({} as tArrNum);
   // Array of object with key named "type"
-  const arrType = new Schema({
+  const arrType = Schema.create({
     fooArray: {
       type: [{
         type: {
@@ -1079,13 +1091,13 @@ function gh12882() {
   });
   type tArrType = InferSchemaType<typeof arrType>;
   expectType<{
-    fooArray: Types.DocumentArray<{
+    fooArray: Array<{
       type: string;
       foo: number;
-    }>
-  }>({} as tArrType);
+    } & { _id: Types.ObjectId }>
+  } & { _id: Types.ObjectId }>({} as tArrType);
   // Readonly array of strings
-  const rArrString = new Schema({
+  const rArrString = Schema.create({
     fooArray: {
       type: [{
         type: String,
@@ -1097,9 +1109,9 @@ function gh12882() {
   type rTArrString = InferSchemaType<typeof rArrString>;
   expectType<{
     fooArray: string[]
-  }>({} as rTArrString);
+  } & { _id: Types.ObjectId }>({} as rTArrString);
   // Readonly array of numbers using string definition
-  const rArrNum = new Schema({
+  const rArrNum = Schema.create({
     fooArray: {
       type: [{
         type: 'Number',
@@ -1111,9 +1123,9 @@ function gh12882() {
   type rTArrNum = InferSchemaType<typeof rArrNum>;
   expectType<{
     fooArray: number[]
-  }>({} as rTArrNum);
+  } & { _id: Types.ObjectId }>({} as rTArrNum);
   // Readonly array of object with key named "type"
-  const rArrType = new Schema({
+  const rArrType = Schema.create({
     fooArray: {
       type: [{
         type: {
@@ -1130,15 +1142,15 @@ function gh12882() {
   });
   type rTArrType = InferSchemaType<typeof rArrType>;
   expectType<{
-    fooArray: Types.DocumentArray<{
+    fooArray: Array<{
       type: string;
       foo: number;
-    }>
-  }>({} as rTArrType);
+    } & { _id: Types.ObjectId }>
+  } & { _id: Types.ObjectId }>({} as rTArrType);
 }
 
 function gh13534() {
-  const schema = new Schema({
+  const schema = Schema.create({
     myId: { type: Schema.ObjectId, required: true }
   });
   const Test = model('Test', schema);
@@ -1148,7 +1160,7 @@ function gh13534() {
 }
 
 function maps() {
-  const schema = new Schema({
+  const schema = Schema.create({
     myMap: { type: Schema.Types.Map, of: Number, required: true }
   });
   const Test = model('Test', schema);
@@ -1159,7 +1171,7 @@ function maps() {
 }
 
 function gh13514() {
-  const schema = new Schema({
+  const schema = Schema.create({
     email: {
       type: String,
       required: {
@@ -1175,7 +1187,7 @@ function gh13514() {
 }
 
 function gh13633() {
-  const schema = new Schema({ name: String });
+  const schema = Schema.create({ name: String });
 
   schema.pre('updateOne', { document: true, query: false }, function(next) {
   });
@@ -1194,12 +1206,12 @@ function gh13633() {
 }
 
 function gh13702() {
-  const schema = new Schema({ name: String });
+  const schema = Schema.create({ name: String });
   expectType<[IndexDefinition, IndexOptions][]>(schema.indexes());
 }
 
 function gh13780() {
-  const schema = new Schema({ num: Schema.Types.BigInt });
+  const schema = Schema.create({ num: Schema.Types.BigInt });
   type InferredType = InferSchemaType<typeof schema>;
   expectType<bigint | undefined | null>(null as unknown as InferredType['num']);
 }
@@ -1228,7 +1240,7 @@ function gh13800() {
   });
 
   // Auto Typed Schema
-  const autoTypedSchema = new Schema({
+  const autoTypedSchema = Schema.create({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true }
   });
@@ -1243,24 +1255,12 @@ async function gh13797() {
   interface IUser {
     name: string;
   }
-  new Schema<IUser>({
-    name: {
-      type: String,
-      required: function() {
-        expectType<HydratedDocument<IUser>>(this);
-        return true;
-      }
-    }
-  });
-  new Schema<IUser>({
-    name: {
-      type: String,
-      default: function() {
-        expectType<HydratedDocument<IUser>>(this);
-        return '';
-      }
-    }
-  });
+  new Schema<IUser>({ name: { type: String, required: function() {
+    expectType<IUser>(this); return true;
+  } } });
+  new Schema<IUser>({ name: { type: String, default: function() {
+    expectType<IUser>(this); return '';
+  } } });
 }
 
 declare const brand: unique symbol;
@@ -1273,10 +1273,12 @@ function gh14002() {
   }
 
   const userIdTypeHint = 'placeholder' as UserId;
-  const schema = new Schema({
-    userId: { type: String, required: true, __typehint: userIdTypeHint }
-  });
-  expectType<IUser>({} as InferSchemaType<typeof schema>);
+  const schemaDef = {
+    userId: { type: String, required: true, __rawDocTypeHint: userIdTypeHint, __hydratedDocTypeHint: userIdTypeHint }
+  } as const;
+  const schema = Schema.create(schemaDef);
+  expectType<IUser & { _id: Types.ObjectId }>({} as InferSchemaType<typeof schema>);
+  expectType<UserId>({} as InferHydratedDocType<typeof schemaDef>['userId']);
 }
 
 function gh14028_methods() {
@@ -1411,14 +1413,14 @@ function gh13424() {
     subDocArray: { type: [subDoc], required: true }
   };
 
-  const TestModel = model('TestModel', new Schema(testSchema));
+  const TestModel = model('TestModel', Schema.create(testSchema));
 
   const doc = new TestModel({});
   expectType<Types.ObjectId>(doc.subDocArray[0]._id);
 }
 
 function gh14147() {
-  const affiliateSchema = new Schema({
+  const affiliateSchema = Schema.create({
     balance: { type: BigInt, default: BigInt(0) }
   });
 
@@ -1440,7 +1442,7 @@ function gh14235() {
 }
 
 function gh14496() {
-  const schema = new Schema({
+  const schema = Schema.create({
     name: {
       type: String
     }
@@ -1458,7 +1460,7 @@ function gh14496() {
 }
 
 function gh14367() {
-  const UserSchema = new Schema({
+  const UserSchema = Schema.create({
     counts: [Schema.Types.Number],
     roles: [Schema.Types.String],
     dates: [Schema.Types.Date],
@@ -1468,6 +1470,7 @@ function gh14367() {
   type IUser = InferSchemaType<typeof UserSchema>;
 
   const x: IUser = {
+    _id: new Types.ObjectId(),
     counts: [12],
     roles: ['test'],
     dates: [new Date('2016-06-01')],
@@ -1530,7 +1533,7 @@ function gh13772() {
     name: String,
     docArr: [{ name: String }]
   } as const;
-  const schema = new Schema(schemaDefinition);
+  const schema = Schema.create(schemaDefinition);
 
   const TestModel = model('User', schema);
   type RawDocType = InferRawDocType<typeof schemaDefinition>;
@@ -1552,17 +1555,12 @@ function gh14696() {
 
   const x: ValidateOpts<unknown, User> = {
     validator(v: any) {
-      expectAssignable<User | Query<unknown, User>>(this);
-      return !v || this instanceof Query || this.name === 'super admin';
+      expectAssignable<User>(this);
+      return !v || this.name === 'super admin';
     }
   };
 
-  interface IUserMethods {
-    isSuperAdmin(): boolean;
-  }
-
-  type UserModelType = Model<User, {}, IUserMethods>;
-  const userSchema = new Schema<User, UserModelType, IUserMethods>({
+  const userSchema = new Schema<User>({
     name: {
       type: String,
       required: [true, 'Name on card is required']
@@ -1572,11 +1570,8 @@ function gh14696() {
       default: false,
       validate: {
         validator(v: any) {
-          expectAssignable<User | Query<unknown, User>>(this);
-          if (!v) {
-            return true;
-          }
-          return this.get('name') === 'super admin' || (!(this instanceof Query) && this.isSuperAdmin());
+          expectAssignable<User>(this);
+          return !v || this.name === 'super admin';
         }
       }
     },
@@ -1585,12 +1580,8 @@ function gh14696() {
       default: false,
       validate: {
         async validator(v: any) {
-          expectAssignable<User | Query<unknown, User>>(this);
-          if (this instanceof Query) {
-            const doc = await this.clone().findOne().orFail();
-            return doc.isSuperAdmin();
-          }
-          return !v || this.get('name') === 'super admin';
+          expectAssignable<User>(this);
+          return !v || this.name === 'super admin';
         }
       }
     }
@@ -1599,9 +1590,9 @@ function gh14696() {
 }
 
 function gh14748() {
-  const nestedSchema = new Schema({ name: String });
+  const nestedSchema = Schema.create({ name: String });
 
-  const schema = new Schema({
+  const schema = Schema.create({
     arr: [nestedSchema],
     singleNested: nestedSchema
   });
@@ -1637,13 +1628,15 @@ function gh13215() {
     userName: string;
   } & {
     date: Date;
-  };
+  } & { _id: Types.ObjectId };
 
-  expectType<User & { _id: Types.ObjectId }>({} as RawDocType);
+  expectType<User>({} as RawDocType);
 
-  const schema = new Schema(schemaDefinition, schemaOptions);
+  const schema = Schema.create(schemaDefinition, schemaOptions);
   type SchemaType = InferSchemaType<typeof schema>;
   expectType<User>({} as SchemaType);
+  type HydratedDoc = ObtainSchemaGeneric<typeof schema, 'THydratedDocumentType'>;
+  expectType<HydratedDocument<User>>({} as HydratedDoc);
 }
 
 function gh14825() {
@@ -1668,13 +1661,13 @@ function gh14825() {
 
   expectAssignable<User>({} as RawDocType);
 
-  const schema = new Schema(schemaDefinition, schemaOptions);
+  const schema = Schema.create(schemaDefinition, schemaOptions);
   type SchemaType = InferSchemaType<typeof schema>;
   expectAssignable<User>({} as SchemaType);
 }
 
 function gh8389() {
-  const schema = new Schema({ name: String, tags: [String] });
+  const schema = Schema.create({ name: String, tags: [String] });
 
   expectAssignable<SchemaType<any> | undefined>(schema.path('name').getEmbeddedSchemaType());
   expectAssignable<SchemaType<any> | undefined>(schema.path('tags').getEmbeddedSchemaType());
@@ -1685,7 +1678,7 @@ function gh14879() {
 }
 
 async function gh14950() {
-  const SightingSchema = new Schema(
+  const SightingSchema = Schema.create(
     {
       _id: { type: Schema.Types.ObjectId, required: true },
       location: {
@@ -1703,12 +1696,16 @@ async function gh14950() {
 }
 
 async function gh14902() {
-  const exampleSchema = new Schema({
+  const subdocSchema = Schema.create({
+    testBuf: Buffer
+  });
+
+  const exampleSchema = Schema.create({
     image: { type: Buffer },
     subdoc: {
-      type: new Schema({
+      type: Schema.create({
         testBuf: Buffer
-      })
+      } as const)
     }
   });
   const Test = model('Test', exampleSchema);
@@ -1719,12 +1716,12 @@ async function gh14902() {
 }
 
 async function gh14451() {
-  const exampleSchema = new Schema({
+  const exampleSchema = Schema.create({
     myId: { type: 'ObjectId' },
     myRequiredId: { type: 'ObjectId', required: true },
     myBuf: { type: Buffer, required: true },
     subdoc: {
-      type: new Schema({
+      type: Schema.create({
         subdocProp: Date
       })
     },
@@ -1732,14 +1729,13 @@ async function gh14451() {
     myMap: {
       type: Map,
       of: String
-    },
-    myUUID: 'UUID'
-  });
+    }
+  } as const);
 
   const Test = model('Test', exampleSchema);
 
   type TestJSON = JSONSerialized<InferSchemaType<typeof exampleSchema>>;
-  expectType<{
+  expectAssignable<{
     myId?: string | undefined | null,
     myRequiredId: string,
     myBuf: { type: 'buffer', data: number[] },
@@ -1748,12 +1744,12 @@ async function gh14451() {
     } | null,
     docArr: { nums: number[], times: string[] }[],
     myMap?: Record<string, string> | null | undefined,
-    myUUID?: string | null | undefined
+    _id: string
   }>({} as TestJSON);
 }
 
 async function gh12959() {
-  const schema = new Schema({ name: String });
+  const schema = Schema.create({ name: String });
   const TestModel = model('Test', schema);
 
   const doc = await TestModel.findOne().orFail();
@@ -1763,7 +1759,7 @@ async function gh12959() {
 }
 
 async function gh15236() {
-  const schema = new Schema({
+  const schema = Schema.create({
     myNum: { type: Number }
   });
 
@@ -1771,12 +1767,12 @@ async function gh15236() {
 }
 
 function gh15244() {
-  const schema = new Schema({});
-  schema.discriminator('Name', new Schema({}), { value: 'value' });
+  const schema = Schema.create({});
+  schema.discriminator('Name', Schema.create({}), { value: 'value' });
 }
 
 async function schemaDouble() {
-  const schema = new Schema({ balance: 'Double' });
+  const schema = Schema.create({ balance: 'Double' } as const);
   const TestModel = model('Test', schema);
 
   const doc = await TestModel.findOne().orFail();
@@ -1789,7 +1785,7 @@ function gh15301() {
   }
   const userSchema = new Schema<IUser>({
     time: {
-      type: new Schema(
+      type: Schema.create(
         {
           hours: { type: Number, required: true },
           minutes: { type: Number, required: true }
@@ -1815,7 +1811,7 @@ function gh15301() {
 }
 
 function gh15412() {
-  const ScheduleEntrySchema = new Schema({
+  const ScheduleEntrySchema = Schema.create({
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: false }
   });

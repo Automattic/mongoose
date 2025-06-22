@@ -601,6 +601,46 @@ describe('model middleware', function() {
       assert.ok(errors[0].message.includes('duplicate key error'), errors[0].message);
     });
 
+    it('post save error handler gets doc as param (gh-15480)', async function() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        arr: [String]
+      });
+
+      let postSaveErrorCalled = false;
+      let postSaveErrorName = null;
+      let postSaveErrorDoc = undefined;
+
+      // Add post-save error handler
+      userSchema.post('save', function(err, doc, next) {
+        postSaveErrorCalled = true;
+        postSaveErrorName = err && err.name;
+        postSaveErrorDoc = doc;
+        next();
+      });
+
+      const User = db.model('User', userSchema);
+
+      const original = await User.create({ name: 'Alice' });
+      await User.updateOne({ _id: original._id }, { $unset: { arr: 1 } });
+
+      const docA = await User.findById(original._id);
+      const docB = await User.findById(original._id);
+
+      // Modify and save docA to bump __v
+      docA.name = 'Alice A';
+      await docA.save();
+
+      // Now attempt to save docB, which has stale __v
+      docB.name = 'Alice B';
+      const err = await docB.save().then(() => null, err => err);
+      assert.ok(err);
+
+      assert.ok(postSaveErrorCalled, 'post save error handler should be called');
+      assert.equal(postSaveErrorName, 'VersionError');
+      assert.strictEqual(postSaveErrorDoc, docB);
+    });
+
     it('supports skipping wrapped function', async function() {
       const schema = new Schema({ name: String, prop: String });
 

@@ -14727,6 +14727,44 @@ describe('document', function() {
     assert.strictEqual(car.sunroof, true);
   });
 
+  it('merge option for set() only marks changed subpaths as modified (gh-11913)', async function() {
+    const personSchema = new mongoose.Schema({
+      name: {
+        first: String,
+        last: String
+      },
+      haircolor: String,
+      eyecolor: String
+    });
+    const Person = db.model('Person', personSchema);
+
+    const h = {
+      name: {
+        first: 'bob',
+        last: 'jones'
+      },
+      haircolor: 'brown',
+      eyecolor: 'brown'
+    };
+
+    const human = new Person(h);
+    await human.save();
+
+    h.name.first = 'Larry';
+    human.set(h, null, null, { merge: true });
+
+    assert.deepStrictEqual(
+      human.modifiedPaths({ includeChildren: true }).sort(),
+      ['name', 'name.first']
+    );
+    assert.strictEqual(human.isModified('haircolor'), false);
+    assert.strictEqual(human.isModified('eyecolor'), false);
+    assert.strictEqual(human.isModified('name.first'), true);
+    assert.strictEqual(human.isModified('name.last'), false);
+
+    assert.deepStrictEqual(human.getChanges().$set, { 'name.first': 'Larry' });
+  });
+
   it('avoids double validating document arrays underneath single nested (gh-15335)', async function() {
     let arraySubdocValidateCalls = 0;
     let strValidateCalls = 0;

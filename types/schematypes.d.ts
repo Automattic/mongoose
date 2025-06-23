@@ -365,7 +365,7 @@ declare module 'mongoose' {
         discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
 
         /** The schematype embedded in this array */
-        caster?: SchemaType;
+        embeddedSchemaType: SchemaType;
 
         /** Default options for this SchemaType */
         defaultOptions: Record<string, any>;
@@ -457,6 +457,12 @@ declare module 'mongoose' {
 
         /** The schema used for documents in this array */
         schema: Schema;
+
+        /** The schematype embedded in this array */
+        embeddedSchemaType: Subdocument;
+
+        /** The constructor used for subdocuments in this array */
+        Constructor: typeof Types.Subdocument;
 
         /** The constructor used for subdocuments in this array */
         caster?: typeof Types.Subdocument;

@@ -530,6 +530,9 @@ declare module 'mongoose' {
         /** The document's schema */
         schema: Schema;
 
+        /** The constructor used for subdocuments in this array */
+        Constructor: typeof Types.Subdocument;
+
         /** Default options for this SchemaType */
         defaultOptions: Record<string, any>;
 

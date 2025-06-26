@@ -3341,7 +3341,8 @@ describe('schema', function() {
           type: String,
           required: function() { return this.age != null; },
           enum: ['document', 'self-reported']
-        }
+        },
+        any: Object
       }, { autoCreate: false, autoIndex: false });
 
       assert.deepStrictEqual(schema.toJSONSchema({ useBsonType: true }), {
@@ -3359,7 +3360,8 @@ describe('schema', function() {
           ageSource: {
             bsonType: ['string', 'null'],
             enum: ['document', 'self-reported', null]
-          }
+          },
+          any: {}
         }
       });
 
@@ -3379,7 +3381,8 @@ describe('schema', function() {
           ageSource: {
             type: ['string', 'null'],
             enum: ['document', 'self-reported', null]
-          }
+          },
+          any: {}
         }
       });
 
@@ -3390,18 +3393,21 @@ describe('schema', function() {
       });
       const Test = db.model('Test', schema, collectionName);
 
-      const doc1 = await Test.create({ name: 'Taco' });
+      const doc1 = await Test.create({ name: 'Taco', any: null });
       assert.equal(doc1.name, 'Taco');
+      assert.strictEqual(doc1.any, null);
 
-      const doc2 = await Test.create({ name: 'Billy', age: null, ageSource: null });
+      const doc2 = await Test.create({ name: 'Billy', age: null, ageSource: null, any: 42 });
       assert.equal(doc2.name, 'Billy');
       assert.strictEqual(doc2.age, null);
       assert.strictEqual(doc2.ageSource, null);
+      assert.strictEqual(doc2.any, 42);
 
-      const doc3 = await Test.create({ name: 'John', age: 30, ageSource: 'document' });
+      const doc3 = await Test.create({ name: 'John', age: 30, ageSource: 'document', any: { foo: 'bar' } });
       assert.equal(doc3.name, 'John');
       assert.equal(doc3.age, 30);
       assert.equal(doc3.ageSource, 'document');
+      assert.deepStrictEqual(doc3.any, { foo: 'bar' });
 
       await assert.rejects(
         Test.create([{ name: 'Foobar', age: null, ageSource: 'something else' }], { validateBeforeSave: false }),
@@ -3878,15 +3884,6 @@ describe('schema', function() {
           }
         }
       });
-    });
-
-    it('throws error on mixed type', function() {
-      const schema = new Schema({
-        mixed: mongoose.Mixed
-      });
-
-      assert.throws(() => schema.toJSONSchema({ useBsonType: true }), /unsupported SchemaType to JSON Schema: Mixed/);
-      assert.throws(() => schema.toJSONSchema(), /unsupported SchemaType to JSON Schema: Mixed/);
     });
   });
 

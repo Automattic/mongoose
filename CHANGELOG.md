@@ -1,3 +1,11 @@
+8.16.1 / 2025-06-26
+===================
+ * fix(document): avoid setting _skipMarkModified when setting nested path with merge option #15484 #11913
+ * fix(model): make sure post save error handler gets doc as param on VersionError #15483 #15480
+ * fix: consistent $conditionalHandlers setup between schematypes #15490
+ * docs(compatibility): note that mongodb 4.0 is not supported anymore since 8.16.0 #15487 [hasezoey](https://github.com/hasezoey)
+ * docs: remove unnecessary --save flag from npm install instruction #15486 [Thahirgeek](https://github.com/Thahirgeek)
+
 8.16.0 / 2025-06-16
 ===================
  * feat(model): add Model.createSearchIndexes() #15470 #15465

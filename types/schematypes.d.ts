@@ -268,6 +268,9 @@ declare module 'mongoose' {
     /** Array containing default setters for all instances of this SchemaType */
     static setters: ((val?: unknown, priorVal?: unknown, doc?: Document<unknown>, options?: Record<string, any> | null) => unknown)[];
 
+    /** Contains the handlers for different query operators for this schema type. */
+    $conditionalHandlers: { [op: string]: (val: any, context: any) => any };
+
     /** The class that Mongoose uses internally to instantiate this SchemaType's `options` property. */
     OptionsConstructor: SchemaTypeOptions<T>;
 

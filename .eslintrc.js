@@ -77,28 +77,6 @@ module.exports = {
         browser: true
       }
     }
-    // // eslint-plugin-markdown has been disabled because of out-standing issues, see https://github.com/eslint/eslint-plugin-markdown/issues/214
-    // {
-    //   files: ['**/*.md'],
-    //   processor: 'markdown/markdown'
-    // },
-    // {
-    //   files: ['**/*.md/*.js', '**/*.md/*.javascript', '**/*.md/*.ts', '**/*.md/*.typescript'],
-    //   parserOptions: {
-    //     ecmaFeatures: {
-    //       impliedStrict: true
-    //     },
-    //     sourceType: 'module', // required to allow "import" statements
-    //     ecmaVersion: 'latest' // required to allow top-level await
-    //   },
-    //   rules: {
-    //     'no-undef': 'off',
-    //     'no-unused-expressions': 'off',
-    //     'no-unused-vars': 'off',
-    //     'no-redeclare': 'off',
-    //     '@typescript-eslint/no-redeclare': 'off'
-    //   }
-    // }
   ],
   plugins: [
     'mocha-no-only'

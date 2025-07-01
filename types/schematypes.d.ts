@@ -196,13 +196,13 @@ declare module 'mongoose' {
     /** Attaches a validator that succeeds if the data string matches the given regular expression, and fails otherwise. */
     match?: RegExp | [RegExp, string] | readonly [RegExp, string];
 
-    /** If truthy, Mongoose will add a custom setter that lowercases this string using JavaScript's built-in `String#toLowerCase()`. */
+    /** If truthy, Mongoose will add a [custom setter](https://mongoosejs.com/docs/api/schematype.html#SchemaType.prototype.set()) that lowercases this string using JavaScript's built-in `String#toLowerCase()`. */
     lowercase?: boolean;
 
-    /** If truthy, Mongoose will add a custom setter that removes leading and trailing whitespace using JavaScript's built-in `String#trim()`. */
+    /** If truthy, Mongoose will add a [custom setter](https://mongoosejs.com/docs/api/schematype.html#SchemaType.prototype.set()) that removes leading and trailing whitespace using JavaScript's built-in `String#trim()`. */
     trim?: boolean;
 
-    /** If truthy, Mongoose will add a custom setter that uppercases this string using JavaScript's built-in `String#toUpperCase()`. */
+    /** If truthy, Mongoose will add a [custom setter](https://mongoosejs.com/docs/api/schematype.html#SchemaType.prototype.set()) that uppercases this string using JavaScript's built-in `String#toUpperCase()`. */
     uppercase?: boolean;
 
     /** If set, Mongoose will add a custom validator that ensures the given string's `length` is at least the given number. */

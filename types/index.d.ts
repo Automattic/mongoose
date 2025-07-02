@@ -207,7 +207,7 @@ declare module 'mongoose' {
     [k: string]: string;
   }
 
-  export interface ToObjectOptions<THydratedDocumentType = HydratedDocument<unknown>> {
+  export interface ToObjectOptions<RawDocType = unknown, THydratedDocumentType = HydratedDocument<RawDocType>> {
     /** if `options.virtuals = true`, you can set `options.aliases = false` to skip applying aliases. This option is a no-op if `options.virtuals = false`. */
     aliases?: boolean;
     /** if true, replace any conventionally populated paths with the original id in the output. Has no affect on virtual populated paths. */
@@ -225,7 +225,7 @@ declare module 'mongoose' {
     /** if set, mongoose will call this function to allow you to transform the returned object */
     transform?: boolean | ((
       doc: THydratedDocumentType,
-      ret: Record<string, any>,
+      ret: RawDocType,
       options: ToObjectOptions<THydratedDocumentType>
     ) => any);
     /** If true, omits fields that are excluded in this document's projection. Unless you specified a projection, this will omit any field that has `select: false` in the schema. */
@@ -506,7 +506,7 @@ declare module 'mongoose' {
     requiredPaths(invalidate?: boolean): string[];
 
     /** Sets a schema option. */
-    set<K extends keyof SchemaOptions>(key: K, value: SchemaOptions[K], _tags?: any): this;
+    set<K extends keyof SchemaOptions>(key: K, value: SchemaOptions<DocType>[K], _tags?: any): this;
 
     /** Adds static "class" methods to Models compiled from this schema. */
     static<K extends keyof TStaticMethods>(name: K, fn: TStaticMethods[K]): this;

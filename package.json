@@ -42,7 +42,7 @@
     "babel-loader": "8.2.5",
     "broken-link-checker": "^0.7.8",
     "buffer": "^5.6.0",
-    "cheerio": "1.0.0",
+    "cheerio": "1.1.0",
     "crypto-browserify": "3.12.1",
     "dox": "1.0.0",
     "eslint": "8.57.1",

@@ -83,17 +83,18 @@ declare module 'mongoose' {
     collection?: string,
     options?: CompileModelOptions
   ): Model<
-  InferSchemaType<TSchema>,
-  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
-  ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-  ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
-  HydratedDocument<
-  InferSchemaType<TSchema>,
-  ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
-  ObtainSchemaGeneric<TSchema, 'TVirtuals'>
-  >,
-  TSchema
+    InferSchemaType<TSchema>,
+    ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+    ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+    ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+    HydratedDocument<
+      InferSchemaType<TSchema>,
+      ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+      ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+      ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+      ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>
+    >,
+    TSchema
   > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
   export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
@@ -139,7 +140,7 @@ declare module 'mongoose' {
     ? IfAny<U, T & { _id: Types.ObjectId }, T & Required<{ _id: U }>>
     : T & { _id: Types.ObjectId };
 
-  export type Default__v<T> = T extends { __v?: infer U }
+  export type Default__v<T, TSchemaOptions = {}> = TSchemaOptions extends { versionKey: false } ? T : T extends { __v?: infer U }
     ? T
     : T & { __v: number };
 
@@ -148,17 +149,18 @@ declare module 'mongoose' {
     DocType,
     TOverrides = {},
     TQueryHelpers = {},
-    TVirtuals = {}
+    TVirtuals = {},
+    TSchemaOptions = {}
   > = IfAny<
     DocType,
     any,
     TOverrides extends Record<string, never> ?
-      Document<unknown, TQueryHelpers, DocType, TVirtuals> & Default__v<Require_id<DocType>> :
+      Document<unknown, TQueryHelpers, DocType, TVirtuals, TSchemaOptions> & Default__v<Require_id<DocType>, TSchemaOptions> :
       IfAny<
         TOverrides,
-        Document<unknown, TQueryHelpers, DocType, TVirtuals> & Default__v<Require_id<DocType>>,
-        Document<unknown, TQueryHelpers, DocType, TVirtuals> & MergeType<
-          Default__v<Require_id<DocType>>,
+        Document<unknown, TQueryHelpers, DocType, TVirtuals, TSchemaOptions> & Default__v<Require_id<DocType>, TSchemaOptions>,
+        Document<unknown, TQueryHelpers, DocType, TVirtuals, TSchemaOptions> & MergeType<
+          Default__v<Require_id<DocType>, TSchemaOptions>,
           TOverrides
         >
       >
@@ -196,10 +198,11 @@ declare module 'mongoose' {
     >;
 
   export type HydratedDocumentFromSchema<TSchema extends Schema> = HydratedDocument<
-  InferSchemaType<TSchema>,
-  ObtainSchemaGeneric<TSchema, 'TInstanceMethods'> & ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
-  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
-  ObtainSchemaGeneric<TSchema, 'TVirtuals'>
+    InferSchemaType<TSchema>,
+    ObtainSchemaGeneric<TSchema, 'TInstanceMethods'> & ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+    ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+    ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+    ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>
   >;
 
   export interface TagSet {
@@ -272,7 +275,7 @@ declare module 'mongoose' {
       ObtainDocumentType<any, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
       ResolveSchemaOptions<TSchemaOptions>
     >,
-    THydratedDocumentType = HydratedDocument<FlatRecord<DocType>, TVirtuals & TInstanceMethods, {}, TVirtuals>
+    THydratedDocumentType = HydratedDocument<FlatRecord<DocType>, TVirtuals & TInstanceMethods, {}, TVirtuals, ResolveSchemaOptions<TSchemaOptions>>
   >
     extends events.EventEmitter {
     /**

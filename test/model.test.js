@@ -6992,7 +6992,6 @@ describe('Model', function() {
 
   describe('bulkSave() (gh-9673)', function() {
     it('saves new documents', async function() {
-
       const userSchema = new Schema({
         name: { type: String }
       });
@@ -7014,11 +7013,33 @@ describe('Model', function() {
           'Hafez2_gh-9673-1'
         ]
       );
+    });
 
+    it('saves new documents with ordered: false (gh-15495)', async function() {
+      const userSchema = new Schema({
+        name: { type: String }
+      });
+
+      const User = db.model('User', userSchema);
+
+
+      await User.bulkSave([
+        new User({ name: 'Hafez1_gh-9673-1' }),
+        new User({ name: 'Hafez2_gh-9673-1' })
+      ], { ordered: false });
+
+      const users = await User.find().sort('name');
+
+      assert.deepEqual(
+        users.map(user => user.name),
+        [
+          'Hafez1_gh-9673-1',
+          'Hafez2_gh-9673-1'
+        ]
+      );
     });
 
     it('updates documents', async function() {
-
       const userSchema = new Schema({
         name: { type: String }
       });
@@ -7038,6 +7059,38 @@ describe('Model', function() {
       users[1].name = 'Hafez2_gh-9673-2-updated';
 
       await User.bulkSave(users);
+
+      const usersAfterUpdate = await User.find().sort('name');
+
+      assert.deepEqual(
+        usersAfterUpdate.map(user => user.name),
+        [
+          'Hafez1_gh-9673-2-updated',
+          'Hafez2_gh-9673-2-updated',
+          'Hafez3_gh-9673-2'
+        ]
+      );
+    });
+
+    it('updates documents with ordered: false (gh-15495)', async function() {
+      const userSchema = new Schema({
+        name: { type: String }
+      });
+
+      const User = db.model('User', userSchema);
+
+      await User.insertMany([
+        new User({ name: 'Hafez1_gh-9673-2' }),
+        new User({ name: 'Hafez2_gh-9673-2' }),
+        new User({ name: 'Hafez3_gh-9673-2' })
+      ]);
+
+      const users = await User.find().sort('name');
+
+      users[0].name = 'Hafez1_gh-9673-2-updated';
+      users[1].name = 'Hafez2_gh-9673-2-updated';
+
+      await User.bulkSave(users, { ordered: false });
 
       const usersAfterUpdate = await User.find().sort('name');
 

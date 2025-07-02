@@ -17,7 +17,7 @@
 Next install Mongoose from the command line using `npm`:
 
 ```sh
-npm install mongoose --save
+npm install mongoose
 ```
 
 Now say we like fuzzy kittens and want to record every kitten we ever meet

@@ -1838,3 +1838,32 @@ function defaultReturnsUndefined() {
     }
   });
 }
+
+function gh15479() {
+  const TestSchema = new Schema({
+    name: String,
+    testField: {
+      type: String,
+      required: true,
+      default: 'blah'
+    }
+  });
+
+  function transform(doc: unknown, ret: InferSchemaType<typeof TestSchema>) {
+    const { testField, ...val } = ret;
+    return val;
+  }
+
+  TestSchema.set('toJSON', { transform });
+
+  const TestModel = model('Test', TestSchema);
+
+  const doc = new TestModel();
+
+  getTestField(doc.toJSON<ReturnType<typeof transform> & { testField: string }>());
+  expectError(getTestField(doc.toJSON<ReturnType<typeof transform>>()));
+
+  function getTestField(obj: { testField: string }) {
+    return obj.testField;
+  }
+}

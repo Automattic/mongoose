@@ -293,7 +293,7 @@ describe('model middleware', function() {
       title: String
     });
 
-    schema.post('save', function() {
+    schema.post('save', function postSaveTestError() {
       throw new Error('woops!');
     });
 
@@ -320,7 +320,7 @@ describe('model middleware', function() {
 
     schema.pre('save', function(next) {
       next();
-      // This error will not get reported, because you already called next()
+      // Error takes precedence over next()
       throw new Error('woops!');
     });
 
@@ -333,8 +333,8 @@ describe('model middleware', function() {
 
     const test = new TestMiddleware({ title: 'Test' });
 
-    await test.save();
-    assert.equal(called, 1);
+    await assert.rejects(test.save(), /woops!/);
+    assert.equal(called, 0);
   });
 
   it('validate + remove', async function() {
@@ -414,6 +414,36 @@ describe('model middleware', function() {
     assert.equal(docs[0].name, 'foo');
     assert.equal(preCalled, 1);
     assert.equal(postCalled, 1);
+  });
+
+  it('static hooks async stack traces (gh-15317) (gh-5982)', async function staticHookAsyncStackTrace() {
+    const schema = new Schema({
+      name: String
+    });
+
+    schema.statics.findByName = function() {
+      return this.find({ otherProp: { $notAnOperator: 'value' } });
+    };
+
+    let preCalled = 0;
+    schema.pre('findByName', function() {
+      ++preCalled;
+    });
+
+    let postCalled = 0;
+    schema.post('findByName', function() {
+      ++postCalled;
+    });
+
+    const Model = db.model('Test', schema);
+
+    await Model.create({ name: 'foo' });
+
+    const err = await Model.findByName('foo').then(() => null, err => err);
+    assert.equal(err.name, 'MongoServerError');
+    assert.ok(err.stack.includes('staticHookAsyncStackTrace'));
+    assert.equal(preCalled, 1);
+    assert.equal(postCalled, 0);
   });
 
   it('deleteOne hooks (gh-7538)', async function() {
@@ -569,6 +599,46 @@ describe('model middleware', function() {
       assert.equal(errors.length, 1);
       assert.equal(errors[0].name, 'MongoBulkWriteError');
       assert.ok(errors[0].message.includes('duplicate key error'), errors[0].message);
+    });
+
+    it('post save error handler gets doc as param (gh-15480)', async function() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        arr: [String]
+      });
+
+      let postSaveErrorCalled = false;
+      let postSaveErrorName = null;
+      let postSaveErrorDoc = undefined;
+
+      // Add post-save error handler
+      userSchema.post('save', function(err, doc, next) {
+        postSaveErrorCalled = true;
+        postSaveErrorName = err && err.name;
+        postSaveErrorDoc = doc;
+        next();
+      });
+
+      const User = db.model('User', userSchema);
+
+      const original = await User.create({ name: 'Alice' });
+      await User.updateOne({ _id: original._id }, { $unset: { arr: 1 } });
+
+      const docA = await User.findById(original._id);
+      const docB = await User.findById(original._id);
+
+      // Modify and save docA to bump __v
+      docA.name = 'Alice A';
+      await docA.save();
+
+      // Now attempt to save docB, which has stale __v
+      docB.name = 'Alice B';
+      const err = await docB.save().then(() => null, err => err);
+      assert.ok(err);
+
+      assert.ok(postSaveErrorCalled, 'post save error handler should be called');
+      assert.equal(postSaveErrorName, 'VersionError');
+      assert.strictEqual(postSaveErrorDoc, docB);
     });
 
     it('supports skipping wrapped function', async function() {

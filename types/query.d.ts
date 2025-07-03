@@ -1,7 +1,23 @@
 declare module 'mongoose' {
   import mongodb = require('mongodb');
 
-  export type Condition<T> = T | QuerySelector<T | any> | any;
+  type StringQueryTypeCasting = string | RegExp;
+  type ObjectIdQueryTypeCasting = Types.ObjectId | string;
+  type UUIDQueryTypeCasting = Types.UUID | string;
+  type BufferQueryCasting = Buffer | mongodb.Binary | number[] | string | { $binary: string | mongodb.Binary };
+  type QueryTypeCasting<T> = T extends string
+    ? StringQueryTypeCasting
+    : T extends Types.ObjectId
+      ? ObjectIdQueryTypeCasting
+      : T extends Types.UUID
+        ? UUIDQueryTypeCasting
+        : T extends Buffer
+          ? BufferQueryCasting
+          : T;
+
+  export type ApplyBasicQueryCasting<T> = T | T[] | (T extends (infer U)[] ? QueryTypeCasting<U> : T);
+
+  export type Condition<T> = ApplyBasicQueryCasting<QueryTypeCasting<T>> | QuerySelector<ApplyBasicQueryCasting<QueryTypeCasting<T>>>;
 
   /**
    * Filter query to select the documents that match the query
@@ -10,11 +26,9 @@ declare module 'mongoose' {
    * { age: { $gte: 30 } }
    * ```
    */
-  type RootFilterQuery<T> = FilterQuery<T> | Query<any, any> | Types.ObjectId;
+  type RootFilterQuery<T> = FilterQuery<T>;
 
-  type FilterQuery<T> = {
-    [P in keyof T]?: Condition<T[P]>;
-  } & RootQuerySelector<T> & { _id?: Condition<string>; };
+  type FilterQuery<T> = { [P in keyof T]?: Condition<T[P]>; } & RootQuerySelector<T>;
 
   type MongooseBaseQueryOptionKeys =
     | 'context'
@@ -58,13 +72,13 @@ declare module 'mongoose' {
 
   type QuerySelector<T> = {
     // Comparison
-    $eq?: T;
+    $eq?: T | null | undefined;
     $gt?: T;
     $gte?: T;
     $in?: [T] extends AnyArray<any> ? Unpacked<T>[] : T[];
     $lt?: T;
     $lte?: T;
-    $ne?: T;
+    $ne?: T | null | undefined;
     $nin?: [T] extends AnyArray<any> ? Unpacked<T>[] : T[];
     // Logical
     $not?: T extends string ? QuerySelector<T> | RegExp : QuerySelector<T>;

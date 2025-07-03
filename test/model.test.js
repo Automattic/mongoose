@@ -558,7 +558,7 @@ describe('Model', function() {
       let post;
       try {
         post = new BlogPost({ date: 'Test', meta: { date: 'Test' } });
-      } catch (e) {
+      } catch {
         threw = true;
       }
 
@@ -566,7 +566,7 @@ describe('Model', function() {
 
       try {
         post.set('title', 'Test');
-      } catch (e) {
+      } catch {
         threw = true;
       }
 
@@ -591,7 +591,7 @@ describe('Model', function() {
             date: 'Test'
           }
         });
-      } catch (e) {
+      } catch {
         threw = true;
       }
 
@@ -599,7 +599,7 @@ describe('Model', function() {
 
       try {
         post.set('meta.date', 'Test');
-      } catch (e) {
+      } catch {
         threw = true;
       }
 
@@ -657,7 +657,7 @@ describe('Model', function() {
         post.get('comments').push({
           date: 'Bad date'
         });
-      } catch (e) {
+      } catch {
         threw = true;
       }
 
@@ -1313,7 +1313,7 @@ describe('Model', function() {
           JSON.stringify(meta);
           getter1 = JSON.stringify(post.get('meta'));
           getter2 = JSON.stringify(post.meta);
-        } catch (err) {
+        } catch {
           threw = true;
         }
 
@@ -2154,10 +2154,15 @@ describe('Model', function() {
           next();
         });
 
+        let schemaPostSaveCalls = 0;
         const schema = new Schema({ name: String, child: [childSchema] });
         schema.pre('save', function(next) {
           this.name = 'parent';
           next();
+        });
+        schema.post('save', function testSchemaPostSave(err, res, next) {
+          ++schemaPostSaveCalls;
+          next(err);
         });
 
         const S = db.model('Test', schema);
@@ -2165,6 +2170,7 @@ describe('Model', function() {
 
         const err = await s.save().then(() => null, err => err);
         assert.equal(err.message, 'Error 101');
+        assert.equal(schemaPostSaveCalls, 1);
       });
 
       describe('init', function() {
@@ -2397,7 +2403,7 @@ describe('Model', function() {
       let threw = false;
       try {
         new P({ path: 'i should not throw' });
-      } catch (err) {
+      } catch {
         threw = true;
       }
 
@@ -6992,7 +6998,6 @@ describe('Model', function() {
 
   describe('bulkSave() (gh-9673)', function() {
     it('saves new documents', async function() {
-
       const userSchema = new Schema({
         name: { type: String }
       });
@@ -7014,11 +7019,33 @@ describe('Model', function() {
           'Hafez2_gh-9673-1'
         ]
       );
+    });
 
+    it('saves new documents with ordered: false (gh-15495)', async function() {
+      const userSchema = new Schema({
+        name: { type: String }
+      });
+
+      const User = db.model('User', userSchema);
+
+
+      await User.bulkSave([
+        new User({ name: 'Hafez1_gh-9673-1' }),
+        new User({ name: 'Hafez2_gh-9673-1' })
+      ], { ordered: false });
+
+      const users = await User.find().sort('name');
+
+      assert.deepEqual(
+        users.map(user => user.name),
+        [
+          'Hafez1_gh-9673-1',
+          'Hafez2_gh-9673-1'
+        ]
+      );
     });
 
     it('updates documents', async function() {
-
       const userSchema = new Schema({
         name: { type: String }
       });
@@ -7038,6 +7065,38 @@ describe('Model', function() {
       users[1].name = 'Hafez2_gh-9673-2-updated';
 
       await User.bulkSave(users);
+
+      const usersAfterUpdate = await User.find().sort('name');
+
+      assert.deepEqual(
+        usersAfterUpdate.map(user => user.name),
+        [
+          'Hafez1_gh-9673-2-updated',
+          'Hafez2_gh-9673-2-updated',
+          'Hafez3_gh-9673-2'
+        ]
+      );
+    });
+
+    it('updates documents with ordered: false (gh-15495)', async function() {
+      const userSchema = new Schema({
+        name: { type: String }
+      });
+
+      const User = db.model('User', userSchema);
+
+      await User.insertMany([
+        new User({ name: 'Hafez1_gh-9673-2' }),
+        new User({ name: 'Hafez2_gh-9673-2' }),
+        new User({ name: 'Hafez3_gh-9673-2' })
+      ]);
+
+      const users = await User.find().sort('name');
+
+      users[0].name = 'Hafez1_gh-9673-2-updated';
+      users[1].name = 'Hafez2_gh-9673-2-updated';
+
+      await User.bulkSave(users, { ordered: false });
 
       const usersAfterUpdate = await User.find().sort('name');
 

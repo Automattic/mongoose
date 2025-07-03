@@ -33,6 +33,7 @@ declare module 'mongoose' {
   import events = require('events');
   import mongodb = require('mongodb');
   import mongoose = require('mongoose');
+  import bson = require('bson');
 
   export type Mongoose = typeof mongoose;
 
@@ -207,7 +208,7 @@ declare module 'mongoose' {
     [k: string]: string;
   }
 
-  export interface ToObjectOptions<THydratedDocumentType = HydratedDocument<unknown>> {
+  export interface ToObjectOptions<RawDocType = unknown, THydratedDocumentType = HydratedDocument<RawDocType>> {
     /** if `options.virtuals = true`, you can set `options.aliases = false` to skip applying aliases. This option is a no-op if `options.virtuals = false`. */
     aliases?: boolean;
     /** if true, replace any conventionally populated paths with the original id in the output. Has no affect on virtual populated paths. */
@@ -225,7 +226,7 @@ declare module 'mongoose' {
     /** if set, mongoose will call this function to allow you to transform the returned object */
     transform?: boolean | ((
       doc: THydratedDocumentType,
-      ret: Record<string, any>,
+      ret: Default__v<Require_id<RawDocType>>,
       options: ToObjectOptions<THydratedDocumentType>
     ) => any);
     /** If true, omits fields that are excluded in this document's projection. Unless you specified a projection, this will omit any field that has `select: false` in the schema. */
@@ -555,7 +556,7 @@ declare module 'mongoose' {
     requiredPaths(invalidate?: boolean): string[];
 
     /** Sets a schema option. */
-    set<K extends keyof SchemaOptions>(key: K, value: SchemaOptions[K], _tags?: any): this;
+    set<K extends keyof SchemaOptions>(key: K, value: SchemaOptions<DocType>[K], _tags?: any): this;
 
     /** Adds static "class" methods to Models compiled from this schema. */
     static<K extends keyof TStaticMethods>(name: K, fn: TStaticMethods[K]): this;
@@ -609,7 +610,7 @@ declare module 'mongoose' {
     | SchemaDefinition<T, EnforcedDocType, THydratedDocumentType>
     | SchemaDefinition<Unpacked<T>, EnforcedDocType, THydratedDocumentType>[]
     | typeof Schema.Types.Mixed
-    | MixedSchemaTypeOptions<EnforcedDocType>;
+    | MixedSchemaTypeOptions<EnforcedDocType, THydratedDocumentType>;
 
   export type SchemaDefinition<T = undefined, EnforcedDocType = any, THydratedDocumentType = HydratedDocument<EnforcedDocType>> = T extends undefined
     ? { [path: string]: SchemaDefinitionProperty; }
@@ -618,7 +619,7 @@ declare module 'mongoose' {
   export type AnyArray<T> = T[] | ReadonlyArray<T>;
   export type ExtractMongooseArray<T> = T extends Types.Array<any> ? AnyArray<Unpacked<T>> : T;
 
-  export interface MixedSchemaTypeOptions<EnforcedDocType> extends SchemaTypeOptions<Schema.Types.Mixed, EnforcedDocType> {
+  export interface MixedSchemaTypeOptions<EnforcedDocType, THydratedDocumentType> extends SchemaTypeOptions<Schema.Types.Mixed, EnforcedDocType, THydratedDocumentType> {
     type: typeof Schema.Types.Mixed;
   }
 
@@ -852,6 +853,25 @@ declare module 'mongoose' {
                     : BufferToBinary<T[K]>;
           } : T;
 
+    /**
+    * Converts any Buffer properties into "{ type: 'buffer', data: [1, 2, 3] }" format for JSON serialization
+    */
+    export type UUIDToJSON<T> = T extends bson.UUID
+      ? string
+      : T extends Document
+        ? T
+        : T extends TreatAsPrimitives
+          ? T
+          : T extends Record<string, any> ? {
+            [K in keyof T]: T[K] extends bson.UUID
+              ? string
+              : T[K] extends Types.DocumentArray<infer ItemType>
+                  ? Types.DocumentArray<UUIDToJSON<ItemType>>
+                  : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+                    ? HydratedSingleSubdocument<SubdocType>
+                    : UUIDToJSON<T[K]>;
+          } : T;
+
   /**
    * Converts any ObjectId properties into strings for JSON serialization
    */
@@ -911,7 +931,9 @@ declare module 'mongoose' {
     FlattenMaps<
       BufferToJSON<
         ObjectIdToString<
-          DateToString<T>
+          UUIDToJSON<
+            DateToString<T>
+          >
         >
       >
     >

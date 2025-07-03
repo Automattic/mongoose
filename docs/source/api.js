@@ -400,7 +400,7 @@ function processFile(props) {
       console.warn(`Property "${ctx.name}" in "${ctx.constructor}" has both instance and static JSDOC markings (most likely both @instance and @static)! (File: "${props.file}")`);
     }
 
-    // the following if-else-if statement is in this order, because there are more "instance" methods thans static
+    // the following if-else-if statement is in this order, because there are more "instance" methods than static
     // the following condition will be true if "isInstance = true" or if "isInstance = false && isStatic = false" AND "ctx.string" are empty or not defined
     // if "isStatic" and "isInstance" are falsy and "ctx.string" is not falsy, then rely on the "ctx.string" set by "dox"
     if (ctx.isInstance || (!ctx.isStatic && !ctx.isInstance && (!ctx.string || ctx.constructorWasUndefined))) {

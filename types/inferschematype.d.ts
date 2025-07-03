@@ -247,7 +247,9 @@ type IsSchemaTypeFromBuiltinClass<T> = T extends (typeof String)
                                         ? false
                                         : T extends Buffer
                                           ? true
-                                          : false;
+                                          : T extends Types.UUID
+                                            ? true
+                                            : false;
 
 /**
  * @summary Resolve path type by returning the corresponding type.
@@ -313,9 +315,9 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
                                             IfEquals<PathValueType, Schema.Types.BigInt> extends true ? bigint :
                                               IfEquals<PathValueType, BigInt> extends true ? bigint :
                                                 PathValueType extends 'bigint' | 'BigInt' | typeof Schema.Types.BigInt | typeof BigInt ? bigint :
-                                                  PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? Buffer :
+                                                  PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? Types.UUID :
                                                     PathValueType extends 'double' | 'Double' | typeof Schema.Types.Double ? Types.Double :
-                                                      IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
+                                                      IfEquals<PathValueType, Schema.Types.UUID> extends true ? Types.UUID :
                                                         PathValueType extends MapConstructor | 'Map' ? Map<string, ResolvePathType<Options['of']>> :
                                                           IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ResolvePathType<Options['of']>> :
                                                             PathValueType extends ArrayConstructor ? any[] :

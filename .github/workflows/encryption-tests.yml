@@ -1,10 +1,22 @@
 name: Encryption Tests 
 
 on:
-  push: 
-    branches: ['master']
   pull_request:
-    branches: [ 'master', 'csfle' ]
+    paths:
+      - ".github/workflows/encryption-tests.yml"
+      - "package.json"
+      - "index.js"
+      - "lib/**"
+      - "test/encryption/**.js"
+      - "scripts/setup-encryption-tests.js"
+  push:
+    paths:
+      - ".github/workflows/encryption-tests.yml"
+      - "package.json"
+      - "index.js"
+      - "lib/**"
+      - "test/encryption/**.js"
+      - "scripts/setup-encryption-tests.js"
   workflow_dispatch: {}
 
 permissions:

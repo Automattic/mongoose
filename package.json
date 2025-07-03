@@ -55,13 +55,7 @@
     "ncp": "^2.0.0",
     "nyc": "15.1.0",
     "pug": "3.0.3",
-<<<<<<< HEAD
-    "sinon": "20.0.0",
-=======
-    "q": "1.5.1",
     "sinon": "21.0.0",
-    "stream-browserify": "3.0.0",
->>>>>>> master
     "tsd": "0.32.0",
     "typescript": "5.8.3",
     "typescript-eslint": "^8.31.1",

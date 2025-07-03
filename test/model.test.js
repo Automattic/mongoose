@@ -5118,23 +5118,10 @@ describe('Model', function() {
         );
       });
 
-      it('syncIndexes() allows overwriting `background` option (gh-8645)', async function() {
-        const opts = { autoIndex: false };
-        const schema = new Schema({ name: String }, opts);
-        schema.index({ name: 1 }, { background: true });
-
-        const M = db.model('Test', schema);
-        await M.syncIndexes({ background: false });
-
-        const indexes = await M.listIndexes();
-        assert.deepEqual(indexes[1].key, { name: 1 });
-        assert.strictEqual(indexes[1].background, false);
-      });
-
       it('syncIndexes() does not call createIndex for indexes that already exist', async function() {
         const opts = { autoIndex: false };
         const schema = new Schema({ name: String }, opts);
-        schema.index({ name: 1 }, { background: true });
+        schema.index({ name: 1 });
 
         const M = db.model('Test', schema);
         await M.syncIndexes();
@@ -5253,9 +5240,9 @@ describe('Model', function() {
         const BuyEvent = Event.discriminator('BuyEvent', buyEventSchema);
 
         // Act
-        const droppedByEvent = await Event.syncIndexes({ background: false });
-        const droppedByClickEvent = await ClickEvent.syncIndexes({ background: false });
-        const droppedByBuyEvent = await BuyEvent.syncIndexes({ background: false });
+        const droppedByEvent = await Event.syncIndexes();
+        const droppedByClickEvent = await ClickEvent.syncIndexes();
+        const droppedByBuyEvent = await BuyEvent.syncIndexes();
 
         const eventIndexes = await Event.listIndexes();
 

@@ -9202,7 +9202,7 @@ describe('model: populate:', function() {
       assert.equal(docs[1].items[0].foo.title, 'doc1');
     });
 
-    it('Sets the populated document\'s parent() (gh-8092)', async function() {
+    it('Sets the populated document\'s parent() (gh-15494) (gh-8092)', async function() {
       const schema = new Schema({
         single: { type: Number, ref: 'Child' },
         arr: [{ type: Number, ref: 'Child' }],
@@ -9244,6 +9244,16 @@ describe('model: populate:', function() {
       await doc.populate('single');
       assert.ok(doc.single.parent() === doc);
       assert.ok(doc.single.$parent() === doc);
+
+      let cursor = await Parent.find().populate('single').cursor();
+      doc = await cursor.next();
+      assert.ok(doc.single.parent() === doc);
+      assert.ok(doc.single.$parent() === doc);
+
+      cursor = await Parent.find().populate('arr').cursor();
+      doc = await cursor.next();
+      assert.ok(doc.arr[0].parent() === doc);
+      assert.ok(doc.arr[0].$parent() === doc);
     });
 
     it('populates single nested discriminator underneath doc array when populated docs have different model but same id (gh-9244)', async function() {

@@ -1792,7 +1792,7 @@ function gh15301() {
   interface IUser {
     time: { hours: number, minutes: number }
   }
-  const userSchema = new Schema<IUser>({
+  const userSchema = Schema.create({
     time: {
       type: Schema.create(
         {
@@ -1812,7 +1812,7 @@ function gh15301() {
   };
 
   userSchema.pre('init', function(rawDoc) {
-    expectType<IUser>(rawDoc);
+    expectAssignable<IUser>(rawDoc);
     if (typeof rawDoc.time === 'string') {
       rawDoc.time = timeStringToObject(rawDoc.time);
     }
@@ -1836,7 +1836,7 @@ function gh15412() {
 }
 
 function defaultReturnsUndefined() {
-  const schema = new Schema<{ arr: number[] }>({
+  const schema = Schema.create({
     arr: {
       type: [Number],
       default: () => void 0

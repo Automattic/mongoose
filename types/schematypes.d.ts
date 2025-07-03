@@ -464,9 +464,6 @@ declare module 'mongoose' {
         /** The constructor used for subdocuments in this array */
         Constructor: typeof Types.Subdocument;
 
-        /** The constructor used for subdocuments in this array */
-        caster?: typeof Types.Subdocument;
-
         /** Default options for this SchemaType */
         defaultOptions: Record<string, any>;
       }
@@ -530,7 +527,7 @@ declare module 'mongoose' {
         /** The document's schema */
         schema: Schema;
 
-        /** The constructor used for subdocuments in this array */
+        /** The constructor used to create subdocuments based on this schematype */
         Constructor: typeof Types.Subdocument;
 
         /** Default options for this SchemaType */

@@ -150,11 +150,11 @@ describe('encryption integration tests', () => {
         isEncryptedValue(encryptedDoc, 'field');
 
         const doc = await model.findOne({ _id });
-        if (Buffer.isBuffer(input)) {
+        if (Buffer.isBuffer(input) || input instanceof UUID) {
           // mongoose's Buffer does not support deep equality - instead use the Buffer.equals method.
           assert.ok(doc.field.equals(input));
         } else {
-          assert.deepEqual(doc.field.toString(), expected ?? input);
+          assert.deepEqual(doc.field, expected ?? input);
         }
       }
 

@@ -76,7 +76,7 @@ declare module 'mongoose' {
 
   type ApplySchemaOptions<T, O = DefaultSchemaOptions> = ResolveTimestamps<T, O>;
 
-  type ResolveTimestamps<T, O> = O extends { methods: any } | { statics: any } | { virtuals: any } | { timestamps?: false } ? T
+  type ResolveTimestamps<T, O> = O extends { timestamps: false } ? T
     // For some reason, TypeScript sets all the document properties to unknown
     // if we use methods, statics, or virtuals. So avoid inferring timestamps
     // if any of these are set for now. See gh-12807

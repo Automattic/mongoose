@@ -899,11 +899,7 @@ function testInferTimestamps() {
   });
 
   type WithTimestamps2 = InferSchemaType<typeof schema2>;
-  // For some reason, expectType<{ createdAt: Date, updatedAt: Date, name?: string }> throws
-  // an error "Parameter type { createdAt: Date; updatedAt: Date; name?: string | undefined; }
-  // is not identical to argument type { createdAt: NativeDate; updatedAt: NativeDate; } &
-  // { name?: string | undefined; }"
-  expectType<{ name?: string | null }>({} as WithTimestamps2);
+  expectType<{ createdAt: Date, updatedAt: Date } & { name?: string | null }>({} as WithTimestamps2);
 }
 
 function gh12431() {

@@ -154,7 +154,7 @@ describe('encryption integration tests', () => {
           // mongoose's Buffer does not support deep equality - instead use the Buffer.equals method.
           assert.ok(doc.field.equals(input));
         } else {
-          assert.deepEqual(doc.field, expected ?? input);
+          assert.deepEqual(doc.field.toString(), expected ?? input);
         }
       }
 

@@ -239,6 +239,26 @@ await test.save();
 test.uuid; // string
 ```
 
+### SchemaType caster and casterConstructor properties were removed
+
+In Mongoose 8, certain schema type instances had a `caster` property which contained either the embedded schema type or embedded subdocument constructor.
+In Mongoose 9, to make types and internal logic more consistent, we removed the `caster` property in favor of `embeddedSchemaType` and `Constructor`.
+
+```javascript
+const schema = new mongoose.Schema({ docArray: [new mongoose.Schema({ name: String })], arr: [String] });
+
+// In Mongoose 8:
+console.log(schema.path('arr').caster); // String SchemaType
+console.log(schema.path('docArray').caster); // EmbeddedDocument constructor
+
+// In Mongoose 9:
+console.log(schema.path('arr').embeddedSchemaType); // SchemaString
+console.log(schema.path('docArray').embeddedSchemaType); // SchemaDocumentArrayElement
+
+console.log(schema.path('arr').Constructor); // undefined
+console.log(schema.path('docArray').Constructor); // EmbeddedDocument constructor
+```
+
 ## TypeScript
 
 ### FilterQuery Properties No Longer Resolve to any

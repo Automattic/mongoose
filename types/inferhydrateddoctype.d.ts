@@ -9,6 +9,9 @@ import {
 import { UUID } from 'mongodb';
 
 declare module 'mongoose' {
+  /**
+   * Given a schema definition, returns the hydrated document type from the schema definition.
+   */
   export type InferHydratedDocType<
     DocDefinition,
     TSchemaOptions extends Record<any, any> = DefaultSchemaOptions
@@ -60,8 +63,8 @@ declare module 'mongoose' {
    * @summary Resolve path type by returning the corresponding type.
    * @param {PathValueType} PathValueType Document definition path type.
    * @param {Options} Options Document definition path options except path type.
-   * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
-   * @returns Number, "Number" or "number" will be resolved to number type.
+   * @param {TypeKey} TypeKey A generic of literal string type. Refers to the property used for path type definition.
+   * @returns Type
    */
   type ResolveHydratedPathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}, TypeKey extends string = DefaultSchemaOptions['typeKey'], TypeHint = never> =
   IfEquals<TypeHint, never,

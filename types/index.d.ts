@@ -283,6 +283,7 @@ declare module 'mongoose' {
      */
     constructor(definition?: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType, THydratedDocumentType> | DocType, options?: SchemaOptions<FlatRecord<DocType>, TInstanceMethods, TQueryHelpers, TStaticMethods, TVirtuals, THydratedDocumentType> | ResolveSchemaOptions<TSchemaOptions>);
 
+    /* Creates a new schema with the given definition and options. Equivalent to `new Schema(definition, options)`, but with better automatic type inference. */
     static create<
       TSchemaDefinition extends SchemaDefinition<undefined, RawDocType, THydratedDocumentType>,
       TSchemaOptions extends DefaultSchemaOptions,

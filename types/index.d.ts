@@ -225,7 +225,7 @@ declare module 'mongoose' {
     /** if set, mongoose will call this function to allow you to transform the returned object */
     transform?: boolean | ((
       doc: THydratedDocumentType,
-      ret: RawDocType,
+      ret: Default__v<Require_id<RawDocType>>,
       options: ToObjectOptions<THydratedDocumentType>
     ) => any);
     /** If true, omits fields that are excluded in this document's projection. Unless you specified a projection, this will omit any field that has `select: false` in the schema. */

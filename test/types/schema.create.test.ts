@@ -1256,10 +1256,10 @@ async function gh13797() {
     name: string;
   }
   new Schema<IUser>({ name: { type: String, required: function() {
-    expectType<IUser>(this); return true;
+    expectAssignable<IUser>(this); return true;
   } } });
   new Schema<IUser>({ name: { type: String, default: function() {
-    expectType<IUser>(this); return '';
+    expectAssignable<IUser>(this); return '';
   } } });
 }
 
@@ -1555,7 +1555,10 @@ function gh14696() {
 
   const x: ValidateOpts<unknown, User> = {
     validator(v: any) {
-      expectAssignable<User>(this);
+      expectAssignable<User | Query<unknown, User>>(this);
+      if (this instanceof Query) {
+        return !v;
+      }
       return !v || this.name === 'super admin';
     }
   };
@@ -1570,7 +1573,10 @@ function gh14696() {
       default: false,
       validate: {
         validator(v: any) {
-          expectAssignable<User>(this);
+          expectAssignable<User | Query<unknown, User>>(this);
+          if (this instanceof Query) {
+            return !v;
+          }
           return !v || this.name === 'super admin';
         }
       }
@@ -1580,7 +1586,10 @@ function gh14696() {
       default: false,
       validate: {
         async validator(v: any) {
-          expectAssignable<User>(this);
+          expectAssignable<User | Query<unknown, User>>(this);
+          if (this instanceof Query) {
+            return !v;
+          }
           return !v || this.name === 'super admin';
         }
       }

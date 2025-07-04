@@ -79,6 +79,11 @@ a [separate environment](https://github.com/facebook/jest/issues/7184),
 so you cannot use any connections you create in `globalSetup`
 in your tests.
 
+## resetModules
+
+We recommend setting `resetModules` to `false` in your Jest config.
+[`resetModules: true` can cause issues with internal `instanceof` checks](https://github.com/Automattic/mongoose/issues/15499) by creating multiple dangling copies of the Mongoose module.
+
 ## Further Reading
 
 Want to learn how to test Mongoose apps correctly? The

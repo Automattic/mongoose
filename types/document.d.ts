@@ -256,23 +256,34 @@ declare module 'mongoose' {
     set(value: string | Record<string, any>): this;
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
+    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: true }): FlattenMaps<ObjectIdToString<Default__v<Require_id<DocType & TVirtuals>>>>;
+    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true }): FlattenMaps<ObjectIdToString<Default__v<Require_id<DocType>>>>;
+    toJSON(options: ToObjectOptions & { flattenMaps: true, virtuals: true }): FlattenMaps<Default__v<Require_id<DocType & TVirtuals>>>;
+    toJSON(options: ToObjectOptions & { flattenObjectIds: true, virtuals: true }): ObjectIdToString<Default__v<Require_id<DocType & TVirtuals>>>;
+    toJSON(options: ToObjectOptions & { flattenMaps: true }): FlattenMaps<Default__v<Require_id<DocType>>>;
+    toJSON(options: ToObjectOptions & { flattenObjectIds: true }): ObjectIdToString<Default__v<Require_id<DocType>>>;
     toJSON(options: ToObjectOptions & { virtuals: true }): Default__v<Require_id<DocType & TVirtuals>>;
-    toJSON(options?: ToObjectOptions & { flattenMaps?: true, flattenObjectIds?: false }): FlattenMaps<Default__v<Require_id<DocType>>>;
-    toJSON(options: ToObjectOptions & { flattenObjectIds: false }): FlattenMaps<Default__v<Require_id<DocType>>>;
-    toJSON(options: ToObjectOptions & { flattenObjectIds: true }): ObjectIdToString<FlattenMaps<Default__v<Require_id<DocType>>>>;
-    toJSON(options: ToObjectOptions & { flattenMaps: false }): Default__v<Require_id<DocType>>;
-    toJSON(options: ToObjectOptions & { flattenMaps: false; flattenObjectIds: true }): ObjectIdToString<Default__v<Require_id<DocType>>>;
+    toJSON(options?: ToObjectOptions): Default__v<Require_id<DocType>>;
 
-    toJSON<T = Default__v<Require_id<DocType>>>(options?: ToObjectOptions & { flattenMaps?: true, flattenObjectIds?: false }): FlattenMaps<T>;
-    toJSON<T = Default__v<Require_id<DocType>>>(options: ToObjectOptions & { flattenObjectIds: false }): FlattenMaps<T>;
-    toJSON<T = Default__v<Require_id<DocType>>>(options: ToObjectOptions & { flattenObjectIds: true }): ObjectIdToString<FlattenMaps<T>>;
-    toJSON<T = Default__v<Require_id<DocType>>>(options: ToObjectOptions & { flattenMaps: false }): T;
-    toJSON<T = Default__v<Require_id<DocType>>>(options: ToObjectOptions & { flattenMaps: false; flattenObjectIds: true }): ObjectIdToString<T>;
+    toJSON<T = Default__v<Require_id<DocType>>>(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true }): FlattenMaps<ObjectIdToString<T>>;
+    toJSON<T = Default__v<Require_id<DocType>>>(options: ToObjectOptions & { flattenObjectIds: true }): ObjectIdToString<T>;
+    toJSON<T = Default__v<Require_id<DocType>>>(options: ToObjectOptions & { flattenMaps: true }): FlattenMaps<T>;
+    toJSON<T = Default__v<Require_id<DocType>>>(options?: ToObjectOptions): T;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
+    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: true }): FlattenMaps<ObjectIdToString<Default__v<Require_id<DocType & TVirtuals>>>>;
+    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true }): FlattenMaps<ObjectIdToString<Default__v<Require_id<DocType>>>>;
+    toObject(options: ToObjectOptions & { flattenMaps: true, virtuals: true }): FlattenMaps<Default__v<Require_id<DocType & TVirtuals>>>;
+    toObject(options: ToObjectOptions & { flattenObjectIds: true, virtuals: true }): ObjectIdToString<Default__v<Require_id<DocType & TVirtuals>>>;
+    toObject(options: ToObjectOptions & { flattenMaps: true }): FlattenMaps<Default__v<Require_id<DocType>>>;
+    toObject(options: ToObjectOptions & { flattenObjectIds: true }): ObjectIdToString<Default__v<Require_id<DocType>>>;
     toObject(options: ToObjectOptions & { virtuals: true }): Default__v<Require_id<DocType & TVirtuals>>;
     toObject(options?: ToObjectOptions): Default__v<Require_id<DocType>>;
-    toObject<T>(options?: ToObjectOptions): Default__v<Require_id<T>>;
+
+    toObject<T = Default__v<Require_id<DocType>>>(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true }): FlattenMaps<ObjectIdToString<T>>;
+    toObject<T = Default__v<Require_id<DocType>>>(options: ToObjectOptions & { flattenObjectIds: true }): ObjectIdToString<T>;
+    toObject<T = Default__v<Require_id<DocType>>>(options: ToObjectOptions & { flattenMaps: true }): FlattenMaps<T>;
+    toObject<T = Default__v<Require_id<DocType>>>(options?: ToObjectOptions): T;
 
     /** Clears the modified state on the specified path. */
     unmarkModified<T extends keyof DocType>(path: T): void;

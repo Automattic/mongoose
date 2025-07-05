@@ -248,7 +248,7 @@ In Mongoose 9, to make types and internal logic more consistent, we removed the 
 const schema = new mongoose.Schema({ docArray: [new mongoose.Schema({ name: String })], arr: [String] });
 
 // In Mongoose 8:
-console.log(schema.path('arr').caster); // String SchemaType
+console.log(schema.path('arr').caster); // SchemaString
 console.log(schema.path('docArray').caster); // EmbeddedDocument constructor
 
 // In Mongoose 9:

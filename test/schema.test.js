@@ -829,18 +829,18 @@ describe('schema', function() {
         const Tobi = new Schema({
           name: { type: String, index: true },
           last: { type: Number, sparse: true },
-          nope: { type: String, index: { background: false } }
+          nope: { type: String, index: true }
         });
 
         Tobi.index({ firstname: 1, last: 1 }, { unique: true, expires: '1h' });
-        Tobi.index({ firstname: 1, nope: 1 }, { unique: true, background: false });
+        Tobi.index({ firstname: 1, nope: 1 }, { unique: true });
 
         assert.deepEqual(Tobi.indexes(), [
-          [{ name: 1 }, { background: true }],
-          [{ last: 1 }, { sparse: true, background: true }],
-          [{ nope: 1 }, { background: false }],
-          [{ firstname: 1, last: 1 }, { unique: true, expireAfterSeconds: 60 * 60, background: true }],
-          [{ firstname: 1, nope: 1 }, { unique: true, background: false }]
+          [{ name: 1 }, {}],
+          [{ last: 1 }, { sparse: true }],
+          [{ nope: 1 }, {}],
+          [{ firstname: 1, last: 1 }, { unique: true, expireAfterSeconds: 60 * 60 }],
+          [{ firstname: 1, nope: 1 }, { unique: true }]
         ]);
 
 
@@ -889,7 +889,7 @@ describe('schema', function() {
         });
 
         assert.deepEqual(schema.indexes(), [
-          [{ point: '2dsphere' }, { background: true }]
+          [{ point: '2dsphere' }, {}]
         ]);
       });
 
@@ -2505,7 +2505,7 @@ describe('schema', function() {
     const TurboManSchema = Schema();
     TurboManSchema.add(ToySchema);
 
-    assert.deepStrictEqual(TurboManSchema.indexes(), [[{ name: 1 }, { background: true }]]);
+    assert.deepStrictEqual(TurboManSchema.indexes(), [[{ name: 1 }, {}]]);
   });
 
   describe('gh-8849', function() {

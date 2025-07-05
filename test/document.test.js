@@ -873,7 +873,7 @@ describe('document', function() {
 
       // override to check if toJSON gets fired
       const path = TestDocument.prototype.schema.path('em');
-      path.casterConstructor.prototype.toJSON = function() {
+      path.Constructor.prototype.toJSON = function() {
         return {};
       };
 
@@ -889,7 +889,7 @@ describe('document', function() {
       assert.equal(clone.em[0].constructor.name, 'Object');
       assert.equal(Object.keys(clone.em[0]).length, 0);
       delete doc.schema.options.toJSON;
-      delete path.casterConstructor.prototype.toJSON;
+      delete path.Constructor.prototype.toJSON;
 
       doc.schema.options.toJSON = { minimize: false };
       delete doc.schema._defaultToObjectOptionsMap;

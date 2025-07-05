@@ -124,8 +124,8 @@ declare module 'mongoose' {
                                                 PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? UUID :
                                                   PathValueType extends 'double' | 'Double' | typeof Schema.Types.Double ? Types.Double :
                                                     IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
-                                                      PathValueType extends MapConstructor | 'Map' ? Map<string, ResolveRawPathType<Options['of']>> :
-                                                        IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ResolveRawPathType<Options['of']>> :
+                                                      PathValueType extends MapConstructor | 'Map' ? Record<string, ResolveRawPathType<Options['of']> | undefined> :
+                                                        IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Record<string, ResolveRawPathType<Options['of']> | undefined> :
                                                           PathValueType extends ArrayConstructor ? any[] :
                                                             PathValueType extends typeof Schema.Types.Mixed ? any:
                                                               IfEquals<PathValueType, ObjectConstructor> extends true ? any:

@@ -16,7 +16,8 @@ import mongoose, {
   WithLevel1NestedPaths,
   createConnection,
   connection,
-  model
+  model,
+  ObtainSchemaGeneric
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
@@ -575,12 +576,14 @@ async function gh12319() {
   );
 
   const ProjectModel = model('Project', projectSchema);
+  const doc = new ProjectModel();
+  doc.doSomething();
 
   type ProjectModelHydratedDoc = HydratedDocumentFromSchema<
     typeof projectSchema
   >;
 
-  expectType<ProjectModelHydratedDoc>(await ProjectModel.findOne().orFail());
+  expectAssignable<ProjectModelHydratedDoc>(await ProjectModel.findOne().orFail());
 }
 
 function findWithId() {

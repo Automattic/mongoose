@@ -70,7 +70,7 @@ In Mongoose 9, `next(null, 'new arg')` doesn't overwrite the args to the next mi
 
 ## Removed background option for indexes
 
-[MongoDB no longer supports the `background` option for indexes as of MongoDB 4.2](https://www.mongodb.com/docs/manual/core/index-creation/#index-operations). Mongoose 9 will no longer set the background option by default.
+[MongoDB no longer supports the `background` option for indexes as of MongoDB 4.2](https://www.mongodb.com/docs/manual/core/index-creation/#index-operations). Mongoose 9 will no longer set the background option by default and Mongoose 9 no longer supports setting the `background` option on `Schema.prototype.index()`.
 
 ## Subdocument `deleteOne()` hooks execute only when subdocument is deleted
 

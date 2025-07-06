@@ -320,7 +320,10 @@ declare module 'mongoose' {
       >,
       THydratedDocumentType,
       TSchemaDefinition,
-      BufferToBinary<RawDocType>
+      ApplySchemaOptions<
+        InferRawDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>, { bufferToBinary: true }>,
+        ResolveSchemaOptions<TSchemaOptions>
+      >
     >;
 
     static create<
@@ -345,7 +348,10 @@ declare module 'mongoose' {
       >,
       THydratedDocumentType,
       TSchemaDefinition,
-      BufferToBinary<RawDocType>
+      ApplySchemaOptions<
+        InferRawDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>, { bufferToBinary: true }>,
+        ResolveSchemaOptions<TSchemaOptions>
+      >
     >;
 
     /** Adds key path / schema type pairs to this schema. */

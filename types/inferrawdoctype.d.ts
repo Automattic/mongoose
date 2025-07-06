@@ -6,19 +6,20 @@ import {
   PathWithTypePropertyBaseType,
   PathEnumOrString
 } from './inferschematype';
-import { UUID } from 'mongodb';
+import { Binary, UUID } from 'mongodb';
 
 declare module 'mongoose' {
   export type InferRawDocType<
-    DocDefinition,
-    TSchemaOptions extends Record<any, any> = DefaultSchemaOptions
+    SchemaDefinition,
+    TSchemaOptions extends Record<any, any> = DefaultSchemaOptions,
+    TTransformOptions = { bufferToBinary: false }
   > = Require_id<ApplySchemaOptions<{
     [
-    K in keyof (RequiredPaths<DocDefinition, TSchemaOptions['typeKey']> &
-    OptionalPaths<DocDefinition, TSchemaOptions['typeKey']>)
-    ]: IsPathRequired<DocDefinition[K], TSchemaOptions['typeKey']> extends true
-      ? ObtainRawDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']>
-      : ObtainRawDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']> | null;
+    K in keyof (RequiredPaths<SchemaDefinition, TSchemaOptions['typeKey']> &
+    OptionalPaths<SchemaDefinition, TSchemaOptions['typeKey']>)
+    ]: IsPathRequired<SchemaDefinition[K], TSchemaOptions['typeKey']> extends true
+      ? ObtainRawDocumentPathType<SchemaDefinition[K], TSchemaOptions['typeKey'], TTransformOptions>
+      : ObtainRawDocumentPathType<SchemaDefinition[K], TSchemaOptions['typeKey'], TTransformOptions> | null;
   }, TSchemaOptions>>;
 
   /**
@@ -34,7 +35,8 @@ declare module 'mongoose' {
    */
   type ObtainRawDocumentPathType<
     PathValueType,
-    TypeKey extends string = DefaultTypeKey
+    TypeKey extends string = DefaultTypeKey,
+    TTransformOptions = { bufferToBinary: false }
   > = ResolveRawPathType<
     PathValueType extends PathWithTypePropertyBaseType<TypeKey>
       ? PathValueType[TypeKey] extends PathWithTypePropertyBaseType<TypeKey>
@@ -47,6 +49,7 @@ declare module 'mongoose' {
         : Omit<PathValueType, TypeKey>
       : {},
     TypeKey,
+    TTransformOptions,
     RawDocTypeHint<PathValueType>
   >;
 
@@ -63,44 +66,44 @@ declare module 'mongoose' {
    * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
    * @returns Number, "Number" or "number" will be resolved to number type.
    */
-  type ResolveRawPathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}, TypeKey extends string = DefaultSchemaOptions['typeKey'], TypeHint = never> =
+  type ResolveRawPathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}, TypeKey extends string = DefaultSchemaOptions['typeKey'], TTransformOptions = { bufferToBinary: false }, TypeHint = never> =
   IfEquals<TypeHint, never,
     PathValueType extends Schema<infer RawDocType, any, any, any, any, any, any, any, any, infer TSchemaDefinition> ?
-      IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : InferRawDocType<TSchemaDefinition> :
+      IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : InferRawDocType<TSchemaDefinition, DefaultSchemaOptions, TTransformOptions> :
       PathValueType extends (infer Item)[] ?
         IfEquals<Item, never, any[], Item extends Schema<infer RawDocType, any, any, any, any, any, any, any, any, infer TSchemaDefinition> ?
           // If Item is a schema, infer its type.
-          Array<IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : InferRawDocType<TSchemaDefinition>> :
+          Array<IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : InferRawDocType<TSchemaDefinition, DefaultSchemaOptions, TTransformOptions>> :
           Item extends Record<TypeKey, any> ?
             Item[TypeKey] extends Function | String ?
               // If Item has a type key that's a string or a callable, it must be a scalar,
               // so we can directly obtain its path type.
-              ObtainRawDocumentPathType<Item, TypeKey>[] :
+              ObtainRawDocumentPathType<Item, TypeKey, TTransformOptions>[] :
               // If the type key isn't callable, then this is an array of objects, in which case
               // we need to call InferRawDocType to correctly infer its type.
-              Array<InferRawDocType<Item>> :
+              Array<InferRawDocType<Item, DefaultSchemaOptions, TTransformOptions>> :
             IsSchemaTypeFromBuiltinClass<Item> extends true ?
-              ObtainRawDocumentPathType<Item, TypeKey>[] :
+              ObtainRawDocumentPathType<Item, TypeKey, TTransformOptions>[] :
               IsItRecordAndNotAny<Item> extends true ?
                 Item extends Record<string, never> ?
-                  ObtainRawDocumentPathType<Item, TypeKey>[] :
-                  Array<InferRawDocType<Item>> :
-                ObtainRawDocumentPathType<Item, TypeKey>[]
+                  ObtainRawDocumentPathType<Item, TypeKey, TTransformOptions>[] :
+                  Array<InferRawDocType<Item, DefaultSchemaOptions, TTransformOptions>> :
+                ObtainRawDocumentPathType<Item, TypeKey, TTransformOptions>[]
         >:
         PathValueType extends ReadonlyArray<infer Item> ?
           IfEquals<Item, never, any[], Item extends Schema<infer RawDocType, any, any, any, any, any, any, any, any, infer TSchemaDefinition> ?
-            Array<IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : InferRawDocType<TSchemaDefinition>> :
+            Array<IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : InferRawDocType<TSchemaDefinition, DefaultSchemaOptions, TTransformOptions>> :
             Item extends Record<TypeKey, any> ?
               Item[TypeKey] extends Function | String ?
-                ObtainRawDocumentPathType<Item, TypeKey>[] :
-                InferRawDocType<Item>[]:
+                ObtainRawDocumentPathType<Item, TypeKey, TTransformOptions>[] :
+                InferRawDocType<Item, DefaultSchemaOptions, TTransformOptions>[]:
               IsSchemaTypeFromBuiltinClass<Item> extends true ?
-                ObtainRawDocumentPathType<Item, TypeKey>[] :
+                ObtainRawDocumentPathType<Item, TypeKey, TTransformOptions>[] :
                 IsItRecordAndNotAny<Item> extends true ?
                   Item extends Record<string, never> ?
-                    ObtainRawDocumentPathType<Item, TypeKey>[] :
-                    Array<InferRawDocType<Item>> :
-                  ObtainRawDocumentPathType<Item, TypeKey>[]
+                    ObtainRawDocumentPathType<Item, TypeKey, TTransformOptions>[] :
+                    Array<InferRawDocType<Item, DefaultSchemaOptions, TTransformOptions>> :
+                  ObtainRawDocumentPathType<Item, TypeKey, TTransformOptions>[]
           >:
           PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']> :
             IfEquals<PathValueType, Schema.Types.String> extends true ? PathEnumOrString<Options['enum']> :
@@ -109,7 +112,7 @@ declare module 'mongoose' {
                   IfEquals<PathValueType, Schema.Types.Number> extends true ? number :
                     PathValueType extends DateSchemaDefinition ? NativeDate :
                       IfEquals<PathValueType, Schema.Types.Date> extends true ? NativeDate :
-                        PathValueType extends typeof Buffer | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer :
+                        PathValueType extends typeof Buffer | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? TTransformOptions extends { bufferToBinary: true } ? Binary : Buffer :
                           PathValueType extends BooleanSchemaDefinition ? boolean :
                             IfEquals<PathValueType, Schema.Types.Boolean> extends true ? boolean :
                               PathValueType extends ObjectIdSchemaDefinition ? Types.ObjectId :
@@ -123,7 +126,7 @@ declare module 'mongoose' {
                                               PathValueType extends 'bigint' | 'BigInt' | typeof Schema.Types.BigInt | typeof BigInt ? bigint :
                                                 PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? UUID :
                                                   PathValueType extends 'double' | 'Double' | typeof Schema.Types.Double ? Types.Double :
-                                                    IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
+                                                    IfEquals<PathValueType, Schema.Types.UUID> extends true ? UUID :
                                                       PathValueType extends MapConstructor | 'Map' ? Record<string, ResolveRawPathType<Options['of']> | undefined> :
                                                         IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Record<string, ResolveRawPathType<Options['of']> | undefined> :
                                                           PathValueType extends ArrayConstructor ? any[] :
@@ -131,7 +134,7 @@ declare module 'mongoose' {
                                                               IfEquals<PathValueType, ObjectConstructor> extends true ? any:
                                                                 IfEquals<PathValueType, {}> extends true ? any:
                                                                   PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
-                                                                    PathValueType extends Record<string, any> ? InferRawDocType<PathValueType, { typeKey: TypeKey }> :
+                                                                    PathValueType extends Record<string, any> ? InferRawDocType<PathValueType, { typeKey: TypeKey }, TTransformOptions> :
                                                                       unknown,
   TypeHint>;
 }

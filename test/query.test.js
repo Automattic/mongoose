@@ -4211,7 +4211,7 @@ describe('Query', function() {
     });
     const Test = db.model('Test', schema);
 
-    const BookHolder = schema.path('bookHolder').caster;
+    const BookHolder = schema.path('bookHolder').Constructor;
 
     await Test.collection.insertOne({
       title: 'test-defaults-disabled',

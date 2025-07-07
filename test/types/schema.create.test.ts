@@ -1877,5 +1877,5 @@ function testInferRawDocTypeFromSchema() {
     docArr:({ name: string } & { _id: Types.ObjectId })[],
     subdoc?: ({ answer: number } & { _id: Types.ObjectId }) | null | undefined,
     map?: Record<string, string | undefined> | null | undefined
-  } & { _id: Types.ObjectId }>({} as RawDocType);
+      } & { _id: Types.ObjectId }>({} as RawDocType);
 }

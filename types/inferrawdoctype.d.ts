@@ -9,6 +9,10 @@ import {
 import { UUID } from 'mongodb';
 
 declare module 'mongoose' {
+  export type InferRawDocTypeFromSchema<TSchema extends Schema<any>> = IsItRecordAndNotAny<ObtainSchemaGeneric<TSchema, 'EnforcedDocType'>> extends true
+    ? ObtainSchemaGeneric<TSchema, 'EnforcedDocType'>
+    : FlattenMaps<SubdocsToPOJOs<ObtainSchemaGeneric<TSchema, 'DocType'>>>;
+
   export type InferRawDocType<
     DocDefinition,
     TSchemaOptions extends Record<any, any> = DefaultSchemaOptions

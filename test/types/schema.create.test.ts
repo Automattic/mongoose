@@ -23,7 +23,8 @@ import {
   model,
   ValidateOpts,
   CallbackWithoutResultAndOptionalError,
-  InferHydratedDocType
+  InferHydratedDocType,
+  InferRawDocTypeFromSchema
 } from 'mongoose';
 import { Binary, BSON, UUID } from 'mongodb';
 import { expectType, expectError, expectAssignable } from 'tsd';
@@ -1838,4 +1839,26 @@ function defaultReturnsUndefined() {
       default: () => void 0
     }
   });
+}
+
+function testInferRawDocTypeFromSchema() {
+  const schema = Schema.create({
+    name: String,
+    arr: [Number],
+    docArr: [{ name: { type: String, required: true } }],
+    subdoc: Schema.create({
+      answer: { type: Number, required: true }
+    }),
+    map: { type: Map, of: String }
+  });
+
+  type RawDocType = InferRawDocTypeFromSchema<typeof schema>;
+
+  expectType<{
+    name?: string | null | undefined,
+    arr: number[],
+    docArr: ({ name: string } & { _id: Types.ObjectId })[],
+    subdoc?: ({ answer: number } & { _id: Types.ObjectId }) | null | undefined,
+    map?: Map<string, string> | null | undefined
+  } & { _id: Types.ObjectId }>({} as RawDocType);
 }

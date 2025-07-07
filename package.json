@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "8.16.1",
+  "version": "8.16.2",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -29,9 +29,9 @@
     "sift": "17.1.3"
   },
   "devDependencies": {
-    "@babel/core": "7.27.4",
+    "@babel/core": "7.27.7",
     "@babel/preset-env": "7.27.2",
-    "@mongodb-js/mongodb-downloader": "^0.3.9",
+    "@mongodb-js/mongodb-downloader": "^0.4.2",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
     "@typescript-eslint/parser": "^8.19.1",
     "acquit": "1.4.0",
@@ -42,7 +42,7 @@
     "babel-loader": "8.2.5",
     "broken-link-checker": "^0.7.8",
     "buffer": "^5.6.0",
-    "cheerio": "1.0.0",
+    "cheerio": "1.1.0",
     "crypto-browserify": "3.12.1",
     "dox": "1.0.0",
     "eslint": "8.57.1",
@@ -56,7 +56,7 @@
     "markdownlint-cli2": "^0.18.1",
     "marked": "15.0.12",
     "mkdirp": "^3.0.1",
-    "mocha": "11.5.0",
+    "mocha": "11.7.1",
     "moment": "2.30.1",
     "mongodb-memory-server": "10.1.4",
     "mongodb-runner": "^5.8.2",
@@ -64,7 +64,7 @@
     "nyc": "15.1.0",
     "pug": "3.0.3",
     "q": "1.5.1",
-    "sinon": "20.0.0",
+    "sinon": "21.0.0",
     "stream-browserify": "3.0.0",
     "tsd": "0.32.0",
     "typescript": "5.8.3",

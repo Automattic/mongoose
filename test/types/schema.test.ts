@@ -1851,7 +1851,7 @@ function gh15516() {
     name: String
   });
 
-  schema.virtual('myVirtual').get(function () {
+  schema.virtual('myVirtual').get(function() {
     expectType<HydratedUserDoc>(this);
   });
 }

@@ -9,6 +9,8 @@ import {
 import { UUID } from 'mongodb';
 
 declare module 'mongoose' {
+  export type InferHydratedDocTypeFromSchema<TSchema extends Schema<any>> = ObtainSchemaGeneric<TSchema, 'THydratedDocumentType'>;
+
   /**
    * Given a schema definition, returns the hydrated document type from the schema definition.
    */

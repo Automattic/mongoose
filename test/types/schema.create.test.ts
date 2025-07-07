@@ -1857,8 +1857,8 @@ function testInferRawDocTypeFromSchema() {
   expectType<{
     name?: string | null | undefined,
     arr: number[],
-    docArr: ({ name: string } & { _id: Types.ObjectId })[],
+    docArr:({ name: string } & { _id: Types.ObjectId })[],
     subdoc?: ({ answer: number } & { _id: Types.ObjectId }) | null | undefined,
     map?: Map<string, string> | null | undefined
-  } & { _id: Types.ObjectId }>({} as RawDocType);
+      } & { _id: Types.ObjectId }>({} as RawDocType);
 }

@@ -254,7 +254,6 @@ console.log(schema.path('docArray').caster); // EmbeddedDocument constructor
 console.log(schema.path('arr').casterConstructor); // SchemaString constructor
 console.log(schema.path('docArray').casterConstructor); // EmbeddedDocument constructor
 
-
 // In Mongoose 9:
 console.log(schema.path('arr').embeddedSchemaType); // SchemaString
 console.log(schema.path('docArray').embeddedSchemaType); // SchemaDocumentArrayElement
@@ -262,6 +261,8 @@ console.log(schema.path('docArray').embeddedSchemaType); // SchemaDocumentArrayE
 console.log(schema.path('arr').Constructor); // undefined
 console.log(schema.path('docArray').Constructor); // EmbeddedDocument constructor
 ```
+
+In Mongoose 8, there was also an internal `$embeddedSchemaType` property. That property has been replaced with `embeddedSchemaType`, which is now part of the public API.
 
 ## TypeScript
 

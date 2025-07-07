@@ -131,7 +131,7 @@ describe('timestamps', function() {
 
       const indexes = testSchema.indexes();
       assert.deepEqual(indexes, [
-        [{ updatedAt: 1 }, { background: true, expireAfterSeconds: 7200 }]
+        [{ updatedAt: 1 }, { expireAfterSeconds: 7200 }]
       ]);
     });
   });

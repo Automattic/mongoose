@@ -68,6 +68,10 @@ schema.pre('save', function(next, arg) {
 
 In Mongoose 9, `next(null, 'new arg')` doesn't overwrite the args to the next middleware.
 
+## Removed background option for indexes
+
+[MongoDB no longer supports the `background` option for indexes as of MongoDB 4.2](https://www.mongodb.com/docs/manual/core/index-creation/#index-operations). Mongoose 9 will no longer set the background option by default and Mongoose 9 no longer supports setting the `background` option on `Schema.prototype.index()`.
+
 ## Subdocument `deleteOne()` hooks execute only when subdocument is deleted
 
 Currently, calling `deleteOne()` on a subdocument will execute the `deleteOne()` hooks on the subdocument regardless of whether the subdocument is actually deleted.
@@ -238,6 +242,31 @@ await test.save();
 
 test.uuid; // string
 ```
+
+### SchemaType `caster` and `casterConstructor` properties were removed
+
+In Mongoose 8, certain schema type instances had a `caster` property which contained either the embedded schema type or embedded subdocument constructor.
+In Mongoose 9, to make types and internal logic more consistent, we removed the `caster` property in favor of `embeddedSchemaType` and `Constructor`.
+
+```javascript
+const schema = new mongoose.Schema({ docArray: [new mongoose.Schema({ name: String })], arr: [String] });
+
+// In Mongoose 8:
+console.log(schema.path('arr').caster); // SchemaString
+console.log(schema.path('docArray').caster); // EmbeddedDocument constructor
+
+console.log(schema.path('arr').casterConstructor); // SchemaString constructor
+console.log(schema.path('docArray').casterConstructor); // EmbeddedDocument constructor
+
+// In Mongoose 9:
+console.log(schema.path('arr').embeddedSchemaType); // SchemaString
+console.log(schema.path('docArray').embeddedSchemaType); // SchemaDocumentArrayElement
+
+console.log(schema.path('arr').Constructor); // undefined
+console.log(schema.path('docArray').Constructor); // EmbeddedDocument constructor
+```
+
+In Mongoose 8, there was also an internal `$embeddedSchemaType` property. That property has been replaced with `embeddedSchemaType`, which is now part of the public API.
 
 ## TypeScript
 

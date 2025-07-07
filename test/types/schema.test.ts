@@ -22,8 +22,8 @@ import {
   Query,
   model,
   ValidateOpts,
-  BufferToBinary,
-  CallbackWithoutResultAndOptionalError
+  CallbackWithoutResultAndOptionalError,
+  InferRawDocTypeFromSchema
 } from 'mongoose';
 import { BSON, Binary, UUID } from 'mongodb';
 import { expectType, expectError, expectAssignable } from 'tsd';
@@ -1862,4 +1862,40 @@ function gh15479() {
   function getTestField(obj: { testField: string }) {
     return obj.testField;
   }
+}
+
+function gh15516() {
+  interface IUser {
+    name: string;
+  }
+  type HydratedUserDoc = HydratedDocument<IUser & { customProperty: number, myVirtual: number }>;
+  const schema = new Schema<IUser, Model<IUser>, {}, {}, { myVirtual: number }, {}, DefaultSchemaOptions, any, HydratedUserDoc>({
+    name: String
+  });
+
+  schema.virtual('myVirtual').get(function() {
+    expectType<HydratedUserDoc>(this);
+  });
+}
+
+function testInferRawDocTypeFromSchema() {
+  const schema = new Schema({
+    name: String,
+    arr: [Number],
+    docArr: [{ name: { type: String, required: true } }],
+    subdoc: new Schema({
+      answer: { type: Number, required: true }
+    }),
+    map: { type: Map, of: String }
+  });
+
+  type RawDocType = InferRawDocTypeFromSchema<typeof schema>;
+
+  expectType<{
+    name?: string | null | undefined,
+    arr: number[],
+    docArr: { name: string }[],
+    subdoc?: { answer: number } | null | undefined,
+    map?: Record<string, string> | null | undefined
+  }>({} as RawDocType);
 }

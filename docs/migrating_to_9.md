@@ -251,6 +251,10 @@ const schema = new mongoose.Schema({ docArray: [new mongoose.Schema({ name: Stri
 console.log(schema.path('arr').caster); // SchemaString
 console.log(schema.path('docArray').caster); // EmbeddedDocument constructor
 
+console.log(schema.path('arr').casterConstructor); // SchemaString constructor
+console.log(schema.path('docArray').casterConstructor); // EmbeddedDocument constructor
+
+
 // In Mongoose 9:
 console.log(schema.path('arr').embeddedSchemaType); // SchemaString
 console.log(schema.path('docArray').embeddedSchemaType); // SchemaDocumentArrayElement

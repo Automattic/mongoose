@@ -1863,3 +1863,17 @@ function gh15479() {
     return obj.testField;
   }
 }
+
+function gh15516() {
+  interface IUser {
+    name: string;
+  }
+  type HydratedUserDoc = HydratedDocument<IUser & { customProperty: number, myVirtual: number }>;
+  const schema = new Schema<IUser, Model<IUser>, {}, {}, { myVirtual: number }, {}, DefaultSchemaOptions, any, HydratedUserDoc>({
+    name: String
+  });
+
+  schema.virtual('myVirtual').get(function() {
+    expectType<HydratedUserDoc>(this);
+  });
+}

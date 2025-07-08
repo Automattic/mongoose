@@ -522,7 +522,7 @@ declare module 'mongoose' {
     toJSONSchema(options?: { useBsonType?: boolean }): Record<string, any>;
 
     /** Creates a virtual type with the given name. */
-    virtual<T = HydratedDocument<DocType, TVirtuals & TInstanceMethods, TQueryHelpers>>(
+    virtual<T = THydratedDocumentType>(
       name: keyof TVirtuals | string,
       options?: VirtualTypeOptions<T, DocType>
     ): VirtualType<T>;

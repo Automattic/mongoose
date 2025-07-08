@@ -779,7 +779,7 @@ describe('types.documentarray', function() {
     );
   });
 
-  it('stores all schematype options in the embedded schematype', function () {
+  it('stores all schematype options in the embedded schematype', function() {
     const schema = new mongoose.Schema({
       docArr: [{
         type: new mongoose.Schema({ name: String }),

@@ -354,6 +354,8 @@ declare module 'mongoose' {
     /** Returns a new schema that has the `paths` from the original schema, minus the omitted ones. */
     omit<T = this>(paths: string[], options?: SchemaOptions): T;
 
+    options: SchemaOptions;
+
     /** Gets/sets schema paths. */
     path<ResultType extends SchemaType = SchemaType<any, THydratedDocumentType>>(path: string): ResultType;
     path<pathGeneric extends keyof RawDocType>(path: pathGeneric): SchemaType<RawDocType[pathGeneric]>;

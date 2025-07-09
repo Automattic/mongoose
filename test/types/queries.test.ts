@@ -13,6 +13,7 @@ import {
   UpdateQuery,
   UpdateQueryKnownOnly,
   QuerySelector,
+  InferRawDocType,
   InferSchemaType,
   ProjectionFields,
   QueryOptions,
@@ -709,4 +710,18 @@ function gh14841() {
   const filter: FilterQuery<{ owners: string[] }> = {
     $expr: { $lt: [{ $size: '$owners' }, 10] }
   };
+}
+
+async function gh15526() {
+  const userSchemaDefinition = { name: String, age: Number } as const;
+  const UserModel = model('User', new Schema(userSchemaDefinition));
+  type UserType = InferRawDocType<typeof userSchemaDefinition>;
+
+  const selection = ['name'] as const satisfies readonly (keyof UserType)[];
+
+  const u1 = await UserModel.findOne()
+    .select<Pick<UserType, (typeof selection)[number]>>(selection)
+    .orFail();
+  expectType<string | undefined | null>(u1.name);
+  expectError(u1.age);
 }

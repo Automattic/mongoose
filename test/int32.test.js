@@ -524,6 +524,7 @@ describe('Int32', function() {
       });
       const Parent = db.model('Parent', parentSchema);
       const Child = db.model('Child', childSchema);
+      await Child.deleteMany({});
 
       const { _id } = await Parent.create({ child: 42 });
       await Child.create({ _id: 42, name: 'test-int32-populate' });

@@ -719,8 +719,9 @@ async function gh15526() {
 
   const selection = ['name'] as const satisfies readonly (keyof UserType)[];
 
+  type SelectType = Pick<UserType, (typeof selection)[number]>;
   const u1 = await UserModel.findOne()
-    .select<Pick<UserType, (typeof selection)[number]>>(selection)
+    .select<SelectType>(selection)
     .orFail();
   expectType<string | undefined | null>(u1.name);
   expectError(u1.age);

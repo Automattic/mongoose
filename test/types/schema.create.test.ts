@@ -1866,7 +1866,7 @@ function testInferRawDocTypeFromSchema() {
   expectType<Expected>({} as RawDocType);
 }
 
-function testInferHydratedDocTypeFromSchema() {
+async function testInferHydratedDocTypeFromSchema() {
   const subschema = Schema.create({ answer: { type: Number, required: true } });
   const schema = Schema.create({
     name: String,

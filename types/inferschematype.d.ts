@@ -203,7 +203,7 @@ TypeHint<PathValueType>
  * @param {T} T A generic refers to string path enums.
  * @returns Path enum values type as literal strings or string.
  */
-type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends ReadonlyArray<infer E> ? E : T extends { values: any } ? PathEnumOrString<T['values']> : string;
+type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends ReadonlyArray<infer E> ? E : T extends { values: any } ? PathEnumOrString<T['values']> : T extends Record<string, infer V> ? V : string;
 
 type IsSchemaTypeFromBuiltinClass<T> = T extends (typeof String)
   ? true

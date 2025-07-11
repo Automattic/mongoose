@@ -144,6 +144,24 @@ async function gh13010() {
   expectType<Record<string, string>>(country.name);
 }
 
+async function gh13010_1() {
+  const schema = Schema.create({
+    name: { required: true, type: Map, of: String }
+  });
+
+  const CountryModel = model('Country', schema);
+
+  await CountryModel.create({
+    name: {
+      en: 'Croatia',
+      ru: 'Хорватия'
+    }
+  });
+
+  const country = await CountryModel.findOne().lean().orFail().exec();
+  expectType<Record<string, string | undefined>>(country.name);
+}
+
 async function gh13345_1() {
   const imageSchema = new Schema({
     url: { required: true, type: String }

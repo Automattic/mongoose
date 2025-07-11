@@ -23,7 +23,9 @@ import {
   model,
   ValidateOpts,
   CallbackWithoutResultAndOptionalError,
-  InferRawDocTypeFromSchema
+  InferRawDocTypeFromSchema,
+  InferHydratedDocTypeFromSchema,
+  FlatRecord
 } from 'mongoose';
 import { BSON, Binary, UUID } from 'mongodb';
 import { expectType, expectError, expectAssignable } from 'tsd';
@@ -1898,4 +1900,26 @@ function testInferRawDocTypeFromSchema() {
     subdoc?: { answer: number } | null | undefined,
     map?: Record<string, string> | null | undefined
   }>({} as RawDocType);
+}
+
+function testInferHydratedDocTypeFromSchema() {
+  const schema = new Schema({
+    name: String,
+    arr: [Number],
+    docArr: [{ name: { type: String, required: true } }],
+    subdoc: new Schema({ answer: { type: Number, required: true } }),
+    map: { type: Map, of: String }
+  });
+
+  type HydratedDocType = InferHydratedDocTypeFromSchema<typeof schema>;
+
+  type Expected = HydratedDocument<FlatRecord<{
+    name?: string | null | undefined,
+    arr: number[],
+    docArr: Types.DocumentArray<{ name: string }>,
+    subdoc?: { answer: number } | null | undefined,
+    map?: Map<string, string> | null | undefined
+  }>>;
+
+  expectType<Expected>({} as HydratedDocType);
 }

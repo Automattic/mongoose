@@ -45,8 +45,8 @@ declare module 'mongoose' {
     /** Don't run validation on this path or persist changes to this path. */
     $ignore(path: string): void;
 
-    /** Checks if a path is set to its default. */
-    $isDefault(path: string): boolean;
+    /** Checks if a path is set to its default. If no path set, checks if any path is set to its default. */
+    $isDefault(path?: string): boolean;
 
     /** Getter/setter, determines whether the document was removed or not. */
     $isDeleted(val?: boolean): boolean;

@@ -24,7 +24,8 @@ import {
   ValidateOpts,
   CallbackWithoutResultAndOptionalError,
   InferHydratedDocType,
-  InferRawDocTypeFromSchema
+  InferRawDocTypeFromSchema,
+  InferHydratedDocTypeFromSchema
 } from 'mongoose';
 import { Binary, BSON, UUID } from 'mongodb';
 import { expectType, expectError, expectAssignable } from 'tsd';
@@ -1871,11 +1872,41 @@ function testInferRawDocTypeFromSchema() {
 
   type RawDocType = InferRawDocTypeFromSchema<typeof schema>;
 
-  expectType<{
+  type Expected = {
     name?: string | null | undefined,
     arr: number[],
-    docArr:({ name: string } & { _id: Types.ObjectId })[],
+    docArr: ({ name: string } & { _id: Types.ObjectId })[],
     subdoc?: ({ answer: number } & { _id: Types.ObjectId }) | null | undefined,
+<<<<<<< HEAD
     map?: Record<string, string | undefined> | null | undefined
       } & { _id: Types.ObjectId }>({} as RawDocType);
+=======
+    map?: Map<string, string> | null | undefined
+  } & { _id: Types.ObjectId };
+
+  expectType<Expected>({} as RawDocType);
+}
+
+async function testInferHydratedDocTypeFromSchema() {
+  const subschema = Schema.create({ answer: { type: Number, required: true } });
+  const schema = Schema.create({
+    name: String,
+    arr: [Number],
+    docArr: [{ name: { type: String, required: true } }],
+    subdoc: subschema,
+    map: { type: Map, of: String }
+  });
+
+  type HydratedDocType = InferHydratedDocTypeFromSchema<typeof schema>;
+
+  type Expected = HydratedDocument<{
+    name?: string | null | undefined,
+    arr: Types.Array<number>,
+    docArr: Types.DocumentArray<{ name: string } & { _id: Types.ObjectId }>,
+    subdoc?: HydratedDocument<{ answer: number } & { _id: Types.ObjectId }> | null | undefined,
+    map?: Map<string, string> | null | undefined
+  } & { _id: Types.ObjectId }>;
+
+  expectType<Expected>({} as HydratedDocType);
+>>>>>>> vkarpov15/schema-create
 }

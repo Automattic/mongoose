@@ -758,7 +758,7 @@ declare module 'mongoose' {
 
     /** Specifies which document fields to include or exclude (also known as the query "projection") */
     select<RawDocTypeOverride extends { [P in keyof RawDocType]?: any } = {}>(
-      arg: string | string[] | Record<string, number | boolean | string | object>
+      arg: string | readonly string[] | Record<string, number | boolean | string | object>
     ): QueryWithHelpers<
       IfEquals<
         RawDocTypeOverride,

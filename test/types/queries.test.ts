@@ -13,6 +13,7 @@ import {
   UpdateQuery,
   UpdateQueryKnownOnly,
   QuerySelector,
+  InferRawDocType,
   InferSchemaType,
   ProjectionFields,
   QueryOptions,
@@ -718,4 +719,19 @@ function gh14510() {
   function findById<ModelType extends {_id: Types.ObjectId | string}>(model: Model<ModelType>, _id: Types.ObjectId | string) {
     return model.find({ _id: _id } as FilterQuery<ModelType>);
   }
+}
+
+async function gh15526() {
+  const userSchemaDefinition = { name: String, age: Number } as const;
+  const UserModel = model('User', new Schema(userSchemaDefinition));
+  type UserType = InferRawDocType<typeof userSchemaDefinition>;
+
+  const selection = ['name'] as const satisfies readonly (keyof UserType)[];
+
+  type SelectType = Pick<UserType, (typeof selection)[number]>;
+  const u1 = await UserModel.findOne()
+    .select<SelectType>(selection)
+    .orFail();
+  expectType<string | undefined | null>(u1.name);
+  expectError(u1.age);
 }

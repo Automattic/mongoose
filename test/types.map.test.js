@@ -1347,4 +1347,61 @@ describe('Map', function() {
     assert.ok(error);
     assert.strictEqual(error.errors['a.b.c.d.e'].message.includes('Path `e`'), true);
   });
+
+  it('handles setting then unsetting the same map (gh-15519)', async function() {
+    const debugSchema = new Schema({
+      settings: {
+        type: Map,
+        of: String
+      }
+    });
+
+    const Debug = db.model('Test', debugSchema);
+    const empty = new Debug();
+    await empty.save();
+
+    let doc = await Debug.findById(empty._id);
+    doc.settings = new Map();
+
+    doc.settings.set('test', 'value');
+
+    doc.settings = undefined;
+    assert.deepStrictEqual(doc.getChanges(), { $unset: { settings: 1 } });
+
+    await doc.save();
+
+    // reload and check settings is undefined
+    doc = await Debug.findById(empty._id);
+    assert.strictEqual(doc.settings, undefined);
+  });
+
+  it('handles setting then unsetting the same map of subdocs with a required field (gh-15519)', async function() {
+    const debugSchema = new Schema({
+      settings: {
+        type: Map,
+        of: new Schema({
+          value: { type: String, required: true }
+        }, { _id: false })
+      }
+    });
+
+    const Debug = db.model('Test', debugSchema);
+    const empty = new Debug();
+    await empty.save();
+
+    let doc = await Debug.findById(empty._id);
+    doc.settings = new Map();
+
+    doc.settings.set('test', { value: 'abc' });
+
+    doc.settings = undefined;
+    assert.deepStrictEqual(doc.getChanges(), { $unset: { settings: 1 } });
+
+    // Should not throw, even though the subdoc has a required field
+    await doc.save();
+
+    // reload and check settings is undefined
+    doc = await Debug.findById(empty._id);
+    assert.strictEqual(doc.settings, undefined);
+  });
 });

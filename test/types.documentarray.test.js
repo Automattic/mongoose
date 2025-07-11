@@ -778,4 +778,14 @@ describe('types.documentarray', function() {
       /options.0.0.val: Path `val` is required./
     );
   });
+
+  it('stores all schematype options in the embedded schematype', function() {
+    const schema = new mongoose.Schema({
+      docArr: [{
+        type: new mongoose.Schema({ name: String }),
+        someCustomOption: 'test 42'
+      }]
+    });
+    assert.strictEqual(schema.path('docArr').$embeddedSchemaType.options.someCustomOption, 'test 42');
+  });
 });

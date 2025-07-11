@@ -1,3 +1,9 @@
+8.16.3 / 2025-07-10
+===================
+ * fix(document): clean modified subpaths if unsetting map #15520 #15519
+ * fix: make DocumentArray SchemaType pass all options to embedded SchemaType #15523
+ * types: support readonly array in query.select #15527 [omermizr](https://github.com/omermizr)
+
 8.16.2 / 2025-07-07
 ===================
  * fix(cursor): populate after hydrating in queryCursor so populated docs get parent() #15498 #15494

@@ -1877,11 +1877,7 @@ function testInferRawDocTypeFromSchema() {
     arr: number[],
     docArr: ({ name: string } & { _id: Types.ObjectId })[],
     subdoc?: ({ answer: number } & { _id: Types.ObjectId }) | null | undefined,
-<<<<<<< HEAD
-    map?: Record<string, string | undefined> | null | undefined
-      } & { _id: Types.ObjectId }>({} as RawDocType);
-=======
-    map?: Map<string, string> | null | undefined
+    map?: Record<string, string | undefined> | null | undefined;
   } & { _id: Types.ObjectId };
 
   expectType<Expected>({} as RawDocType);
@@ -1908,5 +1904,4 @@ async function testInferHydratedDocTypeFromSchema() {
   } & { _id: Types.ObjectId }>;
 
   expectType<Expected>({} as HydratedDocType);
->>>>>>> vkarpov15/schema-create
 }

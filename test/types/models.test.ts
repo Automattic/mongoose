@@ -1033,3 +1033,18 @@ async function gh15437() {
   expectType<number>(doc1.age);
   expectAssignable<undefined | null | string>(doc1.address);
 }
+
+async function customModelInstanceWithStatics() {
+  type RawDocType = { name: string };
+  type ModelType = mongoose.Model<RawDocType> & { someCustomProp: number };
+  const schema = new Schema<RawDocType, ModelType>(
+    { name: { type: String, required: true } },
+    {
+      statics: {
+        function() {
+          expectType<number>(this.someCustomProp);
+        }
+      }
+    }
+  )
+}

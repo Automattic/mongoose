@@ -1046,5 +1046,5 @@ async function customModelInstanceWithStatics() {
         }
       }
     }
-  )
+  );
 }

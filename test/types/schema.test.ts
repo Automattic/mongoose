@@ -1881,3 +1881,14 @@ function gh15516() {
     expectType<HydratedUserDoc>(this);
   });
 }
+
+function gh15536() {
+  const UserModelNameRequiredCustom = model('User', new Schema(
+    {
+      name: { type: String, required: 'This is a custom error message' }
+    }
+  ));
+
+  const user3 = new UserModelNameRequiredCustom({ name: null });
+  expectType<string>(user3.name);
+}

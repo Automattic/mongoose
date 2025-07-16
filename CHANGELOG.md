@@ -1,3 +1,11 @@
+8.16.4 / 2025-07-16
+===================
+ * fix(connection): avoid calling connection.close() internally with force: Object #15534 #15531
+ * types(schema): handle required: string in schema definitions #15538 #15536
+ * types(document): allow calling $isDefault() with no args #15528 #15522
+ * types: infer Typescript string enums #15530 [ruiaraujo](https://github.com/ruiaraujo)
+ * types: pass TModelType down to schema statics #15537
+
 8.16.3 / 2025-07-10
 ===================
  * fix(document): clean modified subpaths if unsetting map #15520 #15519

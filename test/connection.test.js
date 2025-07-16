@@ -463,6 +463,18 @@ describe('connections:', function() {
     }
   });
 
+  it('can re-open after close with useDb() (gh-15531)', async function() {
+    const opts = {};
+    const conn = await mongoose.createConnection(start.uri, opts).asPromise();
+
+    conn.useDb('test-db');
+
+    await conn.close();
+    await conn.openUri(start.uri);
+    assert.strictEqual(conn.readyState, 1);
+    await conn.collection('Test').insertOne({ x: 1 });
+  });
+
   it('verify that attempt to re-open destroyed connection throws error, via callback', async function() {
     const opts = {};
     const conn = await mongoose.createConnection(start.uri, opts).asPromise();

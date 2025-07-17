@@ -86,7 +86,7 @@ describe('Map', function() {
     assert.ok(threw);
   });
 
-  it('deep set', function(done) {
+  it('deep set', async function() {
     const userSchema = new mongoose.Schema({
       socialMediaHandles: {
         type: Schema.Types.Map,
@@ -102,8 +102,33 @@ describe('Map', function() {
 
     assert.equal(user.socialMediaHandles.get('github'), 'vkarpov15');
     assert.equal(user.get('socialMediaHandles.github'), 'vkarpov15');
+    await user.validate();
+  });
 
-    done();
+  it('handles required in maps', async function() {
+    const userSchema = new mongoose.Schema({
+      socialMediaHandles: {
+        type: Schema.Types.Map,
+        of: { type: String, required: true }
+      }
+    });
+
+    const User = db.model('Test', userSchema);
+
+    const user = new User({ socialMediaHandles: {} });
+    user.set('socialMediaHandles.github', null);
+    assert.strictEqual(user.socialMediaHandles.get('github'), null);
+    assert.strictEqual(user.get('socialMediaHandles.github'), null);
+    await assert.rejects(
+      user.validate(),
+      /socialMediaHandles.github: Path `socialMediaHandles.github` is required./
+    );
+
+    const user2 = new User({ socialMediaHandles: {} });
+    user2.set('socialMediaHandles.github', 'vkarpov15');
+    assert.equal(user2.socialMediaHandles.get('github'), 'vkarpov15');
+    assert.equal(user2.get('socialMediaHandles.github'), 'vkarpov15');
+    await user2.validate();
   });
 
   it('supports delete() (gh-7743)', async function() {

@@ -82,9 +82,9 @@ function gh15535() {
   const ParentSchema = new Schema({
     field1: {
       type: String,
-      required: true,
+      required: true
     },
-    field2: Number,
+    field2: Number
   }, {
     discriminatorKey: 'field1',
     methods: {
@@ -94,10 +94,10 @@ function gh15535() {
     }
   });
 
-  const ParentModel = mongoose.model('Parent', ParentSchema)
+  const ParentModel = mongoose.model('Parent', ParentSchema);
 
   const ChildSchema = new Schema({
-    field3: String,
+    field3: String
   }, {
     methods: {
       getField3() {
@@ -107,7 +107,7 @@ function gh15535() {
   });
 
 
-  const ChildModel = ParentModel.discriminator('child', ChildSchema)
+  const ChildModel = ParentModel.discriminator('child', ChildSchema);
 
   const doc = new ChildModel({});
   expectType<string>(doc.field1);

@@ -266,7 +266,6 @@ declare module 'mongoose' {
     THydratedDocumentType = HydratedDocument<TRawDocType, TVirtuals & TInstanceMethods, TQueryHelpers, TVirtuals>,
     TSchema = any> extends
     NodeJS.EventEmitter,
-    AcceptsDiscriminator,
     IndexManager,
     SessionStarter {
     new <DocType = Partial<TRawDocType>>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): THydratedDocumentType;
@@ -418,6 +417,33 @@ declare module 'mongoose' {
       'deleteOne',
       TInstanceMethods & TVirtuals
     >;
+
+    /** Adds a discriminator type. */
+    discriminator<TDiscriminatorSchema extends Schema<any>>(
+      name: string,
+      schema: TDiscriminatorSchema,
+      value?: string | number | ObjectId | DiscriminatorOptions
+    ): Model<
+      TRawDocType & InferSchemaType<TDiscriminatorSchema>,
+      TQueryHelpers & ObtainSchemaGeneric<TDiscriminatorSchema, 'TQueryHelpers'>,
+      TVirtuals & ObtainSchemaGeneric<TDiscriminatorSchema, 'TVirtuals'>,
+      HydratedDocument<
+        TRawDocType & InferSchemaType<TDiscriminatorSchema>,
+        TVirtuals & ObtainSchemaGeneric<TDiscriminatorSchema, 'TVirtuals'> & TInstanceMethods & ObtainSchemaGeneric<TDiscriminatorSchema, 'TInstanceMethods'>,
+        TQueryHelpers & ObtainSchemaGeneric<TDiscriminatorSchema, 'TQueryHelpers'>,
+        TVirtuals & ObtainSchemaGeneric<TDiscriminatorSchema, 'TVirtuals'>
+      >
+    > & ObtainSchemaGeneric<TDiscriminatorSchema, 'TStaticMethods'>;
+    discriminator<D>(
+      name: string | number,
+      schema: Schema,
+      value?: string | number | ObjectId | DiscriminatorOptions
+    ): Model<D>;
+    discriminator<T, U>(
+      name: string | number,
+      schema: Schema<T, U>,
+      value?: string | number | ObjectId | DiscriminatorOptions
+    ): U;
 
     /**
      * Delete an existing [Atlas search index](https://www.mongodb.com/docs/atlas/atlas-search/create-index/) by name.

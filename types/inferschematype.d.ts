@@ -56,8 +56,8 @@ declare module 'mongoose' {
    * @param {TSchema} TSchema A generic of schema type instance.
    * @param {alias} alias Targeted generic alias.
    */
-  type ObtainSchemaGeneric<TSchema, alias extends 'EnforcedDocType' | 'M' | 'TInstanceMethods' | 'TQueryHelpers' | 'TVirtuals' | 'TStaticMethods' | 'TSchemaOptions' | 'DocType'> =
-   TSchema extends Schema<infer EnforcedDocType, infer M, infer TInstanceMethods, infer TQueryHelpers, infer TVirtuals, infer TStaticMethods, infer TSchemaOptions, infer DocType>
+  type ObtainSchemaGeneric<TSchema, alias extends 'EnforcedDocType' | 'M' | 'TInstanceMethods' | 'TQueryHelpers' | 'TVirtuals' | 'TStaticMethods' | 'TSchemaOptions' | 'DocType' | 'THydratedDocumentType'> =
+   TSchema extends Schema<infer EnforcedDocType, infer M, infer TInstanceMethods, infer TQueryHelpers, infer TVirtuals, infer TStaticMethods, infer TSchemaOptions, infer DocType, infer THydratedDocumentType>
      ? {
        EnforcedDocType: EnforcedDocType;
        M: M;
@@ -67,6 +67,7 @@ declare module 'mongoose' {
        TStaticMethods: TStaticMethods;
        TSchemaOptions: TSchemaOptions;
        DocType: DocType;
+       THydratedDocumentType: THydratedDocumentType;
      }[alias]
      : unknown;
 
@@ -107,7 +108,7 @@ type IsPathDefaultUndefined<PathType> = PathType extends { default: undefined } 
  * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
  */
 type IsPathRequired<P, TypeKey extends string = DefaultTypeKey> =
-  P extends { required: true | [true, string | undefined] | { isRequired: true } } | ArrayConstructor | any[]
+  P extends { required: true | string | [true, string | undefined] | { isRequired: true } } | ArrayConstructor | any[]
     ? true
     : P extends { required: boolean }
       ? P extends { required: false }
@@ -203,7 +204,7 @@ TypeHint<PathValueType>
  * @param {T} T A generic refers to string path enums.
  * @returns Path enum values type as literal strings or string.
  */
-type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends ReadonlyArray<infer E> ? E : T extends { values: any } ? PathEnumOrString<T['values']> : string;
+type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends ReadonlyArray<infer E> ? E : T extends { values: any } ? PathEnumOrString<T['values']> : T extends Record<string, infer V> ? V : string;
 
 type IsSchemaTypeFromBuiltinClass<T> = T extends (typeof String)
   ? true

@@ -16,7 +16,8 @@ declare module 'mongoose' {
     QueryHelpers = {},
     TStaticMethods = {},
     TVirtuals = {},
-    THydratedDocumentType = HydratedDocument<DocType, TInstanceMethods, QueryHelpers>
+    THydratedDocumentType = HydratedDocument<DocType, TInstanceMethods, QueryHelpers>,
+    TModelType = Model<DocType, QueryHelpers, TInstanceMethods, TVirtuals, THydratedDocumentType>
   > {
     /**
      * By default, Mongoose's init() function creates all the indexes defined in your model's schema by
@@ -219,8 +220,8 @@ declare module 'mongoose' {
     statics?: IfEquals<
       TStaticMethods,
       {},
-      { [name: string]: (this: Model<DocType>, ...args: any[]) => unknown },
-      AddThisParameter<TStaticMethods, Model<DocType>>
+      { [name: string]: (this: TModelType, ...args: any[]) => unknown },
+      AddThisParameter<TStaticMethods, TModelType>
     >
 
     /**

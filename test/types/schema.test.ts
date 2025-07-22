@@ -1035,6 +1035,32 @@ function gh12869() {
   expectType<'foo' | 'bar'>({} as Example['active']);
 }
 
+
+function stringEnumInfer() {
+  enum StringEnum {
+    Foo = 'foo',
+    Bar = 'bar'
+  }
+
+  const stringEnumSchema = new Schema(
+    {
+      active: { type: String, enum: StringEnum }
+    }
+  );
+
+  type StringEnumExample = InferSchemaType<typeof stringEnumSchema>;
+  expectType<StringEnum | null | undefined>({} as StringEnumExample['active']);
+
+  const stringEnumSchemaRequired = new Schema(
+    {
+      active: { type: String, enum: StringEnum, required: true }
+    }
+  );
+
+  type StringEnumRequiredExample = InferSchemaType<typeof stringEnumSchemaRequired>;
+  expectAssignable<StringEnum>({} as StringEnumRequiredExample['active']);
+}
+
 function gh12882() {
   // Array of strings
   const arrString = new Schema({
@@ -1879,4 +1905,15 @@ function gh15516() {
   schema.virtual('myVirtual').get(function() {
     expectType<HydratedUserDoc>(this);
   });
+}
+
+function gh15536() {
+  const UserModelNameRequiredCustom = model('User', new Schema(
+    {
+      name: { type: String, required: 'This is a custom error message' }
+    }
+  ));
+
+  const user3 = new UserModelNameRequiredCustom({ name: null });
+  expectType<string>(user3.name);
 }

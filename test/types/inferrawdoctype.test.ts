@@ -1,4 +1,4 @@
-import { InferRawDocType } from "mongoose";
+import { InferRawDocType, type ResolveTimestamps } from "mongoose";
 import { expectType, expectError } from "tsd";
 
 function gh14839() {
@@ -72,4 +72,13 @@ function Timestamps() {
     createdAt: NativeDate;
     updatedAt: NativeDate;
   }>({} as UserType);
+
+  type Z = ResolveTimestamps<
+    { foo: true },
+    {
+      timestamps: {
+        createdAt: "bar";
+      };
+    }
+  >;
 }

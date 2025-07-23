@@ -56,8 +56,8 @@ declare module 'mongoose' {
    * @param {TSchema} TSchema A generic of schema type instance.
    * @param {alias} alias Targeted generic alias.
    */
-  type ObtainSchemaGeneric<TSchema, alias extends 'EnforcedDocType' | 'M' | 'TInstanceMethods' | 'TQueryHelpers' | 'TVirtuals' | 'TStaticMethods' | 'TSchemaOptions' | 'DocType' | 'THydratedDocumentType'> =
-   TSchema extends Schema<infer EnforcedDocType, infer M, infer TInstanceMethods, infer TQueryHelpers, infer TVirtuals, infer TStaticMethods, infer TSchemaOptions, infer DocType, infer THydratedDocumentType>
+  type ObtainSchemaGeneric<TSchema, alias extends 'EnforcedDocType' | 'M' | 'TInstanceMethods' | 'TQueryHelpers' | 'TVirtuals' | 'TStaticMethods' | 'TSchemaOptions' | 'DocType' | 'THydratedDocumentType' | 'TSchemaDefinition'> =
+   TSchema extends Schema<infer EnforcedDocType, infer M, infer TInstanceMethods, infer TQueryHelpers, infer TVirtuals, infer TStaticMethods, infer TSchemaOptions, infer DocType, infer THydratedDocumentType, infer TSchemaDefinition>
      ? {
        EnforcedDocType: EnforcedDocType;
        M: M;
@@ -68,6 +68,7 @@ declare module 'mongoose' {
        TSchemaOptions: TSchemaOptions;
        DocType: DocType;
        THydratedDocumentType: THydratedDocumentType;
+       TSchemaDefinition: TSchemaDefinition;
      }[alias]
      : unknown;
 
@@ -75,7 +76,7 @@ declare module 'mongoose' {
 
   type ApplySchemaOptions<T, O = DefaultSchemaOptions> = ResolveTimestamps<T, O>;
 
-  type ResolveTimestamps<T, O> = O extends { methods: any } | { statics: any } | { virtuals: any } | { timestamps?: false } ? T
+  type ResolveTimestamps<T, O> = O extends { timestamps: false } ? T
     // For some reason, TypeScript sets all the document properties to unknown
     // if we use methods, statics, or virtuals. So avoid inferring timestamps
     // if any of these are set for now. See gh-12807

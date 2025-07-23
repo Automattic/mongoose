@@ -23,7 +23,14 @@ declare module 'mongoose' {
     ): U;
   }
 
-  interface MongooseBulkWriteOptions extends mongodb.BulkWriteOptions {
+  export type MongooseBulkWriteResult = mongodb.BulkWriteResult & {
+    mongoose?: {
+      validationErrors: Error[],
+      results: Array<Error | mongodb.WriteError | null>
+    }
+  };
+
+  export interface MongooseBulkWriteOptions extends mongodb.BulkWriteOptions {
     session?: ClientSession;
     skipValidation?: boolean;
     throwOnValidationError?: boolean;
@@ -308,18 +315,18 @@ declare module 'mongoose' {
     bulkWrite<DocContents = TRawDocType>(
       writes: Array<AnyBulkWriteOperation<DocContents extends Document ? any : (DocContents extends {} ? DocContents : any)>>,
       options: MongooseBulkWriteOptions & { ordered: false }
-    ): Promise<mongodb.BulkWriteResult & { mongoose?: { validationErrors: Error[], results: Array<Error | mongodb.WriteError | null> } }>;
+    ): Promise<MongooseBulkWriteResult>;
     bulkWrite<DocContents = TRawDocType>(
       writes: Array<AnyBulkWriteOperation<DocContents extends Document ? any : (DocContents extends {} ? DocContents : any)>>,
       options?: MongooseBulkWriteOptions
-    ): Promise<mongodb.BulkWriteResult>;
+    ): Promise<MongooseBulkWriteResult>;
 
     /**
      * Sends multiple `save()` calls in a single `bulkWrite()`. This is faster than
      * sending multiple `save()` calls because with `bulkSave()` there is only one
      * network round trip to the MongoDB server.
      */
-    bulkSave(documents: Array<Document>, options?: MongooseBulkSaveOptions): Promise<mongodb.BulkWriteResult>;
+    bulkSave(documents: Array<Document>, options?: MongooseBulkSaveOptions): Promise<MongooseBulkWriteResult>;
 
     /** Collection the model uses. */
     collection: Collection;

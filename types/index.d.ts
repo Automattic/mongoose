@@ -602,7 +602,7 @@ declare module 'mongoose' {
     | typeof Schema.Types.UUID;
 
 
-  export type InferId<T> = T extends { _id?: any } ? T['_id'] : Types.ObjectId;
+  export type InferId<T> = mongodb.InferIdType<T>;
 
   export interface VirtualTypeOptions<HydratedDocType = Document, DocType = unknown> {
     /** If `ref` is not nullish, this becomes a populated virtual. */
@@ -896,11 +896,6 @@ declare module 'mongoose' {
   export type TreatAsPrimitives = actualPrimitives | NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId | Buffer | Function | mongodb.Binary | mongodb.ClientSession;
 
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
-
-  /**
-   * Helper to choose the best option between two type helpers
-   */
-  export type _pickObject<T1, T2, Fallback> = T1 extends false ? T2 extends false ? Fallback : T2 : T1;
 
   /* for ts-mongoose */
   export class mquery { }

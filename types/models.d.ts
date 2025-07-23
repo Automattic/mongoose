@@ -312,11 +312,11 @@ declare module 'mongoose' {
      * round trip to the MongoDB server.
      */
     bulkWrite<DocContents = TRawDocType>(
-      writes: Array<AnyBulkWriteOperation<DocContents extends Document ? any : (DocContents extends {} ? DocContents : any)>>,
+      writes: Array<AnyBulkWriteOperation<DocContents>>,
       options: MongooseBulkWriteOptions & { ordered: false }
     ): Promise<MongooseBulkWriteResult>;
     bulkWrite<DocContents = TRawDocType>(
-      writes: Array<AnyBulkWriteOperation<DocContents extends Document ? any : (DocContents extends {} ? DocContents : any)>>,
+      writes: Array<AnyBulkWriteOperation<DocContents>>,
       options?: MongooseBulkWriteOptions
     ): Promise<MongooseBulkWriteResult>;
 
@@ -426,20 +426,15 @@ declare module 'mongoose' {
     >;
 
     /** Adds a discriminator type. */
-    discriminator<TDiscriminatorSchema extends Schema<any>>(
-      name: string,
+    discriminator<TDiscriminatorSchema extends Schema<any, any>>(
+      name: string | number,
       schema: TDiscriminatorSchema,
       value?: string | number | ObjectId | DiscriminatorOptions
     ): Model<
       TRawDocType & InferSchemaType<TDiscriminatorSchema>,
       TQueryHelpers & ObtainSchemaGeneric<TDiscriminatorSchema, 'TQueryHelpers'>,
-      TVirtuals & ObtainSchemaGeneric<TDiscriminatorSchema, 'TVirtuals'>,
-      HydratedDocument<
-        TRawDocType & InferSchemaType<TDiscriminatorSchema>,
-        TVirtuals & ObtainSchemaGeneric<TDiscriminatorSchema, 'TVirtuals'> & TInstanceMethods & ObtainSchemaGeneric<TDiscriminatorSchema, 'TInstanceMethods'>,
-        TQueryHelpers & ObtainSchemaGeneric<TDiscriminatorSchema, 'TQueryHelpers'>,
-        TVirtuals & ObtainSchemaGeneric<TDiscriminatorSchema, 'TVirtuals'>
-      >
+      TInstanceMethods & ObtainSchemaGeneric<TDiscriminatorSchema, 'TInstanceMethods'>,
+      TVirtuals & ObtainSchemaGeneric<TDiscriminatorSchema, 'TVirtuals'>
     > & ObtainSchemaGeneric<TDiscriminatorSchema, 'TStaticMethods'>;
     discriminator<D>(
       name: string | number,
@@ -911,7 +906,7 @@ declare module 'mongoose' {
     replaceOne<ResultDoc = THydratedDocumentType>(
       filter?: RootFilterQuery<TRawDocType>,
       replacement?: TRawDocType | AnyObject,
-      options?: (mongodb.ReplaceOptions & MongooseQueryOptions<TRawDocType>) | null
+      options?: (mongodb.ReplaceOptions & QueryOptions<TRawDocType>) | null
     ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, TRawDocType, 'replaceOne', TInstanceMethods & TVirtuals>;
 
     /** Apply changes made to this model's schema after this model was compiled. */

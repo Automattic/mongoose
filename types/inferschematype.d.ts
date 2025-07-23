@@ -15,6 +15,7 @@ import {
   DefaultSchemaOptions,
   IsItRecordAndNotAny,
   Show,
+  type ResolveTimestamps,
 } from "mongoose";
 
 declare module "mongoose" {
@@ -122,24 +123,24 @@ declare module "mongoose" {
   };
 
   type ResolveTimestamps<T, O> = O extends UninferrableOptions
-    ? T
-    : // For some reason, TypeScript sets all the document properties to unknown
-    // if we use methods, statics, or virtuals. So avoid inferring timestamps
-    // if any of these are set for now. See gh-12807
-    O extends { timestamps: infer TimestampOptions }
+    ? // For some reason, TypeScript sets all the document properties to unknown
+      // if we use methods, statics, or virtuals. So avoid inferring timestamps
+      // if any of these are set for now. See gh-12807
+      T
+    : O extends { timestamps: infer TimestampOptions }
     ? TimestampOptions extends true
       ? Show<T & DefaultTimestampProps>
       : TimestampOptions extends SchemaTimestampsConfig
-      ? {
-          -readonly [K in keyof Pick<
-            TimestampOptions,
-            "createdAt" | "updatedAt"
-          > as TimestampOptions[K] extends true
-            ? K
-            : TimestampOptions[K] extends `${infer TimestampValue}`
-            ? TimestampValue
-            : never]: NativeDate;
-        } & T
+      ? Show<
+          T & {
+            [K in keyof TimestampOptions &
+              keyof DefaultTimestampProps as TimestampOptions[K] extends true
+              ? K
+              : TimestampOptions[K] extends `${infer TimestampValue}`
+              ? TimestampValue
+              : never]: NativeDate;
+          }
+        >
       : T
     : T;
 }

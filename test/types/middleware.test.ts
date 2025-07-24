@@ -179,7 +179,7 @@ function gh11257() {
   });
 
   schema.pre('save', { document: true }, function() {
-    expectType<HydratedDocument<User>>(this);
+    expectAssignable<HydratedDocument<User>>(this);
   });
 
   schema.pre('updateOne', { document: true, query: false }, function() {

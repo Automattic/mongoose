@@ -4,7 +4,7 @@ declare module 'mongoose' {
   /** Extract generic type from Aggregate class */
   type AggregateExtract<P> = P extends Aggregate<infer T> ? T : never;
 
-  interface AggregateOptions extends Omit<mongodb.AggregateOptions, 'session'>, SessionOption {
+  interface AggregateOptions extends Omit<mongodb.AggregateOptions & mongodb.Abortable, 'session'>, SessionOption {
     [key: string]: any;
   }
 

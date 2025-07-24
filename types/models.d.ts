@@ -334,7 +334,7 @@ declare module 'mongoose' {
     /** Creates a `countDocuments` query: counts the number of documents that match `filter`. */
     countDocuments(
       filter?: RootFilterQuery<TRawDocType>,
-      options?: (mongodb.CountOptions & MongooseBaseQueryOptions<TRawDocType>) | null
+      options?: (mongodb.CountOptions & MongooseBaseQueryOptions<TRawDocType> & mongodb.Abortable) | null
     ): QueryWithHelpers<
       number,
       THydratedDocumentType,
@@ -469,7 +469,7 @@ declare module 'mongoose' {
     findOne<ResultDoc = THydratedDocumentType>(
       filter: RootFilterQuery<TRawDocType>,
       projection: ProjectionType<TRawDocType> | null | undefined,
-      options: QueryOptions<TRawDocType> & { lean: true }
+      options: QueryOptions<TRawDocType> & { lean: true } & mongodb.Abortable
     ): QueryWithHelpers<
       GetLeanResultType<TRawDocType, TRawDocType, 'findOne'> | null,
       ResultDoc,
@@ -481,7 +481,7 @@ declare module 'mongoose' {
     findOne<ResultDoc = THydratedDocumentType>(
       filter?: RootFilterQuery<TRawDocType>,
       projection?: ProjectionType<TRawDocType> | null,
-      options?: QueryOptions<TRawDocType> | null
+      options?: QueryOptions<TRawDocType> & mongodb.Abortable | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType, 'findOne', TInstanceMethods & TVirtuals>;
     findOne<ResultDoc = THydratedDocumentType>(
       filter?: RootFilterQuery<TRawDocType>,
@@ -700,7 +700,7 @@ declare module 'mongoose' {
     find<ResultDoc = THydratedDocumentType>(
       filter: RootFilterQuery<TRawDocType>,
       projection: ProjectionType<TRawDocType> | null | undefined,
-      options: QueryOptions<TRawDocType> & { lean: true }
+      options: QueryOptions<TRawDocType> & { lean: true } & mongodb.Abortable
     ): QueryWithHelpers<
       GetLeanResultType<TRawDocType, TRawDocType[], 'find'>,
       ResultDoc,
@@ -712,7 +712,7 @@ declare module 'mongoose' {
     find<ResultDoc = THydratedDocumentType>(
       filter: RootFilterQuery<TRawDocType>,
       projection?: ProjectionType<TRawDocType> | null | undefined,
-      options?: QueryOptions<TRawDocType> | null | undefined
+      options?: QueryOptions<TRawDocType> & mongodb.Abortable | null | undefined
     ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'find', TInstanceMethods & TVirtuals>;
     find<ResultDoc = THydratedDocumentType>(
       filter: RootFilterQuery<TRawDocType>,

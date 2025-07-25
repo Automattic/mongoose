@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "mongoose": "file:../../../mongoose.tgz",
-    "typescript": "5.5.x"
+    "typescript": "5.8.x"
   },
   "scripts": {
     "benchmark": "tsc --extendedDiagnostics"

@@ -726,3 +726,47 @@ async function gh15526() {
   expectType<string | undefined | null>(u1.name);
   expectError(u1.age);
 }
+
+async function gh14173() {
+  const userSchema = new Schema({
+    name: String,
+    account: {
+      amount: Number,
+      owner: { type: String, default: () => 'OWNER' },
+      taxIds: [Number]
+    }
+  });
+  const User = model('User', userSchema);
+
+  const { _id } = await User.create({
+    name: 'test',
+    account: {
+      amount: 25,
+      owner: 'test',
+      taxIds: [42]
+    }
+  });
+
+  const doc = await User
+    .findOne({ _id }, { name: 1, account: { amount: 1 } })
+    .orFail();
+}
+
+async function gh3230() {
+  const Test = model(
+    'Test',
+    new Schema({ name: String, arr: [{ testRef: { type: 'ObjectId', ref: 'Test2' } }] })
+  );
+
+  const schema = new Schema({ name: String });
+  const Test2 = model('Test2', schema);
+  const D = Test2.discriminator('D', new Schema({ prop: String }));
+
+
+  await Test.deleteMany({});
+  await Test2.deleteMany({});
+  const { _id } = await D.create({ name: 'foo', prop: 'bar' });
+  const test = await Test.create({ name: 'test', arr: [{ testRef: _id }] });
+
+  console.log(await Test.findById(test._id).populate('arr.testRef', { name: 1, prop: 1, _id: 0, __t: 0 }));
+}

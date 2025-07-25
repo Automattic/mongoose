@@ -1,3 +1,9 @@
+8.16.5 / 2025-07-25
+===================
+ * fix(map): avoid throwing required error if saving map of primitives with required: true #15542
+ * types(model): export MongooseBulkWriteResult type #15546
+ * types(connection): add base to connection type #15544
+
 8.16.4 / 2025-07-16
 ===================
  * fix(connection): avoid calling connection.close() internally with force: Object #15534 #15531

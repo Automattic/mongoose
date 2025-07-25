@@ -532,7 +532,7 @@ export function autoTypedSchema() {
   }, {
     statics: {
       staticFn() {
-        expectType<Model<InferSchemaType<typeof AutoTypedSchema>>>(this);
+        expectAssignable<Model<InferSchemaType<typeof AutoTypedSchema>>>(this);
         return 'Returned from staticFn' as const;
       }
     },

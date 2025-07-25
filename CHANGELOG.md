@@ -1,3 +1,17 @@
+8.16.5 / 2025-07-25
+===================
+ * fix(map): avoid throwing required error if saving map of primitives with required: true #15542
+ * types(model): export MongooseBulkWriteResult type #15546
+ * types(connection): add base to connection type #15544
+
+8.16.4 / 2025-07-16
+===================
+ * fix(connection): avoid calling connection.close() internally with force: Object #15534 #15531
+ * types(schema): handle required: string in schema definitions #15538 #15536
+ * types(document): allow calling $isDefault() with no args #15528 #15522
+ * types: infer Typescript string enums #15530 [ruiaraujo](https://github.com/ruiaraujo)
+ * types: pass TModelType down to schema statics #15537
+
 8.16.3 / 2025-07-10
 ===================
  * fix(document): clean modified subpaths if unsetting map #15520 #15519

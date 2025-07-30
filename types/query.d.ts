@@ -31,19 +31,9 @@ declare module 'mongoose' {
     | 'strictQuery'
     | 'translateAliases';
 
-  type MongooseQueryOptions<
-    DocType = unknown,
-    Keys extends keyof QueryOptions<DocType> = MongooseBaseQueryOptionKeys | 'timestamps' | 'lean'
-  > = Pick<QueryOptions<DocType>, Keys> & {
-    [other: string]: any;
-  };
+  type MongooseBaseQueryOptions<DocType = unknown> = Pick<QueryOptions<DocType>, MongooseBaseQueryOptionKeys>;
 
-  type MongooseBaseQueryOptions<DocType = unknown> = MongooseQueryOptions<DocType, MongooseBaseQueryOptionKeys>;
-
-  type MongooseUpdateQueryOptions<DocType = unknown> = MongooseQueryOptions<
-    DocType,
-    MongooseBaseQueryOptionKeys | 'timestamps'
-  >;
+  type MongooseUpdateQueryOptions<DocType = unknown> = Pick<QueryOptions<DocType>, MongooseBaseQueryOptionKeys | 'timestamps'>;
 
   type ProjectionFields<DocType> = { [Key in keyof DocType]?: any } & Record<string, any>;
 
@@ -239,7 +229,7 @@ declare module 'mongoose' {
     : MergeType<ResultType, Paths>;
 
   class Query<ResultType, DocType, THelpers = {}, RawDocType = unknown, QueryOp = 'find', TDocOverrides = Record<string, never>> implements SessionOperation {
-    _mongooseOptions: MongooseQueryOptions<DocType>;
+    _mongooseOptions: QueryOptions<DocType>;
 
     /**
      * Returns a wrapper around a [mongodb driver cursor](https://mongodb.github.io/node-mongodb-native/4.9/classes/FindCursor.html).
@@ -634,7 +624,7 @@ declare module 'mongoose' {
      * Getter/setter around the current mongoose-specific options for this query
      * Below are the current Mongoose-specific options.
      */
-    mongooseOptions(val?: MongooseQueryOptions): MongooseQueryOptions;
+    mongooseOptions(val?: QueryOptions<DocType>): QueryOptions<DocType>;
 
     /** Specifies a `$ne` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     ne<K = string>(path: K, val: any): this;

@@ -463,7 +463,7 @@ async function gh12342_auto() {
 
   const ProjectModel = model('Project', ProjectSchema);
 
-  expectType<HydratedDocument<Project>[]>(
+  expectAssignable<HydratedDocument<Project>[]>(
     await ProjectModel.findOne().where('stars').gt(1000).byName('mongoose')
   );
 }

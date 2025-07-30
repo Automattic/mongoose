@@ -1,3 +1,14 @@
+8.17.0 / 2025-07-30
+===================
+ * feat: upgrade mongodb -> 6.18.0 #15552
+ * feat(mongoose): export base Connection and Collection classes #15548
+ * feat: make Schema.prototype.$conditionalHandlers public #15497
+ * types: automatically infer discriminator type #15547 #15535
+ * types: make versionKey: false disable __v from hydrated document #15524 #15511
+ * types: indicate support for mongodb abort #15549 [GalacticHypernova](https://github.com/GalacticHypernova)
+ * types: add options property to schemas #15524
+ * types(schematype): make defaultOptions static and add schemaOptions to DocumentArray #15529 #15524
+
 8.16.5 / 2025-07-25
 ===================
  * fix(map): avoid throwing required error if saving map of primitives with required: true #15542

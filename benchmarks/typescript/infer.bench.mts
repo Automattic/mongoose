@@ -1,13 +1,23 @@
 import { bench } from "@ark/attest";
 import type { InferRawDocType } from "mongoose";
 
+bench.baseline(() => {
+  const baselineDefinition = {
+    foo: {
+      type: Boolean,
+    },
+    bar: {
+      type: Number,
+      required: true,
+    },
+  };
+  type BaselineType = InferRawDocType<typeof baselineDefinition>;
+});
+
 const schemaDefinition = {
   email: {
     type: String,
-    trim: true,
     required: true,
-    unique: true,
-    lowercase: true,
   },
   password: {
     type: String,
@@ -15,10 +25,9 @@ const schemaDefinition = {
   },
   dateOfBirth: {
     type: Date,
-    required: true,
   },
 };
 
 bench("InferRawDocType", () => {
   type UserType = InferRawDocType<typeof schemaDefinition>;
-}).types([471, "instantiations"]);
+}).types([165, "instantiations"]);

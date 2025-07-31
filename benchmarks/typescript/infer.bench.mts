@@ -30,4 +30,5 @@ const schemaDefinition = {
 
 bench("InferRawDocType", () => {
   type UserType = InferRawDocType<typeof schemaDefinition>;
-}).types([165, "instantiations"]);
+  // original 165
+}).types([98, "instantiations"]);

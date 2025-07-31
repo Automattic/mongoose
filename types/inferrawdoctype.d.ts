@@ -5,6 +5,8 @@ import {
   OptionalPaths,
   PathWithTypePropertyBaseType,
   PathEnumOrString,
+  type OptionalPathKeys,
+  type RequiredPathKeys,
 } from "./inferschematype";
 
 declare module "mongoose" {
@@ -13,19 +15,21 @@ declare module "mongoose" {
     TSchemaOptions extends Record<any, any> = DefaultSchemaOptions,
   > = ApplySchemaOptions<
     {
-      [K in keyof (RequiredPaths<DocDefinition, TSchemaOptions["typeKey"]> &
-        OptionalPaths<
-          DocDefinition,
-          TSchemaOptions["typeKey"]
-        >)]: IsPathRequired<
+      [K in RequiredPathKeys<
+        DocDefinition,
+        TSchemaOptions["typeKey"]
+      >]: ObtainRawDocumentPathType<
         DocDefinition[K],
         TSchemaOptions["typeKey"]
-      > extends true
-        ? ObtainRawDocumentPathType<DocDefinition[K], TSchemaOptions["typeKey"]>
-        : ObtainRawDocumentPathType<
-            DocDefinition[K],
-            TSchemaOptions["typeKey"]
-          > | null;
+      >;
+    } & {
+      [K in OptionalPathKeys<
+        DocDefinition,
+        TSchemaOptions["typeKey"]
+      >]?: ObtainRawDocumentPathType<
+        DocDefinition[K],
+        TSchemaOptions["typeKey"]
+      > | null;
     },
     TSchemaOptions
   >;

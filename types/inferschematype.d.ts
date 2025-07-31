@@ -136,9 +136,7 @@ declare module "mongoose" {
             [K in keyof TimestampOptions &
               keyof DefaultTimestampProps as TimestampOptions[K] extends true
               ? K
-              : TimestampOptions[K] extends `${infer TimestampValue}`
-              ? TimestampValue
-              : never]: NativeDate;
+              : TimestampOptions[K] & string]: NativeDate;
           }
         >
       : T

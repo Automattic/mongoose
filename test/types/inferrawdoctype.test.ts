@@ -73,7 +73,7 @@ function Timestamps() {
     updatedAt: NativeDate;
   }>({} as UserType);
 
-  type Z = ResolveTimestamps<
+  type Resolved = ResolveTimestamps<
     { foo: true },
     {
       timestamps: {
@@ -81,4 +81,11 @@ function Timestamps() {
       };
     }
   >;
+
+  expectType<Resolved>(
+    {} as {
+      foo: true;
+      bar: NativeDate;
+    }
+  );
 }

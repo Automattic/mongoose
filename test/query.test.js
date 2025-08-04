@@ -4469,6 +4469,14 @@ describe('Query', function() {
     });
   });
 
+  it('propagates readPreference to populate options if read() is called after populate() (gh-15553)', async function() {
+    const schema = new Schema({ name: String, age: Number, friends: [{ type: 'ObjectId', ref: 'Person' }] });
+    const Person = db.model('Person', schema);
+    const query = Person.find({}).populate('friends');
+    query.read('secondaryPreferred');
+    await query.exec();
+    assert.strictEqual(query._mongooseOptions.populate.friends.options.readPreference.mode, 'secondaryPreferred');
+  });
 
   describe('Query with requireFilter', function() {
     let Person;

@@ -207,9 +207,11 @@ declare module 'mongoose' {
 
     /** If set, Mongoose will add a custom validator that ensures the given string's `length` is at least the given number. */
     minlength?: number | [number, string] | readonly [number, string];
+    minLength?: number | [number, string] | readonly [number, string];
 
     /** If set, Mongoose will add a custom validator that ensures the given string's `length` is at most the given number. */
     maxlength?: number | [number, string] | readonly [number, string];
+    maxLength?: number | [number, string] | readonly [number, string];
 
     [other: string]: any;
 

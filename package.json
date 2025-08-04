@@ -29,7 +29,7 @@
     "sift": "17.1.3"
   },
   "devDependencies": {
-    "@babel/core": "7.27.7",
+    "@babel/core": "7.28.0",
     "@babel/preset-env": "7.27.2",
     "@mongodb-js/mongodb-downloader": "^0.4.2",
     "@typescript-eslint/eslint-plugin": "^8.19.1",

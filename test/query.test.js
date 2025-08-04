@@ -4486,6 +4486,10 @@ describe('Query', function() {
     query = Person.find({}).read('secondaryPreferred').populate('friends');
     await query.exec();
     assert.strictEqual(query._mongooseOptions.populate.friends.options.readPreference.mode, 'secondaryPreferred');
+
+    query = Person.find({}).read('primaryPreferred').populate({ path: 'friends', options: { readPreference: 'secondaryPreferred' } });
+    await query.exec();
+    assert.strictEqual(query._mongooseOptions.populate.friends.options.readPreference, 'secondaryPreferred');
   });
 
   describe('Query with requireFilter', function() {

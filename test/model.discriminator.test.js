@@ -156,6 +156,30 @@ describe('model', function() {
       assert.equal(doc.virtualB, 'virtualB');
     });
 
+    it('can define statics using schema options (gh-15556)', function() {
+      const baseSchema = new mongoose.Schema({
+        name: String
+      }, {
+        statics: {
+          staticFunction: () => 'base'
+        }
+      });
+
+      const discriminatorSchema = new mongoose.Schema({
+        prop: String
+      }, {
+        statics: {
+          staticFunction: () => 'discriminator',
+          otherStaticFunction: () => 42
+        }
+      });
+      const BaseModel = db.model('Test', baseSchema);
+      const DiscriminatorModel = BaseModel.discriminator('Test1', discriminatorSchema);
+
+      assert.equal(DiscriminatorModel.staticFunction(), 'discriminator');
+      assert.equal(DiscriminatorModel.otherStaticFunction(), 42);
+    });
+
     it('sets schema root discriminator mapping', function(done) {
       assert.deepEqual(Person.schema.discriminatorMapping, { key: '__t', value: null, isRoot: true });
       done();

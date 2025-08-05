@@ -704,9 +704,9 @@ declare module 'mongoose' {
           [K in keyof T]?: T[K] extends Record<string, any> ? Projector<T[K], Element> | Element : Element;
         }
         : Element;
-  type _IDType = { _id?: boolean | 1 | 0 };
+  type _IDType = { _id?: boolean | number };
   export type InclusionProjection<T> = IsItRecordAndNotAny<T> extends true
-    ? Omit<Projector<WithLevel1NestedPaths<T>, true | 1>, '_id'> & _IDType
+    ? Omit<Projector<WithLevel1NestedPaths<T>, boolean | number>, '_id'> & _IDType
     : AnyObject;
   export type ExclusionProjection<T> = IsItRecordAndNotAny<T> extends true
     ? Omit<Projector<WithLevel1NestedPaths<T>, false | 0>, '_id'> & _IDType

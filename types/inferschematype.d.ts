@@ -63,7 +63,7 @@ declare module 'mongoose' {
        M: M;
        TInstanceMethods: TInstanceMethods;
        TQueryHelpers: TQueryHelpers;
-       TVirtuals: TVirtuals;
+       TVirtuals: (DocType extends { id: any } ? TVirtuals : TSchemaOptions extends { id: false } ? TVirtuals : TVirtuals & { id: string });
        TStaticMethods: TStaticMethods;
        TSchemaOptions: TSchemaOptions;
        DocType: DocType;

@@ -1,21 +1,19 @@
 import {
-  Schema,
-  InferSchemaType,
-  SchemaType,
-  SchemaTypeOptions,
-  Types,
-  NumberSchemaDefinition,
-  StringSchemaDefinition,
   BooleanSchemaDefinition,
   DateSchemaDefinition,
-  ObtainDocumentType,
-  DefaultTypeKey,
-  ObjectIdSchemaDefinition,
-  IfEquals,
   DefaultSchemaOptions,
+  DefaultTypeKey,
+  IfEquals,
+  InferSchemaType,
   IsItRecordAndNotAny,
-  Show,
-  type ResolveTimestamps,
+  NumberSchemaDefinition,
+  ObjectIdSchemaDefinition,
+  ObtainDocumentType,
+  Schema,
+  SchemaType,
+  SchemaTypeOptions,
+  StringSchemaDefinition,
+  Types,
 } from "mongoose";
 
 declare module "mongoose" {
@@ -190,15 +188,6 @@ type IsPathRequired<
         : false;
 
 /**
- * @summary Path base type defined by using TypeKey
- * @description It helps to check if a path is defined by TypeKey OR not.
- * @param {TypeKey} TypeKey A literal string refers to path type property key.
- */
-type PathWithTypePropertyBaseType<TypeKey extends string = DefaultTypeKey> = {
-  [k in TypeKey]: any;
-};
-
-/**
  * @summary A Utility to obtain schema's required path keys.
  * @param {T} T A generic refers to document definition.
  * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
@@ -256,13 +245,13 @@ type ObtainDocumentPathType<
   PathValueType,
   TypeKey extends string = DefaultTypeKey,
 > = ResolvePathType<
-  PathValueType extends PathWithTypePropertyBaseType<TypeKey>
-    ? PathValueType[TypeKey] extends PathWithTypePropertyBaseType<TypeKey>
+  TypeKey extends keyof PathValueType
+    ? TypeKey extends keyof PathValueType[TypeKey]
       ? PathValueType
       : PathValueType[TypeKey]
     : PathValueType,
-  PathValueType extends PathWithTypePropertyBaseType<TypeKey>
-    ? PathValueType[TypeKey] extends PathWithTypePropertyBaseType<TypeKey>
+  TypeKey extends keyof PathValueType
+    ? TypeKey extends keyof PathValueType[TypeKey]
       ? {}
       : Omit<PathValueType, TypeKey>
     : {},

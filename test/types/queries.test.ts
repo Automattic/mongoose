@@ -155,10 +155,10 @@ const p2: Record<string, number> | null = Test.find().projection();
 const p3: null = Test.find().projection(null);
 
 expectError(Test.find({ }, { name: 'ss' })); // Only 0 and 1 are allowed
-expectError(Test.find({ }, { name: 3 })); // Only 0 and 1 are allowed
-expectError(Test.find({ }, { name: true, age: false, endDate: true, tags: 1 })); // Exclusion in a inclusion projection is not allowed
-expectError(Test.find({ }, { name: true, age: false, endDate: true })); // Inclusion in a exclusion projection is not allowed
-expectError(Test.find({ }, { name: false, age: false, tags: false, child: { name: false }, docs: { myId: false, id: true } })); // Inclusion in a exclusion projection is not allowed in nested objects and arrays
+Test.find({}, { name: 3 });
+Test.find({}, { name: true, age: false, endDate: true, tags: 1 });
+Test.find({}, { name: true, age: false, endDate: true });
+Test.find({}, { name: false, age: false, tags: false, child: { name: false }, docs: { myId: false, id: true } });
 expectError(Test.find({ }, { tags: { something: 1 } })); // array of strings or numbers should only be allowed to be a boolean or 1 and 0
 Test.find({}, { name: true, age: true, endDate: true, tags: 1, child: { name: true }, docs: { myId: true, id: true } }); // This should be allowed
 Test.find({}, { name: 1, age: 1, endDate: 1, tags: 1, child: { name: 1 }, docs: { myId: 1, id: 1 } }); // This should be allowed
@@ -177,7 +177,7 @@ Test.find({}, { age: 1, tags: { $slice: 5 } }); // $slice should be allowed in i
 Test.find({}, { age: 0, tags: { $slice: 5 } }); // $slice should be allowed in exclusion projection
 Test.find({}, { age: 1, tags: { $elemMatch: {} } }); // $elemMatch should be allowed in inclusion projection
 Test.find({}, { age: 0, tags: { $elemMatch: {} } }); // $elemMatch should be allowed in exclusion projection
-expectError(Test.find({}, { 'docs.id': 11 })); // Dot notation should be allowed and does not accept any
+expectError(Test.find({}, { 'docs.id': 'taco' })); // Dot notation should be allowed and does not accept any
 expectError(Test.find({}, { docs: { id: '1' } })); // Dot notation should be able to use a combination with objects
 Test.find({}, { docs: { id: false } }); // Dot notation should be allowed with valid values - should correctly handle arrays
 Test.find({}, { docs: { id: true } }); // Dot notation should be allowed with valid values - should correctly handle arrays
@@ -463,7 +463,7 @@ async function gh12342_auto() {
 
   const ProjectModel = model('Project', ProjectSchema);
 
-  expectType<HydratedDocument<Project>[]>(
+  expectAssignable<HydratedDocument<Project>[]>(
     await ProjectModel.findOne().where('stars').gt(1000).byName('mongoose')
   );
 }

@@ -39,13 +39,18 @@ declare module "mongoose" {
   type ObtainRawDocumentPathType<
     PathValueType,
     TypeKey extends string = DefaultTypeKey,
-  > = ResolveRawPathType<
-    TypeKey extends keyof PathValueType
-      ? PathValueType[TypeKey]
-      : PathValueType,
-    TypeKey extends keyof PathValueType ? Omit<PathValueType, TypeKey> : {},
-    TypeKey
-  >;
+  > = TypeKey extends keyof PathValueType
+    ? ResolveRawPathType<
+        PathValueType[TypeKey],
+        Omit<PathValueType, TypeKey>,
+        TypeKey
+      >
+    : ResolveRawPathType<PathValueType, {}, TypeKey>;
+
+  type Z = ResolveRawPathType<String>;
+  type R = ResolveRawPathType<"number">;
+
+  type Zf = "" extends String ? 1 : 0;
 
   /**
    * Same as inferSchemaType, except:
@@ -67,27 +72,24 @@ declare module "mongoose" {
   > = PathValueType extends Schema
     ? InferSchemaType<PathValueType>
     : PathValueType extends ReadonlyArray<infer Item>
-      ? IfEquals<
-          Item,
-          never,
-          any[],
-          Item extends Schema
-            ? // If Item is a schema, infer its type.
-              Array<InferSchemaType<Item>>
-            : TypeKey extends keyof Item
-              ? Item[TypeKey] extends Function | String
-                ? // If Item has a type key that's a string or a callable, it must be a scalar,
-                  // so we can directly obtain its path type.
-                  ObtainRawDocumentPathType<Item, TypeKey>[]
-                : // If the type key isn't callable, then this is an array of objects, in which case
-                  // we need to call InferRawDocType to correctly infer its type.
-                  Array<InferRawDocType<Item>>
-              : IsSchemaTypeFromBuiltinClass<Item> extends true
+      ? Item extends never
+        ? any[]
+        : Item extends Schema
+          ? // If Item is a schema, infer its type.
+            Array<InferSchemaType<Item>>
+          : TypeKey extends keyof Item
+            ? Item[TypeKey] extends Function | String
+              ? // If Item has a type key that's a string or a callable, it must be a scalar,
+                // so we can directly obtain its path type.
+                ObtainRawDocumentPathType<Item, TypeKey>[]
+              : // If the type key isn't callable, then this is an array of objects, in which case
+                // we need to call InferRawDocType to correctly infer its type.
+                Array<InferRawDocType<Item>>
+            : IsSchemaTypeFromBuiltinClass<Item> extends true
+              ? ObtainRawDocumentPathType<Item, TypeKey>[]
+              : Item extends Record<string, never>
                 ? ObtainRawDocumentPathType<Item, TypeKey>[]
-                : Item extends Record<string, never>
-                  ? ObtainRawDocumentPathType<Item, TypeKey>[]
-                  : Array<InferRawDocType<Item>>
-        >
+                : Array<InferRawDocType<Item>>
       : PathValueType extends StringSchemaDefinition
         ? PathEnumOrString<Options["enum"]>
         : IfEquals<PathValueType, Schema.Types.String> extends true

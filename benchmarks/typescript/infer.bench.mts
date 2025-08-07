@@ -38,4 +38,4 @@ bench("InferRawDocType", () => {
   // force lazily evaluated properties to be checked
   type Value = UserType[keyof UserType];
   // original 165
-}).types([341, "instantiations"]);
+}).types([314, "instantiations"]);

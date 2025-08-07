@@ -8,10 +8,15 @@ bench.baseline(() => {
     },
     bar: {
       type: Number,
+    },
+    dob: {
+      type: Date,
       required: true,
     },
   };
   type BaselineType = InferRawDocType<typeof baselineDefinition>;
+  // force lazily evaluated properties to be checked
+  type Foo = BaselineType[keyof BaselineType];
 });
 
 const schemaDefinition = {
@@ -19,8 +24,8 @@ const schemaDefinition = {
     type: String,
     required: true,
   },
-  password: {
-    type: String,
+  id: {
+    type: Number,
     required: true,
   },
   dateOfBirth: {
@@ -30,5 +35,7 @@ const schemaDefinition = {
 
 bench("InferRawDocType", () => {
   type UserType = InferRawDocType<typeof schemaDefinition>;
+  // force lazily evaluated properties to be checked
+  type Value = UserType[keyof UserType];
   // original 165
-}).types([98, "instantiations"]);
+}).types([341, "instantiations"]);

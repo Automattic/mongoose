@@ -37,5 +37,5 @@ bench("InferRawDocType", () => {
   type UserType = InferRawDocType<typeof schemaDefinition>;
   // force lazily evaluated properties to be checked
   type Value = UserType[keyof UserType];
-  // original 165
+  // original 506
 }).types([314, "instantiations"]);

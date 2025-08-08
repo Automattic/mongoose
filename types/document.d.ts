@@ -166,9 +166,6 @@ declare module 'mongoose' {
      */
     getChanges(): UpdateQuery<this>;
 
-    /** The string version of this documents _id. */
-    id?: any;
-
     /** Signal that we desire an increment of this documents version. */
     increment(): this;
 

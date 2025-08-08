@@ -51,6 +51,9 @@ declare module 'mongoose' {
    */
   export type InferSchemaType<TSchema> = IfAny<TSchema, any, ObtainSchemaGeneric<TSchema, 'DocType'>>;
 
+  export type DefaultIdVirtual = { id: string };
+  export type AddDefaultId<DocType, TVirtuals, TSchemaOptions> = (DocType extends { id: any } ? TVirtuals : TSchemaOptions extends { id: false } ? TVirtuals : TVirtuals & { id: string });
+
   /**
    * @summary Obtains schema Generic type by using generic alias.
    * @param {TSchema} TSchema A generic of schema type instance.
@@ -63,7 +66,7 @@ declare module 'mongoose' {
        M: M;
        TInstanceMethods: TInstanceMethods;
        TQueryHelpers: TQueryHelpers;
-       TVirtuals: TVirtuals;
+       TVirtuals: AddDefaultId<DocType, TVirtuals, TSchemaOptions>;
        TStaticMethods: TStaticMethods;
        TSchemaOptions: TSchemaOptions;
        DocType: DocType;

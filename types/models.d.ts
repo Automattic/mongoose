@@ -273,7 +273,6 @@ declare module 'mongoose' {
     THydratedDocumentType = HydratedDocument<TRawDocType, TVirtuals & TInstanceMethods, TQueryHelpers, TVirtuals>,
     TSchema = any> extends
     NodeJS.EventEmitter,
-    AcceptsDiscriminator,
     IndexManager,
     SessionStarter {
     new <DocType = Partial<TRawDocType>>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): THydratedDocumentType;
@@ -313,11 +312,11 @@ declare module 'mongoose' {
      * round trip to the MongoDB server.
      */
     bulkWrite<DocContents = TRawDocType>(
-      writes: Array<AnyBulkWriteOperation<DocContents extends Document ? any : (DocContents extends {} ? DocContents : any)>>,
+      writes: Array<AnyBulkWriteOperation<DocContents>>,
       options: MongooseBulkWriteOptions & { ordered: false }
     ): Promise<MongooseBulkWriteResult>;
     bulkWrite<DocContents = TRawDocType>(
-      writes: Array<AnyBulkWriteOperation<DocContents extends Document ? any : (DocContents extends {} ? DocContents : any)>>,
+      writes: Array<AnyBulkWriteOperation<DocContents>>,
       options?: MongooseBulkWriteOptions
     ): Promise<MongooseBulkWriteResult>;
 
@@ -334,7 +333,7 @@ declare module 'mongoose' {
     /** Creates a `countDocuments` query: counts the number of documents that match `filter`. */
     countDocuments(
       filter?: RootFilterQuery<TRawDocType>,
-      options?: (mongodb.CountOptions & MongooseBaseQueryOptions<TRawDocType>) | null
+      options?: (mongodb.CountOptions & MongooseBaseQueryOptions<TRawDocType> & mongodb.Abortable) | null
     ): QueryWithHelpers<
       number,
       THydratedDocumentType,
@@ -426,6 +425,28 @@ declare module 'mongoose' {
       TInstanceMethods & TVirtuals
     >;
 
+    /** Adds a discriminator type. */
+    discriminator<TDiscriminatorSchema extends Schema<any, any>>(
+      name: string | number,
+      schema: TDiscriminatorSchema,
+      value?: string | number | ObjectId | DiscriminatorOptions
+    ): Model<
+      TRawDocType & InferSchemaType<TDiscriminatorSchema>,
+      TQueryHelpers & ObtainSchemaGeneric<TDiscriminatorSchema, 'TQueryHelpers'>,
+      TInstanceMethods & ObtainSchemaGeneric<TDiscriminatorSchema, 'TInstanceMethods'>,
+      TVirtuals & ObtainSchemaGeneric<TDiscriminatorSchema, 'TVirtuals'>
+    > & ObtainSchemaGeneric<TDiscriminatorSchema, 'TStaticMethods'>;
+    discriminator<D>(
+      name: string | number,
+      schema: Schema,
+      value?: string | number | ObjectId | DiscriminatorOptions
+    ): Model<D>;
+    discriminator<T, U>(
+      name: string | number,
+      schema: Schema<T, U>,
+      value?: string | number | ObjectId | DiscriminatorOptions
+    ): U;
+
     /**
      * Delete an existing [Atlas search index](https://www.mongodb.com/docs/atlas/atlas-search/create-index/) by name.
      * This function only works when connected to MongoDB Atlas.
@@ -469,7 +490,7 @@ declare module 'mongoose' {
     findOne<ResultDoc = THydratedDocumentType>(
       filter: RootFilterQuery<TRawDocType>,
       projection: ProjectionType<TRawDocType> | null | undefined,
-      options: QueryOptions<TRawDocType> & { lean: true }
+      options: QueryOptions<TRawDocType> & { lean: true } & mongodb.Abortable
     ): QueryWithHelpers<
       GetLeanResultType<TRawDocType, TRawDocType, 'findOne'> | null,
       ResultDoc,
@@ -481,7 +502,7 @@ declare module 'mongoose' {
     findOne<ResultDoc = THydratedDocumentType>(
       filter?: RootFilterQuery<TRawDocType>,
       projection?: ProjectionType<TRawDocType> | null,
-      options?: QueryOptions<TRawDocType> | null
+      options?: QueryOptions<TRawDocType> & mongodb.Abortable | null
     ): QueryWithHelpers<ResultDoc | null, ResultDoc, TQueryHelpers, TRawDocType, 'findOne', TInstanceMethods & TVirtuals>;
     findOne<ResultDoc = THydratedDocumentType>(
       filter?: RootFilterQuery<TRawDocType>,
@@ -700,7 +721,7 @@ declare module 'mongoose' {
     find<ResultDoc = THydratedDocumentType>(
       filter: RootFilterQuery<TRawDocType>,
       projection: ProjectionType<TRawDocType> | null | undefined,
-      options: QueryOptions<TRawDocType> & { lean: true }
+      options: QueryOptions<TRawDocType> & { lean: true } & mongodb.Abortable
     ): QueryWithHelpers<
       GetLeanResultType<TRawDocType, TRawDocType[], 'find'>,
       ResultDoc,
@@ -712,7 +733,7 @@ declare module 'mongoose' {
     find<ResultDoc = THydratedDocumentType>(
       filter: RootFilterQuery<TRawDocType>,
       projection?: ProjectionType<TRawDocType> | null | undefined,
-      options?: QueryOptions<TRawDocType> | null | undefined
+      options?: QueryOptions<TRawDocType> & mongodb.Abortable | null | undefined
     ): QueryWithHelpers<Array<ResultDoc>, ResultDoc, TQueryHelpers, TRawDocType, 'find', TInstanceMethods & TVirtuals>;
     find<ResultDoc = THydratedDocumentType>(
       filter: RootFilterQuery<TRawDocType>,
@@ -885,7 +906,7 @@ declare module 'mongoose' {
     replaceOne<ResultDoc = THydratedDocumentType>(
       filter?: RootFilterQuery<TRawDocType>,
       replacement?: TRawDocType | AnyObject,
-      options?: (mongodb.ReplaceOptions & MongooseQueryOptions<TRawDocType>) | null
+      options?: (mongodb.ReplaceOptions & QueryOptions<TRawDocType>) | null
     ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, TRawDocType, 'replaceOne', TInstanceMethods & TVirtuals>;
 
     /** Apply changes made to this model's schema after this model was compiled. */

@@ -1,3 +1,29 @@
+8.17.1 / 2025-08-07
+===================
+ * fix(query): propagate read preference and read concern to populate if read() called after populate() #15567 #15553
+ * fix(model): call correct function in autoSearchIndex #15569 #15565
+ * fix(model): allow setting statics option on discriminator schema #15568 #15556
+ * fix(model): remove unnecessary conversion of undefined -> null in findById #15566 #15551
+ * types: allow passing in projections without as const #15564 #15557
+ * types: support maxLength and minLength in SchemaTypeOptions #15570 #4720
+
+8.17.0 / 2025-07-30
+===================
+ * feat: upgrade mongodb -> 6.18.0 #15552
+ * feat(mongoose): export base Connection and Collection classes #15548
+ * feat: make Schema.prototype.$conditionalHandlers public #15497
+ * types: automatically infer discriminator type #15547 #15535
+ * types: make versionKey: false disable __v from hydrated document #15524 #15511
+ * types: indicate support for mongodb abort #15549 [GalacticHypernova](https://github.com/GalacticHypernova)
+ * types: add options property to schemas #15524
+ * types(schematype): make defaultOptions static and add schemaOptions to DocumentArray #15529 #15524
+
+8.16.5 / 2025-07-25
+===================
+ * fix(map): avoid throwing required error if saving map of primitives with required: true #15542
+ * types(model): export MongooseBulkWriteResult type #15546
+ * types(connection): add base to connection type #15544
+
 8.16.4 / 2025-07-16
 ===================
  * fix(connection): avoid calling connection.close() internally with force: Object #15534 #15531

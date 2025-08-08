@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "8.16.4",
+  "version": "8.17.1",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -22,7 +22,7 @@
   "dependencies": {
     "bson": "^6.10.4",
     "kareem": "git+https://github.com/mongoosejs/kareem.git#vkarpov15/v3",
-    "mongodb": "~6.17.0",
+    "mongodb": "~6.18.0",
     "mpath": "0.9.0",
     "mquery": "5.0.0",
     "ms": "2.1.3",
@@ -35,7 +35,7 @@
     "acquit-require": "0.1.1",
     "ajv": "8.17.1",
     "broken-link-checker": "^0.7.8",
-    "cheerio": "1.1.0",
+    "cheerio": "1.1.2",
     "dox": "1.0.0",
     "eslint": "9.25.1",
     "eslint-plugin-markdown": "^5.1.0",

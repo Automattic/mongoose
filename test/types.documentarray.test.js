@@ -786,6 +786,6 @@ describe('types.documentarray', function() {
         someCustomOption: 'test 42'
       }]
     });
-    assert.strictEqual(schema.path('docArr').$embeddedSchemaType.options.someCustomOption, 'test 42');
+    assert.strictEqual(schema.path('docArr').getEmbeddedSchemaType().options.someCustomOption, 'test 42');
   });
 });

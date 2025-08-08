@@ -293,3 +293,18 @@ function findById<ModelType extends {_id: Types.ObjectId | string}>(model: Model
   return model.find({_id: _id} as FilterQuery<ModelType>); // In Mongoose 8, this `as` was not required
 }
 ```
+
+### Document `id` is no longer `any`
+
+In Mongoose 8 and earlier, `id` was a property on the `Document` class that was set to `any`.
+This was inconsistent with runtime behavior, where `id` is a virtual property that returns `_id` as a string, _unless_ there is already an `id` property on the schema or the schema has the `id` option set to `false`.
+
+Mongoose 9 appends `id` as a string property to `TVirtuals`. The `Document` class no longer has an `id` property.
+
+```ts
+const schema = new Schema({ age: Number });
+const TestModel = mongoose.model('Test', schema);
+
+const doc = new TestModel();
+doc.id; // 'string' in Mongoose 9, 'any' in Mongoose 8.
+```

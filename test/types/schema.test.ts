@@ -1273,7 +1273,7 @@ async function gh13797() {
     name: {
       type: String,
       required: function() {
-        expectType<HydratedDocument<IUser>>(this);
+        expectAssignable<HydratedDocument<IUser>>(this);
         return true;
       }
     }
@@ -1282,7 +1282,7 @@ async function gh13797() {
     name: {
       type: String,
       default: function() {
-        expectType<HydratedDocument<IUser>>(this);
+        expectAssignable<HydratedDocument<IUser>>(this);
         return '';
       }
     }

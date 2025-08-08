@@ -297,7 +297,7 @@ function findById<ModelType extends {_id: Types.ObjectId | string}>(model: Model
 ### Document `id` is no longer `any`
 
 In Mongoose 8 and earlier, `id` was a property on the `Document` class that was set to `any`.
-This was inconsistent with runtime behavior, where `id` is a virtual property that returns `_id` as a string, _unless_ there is already an `id` property on the schema or the schema has the `id` option set to `false`.
+This was inconsistent with runtime behavior, where `id` is a virtual property that returns `_id` as a string, unless there is already an `id` property on the schema or the schema has the `id` option set to `false`.
 
 Mongoose 9 appends `id` as a string property to `TVirtuals`. The `Document` class no longer has an `id` property.
 

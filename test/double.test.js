@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const start = require('./common');
-const BSON = require('bson');
+const BSON = require('mongodb/lib/bson');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;

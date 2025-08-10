@@ -6,7 +6,7 @@
 
 const start = require('./common');
 
-const { EJSON } = require('bson');
+const { EJSON } = require('mongodb/lib/bson');
 const Query = require('../lib/query');
 const assert = require('assert');
 const util = require('./util');

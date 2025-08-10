@@ -4,7 +4,7 @@ const start = require('./common');
 const util = require('./util');
 
 const assert = require('assert');
-const bson = require('bson');
+const bson = require('mongodb/lib/bson');
 const { randomUUID } = require('crypto');
 
 const mongoose = start.mongoose;

@@ -20,7 +20,6 @@
   "type": "commonjs",
   "license": "MIT",
   "dependencies": {
-    "bson": "^6.10.4",
     "kareem": "git+https://github.com/mongoosejs/kareem.git#vkarpov15/v3",
     "mongodb": "~6.18.0",
     "mpath": "0.9.0",

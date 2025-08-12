@@ -227,6 +227,7 @@ describe('model: validate: ', function() {
       then(() => null, err => err);
     assert.ok(err);
     assert.deepEqual(Object.keys(err.errors).sort(), ['invalidPath1', 'invalidPath2']);
-    assert.equal(err.errors['invalidPath1', 'invalidPath2'].name, 'CastError');
+    assert.equal(err.errors['invalidPath1'].name, 'CastError');
+    assert.equal(err.errors['invalidPath2'].name, 'CastError');
   });
 });

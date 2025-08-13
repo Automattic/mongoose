@@ -475,3 +475,24 @@ async function gh15316() {
   expectType<string>(doc.toJSON({ virtuals: true }).upper);
   expectType<string>(doc.toObject({ virtuals: true }).upper);
 }
+
+async function gh15578() {
+  interface RawDocType {
+      _id: Types.ObjectId;
+      testProperty: number;
+  }
+
+  const ASchema = new Schema<RawDocType>({
+    testProperty: Number
+  });
+
+  const AModel = model<RawDocType>('YourModel', ASchema);
+
+  const a = new AModel({ testProperty: 8 });
+  const toObjectFlattened: Omit<RawDocType, '_id'> & { _id: string } = a.toObject({ flattenObjectIds: true });
+  const toObjectWithVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toObject({ virtuals: true, flattenObjectIds: true });
+  const toObjectWithoutVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toObject({ virtuals: false, flattenObjectIds: true });
+  const toJSONFlattened: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ flattenObjectIds: true });
+  const toJSONWithVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: true, flattenObjectIds: true });
+  const toJSONWithoutVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: false, flattenObjectIds: true });
+}

@@ -1,3 +1,12 @@
+8.17.1 / 2025-08-07
+===================
+ * fix(query): propagate read preference and read concern to populate if read() called after populate() #15567 #15553
+ * fix(model): call correct function in autoSearchIndex #15569 #15565
+ * fix(model): allow setting statics option on discriminator schema #15568 #15556
+ * fix(model): remove unnecessary conversion of undefined -> null in findById #15566 #15551
+ * types: allow passing in projections without as const #15564 #15557
+ * types: support maxLength and minLength in SchemaTypeOptions #15570 #4720
+
 8.17.0 / 2025-07-30
 ===================
  * feat: upgrade mongodb -> 6.18.0 #15552

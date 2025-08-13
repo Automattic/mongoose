@@ -14587,7 +14587,7 @@ describe('document', function() {
     assert.strictEqual(updatedItem.nested.get('inserted2').map.get('a1'), 1);
   });
 
-  it('removes versionKey from output if versionKey: false set on toObject() or toJSON() (gh-15578)', async function () {
+  it('removes versionKey from output if versionKey: false set on toObject() or toJSON() (gh-15578)', async function() {
     const schema = new mongoose.Schema({ name: String }, { versionKey: '__v' });
     const Model = db.model('Test', schema);
 

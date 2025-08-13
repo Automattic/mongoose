@@ -256,8 +256,12 @@ declare module 'mongoose' {
     set(value: string | Record<string, any>): this;
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
+    toJSON(options: ToObjectOptions & { versionKey: false, virtuals: true, flattenObjectIds: true }): Omit<ObjectIdToString<FlattenMaps<Require_id<DocType & TVirtuals>>>, '__v'>;
     toJSON(options: ToObjectOptions & { virtuals: true, flattenObjectIds: true }): ObjectIdToString<FlattenMaps<Default__v<Require_id<DocType & TVirtuals>, TSchemaOptions>>>;
+    toJSON(options: ToObjectOptions & { versionKey: false, virtuals: true }): Omit<Require_id<DocType & TVirtuals>, '__v'>;
+    toJSON(options: ToObjectOptions & { versionKey: false, flattenObjectIds: true }): ObjectIdToString<FlattenMaps<Omit<Require_id<DocType>, '__v'>>>;
     toJSON(options: ToObjectOptions & { virtuals: true }): Default__v<Require_id<DocType & TVirtuals>, TSchemaOptions>;
+    toJSON(options: ToObjectOptions & { versionKey: false }): Omit<Require_id<DocType & TVirtuals>, '__v'>;
     toJSON(options?: ToObjectOptions & { flattenMaps?: true, flattenObjectIds?: false }): FlattenMaps<Default__v<Require_id<DocType>, TSchemaOptions>>;
     toJSON(options: ToObjectOptions & { flattenObjectIds: false }): FlattenMaps<Default__v<Require_id<DocType>, TSchemaOptions>>;
     toJSON(options: ToObjectOptions & { flattenObjectIds: true }): ObjectIdToString<FlattenMaps<Default__v<Require_id<DocType>, TSchemaOptions>>>;
@@ -271,8 +275,12 @@ declare module 'mongoose' {
     toJSON<T = Default__v<Require_id<DocType>, TSchemaOptions>>(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: true }): ObjectIdToString<T>;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
+    toObject(options: ToObjectOptions & { versionKey: false, virtuals: true, flattenObjectIds: true }): Omit<ObjectIdToString<Require_id<DocType & TVirtuals>>, '__v'>;
     toObject(options: ToObjectOptions & { virtuals: true, flattenObjectIds: true }): ObjectIdToString<Default__v<Require_id<DocType & TVirtuals>, TSchemaOptions>>;
+    toObject(options: ToObjectOptions & { versionKey: false, flattenObjectIds: true }): Omit<ObjectIdToString<Require_id<DocType & TVirtuals>>, '__v'>;
+    toObject(options: ToObjectOptions & { versionKey: false, virtuals: true }): Omit<Require_id<DocType & TVirtuals>, '__v'>;
     toObject(options: ToObjectOptions & { virtuals: true }): Default__v<Require_id<DocType & TVirtuals>, TSchemaOptions>;
+    toObject(options: ToObjectOptions & { versionKey: false }): Omit<Require_id<DocType & TVirtuals>, '__v'>;
     toObject(options: ToObjectOptions & { flattenObjectIds: true }): ObjectIdToString<Default__v<Require_id<DocType & TVirtuals>, TSchemaOptions>>;
     toObject(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;
     toObject<T>(options?: ToObjectOptions): Default__v<Require_id<T>, TSchemaOptions>;

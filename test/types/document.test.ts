@@ -7,7 +7,8 @@ import {
   HydratedDocument,
   HydratedArraySubdocument,
   HydratedSingleSubdocument,
-  DefaultSchemaOptions
+  DefaultSchemaOptions,
+  ObtainSchemaGeneric
 } from 'mongoose';
 import { DeleteResult } from 'mongodb';
 import { expectAssignable, expectError, expectNotAssignable, expectType } from 'tsd';
@@ -495,4 +496,14 @@ async function gh15578() {
   const toJSONFlattened: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ flattenObjectIds: true });
   const toJSONWithVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: true, flattenObjectIds: true });
   const toJSONWithoutVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: false, flattenObjectIds: true });
+
+  const objWithoutVersionKey = a.toObject({ versionKey: false });
+  const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
+  expectError(objWithoutVersionKey.__v);
+  expectError(jsonWithoutVersionKey.__v);
+
+  const objWithVersionKey = a.toObject();
+  const jsonWithVersionKey = a.toJSON();
+  expectType<number>(objWithVersionKey.__v);
+  expectType<number>(jsonWithVersionKey.__v);
 }

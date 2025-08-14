@@ -79,7 +79,6 @@ declare module 'mongoose' {
     : PathValueType extends BufferSchemaDefinition ? Buffer
     : PathValueType extends BooleanSchemaDefinition ? boolean
     : PathValueType extends ObjectIdSchemaDefinition ? Types.ObjectId
-    : IfEquals<PathValueType, Types.ObjectId> extends true ? Types.ObjectId
     : PathValueType extends Decimal128SchemaDefinition ? Types.Decimal128
     : PathValueType extends BigintSchemaDefinition ? bigint
     : PathValueType extends UuidSchemaDefinition ? Buffer

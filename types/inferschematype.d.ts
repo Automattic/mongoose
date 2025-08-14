@@ -113,14 +113,12 @@ declare module 'mongoose' {
       // if any of these are set for now. See gh-12807
       T
     : O extends { timestamps: infer TimestampOptions } ?
-      TimestampOptions extends true ? Show<T & DefaultTimestampProps>
+      TimestampOptions extends true ? T & DefaultTimestampProps
       : TimestampOptions extends SchemaTimestampsConfig ?
-        Show<
-          T & {
-            [K in keyof TimestampOptions & keyof DefaultTimestampProps as TimestampOptions[K] extends true ? K
-            : TimestampOptions[K] & string]: NativeDate;
-          }
-        >
+        T & {
+          [K in keyof TimestampOptions & keyof DefaultTimestampProps as TimestampOptions[K] extends true ? K
+          : TimestampOptions[K] & string]: NativeDate;
+        }
       : T
     : T;
 }

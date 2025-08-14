@@ -1,18 +1,18 @@
-import { bench } from "@ark/attest";
-import type { InferRawDocType } from "mongoose";
+import { bench } from '@ark/attest';
+import type { InferRawDocType } from 'mongoose';
 
 bench.baseline(() => {
   const baselineDefinition = {
     foo: {
-      type: Boolean,
+      type: String
     },
     bar: {
-      type: Number,
+      type: Number
     },
     dob: {
       type: Date,
-      required: true,
-    },
+      required: true
+    }
   };
   type BaselineType = InferRawDocType<typeof baselineDefinition>;
   // force lazily evaluated properties to be checked
@@ -22,20 +22,20 @@ bench.baseline(() => {
 const schemaDefinition = {
   email: {
     type: String,
-    required: true,
+    required: true
   },
   id: {
     type: Number,
-    required: true,
+    required: true
   },
   dateOfBirth: {
-    type: Date,
-  },
+    type: Date
+  }
 };
 
-bench("InferRawDocType", () => {
+bench('InferRawDocType', () => {
   type UserType = InferRawDocType<typeof schemaDefinition>;
   // force lazily evaluated properties to be checked
   type Value = UserType[keyof UserType];
   // original 506
-}).types([314, "instantiations"]);
+}).types([314, 'instantiations']);

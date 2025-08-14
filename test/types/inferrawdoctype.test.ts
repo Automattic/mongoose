@@ -1,5 +1,5 @@
-import { InferRawDocType, type ResolveTimestamps } from "mongoose";
-import { expectType, expectError } from "tsd";
+import { InferRawDocType, type ResolveTimestamps, type Schema, type Types } from 'mongoose';
+import { expectType, expectError } from 'tsd';
 
 function gh14839() {
   const schemaDefinition = {
@@ -8,64 +8,57 @@ function gh14839() {
       trim: true,
       required: true,
       unique: true,
-      lowercase: true,
+      lowercase: true
     },
     password: {
       type: String,
-      required: true,
+      required: true
     },
     dateOfBirth: {
       type: Date,
-      required: true,
-    },
+      required: true
+    }
   };
 
   type UserType = InferRawDocType<typeof schemaDefinition>;
-  expectType<{ email: string; password: string; dateOfBirth: Date }>(
-    {} as UserType
-  );
+  expectType<{ email: string; password: string; dateOfBirth: Date }>({} as UserType);
 }
 
 function optionality() {
   const schemaDefinition = {
     name: {
       type: String,
-      required: true,
+      required: true
     },
     dateOfBirth: {
-      type: Number,
-    },
+      type: Number
+    }
   };
 
   type UserType = InferRawDocType<typeof schemaDefinition>;
-  expectType<{ name: string; dateOfBirth?: number | null | undefined }>(
-    {} as UserType
-  );
+  expectType<{ name: string; dateOfBirth?: number | null | undefined }>({} as UserType);
 }
 
 type SchemaOptionsWithTimestamps<t> = {
-  typeKey: "type";
+  typeKey: 'type';
   id: true;
   _id: true;
   timestamps: t;
-  versionKey: "__v";
+  versionKey: '__v';
 };
 
 function Timestamps() {
   const schemaDefinition = {
     name: {
       type: String,
-      required: true,
+      required: true
     },
     dateOfBirth: {
-      type: Number,
-    },
+      type: Number
+    }
   };
 
-  type UserType = InferRawDocType<
-    typeof schemaDefinition,
-    SchemaOptionsWithTimestamps<true>
-  >;
+  type UserType = InferRawDocType<typeof schemaDefinition, SchemaOptionsWithTimestamps<true>>;
   expectType<{
     name: string;
     dateOfBirth?: number | null | undefined;
@@ -77,7 +70,7 @@ function Timestamps() {
     { foo: true },
     {
       timestamps: {
-        createdAt: "bar";
+        createdAt: 'bar';
       };
     }
   >;
@@ -88,4 +81,42 @@ function Timestamps() {
       bar: NativeDate;
     }
   );
+}
+
+function DefinitionTypes() {
+  type Actual = InferRawDocType<{
+    lowercaseString: 'string';
+    uppercaseString: 'String';
+    stringConstructor: typeof String;
+    schemaConstructor: typeof Schema.Types.String;
+    stringInstance: String;
+    schemaInstance: Schema.Types.String;
+  }>;
+
+  expectType<{
+    lowercaseString?: string | null | undefined;
+    uppercaseString?: string | null | undefined;
+    stringConstructor?: string | null | undefined;
+    schemaConstructor?: string | null | undefined;
+    stringInstance?: string | null | undefined;
+    schemaInstance?: string | null | undefined;
+  }>({} as Actual);
+}
+
+function MoreDefinitionTypes() {
+  type Actual = InferRawDocType<{
+    // ensure string literals are not inferred as string
+    numberString: 'number';
+    // ensure a schema constructor with methods is not assignable to an empty one
+    objectIdConstructor: typeof Schema.Types.ObjectId;
+    // ensure a schema instance with methods is not assignable to an empty one
+    objectIdInstance: Schema.Types.ObjectId;
+  }>;
+
+  expectType<{
+    numberString?: number | null | undefined;
+    // these should not fallback to Boolean, which has no methods
+    objectIdConstructor?: Types.ObjectId | null | undefined;
+    objectIdInstance?: Types.ObjectId | null | undefined;
+  }>({} as Actual);
 }

@@ -6,22 +6,21 @@ import {
 } from './inferschematype';
 
 declare module 'mongoose' {
-  export type InferRawDocType<
-    DocDefinition,
-    TSchemaOptions extends Record<any, any> = DefaultSchemaOptions
-  > = ApplySchemaOptions<
-    {
-      [K in RequiredPathKeys<DocDefinition, TSchemaOptions['typeKey']>]: ObtainRawDocumentPathType<
-        DocDefinition[K],
-        TSchemaOptions['typeKey']
-      >;
-    } & {
-      [K in OptionalPathKeys<DocDefinition, TSchemaOptions['typeKey']>]?: ObtainRawDocumentPathType<
-        DocDefinition[K],
-        TSchemaOptions['typeKey']
-      > | null;
-    },
-    TSchemaOptions
+  export type InferRawDocType<DocDefinition, TSchemaOptions extends Record<any, any> = DefaultSchemaOptions> = Show<
+    ApplySchemaOptions<
+      {
+        [K in RequiredPathKeys<DocDefinition, TSchemaOptions['typeKey']>]: ObtainRawDocumentPathType<
+          DocDefinition[K],
+          TSchemaOptions['typeKey']
+        >;
+      } & {
+        [K in OptionalPathKeys<DocDefinition, TSchemaOptions['typeKey']>]?: ObtainRawDocumentPathType<
+          DocDefinition[K],
+          TSchemaOptions['typeKey']
+        > | null;
+      },
+      TSchemaOptions
+    >
   >;
 
   /**
@@ -34,11 +33,6 @@ declare module 'mongoose' {
     TypeKey extends keyof PathValueType ?
       ResolveRawPathType<PathValueType[TypeKey], Omit<PathValueType, TypeKey>, TypeKey>
     : ResolveRawPathType<PathValueType, {}, TypeKey>;
-
-  type Z = ResolveRawPathType<String>;
-  type R = ResolveRawPathType<'number'>;
-
-  type Zf = '' extends String ? 1 : 0;
 
   /**
    * Same as inferSchemaType, except:
@@ -76,7 +70,6 @@ declare module 'mongoose' {
       : Item extends Record<string, never> ? ObtainRawDocumentPathType<Item, TypeKey>[]
       : Array<InferRawDocType<Item>>
     : PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']>
-    : IfEquals<PathValueType, Schema.Types.String> extends true ? PathEnumOrString<Options['enum']>
     : IfEquals<PathValueType, String> extends true ? PathEnumOrString<Options['enum']>
     : PathValueType extends NumberSchemaDefinition ?
       Options['enum'] extends ReadonlyArray<any> ?

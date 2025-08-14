@@ -13,10 +13,10 @@ import {
   SchemaType,
   SchemaTypeOptions,
   StringSchemaDefinition,
-  Types,
-} from "mongoose";
+  Types
+} from 'mongoose';
 
-declare module "mongoose" {
+declare module 'mongoose' {
   /**
    * @summary Obtains document schema type.
    * @description Obtains document schema type from document Definition OR returns enforced schema type if it's provided.
@@ -27,28 +27,18 @@ declare module "mongoose" {
   type ObtainDocumentType<
     DocDefinition,
     EnforcedDocType = any,
-    TSchemaOptions extends Record<any, any> = DefaultSchemaOptions,
+    TSchemaOptions extends Record<any, any> = DefaultSchemaOptions
   > =
-    IsItRecordAndNotAny<EnforcedDocType> extends true
-      ? EnforcedDocType
-      : {
-          [K in keyof (RequiredPaths<DocDefinition, TSchemaOptions["typeKey"]> &
-            OptionalPaths<
-              DocDefinition,
-              TSchemaOptions["typeKey"]
-            >)]: IsPathRequired<
-            DocDefinition[K],
-            TSchemaOptions["typeKey"]
-          > extends true
-            ? ObtainDocumentPathType<
-                DocDefinition[K],
-                TSchemaOptions["typeKey"]
-              >
-            : ObtainDocumentPathType<
-                DocDefinition[K],
-                TSchemaOptions["typeKey"]
-              > | null;
-        };
+    IsItRecordAndNotAny<EnforcedDocType> extends true ? EnforcedDocType
+    : {
+        [K in keyof (RequiredPaths<DocDefinition, TSchemaOptions['typeKey']> &
+          OptionalPaths<DocDefinition, TSchemaOptions['typeKey']>)]: IsPathRequired<
+          DocDefinition[K],
+          TSchemaOptions['typeKey']
+        > extends true ?
+          ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']>
+        : ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']> | null;
+      };
 
   /**
    * @summary Obtains document schema type from Schema instance.
@@ -59,11 +49,7 @@ declare module "mongoose" {
    * // result
    * type UserType = {userName?: string}
    */
-  export type InferSchemaType<TSchema> = IfAny<
-    TSchema,
-    any,
-    ObtainSchemaGeneric<TSchema, "DocType">
-  >;
+  export type InferSchemaType<TSchema> = IfAny<TSchema, any, ObtainSchemaGeneric<TSchema, 'DocType'>>;
 
   /**
    * @summary Obtains schema Generic type by using generic alias.
@@ -73,92 +59,80 @@ declare module "mongoose" {
   type ObtainSchemaGeneric<
     TSchema,
     alias extends
-      | "EnforcedDocType"
-      | "M"
-      | "TInstanceMethods"
-      | "TQueryHelpers"
-      | "TVirtuals"
-      | "TStaticMethods"
-      | "TSchemaOptions"
-      | "DocType"
-      | "THydratedDocumentType",
+      | 'EnforcedDocType'
+      | 'M'
+      | 'TInstanceMethods'
+      | 'TQueryHelpers'
+      | 'TVirtuals'
+      | 'TStaticMethods'
+      | 'TSchemaOptions'
+      | 'DocType'
+      | 'THydratedDocumentType'
   > =
-    TSchema extends Schema<
-      infer EnforcedDocType,
-      infer M,
-      infer TInstanceMethods,
-      infer TQueryHelpers,
-      infer TVirtuals,
-      infer TStaticMethods,
-      infer TSchemaOptions,
-      infer DocType,
-      infer THydratedDocumentType
-    >
-      ? {
-          EnforcedDocType: EnforcedDocType;
-          M: M;
-          TInstanceMethods: TInstanceMethods;
-          TQueryHelpers: TQueryHelpers;
-          TVirtuals: TVirtuals;
-          TStaticMethods: TStaticMethods;
-          TSchemaOptions: TSchemaOptions;
-          DocType: DocType;
-          THydratedDocumentType: THydratedDocumentType;
-        }[alias]
-      : unknown;
+    TSchema extends (
+      Schema<
+        infer EnforcedDocType,
+        infer M,
+        infer TInstanceMethods,
+        infer TQueryHelpers,
+        infer TVirtuals,
+        infer TStaticMethods,
+        infer TSchemaOptions,
+        infer DocType,
+        infer THydratedDocumentType
+      >
+    ) ?
+      {
+        EnforcedDocType: EnforcedDocType;
+        M: M;
+        TInstanceMethods: TInstanceMethods;
+        TQueryHelpers: TQueryHelpers;
+        TVirtuals: TVirtuals;
+        TStaticMethods: TStaticMethods;
+        TSchemaOptions: TSchemaOptions;
+        DocType: DocType;
+        THydratedDocumentType: THydratedDocumentType;
+      }[alias]
+    : unknown;
 
   type ResolveSchemaOptions<T> = MergeType<DefaultSchemaOptions, T>;
 
-  type ApplySchemaOptions<T, O = DefaultSchemaOptions> = ResolveTimestamps<
-    T,
-    O
-  >;
+  type ApplySchemaOptions<T, O = DefaultSchemaOptions> = ResolveTimestamps<T, O>;
 
-  type UninferrableOptions =
-    | { methods: any }
-    | { statics: any }
-    | { virtuals: any }
-    | { timestamps?: false };
+  type UninferrableOptions = { methods: any } | { statics: any } | { virtuals: any } | { timestamps?: false };
 
   type DefaultTimestampProps = {
     createdAt: NativeDate;
     updatedAt: NativeDate;
   };
 
-  type ResolveTimestamps<T, O> = O extends UninferrableOptions
-    ? // For some reason, TypeScript sets all the document properties to unknown
+  type ResolveTimestamps<T, O> =
+    O extends UninferrableOptions ?
+      // For some reason, TypeScript sets all the document properties to unknown
       // if we use methods, statics, or virtuals. So avoid inferring timestamps
       // if any of these are set for now. See gh-12807
       T
-    : O extends { timestamps: infer TimestampOptions }
-      ? TimestampOptions extends true
-        ? Show<T & DefaultTimestampProps>
-        : TimestampOptions extends SchemaTimestampsConfig
-          ? Show<
-              T & {
-                [K in keyof TimestampOptions &
-                  keyof DefaultTimestampProps as TimestampOptions[K] extends true
-                  ? K
-                  : TimestampOptions[K] & string]: NativeDate;
-              }
-            >
-          : T
-      : T;
+    : O extends { timestamps: infer TimestampOptions } ?
+      TimestampOptions extends true ? Show<T & DefaultTimestampProps>
+      : TimestampOptions extends SchemaTimestampsConfig ?
+        Show<
+          T & {
+            [K in keyof TimestampOptions & keyof DefaultTimestampProps as TimestampOptions[K] extends true ? K
+            : TimestampOptions[K] & string]: NativeDate;
+          }
+        >
+      : T
+    : T;
 }
 
-type IsPathDefaultUndefined<PathType> = PathType extends { default: undefined }
-  ? true
-  : PathType extends { default: (...args: any[]) => undefined }
-    ? true
-    : false;
+type IsPathDefaultUndefined<PathType> =
+  PathType extends { default: undefined } ? true
+  : PathType extends { default: (...args: any[]) => undefined } ? true
+  : false;
 
 type RequiredPropertyDefinition =
   | {
-      required:
-        | true
-        | string
-        | [true, string | undefined]
-        | { isRequired: true };
+      required: true | string | [true, string | undefined] | { isRequired: true };
     }
   | ArrayConstructor
   | any[];
@@ -168,24 +142,21 @@ type RequiredPropertyDefinition =
  * @param {P} P Document path.
  * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
  */
-type IsPathRequired<
-  P,
-  TypeKey extends string = DefaultTypeKey,
-> = P extends RequiredPropertyDefinition
-  ? true
-  : P extends { required: boolean }
-    ? P extends { required: false }
-      ? false
-      : true
-    : P extends Record<TypeKey, ArrayConstructor | any[]>
-      ? IsPathDefaultUndefined<P> extends true
-        ? false
-        : true
-      : P extends Record<TypeKey, any>
-        ? P extends { default: any }
-          ? IfEquals<P["default"], undefined, false, true>
-          : false
-        : false;
+type IsPathRequired<P, TypeKey extends string = DefaultTypeKey> =
+  P extends RequiredPropertyDefinition ? true
+  : P extends { required: boolean } ?
+    P extends { required: false } ?
+      false
+    : true
+  : P extends Record<TypeKey, ArrayConstructor | any[]> ?
+    IsPathDefaultUndefined<P> extends true ?
+      false
+    : true
+  : P extends Record<TypeKey, any> ?
+    P extends { default: any } ?
+      IfEquals<P['default'], undefined, false, true>
+    : false
+  : false;
 
 /**
  * @summary A Utility to obtain schema's required path keys.
@@ -193,10 +164,7 @@ type IsPathRequired<
  * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
  * @returns required paths keys of document definition.
  */
-type RequiredPathKeys<T, TypeKey extends string = DefaultTypeKey> = Exclude<
-  keyof T,
-  OptionalPathKeys<T, TypeKey>
->;
+type RequiredPathKeys<T, TypeKey extends string = DefaultTypeKey> = Exclude<keyof T, OptionalPathKeys<T, TypeKey>>;
 
 /**
  * @summary A Utility to obtain schema's required paths.
@@ -241,20 +209,17 @@ type TypeHint<T> = T extends { __typehint: infer U } ? U : never;
  * @param {PathValueType} PathValueType Document definition path type.
  * @param {TypeKey} TypeKey A generic refers to document definition.
  */
-type ObtainDocumentPathType<
-  PathValueType,
-  TypeKey extends string = DefaultTypeKey,
-> = ResolvePathType<
-  TypeKey extends keyof PathValueType
-    ? TypeKey extends keyof PathValueType[TypeKey]
-      ? PathValueType
-      : PathValueType[TypeKey]
-    : PathValueType,
-  TypeKey extends keyof PathValueType
-    ? TypeKey extends keyof PathValueType[TypeKey]
-      ? {}
-      : Omit<PathValueType, TypeKey>
-    : {},
+type ObtainDocumentPathType<PathValueType, TypeKey extends string = DefaultTypeKey> = ResolvePathType<
+  TypeKey extends keyof PathValueType ?
+    TypeKey extends keyof PathValueType[TypeKey] ?
+      PathValueType
+    : PathValueType[TypeKey]
+  : PathValueType,
+  TypeKey extends keyof PathValueType ?
+    TypeKey extends keyof PathValueType[TypeKey] ?
+      {}
+    : Omit<PathValueType, TypeKey>
+  : {},
   TypeKey,
   TypeHint<PathValueType>
 >;
@@ -263,61 +228,34 @@ type ObtainDocumentPathType<
  * @param {T} T A generic refers to string path enums.
  * @returns Path enum values type as literal strings or string.
  */
-type PathEnumOrString<T extends SchemaTypeOptions<string>["enum"]> =
-  T extends ReadonlyArray<infer E>
-    ? E
-    : T extends { values: any }
-      ? PathEnumOrString<T["values"]>
-      : T extends Record<string, infer V>
-        ? V
-        : string;
+type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> =
+  T extends ReadonlyArray<infer E> ? E
+  : T extends { values: any } ? PathEnumOrString<T['values']>
+  : T extends Record<string, infer V> ? V
+  : string;
 
-type IsSchemaTypeFromBuiltinClass<T> = T extends typeof String
-  ? true
-  : T extends typeof Number
-    ? true
-    : T extends typeof Boolean
-      ? true
-      : T extends typeof Buffer
-        ? true
-        : T extends typeof Schema.Types.ObjectId
-          ? true
-          : T extends typeof Schema.Types.UUID
-            ? true
-            : T extends typeof Schema.Types.Decimal128
-              ? true
-              : T extends typeof Schema.Types.Int32
-                ? true
-                : T extends typeof Schema.Types.String
-                  ? true
-                  : T extends typeof Schema.Types.Number
-                    ? true
-                    : T extends typeof Schema.Types.Date
-                      ? true
-                      : T extends typeof Schema.Types.Double
-                        ? true
-                        : T extends typeof Schema.Types.Boolean
-                          ? true
-                          : T extends Types.ObjectId
-                            ? true
-                            : T extends Types.Decimal128
-                              ? true
-                              : T extends NativeDate
-                                ? true
-                                : T extends typeof Schema.Types.Mixed
-                                  ? true
-                                  : IfEquals<
-                                        T,
-                                        Schema.Types.ObjectId,
-                                        true,
-                                        false
-                                      > extends true
-                                    ? true
-                                    : unknown extends Buffer
-                                      ? false
-                                      : T extends Buffer
-                                        ? true
-                                        : false;
+type IsSchemaTypeFromBuiltinClass<T> =
+  T extends typeof String ? true
+  : T extends typeof Number ? true
+  : T extends typeof Boolean ? true
+  : T extends typeof Buffer ? true
+  : T extends typeof Schema.Types.ObjectId ? true
+  : T extends typeof Schema.Types.UUID ? true
+  : T extends typeof Schema.Types.Decimal128 ? true
+  : T extends typeof Schema.Types.Int32 ? true
+  : T extends typeof Schema.Types.String ? true
+  : T extends typeof Schema.Types.Number ? true
+  : T extends typeof Schema.Types.Date ? true
+  : T extends typeof Schema.Types.Double ? true
+  : T extends typeof Schema.Types.Boolean ? true
+  : T extends Types.ObjectId ? true
+  : T extends Types.Decimal128 ? true
+  : T extends NativeDate ? true
+  : T extends typeof Schema.Types.Mixed ? true
+  : IfEquals<T, Schema.Types.ObjectId, true, false> extends true ? true
+  : unknown extends Buffer ? false
+  : T extends Buffer ? true
+  : false;
 
 /**
  * @summary Resolve path type by returning the corresponding type.
@@ -329,195 +267,92 @@ type IsSchemaTypeFromBuiltinClass<T> = T extends typeof String
 type ResolvePathType<
   PathValueType,
   Options extends SchemaTypeOptions<PathValueType> = {},
-  TypeKey extends string = DefaultSchemaOptions["typeKey"],
-  TypeHint = never,
+  TypeKey extends string = DefaultSchemaOptions['typeKey'],
+  TypeHint = never
 > = IfEquals<
   TypeHint,
   never,
-  PathValueType extends Schema
-    ? InferSchemaType<PathValueType>
-    : PathValueType extends (infer Item)[]
-      ? IfEquals<
-          Item,
-          never,
-          any[],
-          Item extends Schema
-            ? // If Item is a schema, infer its type.
-              Types.DocumentArray<InferSchemaType<Item>>
-            : Item extends Record<TypeKey, any>
-              ? Item[TypeKey] extends Function | String
-                ? // If Item has a type key that's a string or a callable, it must be a scalar,
-                  // so we can directly obtain its path type.
-                  ObtainDocumentPathType<Item, TypeKey>[]
-                : // If the type key isn't callable, then this is an array of objects, in which case
-                  // we need to call ObtainDocumentType to correctly infer its type.
-                  Types.DocumentArray<
-                    ObtainDocumentType<Item, any, { typeKey: TypeKey }>
-                  >
-              : IsSchemaTypeFromBuiltinClass<Item> extends true
-                ? ObtainDocumentPathType<Item, TypeKey>[]
-                : IsItRecordAndNotAny<Item> extends true
-                  ? Item extends Record<string, never>
-                    ? ObtainDocumentPathType<Item, TypeKey>[]
-                    : Types.DocumentArray<
-                        ObtainDocumentType<Item, any, { typeKey: TypeKey }>
-                      >
-                  : ObtainDocumentPathType<Item, TypeKey>[]
-        >
-      : PathValueType extends ReadonlyArray<infer Item>
-        ? IfEquals<
-            Item,
-            never,
-            any[],
-            Item extends Schema
-              ? Types.DocumentArray<InferSchemaType<Item>>
-              : Item extends Record<TypeKey, any>
-                ? Item[TypeKey] extends Function | String
-                  ? ObtainDocumentPathType<Item, TypeKey>[]
-                  : ObtainDocumentType<Item, any, { typeKey: TypeKey }>[]
-                : IsSchemaTypeFromBuiltinClass<Item> extends true
-                  ? ObtainDocumentPathType<Item, TypeKey>[]
-                  : IsItRecordAndNotAny<Item> extends true
-                    ? Item extends Record<string, never>
-                      ? ObtainDocumentPathType<Item, TypeKey>[]
-                      : Types.DocumentArray<
-                          ObtainDocumentType<Item, any, { typeKey: TypeKey }>
-                        >
-                    : ObtainDocumentPathType<Item, TypeKey>[]
-          >
-        : PathValueType extends StringSchemaDefinition
-          ? PathEnumOrString<Options["enum"]>
-          : IfEquals<PathValueType, Schema.Types.String> extends true
-            ? PathEnumOrString<Options["enum"]>
-            : IfEquals<PathValueType, String> extends true
-              ? PathEnumOrString<Options["enum"]>
-              : PathValueType extends NumberSchemaDefinition
-                ? Options["enum"] extends ReadonlyArray<any>
-                  ? Options["enum"][number]
-                  : number
-                : IfEquals<PathValueType, Schema.Types.Number> extends true
-                  ? number
-                  : PathValueType extends DateSchemaDefinition
-                    ? NativeDate
-                    : IfEquals<PathValueType, Schema.Types.Date> extends true
-                      ? NativeDate
-                      : PathValueType extends
-                            | typeof Buffer
-                            | "buffer"
-                            | "Buffer"
-                            | typeof Schema.Types.Buffer
-                        ? Buffer
-                        : PathValueType extends BooleanSchemaDefinition
-                          ? boolean
-                          : IfEquals<
-                                PathValueType,
-                                Schema.Types.Boolean
-                              > extends true
-                            ? boolean
-                            : PathValueType extends ObjectIdSchemaDefinition
-                              ? Types.ObjectId
-                              : IfEquals<
-                                    PathValueType,
-                                    Types.ObjectId
-                                  > extends true
-                                ? Types.ObjectId
-                                : IfEquals<
-                                      PathValueType,
-                                      Schema.Types.ObjectId
-                                    > extends true
-                                  ? Types.ObjectId
-                                  : PathValueType extends
-                                        | "decimal128"
-                                        | "Decimal128"
-                                        | typeof Schema.Types.Decimal128
-                                    ? Types.Decimal128
-                                    : IfEquals<
-                                          PathValueType,
-                                          Schema.Types.Decimal128
-                                        > extends true
-                                      ? Types.Decimal128
-                                      : IfEquals<
-                                            PathValueType,
-                                            Types.Decimal128
-                                          > extends true
-                                        ? Types.Decimal128
-                                        : IfEquals<
-                                              PathValueType,
-                                              Schema.Types.BigInt
-                                            > extends true
-                                          ? bigint
-                                          : IfEquals<
-                                                PathValueType,
-                                                BigInt
-                                              > extends true
-                                            ? bigint
-                                            : PathValueType extends
-                                                  | "bigint"
-                                                  | "BigInt"
-                                                  | typeof Schema.Types.BigInt
-                                                  | typeof BigInt
-                                              ? bigint
-                                              : PathValueType extends
-                                                    | "uuid"
-                                                    | "UUID"
-                                                    | typeof Schema.Types.UUID
-                                                ? Buffer
-                                                : PathValueType extends
-                                                      | "double"
-                                                      | "Double"
-                                                      | typeof Schema.Types.Double
-                                                  ? Types.Double
-                                                  : IfEquals<
-                                                        PathValueType,
-                                                        Schema.Types.UUID
-                                                      > extends true
-                                                    ? Buffer
-                                                    : PathValueType extends
-                                                          | MapConstructor
-                                                          | "Map"
-                                                      ? Map<
-                                                          string,
-                                                          ResolvePathType<
-                                                            Options["of"]
-                                                          >
-                                                        >
-                                                      : IfEquals<
-                                                            PathValueType,
-                                                            typeof Schema.Types.Map
-                                                          > extends true
-                                                        ? Map<
-                                                            string,
-                                                            ResolvePathType<
-                                                              Options["of"]
-                                                            >
-                                                          >
-                                                        : PathValueType extends ArrayConstructor
-                                                          ? any[]
-                                                          : PathValueType extends typeof Schema.Types.Mixed
-                                                            ? any
-                                                            : IfEquals<
-                                                                  PathValueType,
-                                                                  ObjectConstructor
-                                                                > extends true
-                                                              ? any
-                                                              : IfEquals<
-                                                                    PathValueType,
-                                                                    {}
-                                                                  > extends true
-                                                                ? any
-                                                                : PathValueType extends typeof SchemaType
-                                                                  ? PathValueType["prototype"]
-                                                                  : PathValueType extends Record<
-                                                                        string,
-                                                                        any
-                                                                      >
-                                                                    ? ObtainDocumentType<
-                                                                        PathValueType,
-                                                                        any,
-                                                                        {
-                                                                          typeKey: TypeKey;
-                                                                        }
-                                                                      >
-                                                                    : unknown,
+  PathValueType extends Schema ? InferSchemaType<PathValueType>
+  : PathValueType extends (infer Item)[] ?
+    IfEquals<
+      Item,
+      never,
+      any[],
+      Item extends Schema ?
+        // If Item is a schema, infer its type.
+        Types.DocumentArray<InferSchemaType<Item>>
+      : Item extends Record<TypeKey, any> ?
+        Item[TypeKey] extends Function | String ?
+          // If Item has a type key that's a string or a callable, it must be a scalar,
+          // so we can directly obtain its path type.
+          ObtainDocumentPathType<Item, TypeKey>[]
+        : // If the type key isn't callable, then this is an array of objects, in which case
+          // we need to call ObtainDocumentType to correctly infer its type.
+          Types.DocumentArray<ObtainDocumentType<Item, any, { typeKey: TypeKey }>>
+      : IsSchemaTypeFromBuiltinClass<Item> extends true ? ObtainDocumentPathType<Item, TypeKey>[]
+      : IsItRecordAndNotAny<Item> extends true ?
+        Item extends Record<string, never> ?
+          ObtainDocumentPathType<Item, TypeKey>[]
+        : Types.DocumentArray<ObtainDocumentType<Item, any, { typeKey: TypeKey }>>
+      : ObtainDocumentPathType<Item, TypeKey>[]
+    >
+  : PathValueType extends ReadonlyArray<infer Item> ?
+    IfEquals<
+      Item,
+      never,
+      any[],
+      Item extends Schema ? Types.DocumentArray<InferSchemaType<Item>>
+      : Item extends Record<TypeKey, any> ?
+        Item[TypeKey] extends Function | String ?
+          ObtainDocumentPathType<Item, TypeKey>[]
+        : ObtainDocumentType<Item, any, { typeKey: TypeKey }>[]
+      : IsSchemaTypeFromBuiltinClass<Item> extends true ? ObtainDocumentPathType<Item, TypeKey>[]
+      : IsItRecordAndNotAny<Item> extends true ?
+        Item extends Record<string, never> ?
+          ObtainDocumentPathType<Item, TypeKey>[]
+        : Types.DocumentArray<ObtainDocumentType<Item, any, { typeKey: TypeKey }>>
+      : ObtainDocumentPathType<Item, TypeKey>[]
+    >
+  : PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']>
+  : IfEquals<PathValueType, Schema.Types.String> extends true ? PathEnumOrString<Options['enum']>
+  : IfEquals<PathValueType, String> extends true ? PathEnumOrString<Options['enum']>
+  : PathValueType extends NumberSchemaDefinition ?
+    Options['enum'] extends ReadonlyArray<any> ?
+      Options['enum'][number]
+    : number
+  : IfEquals<PathValueType, Schema.Types.Number> extends true ? number
+  : PathValueType extends DateSchemaDefinition ? NativeDate
+  : IfEquals<PathValueType, Schema.Types.Date> extends true ? NativeDate
+  : PathValueType extends typeof Buffer | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer
+  : PathValueType extends BooleanSchemaDefinition ? boolean
+  : IfEquals<PathValueType, Schema.Types.Boolean> extends true ? boolean
+  : PathValueType extends ObjectIdSchemaDefinition ? Types.ObjectId
+  : IfEquals<PathValueType, Types.ObjectId> extends true ? Types.ObjectId
+  : IfEquals<PathValueType, Schema.Types.ObjectId> extends true ? Types.ObjectId
+  : PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 ? Types.Decimal128
+  : IfEquals<PathValueType, Schema.Types.Decimal128> extends true ? Types.Decimal128
+  : IfEquals<PathValueType, Types.Decimal128> extends true ? Types.Decimal128
+  : IfEquals<PathValueType, Schema.Types.BigInt> extends true ? bigint
+  : IfEquals<PathValueType, BigInt> extends true ? bigint
+  : PathValueType extends 'bigint' | 'BigInt' | typeof Schema.Types.BigInt | typeof BigInt ? bigint
+  : PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? Buffer
+  : PathValueType extends 'double' | 'Double' | typeof Schema.Types.Double ? Types.Double
+  : IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer
+  : PathValueType extends MapConstructor | 'Map' ? Map<string, ResolvePathType<Options['of']>>
+  : IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ResolvePathType<Options['of']>>
+  : PathValueType extends ArrayConstructor ? any[]
+  : PathValueType extends typeof Schema.Types.Mixed ? any
+  : IfEquals<PathValueType, ObjectConstructor> extends true ? any
+  : IfEquals<PathValueType, {}> extends true ? any
+  : PathValueType extends typeof SchemaType ? PathValueType['prototype']
+  : PathValueType extends Record<string, any> ?
+    ObtainDocumentType<
+      PathValueType,
+      any,
+      {
+        typeKey: TypeKey;
+      }
+    >
+  : unknown,
   TypeHint
 >;

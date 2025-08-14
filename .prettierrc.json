@@ -1,0 +1,6 @@
+{
+  "printWidth": 120,
+  "trailingComma": "none",
+  "singleQuote": true,
+  "experimentalTernaries": true
+}

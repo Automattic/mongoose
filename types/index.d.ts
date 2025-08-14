@@ -559,6 +559,11 @@ declare module 'mongoose' {
   export type BooleanSchemaDefinition = typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean | Schema.Types.Boolean;
   export type DateSchemaDefinition = DateConstructor | 'date' | 'Date' | typeof Schema.Types.Date | Schema.Types.Date;
   export type ObjectIdSchemaDefinition = 'ObjectId' | 'ObjectID' | typeof Schema.Types.ObjectId | Schema.Types.ObjectId;
+  export type BufferSchemaDefinition = typeof Buffer | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer;
+  export type Decimal128SchemaDefinition = 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 | Schema.Types.Decimal128 | Types.Decimal128;
+  export type BigintSchemaDefinition = 'bigint' | 'BigInt' | typeof Schema.Types.BigInt | Schema.Types.BigInt | typeof BigInt | BigInt;
+  export type UuidSchemaDefinition = 'uuid' | 'UUID' | typeof Schema.Types.UUID | Schema.Types.UUID;
+  export type MapSchemaDefinition = MapConstructor | 'Map' | typeof Schema.Types.Map;
 
   export type SchemaDefinitionWithBuiltInClass<T> = T extends number
     ? NumberSchemaDefinition

@@ -75,25 +75,15 @@ declare module 'mongoose' {
       Options['enum'] extends ReadonlyArray<any> ?
         Options['enum'][number]
       : number
-    : IfEquals<PathValueType, Schema.Types.Number> extends true ? number
     : PathValueType extends DateSchemaDefinition ? NativeDate
-    : IfEquals<PathValueType, Schema.Types.Date> extends true ? NativeDate
-    : PathValueType extends typeof Buffer | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? Buffer
+    : PathValueType extends BufferSchemaDefinition ? Buffer
     : PathValueType extends BooleanSchemaDefinition ? boolean
-    : IfEquals<PathValueType, Schema.Types.Boolean> extends true ? boolean
     : PathValueType extends ObjectIdSchemaDefinition ? Types.ObjectId
     : IfEquals<PathValueType, Types.ObjectId> extends true ? Types.ObjectId
-    : IfEquals<PathValueType, Schema.Types.ObjectId> extends true ? Types.ObjectId
-    : PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 ? Types.Decimal128
-    : IfEquals<PathValueType, Schema.Types.Decimal128> extends true ? Types.Decimal128
-    : IfEquals<PathValueType, Types.Decimal128> extends true ? Types.Decimal128
-    : IfEquals<PathValueType, Schema.Types.BigInt> extends true ? bigint
-    : IfEquals<PathValueType, BigInt> extends true ? bigint
-    : PathValueType extends 'bigint' | 'BigInt' | typeof Schema.Types.BigInt | typeof BigInt ? bigint
-    : PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? Buffer
-    : IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer
-    : PathValueType extends MapConstructor | 'Map' ? Map<string, ResolveRawPathType<Options['of']>>
-    : IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ResolveRawPathType<Options['of']>>
+    : PathValueType extends Decimal128SchemaDefinition ? Types.Decimal128
+    : PathValueType extends BigintSchemaDefinition ? bigint
+    : PathValueType extends UuidSchemaDefinition ? Buffer
+    : PathValueType extends MapSchemaDefinition ? Map<string, ResolveRawPathType<Options['of']>>
     : PathValueType extends ArrayConstructor ? any[]
     : PathValueType extends typeof Schema.Types.Mixed ? any
     : IfEquals<PathValueType, ObjectConstructor> extends true ? any

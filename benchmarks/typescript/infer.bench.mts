@@ -1,5 +1,5 @@
 import { bench } from '@ark/attest';
-import type { InferRawDocType } from 'mongoose';
+import type { Schema, InferRawDocType } from 'mongoose';
 
 bench.baseline(() => {
   const baselineDefinition = {
@@ -39,3 +39,13 @@ bench('InferRawDocType', () => {
   type Value = UserType[keyof UserType];
   // original 506
 }).types([314, 'instantiations']);
+
+bench('InferRawDocType (mixed)', () => {
+  type T = InferRawDocType<{
+    foo: typeof Schema.Types.Mixed;
+    bar: {};
+    baz: ObjectConstructor;
+  }>;
+  // force lazily evaluated properties to be checked
+  type Value = T[keyof T];
+}).types([617, 'instantiations']);

@@ -4469,6 +4469,51 @@ describe('Query', function() {
     });
   });
 
+  it('propagates readPreference to populate options if read() is called after populate() (gh-15553)', async function() {
+    const schema = new Schema({ name: String, age: Number, friends: [{ type: 'ObjectId', ref: 'Person' }] });
+    const Person = db.model('Person', schema);
+
+    let query = Person.find({}).populate('friends');
+    query.read('secondaryPreferred');
+    await query.exec();
+    assert.strictEqual(query._mongooseOptions.populate.friends.options.readPreference.mode, 'secondaryPreferred');
+
+    query = Person.find({}).read('secondary').populate('friends');
+    query.read('secondaryPreferred');
+    await query.exec();
+    assert.strictEqual(query._mongooseOptions.populate.friends.options.readPreference.mode, 'secondaryPreferred');
+
+    query = Person.find({}).read('secondaryPreferred').populate('friends');
+    await query.exec();
+    assert.strictEqual(query._mongooseOptions.populate.friends.options.readPreference.mode, 'secondaryPreferred');
+
+    query = Person.find({}).read('primaryPreferred').populate({ path: 'friends', options: { readPreference: 'secondaryPreferred' } });
+    await query.exec();
+    assert.strictEqual(query._mongooseOptions.populate.friends.options.readPreference, 'secondaryPreferred');
+  });
+
+  it('propagates readConcern to populate options if readConcern() is called after populate() (gh-15553)', async function() {
+    const schema = new Schema({ name: String, age: Number, friends: [{ type: 'ObjectId', ref: 'Person' }] });
+    const Person = db.model('Person', schema);
+
+    let query = Person.find({}).populate('friends');
+    query.readConcern('majority');
+    await query.exec();
+    assert.strictEqual(query._mongooseOptions.populate.friends.options.readConcern.level, 'majority');
+
+    query = Person.find({}).readConcern('local').populate('friends');
+    query.readConcern('majority');
+    await query.exec();
+    assert.strictEqual(query._mongooseOptions.populate.friends.options.readConcern.level, 'majority');
+
+    query = Person.find({}).readConcern('majority').populate('friends');
+    await query.exec();
+    assert.strictEqual(query._mongooseOptions.populate.friends.options.readConcern.level, 'majority');
+
+    query = Person.find({}).readConcern('majority').populate({ path: 'friends', options: { readConcern: 'local' } });
+    await query.exec();
+    assert.strictEqual(query._mongooseOptions.populate.friends.options.readConcern, 'local');
+  });
 
   describe('Query with requireFilter', function() {
     let Person;

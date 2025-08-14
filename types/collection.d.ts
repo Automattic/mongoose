@@ -21,6 +21,8 @@ declare module 'mongoose' {
     name: string;
   }
 
+  export type BaseCollection<T extends mongodb.Document> = CollectionBase<T>;
+
   /*
    * section drivers/node-mongodb-native/collection.js
    */

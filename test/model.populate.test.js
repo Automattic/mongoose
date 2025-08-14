@@ -5569,6 +5569,7 @@ describe('model: populate:', function() {
         const Model = db.model('Test1', schema);
 
         const q = Model.find().read('secondaryPreferred').populate('ref');
+        await q.exec();
         assert.equal(q._mongooseOptions.populate['ref'].options.readPreference.mode,
           'secondaryPreferred');
       });

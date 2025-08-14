@@ -91,7 +91,8 @@ declare module 'mongoose' {
       InferSchemaType<TSchema>,
       ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
       ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
-      ObtainSchemaGeneric<TSchema, 'TVirtuals'>
+      ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+      ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>
     >,
     TSchema
   > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
@@ -139,7 +140,7 @@ declare module 'mongoose' {
     ? IfAny<U, T & { _id: Types.ObjectId }, T & Required<{ _id: U }>>
     : T & { _id: Types.ObjectId };
 
-  export type Default__v<T> = T extends { __v?: infer U }
+  export type Default__v<T, TSchemaOptions = {}> = TSchemaOptions extends { versionKey: false } ? T : T extends { __v?: infer U }
     ? T
     : T & { __v: number };
 
@@ -148,17 +149,18 @@ declare module 'mongoose' {
     DocType,
     TOverrides = {},
     TQueryHelpers = {},
-    TVirtuals = {}
+    TVirtuals = {},
+    TSchemaOptions = {}
   > = IfAny<
     DocType,
     any,
     TOverrides extends Record<string, never> ?
-      Document<unknown, TQueryHelpers, DocType, TVirtuals> & Default__v<Require_id<DocType>> :
+      Document<unknown, TQueryHelpers, DocType, TVirtuals, TSchemaOptions> & Default__v<Require_id<DocType>, TSchemaOptions> :
       IfAny<
         TOverrides,
-        Document<unknown, TQueryHelpers, DocType, TVirtuals> & Default__v<Require_id<DocType>>,
-        Document<unknown, TQueryHelpers, DocType, TVirtuals> & MergeType<
-          Default__v<Require_id<DocType>>,
+        Document<unknown, TQueryHelpers, DocType, TVirtuals, TSchemaOptions> & Default__v<Require_id<DocType>, TSchemaOptions>,
+        Document<unknown, TQueryHelpers, DocType, TVirtuals, TSchemaOptions> & MergeType<
+          Default__v<Require_id<DocType>, TSchemaOptions>,
           TOverrides
         >
       >
@@ -196,10 +198,11 @@ declare module 'mongoose' {
     >;
 
   export type HydratedDocumentFromSchema<TSchema extends Schema> = HydratedDocument<
-  InferSchemaType<TSchema>,
-  ObtainSchemaGeneric<TSchema, 'TInstanceMethods'> & ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
-  ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
-  ObtainSchemaGeneric<TSchema, 'TVirtuals'>
+    InferSchemaType<TSchema>,
+    ObtainSchemaGeneric<TSchema, 'TInstanceMethods'> & ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+    ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+    ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+    ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>
   >;
 
   export interface TagSet {
@@ -272,7 +275,7 @@ declare module 'mongoose' {
       ObtainDocumentType<any, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
       ResolveSchemaOptions<TSchemaOptions>
     >,
-    THydratedDocumentType = HydratedDocument<FlatRecord<DocType>, TVirtuals & TInstanceMethods, {}, TVirtuals>
+    THydratedDocumentType = HydratedDocument<FlatRecord<DocType>, TVirtuals & TInstanceMethods, {}, TVirtuals, ResolveSchemaOptions<TSchemaOptions>>
   >
     extends events.EventEmitter {
     /**
@@ -369,6 +372,8 @@ declare module 'mongoose' {
 
     /** Returns a new schema that has the `paths` from the original schema, minus the omitted ones. */
     omit<T = this>(paths: string[], options?: SchemaOptions): T;
+
+    options: SchemaOptions;
 
     /** Gets/sets schema paths. */
     path<ResultType extends SchemaType = SchemaType<any, THydratedDocumentType>>(path: string): ResultType;
@@ -602,7 +607,7 @@ declare module 'mongoose' {
     | typeof Schema.Types.UUID;
 
 
-  export type InferId<T> = T extends { _id?: any } ? T['_id'] : Types.ObjectId;
+  export type InferId<T> = mongodb.InferIdType<T>;
 
   export interface VirtualTypeOptions<HydratedDocType = Document, DocType = unknown> {
     /** If `ref` is not nullish, this becomes a populated virtual. */
@@ -699,9 +704,9 @@ declare module 'mongoose' {
           [K in keyof T]?: T[K] extends Record<string, any> ? Projector<T[K], Element> | Element : Element;
         }
         : Element;
-  type _IDType = { _id?: boolean | 1 | 0 };
+  type _IDType = { _id?: boolean | number };
   export type InclusionProjection<T> = IsItRecordAndNotAny<T> extends true
-    ? Omit<Projector<WithLevel1NestedPaths<T>, true | 1>, '_id'> & _IDType
+    ? Omit<Projector<WithLevel1NestedPaths<T>, boolean | number>, '_id'> & _IDType
     : AnyObject;
   export type ExclusionProjection<T> = IsItRecordAndNotAny<T> extends true
     ? Omit<Projector<WithLevel1NestedPaths<T>, false | 0>, '_id'> & _IDType
@@ -896,11 +901,6 @@ declare module 'mongoose' {
   export type TreatAsPrimitives = actualPrimitives | NativeDate | RegExp | symbol | Error | BigInt | Types.ObjectId | Buffer | Function | mongodb.Binary | mongodb.ClientSession;
 
   export type SchemaDefinitionType<T> = T extends Document ? Omit<T, Exclude<keyof Document, '_id' | 'id' | '__v'>> : T;
-
-  /**
-   * Helper to choose the best option between two type helpers
-   */
-  export type _pickObject<T1, T2, Fallback> = T1 extends false ? T2 extends false ? Fallback : T2 : T1;
 
   /* for ts-mongoose */
   export class mquery { }

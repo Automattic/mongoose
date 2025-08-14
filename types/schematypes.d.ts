@@ -207,9 +207,11 @@ declare module 'mongoose' {
 
     /** If set, Mongoose will add a custom validator that ensures the given string's `length` is at least the given number. */
     minlength?: number | [number, string] | readonly [number, string];
+    minLength?: number | [number, string] | readonly [number, string];
 
     /** If set, Mongoose will add a custom validator that ensures the given string's `length` is at most the given number. */
     maxlength?: number | [number, string] | readonly [number, string];
+    maxLength?: number | [number, string] | readonly [number, string];
 
     [other: string]: any;
 
@@ -267,6 +269,9 @@ declare module 'mongoose' {
 
     /** Array containing default setters for all instances of this SchemaType */
     static setters: ((val?: unknown, priorVal?: unknown, doc?: Document<unknown>, options?: Record<string, any> | null) => unknown)[];
+
+    /** Contains the handlers for different query operators for this schema type. */
+    $conditionalHandlers: { [op: string]: (val: any, context: any) => any };
 
     /** The class that Mongoose uses internally to instantiate this SchemaType's `options` property. */
     OptionsConstructor: SchemaTypeOptions<T>;
@@ -350,7 +355,7 @@ declare module 'mongoose' {
     validateAll(validators: Array<RegExp | ValidatorFunction<DocType> | Validator<DocType>>): this;
 
     /** Default options for this SchemaType */
-    defaultOptions?: Record<string, any>;
+    static defaultOptions?: Record<string, any>;
   }
 
   namespace Schema {
@@ -368,7 +373,7 @@ declare module 'mongoose' {
         caster?: SchemaType;
 
         /** Default options for this SchemaType */
-        defaultOptions: Record<string, any>;
+        static defaultOptions: Record<string, any>;
 
         /**
          * Adds an enum validator if this is an array of strings or numbers. Equivalent to
@@ -382,7 +387,7 @@ declare module 'mongoose' {
         static schemaName: 'BigInt';
 
         /** Default options for this SchemaType */
-        defaultOptions: Record<string, any>;
+        static defaultOptions: Record<string, any>;
       }
 
       class Boolean extends SchemaType {
@@ -396,7 +401,7 @@ declare module 'mongoose' {
         static convertToFalse: Set<any>;
 
         /** Default options for this SchemaType */
-        defaultOptions: Record<string, any>;
+        static defaultOptions: Record<string, any>;
       }
 
       class Buffer extends SchemaType {
@@ -410,7 +415,7 @@ declare module 'mongoose' {
         subtype(subtype: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 128): this;
 
         /** Default options for this SchemaType */
-        defaultOptions: Record<string, any>;
+        static defaultOptions: Record<string, any>;
       }
 
       class Date extends SchemaType {
@@ -427,7 +432,7 @@ declare module 'mongoose' {
         min(value: NativeDate, message?: string): this;
 
         /** Default options for this SchemaType */
-        defaultOptions: Record<string, any>;
+        static defaultOptions: Record<string, any>;
       }
 
       class Decimal128 extends SchemaType {
@@ -435,7 +440,7 @@ declare module 'mongoose' {
         static schemaName: 'Decimal128';
 
         /** Default options for this SchemaType */
-        defaultOptions: Record<string, any>;
+        static defaultOptions: Record<string, any>;
       }
 
       class Int32 extends SchemaType {
@@ -443,7 +448,7 @@ declare module 'mongoose' {
         static schemaName: 'Int32';
 
         /** Default options for this SchemaType */
-        defaultOptions: Record<string, any>;
+        static defaultOptions: Record<string, any>;
       }
 
       class DocumentArray extends SchemaType implements AcceptsDiscriminator {
@@ -451,6 +456,8 @@ declare module 'mongoose' {
         static schemaName: 'DocumentArray';
 
         static options: { castNonArrays: boolean; };
+
+        schemaOptions?: SchemaOptions;
 
         discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
         discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
@@ -462,7 +469,7 @@ declare module 'mongoose' {
         caster?: typeof Types.Subdocument;
 
         /** Default options for this SchemaType */
-        defaultOptions: Record<string, any>;
+        static defaultOptions: Record<string, any>;
       }
 
       class Map extends SchemaType {
@@ -470,7 +477,7 @@ declare module 'mongoose' {
         static schemaName: 'Map';
 
         /** Default options for this SchemaType */
-        defaultOptions: Record<string, any>;
+        static defaultOptions: Record<string, any>;
       }
 
       class Mixed extends SchemaType {
@@ -478,7 +485,7 @@ declare module 'mongoose' {
         static schemaName: 'Mixed';
 
         /** Default options for this SchemaType */
-        defaultOptions: Record<string, any>;
+        static defaultOptions: Record<string, any>;
       }
 
       class Number extends SchemaType {
@@ -495,7 +502,7 @@ declare module 'mongoose' {
         min(value: number, message?: string): this;
 
         /** Default options for this SchemaType */
-        defaultOptions: Record<string, any>;
+        static defaultOptions: Record<string, any>;
       }
 
       class Double extends SchemaType {
@@ -503,7 +510,7 @@ declare module 'mongoose' {
         static schemaName: 'Double';
 
         /** Default options for this SchemaType */
-        defaultOptions: Record<string, any>;
+        static defaultOptions: Record<string, any>;
       }
 
       class ObjectId extends SchemaType {
@@ -514,7 +521,7 @@ declare module 'mongoose' {
         auto(turnOn: boolean): this;
 
         /** Default options for this SchemaType */
-        defaultOptions: Record<string, any>;
+        static defaultOptions: Record<string, any>;
       }
 
       class Subdocument<DocType = unknown> extends SchemaType implements AcceptsDiscriminator {
@@ -525,7 +532,7 @@ declare module 'mongoose' {
         schema: Schema;
 
         /** Default options for this SchemaType */
-        defaultOptions: Record<string, any>;
+        static defaultOptions: Record<string, any>;
 
         discriminator<T, U>(name: string | number, schema: Schema<T, U>, value?: string): U;
         discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
@@ -559,7 +566,7 @@ declare module 'mongoose' {
         uppercase(shouldApply?: boolean): this;
 
         /** Default options for this SchemaType */
-        defaultOptions: Record<string, any>;
+        static defaultOptions: Record<string, any>;
       }
 
       class UUID extends SchemaType {
@@ -567,7 +574,7 @@ declare module 'mongoose' {
         static schemaName: 'UUID';
 
         /** Default options for this SchemaType */
-        defaultOptions: Record<string, any>;
+        static defaultOptions: Record<string, any>;
       }
     }
   }

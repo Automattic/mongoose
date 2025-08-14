@@ -71,11 +71,17 @@ declare module 'mongoose' {
       };
   }[keyof SchemaMap];
 
+  export type BaseConnection = Connection;
+
   class Connection extends events.EventEmitter implements SessionStarter {
+    /** Runs a [db-level aggregate()](https://www.mongodb.com/docs/manual/reference/method/db.aggregate/) on this connection's underlying `db` */
     aggregate<ResultType = unknown>(pipeline?: PipelineStage[] | null, options?: AggregateOptions): Aggregate<Array<ResultType>>;
 
     /** Returns a promise that resolves when this connection successfully connects to MongoDB */
     asPromise(): Promise<this>;
+
+    /** The Mongoose instance this connection is associated with */
+    base: Mongoose;
 
     bulkWrite<TSchemaMap extends Record<string, AnyObject>>(
       ops: Array<ConnectionBulkWriteModel<TSchemaMap>>,

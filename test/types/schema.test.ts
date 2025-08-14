@@ -532,13 +532,13 @@ export function autoTypedSchema() {
   }, {
     statics: {
       staticFn() {
-        expectType<Model<InferSchemaType<typeof AutoTypedSchema>>>(this);
+        expectAssignable<Model<InferSchemaType<typeof AutoTypedSchema>>>(this);
         return 'Returned from staticFn' as const;
       }
     },
     methods: {
       instanceFn() {
-        expectType<HydratedDocument<InferSchemaType<typeof AutoTypedSchema>>>(this);
+        expectAssignable<HydratedDocument<InferSchemaType<typeof AutoTypedSchema>>>(this);
         return 'Returned from DocumentInstanceFn' as const;
       }
     },
@@ -972,10 +972,10 @@ function gh12590() {
   type User = InferSchemaType<typeof UserSchema>;
 
   const path = UserSchema.path('hashed_password');
-  expectType<SchemaType<any, HydratedDocument<User>>>(path);
+  expectAssignable<SchemaType<any, HydratedDocument<User>>>(path);
 
   UserSchema.path('hashed_password').validate(function(v) {
-    expectType<HydratedDocument<User>>(this);
+    expectAssignable<HydratedDocument<User>>(this);
     if (this._password && this._password.length < 8) {
       this.invalidate('password', 'Password must be at least 8 characters.');
     }
@@ -1866,6 +1866,31 @@ function gh15479() {
   function getTestField(obj: { testField: string }) {
     return obj.testField;
   }
+}
+
+function gh15494() {
+  const SchemaA = new Schema({ name: String });
+  const SchemaB = new Schema({ name: String }, { versionKey: false });
+
+  const ModelA = model('ModelA', SchemaA);
+  const ModelB = model('ModelB', SchemaB);
+
+  type HydratedA = ReturnType<(typeof ModelA)['hydrate']>;
+  type HydratedB = ReturnType<(typeof ModelB)['hydrate']>;
+
+  const docA = new ModelA({ name: 'Alice' });
+  const docB = new ModelB({ name: 'Bob' });
+
+  // Should have __v
+  expectType<number>(docA.__v);
+  // Should not have __v
+  expectError(docB.__v);
+
+  const objA = docA.toObject();
+  expectType<number>(objA.__v);
+
+  const objB = docB.toObject();
+  expectError(objB.__v);
 }
 
 function gh15516() {

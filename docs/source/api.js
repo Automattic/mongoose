@@ -29,6 +29,7 @@ const files = [
   'lib/schema/number.js',
   'lib/schema/objectId.js',
   'lib/schema/string.js',
+  'lib/schema/uuid.js',
   'lib/options/schemaTypeOptions.js',
   'lib/options/schemaArrayOptions.js',
   'lib/options/schemaBufferOptions.js',
@@ -42,7 +43,8 @@ const files = [
   'lib/types/buffer.js',
   'lib/types/decimal128.js',
   'lib/types/map.js',
-  'lib/types/array/methods/index.js'
+  'lib/types/array/methods/index.js',
+  'lib/types/uuid.js'
 ];
 
 /** @type {Map.<string, DocsObj>} */

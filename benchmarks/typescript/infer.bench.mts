@@ -40,7 +40,7 @@ bench('InferRawDocType (basic)', () => {
   type UserType = InferRawDocType<typeof schemaDefinition>;
   // force lazily evaluated properties to be checked
   type Value = ValueOf<UserType>;
-  // original 506
+  // original 501
 }).types([320, 'instantiations']);
 
 bench('InferRawDocType (mixed)', () => {
@@ -51,7 +51,7 @@ bench('InferRawDocType (mixed)', () => {
   }>;
   // force lazily evaluated properties to be checked
   type Value = ValueOf<T>;
-  // original 1620
+  // original 1626
 }).types([535, 'instantiations']);
 
 bench('InferRawDocType (nested)', () => {
@@ -80,4 +80,5 @@ bench('InferRawDocType (nested)', () => {
   }>;
 
   type Value = ValueOf<ValueOf<ValueOf<T>>>;
+  // original 4214
 }).types([2097, 'instantiations']);

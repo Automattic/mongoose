@@ -48,10 +48,8 @@ Test.create([{}]).then(docs => {
   expectType<string>(docs[0].name);
 });
 
-expectError(Test.create<ITest>({}));
-
-Test.create<ITest>({ name: 'test' });
-Test.create<ITest>({ _id: new Types.ObjectId('0'.repeat(24)), name: 'test' });
+Test.create({ name: 'test' });
+Test.create({ _id: new Types.ObjectId('0'.repeat(24)), name: 'test' });
 
 Test.insertMany({ name: 'test' }, {}).then(docs => {
   expectType<Types.ObjectId>(docs[0]._id);
@@ -135,6 +133,36 @@ Test.insertMany({ _id: new Types.ObjectId('000000000000000000000000'), name: 'te
 async function createWithAggregateErrors() {
   expectType<(HydratedDocument<ITest>)[]>(await Test.create([{}]));
   expectType<(HydratedDocument<ITest> | Error)[]>(await Test.create([{}], { aggregateErrors: true }));
+}
+
+async function createWithSubdoc() {
+  const schema = new Schema({ name: String, subdoc: new Schema({ prop: { type: String, required: true } }) });
+  const TestModel = model('Test', schema);
+  const doc = await TestModel.create({ name: 'test', subdoc: { prop: 'value' } });
+  expectType<string | null | undefined>(doc.name);
+  expectType<string>(doc.subdoc!.prop);
+}
+
+async function createWithDocArray() {
+  const schema = new Schema({ name: String, subdocs: [new Schema({ prop: { type: String, required: true } })] });
+  const TestModel = model('Test', schema);
+  const doc = await TestModel.create({ name: 'test', subdocs: [{ prop: 'value' }] });
+  expectType<string | null | undefined>(doc.name);
+  expectType<string>(doc.subdocs[0].prop);
+}
+
+async function createWithMapOfSubdocs() {
+  const schema = new Schema({
+    name: String,
+    subdocMap: {
+      type: Map,
+      of: new Schema({ prop: { type: String, required: true } })
+    }
+  });
+  const TestModel = model('Test', schema);
+  const doc = await TestModel.create({ name: 'test', subdocMap: { taco: { prop: 'beef' } } });
+  expectType<string | null | undefined>(doc.name);
+  expectType<string>(doc.subdocMap!.get('taco')!.prop);
 }
 
 createWithAggregateErrors();

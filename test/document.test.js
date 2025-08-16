@@ -14586,6 +14586,35 @@ describe('document', function() {
     assert.strictEqual(updatedItem.nested.get('inserted').map.get('a1'), 1);
     assert.strictEqual(updatedItem.nested.get('inserted2').map.get('a1'), 1);
   });
+
+  it('removes versionKey from output if versionKey: false set on toObject() or toJSON() (gh-15578)', async function() {
+    const schema = new mongoose.Schema({ name: String }, { versionKey: '__v' });
+    const Model = db.model('Test', schema);
+
+    const doc = await Model.create({ name: 'test' });
+
+    // Default: versionKey present
+    let obj = doc.toObject();
+    assert.ok(obj.hasOwnProperty('__v'));
+
+    obj = doc.toObject();
+    assert.ok(obj.hasOwnProperty('__v'));
+
+    // toObject({ versionKey: false }) removes versionKey
+    obj = doc.toObject({ versionKey: false });
+    assert.ok(!obj.hasOwnProperty('__v'));
+
+    // toJSON({ versionKey: false }) removes versionKey
+    obj = doc.toJSON({ versionKey: false });
+    assert.ok(!obj.hasOwnProperty('__v'));
+
+    // If versionKey: false in schema, versionKey should not be present
+    const schemaNoVersion = new mongoose.Schema({ name: String }, { versionKey: false });
+    const ModelNoVersion = db.model('TestNoVersion', schemaNoVersion);
+    const docNoVersion = await ModelNoVersion.create({ name: 'test2' });
+    obj = docNoVersion.toObject();
+    assert.ok(!obj.hasOwnProperty('__v'));
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

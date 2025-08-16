@@ -140,9 +140,21 @@ declare module 'mongoose' {
     ? IfAny<U, T & { _id: Types.ObjectId }, T & Required<{ _id: U }>>
     : T & { _id: Types.ObjectId };
 
-  export type Default__v<T, TSchemaOptions = {}> = TSchemaOptions extends { versionKey: false } ? T : T extends { __v?: infer U }
+  export type Default__v<T, TSchemaOptions = {}> = TSchemaOptions extends { versionKey: false }
     ? T
-    : T & { __v: number };
+    : TSchemaOptions extends { versionKey: infer VK }
+      ? (
+          // If VK is a *literal* string, add that property
+          T & {
+            [K in VK as K extends string
+              ? (string extends K ? never : K) // drop if wide string
+              : never
+            ]: number
+          }
+        )
+      : T extends { __v?: infer U }
+        ? T
+        : T & { __v: number };
 
   /** Helper type for getting the hydrated document type from the raw document type. The hydrated document type is what `new MyModel()` returns. */
   export type HydratedDocument<

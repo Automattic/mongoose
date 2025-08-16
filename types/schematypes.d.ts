@@ -395,7 +395,7 @@ declare module 'mongoose' {
       class Array extends SchemaType implements AcceptsDiscriminator {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'Array';
-        readonly schemaName = 'Array';
+        readonly schemaName: 'Array';
 
         static options: { castNonArrays: boolean };
 
@@ -418,7 +418,7 @@ declare module 'mongoose' {
       class BigInt extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'BigInt';
-        readonly schemaName = 'BigInt';
+        readonly schemaName: 'BigInt';
 
         /** Default options for this SchemaType */
         static defaultOptions: Record<string, any>;
@@ -427,7 +427,7 @@ declare module 'mongoose' {
       class Boolean extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'Boolean';
-        readonly schemaName = 'Boolean';
+        readonly schemaName: 'Boolean';
 
         /** Configure which values get casted to `true`. */
         static convertToTrue: Set<any>;
@@ -442,7 +442,7 @@ declare module 'mongoose' {
       class Buffer extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'Buffer';
-        readonly schemaName = 'Buffer';
+        readonly schemaName: 'Buffer';
 
         /**
          * Sets the default [subtype](https://studio3t.com/whats-new/best-practices-uuid-mongodb/)
@@ -457,7 +457,7 @@ declare module 'mongoose' {
       class Date extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'Date';
-        readonly schemaName = 'Date';
+        readonly schemaName: 'Date';
 
         /** Declares a TTL index (rounded to the nearest second) for _Date_ types only. */
         expires(when: number | string): this;
@@ -475,7 +475,7 @@ declare module 'mongoose' {
       class Decimal128 extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'Decimal128';
-        readonly schemaName = 'Decimal128';
+        readonly schemaName: 'Decimal128';
 
         /** Default options for this SchemaType */
         static defaultOptions: Record<string, any>;
@@ -484,7 +484,7 @@ declare module 'mongoose' {
       class Int32 extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'Int32';
-        readonly schemaName = 'Int32';
+        readonly schemaName: 'Int32';
 
         /** Default options for this SchemaType */
         static defaultOptions: Record<string, any>;
@@ -493,7 +493,7 @@ declare module 'mongoose' {
       class DocumentArray extends SchemaType implements AcceptsDiscriminator {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'DocumentArray';
-        readonly schemaName = 'DocumentArray';
+        readonly schemaName: 'DocumentArray';
 
         static options: { castNonArrays: boolean };
 
@@ -515,7 +515,7 @@ declare module 'mongoose' {
       class Map extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'Map';
-        readonly schemaName = 'Map';
+        readonly schemaName: 'Map';
 
         /** Default options for this SchemaType */
         static defaultOptions: Record<string, any>;
@@ -524,7 +524,7 @@ declare module 'mongoose' {
       class Mixed extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'Mixed';
-        readonly schemaName = 'Mixed';
+        readonly schemaName: 'Mixed';
 
         /** Default options for this SchemaType */
         static defaultOptions: Record<string, any>;
@@ -533,7 +533,7 @@ declare module 'mongoose' {
       class Number extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'Number';
-        readonly schemaName = 'Number';
+        readonly schemaName: 'Number';
 
         /** Sets a enum validator */
         enum(vals: number[]): this;
@@ -551,7 +551,7 @@ declare module 'mongoose' {
       class Double extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'Double';
-        readonly schemaName = 'Double';
+        readonly schemaName: 'Double';
 
         /** Default options for this SchemaType */
         static defaultOptions: Record<string, any>;
@@ -560,7 +560,7 @@ declare module 'mongoose' {
       class ObjectId extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'ObjectId';
-        readonly schemaName = 'ObjectId';
+        readonly schemaName: 'ObjectId';
 
         /** Adds an auto-generated ObjectId default if turnOn is true. */
         auto(turnOn: boolean): this;
@@ -594,7 +594,7 @@ declare module 'mongoose' {
       class String extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'String';
-        readonly schemaName = 'String';
+        readonly schemaName: 'String';
 
         /** Adds an enum validator */
         enum(vals: string[] | any): this;
@@ -624,7 +624,7 @@ declare module 'mongoose' {
       class UUID extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'UUID';
-        readonly schemaName = 'UUID';
+        readonly schemaName: 'UUID';
 
         /** Default options for this SchemaType */
         static defaultOptions: Record<string, any>;

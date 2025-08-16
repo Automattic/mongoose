@@ -68,6 +68,23 @@ schema.pre('save', function(next, arg) {
 
 In Mongoose 9, `next(null, 'new arg')` doesn't overwrite the args to the next middleware.
 
+## Update pipelines disallowed by default
+
+As of MongoDB 4.2, you can pass an array of pipeline stages to `updateOne()`, `updateMany()`, and `findOneAndUpdate()` to modify the document in multiple stages.
+Mongoose does not cast update pipelines at all, so for Mongoose 9 we've made using update pipelines throw an error by default.
+
+```javascript
+// Throws in Mongoose 9. Works in Mongoose 8
+await Model.updateOne({}, [{ $set: { newProp: 'test2' } }]);
+```
+
+Set `updatePipeline: true` to enable update pipelines.
+
+```javascript
+// Works in Mongoose 9
+await Model.updateOne({}, [{ $set: { newProp: 'test2' } }], { updatePipeline: true });
+```
+
 ## Removed background option for indexes
 
 [MongoDB no longer supports the `background` option for indexes as of MongoDB 4.2](https://www.mongodb.com/docs/manual/core/index-creation/#index-operations). Mongoose 9 will no longer set the background option by default and Mongoose 9 no longer supports setting the `background` option on `Schema.prototype.index()`.

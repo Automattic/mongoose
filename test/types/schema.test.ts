@@ -1637,7 +1637,6 @@ function gh13215() {
   >;
   type User = {
     userName: string;
-  } & {
     date: Date;
   };
 

@@ -14597,6 +14597,9 @@ describe('document', function() {
     let obj = doc.toObject();
     assert.ok(obj.hasOwnProperty('__v'));
 
+    obj = doc.toObject();
+    assert.ok(obj.hasOwnProperty('__v'));
+
     // toObject({ versionKey: false }) removes versionKey
     obj = doc.toObject({ versionKey: false });
     assert.ok(!obj.hasOwnProperty('__v'));

@@ -575,7 +575,9 @@ declare module 'mongoose' {
           ? DateSchemaDefinition
           : (Function | string);
 
-  export type SchemaDefinitionProperty<T = undefined, EnforcedDocType = any, THydratedDocumentType = HydratedDocument<EnforcedDocType>> = SchemaDefinitionWithBuiltInClass<T>
+  export type SchemaDefinitionProperty<T = undefined, EnforcedDocType = any, THydratedDocumentType = HydratedDocument<EnforcedDocType>> =
+    // ThisType intersection here avoids corrupting ThisType for SchemaTypeOptions (see test gh11828)
+    | SchemaDefinitionWithBuiltInClass<T> & ThisType<EnforcedDocType>
     | SchemaTypeOptions<T extends undefined ? any : T, EnforcedDocType, THydratedDocumentType>
     | typeof SchemaType
     | Schema<any, any, any>

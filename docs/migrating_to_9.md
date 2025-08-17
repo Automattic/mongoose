@@ -308,6 +308,8 @@ const doc = await TestModel.create({ age: 'not a number', someOtherProperty: 'va
 
 In Mongoose 9, `create()` and `insertOne()` no longer accept a generic parameter. Instead, they accept `Partial<RawDocType>` with some additional query casting applied that allows objects for maps, strings for ObjectIds, and POJOs for subdocuments and document arrays.
 
+If your parameters to `create()` don't match `Partial<RawDocType>`, you can use `as` to cast as follows.
+
 ```ts
 const doc = await TestModel.create({ age: 'not a number', someOtherProperty: 'value' } as unknown as Partial<InferSchemaType<typeof schema>>);
 ```

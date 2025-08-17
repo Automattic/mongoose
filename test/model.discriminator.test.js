@@ -1628,7 +1628,7 @@ describe('model', function() {
 
     const { _id } = await UserWithPost.create({ postId: post._id });
 
-    const user = await User.findOne({ _id }).populate({ path: 'post' });
+    const user = await User.findById(_id).populate({ path: 'post' });
 
     assert.ok(user.postId);
   });

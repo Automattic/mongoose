@@ -136,10 +136,11 @@ async function createWithAggregateErrors() {
 }
 
 async function createWithSubdoc() {
-  const schema = new Schema({ name: String, subdoc: new Schema({ prop: { type: String, required: true } }) });
+  const schema = new Schema({ name: String, registeredAt: Date, subdoc: new Schema({ prop: { type: String, required: true } }) });
   const TestModel = model('Test', schema);
-  const doc = await TestModel.create({ name: 'test', subdoc: { prop: 'value' } });
+  const doc = await TestModel.create({ name: 'test', registeredAt: '2022-06-01', subdoc: { prop: 'value' } });
   expectType<string | null | undefined>(doc.name);
+  expectType<Date | null | undefined>(doc.registeredAt);
   expectType<string>(doc.subdoc!.prop);
 }
 
@@ -160,9 +161,35 @@ async function createWithMapOfSubdocs() {
     }
   });
   const TestModel = model('Test', schema);
+
   const doc = await TestModel.create({ name: 'test', subdocMap: { taco: { prop: 'beef' } } });
   expectType<string | null | undefined>(doc.name);
   expectType<string>(doc.subdocMap!.get('taco')!.prop);
+
+  const doc2 = await TestModel.create({ name: 'test', subdocMap: [['taco', { prop: 'beef' }]] });
+  expectType<string | null | undefined>(doc2.name);
+  expectType<string>(doc2.subdocMap!.get('taco')!.prop);
+}
+
+async function createWithRawDocTypeNo_id() {
+  interface RawDocType {
+    name: string;
+    registeredAt: Date;
+  }
+
+  const schema = new Schema<RawDocType>({
+    name: String,
+    registeredAt: Date
+  });
+  const TestModel = model<RawDocType>('Test', schema);
+
+  const doc = await TestModel.create({ _id: '0'.repeat(24), name: 'test' });
+  expectType<string>(doc.name);
+  expectType<Types.ObjectId>(doc._id);
+
+  const doc2 = await TestModel.create({ name: 'test', _id: new Types.ObjectId() });
+  expectType<string>(doc2.name);
+  expectType<Types.ObjectId>(doc2._id);
 }
 
 createWithAggregateErrors();

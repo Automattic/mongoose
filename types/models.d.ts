@@ -260,9 +260,19 @@ declare module 'mongoose' {
     hint?: mongodb.Hint;
   }
 
+  /*
+   * Apply common casting logic to the given type, allowing:
+   * - strings for ObjectIds
+   * - strings and numbers for Dates
+   * - strings for Buffers
+   * - strings for UUIDs
+   * - POJOs for subdocuments
+   * - vanilla arrays of POJOs for document arrays
+   * - POJOs and array of arrays for maps
+   */
   type ApplyBasicCreateCasting<T> = {
     [K in keyof T]: NonNullable<T[K]> extends Map<infer KeyType extends string, infer ValueType>
-      ? (Record<KeyType, ValueType> | T[K])
+      ? (Record<KeyType, ValueType> | Array<[KeyType, ValueType]> | T[K])
       : NonNullable<T[K]> extends Types.DocumentArray<infer RawSubdocType>
          ? RawSubdocType[] | T[K]
          : QueryTypeCasting<T[K]>;
@@ -352,10 +362,10 @@ declare module 'mongoose' {
     >;
 
     /** Creates a new document or documents */
-    create(docs: Array<Partial<ApplyBasicCreateCasting<TRawDocType>>>, options: CreateOptions & { aggregateErrors: true }): Promise<(THydratedDocumentType | Error)[]>;
-    create(docs: Array<Partial<ApplyBasicCreateCasting<TRawDocType>>>, options?: CreateOptions): Promise<THydratedDocumentType[]>;
-    create(doc: Partial<ApplyBasicCreateCasting<TRawDocType>>): Promise<THydratedDocumentType>;
-    create(...docs: Array<Partial<ApplyBasicCreateCasting<TRawDocType>>>): Promise<THydratedDocumentType[]>;
+    create(docs: Array<Partial<ApplyBasicCreateCasting<Require_id<TRawDocType>>>>, options: CreateOptions & { aggregateErrors: true }): Promise<(THydratedDocumentType | Error)[]>;
+    create(docs: Array<Partial<ApplyBasicCreateCasting<Require_id<TRawDocType>>>>, options?: CreateOptions): Promise<THydratedDocumentType[]>;
+    create(doc: Partial<ApplyBasicCreateCasting<Require_id<TRawDocType>>>): Promise<THydratedDocumentType>;
+    create(...docs: Array<Partial<ApplyBasicCreateCasting<Require_id<TRawDocType>>>>): Promise<THydratedDocumentType[]>;
 
     /**
      * Create the collection for this model. By default, if no indexes are specified,

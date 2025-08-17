@@ -43,7 +43,8 @@ declare module 'mongoose' {
     | 'setDefaultsOnInsert'
     | 'strict'
     | 'strictQuery'
-    | 'translateAliases';
+    | 'translateAliases'
+    | 'updatePipeline';
 
   type MongooseBaseQueryOptions<DocType = unknown> = Pick<QueryOptions<DocType>, MongooseBaseQueryOptionKeys>;
 
@@ -219,6 +220,11 @@ declare module 'mongoose' {
     translateAliases?: boolean;
     upsert?: boolean;
     useBigInt64?: boolean;
+    /**
+     * Set to true to allow passing in an update pipeline instead of an update document.
+     * Mongoose disallows update pipelines by default because Mongoose does not cast update pipelines.
+     */
+    updatePipeline?: boolean;
     writeConcern?: mongodb.WriteConcern;
 
     [other: string]: any;

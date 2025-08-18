@@ -1,3 +1,10 @@
+8.17.2 / 2025-08-18
+===================
+ * fix: avoid Model.validate() hanging when all paths fail casting #15580 #15579 [piotracalski](https://github.com/piotracalski)
+ * types(document): better support for flattenObjectIds and versionKey options for toObject() and toJSON() #15582 #15578
+ * docs: fix docs jsdoc tags and add UUID to be listed #15585
+ * docs(document): fix code sample that errors with "Cannot set properties of undefined" #15589
+
 8.17.1 / 2025-08-07
 ===================
  * fix(query): propagate read preference and read concern to populate if read() called after populate() #15567 #15553

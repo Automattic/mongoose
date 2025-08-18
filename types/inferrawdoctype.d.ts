@@ -67,8 +67,11 @@ declare module 'mongoose' {
           // we need to call InferRawDocType to correctly infer its type.
           Array<InferRawDocType<Item>>
       : IsSchemaTypeFromBuiltinClass<Item> extends true ? ObtainRawDocumentPathType<Item, TypeKey>[]
-      : Item extends Record<string, never> ? ObtainRawDocumentPathType<Item, TypeKey>[]
-      : Array<InferRawDocType<Item>>
+      : IsItRecordAndNotAny<Item> extends true ?
+        Item extends Record<string, never> ?
+          ObtainRawDocumentPathType<Item, TypeKey>[]
+        : Array<InferRawDocType<Item>>
+      : ObtainRawDocumentPathType<Item, TypeKey>[]
     : PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']>
     : IfEquals<PathValueType, String> extends true ? PathEnumOrString<Options['enum']>
     : PathValueType extends NumberSchemaDefinition ?

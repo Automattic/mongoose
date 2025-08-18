@@ -206,4 +206,28 @@ describe('model: validate: ', function() {
     assert.equal(err.errors['myNumber'].name, 'CastError');
     assert.equal(err.errors['invalid1'].name, 'ValidatorError');
   });
+
+  it('should return cast errors when validating only paths that fail casting', async function() {
+    const Model = mongoose.model('Test', new Schema({
+      validPath: {
+        type: String,
+        required: true
+      },
+      invalidPath1: {
+        type: Number,
+        required: true
+      },
+      invalidPath2: {
+        type: Number,
+        required: true
+      }
+    }));
+
+    const err = await Model.validate({ validPath: 'foo', invalidPath1: 'not a number', invalidPath2: 'not a number' }, ['invalidPath1', 'invalidPath2']).
+      then(() => null, err => err);
+    assert.ok(err);
+    assert.deepEqual(Object.keys(err.errors).sort(), ['invalidPath1', 'invalidPath2']);
+    assert.equal(err.errors['invalidPath1'].name, 'CastError');
+    assert.equal(err.errors['invalidPath2'].name, 'CastError');
+  });
 });

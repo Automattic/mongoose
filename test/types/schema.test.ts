@@ -643,7 +643,7 @@ function gh11997() {
 function gh12003() {
   const baseSchemaOptions = {
     versionKey: false
-  };
+  } as const;
 
   const BaseSchema = new Schema({
     name: String
@@ -653,6 +653,7 @@ function gh12003() {
 
   type TSchemaOptions = ResolveSchemaOptions<ObtainSchemaGeneric<typeof BaseSchema, 'TSchemaOptions'>>;
   expectType<'type'>({} as TSchemaOptions['typeKey']);
+  expectType<false>({} as TSchemaOptions['versionKey']);
 
   expectType<{ name?: string | null }>({} as BaseSchemaType);
 }

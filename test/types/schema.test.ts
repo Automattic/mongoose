@@ -1920,3 +1920,33 @@ function gh15536() {
   const user3 = new UserModelNameRequiredCustom({ name: null });
   expectType<string>(user3.name);
 }
+
+function gh10894() {
+  function autoInferred() {
+    const schema = new Schema({
+      testProp: {
+        type: 'Union',
+        of: [String, Number]
+      }
+    });
+    const TestModel = model('Test', schema);
+
+    type InferredDocType = InferSchemaType<typeof schema>;
+    expectType<string | number | null | undefined>({} as InferredDocType['testProp']);
+
+    const doc = new TestModel({ testProp: 42 });
+    expectType<string | number | null | undefined>(doc.testProp);
+
+    const toObject = doc.toObject();
+    expectType<string | number | null | undefined>(toObject.testProp);
+
+    const schemaDefinition = {
+      testProp: {
+        type: 'Union',
+        of: ['String', 'Number']
+      }
+    } as const;
+    type RawDocType = InferRawDocType<typeof schemaDefinition>;
+    expectType<string | number | null | undefined>({} as RawDocType['testProp']);
+  }
+}

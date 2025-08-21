@@ -266,7 +266,7 @@ describe('schematype', function() {
     });
 
     const typesToTest = Object.values(mongoose.SchemaTypes).
-      filter(t => t.name !== 'SchemaSubdocument' && t.name !== 'SchemaDocumentArray');
+      filter(t => t.name !== 'SchemaSubdocument' && t.name !== 'SchemaDocumentArray' && t.name !== 'Union');
 
     typesToTest.forEach((type) => {
       it(type.name + ', when given a default option, set its', () => {

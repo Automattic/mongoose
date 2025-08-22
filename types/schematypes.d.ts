@@ -188,7 +188,7 @@ declare module 'mongoose' {
     _id?: boolean;
 
     /** If set, specifies the type of this map's values. Mongoose will cast this map's values to the given type. */
-    of?: Function | SchemaDefinitionProperty<any>;
+    of?: Function | SchemaDefinitionProperty<any> | (Function | SchemaDefinitionProperty<any>)[];
 
     /** If true, uses Mongoose's default `_id` settings. Only allowed for ObjectIds */
     auto?: boolean;
@@ -564,6 +564,13 @@ declare module 'mongoose' {
 
         /** Adds an uppercase [setter](http://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-set). */
         uppercase(shouldApply?: boolean): this;
+
+        /** Default options for this SchemaType */
+        static defaultOptions: Record<string, any>;
+      }
+
+      class Union extends SchemaType {
+        static schemaName: 'Union';
 
         /** Default options for this SchemaType */
         static defaultOptions: Record<string, any>;

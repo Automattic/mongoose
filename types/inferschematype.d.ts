@@ -75,10 +75,7 @@ declare module 'mongoose' {
 
   type ApplySchemaOptions<T, O = DefaultSchemaOptions> = ResolveTimestamps<T, O>;
 
-  type ResolveTimestamps<T, O> = O extends { methods: any } | { statics: any } | { virtuals: any } | { timestamps?: false } ? T
-    // For some reason, TypeScript sets all the document properties to unknown
-    // if we use methods, statics, or virtuals. So avoid inferring timestamps
-    // if any of these are set for now. See gh-12807
+  type ResolveTimestamps<T, O> = O extends { timestamps?: false } ? T
     : O extends { timestamps: infer TimestampOptions } ? TimestampOptions extends true
       ? { createdAt: NativeDate; updatedAt: NativeDate; } & T
       : TimestampOptions extends SchemaTimestampsConfig
@@ -206,6 +203,10 @@ TypeHint<PathValueType>
  */
 type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> = T extends ReadonlyArray<infer E> ? E : T extends { values: any } ? PathEnumOrString<T['values']> : T extends Record<string, infer V> ? V : string;
 
+type UnionToType<T extends readonly any[]> = T[number] extends infer U
+  ? ResolvePathType<U>
+  : never;
+
 type IsSchemaTypeFromBuiltinClass<T> = T extends (typeof String)
   ? true
   : T extends (typeof Number)
@@ -317,11 +318,12 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
                                                       IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
                                                         PathValueType extends MapConstructor | 'Map' ? Map<string, ResolvePathType<Options['of']>> :
                                                           IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ResolvePathType<Options['of']>> :
-                                                            PathValueType extends ArrayConstructor ? any[] :
-                                                              PathValueType extends typeof Schema.Types.Mixed ? any:
-                                                                IfEquals<PathValueType, ObjectConstructor> extends true ? any:
-                                                                  IfEquals<PathValueType, {}> extends true ? any:
-                                                                    PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
-                                                                      PathValueType extends Record<string, any> ? ObtainDocumentType<PathValueType, any, { typeKey: TypeKey }> :
-                                                                        unknown,
+                                                            PathValueType extends 'Union' | 'union' | typeof Schema.Types.Union ? Options['of'] extends readonly any[] ? UnionToType<Options['of']> : never :
+                                                              PathValueType extends ArrayConstructor ? any[] :
+                                                                PathValueType extends typeof Schema.Types.Mixed ? any:
+                                                                  IfEquals<PathValueType, ObjectConstructor> extends true ? any:
+                                                                    IfEquals<PathValueType, {}> extends true ? any:
+                                                                      PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
+                                                                        PathValueType extends Record<string, any> ? ObtainDocumentType<PathValueType, any, { typeKey: TypeKey }> :
+                                                                          unknown,
   TypeHint>;

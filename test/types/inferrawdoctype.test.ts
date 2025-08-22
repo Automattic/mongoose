@@ -1,4 +1,4 @@
-import { InferRawDocType, type ResolveTimestamps, type Schema, type Types } from 'mongoose';
+import { InferRawDocType, type InferSchemaType, type ResolveTimestamps, type Schema, type Types } from 'mongoose';
 import { expectType, expectError } from 'tsd';
 
 function gh14839() {
@@ -119,4 +119,11 @@ function MoreDefinitionTypes() {
     objectIdConstructor?: Types.ObjectId | null | undefined;
     objectIdInstance?: Types.ObjectId | null | undefined;
   }>({} as Actual);
+}
+
+function HandlesAny() {
+  type ActualShallow = InferRawDocType<any>;
+  expectType<{ [x: PropertyKey]: any }>({} as ActualShallow);
+  type ActualNested = InferRawDocType<Record<string, any>>;
+  expectType<{ [x: string]: any }>({} as ActualNested);
 }

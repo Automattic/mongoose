@@ -34,6 +34,11 @@ declare module 'mongoose' {
       ResolveRawPathType<PathValueType[TypeKey], Omit<PathValueType, TypeKey>, TypeKey>
     : ResolveRawPathType<PathValueType, {}, TypeKey>;
 
+  // can be efficiently checked like:
+  // `[T] extends [neverOrAny] ? T : ...`
+  // to avoid edge cases
+  type neverOrAny = ' ~neverOrAny~';
+
   /**
    * Same as inferSchemaType, except:
    *
@@ -52,7 +57,8 @@ declare module 'mongoose' {
     Options extends SchemaTypeOptions<PathValueType> = {},
     TypeKey extends string = DefaultSchemaOptions['typeKey']
   > =
-    PathValueType extends Schema ? InferSchemaType<PathValueType>
+    [PathValueType] extends [neverOrAny] ? PathValueType
+    : PathValueType extends Schema ? InferSchemaType<PathValueType>
     : PathValueType extends ReadonlyArray<infer Item> ?
       Item extends never ? any[]
       : Item extends Schema ?

@@ -73,3 +73,6 @@ list.out
 
 data
 fle-cluster-config.json
+
+# @ark/attest (type testing)
+.attest

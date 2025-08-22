@@ -6810,7 +6810,7 @@ describe('Model', function() {
 
       assert.throws(
         () => User.buildBulkWriteOperations(users),
-        /name: Path `name` \(`a`\) is shorter than the minimum allowed length/
+        /name: Path `name` \(`a`, length 1\) is shorter than the minimum allowed length/
       );
     });
 

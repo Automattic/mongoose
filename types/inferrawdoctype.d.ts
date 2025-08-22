@@ -35,6 +35,10 @@ declare module 'mongoose' {
     TypeKey
   >;
 
+  type UnionToRawPathType<T extends readonly any[]> = T[number] extends infer U
+    ? ResolveRawPathType<U>
+    : never;
+
   /**
    * Same as inferSchemaType, except:
    *
@@ -109,11 +113,12 @@ declare module 'mongoose' {
                                                 IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
                                                   PathValueType extends MapConstructor | 'Map' ? Map<string, ResolveRawPathType<Options['of']>> :
                                                     IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ResolveRawPathType<Options['of']>> :
-                                                      PathValueType extends ArrayConstructor ? any[] :
-                                                        PathValueType extends typeof Schema.Types.Mixed ? any:
-                                                          IfEquals<PathValueType, ObjectConstructor> extends true ? any:
-                                                            IfEquals<PathValueType, {}> extends true ? any:
-                                                              PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
-                                                                PathValueType extends Record<string, any> ? InferRawDocType<PathValueType> :
-                                                                  unknown;
+                                                      PathValueType extends 'Union' | 'union' | typeof Schema.Types.Union ? Options['of'] extends readonly any[] ? UnionToRawPathType<Options['of']> : never :
+                                                        PathValueType extends ArrayConstructor ? any[] :
+                                                          PathValueType extends typeof Schema.Types.Mixed ? any:
+                                                            IfEquals<PathValueType, ObjectConstructor> extends true ? any:
+                                                              IfEquals<PathValueType, {}> extends true ? any:
+                                                                PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
+                                                                  PathValueType extends Record<string, any> ? InferRawDocType<PathValueType> :
+                                                                    unknown;
 }

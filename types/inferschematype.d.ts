@@ -99,26 +99,22 @@ declare module 'mongoose' {
 
   type ApplySchemaOptions<T, O = DefaultSchemaOptions> = ResolveTimestamps<T, O>;
 
-  type UninferrableOptions = { methods: any } | { statics: any } | { virtuals: any } | { timestamps?: false };
-
   type DefaultTimestampProps = {
     createdAt: NativeDate;
     updatedAt: NativeDate;
   };
 
   type ResolveTimestamps<T, O> =
-    O extends UninferrableOptions ?
-      // For some reason, TypeScript sets all the document properties to unknown
-      // if we use methods, statics, or virtuals. So avoid inferring timestamps
-      // if any of these are set for now. See gh-12807
-      T
+    O extends { timestamps?: false } ? T
     : O extends { timestamps: infer TimestampOptions } ?
       TimestampOptions extends true ? T & DefaultTimestampProps
       : TimestampOptions extends SchemaTimestampsConfig ?
-        Show<T & {
-          [K in keyof TimestampOptions & keyof DefaultTimestampProps as TimestampOptions[K] extends true ? K
-          : TimestampOptions[K] & string]: NativeDate;
-        }>
+        Show<
+          T & {
+            [K in keyof TimestampOptions & keyof DefaultTimestampProps as TimestampOptions[K] extends true ? K
+            : TimestampOptions[K] & string]: NativeDate;
+          }
+        >
       : T
     : T;
 }
@@ -255,6 +251,8 @@ type IsSchemaTypeFromBuiltinClass<T> =
   : T extends Buffer ? true
   : false;
 
+type UnionToType<T extends readonly any[]> = T[number] extends infer U ? ResolvePathType<U> : never;
+
 /**
  * @summary Resolve path type by returning the corresponding type.
  * @param {PathValueType} PathValueType Document definition path type.
@@ -338,6 +336,10 @@ type ResolvePathType<
   : IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer
   : PathValueType extends MapConstructor | 'Map' ? Map<string, ResolvePathType<Options['of']>>
   : IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ResolvePathType<Options['of']>>
+  : PathValueType extends 'Union' | 'union' | typeof Schema.Types.Union ?
+    Options['of'] extends readonly any[] ?
+      UnionToType<Options['of']>
+    : never
   : PathValueType extends ArrayConstructor ? any[]
   : PathValueType extends typeof Schema.Types.Mixed ? any
   : IfEquals<PathValueType, ObjectConstructor> extends true ? any

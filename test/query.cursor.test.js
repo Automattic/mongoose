@@ -209,9 +209,8 @@ describe('QueryCursor', function() {
     it('with pre-find hooks (gh-5096)', async function() {
       const schema = new Schema({ name: String });
       let called = 0;
-      schema.pre('find', function(next) {
+      schema.pre('find', function() {
         ++called;
-        next();
       });
 
       db.deleteModel(/Test/);
@@ -883,8 +882,8 @@ describe('QueryCursor', function() {
   it('throws if calling skipMiddlewareFunction() with non-empty array (gh-13411)', async function() {
     const schema = new mongoose.Schema({ name: String });
 
-    schema.pre('find', (next) => {
-      next(mongoose.skipMiddlewareFunction([{ name: 'bar' }]));
+    schema.pre('find', () => {
+      throw mongoose.skipMiddlewareFunction([{ name: 'bar' }]);
     });
 
     const Movie = db.model('Movie', schema);

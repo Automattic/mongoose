@@ -15,9 +15,7 @@ declare module 'mongoose' {
           ? BufferQueryCasting
           : T;
 
-  export type ApplyBasicQueryCasting<T> = T | T[] | (T extends (infer U)[] ? QueryTypeCasting<U> : T);
-
-  export type Condition<T> = ApplyBasicQueryCasting<QueryTypeCasting<T>> | QuerySelector<ApplyBasicQueryCasting<QueryTypeCasting<T>>>;
+  export type ApplyBasicQueryCasting<T> = T | T[] | (T extends (infer U)[] ? QueryTypeCasting<U> : T) | null;
 
   /**
    * Filter query to select the documents that match the query
@@ -28,7 +26,7 @@ declare module 'mongoose' {
    */
   type RootFilterQuery<T> = FilterQuery<T>;
 
-  type FilterQuery<T> = { [P in keyof T]?: Condition<T[P]>; } & RootQuerySelector<T>;
+  type FilterQuery<T> = ({ [P in keyof T]?: mongodb.Condition<ApplyBasicQueryCasting<QueryTypeCasting<T[P]>>>; } & mongodb.RootFilterOperators<{ [P in keyof T]?: ApplyBasicQueryCasting<QueryTypeCasting<T[P]>>; }>) | Query<any, any>;
 
   type MongooseBaseQueryOptionKeys =
     | 'context'
@@ -60,73 +58,6 @@ declare module 'mongoose' {
     QueryOp = 'find',
     TDocOverrides = Record<string, never>
   > = Query<ResultType, DocType, THelpers, RawDocType, QueryOp, TDocOverrides> & THelpers;
-
-  type QuerySelector<T> = {
-    // Comparison
-    $eq?: T | null | undefined;
-    $gt?: T;
-    $gte?: T;
-    $in?: [T] extends AnyArray<any> ? Unpacked<T>[] : T[];
-    $lt?: T;
-    $lte?: T;
-    $ne?: T | null | undefined;
-    $nin?: [T] extends AnyArray<any> ? Unpacked<T>[] : T[];
-    // Logical
-    $not?: T extends string ? QuerySelector<T> | RegExp : QuerySelector<T>;
-    // Element
-    /**
-     * When `true`, `$exists` matches the documents that contain the field,
-     * including documents where the field value is null.
-     */
-    $exists?: boolean;
-    $type?: string | number;
-    // Evaluation
-    $expr?: any;
-    $jsonSchema?: any;
-    $mod?: T extends number ? [number, number] : never;
-    $regex?: T extends string ? RegExp | string : never;
-    $options?: T extends string ? string : never;
-    // Geospatial
-    // TODO: define better types for geo queries
-    $geoIntersects?: { $geometry: object };
-    $geoWithin?: object;
-    $near?: object;
-    $nearSphere?: object;
-    $maxDistance?: number;
-    // Array
-    // TODO: define better types for $all and $elemMatch
-    $all?: T extends AnyArray<any> ? any[] : never;
-    $elemMatch?: T extends AnyArray<any> ? object : never;
-    $size?: T extends AnyArray<any> ? number : never;
-    // Bitwise
-    $bitsAllClear?: number | mongodb.Binary | number[];
-    $bitsAllSet?: number | mongodb.Binary | number[];
-    $bitsAnyClear?: number | mongodb.Binary | number[];
-    $bitsAnySet?: number | mongodb.Binary | number[];
-  };
-
-  type RootQuerySelector<T> = {
-    /** @see https://www.mongodb.com/docs/manual/reference/operator/query/and/#op._S_and */
-    $and?: Array<FilterQuery<T>>;
-    /** @see https://www.mongodb.com/docs/manual/reference/operator/query/nor/#op._S_nor */
-    $nor?: Array<FilterQuery<T>>;
-    /** @see https://www.mongodb.com/docs/manual/reference/operator/query/or/#op._S_or */
-    $or?: Array<FilterQuery<T>>;
-    /** @see https://www.mongodb.com/docs/manual/reference/operator/query/text */
-    $text?: {
-      $search: string;
-      $language?: string;
-      $caseSensitive?: boolean;
-      $diacriticSensitive?: boolean;
-    };
-    /** @see https://www.mongodb.com/docs/manual/reference/operator/query/where/#op._S_where */
-    $where?: string | Function;
-    /** @see https://www.mongodb.com/docs/manual/reference/operator/query/comment/#op._S_comment */
-    $comment?: string;
-    $expr?: Record<string, any>;
-    // this will mark all unrecognized properties as any (including nested queries)
-    [key: string]: any;
-  };
 
   interface QueryTimestampsConfig {
     createdAt?: boolean;

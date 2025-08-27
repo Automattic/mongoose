@@ -1950,3 +1950,19 @@ function gh10894() {
     expectType<string | number | null | undefined>({} as RawDocType['testProp']);
   }
 }
+
+function autoInferredNestedMaps() {
+  const schema = new Schema({
+    nestedMap: {
+      type: Map,
+      required: true,
+      of: {
+        type: Map,
+        of: String
+      }
+    }
+  });
+  const TestModel = model('Test', schema);
+  const doc = new TestModel({ nestedMap: new Map([['1', new Map([['2', 'value']])]]) });
+  expectType<Map<string, Map<string, string>>>(doc.nestedMap);
+}

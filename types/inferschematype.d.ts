@@ -316,8 +316,8 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
                                                   PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? Buffer :
                                                     PathValueType extends 'double' | 'Double' | typeof Schema.Types.Double ? Types.Double :
                                                       IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
-                                                        PathValueType extends MapConstructor | 'Map' ? Map<string, ResolvePathType<Options['of']>> :
-                                                          IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ResolvePathType<Options['of']>> :
+                                                        PathValueType extends MapConstructor | 'Map' ? Map<string, ObtainDocumentPathType<Options['of']>> :
+                                                          IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ObtainDocumentPathType<Options['of']>> :
                                                             PathValueType extends 'Union' | 'union' | typeof Schema.Types.Union ? Options['of'] extends readonly any[] ? UnionToType<Options['of']> : never :
                                                               PathValueType extends ArrayConstructor ? any[] :
                                                                 PathValueType extends typeof Schema.Types.Mixed ? any:

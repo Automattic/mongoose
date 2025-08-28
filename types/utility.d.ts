@@ -2,7 +2,7 @@ declare module 'mongoose' {
   type IfAny<IFTYPE, THENTYPE, ELSETYPE = IFTYPE> = 0 extends (1 & IFTYPE) ? THENTYPE : ELSETYPE;
   type IfUnknown<IFTYPE, THENTYPE> = unknown extends IFTYPE ? THENTYPE : IFTYPE;
 
-  type WithLevel1NestedPaths<T, K extends keyof T = keyof T> = {
+  type WithLevel1NestedPaths<T, K extends keyof T = keyof T> = IsItRecordAndNotAny<T> extends true ? {
     [P in K | NestedPaths<Required<T>, K>]: P extends K
       // Handle top-level paths
       // First, drill into documents so we don't end up surfacing `$assertPopulated`, etc.
@@ -28,7 +28,7 @@ declare module 'mongoose' {
               : never
           : never
         : never;
-  };
+  } : T;
 
   type HasStringIndex<T> =
     string extends Extract<keyof T, string> ? true : false;

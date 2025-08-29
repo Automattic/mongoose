@@ -1063,6 +1063,30 @@ function stringEnumInfer() {
   type StringEnumRequiredExample = InferSchemaType<typeof stringEnumSchemaRequired>;
   expectAssignable<StringEnum>({} as StringEnumRequiredExample['active']);
 }
+function stringEnumArrayInfer() {
+  enum StringEnum {
+    Foo = 'foo',
+    Bar = 'bar'
+  }
+
+  const stringEnumSchema = new Schema(
+    {
+      active: { type: [String], enum: StringEnum, required: false }
+    }
+  );
+
+  type StringEnumExample = InferSchemaType<typeof stringEnumSchema>;
+  expectAssignable<StringEnum[] | null | undefined>({} as StringEnumExample['active']);
+
+  const stringEnumSchemaRequired = new Schema(
+    {
+      active: { type: [String], enum: StringEnum, required: true }
+    }
+  );
+
+  type StringEnumRequiredExample = InferSchemaType<typeof stringEnumSchemaRequired>;
+  expectAssignable<StringEnum[]>({} as StringEnumRequiredExample['active']);
+}
 
 function gh12882() {
   // Array of strings

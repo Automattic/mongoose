@@ -272,7 +272,7 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
               // we need to call ObtainDocumentType to correctly infer its type.
               Types.DocumentArray<ObtainDocumentType<Item, any, { typeKey: TypeKey }>> :
             IsSchemaTypeFromBuiltinClass<Item> extends true ?
-              ObtainDocumentPathType<Item, TypeKey>[] :
+              ResolvePathType<Item, { enum: Options['enum'] }, TypeKey>[] :
               IsItRecordAndNotAny<Item> extends true ?
                 Item extends Record<string, never> ?
                   ObtainDocumentPathType<Item, TypeKey>[] :

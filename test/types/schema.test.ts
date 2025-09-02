@@ -1069,6 +1069,9 @@ function stringEnumArrayInfer() {
     Bar = 'bar'
   }
 
+  const schemaDefinition = {
+    active: { type: [String], enum: StringEnum, required: false }
+  } as const;
   const stringEnumSchema = new Schema(
     {
       active: { type: [String], enum: StringEnum, required: false }
@@ -1077,7 +1080,12 @@ function stringEnumArrayInfer() {
 
   type StringEnumExample = InferSchemaType<typeof stringEnumSchema>;
   expectAssignable<StringEnum[] | null | undefined>({} as StringEnumExample['active']);
+  type RawStringEnumExample = InferRawDocType<typeof schemaDefinition>;
+  expectAssignable<StringEnum[] | null | undefined>({} as RawStringEnumExample['active']);
 
+  const schemaDefinitionRequired = {
+    active: { type: [String], enum: StringEnum, required: true }
+  } as const;
   const stringEnumSchemaRequired = new Schema(
     {
       active: { type: [String], enum: StringEnum, required: true }
@@ -1086,6 +1094,8 @@ function stringEnumArrayInfer() {
 
   type StringEnumRequiredExample = InferSchemaType<typeof stringEnumSchemaRequired>;
   expectAssignable<StringEnum[]>({} as StringEnumRequiredExample['active']);
+  type RawStringEnumRequiredExample = InferRawDocType<typeof schemaDefinitionRequired>;
+  expectAssignable<StringEnum[] | null | undefined>({} as RawStringEnumRequiredExample['active']);
 }
 
 function gh12882() {

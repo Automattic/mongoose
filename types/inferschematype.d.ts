@@ -285,7 +285,7 @@ type ResolvePathType<
         : // If the type key isn't callable, then this is an array of objects, in which case
           // we need to call ObtainDocumentType to correctly infer its type.
           Types.DocumentArray<ObtainDocumentType<Item, any, { typeKey: TypeKey }>>
-      : IsSchemaTypeFromBuiltinClass<Item> extends true ? ObtainDocumentPathType<Item, TypeKey>[]
+      : IsSchemaTypeFromBuiltinClass<Item> extends true ? ResolvePathType<Item, { enum: Options['enum'] }, TypeKey>[]
       : IsItRecordAndNotAny<Item> extends true ?
         Item extends Record<string, never> ?
           ObtainDocumentPathType<Item, TypeKey>[]

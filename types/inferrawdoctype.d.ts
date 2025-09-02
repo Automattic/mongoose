@@ -91,7 +91,7 @@ declare module 'mongoose' {
     : PathValueType extends Decimal128SchemaDefinition ? Types.Decimal128
     : PathValueType extends BigintSchemaDefinition ? bigint
     : PathValueType extends UuidSchemaDefinition ? Buffer
-    : PathValueType extends MapSchemaDefinition ? Map<string, ResolveRawPathType<Options['of']>>
+    : PathValueType extends MapSchemaDefinition ? Map<string, ObtainRawDocumentPathType<Options['of']>>
     : PathValueType extends UnionSchemaDefinition ?
       ResolveRawPathType<Options['of'] extends ReadonlyArray<infer Item> ? Item : never>
     : PathValueType extends ArrayConstructor ? any[]

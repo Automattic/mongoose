@@ -100,3 +100,55 @@ const ProjectModel = model('Project', ProjectSchema);
 // Equivalent to `ProjectModel.find({ stars: { $gt: 1000 }, name: 'mongoose' })`
 await ProjectModel.find().where('stars').gt(1000).byName('mongoose');
 ```
+
+## Using Query Helper Overrides For Different Query Shapes
+
+Sometimes you want a query helper to return a different type depending on whether the query is "lean" or not.
+For example, suppose you want a `toMap()` query helper that converts the results of a query into a `Map` keyed by `_id`.
+If you call `.lean()`, you want the map values to be plain objects; otherwise, you want hydrated documents.
+
+To achieve this, you can use TypeScript function overloads on your query helper based on the value of `this`.
+Here's an example of how to type a `toMap()` query helper so that it returns the correct type for both lean and non-lean queries:
+```typescript
+import { Model, HydratedDocument, QueryWithHelpers, Schema, model, Types } from 'mongoose';
+
+// Query helper interface with overloads for lean and non-lean queries
+export interface ToMapQueryHelpers<RawDocType, HydratedDocType> {
+  // For non-lean queries: returns Map<string, HydratedDocType>
+  toMap(this: QueryWithHelpers<HydratedDocType[], HydratedDocType>): QueryWithHelpers<Map<string, HydratedDocType>, HydratedDocType>;
+  // For lean queries: returns Map<string, RawDocType>
+  toMap(this: QueryWithHelpers<RawDocType[], HydratedDocType>): QueryWithHelpers<Map<string, RawDocType>, HydratedDocType>;
+}
+
+export interface IUser {
+  _id: Types.ObjectId;
+  name: string;
+}
+
+export type UserHydratedDocument = HydratedDocument<IUser>;
+
+export type UserModelType = Model<
+  IUser,
+  ToMapQueryHelpers<IUser, UserHydratedDocument>
+>;
+
+const UserSchema = new Schema<IUser, UserModelType>({ name: String });
+
+const User = model<IUser, UserModelType>('User', UserSchema);
+
+async function run() {
+  // Non-lean: Map<string, UserHydratedDocument>
+  const hydratedMap = await User.find().toMap();
+  // hydratedMap.get('someId') is a hydrated document
+
+  // Lean: Map<string, UserRawDoc>
+  const leanMap = await User.find().lean().toMap();
+  // leanMap.get('someId') is a plain object
+
+  // The following will fail at compile time, as expected, because `toMap()` shouldn't work with single documents or numbers
+  // await User.findOne().toMap();
+  // await User.countDocuments().toMap();
+}
+```
+
+With this approach, TypeScript will infer the correct return type for `.toMap()` depending on whether you use `.lean()` or not. This ensures type safety and prevents accidental misuse of the query helper on queries that don't return arrays of documents.

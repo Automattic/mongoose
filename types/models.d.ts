@@ -435,7 +435,7 @@ declare module 'mongoose' {
       TQueryHelpers & ObtainSchemaGeneric<TDiscriminatorSchema, 'TQueryHelpers'>,
       TInstanceMethods & ObtainSchemaGeneric<TDiscriminatorSchema, 'TInstanceMethods'>,
       TVirtuals & ObtainSchemaGeneric<TDiscriminatorSchema, 'TVirtuals'>
-    > & ObtainSchemaGeneric<TDiscriminatorSchema, 'TStaticMethods'>;
+    > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'> & ObtainSchemaGeneric<TDiscriminatorSchema, 'TStaticMethods'>;
     discriminator<D>(
       name: string | number,
       schema: Schema,

@@ -109,6 +109,7 @@ If you call `.lean()`, you want the map values to be plain objects; otherwise, y
 
 To achieve this, you can use TypeScript function overloads on your query helper based on the value of `this`.
 Here's an example of how to type a `toMap()` query helper so that it returns the correct type for both lean and non-lean queries:
+
 ```typescript
 import { Model, HydratedDocument, QueryWithHelpers, Schema, model, Types } from 'mongoose';
 

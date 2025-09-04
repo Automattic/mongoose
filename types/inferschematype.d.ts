@@ -1,12 +1,17 @@
 import {
   AnyArray,
   BooleanSchemaDefinition,
+  BigintSchemaDefinition,
+  BufferSchemaDefinition,
   DateSchemaDefinition,
+  Decimal128SchemaDefinition,
   DefaultSchemaOptions,
   DefaultTypeKey,
+  DoubleSchemaDefinition,
   IfEquals,
   InferSchemaType,
   IsItRecordAndNotAny,
+  MapSchemaDefinition,
   NumberSchemaDefinition,
   ObjectIdSchemaDefinition,
   ObtainDocumentType,
@@ -14,7 +19,9 @@ import {
   SchemaType,
   SchemaTypeOptions,
   StringSchemaDefinition,
-  Types
+  Types,
+  UnionSchemaDefinition,
+  UuidSchemaDefinition
 } from 'mongoose';
 
 declare module 'mongoose' {
@@ -294,15 +301,15 @@ type ResolvePathType<
       Options['enum'][number]
     : number
   : PathValueType extends DateSchemaDefinition ? NativeDate
-  : PathValueType extends typeof Buffer | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer | Schema.Types.Buffer ? Buffer
+  : PathValueType extends BufferSchemaDefinition ? Buffer
   : PathValueType extends BooleanSchemaDefinition ? boolean
   : PathValueType extends ObjectIdSchemaDefinition ? Types.ObjectId
-  : PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 | Types.Decimal128 | Schema.Types.Decimal128 ? Types.Decimal128
-  : PathValueType extends 'bigint' | 'BigInt' | typeof Schema.Types.BigInt | typeof BigInt | Schema.Types.BigInt ? bigint
-  : PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID | Schema.Types.UUID ? Buffer
-  : PathValueType extends 'double' | 'Double' | typeof Schema.Types.Double ? Types.Double
-  : PathValueType extends MapConstructor | 'Map' | typeof Schema.Types.Map | Schema.Types.Map ? Map<string, ObtainDocumentPathType<Options['of']>>
-  : PathValueType extends 'Union' | 'union' | typeof Schema.Types.Union ?
+  : PathValueType extends Decimal128SchemaDefinition ? Types.Decimal128
+  : PathValueType extends BigintSchemaDefinition ? bigint
+  : PathValueType extends UuidSchemaDefinition ? Buffer
+  : PathValueType extends DoubleSchemaDefinition ? Types.Double
+  : PathValueType extends MapSchemaDefinition ? Map<string, ObtainDocumentPathType<Options['of']>>
+  : PathValueType extends UnionSchemaDefinition ?
     Options['of'] extends AnyArray<infer U> ? ResolvePathType<U>
     : never
   : PathValueType extends ArrayConstructor ? any[]

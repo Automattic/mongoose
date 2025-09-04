@@ -142,7 +142,7 @@ async function run() {
   const hydratedMap = await User.find().toMap();
   // hydratedMap.get('someId') is a hydrated document
 
-  // Lean: Map<string, UserRawDoc>
+  // Lean: Map<string, IUser>
   const leanMap = await User.find().lean().toMap();
   // leanMap.get('someId') is a plain object
 

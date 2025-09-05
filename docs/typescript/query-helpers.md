@@ -124,11 +124,16 @@ export interface ToMapQueryHelpers<RawDocType, HydratedDocType> {
 // Query helpers definition. Will be used in schema options
 const query: ToMapQueryHelpers<IUser, UserHydratedDocument> = {
   // Chainable query helper that converts an array of documents to
-  // a map of document _id (as a string) to the document. Requires a little
-  // bit of TypeScript tweaking to make TypeScript happy with the union type in `this`
-  toMap<Q extends QueryWithHelpers<any[], UserHydratedDocument>>(this: Q) {
-    type ResultType = Q extends QueryWithHelpers<infer R, UserHydratedDocument> ? Q : never;
-    return this.transform((docs) => new Map<string, ResultType>(docs.map(doc => [doc._id.toString(), doc])));
+  // a map of document _id (as a string) to the document
+  toMap() {
+    return this.transform((docs) => {
+      // The `if` statements are type gymnastics to help TypeScript
+      // handle the `IUser[] | UserHydratedDocument[]` union. Not necessary
+      // for runtime correctness.
+      if (docs.length === 0) return new Map();
+      if (docs[0] instanceof Document) return new Map(docs.map(doc => [doc._id.toString(), doc]));
+      return new Map(docs.map(doc => [doc._id.toString(), doc]));
+    });
   }
 };
 

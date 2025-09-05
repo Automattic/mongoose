@@ -63,8 +63,22 @@ doc.isNew;
 
 ## Note About Parallelism in Transactions {#note-about-parallelism-in-transactions}
 
-Running operations in parallel is **not supported** during a transaction. The use of `Promise.all`, `Promise.allSettled`, `Promise.race`, etc. to parallelize operations inside a transaction is
-undefined behaviour and should be avoided.
+Running operations in parallel is **not supported** during a transaction.
+The use of `Promise.all`, `Promise.allSettled`, `Promise.race`, etc. to parallelize operations inside a transaction is undefined behaviour and should be avoided.
+
+MongoDB also does not support multiple transactions on the same session in parallel.
+This also means MongoDB does not support nested transactions on the same session.
+The following code will throw a `Transaction already in progress` error.
+
+```javascript
+const doc = new Person({ name: 'Will Riker' });
+
+await db.transaction(async function setRank(session) {
+  // This throws `Transaction already in progress` because there is already a transaction
+  // in progress for this session.
+  await session.withTransaction(async () => {});
+});
+```
 
 ## With Mongoose Documents and `save()` {#with-mongoose-documents-and-save}
 
@@ -115,6 +129,34 @@ await Test.exists({ _id: doc._id });
 
 With `transactionAsyncLocalStorage`, you no longer need to pass sessions to every operation.
 Mongoose will add the session by default under the hood.
+
+`transactionAsyncLocalStorage` creates a new session each time you call `connection.transaction()`.
+This means each transaction will have its own session and be independent of other transactions.
+This also means that nested transactions are also independent of each other.
+
+```javascript
+await mongoose.connection.transaction(async () => {
+  await User.create({ name: 'John' });
+  // This starts an independent transaction - this transaction will **NOT**
+  // be rolled back even though it is within another `transaction()` call
+  await mongoose.connection.transaction(async () => {
+    await User.create({ name: 'Jane' });
+  });
+  throw new Error('Fail the top-level transaction');
+});
+```
+
+However, if the nested transaction fails, the top-level transaction will still be rolled back because `await mongoose.connection.transaction()` throws.
+
+```javascript
+await mongoose.connection.transaction(async () => {
+  await User.create({ name: 'John' });
+  await mongoose.connection.transaction(async () => {
+    // This causes both transactions to roll back, but only because this error bubbles up.
+    throw new Error('Fail the nested transaction');
+  });
+});
+```
 
 ## Advanced Usage {#advanced-usage}
 

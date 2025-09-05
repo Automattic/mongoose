@@ -576,7 +576,8 @@ declare module 'mongoose' {
   export type BigintSchemaDefinition = 'bigint' | 'BigInt' | typeof Schema.Types.BigInt | Schema.Types.BigInt | typeof BigInt | BigInt;
   export type UuidSchemaDefinition = 'uuid' | 'UUID' | typeof Schema.Types.UUID | Schema.Types.UUID;
   export type MapSchemaDefinition = MapConstructor | 'Map' | typeof Schema.Types.Map;
-  export type UnionSchemaDefinition = 'Union' | 'union' | typeof Schema.Types.Union;
+  export type UnionSchemaDefinition = 'Union' | 'union' | typeof Schema.Types.Union | Schema.Types.Union;
+  export type DoubleSchemaDefinition = 'double' | 'Double' | typeof Schema.Types.Double | Schema.Types.Double;
 
   export type SchemaDefinitionWithBuiltInClass<T> = T extends number
     ? NumberSchemaDefinition

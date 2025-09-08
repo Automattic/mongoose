@@ -2766,10 +2766,16 @@ describe('model: updateOne: ', function() {
       const Model = db.model('Test', schema);
 
       await Model.create({ oldProp: 'test' });
+
+      assert.throws(
+        () => Model.updateOne({}, [{ $set: { newProp: 'test2' } }]),
+        /Cannot pass an array to query updates unless the `updatePipeline` option is set/
+      );
+
       await Model.updateOne({}, [
         { $set: { newProp: 'test2' } },
         { $unset: ['oldProp'] }
-      ]);
+      ], { updatePipeline: true });
       let doc = await Model.findOne();
       assert.equal(doc.newProp, 'test2');
       assert.strictEqual(doc.oldProp, void 0);
@@ -2778,7 +2784,7 @@ describe('model: updateOne: ', function() {
       await Model.updateOne({}, [
         { $addFields: { oldProp: 'test3' } },
         { $project: { newProp: 0 } }
-      ]);
+      ], { updatePipeline: true });
       doc = await Model.findOne();
       assert.equal(doc.oldProp, 'test3');
       assert.strictEqual(doc.newProp, void 0);
@@ -2792,7 +2798,7 @@ describe('model: updateOne: ', function() {
       await Model.updateOne({}, [
         { $set: { newProp: 'test2' } },
         { $unset: 'oldProp' }
-      ]);
+      ], { updatePipeline: true });
       const doc = await Model.findOne();
       assert.equal(doc.newProp, 'test2');
       assert.strictEqual(doc.oldProp, void 0);
@@ -2805,8 +2811,11 @@ describe('model: updateOne: ', function() {
       const updatedAt = cat.updatedAt;
 
       await new Promise(resolve => setTimeout(resolve), 50);
-      const updated = await Cat.findOneAndUpdate({ _id: cat._id },
-        [{ $set: { name: 'Raikou' } }], { new: true });
+      const updated = await Cat.findOneAndUpdate(
+        { _id: cat._id },
+        [{ $set: { name: 'Raikou' } }],
+        { new: true, updatePipeline: true }
+      );
       assert.ok(updated.updatedAt.getTime() > updatedAt.getTime());
     });
   });

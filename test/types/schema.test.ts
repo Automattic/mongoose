@@ -900,11 +900,13 @@ function testInferTimestamps() {
   });
 
   type WithTimestamps2 = InferSchemaType<typeof schema2>;
-  // For some reason, expectType<{ createdAt: Date, updatedAt: Date, name?: string }> throws
-  // an error "Parameter type { createdAt: Date; updatedAt: Date; name?: string | undefined; }
-  // is not identical to argument type { createdAt: NativeDate; updatedAt: NativeDate; } &
-  // { name?: string | undefined; }"
-  expectType<{ name?: string | null }>({} as WithTimestamps2);
+  expectType<{ createdAt: Date; updatedAt: Date } & { name?: string | null }>({} as WithTimestamps2);
+
+  const TestModel = model('Test', schema2);
+  const doc = new TestModel({ name: 'test' });
+  expectType<string | undefined | null>(doc.name);
+
+  expectType<string | undefined | null>(doc.myName());
 }
 
 function gh12431() {
@@ -1060,6 +1062,30 @@ function stringEnumInfer() {
 
   type StringEnumRequiredExample = InferSchemaType<typeof stringEnumSchemaRequired>;
   expectAssignable<StringEnum>({} as StringEnumRequiredExample['active']);
+}
+function stringEnumArrayInfer() {
+  enum StringEnum {
+    Foo = 'foo',
+    Bar = 'bar'
+  }
+
+  const stringEnumSchema = new Schema(
+    {
+      active: { type: [String], enum: StringEnum, required: false }
+    }
+  );
+
+  type StringEnumExample = InferSchemaType<typeof stringEnumSchema>;
+  expectAssignable<StringEnum[] | null | undefined>({} as StringEnumExample['active']);
+
+  const stringEnumSchemaRequired = new Schema(
+    {
+      active: { type: [String], enum: StringEnum, required: true }
+    }
+  );
+
+  type StringEnumRequiredExample = InferSchemaType<typeof stringEnumSchemaRequired>;
+  expectAssignable<StringEnum[]>({} as StringEnumRequiredExample['active']);
 }
 
 function gh12882() {
@@ -1943,4 +1969,50 @@ function gh15536() {
 
   const user3 = new UserModelNameRequiredCustom({ name: null });
   expectType<string>(user3.name);
+}
+
+function gh10894() {
+  function autoInferred() {
+    const schema = new Schema({
+      testProp: {
+        type: 'Union',
+        of: [String, Number]
+      }
+    });
+    const TestModel = model('Test', schema);
+
+    type InferredDocType = InferSchemaType<typeof schema>;
+    expectType<string | number | null | undefined>({} as InferredDocType['testProp']);
+
+    const doc = new TestModel({ testProp: 42 });
+    expectType<string | number | null | undefined>(doc.testProp);
+
+    const toObject = doc.toObject();
+    expectType<string | number | null | undefined>(toObject.testProp);
+
+    const schemaDefinition = {
+      testProp: {
+        type: 'Union',
+        of: ['String', 'Number']
+      }
+    } as const;
+    type RawDocType = InferRawDocType<typeof schemaDefinition>;
+    expectType<string | number | null | undefined>({} as RawDocType['testProp']);
+  }
+}
+
+function autoInferredNestedMaps() {
+  const schema = new Schema({
+    nestedMap: {
+      type: Map,
+      required: true,
+      of: {
+        type: Map,
+        of: String
+      }
+    }
+  });
+  const TestModel = model('Test', schema);
+  const doc = new TestModel({ nestedMap: new Map([['1', new Map([['2', 'value']])]]) });
+  expectType<Map<string, Map<string, string>>>(doc.nestedMap);
 }

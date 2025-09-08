@@ -171,6 +171,22 @@ async function createWithMapOfSubdocs() {
   expectType<string>(doc2.subdocMap!.get('taco')!.prop);
 }
 
+async function createWithSubdocs() {
+  const schema = new Schema({
+    name: String,
+    subdoc: new Schema({
+      prop: { type: String, required: true },
+      otherProp: { type: String, required: true }
+    })
+  });
+  const TestModel = model('Test', schema);
+
+  const doc = await TestModel.create({ name: 'test', subdoc: { prop: 'test 1' } });
+  expectType<string | null | undefined>(doc.name);
+  expectType<string>(doc.subdoc!.prop);
+  expectType<string>(doc.subdoc!.otherProp);
+}
+
 async function createWithRawDocTypeNo_id() {
   interface RawDocType {
     name: string;

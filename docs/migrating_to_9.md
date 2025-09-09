@@ -285,6 +285,11 @@ console.log(schema.path('docArray').Constructor); // EmbeddedDocument constructo
 
 In Mongoose 8, there was also an internal `$embeddedSchemaType` property. That property has been replaced with `embeddedSchemaType`, which is now part of the public API.
 
+### Query use$geoWithin removed, now always true
+
+`mongoose.Query` had a `use$geoWithin` property that could configure converting `$geoWithin` to `$within` to support MongoDB versions before 2.4.
+That property has been removed in Mongoose 9. `$geoWithin` is now never converted to `$within`, because MongoDB no longer supports `$within`.
+
 ## TypeScript
 
 ### FilterQuery renamed to QueryFilter

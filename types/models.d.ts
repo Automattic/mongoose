@@ -533,10 +533,6 @@ declare module 'mongoose' {
       docs: Array<TRawDocType>
     ): Promise<Array<THydratedDocumentType>>;
     insertMany(
-      docs: Array<TRawDocType>,
-      options: InsertManyOptions & { lean: true; }
-    ): Promise<Array<Require_id<TRawDocType>>>;
-    insertMany(
       doc: Array<TRawDocType>,
       options: InsertManyOptions & { ordered: false; rawResult: true; }
     ): Promise<mongodb.InsertManyResult<Require_id<TRawDocType>> & {
@@ -553,6 +549,23 @@ declare module 'mongoose' {
       docs: Array<TRawDocType>,
       options: InsertManyOptions & { lean: true, rawResult: true; }
     ): Promise<mongodb.InsertManyResult<Require_id<TRawDocType>>>;
+    insertMany<DocContents = TRawDocType>(
+      doc: DocContents | TRawDocType,
+      options: InsertManyOptions & { ordered: false; rawResult: true; }
+    ): Promise<mongodb.InsertManyResult<Require_id<DocContents>> & {
+      mongoose: {
+        validationErrors: (CastError | Error.ValidatorError)[];
+        results: Array<
+          Error |
+          Object |
+          MergeType<THydratedDocumentType, DocContents>
+        >
+      }
+    }>;
+    insertMany(
+      docs: Array<TRawDocType>,
+      options: InsertManyOptions & { lean: true; }
+    ): Promise<Array<Require_id<TRawDocType>>>;
     insertMany(
       docs: Array<TRawDocType>,
       options: InsertManyOptions & { rawResult: true; }
@@ -569,19 +582,6 @@ declare module 'mongoose' {
       docs: DocContents | TRawDocType,
       options: InsertManyOptions & { lean: true; }
     ): Promise<Array<Require_id<DocContents>>>;
-    insertMany<DocContents = TRawDocType>(
-      doc: DocContents | TRawDocType,
-      options: InsertManyOptions & { ordered: false; rawResult: true; }
-    ): Promise<mongodb.InsertManyResult<Require_id<DocContents>> & {
-      mongoose: {
-        validationErrors: (CastError | Error.ValidatorError)[];
-        results: Array<
-          Error |
-          Object |
-          MergeType<THydratedDocumentType, DocContents>
-        >
-      }
-    }>;
     insertMany<DocContents = TRawDocType>(
       docs: Array<DocContents | TRawDocType>,
       options: InsertManyOptions & { rawResult: true; }

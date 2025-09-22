@@ -609,7 +609,7 @@ describe('model middleware', function() {
     it('supports skipping wrapped function', async function() {
       const schema = new Schema({ name: String, prop: String });
 
-      schema.pre('bulkWrite', function(ops) {
+      schema.pre('bulkWrite', function() {
         throw mongoose.skipMiddlewareFunction('skipMiddlewareFunction test');
       });
 

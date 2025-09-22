@@ -12298,25 +12298,31 @@ describe('document', function() {
     assert.strictEqual(clonedDoc.$session(), session);
   });
 
-  it('$clone() with single nested and doc array (gh-14353) (gh-11849)', async function() {
+  it('$clone() with single nested and doc array (gh-15625) (gh-14353) (gh-11849)', async function() {
     const schema = new mongoose.Schema({
       subdocArray: [{
         name: String
       }],
-      subdoc: new mongoose.Schema({ name: String })
+      subdoc: new mongoose.Schema({ name: String }),
+      arr: [Number]
     });
     const Test = db.model('Test', schema);
 
-    const item = await Test.create({ subdocArray: [{ name: 'test 1' }], subdoc: { name: 'test 2' } });
+    const item = await Test.create({ subdocArray: [{ name: 'test 1' }], subdoc: { name: 'test 2' }, arr: [99] });
 
     const doc = await Test.findById(item._id);
     const clonedDoc = doc.$clone();
 
     assert.ok(clonedDoc.subdocArray[0].$__);
     assert.ok(clonedDoc.subdoc.$__);
+    assert.ok(clonedDoc.subdocArray.isMongooseDocumentArray);
+    assert.equal(typeof clonedDoc.subdocArray.id, 'function');
+    assert.ok(clonedDoc.arr.isMongooseArray);
+    assert.ok(!clonedDoc.arr.isMongooseDocumentArray);
 
     assert.deepEqual(doc.subdocArray[0], clonedDoc.subdocArray[0]);
     assert.deepEqual(doc.subdoc, clonedDoc.subdoc);
+    assert.deepEqual(doc.arr, [99]);
   });
 
   it('can create document with document array and top-level key named `schema` (gh-12480)', async function() {

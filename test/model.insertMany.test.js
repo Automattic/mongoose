@@ -279,18 +279,16 @@ describe('insertMany()', function() {
     });
     let calledPre = 0;
     let calledPost = 0;
-    schema.pre('insertMany', function(next, docs) {
+    schema.pre('insertMany', function(docs) {
       assert.equal(docs.length, 2);
       assert.equal(docs[0].name, 'Star Wars');
       ++calledPre;
-      next();
     });
-    schema.pre('insertMany', function(next, docs) {
+    schema.pre('insertMany', function(docs) {
       assert.equal(docs.length, 2);
       assert.equal(docs[0].name, 'Star Wars');
       docs[0].name = 'A New Hope';
       ++calledPre;
-      next();
     });
     schema.post('insertMany', function() {
       ++calledPost;

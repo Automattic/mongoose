@@ -497,7 +497,6 @@ declare module 'mongoose' {
       method: 'insertMany' | RegExp,
       fn: (
         this: T,
-        next: (err?: CallbackError) => void,
         docs: any | Array<any>,
         options?: InsertManyOptions & { lean?: boolean }
       ) => void | Promise<void>
@@ -507,7 +506,6 @@ declare module 'mongoose' {
       method: 'bulkWrite' | RegExp,
       fn: (
         this: T,
-        next: (err?: CallbackError) => void,
         ops: Array<AnyBulkWriteOperation<any>>,
         options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions
       ) => void | Promise<void>
@@ -517,7 +515,6 @@ declare module 'mongoose' {
       method: 'createCollection' | RegExp,
       fn: (
         this: T,
-        next: (err?: CallbackError) => void,
         options?: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'>
       ) => void | Promise<void>
     ): this;

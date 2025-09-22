@@ -902,9 +902,8 @@ describe('model: updateOne:', function() {
       let numPres = 0;
       let numPosts = 0;
       const band = new Schema({ members: [String] });
-      band.pre('updateOne', function(next) {
+      band.pre('updateOne', function() {
         ++numPres;
-        next();
       });
       band.post('updateOne', function() {
         ++numPosts;
@@ -1237,9 +1236,8 @@ describe('model: updateOne:', function() {
     it('middleware update with exec (gh-3549)', async function() {
       const Schema = mongoose.Schema({ name: String });
 
-      Schema.pre('updateOne', function(next) {
+      Schema.pre('updateOne', function() {
         this.updateOne({ name: 'Val' });
-        next();
       });
 
       const Model = db.model('Test', Schema);

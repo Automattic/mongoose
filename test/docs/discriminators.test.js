@@ -164,17 +164,15 @@ describe('discriminator docs', function() {
 
     const eventSchema = new mongoose.Schema({ time: Date }, options);
     let eventSchemaCalls = 0;
-    eventSchema.pre('validate', function(next) {
+    eventSchema.pre('validate', function() {
       ++eventSchemaCalls;
-      next();
     });
     const Event = mongoose.model('GenericEvent', eventSchema);
 
     const clickedLinkSchema = new mongoose.Schema({ url: String }, options);
     let clickedSchemaCalls = 0;
-    clickedLinkSchema.pre('validate', function(next) {
+    clickedLinkSchema.pre('validate', function() {
       ++clickedSchemaCalls;
-      next();
     });
     const ClickedLinkEvent = Event.discriminator('ClickedLinkEvent',
       clickedLinkSchema);

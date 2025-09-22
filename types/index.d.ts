@@ -64,7 +64,7 @@ declare module 'mongoose' {
    * Sanitizes query filters against query selector injection attacks by wrapping
    * any nested objects that have a property whose name starts with `$` in a `$eq`.
    */
-  export function sanitizeFilter<T>(filter: FilterQuery<T>): FilterQuery<T>;
+  export function sanitizeFilter<T>(filter: QueryFilter<T>): QueryFilter<T>;
 
   /** Gets mongoose options */
   export function get<K extends keyof MongooseOptions>(key: K): MongooseOptions[K];
@@ -644,7 +644,7 @@ declare module 'mongoose' {
     count?: boolean;
 
     /** Add an extra match condition to `populate()`. */
-    match?: FilterQuery<any> | ((doc: Record<string, any>, virtual?: this) => Record<string, any> | null);
+    match?: QueryFilter<any> | ((doc: Record<string, any>, virtual?: this) => Record<string, any> | null);
 
     /** Add a default `limit` to the `populate()` query. */
     limit?: number;

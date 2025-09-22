@@ -940,8 +940,8 @@ async function gh12064() {
 function testWithLevel1NestedPaths() {
   type Test1 = WithLevel1NestedPaths<{
     topLevel: number,
-    nested1Level: {
-      l2: string
+    nested1Level?: {
+      l2?: string | null | undefined
     },
     nested2Level: {
       l2: { l3: boolean }
@@ -950,8 +950,8 @@ function testWithLevel1NestedPaths() {
 
   expectType<{
     topLevel: number,
-    nested1Level: { l2: string },
-    'nested1Level.l2': string,
+    nested1Level: { l2?: string | null | undefined },
+    'nested1Level.l2': string | null | undefined,
     nested2Level: { l2: { l3: boolean } },
     'nested2Level.l2': { l3: boolean }
   }>({} as Test1);
@@ -968,11 +968,15 @@ function testWithLevel1NestedPaths() {
   type InferredDocType = InferSchemaType<typeof schema>;
 
   type Test2 = WithLevel1NestedPaths<InferredDocType>;
-  expectAssignable<{
-    _id: string | null | undefined,
-    foo?: { one?: string | null | undefined } | null | undefined,
+  expectType<{
+    _id: string,
+    foo: { one?: string | null | undefined },
     'foo.one': string | null | undefined
   }>({} as Test2);
+  expectType<string>({} as Test2['_id']);
+  expectType<{ one?: string | null | undefined }>({} as Test2['foo']);
+  expectType<string | null | undefined>({} as Test2['foo.one']);
+  expectType<'_id' | 'foo' | 'foo.one'>({} as keyof Test2);
 }
 
 async function gh14802() {
@@ -1047,4 +1051,12 @@ async function customModelInstanceWithStatics() {
       }
     }
   );
+}
+
+async function gh16526() {
+  const schema = new Schema({ name: String });
+  const Tank = model('Tank', schema);
+
+  const insertManyResult = await Tank.insertMany([{ name: 'test' }], { lean: true, rawResult: true });
+  expectType<number>(insertManyResult.insertedCount);
 }

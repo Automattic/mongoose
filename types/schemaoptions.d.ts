@@ -180,7 +180,7 @@ declare module 'mongoose' {
      *
      * @default '__v'
      */
-    versionKey?: string | boolean;
+    versionKey?: string | false;
     /**
      * By default, Mongoose will automatically select() any populated paths for you, unless you explicitly exclude them.
      *

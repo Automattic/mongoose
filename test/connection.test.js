@@ -871,7 +871,7 @@ describe('connections:', function() {
       await db.close();
     });
 
-    it('updates child dbs lastHeartbeatAt (gh-15635)', async function () {
+    it('updates child dbs lastHeartbeatAt (gh-15635)', async function() {
       const db = await mongoose.createConnection(start.uri).asPromise();
 
       const schema = mongoose.Schema({ name: String }, { autoCreate: false, autoIndex: false });

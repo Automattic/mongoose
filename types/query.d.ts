@@ -3,6 +3,7 @@ declare module 'mongoose' {
 
   type StringQueryTypeCasting = string | RegExp;
   type ObjectIdQueryTypeCasting = Types.ObjectId | string;
+  type DateQueryTypeCasting = string | number | NativeDate;
   type UUIDQueryTypeCasting = Types.UUID | string;
   type BufferQueryCasting = Buffer | mongodb.Binary | number[] | string | { $binary: string | mongodb.Binary };
   type QueryTypeCasting<T> = T extends string
@@ -13,7 +14,9 @@ declare module 'mongoose' {
         ? UUIDQueryTypeCasting
         : T extends Buffer
           ? BufferQueryCasting
-          : T;
+          : T extends NativeDate
+            ? DateQueryTypeCasting
+            : T;
 
   export type ApplyBasicQueryCasting<T> = T | T[] | (T extends (infer U)[] ? QueryTypeCasting<U> : T);
 

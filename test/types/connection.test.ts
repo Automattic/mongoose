@@ -76,7 +76,6 @@ expectType<Promise<ConnectionSyncIndexesResult>>(conn.syncIndexes({ background: 
 
 expectType<Connection>(conn.useDb('test'));
 expectType<Connection>(conn.useDb('test', {}));
-expectType<Connection>(conn.useDb('test', { noListener: true }));
 expectType<Connection>(conn.useDb('test', { useCache: true }));
 
 expectType<Promise<string[]>>(

@@ -981,7 +981,7 @@ describe('aggregate: ', function() {
 
         const calledWith = [];
         s.pre('aggregate', function() {
-          return Promise.reject(new Error('woops'));
+          throw new Error('woops');
         });
         s.post('aggregate', function(error, res, next) {
           calledWith.push(error);

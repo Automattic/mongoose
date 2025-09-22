@@ -1,3 +1,19 @@
+8.18.2 / 2025-09-22
+===================
+ * fix(document): prevent $clone() from converting mongoose arrays into vanilla arrays #15633 #15625
+ * fix(connection): use correct collection name for model when using useConnection() #15637
+ * fix(connection): propagate changes to _lastHeartbeatAt to useDb() child connections #15640 #15635
+ * types: fix schema property type definition in SchemaType #15631
+
+8.18.1 / 2025-09-08
+===================
+ * types: correct type inference for maps of maps #15602
+ * types(model): copy base model statics onto discriminator model #15623 #15600
+ * types: fix types for a string of enums #15605 [ruiaraujo](https://github.com/ruiaraujo)
+ * types(SchemaOptions): disallow versionKey: true, which fails at runtime #15606
+ * docs(typescript): add example explaining how to use query helper overrides for handling lean() #15622 #15601
+ * docs(transactions): add note about nested transactions #15624
+
 8.18.0 / 2025-08-22
 ===================
  * feat(schema): support for union types #15574 #10894

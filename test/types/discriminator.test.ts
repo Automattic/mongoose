@@ -116,3 +116,28 @@ function gh15535() {
   expectType<string | null | undefined>(doc.field3);
   expectType<string | null | undefined>(doc.getField3());
 }
+
+async function gh15600() {
+  // Base model with custom static method
+  const baseSchema = new Schema(
+    { name: String },
+    {
+      statics: {
+        findByName(name: string) {
+          return this.findOne({ name });
+        }
+      }
+    }
+  );
+  const BaseModel = model('Base', baseSchema);
+
+  const baseRes = await BaseModel.findByName('test');
+  expectType<string | null | undefined>(baseRes!.name);
+
+  // Discriminator model inheriting base static methods
+  const discriminatorSchema = new Schema({ extra: String });
+  const DiscriminatorModel = BaseModel.discriminator('Discriminator', discriminatorSchema);
+
+  const res = await DiscriminatorModel.findByName('test');
+  expectType<string | null | undefined>(res!.name);
+}

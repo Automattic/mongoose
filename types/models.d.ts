@@ -435,7 +435,7 @@ declare module 'mongoose' {
       TQueryHelpers & ObtainSchemaGeneric<TDiscriminatorSchema, 'TQueryHelpers'>,
       TInstanceMethods & ObtainSchemaGeneric<TDiscriminatorSchema, 'TInstanceMethods'>,
       TVirtuals & ObtainSchemaGeneric<TDiscriminatorSchema, 'TVirtuals'>
-    > & ObtainSchemaGeneric<TDiscriminatorSchema, 'TStaticMethods'>;
+    > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'> & ObtainSchemaGeneric<TDiscriminatorSchema, 'TStaticMethods'>;
     discriminator<D>(
       name: string | number,
       schema: Schema,
@@ -533,10 +533,6 @@ declare module 'mongoose' {
       docs: Array<TRawDocType>
     ): Promise<Array<THydratedDocumentType>>;
     insertMany(
-      docs: Array<TRawDocType>,
-      options: InsertManyOptions & { lean: true; }
-    ): Promise<Array<Require_id<TRawDocType>>>;
-    insertMany(
       doc: Array<TRawDocType>,
       options: InsertManyOptions & { ordered: false; rawResult: true; }
     ): Promise<mongodb.InsertManyResult<Require_id<TRawDocType>> & {
@@ -553,22 +549,6 @@ declare module 'mongoose' {
       docs: Array<TRawDocType>,
       options: InsertManyOptions & { lean: true, rawResult: true; }
     ): Promise<mongodb.InsertManyResult<Require_id<TRawDocType>>>;
-    insertMany(
-      docs: Array<TRawDocType>,
-      options: InsertManyOptions & { rawResult: true; }
-    ): Promise<mongodb.InsertManyResult<Require_id<THydratedDocumentType>>>;
-    insertMany(
-      doc: Array<TRawDocType>,
-      options: InsertManyOptions
-    ): Promise<Array<THydratedDocumentType>>;
-    insertMany<DocContents = TRawDocType>(
-      docs: Array<DocContents | TRawDocType>,
-      options: InsertManyOptions & { lean: true; }
-    ): Promise<Array<Require_id<DocContents>>>;
-    insertMany<DocContents = TRawDocType>(
-      docs: DocContents | TRawDocType,
-      options: InsertManyOptions & { lean: true; }
-    ): Promise<Array<Require_id<DocContents>>>;
     insertMany<DocContents = TRawDocType>(
       doc: DocContents | TRawDocType,
       options: InsertManyOptions & { ordered: false; rawResult: true; }
@@ -582,13 +562,26 @@ declare module 'mongoose' {
         >
       }
     }>;
+    insertMany(
+      docs: Array<TRawDocType>,
+      options: InsertManyOptions & { lean: true; }
+    ): Promise<Array<Require_id<TRawDocType>>>;
+    insertMany(
+      docs: Array<TRawDocType>,
+      options: InsertManyOptions & { rawResult: true; }
+    ): Promise<mongodb.InsertManyResult<Require_id<THydratedDocumentType>>>;
+    insertMany<DocContents = TRawDocType>(
+      docs: Array<DocContents | TRawDocType>,
+      options: InsertManyOptions & { lean: true; }
+    ): Promise<Array<Require_id<DocContents>>>;
+    insertMany<DocContents = TRawDocType>(
+      docs: DocContents | TRawDocType,
+      options: InsertManyOptions & { lean: true; }
+    ): Promise<Array<Require_id<DocContents>>>;
     insertMany<DocContents = TRawDocType>(
       docs: Array<DocContents | TRawDocType>,
       options: InsertManyOptions & { rawResult: true; }
     ): Promise<mongodb.InsertManyResult<Require_id<DocContents>>>;
-    insertMany<DocContents = TRawDocType>(
-      docs: Array<DocContents | TRawDocType>
-    ): Promise<Array<MergeType<THydratedDocumentType, Omit<DocContents, '_id'>>>>;
     insertMany<DocContents = TRawDocType>(
       doc: DocContents,
       options: InsertManyOptions & { lean: true; }
@@ -597,6 +590,13 @@ declare module 'mongoose' {
       doc: DocContents,
       options: InsertManyOptions & { rawResult: true; }
     ): Promise<mongodb.InsertManyResult<Require_id<DocContents>>>;
+    insertMany(
+      doc: Array<TRawDocType>,
+      options: InsertManyOptions
+    ): Promise<Array<THydratedDocumentType>>;
+    insertMany<DocContents = TRawDocType>(
+      docs: Array<DocContents | TRawDocType>
+    ): Promise<Array<MergeType<THydratedDocumentType, Omit<DocContents, '_id'>>>>;
     insertMany<DocContents = TRawDocType>(
       doc: DocContents,
       options: InsertManyOptions

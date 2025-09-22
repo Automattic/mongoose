@@ -272,7 +272,7 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
               // we need to call ObtainDocumentType to correctly infer its type.
               Types.DocumentArray<ObtainDocumentType<Item, any, { typeKey: TypeKey }>> :
             IsSchemaTypeFromBuiltinClass<Item> extends true ?
-              ObtainDocumentPathType<Item, TypeKey>[] :
+              ResolvePathType<Item, { enum: Options['enum'] }, TypeKey>[] :
               IsItRecordAndNotAny<Item> extends true ?
                 Item extends Record<string, never> ?
                   ObtainDocumentPathType<Item, TypeKey>[] :
@@ -316,8 +316,8 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
                                                   PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? Buffer :
                                                     PathValueType extends 'double' | 'Double' | typeof Schema.Types.Double ? Types.Double :
                                                       IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
-                                                        PathValueType extends MapConstructor | 'Map' ? Map<string, ResolvePathType<Options['of']>> :
-                                                          IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ResolvePathType<Options['of']>> :
+                                                        PathValueType extends MapConstructor | 'Map' ? Map<string, ObtainDocumentPathType<Options['of']>> :
+                                                          IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ObtainDocumentPathType<Options['of']>> :
                                                             PathValueType extends 'Union' | 'union' | typeof Schema.Types.Union ? Options['of'] extends readonly any[] ? UnionToType<Options['of']> : never :
                                                               PathValueType extends ArrayConstructor ? any[] :
                                                                 PathValueType extends typeof Schema.Types.Mixed ? any:

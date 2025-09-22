@@ -1,3 +1,10 @@
+8.18.2 / 2025-09-22
+===================
+ * fix(document): prevent $clone() from converting mongoose arrays into vanilla arrays #15633 #15625
+ * fix(connection): use correct collection name for model when using useConnection() #15637
+ * fix(connection): propagate changes to _lastHeartbeatAt to useDb() child connections #15640 #15635
+ * types: fix schema property type definition in SchemaType #15631
+
 8.18.1 / 2025-09-08
 ===================
  * types: correct type inference for maps of maps #15602

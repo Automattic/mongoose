@@ -58,6 +58,7 @@ declare module 'mongoose' {
   interface HydrateOptions {
     setters?: boolean;
     hydratedPopulatedDocs?: boolean;
+    virtuals?: boolean;
   }
 
   interface InsertManyOptions extends

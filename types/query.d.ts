@@ -31,7 +31,7 @@ declare module 'mongoose' {
     | 'strictQuery'
     | 'translateAliases';
 
-  type MongooseBaseQueryOptions<DocType = unknown> = Pick<QueryOptions<DocType>, MongooseBaseQueryOptionKeys> & {
+  type MongooseBaseQueryOptions<DocType = unknown> = Pick<QueryOptions<DocType>, MongooseBaseQueryOptionKeys | 'timestamps' | 'lean'> & {
     [other: string]: any;
   };
 

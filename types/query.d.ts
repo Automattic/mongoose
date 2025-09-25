@@ -118,6 +118,15 @@ declare module 'mongoose' {
     updatedAt?: boolean;
   }
 
+  // Options that can be passed to Query.prototype.lean()
+  interface LeanOptions<RawDocType> {
+    // Set to false to strip out the version key
+    versionKey?: boolean;
+    // Transform the result document in place
+    transform?: (doc: RawDocType) => void;
+    [key: string]: any;
+  }
+
   interface QueryOptions<DocType = unknown> extends
     PopulateOption,
     SessionOption {
@@ -132,7 +141,7 @@ declare module 'mongoose' {
     /**
      * If truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document.
      */
-    lean?: boolean | Record<string, any>;
+    lean?: boolean | LeanOptions<any>;
     limit?: number;
     maxTimeMS?: number;
     multi?: boolean;
@@ -558,7 +567,7 @@ declare module 'mongoose' {
 
     /** Sets the lean option. */
     lean(
-      val?: boolean | any
+      val?: boolean | LeanOptions<RawDocType>
     ): QueryWithHelpers<
       ResultType extends null
         ? GetLeanResultType<RawDocType, ResultType, QueryOp> | null
@@ -570,7 +579,7 @@ declare module 'mongoose' {
       TDocOverrides
       >;
     lean<LeanResultType>(
-      val?: boolean | any
+      val?: boolean | LeanOptions<RawDocType>
     ): QueryWithHelpers<
       ResultType extends null
         ? LeanResultType | null

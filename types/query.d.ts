@@ -568,8 +568,18 @@ declare module 'mongoose' {
     j(val: boolean | null): this;
 
     /** Sets the lean option. */
+    lean(): QueryWithHelpers<
+      ResultType extends null
+        ? GetLeanResultType<RawDocType, ResultType, QueryOp> | null
+        : GetLeanResultType<RawDocType, ResultType, QueryOp>,
+      DocType,
+      THelpers,
+      RawDocType,
+      QueryOp,
+      TDocOverrides
+      >;
     lean(
-      val?: boolean | LeanOptions
+      val: true | LeanOptions
     ): QueryWithHelpers<
       ResultType extends null
         ? GetLeanResultType<RawDocType, ResultType, QueryOp> | null
@@ -580,8 +590,32 @@ declare module 'mongoose' {
       QueryOp,
       TDocOverrides
       >;
+    lean(
+      val: false
+    ): QueryWithHelpers<
+      ResultType extends AnyArray<any>
+        ? DocType[]
+        : ResultType extends null
+          ? DocType | null
+          : DocType,
+      DocType,
+      THelpers,
+      RawDocType,
+      QueryOp,
+      TDocOverrides
+      >;
+    lean<LeanResultType>(): QueryWithHelpers<
+      ResultType extends null
+        ? LeanResultType | null
+        : LeanResultType,
+      DocType,
+      THelpers,
+      RawDocType,
+      QueryOp,
+      TDocOverrides
+      >;
     lean<LeanResultType>(
-      val?: boolean | LeanOptions
+      val: boolean | LeanOptions
     ): QueryWithHelpers<
       ResultType extends null
         ? LeanResultType | null

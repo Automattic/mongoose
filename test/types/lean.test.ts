@@ -350,6 +350,17 @@ async function gh15158() {
   createSomeModelAndDoSomething();
 }
 
+async function leanFalse() {
+  const schema = new Schema({
+    name: String
+  });
+  const Test = model('Test', schema);
+  type TestDocument = ReturnType<(typeof Test)['hydrate']>;
+
+  const doc = await Test.findOne().orFail().lean(false);
+  expectType<TestDocument>(doc);
+}
+
 async function gh15583() {
   const schema = new Schema(
     { name: String },

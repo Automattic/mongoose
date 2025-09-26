@@ -7,7 +7,7 @@ interface ITest {
   map3: Map<string, number>
 }
 
-const schema: Schema = new Schema<ITest>({
+const schema = new Schema<ITest>({
   map1: {
     type: Map,
     of: Number

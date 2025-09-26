@@ -1,6 +1,6 @@
 import { Schema, model, Document, connection, Collection } from 'mongoose';
 
-const schema: Schema = new Schema({ name: { type: 'String' } });
+const schema = new Schema({ name: { type: 'String' } });
 
 interface ITest {
   name?: string;

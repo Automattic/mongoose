@@ -40,7 +40,7 @@ async function gh14374() {
   interface Child {
     name: string
   }
-  const childSchema: Schema = new Schema({ name: String });
+  const childSchema = new Schema({ name: String });
 
   const cursor = ParentModel.find({}).populate<{ child: Child }>('child').cursor();
   for await (const doc of cursor) {

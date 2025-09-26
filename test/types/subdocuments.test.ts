@@ -9,9 +9,9 @@ import {
 } from 'mongoose';
 import { expectAssignable } from 'tsd';
 
-const childSchema: Schema = new Schema({ name: String });
+const childSchema = new Schema({ name: String });
 
-const schema: Schema = new Schema({
+const schema = new Schema({
   child1: childSchema,
   child2: {
     type: childSchema,
@@ -24,7 +24,7 @@ const schema: Schema = new Schema({
   }]
 });
 
-interface ITest extends Document {
+interface ITest {
   child1: { _id: Types.ObjectId, name: string },
   child2: { name: string }
 }

@@ -59,7 +59,7 @@ declare module 'mongoose' {
     collectionOptions?: mongodb.CreateCollectionOptions;
 
     /** Default lean options for queries */
-    lean?: boolean | Record<string, any>;
+    lean?: boolean | LeanOptions;
 
     /** The timeseries option to use when creating the model's collection. */
     timeseries?: mongodb.TimeSeriesCollectionOptions;

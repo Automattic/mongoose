@@ -349,3 +349,23 @@ async function gh15158() {
 
   createSomeModelAndDoSomething();
 }
+
+async function gh15583() {
+  const schema = new Schema(
+    { name: String },
+    {
+      lean: {
+        transform: doc => {
+          doc.transformed = true;
+          return doc;
+        }
+      }
+    }
+  );
+
+  type TRawDocType = InferSchemaType<typeof schema>;
+  const TestModel = model('Test', schema);
+
+  const testDoc = await TestModel.findOne().lean<TRawDocType & { transformed: boolean }>().orFail();
+  expectType<boolean>(testDoc.transformed);
+}

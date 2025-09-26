@@ -1,7 +1,7 @@
 import { Schema, model, Document, Expression, PipelineStage, Types, Model, Aggregate } from 'mongoose';
 import { expectType } from 'tsd';
 
-const schema: Schema = new Schema({ name: { type: 'String' } });
+const schema = new Schema({ name: { type: 'String' } });
 
 interface ITest {
   name?: string;

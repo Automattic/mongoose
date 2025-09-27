@@ -113,10 +113,8 @@ jobs:
       MONGOOSE_TEST_URI: mongodb://127.0.0.1:27017/mongoose_test?directConnection=true
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-      - name: Install Atlas CLI
-        run: |
-          curl -s https://www.mongodb.com/atlascli/atlascli-install.sh | sh
-          echo "$HOME/.mongodb/bin" >> $GITHUB_PATH
+      - name: Setup AtlasCLI
+        uses: mongodb/atlas-github-action@v0.2.0
       - name: Setup local Atlas deployment
         run: atlas deployments setup mycluster --type local --force --port 27017
       - name: Setup node

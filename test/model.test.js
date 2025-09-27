@@ -8742,30 +8742,148 @@ describe('Model', function() {
   });
 
   it('createSearchIndexes creates an index for each search index in schema (gh-15465)', async function() {
-    const sinon = require('sinon');
+    this.timeout(20000);
+    const version = await start.mongodVersion();
+    if (version[0] < 8 || !process.env.IS_ATLAS) {
+      this.skip();
+      return;
+    }
     const schema = new mongoose.Schema({
       name: String,
       description: String
     });
 
-    schema.searchIndex({ name: 'test', definition: { mappings: { dynamic: true } } });
+    schema.searchIndex({
+      name: 'test',
+      definition: {
+        mappings: {
+          dynamic: false,
+          fields: { name: { type: 'string' }, description: { type: 'string' } }
+        }
+      }
+    });
 
     const TestModel = db.model('Test', schema);
 
-    const createSearchIndexStub = sinon.stub(TestModel, 'createSearchIndex').resolves({ acknowledged: true });
+    await TestModel.init();
+    const results = await TestModel.createSearchIndexes();
 
     try {
-      const results = await TestModel.createSearchIndexes();
-
-      assert.equal(createSearchIndexStub.callCount, 1);
       assert.equal(results.length, 1);
-      assert.deepEqual(results, [{ acknowledged: true }]);
+      assert.deepEqual(results, ['test']);
 
-      // Verify that createSearchIndex was called with the correct arguments
-      assert.ok(createSearchIndexStub.firstCall.calledWithMatch({ name: 'test', definition: { mappings: { dynamic: true } } }));
+      let indexes = await TestModel.listSearchIndexes();
+      assert.equal(indexes.length, 1);
+      assert.equal(indexes[0].name, 'test');
+
+      let isQueryable = indexes[0].queryable;
+      while (!isQueryable) {
+        await delay(100);
+        indexes = await TestModel.listSearchIndexes();
+        isQueryable = indexes[0].queryable;
+      }
+
+      // Insert a document to search.
+      await TestModel.create({ name: 'Atlas Search Example', description: 'This is a test for MongoDB Atlas Search.' });
+
+      // Retry aggregate up to 10 times every 500ms because Lucene index is not immediately queryable
+      let searchResults;
+      for (let tries = 0; tries < 10; ++tries) {
+        searchResults = await TestModel.aggregate([
+          {
+            $search: {
+              index: 'test',
+              text: {
+                query: 'Atlas',
+                path: 'name'
+              }
+            }
+          }
+        ]);
+        if (searchResults.length > 0) {
+          break;
+        }
+        await delay(500);
+      }
+      assert.ok(searchResults.length > 0);
+      assert.strictEqual(searchResults[0].name, 'Atlas Search Example');
     } finally {
-      sinon.restore();
+      await TestModel.dropSearchIndex('test');
     }
+  });
+
+  it('can create a vector search index (gh-15465)', async function() {
+    this.timeout(10000);
+    const version = await start.mongodVersion();
+    if (version[0] < 8 || !process.env.IS_ATLAS) {
+      this.skip();
+      return;
+    }
+    const schema = new mongoose.Schema({
+      name: String,
+      myVector: [Number]
+    });
+    schema.searchIndex({
+      name: 'vector_index',
+      type: 'vectorSearch',
+      definition: {
+        fields: [
+          {
+            type: 'vector',
+            numDimensions: 2,
+            path: 'myVector',
+            similarity: 'dotProduct',
+            quantization: 'scalar'
+          }
+        ]
+      }
+    });
+
+    const TestModel = db.model('Test', schema);
+
+    await TestModel.init();
+    const results = await TestModel.createSearchIndexes();
+
+    assert.equal(results.length, 1);
+    assert.deepEqual(results, ['vector_index']);
+
+    await TestModel.create([{ name: 'Test1', myVector: [0, 99] }, { name: 'Test2', myVector: [99, 0] }])
+
+    let indexes = await TestModel.listSearchIndexes();
+    let isQueryable = indexes[0].queryable;
+    while (!isQueryable) {
+      await delay(100);
+      indexes = await TestModel.listSearchIndexes();
+      isQueryable = indexes[0].queryable;
+    }
+
+    let [doc] = await TestModel.aggregate([
+      {
+        $vectorSearch: {
+          index: 'vector_index',
+          path: 'myVector',
+          queryVector: [0, 100],
+          numCandidates: 10,
+          limit: 1
+        }
+      }
+    ]);
+    assert.strictEqual(doc.name, 'Test1');
+
+    [doc] = await TestModel.aggregate([
+      {
+        $vectorSearch: {
+          index: 'vector_index',
+          path: 'myVector',
+          queryVector: [100, 1],
+          numCandidates: 10,
+          limit: 1
+        }
+      }
+    ]);
+    assert.strictEqual(doc.name, 'Test2');
+
+    await TestModel.dropSearchIndex('vector_index');
   });
 });
 

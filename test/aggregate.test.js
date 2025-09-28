@@ -886,9 +886,9 @@ describe('aggregate: ', function() {
         const s = new Schema({ name: String });
 
         let called = 0;
-        s.pre('aggregate', function(next) {
+        s.pre('aggregate', function() {
           ++called;
-          next();
+          return Promise.resolve();
         });
 
         const M = db.model('Test', s);
@@ -902,9 +902,9 @@ describe('aggregate: ', function() {
       it('setting option in pre (gh-7606)', async function() {
         const s = new Schema({ name: String });
 
-        s.pre('aggregate', function(next) {
+        s.pre('aggregate', function() {
           this.options.collation = { locale: 'en_US', strength: 1 };
-          next();
+          return Promise.resolve();
         });
 
         const M = db.model('Test', s);
@@ -920,9 +920,9 @@ describe('aggregate: ', function() {
       it('adding to pipeline in pre (gh-8017)', async function() {
         const s = new Schema({ name: String });
 
-        s.pre('aggregate', function(next) {
+        s.pre('aggregate', function() {
           this.append({ $limit: 1 });
-          next();
+          return Promise.resolve();
         });
 
         const M = db.model('Test', s);
@@ -980,8 +980,8 @@ describe('aggregate: ', function() {
         const s = new Schema({ name: String });
 
         const calledWith = [];
-        s.pre('aggregate', function(next) {
-          next(new Error('woops'));
+        s.pre('aggregate', function() {
+          throw new Error('woops');
         });
         s.post('aggregate', function(error, res, next) {
           calledWith.push(error);
@@ -1003,9 +1003,9 @@ describe('aggregate: ', function() {
 
         let calledPre = 0;
         let calledPost = 0;
-        s.pre('aggregate', function(next) {
+        s.pre('aggregate', function() {
           ++calledPre;
-          next();
+          return Promise.resolve();
         });
         s.post('aggregate', function(res, next) {
           ++calledPost;
@@ -1030,9 +1030,9 @@ describe('aggregate: ', function() {
 
         let calledPre = 0;
         const calledPost = [];
-        s.pre('aggregate', function(next) {
+        s.pre('aggregate', function() {
           ++calledPre;
-          next();
+          return Promise.resolve();
         });
         s.post('aggregate', function(res, next) {
           calledPost.push(res);
@@ -1295,11 +1295,10 @@ describe('aggregate: ', function() {
   it('cursor() errors out if schema pre aggregate hook throws an error (gh-15279)', async function() {
     const schema = new Schema({ name: String });
 
-    schema.pre('aggregate', function(next) {
+    schema.pre('aggregate', function() {
       if (!this.options.allowed) {
         throw new Error('Unauthorized aggregate operation: only allowed operations are permitted');
       }
-      next();
     });
 
     const Test = db.model('Test', schema);

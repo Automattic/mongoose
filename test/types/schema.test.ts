@@ -1233,15 +1233,15 @@ function gh13633() {
   schema.pre('updateOne', { document: true, query: false }, function(next) {
   });
 
-  schema.pre('updateOne', { document: true, query: false }, function(next, options) {
+  schema.pre('updateOne', { document: true, query: false }, function(options) {
     expectType<Record<string, any> | undefined>(options);
   });
 
   schema.post('save', function(res, next) {
   });
-  schema.pre('insertMany', function(next, docs) {
+  schema.pre('insertMany', function(docs) {
   });
-  schema.pre('insertMany', function(next, docs, options) {
+  schema.pre('insertMany', function(docs, options) {
     expectType<(InsertManyOptions & { lean?: boolean }) | undefined>(options);
   });
 }

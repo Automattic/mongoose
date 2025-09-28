@@ -273,7 +273,7 @@ declare module 'mongoose' {
     transaction<ReturnType = unknown>(fn: (session: mongodb.ClientSession) => Promise<ReturnType>, options?: mongodb.TransactionOptions): Promise<ReturnType>;
 
     /** Switches to a different database using the same connection pool. */
-    useDb(name: string, options?: { useCache?: boolean, noListener?: boolean }): Connection;
+    useDb(name: string, options?: { useCache?: boolean }): Connection;
 
     /** The username specified in the URI */
     readonly user: string;

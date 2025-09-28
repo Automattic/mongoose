@@ -446,75 +446,6 @@ describe('Query', function() {
     });
   });
 
-  describe('within', function() {
-    describe('box', function() {
-      it('via where', function() {
-        const query = new Query({});
-        query.where('gps').within().box({ ll: [5, 25], ur: [10, 30] });
-        const match = { gps: { $within: { $box: [[5, 25], [10, 30]] } } };
-        if (Query.use$geoWithin) {
-          match.gps.$geoWithin = match.gps.$within;
-          delete match.gps.$within;
-        }
-        assert.deepEqual(query._conditions, match);
-
-      });
-      it('via where, no object', function() {
-        const query = new Query({});
-        query.where('gps').within().box([5, 25], [10, 30]);
-        const match = { gps: { $within: { $box: [[5, 25], [10, 30]] } } };
-        if (Query.use$geoWithin) {
-          match.gps.$geoWithin = match.gps.$within;
-          delete match.gps.$within;
-        }
-        assert.deepEqual(query._conditions, match);
-
-      });
-    });
-
-    describe('center', function() {
-      it('via where', function() {
-        const query = new Query({});
-        query.where('gps').within().center({ center: [5, 25], radius: 5 });
-        const match = { gps: { $within: { $center: [[5, 25], 5] } } };
-        if (Query.use$geoWithin) {
-          match.gps.$geoWithin = match.gps.$within;
-          delete match.gps.$within;
-        }
-        assert.deepEqual(query._conditions, match);
-
-      });
-    });
-
-    describe('centerSphere', function() {
-      it('via where', function() {
-        const query = new Query({});
-        query.where('gps').within().centerSphere({ center: [5, 25], radius: 5 });
-        const match = { gps: { $within: { $centerSphere: [[5, 25], 5] } } };
-        if (Query.use$geoWithin) {
-          match.gps.$geoWithin = match.gps.$within;
-          delete match.gps.$within;
-        }
-        assert.deepEqual(query._conditions, match);
-
-      });
-    });
-
-    describe('polygon', function() {
-      it('via where', function() {
-        const query = new Query({});
-        query.where('gps').within().polygon({ a: { x: 10, y: 20 }, b: { x: 15, y: 25 }, c: { x: 20, y: 20 } });
-        const match = { gps: { $within: { $polygon: [{ a: { x: 10, y: 20 }, b: { x: 15, y: 25 }, c: { x: 20, y: 20 } }] } } };
-        if (Query.use$geoWithin) {
-          match.gps.$geoWithin = match.gps.$within;
-          delete match.gps.$within;
-        }
-        assert.deepEqual(query._conditions, match);
-
-      });
-    });
-  });
-
   describe('exists', function() {
     it('0 args via where', function() {
       const query = new Query({});
@@ -1923,9 +1854,8 @@ describe('Query', function() {
       ];
 
       ops.forEach(function(op) {
-        TestSchema.pre(op, function(next) {
+        TestSchema.pre(op, function() {
           this.error(new Error(op + ' error'));
-          next();
         });
       });
 

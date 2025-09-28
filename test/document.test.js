@@ -2210,9 +2210,8 @@ describe('document', function() {
       }, { _id: false, id: false });
 
       let userHookCount = 0;
-      userSchema.pre('save', function(next) {
+      userSchema.pre('save', function() {
         ++userHookCount;
-        next();
       });
 
       const eventSchema = new mongoose.Schema({
@@ -2221,9 +2220,8 @@ describe('document', function() {
       });
 
       let eventHookCount = 0;
-      eventSchema.pre('save', function(next) {
+      eventSchema.pre('save', function() {
         ++eventHookCount;
-        next();
       });
 
       const Event = db.model('Event', eventSchema);
@@ -2785,9 +2783,8 @@ describe('document', function() {
       const childSchema = new Schema({ count: Number });
 
       let preCalls = 0;
-      childSchema.pre('save', function(next) {
+      childSchema.pre('save', function() {
         ++preCalls;
-        next();
       });
 
       const SingleNestedSchema = new Schema({
@@ -2981,10 +2978,9 @@ describe('document', function() {
         name: String
       });
 
-      ChildSchema.pre('save', function(next) {
+      ChildSchema.pre('save', function() {
         assert.ok(this.isModified('name'));
         ++called;
-        next();
       });
 
       const ParentSchema = new Schema({
@@ -3316,9 +3312,8 @@ describe('document', function() {
       });
 
       const called = {};
-      ChildSchema.pre('deleteOne', { document: true, query: false }, function(next) {
+      ChildSchema.pre('deleteOne', { document: true, query: false }, function() {
         called[this.name] = true;
-        next();
       });
 
       const ParentSchema = new Schema({
@@ -4245,9 +4240,8 @@ describe('document', function() {
         name: String
       }, { timestamps: true, versionKey: null });
 
-      schema.pre('save', function(next) {
+      schema.pre('save', function() {
         this.$where = { updatedAt: this.updatedAt };
-        next();
       });
 
       schema.post('save', function(error, res, next) {
@@ -4331,9 +4325,8 @@ describe('document', function() {
       });
       let count = 0;
 
-      childSchema.pre('validate', function(next) {
+      childSchema.pre('validate', function() {
         ++count;
-        next();
       });
 
       const parentSchema = new Schema({
@@ -4371,9 +4364,8 @@ describe('document', function() {
       });
       let count = 0;
 
-      childSchema.pre('validate', function(next) {
+      childSchema.pre('validate', function() {
         ++count;
-        next();
       });
 
       const parentSchema = new Schema({
@@ -4949,8 +4941,8 @@ describe('document', function() {
     it('handles errors in subdoc pre validate (gh-5215)', async function() {
       const childSchema = new mongoose.Schema({});
 
-      childSchema.pre('validate', function(next) {
-        next(new Error('child pre validate'));
+      childSchema.pre('validate', function() {
+        throw new Error('child pre validate');
       });
 
       const parentSchema = new mongoose.Schema({
@@ -6034,11 +6026,10 @@ describe('document', function() {
         e: { type: String }
       });
 
-      MainSchema.pre('save', function(next) {
+      MainSchema.pre('save', function() {
         if (this.isModified()) {
           this.set('a.c', 100, Number);
         }
-        next();
       });
 
       const Main = db.model('Test', MainSchema);
@@ -8561,13 +8552,12 @@ describe('document', function() {
     const owners = [];
 
     // Middleware to set a default location name derived from the parent organization doc
-    locationSchema.pre('validate', function(next) {
+    locationSchema.pre('validate', function() {
       const owner = this.ownerDocument();
       owners.push(owner);
       if (this.isNew && !this.get('name') && owner.get('name')) {
         this.set('name', `${owner.get('name')} Office`);
       }
-      next();
     });
 
     const organizationSchema = Schema({
@@ -10101,9 +10091,8 @@ describe('document', function() {
       }
     }, {});
     let count = 0;
-    SubSchema.pre('deleteOne', { document: true, query: false }, function(next) {
+    SubSchema.pre('deleteOne', { document: true, query: false }, function() {
       count++;
-      next();
     });
     const thisSchema = new Schema({
       foo: {
@@ -10301,10 +10290,8 @@ describe('document', function() {
       observers: [observerSchema]
     });
 
-    entrySchema.pre('save', function(next) {
+    entrySchema.pre('save', function() {
       this.observers = [{ user: this.creator }];
-
-      next();
     });
 
     const Test = db.model('Test', entrySchema);
@@ -10984,15 +10971,13 @@ describe('document', function() {
 
     const Book = db.model('Test', BookSchema);
 
-    function disallownumflows(next) {
+    function disallownumflows() {
       const self = this;
-      if (self.isNew) return next();
+      if (self.isNew) return;
 
       if (self.quantity === 27) {
-        return next(new Error('Wrong Quantity'));
+        throw new Error('Wrong Quantity');
       }
-
-      next();
     }
 
     const { _id } = await Book.create({ name: 'Hello', price: 50, quantity: 25 });
@@ -12298,25 +12283,31 @@ describe('document', function() {
     assert.strictEqual(clonedDoc.$session(), session);
   });
 
-  it('$clone() with single nested and doc array (gh-14353) (gh-11849)', async function() {
+  it('$clone() with single nested and doc array (gh-15625) (gh-14353) (gh-11849)', async function() {
     const schema = new mongoose.Schema({
       subdocArray: [{
         name: String
       }],
-      subdoc: new mongoose.Schema({ name: String })
+      subdoc: new mongoose.Schema({ name: String }),
+      arr: [Number]
     });
     const Test = db.model('Test', schema);
 
-    const item = await Test.create({ subdocArray: [{ name: 'test 1' }], subdoc: { name: 'test 2' } });
+    const item = await Test.create({ subdocArray: [{ name: 'test 1' }], subdoc: { name: 'test 2' }, arr: [99] });
 
     const doc = await Test.findById(item._id);
     const clonedDoc = doc.$clone();
 
     assert.ok(clonedDoc.subdocArray[0].$__);
     assert.ok(clonedDoc.subdoc.$__);
+    assert.ok(clonedDoc.subdocArray.isMongooseDocumentArray);
+    assert.equal(typeof clonedDoc.subdocArray.id, 'function');
+    assert.ok(clonedDoc.arr.isMongooseArray);
+    assert.ok(!clonedDoc.arr.isMongooseDocumentArray);
 
     assert.deepEqual(doc.subdocArray[0], clonedDoc.subdocArray[0]);
     assert.deepEqual(doc.subdoc, clonedDoc.subdoc);
+    assert.deepEqual(doc.arr, [99]);
   });
 
   it('can create document with document array and top-level key named `schema` (gh-12480)', async function() {
@@ -13859,17 +13850,15 @@ describe('document', function() {
       postDeleteOne: 0
     };
     let postDeleteOneError = null;
-    ChildSchema.pre('save', function(next) {
+    ChildSchema.pre('save', function() {
       ++called.preSave;
-      next();
     });
     ChildSchema.post('save', function(subdoc, next) {
       ++called.postSave;
       next();
     });
-    ChildSchema.pre('deleteOne', { document: true, query: false }, function(next) {
+    ChildSchema.pre('deleteOne', { document: true, query: false }, function() {
       ++called.preDeleteOne;
-      next();
     });
     ChildSchema.post('deleteOne', { document: true, query: false }, function(subdoc, next) {
       ++called.postDeleteOne;

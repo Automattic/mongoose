@@ -185,12 +185,14 @@ const { promiseOrCallback } = require('mongoose');
 promiseOrCallback; // undefined in Mongoose 9
 ```
 
-## In `isAsync` middleware `next()` errors take priority over `done()` errors
+## `isAsync` middleware no longer supported
 
-Due to Mongoose middleware now relying on promises and async/await, `next()` errors take priority over `done()` errors.
-If you use `isAsync` middleware, any errors in `next()` will be thrown first, and `done()` errors will only be thrown if there are no `next()` errors.
+Mongoose 9 no longer supports `isAsync` middleware. Middleware functions that use the legacy signature with both `next` and `done` callbacks (i.e., `function(next, done)`) are not supported. We recommend middleware now use promises or async/await.
+
+If you have code that uses `isAsync` middleware, you must refactor it to use async functions or return a promise instead.
 
 ```javascript
+// ❌ Not supported in Mongoose 9
 const schema = new Schema({});
 
 schema.pre('save', true, function(next, done) {
@@ -214,8 +216,16 @@ schema.pre('save', true, function(next, done) {
     25);
 });
 
-// In Mongoose 8, with the above middleware, `save()` would error with 'first done() error'
-// In Mongoose 9, with the above middleware, `save()` will error with 'second next() error'
+// ✅ Supported in Mongoose 9: use async functions or return a promise
+schema.pre('save', async function() {
+  execed.first = true;
+  await new Promise(resolve => setTimeout(resolve, 5));
+});
+
+schema.pre('save', async function() {
+  execed.second = true;
+  await new Promise(resolve => setTimeout(resolve, 25));
+});
 ```
 
 ## Removed `skipOriginalStackTraces` option
@@ -284,6 +294,26 @@ console.log(schema.path('docArray').Constructor); // EmbeddedDocument constructo
 ```
 
 In Mongoose 8, there was also an internal `$embeddedSchemaType` property. That property has been replaced with `embeddedSchemaType`, which is now part of the public API.
+
+### Query use$geoWithin removed, now always true
+
+`mongoose.Query` had a `use$geoWithin` property that could configure converting `$geoWithin` to `$within` to support MongoDB versions before 2.4.
+That property has been removed in Mongoose 9. `$geoWithin` is now never converted to `$within`, because MongoDB no longer supports `$within`.
+
+## Removed `noListener` option from `useDb()`/connections
+
+The `noListener` option has been removed from connections and from the `useDb()` method. In Mongoose 8.x, you could call `useDb()` with `{ noListener: true }` to prevent the new connection object from listening to state changes on the base connection, which was sometimes useful to reduce memory usage when dynamically creating connections for every request.
+
+In Mongoose 9.x, the `noListener` option is no longer supported or documented. The second argument to `useDb()` now only supports `{ useCache }`.
+
+```javascript
+// Mongoose 8.x
+conn.useDb('myDb', { noListener: true }); // works
+
+// Mongoose 9.x
+conn.useDb('myDb', { noListener: true }); // TypeError: noListener is not a supported option
+conn.useDb('myDb', { useCache: true }); // works
+```
 
 ## TypeScript
 

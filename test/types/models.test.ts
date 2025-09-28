@@ -1052,3 +1052,11 @@ async function customModelInstanceWithStatics() {
     }
   );
 }
+
+async function gh16526() {
+  const schema = new Schema({ name: String });
+  const Tank = model('Tank', schema);
+
+  const insertManyResult = await Tank.insertMany([{ name: 'test' }], { lean: true, rawResult: true });
+  expectType<number>(insertManyResult.insertedCount);
+}

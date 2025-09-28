@@ -408,9 +408,8 @@ describe('Model', function() {
       name: String
     });
 
-    childSchema.pre('save', function(next) {
+    childSchema.pre('save', function() {
       child_hook = this.name;
-      next();
     });
 
     const parentSchema = new Schema({
@@ -418,9 +417,8 @@ describe('Model', function() {
       children: [childSchema]
     });
 
-    parentSchema.pre('save', function(next) {
+    parentSchema.pre('save', function() {
       parent_hook = this.name;
-      next();
     });
 
     const Parent = db.model('Parent', parentSchema);
@@ -1016,11 +1014,10 @@ describe('Model', function() {
           baz: { type: String }
         });
 
-        ValidationMiddlewareSchema.pre('validate', function(next) {
+        ValidationMiddlewareSchema.pre('validate', function() {
           if (this.get('baz') === 'bad') {
             this.invalidate('baz', 'bad');
           }
-          next();
         });
 
         Post = db.model('Test', ValidationMiddlewareSchema);
@@ -2096,14 +2093,12 @@ describe('Model', function() {
         const schema = new Schema({ name: String });
         let called = 0;
 
-        schema.pre('save', function(next) {
+        schema.pre('save', function() {
           called++;
-          next(undefined);
         });
 
-        schema.pre('save', function(next) {
+        schema.pre('save', function() {
           called++;
-          next(null);
         });
 
         const S = db.model('Test', schema);
@@ -2115,22 +2110,19 @@ describe('Model', function() {
 
       it('called on all sub levels', async function() {
         const grandSchema = new Schema({ name: String });
-        grandSchema.pre('save', function(next) {
+        grandSchema.pre('save', function() {
           this.name = 'grand';
-          next();
         });
 
         const childSchema = new Schema({ name: String, grand: [grandSchema] });
-        childSchema.pre('save', function(next) {
+        childSchema.pre('save', function() {
           this.name = 'child';
-          next();
         });
 
         const schema = new Schema({ name: String, child: [childSchema] });
 
-        schema.pre('save', function(next) {
+        schema.pre('save', function() {
           this.name = 'parent';
-          next();
         });
 
         const S = db.model('Test', schema);
@@ -2144,21 +2136,19 @@ describe('Model', function() {
 
       it('error on any sub level', async function() {
         const grandSchema = new Schema({ name: String });
-        grandSchema.pre('save', function(next) {
-          next(new Error('Error 101'));
+        grandSchema.pre('save', function() {
+          throw new Error('Error 101');
         });
 
         const childSchema = new Schema({ name: String, grand: [grandSchema] });
-        childSchema.pre('save', function(next) {
+        childSchema.pre('save', function() {
           this.name = 'child';
-          next();
         });
 
         let schemaPostSaveCalls = 0;
         const schema = new Schema({ name: String, child: [childSchema] });
-        schema.pre('save', function(next) {
+        schema.pre('save', function() {
           this.name = 'parent';
-          next();
         });
         schema.post('save', function testSchemaPostSave(err, res, next) {
           ++schemaPostSaveCalls;
@@ -2480,8 +2470,8 @@ describe('Model', function() {
     describe('when no callback is passed', function() {
       it('should emit error on its Model when there are listeners', async function() {
         const DefaultErrSchema = new Schema({});
-        DefaultErrSchema.pre('save', function(next) {
-          next(new Error());
+        DefaultErrSchema.pre('save', function() {
+          throw new Error();
         });
 
         const DefaultErr = db.model('Test', DefaultErrSchema);
@@ -6072,9 +6062,8 @@ describe('Model', function() {
     };
 
     let called = 0;
-    schema.pre('aggregate', function(next) {
+    schema.pre('aggregate', function() {
       ++called;
-      next();
     });
     const Model = db.model('Test', schema);
 
@@ -6101,9 +6090,8 @@ describe('Model', function() {
     };
 
     let called = 0;
-    schema.pre('insertMany', function(next) {
+    schema.pre('insertMany', function() {
       ++called;
-      next();
     });
     const Model = db.model('Test', schema);
 
@@ -6126,9 +6114,8 @@ describe('Model', function() {
     };
 
     let called = 0;
-    schema.pre('save', function(next) {
+    schema.pre('save', function() {
       ++called;
-      next();
     });
 
     const Model = db.model('Test', schema);
@@ -8144,9 +8131,8 @@ describe('Model', function() {
         name: String
       });
       let bypass = true;
-      testSchema.pre('findOne', function(next) {
+      testSchema.pre('findOne', function() {
         bypass = false;
-        next();
       });
       const Test = db.model('gh13250', testSchema);
       const doc = await Test.create({
@@ -8307,7 +8293,7 @@ describe('Model', function() {
       const schema = new mongoose.Schema({
         name: String
       });
-      const Model = db.model('Test', schema);
+      const Model = db.model('Test', schema, 'tests');
       assert.equal(db.model('Test'), Model);
       const original = Model.find();
       assert.equal(original.model.collection.conn.name, 'mongoose_test');
@@ -8322,6 +8308,7 @@ describe('Model', function() {
       assert.equal(db.models[Model.modelName], undefined);
       assert(connection.models[Model.modelName]);
       const query = Model.find();
+      assert.equal(query.model.collection.collectionName, 'tests');
       assert.equal(query.model.collection.conn.name, 'mongoose_test_2');
 
       await Model.deleteMany({});

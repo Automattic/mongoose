@@ -322,8 +322,8 @@ declare module 'mongoose' {
      */
     required(required: boolean, message?: string): this;
 
-    /** The schema this SchemaType instance is part of */
-    schema: Schema<any>;
+    /** If the SchemaType is a subdocument or document array, this is the schema of that subdocument */
+    schema?: Schema<any>;
 
     /** Sets default select() behavior for this path. */
     select(val: boolean): this;

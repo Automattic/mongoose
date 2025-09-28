@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "8.18.1",
+  "version": "8.18.2",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -20,7 +20,7 @@
   "type": "commonjs",
   "license": "MIT",
   "dependencies": {
-    "kareem": "git+https://github.com/mongoosejs/kareem.git#vkarpov15/v3",
+    "kareem": "git+https://github.com/mongoosejs/kareem.git#vkarpov15/remove-isasync",
     "mongodb": "~6.18.0",
     "mpath": "0.9.0",
     "mquery": "5.0.0",

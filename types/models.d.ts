@@ -675,7 +675,7 @@ declare module 'mongoose' {
     translateAliases(raw: any): any;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
-    distinct<DocKey extends string, ResultType = unknown>(
+    distinct<DocKey extends string>(
       field: DocKey,
       filter?: QueryFilter<TRawDocType>,
       options?: QueryOptions<TRawDocType>
@@ -683,7 +683,7 @@ declare module 'mongoose' {
       Array<
         DocKey extends keyof WithLevel1NestedPaths<TRawDocType>
           ? WithoutUndefined<Unpacked<WithLevel1NestedPaths<TRawDocType>[DocKey]>>
-          : ResultType
+          : unknown
       >,
       THydratedDocumentType,
       TQueryHelpers,
@@ -916,21 +916,21 @@ declare module 'mongoose' {
     schema: Schema<TRawDocType>;
 
     /** Creates a `updateMany` query: updates all documents that match `filter` with `update`. */
-    updateMany<ResultDoc = THydratedDocumentType>(
+    updateMany(
       filter: QueryFilter<TRawDocType>,
       update: UpdateQuery<TRawDocType> | UpdateWithAggregationPipeline,
       options?: (mongodb.UpdateOptions & MongooseUpdateQueryOptions<TRawDocType>) | null
-    ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, TRawDocType, 'updateMany', TInstanceMethods & TVirtuals>;
+    ): QueryWithHelpers<UpdateWriteOpResult, THydratedDocumentType, TQueryHelpers, TRawDocType, 'updateMany', TInstanceMethods & TVirtuals>;
 
     /** Creates a `updateOne` query: updates the first document that matches `filter` with `update`. */
-    updateOne<ResultDoc = THydratedDocumentType>(
+    updateOne(
       filter: QueryFilter<TRawDocType>,
       update: UpdateQuery<TRawDocType> | UpdateWithAggregationPipeline,
       options?: (mongodb.UpdateOptions & MongooseUpdateQueryOptions<TRawDocType>) | null
-    ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, TRawDocType, 'updateOne', TInstanceMethods & TVirtuals>;
-    updateOne<ResultDoc = THydratedDocumentType>(
+    ): QueryWithHelpers<UpdateWriteOpResult, THydratedDocumentType, TQueryHelpers, TRawDocType, 'updateOne', TInstanceMethods & TVirtuals>;
+    updateOne(
       update: UpdateQuery<TRawDocType> | UpdateWithAggregationPipeline
-    ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, TRawDocType, 'updateOne', TInstanceMethods & TVirtuals>;
+    ): QueryWithHelpers<UpdateWriteOpResult, THydratedDocumentType, TQueryHelpers, TRawDocType, 'updateOne', TInstanceMethods & TVirtuals>;
 
     /** Creates a Query, applies the passed conditions, and returns the Query. */
     where<ResultDoc = THydratedDocumentType>(

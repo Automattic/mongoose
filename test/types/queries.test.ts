@@ -339,7 +339,6 @@ async function gh11306(): Promise<void> {
 
   expectType<unknown[]>(await MyModel.distinct('notThereInSchema'));
   expectType<string[]>(await MyModel.distinct('name'));
-  expectType<number[]>(await MyModel.distinct<'overrideTest', number>('overrideTest'));
 }
 
 function autoTypedQuery() {

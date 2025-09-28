@@ -68,31 +68,27 @@ schema.post<ITest>('save', function(err: Error, res: ITest, next: Function) {
   console.log(this.name, err.stack);
 });
 
-schema.pre<Model<ITest>>('insertMany', function() {
-  const name: string = this.name;
+schema.pre('insertMany', function() {
+  const name: string = this.modelName;
   return Promise.resolve();
 });
 
-schema.pre<Model<ITest>>('insertMany', function() {
-  console.log(this.name);
+schema.pre('insertMany', function() {
+  console.log(this.modelName);
 });
 
-schema.pre<Model<ITest>>('insertMany', function() {
-  console.log(this.name);
+schema.pre('insertMany', function(docs: ITest[]) {
+  console.log(this.modelName, docs);
 });
 
-schema.pre<Model<ITest>>('insertMany', function(docs: ITest[]) {
-  console.log(this.name, docs);
+schema.pre('insertMany', function(docs: Array<ITest>) {
+  console.log(this.modelName, docs);
 });
 
-schema.pre<Model<ITest>>('insertMany', function(docs: Array<ITest>) {
-  console.log(this.name, docs);
+schema.pre('bulkWrite', function(ops: Array<AnyBulkWriteOperation<any>>) {
 });
 
-schema.pre<Model<ITest>>('bulkWrite', function(ops: Array<AnyBulkWriteOperation<any>>) {
-});
-
-schema.pre<Model<ITest>>('createCollection', function(opts?: CreateCollectionOptions) {
+schema.pre('createCollection', function(opts?: CreateCollectionOptions) {
 });
 
 schema.pre<Query<number, any>>('estimatedDocumentCount', function() {});

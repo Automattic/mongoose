@@ -16,19 +16,10 @@ declare module 'mongoose' {
           : T;
 
   export type ApplyBasicQueryCasting<T> = T | T[] | (T extends (infer U)[] ? QueryTypeCasting<U> : T) | null;
-
   type ApplyQueryCastingToObject<T> = { [P in keyof T]?: ApplyBasicQueryCasting<QueryTypeCasting<T[P]>>; };
-  type ApplyConditionToObject<T> = { [P in keyof T]?: mongodb.Condition<ApplyBasicQueryCasting<QueryTypeCasting<T[P]>>> };
 
-  /**
-   * Filter query to select the documents that match the query
-   * @example
-   * ```js
-   * { age: { $gte: 30 } }
-   * ```
-   */
-  type _QueryFilter<T> = (ApplyConditionToObject<T> & mongodb.RootFilterOperators<ApplyQueryCastingToObject<T>>) | Query<any, any>;
-  type QueryFilter<T> = _QueryFilter<WithLevel1NestedPaths<T>>;
+  type _QueryFilter<T> = ({ [P in keyof T]?: mongodb.Condition<T[P] | null>; } & mongodb.RootFilterOperators<T>) | Query<any, any>;
+  type QueryFilter<T> = _QueryFilter<ApplyQueryCastingToObject<WithLevel1NestedPaths<T>>>;
 
   type MongooseBaseQueryOptionKeys =
     | 'context'

@@ -362,6 +362,7 @@ declare module 'mongoose' {
     >;
 
     /** Creates a new document or documents */
+    create(): Promise<null>;
     create(docs: Array<DeepPartial<ApplyBasicCreateCasting<Require_id<TRawDocType>>>>, options: CreateOptions & { aggregateErrors: true }): Promise<(THydratedDocumentType | Error)[]>;
     create(docs: Array<DeepPartial<ApplyBasicCreateCasting<Require_id<TRawDocType>>>>, options?: CreateOptions): Promise<THydratedDocumentType[]>;
     create(doc: DeepPartial<ApplyBasicCreateCasting<Require_id<TRawDocType>>>): Promise<THydratedDocumentType>;

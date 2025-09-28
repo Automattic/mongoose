@@ -8755,6 +8755,9 @@ describe('Model', function() {
     });
 
     afterEach(async function() {
+      if (this.currentTest.pending) {
+        return; // Test was skipped
+      }
       const indexes = await TestModel.listSearchIndexes().catch(() => []);
       for (const idx of indexes) {
         await TestModel.dropSearchIndex(idx.name);

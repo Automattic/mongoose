@@ -8424,7 +8424,7 @@ describe('Model', function() {
       const schema = new mongoose.Schema({
         name: String
       });
-      const Model = db.model('Test', schema);
+      const Model = db.model('Test', schema, 'tests');
       assert.equal(db.model('Test'), Model);
       const original = Model.find();
       assert.equal(original.model.collection.conn.name, 'mongoose_test');
@@ -8439,6 +8439,7 @@ describe('Model', function() {
       assert.equal(db.models[Model.modelName], undefined);
       assert(connection.models[Model.modelName]);
       const query = Model.find();
+      assert.equal(query.model.collection.collectionName, 'tests');
       assert.equal(query.model.collection.conn.name, 'mongoose_test_2');
 
       await Model.deleteMany({});

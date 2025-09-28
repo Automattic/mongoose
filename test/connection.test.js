@@ -870,6 +870,22 @@ describe('connections:', function() {
 
       await db.close();
     });
+
+    it('updates child dbs lastHeartbeatAt (gh-15635)', async function() {
+      const db = await mongoose.createConnection(start.uri).asPromise();
+
+      const schema = mongoose.Schema({ name: String }, { autoCreate: false, autoIndex: false });
+      const Test = db.model('Test', schema);
+      await Test.deleteMany({});
+      await Test.create({ name: 'gh-11821' });
+
+      const db2 = db.useDb(start.databases[1]);
+
+      const now = Date.now();
+      db.client.emit('serverHeartbeatSucceeded');
+      assert.ok(db._lastHeartbeatAt >= now);
+      assert.ok(db2._lastHeartbeatAt >= now);
+    });
   });
 
   describe('shouldAuthenticate()', function() {

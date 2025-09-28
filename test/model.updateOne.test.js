@@ -3196,7 +3196,7 @@ describe('model: updateOne: ', function() {
 
     await Model.create({ tags: [] });
     // This is a no-op, but should not cause an error
-    await Model.updateOne({}, { $addToSet: { $each: ['test'] } });
+    await Model.updateOne({}, { $addToSet: { tags: { $each: ['test'] } } });
   });
 });
 

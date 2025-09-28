@@ -5,12 +5,10 @@ interface IDocument extends Document {
   name?: string;
 }
 
-const preMiddlewareFn: PreSaveMiddlewareFunction<Document> = function(next, opts) {
+const preMiddlewareFn: PreSaveMiddlewareFunction<Document> = function(opts) {
   this.$markValid('name');
-  if (opts.session) {
-    next();
-  } else {
-    next(new Error('Operation must be in Session.'));
+  if (!opts.session) {
+    throw new Error('Operation must be in Session.');
   }
 };
 

@@ -290,6 +290,21 @@ In Mongoose 8, there was also an internal `$embeddedSchemaType` property. That p
 `mongoose.Query` had a `use$geoWithin` property that could configure converting `$geoWithin` to `$within` to support MongoDB versions before 2.4.
 That property has been removed in Mongoose 9. `$geoWithin` is now never converted to `$within`, because MongoDB no longer supports `$within`.
 
+## Removed `noListener` option from `useDb()`/connections
+
+The `noListener` option has been removed from connections and from the `useDb()` method. In Mongoose 8.x, you could call `useDb()` with `{ noListener: true }` to prevent the new connection object from listening to state changes on the base connection, which was sometimes useful to reduce memory usage when dynamically creating connections for every request.
+
+In Mongoose 9.x, the `noListener` option is no longer supported or documented. The second argument to `useDb()` now only supports `{ useCache }`.
+
+```javascript
+// Mongoose 8.x
+conn.useDb('myDb', { noListener: true }); // works
+
+// Mongoose 9.x
+conn.useDb('myDb', { noListener: true }); // TypeError: noListener is not a supported option
+conn.useDb('myDb', { useCache: true }); // works
+```
+
 ## TypeScript
 
 ### FilterQuery renamed to QueryFilter

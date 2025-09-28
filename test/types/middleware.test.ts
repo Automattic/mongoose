@@ -209,7 +209,7 @@ function gh15242() {
 
   type ValidatorThis = DocumentValidatorThis | QueryValidatorThis;
   type DocumentValidatorThis = HydratedDocument<PostPersisted>;
-  type QueryValidatorThis = Query<PostRecord, PostRecord>;
+  type QueryValidatorThis = Query<unknown, PostRecord>;
 
   const PostSchema = new Schema<PostPersisted>({
     title: { type: String, required: true },

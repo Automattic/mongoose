@@ -64,7 +64,7 @@ declare module 'mongoose' {
    * Sanitizes query filters against query selector injection attacks by wrapping
    * any nested objects that have a property whose name starts with `$` in a `$eq`.
    */
-  export function sanitizeFilter<T>(filter: FilterQuery<T>): FilterQuery<T>;
+  export function sanitizeFilter<T>(filter: QueryFilter<T>): QueryFilter<T>;
 
   /** Gets mongoose options */
   export function get<K extends keyof MongooseOptions>(key: K): MongooseOptions[K];
@@ -592,7 +592,7 @@ declare module 'mongoose' {
     | SchemaDefinition<T, EnforcedDocType, THydratedDocumentType>
     | SchemaDefinition<Unpacked<T>, EnforcedDocType, THydratedDocumentType>[]
     | typeof Schema.Types.Mixed
-    | MixedSchemaTypeOptions<EnforcedDocType>;
+    | MixedSchemaTypeOptions<EnforcedDocType, THydratedDocumentType>;
 
   export type SchemaDefinition<T = undefined, EnforcedDocType = any, THydratedDocumentType = HydratedDocument<EnforcedDocType>> = T extends undefined
     ? { [path: string]: SchemaDefinitionProperty; }
@@ -601,7 +601,7 @@ declare module 'mongoose' {
   export type AnyArray<T> = T[] | ReadonlyArray<T>;
   export type ExtractMongooseArray<T> = T extends Types.Array<any> ? AnyArray<Unpacked<T>> : T;
 
-  export interface MixedSchemaTypeOptions<EnforcedDocType> extends SchemaTypeOptions<Schema.Types.Mixed, EnforcedDocType> {
+  export interface MixedSchemaTypeOptions<EnforcedDocType, THydratedDocumentType> extends SchemaTypeOptions<Schema.Types.Mixed, EnforcedDocType, THydratedDocumentType> {
     type: typeof Schema.Types.Mixed;
   }
 
@@ -647,7 +647,7 @@ declare module 'mongoose' {
     count?: boolean;
 
     /** Add an extra match condition to `populate()`. */
-    match?: FilterQuery<any> | ((doc: Record<string, any>, virtual?: this) => Record<string, any> | null);
+    match?: QueryFilter<any> | ((doc: Record<string, any>, virtual?: this) => Record<string, any> | null);
 
     /** Add a default `limit` to the `populate()` query. */
     limit?: number;
@@ -835,6 +835,25 @@ declare module 'mongoose' {
                     : BufferToBinary<T[K]>;
           } : T;
 
+    /**
+    * Converts any Buffer properties into "{ type: 'buffer', data: [1, 2, 3] }" format for JSON serialization
+    */
+    export type UUIDToJSON<T> = T extends mongodb.UUID
+      ? string
+      : T extends Document
+        ? T
+        : T extends TreatAsPrimitives
+          ? T
+          : T extends Record<string, any> ? {
+            [K in keyof T]: T[K] extends mongodb.UUID
+              ? string
+              : T[K] extends Types.DocumentArray<infer ItemType>
+                  ? Types.DocumentArray<UUIDToJSON<ItemType>>
+                  : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+                    ? HydratedSingleSubdocument<SubdocType>
+                    : UUIDToJSON<T[K]>;
+          } : T;
+
   /**
    * Converts any ObjectId properties into strings for JSON serialization
    */
@@ -894,7 +913,9 @@ declare module 'mongoose' {
     FlattenMaps<
       BufferToJSON<
         ObjectIdToString<
-          DateToString<T>
+          UUIDToJSON<
+            DateToString<T>
+          >
         >
       >
     >

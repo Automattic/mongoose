@@ -7,7 +7,6 @@
 const start = require('./common');
 
 const STATES = require('../lib/connectionState');
-const Q = require('q');
 const assert = require('assert');
 const mongodb = require('mongodb');
 const MongooseError = require('../lib/error/index');
@@ -118,20 +117,6 @@ describe('connections:', function() {
       await assert.rejects(async function() {
         await mongoose.createConnection(void 0).asPromise();
       }, /string.*createConnection/);
-    });
-
-    it('resolving with q (gh-5714)', async function() {
-      const bootMongo = Q.defer();
-
-      const conn = mongoose.createConnection(start.uri);
-
-      conn.on('connected', function() {
-        bootMongo.resolve(this);
-      });
-
-      const _conn = await bootMongo.promise;
-      assert.equal(_conn, conn);
-      await conn.close();
     });
 
     it('connection plugins (gh-7378)', async function() {
@@ -869,6 +854,22 @@ describe('connections:', function() {
       assert.equal(doc.name, 'gh-11821');
 
       await db.close();
+    });
+
+    it('updates child dbs lastHeartbeatAt (gh-15635)', async function() {
+      const db = await mongoose.createConnection(start.uri).asPromise();
+
+      const schema = mongoose.Schema({ name: String }, { autoCreate: false, autoIndex: false });
+      const Test = db.model('Test', schema);
+      await Test.deleteMany({});
+      await Test.create({ name: 'gh-11821' });
+
+      const db2 = db.useDb(start.databases[1]);
+
+      const now = Date.now();
+      db.client.emit('serverHeartbeatSucceeded');
+      assert.ok(db._lastHeartbeatAt >= now);
+      assert.ok(db2._lastHeartbeatAt >= now);
     });
   });
 

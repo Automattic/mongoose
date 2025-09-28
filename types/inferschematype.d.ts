@@ -51,6 +51,9 @@ declare module 'mongoose' {
    */
   export type InferSchemaType<TSchema> = IfAny<TSchema, any, ObtainSchemaGeneric<TSchema, 'DocType'>>;
 
+  export type DefaultIdVirtual = { id: string };
+  export type AddDefaultId<DocType, TVirtuals, TSchemaOptions> = (DocType extends { id: any } ? TVirtuals : TSchemaOptions extends { id: false } ? TVirtuals : TVirtuals & { id: string });
+
   /**
    * @summary Obtains schema Generic type by using generic alias.
    * @param {TSchema} TSchema A generic of schema type instance.
@@ -63,7 +66,7 @@ declare module 'mongoose' {
        M: M;
        TInstanceMethods: TInstanceMethods;
        TQueryHelpers: TQueryHelpers;
-       TVirtuals: TVirtuals;
+       TVirtuals: AddDefaultId<DocType, TVirtuals, TSchemaOptions>;
        TStaticMethods: TStaticMethods;
        TSchemaOptions: TSchemaOptions;
        DocType: DocType;
@@ -247,7 +250,9 @@ type IsSchemaTypeFromBuiltinClass<T> = T extends (typeof String)
                                         ? false
                                         : T extends Buffer
                                           ? true
-                                          : false;
+                                          : T extends Types.UUID
+                                            ? true
+                                            : false;
 
 /**
  * @summary Resolve path type by returning the corresponding type.
@@ -313,9 +318,9 @@ type ResolvePathType<PathValueType, Options extends SchemaTypeOptions<PathValueT
                                             IfEquals<PathValueType, Schema.Types.BigInt> extends true ? bigint :
                                               IfEquals<PathValueType, BigInt> extends true ? bigint :
                                                 PathValueType extends 'bigint' | 'BigInt' | typeof Schema.Types.BigInt | typeof BigInt ? bigint :
-                                                  PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? Buffer :
+                                                  PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? Types.UUID :
                                                     PathValueType extends 'double' | 'Double' | typeof Schema.Types.Double ? Types.Double :
-                                                      IfEquals<PathValueType, Schema.Types.UUID> extends true ? Buffer :
+                                                      IfEquals<PathValueType, Schema.Types.UUID> extends true ? Types.UUID :
                                                         PathValueType extends MapConstructor | 'Map' ? Map<string, ObtainDocumentPathType<Options['of']>> :
                                                           IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Map<string, ObtainDocumentPathType<Options['of']>> :
                                                             PathValueType extends 'Union' | 'union' | typeof Schema.Types.Union ? Options['of'] extends readonly any[] ? UnionToType<Options['of']> : never :

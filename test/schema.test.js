@@ -829,18 +829,18 @@ describe('schema', function() {
         const Tobi = new Schema({
           name: { type: String, index: true },
           last: { type: Number, sparse: true },
-          nope: { type: String, index: { background: false } }
+          nope: { type: String, index: true }
         });
 
         Tobi.index({ firstname: 1, last: 1 }, { unique: true, expires: '1h' });
-        Tobi.index({ firstname: 1, nope: 1 }, { unique: true, background: false });
+        Tobi.index({ firstname: 1, nope: 1 }, { unique: true });
 
         assert.deepEqual(Tobi.indexes(), [
-          [{ name: 1 }, { background: true }],
-          [{ last: 1 }, { sparse: true, background: true }],
-          [{ nope: 1 }, { background: false }],
-          [{ firstname: 1, last: 1 }, { unique: true, expireAfterSeconds: 60 * 60, background: true }],
-          [{ firstname: 1, nope: 1 }, { unique: true, background: false }]
+          [{ name: 1 }, {}],
+          [{ last: 1 }, { sparse: true }],
+          [{ nope: 1 }, {}],
+          [{ firstname: 1, last: 1 }, { unique: true, expireAfterSeconds: 60 * 60 }],
+          [{ firstname: 1, nope: 1 }, { unique: true }]
         ]);
 
 
@@ -889,7 +889,7 @@ describe('schema', function() {
         });
 
         assert.deepEqual(schema.indexes(), [
-          [{ point: '2dsphere' }, { background: true }]
+          [{ point: '2dsphere' }, {}]
         ]);
       });
 
@@ -1667,7 +1667,7 @@ describe('schema', function() {
       test: [{ $type: String }]
     }, { typeKey: '$type' });
 
-    assert.equal(testSchema.paths.test.caster.instance, 'String');
+    assert.equal(testSchema.paths.test.embeddedSchemaType.instance, 'String');
 
     const Test = mongoose.model('gh4548', testSchema);
     const test = new Test({ test: [123] });
@@ -1680,11 +1680,7 @@ describe('schema', function() {
       test: [Array]
     });
 
-    assert.ok(testSchema.paths.test.casterConstructor !== Array);
-    assert.equal(testSchema.paths.test.casterConstructor,
-      mongoose.Schema.Types.Array);
-
-
+    assert.ok(testSchema.paths.test.embeddedSchemaType instanceof mongoose.Schema.Types.Array);
   });
 
   describe('remove()', function() {
@@ -1788,7 +1784,7 @@ describe('schema', function() {
         nums: ['Decimal128']
       });
       assert.ok(schema.path('num') instanceof Decimal128);
-      assert.ok(schema.path('nums').caster instanceof Decimal128);
+      assert.ok(schema.path('nums').embeddedSchemaType instanceof Decimal128);
 
       const casted = schema.path('num').cast('6.2e+23');
       assert.ok(casted instanceof mongoose.Types.Decimal128);
@@ -1952,7 +1948,7 @@ describe('schema', function() {
 
         const clone = bananaSchema.clone();
         schema.path('fruits').discriminator('banana', clone);
-        assert.ok(clone.path('color').caster.discriminators);
+        assert.ok(clone.path('color').Constructor.discriminators);
 
         const Basket = db.model('Test', schema);
         const b = new Basket({
@@ -2125,7 +2121,7 @@ describe('schema', function() {
     const schema = Schema({ testId: [{ type: 'ObjectID' }] });
     const path = schema.path('testId');
     assert.ok(path);
-    assert.ok(path.caster instanceof Schema.ObjectId);
+    assert.ok(path.embeddedSchemaType instanceof Schema.ObjectId);
   });
 
   it('supports getting path under array (gh-8057)', function() {
@@ -2505,7 +2501,7 @@ describe('schema', function() {
     const TurboManSchema = Schema();
     TurboManSchema.add(ToySchema);
 
-    assert.deepStrictEqual(TurboManSchema.indexes(), [[{ name: 1 }, { background: true }]]);
+    assert.deepStrictEqual(TurboManSchema.indexes(), [[{ name: 1 }, {}]]);
   });
 
   describe('gh-8849', function() {
@@ -2579,7 +2575,7 @@ describe('schema', function() {
       arr: mongoose.Schema.Types.Array
     });
 
-    assert.equal(schema.path('arr').caster.instance, 'Mixed');
+    assert.equal(schema.path('arr').embeddedSchemaType.instance, 'Mixed');
   });
 
   it('handles using a schematype when defining a path (gh-9370)', function() {
@@ -2670,9 +2666,9 @@ describe('schema', function() {
       subdocs: { type: Array, of: Schema({ name: String }) }
     });
 
-    assert.equal(schema.path('nums').caster.instance, 'Number');
-    assert.equal(schema.path('tags').caster.instance, 'String');
-    assert.equal(schema.path('subdocs').casterConstructor.schema.path('name').instance, 'String');
+    assert.equal(schema.path('nums').embeddedSchemaType.instance, 'Number');
+    assert.equal(schema.path('tags').embeddedSchemaType.instance, 'String');
+    assert.equal(schema.path('subdocs').embeddedSchemaType.schema.path('name').instance, 'String');
   });
 
   it('should use the top-most class\'s getter/setter gh-8892', function() {
@@ -2817,8 +2813,8 @@ describe('schema', function() {
       somethingElse: { type: [{ type: { somePath: String } }] }
     });
 
-    assert.equal(schema.path('something').caster.schema.path('somePath').instance, 'String');
-    assert.equal(schema.path('somethingElse').caster.schema.path('somePath').instance, 'String');
+    assert.equal(schema.path('something').embeddedSchemaType.schema.path('somePath').instance, 'String');
+    assert.equal(schema.path('somethingElse').embeddedSchemaType.schema.path('somePath').instance, 'String');
   });
 
   it('handles `Date` with `type` (gh-10807)', function() {
@@ -3218,9 +3214,9 @@ describe('schema', function() {
       tags: [{ type: 'Array', of: String }],
       subdocs: [{ type: Array, of: Schema({ name: String }) }]
     });
-    assert.equal(schema.path('nums.$').caster.instance, 'Number'); // actually Mixed
-    assert.equal(schema.path('tags.$').caster.instance, 'String'); // actually Mixed
-    assert.equal(schema.path('subdocs.$').casterConstructor.schema.path('name').instance, 'String'); // actually Mixed
+    assert.equal(schema.path('nums.$').embeddedSchemaType.instance, 'Number');
+    assert.equal(schema.path('tags.$').embeddedSchemaType.instance, 'String');
+    assert.equal(schema.path('subdocs.$').embeddedSchemaType.schema.path('name').instance, 'String');
   });
   it('handles discriminator options with Schema.prototype.discriminator (gh-14448)', async function() {
     const eventSchema = new mongoose.Schema({

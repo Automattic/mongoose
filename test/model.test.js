@@ -558,7 +558,7 @@ describe('Model', function() {
       let post;
       try {
         post = new BlogPost({ date: 'Test', meta: { date: 'Test' } });
-      } catch (e) {
+      } catch {
         threw = true;
       }
 
@@ -566,7 +566,7 @@ describe('Model', function() {
 
       try {
         post.set('title', 'Test');
-      } catch (e) {
+      } catch {
         threw = true;
       }
 
@@ -591,7 +591,7 @@ describe('Model', function() {
             date: 'Test'
           }
         });
-      } catch (e) {
+      } catch {
         threw = true;
       }
 
@@ -599,7 +599,7 @@ describe('Model', function() {
 
       try {
         post.set('meta.date', 'Test');
-      } catch (e) {
+      } catch {
         threw = true;
       }
 
@@ -657,7 +657,7 @@ describe('Model', function() {
         post.get('comments').push({
           date: 'Bad date'
         });
-      } catch (e) {
+      } catch {
         threw = true;
       }
 
@@ -1313,7 +1313,7 @@ describe('Model', function() {
           JSON.stringify(meta);
           getter1 = JSON.stringify(post.get('meta'));
           getter2 = JSON.stringify(post.meta);
-        } catch (err) {
+        } catch {
           threw = true;
         }
 
@@ -2154,10 +2154,15 @@ describe('Model', function() {
           next();
         });
 
+        let schemaPostSaveCalls = 0;
         const schema = new Schema({ name: String, child: [childSchema] });
         schema.pre('save', function(next) {
           this.name = 'parent';
           next();
+        });
+        schema.post('save', function testSchemaPostSave(err, res, next) {
+          ++schemaPostSaveCalls;
+          next(err);
         });
 
         const S = db.model('Test', schema);
@@ -2165,6 +2170,7 @@ describe('Model', function() {
 
         const err = await s.save().then(() => null, err => err);
         assert.equal(err.message, 'Error 101');
+        assert.equal(schemaPostSaveCalls, 1);
       });
 
       describe('init', function() {
@@ -2397,7 +2403,7 @@ describe('Model', function() {
       let threw = false;
       try {
         new P({ path: 'i should not throw' });
-      } catch (err) {
+      } catch {
         threw = true;
       }
 
@@ -5112,23 +5118,10 @@ describe('Model', function() {
         );
       });
 
-      it('syncIndexes() allows overwriting `background` option (gh-8645)', async function() {
-        const opts = { autoIndex: false };
-        const schema = new Schema({ name: String }, opts);
-        schema.index({ name: 1 }, { background: true });
-
-        const M = db.model('Test', schema);
-        await M.syncIndexes({ background: false });
-
-        const indexes = await M.listIndexes();
-        assert.deepEqual(indexes[1].key, { name: 1 });
-        assert.strictEqual(indexes[1].background, false);
-      });
-
       it('syncIndexes() does not call createIndex for indexes that already exist', async function() {
         const opts = { autoIndex: false };
         const schema = new Schema({ name: String }, opts);
-        schema.index({ name: 1 }, { background: true });
+        schema.index({ name: 1 });
 
         const M = db.model('Test', schema);
         await M.syncIndexes();
@@ -5247,9 +5240,9 @@ describe('Model', function() {
         const BuyEvent = Event.discriminator('BuyEvent', buyEventSchema);
 
         // Act
-        const droppedByEvent = await Event.syncIndexes({ background: false });
-        const droppedByClickEvent = await ClickEvent.syncIndexes({ background: false });
-        const droppedByBuyEvent = await BuyEvent.syncIndexes({ background: false });
+        const droppedByEvent = await Event.syncIndexes();
+        const droppedByClickEvent = await ClickEvent.syncIndexes();
+        const droppedByBuyEvent = await BuyEvent.syncIndexes();
 
         const eventIndexes = await Event.listIndexes();
 
@@ -8314,7 +8307,7 @@ describe('Model', function() {
       const schema = new mongoose.Schema({
         name: String
       });
-      const Model = db.model('Test', schema);
+      const Model = db.model('Test', schema, 'tests');
       assert.equal(db.model('Test'), Model);
       const original = Model.find();
       assert.equal(original.model.collection.conn.name, 'mongoose_test');
@@ -8329,6 +8322,7 @@ describe('Model', function() {
       assert.equal(db.models[Model.modelName], undefined);
       assert(connection.models[Model.modelName]);
       const query = Model.find();
+      assert.equal(query.model.collection.collectionName, 'tests');
       assert.equal(query.model.collection.conn.name, 'mongoose_test_2');
 
       await Model.deleteMany({});

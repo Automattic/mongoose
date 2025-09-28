@@ -68,18 +68,18 @@ declare module 'mongoose' {
               T extends Buffer ? SchemaDefinition<typeof Buffer> :
                 T extends Types.ObjectId ? ObjectIdSchemaDefinition :
                   T extends Types.ObjectId[] ? AnyArray<ObjectIdSchemaDefinition> | AnyArray<SchemaTypeOptions<ObjectId, EnforcedDocType, THydratedDocumentType>> :
-                    T extends object[] ? (AnyArray<Schema<any, any, any>> | AnyArray<SchemaDefinition<Unpacked<T>>> | AnyArray<SchemaTypeOptions<Unpacked<T>, EnforcedDocType, THydratedDocumentType>>) :
+                    T extends object[] ? (AnyArray<Schema<any, any, any>> | AnyArray<SchemaDefinition<Unpacked<T>, EnforcedDocType, THydratedDocumentType>> | AnyArray<SchemaTypeOptions<Unpacked<T>, EnforcedDocType, THydratedDocumentType>>) :
                       T extends string[] ? AnyArray<StringSchemaDefinition> | AnyArray<SchemaTypeOptions<string, EnforcedDocType, THydratedDocumentType>> :
                         T extends number[] ? AnyArray<NumberSchemaDefinition> | AnyArray<SchemaTypeOptions<number, EnforcedDocType, THydratedDocumentType>> :
                           T extends boolean[] ? AnyArray<BooleanSchemaDefinition> | AnyArray<SchemaTypeOptions<boolean, EnforcedDocType, THydratedDocumentType>> :
                             T extends Function[] ? AnyArray<Function | string> | AnyArray<SchemaTypeOptions<Unpacked<T>, EnforcedDocType, THydratedDocumentType>> :
-                              T | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<T> | Function | AnyArray<Function>;
+                              T | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<T, EnforcedDocType, THydratedDocumentType> | Function | AnyArray<Function>;
 
     /** Defines a virtual with the given name that gets/sets this path. */
     alias?: string | string[];
 
     /** Function or object describing how to validate this schematype. See [validation docs](https://mongoosejs.com/docs/validation.html). */
-    validate?: SchemaValidator<T, EnforcedDocType, THydratedDocumentType> | AnyArray<SchemaValidator<T, EnforcedDocType, THydratedDocumentType>>;
+    validate?: SchemaValidator<T, THydratedDocumentType> | AnyArray<SchemaValidator<T, THydratedDocumentType>>;
 
     /** Allows overriding casting logic for this individual path. If a string, the given string overwrites Mongoose's default cast error message. */
     cast?: string |
@@ -93,13 +93,13 @@ declare module 'mongoose' {
      * path cannot be set to a nullish value. If a function, Mongoose calls the
      * function and only checks for nullish values if the function returns a truthy value.
      */
-    required?: boolean | ((this: EnforcedDocType) => boolean) | [boolean, string] | [(this: EnforcedDocType) => boolean, string];
+    required?: boolean | ((this: THydratedDocumentType) => boolean) | [boolean, string] | [(this: THydratedDocumentType) => boolean, string];
 
     /**
      * The default value for this path. If a function, Mongoose executes the function
      * and uses the return value as the default.
      */
-    default?: DefaultType<T> | ((this: EnforcedDocType, doc: any) => DefaultType<T> | null | undefined) | null;
+    default?: DefaultType<T> | ((this: THydratedDocumentType, doc: THydratedDocumentType) => DefaultType<T> | null | undefined) | null;
 
     /**
      * The model that `populate()` should use if populating this path.
@@ -370,7 +370,7 @@ declare module 'mongoose' {
         discriminator<D>(name: string | number, schema: Schema, value?: string): Model<D>;
 
         /** The schematype embedded in this array */
-        caster?: SchemaType;
+        embeddedSchemaType: SchemaType;
 
         /** Default options for this SchemaType */
         static defaultOptions: Record<string, any>;
@@ -465,8 +465,11 @@ declare module 'mongoose' {
         /** The schema used for documents in this array */
         schema: Schema;
 
+        /** The schematype embedded in this array */
+        embeddedSchemaType: Subdocument;
+
         /** The constructor used for subdocuments in this array */
-        caster?: typeof Types.Subdocument;
+        Constructor: typeof Types.Subdocument;
 
         /** Default options for this SchemaType */
         static defaultOptions: Record<string, any>;
@@ -530,6 +533,9 @@ declare module 'mongoose' {
 
         /** The document's schema */
         schema: Schema;
+
+        /** The constructor used to create subdocuments based on this schematype */
+        Constructor: typeof Types.Subdocument;
 
         /** Default options for this SchemaType */
         static defaultOptions: Record<string, any>;

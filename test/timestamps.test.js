@@ -131,7 +131,7 @@ describe('timestamps', function() {
 
       const indexes = testSchema.indexes();
       assert.deepEqual(indexes, [
-        [{ updatedAt: 1 }, { background: true, expireAfterSeconds: 7200 }]
+        [{ updatedAt: 1 }, { expireAfterSeconds: 7200 }]
       ]);
     });
   });
@@ -1034,9 +1034,7 @@ describe('timestamps', function() {
       sub: { subName: 'John' }
     });
     await doc.save();
-    await Test.updateMany({}, [{ $set: { updateCounter: 1 } }]);
-    // oddly enough, the null property is not accessible. Doing check.null doesn't return anything even though
-    // if you were to console.log() the output of a findOne you would be able to see it. This is the workaround.
+    await Test.updateMany({}, [{ $set: { updateCounter: 1 } }], { updatePipeline: true });
     const test = await Test.countDocuments({ null: { $exists: true } });
     assert.equal(test, 0);
     // now we need to make sure that the solution didn't prevent the updateCounter addition

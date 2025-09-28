@@ -21,4 +21,13 @@ describe('SchemaString', function() {
     assert.ifError(doc.validateSync());
     assert.ifError(doc.validateSync());
   });
+
+  it('regex validator works with validate() (gh-15380)', async function() {
+    const schema = new Schema({ x: { type: String, validate: /abc/g } });
+    mongoose.deleteModel(/Test/);
+    M = mongoose.model('Test', schema);
+
+    const doc = new M({ x: 'abc' });
+    await doc.validate();
+  });
 });

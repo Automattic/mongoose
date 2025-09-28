@@ -72,7 +72,6 @@ expectType<Promise<mongodb.ClientSession>>(conn.startSession({ causalConsistency
 
 expectType<Promise<ConnectionSyncIndexesResult>>(conn.syncIndexes());
 expectType<Promise<ConnectionSyncIndexesResult>>(conn.syncIndexes({ continueOnError: true }));
-expectType<Promise<ConnectionSyncIndexesResult>>(conn.syncIndexes({ background: true }));
 
 expectType<Connection>(conn.useDb('test'));
 expectType<Connection>(conn.useDb('test', {}));

@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const start = require('./common');
-const BSON = require('bson');
+const BSON = require('mongodb/lib/bson');
 const sinon = require('sinon');
 
 const mongoose = start.mongoose;

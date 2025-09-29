@@ -1,3 +1,10 @@
+8.18.3 / 2025-09-29
+===================
+ * fix(update): avoid throwing error if update has a top-level $addToSet with no path #15648 #15642
+ * types(query): allow passing arbitrary options #15644 #15643
+ * docs(connection+mongoose): correct mongodb option name user -> username #15650 #15647
+ * test: add tests covering vector search and text search using Atlas CLI #15649 #15645
+
 8.18.2 / 2025-09-22
 ===================
  * fix(document): prevent $clone() from converting mongoose arrays into vanilla arrays #15633 #15625

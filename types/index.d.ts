@@ -914,8 +914,8 @@ declare module 'mongoose' {
    * https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#distributive-conditional-types
    */
   type FlattenProperty<T> = T extends Map<any, infer V>
-    ? Record<string, V> : T extends TreatAsPrimitives
-      ? T : T extends Types.DocumentArray<infer ItemType>
+      ? Record<string, V> : T extends TreatAsPrimitives
+      ? T : T extends Document ? T : T extends Types.DocumentArray<infer ItemType>
         ? Types.DocumentArray<FlattenMaps<ItemType>> : FlattenMaps<T>;
 
   export type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;

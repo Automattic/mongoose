@@ -71,6 +71,8 @@ declare module 'mongoose' {
 
   export function omitUndefined<T extends Record<string, any>>(val: T): T;
 
+  export type HydratedDocFromModel<M extends Model<any>> = ReturnType<M['hydrate']>;
+
   /* ! ignore */
   export type CompileModelOptions = {
     overwriteModels?: boolean,

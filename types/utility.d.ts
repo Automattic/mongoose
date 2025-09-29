@@ -82,6 +82,12 @@ declare module 'mongoose' {
     U :
     T extends ReadonlyArray<infer U> ? U : T;
 
+  type DeepPartial<T> =
+    T extends TreatAsPrimitives ? T :
+    T extends Array<infer U> ? DeepPartial<U>[] :
+    T extends Record<string, any> ? { [K in keyof T]?: DeepPartial<T[K]> } :
+    T;
+
   type UnpackedIntersection<T, U> = T extends null ? null : T extends (infer A)[]
     ? (Omit<A, keyof U> & U)[]
     : keyof U extends never

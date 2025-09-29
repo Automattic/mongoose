@@ -345,6 +345,26 @@ function findById<ModelType extends {_id: Types.ObjectId | string}>(model: Model
 }
 ```
 
+### No more generic parameter for `create()` and `insertOne()`
+
+In Mongoose 8, `create()` and `insertOne()` accepted a generic parameter, which meant TypeScript let you pass any value to the function.
+
+```ts
+const schema = new Schema({ age: Number });
+const TestModel = mongoose.model('Test', schema);
+
+// Worked in Mongoose 8, TypeScript error in Mongoose 9
+const doc = await TestModel.create({ age: 'not a number', someOtherProperty: 'value' });
+```
+
+In Mongoose 9, `create()` and `insertOne()` no longer accept a generic parameter. Instead, they accept `Partial<RawDocType>` with some additional query casting applied that allows objects for maps, strings for ObjectIds, and POJOs for subdocuments and document arrays.
+
+If your parameters to `create()` don't match `Partial<RawDocType>`, you can use `as` to cast as follows.
+
+```ts
+const doc = await TestModel.create({ age: 'not a number', someOtherProperty: 'value' } as unknown as Partial<InferSchemaType<typeof schema>>);
+```
+
 ### Document `id` is no longer `any`
 
 In Mongoose 8 and earlier, `id` was a property on the `Document` class that was set to `any`.

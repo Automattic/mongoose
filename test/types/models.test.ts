@@ -330,8 +330,6 @@ async function gh12277() {
 }
 
 async function overwriteBulkWriteContents() {
-  type DocumentType<T> = Document<any, any, T> & T;
-
   interface BaseModelClassDoc {
     firstname: string;
   }
@@ -380,7 +378,7 @@ export function autoTypedModel() {
   (async() => {
   // Model-functions-test
   // Create should works with arbitrary objects.
-    const randomObject = await AutoTypedModel.create({ unExistKey: 'unExistKey', description: 'st' });
+    const randomObject = await AutoTypedModel.create({ unExistKey: 'unExistKey', description: 'st' } as Partial<InferSchemaType<typeof AutoTypedSchema>>);
     expectType<AutoTypedSchemaType['schema']['userName']>(randomObject.userName);
 
     const testDoc1 = await AutoTypedModel.create({ userName: 'M0_0a' });

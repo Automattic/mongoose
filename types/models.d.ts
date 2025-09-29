@@ -260,6 +260,24 @@ declare module 'mongoose' {
     hint?: mongodb.Hint;
   }
 
+  /*
+   * Apply common casting logic to the given type, allowing:
+   * - strings for ObjectIds
+   * - strings and numbers for Dates
+   * - strings for Buffers
+   * - strings for UUIDs
+   * - POJOs for subdocuments
+   * - vanilla arrays of POJOs for document arrays
+   * - POJOs and array of arrays for maps
+   */
+  type ApplyBasicCreateCasting<T> = {
+    [K in keyof T]: NonNullable<T[K]> extends Map<infer KeyType extends string, infer ValueType>
+      ? (Record<KeyType, ValueType> | Array<[KeyType, ValueType]> | T[K])
+      : NonNullable<T[K]> extends Types.DocumentArray<infer RawSubdocType>
+         ? RawSubdocType[] | T[K]
+         : QueryTypeCasting<T[K]>;
+  };
+
   /**
    * Models are fancy constructors compiled from `Schema` definitions.
    * An instance of a model is called a document.
@@ -344,10 +362,11 @@ declare module 'mongoose' {
     >;
 
     /** Creates a new document or documents */
-    create<DocContents = AnyKeys<TRawDocType>>(docs: Array<TRawDocType | DocContents>, options: CreateOptions & { aggregateErrors: true }): Promise<(THydratedDocumentType | Error)[]>;
-    create<DocContents = AnyKeys<TRawDocType>>(docs: Array<TRawDocType | DocContents>, options?: CreateOptions): Promise<THydratedDocumentType[]>;
-    create<DocContents = AnyKeys<TRawDocType>>(doc: DocContents | TRawDocType): Promise<THydratedDocumentType>;
-    create<DocContents = AnyKeys<TRawDocType>>(...docs: Array<TRawDocType | DocContents>): Promise<THydratedDocumentType[]>;
+    create(): Promise<null>;
+    create(docs: Array<DeepPartial<ApplyBasicCreateCasting<Require_id<TRawDocType>>>>, options: CreateOptions & { aggregateErrors: true }): Promise<(THydratedDocumentType | Error)[]>;
+    create(docs: Array<DeepPartial<ApplyBasicCreateCasting<Require_id<TRawDocType>>>>, options?: CreateOptions): Promise<THydratedDocumentType[]>;
+    create(doc: DeepPartial<ApplyBasicCreateCasting<Require_id<TRawDocType>>>): Promise<THydratedDocumentType>;
+    create(...docs: Array<DeepPartial<ApplyBasicCreateCasting<Require_id<TRawDocType>>>>): Promise<THydratedDocumentType[]>;
 
     /**
      * Create the collection for this model. By default, if no indexes are specified,
@@ -616,7 +635,7 @@ declare module 'mongoose' {
      * `MyModel.insertOne(obj, options)` is almost equivalent to `new MyModel(obj).save(options)`.
      * The difference is that `insertOne()` checks if `obj` is already a document, and checks for discriminators.
      */
-    insertOne<DocContents = AnyKeys<TRawDocType>>(doc: DocContents | TRawDocType, options?: SaveOptions): Promise<THydratedDocumentType>;
+    insertOne(doc: Partial<ApplyBasicCreateCasting<TRawDocType>>, options?: SaveOptions): Promise<THydratedDocumentType>;
 
     /**
      * List all [Atlas search indexes](https://www.mongodb.com/docs/atlas/atlas-search/create-index/) on this model's collection.

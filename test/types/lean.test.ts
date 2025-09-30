@@ -412,7 +412,7 @@ async function gh15583_2() {
     { name: String },
     { lean: { virtuals: true } }
   );
-  const TestModel2 = model('Test', schema);
+  const TestModel2 = model('Test', schema2);
 
   const testDoc6 = await TestModel2.findOne().orFail();
   expectError(testDoc6.save());

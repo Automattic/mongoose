@@ -397,4 +397,26 @@ describe('castArrayFilters', function() {
     assert.strictEqual(q.getOptions().arrayFilters[1]['product._id'].toHexString(), productId.toHexString());
     assert.strictEqual(q.getUpdate().$set['events.$[event].products.$[product].price'], 20);
   });
+
+  it('does not cast array filters that point into mixed array paths (gh-15653)', function() {
+    const schema = new Schema({
+      anything: [Schema.Types.Mixed]
+    });
+    const q = new Query();
+    q.schema = schema;
+
+    const update = { $set: { 'anything.$[item].any.foo': 'bar' } };
+    const opts = {
+      arrayFilters: [
+        { 'item.any.foo': 123 }
+      ]
+    };
+
+    q.updateOne({}, update, opts);
+
+    castArrayFilters(q);
+
+    // value is left as is, not cast to string
+    assert.strictEqual(q.options.arrayFilters[0]['item.any.foo'], 123);
+  });
 });

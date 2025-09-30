@@ -22,4 +22,14 @@ describe('getPath()', function() {
     assert.equal(getPath(schema, 'nested.docs.el').constructor.name, 'SchemaString');
     assert.equal(getPath(schema, 'nested.0.docs.el').constructor.name, 'SchemaString');
   });
+
+  it('handles getting paths underneath Mixed array (gh-15653)', function() {
+    const schema = new Schema({
+      any: [Schema.Types.Mixed]
+    });
+    assert.strictEqual(getPath(schema, 'any.0.foo').constructor.name, 'SchemaMixed');
+    assert.strictEqual(getPath(schema, 'any.0.foo.bar.baz').constructor.name, 'SchemaMixed');
+
+    assert.strictEqual(getPath(schema, 'any.0').constructor.name, 'SchemaMixed');
+  });
 });

@@ -1,5 +1,4 @@
 import {
-  Condition,
   HydratedDocument,
   Schema,
   model,
@@ -11,7 +10,6 @@ import {
   PopulatedDoc,
   UpdateQuery,
   UpdateQueryKnownOnly,
-  QuerySelector,
   InferRawDocType,
   InferSchemaType,
   ProjectionFields,
@@ -19,6 +17,7 @@ import {
   ProjectionType,
   QueryFilter
 } from 'mongoose';
+import mongodb from 'mongodb';
 import mongoose from 'mongoose';
 import { ModifyResult, ObjectId } from 'mongodb';
 import { expectAssignable, expectError, expectNotAssignable, expectType } from 'tsd';
@@ -340,7 +339,6 @@ async function gh11306(): Promise<void> {
 
   expectType<unknown[]>(await MyModel.distinct('notThereInSchema'));
   expectType<string[]>(await MyModel.distinct('name'));
-  expectType<number[]>(await MyModel.distinct<'overrideTest', number>('overrideTest'));
 }
 
 function autoTypedQuery() {
@@ -352,7 +350,7 @@ function autoTypedQuery() {
 function gh11964() {
   class Repository<T extends { id: string }> {
     find(id: string) {
-      const idCondition: Condition<T['id']> = id as Condition<T['id']>;
+      const idCondition: mongodb.Condition<T['id']> = id as mongodb.Condition<T['id']>;
 
       // `as` is necessary because `T` can be `{ id: never }`,
       // so we need to explicitly coerce
@@ -362,7 +360,7 @@ function gh11964() {
 }
 
 function gh14397() {
-  type Condition<T> = T | QuerySelector<T>; // redefined here because it's not exported by mongoose
+  type Condition<T> = mongodb.Condition<T>; // redefined here because it's not exported by mongoose
 
   type WithId<T extends object> = T & { id: string };
 

@@ -18,18 +18,9 @@ declare module 'mongoose' {
             ? DateQueryTypeCasting
             : T;
 
-  export type ApplyBasicQueryCasting<T> = T | T[] | (T extends (infer U)[] ? QueryTypeCasting<U> : T);
+  export type ApplyBasicQueryCasting<T> = QueryTypeCasting<T> | QueryTypeCasting<T[]> | (T extends (infer U)[] ? QueryTypeCasting<U> : T) | null;
 
-  export type Condition<T> = ApplyBasicQueryCasting<QueryTypeCasting<T>> | QuerySelector<ApplyBasicQueryCasting<QueryTypeCasting<T>>>;
-
-  /**
-   * Filter query to select the documents that match the query
-   * @example
-   * ```js
-   * { age: { $gte: 30 } }
-   * ```
-   */
-  type _QueryFilter<T> = { [P in keyof T]?: Condition<T[P]>; } & RootQuerySelector<T>
+  type _QueryFilter<T> = ({ [P in keyof T]?: mongodb.Condition<ApplyBasicQueryCasting<T[P]>>; } & mongodb.RootFilterOperators<{ [P in keyof T]?: ApplyBasicQueryCasting<T[P]>; }>) | Query<any, any>;
   type QueryFilter<T> = _QueryFilter<WithLevel1NestedPaths<T>>;
 
   type MongooseBaseQueryOptionKeys =
@@ -63,73 +54,6 @@ declare module 'mongoose' {
     TDocOverrides = Record<string, never>
   > = Query<ResultType, DocType, THelpers, RawDocType, QueryOp, TDocOverrides> & THelpers;
 
-  type QuerySelector<T> = {
-    // Comparison
-    $eq?: T | null | undefined;
-    $gt?: T;
-    $gte?: T;
-    $in?: [T] extends AnyArray<any> ? Unpacked<T>[] : T[];
-    $lt?: T;
-    $lte?: T;
-    $ne?: T | null | undefined;
-    $nin?: [T] extends AnyArray<any> ? Unpacked<T>[] : T[];
-    // Logical
-    $not?: T extends string ? QuerySelector<T> | RegExp : QuerySelector<T>;
-    // Element
-    /**
-     * When `true`, `$exists` matches the documents that contain the field,
-     * including documents where the field value is null.
-     */
-    $exists?: boolean;
-    $type?: string | number;
-    // Evaluation
-    $expr?: any;
-    $jsonSchema?: any;
-    $mod?: T extends number ? [number, number] : never;
-    $regex?: T extends string ? RegExp | string : never;
-    $options?: T extends string ? string : never;
-    // Geospatial
-    // TODO: define better types for geo queries
-    $geoIntersects?: { $geometry: object };
-    $geoWithin?: object;
-    $near?: object;
-    $nearSphere?: object;
-    $maxDistance?: number;
-    // Array
-    // TODO: define better types for $all and $elemMatch
-    $all?: T extends AnyArray<any> ? any[] : never;
-    $elemMatch?: T extends AnyArray<any> ? object : never;
-    $size?: T extends AnyArray<any> ? number : never;
-    // Bitwise
-    $bitsAllClear?: number | mongodb.Binary | number[];
-    $bitsAllSet?: number | mongodb.Binary | number[];
-    $bitsAnyClear?: number | mongodb.Binary | number[];
-    $bitsAnySet?: number | mongodb.Binary | number[];
-  };
-
-  type RootQuerySelector<T> = {
-    /** @see https://www.mongodb.com/docs/manual/reference/operator/query/and/#op._S_and */
-    $and?: Array<QueryFilter<T>>;
-    /** @see https://www.mongodb.com/docs/manual/reference/operator/query/nor/#op._S_nor */
-    $nor?: Array<QueryFilter<T>>;
-    /** @see https://www.mongodb.com/docs/manual/reference/operator/query/or/#op._S_or */
-    $or?: Array<QueryFilter<T>>;
-    /** @see https://www.mongodb.com/docs/manual/reference/operator/query/text */
-    $text?: {
-      $search: string;
-      $language?: string;
-      $caseSensitive?: boolean;
-      $diacriticSensitive?: boolean;
-    };
-    /** @see https://www.mongodb.com/docs/manual/reference/operator/query/where/#op._S_where */
-    $where?: string | Function;
-    /** @see https://www.mongodb.com/docs/manual/reference/operator/query/comment/#op._S_comment */
-    $comment?: string;
-    $expr?: Record<string, any>;
-    // this will mark all unrecognized properties as any (including nested queries)
-    [key: string]: any;
-  };
-
   interface QueryTimestampsConfig {
     createdAt?: boolean;
     updatedAt?: boolean;
@@ -138,7 +62,7 @@ declare module 'mongoose' {
   interface QueryOptions<DocType = unknown> extends
     PopulateOption,
     SessionOption {
-    arrayFilters?: { [key: string]: any }[];
+    arrayFilters?: AnyObject[];
     batchSize?: number;
     collation?: mongodb.CollationOptions;
     comment?: any;
@@ -167,7 +91,7 @@ declare module 'mongoose' {
      * Set `overwriteImmutable` to `true` to allow updating immutable properties using other update operators.
      */
     overwriteImmutable?: boolean;
-    projection?: { [P in keyof DocType]?: number | string } | AnyObject | string;
+    projection?: AnyObject | string;
     /**
      * if true, returns the full ModifyResult rather than just the document
      */
@@ -396,7 +320,7 @@ declare module 'mongoose' {
     >;
 
     /** Specifies a `$elemMatch` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    elemMatch<K = string>(path: K, val: any): this;
+    elemMatch(path: string, val: any): this;
     elemMatch(val: Function | any): this;
 
     /**
@@ -420,7 +344,7 @@ declare module 'mongoose' {
     >;
 
     /** Specifies a `$exists` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    exists<K = string>(path: K, val: boolean): this;
+    exists(path: string, val: boolean): this;
     exists(val: boolean): this;
 
     /**
@@ -558,18 +482,18 @@ declare module 'mongoose' {
     getUpdate(): UpdateQuery<DocType> | UpdateWithAggregationPipeline | null;
 
     /** Specifies a `$gt` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    gt<K = string>(path: K, val: any): this;
+    gt(path: string, val: any): this;
     gt(val: number): this;
 
     /** Specifies a `$gte` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    gte<K = string>(path: K, val: any): this;
+    gte(path: string, val: any): this;
     gte(val: number): this;
 
     /** Sets query hints. */
     hint(val: any): this;
 
     /** Specifies an `$in` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    in<K = string>(path: K, val: any[]): this;
+    in(path: string, val: any[]): this;
     in(val: Array<any>): this;
 
     /** Declares an intersects query for `geometry()`. */
@@ -608,11 +532,11 @@ declare module 'mongoose' {
     limit(val: number): this;
 
     /** Specifies a `$lt` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    lt<K = string>(path: K, val: any): this;
+    lt(path: string, val: any): this;
     lt(val: number): this;
 
     /** Specifies a `$lte` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    lte<K = string>(path: K, val: any): this;
+    lte(path: string, val: any): this;
     lte(val: number): this;
 
     /**
@@ -636,7 +560,7 @@ declare module 'mongoose' {
     merge(source: QueryFilter<RawDocType>): this;
 
     /** Specifies a `$mod` condition, filters documents for documents whose `path` property is a number that is equal to `remainder` modulo `divisor`. */
-    mod<K = string>(path: K, val: number): this;
+    mod(path: string, val: number): this;
     mod(val: Array<number>): this;
 
     /** The model this query was created from */
@@ -649,15 +573,15 @@ declare module 'mongoose' {
     mongooseOptions(val?: QueryOptions<DocType>): QueryOptions<DocType>;
 
     /** Specifies a `$ne` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    ne<K = string>(path: K, val: any): this;
+    ne(path: string, val: any): this;
     ne(val: any): this;
 
     /** Specifies a `$near` or `$nearSphere` condition */
-    near<K = string>(path: K, val: any): this;
+    near(path: string, val: any): this;
     near(val: any): this;
 
     /** Specifies an `$nin` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    nin<K = string>(path: K, val: any[]): this;
+    nin(path: string, val: any[]): this;
     nin(val: Array<any>): this;
 
     /** Specifies arguments for an `$nor` condition. */
@@ -743,7 +667,7 @@ declare module 'mongoose' {
     readConcern(level: string): this;
 
     /** Specifies a `$regex` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    regex<K = string>(path: K, val: RegExp): this;
+    regex(path: string, val: RegExp): this;
     regex(val: string | RegExp): this;
 
     /**
@@ -828,7 +752,7 @@ declare module 'mongoose' {
     setUpdate(update: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline): void;
 
     /** Specifies an `$size` query condition. When called with one argument, the most recent path passed to `where()` is used. */
-    size<K = string>(path: K, val: number): this;
+    size(path: string, val: number): this;
     size(val: number): this;
 
     /** Specifies the number of documents to skip. */
@@ -840,7 +764,7 @@ declare module 'mongoose' {
 
     /** Sets the sort order. If an object is passed, values allowed are `asc`, `desc`, `ascending`, `descending`, `1`, and `-1`. */
     sort(
-      arg?: string | { [key: string]: SortOrder | { $meta: any } } | [string, SortOrder][] | undefined | null,
+      arg?: string | Record<string, SortOrder | { $meta: any }> | [string, SortOrder][] | undefined | null,
       options?: { override?: boolean }
     ): this;
 

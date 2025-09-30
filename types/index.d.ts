@@ -333,7 +333,7 @@ declare module 'mongoose' {
     clearIndexes(): this;
 
     /** Returns a copy of this schema */
-    clone<T = this>(): T;
+    clone(): this;
 
     discriminator<DisSchema = Schema>(name: string | number, schema: DisSchema, options?: DiscriminatorOptions): this;
 
@@ -412,7 +412,7 @@ declare module 'mongoose' {
     post<T = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, options: SchemaPostOptions & { errorHandler: true }, fn: ErrorHandlingMiddlewareWithOption<T>): this;
     post<T = THydratedDocumentType>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions & { errorHandler: true }, fn: ErrorHandlingMiddlewareWithOption<T>): this;
     post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPostOptions & { errorHandler: true }, fn: ErrorHandlingMiddlewareWithOption<T, Array<any>>): this;
-    post<T = TModelType>(method: 'insertMany' | RegExp, options: SchemaPostOptions & { errorHandler: true }, fn: ErrorHandlingMiddlewareWithOption<T>): this;
+    post(method: 'insertMany' | RegExp, options: SchemaPostOptions & { errorHandler: true }, fn: ErrorHandlingMiddlewareWithOption<TModelType>): this;
 
     // this = never since it never happens
     post<T = never>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: SchemaPostOptions & { document: false, query: false }, fn: PostMiddlewareFunction<never, never>): this;
@@ -453,14 +453,14 @@ declare module 'mongoose' {
     // method aggregate and insertMany with PostMiddlewareFunction
     post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: PostMiddlewareFunction<T, Array<AggregateExtract<T>>>): this;
     post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, Array<AggregateExtract<T>>>): this;
-    post<T = TModelType>(method: 'insertMany' | RegExp, fn: PostMiddlewareFunction<T, T>): this;
-    post<T = TModelType>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, T>): this;
+    post(method: 'insertMany' | RegExp, fn: PostMiddlewareFunction<TModelType, TModelType>): this;
+    post(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<TModelType, TModelType>): this;
 
     // method aggregate and insertMany with ErrorHandlingMiddlewareFunction
     post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: ErrorHandlingMiddlewareFunction<T, Array<any>>): this;
     post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T, Array<any>>): this;
-    post<T = TModelType>(method: 'bulkWrite' | 'createCollection' | 'insertMany' | RegExp, fn: ErrorHandlingMiddlewareFunction<T>): this;
-    post<T = TModelType>(method: 'bulkWrite' | 'createCollection' | 'insertMany' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    post(method: 'bulkWrite' | 'createCollection' | 'insertMany' | RegExp, fn: ErrorHandlingMiddlewareFunction<TModelType>): this;
+    post(method: 'bulkWrite' | 'createCollection' | 'insertMany' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<TModelType>): this;
 
     /** Defines a pre hook for the model. */
     // this = never since it never happens
@@ -495,28 +495,28 @@ declare module 'mongoose' {
     // method aggregate
     pre<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: PreMiddlewareFunction<T>): this;
     /* method insertMany */
-    pre<T = TModelType>(
+    pre(
       method: 'insertMany' | RegExp,
       fn: (
-        this: T,
+        this: TModelType,
         docs: any | Array<any>,
         options?: InsertManyOptions & { lean?: boolean }
       ) => void | Promise<void>
     ): this;
     /* method bulkWrite */
-    pre<T = TModelType>(
+    pre(
       method: 'bulkWrite' | RegExp,
       fn: (
-        this: T,
+        this: TModelType,
         ops: Array<AnyBulkWriteOperation<any>>,
         options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions
       ) => void | Promise<void>
     ): this;
     /* method createCollection */
-    pre<T = TModelType>(
+    pre(
       method: 'createCollection' | RegExp,
       fn: (
-        this: T,
+        this: TModelType,
         options?: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'>
       ) => void | Promise<void>
     ): this;
@@ -560,7 +560,7 @@ declare module 'mongoose' {
     virtuals: TVirtuals;
 
     /** Returns the virtual type with the given `name`. */
-    virtualpath<T = THydratedDocumentType>(name: string): VirtualType<T> | null;
+    virtualpath(name: string): VirtualType<THydratedDocumentType> | null;
 
     static ObjectId: typeof Schema.Types.ObjectId;
   }

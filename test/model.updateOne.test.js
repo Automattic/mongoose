@@ -3196,6 +3196,15 @@ describe('model: updateOne: ', function() {
     assert.equal(validateDetailsCalls, 1);
     assert.equal(validateNameCalls, 1);
   });
+
+  it('casts top level $each (gh-15642)', async function() {
+    const schema = new Schema({ tags: [String] });
+    const Model = db.model('Test', schema);
+
+    await Model.create({ tags: [] });
+    // This is a no-op, but should not cause an error
+    await Model.updateOne({}, { $addToSet: { $each: ['test'] } });
+  });
 });
 
 async function delay(ms) {

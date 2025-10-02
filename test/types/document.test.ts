@@ -21,7 +21,7 @@ const Drink = model('Drink', new Schema({
   name: String
 }));
 
-const schema: Schema = new Schema({
+const schema = new Schema({
   name: { type: 'String', required: true },
   address: new Schema({ city: { type: String, required: true } }),
   favoritDrink: {

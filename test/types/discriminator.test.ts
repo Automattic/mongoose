@@ -1,7 +1,7 @@
 import mongoose, { Document, Model, Schema, SchemaDefinition, SchemaOptions, Types, model, HydratedDocFromModel, InferSchemaType } from 'mongoose';
 import { expectType } from 'tsd';
 
-const schema: Schema = new Schema({ name: { type: 'String' } });
+const schema = new Schema({ name: { type: 'String' } });
 
 interface IBaseTest {
   name?: string;
@@ -42,13 +42,13 @@ function test(): void {
     type: CardType.Land;
   }
 
-  const cardDbBaseSchemaDefinition: SchemaDefinition = {
+  const cardDbBaseSchemaDefinition = {
     type: { type: String, required: true }
   };
 
   const cardDbSchemaOptions: SchemaOptions = { discriminatorKey: 'type' };
 
-  const cardDbSchema: Schema = new Schema(
+  const cardDbSchema = new Schema(
     cardDbBaseSchemaDefinition,
     cardDbSchemaOptions
   );
@@ -59,9 +59,9 @@ function test(): void {
     'card'
   );
 
-  const landDbAdditionalPropertiesSchemaDefinition: SchemaDefinition = {};
+  const landDbAdditionalPropertiesSchemaDefinition = {};
 
-  const landDbSchema: Schema = new Schema(
+  const landDbSchema = new Schema(
     landDbAdditionalPropertiesSchemaDefinition
   );
 

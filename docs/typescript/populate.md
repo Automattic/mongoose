@@ -18,7 +18,7 @@ const ParentModel = model<Parent>('Parent', new Schema({
 interface Child {
   name: string;
 }
-const childSchema: Schema = new Schema({ name: String });
+const childSchema = new Schema({ name: String });
 const ChildModel = model<Child>('Child', childSchema);
 
 // Populate with `Paths` generic `{ child: Child }` to override `child` path
@@ -48,7 +48,7 @@ const ParentModel = model<Parent>('Parent', new Schema({
   child: { type: Schema.Types.ObjectId, ref: 'Child' },
   name: String
 }));
-const childSchema: Schema = new Schema({ name: String });
+const childSchema = new Schema({ name: String });
 const ChildModel = model<Child>('Child', childSchema);
 
 // Populate with `Paths` generic `{ child: Child }` to override `child` path
@@ -78,7 +78,7 @@ const ParentModel = model<Parent>('Parent', new Schema({
 interface Child {
   name?: string;
 }
-const childSchema: Schema = new Schema({ name: String });
+const childSchema = new Schema({ name: String });
 const ChildModel = model<Child>('Child', childSchema);
 
 ParentModel.findOne({}).populate('child').orFail().then((doc: Parent) => {

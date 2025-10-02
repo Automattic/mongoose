@@ -7680,6 +7680,116 @@ describe('Model', function() {
     assert.equal(doc.text, 'foobar');
   });
 
+  it('supports virtuals option for `hydrate()` (gh-15627)', function() {
+    // 2) virtual in a document array
+    const arrSchema = new Schema({
+      value: String
+    });
+    arrSchema.virtual('valueLower');
+
+    // 3) virtual in a subdocument
+    const nestedSchema = new Schema({
+      foo: String
+    });
+    nestedSchema.virtual('fooRev');
+
+    // 4) virtual in a map of subdocuments
+    const mapSubSchema = new Schema({
+      v: String
+    }, { _id: false });
+    mapSubSchema.virtual('vDouble');
+
+    const schema = Schema({
+      name: String,
+      nested: nestedSchema,
+      arr: [arrSchema],
+      map: {
+        type: Map,
+        of: mapSubSchema
+      },
+      friendId: {
+        type: mongoose.Schema.Types.ObjectId
+      }
+    }, { toObject: { virtuals: true }, toJSON: { virtuals: true } });
+
+    // 1) top-level virtual
+    schema.virtual('topLevel');
+
+    // 5) top-level populated virtual
+    schema.virtual('friend', {
+      ref: 'TestUser',
+      localField: 'friendId',
+      foreignField: '_id',
+      justOne: true
+    });
+
+    db.model('User', new Schema({
+      _id: mongoose.Schema.Types.ObjectId,
+      username: String
+    }));
+
+    const TestModel = db.model('Test', schema);
+
+    const userId = new mongoose.Types.ObjectId();
+
+    // Hydrate with various virtuals in the raw object
+    const doc = TestModel.hydrate({
+      name: 'Bill',
+      topLevel: 'test top level virtual',
+      arr: [
+        { value: 'FOO', valueLower: 'foo' },
+        { value: 'BAR', valueLower: 'bar' }
+      ],
+      nested: { foo: 'baz', fooRev: 'zab' },
+      map: {
+        first: { v: 'ab', vDouble: 'abab' },
+        second: { v: 'xy', vDouble: 'xyxy' }
+      },
+      friendId: userId,
+      friend: { _id: userId, username: 'Populated Friend' }
+    }, null, { virtuals: true }); // ensure virtuals:true here
+
+    // 1) Top-level virtual
+    assert.equal(doc.name, 'Bill');
+    assert.equal(doc.topLevel, 'test top level virtual');
+    assert.strictEqual(doc.toObject().topLevel, 'test top level virtual');
+
+    // 2) Document array virtuals
+    assert.equal(doc.arr.length, 2);
+    assert.equal(doc.arr[0].value, 'FOO');
+    assert.equal(doc.arr[0].valueLower, 'foo');
+    assert.strictEqual(doc.arr[0].toObject().valueLower, 'foo');
+    assert.equal(doc.arr[1].value, 'BAR');
+    assert.equal(doc.arr[1].valueLower, 'bar');
+    assert.strictEqual(doc.arr[1].toObject().valueLower, 'bar');
+
+    // 3) Virtual in subdocument
+    assert.ok(doc.nested);
+    assert.equal(doc.nested.foo, 'baz');
+    assert.equal(doc.nested.fooRev, 'zab');
+    assert.strictEqual(doc.nested.toObject().fooRev, 'zab');
+
+    // 4) Virtual in map of subdocuments
+    assert.ok(doc.map instanceof Map);
+    assert.equal(doc.map.get('first').v, 'ab');
+    assert.equal(doc.map.get('first').vDouble, 'abab');
+    assert.strictEqual(doc.map.get('first').toObject().vDouble, 'abab');
+    assert.equal(doc.map.get('second').v, 'xy');
+    assert.equal(doc.map.get('second').vDouble, 'xyxy');
+    assert.strictEqual(doc.map.get('second').toObject().vDouble, 'xyxy');
+
+    // 5) Top-level populated virtual
+    assert.equal(doc.friendId.toString(), userId.toString());
+    assert.ok(doc.friend);
+    assert.equal(doc.friend._id.toString(), userId.toString());
+    assert.equal(doc.friend.username, 'Populated Friend');
+
+    assert.throws(
+      () => TestModel.hydrate({}, null, { virtuals: true, hydratedPopulatedDocs: false }),
+      /Cannot set `hydratedPopulatedDocs` option to false if `virtuals` option is truthy/
+    );
+  });
+
   it('sets index collation based on schema collation (gh-7621)', async function() {
     let testSchema = new Schema(
       { name: { type: String, index: true } }

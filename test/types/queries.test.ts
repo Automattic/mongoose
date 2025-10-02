@@ -28,7 +28,7 @@ interface QueryHelpers {
   byName(this: QueryWithHelpers<any, ITest, QueryHelpers>, name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;
 }
 
-const childSchema: Schema = new Schema({ name: String });
+const childSchema = new Schema({ name: String });
 const ChildModel = model<Child>('Child', childSchema);
 
 const schema: Schema<ITest, Model<ITest, QueryHelpers>, {}, QueryHelpers> = new Schema({
@@ -471,7 +471,7 @@ async function gh12342_auto() {
 }
 
 async function gh11602(): Promise<void> {
-  const query: Query<ITest | null, ITest> = Test.findOne();
+  const query = Test.findOne();
   query instanceof Query;
 
   const ModelType = model<ITest>('foo', schema);

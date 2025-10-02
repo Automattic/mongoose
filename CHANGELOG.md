@@ -1,3 +1,11 @@
+8.19.0 / 2025-10-02
+===================
+ * feat: upgrade mongodb driver to 6.20.0 #15651 #15656
+ * feat(model): add virtuals option to Model.hydrate() to set virtuals #15638 #15627
+ * fix(schema): handle casting array filters underneath maps of Mixed #15655 #15653
+ * types: optimize InferRawDocType #15588 [ssalbdivad](https://github.com/ssalbdivad)
+ * types(schema): add lean schema option to TypeScript types #15646 #15583 #10090
+
 8.18.3 / 2025-09-29
 ===================
  * fix(update): avoid throwing error if update has a top-level $addToSet with no path #15648 #15642

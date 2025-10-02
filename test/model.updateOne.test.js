@@ -3195,8 +3195,10 @@ describe('model: updateOne: ', function() {
     const Model = db.model('Test', schema);
 
     await Model.create({ tags: [] });
-    // This is a no-op, but should not cause an error
-    await Model.updateOne({}, { $addToSet: { $each: ['test'] } });
+    await assert.rejects(
+      Model.updateOne({}, { $addToSet: { $each: ['test'] } }),
+      /Modifiers such as "\$each", "\$or", "\$and", "\$in" must appear under a valid field path/
+    );
   });
 });
 

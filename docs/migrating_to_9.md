@@ -295,12 +295,18 @@ console.log(schema.path('docArray').Constructor); // EmbeddedDocument constructo
 
 In Mongoose 8, there was also an internal `$embeddedSchemaType` property. That property has been replaced with `embeddedSchemaType`, which is now part of the public API.
 
+### Removed `skipId` parameter to `Model()` and `Document()`
+
+In Mongoose 8, the 3rd parameter to `Model()` and `Document()` was either a boolean or `options` object.
+If a boolean, Mongoose would interpret the 3rd parameter as the `skipId` option.
+In Mongoose 9, the 3rd parameter is always an `options` object, passing a `boolean` is no longer supported.
+
 ### Query use$geoWithin removed, now always true
 
 `mongoose.Query` had a `use$geoWithin` property that could configure converting `$geoWithin` to `$within` to support MongoDB versions before 2.4.
 That property has been removed in Mongoose 9. `$geoWithin` is now never converted to `$within`, because MongoDB no longer supports `$within`.
 
-## Removed `noListener` option from `useDb()`/connections
+### Removed `noListener` option from `useDb()`/connections
 
 The `noListener` option has been removed from connections and from the `useDb()` method. In Mongoose 8.x, you could call `useDb()` with `{ noListener: true }` to prevent the new connection object from listening to state changes on the base connection, which was sometimes useful to reduce memory usage when dynamically creating connections for every request.
 

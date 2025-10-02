@@ -293,7 +293,7 @@ declare module 'mongoose' {
     NodeJS.EventEmitter,
     IndexManager,
     SessionStarter {
-    new <DocType = Partial<TRawDocType>>(doc?: DocType, fields?: any | null, options?: boolean | AnyObject): THydratedDocumentType;
+    new <DocType = Partial<TRawDocType>>(doc?: DocType, fields?: any | null, options?: AnyObject): THydratedDocumentType;
 
     aggregate<R = any>(pipeline?: PipelineStage[], options?: AggregateOptions): Aggregate<Array<R>>;
     aggregate<R = any>(pipeline: PipelineStage[]): Aggregate<Array<R>>;

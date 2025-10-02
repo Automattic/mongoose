@@ -9104,8 +9104,7 @@ describe('document', function() {
     });
     const Test = db.model('Test', testSchema);
 
-    const doc = new Test({ testArray: [{}], testSingleNested: {} }, null,
-      { defaults: false });
+    const doc = new Test({ testArray: [{}], testSingleNested: {} }, null, { defaults: false });
     assert.ok(!doc.testTopLevel);
     assert.ok(!doc.testNested.prop);
     assert.ok(!doc.testArray[0].prop);

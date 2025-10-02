@@ -566,11 +566,18 @@ declare module 'mongoose' {
     static ObjectId: typeof Schema.Types.ObjectId;
   }
 
-  export type NumberSchemaDefinition = typeof Number | 'number' | 'Number' | typeof Schema.Types.Number;
-  export type StringSchemaDefinition = typeof String | 'string' | 'String' | typeof Schema.Types.String;
-  export type BooleanSchemaDefinition = typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean;
-  export type DateSchemaDefinition = DateConstructor | 'date' | 'Date' | typeof Schema.Types.Date;
-  export type ObjectIdSchemaDefinition = 'ObjectId' | 'ObjectID' | typeof Schema.Types.ObjectId;
+  export type NumberSchemaDefinition = typeof Number | 'number' | 'Number' | typeof Schema.Types.Number | Schema.Types.Number;
+  export type StringSchemaDefinition = typeof String | 'string' | 'String' | typeof Schema.Types.String | Schema.Types.String;
+  export type BooleanSchemaDefinition = typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean | Schema.Types.Boolean;
+  export type DateSchemaDefinition = DateConstructor | 'date' | 'Date' | typeof Schema.Types.Date | Schema.Types.Date;
+  export type ObjectIdSchemaDefinition = 'ObjectId' | 'ObjectID' | typeof Schema.Types.ObjectId | Schema.Types.ObjectId | Types.ObjectId;
+  export type BufferSchemaDefinition = typeof Buffer | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer;
+  export type Decimal128SchemaDefinition = 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 | Schema.Types.Decimal128 | Types.Decimal128;
+  export type BigintSchemaDefinition = 'bigint' | 'BigInt' | typeof Schema.Types.BigInt | Schema.Types.BigInt | typeof BigInt | BigInt;
+  export type UuidSchemaDefinition = 'uuid' | 'UUID' | typeof Schema.Types.UUID | Schema.Types.UUID;
+  export type MapSchemaDefinition = MapConstructor | 'Map' | typeof Schema.Types.Map;
+  export type UnionSchemaDefinition = 'Union' | 'union' | typeof Schema.Types.Union | Schema.Types.Union;
+  export type DoubleSchemaDefinition = 'double' | 'Double' | typeof Schema.Types.Double | Schema.Types.Double;
 
   export type SchemaDefinitionWithBuiltInClass<T> = T extends number
     ? NumberSchemaDefinition
@@ -582,7 +589,9 @@ declare module 'mongoose' {
           ? DateSchemaDefinition
           : (Function | string);
 
-  export type SchemaDefinitionProperty<T = undefined, EnforcedDocType = any, THydratedDocumentType = HydratedDocument<EnforcedDocType>> = SchemaDefinitionWithBuiltInClass<T>
+  export type SchemaDefinitionProperty<T = undefined, EnforcedDocType = any, THydratedDocumentType = HydratedDocument<EnforcedDocType>> =
+    // ThisType intersection here avoids corrupting ThisType for SchemaTypeOptions (see test gh11828)
+    | SchemaDefinitionWithBuiltInClass<T> & ThisType<EnforcedDocType>
     | SchemaTypeOptions<T extends undefined ? any : T, EnforcedDocType, THydratedDocumentType>
     | typeof SchemaType
     | Schema<any, any, any>
@@ -905,8 +914,8 @@ declare module 'mongoose' {
    * https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#distributive-conditional-types
    */
   type FlattenProperty<T> = T extends Map<any, infer V>
-    ? Record<string, V> : T extends TreatAsPrimitives
-      ? T : T extends Types.DocumentArray<infer ItemType>
+      ? Record<string, V> : T extends TreatAsPrimitives
+      ? T : T extends Document ? T : T extends Types.DocumentArray<infer ItemType>
         ? Types.DocumentArray<FlattenMaps<ItemType>> : FlattenMaps<T>;
 
   export type actualPrimitives = string | boolean | number | bigint | symbol | null | undefined;

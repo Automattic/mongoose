@@ -2952,6 +2952,40 @@ describe('schema', function() {
     });
     const entry = await Test.findOne();
     assert.equal(entry instanceof mongoose.Document, false);
+
+    const doc = await Test.findOne().lean(false);
+    assert.ok(doc instanceof mongoose.Document);
+
+    const doc2 = await Test.findOne().setOptions({ lean: false });
+    assert.ok(doc2 instanceof mongoose.Document);
+  });
+
+  it('handles lean transform option (gh-15583) (gh-10090)', async function() {
+    const testSchema = new mongoose.Schema({
+      name: String
+    }, { lean: { transform: doc => Object.assign(doc, { _transformed: true }) } });
+    const Test = db.model('gh10090', testSchema);
+    await Test.create({
+      name: 'I am a lean doc, fast and small'
+    });
+    const entry = await Test.findOne();
+    assert.equal(entry instanceof mongoose.Document, false);
+    assert.ok(entry._transformed);
+
+    const doc = await Test.findOne().lean({ transform: doc => Object.assign(doc, { _otherTransform: true }) });
+    assert.equal(doc instanceof mongoose.Document, false);
+    assert.ok(doc._otherTransform);
+    assert.ok(!doc._transformed);
+
+    const doc2 = await Test.findOne().lean(true);
+    assert.equal(doc2 instanceof mongoose.Document, false);
+    assert.ok(!doc2._transformed);
+    assert.ok(!doc2._otherTransform);
+
+    const doc3 = await Test.findOne().lean(false);
+    assert.equal(doc3 instanceof mongoose.Document, true);
+    assert.ok(!doc3._transformed);
+    assert.ok(!doc3._otherTransform);
   });
 
   it('disallows setting special properties with `add()` or constructor (gh-12085)', function() {

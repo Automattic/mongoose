@@ -24,7 +24,13 @@ describe('connections:', function() {
 
   describe('openUri (gh-5304)', function() {
     it('with mongoose.createConnection()', function() {
-      const conn = mongoose.createConnection(start.uri.slice(0, start.uri.lastIndexOf('/')) + '/' + start.databases[0]);
+      // Handle start.uri with potential query string parameters
+      const uriWithoutDb = start.uri.slice(0, start.uri.lastIndexOf('/'));
+      const dbAndQuery = start.uri.slice(start.uri.lastIndexOf('/') + 1);
+      const queryIndex = dbAndQuery.indexOf('?');
+      const query = queryIndex !== -1 ? dbAndQuery.slice(queryIndex) : '';
+      const newUri = uriWithoutDb + '/' + start.databases[0] + query;
+      const conn = mongoose.createConnection(newUri);
       assert.equal(conn.constructor.name, 'NativeConnection');
 
       const Test = conn.model('Test', new Schema({ name: String }));
@@ -538,13 +544,16 @@ describe('connections:', function() {
       });
   });
 
-  it('uses default database in uri if options.dbName is not provided', function() {
-    return mongoose.createConnection(start.uri.slice(0, start.uri.lastIndexOf('/')) + '/default-db-name').
-      asPromise().
-      then(db => {
-        assert.equal(db.name, 'default-db-name');
-        db.close();
-      });
+  it('uses default database in uri if options.dbName is not provided', async function() {
+    // Handle possible query string parameters in start.uri
+    const uriWithoutDb = start.uri.slice(0, start.uri.lastIndexOf('/'));
+    const dbAndQuery = start.uri.slice(start.uri.lastIndexOf('/') + 1);
+    const queryIndex = dbAndQuery.indexOf('?');
+    const query = queryIndex !== -1 ? dbAndQuery.slice(queryIndex) : '';
+    const newUri = uriWithoutDb + '/default-db-name' + query;
+    const db = await mongoose.createConnection(newUri).asPromise();
+    assert.equal(db.name, 'default-db-name');
+    await db.close();
   });
 
   it('startSession() (gh-6653)', function() {
@@ -854,6 +863,22 @@ describe('connections:', function() {
       assert.equal(doc.name, 'gh-11821');
 
       await db.close();
+    });
+
+    it('updates child dbs lastHeartbeatAt (gh-15635)', async function() {
+      const db = await mongoose.createConnection(start.uri).asPromise();
+
+      const schema = mongoose.Schema({ name: String }, { autoCreate: false, autoIndex: false });
+      const Test = db.model('Test', schema);
+      await Test.deleteMany({});
+      await Test.create({ name: 'gh-11821' });
+
+      const db2 = db.useDb(start.databases[1]);
+
+      const now = Date.now();
+      db.client.emit('serverHeartbeatSucceeded');
+      assert.ok(db._lastHeartbeatAt >= now);
+      assert.ok(db2._lastHeartbeatAt >= now);
     });
   });
 

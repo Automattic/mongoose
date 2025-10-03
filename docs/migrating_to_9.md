@@ -68,6 +68,23 @@ schema.pre('save', function(next, arg) {
 
 In Mongoose 9, `next(null, 'new arg')` doesn't overwrite the args to the next middleware.
 
+## Update pipelines disallowed by default
+
+As of MongoDB 4.2, you can pass an array of pipeline stages to `updateOne()`, `updateMany()`, and `findOneAndUpdate()` to modify the document in multiple stages.
+Mongoose does not cast update pipelines at all, so for Mongoose 9 we've made using update pipelines throw an error by default.
+
+```javascript
+// Throws in Mongoose 9. Works in Mongoose 8
+await Model.updateOne({}, [{ $set: { newProp: 'test2' } }]);
+```
+
+Set `updatePipeline: true` to enable update pipelines.
+
+```javascript
+// Works in Mongoose 9
+await Model.updateOne({}, [{ $set: { newProp: 'test2' } }], { updatePipeline: true });
+```
+
 ## Removed background option for indexes
 
 [MongoDB no longer supports the `background` option for indexes as of MongoDB 4.2](https://www.mongodb.com/docs/manual/core/index-creation/#index-operations). Mongoose 9 will no longer set the background option by default and Mongoose 9 no longer supports setting the `background` option on `Schema.prototype.index()`.
@@ -168,12 +185,14 @@ const { promiseOrCallback } = require('mongoose');
 promiseOrCallback; // undefined in Mongoose 9
 ```
 
-## In `isAsync` middleware `next()` errors take priority over `done()` errors
+## `isAsync` middleware no longer supported
 
-Due to Mongoose middleware now relying on promises and async/await, `next()` errors take priority over `done()` errors.
-If you use `isAsync` middleware, any errors in `next()` will be thrown first, and `done()` errors will only be thrown if there are no `next()` errors.
+Mongoose 9 no longer supports `isAsync` middleware. Middleware functions that use the legacy signature with both `next` and `done` callbacks (i.e., `function(next, done)`) are not supported. We recommend middleware now use promises or async/await.
+
+If you have code that uses `isAsync` middleware, you must refactor it to use async functions or return a promise instead.
 
 ```javascript
+// ❌ Not supported in Mongoose 9
 const schema = new Schema({});
 
 schema.pre('save', true, function(next, done) {
@@ -197,8 +216,16 @@ schema.pre('save', true, function(next, done) {
     25);
 });
 
-// In Mongoose 8, with the above middleware, `save()` would error with 'first done() error'
-// In Mongoose 9, with the above middleware, `save()` will error with 'second next() error'
+// ✅ Supported in Mongoose 9: use async functions or return a promise
+schema.pre('save', async function() {
+  execed.first = true;
+  await new Promise(resolve => setTimeout(resolve, 5));
+});
+
+schema.pre('save', async function() {
+  execed.second = true;
+  await new Promise(resolve => setTimeout(resolve, 25));
+});
 ```
 
 ## Removed `skipOriginalStackTraces` option
@@ -268,11 +295,41 @@ console.log(schema.path('docArray').Constructor); // EmbeddedDocument constructo
 
 In Mongoose 8, there was also an internal `$embeddedSchemaType` property. That property has been replaced with `embeddedSchemaType`, which is now part of the public API.
 
+### Removed `skipId` parameter to `Model()` and `Document()`
+
+In Mongoose 8, the 3rd parameter to `Model()` and `Document()` was either a boolean or `options` object.
+If a boolean, Mongoose would interpret the 3rd parameter as the `skipId` option.
+In Mongoose 9, the 3rd parameter is always an `options` object, passing a `boolean` is no longer supported.
+
+### Query use$geoWithin removed, now always true
+
+`mongoose.Query` had a `use$geoWithin` property that could configure converting `$geoWithin` to `$within` to support MongoDB versions before 2.4.
+That property has been removed in Mongoose 9. `$geoWithin` is now never converted to `$within`, because MongoDB no longer supports `$within`.
+
+### Removed `noListener` option from `useDb()`/connections
+
+The `noListener` option has been removed from connections and from the `useDb()` method. In Mongoose 8.x, you could call `useDb()` with `{ noListener: true }` to prevent the new connection object from listening to state changes on the base connection, which was sometimes useful to reduce memory usage when dynamically creating connections for every request.
+
+In Mongoose 9.x, the `noListener` option is no longer supported or documented. The second argument to `useDb()` now only supports `{ useCache }`.
+
+```javascript
+// Mongoose 8.x
+conn.useDb('myDb', { noListener: true }); // works
+
+// Mongoose 9.x
+conn.useDb('myDb', { noListener: true }); // TypeError: noListener is not a supported option
+conn.useDb('myDb', { useCache: true }); // works
+```
+
 ## TypeScript
 
-### FilterQuery Properties No Longer Resolve to any
+### FilterQuery renamed to QueryFilter
 
-In Mongoose 9, the `FilterQuery` type, which is the type of the first param to `Model.find()`, `Model.findOne()`, etc. now enforces stronger types for top-level keys.
+In Mongoose 9, `FilterQuery` (the first parameter to `Model.find()`, `Model.findOne()`, etc.) was renamed to `QueryFilter`.
+
+### QueryFilter Properties No Longer Resolve to any
+
+In Mongoose 9, the `QueryFilter` type, which is the type of the first param to `Model.find()`, `Model.findOne()`, etc. now enforces stronger types for top-level keys.
 
 ```typescript
 const schema = new Schema({ age: Number });
@@ -283,13 +340,48 @@ TestModel.find({ age: { $notAnOperator: 42 } }); // Works in Mongoose 8, TS erro
 ```
 
 This change is backwards breaking if you use generics when creating queries as shown in the following example.
-If you run into the following issue or any similar issues, you can use `as FilterQuery`.
+If you run into the following issue or any similar issues, you can use `as QueryFilter`.
 
 ```typescript
 // From https://stackoverflow.com/questions/56505560/how-to-fix-ts2322-could-be-instantiated-with-a-different-subtype-of-constraint:
 // "Never assign a concrete type to a generic type parameter, consider it as read-only!"
 // This function is generally something you shouldn't do in TypeScript, can work around it with `as` though.
 function findById<ModelType extends {_id: Types.ObjectId | string}>(model: Model<ModelType>, _id: Types.ObjectId | string) {
-  return model.find({_id: _id} as FilterQuery<ModelType>); // In Mongoose 8, this `as` was not required
+  return model.find({_id: _id} as QueryFilter<ModelType>); // In Mongoose 8, this `as` was not required
 }
+```
+
+### No more generic parameter for `create()` and `insertOne()`
+
+In Mongoose 8, `create()` and `insertOne()` accepted a generic parameter, which meant TypeScript let you pass any value to the function.
+
+```ts
+const schema = new Schema({ age: Number });
+const TestModel = mongoose.model('Test', schema);
+
+// Worked in Mongoose 8, TypeScript error in Mongoose 9
+const doc = await TestModel.create({ age: 'not a number', someOtherProperty: 'value' });
+```
+
+In Mongoose 9, `create()` and `insertOne()` no longer accept a generic parameter. Instead, they accept `Partial<RawDocType>` with some additional query casting applied that allows objects for maps, strings for ObjectIds, and POJOs for subdocuments and document arrays.
+
+If your parameters to `create()` don't match `Partial<RawDocType>`, you can use `as` to cast as follows.
+
+```ts
+const doc = await TestModel.create({ age: 'not a number', someOtherProperty: 'value' } as unknown as Partial<InferSchemaType<typeof schema>>);
+```
+
+### Document `id` is no longer `any`
+
+In Mongoose 8 and earlier, `id` was a property on the `Document` class that was set to `any`.
+This was inconsistent with runtime behavior, where `id` is a virtual property that returns `_id` as a string, unless there is already an `id` property on the schema or the schema has the `id` option set to `false`.
+
+Mongoose 9 appends `id` as a string property to `TVirtuals`. The `Document` class no longer has an `id` property.
+
+```ts
+const schema = new Schema({ age: Number });
+const TestModel = mongoose.model('Test', schema);
+
+const doc = new TestModel();
+doc.id; // 'string' in Mongoose 9, 'any' in Mongoose 8.
 ```

@@ -55,8 +55,7 @@ EmployeeSchema.statics.findByDepartment = function() {
 EmployeeSchema.path('department').validate(function(value) {
   return /[a-zA-Z]/.test(value);
 }, 'Invalid name');
-const employeeSchemaPreSaveFn = function(next) {
-  next();
+const employeeSchemaPreSaveFn = function() {
 };
 EmployeeSchema.pre('save', employeeSchemaPreSaveFn);
 EmployeeSchema.set('toObject', { getters: true, virtuals: false });
@@ -154,6 +153,30 @@ describe('model', function() {
       const doc = new DiscriminatorModel();
       assert.equal(doc.virtualA, 'virtualA');
       assert.equal(doc.virtualB, 'virtualB');
+    });
+
+    it('can define statics using schema options (gh-15556)', function() {
+      const baseSchema = new mongoose.Schema({
+        name: String
+      }, {
+        statics: {
+          staticFunction: () => 'base'
+        }
+      });
+
+      const discriminatorSchema = new mongoose.Schema({
+        prop: String
+      }, {
+        statics: {
+          staticFunction: () => 'discriminator',
+          otherStaticFunction: () => 42
+        }
+      });
+      const BaseModel = db.model('Test', baseSchema);
+      const DiscriminatorModel = BaseModel.discriminator('Test1', discriminatorSchema);
+
+      assert.equal(DiscriminatorModel.staticFunction(), 'discriminator');
+      assert.equal(DiscriminatorModel.otherStaticFunction(), 42);
     });
 
     it('sets schema root discriminator mapping', function(done) {
@@ -372,9 +395,8 @@ describe('model', function() {
 
       it('deduplicates hooks (gh-2945)', function() {
         let called = 0;
-        function middleware(next) {
+        function middleware() {
           ++called;
-          next();
         }
 
         function ActivityBaseSchema() {
@@ -560,14 +582,12 @@ describe('model', function() {
         });
         let childCalls = 0;
         let childValidateCalls = 0;
-        const preValidate = function preValidate(next) {
+        const preValidate = function preValidate() {
           ++childValidateCalls;
-          next();
         };
         childSchema.pre('validate', preValidate);
-        childSchema.pre('save', function(next) {
+        childSchema.pre('save', function() {
           ++childCalls;
-          next();
         });
 
         const personSchema = new Schema({
@@ -579,9 +599,8 @@ describe('model', function() {
           heir: childSchema
         });
         let parentCalls = 0;
-        parentSchema.pre('save', function(next) {
+        parentSchema.pre('save', function() {
           ++parentCalls;
-          next();
         });
 
         const Person = db.model('Person', personSchema);
@@ -1234,18 +1253,16 @@ describe('model', function() {
         { message: String },
         { discriminatorKey: 'kind', _id: false }
       );
-      eventSchema.pre('validate', function(next) {
+      eventSchema.pre('validate', function() {
         counters.eventPreValidate++;
-        next();
       });
 
       eventSchema.post('validate', function() {
         counters.eventPostValidate++;
       });
 
-      eventSchema.pre('save', function(next) {
+      eventSchema.pre('save', function() {
         counters.eventPreSave++;
-        next();
       });
 
       eventSchema.post('save', function() {
@@ -1256,18 +1273,16 @@ describe('model', function() {
         product: String
       }, { _id: false });
 
-      purchasedSchema.pre('validate', function(next) {
+      purchasedSchema.pre('validate', function() {
         counters.purchasePreValidate++;
-        next();
       });
 
       purchasedSchema.post('validate', function() {
         counters.purchasePostValidate++;
       });
 
-      purchasedSchema.pre('save', function(next) {
+      purchasedSchema.pre('save', function() {
         counters.purchasePreSave++;
-        next();
       });
 
       purchasedSchema.post('save', function() {
@@ -1602,9 +1617,9 @@ describe('model', function() {
 
     const post = await Post.create({});
 
-    await UserWithPost.create({ postId: post._id });
+    const { _id } = await UserWithPost.create({ postId: post._id });
 
-    const user = await User.findOne().populate({ path: 'post' });
+    const user = await User.findById(_id).populate({ path: 'post' });
 
     assert.ok(user.postId);
   });
@@ -2120,7 +2135,7 @@ describe('model', function() {
     const childSchema = new Schema({}, { typeKey: 'bar' });
     assert.throws(() => {
       Base.discriminator('model-discriminator-custom1', childSchema);
-    }, { message: 'Can\'t customize discriminator option typeKey (can only modify toJSON, toObject, _id, id, virtuals, methods)' });
+    }, { message: 'Can\'t customize discriminator option typeKey (can only modify toJSON, toObject, _id, id, virtuals, methods, statics)' });
   });
   it('handles customizable discriminator options gh-12135', function() {
     const baseSchema = Schema({}, { toJSON: { virtuals: true } });
@@ -2324,9 +2339,8 @@ describe('model', function() {
     });
 
     const subdocumentPreSaveHooks = [];
-    subdocumentSchema.pre('save', function(next) {
+    subdocumentSchema.pre('save', function() {
       subdocumentPreSaveHooks.push(this);
-      next();
     });
 
     const schema = mongoose.Schema({
@@ -2335,9 +2349,8 @@ describe('model', function() {
     }, { discriminatorKey: 'type' });
 
     const documentPreSaveHooks = [];
-    schema.pre('save', function(next) {
+    schema.pre('save', function() {
       documentPreSaveHooks.push(this);
-      next();
     });
 
     const Document = db.model('Document', schema);
@@ -2345,9 +2358,8 @@ describe('model', function() {
     const discriminatorSchema = mongoose.Schema({});
 
     const discriminatorPreSaveHooks = [];
-    discriminatorSchema.pre('save', function(next) {
+    discriminatorSchema.pre('save', function() {
       discriminatorPreSaveHooks.push(this);
-      next();
     });
 
     const Discriminator = Document.discriminator('Discriminator', discriminatorSchema);

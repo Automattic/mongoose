@@ -6,7 +6,7 @@
 
 const start = require('./common');
 
-const { EJSON } = require('bson');
+const { EJSON } = require('mongodb/lib/bson');
 const Query = require('../lib/query');
 const assert = require('assert');
 const util = require('./util');
@@ -443,75 +443,6 @@ describe('Query', function() {
       query.where('checkin').near([40, -72]).maxDistance(1);
       assert.deepEqual(query._conditions, { checkin: { $near: [40, -72], $maxDistance: 1 } });
 
-    });
-  });
-
-  describe('within', function() {
-    describe('box', function() {
-      it('via where', function() {
-        const query = new Query({});
-        query.where('gps').within().box({ ll: [5, 25], ur: [10, 30] });
-        const match = { gps: { $within: { $box: [[5, 25], [10, 30]] } } };
-        if (Query.use$geoWithin) {
-          match.gps.$geoWithin = match.gps.$within;
-          delete match.gps.$within;
-        }
-        assert.deepEqual(query._conditions, match);
-
-      });
-      it('via where, no object', function() {
-        const query = new Query({});
-        query.where('gps').within().box([5, 25], [10, 30]);
-        const match = { gps: { $within: { $box: [[5, 25], [10, 30]] } } };
-        if (Query.use$geoWithin) {
-          match.gps.$geoWithin = match.gps.$within;
-          delete match.gps.$within;
-        }
-        assert.deepEqual(query._conditions, match);
-
-      });
-    });
-
-    describe('center', function() {
-      it('via where', function() {
-        const query = new Query({});
-        query.where('gps').within().center({ center: [5, 25], radius: 5 });
-        const match = { gps: { $within: { $center: [[5, 25], 5] } } };
-        if (Query.use$geoWithin) {
-          match.gps.$geoWithin = match.gps.$within;
-          delete match.gps.$within;
-        }
-        assert.deepEqual(query._conditions, match);
-
-      });
-    });
-
-    describe('centerSphere', function() {
-      it('via where', function() {
-        const query = new Query({});
-        query.where('gps').within().centerSphere({ center: [5, 25], radius: 5 });
-        const match = { gps: { $within: { $centerSphere: [[5, 25], 5] } } };
-        if (Query.use$geoWithin) {
-          match.gps.$geoWithin = match.gps.$within;
-          delete match.gps.$within;
-        }
-        assert.deepEqual(query._conditions, match);
-
-      });
-    });
-
-    describe('polygon', function() {
-      it('via where', function() {
-        const query = new Query({});
-        query.where('gps').within().polygon({ a: { x: 10, y: 20 }, b: { x: 15, y: 25 }, c: { x: 20, y: 20 } });
-        const match = { gps: { $within: { $polygon: [{ a: { x: 10, y: 20 }, b: { x: 15, y: 25 }, c: { x: 20, y: 20 } }] } } };
-        if (Query.use$geoWithin) {
-          match.gps.$geoWithin = match.gps.$within;
-          delete match.gps.$within;
-        }
-        assert.deepEqual(query._conditions, match);
-
-      });
     });
   });
 
@@ -1923,9 +1854,8 @@ describe('Query', function() {
       ];
 
       ops.forEach(function(op) {
-        TestSchema.pre(op, function(next) {
+        TestSchema.pre(op, function() {
           this.error(new Error(op + ' error'));
-          next();
         });
       });
 
@@ -4514,6 +4444,51 @@ describe('Query', function() {
     });
   });
 
+  it('propagates readPreference to populate options if read() is called after populate() (gh-15553)', async function() {
+    const schema = new Schema({ name: String, age: Number, friends: [{ type: 'ObjectId', ref: 'Person' }] });
+    const Person = db.model('Person', schema);
+
+    let query = Person.find({}).populate('friends');
+    query.read('secondaryPreferred');
+    await query.exec();
+    assert.strictEqual(query._mongooseOptions.populate.friends.options.readPreference.mode, 'secondaryPreferred');
+
+    query = Person.find({}).read('secondary').populate('friends');
+    query.read('secondaryPreferred');
+    await query.exec();
+    assert.strictEqual(query._mongooseOptions.populate.friends.options.readPreference.mode, 'secondaryPreferred');
+
+    query = Person.find({}).read('secondaryPreferred').populate('friends');
+    await query.exec();
+    assert.strictEqual(query._mongooseOptions.populate.friends.options.readPreference.mode, 'secondaryPreferred');
+
+    query = Person.find({}).read('primaryPreferred').populate({ path: 'friends', options: { readPreference: 'secondaryPreferred' } });
+    await query.exec();
+    assert.strictEqual(query._mongooseOptions.populate.friends.options.readPreference, 'secondaryPreferred');
+  });
+
+  it('propagates readConcern to populate options if readConcern() is called after populate() (gh-15553)', async function() {
+    const schema = new Schema({ name: String, age: Number, friends: [{ type: 'ObjectId', ref: 'Person' }] });
+    const Person = db.model('Person', schema);
+
+    let query = Person.find({}).populate('friends');
+    query.readConcern('majority');
+    await query.exec();
+    assert.strictEqual(query._mongooseOptions.populate.friends.options.readConcern.level, 'majority');
+
+    query = Person.find({}).readConcern('local').populate('friends');
+    query.readConcern('majority');
+    await query.exec();
+    assert.strictEqual(query._mongooseOptions.populate.friends.options.readConcern.level, 'majority');
+
+    query = Person.find({}).readConcern('majority').populate('friends');
+    await query.exec();
+    assert.strictEqual(query._mongooseOptions.populate.friends.options.readConcern.level, 'majority');
+
+    query = Person.find({}).readConcern('majority').populate({ path: 'friends', options: { readConcern: 'local' } });
+    await query.exec();
+    assert.strictEqual(query._mongooseOptions.populate.friends.options.readConcern, 'local');
+  });
 
   describe('Query with requireFilter', function() {
     let Person;

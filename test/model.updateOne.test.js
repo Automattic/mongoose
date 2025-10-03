@@ -902,9 +902,8 @@ describe('model: updateOne:', function() {
       let numPres = 0;
       let numPosts = 0;
       const band = new Schema({ members: [String] });
-      band.pre('updateOne', function(next) {
+      band.pre('updateOne', function() {
         ++numPres;
-        next();
       });
       band.post('updateOne', function() {
         ++numPosts;
@@ -1237,9 +1236,8 @@ describe('model: updateOne:', function() {
     it('middleware update with exec (gh-3549)', async function() {
       const Schema = mongoose.Schema({ name: String });
 
-      Schema.pre('updateOne', function(next) {
+      Schema.pre('updateOne', function() {
         this.updateOne({ name: 'Val' });
-        next();
       });
 
       const Model = db.model('Test', Schema);
@@ -2766,10 +2764,16 @@ describe('model: updateOne: ', function() {
       const Model = db.model('Test', schema);
 
       await Model.create({ oldProp: 'test' });
+
+      assert.throws(
+        () => Model.updateOne({}, [{ $set: { newProp: 'test2' } }]),
+        /Cannot pass an array to query updates unless the `updatePipeline` option is set/
+      );
+
       await Model.updateOne({}, [
         { $set: { newProp: 'test2' } },
         { $unset: ['oldProp'] }
-      ]);
+      ], { updatePipeline: true });
       let doc = await Model.findOne();
       assert.equal(doc.newProp, 'test2');
       assert.strictEqual(doc.oldProp, void 0);
@@ -2778,7 +2782,7 @@ describe('model: updateOne: ', function() {
       await Model.updateOne({}, [
         { $addFields: { oldProp: 'test3' } },
         { $project: { newProp: 0 } }
-      ]);
+      ], { updatePipeline: true });
       doc = await Model.findOne();
       assert.equal(doc.oldProp, 'test3');
       assert.strictEqual(doc.newProp, void 0);
@@ -2792,7 +2796,7 @@ describe('model: updateOne: ', function() {
       await Model.updateOne({}, [
         { $set: { newProp: 'test2' } },
         { $unset: 'oldProp' }
-      ]);
+      ], { updatePipeline: true });
       const doc = await Model.findOne();
       assert.equal(doc.newProp, 'test2');
       assert.strictEqual(doc.oldProp, void 0);
@@ -2805,8 +2809,11 @@ describe('model: updateOne: ', function() {
       const updatedAt = cat.updatedAt;
 
       await new Promise(resolve => setTimeout(resolve), 50);
-      const updated = await Cat.findOneAndUpdate({ _id: cat._id },
-        [{ $set: { name: 'Raikou' } }], { new: true });
+      const updated = await Cat.findOneAndUpdate(
+        { _id: cat._id },
+        [{ $set: { name: 'Raikou' } }],
+        { new: true, updatePipeline: true }
+      );
       assert.ok(updated.updatedAt.getTime() > updatedAt.getTime());
     });
   });
@@ -3188,6 +3195,15 @@ describe('model: updateOne: ', function() {
     // Assert that each validator was only called once
     assert.equal(validateDetailsCalls, 1);
     assert.equal(validateNameCalls, 1);
+  });
+
+  it('casts top level $each (gh-15642)', async function() {
+    const schema = new Schema({ tags: [String] });
+    const Model = db.model('Test', schema);
+
+    await Model.create({ tags: [] });
+    // This is a no-op, but should not cause an error
+    await Model.updateOne({}, { $addToSet: { $each: ['test'] } });
   });
 });
 

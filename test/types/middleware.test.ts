@@ -2,12 +2,10 @@ import { Schema, model, Model, Document, SaveOptions, Query, Aggregate, Hydrated
 import { expectError, expectType, expectNotType, expectAssignable } from 'tsd';
 import { CreateCollectionOptions } from 'mongodb';
 
-const preMiddlewareFn: PreSaveMiddlewareFunction<Document> = function(next, opts) {
+const preMiddlewareFn: PreSaveMiddlewareFunction<Document> = function(opts) {
   this.$markValid('name');
-  if (opts.session) {
-    next();
-  } else {
-    next(new Error('Operation must be in Session.'));
+  if (!opts.session) {
+    throw new Error('Operation must be in Session.');
   }
 };
 
@@ -45,12 +43,11 @@ schema.pre(['save', 'validate'], { query: false, document: true }, async functio
   await Test.findOne({});
 });
 
-schema.pre('save', function(next, opts: SaveOptions) {
+schema.pre('save', function(opts: SaveOptions) {
   console.log(opts.session);
-  next();
 });
 
-schema.pre('save', function(next) {
+schema.pre('save', function() {
   console.log(this.name);
 });
 
@@ -71,45 +68,36 @@ schema.post<ITest>('save', function(err: Error, res: ITest, next: Function) {
   console.log(this.name, err.stack);
 });
 
-schema.pre<Model<ITest>>('insertMany', function() {
-  const name: string = this.name;
+schema.pre('insertMany', function() {
+  const name: string = this.modelName;
   return Promise.resolve();
 });
 
-schema.pre<Model<ITest>>('insertMany', function() {
-  console.log(this.name);
+schema.pre('insertMany', function() {
+  console.log(this.modelName);
 });
 
-schema.pre<Model<ITest>>('insertMany', function(next) {
-  console.log(this.name);
-  next();
+schema.pre('insertMany', function(docs: ITest[]) {
+  console.log(this.modelName, docs);
 });
 
-schema.pre<Model<ITest>>('insertMany', function(next, doc: ITest) {
-  console.log(this.name, doc);
-  next();
+schema.pre('insertMany', function(docs: Array<ITest>) {
+  console.log(this.modelName, docs);
 });
 
-schema.pre<Model<ITest>>('insertMany', function(next, docs: Array<ITest>) {
-  console.log(this.name, docs);
-  next();
+schema.pre('bulkWrite', function(ops: Array<AnyBulkWriteOperation<any>>) {
 });
 
-schema.pre<Model<ITest>>('bulkWrite', function(next, ops: Array<AnyBulkWriteOperation<any>>) {
-  next();
+schema.pre('createCollection', function(opts?: CreateCollectionOptions) {
 });
 
-schema.pre<Model<ITest>>('createCollection', function(next, opts?: CreateCollectionOptions) {
-  next();
-});
-
-schema.pre<Query<number, any>>('estimatedDocumentCount', function(next) {});
+schema.pre<Query<number, any>>('estimatedDocumentCount', function() {});
 schema.post<Query<number, any>>('estimatedDocumentCount', function(count, next) {
   expectType<number>(count);
   next();
 });
 
-schema.pre<Query<number, any>>('countDocuments', function(next) {});
+schema.pre<Query<number, any>>('countDocuments', function() {});
 schema.post<Query<number, any>>('countDocuments', function(count, next) {
   expectType<number>(count);
   next();
@@ -139,9 +127,8 @@ function gh11480(): void {
 
   const UserSchema = new Schema<IUserSchema>({ name: { type: String } });
 
-  UserSchema.pre('save', function(next) {
+  UserSchema.pre('save', function() {
     expectNotType<any>(this);
-    next();
   });
 }
 
@@ -179,7 +166,7 @@ function gh11257() {
   });
 
   schema.pre('save', { document: true }, function() {
-    expectType<HydratedDocument<User>>(this);
+    expectAssignable<HydratedDocument<User>>(this);
   });
 
   schema.pre('updateOne', { document: true, query: false }, function() {

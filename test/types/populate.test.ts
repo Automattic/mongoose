@@ -7,7 +7,7 @@ interface Child {
   name: string;
 }
 
-const childSchema: Schema = new Schema({ name: String });
+const childSchema = new Schema({ name: String });
 const ChildModel = model<Child>('Child', childSchema);
 
 interface Parent {
@@ -24,14 +24,14 @@ ParentModel.
   findOne({}).
   populate<{ child: Document<ObjectId> & Child }>('child').
   orFail().
-  then((doc: Document<ObjectId, {}, Parent> & Parent) => {
+  then((doc) => {
     const child = doc.child;
     if (child == null || child instanceof ObjectId) {
       throw new Error('should be populated');
     } else {
       useChildDoc(child);
     }
-    const lean = doc.toObject<typeof doc>();
+    const lean = doc.toObject<mongoose.MergeType<Parent, { Child: Child }>>();
     const leanChild = lean.child;
     if (leanChild == null || leanChild instanceof ObjectId) {
       throw new Error('should be populated');
@@ -119,7 +119,7 @@ function gh11014() {
       name: String
     })
   );
-  const childSchema: Schema = new Schema({ name: String });
+  const childSchema = new Schema({ name: String });
   const ChildModel = model<Child>('Child', childSchema);
 
   // Populate with `Paths` generic `{ child: Child }` to override `child` path
@@ -267,7 +267,7 @@ async function gh11710() {
     child: { type: Schema.Types.ObjectId, ref: 'Child' },
     name: String
   }));
-  const childSchema: Schema = new Schema({ name: String });
+  const childSchema = new Schema({ name: String });
   const ChildModel = model<Child>('Child', childSchema);
 
   // Populate with `Paths` generic `{ child: Child }` to override `child` path
@@ -280,7 +280,7 @@ async function gh11758() {
     name: string
     _id: Types.ObjectId
   }
-  const nestedChildSchema: Schema = new Schema({ name: String });
+  const nestedChildSchema = new Schema({ name: String });
 
   interface Parent {
     nestedChild: Types.ObjectId
@@ -319,7 +319,7 @@ async function gh11955() {
   interface Child {
     name: string;
   }
-  const childSchema: Schema = new Schema({ name: String });
+  const childSchema = new Schema({ name: String });
   model<Child>('Child', childSchema);
 
   const parent = await ParentModel.findOne({}).exec();
@@ -389,7 +389,7 @@ function gh14441() {
   interface Child {
     name: string;
   }
-  const childSchema: Schema = new Schema({ name: String });
+  const childSchema = new Schema({ name: String });
   model<Child>('Child', childSchema);
 
   ParentModel.findOne({})

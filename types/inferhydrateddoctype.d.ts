@@ -3,7 +3,6 @@ import {
   IsSchemaTypeFromBuiltinClass,
   RequiredPaths,
   OptionalPaths,
-  PathWithTypePropertyBaseType,
   PathEnumOrString
 } from './inferschematype';
 import { UUID } from 'mongodb';
@@ -36,13 +35,13 @@ declare module 'mongoose' {
     PathValueType,
     TypeKey extends string = DefaultTypeKey
   > = ResolveHydratedPathType<
-    PathValueType extends PathWithTypePropertyBaseType<TypeKey>
-      ? PathValueType[TypeKey] extends PathWithTypePropertyBaseType<TypeKey>
+    TypeKey extends keyof PathValueType
+      ? TypeKey extends keyof PathValueType[TypeKey]
         ? PathValueType
         : PathValueType[TypeKey]
       : PathValueType,
-    PathValueType extends PathWithTypePropertyBaseType<TypeKey>
-      ? PathValueType[TypeKey] extends PathWithTypePropertyBaseType<TypeKey>
+    TypeKey extends keyof PathValueType
+      ? TypeKey extends keyof PathValueType[TypeKey]
         ? {}
         : Omit<PathValueType, TypeKey>
       : {},
@@ -82,7 +81,7 @@ declare module 'mongoose' {
             Item[TypeKey] extends Function | String ?
               // If Item has a type key that's a string or a callable, it must be a scalar,
               // so we can directly obtain its path type.
-              Types.Array<ObtainHydratedDocumentPathType<Item, TypeKey>> :
+              Types.Array<ResolveHydratedPathType<Item, { enum: Options['enum'] }, TypeKey>> :
               // If the type key isn't callable, then this is an array of objects, in which case
               // we need to call InferHydratedDocType to correctly infer its type.
               Types.DocumentArray<
@@ -90,7 +89,7 @@ declare module 'mongoose' {
                 Types.Subdocument<InferHydratedDocType<Item>['_id'], unknown, InferHydratedDocType<Item>> & InferHydratedDocType<Item>
               > :
             IsSchemaTypeFromBuiltinClass<Item> extends true ?
-              Types.Array<ObtainHydratedDocumentPathType<Item, TypeKey>> :
+              Types.Array<ResolveHydratedPathType<Item, { enum: Options['enum'] }, TypeKey>> :
               IsItRecordAndNotAny<Item> extends true ?
                 Item extends Record<string, never> ?
                   Types.Array<ObtainHydratedDocumentPathType<Item, TypeKey>> :
@@ -107,13 +106,13 @@ declare module 'mongoose' {
               Types.DocumentArray<InferRawDocType<TSchemaDefition>, Types.Subdocument<InferHydratedDocType<TSchemaDefition>['_id'], unknown, InferHydratedDocType<TSchemaDefition>> & InferHydratedDocType<TSchemaDefition>> :
             Item extends Record<TypeKey, any> ?
               Item[TypeKey] extends Function | String ?
-                Types.Array<ObtainHydratedDocumentPathType<Item, TypeKey>> :
+                Types.Array<ResolveHydratedPathType<Item, { enum: Options['enum'] }, TypeKey>> :
                 Types.DocumentArray<
                   InferRawDocType<Item>,
                   Types.Subdocument<InferHydratedDocType<Item>['_id'], unknown, InferHydratedDocType<Item>> & InferHydratedDocType<Item>
                 >:
               IsSchemaTypeFromBuiltinClass<Item> extends true ?
-                Types.Array<ObtainHydratedDocumentPathType<Item, TypeKey>> :
+                Types.Array<ResolveHydratedPathType<Item, { enum: Options['enum'] }, TypeKey>> :
                 IsItRecordAndNotAny<Item> extends true ?
                   Item extends Record<string, never> ?
                     Types.Array<ObtainHydratedDocumentPathType<Item, TypeKey>> :

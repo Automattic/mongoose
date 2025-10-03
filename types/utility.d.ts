@@ -4,6 +4,9 @@ declare module 'mongoose' {
     : ELSETYPE;
   type IfUnknown<IFTYPE, THENTYPE> = unknown extends IFTYPE ? THENTYPE : IFTYPE;
 
+  type IsNotNever<T> = [T] extends [never] ? false : true;
+  type IsAny<T> = 0 extends 1 & T ? true : false;
+
   type WithLevel1NestedPaths<T, K extends keyof T = keyof T> = IsItRecordAndNotAny<T> extends true ? {
     [P in K | NestedPaths<Required<T>, K>]: P extends K
       // Handle top-level paths

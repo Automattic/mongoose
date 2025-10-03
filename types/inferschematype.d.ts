@@ -79,6 +79,7 @@ declare module 'mongoose' {
       | 'TSchemaOptions'
       | 'DocType'
       | 'THydratedDocumentType'
+      | 'TSchemaDefinition'
   > =
     TSchema extends (
       Schema<
@@ -90,7 +91,8 @@ declare module 'mongoose' {
         infer TStaticMethods,
         infer TSchemaOptions,
         infer DocType,
-        infer THydratedDocumentType
+        infer THydratedDocumentType,
+        infer TSchemaDefinition
       >
     ) ?
       {
@@ -103,6 +105,7 @@ declare module 'mongoose' {
         TSchemaOptions: TSchemaOptions;
         DocType: DocType;
         THydratedDocumentType: THydratedDocumentType;
+        TSchemaDefinition: TSchemaDefinition;
       }[alias]
     : unknown;
 

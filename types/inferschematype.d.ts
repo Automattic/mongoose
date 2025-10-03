@@ -261,6 +261,7 @@ type IsSchemaTypeFromBuiltinClass<T> =
   : T extends Types.Decimal128 ? true
   : T extends NativeDate ? true
   : T extends typeof Schema.Types.Mixed ? true
+  : T extends Types.UUID ? true
   : unknown extends Buffer ? false
   : T extends Buffer ? true
   : false;
@@ -308,12 +309,12 @@ type ResolvePathType<
       Options['enum'][number]
     : number
   : PathValueType extends DateSchemaDefinition ? NativeDate
+  : PathValueType extends UuidSchemaDefinition ? Types.UUID
   : PathValueType extends BufferSchemaDefinition ? Buffer
   : PathValueType extends BooleanSchemaDefinition ? boolean
   : PathValueType extends ObjectIdSchemaDefinition ? Types.ObjectId
   : PathValueType extends Decimal128SchemaDefinition ? Types.Decimal128
   : PathValueType extends BigintSchemaDefinition ? bigint
-  : PathValueType extends UuidSchemaDefinition ? Types.UUID
   : PathValueType extends DoubleSchemaDefinition ? Types.Double
   : PathValueType extends MapSchemaDefinition ? Map<string, ObtainDocumentPathType<Options['of']>>
   : PathValueType extends UnionSchemaDefinition ?

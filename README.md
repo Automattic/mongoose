@@ -57,7 +57,7 @@ pnpm add mongoose
 ### Using Yarn
 
 ```sh
-yarn add  mongoose
+yarn add mongoose
 ```
 ### Using Bun
 

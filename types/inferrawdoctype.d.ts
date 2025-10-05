@@ -37,10 +37,20 @@ declare module 'mongoose' {
    * @param {PathValueType} PathValueType Document definition path type.
    * @param {TypeKey} TypeKey A generic refers to document definition.
    */
-   type ObtainRawDocumentPathType<PathValueType, TypeKey extends string = DefaultTypeKey> =
-       TypeKey extends keyof PathValueType
-       ? ResolveRawPathType<PathValueType[TypeKey], Omit<PathValueType, TypeKey>, TypeKey, RawDocTypeHint<PathValueType>>
-       : ResolveRawPathType<PathValueType, {}, TypeKey, RawDocTypeHint<PathValueType>>;
+   type ObtainRawDocumentPathType<PathValueType, TypeKey extends string = DefaultTypeKey> = ResolveRawPathType<
+     TypeKey extends keyof PathValueType ?
+       TypeKey extends keyof PathValueType[TypeKey] ?
+         PathValueType
+       : PathValueType[TypeKey]
+     : PathValueType,
+     TypeKey extends keyof PathValueType ?
+       TypeKey extends keyof PathValueType[TypeKey] ?
+         {}
+       : Omit<PathValueType, TypeKey>
+     : {},
+     TypeKey,
+     RawDocTypeHint<PathValueType>
+   >;
 
   type neverOrAny = ' ~neverOrAny~';
 
@@ -67,7 +77,7 @@ declare module 'mongoose' {
        : [PathValueType] extends [neverOrAny] ? PathValueType
        : PathValueType extends Schema<infer RawDocType, any, any, any, any, any, any, any, any, infer TSchemaDefinition> ? IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : InferRawDocType<TSchemaDefinition>
        : PathValueType extends ReadonlyArray<infer Item> ?
-         Item extends never ? any[]
+         IfEquals<Item, never> extends true ? any[]
          : Item extends Schema<infer RawDocType, any, any, any, any, any, any, any, any, infer TSchemaDefinition> ?
            // If Item is a schema, infer its type.
            Array<IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : InferRawDocType<TSchemaDefinition>>

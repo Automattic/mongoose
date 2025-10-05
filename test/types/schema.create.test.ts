@@ -135,7 +135,7 @@ const ProfileSchemaDef2: SchemaDefinition<IProfile> = {
   age: Schema.Types.Number
 };
 
-const ProfileSchema2: Schema<IProfile, Model<IProfile>> = new Schema<IProfile>(ProfileSchemaDef2);
+const ProfileSchema2 = new Schema<IProfile, Model<IProfile>>(ProfileSchemaDef2);
 
 const UserSchemaDef: SchemaDefinition<IUser> = {
   email: String,

@@ -370,31 +370,16 @@ declare module 'mongoose' {
 
     /** Creates a `find` query: gets a list of documents that match `filter`. */
     find(
-      filter: QueryFilter<RawDocType>,
+      filter?: QueryFilter<RawDocType>,
       projection?: ProjectionType<RawDocType> | null,
       options?: QueryOptions<RawDocType> | null
     ): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find', TDocOverrides>;
-    find(
-      filter: QueryFilter<RawDocType>,
-      projection?: ProjectionType<RawDocType> | null
-    ): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find', TDocOverrides>;
-    find(
-      filter: QueryFilter<RawDocType>
-    ): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find', TDocOverrides>;
-    find(): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find', TDocOverrides>;
 
     /** Declares the query a findOne operation. When executed, returns the first found document. */
     findOne(
       filter?: QueryFilter<RawDocType>,
       projection?: ProjectionType<RawDocType> | null,
       options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TDocOverrides>;
-    findOne(
-      filter?: QueryFilter<RawDocType>,
-      projection?: ProjectionType<RawDocType> | null
-    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TDocOverrides>;
-    findOne(
-      filter?: QueryFilter<RawDocType>
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TDocOverrides>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
@@ -415,27 +400,16 @@ declare module 'mongoose' {
       options: QueryOptions<RawDocType> & { upsert: true } & ReturnsNewDoc
     ): QueryWithHelpers<DocType, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
     findOneAndUpdate(
-      filter: QueryFilter<RawDocType>,
-      update: UpdateQuery<RawDocType>,
+      filter?: QueryFilter<RawDocType>,
+      update?: UpdateQuery<RawDocType>,
       options?: QueryOptions<RawDocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
-    findOneAndUpdate(
-      update: UpdateQuery<RawDocType>
-    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
-    findOneAndUpdate(): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
 
     /** Declares the query a findById operation. When executed, returns the document with the given `_id`. */
     findById(
       id: mongodb.ObjectId | any,
       projection?: ProjectionType<RawDocType> | null,
       options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TDocOverrides>;
-    findById(
-      id: mongodb.ObjectId | any,
-      projection?: ProjectionType<RawDocType> | null
-    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TDocOverrides>;
-    findById(
-      id: mongodb.ObjectId | any
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TDocOverrides>;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
@@ -463,10 +437,6 @@ declare module 'mongoose' {
       id?: mongodb.ObjectId | any,
       update?: UpdateQuery<RawDocType>,
       options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
-    findByIdAndUpdate(
-      id: mongodb.ObjectId | any,
-      update: UpdateQuery<RawDocType>
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
 
     /** Specifies a `$geometry` condition */
@@ -832,17 +802,12 @@ declare module 'mongoose' {
 
     /**
      * Declare and/or execute this query as an updateMany() operation. Same as
-     * `update()`, except MongoDB will update _all_ documents that match
-     * `filter` (as opposed to just the first one) regardless of the value of
-     * the `multi` option.
+     * `update()`, except MongoDB will update _all_ documents that match `filter`
      */
     updateMany(
       filter: QueryFilter<RawDocType>,
       update: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline,
       options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType, 'updateMany', TDocOverrides>;
-    updateMany(
-      update: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline
     ): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType, 'updateMany', TDocOverrides>;
 
     /**
@@ -853,9 +818,6 @@ declare module 'mongoose' {
       filter: QueryFilter<RawDocType>,
       update: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline,
       options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType, 'updateOne', TDocOverrides>;
-    updateOne(
-      update: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline
     ): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType, 'updateOne', TDocOverrides>;
 
     /**

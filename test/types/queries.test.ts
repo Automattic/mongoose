@@ -1,4 +1,4 @@
-import {
+import mongoose, {
   Condition,
   HydratedDocument,
   Schema,
@@ -769,4 +769,32 @@ async function gh3230() {
   const test = await Test.create({ name: 'test', arr: [{ testRef: _id }] });
 
   console.log(await Test.findById(test._id).populate('arr.testRef', { name: 1, prop: 1, _id: 0, __t: 0 }));
+}
+
+function gh15671() {
+  interface DefaultQuery {
+    search?: string;
+  }
+
+  type QueryFeaturesProps = {
+    params: Partial<DefaultQuery>;
+  };
+
+  const queryFeatures = async <T, R, TQueryOp>(
+    query: mongoose.Query<R, T, object, T, TQueryOp>,
+    { params }: QueryFeaturesProps
+  ): Promise<{ content: mongoose.GetLeanResultType<T, R, TQueryOp>; result?: number }> => {
+    if (params.search) {
+      query.find({
+        $text: {
+          $search: params.search
+        }
+      });
+    }
+
+    const content = await query.lean().orFail().exec();
+    return {
+      content
+    };
+  };
 }

@@ -10,11 +10,9 @@ declare module 'mongoose' {
    * { age: { $gte: 30 } }
    * ```
    */
-  type RootFilterQuery<T> = FilterQuery<T> | Query<any, any> | Types.ObjectId;
+  type RootFilterQuery<T> = IsItRecordAndNotAny<T> extends true ? FilterQuery<T> | Query<any, any> | Types.ObjectId : FilterQuery<Record<string, any>> | Query<any, any> | Types.ObjectId;
 
-  type FilterQuery<T> = IsItRecordAndNotAny<T> extends true ?
-    ({ [P in keyof T]?: Condition<T[P]>; } & RootQuerySelector<T> & { _id?: Condition<string>; }) :
-    FilterQuery<Record<string, any>>;
+  type FilterQuery<T> = ({ [P in keyof T]?: Condition<T[P]>; } & RootQuerySelector<T> & { _id?: Condition<string>; });
 
   type MongooseBaseQueryOptionKeys =
     | 'context'
@@ -424,31 +422,16 @@ declare module 'mongoose' {
 
     /** Creates a `find` query: gets a list of documents that match `filter`. */
     find(
-      filter: RootFilterQuery<RawDocType>,
+      filter?: RootFilterQuery<RawDocType>,
       projection?: ProjectionType<RawDocType> | null,
       options?: QueryOptions<RawDocType> | null
     ): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find', TDocOverrides>;
-    find(
-      filter: RootFilterQuery<RawDocType>,
-      projection?: ProjectionType<RawDocType> | null
-    ): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find', TDocOverrides>;
-    find(
-      filter: RootFilterQuery<RawDocType>
-    ): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find', TDocOverrides>;
-    find(): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find', TDocOverrides>;
 
     /** Declares the query a findOne operation. When executed, returns the first found document. */
     findOne(
       filter?: RootFilterQuery<RawDocType>,
       projection?: ProjectionType<RawDocType> | null,
       options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TDocOverrides>;
-    findOne(
-      filter?: RootFilterQuery<RawDocType>,
-      projection?: ProjectionType<RawDocType> | null
-    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TDocOverrides>;
-    findOne(
-      filter?: RootFilterQuery<RawDocType>
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TDocOverrides>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
@@ -483,13 +466,6 @@ declare module 'mongoose' {
       id: mongodb.ObjectId | any,
       projection?: ProjectionType<RawDocType> | null,
       options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TDocOverrides>;
-    findById(
-      id: mongodb.ObjectId | any,
-      projection?: ProjectionType<RawDocType> | null
-    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TDocOverrides>;
-    findById(
-      id: mongodb.ObjectId | any
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TDocOverrides>;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */

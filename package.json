@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "8.19.0",
+  "version": "8.19.1",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@ark/attest": "0.48.2",
-    "@babel/core": "7.28.3",
+    "@babel/core": "7.28.4",
     "@babel/preset-env": "7.28.3",
     "@mongodb-js/mongodb-downloader": "^0.4.2",
     "@typescript-eslint/eslint-plugin": "^8.19.1",
@@ -57,9 +57,9 @@
     "markdownlint-cli2": "^0.18.1",
     "marked": "15.0.12",
     "mkdirp": "^3.0.1",
-    "mocha": "11.7.2",
+    "mocha": "11.7.4",
     "moment": "2.30.1",
-    "mongodb-memory-server": "10.2.0",
+    "mongodb-memory-server": "10.2.1",
     "mongodb-runner": "^5.8.2",
     "ncp": "^2.0.0",
     "nyc": "15.1.0",
@@ -68,9 +68,9 @@
     "sinon": "21.0.0",
     "stream-browserify": "3.0.0",
     "tsd": "0.33.0",
-    "typescript": "5.9.2",
+    "typescript": "5.9.3",
     "uuid": "11.1.0",
-    "webpack": "5.101.3"
+    "webpack": "5.102.0"
   },
   "directories": {
     "lib": "./lib/mongoose"

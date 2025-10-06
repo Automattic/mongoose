@@ -10,7 +10,7 @@ declare module 'mongoose' {
    * { age: { $gte: 30 } }
    * ```
    */
-  type RootFilterQuery<T> = FilterQuery<T> | Query<any, any> | Types.ObjectId;
+  type RootFilterQuery<T> = IsItRecordAndNotAny<T> extends true ? FilterQuery<T> | Query<any, any> | Types.ObjectId : FilterQuery<Record<string, any>> | Query<any, any> | Types.ObjectId;
 
   type FilterQuery<T> = ({ [P in keyof T]?: Condition<T[P]>; } & RootQuerySelector<T> & { _id?: Condition<string>; });
 

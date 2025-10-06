@@ -1,3 +1,11 @@
+8.19.1 / 2025-10-06
+===================
+ * perf: avoid getting all modified paths in update when checking if versionKey needs to be set #15677 #15672
+ * perf: Avoid needless path translation #15679 [orgads](https://github.com/orgads)
+ * fix(query): throw error if using update operator with modifier and no path #15670 #15642
+ * types: avoid making FilterQuery a conditional type because of how typescript handles distributed conditional unions #15676 #15671
+ * docs: update installation instructions #15675 [aalok-y](https://github.com/aalok-y)
+
 8.19.0 / 2025-10-02
 ===================
  * feat: upgrade mongodb driver to 6.20.0 #15651 #15656

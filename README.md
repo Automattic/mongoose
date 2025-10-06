@@ -42,8 +42,30 @@ View all 400+ [contributors](https://github.com/Automattic/mongoose/graphs/contr
 
 First install [Node.js](http://nodejs.org/) and [MongoDB](https://www.mongodb.org/downloads). Then:
 
+Then install the `mongoose` package using your preferred package manager:
+
+### Using npm
+
 ```sh
 npm install mongoose
+```
+
+### Using pnpm
+
+```sh
+pnpm add mongoose
+```
+
+### Using Yarn
+
+```sh
+yarn add mongoose
+```
+
+### Using Bun
+
+```sh
+bun add mongoose
 ```
 
 Mongoose 6.8.0 also includes alpha support for [Deno](https://deno.land/).

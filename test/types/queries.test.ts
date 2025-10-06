@@ -1,4 +1,4 @@
-import {
+import mongoose, {
   HydratedDocument,
   Schema,
   model,
@@ -18,7 +18,6 @@ import {
   QueryFilter
 } from 'mongoose';
 import mongodb from 'mongodb';
-import mongoose from 'mongoose';
 import { ModifyResult, ObjectId } from 'mongodb';
 import { expectAssignable, expectError, expectNotAssignable, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
@@ -798,4 +797,32 @@ async function gh12064() {
   expectError(TestModel.findOne({ 'subdoc.subdocProp': 'taco tuesday' }));
   expectError(TestModel.findOne({ 'nested.nestedProp': true }));
   expectError(TestModel.findOne({ 'documentArray.documentArrayProp': 'taco' }));
+}
+
+function gh15671() {
+  interface DefaultQuery {
+    search?: string;
+  }
+
+  type QueryFeaturesProps = {
+    params: Partial<DefaultQuery>;
+  };
+
+  const queryFeatures = async <T, R, TQueryOp>(
+    query: mongoose.Query<R, T, object, T, TQueryOp>,
+    { params }: QueryFeaturesProps
+  ): Promise<{ content: mongoose.GetLeanResultType<T, R, TQueryOp>; result?: number }> => {
+    if (params.search) {
+      query.find({
+        $text: {
+          $search: params.search
+        }
+      });
+    }
+
+    const content = await query.lean().orFail().exec();
+    return {
+      content
+    };
+  };
 }

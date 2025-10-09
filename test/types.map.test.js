@@ -1429,4 +1429,85 @@ describe('Map', function() {
     doc = await Debug.findById(empty._id);
     assert.strictEqual(doc.settings, undefined);
   });
+
+  it('handles maps with document arrays and maps of maps with document arrays (gh-15678)', async function() {
+    const itemSchema = new Schema({
+      name: String,
+      itemNum: Number,
+      itemTags: [String]
+    }, { _id: false });
+
+    const groupSchema = new Schema({
+      items: { type: Map, of: itemSchema, default: {} },
+      groupNum: Number,
+      groupTags: [String]
+    }, { _id: false });
+
+    const parentSchema = new Schema({
+      groups: { type: Map, of: groupSchema, default: {} }
+    });
+
+    const M = db.model('Test', parentSchema);
+
+    // as if read from M.findOne() etc
+    const x = new M().init({
+      groups: {
+        g1: {
+          items: {
+            i1: {
+              name: 'my item'
+            }
+          },
+          groupTags: ['hi']
+        }
+      }
+    });
+
+    // after each test below in isolation (others commented)
+    // console.log(x.getChanges())
+
+    x.groups.get('g1').items.set('i2', { name: 'second item' });
+    assert.deepStrictEqual(x.getChanges(), {
+      $set: { 'groups.g1.items.i2': { name: 'second item', itemTags: [] } }
+    });
+
+    x.groups.get('g1').groupNum = 42;
+    assert.deepStrictEqual(x.getChanges(), {
+      $set: {
+        'groups.g1.items.i2': { name: 'second item', itemTags: [] },
+        'groups.g1.groupNum': 42
+      }
+    }
+    );
+
+    x.groups.get('g1').items.get('i1').name = 'different item';
+    assert.deepStrictEqual(x.getChanges(), {
+      $set: {
+        'groups.g1.items.i2': { name: 'second item', itemTags: [] },
+        'groups.g1.groupNum': 42,
+        'groups.g1.items.i1.name': 'different item'
+      }
+    }
+    );
+
+    x.groups.get('g1').items.get('i1').itemNum = 20;
+    assert.deepStrictEqual(x.getChanges(), {
+      $set: {
+        'groups.g1.items.i2': { name: 'second item', itemTags: [] },
+        'groups.g1.groupNum': 42,
+        'groups.g1.items.i1.name': 'different item',
+        'groups.g1.items.i1.itemNum': 20
+      }
+    }
+    );
+
+    x.groups.get('g1').items.get('i1').itemTags.push('foo');
+    assert.deepStrictEqual(x.getChanges(), {
+      $set: {
+        'groups.g1.items.i2': { name: 'second item', itemTags: [] },
+        'groups.g1.groupNum': 42,
+        'groups.g1.items.i1': { name: 'different item', itemTags: ['foo'], itemNum: 20 }
+      }
+    });
+  });
 });

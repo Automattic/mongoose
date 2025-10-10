@@ -97,7 +97,7 @@ declare module 'mongoose' {
     TSchema
   > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
-  export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
+  export function model<T>(name: string, schema?: Schema<any, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
 
   export function model<T, U, TQueryHelpers = {}>(
     name: string,

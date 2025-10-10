@@ -202,7 +202,7 @@ declare module 'mongoose' {
       collection?: string,
       options?: CompileModelOptions
     ): U;
-    model<T>(name: string, schema?: Schema<T, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
+    model<T>(name: string, schema?: Schema<any, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
 
     /** Returns an array of model names created on this connection. */
     modelNames(): Array<string>;

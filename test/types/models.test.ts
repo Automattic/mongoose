@@ -1056,3 +1056,23 @@ async function gh16526() {
   const insertManyResult = await Tank.insertMany([{ name: 'test' }], { lean: true, rawResult: true });
   expectType<number>(insertManyResult.insertedCount);
 }
+
+async function gh15681() {
+  function getMongooseModel<T>(resName: string): mongoose.Model<T> {
+    if (mongoose.models[resName]) {
+      return mongoose.models[resName];
+    }
+
+    const schema = new mongoose.Schema({
+      example: String
+    });
+
+    return mongoose.model<T>(resName, schema);
+  }
+
+  type Example = {
+    name: string;
+  };
+
+  const Model = getMongooseModel<Example>('Example');
+}

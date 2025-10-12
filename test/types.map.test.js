@@ -1503,10 +1503,15 @@ describe('Map', function() {
 
     x.groups.get('g1').items.get('i1').itemTags.push('foo');
     assert.deepStrictEqual(x.getChanges(), {
+      $inc: { __v: 1 },
+      $push: {
+        'groups.g1.items.i1.itemTags': { $each: ['foo'] }
+      },
       $set: {
         'groups.g1.items.i2': { name: 'second item', itemTags: [] },
         'groups.g1.groupNum': 42,
-        'groups.g1.items.i1': { name: 'different item', itemTags: ['foo'], itemNum: 20 }
+        'groups.g1.items.i1.itemNum': 20,
+        'groups.g1.items.i1.name': 'different item'
       }
     });
   });

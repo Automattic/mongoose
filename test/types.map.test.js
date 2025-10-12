@@ -1515,4 +1515,307 @@ describe('Map', function() {
       }
     });
   });
+
+  it('handles push() on arrays in subdocuments and maps correctly (gh-15678)', async function() {
+    const itemSchema = new Schema({
+      numField: Number,
+      arrayField: [String]
+    }, { _id: false });
+
+    const groupSchema = new Schema({
+      items: { type: Map, of: itemSchema },
+      numField: Number,
+      arrayField: [String]
+    }, { _id: false });
+
+    const parentSchema = new Schema({
+      groups: { type: Map, of: groupSchema },
+      singleItem: { type: itemSchema }
+    });
+
+    const M = db.model('Test', parentSchema);
+
+    const x = new M().init({
+      groups: {
+        g1: {
+          items: {
+            i1: {
+              numField: 1,
+              arrayField: ['a']
+            }
+          },
+          numField: 2,
+          arrayField: ['b']
+        }
+      },
+      singleItem: {
+        numField: 3,
+        arrayField: ['c']
+      }
+    });
+
+    // Test 1: push to singleItem.arrayField should use $push, not $set on entire subdoc
+    x.singleItem.arrayField.push('val1');
+    assert.deepStrictEqual(x.getChanges(), {
+      $push: { 'singleItem.arrayField': { $each: ['val1'] } },
+      $inc: { __v: 1 }
+    });
+
+    // Test 2: push to groups.g1.arrayField should use $push, not $set on entire subdoc
+    x.groups.get('g1').arrayField.push('val2');
+    assert.deepStrictEqual(x.getChanges(), {
+      $push: {
+        'singleItem.arrayField': { $each: ['val1'] },
+        'groups.g1.arrayField': { $each: ['val2'] }
+      },
+      $inc: { __v: 1 }
+    });
+
+    // Test 3: push to groups.g1.items.i1.arrayField should use $push
+    x.groups.get('g1').items.get('i1').arrayField.push('val3');
+    assert.deepStrictEqual(x.getChanges(), {
+      $push: {
+        'singleItem.arrayField': { $each: ['val1'] },
+        'groups.g1.arrayField': { $each: ['val2'] },
+        'groups.g1.items.i1.arrayField': { $each: ['val3'] }
+      },
+      $inc: { __v: 1 }
+    });
+
+    // Test 4: pull from singleItem.arrayField
+    x.singleItem.arrayField.pull('c');
+    assert.deepStrictEqual(x.getChanges(), {
+      $set: { 'singleItem.arrayField': ['val1'] },
+      $push: {
+        'groups.g1.arrayField': { $each: ['val2'] },
+        'groups.g1.items.i1.arrayField': { $each: ['val3'] }
+      },
+      $inc: { __v: 1 }
+    });
+  });
+
+  it('handles various array operations on subdocument arrays correctly (gh-15678)', async function() {
+    const itemSchema = new Schema({
+      tags: [String]
+    }, { _id: false });
+
+    const schema = new Schema({
+      items: { type: Map, of: itemSchema },
+      directItem: itemSchema
+    });
+
+    const M = db.model('Test', schema);
+
+    // Test non-atomic operations (pop, shift, unshift, splice) fall back to $set
+    const doc1 = new M().init({
+      items: { i1: { tags: ['a', 'b', 'c'] } },
+      directItem: { tags: ['x', 'y', 'z'] }
+    });
+
+    // pop() should use $set
+    doc1.items.get('i1').tags.pop();
+    assert.deepStrictEqual(doc1.getChanges(), {
+      $set: { 'items.i1.tags': ['a', 'b'] },
+      $inc: { __v: 1 }
+    });
+
+    // shift() should use $set
+    const doc2 = new M().init({
+      items: { i1: { tags: ['a', 'b', 'c'] } }
+    });
+    doc2.items.get('i1').tags.shift();
+    assert.deepStrictEqual(doc2.getChanges(), {
+      $set: { 'items.i1.tags': ['b', 'c'] },
+      $inc: { __v: 1 }
+    });
+
+    // unshift() should use $set
+    const doc3 = new M().init({
+      items: { i1: { tags: ['a', 'b'] } }
+    });
+    doc3.items.get('i1').tags.unshift('z');
+    assert.deepStrictEqual(doc3.getChanges(), {
+      $set: { 'items.i1.tags': ['z', 'a', 'b'] },
+      $inc: { __v: 1 }
+    });
+
+    // splice() should use $set
+    const doc4 = new M().init({
+      items: { i1: { tags: ['a', 'b', 'c'] } }
+    });
+    doc4.items.get('i1').tags.splice(1, 1);
+    assert.deepStrictEqual(doc4.getChanges(), {
+      $set: { 'items.i1.tags': ['a', 'c'] },
+      $inc: { __v: 1 }
+    });
+
+    // addToSet() should use $addToSet
+    const doc5 = new M().init({
+      items: { i1: { tags: ['a', 'b'] } }
+    });
+    doc5.items.get('i1').tags.addToSet('c');
+    assert.deepStrictEqual(doc5.getChanges(), {
+      $addToSet: { 'items.i1.tags': { $each: ['c'] } },
+      $inc: { __v: 1 }
+    });
+
+    // Test direct subdocument (not in map)
+    const doc6 = new M().init({
+      directItem: { tags: ['x', 'y'] }
+    });
+    doc6.directItem.tags.push('z');
+    assert.deepStrictEqual(doc6.getChanges(), {
+      $push: { 'directItem.tags': { $each: ['z'] } },
+      $inc: { __v: 1 }
+    });
+
+    // Test mixing operations: push is atomic, then pop makes it $set
+    const doc7 = new M().init({
+      items: { i1: { tags: ['a', 'b'] } }
+    });
+    doc7.items.get('i1').tags.push('c');
+    let changes = doc7.getChanges();
+    assert.ok(changes.$push);
+    assert.deepStrictEqual(changes.$push['items.i1.tags'], { $each: ['c'] });
+
+    doc7.items.get('i1').tags.pop();
+    changes = doc7.getChanges();
+    // After pop(), should fall back to $set
+    assert.deepStrictEqual(changes, {
+      $set: { 'items.i1.tags': ['a', 'b'] },
+      $inc: { __v: 1 }
+    });
+  });
+
+  it('handles empty arrays and save/reload for subdocument arrays (gh-15678)', async function() {
+    const itemSchema = new Schema({
+      tags: [String]
+    }, { _id: false });
+
+    const schema = new Schema({
+      items: { type: Map, of: itemSchema }
+    });
+
+    const M = db.model('Test', schema);
+
+    // Test with empty array
+    const doc = await M.create({
+      items: new Map([['i1', { tags: [] }]])
+    });
+
+    doc.items.get('i1').tags.push('first');
+    assert.deepStrictEqual(doc.getChanges(), {
+      $push: { 'items.i1.tags': { $each: ['first'] } },
+      $inc: { __v: 1 }
+    });
+
+    await doc.save();
+
+    // After save, changes should be cleared
+    assert.deepStrictEqual(doc.getChanges(), {});
+
+    // Reload and modify again
+    const reloaded = await M.findById(doc._id);
+    assert.deepStrictEqual(Array.from(reloaded.items.get('i1').tags), ['first']);
+
+    reloaded.items.get('i1').tags.push('second');
+    assert.deepStrictEqual(reloaded.getChanges(), {
+      $push: { 'items.i1.tags': { $each: ['second'] } },
+      $inc: { __v: 1 }
+    });
+
+    await reloaded.save();
+
+    const final = await M.findById(doc._id);
+    assert.deepStrictEqual(Array.from(final.items.get('i1').tags), ['first', 'second']);
+  });
+
+  it('handles map of subdocument with map of arrays (gh-15678)', async function() {
+    // Map -> Subdoc -> Map -> Array
+    const innerSchema = new Schema({
+      lists: { type: Map, of: [String] },
+      name: String
+    }, { _id: false });
+
+    const outerSchema = new Schema({
+      containers: { type: Map, of: innerSchema }
+    });
+
+    const M = db.model('Test', outerSchema);
+
+    const doc = new M().init({
+      containers: {
+        c1: {
+          name: 'container1',
+          lists: {
+            list1: ['a', 'b'],
+            list2: ['x', 'y']
+          }
+        }
+      }
+    });
+
+    // Push to array in map within subdoc within map
+    doc.containers.get('c1').lists.get('list1').push('c');
+    assert.deepStrictEqual(doc.getChanges(), {
+      $push: { 'containers.c1.lists.list1': { $each: ['c'] } },
+      $inc: { __v: 1 }
+    });
+
+    // Push to different array in same nested structure
+    doc.containers.get('c1').lists.get('list2').push('z');
+    assert.deepStrictEqual(doc.getChanges(), {
+      $push: {
+        'containers.c1.lists.list1': { $each: ['c'] },
+        'containers.c1.lists.list2': { $each: ['z'] }
+      },
+      $inc: { __v: 1 }
+    });
+
+    // Modify subdoc scalar field alongside array operations
+    doc.containers.get('c1').name = 'updated';
+    assert.deepStrictEqual(doc.getChanges(), {
+      $push: {
+        'containers.c1.lists.list1': { $each: ['c'] },
+        'containers.c1.lists.list2': { $each: ['z'] }
+      },
+      $set: {
+        'containers.c1.name': 'updated'
+      },
+      $inc: { __v: 1 }
+    });
+
+    // Test with element modification instead of push
+    const doc2 = new M().init({
+      containers: {
+        c1: {
+          lists: {
+            list1: ['a', 'b', 'c']
+          }
+        }
+      }
+    });
+
+    doc2.containers.get('c1').lists.get('list1').set(1, 'modified');
+    assert.deepStrictEqual(doc2.getChanges(), {
+      $set: { 'containers.c1.lists.list1.1': 'modified' }
+    });
+
+    // Test pop on deeply nested array
+    const doc3 = new M().init({
+      containers: {
+        c1: {
+          lists: {
+            list1: ['a', 'b', 'c']
+          }
+        }
+      }
+    });
+
+    doc3.containers.get('c1').lists.get('list1').pop();
+    assert.deepStrictEqual(doc3.getChanges(), {
+      $set: { 'containers.c1.lists.list1': ['a', 'b'] },
+      $inc: { __v: 1 }
+    });
+  });
 });

@@ -350,6 +350,8 @@ declare module 'mongoose' {
     // Default - no special options, just Require_id<DocType>
     toObject(options?: ToObjectOptions): Require_id<DocType>;
 
+    toObject<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
+
     /** Clears the modified state on the specified path. */
     unmarkModified<T extends keyof DocType>(path: T): void;
     unmarkModified(path: string): void;

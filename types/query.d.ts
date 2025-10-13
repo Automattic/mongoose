@@ -522,7 +522,7 @@ declare module 'mongoose' {
       QueryOp,
       TDocOverrides
       >;
-    lean<LeanResultType>(): QueryWithHelpers<
+    lean<LeanResultType = RawDocType>(): QueryWithHelpers<
       ResultType extends null
         ? LeanResultType | null
         : LeanResultType,
@@ -532,7 +532,7 @@ declare module 'mongoose' {
       QueryOp,
       TDocOverrides
       >;
-    lean<LeanResultType>(
+    lean<LeanResultType = RawDocType>(
       val: boolean | LeanOptions
     ): QueryWithHelpers<
       ResultType extends null

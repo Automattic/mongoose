@@ -476,7 +476,7 @@ declare module 'mongoose' {
       projection?: ProjectionType<TRawDocType> | null,
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? TRawDocType | null : ResultDoc | null,
+      HasLeanOption<TSchema> extends true ? TLeanResultType | null : ResultDoc | null,
       ResultDoc,
       TQueryHelpers,
       TLeanResultType,
@@ -490,7 +490,7 @@ declare module 'mongoose' {
       projection?: ProjectionType<TRawDocType> | null,
       options?: QueryOptions<TRawDocType> & mongodb.Abortable | null
     ): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? TRawDocType | null : ResultDoc | null,
+      HasLeanOption<TSchema> extends true ? TLeanResultType | null : ResultDoc | null,
       ResultDoc,
       TQueryHelpers,
       TLeanResultType,
@@ -701,11 +701,23 @@ declare module 'mongoose' {
 
     /** Creates a `find` query: gets a list of documents that match `filter`. */
     find<ResultDoc = THydratedDocumentType>(
-      filter?: QueryFilter<TRawDocType>,
-      projection?: ProjectionType<TRawDocType> | null | undefined,
-      options?: QueryOptions<TRawDocType> & { lean: true } & mongodb.Abortable
+      filter: QueryFilter<TRawDocType>,
+      projection: ProjectionType<TRawDocType> | null | undefined,
+      options: QueryOptions<TRawDocType> & { lean: true } & mongodb.Abortable
     ): QueryWithHelpers<
       GetLeanResultType<TRawDocType, TRawDocType[], 'find'>,
+      ResultDoc,
+      TQueryHelpers,
+      TLeanResultType,
+      'find',
+      TInstanceMethods & TVirtuals
+    >;
+    find<ResultDoc = THydratedDocumentType>(
+      filter?: QueryFilter<TRawDocType>,
+      projection?: ProjectionType<TRawDocType> | null | undefined,
+      options?: QueryOptions<TRawDocType> & mongodb.Abortable
+    ): QueryWithHelpers<
+      ResultDoc[],
       ResultDoc,
       TQueryHelpers,
       TLeanResultType,

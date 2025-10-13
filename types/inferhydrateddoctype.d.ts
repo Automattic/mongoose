@@ -106,7 +106,7 @@ declare module 'mongoose' {
     : PathValueType extends UuidSchemaDefinition ? UUID
     : PathValueType extends DoubleSchemaDefinition ? Types.Double
     : PathValueType extends typeof Schema.Types.Mixed ? any
-    : PathValueType extends MapSchemaDefinition ? Map<string, ResolveHydratedPathType<Options['of']>>
+    : PathValueType extends MapSchemaDefinition ? Map<string, ObtainHydratedDocumentPathType<Options['of']>>
     : IfEquals<PathValueType, ObjectConstructor> extends true ? any
     : PathValueType extends typeof SchemaType ? PathValueType['prototype']
     : PathValueType extends ArrayConstructor ? Types.Array<any>

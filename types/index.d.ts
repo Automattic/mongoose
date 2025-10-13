@@ -98,7 +98,9 @@ declare module 'mongoose' {
         InferSchemaType<TSchema>,
         ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
         ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
-        ObtainSchemaGeneric<TSchema, 'TVirtuals'>
+        ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+        InferSchemaType<TSchema>,
+        ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>
       >,
     TSchema,
     ObtainSchemaGeneric<TSchema, 'TLeanResultType'>

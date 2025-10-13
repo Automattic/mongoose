@@ -301,8 +301,8 @@ declare module 'mongoose' {
     // Handle virtuals: true
     toJSON(options: ToObjectOptions & { virtuals: true }): Require_id<DocType & TVirtuals>;
 
-    // Default - no special options, just Require_id<DocType>
-    toJSON(options?: ToObjectOptions): Require_id<DocType>;
+    // Default - no special options
+    toJSON(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;
 
     toJSON<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
 
@@ -349,8 +349,8 @@ declare module 'mongoose' {
     // Handle virtuals: true
     toObject(options: ToObjectOptions & { virtuals: true }): Require_id<DocType & TVirtuals>;
 
-    // Default - no special options, just Require_id<DocType>
-    toObject(options?: ToObjectOptions): Require_id<DocType>;
+    // Default - no special options
+    toObject(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;
 
     toObject<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
 

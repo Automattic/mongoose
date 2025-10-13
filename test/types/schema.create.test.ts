@@ -1177,7 +1177,7 @@ function maps() {
   expectType<number | undefined>(doc.myMap!.get('answer'));
 
   const obj = doc.toObject();
-  expectType<Record<string, number | undefined>>(obj.myMap);
+  expectType<Record<string, number>>(obj.myMap);
 }
 
 function gh13514() {

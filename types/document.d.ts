@@ -304,6 +304,8 @@ declare module 'mongoose' {
     // Default - no special options, just Require_id<DocType>
     toJSON(options?: ToObjectOptions): Require_id<DocType>;
 
+    toJSON<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
+
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
     // flattenMaps: false (default) cases
     toObject(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: true, virtuals: true, versionKey: false }): ObjectIdToString<Omit<Require_id<DocType & TVirtuals>, '__v'>>;

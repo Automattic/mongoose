@@ -109,7 +109,7 @@ declare module 'mongoose' {
            Options['enum'][number]
          : number
        : PathValueType extends DateSchemaDefinition ? NativeDate
-       : PathValueType extends BufferSchemaDefinition ? Buffer
+       : PathValueType extends BufferSchemaDefinition ? (TTransformOptions extends { bufferToBinary: true } ? Binary : Buffer)
        : PathValueType extends BooleanSchemaDefinition ? boolean
        : PathValueType extends ObjectIdSchemaDefinition ? Types.ObjectId
        : PathValueType extends Decimal128SchemaDefinition ? Types.Decimal128

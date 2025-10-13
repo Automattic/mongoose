@@ -78,7 +78,7 @@ declare module 'mongoose' {
               Types.DocumentArray<InferRawDocType<TSchemaDefition>, Types.Subdocument<InferHydratedDocType<TSchemaDefition>['_id'], unknown, InferHydratedDocType<TSchemaDefition>> & InferHydratedDocType<TSchemaDefition>> :
             Item extends Record<TypeKey, any> ?
               Item[TypeKey] extends Function | String ?
-                Types.Array<ResolveHydratedPathType<Item, { enum: Options['enum'] }, TypeKey>> :
+                Types.Array<ObtainHydratedDocumentPathType<Item, TypeKey>> :
                 Types.DocumentArray<
                   InferRawDocType<Item>,
                   Types.Subdocument<InferHydratedDocType<Item>['_id'], unknown, InferHydratedDocType<Item>> & InferHydratedDocType<Item>

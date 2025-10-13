@@ -176,6 +176,45 @@ describe('ValidationError', function() {
       // should pass validation
       await model.validate();
     });
+
+    it('can include custom error message with string length', async function() {
+      const AddressSchema = new Schema({
+        postalCode: { type: String, maxlength: [10, 'Postal code must be at most 10 characters, got {LENGTH}'] }
+      });
+
+      const Address = mongoose.model('gh15550', AddressSchema);
+
+      const model = new Address({
+        postalCode: '95125012345'
+      });
+
+      // should fail validation
+      const err = await model.validate().then(() => null, err => err);
+
+      assert.notEqual(err, null, 'String maxLength validation failed.');
+      assert.ok(err.message.endsWith('Postal code must be at most 10 characters, got 11'), err.message);
+    });
+
+    it('trims long strings in error message', async function() {
+      const AddressSchema = new Schema({
+        name: { type: String, maxlength: 10 }
+      });
+
+      const Address = mongoose.model('gh15550_2', AddressSchema);
+
+      const model = new Address({
+        name: 'John Jacob Jingleheimer Schmidt'
+      });
+
+      // should fail validation
+      const err = await model.validate().then(() => null, err => err);
+
+      assert.notEqual(err, null, 'String maxLength validation failed.');
+      assert.ok(
+        err.message.endsWith('Path `name` (`John Jacob Jingleheimer Schmid...`, length 31) is longer than the maximum allowed length (10).'),
+        err.message
+      );
+    });
   });
 
   describe('#toString', function() {

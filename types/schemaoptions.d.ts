@@ -16,7 +16,8 @@ declare module 'mongoose' {
     QueryHelpers = {},
     TStaticMethods = {},
     TVirtuals = {},
-    THydratedDocumentType = HydratedDocument<DocType, TInstanceMethods, QueryHelpers>
+    THydratedDocumentType = HydratedDocument<DocType, TInstanceMethods, QueryHelpers>,
+    TModelType = Model<DocType, QueryHelpers, TInstanceMethods, TVirtuals, THydratedDocumentType>
   > {
     /**
      * By default, Mongoose's init() function creates all the indexes defined in your model's schema by
@@ -56,6 +57,9 @@ declare module 'mongoose' {
 
     /** Arbitrary options passed to `createCollection()` */
     collectionOptions?: mongodb.CreateCollectionOptions;
+
+    /** Default lean options for queries */
+    lean?: boolean | LeanOptions;
 
     /** The timeseries option to use when creating the model's collection. */
     timeseries?: mongodb.TimeSeriesCollectionOptions;
@@ -179,7 +183,7 @@ declare module 'mongoose' {
      *
      * @default '__v'
      */
-    versionKey?: string | boolean;
+    versionKey?: string | false;
     /**
      * By default, Mongoose will automatically select() any populated paths for you, unless you explicitly exclude them.
      *
@@ -219,8 +223,8 @@ declare module 'mongoose' {
     statics?: IfEquals<
       TStaticMethods,
       {},
-      { [name: string]: (this: Model<DocType>, ...args: any[]) => unknown },
-      AddThisParameter<TStaticMethods, Model<DocType>>
+      { [name: string]: (this: TModelType, ...args: any[]) => unknown },
+      AddThisParameter<TStaticMethods, TModelType>
     >
 
     /**

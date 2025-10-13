@@ -135,7 +135,7 @@ const ProfileSchemaDef2: SchemaDefinition<IProfile> = {
   age: Schema.Types.Number
 };
 
-const ProfileSchema2: Schema<IProfile, Model<IProfile>> = new Schema<IProfile>(ProfileSchemaDef2);
+const ProfileSchema2 = new Schema<IProfile, Model<IProfile>>(ProfileSchemaDef2);
 
 const UserSchemaDef: SchemaDefinition<IUser> = {
   email: String,
@@ -645,7 +645,7 @@ function gh11997() {
 function gh12003() {
   const baseSchemaOptions = {
     versionKey: false
-  };
+  } as const;
 
   const BaseSchema = Schema.create({
     name: String
@@ -1199,18 +1199,18 @@ function gh13514() {
 function gh13633() {
   const schema = Schema.create({ name: String });
 
-  schema.pre('updateOne', { document: true, query: false }, function(next) {
+  schema.pre('updateOne', { document: true, query: false }, function() {
   });
 
-  schema.pre('updateOne', { document: true, query: false }, function(next, options) {
+  schema.pre('updateOne', { document: true, query: false }, function(options) {
     expectType<Record<string, any> | undefined>(options);
   });
 
   schema.post('save', function(res, next) {
   });
-  schema.pre('insertMany', function(next, docs) {
+  schema.pre('insertMany', function(docs) {
   });
-  schema.pre('insertMany', function(next, docs, options) {
+  schema.pre('insertMany', function(docs, options) {
     expectType<(InsertManyOptions & { lean?: boolean }) | undefined>(options);
   });
 }
@@ -1645,7 +1645,6 @@ function gh13215() {
   >;
   type User = {
     userName: string;
-  } & {
     date: Date;
   } & { _id: Types.ObjectId };
 
@@ -1653,7 +1652,11 @@ function gh13215() {
 
   const schema = Schema.create(schemaDefinition, schemaOptions);
   type SchemaType = InferSchemaType<typeof schema>;
-  expectType<User>({} as SchemaType);
+  expectType<{
+    userName: string;
+    date: Date;
+    _id: Types.ObjectId;
+  }>({} as SchemaType);
   type HydratedDoc = ObtainSchemaGeneric<typeof schema, 'THydratedDocumentType'>;
   expectType<HydratedDocument<User>>({} as HydratedDoc);
 }

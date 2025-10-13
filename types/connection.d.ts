@@ -72,10 +72,14 @@ declare module 'mongoose' {
   }[keyof SchemaMap];
 
   class Connection extends events.EventEmitter implements SessionStarter {
+    /** Runs a [db-level aggregate()](https://www.mongodb.com/docs/manual/reference/method/db.aggregate/) on this connection's underlying `db` */
     aggregate<ResultType = unknown>(pipeline?: PipelineStage[] | null, options?: AggregateOptions): Aggregate<Array<ResultType>>;
 
     /** Returns a promise that resolves when this connection successfully connects to MongoDB */
     asPromise(): Promise<this>;
+
+    /** The Mongoose instance this connection is associated with */
+    base: Mongoose;
 
     bulkWrite<TSchemaMap extends Record<string, AnyObject>>(
       ops: Array<ConnectionBulkWriteModel<TSchemaMap>>,
@@ -269,7 +273,7 @@ declare module 'mongoose' {
     transaction<ReturnType = unknown>(fn: (session: mongodb.ClientSession) => Promise<ReturnType>, options?: mongodb.TransactionOptions): Promise<ReturnType>;
 
     /** Switches to a different database using the same connection pool. */
-    useDb(name: string, options?: { useCache?: boolean, noListener?: boolean }): Connection;
+    useDb(name: string, options?: { useCache?: boolean }): Connection;
 
     /** The username specified in the URI */
     readonly user: string;
@@ -280,4 +284,5 @@ declare module 'mongoose' {
     withSession<T = any>(executor: (session: ClientSession) => Promise<T>): Promise<T>;
   }
 
+  export class BaseConnection extends Connection {}
 }

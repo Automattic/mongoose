@@ -58,9 +58,8 @@ describe('query middleware', function() {
 
   it('has a pre find hook', async function() {
     let count = 0;
-    schema.pre('find', function(next) {
+    schema.pre('find', function() {
       ++count;
-      next();
     });
 
     await initializeData();
@@ -87,9 +86,8 @@ describe('query middleware', function() {
 
   it('works when using a chained query builder', async function() {
     let count = 0;
-    schema.pre('find', function(next) {
+    schema.pre('find', function() {
       ++count;
-      next();
     });
 
     let postCount = 0;
@@ -110,9 +108,8 @@ describe('query middleware', function() {
 
   it('has separate pre-findOne() and post-findOne() hooks', async function() {
     let count = 0;
-    schema.pre('findOne', function(next) {
+    schema.pre('findOne', function() {
       ++count;
-      next();
     });
 
     let postCount = 0;
@@ -132,9 +129,8 @@ describe('query middleware', function() {
   it('with regular expression (gh-6680)', async function() {
     let count = 0;
     let postCount = 0;
-    schema.pre(/find/, function(next) {
+    schema.pre(/find/, function() {
       ++count;
-      next();
     });
 
     schema.post(/find/, function(result, next) {
@@ -163,9 +159,8 @@ describe('query middleware', function() {
   });
 
   it('can populate in pre hook', async function() {
-    schema.pre('findOne', function(next) {
+    schema.pre('findOne', function() {
       this.populate('publisher');
-      next();
     });
 
     await initializeData();
@@ -442,8 +437,8 @@ describe('query middleware', function() {
     const schema = new Schema({});
     let called = false;
 
-    schema.pre('find', function(next) {
-      next(new Error('test'));
+    schema.pre('find', function() {
+      throw new Error('test');
     });
 
     schema.post('find', function(res, next) {
@@ -468,9 +463,8 @@ describe('query middleware', function() {
     let calledPre = 0;
     let calledPost = 0;
 
-    schema.pre('find', function(next) {
+    schema.pre('find', function() {
       ++calledPre;
-      next();
     });
 
     schema.post('find', function(res, next) {
@@ -552,8 +546,8 @@ describe('query middleware', function() {
     const schema = Schema({ name: String });
     const now = Date.now();
 
-    schema.pre('find', function(next) {
-      next(mongoose.skipMiddlewareFunction([{ name: 'from cache' }]));
+    schema.pre('find', function() {
+      throw mongoose.skipMiddlewareFunction([{ name: 'from cache' }]);
     });
     schema.post('find', function(res) {
       res.forEach(doc => {

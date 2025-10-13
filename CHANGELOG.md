@@ -1,3 +1,90 @@
+8.19.1 / 2025-10-06
+===================
+ * perf: avoid getting all modified paths in update when checking if versionKey needs to be set #15677 #15672
+ * perf: Avoid needless path translation #15679 [orgads](https://github.com/orgads)
+ * fix(query): throw error if using update operator with modifier and no path #15670 #15642
+ * types: avoid making FilterQuery a conditional type because of how typescript handles distributed conditional unions #15676 #15671
+ * docs: update installation instructions #15675 [aalok-y](https://github.com/aalok-y)
+
+8.19.0 / 2025-10-02
+===================
+ * feat: upgrade mongodb driver to 6.20.0 #15651 #15656
+ * feat(model): add virtuals option to Model.hydrate() to set virtuals #15638 #15627
+ * fix(schema): handle casting array filters underneath maps of Mixed #15655 #15653
+ * types: optimize InferRawDocType #15588 [ssalbdivad](https://github.com/ssalbdivad)
+ * types(schema): add lean schema option to TypeScript types #15646 #15583 #10090
+
+8.18.3 / 2025-09-29
+===================
+ * fix(update): avoid throwing error if update has a top-level $addToSet with no path #15648 #15642
+ * types(query): allow passing arbitrary options #15644 #15643
+ * docs(connection+mongoose): correct mongodb option name user -> username #15650 #15647
+ * test: add tests covering vector search and text search using Atlas CLI #15649 #15645
+
+8.18.2 / 2025-09-22
+===================
+ * fix(document): prevent $clone() from converting mongoose arrays into vanilla arrays #15633 #15625
+ * fix(connection): use correct collection name for model when using useConnection() #15637
+ * fix(connection): propagate changes to _lastHeartbeatAt to useDb() child connections #15640 #15635
+ * types: fix schema property type definition in SchemaType #15631
+
+8.18.1 / 2025-09-08
+===================
+ * types: correct type inference for maps of maps #15602
+ * types(model): copy base model statics onto discriminator model #15623 #15600
+ * types: fix types for a string of enums #15605 [ruiaraujo](https://github.com/ruiaraujo)
+ * types(SchemaOptions): disallow versionKey: true, which fails at runtime #15606
+ * docs(typescript): add example explaining how to use query helper overrides for handling lean() #15622 #15601
+ * docs(transactions): add note about nested transactions #15624
+
+8.18.0 / 2025-08-22
+===================
+ * feat(schema): support for union types #15574 #10894
+ * fix: trim long strings in minLength and maxLength error messages and display the string length #15571 #15550
+ * types(connection+collection): make BaseCollection and BaseConnection usable as values #15575 #15548
+ * types: remove logic that omits timestamps when virtuals, methods, etc. options set #15577 #12807
+
+8.17.2 / 2025-08-18
+===================
+ * fix: avoid Model.validate() hanging when all paths fail casting #15580 #15579 [piotracalski](https://github.com/piotracalski)
+ * types(document): better support for flattenObjectIds and versionKey options for toObject() and toJSON() #15582 #15578
+ * docs: fix docs jsdoc tags and add UUID to be listed #15585
+ * docs(document): fix code sample that errors with "Cannot set properties of undefined" #15589
+
+8.17.1 / 2025-08-07
+===================
+ * fix(query): propagate read preference and read concern to populate if read() called after populate() #15567 #15553
+ * fix(model): call correct function in autoSearchIndex #15569 #15565
+ * fix(model): allow setting statics option on discriminator schema #15568 #15556
+ * fix(model): remove unnecessary conversion of undefined -> null in findById #15566 #15551
+ * types: allow passing in projections without as const #15564 #15557
+ * types: support maxLength and minLength in SchemaTypeOptions #15570 #4720
+
+8.17.0 / 2025-07-30
+===================
+ * feat: upgrade mongodb -> 6.18.0 #15552
+ * feat(mongoose): export base Connection and Collection classes #15548
+ * feat: make Schema.prototype.$conditionalHandlers public #15497
+ * types: automatically infer discriminator type #15547 #15535
+ * types: make versionKey: false disable __v from hydrated document #15524 #15511
+ * types: indicate support for mongodb abort #15549 [GalacticHypernova](https://github.com/GalacticHypernova)
+ * types: add options property to schemas #15524
+ * types(schematype): make defaultOptions static and add schemaOptions to DocumentArray #15529 #15524
+
+8.16.5 / 2025-07-25
+===================
+ * fix(map): avoid throwing required error if saving map of primitives with required: true #15542
+ * types(model): export MongooseBulkWriteResult type #15546
+ * types(connection): add base to connection type #15544
+
+8.16.4 / 2025-07-16
+===================
+ * fix(connection): avoid calling connection.close() internally with force: Object #15534 #15531
+ * types(schema): handle required: string in schema definitions #15538 #15536
+ * types(document): allow calling $isDefault() with no args #15528 #15522
+ * types: infer Typescript string enums #15530 [ruiaraujo](https://github.com/ruiaraujo)
+ * types: pass TModelType down to schema statics #15537
+
 8.16.3 / 2025-07-10
 ===================
  * fix(document): clean modified subpaths if unsetting map #15520 #15519

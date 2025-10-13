@@ -79,14 +79,15 @@ describe('model', function() {
       });
 
       let startTime, endTime;
-      SchemaWithPreSaveHook.pre('save', true, function hook(next, done) {
-        setTimeout(function() {
-          countPre++;
-          if (countPre === 1) startTime = Date.now();
-          else if (countPre === 4) endTime = Date.now();
-          next();
-          done();
-        }, 100);
+      SchemaWithPreSaveHook.pre('save', function hook() {
+        return new Promise(resolve => {
+          setTimeout(() => {
+            countPre++;
+            if (countPre === 1) startTime = Date.now();
+            else if (countPre === 4) endTime = Date.now();
+            resolve();
+          }, 100);
+        });
       });
       SchemaWithPreSaveHook.post('save', function() {
         countPost++;
@@ -182,10 +183,9 @@ describe('model', function() {
 
         const Count = db.model('gh4038', countSchema);
 
-        testSchema.pre('save', async function(next) {
+        testSchema.pre('save', async function() {
           const doc = await Count.findOneAndUpdate({}, { $inc: { n: 1 } }, { new: true, upsert: true });
           this.reference = doc.n;
-          next();
         });
 
         const Test = db.model('gh4038Test', testSchema);

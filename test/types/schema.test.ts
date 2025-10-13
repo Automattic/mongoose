@@ -25,7 +25,8 @@ import {
   CallbackWithoutResultAndOptionalError,
   InferRawDocTypeFromSchema,
   InferHydratedDocTypeFromSchema,
-  FlatRecord
+  FlatRecord,
+  InferHydratedDocType
 } from 'mongoose';
 import { BSON, Binary, UUID } from 'mongodb';
 import { expectType, expectError, expectAssignable } from 'tsd';
@@ -135,7 +136,7 @@ const ProfileSchemaDef2: SchemaDefinition<IProfile> = {
   age: Schema.Types.Number
 };
 
-const ProfileSchema2: Schema<IProfile, Model<IProfile>> = new Schema<IProfile>(ProfileSchemaDef2);
+const ProfileSchema2: Schema<IProfile, Model<IProfile>> = new Schema<IProfile, Model<IProfile>>(ProfileSchemaDef2);
 
 const UserSchemaDef: SchemaDefinition<IUser> = {
   email: String,
@@ -534,13 +535,13 @@ export function autoTypedSchema() {
   }, {
     statics: {
       staticFn() {
-        expectType<Model<InferSchemaType<typeof AutoTypedSchema>>>(this);
+        expectAssignable<Model<InferSchemaType<typeof AutoTypedSchema>>>(this);
         return 'Returned from staticFn' as const;
       }
     },
     methods: {
       instanceFn() {
-        expectType<HydratedDocument<InferSchemaType<typeof AutoTypedSchema>>>(this);
+        expectAssignable<HydratedDocument<InferSchemaType<typeof AutoTypedSchema>>>(this);
         return 'Returned from DocumentInstanceFn' as const;
       }
     },
@@ -645,7 +646,7 @@ function gh11997() {
 function gh12003() {
   const baseSchemaOptions = {
     versionKey: false
-  };
+  } as const;
 
   const BaseSchema = new Schema({
     name: String
@@ -655,6 +656,7 @@ function gh12003() {
 
   type TSchemaOptions = ResolveSchemaOptions<ObtainSchemaGeneric<typeof BaseSchema, 'TSchemaOptions'>>;
   expectType<'type'>({} as TSchemaOptions['typeKey']);
+  expectType<false>({} as TSchemaOptions['versionKey']);
 
   expectType<{ name?: string | null }>({} as BaseSchemaType);
 }
@@ -901,7 +903,13 @@ function testInferTimestamps() {
   });
 
   type WithTimestamps2 = InferSchemaType<typeof schema2>;
-  expectType<{ createdAt: Date, updatedAt: Date } & { name?: string | null }>({} as WithTimestamps2);
+  expectType<{ createdAt: Date; updatedAt: Date } & { name?: string | null }>({} as WithTimestamps2);
+
+  const TestModel = model('Test', schema2);
+  const doc = new TestModel({ name: 'test' });
+  expectType<string | undefined | null>(doc.name);
+
+  expectType<string | undefined | null>(doc.myName());
 }
 
 function gh12431() {
@@ -970,10 +978,10 @@ function gh12590() {
   type User = InferSchemaType<typeof UserSchema>;
 
   const path = UserSchema.path('hashed_password');
-  expectType<SchemaType<any, HydratedDocument<User>>>(path);
+  expectAssignable<SchemaType<any, HydratedDocument<User>>>(path);
 
   UserSchema.path('hashed_password').validate(function(v) {
-    expectType<HydratedDocument<User>>(this);
+    expectAssignable<HydratedDocument<User>>(this);
     if (this._password && this._password.length < 8) {
       this.invalidate('password', 'Password must be at least 8 characters.');
     }
@@ -1031,6 +1039,68 @@ function gh12869() {
 
   type Example = InferSchemaType<typeof dbExample>;
   expectType<'foo' | 'bar'>({} as Example['active']);
+}
+
+
+function stringEnumInfer() {
+  enum StringEnum {
+    Foo = 'foo',
+    Bar = 'bar'
+  }
+
+  const stringEnumSchema = new Schema(
+    {
+      active: { type: String, enum: StringEnum }
+    }
+  );
+
+  type StringEnumExample = InferSchemaType<typeof stringEnumSchema>;
+  expectType<StringEnum | null | undefined>({} as StringEnumExample['active']);
+
+  const stringEnumSchemaRequired = new Schema(
+    {
+      active: { type: String, enum: StringEnum, required: true }
+    }
+  );
+
+  type StringEnumRequiredExample = InferSchemaType<typeof stringEnumSchemaRequired>;
+  expectAssignable<StringEnum>({} as StringEnumRequiredExample['active']);
+}
+function stringEnumArrayInfer() {
+  enum StringEnum {
+    Foo = 'foo',
+    Bar = 'bar'
+  }
+
+  const schemaDefinition = {
+    active: { type: [String], enum: StringEnum, required: false }
+  } as const;
+  const stringEnumSchema = new Schema(
+    {
+      active: { type: [String], enum: StringEnum, required: false }
+    }
+  );
+
+  type StringEnumExample = InferSchemaType<typeof stringEnumSchema>;
+  expectAssignable<StringEnum[] | null | undefined>({} as StringEnumExample['active']);
+  type RawStringEnumExample = InferRawDocType<typeof schemaDefinition>;
+  expectAssignable<StringEnum[] | null | undefined>({} as RawStringEnumExample['active']);
+  type HydratedStringEnumExample = InferHydratedDocType<typeof schemaDefinition>;
+  expectAssignable<StringEnum[] | null | undefined>({} as HydratedStringEnumExample['active']);
+
+  const schemaDefinitionRequired = {
+    active: { type: [String], enum: StringEnum, required: true }
+  } as const;
+  const stringEnumSchemaRequired = new Schema(
+    {
+      active: { type: [String], enum: StringEnum, required: true }
+    }
+  );
+
+  type StringEnumRequiredExample = InferSchemaType<typeof stringEnumSchemaRequired>;
+  expectAssignable<StringEnum[]>({} as StringEnumRequiredExample['active']);
+  type RawStringEnumRequiredExample = InferRawDocType<typeof schemaDefinitionRequired>;
+  expectAssignable<StringEnum[] | null | undefined>({} as RawStringEnumRequiredExample['active']);
 }
 
 function gh12882() {
@@ -1178,15 +1248,15 @@ function gh13633() {
   schema.pre('updateOne', { document: true, query: false }, function(next) {
   });
 
-  schema.pre('updateOne', { document: true, query: false }, function(next, options) {
+  schema.pre('updateOne', { document: true, query: false }, function(options) {
     expectType<Record<string, any> | undefined>(options);
   });
 
   schema.post('save', function(res, next) {
   });
-  schema.pre('insertMany', function(next, docs) {
+  schema.pre('insertMany', function(docs) {
   });
-  schema.pre('insertMany', function(next, docs, options) {
+  schema.pre('insertMany', function(docs, options) {
     expectType<(InsertManyOptions & { lean?: boolean }) | undefined>(options);
   });
 }
@@ -1245,7 +1315,7 @@ async function gh13797() {
     name: {
       type: String,
       required: function() {
-        expectType<HydratedDocument<IUser>>(this);
+        expectAssignable<HydratedDocument<IUser>>(this);
         return true;
       }
     }
@@ -1254,7 +1324,7 @@ async function gh13797() {
     name: {
       type: String,
       default: function() {
-        expectType<HydratedDocument<IUser>>(this);
+        expectAssignable<HydratedDocument<IUser>>(this);
         return '';
       }
     }
@@ -1633,7 +1703,6 @@ function gh13215() {
   >;
   type User = {
     userName: string;
-  } & {
     date: Date;
   };
 
@@ -1866,6 +1935,31 @@ function gh15479() {
   }
 }
 
+function gh15494() {
+  const SchemaA = new Schema({ name: String });
+  const SchemaB = new Schema({ name: String }, { versionKey: false });
+
+  const ModelA = model('ModelA', SchemaA);
+  const ModelB = model('ModelB', SchemaB);
+
+  type HydratedA = ReturnType<(typeof ModelA)['hydrate']>;
+  type HydratedB = ReturnType<(typeof ModelB)['hydrate']>;
+
+  const docA = new ModelA({ name: 'Alice' });
+  const docB = new ModelB({ name: 'Bob' });
+
+  // Should have __v
+  expectType<number>(docA.__v);
+  // Should not have __v
+  expectError(docB.__v);
+
+  const objA = docA.toObject();
+  expectType<number>(objA.__v);
+
+  const objB = docB.toObject();
+  expectError(objB.__v);
+}
+
 function gh15516() {
   interface IUser {
     name: string;
@@ -1922,4 +2016,61 @@ function testInferHydratedDocTypeFromSchema() {
   }>>;
 
   expectType<Expected>({} as HydratedDocType);
+}
+
+function gh15536() {
+  const UserModelNameRequiredCustom = model('User', new Schema(
+    {
+      name: { type: String, required: 'This is a custom error message' }
+    }
+  ));
+
+  const user3 = new UserModelNameRequiredCustom({ name: null });
+  expectType<string>(user3.name);
+}
+
+function gh10894() {
+  function autoInferred() {
+    const schema = new Schema({
+      testProp: {
+        type: 'Union',
+        of: [String, Number]
+      }
+    });
+    const TestModel = model('Test', schema);
+
+    type InferredDocType = InferSchemaType<typeof schema>;
+    expectType<string | number | null | undefined>({} as InferredDocType['testProp']);
+
+    const doc = new TestModel({ testProp: 42 });
+    expectType<string | number | null | undefined>(doc.testProp);
+
+    const toObject = doc.toObject();
+    expectType<string | number | null | undefined>(toObject.testProp);
+
+    const schemaDefinition = {
+      testProp: {
+        type: 'Union',
+        of: ['String', 'Number']
+      }
+    } as const;
+    type RawDocType = InferRawDocType<typeof schemaDefinition>;
+    expectType<string | number | null | undefined>({} as RawDocType['testProp']);
+  }
+}
+
+function autoInferredNestedMaps() {
+  const schema = new Schema({
+    nestedMap: {
+      type: Map,
+      required: true,
+      of: {
+        type: Map,
+        of: String
+      }
+    }
+  });
+  const TestModel = model('Test', schema);
+  const doc = new TestModel({ nestedMap: new Map([['1', new Map([['2', 'value']])]]) });
+  expectType<Map<string, Map<string, string>>>(doc.nestedMap);
 }

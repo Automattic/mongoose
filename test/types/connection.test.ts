@@ -1,4 +1,4 @@
-import { createConnection, Schema, Collection, Connection, ConnectionSyncIndexesResult, Model, connection, HydratedDocument, Query } from 'mongoose';
+import { createConnection, Schema, Collection, Connection, ConnectionSyncIndexesResult, InferSchemaType, Model, connection, HydratedDocument, Query } from 'mongoose';
 import * as mongodb from 'mongodb';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
@@ -75,7 +75,6 @@ expectType<Promise<ConnectionSyncIndexesResult>>(conn.syncIndexes({ continueOnEr
 
 expectType<Connection>(conn.useDb('test'));
 expectType<Connection>(conn.useDb('test', {}));
-expectType<Connection>(conn.useDb('test', { noListener: true }));
 expectType<Connection>(conn.useDb('test', { useCache: true }));
 
 expectType<Promise<string[]>>(
@@ -93,7 +92,7 @@ export function autoTypedModelConnection() {
   (async() => {
   // Model-functions-test
   // Create should works with arbitrary objects.
-    const randomObject = await AutoTypedModel.create({ unExistKey: 'unExistKey', description: 'st' });
+    const randomObject = await AutoTypedModel.create({ unExistKey: 'unExistKey', description: 'st' } as Partial<InferSchemaType<typeof AutoTypedSchema>>);
     expectType<AutoTypedSchemaType['schema']['userName']>(randomObject.userName);
 
     const testDoc1 = await AutoTypedModel.create({ userName: 'M0_0a' });

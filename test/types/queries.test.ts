@@ -1,5 +1,4 @@
-import {
-  Condition,
+import mongoose, {
   HydratedDocument,
   Schema,
   model,
@@ -9,16 +8,16 @@ import {
   Model,
   QueryWithHelpers,
   PopulatedDoc,
-  FilterQuery,
   UpdateQuery,
   UpdateQueryKnownOnly,
-  QuerySelector,
   InferRawDocType,
   InferSchemaType,
   ProjectionFields,
   QueryOptions,
-  ProjectionType
+  ProjectionType,
+  QueryFilter
 } from 'mongoose';
+import mongodb from 'mongodb';
 import { ModifyResult, ObjectId } from 'mongodb';
 import { expectAssignable, expectError, expectNotAssignable, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
@@ -28,7 +27,7 @@ interface QueryHelpers {
   byName(this: QueryWithHelpers<any, ITest, QueryHelpers>, name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;
 }
 
-const childSchema: Schema = new Schema({ name: String });
+const childSchema = new Schema({ name: String });
 const ChildModel = model<Child>('Child', childSchema);
 
 const schema: Schema<ITest, Model<ITest, QueryHelpers>, {}, QueryHelpers> = new Schema({
@@ -69,6 +68,9 @@ interface ITest {
   docs?: ISubdoc[];
   endDate?: Date;
 }
+
+type X = mongoose.WithLevel1NestedPaths<ITest>;
+expectType<number | undefined>({} as X['docs.id']);
 
 const Test = model<ITest, Model<ITest, QueryHelpers>>('Test', schema);
 
@@ -155,10 +157,10 @@ const p2: Record<string, number> | null = Test.find().projection();
 const p3: null = Test.find().projection(null);
 
 expectError(Test.find({ }, { name: 'ss' })); // Only 0 and 1 are allowed
-expectError(Test.find({ }, { name: 3 })); // Only 0 and 1 are allowed
-expectError(Test.find({ }, { name: true, age: false, endDate: true, tags: 1 })); // Exclusion in a inclusion projection is not allowed
-expectError(Test.find({ }, { name: true, age: false, endDate: true })); // Inclusion in a exclusion projection is not allowed
-expectError(Test.find({ }, { name: false, age: false, tags: false, child: { name: false }, docs: { myId: false, id: true } })); // Inclusion in a exclusion projection is not allowed in nested objects and arrays
+Test.find({}, { name: 3 });
+Test.find({}, { name: true, age: false, endDate: true, tags: 1 });
+Test.find({}, { name: true, age: false, endDate: true });
+Test.find({}, { name: false, age: false, tags: false, child: { name: false }, docs: { myId: false, id: true } });
 expectError(Test.find({ }, { tags: { something: 1 } })); // array of strings or numbers should only be allowed to be a boolean or 1 and 0
 Test.find({}, { name: true, age: true, endDate: true, tags: 1, child: { name: true }, docs: { myId: true, id: true } }); // This should be allowed
 Test.find({}, { name: 1, age: 1, endDate: 1, tags: 1, child: { name: 1 }, docs: { myId: 1, id: 1 } }); // This should be allowed
@@ -177,7 +179,7 @@ Test.find({}, { age: 1, tags: { $slice: 5 } }); // $slice should be allowed in i
 Test.find({}, { age: 0, tags: { $slice: 5 } }); // $slice should be allowed in exclusion projection
 Test.find({}, { age: 1, tags: { $elemMatch: {} } }); // $elemMatch should be allowed in inclusion projection
 Test.find({}, { age: 0, tags: { $elemMatch: {} } }); // $elemMatch should be allowed in exclusion projection
-expectError(Test.find({}, { 'docs.id': 11 })); // Dot notation should be allowed and does not accept any
+expectError(Test.find({}, { 'docs.id': 'taco' })); // Dot notation should be allowed and does not accept any
 expectError(Test.find({}, { docs: { id: '1' } })); // Dot notation should be able to use a combination with objects
 Test.find({}, { docs: { id: false } }); // Dot notation should be allowed with valid values - should correctly handle arrays
 Test.find({}, { docs: { id: true } }); // Dot notation should be allowed with valid values - should correctly handle arrays
@@ -210,13 +212,13 @@ expectError(Test.find().sort(['invalid']));
 
 // Super generic query
 function testGenericQuery(): void {
-  interface CommonInterface<T> extends Document {
+  interface CommonInterface<T> {
     something: string;
     content: T;
   }
 
   async function findSomething<T>(model: Model<CommonInterface<T>>): Promise<CommonInterface<T>> {
-    return model.findOne({ something: 'test' }).orFail().exec();
+    return model.findOne({ something: 'test' } as mongoose.QueryFilter<CommonInterface<T>>).orFail().exec();
   }
 }
 
@@ -257,7 +259,7 @@ function gh10757() {
 
   type MyClassDocument = MyClass & Document;
 
-  const test: FilterQuery<MyClass> = { status: { $in: [MyEnum.VALUE1, MyEnum.VALUE2] } };
+  const test: QueryFilter<MyClass> = { status: { $in: [MyEnum.VALUE1, MyEnum.VALUE2] } };
 }
 
 function gh10857() {
@@ -266,7 +268,7 @@ function gh10857() {
     status: MyUnion;
   }
   type MyClassDocument = MyClass & Document;
-  const test: FilterQuery<MyClass> = { status: { $in: ['VALUE1', 'VALUE2'] } };
+  const test: QueryFilter<MyClass> = { status: { $in: ['VALUE1', 'VALUE2'] } };
 }
 
 function gh10786() {
@@ -336,7 +338,6 @@ async function gh11306(): Promise<void> {
 
   expectType<unknown[]>(await MyModel.distinct('notThereInSchema'));
   expectType<string[]>(await MyModel.distinct('name'));
-  expectType<number[]>(await MyModel.distinct<'overrideTest', number>('overrideTest'));
 }
 
 function autoTypedQuery() {
@@ -348,17 +349,17 @@ function autoTypedQuery() {
 function gh11964() {
   class Repository<T extends { id: string }> {
     find(id: string) {
-      const idCondition: Condition<T['id']> = id as Condition<T['id']>;
+      const idCondition: mongodb.Condition<T['id']> = id as mongodb.Condition<T['id']>;
 
       // `as` is necessary because `T` can be `{ id: never }`,
       // so we need to explicitly coerce
-      const filter: FilterQuery<T> = { id } as FilterQuery<T>;
+      const filter: QueryFilter<T> = { id } as QueryFilter<T>;
     }
   }
 }
 
 function gh14397() {
-  type Condition<T> = T | QuerySelector<T>; // redefined here because it's not exported by mongoose
+  type Condition<T> = mongodb.Condition<T>; // redefined here because it's not exported by mongoose
 
   type WithId<T extends object> = T & { id: string };
 
@@ -370,7 +371,7 @@ function gh14397() {
   const id = 'Test Id';
 
   let idCondition: Condition<WithId<TestUser>['id']>;
-  let filter: FilterQuery<WithId<TestUser>>;
+  let filter: QueryFilter<WithId<TestUser>>;
 
   expectAssignable<typeof idCondition>(id);
   expectAssignable<typeof filter>({ id });
@@ -463,13 +464,13 @@ async function gh12342_auto() {
 
   const ProjectModel = model('Project', ProjectSchema);
 
-  expectType<HydratedDocument<Project>[]>(
+  expectAssignable<HydratedDocument<Project>[]>(
     await ProjectModel.findOne().where('stars').gt(1000).byName('mongoose')
   );
 }
 
 async function gh11602(): Promise<void> {
-  const query: Query<ITest | null, ITest> = Test.findOne();
+  const query = Test.findOne();
   query instanceof Query;
 
   const ModelType = model<ITest>('foo', schema);
@@ -510,7 +511,7 @@ async function gh13142() {
       Projection extends ProjectionFields<Blog>,
       Options extends QueryOptions<Blog>
     >(
-      filter: FilterQuery<Blog>,
+      filter: QueryFilter<mongoose.WithLevel1NestedPaths<Blog>>,
       projection: Projection,
       options: Options
     ): Promise<
@@ -642,8 +643,8 @@ function gh14473() {
   }
 
   const generateExists = <D extends AbstractSchema = AbstractSchema>() => {
-    const query: FilterQuery<D> = { deletedAt: { $ne: null } };
-    const query2: FilterQuery<D> = { deletedAt: { $lt: new Date() } } as FilterQuery<D>;
+    const query: QueryFilter<D> = { deletedAt: { $ne: null } };
+    const query2: QueryFilter<D> = { deletedAt: { $lt: new Date() } } as QueryFilter<D>;
   };
 }
 
@@ -707,7 +708,7 @@ async function gh14545() {
 }
 
 function gh14841() {
-  const filter: FilterQuery<{ owners: string[] }> = {
+  const filter: QueryFilter<{ owners: string[] }> = {
     $expr: { $lt: [{ $size: '$owners' }, 10] }
   };
 }
@@ -717,7 +718,7 @@ function gh14510() {
   // "Never assign a concrete type to a generic type parameter, consider it as read-only!"
   // This function is generally something you shouldn't do in TypeScript, can work around it with `as` though.
   function findById<ModelType extends {_id: Types.ObjectId | string}>(model: Model<ModelType>, _id: Types.ObjectId | string) {
-    return model.find({ _id: _id } as FilterQuery<ModelType>);
+    return model.find({ _id: _id } as QueryFilter<ModelType>);
   }
 }
 
@@ -734,4 +735,94 @@ async function gh15526() {
     .orFail();
   expectType<string | undefined | null>(u1.name);
   expectError(u1.age);
+}
+
+async function gh14173() {
+  const userSchema = new Schema({
+    name: String,
+    account: {
+      amount: Number,
+      owner: { type: String, default: () => 'OWNER' },
+      taxIds: [Number]
+    }
+  });
+  const User = model('User', userSchema);
+
+  const { _id } = await User.create({
+    name: 'test',
+    account: {
+      amount: 25,
+      owner: 'test',
+      taxIds: [42]
+    }
+  });
+
+  const doc = await User
+    .findOne({ _id }, { name: 1, account: { amount: 1 } })
+    .orFail();
+}
+
+async function gh3230() {
+  const Test = model(
+    'Test',
+    new Schema({ name: String, arr: [{ testRef: { type: 'ObjectId', ref: 'Test2' } }] })
+  );
+
+  const schema = new Schema({ name: String });
+  const Test2 = model('Test2', schema);
+  const D = Test2.discriminator('D', new Schema({ prop: String }));
+
+
+  await Test.deleteMany({});
+  await Test2.deleteMany({});
+  const { _id } = await D.create({ name: 'foo', prop: 'bar' });
+  const test = await Test.create({ name: 'test', arr: [{ testRef: _id }] });
+
+  console.log(await Test.findById(test._id).populate('arr.testRef', { name: 1, prop: 1, _id: 0, __t: 0 }));
+}
+
+async function gh12064() {
+  const schema = new Schema({
+    subdoc: new Schema({
+      subdocProp: Number
+    }),
+    nested: {
+      nestedProp: String
+    },
+    documentArray: [{ documentArrayProp: Boolean }]
+  });
+  const TestModel = model('Model', schema);
+
+  await TestModel.findOne({ 'subdoc.subdocProp': { $gt: 0 }, 'nested.nestedProp': { $in: ['foo', 'bar'] }, 'documentArray.documentArrayProp': { $ne: true } });
+  expectError(TestModel.findOne({ 'subdoc.subdocProp': 'taco tuesday' }));
+  expectError(TestModel.findOne({ 'nested.nestedProp': true }));
+  expectError(TestModel.findOne({ 'documentArray.documentArrayProp': 'taco' }));
+}
+
+function gh15671() {
+  interface DefaultQuery {
+    search?: string;
+  }
+
+  type QueryFeaturesProps = {
+    params: Partial<DefaultQuery>;
+  };
+
+  const queryFeatures = async <T, R, TQueryOp>(
+    query: mongoose.Query<R, T, object, T, TQueryOp>,
+    { params }: QueryFeaturesProps
+  ): Promise<{ content: mongoose.GetLeanResultType<T, R, TQueryOp>; result?: number }> => {
+    if (params.search) {
+      query.find({
+        $text: {
+          $search: params.search
+        }
+      });
+    }
+
+    const content = await query.lean().orFail().exec();
+    return {
+      content
+    };
+  };
 }

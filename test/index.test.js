@@ -302,9 +302,8 @@ describe('mongoose module:', function() {
     mong.plugin(function(s) {
       calls.push(s);
 
-      s.pre('save', function(next) {
+      s.pre('save', function() {
         ++preSaveCalls;
-        next();
       });
 
       s.methods.testMethod = function() { return 42; };

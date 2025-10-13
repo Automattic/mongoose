@@ -1,10 +1,9 @@
 import {
-  IsPathRequired,
   IsSchemaTypeFromBuiltinClass,
-  RequiredPaths,
+  PathEnumOrString,
   OptionalPaths,
-  PathWithTypePropertyBaseType,
-  PathEnumOrString
+  RequiredPaths,
+  IsPathRequired
 } from './inferschematype';
 import { Binary, UUID } from 'mongodb';
 
@@ -28,8 +27,10 @@ declare module 'mongoose' {
 
   /**
    * @summary Allows users to optionally choose their own type for a schema field for stronger typing.
+   * Make sure to check for `any` because `T extends { __rawDocTypeHint: infer U }` will infer `unknown` if T is `any`.
    */
-  type RawDocTypeHint<T> = T extends { __rawDocTypeHint: infer U } ? U: never;
+  type RawDocTypeHint<T> = IsAny<T> extends true ? never
+    : T extends { __rawDocTypeHint: infer U } ? U: never;
 
   /**
    * @summary Obtains schema Path type.
@@ -37,25 +38,27 @@ declare module 'mongoose' {
    * @param {PathValueType} PathValueType Document definition path type.
    * @param {TypeKey} TypeKey A generic refers to document definition.
    */
-  type ObtainRawDocumentPathType<
-    PathValueType,
-    TypeKey extends string = DefaultTypeKey,
-    TTransformOptions = { bufferToBinary: false }
-  > = ResolveRawPathType<
-    PathValueType extends PathWithTypePropertyBaseType<TypeKey>
-      ? PathValueType[TypeKey] extends PathWithTypePropertyBaseType<TypeKey>
-        ? PathValueType
-        : PathValueType[TypeKey]
-      : PathValueType,
-    PathValueType extends PathWithTypePropertyBaseType<TypeKey>
-      ? PathValueType[TypeKey] extends PathWithTypePropertyBaseType<TypeKey>
-        ? {}
-        : Omit<PathValueType, TypeKey>
-      : {},
-    TypeKey,
-    TTransformOptions,
-    RawDocTypeHint<PathValueType>
-  >;
+   type ObtainRawDocumentPathType<
+     PathValueType,
+     TypeKey extends string = DefaultTypeKey,
+     TTransformOptions = { bufferToBinary: false }
+   > = ResolveRawPathType<
+     TypeKey extends keyof PathValueType ?
+       TypeKey extends keyof PathValueType[TypeKey] ?
+         PathValueType
+       : PathValueType[TypeKey]
+     : PathValueType,
+     TypeKey extends keyof PathValueType ?
+       TypeKey extends keyof PathValueType[TypeKey] ?
+         {}
+       : Omit<PathValueType, TypeKey>
+     : {},
+     TypeKey,
+     TTransformOptions,
+     RawDocTypeHint<PathValueType>
+   >;
+
+  type neverOrAny = ' ~neverOrAny~';
 
   /**
    * Same as inferSchemaType, except:
@@ -70,75 +73,57 @@ declare module 'mongoose' {
    * @param {TypeKey} TypeKey A generic of literal string type."Refers to the property used for path type definition".
    * @returns Number, "Number" or "number" will be resolved to number type.
    */
-  type ResolveRawPathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}, TypeKey extends string = DefaultSchemaOptions['typeKey'], TTransformOptions = { bufferToBinary: false }, TypeHint = never> =
-  IfEquals<TypeHint, never,
-    PathValueType extends Schema<infer RawDocType, any, any, any, any, any, any, any, any, infer TSchemaDefinition> ?
-      IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : InferRawDocType<TSchemaDefinition, DefaultSchemaOptions, TTransformOptions> :
-      PathValueType extends (infer Item)[] ?
-        IfEquals<Item, never, any[], Item extends Schema<infer RawDocType, any, any, any, any, any, any, any, any, infer TSchemaDefinition> ?
-          // If Item is a schema, infer its type.
-          Array<IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : InferRawDocType<TSchemaDefinition, DefaultSchemaOptions, TTransformOptions>> :
-          Item extends Record<TypeKey, any> ?
-            Item[TypeKey] extends Function | String ?
-              // If Item has a type key that's a string or a callable, it must be a scalar,
-              // so we can directly obtain its path type.
-              ObtainRawDocumentPathType<Item, TypeKey, TTransformOptions>[] :
-              // If the type key isn't callable, then this is an array of objects, in which case
-              // we need to call InferRawDocType to correctly infer its type.
-              Array<InferRawDocType<Item, DefaultSchemaOptions, TTransformOptions>> :
-            IsSchemaTypeFromBuiltinClass<Item> extends true ?
-              ObtainRawDocumentPathType<Item, TypeKey, TTransformOptions>[] :
-              IsItRecordAndNotAny<Item> extends true ?
-                Item extends Record<string, never> ?
-                  ObtainRawDocumentPathType<Item, TypeKey, TTransformOptions>[] :
-                  Array<InferRawDocType<Item, DefaultSchemaOptions, TTransformOptions>> :
-                ObtainRawDocumentPathType<Item, TypeKey, TTransformOptions>[]
-        >:
-        PathValueType extends ReadonlyArray<infer Item> ?
-          IfEquals<Item, never, any[], Item extends Schema<infer RawDocType, any, any, any, any, any, any, any, any, infer TSchemaDefinition> ?
-            Array<IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : InferRawDocType<TSchemaDefinition, DefaultSchemaOptions, TTransformOptions>> :
-            Item extends Record<TypeKey, any> ?
-              Item[TypeKey] extends Function | String ?
-                ObtainRawDocumentPathType<Item, TypeKey, TTransformOptions>[] :
-                InferRawDocType<Item, DefaultSchemaOptions, TTransformOptions>[]:
-              IsSchemaTypeFromBuiltinClass<Item> extends true ?
-                ObtainRawDocumentPathType<Item, TypeKey, TTransformOptions>[] :
-                IsItRecordAndNotAny<Item> extends true ?
-                  Item extends Record<string, never> ?
-                    ObtainRawDocumentPathType<Item, TypeKey, TTransformOptions>[] :
-                    Array<InferRawDocType<Item, DefaultSchemaOptions, TTransformOptions>> :
-                  ObtainRawDocumentPathType<Item, TypeKey, TTransformOptions>[]
-          >:
-          PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']> :
-            IfEquals<PathValueType, Schema.Types.String> extends true ? PathEnumOrString<Options['enum']> :
-              IfEquals<PathValueType, String> extends true ? PathEnumOrString<Options['enum']> :
-                PathValueType extends NumberSchemaDefinition ? Options['enum'] extends ReadonlyArray<any> ? Options['enum'][number] : number :
-                  IfEquals<PathValueType, Schema.Types.Number> extends true ? number :
-                    PathValueType extends DateSchemaDefinition ? NativeDate :
-                      IfEquals<PathValueType, Schema.Types.Date> extends true ? NativeDate :
-                        PathValueType extends typeof Buffer | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer ? TTransformOptions extends { bufferToBinary: true } ? Binary : Buffer :
-                          PathValueType extends BooleanSchemaDefinition ? boolean :
-                            IfEquals<PathValueType, Schema.Types.Boolean> extends true ? boolean :
-                              PathValueType extends ObjectIdSchemaDefinition ? Types.ObjectId :
-                                IfEquals<PathValueType, Types.ObjectId> extends true ? Types.ObjectId :
-                                  IfEquals<PathValueType, Schema.Types.ObjectId> extends true ? Types.ObjectId :
-                                    PathValueType extends 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 ? Types.Decimal128 :
-                                      IfEquals<PathValueType, Schema.Types.Decimal128> extends true ? Types.Decimal128 :
-                                        IfEquals<PathValueType, Types.Decimal128> extends true ? Types.Decimal128 :
-                                          IfEquals<PathValueType, Schema.Types.BigInt> extends true ? bigint :
-                                            IfEquals<PathValueType, BigInt> extends true ? bigint :
-                                              PathValueType extends 'bigint' | 'BigInt' | typeof Schema.Types.BigInt | typeof BigInt ? bigint :
-                                                PathValueType extends 'uuid' | 'UUID' | typeof Schema.Types.UUID ? UUID :
-                                                  PathValueType extends 'double' | 'Double' | typeof Schema.Types.Double ? Types.Double :
-                                                    IfEquals<PathValueType, Schema.Types.UUID> extends true ? UUID :
-                                                      PathValueType extends MapConstructor | 'Map' ? Record<string, ResolveRawPathType<Options['of']> | undefined> :
-                                                        IfEquals<PathValueType, typeof Schema.Types.Map> extends true ? Record<string, ResolveRawPathType<Options['of']> | undefined> :
-                                                          PathValueType extends ArrayConstructor ? any[] :
-                                                            PathValueType extends typeof Schema.Types.Mixed ? any:
-                                                              IfEquals<PathValueType, ObjectConstructor> extends true ? any:
-                                                                IfEquals<PathValueType, {}> extends true ? any:
-                                                                  PathValueType extends typeof SchemaType ? PathValueType['prototype'] :
-                                                                    PathValueType extends Record<string, any> ? InferRawDocType<PathValueType, { typeKey: TypeKey }, TTransformOptions> :
-                                                                      unknown,
-  TypeHint>;
+   type ResolveRawPathType<
+       PathValueType,
+       Options extends SchemaTypeOptions<PathValueType> = {},
+       TypeKey extends string = DefaultSchemaOptions['typeKey'],
+       TTransformOptions = { bufferToBinary: false },
+       TypeHint = never
+     > =
+       IsNotNever<TypeHint> extends true ? TypeHint
+       : [PathValueType] extends [neverOrAny] ? PathValueType
+       : PathValueType extends Schema<infer RawDocType, any, any, any, any, any, any, any, any, infer TSchemaDefinition> ? IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : InferRawDocType<TSchemaDefinition, DefaultSchemaOptions, TTransformOptions>
+       : PathValueType extends ReadonlyArray<infer Item> ?
+         IfEquals<Item, never> extends true ? any[]
+         : Item extends Schema<infer RawDocType, any, any, any, any, any, any, any, any, infer TSchemaDefinition> ?
+           // If Item is a schema, infer its type.
+           Array<IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : InferRawDocType<TSchemaDefinition, DefaultSchemaOptions, TTransformOptions>>
+         : TypeKey extends keyof Item ?
+           Item[TypeKey] extends Function | String ?
+             // If Item has a type key that's a string or a callable, it must be a scalar,
+             // so we can directly obtain its path type.
+             ObtainRawDocumentPathType<Item, TypeKey, TTransformOptions>[]
+           : // If the type key isn't callable, then this is an array of objects, in which case
+             // we need to call InferRawDocType to correctly infer its type.
+             Array<InferRawDocType<Item, DefaultSchemaOptions, TTransformOptions>>
+         : IsSchemaTypeFromBuiltinClass<Item> extends true ? ResolveRawPathType<Item, { enum: Options['enum'] }, TypeKey>[]
+         : IsItRecordAndNotAny<Item> extends true ?
+           Item extends Record<string, never> ?
+             ObtainRawDocumentPathType<Item, TypeKey, TTransformOptions>[]
+           : Array<InferRawDocType<Item, DefaultSchemaOptions, TTransformOptions>>
+         : ObtainRawDocumentPathType<Item, TypeKey, TTransformOptions>[]
+       : PathValueType extends StringSchemaDefinition ? PathEnumOrString<Options['enum']>
+       : IfEquals<PathValueType, String> extends true ? PathEnumOrString<Options['enum']>
+       : PathValueType extends NumberSchemaDefinition ?
+         Options['enum'] extends ReadonlyArray<any> ?
+           Options['enum'][number]
+         : number
+       : PathValueType extends DateSchemaDefinition ? NativeDate
+       : PathValueType extends BufferSchemaDefinition ? Buffer
+       : PathValueType extends BooleanSchemaDefinition ? boolean
+       : PathValueType extends ObjectIdSchemaDefinition ? Types.ObjectId
+       : PathValueType extends Decimal128SchemaDefinition ? Types.Decimal128
+       : PathValueType extends BigintSchemaDefinition ? bigint
+       : PathValueType extends UuidSchemaDefinition ? Types.UUID
+       : PathValueType extends MapSchemaDefinition ? Map<string, ResolveRawPathType<Options['of']>>
+       : PathValueType extends DoubleSchemaDefinition ? Types.Double
+       : PathValueType extends UnionSchemaDefinition ?
+         ResolveRawPathType<Options['of'] extends ReadonlyArray<infer Item> ? Item : never>
+       : PathValueType extends ArrayConstructor ? any[]
+       : PathValueType extends typeof Schema.Types.Mixed ? any
+       : IfEquals<PathValueType, ObjectConstructor> extends true ? any
+       : IfEquals<PathValueType, {}> extends true ? any
+       : PathValueType extends typeof SchemaType ? PathValueType['prototype']
+       : PathValueType extends Record<string, any> ? InferRawDocType<PathValueType>
+       : unknown;
 }

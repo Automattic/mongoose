@@ -71,3 +71,8 @@ function setAsObject() {
 }
 
 const x: { name: string } = mongoose.omitUndefined({ name: 'foo' });
+
+function baseConnectionAndCollection() {
+  const conn: mongoose.BaseConnection = mongoose.createConnection();
+  const coll: mongoose.BaseCollection<any> = conn.collection('test1');
+}

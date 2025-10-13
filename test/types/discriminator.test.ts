@@ -1,6 +1,7 @@
-import mongoose, { Document, Model, Schema, SchemaDefinition, SchemaOptions, Types, model } from 'mongoose';
+import mongoose, { Document, Model, Schema, SchemaDefinition, SchemaOptions, Types, model, HydratedDocFromModel, InferSchemaType } from 'mongoose';
+import { expectType } from 'tsd';
 
-const schema: Schema = new Schema({ name: { type: 'String' } });
+const schema = new Schema({ name: { type: 'String' } });
 
 interface IBaseTest {
   name?: string;
@@ -41,13 +42,13 @@ function test(): void {
     type: CardType.Land;
   }
 
-  const cardDbBaseSchemaDefinition: SchemaDefinition = {
+  const cardDbBaseSchemaDefinition = {
     type: { type: String, required: true }
   };
 
   const cardDbSchemaOptions: SchemaOptions = { discriminatorKey: 'type' };
 
-  const cardDbSchema: Schema = new Schema(
+  const cardDbSchema = new Schema(
     cardDbBaseSchemaDefinition,
     cardDbSchemaOptions
   );
@@ -58,9 +59,9 @@ function test(): void {
     'card'
   );
 
-  const landDbAdditionalPropertiesSchemaDefinition: SchemaDefinition = {};
+  const landDbAdditionalPropertiesSchemaDefinition = {};
 
-  const landDbSchema: Schema = new Schema(
+  const landDbSchema = new Schema(
     landDbAdditionalPropertiesSchemaDefinition
   );
 
@@ -75,4 +76,73 @@ function test(): void {
   });
 
   const sampleCardDb: CardDb = sampleLandDb;
+}
+
+function gh15535() {
+  const ParentSchema = new Schema({
+    field1: {
+      type: String,
+      required: true
+    },
+    field2: Number
+  }, {
+    discriminatorKey: 'field1',
+    methods: {
+      getField2() {
+        return this.field2;
+      }
+    }
+  });
+
+  const ParentModel = mongoose.model('Parent', ParentSchema);
+
+  const ChildSchema = new Schema({
+    field3: String
+  }, {
+    methods: {
+      getField3() {
+        return this.field3;
+      }
+    }
+  });
+
+
+  const ChildModel = ParentModel.discriminator('child', ChildSchema);
+
+  const doc = new ChildModel({});
+  expectType<string>(doc.field1);
+  expectType<number | null | undefined>(doc.field2);
+  expectType<number | null | undefined>(doc.getField2());
+  expectType<string | null | undefined>(doc.field3);
+  expectType<string | null | undefined>(doc.getField3());
+}
+
+async function gh15600() {
+  // Base model with custom static method
+  const baseSchema = new Schema(
+    { __t: String, name: String },
+    {
+      statics: {
+        findByName(name: string) {
+          return this.findOne({ name });
+        }
+      }
+    }
+  );
+  const BaseModel = model('Base', baseSchema);
+
+  const baseRes = await BaseModel.findByName('test');
+  expectType<string | null | undefined>(baseRes!.name);
+
+  // Discriminator model inheriting base static methods
+  const discriminatorSchema = new Schema({ extra: String });
+  const DiscriminatorModel = BaseModel.discriminator('Discriminator', discriminatorSchema);
+
+  const res = await DiscriminatorModel.findByName('test');
+  expectType<string | null | undefined>(res!.name);
+
+  const doc = await BaseModel.create(
+    { __t: 'Discriminator', name: 'test', extra: 'test' } as InferSchemaType<typeof baseSchema>
+  ) as HydratedDocFromModel<typeof DiscriminatorModel>;
+  expectType<string | null | undefined>(doc.extra);
 }

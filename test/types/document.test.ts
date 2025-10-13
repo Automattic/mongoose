@@ -7,7 +7,9 @@ import {
   HydratedDocument,
   HydratedArraySubdocument,
   HydratedSingleSubdocument,
-  DefaultSchemaOptions
+  DefaultSchemaOptions,
+  ObtainSchemaGeneric,
+  ResolveSchemaOptions
 } from 'mongoose';
 import { DeleteResult } from 'mongodb';
 import { expectAssignable, expectError, expectNotAssignable, expectType } from 'tsd';
@@ -19,7 +21,7 @@ const Drink = model('Drink', new Schema({
   name: String
 }));
 
-const schema: Schema = new Schema({
+const schema = new Schema({
   name: { type: 'String', required: true },
   address: new Schema({ city: { type: String, required: true } }),
   favoritDrink: {
@@ -137,7 +139,7 @@ async function gh11117(): Promise<void> {
 
   const fooModel = model('foos', fooSchema);
 
-  const items = await fooModel.create<Foo>([
+  const items = await fooModel.create([
     {
       someId: new Types.ObjectId(),
       someDate: new Date(),
@@ -474,4 +476,180 @@ async function gh15316() {
 
   expectType<string>(doc.toJSON({ virtuals: true }).upper);
   expectType<string>(doc.toObject({ virtuals: true }).upper);
+}
+
+function gh13079() {
+  const schema = new Schema({
+    name: { type: String, required: true }
+  });
+  const TestModel = model('Test', schema);
+
+  const doc = new TestModel({ name: 'taco' });
+  expectType<string>(doc.id);
+
+  const schema2 = new Schema({
+    id: { type: Number, required: true },
+    name: { type: String, required: true }
+  });
+  const TestModel2 = model('Test', schema2);
+
+  const doc2 = new TestModel2({ name: 'taco' });
+  expectType<number>(doc2.id);
+
+  const schema3 = new Schema<{ name: string }>({
+    name: { type: String, required: true }
+  });
+  const TestModel3 = model('Test', schema3);
+
+  const doc3 = new TestModel3({ name: 'taco' });
+  expectType<string>(doc3.id);
+
+  const schema4 = new Schema<{ name: string, id: number }>({
+    id: { type: Number, required: true },
+    name: { type: String, required: true }
+  });
+  const TestModel4 = model('Test', schema4);
+
+  const doc4 = new TestModel4({ name: 'taco' });
+  expectType<number>(doc4.id);
+
+  const schema5 = new Schema({
+    name: { type: String, required: true }
+  }, { id: false });
+  const TestModel5 = model('Test', schema5);
+
+  const doc5 = new TestModel5({ name: 'taco' });
+  expectError(doc5.id);
+}
+
+async function gh15578() {
+  function withDocType() {
+    interface RawDocType {
+      _id: Types.ObjectId;
+      testProperty: number;
+    }
+
+    const ASchema = new Schema<RawDocType>({
+      testProperty: Number
+    });
+
+    const AModel = model<RawDocType>('YourModel', ASchema);
+
+    const a = new AModel({ testProperty: 8 });
+    const toObjectFlattened: Omit<RawDocType, '_id'> & { _id: string } = a.toObject({ flattenObjectIds: true });
+    const toObjectWithVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toObject({ virtuals: true, flattenObjectIds: true });
+    const toObjectWithoutVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toObject({ virtuals: false, flattenObjectIds: true });
+    const toJSONFlattened: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ flattenObjectIds: true });
+    const toJSONWithVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: true, flattenObjectIds: true });
+    const toJSONWithoutVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: false, flattenObjectIds: true });
+
+    const objWithoutVersionKey = a.toObject({ versionKey: false });
+    const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
+    expectError(objWithoutVersionKey.__v);
+    expectError(jsonWithoutVersionKey.__v);
+
+    const objWithVersionKey = a.toObject();
+    const jsonWithVersionKey = a.toJSON();
+    expectType<number>(objWithVersionKey.__v);
+    expectType<number>(jsonWithVersionKey.__v);
+  }
+
+  function withDocTypeAndVersionKey() {
+    interface RawDocType {
+      _id: Types.ObjectId;
+      testProperty: number;
+    }
+
+    const schemaOptions = { versionKey: 'taco' } as const;
+
+    type ModelType = Model<RawDocType, {}, {}, {}, HydratedDocument<RawDocType, {}, {}, {}, typeof schemaOptions>>;
+
+    const ASchema = new Schema<RawDocType, ModelType, {}, {}, {}, {}, typeof schemaOptions>({
+      testProperty: Number
+    }, schemaOptions);
+
+    const AModel = model<RawDocType, ModelType>('YourModel', ASchema);
+
+    const a = new AModel({ testProperty: 8 });
+    const toObjectFlattened: Omit<RawDocType, '_id'> & { _id: string } = a.toObject({ flattenObjectIds: true });
+    const toObjectWithVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toObject({ virtuals: true, flattenObjectIds: true });
+    const toObjectWithoutVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toObject({ virtuals: false, flattenObjectIds: true });
+    const toJSONFlattened: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ flattenObjectIds: true });
+    const toJSONWithVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: true, flattenObjectIds: true });
+    const toJSONWithoutVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: false, flattenObjectIds: true });
+
+    const objWithoutVersionKey = a.toObject({ versionKey: false });
+    const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
+    expectError(objWithoutVersionKey.taco);
+    expectError(jsonWithoutVersionKey.taco);
+
+    const objWithVersionKey = a.toObject();
+    const jsonWithVersionKey = a.toJSON();
+    expectType<number>(objWithVersionKey.taco);
+    expectType<number>(jsonWithVersionKey.taco);
+  }
+
+  function autoInferred() {
+    interface RawDocType {
+      _id: Types.ObjectId;
+      testProperty?: number | null;
+    }
+
+    const ASchema = new Schema({
+      testProperty: Number
+    });
+
+    const AModel = model('YourModel', ASchema);
+
+    const a = new AModel({ testProperty: 8 });
+    const toObjectFlattened: Omit<RawDocType, '_id'> & { _id: string } = a.toObject({ flattenObjectIds: true });
+    const toObjectWithVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toObject({ virtuals: true, flattenObjectIds: true });
+    const toObjectWithoutVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toObject({ virtuals: false, flattenObjectIds: true });
+    const toJSONFlattened: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ flattenObjectIds: true });
+    const toJSONWithVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: true, flattenObjectIds: true });
+    const toJSONWithoutVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: false, flattenObjectIds: true });
+
+    const objWithoutVersionKey = a.toObject({ versionKey: false });
+    const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
+    expectError(objWithoutVersionKey.__v);
+    expectError(jsonWithoutVersionKey.__v);
+
+    const objWithVersionKey = a.toObject();
+    const jsonWithVersionKey = a.toJSON();
+    expectType<number>(objWithVersionKey.__v);
+    expectType<number>(jsonWithVersionKey.__v);
+  }
+
+  function autoInferredWithCustomVersionKey() {
+    interface RawDocType {
+      _id: Types.ObjectId;
+      testProperty?: number | null;
+    }
+
+    const ASchema = new Schema({
+      testProperty: Number
+    }, { versionKey: 'taco' });
+
+    const AModel = model('YourModel', ASchema);
+
+    type TSchemaOptions = ResolveSchemaOptions<ObtainSchemaGeneric<typeof ASchema, 'TSchemaOptions'>>;
+
+    const a = new AModel({ testProperty: 8 });
+    const toObjectFlattened: Omit<RawDocType, '_id'> & { _id: string } = a.toObject({ flattenObjectIds: true });
+    const toObjectWithVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toObject({ virtuals: true, flattenObjectIds: true });
+    const toObjectWithoutVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toObject({ virtuals: false, flattenObjectIds: true });
+    const toJSONFlattened: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ flattenObjectIds: true });
+    const toJSONWithVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: true, flattenObjectIds: true });
+    const toJSONWithoutVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: false, flattenObjectIds: true });
+
+    const objWithoutVersionKey = a.toObject({ versionKey: false });
+    const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
+    expectError(objWithoutVersionKey.taco);
+    expectError(jsonWithoutVersionKey.taco);
+
+    const objWithVersionKey = a.toObject();
+    const jsonWithVersionKey = a.toJSON();
+    expectType<number>(objWithVersionKey.taco);
+    expectType<number>(jsonWithVersionKey.taco);
+  }
 }

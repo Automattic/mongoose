@@ -367,3 +367,88 @@ async function gh15158() {
 
   createSomeModelAndDoSomething();
 }
+
+async function leanFalse() {
+  const schema = new Schema({
+    name: String
+  });
+  const Test = model('Test', schema);
+  type TestDocument = ReturnType<(typeof Test)['hydrate']>;
+
+  const doc = await Test.findOne().orFail().lean(false);
+  expectType<TestDocument>(doc);
+}
+
+async function gh15583() {
+  const schema = new Schema(
+    { name: String },
+    {
+      lean: {
+        transform: doc => {
+          doc.transformed = true;
+          return doc;
+        }
+      }
+    }
+  );
+
+  type TRawDocType = InferSchemaType<typeof schema>;
+  const TestModel = model('Test', schema);
+
+  const testDoc = await TestModel.findOne().lean<TRawDocType & { transformed: boolean }>().orFail();
+  expectType<boolean>(testDoc.transformed);
+}
+
+async function gh15583_2() {
+  const schema = new Schema(
+    { name: String },
+    { lean: true }
+  );
+  const TestModel = model('Test', schema);
+
+  const testDoc = await TestModel.findOne().orFail();
+  expectError(testDoc.save());
+
+  const testDoc2 = await TestModel.findById('anything').lean().orFail();
+  expectError(testDoc2.save());
+
+  const testDocs = await TestModel.find().lean().exec();
+  for (const doc of testDocs) {
+    expectError(doc.save());
+  }
+
+  const testDoc3 = await TestModel.findOneAndUpdate({}, { name: 'test' }).lean().orFail();
+  expectError(testDoc3.save());
+
+  const testDoc4 = await TestModel.findOneAndReplace({}, { name: 'test' }).lean().orFail();
+  expectError(testDoc4.save());
+
+  const testDoc5 = await TestModel.findOneAndDelete({}).lean().orFail();
+  expectError(testDoc5.save());
+
+  const schema2 = new Schema(
+    { name: String },
+    { lean: { virtuals: true } }
+  );
+  const TestModel2 = model('Test', schema2);
+
+  const testDoc6 = await TestModel2.findOne().orFail();
+  expectError(testDoc6.save());
+
+  const testDoc7 = await TestModel2.findById('anything').lean().orFail();
+  expectError(testDoc7.save());
+
+  const testDocs2 = await TestModel2.find().lean().exec();
+  for (const doc of testDocs2) {
+    expectError(doc.save());
+  }
+
+  const testDoc8 = await TestModel2.findOneAndUpdate({}, { name: 'test' }).lean().orFail();
+  expectError(testDoc8.save());
+
+  const testDoc9 = await TestModel2.findOneAndReplace({}, { name: 'test' }).lean().orFail();
+  expectError(testDoc9.save());
+
+  const testDoc10 = await TestModel2.findOneAndDelete({}).lean().orFail();
+  expectError(testDoc10.save());
+}

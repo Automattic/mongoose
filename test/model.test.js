@@ -408,9 +408,8 @@ describe('Model', function() {
       name: String
     });
 
-    childSchema.pre('save', function(next) {
+    childSchema.pre('save', function() {
       child_hook = this.name;
-      next();
     });
 
     const parentSchema = new Schema({
@@ -418,9 +417,8 @@ describe('Model', function() {
       children: [childSchema]
     });
 
-    parentSchema.pre('save', function(next) {
+    parentSchema.pre('save', function() {
       parent_hook = this.name;
-      next();
     });
 
     const Parent = db.model('Parent', parentSchema);
@@ -1016,11 +1014,10 @@ describe('Model', function() {
           baz: { type: String }
         });
 
-        ValidationMiddlewareSchema.pre('validate', function(next) {
+        ValidationMiddlewareSchema.pre('validate', function() {
           if (this.get('baz') === 'bad') {
             this.invalidate('baz', 'bad');
           }
-          next();
         });
 
         Post = db.model('Test', ValidationMiddlewareSchema);
@@ -2096,14 +2093,12 @@ describe('Model', function() {
         const schema = new Schema({ name: String });
         let called = 0;
 
-        schema.pre('save', function(next) {
+        schema.pre('save', function() {
           called++;
-          next(undefined);
         });
 
-        schema.pre('save', function(next) {
+        schema.pre('save', function() {
           called++;
-          next(null);
         });
 
         const S = db.model('Test', schema);
@@ -2115,22 +2110,19 @@ describe('Model', function() {
 
       it('called on all sub levels', async function() {
         const grandSchema = new Schema({ name: String });
-        grandSchema.pre('save', function(next) {
+        grandSchema.pre('save', function() {
           this.name = 'grand';
-          next();
         });
 
         const childSchema = new Schema({ name: String, grand: [grandSchema] });
-        childSchema.pre('save', function(next) {
+        childSchema.pre('save', function() {
           this.name = 'child';
-          next();
         });
 
         const schema = new Schema({ name: String, child: [childSchema] });
 
-        schema.pre('save', function(next) {
+        schema.pre('save', function() {
           this.name = 'parent';
-          next();
         });
 
         const S = db.model('Test', schema);
@@ -2144,21 +2136,19 @@ describe('Model', function() {
 
       it('error on any sub level', async function() {
         const grandSchema = new Schema({ name: String });
-        grandSchema.pre('save', function(next) {
-          next(new Error('Error 101'));
+        grandSchema.pre('save', function() {
+          throw new Error('Error 101');
         });
 
         const childSchema = new Schema({ name: String, grand: [grandSchema] });
-        childSchema.pre('save', function(next) {
+        childSchema.pre('save', function() {
           this.name = 'child';
-          next();
         });
 
         let schemaPostSaveCalls = 0;
         const schema = new Schema({ name: String, child: [childSchema] });
-        schema.pre('save', function(next) {
+        schema.pre('save', function() {
           this.name = 'parent';
-          next();
         });
         schema.post('save', function testSchemaPostSave(err, res, next) {
           ++schemaPostSaveCalls;
@@ -2480,8 +2470,8 @@ describe('Model', function() {
     describe('when no callback is passed', function() {
       it('should emit error on its Model when there are listeners', async function() {
         const DefaultErrSchema = new Schema({});
-        DefaultErrSchema.pre('save', function(next) {
-          next(new Error());
+        DefaultErrSchema.pre('save', function() {
+          throw new Error();
         });
 
         const DefaultErr = db.model('Test', DefaultErrSchema);
@@ -6072,9 +6062,8 @@ describe('Model', function() {
     };
 
     let called = 0;
-    schema.pre('aggregate', function(next) {
+    schema.pre('aggregate', function() {
       ++called;
-      next();
     });
     const Model = db.model('Test', schema);
 
@@ -6101,9 +6090,8 @@ describe('Model', function() {
     };
 
     let called = 0;
-    schema.pre('insertMany', function(next) {
+    schema.pre('insertMany', function() {
       ++called;
-      next();
     });
     const Model = db.model('Test', schema);
 
@@ -6126,9 +6114,8 @@ describe('Model', function() {
     };
 
     let called = 0;
-    schema.pre('save', function(next) {
+    schema.pre('save', function() {
       ++called;
-      next();
     });
 
     const Model = db.model('Test', schema);
@@ -6803,7 +6790,7 @@ describe('Model', function() {
 
       assert.throws(
         () => User.buildBulkWriteOperations(users),
-        /name: Path `name` \(`a`\) is shorter than the minimum allowed length/
+        /name: Path `name` \(`a`, length 1\) is shorter than the minimum allowed length/
       );
     });
 
@@ -7693,6 +7680,116 @@ describe('Model', function() {
     assert.equal(doc.text, 'foobar');
   });
 
+  it('supports virtuals option for `hydrate()` (gh-15627)', function() {
+    // 2) virtual in a document array
+    const arrSchema = new Schema({
+      value: String
+    });
+    arrSchema.virtual('valueLower');
+
+    // 3) virtual in a subdocument
+    const nestedSchema = new Schema({
+      foo: String
+    });
+    nestedSchema.virtual('fooRev');
+
+    // 4) virtual in a map of subdocuments
+    const mapSubSchema = new Schema({
+      v: String
+    }, { _id: false });
+    mapSubSchema.virtual('vDouble');
+
+    const schema = Schema({
+      name: String,
+      nested: nestedSchema,
+      arr: [arrSchema],
+      map: {
+        type: Map,
+        of: mapSubSchema
+      },
+      friendId: {
+        type: mongoose.Schema.Types.ObjectId
+      }
+    }, { toObject: { virtuals: true }, toJSON: { virtuals: true } });
+
+    // 1) top-level virtual
+    schema.virtual('topLevel');
+
+    // 5) top-level populated virtual
+    schema.virtual('friend', {
+      ref: 'TestUser',
+      localField: 'friendId',
+      foreignField: '_id',
+      justOne: true
+    });
+
+    db.model('User', new Schema({
+      _id: mongoose.Schema.Types.ObjectId,
+      username: String
+    }));
+
+    const TestModel = db.model('Test', schema);
+
+    const userId = new mongoose.Types.ObjectId();
+
+    // Hydrate with various virtuals in the raw object
+    const doc = TestModel.hydrate({
+      name: 'Bill',
+      topLevel: 'test top level virtual',
+      arr: [
+        { value: 'FOO', valueLower: 'foo' },
+        { value: 'BAR', valueLower: 'bar' }
+      ],
+      nested: { foo: 'baz', fooRev: 'zab' },
+      map: {
+        first: { v: 'ab', vDouble: 'abab' },
+        second: { v: 'xy', vDouble: 'xyxy' }
+      },
+      friendId: userId,
+      friend: { _id: userId, username: 'Populated Friend' }
+    }, null, { virtuals: true }); // ensure virtuals:true here
+
+    // 1) Top-level virtual
+    assert.equal(doc.name, 'Bill');
+    assert.equal(doc.topLevel, 'test top level virtual');
+    assert.strictEqual(doc.toObject().topLevel, 'test top level virtual');
+
+    // 2) Document array virtuals
+    assert.equal(doc.arr.length, 2);
+    assert.equal(doc.arr[0].value, 'FOO');
+    assert.equal(doc.arr[0].valueLower, 'foo');
+    assert.strictEqual(doc.arr[0].toObject().valueLower, 'foo');
+    assert.equal(doc.arr[1].value, 'BAR');
+    assert.equal(doc.arr[1].valueLower, 'bar');
+    assert.strictEqual(doc.arr[1].toObject().valueLower, 'bar');
+
+    // 3) Virtual in subdocument
+    assert.ok(doc.nested);
+    assert.equal(doc.nested.foo, 'baz');
+    assert.equal(doc.nested.fooRev, 'zab');
+    assert.strictEqual(doc.nested.toObject().fooRev, 'zab');
+
+    // 4) Virtual in map of subdocuments
+    assert.ok(doc.map instanceof Map);
+    assert.equal(doc.map.get('first').v, 'ab');
+    assert.equal(doc.map.get('first').vDouble, 'abab');
+    assert.strictEqual(doc.map.get('first').toObject().vDouble, 'abab');
+    assert.equal(doc.map.get('second').v, 'xy');
+    assert.equal(doc.map.get('second').vDouble, 'xyxy');
+    assert.strictEqual(doc.map.get('second').toObject().vDouble, 'xyxy');
+
+    // 5) Top-level populated virtual
+    assert.equal(doc.friendId.toString(), userId.toString());
+    assert.ok(doc.friend);
+    assert.equal(doc.friend._id.toString(), userId.toString());
+    assert.equal(doc.friend.username, 'Populated Friend');
+
+    assert.throws(
+      () => TestModel.hydrate({}, null, { virtuals: true, hydratedPopulatedDocs: false }),
+      /Cannot set `hydratedPopulatedDocs` option to false if `virtuals` option is truthy/
+    );
+  });
+
   it('sets index collation based on schema collation (gh-7621)', async function() {
     let testSchema = new Schema(
       { name: { type: String, index: true } }
@@ -8144,9 +8241,8 @@ describe('Model', function() {
         name: String
       });
       let bypass = true;
-      testSchema.pre('findOne', function(next) {
+      testSchema.pre('findOne', function() {
         bypass = false;
-        next();
       });
       const Test = db.model('gh13250', testSchema);
       const doc = await Test.create({
@@ -8307,7 +8403,7 @@ describe('Model', function() {
       const schema = new mongoose.Schema({
         name: String
       });
-      const Model = db.model('Test', schema);
+      const Model = db.model('Test', schema, 'tests');
       assert.equal(db.model('Test'), Model);
       const original = Model.find();
       assert.equal(original.model.collection.conn.name, 'mongoose_test');
@@ -8322,6 +8418,7 @@ describe('Model', function() {
       assert.equal(db.models[Model.modelName], undefined);
       assert(connection.models[Model.modelName]);
       const query = Model.find();
+      assert.equal(query.model.collection.collectionName, 'tests');
       assert.equal(query.model.collection.conn.name, 'mongoose_test_2');
 
       await Model.deleteMany({});
@@ -8733,31 +8830,155 @@ describe('Model', function() {
     });
   });
 
-  it('createSearchIndexes creates an index for each search index in schema (gh-15465)', async function() {
-    const sinon = require('sinon');
-    const schema = new mongoose.Schema({
-      name: String,
-      description: String
+  describe('Atlas/Vector Search Indexes (gh-15465)', function() {
+    // Apply consistent timeout for all tests in this block
+    this.timeout(20000);
+
+    let TestModel;
+
+    beforeEach(async function() {
+      const version = await start.mongodVersion();
+      if (version[0] < 8 || !process.env.IS_ATLAS) {
+        this.skip();
+      }
     });
 
-    schema.searchIndex({ name: 'test', definition: { mappings: { dynamic: true } } });
+    afterEach(async function() {
+      if (this.currentTest.pending) {
+        return; // Test was skipped
+      }
+      const indexes = await TestModel.listSearchIndexes().catch(() => []);
+      for (const idx of indexes) {
+        await TestModel.dropSearchIndex(idx.name);
+      }
+    });
 
-    const TestModel = db.model('Test', schema);
+    it('createSearchIndexes creates an index for each search index in schema (gh-15465)', async function() {
+      const schema = new mongoose.Schema({
+        name: String,
+        description: String
+      });
 
-    const createSearchIndexStub = sinon.stub(TestModel, 'createSearchIndex').resolves({ acknowledged: true });
+      schema.searchIndex({
+        name: 'test',
+        definition: {
+          mappings: {
+            dynamic: false,
+            fields: { name: { type: 'string' }, description: { type: 'string' } }
+          }
+        }
+      });
 
-    try {
+      TestModel = db.model('Test', schema);
+
+      await TestModel.init();
       const results = await TestModel.createSearchIndexes();
 
-      assert.equal(createSearchIndexStub.callCount, 1);
       assert.equal(results.length, 1);
-      assert.deepEqual(results, [{ acknowledged: true }]);
+      assert.deepEqual(results, ['test']);
 
-      // Verify that createSearchIndex was called with the correct arguments
-      assert.ok(createSearchIndexStub.firstCall.calledWithMatch({ name: 'test', definition: { mappings: { dynamic: true } } }));
-    } finally {
-      sinon.restore();
-    }
+      let indexes = await TestModel.listSearchIndexes();
+      assert.equal(indexes.length, 1);
+      assert.equal(indexes[0].name, 'test');
+
+      let isQueryable = indexes[0].queryable;
+      while (!isQueryable) {
+        await delay(100);
+        indexes = await TestModel.listSearchIndexes();
+        isQueryable = indexes[0].queryable;
+      }
+
+      // Insert a document to search.
+      await TestModel.create({ name: 'Atlas Search Example', description: 'This is a test for MongoDB Atlas Search.' });
+
+      // Retry aggregate up to 10 times every 500ms because Lucene index is not immediately queryable
+      let searchResults;
+      for (let tries = 0; tries < 10; ++tries) {
+        searchResults = await TestModel.aggregate([
+          {
+            $search: {
+              index: 'test',
+              text: {
+                query: 'Atlas',
+                path: 'name'
+              }
+            }
+          }
+        ]);
+        if (searchResults.length > 0) {
+          break;
+        }
+        await delay(500);
+      }
+      assert.ok(searchResults.length > 0);
+      assert.strictEqual(searchResults[0].name, 'Atlas Search Example');
+    });
+
+    it('can create a vector search index (gh-15465)', async function() {
+      const schema = new mongoose.Schema({
+        name: String,
+        myVector: [Number]
+      });
+      schema.searchIndex({
+        name: 'vector_index',
+        type: 'vectorSearch',
+        definition: {
+          fields: [
+            {
+              type: 'vector',
+              numDimensions: 2,
+              path: 'myVector',
+              similarity: 'dotProduct',
+              quantization: 'scalar'
+            }
+          ]
+        }
+      });
+
+      TestModel = db.model('Test', schema);
+
+      await TestModel.init();
+      const results = await TestModel.createSearchIndexes();
+
+      assert.equal(results.length, 1);
+      assert.deepEqual(results, ['vector_index']);
+
+      await TestModel.create([{ name: 'Test1', myVector: [0, 99] }, { name: 'Test2', myVector: [99, 0] }]);
+
+      let indexes = await TestModel.listSearchIndexes();
+      let isQueryable = indexes[0].queryable;
+      while (!isQueryable) {
+        await delay(100);
+        indexes = await TestModel.listSearchIndexes();
+        isQueryable = indexes[0].queryable;
+      }
+
+      let [doc] = await TestModel.aggregate([
+        {
+          $vectorSearch: {
+            index: 'vector_index',
+            path: 'myVector',
+            queryVector: [0, 100],
+            numCandidates: 10,
+            limit: 1
+          }
+        }
+      ]);
+      assert.strictEqual(doc.name, 'Test1');
+
+      [doc] = await TestModel.aggregate([
+        {
+          $vectorSearch: {
+            index: 'vector_index',
+            path: 'myVector',
+            queryVector: [100, 1],
+            numCandidates: 10,
+            limit: 1
+          }
+        }
+      ]);
+      assert.strictEqual(doc.name, 'Test2');
+    });
   });
 });
 

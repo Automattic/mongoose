@@ -367,7 +367,7 @@ declare module 'mongoose' {
         InferRawDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>,
         ResolveSchemaOptions<TSchemaOptions>
       >,
-      THydratedDocumentType extends AnyObject = HydratedDocument<InferRawDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>>
+      THydratedDocumentType extends AnyObject = HydratedDocument<InferHydratedDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>>
     >(def: TSchemaDefinition, options: TSchemaOptions): Schema<
       RawDocType,
       Model<RawDocType, any, any, any>,

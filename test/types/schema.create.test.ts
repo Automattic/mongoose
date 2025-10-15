@@ -1898,13 +1898,39 @@ async function testInferHydratedDocTypeFromSchema() {
 
   type HydratedDocType = InferHydratedDocTypeFromSchema<typeof schema>;
 
-  type Expected = HydratedDocument<{
-    name?: string | null | undefined,
-    arr: Types.Array<number>,
-    docArr: Types.DocumentArray<{ name: string } & { _id: Types.ObjectId }>,
-    subdoc?: HydratedDocument<{ answer: number } & { _id: Types.ObjectId }> | null | undefined,
-    map?: Map<string, string> | null | undefined
-  } & { _id: Types.ObjectId }>;
+  type Expected = HydratedDocument<
+    {
+      name?: string | null | undefined,
+      arr: Types.Array<number>,
+      docArr: Types.DocumentArray<{ name: string } & { _id: Types.ObjectId }>,
+      subdoc?: HydratedDocument<{ answer: number } & { _id: Types.ObjectId }> | null | undefined,
+      map?: Map<string, string> | null | undefined
+    } & { _id: Types.ObjectId },
+    {},
+    {},
+    {},
+    {
+      name?: string | null | undefined,
+      arr: number[],
+      docArr: Array<{ name: string } & { _id: Types.ObjectId }>,
+      subdoc?: ({ answer: number } & { _id: Types.ObjectId }) | null | undefined,
+      map?: Record<string, string> | null | undefined
+    } & { _id: Types.ObjectId }
+  >;
 
   expectType<Expected>({} as HydratedDocType);
+
+  const def = {
+    name: String,
+    arr: [Number],
+    docArr: [{ name: { type: String, required: true } }],
+    map: { type: Map, of: String }
+  } as const;
+  type InferredHydratedDocType = InferHydratedDocType<typeof def>;
+  expectType<{
+    name?: string | null | undefined,
+    arr?: Types.Array<number> | null | undefined,
+    docArr?: Types.DocumentArray<{ name: string } & { _id: Types.ObjectId }> | null | undefined,
+    map?: Map<string, string> | null | undefined
+  } & { _id: Types.ObjectId }>({} as InferredHydratedDocType);
 }

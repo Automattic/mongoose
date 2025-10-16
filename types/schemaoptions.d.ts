@@ -16,7 +16,7 @@ declare module 'mongoose' {
     QueryHelpers = {},
     TStaticMethods = {},
     TVirtuals = {},
-    THydratedDocumentType = HydratedDocument<DocType, TInstanceMethods, QueryHelpers>,
+    THydratedDocumentType = HydratedDocument<DocType, TVirtuals & TInstanceMethods, QueryHelpers>,
     TModelType = Model<DocType, QueryHelpers, TInstanceMethods, TVirtuals, THydratedDocumentType>
   > {
     /**

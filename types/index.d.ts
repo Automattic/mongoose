@@ -90,14 +90,20 @@ declare module 'mongoose' {
     ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
     ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
     ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
-    HydratedDocument<
-      InferSchemaType<TSchema>,
-      ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-      ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
-      ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
-      ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>
-    >,
-    TSchema
+    // If first schema generic param is set, that means we have an explicit raw doc type,
+    // so user should also specify a hydrated doc type if the auto inferred one isn't correct.
+    IsItRecordAndNotAny<ObtainSchemaGeneric<TSchema, 'EnforcedDocType'>> extends true
+      ? ObtainSchemaGeneric<TSchema, 'THydratedDocumentType'>
+      : HydratedDocument<
+        InferSchemaType<TSchema>,
+        ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+        ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+        ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+        InferSchemaType<TSchema>,
+        ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>
+      >,
+    TSchema,
+    ObtainSchemaGeneric<TSchema, 'TLeanResultType'>
   > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
   export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
@@ -161,25 +167,27 @@ declare module 'mongoose' {
 
   /** Helper type for getting the hydrated document type from the raw document type. The hydrated document type is what `new MyModel()` returns. */
   export type HydratedDocument<
-    DocType,
+    HydratedDocPathsType,
     TOverrides = {},
     TQueryHelpers = {},
     TVirtuals = {},
-    TSchemaOptions = {}
+    RawDocType = HydratedDocPathsType,
+    TSchemaOptions = DefaultSchemaOptions
   > = IfAny<
-    DocType,
+    HydratedDocPathsType,
     any,
     TOverrides extends Record<string, never> ?
-      Document<unknown, TQueryHelpers, DocType, TVirtuals, TSchemaOptions> & Default__v<Require_id<DocType>, TSchemaOptions> :
+      Document<unknown, TQueryHelpers, RawDocType, TVirtuals, TSchemaOptions> & Default__v<Require_id<HydratedDocPathsType>, TSchemaOptions> :
       IfAny<
         TOverrides,
-        Document<unknown, TQueryHelpers, DocType, TVirtuals, TSchemaOptions> & Default__v<Require_id<DocType>, TSchemaOptions>,
-        Document<unknown, TQueryHelpers, DocType, TVirtuals, TSchemaOptions> & MergeType<
-          Default__v<Require_id<DocType>, TSchemaOptions>,
+        Document<unknown, TQueryHelpers, RawDocType, TVirtuals, TSchemaOptions> & Default__v<Require_id<HydratedDocPathsType>, TSchemaOptions>,
+        Document<unknown, TQueryHelpers, RawDocType, TVirtuals, TSchemaOptions> & MergeType<
+          Default__v<Require_id<HydratedDocPathsType>, TSchemaOptions>,
           TOverrides
         >
       >
   >;
+
   export type HydratedSingleSubdocument<
     DocType,
     TOverrides = {}
@@ -217,6 +225,7 @@ declare module 'mongoose' {
     ObtainSchemaGeneric<TSchema, 'TInstanceMethods'> & ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
     ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
     ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+    InferSchemaType<TSchema>,
     ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>
   >;
 
@@ -290,8 +299,16 @@ declare module 'mongoose' {
       ObtainDocumentType<any, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
       ResolveSchemaOptions<TSchemaOptions>
     >,
-    THydratedDocumentType = HydratedDocument<FlatRecord<DocType>, TVirtuals & TInstanceMethods, {}, TVirtuals, ResolveSchemaOptions<TSchemaOptions>>,
-    TSchemaDefinition = SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType, THydratedDocumentType>
+    THydratedDocumentType = HydratedDocument<
+      DocType,
+      AddDefaultId<DocType, TVirtuals, TSchemaOptions> & TInstanceMethods,
+      TQueryHelpers,
+      AddDefaultId<DocType, TVirtuals, TSchemaOptions>,
+      IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : DocType,
+      ResolveSchemaOptions<TSchemaOptions>
+    >,
+    TSchemaDefinition = SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType, THydratedDocumentType>,
+    LeanResultType = IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : Default__v<Require_id<BufferToBinary<FlattenMaps<DocType>>>>
   >
     extends events.EventEmitter {
     /**
@@ -323,7 +340,13 @@ declare module 'mongoose' {
         InferRawDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>,
         ResolveSchemaOptions<TSchemaOptions>
       >,
-      THydratedDocumentType extends AnyObject = HydratedDocument<InferHydratedDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>>
+      THydratedDocumentType extends AnyObject = HydratedDocument<
+        InferHydratedDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>,
+        TSchemaOptions extends { methods: infer M } ? M : {},
+        TSchemaOptions extends { query: any } ? TSchemaOptions['query'] : {},
+        TSchemaOptions extends { virtuals: any } ? TSchemaOptions['virtuals'] : {},
+        RawDocType
+      >
     >(def: TSchemaDefinition): Schema<
       RawDocType,
       Model<RawDocType, any, any, any>,
@@ -337,7 +360,11 @@ declare module 'mongoose' {
         ResolveSchemaOptions<TSchemaOptions>
       >,
       THydratedDocumentType,
-      TSchemaDefinition
+      TSchemaDefinition,
+      ApplySchemaOptions<
+        InferRawDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>, { bufferToBinary: true }>,
+        ResolveSchemaOptions<TSchemaOptions>
+      >
     >;
 
     static create<
@@ -347,7 +374,7 @@ declare module 'mongoose' {
         InferRawDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>,
         ResolveSchemaOptions<TSchemaOptions>
       >,
-      THydratedDocumentType extends AnyObject = HydratedDocument<InferRawDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>>
+      THydratedDocumentType extends AnyObject = HydratedDocument<InferHydratedDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>>
     >(def: TSchemaDefinition, options: TSchemaOptions): Schema<
       RawDocType,
       Model<RawDocType, any, any, any>,
@@ -361,7 +388,11 @@ declare module 'mongoose' {
         ResolveSchemaOptions<TSchemaOptions>
       >,
       THydratedDocumentType,
-      TSchemaDefinition
+      TSchemaDefinition,
+      ApplySchemaOptions<
+        InferRawDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>, { bufferToBinary: true }>,
+        ResolveSchemaOptions<TSchemaOptions>
+      >
     >;
 
     /** Adds key path / schema type pairs to this schema. */

@@ -562,7 +562,7 @@ async function gh15578() {
 
     const schemaOptions = { versionKey: 'taco' } as const;
 
-    type ModelType = Model<RawDocType, {}, {}, {}, HydratedDocument<RawDocType, {}, {}, {}, typeof schemaOptions>>;
+    type ModelType = Model<RawDocType, {}, {}, {}, HydratedDocument<RawDocType, {}, {}, {}, RawDocType, typeof schemaOptions>>;
 
     const ASchema = new Schema<RawDocType, ModelType, {}, {}, {}, {}, typeof schemaOptions>({
       testProperty: Number

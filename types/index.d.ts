@@ -299,7 +299,14 @@ declare module 'mongoose' {
       ObtainDocumentType<any, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
       ResolveSchemaOptions<TSchemaOptions>
     >,
-    THydratedDocumentType = HydratedDocument<DocType, AddDefaultId<DocType, TVirtuals, TSchemaOptions> & TInstanceMethods, TQueryHelpers, TVirtuals, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
+    THydratedDocumentType = HydratedDocument<
+      DocType,
+      AddDefaultId<DocType, TVirtuals, TSchemaOptions> & TInstanceMethods,
+      TQueryHelpers,
+      TVirtuals,
+      IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : DocType,
+      ResolveSchemaOptions<TSchemaOptions>
+    >,
     TSchemaDefinition = SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType, THydratedDocumentType>,
     LeanResultType = IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : Default__v<Require_id<BufferToBinary<FlattenMaps<DocType>>>>
   >

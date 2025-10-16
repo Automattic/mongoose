@@ -94,7 +94,7 @@
     "test": "mocha --exit ./test/*.test.js",
     "test-deno": "deno run --allow-env --allow-read --allow-net --allow-run --allow-sys --allow-write ./test/deno.mjs",
     "test-rs": "START_REPLICA_SET=1 mocha --timeout 30000 --exit ./test/*.test.js",
-    "test-tsd": "node ./test/types/check-types-filename && tsd",
+    "test-tsd": "node ./test/types/check-types-filename && tsd --full",
     "setup-test-encryption": "node scripts/setup-encryption-tests.js",
     "test-encryption": "mocha --exit ./test/encryption/*.test.js",
     "tdd": "mocha ./test/*.test.js --inspect --watch --recursive --watch-files ./**/*.{js,ts}",

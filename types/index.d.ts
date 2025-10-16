@@ -172,7 +172,7 @@ declare module 'mongoose' {
     TQueryHelpers = {},
     TVirtuals = {},
     RawDocType = HydratedDocPathsType,
-    TSchemaOptions = {}
+    TSchemaOptions = DefaultSchemaOptions
   > = IfAny<
     HydratedDocPathsType,
     any,
@@ -303,7 +303,7 @@ declare module 'mongoose' {
       DocType,
       AddDefaultId<DocType, TVirtuals, TSchemaOptions> & TInstanceMethods,
       TQueryHelpers,
-      TVirtuals,
+      AddDefaultId<DocType, TVirtuals, TSchemaOptions>,
       IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : DocType,
       ResolveSchemaOptions<TSchemaOptions>
     >,

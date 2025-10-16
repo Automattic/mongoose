@@ -415,8 +415,8 @@ export function autoTypedSchema() {
     objectId2?: Types.ObjectId | null;
     objectId3?: Types.ObjectId | null;
     customSchema?: Int8 | null;
-    map1?: Record<string, string | undefined> | null;
-    map2?: Record<string, number | undefined> | null;
+    map1?: Record<string, string> | null;
+    map2?: Record<string, number> | null;
     array1: string[];
     array2: any[];
     array3: any[];
@@ -1880,7 +1880,7 @@ function testInferRawDocTypeFromSchema() {
     arr: number[],
     docArr: ({ name: string } & { _id: Types.ObjectId })[],
     subdoc?: ({ answer: number } & { _id: Types.ObjectId }) | null | undefined,
-    map?: Record<string, string | undefined> | null | undefined;
+    map?: Record<string, string> | null | undefined;
   } & { _id: Types.ObjectId };
 
   expectType<Expected>({} as RawDocType);

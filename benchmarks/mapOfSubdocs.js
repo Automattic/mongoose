@@ -28,7 +28,7 @@ async function run() {
   );
   const MinisMap = mongoose.model('MinisMap', minisMap);
   await MinisMap.init();
-  
+
   const mini = new Map();
   for (let i = 0; i < 2000; ++i) {
     const miniID = new mongoose.Types.ObjectId();

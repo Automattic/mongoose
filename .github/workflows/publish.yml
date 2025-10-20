@@ -28,6 +28,4 @@ jobs:
         run: npm run build-browser
 
       - name: Dry run publish with provenance
-        run: npm publish --provenance --access public --dry-run
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public

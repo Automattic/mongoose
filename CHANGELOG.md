@@ -1,3 +1,9 @@
+8.19.2 / 2025-10-20
+===================
+ * perf(setDefaultsOnInsert): avoid computing all modified paths when running setDefaultsOnInsert and update validators, only calculate if there are defaults to set #15691 #15672
+ * fix: correct handling of relative vs absolute paths with maps and subdocuments #15682 #15678 #15350
+ * ci: add publish script with provenance #15684 #15680
+
 8.19.1 / 2025-10-06
 ===================
  * perf: avoid getting all modified paths in update when checking if versionKey needs to be set #15677 #15672

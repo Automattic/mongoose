@@ -172,7 +172,7 @@ declare module 'mongoose' {
   type QueryOpThatReturnsDocument = 'find' | 'findOne' | 'findOneAndUpdate' | 'findOneAndReplace' | 'findOneAndDelete';
 
   type GetLeanResultType<RawDocType, ResultType, QueryOp> = QueryOp extends QueryOpThatReturnsDocument
-    ? (ResultType extends any[] ? Default__v<Require_id<FlattenMaps<BufferToBinary<RawDocType>>>>[] : Default__v<Require_id<FlattenMaps<BufferToBinary<RawDocType>>>>)
+    ? (ResultType extends any[] ? Default__v<Require_id<RawDocType>>[] : Default__v<Require_id<RawDocType>>)
     : ResultType;
 
   type MergePopulatePaths<RawDocType, ResultType, QueryOp, Paths, TQueryHelpers, TDocOverrides = Record<string, never>> = QueryOp extends QueryOpThatReturnsDocument
@@ -522,7 +522,7 @@ declare module 'mongoose' {
       QueryOp,
       TDocOverrides
       >;
-    lean<LeanResultType>(): QueryWithHelpers<
+    lean<LeanResultType = RawDocType>(): QueryWithHelpers<
       ResultType extends null
         ? LeanResultType | null
         : LeanResultType,
@@ -532,7 +532,7 @@ declare module 'mongoose' {
       QueryOp,
       TDocOverrides
       >;
-    lean<LeanResultType>(
+    lean<LeanResultType = RawDocType>(
       val: boolean | LeanOptions
     ): QueryWithHelpers<
       ResultType extends null

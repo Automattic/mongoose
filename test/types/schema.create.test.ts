@@ -415,8 +415,8 @@ export function autoTypedSchema() {
     objectId2?: Types.ObjectId | null;
     objectId3?: Types.ObjectId | null;
     customSchema?: Int8 | null;
-    map1?: Map<string, string> | null;
-    map2?: Map<string, number> | null;
+    map1?: Record<string, string> | null;
+    map2?: Record<string, number> | null;
     array1: string[];
     array2: any[];
     array3: any[];
@@ -736,17 +736,26 @@ function gh12030() {
     } & { _id: Types.ObjectId }>;
   } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema3>);
 
+  type RawDocType3 = ObtainSchemaGeneric<typeof Schema3, 'DocType'>;
   type HydratedDoc3 = ObtainSchemaGeneric<typeof Schema3, 'THydratedDocumentType'>;
   expectType<
     HydratedDocument<{
       users: Types.DocumentArray<
         { credit: number; username?: string | null; } & { _id: Types.ObjectId },
-        Types.Subdocument<Types.ObjectId, unknown, { credit: number; username?: string | null; } & { _id: Types.ObjectId }> & { credit: number; username?: string | null; } & { _id: Types.ObjectId }
+        Types.Subdocument<
+          Types.ObjectId,
+          unknown,
+          { credit: number; username?: string | null; } & { _id: Types.ObjectId }
+        > & { credit: number; username?: string | null; } & { _id: Types.ObjectId }
       >;
-    } & { _id: Types.ObjectId }>
+    } & { _id: Types.ObjectId }, {}, {}, {}, RawDocType3>
   >({} as HydratedDoc3);
   expectType<
-    Types.Subdocument<Types.ObjectId, unknown, { credit: number; username?: string | null; } & { _id: Types.ObjectId }> & { credit: number; username?: string | null; } & { _id: Types.ObjectId }
+    Types.Subdocument<
+      Types.ObjectId,
+      unknown,
+      { credit: number; username?: string | null; } & { _id: Types.ObjectId }
+    > & { credit: number; username?: string | null; } & { _id: Types.ObjectId }
   >({} as HydratedDoc3['users'][0]);
 
   const Schema4 = Schema.create({
@@ -1166,6 +1175,9 @@ function maps() {
   const doc = new Test({ myMap: { answer: 42 } });
   expectType<Map<string, number>>(doc.myMap);
   expectType<number | undefined>(doc.myMap!.get('answer'));
+
+  const obj = doc.toObject();
+  expectType<Record<string, number>>(obj.myMap);
 }
 
 function gh13514() {
@@ -1702,7 +1714,12 @@ async function gh14950() {
   const doc = await TestModel.findOne().orFail();
 
   expectType<string>(doc.location!.type);
-  expectType<number[]>(doc.location!.coordinates);
+  expectType<Types.Array<number>>(doc.location!.coordinates);
+
+  const lean = await TestModel.findOne().lean().orFail();
+
+  expectType<string>(lean.location!.type);
+  expectType<number[]>(lean.location!.coordinates);
 }
 
 async function gh14902() {
@@ -1753,7 +1770,7 @@ async function gh14451() {
       subdocProp?: string | undefined | null
     } | null,
     docArr: { nums: number[], times: string[] }[],
-    myMap?: Record<string, string> | null | undefined,
+    myMap?: Record<string, string | undefined> | null | undefined,
     _id: string
   }>({} as TestJSON);
 }
@@ -1863,7 +1880,7 @@ function testInferRawDocTypeFromSchema() {
     arr: number[],
     docArr: ({ name: string } & { _id: Types.ObjectId })[],
     subdoc?: ({ answer: number } & { _id: Types.ObjectId }) | null | undefined,
-    map?: Map<string, string> | null | undefined
+    map?: Record<string, string> | null | undefined;
   } & { _id: Types.ObjectId };
 
   expectType<Expected>({} as RawDocType);
@@ -1881,13 +1898,39 @@ async function testInferHydratedDocTypeFromSchema() {
 
   type HydratedDocType = InferHydratedDocTypeFromSchema<typeof schema>;
 
-  type Expected = HydratedDocument<{
-    name?: string | null | undefined,
-    arr: Types.Array<number>,
-    docArr: Types.DocumentArray<{ name: string } & { _id: Types.ObjectId }>,
-    subdoc?: HydratedDocument<{ answer: number } & { _id: Types.ObjectId }> | null | undefined,
-    map?: Map<string, string> | null | undefined
-  } & { _id: Types.ObjectId }>;
+  type Expected = HydratedDocument<
+    {
+      name?: string | null | undefined,
+      arr: Types.Array<number>,
+      docArr: Types.DocumentArray<{ name: string } & { _id: Types.ObjectId }>,
+      subdoc?: HydratedDocument<{ answer: number } & { _id: Types.ObjectId }> | null | undefined,
+      map?: Map<string, string> | null | undefined
+    } & { _id: Types.ObjectId },
+    {},
+    {},
+    {},
+    {
+      name?: string | null | undefined,
+      arr: number[],
+      docArr: Array<{ name: string } & { _id: Types.ObjectId }>,
+      subdoc?: ({ answer: number } & { _id: Types.ObjectId }) | null | undefined,
+      map?: Record<string, string> | null | undefined
+    } & { _id: Types.ObjectId }
+  >;
 
   expectType<Expected>({} as HydratedDocType);
+
+  const def = {
+    name: String,
+    arr: [Number],
+    docArr: [{ name: { type: String, required: true } }],
+    map: { type: Map, of: String }
+  } as const;
+  type InferredHydratedDocType = InferHydratedDocType<typeof def>;
+  expectType<{
+    name?: string | null | undefined,
+    arr?: Types.Array<number> | null | undefined,
+    docArr?: Types.DocumentArray<{ name: string } & { _id: Types.ObjectId }> | null | undefined,
+    map?: Map<string, string> | null | undefined
+  } & { _id: Types.ObjectId }>({} as InferredHydratedDocType);
 }

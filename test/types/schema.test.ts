@@ -2007,13 +2007,13 @@ function testInferHydratedDocTypeFromSchema() {
 
   type HydratedDocType = InferHydratedDocTypeFromSchema<typeof schema>;
 
-  type Expected = HydratedDocument<FlatRecord<{
+  type Expected = HydratedDocument<{
     name?: string | null | undefined,
     arr: number[],
     docArr: Types.DocumentArray<{ name: string }>,
     subdoc?: { answer: number } | null | undefined,
     map?: Map<string, string> | null | undefined
-  }>>;
+  }, { id: string }, {}, { id: string }>;
 
   expectType<Expected>({} as HydratedDocType);
 }

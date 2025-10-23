@@ -99,7 +99,6 @@ mongoose.isValidObjectId(6);
 
 // Works in Mongoose 8, throws in Mongoose 9
 new mongoose.Types.ObjectId(6);
-````
 
 ## Subdocument `deleteOne()` hooks execute only when subdocument is deleted
 

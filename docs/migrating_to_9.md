@@ -89,6 +89,17 @@ await Model.updateOne({}, [{ $set: { newProp: 'test2' } }], { updatePipeline: tr
 
 [MongoDB no longer supports the `background` option for indexes as of MongoDB 4.2](https://www.mongodb.com/docs/manual/core/index-creation/#index-operations). Mongoose 9 will no longer set the background option by default and Mongoose 9 no longer supports setting the `background` option on `Schema.prototype.index()`.
 
+## `mongoose.isValidObjectId()` returns false for numbers
+
+In Mongoose 8, you could create a new ObjectId from a number, and `isValidObjectId()` would return `true` for numbers. In Mongoose 9, `isValidObjectId()` will return `false` for numbers and you can no longer create a new ObjectId from a number.
+
+```javascript
+// true in mongoose 8, false in mongoose 9
+mongoose.isValidObjectId(6);
+
+// Works in Mongoose 8, throws in Mongoose 9
+new mongoose.Types.ObjectId(6);
+
 ## Subdocument `deleteOne()` hooks execute only when subdocument is deleted
 
 Currently, calling `deleteOne()` on a subdocument will execute the `deleteOne()` hooks on the subdocument regardless of whether the subdocument is actually deleted.

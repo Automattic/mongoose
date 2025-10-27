@@ -20,7 +20,7 @@
   "type": "commonjs",
   "license": "MIT",
   "dependencies": {
-    "kareem": "git+https://github.com/mongoosejs/kareem.git#vkarpov15/remove-isasync",
+    "kareem": "git+https://github.com/mongoosejs/kareem.git#vkarpov15/overwrite-arguments",
     "mongodb": "~6.20.0",
     "mpath": "0.9.0",
     "mquery": "5.0.0",

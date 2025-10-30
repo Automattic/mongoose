@@ -6813,7 +6813,7 @@ describe('Model', function() {
         name: { type: String }
       });
 
-      userSchema.pre('save', function () {
+      userSchema.pre('save', function() {
         return mongoose.overwriteMiddlewareArguments({ password: 'taco' });
       });
 

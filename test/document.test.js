@@ -14952,7 +14952,7 @@ describe('document', function() {
     assert.ok(!obj.hasOwnProperty('__v'));
   });
 
-  it('allows using overwriteMiddlewareArguments to override pre("init") hook results (gh-15389)', async function () {
+  it('allows using overwriteMiddlewareArguments to override pre("init") hook results (gh-15389)', async function() {
     const timeStringToObject = (time) => {
       if (typeof time !== 'string') return time;
       const [hours, minutes] = time.split(':');
@@ -14961,11 +14961,11 @@ describe('document', function() {
 
     const timeSchema = new Schema({
       hours: { type: Number, required: true },
-      minutes: { type: Number, required: true },
+      minutes: { type: Number, required: true }
     });
 
     // Attempt to transform during init
-    timeSchema.pre('init', function (rawDoc) {
+    timeSchema.pre('init', function(rawDoc) {
       if (typeof rawDoc === 'string') {
         return mongoose.overwriteMiddlewareArguments(timeStringToObject(rawDoc));
       }
@@ -14975,7 +14975,7 @@ describe('document', function() {
       unknownKey: {
         type: timeSchema,
         required: true
-      },
+      }
     });
     const User = db.model('Test', userSchema);
     await User.collection.insertOne({ unknownKey: '12:34' });
@@ -14984,14 +14984,14 @@ describe('document', function() {
     assert.ok(user.unknownKey.minutes === 34);
   });
 
-  it('allows using overwriteMiddlewareArguments to override pre("validate") hook results (gh-15389)', async function () {
+  it('allows using overwriteMiddlewareArguments to override pre("validate") hook results (gh-15389)', async function() {
     const userSchema = new Schema({
       test: {
         type: String,
         required: true
-      },
+      }
     });
-    userSchema.pre('validate', function (options) {
+    userSchema.pre('validate', function(options) {
       if (options == null) {
         return mongoose.overwriteMiddlewareArguments({ pathsToSkip: ['test'] });
       }

@@ -6807,6 +6807,24 @@ describe('Model', function() {
         /bulkSave expects an array of documents to be passed/
       );
     });
+
+    it('throws an error if pre("save") middleware updates arguments (gh-15389)', async function() {
+      const userSchema = new Schema({
+        name: { type: String }
+      });
+
+      userSchema.pre('save', function () {
+        return mongoose.overwriteMiddlewareArguments({ password: 'taco' });
+      });
+
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'Hafez' });
+      await assert.rejects(
+        () => User.bulkSave([doc]),
+        /Cannot overwrite options in pre\("save"\) hook on bulkSave\(\)/
+      );
+    });
+
     it('throws an error if one element is not a document', function() {
       const userSchema = new Schema({
         name: { type: String }

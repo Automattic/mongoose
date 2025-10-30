@@ -14951,6 +14951,56 @@ describe('document', function() {
     obj = docNoVersion.toObject();
     assert.ok(!obj.hasOwnProperty('__v'));
   });
+
+  it('allows using overwriteMiddlewareArguments to override pre("init") hook results (gh-15389)', async function () {
+    const timeStringToObject = (time) => {
+      if (typeof time !== 'string') return time;
+      const [hours, minutes] = time.split(':');
+      return { hours: parseInt(hours), minutes: parseInt(minutes) };
+    };
+
+    const timeSchema = new Schema({
+      hours: { type: Number, required: true },
+      minutes: { type: Number, required: true },
+    });
+
+    // Attempt to transform during init
+    timeSchema.pre('init', function (rawDoc) {
+      if (typeof rawDoc === 'string') {
+        return mongoose.overwriteMiddlewareArguments(timeStringToObject(rawDoc));
+      }
+    });
+
+    const userSchema = new Schema({
+      unknownKey: {
+        type: timeSchema,
+        required: true
+      },
+    });
+    const User = db.model('Test', userSchema);
+    await User.collection.insertOne({ unknownKey: '12:34' });
+    const user = await User.findOne();
+    assert.ok(user.unknownKey.hours === 12);
+    assert.ok(user.unknownKey.minutes === 34);
+  });
+
+  it('allows using overwriteMiddlewareArguments to override pre("validate") hook results (gh-15389)', async function () {
+    const userSchema = new Schema({
+      test: {
+        type: String,
+        required: true
+      },
+    });
+    userSchema.pre('validate', function (options) {
+      if (options == null) {
+        return mongoose.overwriteMiddlewareArguments({ pathsToSkip: ['test'] });
+      }
+    });
+    const User = db.model('Test', userSchema);
+    const user = new User();
+    await user.validate();
+    await assert.rejects(() => user.validate({}), /Path `test` is required/);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

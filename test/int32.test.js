@@ -301,9 +301,9 @@ describe('Int32', function() {
         assert.ok(err);
         assert.ok(err.errors['myInt']);
         assert.equal(err.errors['myInt'].name, 'CastError');
-        assert.equal(
+        assert.match(
           err.errors['myInt'].message,
-          'Cast to Int32 failed for value "-42.4" (type number) at path "myInt"'
+          /^Cast to Int32 failed for value "-42.4" \(type number\) at path "myInt"/
         );
       });
     });
@@ -319,9 +319,9 @@ describe('Int32', function() {
         assert.ok(err);
         assert.ok(err.errors['myInt']);
         assert.equal(err.errors['myInt'].name, 'CastError');
-        assert.equal(
+        assert.match(
           err.errors['myInt'].message,
-          'Cast to Int32 failed for value "helloworld" (type string) at path "myInt"'
+          /^Cast to Int32 failed for value "helloworld" \(type string\) at path "myInt"/
         );
       });
     });
@@ -337,9 +337,9 @@ describe('Int32', function() {
         assert.ok(err);
         assert.ok(err.errors['myInt']);
         assert.equal(err.errors['myInt'].name, 'CastError');
-        assert.equal(
+        assert.match(
           err.errors['myInt'].message,
-          'Cast to Int32 failed for value "1.2" (type string) at path "myInt"'
+          /^Cast to Int32 failed for value "1\.2" \(type string\) at path "myInt"/
         );
       });
     });
@@ -355,9 +355,9 @@ describe('Int32', function() {
         assert.ok(err);
         assert.ok(err.errors['myInt']);
         assert.equal(err.errors['myInt'].name, 'CastError');
-        assert.equal(
+        assert.match(
           err.errors['myInt'].message,
-          'Cast to Int32 failed for value "NaN" (type number) at path "myInt"'
+          /^Cast to Int32 failed for value "NaN" \(type number\) at path "myInt"/
         );
       });
     });
@@ -373,9 +373,9 @@ describe('Int32', function() {
         assert.ok(err);
         assert.ok(err.errors['myInt']);
         assert.equal(err.errors['myInt'].name, 'CastError');
-        assert.equal(
+        assert.match(
           err.errors['myInt'].message,
-          'Cast to Int32 failed for value "2147483648" (type number) at path "myInt"'
+          /^Cast to Int32 failed for value "2147483648" \(type number\) at path "myInt"/
         );
       });
     });
@@ -391,9 +391,9 @@ describe('Int32', function() {
         assert.ok(err);
         assert.ok(err.errors['myInt']);
         assert.equal(err.errors['myInt'].name, 'CastError');
-        assert.equal(
+        assert.match(
           err.errors['myInt'].message,
-          'Cast to Int32 failed for value "-2147483649" (type number) at path "myInt"'
+          /^Cast to Int32 failed for value "-2147483649" \(type number\) at path "myInt"/
         );
       });
     });

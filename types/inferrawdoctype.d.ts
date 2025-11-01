@@ -60,7 +60,7 @@ declare module 'mongoose' {
     [PathValueType] extends [neverOrAny] ? PathValueType
     : PathValueType extends Schema ? InferSchemaType<PathValueType>
     : PathValueType extends ReadonlyArray<infer Item> ?
-      Item extends never ? any[]
+      [Item] extends [never] ? any[]
       : Item extends Schema ?
         // If Item is a schema, infer its type.
         Array<InferSchemaType<Item>>

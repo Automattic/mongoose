@@ -127,3 +127,10 @@ function HandlesAny() {
   type ActualNested = InferRawDocType<Record<string, any>>;
   expectType<{ [x: string]: any }>({} as ActualNested);
 }
+
+function gh15699() {
+  const schema = { unTypedArray: [] } as const;
+
+  type TSchema = InferRawDocType<typeof schema>;
+  expectType<any[] | null | undefined>({} as unknown as TSchema['unTypedArray']);
+}

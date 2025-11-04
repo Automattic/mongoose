@@ -14,9 +14,13 @@ async function main() {
   await writeFile('fle-cluster-config.json', JSON.stringify(configuration, null, 2));
 
   async function downloadCryptShared() {
-    const crypt_shared_dir = await downloadMongoDb(join(runnerDir, 'crypt'), serverVersion, {
-      enterprise: true,
-      crypt_shared: true
+    const crypt_shared_dir = await downloadMongoDb({
+      directory: join(runnerDir, 'crypt'),
+      version: serverVersion,
+      downloadOptions: {
+        enterprise: true,
+        crypt_shared: true
+      }
     });
 
     for (const dirEntry of await readdir(crypt_shared_dir)) {
@@ -30,8 +34,12 @@ async function main() {
     await rm(runnerDir, { recursive: true }).catch(() => {});
 
     const cryptShared = await downloadCryptShared();
-    const binDir = await downloadMongoDb(runnerDir, serverVersion, {
-      enterprise: true
+    const binDir = await downloadMongoDb({
+      directory: runnerDir,
+      version: serverVersion,
+      downloadOptions: {
+        enterprise: true
+      }
     });
 
     await start({ id: 'encryption-test-cluster', binDir, topology:

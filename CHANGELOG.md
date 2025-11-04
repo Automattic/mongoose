@@ -1,3 +1,9 @@
+8.19.3 / 2025-11-04
+===================
+ * fix(model+plugins): correctly apply shard key on deleteOne() #15705 #15701
+ * fix(schema): correctly cache text indexes as 'text' not 1 #15695
+ * types: make inferRawDocType correctly infer empty array type [] as any[] #15704 #15699
+
 8.19.2 / 2025-10-20
 ===================
  * perf(setDefaultsOnInsert): avoid computing all modified paths when running setDefaultsOnInsert and update validators, only calculate if there are defaults to set #15691 #15672

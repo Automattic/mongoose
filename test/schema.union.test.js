@@ -135,7 +135,7 @@ describe('Union', function() {
     assert.strictEqual(doc2FromDb.test, 'bbb');
   });
 
-  it('handles arrays of unions (gh-15718)', async function () {
+  it('handles arrays of unions (gh-15718)', async function() {
     const schema = new Schema({
       arr: [{
         type: 'Union',

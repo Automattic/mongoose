@@ -50,27 +50,17 @@
     "mkdirp": "^3.0.1",
     "mocha": "11.7.4",
     "moment": "2.30.1",
-<<<<<<< HEAD
-    "mongodb-memory-server": "10.2.1",
-    "mongodb-runner": "^5.8.2",
-    "mongodb-client-encryption": "7.0.0-alpha.1",
-=======
     "mongodb-memory-server": "10.3.0",
     "mongodb-runner": "^6.0.0",
->>>>>>> master
+    "mongodb-client-encryption": "7.0.0-alpha.1",
     "ncp": "^2.0.0",
     "nyc": "15.1.0",
     "pug": "3.0.3",
     "sinon": "21.0.0",
     "tsd": "0.33.0",
     "typescript": "5.9.3",
-<<<<<<< HEAD
     "typescript-eslint": "^8.31.1",
     "uuid": "11.1.0"
-=======
-    "uuid": "11.1.0",
-    "webpack": "5.102.1"
->>>>>>> master
   },
   "directories": {
     "lib": "./lib/mongoose"

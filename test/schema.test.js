@@ -3952,7 +3952,7 @@ describe('schema', function() {
     const firstCall = schema.indexes();
     const secondCall = schema.indexes();
 
-    assert.deepStrictEqual(firstCall, [[{ content: 'text' }, { background: true }]]);
-    assert.deepStrictEqual(secondCall, [[{ content: 'text' }, { background: true }]]);
+    assert.deepStrictEqual(firstCall, [[{ content: 'text' }, {}]]);
+    assert.deepStrictEqual(secondCall, [[{ content: 'text' }, {}]]);
   });
 });

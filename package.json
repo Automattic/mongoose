@@ -60,7 +60,7 @@
     "mocha": "11.7.4",
     "moment": "2.30.1",
     "mongodb-memory-server": "10.2.1",
-    "mongodb-runner": "^5.8.2",
+    "mongodb-runner": "^6.0.0",
     "ncp": "^2.0.0",
     "nyc": "15.1.0",
     "pug": "3.0.3",

@@ -1059,10 +1059,12 @@ schema.path('name').validate(function(value) {
 });
 const M = mongoose.model('Person', schema);
 const m = new M({ name: null });
-m.validate(function(err) {
+try {
+  await m.validate();
+} catch (err) {
   console.log(err); // Will tell you that null is not allowed.
-});
-m.save(); // Succeeds despite being invalid
+}
+await m.save(); // Succeeds despite being invalid
 ```
 
 ## option: versionKey {#versionKey}

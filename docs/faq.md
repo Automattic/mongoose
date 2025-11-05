@@ -254,11 +254,11 @@ For more debugging options (streams, callbacks), see the ['debug' option under `
 
 <hr id="callback_never_executes" />
 
-<a class="anchor" href="#callback_never_executes">**Q**</a>. My `save()` callback never executes. What am I doing wrong?
+<a class="anchor" href="#callback_never_executes">**Q**</a>. My `save()` operation never completes. What am I doing wrong?
 
 **A**. All `collection` actions (insert, remove, queries, etc.) are queued
 until Mongoose successfully connects to MongoDB. It is likely you haven't called Mongoose's
-`connect()` or `createConnection()` function yet.
+`connect()` or `createConnection()` function yet, or haven't awaited the connection.
 
 In Mongoose 5.11, there is a `bufferTimeoutMS` option (set to 10000 by default) that configures how long
 Mongoose will allow an operation to stay buffered before throwing an error.
@@ -408,13 +408,9 @@ mind that populate() will execute a separate query for each document.
 
 <a class="anchor" href="#duplicate-query">**Q**</a>. My query/update seems to execute twice. Why is this happening?
 
-**A**. The most common cause of duplicate queries is **mixing callbacks and promises with queries**.
-That's because passing a callback to a query function, like `find()` or `updateOne()`,
-immediately executes the query, and calling [`then()`](https://masteringjs.io/tutorials/fundamentals/then)
-executes the query again.
-
-Mixing promises and callbacks can lead to duplicate entries in arrays.
-For example, the below code inserts 2 entries into the `tags` array, **not* just 1.
+**A**. The most common cause of duplicate queries is **executing the same query object twice**.
+Calling [`then()`](https://masteringjs.io/tutorials/fundamentals/then) or `await` on the same query object
+multiple times will execute the query multiple times.
 
 ```javascript
 const BlogPost = mongoose.model('BlogPost', new Schema({
@@ -422,13 +418,17 @@ const BlogPost = mongoose.model('BlogPost', new Schema({
   tags: [String]
 }));
 
-// Because there's both `await` **and** a callback, this `updateOne()` executes twice
-// and thus pushes the same string into `tags` twice.
-const update = { $push: { tags: ['javascript'] } };
-await BlogPost.updateOne({ title: 'Introduction to Promises' }, update, (err, res) => {
-  console.log(res);
-});
+// This will throw 'Query was already executed' error
+const query = BlogPost.findOne({ title: 'Introduction to Promises' });
+await query;
+await query; // Error! Query already executed
+
+// To execute the same query twice, use clone()
+await query.clone(); // Works
 ```
+
+Note: Mongoose v7+ no longer supports callbacks. If you're seeing duplicate queries in older code,
+it may be due to mixing callbacks and promises, which is no longer possible in current versions.
 
 <hr id="add_something" />
 

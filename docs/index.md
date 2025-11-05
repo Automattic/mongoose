@@ -88,7 +88,7 @@ fluffy.speak(); // "Meow name is fluffy"
 ```
 
 We have talking kittens! But we still haven't saved anything to MongoDB.
-Each document can be saved to the database by calling its [save](api/model.html#model_Model-save) method. The first argument to the callback will be an error if any occurred.
+Each document can be saved to the database by calling its [save](api/model.html#model_Model-save) method.
 
 ```javascript
 await fluffy.save();
@@ -111,7 +111,7 @@ await Kitten.find({ name: /^fluff/ });
 ```
 
 This performs a search for all documents with a name property that begins
-with "fluff" and returns the result as an array of kittens to the callback.
+with "fluff" and returns the result as an array of kittens.
 
 ## Congratulations
 

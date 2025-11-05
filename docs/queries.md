@@ -20,11 +20,7 @@ Each of these functions returns a
 * [`Model.updateMany()`](api.html#model_Model-updateMany)
 * [`Model.updateOne()`](api.html#model_Model-updateOne)
 
-A mongoose query can be executed in one of two ways. First, if you
-pass in a `callback` function, Mongoose will execute the query asynchronously
-and pass the results to the `callback`.
-
-A query also has a `.then()` function, and thus can be used as a promise.
+Mongoose queries can be executed by using `await`, or by using `.then()` to handle the promise returned by the query.
 
 <ul class="toc">
   <li><a href="#executing">Executing</a></li>

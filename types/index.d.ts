@@ -1032,5 +1032,7 @@ declare module 'mongoose' {
 
   export function skipMiddlewareFunction(val: any): Kareem.SkipWrappedFunction;
 
+  export function overwriteMiddlewareArguments(val: any): Kareem.OverwriteArguments;
+
   export default mongoose;
 }

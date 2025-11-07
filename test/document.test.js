@@ -14998,7 +14998,7 @@ describe('document', function() {
     });
     const User = db.model('Test', userSchema);
     const user = new User();
-    await user.validate();
+    await user.validate(null);
     await assert.rejects(() => user.validate({}), /Path `test` is required/);
   });
 });

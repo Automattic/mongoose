@@ -134,4 +134,28 @@ describe('Union', function() {
     const doc2FromDb = await TestModel.collection.findOne({ _id: doc2._id });
     assert.strictEqual(doc2FromDb.test, 'bbb');
   });
+
+  it('handles arrays of unions (gh-15718)', async function() {
+    const schema = new Schema({
+      arr: [{
+        type: 'Union',
+        of: [Number, Date]
+      }]
+    });
+    const TestModel = db.model('Test', schema);
+
+    const numValue = 42;
+    const dateValue = new Date('2025-06-01');
+
+    const doc = new TestModel({
+      arr: [numValue, dateValue]
+    });
+
+    await doc.save();
+
+    const found = await TestModel.collection.findOne({ _id: doc._id });
+    assert.strictEqual(found.arr.length, 2);
+    assert.strictEqual(found.arr[0], numValue);
+    assert.strictEqual(new Date(found.arr[1]).valueOf(), dateValue.valueOf());
+  });
 });

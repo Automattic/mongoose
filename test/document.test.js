@@ -6534,6 +6534,50 @@ describe('document', function() {
         });
     });
 
+    it('init single nested to num throws ObjectExpectedError (gh-15839) (gh-6710) (gh-6753)', async function() {
+      const schema = new Schema({
+        nested: new Schema({
+          num: Number
+        })
+      });
+
+      const Test = db.model('Test', schema);
+
+      const doc = new Test({});
+      doc.init({ nested: 123 });
+      await assert.rejects(() => doc.validate(), /nested: Tried to set nested object field `nested` to primitive value `123`/);
+
+      assert.throws(() => doc.init(123), /ObjectExpectedError/);
+    });
+
+    it('allows pre init hook to transform data (gh-15839)', async function() {
+      const timeStringToObject = (time) => {
+        if (typeof time !== 'string') return time;
+        const [hours, minutes] = time.split(':');
+        return { hours: parseInt(hours), minutes: parseInt(minutes) };
+      };
+
+      const timeSchema = new Schema({
+        hours: { type: Number, required: true },
+        minutes: { type: Number, required: true }
+      });
+
+      timeSchema.pre('init', function(doc) {
+        if (typeof doc === 'string') {
+          return mongoose.overwriteMiddlewareArguments(timeStringToObject(doc));
+        }
+      });
+
+      const userSchema = new Schema({
+        time: timeSchema
+      });
+
+      const User = db.model('Test', userSchema);
+      const doc = new User({});
+      doc.init({ time: '12:30' });
+      await doc.validate();
+    });
+
     it('set array to false throws ObjectExpectedError (gh-7242)', function() {
       const Child = new mongoose.Schema({});
       const Parent = new mongoose.Schema({
@@ -14906,6 +14950,57 @@ describe('document', function() {
     const docNoVersion = await ModelNoVersion.create({ name: 'test2' });
     obj = docNoVersion.toObject();
     assert.ok(!obj.hasOwnProperty('__v'));
+  });
+
+  it('allows using overwriteMiddlewareArguments to override pre("init") hook results (gh-15389)', async function() {
+    const timeStringToObject = (time) => {
+      if (typeof time !== 'string') return time;
+      const [hours, minutes] = time.split(':');
+      return { hours: parseInt(hours), minutes: parseInt(minutes) };
+    };
+
+    const timeSchema = new Schema({
+      hours: { type: Number, required: true },
+      minutes: { type: Number, required: true }
+    });
+
+    // Attempt to transform during init
+    timeSchema.pre('init', function(rawDoc) {
+      if (typeof rawDoc === 'string') {
+        return mongoose.overwriteMiddlewareArguments(timeStringToObject(rawDoc));
+      }
+    });
+
+    const userSchema = new Schema({
+      unknownKey: {
+        type: timeSchema,
+        required: true
+      }
+    });
+    const User = db.model('Test', userSchema);
+    const _id = new mongoose.Types.ObjectId();
+    await User.collection.insertOne({ _id, unknownKey: '12:34' });
+    const user = await User.findOne({ _id }).orFail();
+    assert.ok(user.unknownKey.hours === 12);
+    assert.ok(user.unknownKey.minutes === 34);
+  });
+
+  it('allows using overwriteMiddlewareArguments to override pre("validate") hook results (gh-15389)', async function() {
+    const userSchema = new Schema({
+      test: {
+        type: String,
+        required: true
+      }
+    });
+    userSchema.pre('validate', function(options) {
+      if (options == null) {
+        return mongoose.overwriteMiddlewareArguments({ pathsToSkip: ['test'] });
+      }
+    });
+    const User = db.model('Test', userSchema);
+    const user = new User();
+    await user.validate(null);
+    await assert.rejects(() => user.validate({}), /Path `test` is required/);
   });
 });
 

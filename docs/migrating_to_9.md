@@ -186,6 +186,20 @@ mySchema.pre('qux', async function qux() {
 });
 ```
 
+## `Document.prototype.updateOne` no longer accepts a callback
+
+`Document.prototype.updateOne` still supported callbacks in Mongoose 8. In Mongoose 9, the callback parameter was removed.
+
+```javascript
+const doc = await TestModel.findOne().orFail();
+
+// Worked in Mongoose 8, no longer supported in Mongoose 9.
+doc.updateOne({ name: 'updated' }, null, (err, res) => {
+  if (err) throw err;
+  console.log(res);
+});
+```
+
 ## Removed `promiseOrCallback`
 
 Mongoose 9 removed the `promiseOrCallback` helper function.

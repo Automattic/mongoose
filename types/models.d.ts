@@ -20,7 +20,7 @@ declare module 'mongoose' {
       name: string | number,
       schema: Schema<T, U>,
       value?: string | number | ObjectId | DiscriminatorOptions
-    ): U;
+    ): Model<U>;
   }
 
   export type MongooseBulkWriteResult = mongodb.BulkWriteResult & {

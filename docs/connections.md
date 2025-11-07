@@ -208,15 +208,13 @@ for (let i = 0; i < 3; ++i) {
 }
 ```
 
-## Callback {#callback}
+## Using Promises and Async/Await {#promises-async-await}
 
-The `connect()` function also accepts a callback parameter and returns a
-[promise](promises.html).
+The `connect()` function returns a [promise](promises.html).
 
 ```javascript
-mongoose.connect(uri, options, function(error) {
-  // Check error in initial connection. There is no 2nd param to the callback.
-});
+// Using async/await. The `mongoose.connect()` promise resolves to mongoose instance.
+await mongoose.connect(uri, options);
 
 // Or using promises
 mongoose.connect(uri, options).then(

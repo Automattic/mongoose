@@ -258,9 +258,9 @@ For more debugging options (streams, callbacks), see the ['debug' option under `
 
 **A**. All `collection` actions (insert, remove, queries, etc.) are queued
 until Mongoose successfully connects to MongoDB. It is likely you haven't called Mongoose's
-`connect()` or `createConnection()` function yet, or haven't awaited the connection.
+`connect()` or `createConnection()` function yet.
 
-In Mongoose 5.11, there is a `bufferTimeoutMS` option (set to 10000 by default) that configures how long
+Mongoose connections support a `bufferTimeoutMS` option (set to 10000 by default) that configures how long
 Mongoose will allow an operation to stay buffered before throwing an error.
 
 If you want to opt out of Mongoose's buffering mechanism across your entire

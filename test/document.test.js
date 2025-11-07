@@ -14978,8 +14978,9 @@ describe('document', function() {
       }
     });
     const User = db.model('Test', userSchema);
-    await User.collection.insertOne({ unknownKey: '12:34' });
-    const user = await User.findOne();
+    const _id = new mongoose.Types.ObjectId();
+    await User.collection.insertOne({ _id, unknownKey: '12:34' });
+    const user = await User.findOne({ _id }).orFail();
     assert.ok(user.unknownKey.hours === 12);
     assert.ok(user.unknownKey.minutes === 34);
   });

@@ -213,13 +213,8 @@ for (let i = 0; i < 3; ++i) {
 The `connect()` function returns a [promise](promises.html).
 
 ```javascript
-// Using async/await
-try {
-  await mongoose.connect(uri, options);
-  // ready to use. The `mongoose.connect()` promise resolves to mongoose instance.
-} catch (error) {
-  // handle initial connection error
-}
+// Using async/await. The `mongoose.connect()` promise resolves to mongoose instance.
+await mongoose.connect(uri, options);
 
 // Or using promises
 mongoose.connect(uri, options).then(

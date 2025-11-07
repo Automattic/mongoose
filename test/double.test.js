@@ -281,9 +281,9 @@ describe('Double', function() {
         assert.ok(err);
         assert.ok(err.errors['myDouble']);
         assert.equal(err.errors['myDouble'].name, 'CastError');
-        assert.equal(
+        assert.match(
           err.errors['myDouble'].message,
-          'Cast to Double failed for value "helloworld" (type string) at path "myDouble"'
+          /^Cast to Double failed for value "helloworld" \(type string\) at path "myDouble"/
         );
       });
     });

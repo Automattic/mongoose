@@ -3946,4 +3946,13 @@ describe('schema', function() {
     await doc.save();
 
   });
+
+  it('retains text index when caching indexes', async function() {
+    const schema = new Schema({ content: { type: String, index: { text: true } } });
+    const firstCall = schema.indexes();
+    const secondCall = schema.indexes();
+
+    assert.deepStrictEqual(firstCall, [[{ content: 'text' }, {}]]);
+    assert.deepStrictEqual(secondCall, [[{ content: 'text' }, {}]]);
+  });
 });

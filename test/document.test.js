@@ -6574,7 +6574,7 @@ describe('document', function() {
 
       const User = db.model('Test', userSchema);
       const doc = new User({});
-      doc.$init({ time: '12:30' });
+      doc.init({ time: '12:30' });
       await doc.validate();
     });
 

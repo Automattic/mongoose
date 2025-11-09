@@ -725,6 +725,7 @@ The following inputs will result will all result in a [CastError](validation.htm
 ### Union {#union}
 
 The `Union` SchemaType allows a path to accept multiple types. Mongoose will attempt to cast the value to one of the specified types.
+
 ```javascript
 const schema = new Schema({
   value: {
@@ -743,6 +744,7 @@ const doc2 = new Model({ value: 42 });
 #### Casting Behavior
 
 When you set a value on a Union path, Mongoose tries to cast it to each type in the `of` array in order. If the value matches one of the types exactly (using `===`), Mongoose uses that value. Otherwise, Mongoose uses the first type that successfully casts the value.
+
 ```javascript
 const schema = new Schema({
   flexibleField: {
@@ -773,6 +775,7 @@ doc4.flexibleField; // Date object
 #### Error Handling
 
 If Mongoose cannot cast the value to any of the specified types, it throws the error from the last type in the union.
+
 ```javascript
 const schema = new Schema({
   value: {
@@ -790,6 +793,7 @@ const doc = new Model({ value: 'not a number or boolean' });
 #### Union with Options
 
 You can specify options for individual types in the union, such as `trim` for strings.
+
 ```javascript
 const schema = new Schema({
   value: {
@@ -810,6 +814,7 @@ doc.value; // 'hello' (trimmed)
 #### Queries and Updates
 
 Union types work with queries and updates. Mongoose casts query filters and update operations according to the union types.
+
 ```javascript
 const schema = new Schema({
   value: {

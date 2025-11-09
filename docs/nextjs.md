@@ -53,7 +53,7 @@ Mongoose handles connection management automatically. Calling `mongoose.connect(
 
 Store your MongoDB connection string in `.env.local`:
 
-```
+```bash
 MONGODB_URI=mongodb://localhost:27017/mydb
 ```
 
@@ -198,6 +198,6 @@ There is no way for Mongoose to connect to MongoDB in Edge Runtime, because [Edg
 
 ## Additional Resources
 
-- [Next.js Official Mongoose Example](https://github.com/vercel/next.js/tree/canary/examples/with-mongodb-mongoose)
-- [Mongoose AWS Lambda Guide](https://mongoosejs.com/docs/lambda.html) (for serverless deployments)
-- [Next.js Data Fetching Documentation](https://nextjs.org/docs/app/building-your-application/data-fetching)
+* [Next.js Official Mongoose Example](https://github.com/vercel/next.js/tree/canary/examples/with-mongodb-mongoose)
+* [Mongoose AWS Lambda Guide](https://mongoosejs.com/docs/lambda.html) (for serverless deployments)
+* [Next.js Data Fetching Documentation](https://nextjs.org/docs/app/building-your-application/data-fetching)

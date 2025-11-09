@@ -814,7 +814,7 @@ Union types work with queries and updates. Mongoose casts query filters and upda
 const schema = new Schema({
   value: {
     type: Schema.Types.Union,
-    of: [Number, String]
+    of: [Number, Date]
   }
 });
 
@@ -829,7 +829,7 @@ doc.value; // 42
 // Update
 await Model.findOneAndUpdate(
   { value: 42 },
-  { value: 'hello' }
+  { value: new Date('2025-06-01') }
 );
 ```
 

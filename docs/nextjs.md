@@ -19,46 +19,22 @@ if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable');
 }
 
-let cached = global.mongoose;
-
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
-}
+export default dbConnect;
 
 async function dbConnect() {
-  if (cached.conn) {
-    return cached.conn;
+  if (mongoose.connection.readyState >= 1) {
+    return;
   }
-
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      return mongoose;
-    });
-  }
-
-  try {
-    cached.conn = await cached.promise;
-  } catch (e) {
-    cached.promise = null;
-    throw e;
-  }
-
-  return cached.conn;
+  return mongoose.connect(MONGODB_URI);
 }
-
-export default dbConnect;
 ```
 
 Then use it in your API routes or Server Components:
 
 ```javascript
 // app/api/users/route.js
-import dbConnect from '@/lib/mongodb';
-import User from '@/models/User';
+import dbConnect from '../../lib/mongodb';
+import User from '../../models/User';
 
 export async function GET() {
   await dbConnect();
@@ -69,9 +45,9 @@ export async function GET() {
 
 ## Best Practices
 
-### Connection Caching
+### Connection Management
 
-In Next.js, especially with serverless deployments, it's important to cache your database connection to avoid creating multiple connections on each request. The example above demonstrates this pattern using a global cache.
+Mongoose handles connection management automatically. Calling `mongoose.connect()` when Mongoose is already connected is a no-op, so you can safely call `dbConnect()` in every API route and Server Component without worrying about creating multiple connections.
 
 ### Environment Variables
 
@@ -136,8 +112,8 @@ If you're using Next.js Pages Router, you can use Mongoose in API routes and `ge
 
 ```javascript
 // pages/api/users.js
-import dbConnect from '@/lib/mongodb';
-import User from '@/models/User';
+import dbConnect from '../../lib/mongodb';
+import User from '../../models/User';
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -160,16 +136,16 @@ Using in `getServerSideProps`:
 
 ```javascript
 // pages/users.js
-import dbConnect from '@/lib/mongodb';
-import User from '@/models/User';
+import dbConnect from '../../lib/mongodb';
+import User from '../../models/User';
 
 export async function getServerSideProps() {
   await dbConnect();
-  const users = await User.find({}).lean();
+  const users = await User.find({});
   
   return {
     props: {
-      users: JSON.parse(JSON.stringify(users)) // Convert to plain objects
+      users: JSON.parse(JSON.stringify(users))
     }
   };
 }
@@ -179,14 +155,14 @@ export default function UsersPage({ users }) {
     <div>
       <h1>Users</h1>
       {users.map(user => (
-        <div key={user._id}>{user.name}</div>
+        <div key={user._id.toString()}>{user.name}</div>
       ))}
     </div>
   );
 }
 ```
 
-**Important:** Always use `.lean()` when fetching data for props, as Next.js requires serializable data.
+**Important:** Use `JSON.parse(JSON.stringify())` to convert Mongoose documents to plain objects, as Next.js requires serializable data.
 
 ## Using with App Router Server Components
 
@@ -194,8 +170,10 @@ With Next.js 13+ App Router, you can use Mongoose directly in Server Components:
 
 ```javascript
 // app/users/page.js
-import dbConnect from '@/lib/mongodb';
-import User from '@/models/User';
+import dbConnect from '../../lib/mongodb';
+import User from '../../models/User';
+
+export const runtime = 'nodejs';
 
 export default async function UsersPage() {
   await dbConnect();

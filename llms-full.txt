@@ -1,0 +1,420 @@
+# Mongoose Documentation
+
+> MongoDB object modeling tool designed to work in an asynchronous environment. Mongoose supports Node.js and Deno (alpha).
+
+## Overview
+
+Mongoose is a MongoDB object modeling tool that provides a schema-based solution to model application data. It includes built-in type casting, validation, query building, business logic hooks, and more.
+
+## Installation
+
+```bash
+npm install mongoose
+```
+
+Or using other package managers:
+- pnpm: `pnpm add mongoose`
+- yarn: `yarn add mongoose`
+- bun: `bun add mongoose`
+
+## Quick Start
+
+```javascript
+const mongoose = require('mongoose');
+
+// Connect to MongoDB
+await mongoose.connect('mongodb://127.0.0.1:27017/test');
+
+// Define a schema
+const kittySchema = new mongoose.Schema({
+  name: String
+});
+
+// Create a model
+const Kitten = mongoose.model('Kitten', kittySchema);
+
+// Create and save a document
+const fluffy = new Kitten({ name: 'fluffy' });
+await fluffy.save();
+
+// Query documents
+const kittens = await Kitten.find();
+```
+
+## Core Documentation
+
+### Getting Started
+- Quick Start Guide: https://mongoosejs.com/docs/index.html
+- Installation and basic usage examples
+- First steps with schemas and models
+
+### Connections
+- Connection Management: https://mongoosejs.com/docs/connections.html
+- Connection strings and options
+- Multiple connections
+- Connection events and error handling
+- Connection pooling
+- Replica sets and sharding
+
+### Schemas
+- Schema Guide: https://mongoosejs.com/docs/guide.html
+- Defining schemas
+- Schema types and options
+- Instance methods and static methods
+- Virtual properties
+- Indexes
+- Schema plugins
+- Nested schemas
+
+### SchemaTypes
+- SchemaTypes Documentation: https://mongoosejs.com/docs/schematypes.html
+- String, Number, Date, Buffer, Boolean, Mixed, ObjectId, Array, Decimal128, Map, UUID
+- SchemaType options (required, default, validate, get, set, alias, immutable, transform)
+- Custom SchemaTypes: https://mongoosejs.com/docs/customschematypes.html
+
+### Models
+- Models Guide: https://mongoosejs.com/docs/models.html
+- Compiling schemas into models
+- Creating documents
+- Querying documents
+- Updating documents
+- Deleting documents
+- Static methods
+- Model methods
+
+### Documents
+- Documents Guide: https://mongoosejs.com/docs/documents.html
+- Document instances
+- Updating documents
+- Validating documents
+- Saving documents
+- Document methods
+- Document properties (isNew, id, _id)
+- toObject() and toJSON()
+
+### Queries
+- Queries Guide: https://mongoosejs.com/docs/queries.html
+- Query building
+- Query execution
+- Query helpers
+- Query middleware
+- Streaming query results
+- Query methods: find, findOne, findById, where, select, limit, skip, sort, etc.
+
+### Validation
+- Validation Guide: https://mongoosejs.com/docs/validation.html
+- Built-in validators
+- Custom validators
+- Async validators
+- Validation errors
+- Update validators
+- Required validators
+
+### Middleware (Hooks)
+- Middleware Guide: https://mongoosejs.com/docs/middleware.html
+- Pre and post hooks
+- Document middleware
+- Query middleware
+- Aggregate middleware
+- Model middleware
+- Error handling middleware
+- Middleware execution order
+
+### Populate
+- Populate Guide: https://mongoosejs.com/docs/populate.html
+- Basic population
+- Population across multiple levels
+- Cross-database population
+- Dynamic references
+- Virtual populate
+- Populate options (select, match, limit, sort)
+
+### Discriminators
+- Discriminators Guide: https://mongoosejs.com/docs/discriminators.html
+- Single collection inheritance
+- Discriminator keys
+- Discriminator models
+- Embedded discriminators
+
+### Subdocuments
+- Subdocuments Guide: https://mongoosejs.com/docs/subdocs.html
+- Document arrays
+- Single nested subdocuments
+- Subdocument defaults
+- Finding subdocuments
+- Adding and removing subdocuments
+- Subdocument validation
+
+### Transactions
+- Transactions Guide: https://mongoosejs.com/docs/transactions.html
+- Starting transactions
+- Committing and aborting transactions
+- Transaction options
+- Transaction middleware
+- Save() with transactions
+
+### Change Streams
+- Change Streams Guide: https://mongoosejs.com/docs/change-streams.html
+- Watching collections
+- Change stream events
+- Resume tokens
+- Change stream options
+
+### Plugins
+- Plugins Guide: https://mongoosejs.com/docs/plugins.html
+- Writing plugins
+- Using plugins
+- Global plugins
+- Plugin options
+- Community plugins: http://plugins.mongoosejs.io/
+
+### Advanced Schemas
+- Advanced Schemas: https://mongoosejs.com/docs/advanced_schemas.html
+- Schema inheritance
+- Schema options
+- Schema methods
+
+### Defaults
+- Defaults Guide: https://mongoosejs.com/docs/defaults.html
+- Default values
+- Default functions
+- Default with context
+
+### Timestamps
+- Timestamps Guide: https://mongoosejs.com/docs/timestamps.html
+- Automatic timestamps
+- Custom timestamp names
+- Timestamp options
+
+### GeoJSON
+- GeoJSON Guide: https://mongoosejs.com/docs/geojson.html
+- Point, LineString, Polygon
+- Geospatial queries
+- 2dsphere indexes
+
+## TypeScript Support
+
+### TypeScript Guide
+- TypeScript Documentation: https://mongoosejs.com/docs/typescript.html
+- Setting up TypeScript with Mongoose
+- Type definitions
+
+### TypeScript Schemas
+- TypeScript Schemas: https://mongoosejs.com/docs/typescript/schemas.html
+- Defining schemas with TypeScript
+- Schema type inference
+- InferSchemaType
+
+### TypeScript Models
+- TypeScript Models: https://mongoosejs.com/docs/typescript/models.html
+- Model type definitions
+- Document types
+- Query types
+
+### TypeScript Statics
+- TypeScript Statics: https://mongoosejs.com/docs/typescript/statics.html
+- Static method types
+
+### TypeScript Query Helpers
+- TypeScript Query Helpers: https://mongoosejs.com/docs/typescript/query-helpers.html
+- Custom query helper types
+
+### TypeScript Virtuals
+- TypeScript Virtuals: https://mongoosejs.com/docs/typescript/virtuals.html
+- Virtual property types
+
+### TypeScript Subdocuments
+- TypeScript Subdocuments: https://mongoosejs.com/docs/typescript/subdocuments.html
+- Subdocument types
+
+## Integration Guides
+
+### Async/Await
+- Async/Await Guide: https://mongoosejs.com/docs/async-await.html
+- Using async/await with Mongoose
+- Error handling with async/await
+
+### Promises
+- Promises Guide: https://mongoosejs.com/docs/promises.html
+- Promise support in Mongoose
+- Custom promise libraries
+
+### Browser Support
+- Browser Guide: https://mongoosejs.com/docs/browser.html
+- Using Mongoose in the browser
+
+### Jest
+- Jest Integration: https://mongoosejs.com/docs/jest.html
+- Testing with Jest
+- Setup and teardown
+
+### Next.js
+- Next.js Integration: https://mongoosejs.com/docs/nextjs.html
+- Using Mongoose with Next.js
+- Connection management in Next.js
+
+### AWS Lambda
+- Lambda Guide: https://mongoosejs.com/docs/lambda.html
+- Using Mongoose in AWS Lambda
+- Connection pooling in Lambda
+
+### Lodash
+- Lodash Integration: https://mongoosejs.com/docs/lodash.html
+- Using Lodash with Mongoose
+
+## Migration Guides
+
+### Migrating to 8.x
+- Migration Guide: https://mongoosejs.com/docs/migrating_to_8.html
+- Breaking changes in Mongoose 8
+- Removed features
+- New features
+
+### Migrating to 7.x
+- Migration Guide: https://mongoosejs.com/docs/migrating_to_7.html
+- Breaking changes in Mongoose 7
+- Removed features
+- New features
+
+### Migrating to 6.x
+- Migration Guide: https://mongoosejs.com/docs/migrating_to_6.html
+- Breaking changes in Mongoose 6
+- Removed features
+- New features
+
+### Migrating to 5.x
+- Migration Guide: https://mongoosejs.com/docs/migrating_to_5.html
+- Breaking changes in Mongoose 5
+
+## API Reference
+
+### Mongoose API
+- Mongoose: https://mongoosejs.com/docs/api/mongoose.html
+- connect(), createConnection(), model(), Schema(), etc.
+
+### Schema API
+- Schema: https://mongoosejs.com/docs/api/schema.html
+- Schema methods and properties
+- add(), path(), virtual(), pre(), post(), plugin(), etc.
+
+### SchemaType API
+- SchemaType: https://mongoosejs.com/docs/api/schematype.html
+- SchemaType methods and options
+- required(), default(), validate(), get(), set(), etc.
+
+### Model API
+- Model: https://mongoosejs.com/docs/api/model.html
+- Model static methods
+- find(), findOne(), findById(), create(), updateOne(), deleteOne(), etc.
+
+### Document API
+- Document: https://mongoosejs.com/docs/api/document.html
+- Document instance methods
+- save(), validate(), remove(), populate(), etc.
+
+### Query API
+- Query: https://mongoosejs.com/docs/api/query.html
+- Query methods
+- where(), select(), limit(), skip(), sort(), populate(), exec(), etc.
+
+### Aggregate API
+- Aggregate: https://mongoosejs.com/docs/api/aggregate.html
+- Aggregation pipeline methods
+- match(), group(), sort(), project(), lookup(), etc.
+
+### Connection API
+- Connection: https://mongoosejs.com/docs/api/connection.html
+- Connection methods and events
+- close(), dropDatabase(), model(), etc.
+
+### Error API
+- Error: https://mongoosejs.com/docs/api/error.html
+- Mongoose error types
+- ValidationError, CastError, etc.
+
+## Additional Topics
+
+### FAQ
+- Frequently Asked Questions: https://mongoosejs.com/docs/faq.html
+- Common questions and solutions
+- Best practices
+- Performance tips
+
+### Deprecations
+- Deprecation Warnings: https://mongoosejs.com/docs/deprecations.html
+- Handling deprecation warnings
+- MongoDB driver deprecations
+
+### Compatibility
+- Version Compatibility: https://mongoosejs.com/docs/compatibility.html
+- MongoDB version compatibility
+- Node.js version compatibility
+
+### Version Support
+- Version Support Policy: https://mongoosejs.com/docs/version-support.html
+- Supported versions
+- LTS policy
+
+### Incompatible Packages
+- Incompatible Packages: https://mongoosejs.com/docs/incompatible_packages.html
+- Known package conflicts
+
+### Enterprise
+- Enterprise Support: https://mongoosejs.com/docs/enterprise.html
+- Commercial support options
+- Tidelift subscription
+
+### Field Level Encryption
+- Field Level Encryption: https://mongoosejs.com/docs/field-level-encryption.html
+- Client-side field level encryption
+- Encryption schemas
+
+### Shared Schemas
+- Shared Schemas: https://mongoosejs.com/docs/shared-schemas.html
+- Reusing schemas across models
+
+### Check Version
+- Version Checking: https://mongoosejs.com/docs/check-version.html
+- Runtime version checks
+
+### Further Reading
+- Tutorials and Articles: https://mongoosejs.com/docs/further_reading.html
+- External resources
+- Blog posts
+- Video tutorials
+
+## Community and Support
+
+### GitHub
+- Repository: https://github.com/Automattic/mongoose
+- Issues: https://github.com/Automattic/mongoose/issues
+- Pull Requests: https://github.com/Automattic/mongoose/pulls
+
+### Stack Overflow
+- Questions: https://stackoverflow.com/questions/tagged/mongoose
+- Community answers
+
+### Slack
+- Mongoose Slack: http://slack.mongoosejs.io/
+- Real-time community support
+
+### Help Forum
+- Google Group: http://groups.google.com/group/mongoose-orm
+- Discussion forum
+
+### Plugins
+- Plugin Search: http://plugins.mongoosejs.io/
+- Community plugins
+
+## Contributing
+
+### Contributing Guide
+- How to Contribute: https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md
+- Code style
+- Testing
+- Documentation
+
+## License
+
+Copyright (c) 2010 LearnBoost
+Licensed under the MIT License

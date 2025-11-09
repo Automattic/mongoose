@@ -1,0 +1,54 @@
+# Mongoose
+
+> MongoDB object modeling tool designed to work in an asynchronous environment
+
+## Getting Started
+
+- [Quick Start Guide](https://mongoosejs.com/docs/index.html): Installation and basic usage
+- [Connecting to MongoDB](https://mongoosejs.com/docs/connections.html): Connection management and best practices
+- [Models](https://mongoosejs.com/docs/models.html): Creating and using models
+- [Schemas](https://mongoosejs.com/docs/guide.html): Schema definition and configuration
+- [SchemaTypes](https://mongoosejs.com/docs/schematypes.html): Available schema types and options
+
+## Core Concepts
+
+- [Documents](https://mongoosejs.com/docs/documents.html): Working with document instances
+- [Queries](https://mongoosejs.com/docs/queries.html): Querying and filtering data
+- [Validation](https://mongoosejs.com/docs/validation.html): Built-in and custom validators
+- [Middleware](https://mongoosejs.com/docs/middleware.html): Pre and post hooks
+- [Populate](https://mongoosejs.com/docs/populate.html): Population and cross-referencing
+
+## Advanced Features
+
+- [Subdocuments](https://mongoosejs.com/docs/subdocs.html): Nested documents
+- [Discriminators](https://mongoosejs.com/docs/discriminators.html): Schema inheritance
+- [Plugins](https://mongoosejs.com/docs/plugins.html): Extending schemas with plugins
+- [Transactions](https://mongoosejs.com/docs/transactions.html): Multi-document transactions
+- [Change Streams](https://mongoosejs.com/docs/change-streams.html): Real-time data monitoring
+
+## TypeScript
+
+- [TypeScript Guide](https://mongoosejs.com/docs/typescript.html): Using Mongoose with TypeScript
+- [TypeScript Schemas](https://mongoosejs.com/docs/typescript/schemas.html): Type-safe schemas
+- [TypeScript Models](https://mongoosejs.com/docs/typescript/models.html): Type-safe models
+
+## Migration Guides
+
+- [Migrating to 8.x](https://mongoosejs.com/docs/migrating_to_8.html): Breaking changes in v8
+- [Migrating to 7.x](https://mongoosejs.com/docs/migrating_to_7.html): Breaking changes in v7
+- [Migrating to 6.x](https://mongoosejs.com/docs/migrating_to_6.html): Breaking changes in v6
+
+## API Reference
+
+- [API Documentation](https://mongoosejs.com/docs/api/mongoose.html): Complete API reference
+- [Schema API](https://mongoosejs.com/docs/api/schema.html): Schema methods and properties
+- [Model API](https://mongoosejs.com/docs/api/model.html): Model methods and properties
+- [Document API](https://mongoosejs.com/docs/api/document.html): Document methods and properties
+- [Query API](https://mongoosejs.com/docs/api/query.html): Query methods and properties
+
+## Additional Resources
+
+- [FAQ](https://mongoosejs.com/docs/faq.html): Frequently asked questions
+- [Further Reading](https://mongoosejs.com/docs/further_reading.html): Tutorials and articles
+- [GitHub Repository](https://github.com/Automattic/mongoose): Source code and issues
+- [Stack Overflow](https://stackoverflow.com/questions/tagged/mongoose): Community support

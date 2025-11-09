@@ -48,6 +48,7 @@ Check out [Mongoose's plugins search](http://plugins.mongoosejs.io) to find plug
 * [Buffer](#buffers)
 * [Boolean](#booleans)
 * [Mixed](#mixed)
+* [Union](#union)
 * [ObjectId](#objectids)
 * [Array](#arrays)
 * [Decimal128](api/mongoose.html#mongoose_Mongoose-Decimal128)
@@ -68,6 +69,7 @@ const schema = new Schema({
   updated: { type: Date, default: Date.now },
   age: { type: Number, min: 18, max: 65 },
   mixed: Schema.Types.Mixed,
+  union: { type: Schema.Types.Union, of: [String, Number] },
   _someId: Schema.Types.ObjectId,
   decimal: Schema.Types.Decimal128,
   double: Schema.Types.Double,
@@ -719,6 +721,122 @@ The following inputs will result will all result in a [CastError](validation.htm
 * objects that don't have a `valueOf()` function
 * a decimal that must be rounded to be an integer
 * an input that represents a value outside the bounds of an 32-bit integer
+
+### Union {#union}
+
+The `Union` SchemaType allows a path to accept multiple types. Mongoose will attempt to cast the value to one of the specified types.
+
+```javascript
+const schema = new Schema({
+  value: {
+    type: Schema.Types.Union,
+    of: [String, Number]
+  }
+});
+
+const Model = mongoose.model('Model', schema);
+
+// Both work - Mongoose accepts either type
+const doc1 = new Model({ value: 'hello' });
+const doc2 = new Model({ value: 42 });
+```
+
+#### Casting Behavior
+
+When you set a value on a Union path, Mongoose tries to cast it to each type in the `of` array in order. If the value matches one of the types exactly (using `===`), Mongoose uses that value. Otherwise, Mongoose uses the first type that successfully casts the value.
+
+```javascript
+const schema = new Schema({
+  flexibleField: {
+    type: Schema.Types.Union,
+    of: [Number, Date]
+  }
+});
+
+const Model = mongoose.model('Model', schema);
+
+// Number type
+const doc1 = new Model({ flexibleField: 42 });
+doc1.flexibleField; // 42 (number)
+
+// String '42' gets cast to Number (first type that succeeds)
+const doc2 = new Model({ flexibleField: '42' });
+doc2.flexibleField; // 42 (number)
+
+// Date type
+const doc3 = new Model({ flexibleField: new Date('2025-06-01') });
+doc3.flexibleField; // Date object
+
+// String date gets cast to Date
+const doc4 = new Model({ flexibleField: '2025-06-01' });
+doc4.flexibleField; // Date object
+```
+
+#### Error Handling
+
+If Mongoose cannot cast the value to any of the specified types, it throws the error from the last type in the union.
+
+```javascript
+const schema = new Schema({
+  value: {
+    type: Schema.Types.Union,
+    of: [Number, Boolean]
+  }
+});
+
+const Model = mongoose.model('Model', schema);
+
+const doc = new Model({ value: 'not a number or boolean' });
+// Throws: Cast to Boolean failed for value "not a number or boolean"
+```
+
+#### Union with Options
+
+You can specify options for individual types in the union, such as `trim` for strings.
+
+```javascript
+const schema = new Schema({
+  value: {
+    type: Schema.Types.Union,
+    of: [
+      Number,
+      { type: String, trim: true }
+    ]
+  }
+});
+
+const Model = mongoose.model('Model', schema);
+
+const doc = new Model({ value: '  hello  ' });
+doc.value; // 'hello' (trimmed)
+```
+
+#### Queries and Updates
+
+Union types work with queries and updates. Mongoose casts query filters and update operations according to the union types.
+
+```javascript
+const schema = new Schema({
+  value: {
+    type: Schema.Types.Union,
+    of: [Number, Date]
+  }
+});
+
+const Model = mongoose.model('Model', schema);
+
+await Model.create({ value: 42 });
+
+// Query with string - gets cast to number
+const doc = await Model.findOne({ value: '42' });
+doc.value; // 42
+
+// Update
+await Model.findOneAndUpdate(
+  { value: 42 },
+  { value: new Date('2025-06-01') }
+);
+```
 
 ## Getters {#getters}
 

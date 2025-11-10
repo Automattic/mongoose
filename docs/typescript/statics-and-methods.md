@@ -268,6 +268,6 @@ However:
 ⚠ requires manual TS merging
 ⚠ methods lost in `toObject()` / `toJSON()` / `lean()`
 
-If you want better type inference, [`methods`](https://mongoosejs.com/docs/guide.html#methods) & [`statics`](https://mongoosejs.com/docs/guide.html#statics) on schema are recommended.
+If you want better type inference, [`methods`](../guide.html#methods) & [`statics`](../guide.html#statics) on schema are recommended.
 
 ---

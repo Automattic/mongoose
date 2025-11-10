@@ -81,8 +81,6 @@ const doc = new User({ name: 'test' });
 doc.updateName('foo');
 ```
 
-
-
 # Using `loadClass()` with TypeScript
 
 Mongoose supports applying ES6 classes to a schema using `schema.loadClass()`.

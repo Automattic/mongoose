@@ -83,12 +83,12 @@ doc.updateName('foo');
 
 # Using `loadClass()` with TypeScript
 
-Mongoose supports applying ES6 classes to a schema using `schema.loadClass()`.
+Mongoose supports applying ES6 classes to a schema using [`schema.loadClass()`](https://mongoosejs.com/docs/api/schema.html#Schema.prototype.loadClass()).
 When using TypeScript, there are a few important typing details to understand.
 
-```ts
+<!-- ```ts
 import { Schema, Model, model, Document } from 'mongoose';
-```
+``` -->
 
 ## Basic Usage
 
@@ -130,14 +130,12 @@ const MyModel = model<MyCombinedDocument, MyCombinedModel>(
   'MyClass',
   schema as any
 );
-```
 
-```ts
-MyModel.myStatic();    // static
+MyModel.myStatic();    
 const doc = new MyModel();
-doc.myMethod();        // instance
-doc.myVirtual;         // getter
-doc.property1;         // schema prop
+doc.myMethod();        
+doc.myVirtual;         
+doc.property1;         
 ```
 
 ---
@@ -145,6 +143,7 @@ doc.property1;         // schema prop
 ## Typing `this` Inside Methods
 
 You can annotate `this` in methods to enable full safety.
+Note that this must be done for **each method individually**; it is not possible to set a `this` type for the entire class at once.
 
 ```ts
 class MyClass {

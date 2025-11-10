@@ -31,7 +31,7 @@ Then use it in your API routes or Server Components:
 ```javascript
 // app/api/users/route.js
 import dbConnect from '@/lib/mongodb';
-import User from '../../models/User';
+import User from '@/models/User';
 
 export async function GET() {
   await dbConnect();
@@ -108,8 +108,8 @@ If you're using Next.js Pages Router, you can use Mongoose in API routes and `ge
 
 ```javascript
 // pages/api/users.js
-import dbConnect from '../../lib/mongodb';
-import User from '../../models/User';
+import dbConnect from '@/lib/mongodb';
+import User from '@/models/User';
 
 export default async function handler(req, res) {
   await dbConnect();
@@ -132,8 +132,8 @@ Using in `getServerSideProps`:
 
 ```javascript
 // pages/users.js
-import dbConnect from '../../lib/mongodb';
-import User from '../../models/User';
+import dbConnect from '@/lib/mongodb';
+import User from '@/models/User';
 
 export async function getServerSideProps() {
   await dbConnect();

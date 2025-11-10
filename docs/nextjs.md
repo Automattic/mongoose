@@ -166,8 +166,8 @@ With Next.js 13+ App Router, you can use Mongoose directly in Server Components:
 
 ```javascript
 // app/users/page.js
-import dbConnect from '../../lib/mongodb';
-import User from '../../models/User';
+import dbConnect from '@/lib/mongodb';
+import User from '@/models/User';
 
 export const runtime = 'nodejs';
 

@@ -30,7 +30,7 @@ Then use it in your API routes or Server Components:
 
 ```javascript
 // app/api/users/route.js
-import dbConnect from '../../lib/mongodb';
+import dbConnect from '@/lib/mongodb';
 import User from '../../models/User';
 
 export async function GET() {

@@ -1,5 +1,5 @@
 import { Schema, model, Document, Model, Types } from 'mongoose';
-import { expectType } from 'tsd';
+import { expectType, expectError } from 'tsd';
 
 
 // Basic usage of `loadClass` with TypeScript

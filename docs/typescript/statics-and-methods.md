@@ -172,7 +172,7 @@ class MyClass {
 ```
 
 This is a TypeScript limitation.
-See: [https://github.com/microsoft/TypeScript/issues/52923](https://github.com/microsoft/TypeScript/issues/52923)
+See: [TypeScript issue #52923](https://github.com/microsoft/TypeScript/issues/52923)
 
 ---
 

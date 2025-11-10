@@ -121,7 +121,7 @@ interface MySchema {
 // So we must manually combine schema fields + class members.
 type MyCombined = MySchema & MyClass;
 
- // The model type must include statics from the class
+// The model type must include statics from the class
 type MyCombinedModel = Model<MyCombined> & typeof MyClass;
 
 // A document must combine Mongoose Document + class + schema

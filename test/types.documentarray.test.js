@@ -301,9 +301,8 @@ describe('types.documentarray', function() {
   describe('push()', function() {
     it('does not re-cast instances of its embedded doc', async function() {
       const child = new Schema({ name: String, date: Date });
-      child.pre('save', function(next) {
+      child.pre('save', function() {
         this.date = new Date();
-        next();
       });
       const schema = new Schema({ children: [child] });
       const M = db.model('Test', schema);
@@ -469,10 +468,9 @@ describe('types.documentarray', function() {
   describe('invalidate()', function() {
     it('works', async function() {
       const schema = new Schema({ docs: [{ name: 'string' }] });
-      schema.pre('validate', function(next) {
+      schema.pre('validate', function() {
         const subdoc = this.docs[this.docs.length - 1];
         subdoc.invalidate('name', 'boo boo', '%');
-        next();
       });
       mongoose.deleteModel(/Test/);
       const T = mongoose.model('Test', schema);
@@ -786,6 +784,6 @@ describe('types.documentarray', function() {
         someCustomOption: 'test 42'
       }]
     });
-    assert.strictEqual(schema.path('docArr').$embeddedSchemaType.options.someCustomOption, 'test 42');
+    assert.strictEqual(schema.path('docArr').getEmbeddedSchemaType().options.someCustomOption, 'test 42');
   });
 });

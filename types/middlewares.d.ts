@@ -36,12 +36,10 @@ declare module 'mongoose' {
 
   type PreMiddlewareFunction<ThisType = any> = (
     this: ThisType,
-    next: CallbackWithoutResultAndOptionalError,
     opts?: Record<string, any>
   ) => void | Promise<void> | Kareem.SkipWrappedFunction;
   type PreSaveMiddlewareFunction<ThisType = any> = (
     this: ThisType,
-    next: CallbackWithoutResultAndOptionalError,
     opts: SaveOptions
   ) => void | Promise<void> | Kareem.SkipWrappedFunction;
   type PostMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, res: ResType, next: CallbackWithoutResultAndOptionalError) => void | Promise<void> | Kareem.OverwriteMiddlewareResult;

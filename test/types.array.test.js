@@ -70,7 +70,7 @@ describe('types array', function() {
 
       try {
         b.hasAtomics;
-      } catch (_) {
+      } catch {
         threw = true;
       }
 
@@ -79,8 +79,8 @@ describe('types array', function() {
       const a = new MongooseArray([67, 8]).filter(Boolean);
       try {
         a.push(3, 4);
-      } catch (_) {
-        console.error(_);
+      } catch (err) {
+        console.error(err);
         threw = true;
       }
 
@@ -1693,7 +1693,7 @@ describe('types array', function() {
         arr.num1.push({ x: 1 });
         arr.num1.push(9);
         arr.num1.push('woah');
-      } catch (err) {
+      } catch {
         threw1 = true;
       }
 
@@ -1703,7 +1703,7 @@ describe('types array', function() {
         arr.num2.push({ x: 1 });
         arr.num2.push(9);
         arr.num2.push('woah');
-      } catch (err) {
+      } catch {
         threw2 = true;
       }
 

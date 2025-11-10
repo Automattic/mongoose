@@ -89,7 +89,7 @@ function gh11543() {
 
 async function autoTypedVirtuals() {
   type AutoTypedSchemaType = InferSchemaType<typeof testSchema>;
-  type VirtualsType = { domain: string };
+  type VirtualsType = { domain: string } & { id: string };
   type InferredDocType = AutoTypedSchemaType & ObtainSchemaGeneric<typeof testSchema, 'TVirtuals'>;
 
   const testSchema = new Schema({

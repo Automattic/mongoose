@@ -35,7 +35,7 @@ describe('transactions', function() {
         _skipped = true;
         this.skip();
       }
-    } catch (err) {
+    } catch {
       _skipped = true;
       this.skip();
     }

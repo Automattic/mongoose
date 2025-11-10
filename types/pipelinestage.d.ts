@@ -184,7 +184,7 @@ declare module 'mongoose' {
 
     export interface Match {
       /** [`$match` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/match/) */
-      $match: FilterQuery<any>;
+      $match: QueryFilter<any>;
     }
 
     export interface Merge {

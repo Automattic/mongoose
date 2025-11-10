@@ -9,6 +9,9 @@ describe('multiple require instance', function() {
     try {
       mongoose2 = require('mongoose-separate-require-instance');
     } catch (err) {
+      if (err.code !== 'MODULE_NOT_FOUND') {
+        throw err;
+      }
       return this.skip();
     }
   });

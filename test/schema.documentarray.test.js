@@ -150,14 +150,7 @@ describe('schema.documentarray', function() {
     const TestModel = mongoose.model('Test', testSchema);
     const testDoc = new TestModel();
 
-    const err = await new Promise((resolve, reject) => {
-      testSchema.path('comments').$embeddedSchemaType.doValidate({}, err => {
-        if (err != null) {
-          return reject(err);
-        }
-        resolve();
-      }, testDoc.comments, { index: 1 });
-    }).then(() => null, err => err);
+    const err = await testSchema.path('comments').embeddedSchemaType.doValidate({}, testDoc.comments, { index: 1 }).then(() => null, err => err);
     assert.equal(err.name, 'ValidationError');
     assert.equal(err.message, 'Validation failed: text: Path `text` is required.');
   });

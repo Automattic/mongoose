@@ -1,11 +1,10 @@
 declare module 'mongoose' {
-
-  type SchemaValidator<T, EnforcedDocType, THydratedDocumentType> = RegExp
-    | [RegExp, string]
-    | Function
-    | [Function, string]
-    | ValidateOpts<T, THydratedDocumentType>
-    | ValidateOpts<T, THydratedDocumentType>[];
+  type SchemaValidator<T, THydratedDocumentType> = RegExp |
+    [RegExp, string] |
+    Function |
+    [Function, string] |
+    ValidateOpts<T, THydratedDocumentType> |
+    ValidateOpts<T, THydratedDocumentType>[];
 
   interface ValidatorProps {
     path: string;
@@ -18,18 +17,23 @@ declare module 'mongoose' {
     (props: ValidatorProps): string;
   }
 
-  type ValidateFn<T, EnforcedDocType> =
-    (this: EnforcedDocType, value: any, props?: ValidatorProps & Record<string, any>) => boolean;
+  type ValidateFn<T, THydratedDocumentType> = (
+    this: THydratedDocumentType | Query<unknown, THydratedDocumentType>,
+    value: any,
+    props?: ValidatorProps & Record<string, any>
+  ) => boolean;
 
-  type AsyncValidateFn<T, EnforcedDocType> =
-    (this: EnforcedDocType, value: any, props?: ValidatorProps & Record<string, any>) => Promise<boolean>;
+  type AsyncValidateFn<T, THydratedDocumentType> = (
+    this: THydratedDocumentType | Query<unknown, THydratedDocumentType>,
+    value: any,
+    props?: ValidatorProps & Record<string, any>
+  ) => Promise<boolean>;
 
-  interface ValidateOpts<T, EnforcedDocType> {
+  interface ValidateOpts<T, THydratedDocumentType> {
     msg?: string;
     message?: string | ValidatorMessageFn;
     type?: string;
-    validator: ValidateFn<T, EnforcedDocType>
-    | AsyncValidateFn<T, EnforcedDocType>;
+    validator: ValidateFn<T, THydratedDocumentType> | AsyncValidateFn<T, THydratedDocumentType>;
     propsParameter?: boolean;
   }
 }

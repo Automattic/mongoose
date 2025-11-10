@@ -1,4 +1,4 @@
-import { Schema, model, Types, InferSchemaType, FlattenMaps, HydratedDocument, Model, Document, PopulatedDoc } from 'mongoose';
+import mongoose, { Schema, model, Types, InferSchemaType, FlattenMaps, HydratedDocument, Model, Document, PopulatedDoc } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 
 function gh10345() {
@@ -47,12 +47,11 @@ async function gh11761() {
 
     console.log({ _id, thing1 });
   }
-  // stretch goal, make sure lean works as well
 
   const foundDoc = await ThingModel.findOne().lean().limit(1).exec();
   {
     if (!foundDoc) {
-      return; // Tell TS that it isn't null
+      return;
     }
     const { _id, ...thing2 } = foundDoc;
     expectType<Types.ObjectId>(foundDoc._id);
@@ -128,6 +127,24 @@ async function _11767() {
 
 async function gh13010() {
   const schema = new Schema({
+    name: { required: true, type: Map, of: String }
+  });
+
+  const CountryModel = model('Country', schema);
+
+  await CountryModel.create({
+    name: {
+      en: 'Croatia',
+      ru: 'Хорватия'
+    }
+  });
+
+  const country = await CountryModel.findOne().lean().orFail().exec();
+  expectType<Record<string, string>>(country.name);
+}
+
+async function gh13010_1() {
+  const schema = Schema.create({
     name: { required: true, type: Map, of: String }
   });
 

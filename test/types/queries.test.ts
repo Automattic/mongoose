@@ -1,5 +1,4 @@
 import mongoose, {
-  Condition,
   HydratedDocument,
   Schema,
   model,
@@ -9,16 +8,16 @@ import mongoose, {
   Model,
   QueryWithHelpers,
   PopulatedDoc,
-  FilterQuery,
   UpdateQuery,
   UpdateQueryKnownOnly,
-  QuerySelector,
   InferRawDocType,
   InferSchemaType,
   ProjectionFields,
   QueryOptions,
-  ProjectionType
+  ProjectionType,
+  QueryFilter
 } from 'mongoose';
+import mongodb from 'mongodb';
 import { ModifyResult, ObjectId } from 'mongodb';
 import { expectAssignable, expectError, expectNotAssignable, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
@@ -69,6 +68,9 @@ interface ITest {
   docs?: ISubdoc[];
   endDate?: Date;
 }
+
+type X = mongoose.WithLevel1NestedPaths<ITest>;
+expectType<number | undefined>({} as X['docs.id']);
 
 const Test = model<ITest, Model<ITest, QueryHelpers>>('Test', schema);
 
@@ -210,13 +212,13 @@ expectError(Test.find().sort(['invalid']));
 
 // Super generic query
 function testGenericQuery(): void {
-  interface CommonInterface<T> extends Document {
+  interface CommonInterface<T> {
     something: string;
     content: T;
   }
 
   async function findSomething<T>(model: Model<CommonInterface<T>>): Promise<CommonInterface<T>> {
-    return model.findOne({ something: 'test' }).orFail().exec();
+    return model.findOne({ something: 'test' } as mongoose.QueryFilter<CommonInterface<T>>).orFail().exec();
   }
 }
 
@@ -257,7 +259,7 @@ function gh10757() {
 
   type MyClassDocument = MyClass & Document;
 
-  const test: FilterQuery<MyClass> = { status: { $in: [MyEnum.VALUE1, MyEnum.VALUE2] } };
+  const test: QueryFilter<MyClass> = { status: { $in: [MyEnum.VALUE1, MyEnum.VALUE2] } };
 }
 
 function gh10857() {
@@ -266,7 +268,7 @@ function gh10857() {
     status: MyUnion;
   }
   type MyClassDocument = MyClass & Document;
-  const test: FilterQuery<MyClass> = { status: { $in: ['VALUE1', 'VALUE2'] } };
+  const test: QueryFilter<MyClass> = { status: { $in: ['VALUE1', 'VALUE2'] } };
 }
 
 function gh10786() {
@@ -336,7 +338,6 @@ async function gh11306(): Promise<void> {
 
   expectType<unknown[]>(await MyModel.distinct('notThereInSchema'));
   expectType<string[]>(await MyModel.distinct('name'));
-  expectType<number[]>(await MyModel.distinct<'overrideTest', number>('overrideTest'));
 }
 
 function autoTypedQuery() {
@@ -348,17 +349,17 @@ function autoTypedQuery() {
 function gh11964() {
   class Repository<T extends { id: string }> {
     find(id: string) {
-      const idCondition: Condition<T['id']> = id as Condition<T['id']>;
+      const idCondition: mongodb.Condition<T['id']> = id as mongodb.Condition<T['id']>;
 
       // `as` is necessary because `T` can be `{ id: never }`,
       // so we need to explicitly coerce
-      const filter: FilterQuery<T> = { id } as FilterQuery<T>;
+      const filter: QueryFilter<T> = { id } as QueryFilter<T>;
     }
   }
 }
 
 function gh14397() {
-  type Condition<T> = T | QuerySelector<T>; // redefined here because it's not exported by mongoose
+  type Condition<T> = mongodb.Condition<T>; // redefined here because it's not exported by mongoose
 
   type WithId<T extends object> = T & { id: string };
 
@@ -370,7 +371,7 @@ function gh14397() {
   const id = 'Test Id';
 
   let idCondition: Condition<WithId<TestUser>['id']>;
-  let filter: FilterQuery<WithId<TestUser>>;
+  let filter: QueryFilter<WithId<TestUser>>;
 
   expectAssignable<typeof idCondition>(id);
   expectAssignable<typeof filter>({ id });
@@ -510,7 +511,7 @@ async function gh13142() {
       Projection extends ProjectionFields<Blog>,
       Options extends QueryOptions<Blog>
     >(
-      filter: FilterQuery<Blog>,
+      filter: QueryFilter<mongoose.WithLevel1NestedPaths<Blog>>,
       projection: Projection,
       options: Options
     ): Promise<
@@ -642,8 +643,8 @@ function gh14473() {
   }
 
   const generateExists = <D extends AbstractSchema = AbstractSchema>() => {
-    const query: FilterQuery<D> = { deletedAt: { $ne: null } };
-    const query2: FilterQuery<D> = { deletedAt: { $lt: new Date() } };
+    const query: QueryFilter<D> = { deletedAt: { $ne: null } };
+    const query2: QueryFilter<D> = { deletedAt: { $lt: new Date() } } as QueryFilter<D>;
   };
 }
 
@@ -707,9 +708,18 @@ async function gh14545() {
 }
 
 function gh14841() {
-  const filter: FilterQuery<{ owners: string[] }> = {
+  const filter: QueryFilter<{ owners: string[] }> = {
     $expr: { $lt: [{ $size: '$owners' }, 10] }
   };
+}
+
+function gh14510() {
+  // From https://stackoverflow.com/questions/56505560/how-to-fix-ts2322-could-be-instantiated-with-a-different-subtype-of-constraint:
+  // "Never assign a concrete type to a generic type parameter, consider it as read-only!"
+  // This function is generally something you shouldn't do in TypeScript, can work around it with `as` though.
+  function findById<ModelType extends {_id: Types.ObjectId | string}>(model: Model<ModelType>, _id: Types.ObjectId | string) {
+    return model.find({ _id: _id } as QueryFilter<ModelType>);
+  }
 }
 
 async function gh15526() {
@@ -769,6 +779,24 @@ async function gh3230() {
   const test = await Test.create({ name: 'test', arr: [{ testRef: _id }] });
 
   console.log(await Test.findById(test._id).populate('arr.testRef', { name: 1, prop: 1, _id: 0, __t: 0 }));
+}
+
+async function gh12064() {
+  const schema = new Schema({
+    subdoc: new Schema({
+      subdocProp: Number
+    }),
+    nested: {
+      nestedProp: String
+    },
+    documentArray: [{ documentArrayProp: Boolean }]
+  });
+  const TestModel = model('Model', schema);
+
+  await TestModel.findOne({ 'subdoc.subdocProp': { $gt: 0 }, 'nested.nestedProp': { $in: ['foo', 'bar'] }, 'documentArray.documentArrayProp': { $ne: true } });
+  expectError(TestModel.findOne({ 'subdoc.subdocProp': 'taco tuesday' }));
+  expectError(TestModel.findOne({ 'nested.nestedProp': true }));
+  expectError(TestModel.findOne({ 'documentArray.documentArrayProp': 'taco' }));
 }
 
 function gh15671() {

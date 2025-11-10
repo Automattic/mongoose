@@ -68,7 +68,7 @@ async function run() {
 
   try {
     fs.mkdirSync(`${docsDir}/data`);
-  } catch (err) {}
+  } catch {}
 
   const subscribers = await Subscriber.
     find({ companyName: { $exists: true }, description: { $exists: true }, logo: { $exists: true } }).

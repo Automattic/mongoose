@@ -302,9 +302,8 @@ describe('mongoose module:', function() {
     mong.plugin(function(s) {
       calls.push(s);
 
-      s.pre('save', function(next) {
+      s.pre('save', function() {
         ++preSaveCalls;
-        next();
       });
 
       s.methods.testMethod = function() { return 42; };
@@ -762,7 +761,7 @@ describe('mongoose module:', function() {
     assert.ok(mongoose.isValidObjectId('5f5c2d56f6e911019ec2acdc'));
     assert.ok(mongoose.isValidObjectId('608DE01F32B6A93BBA314159'));
     assert.ok(mongoose.isValidObjectId(new mongoose.Types.ObjectId()));
-    assert.ok(mongoose.isValidObjectId(6));
+    assert.ok(!mongoose.isValidObjectId(6));
     assert.ok(!mongoose.isValidObjectId({ test: 42 }));
   });
 
@@ -1227,20 +1226,5 @@ describe('mongoose module:', function() {
       assert.ok(m.connection);
       assert.equal(m.connection.readyState, 1);
     });
-  });
-
-  it('supports skipOriginalStackTraces option (gh-15194)', async function() {
-    const schema = new Schema({ name: { type: String, required: true } });
-    const m = new mongoose.Mongoose();
-    m.set('skipOriginalStackTraces', true);
-    await m.connect(start.uri);
-
-    const TestModel = m.model('Test', schema);
-    const q = TestModel.find({});
-    await q.exec();
-    assert.strictEqual(q._executionStack, true);
-
-    const err = await q.exec().then(() => null, err => err);
-    assert.strictEqual(err.originalStack, undefined);
   });
 });

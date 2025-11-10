@@ -2,7 +2,7 @@
 
 require('./common');
 
-const ObjectId = require('bson').ObjectId;
+const ObjectId = require('mongodb/lib/bson').ObjectId;
 const Schema = require('../lib/schema');
 const assert = require('assert');
 

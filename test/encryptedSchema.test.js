@@ -3,7 +3,7 @@
 const assert = require('assert');
 const start = require('./common');
 const { ObjectId, Decimal128 } = require('../lib/types');
-const { Double, Int32, UUID } = require('bson');
+const { Double, Int32, UUID } = require('mongodb/lib/bson');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;

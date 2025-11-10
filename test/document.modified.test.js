@@ -323,9 +323,8 @@ describe('document modified', function() {
       });
 
       let preCalls = 0;
-      childSchema.pre('save', function(next) {
+      childSchema.pre('save', function() {
         ++preCalls;
-        next();
       });
 
       let postCalls = 0;

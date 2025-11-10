@@ -1,7 +1,6 @@
 
 declare module 'mongoose' {
   import mongodb = require('mongodb');
-  import bson = require('bson');
 
   class NativeBuffer extends Buffer {}
 
@@ -60,7 +59,7 @@ declare module 'mongoose' {
 
     class Decimal128 extends mongodb.Decimal128 { }
 
-    class DocumentArray<T, THydratedDocumentType extends Types.Subdocument<any, any, T> = Types.Subdocument<InferId<T>, any, T> & T> extends Types.Array<THydratedDocumentType> {
+    class DocumentArray<T, THydratedDocumentType extends Types.Subdocument<any, any, any> = Types.Subdocument<InferId<T>, unknown, T> & T> extends Types.Array<THydratedDocumentType> {
       /** DocumentArray constructor */
       constructor(values: AnyObject[]);
 
@@ -103,8 +102,8 @@ declare module 'mongoose' {
       parentArray(): Types.DocumentArray<unknown>;
     }
 
-    class UUID extends bson.UUID {}
+    class UUID extends mongodb.UUID {}
 
-    class Double extends bson.Double {}
+    class Double extends mongodb.Double {}
   }
 }

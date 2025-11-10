@@ -57,8 +57,8 @@ function gh10139() {
 }
 
 function gh12100() {
-  mongoose.syncIndexes({ continueOnError: true, noResponse: true });
-  mongoose.syncIndexes({ continueOnError: false, noResponse: true });
+  mongoose.syncIndexes({ continueOnError: true, sparse: true });
+  mongoose.syncIndexes({ continueOnError: false, sparse: true });
 }
 
 function setAsObject() {

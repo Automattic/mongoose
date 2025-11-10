@@ -26,12 +26,12 @@ const isMain = require.main === module;
 let jobs = [];
 try {
   jobs = require('../docs/data/jobs.json');
-} catch (err) {}
+} catch {}
 
 let opencollectiveSponsors = [];
 try {
   opencollectiveSponsors = require('../docs/data/opencollective.json');
-} catch (err) {}
+} catch {}
 
 require('acquit-ignore')();
 
@@ -328,7 +328,7 @@ const versionObj = (() => {
 // Create api dir if it doesn't already exist
 try {
   fs.mkdirSync(path.join(cwd, './docs/api'));
-} catch (err) {} // eslint-disable-line no-empty
+} catch {}
 
 const docsFilemap = require('../docs/source/index');
 const files = Object.keys(docsFilemap.fileMap);

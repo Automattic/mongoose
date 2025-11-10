@@ -135,14 +135,12 @@ describe('model middleware', function() {
     });
     let count = 0;
 
-    schema.pre('validate', function(next) {
+    schema.pre('validate', function() {
       assert.equal(count++, 0);
-      next();
     });
 
-    schema.pre('save', function(next) {
+    schema.pre('save', function() {
       assert.equal(count++, 1);
-      next();
     });
 
     const Book = db.model('Test', schema);
@@ -162,14 +160,13 @@ describe('model middleware', function() {
       called++;
     });
 
-    schema.pre('save', function(next) {
+    schema.pre('save', function() {
       called++;
-      next(new Error('Error 101'));
+      throw new Error('Error 101');
     });
 
-    schema.pre('deleteOne', { document: true, query: false }, function(next) {
+    schema.pre('deleteOne', { document: true, query: false }, function() {
       called++;
-      next();
     });
 
     const TestMiddleware = db.model('TestMiddleware', schema);
@@ -242,11 +239,10 @@ describe('model middleware', function() {
     const childPreCallsByName = {};
     let parentPreCalls = 0;
 
-    childSchema.pre('save', function(next) {
+    childSchema.pre('save', function() {
       childPreCallsByName[this.name] = childPreCallsByName[this.name] || 0;
       ++childPreCallsByName[this.name];
       ++childPreCalls;
-      next();
     });
 
     const parentSchema = new mongoose.Schema({
@@ -254,9 +250,8 @@ describe('model middleware', function() {
       children: [childSchema]
     });
 
-    parentSchema.pre('save', function(next) {
+    parentSchema.pre('save', function() {
       ++parentPreCalls;
-      next();
     });
 
     const Parent = db.model('Parent', parentSchema);
@@ -293,7 +288,7 @@ describe('model middleware', function() {
       title: String
     });
 
-    schema.post('save', function() {
+    schema.post('save', function postSaveTestError() {
       throw new Error('woops!');
     });
 
@@ -311,32 +306,6 @@ describe('model middleware', function() {
     }
   });
 
-  it('sync error in pre save after next() (gh-3483)', async function() {
-    const schema = new Schema({
-      title: String
-    });
-
-    let called = 0;
-
-    schema.pre('save', function(next) {
-      next();
-      // This error will not get reported, because you already called next()
-      throw new Error('woops!');
-    });
-
-    schema.pre('save', function(next) {
-      ++called;
-      next();
-    });
-
-    const TestMiddleware = db.model('Test', schema);
-
-    const test = new TestMiddleware({ title: 'Test' });
-
-    await test.save();
-    assert.equal(called, 1);
-  });
-
   it('validate + remove', async function() {
     const schema = new Schema({
       title: String
@@ -347,14 +316,12 @@ describe('model middleware', function() {
         preRemove = 0,
         postRemove = 0;
 
-    schema.pre('validate', function(next) {
+    schema.pre('validate', function() {
       ++preValidate;
-      next();
     });
 
-    schema.pre('deleteOne', { document: true, query: false }, function(next) {
+    schema.pre('deleteOne', { document: true, query: false }, function() {
       ++preRemove;
-      next();
     });
 
     schema.post('validate', function(doc) {
@@ -414,6 +381,36 @@ describe('model middleware', function() {
     assert.equal(docs[0].name, 'foo');
     assert.equal(preCalled, 1);
     assert.equal(postCalled, 1);
+  });
+
+  it('static hooks async stack traces (gh-15317) (gh-5982)', async function staticHookAsyncStackTrace() {
+    const schema = new Schema({
+      name: String
+    });
+
+    schema.statics.findByName = function() {
+      return this.find({ otherProp: { $notAnOperator: 'value' } });
+    };
+
+    let preCalled = 0;
+    schema.pre('findByName', function() {
+      ++preCalled;
+    });
+
+    let postCalled = 0;
+    schema.post('findByName', function() {
+      ++postCalled;
+    });
+
+    const Model = db.model('Test', schema);
+
+    await Model.create({ name: 'foo' });
+
+    const err = await Model.findByName('foo').then(() => null, err => err);
+    assert.equal(err.name, 'MongoServerError');
+    assert.ok(err.stack.includes('staticHookAsyncStackTrace'));
+    assert.equal(preCalled, 1);
+    assert.equal(postCalled, 0);
   });
 
   it('deleteOne hooks (gh-7538)', async function() {
@@ -482,8 +479,8 @@ describe('model middleware', function() {
     it('allows skipping createCollection from hooks', async function() {
       const schema = new Schema({ name: String }, { autoCreate: true });
 
-      schema.pre('createCollection', function(next) {
-        next(mongoose.skipMiddlewareFunction());
+      schema.pre('createCollection', function() {
+        throw mongoose.skipMiddlewareFunction();
       });
 
       const Test = db.model('CreateCollectionHookTest', schema);
@@ -499,9 +496,8 @@ describe('model middleware', function() {
 
       const pre = [];
       const post = [];
-      schema.pre('bulkWrite', function(next, ops) {
+      schema.pre('bulkWrite', function(ops) {
         pre.push(ops);
-        next();
       });
       schema.post('bulkWrite', function(res) {
         post.push(res);
@@ -528,9 +524,8 @@ describe('model middleware', function() {
     it('allows updating ops', async function() {
       const schema = new Schema({ name: String, prop: String });
 
-      schema.pre('bulkWrite', function(next, ops) {
+      schema.pre('bulkWrite', function(ops) {
         ops[0].updateOne.filter.name = 'baz';
-        next();
       });
 
       const Test = db.model('Test', schema);
@@ -614,8 +609,8 @@ describe('model middleware', function() {
     it('supports skipping wrapped function', async function() {
       const schema = new Schema({ name: String, prop: String });
 
-      schema.pre('bulkWrite', function(next) {
-        next(mongoose.skipMiddlewareFunction('skipMiddlewareFunction test'));
+      schema.pre('bulkWrite', function() {
+        throw mongoose.skipMiddlewareFunction('skipMiddlewareFunction test');
       });
 
       const Test = db.model('Test', schema);

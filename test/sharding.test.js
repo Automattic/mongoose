@@ -34,4 +34,15 @@ describe('plugins.sharding', function() {
     res = await TestModel.deleteOne({ name: 'test2' });
     assert.strictEqual(res.deletedCount, 1);
   });
+
+  it('applies shard key to updateOne (gh-15701)', async function() {
+    const TestModel = db.model('Test', new mongoose.Schema({ name: String, shardKey: String }));
+    const doc = await TestModel.create({ name: 'test', shardKey: 'test1' });
+    doc.$__.shardval = { shardKey: 'test2' };
+    let res = await doc.updateOne({ $set: { name: 'test2' } });
+    assert.strictEqual(res.modifiedCount, 0);
+    doc.$__.shardval = { shardKey: 'test1' };
+    res = await doc.updateOne({ $set: { name: 'test2' } });
+    assert.strictEqual(res.modifiedCount, 1);
+  });
 });

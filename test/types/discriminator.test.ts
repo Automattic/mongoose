@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, Schema, SchemaDefinition, SchemaOptions, Types, model } from 'mongoose';
+import mongoose, { Document, Model, Schema, SchemaDefinition, SchemaOptions, Types, model, HydratedDocFromModel, InferSchemaType } from 'mongoose';
 import { expectType } from 'tsd';
 
 const schema = new Schema({ name: { type: 'String' } });
@@ -120,7 +120,7 @@ function gh15535() {
 async function gh15600() {
   // Base model with custom static method
   const baseSchema = new Schema(
-    { name: String },
+    { __t: String, name: String },
     {
       statics: {
         findByName(name: string) {
@@ -140,4 +140,9 @@ async function gh15600() {
 
   const res = await DiscriminatorModel.findByName('test');
   expectType<string | null | undefined>(res!.name);
+
+  const doc = await BaseModel.create(
+    { __t: 'Discriminator', name: 'test', extra: 'test' } as InferSchemaType<typeof baseSchema>
+  ) as HydratedDocFromModel<typeof DiscriminatorModel>;
+  expectType<string | null | undefined>(doc.extra);
 }

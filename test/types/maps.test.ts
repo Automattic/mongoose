@@ -70,7 +70,7 @@ function gh10575() {
 function gh10872(): void {
   const doc = new Test({});
 
-  doc.toJSON().map1.foo;
+  doc.toJSON({ flattenMaps: true }).map1.foo;
 }
 
 function gh13755() {

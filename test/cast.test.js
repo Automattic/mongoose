@@ -9,7 +9,7 @@ require('./common');
 const Schema = require('../lib/schema');
 const assert = require('assert');
 const cast = require('../lib/cast');
-const ObjectId = require('bson').ObjectId;
+const ObjectId = require('mongodb/lib/bson').ObjectId;
 
 describe('cast: ', function() {
   describe('when casting an array', function() {

@@ -86,9 +86,6 @@ doc.updateName('foo');
 Mongoose supports applying ES6 classes to a schema using [`schema.loadClass()`](https://mongoosejs.com/docs/api/schema.html#Schema.prototype.loadClass()).
 When using TypeScript, there are a few important typing details to understand.
 
-<!-- ```ts
-import { Schema, Model, model, Document } from 'mongoose';
-``` -->
 
 ## Basic Usage
 
@@ -121,11 +118,17 @@ interface MySchema {
   property1: string;
 }
 
+// `loadClass()` does NOT update TS types automatically.
+// So we must manually combine schema fields + class members.
 type MyCombined = MySchema & MyClass;
 
+ // The model type must include statics from the class
 type MyCombinedModel = Model<MyCombined> & typeof MyClass;
+
+// A document must combine Mongoose Document + class + schema
 type MyCombinedDocument = Document & MyCombined;
 
+// Cast schema to satisfy TypeScript
 const MyModel = model<MyCombinedDocument, MyCombinedModel>(
   'MyClass',
   schema as any
@@ -147,10 +150,12 @@ Note that this must be done for **each method individually**; it is not possible
 
 ```ts
 class MyClass {
+  // Instance method typed with correct `this` type
   myMethod(this: MyCombinedDocument) {
     return this.property1;
   }
 
+  // Static method typed with correct `this` type
   static myStatic(this: MyCombinedModel) {
     return 42;
   }
@@ -172,6 +177,16 @@ class MyClass {
 
 This is a TypeScript limitation.
 See: [TypeScript issue #52923](https://github.com/microsoft/TypeScript/issues/52923)
+
+As a workaround, you can cast `this` to the document type inside your getter:
+
+```ts
+get myVirtual() {
+  // Workaround: cast 'this' to your document type
+  const self = this as MyCombinedDocument;
+  return `Name: ${self.property1}`;
+}
+```
 
 ---
 
@@ -216,7 +231,7 @@ TS cannot detect when class methods are dropped.
 
 ---
 
-## Recommended Pattern
+## Full example Code
 
 ```ts
 interface MySchema {
@@ -256,7 +271,7 @@ However:
 ⚠ requires manual TS merging
 ⚠ methods lost in `toObject()` / `toJSON()` / `lean()`
 
-If you want better type inference, `methods` & `statics` on schema are recommended.
+If you want better type inference, [`methods`](https://mongoosejs.com/docs/guide.html#methods) & [`statics`](https://mongoosejs.com/docs/guide.html#statics) on schema are recommended.
 
 ---
 

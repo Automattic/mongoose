@@ -140,8 +140,6 @@ doc.myVirtual;
 doc.property1;         
 ```
 
----
-
 ## Typing `this` Inside Methods
 
 You can annotate `this` in methods to enable full safety.

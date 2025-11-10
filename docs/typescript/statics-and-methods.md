@@ -185,8 +185,6 @@ get myVirtual() {
 }
 ```
 
----
-
 ## `toObject()` / `toJSON()` Caveat
 
 `loadClass()` attaches methods at runtime.
@@ -212,8 +210,6 @@ pojo.myMethod; // compiles (unsafe)
 This is a known limitation:
 TS cannot detect when class methods are dropped.
 
----
-
 ## Limitations
 
 | Behavior                                       | Supported |
@@ -225,8 +221,6 @@ TS cannot detect when class methods are dropped.
 | `this` typing in getters/setters               | ❌         |
 | Methods preserved in `toObject()` / `toJSON()` | ❌         |
 | Methods preserved with `.lean()`               | ❌         |
-
----
 
 ## Full example Code
 
@@ -256,8 +250,6 @@ const MyModel = model<MyCombinedDocument, MyCombinedModel>(
   schema as any
 );
 ```
-
----
 
 ## When Should I Use `loadClass()`?
 

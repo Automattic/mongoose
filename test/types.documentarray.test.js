@@ -83,7 +83,7 @@ describe('types.documentarray', function() {
     sub1.title = 'Hello again to all my friends';
     let id = sub1.id;
 
-    let a = new MongooseDocumentArray([sub1]);
+    let a = new MongooseDocumentArray([sub1], 'test', null);
     assert.equal(a.id(id).title, 'Hello again to all my friends');
     assert.equal(a.id(sub1._id).title, 'Hello again to all my friends');
 
@@ -186,8 +186,23 @@ describe('types.documentarray', function() {
 
     a = new MongooseDocumentArray([sub]);
     assert.equal(a.id(id).title, 'Hello again to all my friends');
+  });
 
+  it('#id with custom schematype (gh-15725)', function() {
+    const schema = new Schema({ _id: Number, name: String });
+    const Subdocument = TestDoc(schema);
 
+    const sub1 = new Subdocument();
+    sub1._id = 42;
+    sub1.title = 'Hello again to all my friends';
+
+    const parentDoc = { $__: true, $__schema: new Schema({ subdocs: [schema] }) };
+
+    const a = new MongooseDocumentArray([sub1], 'test', parentDoc);
+    assert.equal(a.id('42').title, 'Hello again to all my friends');
+    assert.equal(a.id(sub1.id).title, 'Hello again to all my friends');
+    assert.ok(!a.id('43'));
+    assert.ok(!a.id('not a number'));
   });
 
   describe('inspect', function() {

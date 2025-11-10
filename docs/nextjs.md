@@ -15,17 +15,14 @@ import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable');
-}
-
 export default dbConnect;
 
 async function dbConnect() {
-  if (mongoose.connection.readyState >= 1) {
-    return;
+  if (!MONGODB_URI) {
+    throw new Error('Please define the MONGODB_URI environment variable');
   }
-  return mongoose.connect(MONGODB_URI);
+  await mongoose.connect(MONGODB_URI);
+  return mongoose;
 }
 ```
 
@@ -69,9 +66,8 @@ import mongoose from 'mongoose';
 
 const UserSchema = new mongoose.Schema({
   name: String,
-  email: { type: String, unique: true },
-  createdAt: { type: Date, default: Date.now }
-});
+  email: { type: String, required: true }
+}, { timestamps: true });
 
 export default mongoose.models.User || mongoose.model('User', UserSchema);
 ```

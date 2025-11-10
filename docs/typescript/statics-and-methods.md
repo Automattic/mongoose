@@ -86,7 +86,6 @@ doc.updateName('foo');
 Mongoose supports applying ES6 classes to a schema using [`schema.loadClass()`](https://mongoosejs.com/docs/api/schema.html#Schema.prototype.loadClass()).
 When using TypeScript, there are a few important typing details to understand.
 
-
 ## Basic Usage
 
 `loadClass()` copies static methods, instance methods, and ES getters/setters from the class onto the schema.
@@ -274,4 +273,3 @@ However:
 If you want better type inference, [`methods`](https://mongoosejs.com/docs/guide.html#methods) & [`statics`](https://mongoosejs.com/docs/guide.html#statics) on schema are recommended.
 
 ---
-

@@ -222,7 +222,7 @@ TS cannot detect when class methods are dropped.
 | Methods preserved in `toObject()` / `toJSON()` | ❌         |
 | Methods preserved with `.lean()`               | ❌         |
 
-## Full example Code
+## Full Example Code
 
 ```ts
 interface MySchema {

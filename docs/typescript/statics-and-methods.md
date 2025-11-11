@@ -214,7 +214,7 @@ const pojo = doc.toObject();
 | Automatic TS merging                           | ❌         |
 | `this` typing in methods                       | ✅         |
 | `this` typing in getters/setters               | ❌         |
-| Methods preserved in `toObject()` / `toJSON()` | ✅         |
+| Methods preserved in `toObject()` / `toJSON()` | ❌         |
 | Methods preserved with `.lean()`               | ❌         |
 
 ## Full Example Code

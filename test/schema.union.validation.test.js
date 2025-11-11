@@ -233,7 +233,7 @@ describe('Union validation', function() {
     assert.ifError(err2);
   });
 
-  it('should not skip validation for arbitrary fields', async function() {
+  it('should remove arbitrary fields from subdocs on save', async function() {
     const SubSchema1 = new mongoose.Schema({
       price: { type: Number, required: true },
       title: { type: String }
@@ -253,18 +253,22 @@ describe('Union validation', function() {
 
     const TestModel = db.model('Test', TestSchema);
 
-    // Arbitrary fields should still be filtered out, but validation should still fail
+    // Save a valid document that includes an arbitrary field. The arbitrary
+    // field should be stripped according to schema strictness when the
+    // document is persisted.
     const doc = new TestModel({
       product: {
-        title: 'string',
-        arbitraryNeverSave: true,
-        isThisSchema1: true,
-        isThisSchema2: true
+        price: 20,
+        title: 'Product with extra field',
+        arbitraryNeverSave: true
       }
     });
 
-    const err = await doc.save().then(() => null, err => err);
-    assert.ok(err, 'Should have validation error even with arbitrary fields');
-    assert.ok(err.errors['product.price'] || err.errors['product.description']);
+    await doc.save();
+
+    const found = await TestModel.findById(doc._id).lean().exec();
+    assert.ok(found, 'Saved document should be found');
+    // The arbitrary field should not be present on the saved subdocument.
+    assert.strictEqual(found.product.arbitraryNeverSave, undefined);
   });
 });

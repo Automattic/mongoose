@@ -109,40 +109,47 @@ const schema = new Schema({ property1: String });
 schema.loadClass(MyClass);
 ```
 
-Mongoose does **not** automatically update TypeScript types for class members.
-To get full type support, you must manually merge types.
+Mongoose does not automatically update TypeScript types for class members. To get full type support, you must manually define types using Mongoose's [Model](../api/model.html) and [HydratedDocument](../typescript.html) generics.
 
 ```ts
-interface MySchema {
+// 1. Define an interface for the raw document data
+interface RawDocType {
   property1: string;
 }
 
-// `loadClass()` does NOT update TS types automatically.
-// So we must manually combine schema fields + class members.
-type MyCombined = MySchema & MyClass;
+// 2. Define the Model type
+// This includes the raw data, query helpers, instance methods, virtuals, and statics.
+type MyCombinedModel = Model<
+  RawDocType, 
+  {}, 
+  Pick<MyClass, 'myMethod'>, 
+  Pick<MyClass, 'myVirtual'> 
+> & Pick<typeof MyClass, 'myStatic'>; 
 
-// The model type must include statics from the class
-type MyCombinedModel = Model<MyCombined> & typeof MyClass;
+// 3. Define the Document type
+type MyCombinedDocument = HydratedDocument<
+  RawDocType,
+  Pick<MyClass, 'myMethod'>, 
+  {}, 
+  Pick<MyClass, 'myVirtual'> 
+>;
 
-// A document must combine Mongoose Document + class + schema
-type MyCombinedDocument = Document & MyCombined;
-
-// Cast schema to satisfy TypeScript
-const MyModel = model<MyCombinedDocument, MyCombinedModel>(
+// 4. Create the Mongoose model
+const MyModel = model<RawDocType, MyCombinedModel>(
   'MyClass',
-  schema as any
+  schema
 );
 
-MyModel.myStatic();    
+MyModel.myStatic();
 const doc = new MyModel();
-doc.myMethod();        
-doc.myVirtual;         
-doc.property1;         
+doc.myMethod();
+doc.myVirtual;
+doc.property1;     
 ```
 
 ## Typing `this` Inside Methods
 
-You can annotate `this` in methods to enable full safety.
+You can annotate `this` in methods to enable full safety, using the [Model](../api/model.html) and [HydratedDocument](../typescript.html) types you defined.
 Note that this must be done for **each method individually**; it is not possible to set a `this` type for the entire class at once.
 
 ```ts
@@ -165,15 +172,14 @@ TypeScript currently does **not** allow `this` parameters on getters/setters:
 
 ```ts
 class MyClass {
-  // error TS2784
+  // error TS2784: 'this' parameters are not allowed in getters
   get myVirtual(this: MyCombinedDocument) {
     return this.property1;
   }
 }
 ```
 
-This is a TypeScript limitation.
-See: [TypeScript issue #52923](https://github.com/microsoft/TypeScript/issues/52923)
+This is a TypeScript limitation. See: [TypeScript issue #52923](https://github.com/microsoft/TypeScript/issues/52923)
 
 As a workaround, you can cast `this` to the document type inside your getter:
 
@@ -185,30 +191,19 @@ get myVirtual() {
 }
 ```
 
-## `toObject()` / `toJSON()` Caveat
+## `toObject()` / `toJSON()`
 
-`loadClass()` attaches methods at runtime.
-However, `toObject()` and `toJSON()` return **plain JavaScript objects** without these methods.
+When using the correct [Model](../api/model.html) and [HydratedDocument](../typescript.html) generics (as shown above), Mongoose's types for `toObject()` and `toJSON()` work as expected. They will correctly return a type that includes **only the raw data** (e.g., `RawDocType`), not the methods or virtuals.
+
+This is a feature, as it accurately reflects the plain object returned at runtime and prevents you from trying to access methods that don't exist.
 
 ```ts
 const doc = new MyModel({ property1: 'test' });
 const pojo = doc.toObject();
+
+// This now correctly causes a TypeScript error!
+// pojo.myMethod(); // Property 'myMethod' does not exist on type 'RawDocType'.
 ```
-
-Runtime:
-
-```ts
-pojo.myMethod(); // runtime error
-```
-
-TypeScript:
-
-```ts
-pojo.myMethod; // compiles (unsafe)
-```
-
-This is a known limitation:
-TS cannot detect when class methods are dropped.
 
 ## Limitations
 
@@ -219,13 +214,15 @@ TS cannot detect when class methods are dropped.
 | Automatic TS merging                           | ❌         |
 | `this` typing in methods                       | ✅         |
 | `this` typing in getters/setters               | ❌         |
-| Methods preserved in `toObject()` / `toJSON()` | ❌         |
+| Methods preserved in `toObject()` / `toJSON()` | ✅         |
 | Methods preserved with `.lean()`               | ❌         |
 
 ## Full Example Code
 
 ```ts
-interface MySchema {
+import { Model, Schema, model, HydratedDocument } from 'mongoose';
+
+interface RawDocType {
   property1: string;
 }
 
@@ -233,22 +230,43 @@ class MyClass {
   myMethod(this: MyCombinedDocument) {
     return this.property1;
   }
-  static myStatic(this: MyCombinedModel) {
+
+  static myStatic() {
     return 42;
+  }
+
+  get myVirtual() {
+    const self = this as MyCombinedDocument;
+    return `Hello ${self.property1}`;
   }
 }
 
-const schema = new Schema<MySchema>({ property1: String });
+const schema = new Schema<RawDocType>({ property1: String });
 schema.loadClass(MyClass);
 
-type MyCombined = MySchema & MyClass;
-type MyCombinedModel = Model<MyCombined> & typeof MyClass;
-type MyCombinedDocument = Document & MyCombined;
+type MyCombinedModel = Model<
+  RawDocType,
+  {},
+  Pick<MyClass, 'myMethod'>,
+  Pick<MyClass, 'myVirtual'>
+> & Pick<typeof MyClass, 'myStatic'>;
 
-const MyModel = model<MyCombinedDocument, MyCombinedModel>(
+type MyCombinedDocument = HydratedDocument<
+  RawDocType,
+  Pick<MyClass, 'myMethod'>,
+  {},
+  Pick<MyClass, 'myVirtual'>
+>;
+
+const MyModel = model<RawDocType, MyCombinedModel>(
   'MyClass',
-  schema as any
+  schema
 );
+
+const doc = new MyModel({ property1: 'world' });
+doc.myMethod(); 
+MyModel.myStatic(); 
+console.log(doc.myVirtual); 
 ```
 
 ## When Should I Use `loadClass()`?
@@ -256,10 +274,9 @@ const MyModel = model<MyCombinedDocument, MyCombinedModel>(
 `loadClass()` is useful when organizing logic in ES6 classes.
 
 However:
-- ✅ works fine
-- ⚠ requires manual TS merging
-- ⚠ methods lost in `toObject()` / `toJSON()` / `lean()`
+
+* ✅ works fine
+* ⚠ requires manual TS merging
+* ⚠ methods lost in `toObject()` / `toJSON()` / `lean()`
 
 If you want better type inference, [`methods`](../guide.html#methods) & [`statics`](../guide.html#statics) on schema are recommended.
-
----

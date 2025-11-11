@@ -195,7 +195,7 @@ get myVirtual() {
 
 When using the correct [Model](../api/model.html) and [HydratedDocument](../typescript.html) generics (as shown above), Mongoose's types for `toObject()` and `toJSON()` work as expected. They will correctly return a type that includes **only the raw data** (e.g., `RawDocType`), not the methods or virtuals.
 
-This is a feature, as it accurately reflects the plain object returned at runtime and prevents you from trying to access methods that don't exist.
+This accurately reflects the plain object returned at runtime and prevents you from trying to access methods that don't exist.
 
 ```ts
 const doc = new MyModel({ property1: 'test' });
@@ -231,7 +231,7 @@ class MyClass {
     return this.property1;
   }
 
-  static myStatic() {
+  static myStatic(this: MyCombinedModel) {
     return 42;
   }
 
@@ -276,7 +276,6 @@ console.log(doc.myVirtual);
 However:
 
 * ✅ works fine
-* ⚠ requires manual TS merging
-* ⚠ methods lost in `toObject()` / `toJSON()` / `lean()`
+* ⚠ requires manual Typescript Types
 
-If you want better type inference, [`methods`](../guide.html#methods) & [`statics`](../guide.html#statics) on schema are recommended.
+If you want better type inference, using schema options [`methods`](../guide.html#methods) and [`statics`](../guide.html#statics) instead of `loadClass` are recommended.

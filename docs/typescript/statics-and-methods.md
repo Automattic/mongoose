@@ -256,9 +256,9 @@ const MyModel = model<MyCombinedDocument, MyCombinedModel>(
 `loadClass()` is useful when organizing logic in ES6 classes.
 
 However:
-✅ works fine
-⚠ requires manual TS merging
-⚠ methods lost in `toObject()` / `toJSON()` / `lean()`
+- ✅ works fine
+- ⚠ requires manual TS merging
+- ⚠ methods lost in `toObject()` / `toJSON()` / `lean()`
 
 If you want better type inference, [`methods`](../guide.html#methods) & [`statics`](../guide.html#statics) on schema are recommended.
 

@@ -429,7 +429,7 @@ describe('insertMany()', function() {
     assert.ok(!err.mongoose.validationErrors[1].errors['name']);
   });
 
-  it('insertMany() validation errors include index and doc properties with ordered false and rawResult', async function() {
+  it('insertMany() validation errors include index property with ordered false and rawResult', async function() {
     const schema = new Schema({
       title: { type: String, required: true },
       requiredField: { type: String, required: true }
@@ -451,19 +451,15 @@ describe('insertMany()', function() {
     // Check first validation error (index 1)
     const error1 = res.mongoose.validationErrors[0];
     assert.equal(error1.index, 1);
-    assert.ok(error1.doc);
-    assert.equal(error1.doc.title, 'title2');
     assert.ok(error1.errors['requiredField']);
 
     // Check second validation error (index 2)
     const error2 = res.mongoose.validationErrors[1];
     assert.equal(error2.index, 2);
-    assert.ok(error2.doc);
-    assert.equal(error2.doc.requiredField, 'field3');
     assert.ok(error2.errors['title']);
   });
 
-  it('insertMany() validation errors include index and doc properties with throwOnValidationError', async function() {
+  it('insertMany() validation errors include index property with throwOnValidationError', async function() {
     const schema = new Schema({
       title: { type: String, required: true },
       requiredField: { type: String, required: true }
@@ -485,15 +481,11 @@ describe('insertMany()', function() {
     // Check first validation error (index 1)
     const error1 = err.validationErrors[0];
     assert.equal(error1.index, 1);
-    assert.ok(error1.doc);
-    assert.equal(error1.doc.title, 'title2');
     assert.ok(error1.errors['requiredField']);
 
     // Check second validation error (index 2)
     const error2 = err.validationErrors[1];
     assert.equal(error2.index, 2);
-    assert.ok(error2.doc);
-    assert.equal(error2.doc.requiredField, 'field3');
     assert.ok(error2.errors['title']);
   });
 

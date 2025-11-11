@@ -106,7 +106,7 @@ function thisParameterPattern() {
 // Test that `toObject()` / `toJSON()` lose class behavior.
 // But TypeScript does NOT warn you about this.
 //
-// This matches the behavior described in the #12813:
+// This matches the behavior described in issue #12813:
 // > doc.toObject().myMethod() compiles but fails at runtime
 // ----------------------------------------------------------
 function toObjectToJSONTest() {

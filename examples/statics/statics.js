@@ -28,6 +28,6 @@ async function run() {
 }
 
 async function cleanup() {
-  await Person.remove();
+  await Person.deleteMany();
   mongoose.disconnect();
 }

@@ -198,7 +198,7 @@ describe('types.documentarray', function() {
 
     const parentDoc = { $__: true, $__schema: new Schema({ subdocs: [schema] }) };
 
-    const a = new MongooseDocumentArray([sub1], 'test', parentDoc);
+    const a = new MongooseDocumentArray([sub1], 'subdocs', parentDoc);
     assert.equal(a.id('42').title, 'Hello again to all my friends');
     assert.equal(a.id(sub1.id).title, 'Hello again to all my friends');
     assert.ok(!a.id('43'));

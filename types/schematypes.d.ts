@@ -97,7 +97,7 @@ declare module 'mongoose' {
 
     /**
      * If true, attach a required validator to this path, which ensures this path
-     * path cannot be set to a nullish value. If a function, Mongoose calls the
+     * cannot be set to a nullish value. If a function, Mongoose calls the
      * function and only checks for nullish values if the function returns a truthy value.
      */
     required?:

@@ -91,6 +91,9 @@ declare module 'mongoose' {
       errors: { [path: string]: ValidatorError | CastError };
       addError: (path: string, error: ValidatorError | CastError) => void;
 
+      /** Index of the document in insertMany() that failed validation (only set for unordered insertMany) */
+      index?: number;
+
       constructor(instance?: MongooseError);
     }
 

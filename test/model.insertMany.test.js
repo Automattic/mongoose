@@ -429,6 +429,66 @@ describe('insertMany()', function() {
     assert.ok(!err.mongoose.validationErrors[1].errors['name']);
   });
 
+  it('insertMany() validation errors include index property with ordered false and rawResult', async function() {
+    const schema = new Schema({
+      title: { type: String, required: true },
+      requiredField: { type: String, required: true }
+    });
+    const User = db.model('User', schema);
+
+    const arr = [
+      { title: 'title1', requiredField: 'field1' },
+      { title: 'title2' }, // Missing requiredField
+      { requiredField: 'field3' }, // Missing title
+      { title: 'title4', requiredField: 'field4' }
+    ];
+    const opts = { ordered: false, rawResult: true };
+    const res = await User.insertMany(arr, opts);
+
+    assert.equal(res.insertedCount, 2);
+    assert.equal(res.mongoose.validationErrors.length, 2);
+
+    // Check first validation error (index 1)
+    const error1 = res.mongoose.validationErrors[0];
+    assert.equal(error1.index, 1);
+    assert.ok(error1.errors['requiredField']);
+
+    // Check second validation error (index 2)
+    const error2 = res.mongoose.validationErrors[1];
+    assert.equal(error2.index, 2);
+    assert.ok(error2.errors['title']);
+  });
+
+  it('insertMany() validation errors include index property with throwOnValidationError', async function() {
+    const schema = new Schema({
+      title: { type: String, required: true },
+      requiredField: { type: String, required: true }
+    });
+    const User = db.model('User', schema);
+
+    const arr = [
+      { title: 'title1', requiredField: 'field1' },
+      { title: 'title2' }, // Missing requiredField
+      { requiredField: 'field3' }, // Missing title
+      { title: 'title4', requiredField: 'field4' }
+    ];
+    const opts = { ordered: false, rawResult: true, throwOnValidationError: true };
+    const err = await User.insertMany(arr, opts).then(() => null, err => err);
+
+    assert.ok(err);
+    assert.equal(err.validationErrors.length, 2);
+
+    // Check first validation error (index 1)
+    const error1 = err.validationErrors[0];
+    assert.equal(error1.index, 1);
+    assert.ok(error1.errors['requiredField']);
+
+    // Check second validation error (index 2)
+    const error2 = err.validationErrors[1];
+    assert.equal(error2.index, 2);
+    assert.ok(error2.errors['title']);
+  });
+
   it('insertMany() populate option (gh-9720)', async function() {
     const schema = new Schema({
       name: { type: String, required: true }

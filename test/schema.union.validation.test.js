@@ -271,4 +271,44 @@ describe('Union validation', function() {
     // The arbitrary field should not be present on the saved subdocument.
     assert.strictEqual(found.product.arbitraryNeverSave, undefined);
   });
+
+  it('should validate using the same schema type that was used for casting', async function() {
+    // This test ensures that casting and validation are tied together.
+    // If a value casts as one type, it must validate against that same type's validators.
+    const TestSchema = new mongoose.Schema({
+      product: {
+        type: mongoose.Schema.Types.Union,
+        of: [{ type: Number, required: true, min: 44 }, String]
+      }
+    });
+
+    const TestModel = db.model('Test', TestSchema);
+
+    // Test 1: value 12 should cast as Number and fail validation (12 < 44)
+    const doc1 = new TestModel({
+      product: 12
+    });
+
+    const err1 = await doc1.save().then(() => null, err => err);
+    assert.ok(err1, 'Should have validation error for number less than min');
+    assert.ok(err1.errors['product']);
+
+    // Test 2: value 50 should cast as Number and pass validation (50 > 44)
+    const doc2 = new TestModel({
+      product: 50
+    });
+
+    await doc2.save();
+    assert.ok(doc2._id);
+    assert.strictEqual(doc2.product, 50);
+
+    // Test 3: string value should cast and validate as String
+    const doc3 = new TestModel({
+      product: 'hello'
+    });
+
+    await doc3.save();
+    assert.ok(doc3._id);
+    assert.strictEqual(doc3.product, 'hello');
+  });
 });

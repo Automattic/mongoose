@@ -1,19 +1,16 @@
 'use strict';
 
 const mongoose = require('../');
-const Benchmark = require('benchmark');
-
-const { Schema } = mongoose;
 
 run().catch(err => {
-  console.error(err);
-  process.exit(1);
+    console.error(err);
+    process.exit(-1);
 });
 
 async function run() {
     await mongoose.connect('mongodb://127.0.0.1:27017/mongoose_benchmark');
 
-    const bookSchema = new Schema({
+    const bookSchema = new mongoose.Schema({
         ticker: String,
         asks: [[Number]],
         bids: [[Number]],
@@ -22,24 +19,32 @@ async function run() {
 
     const Book = mongoose.model('BookNestedArray', bookSchema);
 
-    let doc = { asks: [], bids: [] };
+    const doc = { asks: [], bids: [] };
     for (let i = 0; i < 10000; ++i) {
         doc.asks.push([i]);
         doc.bids.push([i]);
     }
 
-    const suite = new Benchmark.Suite();
+    if (!process.env.MONGOOSE_BENCHMARK_SKIP_SETUP) {
+        await Book.deleteMany({});
+    }
 
-    suite
-        .add('BookNestedArray document construction', function () {
+    const constructStart = Date.now();
+    for (let i = 0; i < 100; ++i) {
         new Book(doc);
-        })
-        .on('cycle', function(evt) {
-        if (process.env.MONGOOSE_DEV || process.env.PULL_REQUEST) {
-            console.log(String(evt.target));
-        }
-        })
-        .run();
+    }
+    const constructEnd = Date.now();
 
-    await mongoose.disconnect();
+    const inst = new Book(doc);
+    const saveStart = Date.now();
+    await inst.save();
+    const saveEnd = Date.now();
+
+    const results = {
+        'document construction (100x) ms': +(constructEnd - constructStart).toFixed(2),
+        'save() time ms': +(saveEnd - saveStart).toFixed(2)
+    };
+
+    console.log(JSON.stringify(results, null, ' '));
+    process.exit(0);
 }

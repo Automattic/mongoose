@@ -192,15 +192,11 @@ function gh11257() {
 }
 
 function gh13601() {
-  interface ITest extends Document {
-    name?: string;
-  }
-
-  const testSchema = new Schema<ITest>({
+  const testSchema = new Schema({
     name: String
   });
 
-  testSchema.pre('deleteOne', { document: true }, function(this: ITest) {
+  testSchema.pre('deleteOne', { document: true }, function() {
     expectAssignable<Document>(this);
   });
 }

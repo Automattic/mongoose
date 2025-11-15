@@ -166,7 +166,7 @@ class MyClass {
 }
 ```
 
-### Getters / Setters Limitation
+## Getters / Setters Limitation
 
 TypeScript currently does **not** allow `this` parameters on getters/setters:
 

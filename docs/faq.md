@@ -456,7 +456,7 @@ await doc.save();
 
 To fix this error, either:
 
-1) Load the full array before modifying and saving:
+(1) Load the full array before modifying and saving:
 
 ```javascript
 const doc = await BlogPost.findById(_id); 
@@ -464,7 +464,7 @@ doc.comments.id(commentId).text = 'Updated';
 await doc.save();
 ```
 
-2) Or use `updateOne()` / `updateMany()` with positional operators or `arrayFilters` so MongoDB can update the array atomically without requiring the full array on the document:
+(2) Or use `updateOne()` / `updateMany()` with positional operators or `arrayFilters` so MongoDB can update the array atomically without requiring the full array on the document:
 
 ```javascript
 await BlogPost.updateOne(

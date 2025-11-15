@@ -191,21 +191,7 @@ get myVirtual() {
 }
 ```
 
-## `toObject()` / `toJSON()`
-
-When using the correct [Model](../api/model.html) and [HydratedDocument](../typescript.html) generics (as shown above), Mongoose's types for `toObject()` and `toJSON()` work as expected. They will correctly return a type that includes **only the raw data** (e.g., `RawDocType`), not the methods or virtuals.
-
-This accurately reflects the plain object returned at runtime and prevents you from trying to access methods that don't exist.
-
-```ts
-const doc = new MyModel({ property1: 'test' });
-const pojo = doc.toObject();
-
-// This now correctly causes a TypeScript error!
-// pojo.myMethod(); // Property 'myMethod' does not exist on type 'RawDocType'.
-```
-
-## Limitations
+## Feature Support Summary
 
 | Behavior                                       | Supported |
 | ---------------------------------------------- | --------- |
@@ -214,8 +200,6 @@ const pojo = doc.toObject();
 | Automatic TS merging                           | ❌         |
 | `this` typing in methods                       | ✅         |
 | `this` typing in getters/setters               | ❌         |
-| Methods preserved in `toObject()` / `toJSON()` | ❌         |
-| Methods preserved with `.lean()`               | ❌         |
 
 ## Full Example Code
 

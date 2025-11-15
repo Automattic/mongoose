@@ -23,46 +23,35 @@ describe('Union validation', function() {
   afterEach(() => util.stopRemainingOps(db));
 
   it('should validate required fields in union schemas', async function() {
-    const SubSchema1 = new mongoose.Schema({
+    // Test primitive | subdocument union
+    const SubSchema = new mongoose.Schema({
       price: { type: Number, required: true },
-      title: { type: String },
-      isThisSchema1: { type: Boolean }
-    });
-
-    const SubSchema2 = new mongoose.Schema({
-      description: { type: String, required: true },
-      title: { type: String },
-      isThisSchema2: { type: Boolean }
+      title: { type: String }
     });
 
     const TestSchema = new mongoose.Schema({
       product: {
         type: mongoose.Schema.Types.Union,
-        of: [SubSchema1, SubSchema2]
+        of: [Number, SubSchema]
       }
     });
 
     const TestModel = db.model('Test', TestSchema);
 
-    // Test 1: Missing required fields for both schemas should fail
+    // Test 1: Number value should succeed
     const doc1 = new TestModel({
-      product: {
-        title: 'string',
-        isThisSchema1: true,
-        isThisSchema2: true
-      }
+      product: 42
     });
 
-    const err1 = await doc1.save().then(() => null, err => err);
-    assert.ok(err1, 'Should have validation error');
-    assert.ok(err1.errors['product.price'] || err1.errors['product.description']);
+    await doc1.save();
+    assert.ok(doc1._id);
+    assert.strictEqual(doc1.product, 42);
 
-    // Test 2: Valid SubSchema1 (with price) should succeed
+    // Test 2: Valid subdocument (with required price) should succeed
     const doc2 = new TestModel({
       product: {
         price: 100,
-        title: 'Valid Product',
-        isThisSchema1: true
+        title: 'Valid Product'
       }
     });
 
@@ -70,67 +59,65 @@ describe('Union validation', function() {
     assert.ok(doc2._id);
     assert.strictEqual(doc2.product.price, 100);
 
-    // Test 3: Valid SubSchema2 (with description) should succeed
+    // Test 3: Invalid subdocument (missing required price) should fail
     const doc3 = new TestModel({
       product: {
-        description: 'A description',
-        title: 'Valid Product 2',
-        isThisSchema2: true
+        title: 'Invalid Product'
       }
     });
 
-    await doc3.save();
-    assert.ok(doc3._id);
-    assert.strictEqual(doc3.product.description, 'A description');
+    const err3 = await doc3.save().then(() => null, err => err);
+    assert.ok(err3, 'Should have validation error');
+    assert.ok(err3.errors['product.price']);
   });
 
   it('should validate required fields in arrays of unions', async function() {
-    const SubSchema1 = new mongoose.Schema({
+    // Test array of primitive | subdocument unions
+    const SubSchema = new mongoose.Schema({
       price: { type: Number, required: true },
-      title: { type: String }
-    });
-
-    const SubSchema2 = new mongoose.Schema({
-      description: { type: String, required: true },
       title: { type: String }
     });
 
     const TestSchema = new mongoose.Schema({
       products: [{
         type: mongoose.Schema.Types.Union,
-        of: [SubSchema1, SubSchema2]
+        of: [Number, SubSchema]
       }]
     });
 
-    const TestModel = db.model('Test', TestSchema);
+    const TestModel = db.model('TestArray', TestSchema);
 
-    // Test with missing required fields
+    // Test 1: Array with mix of numbers and valid subdocuments should succeed
     const doc1 = new TestModel({
       products: [
-        { title: 'Missing both price and description' }
+        42,
+        { price: 100, title: 'Product 1' },
+        99
       ]
     });
 
-    const err1 = await doc1.save().then(() => null, err => err);
-    assert.ok(err1, 'Should have validation error');
-    assert.ok(err1.errors['products.0.price'] || err1.errors['products.0.description']);
+    await doc1.save();
+    assert.ok(doc1._id);
+    assert.strictEqual(doc1.products[0], 42);
+    assert.strictEqual(doc1.products[1].price, 100);
+    assert.strictEqual(doc1.products[2], 99);
 
-    // Test with valid data
+    // Test 2: Array with invalid subdocument (missing required price) should fail
     const doc2 = new TestModel({
       products: [
-        { price: 50, title: 'Product 1' },
-        { description: 'Product 2 desc', title: 'Product 2' }
+        42,
+        { title: 'Invalid Product' }
       ]
     });
 
-    await doc2.save();
-    assert.ok(doc2._id);
-    assert.strictEqual(doc2.products[0].price, 50);
-    assert.strictEqual(doc2.products[1].description, 'Product 2 desc');
+    const err2 = await doc2.save().then(() => null, err => err);
+    assert.ok(err2, 'Should have validation error');
+    assert.ok(err2.errors['products.1.price']);
   });
 
   it('should validate custom validators in union schemas', async function() {
-    const SubSchema1 = new mongoose.Schema({
+    // Test primitive | subdocument union with custom validators
+    const SubSchema = new mongoose.Schema({
       price: {
         type: Number,
         required: true,
@@ -140,52 +127,45 @@ describe('Union validation', function() {
           },
           message: 'Price must be positive'
         }
-      }
-    });
-
-    const SubSchema2 = new mongoose.Schema({
-      description: {
-        type: String,
-        required: true,
-        minlength: 5
-      }
+      },
+      title: { type: String }
     });
 
     const TestSchema = new mongoose.Schema({
       product: {
         type: mongoose.Schema.Types.Union,
-        of: [SubSchema1, SubSchema2]
+        of: [String, SubSchema]
       }
     });
 
-    const TestModel = db.model('Test', TestSchema);
+    const TestModel = db.model('TestValidator', TestSchema);
 
-    // Test with invalid price
+    // Test 1: String value should succeed
     const doc1 = new TestModel({
-      product: {
-        price: -10
-      }
+      product: 'simple string'
     });
 
-    const err1 = await doc1.save().then(() => null, err => err);
-    assert.ok(err1, 'Should have validation error');
-    assert.ok(err1.errors['product'] || err1.errors['product.price']);
+    await doc1.save();
+    assert.ok(doc1._id);
+    assert.strictEqual(doc1.product, 'simple string');
 
-    // Test with invalid description length
+    // Test 2: Invalid price (negative) should fail
     const doc2 = new TestModel({
       product: {
-        description: 'abc'
+        price: -10,
+        title: 'Invalid Product'
       }
     });
 
     const err2 = await doc2.save().then(() => null, err => err);
     assert.ok(err2, 'Should have validation error');
-    assert.ok(err2.errors['product'] || err2.errors['product.description']);
+    assert.ok(err2.errors['product.price']);
 
-    // Test with valid data
+    // Test 3: Valid subdocument should succeed
     const doc3 = new TestModel({
       product: {
-        price: 100
+        price: 100,
+        title: 'Valid Product'
       }
     });
 
@@ -194,43 +174,50 @@ describe('Union validation', function() {
   });
 
   it('should work with validateSync', function() {
-    const SubSchema1 = new mongoose.Schema({
-      price: { type: Number, required: true }
-    });
-
-    const SubSchema2 = new mongoose.Schema({
-      description: { type: String, required: true }
+    // Test primitive | subdocument union with validateSync
+    const SubSchema = new mongoose.Schema({
+      price: { type: Number, required: true },
+      title: { type: String }
     });
 
     const TestSchema = new mongoose.Schema({
       product: {
         type: mongoose.Schema.Types.Union,
-        of: [SubSchema1, SubSchema2]
+        of: [Number, SubSchema]
       }
     });
 
-    const TestModel = db.model('Test', TestSchema);
+    const TestModel = db.model('TestSync', TestSchema);
 
-    // Test with missing required fields
+    // Test 1: Number value should pass
     const doc1 = new TestModel({
-      product: {
-        title: 'No price or description'
-      }
+      product: 42
     });
 
     const err1 = doc1.validateSync();
-    assert.ok(err1, 'Should have validation error');
-    assert.ok(err1.errors['product.price'] || err1.errors['product.description']);
+    assert.ifError(err1);
 
-    // Test with valid data
+    // Test 2: Valid subdocument should pass
     const doc2 = new TestModel({
       product: {
-        price: 100
+        price: 100,
+        title: 'Valid'
       }
     });
 
     const err2 = doc2.validateSync();
     assert.ifError(err2);
+
+    // Test 3: Invalid subdocument (missing required price) should fail
+    const doc3 = new TestModel({
+      product: {
+        title: 'No price'
+      }
+    });
+
+    const err3 = doc3.validateSync();
+    assert.ok(err3, 'Should have validation error');
+    assert.ok(err3.errors['product.price']);
   });
 
   it('should remove arbitrary fields from subdocs on save', async function() {

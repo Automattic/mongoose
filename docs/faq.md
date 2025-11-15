@@ -436,9 +436,9 @@ it may be due to mixing callbacks and promises, which is no longer possible in c
 
 **A**. Mongoose throws `DivergentArrayError` when you call `document.save()` to update an array that was only partially loaded, for example:
 
-- the array was selected using an `$elemMatch` projection
-- the array was populated using `populate()` with `skip`, `limit`, query conditions, or options that exclude `_id`
-- the save would result in MongoDB performing a `$set` or `$pop` of the entire array
+* the array was selected using an `$elemMatch` projection
+* the array was populated using `populate()` with `skip`, `limit`, query conditions, or options that exclude `_id`
+* the save would result in MongoDB performing a `$set` or `$pop` of the entire array
 
 Because only part of the array is in memory, Mongoose can't safely reconstruct the full array to send back to MongoDB without risking data loss, so it throws `DivergentArrayError` instead.
 
@@ -456,7 +456,7 @@ await doc.save();
 
 To fix this error, either:
 
-1. Load the full array before modifying and saving:
+1) Load the full array before modifying and saving:
 
 ```javascript
 const doc = await BlogPost.findById(_id); 
@@ -464,7 +464,7 @@ doc.comments.id(commentId).text = 'Updated';
 await doc.save();
 ```
 
-2. Or use `updateOne()` / `updateMany()` with positional operators or `arrayFilters` so MongoDB can update the array atomically without requiring the full array on the document:
+2) Or use `updateOne()` / `updateMany()` with positional operators or `arrayFilters` so MongoDB can update the array atomically without requiring the full array on the document:
 
 ```javascript
 await BlogPost.updateOne(

@@ -45,6 +45,6 @@ async function run() {
         'save() time ms': +(saveEnd - saveStart).toFixed(2)
     };
 
-    console.log(JSON.stringify(results, null, ' '));
+    console.log(JSON.stringify(results, null, '  '));
     process.exit(0);
 }

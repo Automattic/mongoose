@@ -1645,11 +1645,10 @@ describe('schema', function() {
     const Test = mongoose.model('gh3935', testSchema);
     const test = new Test({ test: true });
 
-    assert.ok(test.validateSync());
-    assert.equal(test.validateSync().errors.test.name, 'CastError');
+    const validationResult = test.validateSync();
+    assert.ok(validationResult);
+    assert.equal(validationResult.errors.test.name, 'CastError');
 
-
-  });
 
   it('trim: false works with strings (gh-4042)', function() {
     const testSchema = new Schema({

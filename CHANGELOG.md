@@ -1,3 +1,26 @@
+8.19.4 / 2025-11-14
+===================
+ * fix(schema): avoid throwing error on array of unions #15720 #15718
+ * fix: store original index on insertMany validation errors #15735 [Jadu07](https://github.com/Jadu07)
+ * types: correct return type of discriminator to Model<U> #15726 [twentytwo777](https://github.com/twentytwo777)
+ * docs: improve Next.js integration guide with comprehensive examples #15730 [adarsh-priydarshi-5646](https://github.com/adarsh-priydarshi-5646)
+ * docs: add documentation for Union Schema Type #15721 [TechGenie-awake](https://github.com/TechGenie-awake)
+ * docs: removed the outdated callback and replaced them with async/await pattern #15723 [hk2166](https://github.com/hk2166)
+ * docs: fix lingering remove() call in statics docs #15737 [Gautam-Bharadwaj](https://github.com/Gautam-Bharadwaj)
+ * docs: fix inline doc typo in schematypes.d.ts #15738 [hagid786](https://github.com/hagid786)
+
+8.19.3 / 2025-11-04
+===================
+ * fix(model+plugins): correctly apply shard key on deleteOne() #15705 #15701
+ * fix(schema): correctly cache text indexes as 'text' not 1 #15695
+ * types: make inferRawDocType correctly infer empty array type [] as any[] #15704 #15699
+
+8.19.2 / 2025-10-20
+===================
+ * perf(setDefaultsOnInsert): avoid computing all modified paths when running setDefaultsOnInsert and update validators, only calculate if there are defaults to set #15691 #15672
+ * fix: correct handling of relative vs absolute paths with maps and subdocuments #15682 #15678 #15350
+ * ci: add publish script with provenance #15684 #15680
+
 8.19.1 / 2025-10-06
 ===================
  * perf: avoid getting all modified paths in update when checking if versionKey needs to be set #15677 #15672

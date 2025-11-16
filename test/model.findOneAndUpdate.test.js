@@ -1354,8 +1354,9 @@ describe('model: findOneAndUpdate:', function() {
       const update = { $push: { addresses: { street: 'not a num' } } };
       const error = await Person.findOneAndUpdate({}, update).then(() => null, err => err);
       assert.ok(error.message.indexOf('street') !== -1);
-      assert.equal(error.reason.message,
-        'Cast to Number failed for value "not a num" (type string) at path "street"');
+      assert.ok(error.reason.message.startsWith(
+        'Cast to Number failed for value "not a num" (type string) at path "street"')
+      );
     });
 
     it('projection option as alias for fields (gh-4315)', async function() {

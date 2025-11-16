@@ -381,8 +381,9 @@ describe('validation docs', function() {
     err.errors['numWheels'].message;
     // acquit:ignore:start
     assert.equal(err.errors['numWheels'].name, 'CastError');
-    assert.equal(err.errors['numWheels'].message,
-      'Cast to Number failed for value "not a number" (type string) at path "numWheels"');
+    assert.ok(err.errors['numWheels'].message.startsWith(
+      'Cast to Number failed for value "not a number"')
+    );
     // acquit:ignore:end
   });
 

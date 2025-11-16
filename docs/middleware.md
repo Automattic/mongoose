@@ -217,9 +217,11 @@ schema.pre('save', async function() {
 // later...
 
 // Changes will not be persisted to MongoDB because a pre hook errored out
-myDoc.save(function(err) {
+try {
+  await myDoc.save();
+} catch (err) {
   console.log(err.message); // something went wrong
-});
+}
 ```
 
 Calling `next()` multiple times is a no-op. If you call `next()` with an

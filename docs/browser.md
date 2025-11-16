@@ -38,5 +38,5 @@ console.log(doc.validateSync());
 
 **Note:** The browser version of Mongoose supports only schema-based validation.
 Built-in validators (like `required`, `enum`, `minlength`) and custom validators work as expected using `validate()` or `validateSync()`.
-However, browser Mongoose does **not** support models, queries, defaults, middleware (hooks), or any database operations.
-Only document validation is available in the browser build.
+However, browser Mongoose does **not** support database operations, queries, or populate. Some features, like simplified models, document hooks (middleware), and defaults, are available in a limited capacity.
+Only document validation and limited model/document features are available in the browser build.

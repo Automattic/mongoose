@@ -2,7 +2,6 @@ declare module 'mongoose' {
   type IfAny<IFTYPE, THENTYPE, ELSETYPE = IFTYPE> = 0 extends 1 & IFTYPE
     ? THENTYPE
     : ELSETYPE;
-  type IfUnknown<IFTYPE, THENTYPE> = unknown extends IFTYPE ? THENTYPE : IFTYPE;
   type IsUnknown<T> = unknown extends T ? true : false;
 
   type WithLevel1NestedPaths<T, K extends keyof T = keyof T> = {

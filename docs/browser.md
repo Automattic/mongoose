@@ -35,3 +35,8 @@ const doc = new mongoose.Document({}, new mongoose.Schema({
 // Prints an error because `name` is required.
 console.log(doc.validateSync());
 ```
+
+**Note:** The browser version of Mongoose supports only schema-based validation.
+Built-in validators (like `required`, `enum`, `minlength`) and custom validators work as expected using `validate()` or `validateSync()`.
+However, browser Mongoose does **not** support database operations, queries, or populate. Some features, like simplified models, document hooks (middleware), and defaults, are available in a limited capacity.
+Only document validation and limited model/document features are available in the browser build.

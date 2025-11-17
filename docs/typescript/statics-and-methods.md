@@ -81,12 +81,12 @@ const doc = new User({ name: 'test' });
 doc.updateName('foo');
 ```
 
-# Using `loadClass()` with TypeScript
+## Using `loadClass()` with TypeScript
 
-Mongoose supports applying ES6 classes to a schema using [`schema.loadClass()`](../api/schema.html#Schema.prototype.loadClass()).
+Mongoose supports applying ES6 classes to a schema using [`schema.loadClass()`](../api/schema.html#Schema.prototype.loadClass()) as an alternative to defining statics and methods in your schema.
 When using TypeScript, there are a few important typing details to understand.
 
-## Basic Usage
+### Basic Usage
 
 `loadClass()` copies static methods, instance methods, and ES getters/setters from the class onto the schema.
 
@@ -147,7 +147,7 @@ doc.myVirtual;
 doc.property1;     
 ```
 
-## Typing `this` Inside Methods
+### Typing `this` Inside Methods
 
 You can annotate `this` in methods to enable full safety, using the [Model](../api/model.html) and [HydratedDocument](../typescript.html) types you defined.
 Note that this must be done for **each method individually**; it is not possible to set a `this` type for the entire class at once.
@@ -166,7 +166,7 @@ class MyClass {
 }
 ```
 
-## Getters / Setters Limitation
+### Getters / Setters Limitation
 
 TypeScript currently does **not** allow `this` parameters on getters/setters:
 
@@ -191,17 +191,7 @@ get myVirtual() {
 }
 ```
 
-## Feature Support Summary
-
-| Behavior                                       | Supported |
-| ---------------------------------------------- | --------- |
-| Copy instance / static methods                 | ✅         |
-| Copy getters/setters                           | ✅         |
-| Automatic TS merging                           | ❌         |
-| `this` typing in methods                       | ✅         |
-| `this` typing in getters/setters               | ❌         |
-
-## Full Example Code
+### Full Example Code
 
 ```ts
 import { Model, Schema, model, HydratedDocument } from 'mongoose';
@@ -253,13 +243,10 @@ MyModel.myStatic();
 console.log(doc.myVirtual); 
 ```
 
-## When Should I Use `loadClass()`?
+### When Should I Use `loadClass()`?
 
-`loadClass()` is useful when organizing logic in ES6 classes.
+`loadClass()` is useful for defining methods and statics in classes.
+If you have a strong preference for classes, you can use `loadClass()`; however, we recommend defining `statics` and `methods` in schema options as described in the first section.
 
-However:
-
-* ✅ works fine
-* ⚠ requires manual Typescript Types
-
-If you want better type inference, using schema options [`methods`](../guide.html#methods) and [`statics`](../guide.html#statics) instead of `loadClass` are recommended.
+The major downside of `loadClass()` in TypeScript is that it requires manual TypeScript types.
+If you want better type inference, you can use schema options [`methods`](../guide.html#methods) and [`statics`](../guide.html#statics).

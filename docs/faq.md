@@ -254,13 +254,13 @@ For more debugging options (streams, callbacks), see the ['debug' option under `
 
 <hr id="callback_never_executes" />
 
-<a class="anchor" href="#callback_never_executes">**Q**</a>. My `save()` callback never executes. What am I doing wrong?
+<a class="anchor" href="#callback_never_executes">**Q**</a>. My `save()` operation never completes. What am I doing wrong?
 
 **A**. All `collection` actions (insert, remove, queries, etc.) are queued
 until Mongoose successfully connects to MongoDB. It is likely you haven't called Mongoose's
 `connect()` or `createConnection()` function yet.
 
-In Mongoose 5.11, there is a `bufferTimeoutMS` option (set to 10000 by default) that configures how long
+Mongoose connections support a `bufferTimeoutMS` option (set to 10000 by default) that configures how long
 Mongoose will allow an operation to stay buffered before throwing an error.
 
 If you want to opt out of Mongoose's buffering mechanism across your entire
@@ -408,13 +408,9 @@ mind that populate() will execute a separate query for each document.
 
 <a class="anchor" href="#duplicate-query">**Q**</a>. My query/update seems to execute twice. Why is this happening?
 
-**A**. The most common cause of duplicate queries is **mixing callbacks and promises with queries**.
-That's because passing a callback to a query function, like `find()` or `updateOne()`,
-immediately executes the query, and calling [`then()`](https://masteringjs.io/tutorials/fundamentals/then)
-executes the query again.
-
-Mixing promises and callbacks can lead to duplicate entries in arrays.
-For example, the below code inserts 2 entries into the `tags` array, **not* just 1.
+**A**. The most common cause of duplicate queries is **executing the same query object twice**.
+Calling [`then()`](https://masteringjs.io/tutorials/fundamentals/then) or `await` on the same query object
+multiple times will execute the query multiple times.
 
 ```javascript
 const BlogPost = mongoose.model('BlogPost', new Schema({
@@ -422,13 +418,62 @@ const BlogPost = mongoose.model('BlogPost', new Schema({
   tags: [String]
 }));
 
-// Because there's both `await` **and** a callback, this `updateOne()` executes twice
-// and thus pushes the same string into `tags` twice.
-const update = { $push: { tags: ['javascript'] } };
-await BlogPost.updateOne({ title: 'Introduction to Promises' }, update, (err, res) => {
-  console.log(res);
-});
+// This will throw 'Query was already executed' error
+const query = BlogPost.findOne({ title: 'Introduction to Promises' });
+await query;
+await query; // Error! Query already executed
+
+// To execute the same query twice, use clone()
+await query.clone(); // Works
 ```
+
+Note: Mongoose v7+ no longer supports callbacks. If you're seeing duplicate queries in older code,
+it may be due to mixing callbacks and promises, which is no longer possible in current versions.
+
+<hr id="divergent-array-error" />
+
+<a class="anchor" href="#divergent-array-error">**Q**</a>. What does `DivergentArrayError` mean and how do I fix it?
+
+**A**. Mongoose throws `DivergentArrayError` when you call `document.save()` to update an array that was only partially loaded, for example:
+
+* the array was selected using an `$elemMatch` projection
+* the array was populated using `populate()` with `skip`, `limit`, query conditions, or options that exclude `_id`
+* the save would result in MongoDB performing a `$set` or `$pop` of the entire array
+
+Because only part of the array is in memory, Mongoose can't safely reconstruct the full array to send back to MongoDB without risking data loss, so it throws `DivergentArrayError` instead.
+
+For example:
+
+```javascript
+const doc = await BlogPost.findOne(
+  { _id },
+  { comments: { $elemMatch: { flagged: true } } }
+);
+
+doc.comments[0].text = 'Updated';
+await doc.save(); 
+```
+
+To fix this error, either:
+
+(1) Load the full array before modifying and saving:
+
+```javascript
+const doc = await BlogPost.findById(_id); 
+doc.comments.id(commentId).text = 'Updated';
+await doc.save();
+```
+
+(2) Or use `updateOne()` / `updateMany()` with positional operators or `arrayFilters` so MongoDB can update the array atomically without requiring the full array on the document:
+
+```javascript
+await BlogPost.updateOne(
+  { _id, 'comments._id': commentId },
+  { $set: { 'comments.$.text': 'Updated' } }
+);
+```
+
+The same guidance applies if you populated an array with `skip`, `limit`, query conditions, or excluded `_id`: avoid calling `save()` to update that partially loaded array; instead, re-query without those options or use an update operation as shown above.
 
 <hr id="add_something" />
 

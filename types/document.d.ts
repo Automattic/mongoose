@@ -18,7 +18,7 @@ declare module 'mongoose' {
    * *  TQueryHelpers - Object with any helpers that should be mixed into the Query type
    * *  DocType - the type of the actual Document created
    */
-  class Document<T = unknown, TQueryHelpers = any, DocType = any, TVirtuals = Record<string, any>, TSchemaOptions = {}> {
+  class Document<T = Types.ObjectId, TQueryHelpers = any, DocType = any, TVirtuals = Record<string, any>, TSchemaOptions = {}> {
     constructor(doc?: any);
 
     /** This documents _id. */

@@ -3,6 +3,7 @@ declare module 'mongoose' {
     ? THENTYPE
     : ELSETYPE;
   type IfUnknown<IFTYPE, THENTYPE> = unknown extends IFTYPE ? THENTYPE : IFTYPE;
+  type IsUnknown<T> = unknown extends T ? true : false;
 
   type WithLevel1NestedPaths<T, K extends keyof T = keyof T> = {
     [P in K | NestedPaths<Required<T>, K>]: P extends K
@@ -135,7 +136,7 @@ declare module 'mongoose' {
    */
   type AddThisParameter<T, D> = {
     [K in keyof T]: T[K] extends (...args: infer A) => infer R
-      ? ThisParameter<T[K], unknown> extends unknown
+      ? IsUnknown<ThisParameter<T[K], unknown>> extends true
         ? (this: D, ...args: A) => R
         : T[K]
       : T[K];

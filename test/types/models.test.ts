@@ -1056,3 +1056,31 @@ async function gh16526() {
   const insertManyResult = await Tank.insertMany([{ name: 'test' }], { lean: true, rawResult: true });
   expectType<number>(insertManyResult.insertedCount);
 }
+
+async function gh15693() {
+  interface IUser {
+    name: string;
+  }
+
+  interface UserMethods {
+    printName(this: IUser): void;
+    getName(): string;
+  }
+
+  const schema = new Schema<IUser, Model<IUser>, UserMethods>({ name: { type: String, required: true } });
+  schema.method('printName', function printName(this: IUser) {
+    expectError(this.isModified('name'));
+    expectError(this.doesNotExist());
+    expectType<string>(this.name);
+    console.log(this.name);
+  });
+  schema.method('getName', function getName() {
+    expectType<boolean>(this.isModified('name'));
+    return this.name;
+  });
+  const User = model('user', schema);
+
+  const leanInst = await User.findOne({}).lean().orFail();
+  User.schema.methods.printName.apply(leanInst);
+
+}

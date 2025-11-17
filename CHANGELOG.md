@@ -1,3 +1,12 @@
+8.20.0 / 2025-11-17
+===================
+ * feat: cast id parameter based on schema _id type in DocumentArray.id() #15733 #15725 #15724 [Lex-Ashu](Lex-Ashu)
+ * fix: pass parent schema to SchemaType constructors in interpretAsType to make implementing custom container types easier #15700
+ * types(models): default _id type to ObjectId for Document #15688 [Catwallon](https://github.com/Catwallon)
+ * docs: add FAQ entry about DivergentArrayError #15743 [Mario5T](https://github.com/Mario5T)
+ * docs: update browser.md with Mongoose limitations #15744 [YashSharma64](https://github.com/YashSharma64)
+ * chore: add benchmark for large nested array documents (related to #9588) #15742 [Kundan-CR7](https://github.com/Kundan-CR7)
+
 8.19.4 / 2025-11-14
 ===================
  * fix(schema): avoid throwing error on array of unions #15720 #15718

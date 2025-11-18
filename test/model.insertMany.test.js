@@ -182,6 +182,111 @@ describe('insertMany()', function() {
     });
   });
 
+  describe('insertMany() lean option with default values (gh-14698)', () => {
+    it('insertMany() should apply default values when lean option is true', async function() {
+      const schema = new Schema({
+        name: { type: String, default: 'Default Name' },
+        age: { type: Number, default: 18 },
+        active: { type: Boolean, default: true }
+      });
+      const TestModel = db.model('TestLeanDefaults', schema);
+
+      const docs = await TestModel.insertMany([
+        { age: 30 },
+        { name: 'Custom Name' },
+        {}
+      ], { lean: true });
+
+      assert.equal(docs.length, 3);
+      // First doc: should have default name, custom age, default active
+      assert.equal(docs[0].name, 'Default Name');
+      assert.equal(docs[0].age, 30);
+      assert.equal(docs[0].active, true);
+      // Second doc: should have custom name, default age, default active
+      assert.equal(docs[1].name, 'Custom Name');
+      assert.equal(docs[1].age, 18);
+      assert.equal(docs[1].active, true);
+      // Third doc: should have all defaults
+      assert.equal(docs[2].name, 'Default Name');
+      assert.equal(docs[2].age, 18);
+      assert.equal(docs[2].active, true);
+
+      // Verify docs are plain objects, not Mongoose documents
+      assert.strictEqual(docs[0] instanceof TestModel, false);
+      assert.strictEqual(docs[1] instanceof TestModel, false);
+      assert.strictEqual(docs[2] instanceof TestModel, false);
+
+      // Verify defaults were persisted to database
+      const savedDocs = await TestModel.find().sort({ age: 1, name: 1 });
+      assert.equal(savedDocs.length, 3);
+      const persistedByAge30 = savedDocs.find(doc => doc.age === 30);
+      assert.equal(persistedByAge30.name, 'Default Name');
+      assert.equal(persistedByAge30.active, true);
+
+      const persistedCustomName = savedDocs.find(doc => doc.name === 'Custom Name');
+      assert.ok(persistedCustomName);
+      assert.equal(persistedCustomName.age, 18);
+      assert.equal(persistedCustomName.active, true);
+
+      const persistedAllDefaults = savedDocs.filter(doc => doc.name === 'Default Name' && doc.age === 18);
+      assert.equal(persistedAllDefaults.length, 1);
+      assert.equal(persistedAllDefaults[0].active, true);
+    });
+
+    it('insertMany() should apply function defaults when lean option is true', async function() {
+      const schema = new Schema({
+        name: { type: String, default: 'Default' },
+        timestamp: { type: Date, default: Date.now },
+        counter: { type: Number, default: () => Math.floor(Math.random() * 1000) }
+      });
+      const TestModel = db.model('TestLeanFunctionDefaults', schema);
+
+      const beforeInsert = Date.now();
+      const docs = await TestModel.insertMany([
+        { name: 'Test1' },
+        { name: 'Test2' }
+      ], { lean: true });
+
+      assert.equal(docs.length, 2);
+      assert.equal(docs[0].name, 'Test1');
+      assert.ok(docs[0].timestamp instanceof Date);
+      assert.ok(docs[0].timestamp.getTime() >= beforeInsert);
+      assert.ok(typeof docs[0].counter === 'number');
+      assert.ok(docs[0].counter >= 0 && docs[0].counter < 1000);
+
+      assert.equal(docs[1].name, 'Test2');
+      assert.ok(docs[1].timestamp instanceof Date);
+      assert.ok(docs[1].timestamp.getTime() >= beforeInsert);
+      assert.ok(typeof docs[1].counter === 'number');
+    });
+
+    it('insertMany() should apply nested defaults when lean option is true', async function() {
+      const nestedSchema = new Schema({
+        value: { type: String, default: 'nested default' }
+      }, { _id: false });
+
+      const schema = new Schema({
+        name: { type: String, default: 'parent default' },
+        nested: { type: nestedSchema, default: () => ({}) }
+      });
+      const TestModel = db.model('TestLeanNestedDefaults', schema);
+
+      const docs = await TestModel.insertMany([
+        { name: 'Custom' },
+        {}
+      ], { lean: true });
+
+      assert.equal(docs.length, 2);
+      assert.equal(docs[0].name, 'Custom');
+      assert.ok(docs[0].nested);
+      assert.equal(docs[0].nested.value, 'nested default');
+
+      assert.equal(docs[1].name, 'parent default');
+      assert.ok(docs[1].nested);
+      assert.equal(docs[1].nested.value, 'nested default');
+    });
+  });
+
   it('insertMany() ordered option for validation errors (gh-5068)', async function() {
     const version = await start.mongodVersion();
 

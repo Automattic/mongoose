@@ -20,10 +20,10 @@
   "type": "commonjs",
   "license": "MIT",
   "dependencies": {
-    "kareem": "git+https://github.com/mongoosejs/kareem.git#vkarpov15/overwrite-arguments",
+    "kareem": "3.0.0",
     "mongodb": "~7.0",
     "mpath": "0.9.0",
-    "mquery": "5.0.0",
+    "mquery": "6.0.0",
     "ms": "2.1.3",
     "sift": "17.1.3"
   },
@@ -135,7 +135,7 @@
       "noImplicitAny": false,
       "strictNullChecks": true,
       "module": "commonjs",
-      "target": "ES2017"
+      "target": "ES2022"
     }
   }
 }

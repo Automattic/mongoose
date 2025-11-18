@@ -6741,6 +6741,172 @@ describe('Model', function() {
     });
   });
 
+  describe('`updatePipeline` global option (gh-15756)', function() {
+    // Arrange
+    const originalValue = mongoose.get('updatePipeline');
+
+    afterEach(() => {
+      mongoose.set('updatePipeline', originalValue);
+    });
+
+    describe('allows update pipelines when global `updatePipeline` is `true`', function() {
+      it('works with updateOne', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: true });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act
+        await User.updateOne({ _id: createdUser._id }, [{ $set: { counter: 1 } }]);
+        const user = await User.findById(createdUser._id);
+
+        // Assert
+        assert.equal(user.counter, 1);
+      });
+
+      it('works with updateMany', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: true });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act
+        await User.updateMany({ _id: createdUser._id }, [{ $set: { counter: 2 } }]);
+        const user = await User.findById(createdUser._id);
+
+        // Assert
+        assert.equal(user.counter, 2);
+      });
+
+      it('works with findOneAndUpdate', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: true });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act
+        const user = await User.findOneAndUpdate({ _id: createdUser._id }, [{ $set: { counter: 3, name: 'Hafez3' } }], { new: true });
+
+        // Assert
+        assert.equal(user.counter, 3);
+        assert.equal(user.name, 'Hafez3');
+      });
+
+      it('works with findByIdAndUpdate', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: true });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act
+        const user = await User.findByIdAndUpdate(createdUser._id, [{ $set: { counter: 4, name: 'Hafez4' } }], { new: true });
+
+        // Assert
+        assert.equal(user.counter, 4);
+        assert.equal(user.name, 'Hafez4');
+      });
+    });
+
+    describe('explicit `updatePipeline` option overrides global setting', function() {
+      it('explicit false overrides global true for updateOne', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: true });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act & Assert
+        assert.throws(
+          () => User.updateOne({ _id: createdUser._id }, [{ $set: { counter: 1 } }], { updatePipeline: false }),
+          /Cannot pass an array to query updates unless the `updatePipeline` option is set/
+        );
+      });
+
+      it('explicit false overrides global true for findOneAndUpdate', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: true });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act & Assert
+        assert.throws(
+          () => User.findOneAndUpdate({ _id: createdUser._id }, [{ $set: { counter: 1 } }], { updatePipeline: false }),
+          /Cannot pass an array to query updates unless the `updatePipeline` option is set/
+        );
+      });
+    });
+
+    describe('throws error when global `updatePipeline` is false and no explicit option', function() {
+      it('updateOne should throw error', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: false });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act & Assert
+        assert.throws(
+          () => User.updateOne({ _id: createdUser._id }, [{ $set: { counter: 1 } }]),
+          /Cannot pass an array to query updates unless the `updatePipeline` option is set/
+        );
+      });
+
+      it('updateMany should throw error', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: false });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act & Assert
+        assert.throws(
+          () => User.updateMany({ _id: createdUser._id }, [{ $set: { counter: 1 } }]),
+          /Cannot pass an array to query updates unless the `updatePipeline` option is set/
+        );
+      });
+
+      it('findOneAndUpdate should throw error', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: false });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act & Assert
+        assert.throws(
+          () => User.findOneAndUpdate({ _id: createdUser._id }, [{ $set: { counter: 1 } }]),
+          /Cannot pass an array to query updates unless the `updatePipeline` option is set/
+        );
+      });
+    });
+
+    describe('explicit `updatePipeline: true` overrides global `updatePipeline: false`', function() {
+      it('works with updateOne', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: false });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act
+        await User.updateOne({ _id: createdUser._id }, [{ $set: { counter: 1 } }], { updatePipeline: true });
+        const user = await User.findById(createdUser._id);
+
+        // Assert
+        assert.equal(user.counter, 1);
+      });
+
+      it('works with findOneAndUpdate', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: false });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act
+        const user = await User.findOneAndUpdate({ _id: createdUser._id }, [{ $set: { counter: 2, name: 'Hafez2' } }], { updatePipeline: true, new: true });
+
+        // Assert
+        assert.equal(user.counter, 2);
+        assert.equal(user.name, 'Hafez2');
+      });
+    });
+
+    function createTestContext({ globalUpdatePipeline }) {
+      mongoose.set('updatePipeline', globalUpdatePipeline);
+      const userSchema = new Schema({
+        name: { type: String },
+        counter: { type: Number, default: 0 }
+      });
+
+      const User = db.model('User', userSchema);
+      return { User };
+    }
+  });
+
   describe('buildBulkWriteOperations() (gh-9673)', () => {
     it('builds write operations', async() => {
 

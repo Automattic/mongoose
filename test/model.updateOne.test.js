@@ -420,6 +420,17 @@ describe('model: updateOne:', function() {
     assert.equal(affected.modifiedCount, 1);
   });
 
+  it('throws error when using lean() on updateOne() (gh-13392)', async function() {
+    let err = null;
+    try {
+      BlogPost.updateOne({ _id: post._id }, { $set: { title: newTitle } }).lean();
+    } catch (e) {
+      err = e;
+    }
+    assert.ok(err);
+    assert.equal(err.message, '`lean()` is not supported on updateOne() operations');
+  });
+
   it('handles $push with $ positionals (gh-1057)', async function() {
     const taskSchema = new Schema({
       name: String

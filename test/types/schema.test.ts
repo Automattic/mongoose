@@ -2074,3 +2074,15 @@ function autoInferredNestedMaps() {
   const doc = new TestModel({ nestedMap: new Map([['1', new Map([['2', 'value']])]]) });
   expectType<Map<string, Map<string, string>>>(doc.nestedMap);
 }
+
+function gh15751() {
+  const schema = new Schema({
+    myId: {
+      type: Types.ObjectId,
+      required: true
+    }
+  });
+  const TestModel = model('Test', schema);
+  const doc = new TestModel();
+  expectType<Types.ObjectId>(doc.myId);
+}

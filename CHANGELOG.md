@@ -1,3 +1,7 @@
+9.0.0-rc1 / 2025-11-19
+======================
+ * fix(populate): correctly populate embedded discriminators on subdocuments #15774
+
 9.0.0-rc0 / 2025-11-19
 ======================
  * BREAKING CHANGE: drop support for callback-based pre middleware, e.g. `next()` in `pre()` hooks

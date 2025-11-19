@@ -85,6 +85,19 @@ Set `updatePipeline: true` to enable update pipelines.
 await Model.updateOne({}, [{ $set: { newProp: 'test2' } }], { updatePipeline: true });
 ```
 
+You can also set `updatePipeline` globally to enable update pipelines for all update operations by default.
+
+```javascript
+// Enable update pipelines globally
+mongoose.set('updatePipeline', true);
+
+// Now update pipelines work without needing to specify the option on each query
+await Model.updateOne({}, [{ $set: { newProp: 'test2' } }]);
+
+// You can still override the global setting per query
+await Model.updateOne({}, [{ $set: { newProp: 'test2' } }], { updatePipeline: false }); // throws
+```
+
 ## Removed background option for indexes
 
 [MongoDB no longer supports the `background` option for indexes as of MongoDB 4.2](https://www.mongodb.com/docs/manual/core/index-creation/#index-operations). Mongoose 9 will no longer set the background option by default and Mongoose 9 no longer supports setting the `background` option on `Schema.prototype.index()`.

@@ -56,6 +56,11 @@ function gh10139() {
   mongoose.set('timestamps.createdAt.immutable', false);
 }
 
+function gh15756() {
+  mongoose.set('updatePipeline', false);
+  mongoose.set('updatePipeline', true);
+}
+
 function gh12100() {
   mongoose.syncIndexes({ continueOnError: true, sparse: true });
   mongoose.syncIndexes({ continueOnError: false, sparse: true });
@@ -64,7 +69,8 @@ function gh12100() {
 function setAsObject() {
   mongoose.set({
     debug: true,
-    autoIndex: false
+    autoIndex: false,
+    updatePipeline: true
   });
 
   expectError(mongoose.set({ invalid: true }));

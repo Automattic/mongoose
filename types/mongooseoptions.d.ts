@@ -215,5 +215,14 @@ declare module 'mongoose' {
      * to their database property names. Defaults to false.
      */
     translateAliases?: boolean;
+
+    /**
+     * If `true`, allows passing update pipelines (arrays) to update operations by default
+     * without explicitly setting `updatePipeline: true` in each query. This is the global
+     * default for the `updatePipeline` query option.
+     *
+     * @default false
+     */
+    updatePipeline?: boolean;
   }
 }

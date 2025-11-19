@@ -59,6 +59,9 @@ declare module 'mongoose' {
    */
   export type InferSchemaType<TSchema> = IfAny<TSchema, any, ObtainSchemaGeneric<TSchema, 'DocType'>>;
 
+  export type DefaultIdVirtual = { id: string };
+  export type AddDefaultId<DocType, TVirtuals, TSchemaOptions> = (DocType extends { id: any } ? TVirtuals : TSchemaOptions extends { id: false } ? TVirtuals : TVirtuals & { id: string });
+
   /**
    * @summary Obtains schema Generic type by using generic alias.
    * @param {TSchema} TSchema A generic of schema type instance.
@@ -76,6 +79,8 @@ declare module 'mongoose' {
       | 'TSchemaOptions'
       | 'DocType'
       | 'THydratedDocumentType'
+      | 'TSchemaDefinition'
+      | 'TLeanResultType'
   > =
     TSchema extends (
       Schema<
@@ -87,7 +92,9 @@ declare module 'mongoose' {
         infer TStaticMethods,
         infer TSchemaOptions,
         infer DocType,
-        infer THydratedDocumentType
+        infer THydratedDocumentType,
+        infer TSchemaDefinition,
+        infer TLeanResultType
       >
     ) ?
       {
@@ -95,11 +102,13 @@ declare module 'mongoose' {
         M: M;
         TInstanceMethods: TInstanceMethods;
         TQueryHelpers: TQueryHelpers;
-        TVirtuals: TVirtuals;
+        TVirtuals: AddDefaultId<DocType, TVirtuals, TSchemaOptions>;
         TStaticMethods: TStaticMethods;
         TSchemaOptions: TSchemaOptions;
         DocType: DocType;
         THydratedDocumentType: THydratedDocumentType;
+        TSchemaDefinition: TSchemaDefinition;
+        TLeanResultType: TLeanResultType;
       }[alias]
     : unknown;
 
@@ -236,6 +245,10 @@ type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> =
   : T extends Record<string, infer V> ? V
   : string;
 
+type UnionToType<T extends readonly any[]> = T[number] extends infer U
+  ? ResolvePathType<U>
+  : never;
+
 type IsSchemaTypeFromBuiltinClass<T> =
   T extends typeof String ? true
   : T extends typeof Number ? true
@@ -254,6 +267,7 @@ type IsSchemaTypeFromBuiltinClass<T> =
   : T extends Types.Decimal128 ? true
   : T extends NativeDate ? true
   : T extends typeof Schema.Types.Mixed ? true
+  : T extends Types.UUID ? true
   : unknown extends Buffer ? false
   : T extends Buffer ? true
   : false;
@@ -301,12 +315,12 @@ type ResolvePathType<
       Options['enum'][number]
     : number
   : PathValueType extends DateSchemaDefinition ? NativeDate
+  : PathValueType extends UuidSchemaDefinition ? Types.UUID
   : PathValueType extends BufferSchemaDefinition ? Buffer
   : PathValueType extends BooleanSchemaDefinition ? boolean
   : PathValueType extends ObjectIdSchemaDefinition ? Types.ObjectId
   : PathValueType extends Decimal128SchemaDefinition ? Types.Decimal128
   : PathValueType extends BigintSchemaDefinition ? bigint
-  : PathValueType extends UuidSchemaDefinition ? Buffer
   : PathValueType extends DoubleSchemaDefinition ? Types.Double
   : PathValueType extends MapSchemaDefinition ? Map<string, ObtainDocumentPathType<Options['of']>>
   : PathValueType extends UnionSchemaDefinition ?

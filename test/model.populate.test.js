@@ -11690,7 +11690,7 @@ describe('model: populate:', function() {
     assert.deepStrictEqual(obj.rubric.parameters.param2.evaluationPrompts.map(prompt => prompt.name), ['Test Prompt 3']);
   });
 
-  it('handles populating embedded discriminator', async function () {
+  it('handles populating embedded discriminator', async function() {
     const sectionSchema = new Schema({
       subdoc: new Schema({
         name: String

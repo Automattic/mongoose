@@ -11689,4 +11689,30 @@ describe('model: populate:', function() {
     assert.deepStrictEqual(obj.rubric.parameters.param1.evaluationPrompts.map(prompt => prompt.name), ['Test Prompt', 'Test Prompt 2']);
     assert.deepStrictEqual(obj.rubric.parameters.param2.evaluationPrompts.map(prompt => prompt.name), ['Test Prompt 3']);
   });
+
+  it('handles populating embedded discriminator', async function () {
+    const sectionSchema = new Schema({
+      subdoc: new Schema({
+        name: String
+      })
+    });
+    sectionSchema.path('subdoc').discriminator('Test', new Schema({
+      subSection: {
+        type: 'ObjectId',
+        ref: 'SubSection'
+      }
+    }));
+    const Section = db.model('Section', sectionSchema);
+    const SubSection = db.model('SubSection', new Schema({ name: String }));
+
+    const subsection = await SubSection.create({ name: 'foo' });
+    let section = await Section.create({
+      subdoc: {
+        __t: 'Test',
+        subSection: subsection._id
+      }
+    });
+    section = await Section.findById(section).populate('subdoc.subSection');
+    assert.equal(section.subdoc.subSection.name, 'foo');
+  });
 });

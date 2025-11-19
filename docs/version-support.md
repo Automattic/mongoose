@@ -32,5 +32,5 @@ After this date, Mongoose 6 will no longer receive any updates—not even securi
 Mongoose 5.x, released **January 17, 2018**, reached **End-of-Life** on **March 1, 2024**.  
 It’s no longer maintained or updated.
 
-- **Latest release:** [5.13.23](https://mongoosejs.com/docs/5.x/index.html)
-- **Docs:** https://mongoosejs.com/docs/6.x/
+* **Latest release:** [5.13.23](https://mongoosejs.com/docs/5.x/index.html)
+* **Docs:** https://mongoosejs.com/docs/6.x/

@@ -1016,7 +1016,7 @@ declare module 'mongoose' {
     recompileSchema(): void;
 
     /** Schema the model uses. */
-    schema: Schema<TRawDocType>;
+    schema: TSchema;
 
     /** Creates a `updateMany` query: updates all documents that match `filter` with `update`. */
     updateMany(

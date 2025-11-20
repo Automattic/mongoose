@@ -2,7 +2,7 @@ declare module 'mongoose' {
   type IfAny<IFTYPE, THENTYPE, ELSETYPE = IFTYPE> = 0 extends 1 & IFTYPE
     ? THENTYPE
     : ELSETYPE;
-  type IfUnknown<IFTYPE, THENTYPE> = unknown extends IFTYPE ? THENTYPE : IFTYPE;
+  type IsUnknown<T> = unknown extends T ? true : false;
 
   type IsNotNever<T> = [T] extends [never] ? false : true;
   type IsAny<T> = 0 extends 1 & T ? true : false;
@@ -155,7 +155,7 @@ declare module 'mongoose' {
    */
   type AddThisParameter<T, D> = {
     [K in keyof T]: T[K] extends (...args: infer A) => infer R
-      ? ThisParameter<T[K], unknown> extends unknown
+      ? IsUnknown<ThisParameter<T[K], unknown>> extends true
         ? (this: D, ...args: A) => R
         : T[K]
       : T[K];

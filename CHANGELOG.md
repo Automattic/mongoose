@@ -1,3 +1,10 @@
+8.20.1 / 2025-11-20
+===================
+ * types: correct Model.schema type and fix unknown check for this param type in schema.methods #15750 #15693
+ * docs: add detailed loadClass() TypeScript usage guide #15731 #12813 [Necro-Rohan](https://github.com/Necro-Rohan)
+ * docs: update version support documentation for Mongoose #15761 [ManmathX](https://github.com/ManmathX)
+ * docs: add copy-to-clipboard feature for code blocks in docs #15759 [vedansha07](https://github.com/vedansha07)
+
 8.20.0 / 2025-11-17
 ===================
  * feat: cast id parameter based on schema _id type in DocumentArray.id() #15733 #15725 #15724 [Lex-Ashu](Lex-Ashu)

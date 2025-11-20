@@ -427,6 +427,55 @@ describe('insertMany()', function() {
     assert.ok(!err.mongoose.validationErrors[1].errors['name']);
   });
 
+  it('attaches validation summary to resolved docs when unordered without rawResult', async function() {
+    const schema = new Schema({
+      name: { type: String, required: true },
+      year: { type: Number, required: true }
+    });
+    const Movie = db.model('Movie', schema);
+
+    const arr = [
+      { foo: 'The Phantom Menace', year: 1999 },
+      { name: 'The Force Awakens', bar: 2015 },
+      { name: 'The Empire Strikes Back', year: 1980 }
+    ];
+    const docs = await Movie.insertMany(arr, { ordered: false });
+
+    assert.equal(docs.length, 1);
+    assert.ok(docs.mongoose);
+    assert.equal(docs.mongoose.validationErrors.length, 2);
+    assert.equal(docs.mongoose.results.length, 3);
+    assert.ok(docs.mongoose.results[0].errors['name']);
+    assert.ok(docs.mongoose.results[1].errors['year']);
+    assert.equal(docs.mongoose.results[2].name, 'The Empire Strikes Back');
+  });
+
+  it('decorates MongoBulkWriteError with validation summary when unordered without rawResult', async function() {
+    const schema = new Schema({
+      name: { type: String, required: true, unique: true },
+      year: { type: Number, required: true }
+    });
+    const Movie = db.model('Movie', schema);
+    await Movie.init();
+
+    const arr = [
+      { foo: 'The Phantom Menace', year: 1999 },
+      { name: 'The Force Awakens', bar: 2015 },
+      { name: 'The Empire Strikes Back', year: 1980 },
+      { name: 'The Empire Strikes Back', year: 1980 }
+    ];
+    const error = await Movie.insertMany(arr, { ordered: false }).then(() => null, err => err);
+
+    assert.ok(error);
+    assert.ok(error.mongoose);
+    assert.equal(error.mongoose.validationErrors.length, 2);
+    assert.equal(error.mongoose.results.length, 4);
+    assert.ok(error.mongoose.results[0].errors['name']);
+    assert.ok(error.mongoose.results[1].errors['year']);
+    const dupError = error.mongoose.results[3];
+    assert.equal(dupError.index, 3);
+  });
+
   it('insertMany() validation errors include index property with ordered false and rawResult', async function() {
     const schema = new Schema({
       title: { type: String, required: true },

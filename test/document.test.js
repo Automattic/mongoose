@@ -873,7 +873,7 @@ describe('document', function() {
 
       // override to check if toJSON gets fired
       const path = TestDocument.prototype.schema.path('em');
-      path.casterConstructor.prototype.toJSON = function() {
+      path.Constructor.prototype.toJSON = function() {
         return {};
       };
 
@@ -889,7 +889,7 @@ describe('document', function() {
       assert.equal(clone.em[0].constructor.name, 'Object');
       assert.equal(Object.keys(clone.em[0]).length, 0);
       delete doc.schema.options.toJSON;
-      delete path.casterConstructor.prototype.toJSON;
+      delete path.Constructor.prototype.toJSON;
 
       doc.schema.options.toJSON = { minimize: false };
       delete doc.schema._defaultToObjectOptionsMap;
@@ -906,7 +906,7 @@ describe('document', function() {
       let str;
       try {
         str = JSON.stringify(arr);
-      } catch (_) {
+      } catch {
         err = true;
       }
       assert.equal(err, false);
@@ -1692,7 +1692,6 @@ describe('document', function() {
       assert.equal(d.nested.setr, 'undefined setter');
       dateSetterCalled = false;
       d.date = undefined;
-      await d.validate();
       assert.ok(dateSetterCalled);
     });
 
@@ -2211,9 +2210,8 @@ describe('document', function() {
       }, { _id: false, id: false });
 
       let userHookCount = 0;
-      userSchema.pre('save', function(next) {
+      userSchema.pre('save', function() {
         ++userHookCount;
-        next();
       });
 
       const eventSchema = new mongoose.Schema({
@@ -2222,9 +2220,8 @@ describe('document', function() {
       });
 
       let eventHookCount = 0;
-      eventSchema.pre('save', function(next) {
+      eventSchema.pre('save', function() {
         ++eventHookCount;
-        next();
       });
 
       const Event = db.model('Event', eventSchema);
@@ -2786,9 +2783,8 @@ describe('document', function() {
       const childSchema = new Schema({ count: Number });
 
       let preCalls = 0;
-      childSchema.pre('save', function(next) {
+      childSchema.pre('save', function() {
         ++preCalls;
-        next();
       });
 
       const SingleNestedSchema = new Schema({
@@ -2982,10 +2978,9 @@ describe('document', function() {
         name: String
       });
 
-      ChildSchema.pre('save', function(next) {
+      ChildSchema.pre('save', function() {
         assert.ok(this.isModified('name'));
         ++called;
-        next();
       });
 
       const ParentSchema = new Schema({
@@ -3317,9 +3312,8 @@ describe('document', function() {
       });
 
       const called = {};
-      ChildSchema.pre('deleteOne', { document: true, query: false }, function(next) {
+      ChildSchema.pre('deleteOne', { document: true, query: false }, function() {
         called[this.name] = true;
-        next();
       });
 
       const ParentSchema = new Schema({
@@ -4246,9 +4240,8 @@ describe('document', function() {
         name: String
       }, { timestamps: true, versionKey: null });
 
-      schema.pre('save', function(next) {
+      schema.pre('save', function() {
         this.$where = { updatedAt: this.updatedAt };
-        next();
       });
 
       schema.post('save', function(error, res, next) {
@@ -4332,9 +4325,8 @@ describe('document', function() {
       });
       let count = 0;
 
-      childSchema.pre('validate', function(next) {
+      childSchema.pre('validate', function() {
         ++count;
-        next();
       });
 
       const parentSchema = new Schema({
@@ -4372,9 +4364,8 @@ describe('document', function() {
       });
       let count = 0;
 
-      childSchema.pre('validate', function(next) {
+      childSchema.pre('validate', function() {
         ++count;
-        next();
       });
 
       const parentSchema = new Schema({
@@ -4502,19 +4493,23 @@ describe('document', function() {
       assert.equal(p.children[0].grandchild.foo(), 'bar');
     });
 
-    it('hooks/middleware for custom methods (gh-6385) (gh-7456)', async function() {
+    it('hooks/middleware for custom methods (gh-6385) (gh-7456)', async function hooksForCustomMethods() {
       const mySchema = new Schema({
         name: String
       });
 
-      mySchema.methods.foo = function(cb) {
-        return cb(null, this.name);
+      mySchema.methods.foo = function() {
+        return Promise.resolve(this.name);
       };
       mySchema.methods.bar = function() {
         return this.name;
       };
       mySchema.methods.baz = function(arg) {
         return Promise.resolve(arg);
+      };
+      mySchema.methods.qux = async function qux() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('error!');
       };
 
       let preFoo = 0;
@@ -4533,6 +4528,15 @@ describe('document', function() {
       });
       mySchema.post('baz', function() {
         ++postBaz;
+      });
+
+      let preQux = 0;
+      let postQux = 0;
+      mySchema.pre('qux', function() {
+        ++preQux;
+      });
+      mySchema.post('qux', function() {
+        ++postQux;
       });
 
       const MyModel = db.model('Test', mySchema);
@@ -4556,6 +4560,12 @@ describe('document', function() {
       assert.equal(await doc.baz('foobar'), 'foobar');
       assert.equal(preBaz, 1);
       assert.equal(preBaz, 1);
+
+      const err = await doc.qux().then(() => null, err => err);
+      assert.equal(err.message, 'error!');
+      assert.ok(err.stack.includes('hooksForCustomMethods'));
+      assert.equal(preQux, 1);
+      assert.equal(postQux, 0);
     });
 
     it('custom methods with promises (gh-6385)', async function() {
@@ -4931,8 +4941,8 @@ describe('document', function() {
     it('handles errors in subdoc pre validate (gh-5215)', async function() {
       const childSchema = new mongoose.Schema({});
 
-      childSchema.pre('validate', function(next) {
-        next(new Error('child pre validate'));
+      childSchema.pre('validate', function() {
+        throw new Error('child pre validate');
       });
 
       const parentSchema = new mongoose.Schema({
@@ -6016,11 +6026,10 @@ describe('document', function() {
         e: { type: String }
       });
 
-      MainSchema.pre('save', function(next) {
+      MainSchema.pre('save', function() {
         if (this.isModified()) {
           this.set('a.c', 100, Number);
         }
-        next();
       });
 
       const Main = db.model('Test', MainSchema);
@@ -6470,14 +6479,16 @@ describe('document', function() {
       });
       const Model = db.model('Test', schema);
 
-      await Model.create({
+      let doc = new Model({
         roles: [
           { name: 'admin' },
           { name: 'mod', folders: [{ folderId: 'foo' }] }
         ]
       });
+      await doc.validate().then(() => null, err => console.log(err));
+      await doc.save();
 
-      const doc = await Model.findOne();
+      doc = await Model.findOne();
 
       doc.roles[1].folders.push({ folderId: 'bar' });
 
@@ -6521,6 +6532,50 @@ describe('document', function() {
           assert.ok(err.message.indexOf('Cast to Embedded') !== -1, err.message);
           assert.equal(err.errors['nested'].reason.name, 'ObjectExpectedError');
         });
+    });
+
+    it('init single nested to num throws ObjectExpectedError (gh-15839) (gh-6710) (gh-6753)', async function() {
+      const schema = new Schema({
+        nested: new Schema({
+          num: Number
+        })
+      });
+
+      const Test = db.model('Test', schema);
+
+      const doc = new Test({});
+      doc.init({ nested: 123 });
+      await assert.rejects(() => doc.validate(), /nested: Tried to set nested object field `nested` to primitive value `123`/);
+
+      assert.throws(() => doc.init(123), /ObjectExpectedError/);
+    });
+
+    it('allows pre init hook to transform data (gh-15839)', async function() {
+      const timeStringToObject = (time) => {
+        if (typeof time !== 'string') return time;
+        const [hours, minutes] = time.split(':');
+        return { hours: parseInt(hours), minutes: parseInt(minutes) };
+      };
+
+      const timeSchema = new Schema({
+        hours: { type: Number, required: true },
+        minutes: { type: Number, required: true }
+      });
+
+      timeSchema.pre('init', function(doc) {
+        if (typeof doc === 'string') {
+          return mongoose.overwriteMiddlewareArguments(timeStringToObject(doc));
+        }
+      });
+
+      const userSchema = new Schema({
+        time: timeSchema
+      });
+
+      const User = db.model('Test', userSchema);
+      const doc = new User({});
+      doc.init({ time: '12:30' });
+      await doc.validate();
     });
 
     it('set array to false throws ObjectExpectedError (gh-7242)', function() {
@@ -8541,13 +8596,12 @@ describe('document', function() {
     const owners = [];
 
     // Middleware to set a default location name derived from the parent organization doc
-    locationSchema.pre('validate', function(next) {
+    locationSchema.pre('validate', function() {
       const owner = this.ownerDocument();
       owners.push(owner);
       if (this.isNew && !this.get('name') && owner.get('name')) {
         this.set('name', `${owner.get('name')} Office`);
       }
-      next();
     });
 
     const organizationSchema = Schema({
@@ -9094,8 +9148,7 @@ describe('document', function() {
     });
     const Test = db.model('Test', testSchema);
 
-    const doc = new Test({ testArray: [{}], testSingleNested: {} }, null,
-      { defaults: false });
+    const doc = new Test({ testArray: [{}], testSingleNested: {} }, null, { defaults: false });
     assert.ok(!doc.testTopLevel);
     assert.ok(!doc.testNested.prop);
     assert.ok(!doc.testArray[0].prop);
@@ -9716,7 +9769,7 @@ describe('document', function() {
     const schema = Schema({ name: String });
 
     let called = 0;
-    schema.pre(/.*/, { document: true, query: false }, function() {
+    schema.pre(/.*/, { document: true, query: false }, function testPreSave9190() {
       ++called;
     });
     const Model = db.model('Test', schema);
@@ -10081,9 +10134,8 @@ describe('document', function() {
       }
     }, {});
     let count = 0;
-    SubSchema.pre('deleteOne', { document: true, query: false }, function(next) {
+    SubSchema.pre('deleteOne', { document: true, query: false }, function() {
       count++;
-      next();
     });
     const thisSchema = new Schema({
       foo: {
@@ -10105,6 +10157,9 @@ describe('document', function() {
     };
     const document = await Model.create(newModel);
     document.mySubdoc[0].deleteOne();
+    // Set timeout to make sure that we aren't calling the deleteOne hooks synchronously
+    await new Promise(resolve => setTimeout(resolve, 10));
+    assert.equal(count, 0);
     await document.save().catch((error) => {
       console.error(error);
     });
@@ -10278,10 +10333,8 @@ describe('document', function() {
       observers: [observerSchema]
     });
 
-    entrySchema.pre('save', function(next) {
+    entrySchema.pre('save', function() {
       this.observers = [{ user: this.creator }];
-
-      next();
     });
 
     const Test = db.model('Test', entrySchema);
@@ -10961,15 +11014,13 @@ describe('document', function() {
 
     const Book = db.model('Test', BookSchema);
 
-    function disallownumflows(next) {
+    function disallownumflows() {
       const self = this;
-      if (self.isNew) return next();
+      if (self.isNew) return;
 
       if (self.quantity === 27) {
-        return next(new Error('Wrong Quantity'));
+        throw new Error('Wrong Quantity');
       }
-
-      next();
     }
 
     const { _id } = await Book.create({ name: 'Hello', price: 50, quantity: 25 });
@@ -13842,17 +13893,15 @@ describe('document', function() {
       postDeleteOne: 0
     };
     let postDeleteOneError = null;
-    ChildSchema.pre('save', function(next) {
+    ChildSchema.pre('save', function() {
       ++called.preSave;
-      next();
     });
     ChildSchema.post('save', function(subdoc, next) {
       ++called.postSave;
       next();
     });
-    ChildSchema.pre('deleteOne', { document: true, query: false }, function(next) {
+    ChildSchema.pre('deleteOne', { document: true, query: false }, function() {
       ++called.preDeleteOne;
-      next();
     });
     ChildSchema.post('deleteOne', { document: true, query: false }, function(subdoc, next) {
       ++called.postDeleteOne;
@@ -14396,6 +14445,287 @@ describe('document', function() {
     }
   });
 
+  describe('async stack traces (gh-15317)', function() {
+    it('works with save() validation errors', async function asyncSaveValidationErrors() {
+      const userSchema = new mongoose.Schema({
+        name: { type: String, required: true, validate: v => v.length > 3 },
+        age: Number
+      });
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'A' });
+      const err = await doc.save().then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.ok(err.stack.includes('asyncSaveValidationErrors'), err.stack);
+    });
+
+    it('works with async pre save errors', async function asyncPreSaveErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      userSchema.pre('save', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('pre save error');
+      });
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'A' });
+      const err = await doc.save().then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'pre save error');
+      assert.ok(err.stack.includes('asyncPreSaveErrors'), err.stack);
+    });
+
+    it('works with async pre save errors on subdocuments', async function asyncSubdocPreSaveErrors() {
+      const addressSchema = new mongoose.Schema({
+        street: String
+      });
+      addressSchema.pre('save', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('subdoc pre save error');
+      });
+      const userSchema = new mongoose.Schema({
+        name: String,
+        address: addressSchema
+      });
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'A', address: { street: 'Main St' } });
+      const err = await doc.save().then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'subdoc pre save error');
+      assert.ok(err.stack.includes('asyncSubdocPreSaveErrors'), err.stack);
+    });
+
+    it('works with save server errors', async function saveServerErrors() {
+      const userSchema = new mongoose.Schema({
+        name: { type: String, unique: true },
+        age: Number
+      });
+      const User = db.model('User', userSchema);
+      await User.init();
+
+      await User.create({ name: 'A' });
+      const doc = new User({ name: 'A' });
+      const err = await doc.save().then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.name, 'MongoServerError');
+      assert.ok(err.stack.includes('saveServerErrors'), err.stack);
+    });
+
+    it('works with async pre save errors with bulkSave()', async function asyncPreBulkSaveErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      userSchema.pre('save', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('pre bulk save error');
+      });
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'A' });
+      const err = await User.bulkSave([doc]).then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'pre bulk save error');
+      assert.ok(err.stack.includes('asyncPreBulkSaveErrors'), err.stack);
+    });
+
+    it('works with async pre validate errors', async function asyncPreValidateErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      userSchema.pre('validate', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('pre validate error');
+      });
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'A' });
+      const err = await doc.save().then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'pre validate error');
+      assert.ok(err.stack.includes('asyncPreValidateErrors'), err.stack);
+    });
+
+    it('works with async post save errors', async function asyncPostSaveErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      userSchema.post('save', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('post save error');
+      });
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'A' });
+      const err = await doc.save().then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'post save error');
+      assert.ok(err.stack.includes('asyncPostSaveErrors'), err.stack);
+    });
+
+    it('works with async pre updateOne errors', async function asyncPreUpdateOneErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      userSchema.pre('updateOne', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('pre updateOne error');
+      });
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'A' });
+      await doc.save();
+      const err = await doc.updateOne({ name: 'B' }).then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'pre updateOne error');
+      assert.ok(err.stack.includes('asyncPreUpdateOneErrors'), err.stack);
+    });
+
+    it('works with updateOne server errors', async function updateOneServerErrors() {
+      const userSchema = new mongoose.Schema({
+        name: { type: String, unique: true },
+        age: Number
+      });
+      const User = db.model('User', userSchema);
+      await User.init();
+      const doc = new User({ name: 'A' });
+      await doc.save();
+      await User.create({ name: 'B' });
+      const err = await doc.updateOne({ name: 'B' }).then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.name, 'MongoServerError');
+      assert.ok(err.stack.includes('updateOneServerErrors'), err.stack);
+    });
+
+    it('works with async post updateOne errors', async function asyncPostUpdateOneErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      userSchema.post('updateOne', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('post updateOne error');
+      });
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'A' });
+      await doc.save();
+      const err = await doc.updateOne({ name: 'B' }).then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'post updateOne error');
+      assert.ok(err.stack.includes('asyncPostUpdateOneErrors'), err.stack);
+    });
+
+    it('works with async pre deleteOne errors on subdocuments', async function asyncSubdocPreDeleteOneErrors() {
+      const addressSchema = new mongoose.Schema({
+        street: String
+      });
+      addressSchema.post('deleteOne', { document: true, query: false }, async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('subdoc pre deleteOne error');
+      });
+      const userSchema = new mongoose.Schema({
+        name: String,
+        address: addressSchema
+      });
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'A', address: { street: 'Main St' } });
+      await doc.save();
+      const err = await doc.deleteOne().then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'subdoc pre deleteOne error');
+      assert.ok(err.stack.includes('asyncSubdocPreDeleteOneErrors'), err.stack);
+    });
+
+    it('works with async pre find errors', async function asyncPreFindErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      userSchema.pre('find', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('pre find error');
+      });
+      const User = db.model('User', userSchema);
+      const err = await User.find().then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'pre find error');
+      assert.ok(err.stack.includes('asyncPreFindErrors'), err.stack);
+    });
+
+    it('works with async post find errors', async function asyncPostFindErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      userSchema.post('find', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('post find error');
+      });
+      const User = db.model('User', userSchema);
+      const err = await User.find().then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'post find error');
+      assert.ok(err.stack.includes('asyncPostFindErrors'), err.stack);
+    });
+
+    it('works with find server errors', async function asyncPostFindErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      const User = db.model('User', userSchema);
+      // Fails on the MongoDB server because $notAnOperator is not a valid operator
+      const err = await User.find({ someProp: { $notAnOperator: 'value' } }).then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.name, 'MongoServerError');
+      assert.ok(err.stack.includes('asyncPostFindErrors'), err.stack);
+    });
+
+    it('works with async pre aggregate errors', async function asyncPreAggregateErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      userSchema.pre('aggregate', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('pre aggregate error');
+      });
+      const User = db.model('User', userSchema);
+      const err = await User.aggregate([{ $match: {} }]).then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'pre aggregate error');
+      assert.ok(err.stack.includes('asyncPreAggregateErrors'), err.stack);
+    });
+
+    it('works with async post aggregate errors', async function asyncPostAggregateErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      userSchema.post('aggregate', async function() {
+        await new Promise(resolve => setTimeout(resolve, 5));
+        throw new Error('post aggregate error');
+      });
+      const User = db.model('User', userSchema);
+      const err = await User.aggregate([{ $match: {} }]).then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.message, 'post aggregate error');
+      assert.ok(err.stack.includes('asyncPostAggregateErrors'), err.stack);
+    });
+
+    it('works with aggregate server errors', async function asyncAggregateServerErrors() {
+      const userSchema = new mongoose.Schema({
+        name: String,
+        age: Number
+      });
+      const User = db.model('User', userSchema);
+      // Fails on the MongoDB server because $notAnOperator is not a valid pipeline stage
+      const err = await User.aggregate([{ $notAnOperator: {} }]).then(() => null, err => err);
+      assert.ok(err instanceof Error);
+      assert.equal(err.name, 'MongoServerError');
+      assert.ok(err.stack.includes('asyncAggregateServerErrors'), err.stack);
+    });
+  });
+
   it('handles selected paths on root discriminator (gh-15308)', async function() {
     const CarSchema = new mongoose.Schema(
       {
@@ -14620,6 +14950,57 @@ describe('document', function() {
     const docNoVersion = await ModelNoVersion.create({ name: 'test2' });
     obj = docNoVersion.toObject();
     assert.ok(!obj.hasOwnProperty('__v'));
+  });
+
+  it('allows using overwriteMiddlewareArguments to override pre("init") hook results (gh-15389)', async function() {
+    const timeStringToObject = (time) => {
+      if (typeof time !== 'string') return time;
+      const [hours, minutes] = time.split(':');
+      return { hours: parseInt(hours), minutes: parseInt(minutes) };
+    };
+
+    const timeSchema = new Schema({
+      hours: { type: Number, required: true },
+      minutes: { type: Number, required: true }
+    });
+
+    // Attempt to transform during init
+    timeSchema.pre('init', function(rawDoc) {
+      if (typeof rawDoc === 'string') {
+        return mongoose.overwriteMiddlewareArguments(timeStringToObject(rawDoc));
+      }
+    });
+
+    const userSchema = new Schema({
+      unknownKey: {
+        type: timeSchema,
+        required: true
+      }
+    });
+    const User = db.model('Test', userSchema);
+    const _id = new mongoose.Types.ObjectId();
+    await User.collection.insertOne({ _id, unknownKey: '12:34' });
+    const user = await User.findOne({ _id }).orFail();
+    assert.ok(user.unknownKey.hours === 12);
+    assert.ok(user.unknownKey.minutes === 34);
+  });
+
+  it('allows using overwriteMiddlewareArguments to override pre("validate") hook results (gh-15389)', async function() {
+    const userSchema = new Schema({
+      test: {
+        type: String,
+        required: true
+      }
+    });
+    userSchema.pre('validate', function(options) {
+      if (options == null) {
+        return mongoose.overwriteMiddlewareArguments({ pathsToSkip: ['test'] });
+      }
+    });
+    const User = db.model('Test', userSchema);
+    const user = new User();
+    await user.validate(null);
+    await assert.rejects(() => user.validate({}), /Path `test` is required/);
   });
 });
 

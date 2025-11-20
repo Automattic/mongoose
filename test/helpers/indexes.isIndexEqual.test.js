@@ -19,7 +19,6 @@ describe('isIndexEqual', function() {
       unique: true,
       key: { username: 1 },
       name: 'username_1',
-      background: true,
       collation: {
         locale: 'en',
         caseLevel: false,
@@ -43,7 +42,6 @@ describe('isIndexEqual', function() {
       unique: true,
       key: { username: 1 },
       name: 'username_1',
-      background: true,
       collation: {
         locale: 'en',
         caseLevel: false,
@@ -65,7 +63,6 @@ describe('isIndexEqual', function() {
       key: { _fts: 'text', _ftsx: 1 },
       name: 'name_text',
       ns: 'test.tests',
-      background: true,
       weights: { name: 1 },
       default_language: 'english',
       language_override: 'language',

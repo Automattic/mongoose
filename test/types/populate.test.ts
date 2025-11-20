@@ -31,7 +31,7 @@ ParentModel.
     } else {
       useChildDoc(child);
     }
-    const lean = doc.toObject<Parent & { child: Child }>();
+    const lean = doc.toObject<mongoose.MergeType<Parent, { Child: Child }>>();
     const leanChild = lean.child;
     if (leanChild == null || leanChild instanceof ObjectId) {
       throw new Error('should be populated');

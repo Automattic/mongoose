@@ -20,6 +20,8 @@ markdown.setOptions({
 // 5.13.5 -> 5.x, 6.8.2 -> 6.x, etc.
 version = version.slice(0, version.indexOf('.')) + '.x';
 
+console.log('Generating search for version', version);
+
 const contentSchema = new mongoose.Schema({
   title: { type: String, required: true },
   body: { type: String, required: true },
@@ -116,12 +118,16 @@ function generateContents() {
 }
 
 async function generateSearch(config) {
+  console.log('Connect to', config.uri);
   await mongoose.connect(config.uri, { dbName: 'mongoose' });
 
   // wait for the index to be created
+  console.log('Init Content model...');
   await Content.init();
 
+  console.log('Deleting existing content...');
   await Content.deleteMany({ version });
+  console.log('Deleted content for version', version);
 
   const contents = generateContents();
 

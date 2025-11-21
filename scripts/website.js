@@ -147,6 +147,7 @@ function deleteAllHtmlFiles() {
 }
 
 function moveDocsToTemp() {
+  console.log('Moving docs to tmp dir...');
   if (!versionObj.versionedPath) {
     throw new Error('Cannot move unversioned deploy to /tmp');
   }
@@ -310,6 +311,7 @@ const versionObj = (() => {
     currentVersion: getCurrentVersion(),
     latestVersion: getLatestVersion(),
     pastVersions: [
+      getLatestVersionOf(8),
       getLatestVersionOf(7),
       getLatestVersionOf(6)
     ]
@@ -624,7 +626,9 @@ if (isMain) {
     }
 
     if (generateSearchPromise) {
+      console.log('Generating search...');
       await generateSearchPromise;
+      console.log('Search generated successfully');
     }
 
     console.log('Done Processing');

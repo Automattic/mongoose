@@ -208,9 +208,19 @@ function parseVersion(str) {
  * Get versions from git tags and put them into {@link filteredTags}
  */
 function getVersions() {
-  // get all tags from git
-  // "trim" is used to remove the ending new-line
-  const res = childProcess.execSync('git tag').toString().trim();
+  let res = '';
+  try {
+    res = childProcess.execSync('git tag', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
+  } catch (err) {
+    console.warn('Skipping git tag lookup for docs version picker because "git tag" could not be executed.');
+    filteredTags = [];
+    return;
+  }
+
+  if (!res) {
+    filteredTags = [];
+    return;
+  }
 
   filteredTags = res.split('\n')
   // map all gotten tags if they match the regular expression
@@ -229,8 +239,7 @@ function getVersions() {
     });
 
   if (filteredTags.length === 0) {
-    console.error('no tags found!');
-    filteredTags.push([0, 0, 0]);
+    console.warn('No git tags found; falling back to the package version for docs.');
   }
 }
 
@@ -252,7 +261,8 @@ function stringifySemverNumber(arr, dotX) {
  * @returns {Version}
  */
 function getLatestVersion() {
-  return { listed: stringifySemverNumber(filteredTags[0]), path: '' };
+  const target = filteredTags.length > 0 ? filteredTags[0] : getPackageVersionFallback();
+  return { listed: stringifySemverNumber(target), path: '' };
 }
 
 /**
@@ -261,12 +271,14 @@ function getLatestVersion() {
  * @returns {Version}
  */
 function getLatestVersionOf(version) {
-  let foundVersion = filteredTags.find(v => v[0] === version);
+  if (filteredTags.length === 0) {
+    return null;
+  }
+  const foundVersion = filteredTags.find(v => v[0] === version);
 
-  // fallback to "0" in case a version cannot be found
   if (!foundVersion) {
-    console.error(`Could not find a version for major "${version}"`);
-    foundVersion = [0, 0, 0];
+    console.warn(`Could not find a version for major "${version}"`);
+    return null;
   }
 
   return { listed: stringifySemverNumber(foundVersion), path: stringifySemverNumber(foundVersion, true) };
@@ -286,6 +298,10 @@ function getCurrentVersion() {
   }
 
   return { listed: versionToUse, path: stringifySemverNumber(parseVersion(versionToUse), true) };
+}
+
+function getPackageVersionFallback() {
+  return parseVersion(pkg.version) || [0, 0, 0];
 }
 
 // execute function to get all tags from git
@@ -312,7 +328,7 @@ const versionObj = (() => {
     pastVersions: [
       getLatestVersionOf(7),
       getLatestVersionOf(6)
-    ]
+    ].filter(Boolean)
   };
   const versionedDeploy = process.env.DOCS_DEPLOY ? !(base.currentVersion.listed === base.latestVersion.listed) : false;
 
@@ -610,7 +626,11 @@ if (isMain) {
     let generateSearchPromise;
     try {
       const config = generateSearch.getConfig();
-      generateSearchPromise = generateSearch.generateSearch(config);
+      if (config) {
+        generateSearchPromise = generateSearch.generateSearch(config);
+      } else {
+        console.warn('Search index generation skipped. Provide a ".config.js" with a MongoDB uri to enable it.');
+      }
     } catch (err) {
       console.error('Generating Search failed:', err);
     }

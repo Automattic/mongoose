@@ -173,7 +173,16 @@ async function generateSearch(config) {
 }
 
 function getConfig() {
-  const config = require('../.config.js');
+  let config;
+  try {
+    config = require('../.config.js');
+  } catch (err) {
+    if (err.code === 'MODULE_NOT_FOUND' && err.message.includes('../.config.js')) {
+      console.warn('Skipping search index generation because ".config.js" (with a MongoDB uri) is missing.');
+      return null;
+    }
+    throw err;
+  }
 
   if (!config || !config.uri) {
     throw new Error('No Config or config.URI given, please create a .config.js file with those values in the root of the repository');
@@ -189,6 +198,9 @@ module.exports.getConfig = getConfig;
 if (isMain) {
   (async function main() {
     const config = getConfig();
+    if (!config) {
+      return;
+    }
     try {
       await generateSearch(config);
     } catch (error) {

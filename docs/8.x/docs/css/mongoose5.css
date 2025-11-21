@@ -1,0 +1,373 @@
+html {
+  font-family: 'Open Sans';
+}
+
+body {
+  margin: 0;
+}
+
+img {
+  width: 100%;
+}
+
+a {
+  text-decoration: none;
+  color: #0971B2;
+}
+
+p {
+  line-height: 1.5em;
+}
+
+h1 a::before,
+h2 a::before,
+h3 a::before,
+h4 a::before,
+a.anchor::before {
+  position: absolute;
+  left: 22px;
+  margin-top: 4px;
+  background-image: url('/docs/images/link_64x64.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  height: 1em;
+  /* Any width that will be over the size of the icon and overlap the link to keep the hover state will work */
+  width: 2em;
+  content: ' ';
+
+  /* Hide it when not hover */
+  opacity: 0;
+}
+
+h1 a:hover::before,
+h2 a:hover::before,
+h3 a:hover::before,
+h4 a:hover::before,
+a.anchor:hover::before {
+  opacity: 1;
+}
+
+h1 a,
+h2 a,
+h3 a,
+h4 a {
+  color: #000;
+}
+
+#logo {
+  width: 62px;
+  height: 30px;
+  position: relative;
+  top: 5px;
+}
+
+.logo-text {
+  color: #800;
+  font-size: 20pt;
+  position: relative;
+  top: 0px;
+  left: 10px;
+  text-transform: none;
+}
+
+.pure-menu-item {
+  font-size: 12pt;
+  padding-top: 0px;
+}
+
+.pure-menu-link {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+/* change sub-item lists to be more dense */
+.sub-item > .pure-menu-link {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+.pure-menu-link:hover, .pure-menu-link.selected {
+  background-color: rgba(0,0,0, 0.1);
+}
+
+li.sub-item {
+  font-size: 11pt;
+  margin-left: 15px;
+}
+
+li.version {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 4px;
+}
+
+li.version ul.pure-menu-children {
+  border: 1px solid #ddd;
+}
+
+#logo-container {
+  padding-top: 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #ddd;
+}
+
+#logo-container > a {
+  display: block;
+}
+
+#menu {
+  z-index: 1;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0px;
+  background-color: #eee;
+  width: 250px;
+  border-right: 1px solid #ddd;
+  overflow-y: auto;
+}
+
+.container {
+  position: relative;
+  left: 250px;
+  padding-left: 50px;
+  width: 850px;
+  margin-bottom: 30lvh;
+}
+
+/* Search */
+
+.search {
+  margin-top: 0.25em !important; /* important, because regardless of order, the ":not(:first-child)" rule takes precedence */
+  margin-bottom: 0.75em;
+  display: flex;
+}
+
+.search input {
+  border: 1px solid #ddd;
+  padding: 0.25em;
+  width: 170px;
+  border-radius: 3px;
+  flex: 1;
+}
+
+#search-input-nav {
+  margin-left: 1em;
+}
+
+.search button {
+  background-color: #777;
+  color: white;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  height: 30px;
+  width: 30px;
+  padding: 0px;
+  flex: 0 0 auto;
+}
+
+#search-button-nav {
+  margin-right: 1em;
+}
+
+.search button img {
+  width: 20px;
+  height: 20px;
+  margin-top: 5px;
+}
+
+.edit-docs-link {
+  position: absolute;
+  top: 0.125em;
+  right: 0px;
+  background-color: #fafafa;
+  border: 1px solid #ddd;
+  padding: 5px;
+  padding-bottom: 0px;
+  border-radius: 3px;
+}
+
+.edit-docs-link img {
+  width: 1.25em;
+}
+
+.pure-menu-link.selected {
+  font-weight: bold;
+}
+
+.pure-menu-item:not(:first-child), .pure-menu-item.sub-item {
+  margin-top: 2px;
+}
+
+/* Mobile */
+
+#mobile-menu {
+  display: none;
+}
+
+@media (max-width: 1160px) {
+  h2:hover::before, h3:hover::before {
+    position: static;
+    display: inline-block;
+    margin-right: .2em;
+  }
+
+  .container {
+    width: 100%;
+    padding: 0px;
+    left: 0px;
+    margin: auto;
+  }
+
+  #content {
+    margin: 10px;
+  }
+
+  #menu {
+    display: none;
+    position: fixed;
+    top: 45px;
+    border-top: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    left: 0px;
+  }
+
+  pre {
+    margin: 0px;
+    margin-top: 10px;
+  }
+
+  #mobile-menu {
+    display: block;
+    height: 45px;
+    background-color: #eee;
+    border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  #logo {
+    border: 0;
+  }
+
+  #mobile-logo-container {
+    padding: 0;
+    border: 0px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    width: 215px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  #logo-container {
+    display: none;
+  }
+
+  .menu-link {
+    position: absolute;
+    display: block;
+    top: 0px;
+    left: 0;
+    background-color: #eee;
+    z-index: 10;
+    width: 2em;
+    height: 3px;
+    padding: 2.1em 1.6em;
+  }
+
+  .menu-link:hover,
+  .menu-link:focus {
+    background: #ddd;
+  }
+
+  #menuLink {
+    width: 40px;
+    height: 40px;
+    padding: 2.5px;
+    color: rgb(0,0,0);
+  }
+
+  .active {
+    display: block !important;
+  }
+
+  .edit-docs-link {
+    display: none;
+  }
+}
+
+.pure-menu-item:last-of-type {
+  padding-bottom: 5px;
+}
+
+/* dont add padding if it also has other elements (like a sub-list) */
+.pure-menu-link:not(:last-child) {
+  padding-bottom: 0px;
+}
+
+/* job board */
+
+#jobs {
+  position: fixed;
+  top: 100px;
+  right: 0px;
+  width: 190px;
+  text-align: center;
+  border: 1px solid #ddd;
+  background-color: #fff;
+}
+
+#jobs img {
+  border: 0px;
+}
+
+#jobs .job-listing {
+  margin-bottom: 0.5em;
+  padding: 4px;
+}
+
+#jobs .job-listing:hover {
+  background-color: #ddd;
+}
+
+#jobs .company {
+  color: black;
+}
+
+#jobs .title {
+  margin-top: 0.25em;
+}
+
+#jobs .location {
+  color: black;
+  margin-top: 0.25em;
+  font-size: 0.75em;
+}
+
+#jobs .company-logo {
+  width: 25%;
+  height: 25%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#jobs .jobs-view-more {
+  margin: 1em;
+  font-size: 0.95em;
+  color: #777777;
+  padding: 0.25em;
+  border-radius: 3px;
+  background-color: #eee;
+}
+
+#jobs .jobs-view-more a {
+  color: black;
+}
+
+@media (max-width: 1360px) {
+  #jobs {
+    display: none !important;
+  }
+}

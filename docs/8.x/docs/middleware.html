@@ -1,0 +1,539 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v8.20.1: Middleware</title><link rel="apple-touch-icon" sizes="57x57" href="/docs/8.x/docs/images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="/docs/8.x/docs/images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="/docs/8.x/docs/images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="/docs/8.x/docs/images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="/docs/8.x/docs/images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="/docs/8.x/docs/images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="/docs/8.x/docs/images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="/docs/8.x/docs/images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="/docs/8.x/docs/images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="/docs/8.x/docs/images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="/docs/8.x/docs/images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="/docs/8.x/docs/images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="/docs/8.x/docs/images/favicon/favicon-16x16.png"><link rel="manifest" href="/docs/8.x/docs/images/favicon/manifest.json"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/8.x/docs/css/github.css"><link rel="stylesheet" href="/docs/8.x/docs/css/mongoose5.css"><link rel="stylesheet" href="/docs/8.x/docs/css/carbonads.css"><link rel="stylesheet" href="/docs/8.x/docs/css/copy-code.css"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="/docs/8.x/docs/images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/8.x/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/8.x/docs/js/native.js"></script></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><svg width="100%" height="100%" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/8.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><nav class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/8.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="/docs/8.x/docs/index.html">Version 8.20.1</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Version 9.0.0</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/index.html">Version 7.8.7</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/index.html">Version 6.13.8</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/8.x/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/guides.html">Guides</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/8.x/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/typescript.html">TypeScript</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/mongoose.html">API</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/virtualtype.html">VirtualType</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/migrating_to_8.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/version-support.html">Version Support</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></nav></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/middleware.md" target="_blank">
+<img src="/docs/8.x/docs/images/pencil.svg" />
+</a><h1 id="middleware">
+        <a href="#middleware">
+          Middleware
+        </a>
+      </h1>
+<div class="sponsored-ad">
+  <a href="https://localizejs.com/?utm_campaign=Mongoose&utm_source=mongoose&utm_medium=banner">
+    <img src="/docs/images/localize-mongoose-ad-banner-2x.jpg">
+  </a>
+</div>
+
+<p>Middleware (also called pre and post <em>hooks</em>) are functions which are passed
+control during execution of asynchronous functions. Middleware is specified
+on the schema level and is useful for writing <a href="plugins.html">plugins</a>.</p>
+<ul class="toc">
+  <li><a href="#types-of-middleware">Types of Middleware</a></li>
+  <li><a href="#pre">Pre</a></li>
+  <li><a href="#error-handling">Errors in Pre Hooks</a></li>
+  <li><a href="#post">Post</a></li>
+  <li><a href="#post-async">Asynchronous Post Hooks</a></li>
+  <li><a href="#defining">Define Middleware Before Compiling Models</a></li>
+  <li><a href="#order">Save/Validate Hooks</a></li>
+  <li><a href="#accessing-parameters-in-middleware">Accessing Parameters in Middleware</a></li>
+  <li><a href="#naming">Naming Conflicts</a></li>
+  <li><a href="#notes">Notes on findAndUpdate() and Query Middleware</a></li>
+  <li><a href="#error-handling-middleware">Error Handling Middleware</a></li>
+  <li><a href="#aggregate">Aggregation Hooks</a></li>
+  <li><a href="#synchronous">Synchronous Hooks</a></li>
+</ul>
+
+<h2 id="types-of-middleware">
+        <a href="#types-of-middleware">
+          Types of Middleware
+        </a>
+      </h2>
+<p>Mongoose has 4 types
+of middleware: document middleware, model middleware, aggregate middleware, and query middleware.</p>
+<p>Document middleware is supported for the following document functions.
+In Mongoose, a document is an instance of a <code>Model</code> class.
+In document middleware functions, <code>this</code> refers to the document. To access the model, use <code>this.constructor</code>.</p>
+<ul>
+<li><a href="api/document.html#document_Document-validate">validate</a></li>
+<li><a href="api/model.html#model_Model-save">save</a></li>
+<li><a href="api/document.html#document_Document-updateOne">updateOne</a></li>
+<li><a href="api/model.html#model_Model-deleteOne">deleteOne</a></li>
+<li><a href="api/document.html#document_Document-init">init</a> (note: init hooks are <a href="#synchronous">synchronous</a>)</li>
+</ul>
+<p>Query middleware is supported for the following Query functions.
+Query middleware executes when you call <code>exec()</code> or <code>then()</code> on a Query object, or <code>await</code> on a Query object.
+In query middleware functions, <code>this</code> refers to the query.</p>
+<ul>
+<li><a href="api/query.html#query_Query-count">count</a></li>
+<li><a href="api/query.html#query_Query-countDocuments">countDocuments</a></li>
+<li><a href="api/query.html#query_Query-deleteMany">deleteMany</a></li>
+<li><a href="api/query.html#query_Query-deleteOne">deleteOne</a></li>
+<li><a href="api/query.html#query_Query-estimatedDocumentCount">estimatedDocumentCount</a></li>
+<li><a href="api/query.html#query_Query-find">find</a></li>
+<li><a href="api/query.html#query_Query-findOne">findOne</a></li>
+<li><a href="api/query.html#query_Query-findOneAndDelete">findOneAndDelete</a></li>
+<li><a href="api/query.html#query_Query-findOneAndReplace">findOneAndReplace</a></li>
+<li><a href="api/query.html#query_Query-findOneAndUpdate">findOneAndUpdate</a></li>
+<li><a href="api/query.html#query_Query-replaceOne">replaceOne</a></li>
+<li><a href="api/query.html#query_Query-updateOne">updateOne</a></li>
+<li><a href="api/query.html#query_Query-updateMany">updateMany</a></li>
+<li><a href="validation.html#update-validators">validate</a></li>
+</ul>
+<p>Aggregate middleware is for <code>MyModel.aggregate()</code>.
+Aggregate middleware executes when you call <code>exec()</code> on an aggregate object.
+In aggregate middleware, <code>this</code> refers to the <a href="api/model.html#model_Model-aggregate">aggregation object</a>.</p>
+<ul>
+<li><a href="api/model.html#model_Model-aggregate">aggregate</a></li>
+</ul>
+<p>Model middleware is supported for the following model functions.
+Don&#39;t confuse model middleware and document middleware: model middleware hooks into <em>static</em> functions on a <code>Model</code> class, document middleware hooks into <em>methods</em> on a <code>Model</code> class.
+In model middleware functions, <code>this</code> refers to the model.</p>
+<ul>
+<li><a href="api/model.html#model_Model-bulkWrite">bulkWrite</a></li>
+<li><a href="api/model.html#model_Model-createCollection">createCollection</a></li>
+<li><a href="api/model.html#model_Model-insertMany">insertMany</a></li>
+</ul>
+<p>Here are the possible strings that can be passed to <code>pre()</code></p>
+<ul>
+<li>aggregate</li>
+<li>bulkWrite</li>
+<li>count</li>
+<li>countDocuments</li>
+<li>createCollection</li>
+<li>deleteOne</li>
+<li>deleteMany</li>
+<li>estimatedDocumentCount</li>
+<li>find</li>
+<li>findOne</li>
+<li>findOneAndDelete</li>
+<li>findOneAndReplace</li>
+<li>findOneAndUpdate</li>
+<li>init</li>
+<li>insertMany</li>
+<li>replaceOne</li>
+<li>save</li>
+<li>update</li>
+<li>updateOne</li>
+<li>updateMany</li>
+<li>validate</li>
+</ul>
+<p>All middleware types support pre and post hooks.
+How pre and post hooks work is described in more detail below.</p>
+<p><strong>Note:</strong> Mongoose registers <code>updateOne</code> middleware on <code>Query.prototype.updateOne()</code> by default.
+This means that both <code>doc.updateOne()</code> and <code>Model.updateOne()</code> trigger <code>updateOne</code> hooks, but <code>this</code> refers to a query, not a document.
+To register <code>updateOne</code> middleware as document middleware, use <code>schema.pre(&#39;updateOne&#39;, { document: true, query: false })</code>.</p>
+<p><strong>Note:</strong> Like <code>updateOne</code>, Mongoose registers <code>deleteOne</code> middleware on <code>Query.prototype.deleteOne</code> by default.
+That means that <code>Model.deleteOne()</code> will trigger <code>deleteOne</code> hooks, and <code>this</code> will refer to a query.
+However, <code>doc.deleteOne()</code> does <strong>not</strong> fire <code>deleteOne</code> query middleware for legacy reasons.
+To register <code>deleteOne</code> middleware as document middleware, use <code>schema.pre(&#39;deleteOne&#39;, { document: true, query: false })</code>.</p>
+<p><strong>Note:</strong> The <a href="./api/model.html#model_Model-create"><code>create()</code></a> function fires <code>save()</code> hooks.</p>
+<p><strong>Note:</strong> Query middlewares are not executed on subdocuments.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> childSchema = <span class="hljs-keyword">new</span> mongoose.<span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>
+});
+
+<span class="hljs-keyword">const</span> mainSchema = <span class="hljs-keyword">new</span> mongoose.<span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">child</span>: [childSchema]
+});
+
+mainSchema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;findOneAndUpdate&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Middleware on parent document&#x27;</span>); <span class="hljs-comment">// Will be executed</span>
+});
+
+childSchema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;findOneAndUpdate&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Middleware on subdocument&#x27;</span>); <span class="hljs-comment">// Will not be executed</span>
+});</code></pre><h2 id="pre">
+        <a href="#pre">
+          Pre 
+        </a>
+      </h2>
+<p>Pre middleware functions are executed one after another, when each
+middleware calls <code>next</code>.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-comment">/* ... */</span> });
+schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">next</span>) {
+  <span class="hljs-comment">// do stuff</span>
+  <span class="hljs-title function_">next</span>();
+});</code></pre><p>In <a href="http://thecodebarbarian.com/introducing-mongoose-5.html#promises-and-async-await-with-middleware">mongoose 5.x</a>, instead of calling <code>next()</code> manually, you can use a
+function that returns a promise. In particular, you can use <a href="http://thecodebarbarian.com/common-async-await-design-patterns-in-node.js.html"><code>async/await</code></a>.</p>
+<pre><code lang="javascript">schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-title function_">doStuff</span>().
+    <span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-title function_">doMoreStuff</span>());
+});
+
+<span class="hljs-comment">// Or, using async functions</span>
+schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">doStuff</span>();
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">doMoreStuff</span>();
+});</code></pre><p>If you use <code>next()</code>, the <code>next()</code> call does <strong>not</strong> stop the rest of the code in your middleware function from executing. Use
+<a href="https://www.bennadel.com/blog/2323-use-a-return-statement-when-invoking-callbacks-especially-in-a-guard-statement.htm">the early <code>return</code> pattern</a>
+to prevent the rest of your middleware function from running when you call <code>next()</code>.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-comment">/* ... */</span> });
+schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">next</span>) {
+  <span class="hljs-keyword">if</span> (<span class="hljs-title function_">foo</span>()) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;calling next!&#x27;</span>);
+    <span class="hljs-comment">// `return next();` will make sure the rest of this function doesn&#x27;t run</span>
+    <span class="hljs-comment">/* return */</span> <span class="hljs-title function_">next</span>();
+  }
+  <span class="hljs-comment">// Unless you comment out the `return` above, &#x27;after next&#x27; will print</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;after next&#x27;</span>);
+});</code></pre><h3 id="use-cases">
+        <a href="#use-cases">
+          Use Cases
+        </a>
+      </h3>
+<p>Middleware are useful for atomizing model logic. Here are some other ideas:</p>
+<ul>
+<li>complex validation</li>
+<li>removing dependent documents (removing a user removes all their blogposts)</li>
+<li>asynchronous defaults</li>
+<li>asynchronous tasks that a certain action triggers</li>
+</ul>
+<h3 id="error-handling">
+        <a href="#error-handling">
+          Errors in Pre Hooks 
+        </a>
+      </h3>
+<p>If any pre hook errors out, mongoose will not execute subsequent middleware
+or the hooked function. Mongoose will instead pass an error to the callback
+and/or reject the returned promise. There are several ways to report an
+error in middleware:</p>
+<pre><code lang="javascript">schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">next</span>) {
+  <span class="hljs-keyword">const</span> err = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&#x27;something went wrong&#x27;</span>);
+  <span class="hljs-comment">// If you call `next()` with an argument, that argument is assumed to be</span>
+  <span class="hljs-comment">// an error.</span>
+  <span class="hljs-title function_">next</span>(err);
+});
+
+schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-comment">// You can also return a promise that rejects</span>
+  <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<span class="hljs-function">(<span class="hljs-params">resolve, reject</span>) =&gt;</span> {
+    <span class="hljs-title function_">reject</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&#x27;something went wrong&#x27;</span>));
+  });
+});
+
+schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-comment">// You can also throw a synchronous error</span>
+  <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&#x27;something went wrong&#x27;</span>);
+});
+
+schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">await</span> <span class="hljs-title class_">Promise</span>.<span class="hljs-title function_">resolve</span>();
+  <span class="hljs-comment">// You can also throw an error in an `async` function</span>
+  <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&#x27;something went wrong&#x27;</span>);
+});
+
+<span class="hljs-comment">// later...</span>
+
+<span class="hljs-comment">// Changes will not be persisted to MongoDB because a pre hook errored out</span>
+<span class="hljs-keyword">try</span> {
+  <span class="hljs-keyword">await</span> myDoc.<span class="hljs-title function_">save</span>();
+} <span class="hljs-keyword">catch</span> (err) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(err.<span class="hljs-property">message</span>); <span class="hljs-comment">// something went wrong</span>
+}</code></pre><p>Calling <code>next()</code> multiple times is a no-op. If you call <code>next()</code> with an
+error <code>err1</code> and then throw an error <code>err2</code>, mongoose will report <code>err1</code>.</p>
+<h2 id="post">
+        <a href="#post">
+          Post middleware 
+        </a>
+      </h2>
+<p><a href="api.html#schema_Schema-post">post</a> middleware are executed <em>after</em>
+the hooked method and all of its <code>pre</code> middleware have completed.</p>
+<pre><code lang="javascript">schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;init&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">doc</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;%s has been initialized from the db&#x27;</span>, doc.<span class="hljs-property">_id</span>);
+});
+schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;validate&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">doc</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;%s has been validated (but not saved yet)&#x27;</span>, doc.<span class="hljs-property">_id</span>);
+});
+schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">doc</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;%s has been saved&#x27;</span>, doc.<span class="hljs-property">_id</span>);
+});
+schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;deleteOne&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">doc</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;%s has been deleted&#x27;</span>, doc.<span class="hljs-property">_id</span>);
+});</code></pre><h2 id="post-async">
+        <a href="#post-async">
+          Asynchronous Post Hooks 
+        </a>
+      </h2>
+<p>If your post hook function takes at least 2 parameters, mongoose will assume the second parameter is a <code>next()</code> function that you will call to trigger the next middleware in the sequence.</p>
+<pre><code lang="javascript"><span class="hljs-comment">// Takes 2 parameters: this is an asynchronous post hook</span>
+schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">doc, next</span>) {
+  <span class="hljs-built_in">setTimeout</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;post1&#x27;</span>);
+    <span class="hljs-comment">// Kick off the second post hook</span>
+    <span class="hljs-title function_">next</span>();
+  }, <span class="hljs-number">10</span>);
+});
+
+<span class="hljs-comment">// Will not execute until the first middleware calls `next()`</span>
+schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">doc, next</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;post2&#x27;</span>);
+  <span class="hljs-title function_">next</span>();
+});</code></pre><p>You can also pass an async function to <code>post()</code>.
+If you pass an async function that takes at least 2 parameters, you are still responsible for calling <code>next()</code>.
+However, you can also pass in an async function that takes less than 2 parameters, and Mongoose will wait for the promise to resolve.</p>
+<pre><code lang="javascript">schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span>(<span class="hljs-params">doc</span>) {
+  <span class="hljs-keyword">await</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<span class="hljs-function"><span class="hljs-params">resolve</span> =&gt;</span> <span class="hljs-built_in">setTimeout</span>(resolve, <span class="hljs-number">1000</span>));
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;post1&#x27;</span>);
+  <span class="hljs-comment">// If less than 2 parameters, no need to call `next()`</span>
+});
+
+schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span>(<span class="hljs-params">doc, next</span>) {
+  <span class="hljs-keyword">await</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Promise</span>(<span class="hljs-function"><span class="hljs-params">resolve</span> =&gt;</span> <span class="hljs-built_in">setTimeout</span>(resolve, <span class="hljs-number">1000</span>));
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;post1&#x27;</span>);
+  <span class="hljs-comment">// If there&#x27;s a `next` parameter, you need to call `next()`.</span>
+  <span class="hljs-title function_">next</span>();
+});</code></pre><h2 id="defining">
+        <a href="#defining">
+          Define Middleware Before Compiling Models 
+        </a>
+      </h2>
+<p>Calling <code>pre()</code> or <code>post()</code> after <a href="models.html#compiling">compiling a model</a>
+does <strong>not</strong> work in Mongoose in general. For example, the below <code>pre(&#39;save&#39;)</code>
+middleware will not fire.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> mongoose.<span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> });
+
+<span class="hljs-comment">// Compile a model from the schema</span>
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">User</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, schema);
+
+<span class="hljs-comment">// Mongoose will **not** call the middleware function, because</span>
+<span class="hljs-comment">// this middleware was defined after the model was compiled</span>
+schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Hello from pre save&#x27;</span>));
+
+<span class="hljs-keyword">const</span> user = <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;test&#x27;</span> });
+user.<span class="hljs-title function_">save</span>();</code></pre><p>This means that you must add all middleware and <a href="plugins.html">plugins</a>
+<strong>before</strong> calling <a href="api/mongoose.html#mongoose_Mongoose-model"><code>mongoose.model()</code></a>.
+The below script will print out &quot;Hello from pre save&quot;:</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> mongoose.<span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> });
+<span class="hljs-comment">// Mongoose will call this middleware function, because this script adds</span>
+<span class="hljs-comment">// the middleware to the schema before compiling the model.</span>
+schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-function">() =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Hello from pre save&#x27;</span>));
+
+<span class="hljs-comment">// Compile a model from the schema</span>
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">User</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, schema);
+
+<span class="hljs-keyword">const</span> user = <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;test&#x27;</span> });
+user.<span class="hljs-title function_">save</span>();</code></pre><p>As a consequence, be careful about exporting Mongoose models from the same
+file that you define your schema. If you choose to use this pattern, you
+must define <a href="api/mongoose.html#mongoose_Mongoose-plugin">global plugins</a>
+<strong>before</strong> calling <code>require()</code> on your model file.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> mongoose.<span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> });
+
+<span class="hljs-comment">// Once you `require()` this file, you can no longer add any middleware</span>
+<span class="hljs-comment">// to this schema.</span>
+<span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, schema);</code></pre><h2 id="order">
+        <a href="#order">
+          Save/Validate Hooks 
+        </a>
+      </h2>
+<p>The <code>save()</code> function triggers <code>validate()</code> hooks, because mongoose
+has a built-in <code>pre(&#39;save&#39;)</code> hook that calls <code>validate()</code>. This means
+that all <code>pre(&#39;validate&#39;)</code> and <code>post(&#39;validate&#39;)</code> hooks get called
+<strong>before</strong> any <code>pre(&#39;save&#39;)</code> hooks.</p>
+<pre><code lang="javascript">schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;validate&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;this gets printed first&#x27;</span>);
+});
+schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;validate&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;this gets printed second&#x27;</span>);
+});
+schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;this gets printed third&#x27;</span>);
+});
+schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;this gets printed fourth&#x27;</span>);
+});</code></pre><h2 id="accessing-parameters-in-middleware">
+        <a href="#accessing-parameters-in-middleware">
+          Accessing Parameters in Middleware 
+        </a>
+      </h2>
+<p>Mongoose provides 2 ways to get information about the function call that triggered the middleware.
+For query middleware, we recommend using <code>this</code>, which will be a <a href="api/query.html">Mongoose Query instance</a>.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">age</span>: <span class="hljs-title class_">Number</span> });
+userSchema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;findOneAndUpdate&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-title function_">getFilter</span>()); <span class="hljs-comment">// { name: &#x27;John&#x27; }</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-title function_">getUpdate</span>()); <span class="hljs-comment">// { age: 30 }</span>
+});
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">User</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, userSchema);
+
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">User</span>.<span class="hljs-title function_">findOneAndUpdate</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;John&#x27;</span> }, { <span class="hljs-attr">$set</span>: { <span class="hljs-attr">age</span>: <span class="hljs-number">30</span> } });</code></pre><p>For document middleware, like <code>pre(&#39;save&#39;)</code>, Mongoose passes the 1st parameter to <code>save()</code> as the 2nd argument to your <code>pre(&#39;save&#39;)</code> callback.
+You should use the 2nd argument to get access to the <code>save()</code> call&#39;s <code>options</code>, because Mongoose documents don&#39;t store all the options you can pass to <code>save()</code>.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">age</span>: <span class="hljs-title class_">Number</span> });
+userSchema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">next, options</span>) {
+  options.<span class="hljs-property">validateModifiedOnly</span>; <span class="hljs-comment">// true</span>
+
+  <span class="hljs-comment">// Remember to call `next()` unless you&#x27;re using an async function or returning a promise</span>
+  <span class="hljs-title function_">next</span>();
+});
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">User</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, userSchema);
+
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">User</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;John&#x27;</span>, <span class="hljs-attr">age</span>: <span class="hljs-number">30</span> });
+<span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">save</span>({ <span class="hljs-attr">validateModifiedOnly</span>: <span class="hljs-literal">true</span> });</code></pre><h2 id="naming">
+        <a href="#naming">
+          Naming Conflicts 
+        </a>
+      </h2>
+<p>Mongoose has both query and document hooks for <code>deleteOne()</code>.</p>
+<pre><code lang="javascript">schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;deleteOne&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) { <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Removing!&#x27;</span>); });
+
+<span class="hljs-comment">// Does **not** print &quot;Removing!&quot;. Document middleware for `deleteOne` is not executed by default</span>
+<span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">deleteOne</span>();
+
+<span class="hljs-comment">// Prints &quot;Removing!&quot;</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">deleteOne</span>();</code></pre><p>You can pass options to <a href="api.html#schema_Schema-pre"><code>Schema.pre()</code></a>
+and <a href="api.html#schema_Schema-post"><code>Schema.post()</code></a> to switch whether
+Mongoose calls your <code>deleteOne()</code> hook for <a href="api/model.html#Model.prototype.deleteOne()"><code>Document.prototype.deleteOne()</code></a>
+or <a href="api/query.html#Query.prototype.deleteOne()"><code>Query.prototype.deleteOne()</code></a>. Note here that you need to set both <code>document</code> and <code>query</code> properties in the passed object:</p>
+<pre><code lang="javascript"><span class="hljs-comment">// Only document middleware</span>
+schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;deleteOne&#x27;</span>, { <span class="hljs-attr">document</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">query</span>: <span class="hljs-literal">false</span> }, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Deleting doc!&#x27;</span>);
+});
+
+<span class="hljs-comment">// Only query middleware. This will get called when you do `Model.deleteOne()`</span>
+<span class="hljs-comment">// but not `doc.deleteOne()`.</span>
+schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;deleteOne&#x27;</span>, { <span class="hljs-attr">query</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">document</span>: <span class="hljs-literal">false</span> }, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Deleting!&#x27;</span>);
+});</code></pre><p>Mongoose also has both query and document hooks for <code>validate()</code>.
+Unlike <code>deleteOne</code> and <code>updateOne</code>, <code>validate</code> middleware applies to <code>Document.prototype.validate</code> by default.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> mongoose.<span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> });
+schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;validate&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Document validate&#x27;</span>);
+});
+schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;validate&#x27;</span>, { <span class="hljs-attr">query</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">document</span>: <span class="hljs-literal">false</span> }, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Query validate&#x27;</span>);
+});
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Test</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, schema);
+
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Test</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;foo&#x27;</span> });
+
+<span class="hljs-comment">// Prints &quot;Document validate&quot;</span>
+<span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">validate</span>();
+
+<span class="hljs-comment">// Prints &quot;Query validate&quot;</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Test</span>.<span class="hljs-title function_">find</span>().<span class="hljs-title function_">validate</span>();</code></pre><h2 id="notes">
+        <a href="#notes">
+          Notes on <code>findAndUpdate()</code> and Query Middleware 
+        </a>
+      </h2>
+<p>Pre and post <code>save()</code> hooks are <strong>not</strong> executed on <code>update()</code>,
+<code>findOneAndUpdate()</code>, etc. You can see a more detailed discussion why in
+<a href="http://github.com/Automattic/mongoose/issues/964">this GitHub issue</a>.
+Mongoose 4.0 introduced distinct hooks for these functions.</p>
+<pre><code lang="javascript">schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;find&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span> <span class="hljs-keyword">instanceof</span> mongoose.<span class="hljs-property">Query</span>); <span class="hljs-comment">// true</span>
+  <span class="hljs-variable language_">this</span>.<span class="hljs-property">start</span> = <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>();
+});
+
+schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;find&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">result</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-variable language_">this</span> <span class="hljs-keyword">instanceof</span> mongoose.<span class="hljs-property">Query</span>); <span class="hljs-comment">// true</span>
+  <span class="hljs-comment">// prints returned documents</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;find() returned &#x27;</span> + <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(result));
+  <span class="hljs-comment">// prints number of milliseconds the query took</span>
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;find() took &#x27;</span> + (<span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>() - <span class="hljs-variable language_">this</span>.<span class="hljs-property">start</span>) + <span class="hljs-string">&#x27; milliseconds&#x27;</span>);
+});</code></pre><p>Query middleware differs from document middleware in a subtle but
+important way: in document middleware, <code>this</code> refers to the document
+being updated. In query middleware, mongoose doesn&#39;t necessarily have
+a reference to the document being updated, so <code>this</code> refers to the
+<strong>query</strong> object rather than the document being updated.</p>
+<p>For instance, if you wanted to add an <code>updatedAt</code> timestamp to every
+<code>updateOne()</code> call, you would use the following pre hook.</p>
+<pre><code lang="javascript">schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;updateOne&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">set</span>({ <span class="hljs-attr">updatedAt</span>: <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>() });
+});</code></pre><p>You <strong>cannot</strong> access the document being updated in <code>pre(&#39;updateOne&#39;)</code> or
+<code>pre(&#39;findOneAndUpdate&#39;)</code> query middleware. If you need to access the document
+that will be updated, you need to execute an explicit query for the document.</p>
+<pre><code lang="javascript">schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;findOneAndUpdate&#x27;</span>, <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">const</span> docToUpdate = <span class="hljs-keyword">await</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">model</span>.<span class="hljs-title function_">findOne</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-title function_">getQuery</span>());
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(docToUpdate); <span class="hljs-comment">// The document that `findOneAndUpdate()` will modify</span>
+});</code></pre><p>However, if you define <code>pre(&#39;updateOne&#39;)</code> document middleware,
+<code>this</code> will be the document being updated. That&#39;s because <code>pre(&#39;updateOne&#39;)</code>
+document middleware hooks into <a href="api/document.html#document_Document-updateOne"><code>Document#updateOne()</code></a>
+rather than <code>Query#updateOne()</code>.</p>
+<pre><code lang="javascript">schema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;updateOne&#x27;</span>, { <span class="hljs-attr">document</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">query</span>: <span class="hljs-literal">false</span> }, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Updating&#x27;</span>);
+});
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Model</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Test&#x27;</span>, schema);
+
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Model</span>();
+<span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">updateOne</span>({ <span class="hljs-attr">$set</span>: { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;test&#x27;</span> } }); <span class="hljs-comment">// Prints &quot;Updating&quot;</span>
+
+<span class="hljs-comment">// Doesn&#x27;t print &quot;Updating&quot;, because `Query#updateOne()` doesn&#x27;t fire</span>
+<span class="hljs-comment">// document middleware.</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">updateOne</span>({}, { <span class="hljs-attr">$set</span>: { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;test&#x27;</span> } });</code></pre><h2 id="error-handling-middleware">
+        <a href="#error-handling-middleware">
+          Error Handling Middleware 
+        </a>
+      </h2>
+<p>Middleware execution normally stops the first time a piece of middleware
+calls <code>next()</code> with an error. However, there is a special kind of post
+middleware called &quot;error handling middleware&quot; that executes specifically
+when an error occurs. Error handling middleware is useful for reporting
+errors and making error messages more readable.</p>
+<p>Error handling middleware is defined as middleware that takes one extra
+parameter: the &#39;error&#39; that occurred as the first parameter to the function.
+Error handling middleware can then transform the error however you want.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
+    <span class="hljs-comment">// Will trigger a MongoServerError with code 11000 when</span>
+    <span class="hljs-comment">// you save a duplicate</span>
+    <span class="hljs-attr">unique</span>: <span class="hljs-literal">true</span>
+  }
+});
+
+<span class="hljs-comment">// Handler **must** take 3 parameters: the error that occurred, the document</span>
+<span class="hljs-comment">// in question, and the `next()` function</span>
+schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;save&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">error, doc, next</span>) {
+  <span class="hljs-keyword">if</span> (error.<span class="hljs-property">name</span> === <span class="hljs-string">&#x27;MongoServerError&#x27;</span> &amp;&amp; error.<span class="hljs-property">code</span> === <span class="hljs-number">11000</span>) {
+    <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&#x27;There was a duplicate key error&#x27;</span>));
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-title function_">next</span>();
+  }
+});
+
+<span class="hljs-comment">// Will trigger the `post(&#x27;save&#x27;)` error handler</span>
+<span class="hljs-title class_">Person</span>.<span class="hljs-title function_">create</span>([{ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Axl Rose&#x27;</span> }, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Axl Rose&#x27;</span> }]);</code></pre><p>Error handling middleware also works with query middleware. You can
+also define a post <code>update()</code> hook that will catch MongoDB duplicate key
+errors.</p>
+<pre><code lang="javascript"><span class="hljs-comment">// The same E11000 error can occur when you call `updateOne()`</span>
+<span class="hljs-comment">// This function **must** take 4 parameters.</span>
+
+schema.<span class="hljs-title function_">post</span>(<span class="hljs-string">&#x27;updateOne&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params">passRawResult, error, res, next</span>) {
+  <span class="hljs-keyword">if</span> (error.<span class="hljs-property">name</span> === <span class="hljs-string">&#x27;MongoServerError&#x27;</span> &amp;&amp; error.<span class="hljs-property">code</span> === <span class="hljs-number">11000</span>) {
+    <span class="hljs-title function_">next</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&#x27;There was a duplicate key error&#x27;</span>));
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-title function_">next</span>(); <span class="hljs-comment">// The `updateOne()` call will still error out.</span>
+  }
+});
+
+<span class="hljs-keyword">const</span> people = [{ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Axl Rose&#x27;</span> }, { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Slash&#x27;</span> }];
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">create</span>(people);
+
+<span class="hljs-comment">// Throws &quot;There was a duplicate key error&quot;</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">updateOne</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Slash&#x27;</span> }, { <span class="hljs-attr">$set</span>: { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Axl Rose&#x27;</span> } });</code></pre><p>Error handling middleware can transform an error, but it can&#39;t remove the
+error. Even if you call <code>next()</code> with no error as shown above, the
+function call will still error out.</p>
+<h2 id="aggregate">
+        <a href="#aggregate">
+          Aggregation Hooks 
+        </a>
+      </h2>
+<p>You can also define hooks for the <a href="api/model.html#model_Model-aggregate"><code>Model.aggregate()</code> function</a>.
+In aggregation middleware functions, <code>this</code> refers to the <a href="api/aggregate.html#Aggregate">Mongoose <code>Aggregate</code> object</a>.
+For example, suppose you&#39;re implementing soft deletes on a <code>Customer</code> model
+by adding an <code>isDeleted</code> property. To make sure <code>aggregate()</code> calls only look
+at customers that aren&#39;t soft deleted, you can use the below middleware to
+add a <a href="api/aggregate.html#aggregate_Aggregate-match"><code>$match</code> stage</a> to the beginning
+of each <a href="https://www.mongodb.com/docs/manual/core/aggregation-pipeline/">aggregation pipeline</a>.</p>
+<pre><code lang="javascript">customerSchema.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;aggregate&#x27;</span>, <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-comment">// Add a $match state to the beginning of each pipeline.</span>
+  <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">pipeline</span>().<span class="hljs-title function_">unshift</span>({ <span class="hljs-attr">$match</span>: { <span class="hljs-attr">isDeleted</span>: { <span class="hljs-attr">$ne</span>: <span class="hljs-literal">true</span> } } });
+});</code></pre><p>The <a href="api/aggregate.html#aggregate_Aggregate-pipeline"><code>Aggregate#pipeline()</code> function</a>
+lets you access the MongoDB aggregation pipeline that Mongoose will send to
+the MongoDB server. It is useful for adding stages to the beginning of the
+pipeline from middleware.</p>
+<h2 id="synchronous">
+        <a href="#synchronous">
+          Synchronous Hooks 
+        </a>
+      </h2>
+<p>Certain Mongoose hooks are synchronous, which means they do <strong>not</strong> support
+functions that return promises or receive a <code>next()</code> callback. Currently,
+only <code>init</code> hooks are synchronous, because the <a href="api/document.html#document_Document-init"><code>init()</code> function</a>
+is synchronous. Below is an example of using pre and post init hooks.</p>
+<pre><code lang="javascript">[<span class="hljs-attr">require</span>:post init hooks.*success]</code></pre><p>To report an error in an init hook, you must throw a <strong>synchronous</strong> error.
+Unlike all other middleware, init middleware does <strong>not</strong> handle promise
+rejections.</p>
+<pre><code lang="javascript">[<span class="hljs-attr">require</span>:post init hooks.*error]</code></pre><h2 id="next">
+        <a href="#next">
+          Next Up 
+        </a>
+      </h2>
+<p>Now that we&#39;ve covered middleware, let&#39;s take a look at Mongoose&#39;s approach
+to faking JOINs with its query <a href="populate.html">population</a> helper.</p>
+</div></div><div id="jobs"><div class="job-listing"><a href="/docs/8.x/docs/jobs.html#61f0b0402d893554bc3a247f"><div class="company-logo"><img src="https://assets.localizecdn.com/uploads/1689251999716.png"></div><div class="description"><div class="company">Localize</div><div class="title">Full Stack Engineer</div><div class="location">Anywhere</div></div></a></div><div class="button jobs-view-more"><a href="/docs/8.x/docs/jobs.html">View more jobs!</a></div></div><script type="text/javascript" src="/docs/8.x/docs/js/navbar-search.js"></script><script type="text/javascript" src="/docs/8.x/docs/js/mobile-navbar-toggle.js"></script><script type="text/javascript" src="/docs/8.x/docs/js/copy-code.js"></script></div></body></html>

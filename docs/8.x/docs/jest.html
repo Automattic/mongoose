@@ -1,0 +1,91 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v8.20.1: Testing Mongoose with Jest</title><link rel="apple-touch-icon" sizes="57x57" href="/docs/8.x/docs/images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="/docs/8.x/docs/images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="/docs/8.x/docs/images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="/docs/8.x/docs/images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="/docs/8.x/docs/images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="/docs/8.x/docs/images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="/docs/8.x/docs/images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="/docs/8.x/docs/images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="/docs/8.x/docs/images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="/docs/8.x/docs/images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="/docs/8.x/docs/images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="/docs/8.x/docs/images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="/docs/8.x/docs/images/favicon/favicon-16x16.png"><link rel="manifest" href="/docs/8.x/docs/images/favicon/manifest.json"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/8.x/docs/css/github.css"><link rel="stylesheet" href="/docs/8.x/docs/css/mongoose5.css"><link rel="stylesheet" href="/docs/8.x/docs/css/carbonads.css"><link rel="stylesheet" href="/docs/8.x/docs/css/copy-code.css"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="/docs/8.x/docs/images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/8.x/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/8.x/docs/js/native.js"></script></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><svg width="100%" height="100%" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/8.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><nav class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/8.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="/docs/8.x/docs/index.html">Version 8.20.1</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Version 9.0.0</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/index.html">Version 7.8.7</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/index.html">Version 6.13.8</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/8.x/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/guides.html">Guides</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/typescript.html">TypeScript</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/mongoose.html">API</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/virtualtype.html">VirtualType</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/migrating_to_8.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/version-support.html">Version Support</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></nav></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/jest.md" target="_blank">
+<img src="/docs/8.x/docs/images/pencil.svg" />
+</a><h1 id="testing-mongoose-with-a-hrefhttpswwwnpmjscompackagejestjesta">
+        <a href="#testing-mongoose-with-a-hrefhttpswwwnpmjscompackagejestjesta">
+          Testing Mongoose with <a href="https://www.npmjs.com/package/jest">Jest</a>
+        </a>
+      </h1>
+<div class="sponsored-ad">
+  <a href="https://localizejs.com/?utm_campaign=Mongoose&utm_source=mongoose&utm_medium=banner">
+    <img src="/docs/images/localize-mongoose-ad-banner-2x.jpg">
+  </a>
+</div>
+
+<p>Jest is a JavaScript runtime developed by Facebook that is usually used for testing.
+Because Jest is designed primarily for testing React applications, using it to test Node.js server-side applications comes with a lot of caveats.
+We strongly recommend using a different testing framework, like <a href="https://mochajs.org/">Mocha</a>.</p>
+<p>To suppress any Jest warnings from Mongoose, set the <code>SUPPRESS_JEST_WARNINGS</code> environment variable:</p>
+<pre><code lang="sh"><span class="hljs-built_in">env</span> SUPPRESS_JEST_WARNINGS=1 npm <span class="hljs-built_in">test</span></code></pre><p>If you choose to delve into dangerous waters and test Mongoose apps with Jest, here&#39;s what you need to know:</p>
+<h2 id="recommended-testenvironment">
+        <a href="#recommended-testenvironment">
+          Recommended <code>testEnvironment</code> 
+        </a>
+      </h2>
+<p>If you are using Jest <code>&lt;=26</code>, do <strong>not</strong> use Jest&#39;s default <a href="https://jestjs.io/docs/en/configuration.html#testenvironment-string"><code>jsdom</code> test environment</a> when testing Mongoose apps, <em>unless</em> you are explicitly testing an application that only uses <a href="browser.html">Mongoose&#39;s browser library</a>. In Jest <code>&gt;=27</code>, <a href="https://jestjs.io/ro/blog/2021/05/25/jest-27#flipping-defaults">&quot;node&quot; is Jest&#39;s default <code>testEnvironment</code></a>, so this is no longer an issue.</p>
+<p>The <code>jsdom</code> test environment attempts to create a browser-like test
+environment in Node.js, and it comes with numerous nasty surprises like a
+<a href="https://github.com/jsdom/jsdom/commit/3f306bea5362aceb2a219a2e98ff96a7464d2f19#commitcomment-31316213">stubbed <code>setTimeout()</code> function</a>
+that silently fails after tests are finished. Mongoose does not support jsdom
+in general and is not expected to function correctly in the <code>jsdom</code> test
+environment.</p>
+<p>To change your <code>testEnvironment</code> to Node.js, add <code>testEnvironment</code> to your
+<code>jest.config.js</code> file:</p>
+<pre><code lang="javascript"><span class="hljs-variable language_">module</span>.<span class="hljs-property">exports</span> = {
+  <span class="hljs-attr">testEnvironment</span>: <span class="hljs-string">&#x27;node&#x27;</span>
+};</code></pre><h2 id="timer-mocks">
+        <a href="#timer-mocks">
+          Timer Mocks 
+        </a>
+      </h2>
+<p>Absolutely do <strong>not</strong> use <a href="https://jestjs.io/docs/en/timer-mocks.html">timer mocks</a> when testing Mongoose apps.
+This is especially important if you&#39;re using Jest <code>&gt;=25</code>, which stubs out <code>process.nextTick()</code>.</p>
+<p>Fake timers stub out global functions like <code>setTimeout()</code> and <code>setInterval()</code>, which causes problems when an underlying library uses these functions.
+Mongoose and the MongoDB Node.js driver uses these functions for deferring work until the next tick of the event loop and for monitoring connections to the MongoDB server.</p>
+<p>If you absolutely must use timer mocks, make sure you import Mongoose <strong>before</strong> calling <code>useFakeTimers()</code>:</p>
+<pre><code lang="javascript"><span class="hljs-comment">// Fine for basic cases, but may still cause issues:</span>
+<span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;mongoose&#x27;</span>);
+
+jest.<span class="hljs-title function_">useFakeTimers</span>();
+
+<span class="hljs-comment">// Bad:</span>
+jest.<span class="hljs-title function_">useFakeTimers</span>();
+
+<span class="hljs-keyword">const</span> mongoose = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;mongoose&#x27;</span>);</code></pre><p>Mongoose devs have already refactored out code to <a href="https://github.com/Automattic/mongoose/issues/6074">avoid using <code>setImmediate()</code></a> to defer work to the next tick of the event loop, but we can&#39;t reasonably ensure that every library Mongoose depends on doesn&#39;t use <code>setImmediate()</code>.</p>
+<p>A better alternative is to create your own wrapper around <code>setTimeout()</code> and
+stub that instead using <a href="http://npmjs.com/package/sinon">sinon</a>.</p>
+<pre><code lang="javascript"><span class="hljs-comment">// time.js</span>
+<span class="hljs-built_in">exports</span>.<span class="hljs-property">setTimeout</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-variable language_">global</span>.<span class="hljs-property">setTimeout</span>.<span class="hljs-title function_">apply</span>(<span class="hljs-variable language_">global</span>, <span class="hljs-variable language_">arguments</span>);
+};
+
+<span class="hljs-comment">// Tests</span>
+<span class="hljs-keyword">const</span> time = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;../util/time&#x27;</span>);
+<span class="hljs-keyword">const</span> sinon = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;sinon&#x27;</span>);
+sinon.<span class="hljs-title function_">stub</span>(time, <span class="hljs-string">&#x27;setTimeout&#x27;</span>);</code></pre><h2 id="globalsetup-and-globalteardown">
+        <a href="#globalsetup-and-globalteardown">
+          <code>globalSetup</code> and <code>globalTeardown</code> 
+        </a>
+      </h2>
+<p>Do <strong>not</strong> use <code>globalSetup</code> to call <code>mongoose.connect()</code> or
+<code>mongoose.createConnection()</code>. Jest runs <code>globalSetup</code> in
+a <a href="https://github.com/facebook/jest/issues/7184">separate environment</a>,
+so you cannot use any connections you create in <code>globalSetup</code>
+in your tests.</p>
+<h2 id="resetmodules">
+        <a href="#resetmodules">
+          resetModules
+        </a>
+      </h2>
+<p>We recommend setting <code>resetModules</code> to <code>false</code> in your Jest config.
+<a href="https://github.com/Automattic/mongoose/issues/15499"><code>resetModules: true</code> can cause issues with internal <code>instanceof</code> checks</a> by creating multiple dangling copies of the Mongoose module.</p>
+<h2 id="further-reading">
+        <a href="#further-reading">
+          Further Reading
+        </a>
+      </h2>
+<p>Want to learn how to test Mongoose apps correctly? The
+<a href="https://pluralsight.pxf.io/c/1321469/424552/7490?u=https%3A%2F%2Fapp.pluralsight.com%2Flibrary%2Fcourses%2Fnode-js-express-rest-web-services%2Ftable-of-contents">RESTful Web Services with Node.js and Express</a>
+course on Pluralsight has a great section on testing Mongoose apps with <a href="http://npmjs.com/package/mocha">Mocha</a>.</p>
+<a href="https://pluralsight.pxf.io/c/1321469/424552/7490?u=https%3A%2F%2Fapp.pluralsight.com%2Flibrary%2Fcourses%2Fnode-js-express-rest-web-services%2Ftable-of-contents">
+  <img src="https://i.imgur.com/KouuaAZ.png" alt="RESTful Web Services with Node.js and Express">
+</a></div></div><div id="jobs"><div class="job-listing"><a href="/docs/8.x/docs/jobs.html#61f0b0402d893554bc3a247f"><div class="company-logo"><img src="https://assets.localizecdn.com/uploads/1689251999716.png"></div><div class="description"><div class="company">Localize</div><div class="title">Full Stack Engineer</div><div class="location">Anywhere</div></div></a></div><div class="button jobs-view-more"><a href="/docs/8.x/docs/jobs.html">View more jobs!</a></div></div><script type="text/javascript" src="/docs/8.x/docs/js/navbar-search.js"></script><script type="text/javascript" src="/docs/8.x/docs/js/mobile-navbar-toggle.js"></script><script type="text/javascript" src="/docs/8.x/docs/js/copy-code.js"></script></div></body></html>

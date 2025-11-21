@@ -1,0 +1,169 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v8.20.1: Mongoose: Query Helpers in TypeScript</title><link rel="apple-touch-icon" sizes="57x57" href="/docs/8.x/docs/images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="/docs/8.x/docs/images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="/docs/8.x/docs/images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="/docs/8.x/docs/images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="/docs/8.x/docs/images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="/docs/8.x/docs/images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="/docs/8.x/docs/images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="/docs/8.x/docs/images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="/docs/8.x/docs/images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="/docs/8.x/docs/images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="/docs/8.x/docs/images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="/docs/8.x/docs/images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="/docs/8.x/docs/images/favicon/favicon-16x16.png"><link rel="manifest" href="/docs/8.x/docs/images/favicon/manifest.json"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/8.x/docs/css/github.css"><link rel="stylesheet" href="/docs/8.x/docs/css/mongoose5.css"><link rel="stylesheet" href="/docs/8.x/docs/css/carbonads.css"><link rel="stylesheet" href="/docs/8.x/docs/css/copy-code.css"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="/docs/8.x/docs/images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/8.x/docs/css/inlinecpc.css"><script type="text/javascript" src="/docs/8.x/docs/js/native.js"></script></head><body><div id="layout"><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><svg width="100%" height="100%" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></a><div id="mobile-logo-container"><a href="/"><img id="logo" src="/docs/8.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div></div><div id="menu"><nav class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><img id="logo" src="/docs/8.x/docs/images/mongoose5_62x30_transparent.png"><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="/docs/8.x/docs/index.html">Version 8.20.1</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Version 9.0.0</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/index.html">Version 7.8.7</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/index.html">Version 6.13.8</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/8.x/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/guides.html">Guides</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/typescript.html">TypeScript</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/typescript/schemas.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/typescript/statics-and-methods.html">Statics and Methods</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/typescript/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/8.x/docs/typescript/query-helpers.html">Query Helpers</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/typescript/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/typescript/virtuals.html">Virtuals</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/typescript/subdocuments.html">Subdocuments</a></li></ul></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/mongoose.html">API</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/8.x/docs/api/virtualtype.html">VirtualType</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/migrating_to_8.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/version-support.html">Version Support</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></nav></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/docs/typescript/query-helpers.md" target="_blank">
+<img src="/docs/8.x/docs/images/pencil.svg" />
+</a><h1 id="query-helpers-in-typescript">
+        <a href="#query-helpers-in-typescript">
+          Query Helpers in TypeScript
+        </a>
+      </h1>
+<div class="sponsored-ad">
+  <a href="https://localizejs.com/?utm_campaign=Mongoose&utm_source=mongoose&utm_medium=banner">
+    <img src="/docs/images/localize-mongoose-ad-banner-2x.jpg">
+  </a>
+</div>
+
+<p><a href="http://thecodebarbarian.com/mongoose-custom-query-methods.html">Query helpers</a> let you define custom helper methods on Mongoose queries.
+Query helpers make queries more semantic using chaining syntax.</p>
+<p>The following is an example of how query helpers work in JavaScript.</p>
+<pre><code lang="javascript"><span class="hljs-title class_">ProjectSchema</span>.<span class="hljs-property">query</span>.<span class="hljs-property">byName</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params">name</span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">find</span>({ <span class="hljs-attr">name</span>: name });
+};
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Project</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Project&#x27;</span>, <span class="hljs-title class_">ProjectSchema</span>);
+
+<span class="hljs-comment">// Works. Any Project query, whether it be `find()`, `findOne()`,</span>
+<span class="hljs-comment">// `findOneAndUpdate()`, `delete()`, etc. now has a `byName()` helper</span>
+<span class="hljs-title class_">Project</span>.<span class="hljs-title function_">find</span>().<span class="hljs-title function_">where</span>(<span class="hljs-string">&#x27;stars&#x27;</span>).<span class="hljs-title function_">gt</span>(<span class="hljs-number">1000</span>).<span class="hljs-title function_">byName</span>(<span class="hljs-string">&#x27;mongoose&#x27;</span>);</code></pre><h2 id="manually-typed-query-helpers">
+        <a href="#manually-typed-query-helpers">
+          Manually Typed Query Helpers
+        </a>
+      </h2>
+<p>In TypeScript, you can define query helpers using a separate query helpers interface.
+Mongoose&#39;s <code>Model</code> takes 3 generic parameters:</p>
+<ol>
+<li>The <code>DocType</code></li>
+<li>a <code>TQueryHelpers</code> type</li>
+<li>a <code>TMethods</code> type</li>
+</ol>
+<p>The 2nd generic parameter, <code>TQueryHelpers</code>, should be an interface that contains a function signature for each of your query helpers.
+Below is an example of creating a <code>ProjectModel</code> with a <code>byName</code> query helper.</p>
+<pre><code lang="typescript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">HydratedDocument</span>, <span class="hljs-title class_">Model</span>, <span class="hljs-title class_">QueryWithHelpers</span>, <span class="hljs-title class_">Schema</span>, model, connect } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mongoose&#x27;</span>;
+
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">Project</span> {
+  <span class="hljs-attr">name</span>?: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">stars</span>?: <span class="hljs-built_in">number</span>;
+}
+
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">ProjectQueryHelpers</span> {
+  <span class="hljs-title function_">byName</span>(<span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span>): <span class="hljs-title class_">QueryWithHelpers</span>&lt;
+    <span class="hljs-title class_">HydratedDocument</span>&lt;<span class="hljs-title class_">Project</span>&gt;[],
+    <span class="hljs-title class_">HydratedDocument</span>&lt;<span class="hljs-title class_">Project</span>&gt;,
+    <span class="hljs-title class_">ProjectQueryHelpers</span>
+  &gt;
+}
+
+<span class="hljs-keyword">type</span> <span class="hljs-title class_">ProjectModelType</span> = <span class="hljs-title class_">Model</span>&lt;<span class="hljs-title class_">Project</span>, <span class="hljs-title class_">ProjectQueryHelpers</span>&gt;;
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">ProjectSchema</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>&lt;
+  <span class="hljs-title class_">Project</span>,
+  <span class="hljs-title class_">Model</span>&lt;<span class="hljs-title class_">Project</span>, <span class="hljs-title class_">ProjectQueryHelpers</span>&gt;,
+  {},
+  <span class="hljs-title class_">ProjectQueryHelpers</span>
+&gt;({
+  <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">stars</span>: <span class="hljs-title class_">Number</span>
+});
+
+<span class="hljs-title class_">ProjectSchema</span>.<span class="hljs-property">query</span>.<span class="hljs-property">byName</span> = <span class="hljs-keyword">function</span> <span class="hljs-title function_">byName</span>(<span class="hljs-params">
+  <span class="hljs-attr">this</span>: <span class="hljs-title class_">QueryWithHelpers</span>&lt;<span class="hljs-built_in">any</span>, <span class="hljs-title class_">HydratedDocument</span>&lt;<span class="hljs-title class_">Project</span>&gt;, <span class="hljs-title class_">ProjectQueryHelpers</span>&gt;,
+  <span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span>
+</span>) {
+  <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">find</span>({ <span class="hljs-attr">name</span>: name });
+};
+
+<span class="hljs-comment">// 2nd param to `model()` is the Model class to return.</span>
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">ProjectModel</span> = model&lt;<span class="hljs-title class_">Project</span>, <span class="hljs-title class_">ProjectModelType</span>&gt;(<span class="hljs-string">&#x27;Project&#x27;</span>, <span class="hljs-title class_">ProjectSchema</span>);
+
+<span class="hljs-title function_">run</span>().<span class="hljs-title function_">catch</span>(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(err));
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">run</span>(<span class="hljs-params"></span>): <span class="hljs-title class_">Promise</span>&lt;<span class="hljs-built_in">void</span>&gt; {
+  <span class="hljs-keyword">await</span> <span class="hljs-title function_">connect</span>(<span class="hljs-string">&#x27;mongodb://127.0.0.1:27017/test&#x27;</span>);
+
+  <span class="hljs-comment">// Equivalent to `ProjectModel.find({ stars: { $gt: 1000 }, name: &#x27;mongoose&#x27; })`</span>
+  <span class="hljs-keyword">await</span> <span class="hljs-title class_">ProjectModel</span>.<span class="hljs-title function_">find</span>().<span class="hljs-title function_">where</span>(<span class="hljs-string">&#x27;stars&#x27;</span>).<span class="hljs-title function_">gt</span>(<span class="hljs-number">1000</span>).<span class="hljs-title function_">byName</span>(<span class="hljs-string">&#x27;mongoose&#x27;</span>);
+}</code></pre><h2 id="auto-typed-query-helpers">
+        <a href="#auto-typed-query-helpers">
+          Auto Typed Query Helpers
+        </a>
+      </h2>
+<p>Mongoose does support auto typed Query Helpers that it are supplied in schema options.
+Query Helpers functions can be defined as following:</p>
+<pre><code lang="typescript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">Schema</span>, model } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mongoose&#x27;</span>;
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">ProjectSchema</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">stars</span>: <span class="hljs-title class_">Number</span>
+}, {
+  <span class="hljs-attr">query</span>: {
+    <span class="hljs-title function_">byName</span>(<span class="hljs-params"><span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span></span>) {
+      <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">find</span>({ name });
+    }
+  }
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">ProjectModel</span> = <span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Project&#x27;</span>, <span class="hljs-title class_">ProjectSchema</span>);
+
+<span class="hljs-comment">// Equivalent to `ProjectModel.find({ stars: { $gt: 1000 }, name: &#x27;mongoose&#x27; })`</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">ProjectModel</span>.<span class="hljs-title function_">find</span>().<span class="hljs-title function_">where</span>(<span class="hljs-string">&#x27;stars&#x27;</span>).<span class="hljs-title function_">gt</span>(<span class="hljs-number">1000</span>).<span class="hljs-title function_">byName</span>(<span class="hljs-string">&#x27;mongoose&#x27;</span>);</code></pre><h2 id="using-query-helper-overrides-for-different-query-shapes">
+        <a href="#using-query-helper-overrides-for-different-query-shapes">
+          Using Query Helper Overrides For Different Query Shapes
+        </a>
+      </h2>
+<p>Sometimes you want a query helper to return a different type depending on whether the query is &quot;lean&quot; or not.
+For example, suppose you want a <code>toMap()</code> query helper that converts the results of a query into a <code>Map</code> keyed by <code>_id</code>.
+If you call <code>.lean()</code>, you want the map values to be plain objects; otherwise, you want hydrated documents.</p>
+<p>To achieve this, you can use TypeScript function overloads on your query helper based on the value of <code>this</code>.
+Here&#39;s an example of how to type a <code>toMap()</code> query helper so that it returns the correct type for both lean and non-lean queries:</p>
+<pre><code lang="typescript"><span class="hljs-keyword">import</span> { <span class="hljs-title class_">Model</span>, <span class="hljs-title class_">HydratedDocument</span>, <span class="hljs-title class_">QueryWithHelpers</span>, <span class="hljs-title class_">Schema</span>, model, <span class="hljs-title class_">Types</span> } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;mongoose&#x27;</span>;
+
+<span class="hljs-comment">// Query helper interface with overloads for lean and non-lean queries</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">ToMapQueryHelpers</span>&lt;<span class="hljs-title class_">RawDocType</span>, <span class="hljs-title class_">HydratedDocType</span>&gt; {
+  <span class="hljs-comment">// For non-lean queries: returns Map&lt;string, HydratedDocType&gt;</span>
+  <span class="hljs-title function_">toMap</span>(<span class="hljs-attr">this</span>: <span class="hljs-title class_">QueryWithHelpers</span>&lt;<span class="hljs-title class_">HydratedDocType</span>[], <span class="hljs-title class_">HydratedDocType</span>&gt;): <span class="hljs-title class_">QueryWithHelpers</span>&lt;<span class="hljs-title class_">Map</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-title class_">HydratedDocType</span>&gt;, <span class="hljs-title class_">HydratedDocType</span>&gt;;
+  <span class="hljs-comment">// For lean queries: returns Map&lt;string, RawDocType&gt;</span>
+  <span class="hljs-title function_">toMap</span>(<span class="hljs-attr">this</span>: <span class="hljs-title class_">QueryWithHelpers</span>&lt;<span class="hljs-title class_">RawDocType</span>[], <span class="hljs-title class_">HydratedDocType</span>&gt;): <span class="hljs-title class_">QueryWithHelpers</span>&lt;<span class="hljs-title class_">Map</span>&lt;<span class="hljs-built_in">string</span>, <span class="hljs-title class_">RawDocType</span>&gt;, <span class="hljs-title class_">HydratedDocType</span>&gt;;
+}
+
+<span class="hljs-comment">// Query helpers definition. Will be used in schema options</span>
+<span class="hljs-keyword">const</span> <span class="hljs-attr">query</span>: <span class="hljs-title class_">ToMapQueryHelpers</span>&lt;<span class="hljs-title class_">IUser</span>, <span class="hljs-title class_">UserHydratedDocument</span>&gt; = {
+  <span class="hljs-comment">// Chainable query helper that converts an array of documents to</span>
+  <span class="hljs-comment">// a map of document _id (as a string) to the document</span>
+  <span class="hljs-title function_">toMap</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">transform</span>(<span class="hljs-function">(<span class="hljs-params">docs</span>) =&gt;</span> {
+      <span class="hljs-comment">// The `if` statements are type gymnastics to help TypeScript</span>
+      <span class="hljs-comment">// handle the `IUser[] | UserHydratedDocument[]` union. Not necessary</span>
+      <span class="hljs-comment">// for runtime correctness.</span>
+      <span class="hljs-keyword">if</span> (docs.<span class="hljs-property">length</span> === <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();
+      <span class="hljs-keyword">if</span> (docs[<span class="hljs-number">0</span>] <span class="hljs-keyword">instanceof</span> <span class="hljs-title class_">Document</span>) <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>(docs.<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">doc</span> =&gt;</span> [doc.<span class="hljs-property">_id</span>.<span class="hljs-title function_">toString</span>(), doc]));
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>(docs.<span class="hljs-title function_">map</span>(<span class="hljs-function"><span class="hljs-params">doc</span> =&gt;</span> [doc.<span class="hljs-property">_id</span>.<span class="hljs-title function_">toString</span>(), doc]));
+    });
+  }
+};
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">IUser</span> {
+  <span class="hljs-attr">_id</span>: <span class="hljs-title class_">Types</span>.<span class="hljs-property">ObjectId</span>;
+  <span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">type</span> <span class="hljs-title class_">UserHydratedDocument</span> = <span class="hljs-title class_">HydratedDocument</span>&lt;<span class="hljs-title class_">IUser</span>&gt;;
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">type</span> <span class="hljs-title class_">UserModelType</span> = <span class="hljs-title class_">Model</span>&lt;
+  <span class="hljs-title class_">IUser</span>,
+  <span class="hljs-title class_">ToMapQueryHelpers</span>&lt;<span class="hljs-title class_">IUser</span>, <span class="hljs-title class_">UserHydratedDocument</span>&gt;
+&gt;;
+
+<span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span> }, { query });
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">User</span> = model&lt;<span class="hljs-title class_">IUser</span>, <span class="hljs-title class_">UserModelType</span>&gt;(<span class="hljs-string">&#x27;User&#x27;</span>, userSchema);
+
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">run</span>(<span class="hljs-params"></span>) {
+  <span class="hljs-comment">// Non-lean: Map&lt;string, UserHydratedDocument&gt;</span>
+  <span class="hljs-keyword">const</span> hydratedMap = <span class="hljs-keyword">await</span> <span class="hljs-title class_">User</span>.<span class="hljs-title function_">find</span>().<span class="hljs-title function_">toMap</span>();
+  <span class="hljs-comment">// hydratedMap.get(&#x27;someId&#x27;) is a hydrated document</span>
+
+  <span class="hljs-comment">// Lean: Map&lt;string, IUser&gt;</span>
+  <span class="hljs-keyword">const</span> leanMap = <span class="hljs-keyword">await</span> <span class="hljs-title class_">User</span>.<span class="hljs-title function_">find</span>().<span class="hljs-title function_">lean</span>().<span class="hljs-title function_">toMap</span>();
+  <span class="hljs-comment">// leanMap.get(&#x27;someId&#x27;) is a plain object</span>
+
+  <span class="hljs-comment">// The following will fail at compile time, as expected, because `toMap()` shouldn&#x27;t work with single documents or numbers</span>
+  <span class="hljs-comment">// await User.findOne().toMap();</span>
+  <span class="hljs-comment">// await User.countDocuments().toMap();</span>
+}</code></pre><p>With this approach, TypeScript will infer the correct return type for <code>.toMap()</code> depending on whether you use <code>.lean()</code> or not. This ensures type safety and prevents accidental misuse of the query helper on queries that don&#39;t return arrays of documents.</p>
+</div></div><div id="jobs"><div class="job-listing"><a href="/docs/8.x/docs/jobs.html#61f0b0402d893554bc3a247f"><div class="company-logo"><img src="https://assets.localizecdn.com/uploads/1689251999716.png"></div><div class="description"><div class="company">Localize</div><div class="title">Full Stack Engineer</div><div class="location">Anywhere</div></div></a></div><div class="button jobs-view-more"><a href="/docs/8.x/docs/jobs.html">View more jobs!</a></div></div><script type="text/javascript" src="/docs/8.x/docs/js/navbar-search.js"></script><script type="text/javascript" src="/docs/8.x/docs/js/mobile-navbar-toggle.js"></script><script type="text/javascript" src="/docs/8.x/docs/js/copy-code.js"></script></div></body></html>

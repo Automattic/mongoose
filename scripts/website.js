@@ -311,6 +311,7 @@ const versionObj = (() => {
     currentVersion: getCurrentVersion(),
     latestVersion: getLatestVersion(),
     pastVersions: [
+      getLatestVersionOf(8),
       getLatestVersionOf(7),
       getLatestVersionOf(6)
     ]

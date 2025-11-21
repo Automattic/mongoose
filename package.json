@@ -81,7 +81,7 @@
     "docs:prepare:publish:5x": "git checkout 5.x && git merge 5.x && npm run docs:clean:stable && npm run docs:generate && npm run docs:copy:tmp && git checkout gh-pages && npm run docs:copy:tmp:5x",
     "docs:prepare:publish:6x": "git checkout 6.x && git merge 6.x && npm run docs:clean:stable && env DOCS_DEPLOY=true npm run docs:generate && mv ./docs/6.x ./tmp && git checkout gh-pages && npm run docs:copy:tmp:6x",
     "docs:prepare:publish:7x": "env DOCS_DEPLOY=true npm run docs:generate && git checkout gh-pages && rimraf ./docs/7.x && mv ./tmp ./docs/7.x",
-    "docs:prepare:publish:8x": "git checkout gh-pages && git merge 8.x && npm run docs:generate",
+    "docs:prepare:publish:8x": "env DOCS_DEPLOY=true npm run docs:generate && git checkout gh-pages && rimraf ./docs/8.x && mv ./tmp ./docs/8.x",
     "docs:check-links": "blc http://127.0.0.1:8089 -ro",
     "lint": "eslint .",
     "lint-js": "eslint . --ext .js --ext .cjs",

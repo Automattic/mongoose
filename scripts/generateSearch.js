@@ -137,7 +137,7 @@ async function generateSearch(config) {
   let doneCount = 0;
   console.log('Search Content to save:', contents.length);
   for (const content of contents) {
-    if (version === '8.x') {
+    if (version === '9.x') {
       let url = content.url.startsWith('/') ? content.url : `/${content.url}`;
       if (!url.startsWith('/docs')) {
         url = '/docs' + url;

@@ -33,10 +33,10 @@ describe('getRelatedIndexes', () => {
       assert.deepStrictEqual(
         filteredSchemaIndexes,
         [
-          [{ actorId: 1 }, { background: true, unique: true }],
+          [{ actorId: 1 }, { unique: true }],
           [
             { happenedAt: 1 },
-            { background: true, partialFilterExpression: { __t: 'EventButNoDiscriminator' } }
+            { partialFilterExpression: { __t: 'EventButNoDiscriminator' } }
           ]
         ]
       );
@@ -88,7 +88,7 @@ describe('getRelatedIndexes', () => {
       assert.deepStrictEqual(
         filteredSchemaIndexes,
         [
-          [{ actorId: 1 }, { background: true, unique: true }]
+          [{ actorId: 1 }, { unique: true }]
         ]
       );
     });
@@ -124,8 +124,7 @@ describe('getRelatedIndexes', () => {
         filteredSchemaIndexes,
         [
           [{ actorId: 1 },
-            { background: true,
-              unique: true,
+            { unique: true,
               partialFilterExpression: { __t: { $exists: true } }
             }
           ]
@@ -182,7 +181,6 @@ describe('getRelatedIndexes', () => {
           [
             { boughtAt: 1 },
             {
-              background: true,
               unique: true,
               partialFilterExpression: {
                 __t: 'BuyEvent',
@@ -207,8 +205,7 @@ describe('getRelatedIndexes', () => {
           unique: true,
           key: { actorId: 1 },
           name: 'actorId_1',
-          ns: 'mongoose_test.some_collection',
-          background: true
+          ns: 'mongoose_test.some_collection'
         },
         {
           v: 2,
@@ -216,8 +213,7 @@ describe('getRelatedIndexes', () => {
           key: { doesNotMatter: 1 },
           name: 'doesNotMatter_1',
           ns: 'mongoose_test.some_collection',
-          partialFilterExpression: { __t: 'EventButNoDiscriminator' },
-          background: true
+          partialFilterExpression: { __t: 'EventButNoDiscriminator' }
         }
       ];
 
@@ -234,8 +230,7 @@ describe('getRelatedIndexes', () => {
             unique: true,
             key: { actorId: 1 },
             name: 'actorId_1',
-            ns: 'mongoose_test.some_collection',
-            background: true
+            ns: 'mongoose_test.some_collection'
           },
           {
             v: 2,
@@ -243,8 +238,7 @@ describe('getRelatedIndexes', () => {
             key: { doesNotMatter: 1 },
             name: 'doesNotMatter_1',
             ns: 'mongoose_test.some_collection',
-            partialFilterExpression: { __t: 'EventButNoDiscriminator' },
-            background: true
+            partialFilterExpression: { __t: 'EventButNoDiscriminator' }
           }
         ]
       );
@@ -296,24 +290,21 @@ describe('getRelatedIndexes', () => {
           unique: true,
           key: { actorId: 1 },
           name: 'actorId_1',
-          ns: 'mongoose_test.some_collection',
-          background: true
+          ns: 'mongoose_test.some_collection'
         },
         {
           unique: true,
           key: { boughtAt: 1 },
           name: 'boughtAt_1',
           ns: 'mongoose_test.some_collection',
-          partialFilterExpression: { __t: 'BuyEvent' },
-          background: true
+          partialFilterExpression: { __t: 'BuyEvent' }
         },
         {
           unique: true,
           key: { clickedAt: 1 },
           name: 'clickedAt_1',
           ns: 'mongoose_test.some_collection',
-          partialFilterExpression: { __t: 'ClickEvent' },
-          background: true
+          partialFilterExpression: { __t: 'ClickEvent' }
         }
       ];
 
@@ -330,8 +321,7 @@ describe('getRelatedIndexes', () => {
             unique: true,
             key: { actorId: 1 },
             name: 'actorId_1',
-            ns: 'mongoose_test.some_collection',
-            background: true
+            ns: 'mongoose_test.some_collection'
           }
         ]
       );
@@ -383,24 +373,21 @@ describe('getRelatedIndexes', () => {
           unique: true,
           key: { actorId: 1 },
           name: 'actorId_1',
-          ns: 'mongoose_test.some_collection',
-          background: true
+          ns: 'mongoose_test.some_collection'
         },
         {
           unique: true,
           key: { boughtAt: 1 },
           name: 'boughtAt_1',
           ns: 'mongoose_test.some_collection',
-          partialFilterExpression: { __t: 'BuyEvent' },
-          background: true
+          partialFilterExpression: { __t: 'BuyEvent' }
         },
         {
           unique: true,
           key: { clickedAt: 1 },
           name: 'clickedAt_1',
           ns: 'mongoose_test.some_collection',
-          partialFilterExpression: { __t: 'ClickEvent' },
-          background: true
+          partialFilterExpression: { __t: 'ClickEvent' }
         }
       ];
 
@@ -416,8 +403,7 @@ describe('getRelatedIndexes', () => {
             key: { boughtAt: 1 },
             name: 'boughtAt_1',
             ns: 'mongoose_test.some_collection',
-            partialFilterExpression: { __t: 'BuyEvent' },
-            background: true
+            partialFilterExpression: { __t: 'BuyEvent' }
           }
         ]
       );

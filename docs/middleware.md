@@ -128,19 +128,17 @@ childSchema.pre('findOneAndUpdate', function() {
 
 ## Pre {#pre}
 
-Pre middleware functions are executed one after another, when each
-middleware calls `next`.
+Pre middleware functions are executed one after another.
 
 ```javascript
 const schema = new Schema({ /* ... */ });
-schema.pre('save', function(next) {
+schema.pre('save', function() {
   // do stuff
-  next();
 });
 ```
 
-In [mongoose 5.x](http://thecodebarbarian.com/introducing-mongoose-5.html#promises-and-async-await-with-middleware), instead of calling `next()` manually, you can use a
-function that returns a promise. In particular, you can use [`async/await`](http://thecodebarbarian.com/common-async-await-design-patterns-in-node.js.html).
+You can also use a function that returns a promise, including async functions.
+Mongoose will wait until the promise resolves to move on to the next middleware.
 
 ```javascript
 schema.pre('save', function() {
@@ -153,33 +151,22 @@ schema.pre('save', async function() {
   await doStuff();
   await doMoreStuff();
 });
-```
 
-If you use `next()`, the `next()` call does **not** stop the rest of the code in your middleware function from executing. Use
-[the early `return` pattern](https://www.bennadel.com/blog/2323-use-a-return-statement-when-invoking-callbacks-especially-in-a-guard-statement.htm)
-to prevent the rest of your middleware function from running when you call `next()`.
-
-```javascript
-const schema = new Schema({ /* ... */ });
-schema.pre('save', function(next) {
-  if (foo()) {
-    console.log('calling next!');
-    // `return next();` will make sure the rest of this function doesn't run
-    /* return */ next();
-  }
-  // Unless you comment out the `return` above, 'after next' will print
-  console.log('after next');
+schema.pre('save', function() {
+  // Will execute **after** `await doMoreStuff()` is done
 });
 ```
 
 ### Use Cases
 
-Middleware are useful for atomizing model logic. Here are some other ideas:
+Middleware is useful for atomizing model logic. Here are some other ideas:
 
 * complex validation
 * removing dependent documents (removing a user removes all their blogposts)
 * asynchronous defaults
 * asynchronous tasks that a certain action triggers
+* updating denormalized data on other documents
+* saving change records
 
 ### Errors in Pre Hooks {#error-handling}
 
@@ -189,11 +176,9 @@ and/or reject the returned promise. There are several ways to report an
 error in middleware:
 
 ```javascript
-schema.pre('save', function(next) {
+schema.pre('save', function() {
   const err = new Error('something went wrong');
-  // If you call `next()` with an argument, that argument is assumed to be
-  // an error.
-  next(err);
+  throw err;
 });
 
 schema.pre('save', function() {
@@ -223,9 +208,6 @@ try {
   console.log(err.message); // something went wrong
 }
 ```
-
-Calling `next()` multiple times is a no-op. If you call `next()` with an
-error `err1` and then throw an error `err2`, mongoose will report `err1`.
 
 ## Post middleware {#post}
 
@@ -375,16 +357,13 @@ const User = mongoose.model('User', userSchema);
 await User.findOneAndUpdate({ name: 'John' }, { $set: { age: 30 } });
 ```
 
-For document middleware, like `pre('save')`, Mongoose passes the 1st parameter to `save()` as the 2nd argument to your `pre('save')` callback.
-You should use the 2nd argument to get access to the `save()` call's `options`, because Mongoose documents don't store all the options you can pass to `save()`.
+Mongoose also passes the 1st parameter to the hooked function, like `save()`, as the 1st argument to your `pre('save')` function.
+You should use the argument to get access to the `save()` call's `options`, because Mongoose documents don't store all the options you can pass to `save()`.
 
 ```javascript
 const userSchema = new Schema({ name: String, age: Number });
-userSchema.pre('save', function(next, options) {
+userSchema.pre('save', function(options) {
   options.validateModifiedOnly; // true
-
-  // Remember to call `next()` unless you're using an async function or returning a promise
-  next();
 });
 const User = mongoose.model('User', userSchema);
 
@@ -515,10 +494,9 @@ await Model.updateOne({}, { $set: { name: 'test' } });
 
 ## Error Handling Middleware {#error-handling-middleware}
 
-Middleware execution normally stops the first time a piece of middleware
-calls `next()` with an error. However, there is a special kind of post
-middleware called "error handling middleware" that executes specifically
-when an error occurs. Error handling middleware is useful for reporting
+Middleware execution normally stops the first time a piece of middleware throws an error, or returns a promise that rejects.
+However, there is a special kind of post middleware called "error handling middleware" that executes specifically when an error occurs.
+Error handling middleware is useful for reporting
 errors and making error messages more readable.
 
 Error handling middleware is defined as middleware that takes one extra
@@ -555,13 +533,13 @@ errors.
 
 ```javascript
 // The same E11000 error can occur when you call `updateOne()`
-// This function **must** take 4 parameters.
+// This function **must** take exactly 3 parameters.
 
-schema.post('updateOne', function(passRawResult, error, res, next) {
+schema.post('updateOne', function(error, res, next) {
   if (error.name === 'MongoServerError' && error.code === 11000) {
-    next(new Error('There was a duplicate key error'));
+    throw new Error('There was a duplicate key error');
   } else {
-    next(); // The `updateOne()` call will still error out.
+    next();
   }
 });
 
@@ -572,9 +550,8 @@ await Person.create(people);
 await Person.updateOne({ name: 'Slash' }, { $set: { name: 'Axl Rose' } });
 ```
 
-Error handling middleware can transform an error, but it can't remove the
-error. Even if you call `next()` with no error as shown above, the
-function call will still error out.
+Error handling middleware can transform an error, but it can't remove the error.
+Even if the error handling middleware succeeds, the function call will still error out.
 
 ## Aggregation Hooks {#aggregate}
 
@@ -600,10 +577,9 @@ pipeline from middleware.
 
 ## Synchronous Hooks {#synchronous}
 
-Certain Mongoose hooks are synchronous, which means they do **not** support
-functions that return promises or receive a `next()` callback. Currently,
-only `init` hooks are synchronous, because the [`init()` function](api/document.html#document_Document-init)
-is synchronous. Below is an example of using pre and post init hooks.
+Certain Mongoose hooks are synchronous, which means they do **not** support functions that return promises.
+Currently, only `init` hooks are synchronous, because the [`init()` function](api/document.html#document_Document-init) is synchronous.
+Below is an example of using pre and post init hooks.
 
 ```acquit
 [require:post init hooks.*success]

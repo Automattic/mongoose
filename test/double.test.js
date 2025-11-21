@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const start = require('./common');
-const BSON = require('bson');
+const BSON = require('mongodb/lib/bson');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -281,10 +281,9 @@ describe('Double', function() {
         assert.ok(err);
         assert.ok(err.errors['myDouble']);
         assert.equal(err.errors['myDouble'].name, 'CastError');
-        assert.ok(
-          err.errors['myDouble'].message.startsWith(
-            'Cast to Double failed for value "helloworld" (type string) at path "myDouble"'
-          )
+        assert.match(
+          err.errors['myDouble'].message,
+          /^Cast to Double failed for value "helloworld" \(type string\) at path "myDouble"/
         );
       });
     });

@@ -217,11 +217,12 @@ declare module 'mongoose' {
     translateAliases?: boolean;
 
     /**
-     * Mongoose queries currently store an `_executionStack` property that stores the stack trace
-     * of where the query was originally executed for debugging `Query was already executed` errors.
-     * This behavior can cause performance issues with bundlers and source maps. Set this option to
-     * `true` to disable Mongoose query stack trace collection.
+     * If `true`, allows passing update pipelines (arrays) to update operations by default
+     * without explicitly setting `updatePipeline: true` in each query. This is the global
+     * default for the `updatePipeline` query option.
+     *
+     * @default false
      */
-    skipOriginalStackTraces?: boolean;
+    updatePipeline?: boolean;
   }
 }

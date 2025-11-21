@@ -25,6 +25,6 @@ jobs:
         run: npm install
 
       - name: Dry run publish with provenance
-        run: npm publish --provenance --access public --tag next
+        run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

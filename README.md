@@ -13,7 +13,7 @@ Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed 
 
 The official documentation website is [mongoosejs.com](http://mongoosejs.com/).
 
-Mongoose 8.0.0 was released on October 31, 2023. You can find more details on [backwards breaking changes in 8.0.0 on our docs site](https://mongoosejs.com/docs/migrating_to_8.html).
+Mongoose 9.0.0 was released on November 21, 2025. You can find more details on [backwards breaking changes in 9.0.0 on our docs site](https://mongoosejs.com/docs/migrating_to_9.html).
 
 ## Support
 

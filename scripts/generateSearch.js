@@ -71,10 +71,12 @@ function generateContents() {
         el = $(el);
         const title = el.text();
         const html = el.nextUntil('h3').html();
+        const id = el.prop('id');
+        const baseUrl = filename.replace('.md', '.html').replace(/^docs/, '');
         const content = new Content({
           title: `${file.title}: ${title}`,
           body: html,
-          url: `${filename.replace('.md', '.html').replace(/^docs/, '')}#${el.prop('id')}`
+          url: id ? `${baseUrl}#${id}` : baseUrl
         });
 
         content.validateSync();
@@ -102,10 +104,12 @@ function generateContents() {
         el = $(el);
         const title = el.text();
         const html = el.nextUntil('h3').html();
+        const id = el.prop('id');
+        const baseUrl = filename.replace('.pug', '.html').replace(/^docs/, '');
         const content = new Content({
           title: `${file.title}: ${title}`,
           body: html,
-          url: `${filename.replace('.pug', '.html').replace(/^docs/, '')}#${el.prop('id')}`
+          url: id ? `${baseUrl}#${id}` : baseUrl
         });
 
         content.validateSync();

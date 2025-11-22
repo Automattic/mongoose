@@ -269,7 +269,7 @@ function processFile(props) {
     if ('constructor' in ctx && ctx.constructor === undefined) {
       ctx.constructorWasUndefined = true;
     }
-
+    if (!prop.tags) continue;
     for (const __tag of prop.tags) {
       // the following has been done, because otherwise no type could be applied for intellisense
       /** @type {TagObject} */

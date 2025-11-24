@@ -21,7 +21,7 @@ conn.readyState === 99;
 expectError(conn.readyState = 0);
 
 expectType<Promise<Record<string, Error | mongodb.Collection<any>>>>(
-  conn.createCollections()
+    conn.createCollections()
 );
 
 expectType<Connection>(new Connection());
@@ -45,18 +45,18 @@ expectType<mongodb.Db | undefined>(conn.db);
 expectType<mongodb.MongoClient>(conn.getClient());
 expectType<Connection>(conn.setClient(new mongodb.MongoClient('mongodb://127.0.0.1:27017/test')));
 
-expectType<Promise<string>>(conn.transaction(async(res) => {
-  expectType<mongodb.ClientSession>(res);
-  return 'a';
+expectType<Promise<string>>(conn.transaction(async (res) => {
+    expectType<mongodb.ClientSession>(res);
+    return 'a';
 }));
-expectType<Promise<string>>(conn.transaction(async(res) => {
-  expectType<mongodb.ClientSession>(res);
-  return 'a';
+expectType<Promise<string>>(conn.transaction(async (res) => {
+    expectType<mongodb.ClientSession>(res);
+    return 'a';
 }, { readConcern: 'majority' }));
 
-expectType<Promise<string>>(conn.withSession(async(res) => {
-  expectType<mongodb.ClientSession>(res);
-  return 'a';
+expectType<Promise<string>>(conn.withSession(async (res) => {
+    expectType<mongodb.ClientSession>(res);
+    return 'a';
 }));
 
 expectError(conn.user = 'invalid');
@@ -80,95 +80,101 @@ expectType<Connection>(conn.useDb('test', { noListener: true }));
 expectType<Connection>(conn.useDb('test', { useCache: true }));
 
 expectType<Promise<string[]>>(
-  conn.listCollections().then(collections => collections.map(coll => coll.name))
+    conn.listCollections().then(collections => collections.map(coll => coll.name))
 );
 
 expectType<Promise<string[]>>(
-  conn.listDatabases().then(dbs => dbs.databases.map(db => db.name))
+    conn.listDatabases().then(dbs => dbs.databases.map(db => db.name))
 );
 
 export function autoTypedModelConnection() {
-  const AutoTypedSchema = autoTypedSchema();
-  const AutoTypedModel = connection.model('AutoTypeModelConnection', AutoTypedSchema);
+    const AutoTypedSchema = autoTypedSchema();
+    const AutoTypedModel = connection.model('AutoTypeModelConnection', AutoTypedSchema);
 
-  (async() => {
-  // Model-functions-test
-  // Create should works with arbitrary objects.
-    const randomObject = await AutoTypedModel.create({ unExistKey: 'unExistKey', description: 'st' });
-    expectType<AutoTypedSchemaType['schema']['userName']>(randomObject.userName);
+    (async () => {
+        // Model-functions-test
+        // Create should works with arbitrary objects.
+        const randomObject = await AutoTypedModel.create({ unExistKey: 'unExistKey', description: 'st' });
+        expectType<AutoTypedSchemaType['schema']['userName']>(randomObject.userName);
 
-    const testDoc1 = await AutoTypedModel.create({ userName: 'M0_0a' });
-    expectType<AutoTypedSchemaType['schema']['userName']>(testDoc1.userName);
-    expectType<AutoTypedSchemaType['schema']['description']>(testDoc1.description);
+        const testDoc1 = await AutoTypedModel.create({ userName: 'M0_0a' });
+        expectType<AutoTypedSchemaType['schema']['userName']>(testDoc1.userName);
+        expectType<AutoTypedSchemaType['schema']['description']>(testDoc1.description);
 
-    const testDoc2 = await AutoTypedModel.insertMany([{ userName: 'M0_0a' }]);
-    expectType<AutoTypedSchemaType['schema']['userName']>(testDoc2[0].userName);
-    expectType<AutoTypedSchemaType['schema']['description'] | undefined>(testDoc2[0]?.description);
+        const testDoc2 = await AutoTypedModel.insertMany([{ userName: 'M0_0a' }]);
+        expectType<AutoTypedSchemaType['schema']['userName']>(testDoc2[0].userName);
+        expectType<AutoTypedSchemaType['schema']['description'] | undefined>(testDoc2[0]?.description);
 
-    const testDoc3 = await AutoTypedModel.findOne({ userName: 'M0_0a' });
-    expectType<AutoTypedSchemaType['schema']['userName'] | undefined>(testDoc3?.userName);
-    expectType<AutoTypedSchemaType['schema']['description'] | undefined>(testDoc3?.description);
+        const testDoc3 = await AutoTypedModel.findOne({ userName: 'M0_0a' });
+        expectType<AutoTypedSchemaType['schema']['userName'] | undefined>(testDoc3?.userName);
+        expectType<AutoTypedSchemaType['schema']['description'] | undefined>(testDoc3?.description);
 
-    // Model-statics-functions-test
-    expectType<ReturnType<AutoTypedSchemaType['statics']['staticFn']>>(AutoTypedModel.staticFn());
+        // Model-statics-functions-test
+        expectType<ReturnType<AutoTypedSchemaType['statics']['staticFn']>>(AutoTypedModel.staticFn());
+    })();
 
-  })();
-  return AutoTypedModel;
+    return AutoTypedModel;
 }
 
 function schemaInstanceMethodsAndQueryHelpersOnConnection() {
-  type UserModelQuery = Query<any, HydratedDocument<User>, UserQueryHelpers> & UserQueryHelpers;
-  interface UserQueryHelpers {
-    byName(this: UserModelQuery, name: string): this
-  }
-  interface User {
-    name: string;
-  }
-  interface UserInstanceMethods {
-    doSomething(this: HydratedDocument<User>): string;
-  }
-  interface UserStaticMethods {
-    findByName(name: string): Promise<HydratedDocument<User>>;
-  }
-  type UserModel = Model<User, UserQueryHelpers, UserInstanceMethods> & UserStaticMethods;
-
-  const userSchema = new Schema<User, UserModel, UserInstanceMethods, UserQueryHelpers, any, UserStaticMethods>({
-    name: String
-  }, {
-    statics: {
-      findByName(name: string) {
-        return connection.model('User').findOne({ name }).orFail();
-      }
-    },
-    methods: {
-      doSomething() {
-        return 'test';
-      }
-    },
-    query: {
-      byName(this: UserModelQuery, name: string) {
-        return this.where({ name });
-      }
+    type UserModelQuery = Query<any, HydratedDocument<User>, UserQueryHelpers> & UserQueryHelpers;
+    interface UserQueryHelpers {
+        byName(this: UserModelQuery, name: string): this;
     }
-  });
+    interface User {
+        name: string;
+    }
+    interface UserInstanceMethods {
+        doSomething(this: HydratedDocument<User>): string;
+    }
+    interface UserStaticMethods {
+        findByName(name: string): Promise<HydratedDocument<User>>;
+    }
+    type UserModel = Model<User, UserQueryHelpers, UserInstanceMethods> & UserStaticMethods;
 
-  const TestModel = connection.model<User, UserModel, UserQueryHelpers>('User', userSchema);
+    const userSchema = new Schema<User, UserModel, UserInstanceMethods, UserQueryHelpers, any, UserStaticMethods>({
+        name: String
+    }, {
+        statics: {
+            findByName(name: string) {
+                return connection.model('User').findOne({ name }).orFail();
+            }
+        },
+        methods: {
+            doSomething() {
+                return 'test';
+            }
+        },
+        query: {
+            byName(this: UserModelQuery, name: string) {
+                return this.where({ name });
+            }
+        }
+    });
+
+    const TestModel = connection.model<User, UserModel, UserQueryHelpers>('User', userSchema);
 }
 
 async function gh15359() {
-  const res = await conn.bulkWrite([{ model: 'Test', name: 'insertOne', document: { name: 'test1' } }]);
-  expectType<number>(res.insertedCount);
-  expectError(res.mongoose.validationErrors);
+    const res = await conn.bulkWrite([{ model: 'Test', name: 'insertOne', document: { name: 'test1' } }]);
+    expectType<number>(res.insertedCount);
+    expectError(res.mongoose.validationErrors);
 
-  const res2 = await conn.bulkWrite([{ model: 'Test', name: 'insertOne', document: { name: 'test2' } }], { ordered: false });
-  expectType<number>(res2.insertedCount);
-  expectType<Error[] | undefined>(res2.mongoose?.validationErrors);
+    const res2 = await conn.bulkWrite(
+        [{ model: 'Test', name: 'insertOne', document: { name: 'test2' } }],
+        { ordered: false }
+    );
+    expectType<number>(res2.insertedCount);
+    expectType<Error[] | undefined>(res2.mongoose?.validationErrors);
 
-  const res3 = await conn.bulkWrite([
-    { model: 'Test', name: 'updateOne', filter: { name: 'test5' }, update: { $set: { num: 42 } } },
-    { model: 'Test', name: 'updateOne', filter: { name: 'test4' }, update: { $set: { num: 'not a number' } } }
-  ], { ordered: false });
-  expectType<number>(res3.insertedCount);
-  expectError((res3 as typeof res3 & { validationErrors?: unknown }).validationErrors);
-  expectType<Error[] | undefined>(res3.mongoose?.validationErrors);
+    const res3 = await conn.bulkWrite(
+        [
+            { model: 'Test', name: 'updateOne', filter: { name: 'test5' }, update: { $set: { num: 42 } } },
+            { model: 'Test', name: 'updateOne', filter: { name: 'test4' }, update: { $set: { num: 'not a number' } } }
+        ],
+        { ordered: false }
+    );
+    expectType<number>(res3.insertedCount);
+    expectError((res3 as typeof res3 & { validationErrors?: unknown }).validationErrors);
+    expectType<Error[] | undefined>(res3.mongoose?.validationErrors);
 }

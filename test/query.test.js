@@ -6,7 +6,7 @@
 
 const start = require('./common');
 
-const { EJSON } = require('bson');
+const { EJSON } = require('mongodb/lib/bson');
 const Query = require('../lib/query');
 const assert = require('assert');
 const util = require('./util');
@@ -446,75 +446,6 @@ describe('Query', function() {
     });
   });
 
-  describe('within', function() {
-    describe('box', function() {
-      it('via where', function() {
-        const query = new Query({});
-        query.where('gps').within().box({ ll: [5, 25], ur: [10, 30] });
-        const match = { gps: { $within: { $box: [[5, 25], [10, 30]] } } };
-        if (Query.use$geoWithin) {
-          match.gps.$geoWithin = match.gps.$within;
-          delete match.gps.$within;
-        }
-        assert.deepEqual(query._conditions, match);
-
-      });
-      it('via where, no object', function() {
-        const query = new Query({});
-        query.where('gps').within().box([5, 25], [10, 30]);
-        const match = { gps: { $within: { $box: [[5, 25], [10, 30]] } } };
-        if (Query.use$geoWithin) {
-          match.gps.$geoWithin = match.gps.$within;
-          delete match.gps.$within;
-        }
-        assert.deepEqual(query._conditions, match);
-
-      });
-    });
-
-    describe('center', function() {
-      it('via where', function() {
-        const query = new Query({});
-        query.where('gps').within().center({ center: [5, 25], radius: 5 });
-        const match = { gps: { $within: { $center: [[5, 25], 5] } } };
-        if (Query.use$geoWithin) {
-          match.gps.$geoWithin = match.gps.$within;
-          delete match.gps.$within;
-        }
-        assert.deepEqual(query._conditions, match);
-
-      });
-    });
-
-    describe('centerSphere', function() {
-      it('via where', function() {
-        const query = new Query({});
-        query.where('gps').within().centerSphere({ center: [5, 25], radius: 5 });
-        const match = { gps: { $within: { $centerSphere: [[5, 25], 5] } } };
-        if (Query.use$geoWithin) {
-          match.gps.$geoWithin = match.gps.$within;
-          delete match.gps.$within;
-        }
-        assert.deepEqual(query._conditions, match);
-
-      });
-    });
-
-    describe('polygon', function() {
-      it('via where', function() {
-        const query = new Query({});
-        query.where('gps').within().polygon({ a: { x: 10, y: 20 }, b: { x: 15, y: 25 }, c: { x: 20, y: 20 } });
-        const match = { gps: { $within: { $polygon: [{ a: { x: 10, y: 20 }, b: { x: 15, y: 25 }, c: { x: 20, y: 20 } }] } } };
-        if (Query.use$geoWithin) {
-          match.gps.$geoWithin = match.gps.$within;
-          delete match.gps.$within;
-        }
-        assert.deepEqual(query._conditions, match);
-
-      });
-    });
-  });
-
   describe('exists', function() {
     it('0 args via where', function() {
       const query = new Query({});
@@ -571,7 +502,7 @@ describe('Query', function() {
 
       try {
         q.find();
-      } catch (err) {
+      } catch {
         threw = true;
       }
 
@@ -1923,9 +1854,8 @@ describe('Query', function() {
       ];
 
       ops.forEach(function(op) {
-        TestSchema.pre(op, function(next) {
+        TestSchema.pre(op, function() {
           this.error(new Error(op + ' error'));
-          next();
         });
       });
 
@@ -3094,7 +3024,6 @@ describe('Query', function() {
   it('throws an error if executed multiple times (gh-7398)', async function() {
     const Test = db.model('Test', Schema({ name: String }));
 
-
     const q = Test.findOne();
 
     await q;
@@ -3103,7 +3032,6 @@ describe('Query', function() {
     assert.ok(err);
     assert.equal(err.name, 'MongooseError');
     assert.equal(err.message, 'Query was already executed: Test.findOne({})');
-    assert.ok(err.originalStack);
 
     err = await q.clone().then(() => null, err => err);
     assert.ifError(err);
@@ -3329,7 +3257,6 @@ describe('Query', function() {
       quiz_title: String,
       questions: [questionSchema]
     }, { strict: 'throw' });
-    const Quiz = db.model('Test', quizSchema);
 
     const mcqQuestionSchema = new Schema({
       text: String,
@@ -3337,6 +3264,7 @@ describe('Query', function() {
     }, { strict: 'throw' });
 
     quizSchema.path('questions').discriminator('mcq', mcqQuestionSchema);
+    const Quiz = db.model('Test', quizSchema);
 
     const id1 = new mongoose.Types.ObjectId();
     const id2 = new mongoose.Types.ObjectId();
@@ -4213,7 +4141,7 @@ describe('Query', function() {
     });
     const Test = db.model('Test', schema);
 
-    const BookHolder = schema.path('bookHolder').caster;
+    const BookHolder = schema.path('bookHolder').Constructor;
 
     await Test.collection.insertOne({
       title: 'test-defaults-disabled',
@@ -4426,6 +4354,52 @@ describe('Query', function() {
     });
   });
 
+  it('throws an error if calling find(null), findOne(null), updateOne(null, update), etc. (gh-14948)', async function() {
+    const userSchema = new Schema({
+      name: String
+    });
+    const UserModel = db.model('User', userSchema);
+    await UserModel.deleteMany({});
+    await UserModel.updateOne({ name: 'test' }, { name: 'test' }, { upsert: true });
+
+    await assert.rejects(
+      () => UserModel.find(null),
+      /ObjectParameterError: Parameter "filter" to find\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.findOne(null),
+      /ObjectParameterError: Parameter "filter" to findOne\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.findOneAndUpdate(null, { name: 'test2' }),
+      /ObjectParameterError: Parameter "filter" to findOneAndUpdate\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.findOneAndReplace(null, { name: 'test2' }),
+      /ObjectParameterError: Parameter "filter" to findOneAndReplace\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.findOneAndDelete(null),
+      /ObjectParameterError: Parameter "filter" to findOneAndDelete\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.updateOne(null, { name: 'test2' }),
+      /ObjectParameterError: Parameter "filter" to updateOne\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.updateMany(null, { name: 'test2' }),
+      /ObjectParameterError: Parameter "filter" to updateMany\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.deleteOne(null),
+      /ObjectParameterError: Parameter "filter" to deleteOne\(\) must be an object, got "null"/
+    );
+    await assert.rejects(
+      () => UserModel.deleteMany(null),
+      /ObjectParameterError: Parameter "filter" to deleteMany\(\) must be an object, got "null"/
+    );
+  });
+
   describe('findById(andUpdate/andDelete)', function() {
     let Person;
     let _id;
@@ -4465,6 +4439,7 @@ describe('Query', function() {
       assert.strictEqual(deletedTarget?.name, targetName);
 
       const target = await Person.find({}).findById(_id);
+
       assert.strictEqual(target, null);
     });
   });
@@ -4547,7 +4522,7 @@ describe('Query', function() {
       it('throws error for null filter when requireFilter is true', async function() {
         await assert.rejects(
           Person.findOneAndUpdate(null, { name: 'Updated' }, { requireFilter: true }),
-          /Empty or invalid filter not allowed with requireFilter enabled/
+          /Parameter "filter" to findOneAndUpdate\(\) must be an object, got "null"/
         );
       });
 
@@ -4609,7 +4584,7 @@ describe('Query', function() {
       it('throws error for null filter when requireFilter is true', async function() {
         await assert.rejects(
           Person.findOneAndReplace(null, { name: 'Replaced', email: 'replaced@example.com' }, { requireFilter: true }),
-          /Empty or invalid filter not allowed with requireFilter enabled/
+          /Parameter "filter" to findOneAndReplace\(\) must be an object, got "null"/
         );
       });
 
@@ -4672,7 +4647,7 @@ describe('Query', function() {
       it('throws error for null filter when requireFilter is true', async function() {
         await assert.rejects(
           Person.findOneAndDelete(null, { requireFilter: true }),
-          /Empty or invalid filter not allowed with requireFilter enabled/
+          /Parameter "filter" to findOneAndDelete\(\) must be an object, got "null"/
         );
       });
 
@@ -4736,7 +4711,7 @@ describe('Query', function() {
       it('throws error for null filter when requireFilter is true', async function() {
         await assert.rejects(
           Person.updateOne(null, { name: 'Updated' }, { requireFilter: true }),
-          /Empty or invalid filter not allowed with requireFilter enabled/
+          /Parameter "filter" to updateOne\(\) must be an object, got "null"/
         );
       });
 
@@ -4806,7 +4781,7 @@ describe('Query', function() {
       it('throws error for null filter when requireFilter is true', async function() {
         await assert.rejects(
           Person.updateMany(null, { name: 'Updated' }, { requireFilter: true }),
-          /Empty or invalid filter not allowed with requireFilter enabled/
+          /Parameter "filter" to updateMany\(\) must be an object, got "null"/
         );
       });
 
@@ -4872,7 +4847,7 @@ describe('Query', function() {
       it('throws error for null filter when requireFilter is true', async function() {
         await assert.rejects(
           Person.deleteOne(null, { requireFilter: true }),
-          /Empty or invalid filter not allowed with requireFilter enabled/
+          /Parameter "filter" to deleteOne\(\) must be an object, got "null"/
         );
       });
 
@@ -4940,7 +4915,7 @@ describe('Query', function() {
       it('throws error for null filter when requireFilter is true', async function() {
         await assert.rejects(
           Person.deleteMany(null, { requireFilter: true }),
-          /Empty or invalid filter not allowed with requireFilter enabled/
+          /Parameter "filter" to deleteMany\(\) must be an object, got "null"/
         );
       });
 

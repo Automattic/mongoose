@@ -408,9 +408,8 @@ describe('Model', function() {
       name: String
     });
 
-    childSchema.pre('save', function(next) {
+    childSchema.pre('save', function() {
       child_hook = this.name;
-      next();
     });
 
     const parentSchema = new Schema({
@@ -418,9 +417,8 @@ describe('Model', function() {
       children: [childSchema]
     });
 
-    parentSchema.pre('save', function(next) {
+    parentSchema.pre('save', function() {
       parent_hook = this.name;
-      next();
     });
 
     const Parent = db.model('Parent', parentSchema);
@@ -558,7 +556,7 @@ describe('Model', function() {
       let post;
       try {
         post = new BlogPost({ date: 'Test', meta: { date: 'Test' } });
-      } catch (e) {
+      } catch {
         threw = true;
       }
 
@@ -566,7 +564,7 @@ describe('Model', function() {
 
       try {
         post.set('title', 'Test');
-      } catch (e) {
+      } catch {
         threw = true;
       }
 
@@ -591,7 +589,7 @@ describe('Model', function() {
             date: 'Test'
           }
         });
-      } catch (e) {
+      } catch {
         threw = true;
       }
 
@@ -599,7 +597,7 @@ describe('Model', function() {
 
       try {
         post.set('meta.date', 'Test');
-      } catch (e) {
+      } catch {
         threw = true;
       }
 
@@ -657,7 +655,7 @@ describe('Model', function() {
         post.get('comments').push({
           date: 'Bad date'
         });
-      } catch (e) {
+      } catch {
         threw = true;
       }
 
@@ -1016,11 +1014,10 @@ describe('Model', function() {
           baz: { type: String }
         });
 
-        ValidationMiddlewareSchema.pre('validate', function(next) {
+        ValidationMiddlewareSchema.pre('validate', function() {
           if (this.get('baz') === 'bad') {
             this.invalidate('baz', 'bad');
           }
-          next();
         });
 
         Post = db.model('Test', ValidationMiddlewareSchema);
@@ -1313,7 +1310,7 @@ describe('Model', function() {
           JSON.stringify(meta);
           getter1 = JSON.stringify(post.get('meta'));
           getter2 = JSON.stringify(post.meta);
-        } catch (err) {
+        } catch {
           threw = true;
         }
 
@@ -2096,14 +2093,12 @@ describe('Model', function() {
         const schema = new Schema({ name: String });
         let called = 0;
 
-        schema.pre('save', function(next) {
+        schema.pre('save', function() {
           called++;
-          next(undefined);
         });
 
-        schema.pre('save', function(next) {
+        schema.pre('save', function() {
           called++;
-          next(null);
         });
 
         const S = db.model('Test', schema);
@@ -2115,22 +2110,19 @@ describe('Model', function() {
 
       it('called on all sub levels', async function() {
         const grandSchema = new Schema({ name: String });
-        grandSchema.pre('save', function(next) {
+        grandSchema.pre('save', function() {
           this.name = 'grand';
-          next();
         });
 
         const childSchema = new Schema({ name: String, grand: [grandSchema] });
-        childSchema.pre('save', function(next) {
+        childSchema.pre('save', function() {
           this.name = 'child';
-          next();
         });
 
         const schema = new Schema({ name: String, child: [childSchema] });
 
-        schema.pre('save', function(next) {
+        schema.pre('save', function() {
           this.name = 'parent';
-          next();
         });
 
         const S = db.model('Test', schema);
@@ -2144,20 +2136,23 @@ describe('Model', function() {
 
       it('error on any sub level', async function() {
         const grandSchema = new Schema({ name: String });
-        grandSchema.pre('save', function(next) {
-          next(new Error('Error 101'));
+        grandSchema.pre('save', function() {
+          throw new Error('Error 101');
         });
 
         const childSchema = new Schema({ name: String, grand: [grandSchema] });
-        childSchema.pre('save', function(next) {
+        childSchema.pre('save', function() {
           this.name = 'child';
-          next();
         });
 
+        let schemaPostSaveCalls = 0;
         const schema = new Schema({ name: String, child: [childSchema] });
-        schema.pre('save', function(next) {
+        schema.pre('save', function() {
           this.name = 'parent';
-          next();
+        });
+        schema.post('save', function testSchemaPostSave(err, res, next) {
+          ++schemaPostSaveCalls;
+          next(err);
         });
 
         const S = db.model('Test', schema);
@@ -2165,6 +2160,7 @@ describe('Model', function() {
 
         const err = await s.save().then(() => null, err => err);
         assert.equal(err.message, 'Error 101');
+        assert.equal(schemaPostSaveCalls, 1);
       });
 
       describe('init', function() {
@@ -2397,7 +2393,7 @@ describe('Model', function() {
       let threw = false;
       try {
         new P({ path: 'i should not throw' });
-      } catch (err) {
+      } catch {
         threw = true;
       }
 
@@ -2474,8 +2470,8 @@ describe('Model', function() {
     describe('when no callback is passed', function() {
       it('should emit error on its Model when there are listeners', async function() {
         const DefaultErrSchema = new Schema({});
-        DefaultErrSchema.pre('save', function(next) {
-          next(new Error());
+        DefaultErrSchema.pre('save', function() {
+          throw new Error();
         });
 
         const DefaultErr = db.model('Test', DefaultErrSchema);
@@ -5112,23 +5108,10 @@ describe('Model', function() {
         );
       });
 
-      it('syncIndexes() allows overwriting `background` option (gh-8645)', async function() {
-        const opts = { autoIndex: false };
-        const schema = new Schema({ name: String }, opts);
-        schema.index({ name: 1 }, { background: true });
-
-        const M = db.model('Test', schema);
-        await M.syncIndexes({ background: false });
-
-        const indexes = await M.listIndexes();
-        assert.deepEqual(indexes[1].key, { name: 1 });
-        assert.strictEqual(indexes[1].background, false);
-      });
-
       it('syncIndexes() does not call createIndex for indexes that already exist', async function() {
         const opts = { autoIndex: false };
         const schema = new Schema({ name: String }, opts);
-        schema.index({ name: 1 }, { background: true });
+        schema.index({ name: 1 });
 
         const M = db.model('Test', schema);
         await M.syncIndexes();
@@ -5247,9 +5230,9 @@ describe('Model', function() {
         const BuyEvent = Event.discriminator('BuyEvent', buyEventSchema);
 
         // Act
-        const droppedByEvent = await Event.syncIndexes({ background: false });
-        const droppedByClickEvent = await ClickEvent.syncIndexes({ background: false });
-        const droppedByBuyEvent = await BuyEvent.syncIndexes({ background: false });
+        const droppedByEvent = await Event.syncIndexes();
+        const droppedByClickEvent = await ClickEvent.syncIndexes();
+        const droppedByBuyEvent = await BuyEvent.syncIndexes();
 
         const eventIndexes = await Event.listIndexes();
 
@@ -6079,9 +6062,8 @@ describe('Model', function() {
     };
 
     let called = 0;
-    schema.pre('aggregate', function(next) {
+    schema.pre('aggregate', function() {
       ++called;
-      next();
     });
     const Model = db.model('Test', schema);
 
@@ -6108,9 +6090,8 @@ describe('Model', function() {
     };
 
     let called = 0;
-    schema.pre('insertMany', function(next) {
+    schema.pre('insertMany', function() {
       ++called;
-      next();
     });
     const Model = db.model('Test', schema);
 
@@ -6133,9 +6114,8 @@ describe('Model', function() {
     };
 
     let called = 0;
-    schema.pre('save', function(next) {
+    schema.pre('save', function() {
       ++called;
-      next();
     });
 
     const Model = db.model('Test', schema);
@@ -6761,6 +6741,172 @@ describe('Model', function() {
     });
   });
 
+  describe('`updatePipeline` global option (gh-15756)', function() {
+    // Arrange
+    const originalValue = mongoose.get('updatePipeline');
+
+    afterEach(() => {
+      mongoose.set('updatePipeline', originalValue);
+    });
+
+    describe('allows update pipelines when global `updatePipeline` is `true`', function() {
+      it('works with updateOne', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: true });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act
+        await User.updateOne({ _id: createdUser._id }, [{ $set: { counter: 1 } }]);
+        const user = await User.findById(createdUser._id);
+
+        // Assert
+        assert.equal(user.counter, 1);
+      });
+
+      it('works with updateMany', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: true });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act
+        await User.updateMany({ _id: createdUser._id }, [{ $set: { counter: 2 } }]);
+        const user = await User.findById(createdUser._id);
+
+        // Assert
+        assert.equal(user.counter, 2);
+      });
+
+      it('works with findOneAndUpdate', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: true });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act
+        const user = await User.findOneAndUpdate({ _id: createdUser._id }, [{ $set: { counter: 3, name: 'Hafez3' } }], { new: true });
+
+        // Assert
+        assert.equal(user.counter, 3);
+        assert.equal(user.name, 'Hafez3');
+      });
+
+      it('works with findByIdAndUpdate', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: true });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act
+        const user = await User.findByIdAndUpdate(createdUser._id, [{ $set: { counter: 4, name: 'Hafez4' } }], { new: true });
+
+        // Assert
+        assert.equal(user.counter, 4);
+        assert.equal(user.name, 'Hafez4');
+      });
+    });
+
+    describe('explicit `updatePipeline` option overrides global setting', function() {
+      it('explicit false overrides global true for updateOne', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: true });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act & Assert
+        assert.throws(
+          () => User.updateOne({ _id: createdUser._id }, [{ $set: { counter: 1 } }], { updatePipeline: false }),
+          /Cannot pass an array to query updates unless the `updatePipeline` option is set/
+        );
+      });
+
+      it('explicit false overrides global true for findOneAndUpdate', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: true });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act & Assert
+        assert.throws(
+          () => User.findOneAndUpdate({ _id: createdUser._id }, [{ $set: { counter: 1 } }], { updatePipeline: false }),
+          /Cannot pass an array to query updates unless the `updatePipeline` option is set/
+        );
+      });
+    });
+
+    describe('throws error when global `updatePipeline` is false and no explicit option', function() {
+      it('updateOne should throw error', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: false });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act & Assert
+        assert.throws(
+          () => User.updateOne({ _id: createdUser._id }, [{ $set: { counter: 1 } }]),
+          /Cannot pass an array to query updates unless the `updatePipeline` option is set/
+        );
+      });
+
+      it('updateMany should throw error', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: false });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act & Assert
+        assert.throws(
+          () => User.updateMany({ _id: createdUser._id }, [{ $set: { counter: 1 } }]),
+          /Cannot pass an array to query updates unless the `updatePipeline` option is set/
+        );
+      });
+
+      it('findOneAndUpdate should throw error', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: false });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act & Assert
+        assert.throws(
+          () => User.findOneAndUpdate({ _id: createdUser._id }, [{ $set: { counter: 1 } }]),
+          /Cannot pass an array to query updates unless the `updatePipeline` option is set/
+        );
+      });
+    });
+
+    describe('explicit `updatePipeline: true` overrides global `updatePipeline: false`', function() {
+      it('works with updateOne', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: false });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act
+        await User.updateOne({ _id: createdUser._id }, [{ $set: { counter: 1 } }], { updatePipeline: true });
+        const user = await User.findById(createdUser._id);
+
+        // Assert
+        assert.equal(user.counter, 1);
+      });
+
+      it('works with findOneAndUpdate', async function() {
+        // Arrange
+        const { User } = createTestContext({ globalUpdatePipeline: false });
+        const createdUser = await User.create({ name: 'Hafez', counter: 0 });
+
+        // Act
+        const user = await User.findOneAndUpdate({ _id: createdUser._id }, [{ $set: { counter: 2, name: 'Hafez2' } }], { updatePipeline: true, new: true });
+
+        // Assert
+        assert.equal(user.counter, 2);
+        assert.equal(user.name, 'Hafez2');
+      });
+    });
+
+    function createTestContext({ globalUpdatePipeline }) {
+      mongoose.set('updatePipeline', globalUpdatePipeline);
+      const userSchema = new Schema({
+        name: { type: String },
+        counter: { type: Number, default: 0 }
+      });
+
+      const User = db.model('User', userSchema);
+      return { User };
+    }
+  });
+
   describe('buildBulkWriteOperations() (gh-9673)', () => {
     it('builds write operations', async() => {
 
@@ -6827,6 +6973,24 @@ describe('Model', function() {
         /bulkSave expects an array of documents to be passed/
       );
     });
+
+    it('throws an error if pre("save") middleware updates arguments (gh-15389)', async function() {
+      const userSchema = new Schema({
+        name: { type: String }
+      });
+
+      userSchema.pre('save', function() {
+        return mongoose.overwriteMiddlewareArguments({ password: 'taco' });
+      });
+
+      const User = db.model('User', userSchema);
+      const doc = new User({ name: 'Hafez' });
+      await assert.rejects(
+        () => User.bulkSave([doc]),
+        /Cannot overwrite options in pre\("save"\) hook on bulkSave\(\)/
+      );
+    });
+
     it('throws an error if one element is not a document', function() {
       const userSchema = new Schema({
         name: { type: String }
@@ -8261,9 +8425,8 @@ describe('Model', function() {
         name: String
       });
       let bypass = true;
-      testSchema.pre('findOne', function(next) {
+      testSchema.pre('findOne', function() {
         bypass = false;
-        next();
       });
       const Test = db.model('gh13250', testSchema);
       const doc = await Test.create({

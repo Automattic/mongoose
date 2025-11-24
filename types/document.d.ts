@@ -166,9 +166,6 @@ declare module 'mongoose' {
      */
     getChanges(): UpdateQuery<this>;
 
-    /** The string version of this documents _id. */
-    id?: any;
-
     /** Signal that we desire an increment of this documents version. */
     increment(): this;
 
@@ -256,33 +253,105 @@ declare module 'mongoose' {
     set(value: string | Record<string, any>): this;
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
-    toJSON(options: ToObjectOptions & { versionKey: false, virtuals: true, flattenObjectIds: true }): Omit<ObjectIdToString<FlattenMaps<Require_id<DocType & TVirtuals>>>, '__v'>;
-    toJSON(options: ToObjectOptions & { virtuals: true, flattenObjectIds: true }): ObjectIdToString<FlattenMaps<Default__v<Require_id<DocType & TVirtuals>, ResolveSchemaOptions<TSchemaOptions>>>>;
-    toJSON(options: ToObjectOptions & { versionKey: false, virtuals: true }): Omit<Require_id<DocType & TVirtuals>, '__v'>;
-    toJSON(options: ToObjectOptions & { versionKey: false, flattenObjectIds: true }): ObjectIdToString<FlattenMaps<Omit<Require_id<DocType>, '__v'>>>;
-    toJSON(options: ToObjectOptions & { virtuals: true }): Default__v<Require_id<DocType & TVirtuals>, ResolveSchemaOptions<TSchemaOptions>>;
-    toJSON(options: ToObjectOptions & { versionKey: false }): Omit<Require_id<DocType & TVirtuals>, '__v'>;
-    toJSON(options?: ToObjectOptions & { flattenMaps?: true, flattenObjectIds?: false }): FlattenMaps<Default__v<Require_id<DocType>, ResolveSchemaOptions<TSchemaOptions>>>;
-    toJSON(options: ToObjectOptions & { flattenObjectIds: false }): FlattenMaps<Default__v<Require_id<DocType>, ResolveSchemaOptions<TSchemaOptions>>>;
-    toJSON(options: ToObjectOptions & { flattenObjectIds: true }): ObjectIdToString<FlattenMaps<Default__v<Require_id<DocType>, ResolveSchemaOptions<TSchemaOptions>>>>;
-    toJSON(options: ToObjectOptions & { flattenMaps: false }): Default__v<Require_id<DocType>, ResolveSchemaOptions<TSchemaOptions>>;
-    toJSON(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: true }): ObjectIdToString<Default__v<Require_id<DocType>, ResolveSchemaOptions<TSchemaOptions>>>;
+    // Consistently handle combinations of flattenMaps, flattenObjectIds, virtuals, and versionKey
 
-    toJSON<T = Default__v<Require_id<DocType>, TSchemaOptions>>(options?: ToObjectOptions & { flattenMaps?: true, flattenObjectIds?: false }): FlattenMaps<T>;
-    toJSON<T = Default__v<Require_id<DocType>, TSchemaOptions>>(options: ToObjectOptions & { flattenObjectIds: false }): FlattenMaps<T>;
-    toJSON<T = Default__v<Require_id<DocType>, TSchemaOptions>>(options: ToObjectOptions & { flattenObjectIds: true }): ObjectIdToString<FlattenMaps<T>>;
-    toJSON<T = Default__v<Require_id<DocType>, TSchemaOptions>>(options: ToObjectOptions & { flattenMaps: false }): T;
-    toJSON<T = Default__v<Require_id<DocType>, TSchemaOptions>>(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: true }): ObjectIdToString<T>;
+    // All combinations, including with and without TVirtuals when virtuals is true/false,
+    // and proper nesting/order: flattenMaps -> ObjectIdToString -> Omit<..., '__v'> when needed.
+
+    // flattenMaps: false (default) cases
+    toJSON(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: true, virtuals: true, versionKey: false }): ObjectIdToString<Omit<Require_id<DocType & TVirtuals>, '__v'>>;
+    toJSON(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: true, virtuals: true }): ObjectIdToString<Require_id<DocType & TVirtuals>>;
+    toJSON(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: false, virtuals: true, versionKey: false }): Omit<Require_id<DocType & TVirtuals>, '__v'>;
+    toJSON(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: false, virtuals: true }): Require_id<DocType & TVirtuals>;
+    toJSON(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: true, virtuals: false, versionKey: false }): ObjectIdToString<Omit<Require_id<DocType>, '__v'>>;
+    toJSON(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: true, virtuals: false }): ObjectIdToString<Require_id<DocType>>;
+    toJSON(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: false, virtuals: false, versionKey: false }): Omit<Require_id<DocType>, '__v'>;
+    toJSON(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: false, virtuals: false }): Require_id<DocType>;
+
+    // flattenMaps: true cases
+    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: true, versionKey: false }): ObjectIdToString<Omit<FlattenMaps<Require_id<DocType & TVirtuals>>, '__v'>>;
+    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: true }): ObjectIdToString<FlattenMaps<Require_id<DocType & TVirtuals>>>;
+    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: false, virtuals: true, versionKey: false }): Omit<FlattenMaps<Require_id<DocType & TVirtuals>>, '__v'>;
+    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: false, virtuals: true }): FlattenMaps<Require_id<DocType & TVirtuals>>;
+    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: false, versionKey: false }): ObjectIdToString<Omit<FlattenMaps<Require_id<DocType>>, '__v'>>;
+    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: false }): ObjectIdToString<FlattenMaps<Require_id<DocType>>>;
+    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: false, virtuals: false, versionKey: false }): Omit<FlattenMaps<Require_id<DocType>>, '__v'>;
+    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: false, virtuals: false }): FlattenMaps<Require_id<DocType>>;
+
+    // Handle "at least" short cross-combinations
+    // (Some permutations above will catch these, but make some explicit for clarity)
+    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: true }): ObjectIdToString<FlattenMaps<Require_id<DocType & TVirtuals>>>;
+    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true }): ObjectIdToString<FlattenMaps<Require_id<DocType>>>;
+    toJSON(options: ToObjectOptions & { flattenObjectIds: true, virtuals: true }): ObjectIdToString<Require_id<DocType & TVirtuals>>;
+    toJSON(options: ToObjectOptions & { flattenObjectIds: true }): ObjectIdToString<Require_id<DocType>>;
+    toJSON(options: ToObjectOptions & { flattenMaps: true, virtuals: true }): FlattenMaps<Require_id<DocType & TVirtuals>>;
+    toJSON(options: ToObjectOptions & { flattenMaps: true }): FlattenMaps<Require_id<DocType>>;
+
+    // Handle versionKey: false (regardless of the others - most specific overloads should come first)
+    toJSON(options: ToObjectOptions & { versionKey: false, flattenMaps: true, flattenObjectIds: true, virtuals: true }): ObjectIdToString<Omit<FlattenMaps<Require_id<DocType & TVirtuals>>, '__v'>>;
+    toJSON(options: ToObjectOptions & { versionKey: false, flattenMaps: false, flattenObjectIds: true, virtuals: true }): ObjectIdToString<Omit<Require_id<DocType & TVirtuals>, '__v'>>;
+    toJSON(options: ToObjectOptions & { versionKey: false, flattenMaps: true, virtuals: true }): Omit<FlattenMaps<Require_id<DocType & TVirtuals>>, '__v'>;
+    toJSON(options: ToObjectOptions & { versionKey: false, flattenObjectIds: true, virtuals: true }): ObjectIdToString<Omit<Require_id<DocType & TVirtuals>, '__v'>>;
+    toJSON(options: ToObjectOptions & { versionKey: false, virtuals: true }): Omit<Require_id<DocType & TVirtuals>, '__v'>;
+    toJSON(options: ToObjectOptions & { versionKey: false, flattenMaps: true, flattenObjectIds: true }): ObjectIdToString<Omit<FlattenMaps<Require_id<DocType>>, '__v'>>;
+    toJSON(options: ToObjectOptions & { versionKey: false, flattenObjectIds: true }): ObjectIdToString<Omit<Require_id<DocType>, '__v'>>;
+    toJSON(options: ToObjectOptions & { versionKey: false, flattenMaps: true }): Omit<FlattenMaps<Require_id<DocType>>, '__v'>;
+    toJSON(options: ToObjectOptions & { versionKey: false }): Omit<Require_id<DocType>, '__v'>;
+
+    // Handle virtuals: true
+    toJSON(options: ToObjectOptions & { virtuals: true }): Require_id<DocType & TVirtuals>;
+
+    // Default - no special options
+    toJSON(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;
+
+    toJSON<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
-    toObject(options: ToObjectOptions & { versionKey: false, virtuals: true, flattenObjectIds: true }): Omit<ObjectIdToString<Require_id<DocType & TVirtuals>>, '__v'>;
-    toObject(options: ToObjectOptions & { virtuals: true, flattenObjectIds: true }): ObjectIdToString<Default__v<Require_id<DocType & TVirtuals>, ResolveSchemaOptions<TSchemaOptions>>>;
-    toObject(options: ToObjectOptions & { versionKey: false, flattenObjectIds: true }): Omit<ObjectIdToString<Require_id<DocType & TVirtuals>>, '__v'>;
+    // flattenMaps: false (default) cases
+    toObject(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: true, virtuals: true, versionKey: false }): ObjectIdToString<Omit<Require_id<DocType & TVirtuals>, '__v'>>;
+    toObject(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: true, virtuals: true }): ObjectIdToString<Require_id<DocType & TVirtuals>>;
+    toObject(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: false, virtuals: true, versionKey: false }): Omit<Require_id<DocType & TVirtuals>, '__v'>;
+    toObject(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: false, virtuals: true }): Require_id<DocType & TVirtuals>;
+    toObject(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: true, virtuals: false, versionKey: false }): ObjectIdToString<Omit<Require_id<DocType>, '__v'>>;
+    toObject(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: true, virtuals: false }): ObjectIdToString<Require_id<DocType>>;
+    toObject(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: false, virtuals: false, versionKey: false }): Omit<Require_id<DocType>, '__v'>;
+    toObject(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: false, virtuals: false }): Require_id<DocType>;
+
+    // flattenMaps: true cases
+    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: true, versionKey: false }): ObjectIdToString<Omit<FlattenMaps<Require_id<DocType & TVirtuals>>, '__v'>>;
+    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: true }): ObjectIdToString<FlattenMaps<Require_id<DocType & TVirtuals>>>;
+    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: false, virtuals: true, versionKey: false }): Omit<FlattenMaps<Require_id<DocType & TVirtuals>>, '__v'>;
+    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: false, virtuals: true }): FlattenMaps<Require_id<DocType & TVirtuals>>;
+    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: false, versionKey: false }): ObjectIdToString<Omit<FlattenMaps<Require_id<DocType>>, '__v'>>;
+    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: false }): ObjectIdToString<FlattenMaps<Require_id<DocType>>>;
+    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: false, virtuals: false, versionKey: false }): Omit<FlattenMaps<Require_id<DocType>>, '__v'>;
+    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: false, virtuals: false }): FlattenMaps<Require_id<DocType>>;
+
+    // Handle "at least" short cross-combinations
+    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: true }): ObjectIdToString<FlattenMaps<Require_id<DocType & TVirtuals>>>;
+    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true }): ObjectIdToString<FlattenMaps<Require_id<DocType>>>;
+    toObject(options: ToObjectOptions & { flattenObjectIds: true, virtuals: true }): ObjectIdToString<Require_id<DocType & TVirtuals>>;
+    toObject(options: ToObjectOptions & { flattenObjectIds: true }): ObjectIdToString<Require_id<DocType>>;
+    toObject(options: ToObjectOptions & { flattenMaps: true, virtuals: true }): FlattenMaps<Require_id<DocType & TVirtuals>>;
+    toObject(options: ToObjectOptions & { flattenMaps: true }): FlattenMaps<Require_id<DocType>>;
+
+    // Handle versionKey: false (regardless of the others - most specific overloads should come first)
+    toObject(options: ToObjectOptions & { versionKey: false, flattenMaps: true, flattenObjectIds: true, virtuals: true }): ObjectIdToString<Omit<FlattenMaps<Require_id<DocType & TVirtuals>>, '__v'>>;
+    toObject(options: ToObjectOptions & { versionKey: false, flattenMaps: false, flattenObjectIds: true, virtuals: true }): ObjectIdToString<Omit<Require_id<DocType & TVirtuals>, '__v'>>;
+    toObject(options: ToObjectOptions & { versionKey: false, flattenMaps: true, virtuals: true }): Omit<FlattenMaps<Require_id<DocType & TVirtuals>>, '__v'>;
+    toObject(options: ToObjectOptions & { versionKey: false, flattenObjectIds: true, virtuals: true }): ObjectIdToString<Omit<Require_id<DocType & TVirtuals>, '__v'>>;
     toObject(options: ToObjectOptions & { versionKey: false, virtuals: true }): Omit<Require_id<DocType & TVirtuals>, '__v'>;
-    toObject(options: ToObjectOptions & { virtuals: true }): Default__v<Require_id<DocType & TVirtuals>, ResolveSchemaOptions<TSchemaOptions>>;
-    toObject(options: ToObjectOptions & { versionKey: false }): Omit<Require_id<DocType & TVirtuals>, '__v'>;
-    toObject(options: ToObjectOptions & { flattenObjectIds: true }): ObjectIdToString<Default__v<Require_id<DocType & TVirtuals>, ResolveSchemaOptions<TSchemaOptions>>>;
-    toObject(options?: ToObjectOptions): Default__v<Require_id<DocType>, ResolveSchemaOptions<TSchemaOptions>>;
+    toObject(options: ToObjectOptions & { versionKey: false, flattenMaps: true, flattenObjectIds: true }): ObjectIdToString<Omit<FlattenMaps<Require_id<DocType>>, '__v'>>;
+    toObject(options: ToObjectOptions & { versionKey: false, flattenObjectIds: true }): ObjectIdToString<Omit<Require_id<DocType>, '__v'>>;
+    toObject(options: ToObjectOptions & { versionKey: false, flattenMaps: true }): Omit<FlattenMaps<Require_id<DocType>>, '__v'>;
+    toObject(options: ToObjectOptions & { versionKey: false }): Omit<Require_id<DocType>, '__v'>;
+
+    // Handle virtuals: true
+    toObject(options: ToObjectOptions & { virtuals: true }): Require_id<DocType & TVirtuals>;
+
+    // Default - no special options
+    toObject(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;
+
     toObject<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
 
     /** Clears the modified state on the specified path. */

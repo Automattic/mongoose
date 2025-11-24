@@ -13,6 +13,8 @@ html(lang='en')
       link(rel="stylesheet", href=`${versions.versionedPath}/docs/css/github.css`)
       link(rel="stylesheet", href=`${versions.versionedPath}/docs/css/mongoose5.css`)
       link(rel="stylesheet", href=`${versions.versionedPath}/docs/css/carbonads.css`)
+      link(rel="stylesheet", href=`${versions.versionedPath}/docs/css/copy-code.css`)
+
 
       meta(name='msapplication-TileColor', content='#ffffff')
       meta(name='msapplication-TileImage', content=`${versions.versionedPath}/docs/images/favicon/ms-icon-144x144.png`)
@@ -137,7 +139,7 @@ html(lang='en')
                   li.pure-menu-item.sub-item
                     a.pure-menu-link(href=`${versions.versionedPath}/docs/api/virtualtype.html`, class=outputUrl === `${versions.versionedPath}/docs/api/virtualtype.html` ? 'selected' : '') VirtualType
               li.pure-menu-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/migrating_to_8.html`, class=outputUrl === `${versions.versionedPath}/docs/migrating_to_8.html` ? 'selected' : '') Migration Guide
+                a.pure-menu-link(href=`${versions.versionedPath}/docs/migrating_to_9.html`, class=outputUrl === `${versions.versionedPath}/docs/migrating_to_9.html` ? 'selected' : '') Migration Guide
               li.pure-menu-item
                 a.pure-menu-link(href=`${versions.versionedPath}/docs/compatibility.html`, class=outputUrl === `${versions.versionedPath}/docs/compatibility.html` ? 'selected' : '') Version Compatibility
               li.pure-menu-item
@@ -172,3 +174,5 @@ html(lang='en')
 
         script(type="text/javascript" src=`${versions.versionedPath}/docs/js/navbar-search.js`)
         script(type="text/javascript" src=`${versions.versionedPath}/docs/js/mobile-navbar-toggle.js`)
+
+        script(type="text/javascript" src=`${versions.versionedPath}/docs/js/copy-code.js`)

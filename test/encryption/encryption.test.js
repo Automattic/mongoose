@@ -4,7 +4,7 @@ const assert = require('assert');
 const mdb = require('mongodb');
 const isBsonType = require('../../lib/helpers/isBsonType');
 const { Schema, createConnection } = require('../../lib');
-const { ObjectId, Double, Int32, Decimal128 } = require('bson');
+const { ObjectId, Double, Int32, Decimal128 } = require('mongodb/lib/bson');
 const fs = require('fs');
 const mongoose = require('../../lib');
 const { Map } = require('../../lib/types');
@@ -143,7 +143,6 @@ describe('encryption integration tests', () => {
     });
 
     for (const { type, name, input, expected } of basicSchemaTypes) {
-      // eslint-disable-next-line no-inner-declarations
       async function test() {
         const [{ _id }] = await model.insertMany([{ field: input }]);
         const encryptedDoc = await utilClient.db('db').collection('schemas').findOne({ _id });
@@ -151,7 +150,7 @@ describe('encryption integration tests', () => {
         isEncryptedValue(encryptedDoc, 'field');
 
         const doc = await model.findOne({ _id });
-        if (Buffer.isBuffer(input)) {
+        if (Buffer.isBuffer(input) || input instanceof UUID) {
           // mongoose's Buffer does not support deep equality - instead use the Buffer.equals method.
           assert.ok(doc.field.equals(input));
         } else {

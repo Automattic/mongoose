@@ -24,9 +24,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: browser build
-        run: npm run build-browser
-
       - name: Dry run publish with provenance
         run: npm publish --provenance --access public
         env:

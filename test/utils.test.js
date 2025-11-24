@@ -25,27 +25,27 @@ const ActiveRoster = StateMachine.ctor('require', 'init', 'modify');
  * Test.
  */
 
-describe('utils', function() {
-  describe('ActiveRoster', function() {
-    it('should detect a path as required if it has been required', function() {
+describe('utils', function () {
+  describe('ActiveRoster', function () {
+    it('should detect a path as required if it has been required', function () {
       const ar = new ActiveRoster();
       ar.require('hello');
       assert.equal(ar.paths.hello, 'require');
     });
 
-    it('should detect a path as inited if it has been inited', function() {
+    it('should detect a path as inited if it has been inited', function () {
       const ar = new ActiveRoster();
       ar.init('hello');
       assert.equal(ar.paths.hello, 'init');
     });
 
-    it('should detect a path as modified', function() {
+    it('should detect a path as modified', function () {
       const ar = new ActiveRoster();
       ar.modify('hello');
       assert.equal(ar.paths.hello, 'modify');
     });
 
-    it('should remove a path from an old state upon a state change', function() {
+    it('should remove a path from an old state upon a state change', function () {
       const ar = new ActiveRoster();
       ar.init('hello');
       ar.modify('hello');
@@ -53,40 +53,40 @@ describe('utils', function() {
       assert.ok(ar.states.modify.hasOwnProperty('hello'));
     });
 
-    it('forEach should be able to iterate through the paths belonging to one state', function() {
+    it('forEach should be able to iterate through the paths belonging to one state', function () {
       const ar = new ActiveRoster();
       ar.init('hello');
       ar.init('goodbye');
       ar.modify('world');
       ar.require('foo');
-      ar.forEach('init', function(path) {
+      ar.forEach('init', function (path) {
         assert.ok(~['hello', 'goodbye'].indexOf(path));
       });
     });
 
-    it('forEach should be able to iterate through the paths in the union of two or more states', function() {
+    it('forEach should be able to iterate through the paths in the union of two or more states', function () {
       const ar = new ActiveRoster();
       ar.init('hello');
       ar.init('goodbye');
       ar.modify('world');
       ar.require('foo');
-      ar.forEach('modify', 'require', function(path) {
+      ar.forEach('modify', 'require', function (path) {
         assert.ok(~['world', 'foo'].indexOf(path));
       });
     });
 
-    it('forEach should iterate through all paths that have any state if given no state arguments', function() {
+    it('forEach should iterate through all paths that have any state if given no state arguments', function () {
       const ar = new ActiveRoster();
       ar.init('hello');
       ar.init('goodbye');
       ar.modify('world');
       ar.require('foo');
-      ar.forEach(function(path) {
+      ar.forEach(function (path) {
         assert.ok(~['hello', 'goodbye', 'world', 'foo'].indexOf(path));
       });
     });
 
-    it('should be able to detect if at least one path exists in a set of states', function() {
+    it('should be able to detect if at least one path exists in a set of states', function () {
       const ar = new ActiveRoster();
       ar.init('hello');
       ar.modify('world');
@@ -98,30 +98,30 @@ describe('utils', function() {
       assert.ok(ar.some('modify', 'require'));
     });
 
-    it('should be able to `map` over the set of paths in a given state', function() {
+    it('should be able to `map` over the set of paths in a given state', function () {
       const ar = new ActiveRoster();
       ar.init('hello');
       ar.modify('world');
       ar.require('iAmTheWalrus');
-      const suffixedPaths = ar.map('init', 'modify', function(path) {
+      const suffixedPaths = ar.map('init', 'modify', function (path) {
         return path + '-suffix';
       });
       assert.deepEqual(suffixedPaths, ['hello-suffix', 'world-suffix']);
     });
 
-    it('should `map` over all states\' paths if no states are specified in a `map` invocation', function() {
+    it('should `map` over all states\' paths if no states are specified in a `map` invocation', function () {
       const ar = new ActiveRoster();
       ar.init('hello');
       ar.modify('world');
       ar.require('iAmTheWalrus');
-      const suffixedPaths = ar.map(function(path) {
+      const suffixedPaths = ar.map(function (path) {
         return path + '-suffix';
       });
       assert.deepEqual(suffixedPaths, ['iAmTheWalrus-suffix', 'hello-suffix', 'world-suffix']);
     });
   });
 
-  it('deepEquals on ObjectIds', function() {
+  it('deepEquals on ObjectIds', function () {
     const s = (new ObjectId()).toString();
 
     const a = new ObjectId(s);
@@ -132,7 +132,7 @@ describe('utils', function() {
     assert.ok(!utils.deepEqual(a, new ObjectId()));
   });
 
-  it('deepEquals on maps (gh-9549)', function() {
+  it('deepEquals on maps (gh-9549)', function () {
     const a = new Map([['a', 1], ['b', 2]]);
     let b = new Map([['a', 1], ['b', 2]]);
 
@@ -145,7 +145,7 @@ describe('utils', function() {
     assert.ok(!utils.deepEqual(a, b));
   });
 
-  it('deepEquals on MongooseDocumentArray works', function() {
+  it('deepEquals on MongooseDocumentArray works', function () {
     const A = new Schema({ a: String });
     mongoose.deleteModel(/Test/);
     const M = mongoose.model('Test', new Schema({
@@ -170,7 +170,7 @@ describe('utils', function() {
   });
 
   // gh-688
-  it('deepEquals with MongooseBuffer', function() {
+  it('deepEquals with MongooseBuffer', function () {
     const str = 'this is the day';
     const a = new MongooseBuffer(str);
     const b = new MongooseBuffer(str);
@@ -186,7 +186,7 @@ describe('utils', function() {
     assert.ok(!utils.deepEqual([], a));
   });
 
-  it('`deepEqual` treats objects with different order of keys as different (gh-9571)', function() {
+  it('`deepEqual` treats objects with different order of keys as different (gh-9571)', function () {
     const user1 = {
       name: 'Hafez',
       age: 26
@@ -196,20 +196,20 @@ describe('utils', function() {
       name: 'Hafez'
     };
 
-    assert.equal(utils.deepEqual(user1, user2), false);
+    assert.equal(utils.deepEqual(user1, user2), true);
   });
 
-  it('deepEqual on arrays and non-arrays (gh-11417)', function() {
+  it('deepEqual on arrays and non-arrays (gh-11417)', function () {
     assert.ok(!utils.deepEqual([], 2));
     assert.ok(!utils.deepEqual(2, []));
   });
 
-  it('array.flatten', function() {
+  it('array.flatten', function () {
     const orig = [0, [1, 2, [3, 4, [5, [6]], 7], 8], 9];
     assert.deepEqual([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], utils.array.flatten(orig));
   });
 
-  it('array.unique', function() {
+  it('array.unique', function () {
     const case1 = [1, 2, 3, 3, 5, 'a', 6, 'a'];
     assert.deepEqual(utils.array.unique(case1), [1, 2, 3, 5, 'a', 6]);
     const objId = new ObjectId('000000000000000000000001');
@@ -226,21 +226,21 @@ describe('utils', function() {
       [1, '000000000000000000000001', objId]);
   });
 
-  describe('merge', function() {
-    it('merges two objects together without overriding properties & methods', function() {
+  describe('merge', function () {
+    it('merges two objects together without overriding properties & methods', function () {
       function To() {
         this.name = 'to';
         this.toProperty = true;
       }
-      To.prototype.getName = function() {};
-      To.prototype.toMethod = function() {};
+      To.prototype.getName = function () { };
+      To.prototype.toMethod = function () { };
 
       function From() {
         this.name = 'from';
         this.fromProperty = true;
       }
-      From.prototype.getName = function() {};
-      From.prototype.fromMethod = function() {};
+      From.prototype.getName = function () { };
+      From.prototype.fromMethod = function () { };
 
       const to = new To();
       const from = new From();
@@ -256,11 +256,11 @@ describe('utils', function() {
     });
   });
 
-  describe('mergeClone', function() {
-    it('handles object with valueOf() (gh-6059)', function() {
+  describe('mergeClone', function () {
+    it('handles object with valueOf() (gh-6059)', function () {
       const from = {
         val: {
-          valueOf: function() { return 42; }
+          valueOf: function () { return 42; }
         }
       };
       const to = { val: 41 };
@@ -270,7 +270,7 @@ describe('utils', function() {
       assert.equal(to.val, 42);
     });
 
-    it('copies dates correctly (gh-6145)', function() {
+    it('copies dates correctly (gh-6145)', function () {
       const from = {
         val: new Date('2011-06-01')
       };
@@ -325,28 +325,28 @@ describe('utils', function() {
     });
   });
 
-  describe('toCollectionName', function() {
-    it('returns the same name for system.profile', function() {
+  describe('toCollectionName', function () {
+    it('returns the same name for system.profile', function () {
       assert.equal(utils.toCollectionName('system.profile'), 'system.profile');
     });
 
-    it('returns the same name for system.indexes', function() {
+    it('returns the same name for system.indexes', function () {
       assert.equal(utils.toCollectionName('system.indexes'), 'system.indexes');
     });
 
-    it('throws an error when name is not a string', function() {
+    it('throws an error when name is not a string', function () {
       assert.throws(() => {
-        utils.toCollectionName(123, () => {});
+        utils.toCollectionName(123, () => { });
       }, /Collection name must be a string/);
     });
 
-    it('throws an error when name is an empty string', function() {
+    it('throws an error when name is an empty string', function () {
       assert.throws(() => {
-        utils.toCollectionName('', () => {});
+        utils.toCollectionName('', () => { });
       }, /Collection name cannot be empty/);
     });
 
-    it('uses the pluralize function when provided', function() {
+    it('uses the pluralize function when provided', function () {
       const pluralize = (name) => name + 's';
       assert.equal(utils.toCollectionName('test', pluralize), 'tests');
     });

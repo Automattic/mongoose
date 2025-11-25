@@ -542,6 +542,7 @@ declare module 'mongoose' {
 
     /** Adds static "class" methods to Models compiled from this schema. */
     static<K extends keyof TStaticMethods>(name: K, fn: TStaticMethods[K]): this;
+    static(obj: { [F in keyof TStaticMethods]: TStaticMethods[F] }): this;
     static(obj: { [F in keyof TStaticMethods]: TStaticMethods[F] } & { [name: string]: (this: TModelType, ...args: any[]) => any }): this;
     static(name: string, fn: (this: TModelType, ...args: any[]) => any): this;
 

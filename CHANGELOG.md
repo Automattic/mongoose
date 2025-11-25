@@ -1,3 +1,69 @@
+9.0.0 / 2025-11-21
+==================
+ * BREAKING CHANGE: drop support for callback-based pre middleware, e.g. `next()` in `pre()` hooks
+ * BREAKING CHANGE: update to MongoDB Node driver v7
+ * BREAKING CHANGE: make UUID schema type return bson UUIDs #15378
+ * BREAKING CHANGE: make findOne(null), find(null), etc. throw an error instead of returning first doc #15019 #14948
+ * BREAKING CHANGE: disallow update pipelines by default, require updatePipeline option #15586 #14424
+ * BREAKING CHANGE: call virtual ref function with subdoc, not top-level doc #14652 #12440 #12363
+ * BREAKING CHANGE(types): make create() and insertOne() params more strict, remove generics to prevent type inference #15587 #15355
+ * BREAKING CHANGE(types): make FilterQuery properties no longer resolve to any in TypeScript #15422
+ * BREAKING CHANGE(types): change `this` to HydratedDocument for default() and required(), HydratedDocument | Query for validate() #15020 #14696
+ * BREAKING CHANGE(types): make id a virtual in TypeScript rather than a property on Document base class #15572 #13079
+ * BREAKING CHANGE(types): consolidate RootQuerySelector, Condition, etc. types with MongoDB driver's #15593
+ * BREAKING CHANGE: asyncify update validators, SchemaType.prototype.doValidate(), save hooks for improved stack traces #15312
+ * BREAKING CHANGE: remove bson as direct dependency, use mongodb/lib/bson instead #15576 #15154
+ * BREAKING CHANGE: remove _executionStack, make validate() async function and call Kareem hooks directly vs through wrappers #15298 #14906
+ * BREAKING CHANGE: remove browser build, move to @mongoosejs/browser instead #15385 #15296
+ * BREAKING CHANGE: remove schematype caster and casterConstructor properties in favor of embeddedSchemaType and Constructor #15513 #15179
+ * BREAKING CHANGE: adding missing pluralizations, fixing pluralization: virus -> viruses #14247 [ItsBradyDavis](https://github.com/ItsBradyDavis)
+ * BREAKING CHANGE: remove connection noListener option #15641 #15640
+ * feat(types): add Schema.create() for TypeScript type inference #15482 #14954
+ * chore: remove examples directory #15597
+
+8.20.1 / 2025-11-20
+===================
+ * types: correct Model.schema type and fix unknown check for this param type in schema.methods #15750 #15693
+ * docs: add detailed loadClass() TypeScript usage guide #15731 #12813 [Necro-Rohan](https://github.com/Necro-Rohan)
+ * docs: update version support documentation for Mongoose #15761 [ManmathX](https://github.com/ManmathX)
+ * docs: add copy-to-clipboard feature for code blocks in docs #15759 [vedansha07](https://github.com/vedansha07)
+
+9.0.0-rc1 / 2025-11-19
+======================
+ * fix(populate): correctly populate embedded discriminators on subdocuments #15774
+
+9.0.0-rc0 / 2025-11-19
+======================
+ * BREAKING CHANGE: drop support for callback-based pre middleware, e.g. `next()` in `pre()` hooks
+ * BREAKING CHANGE: update to MongoDB Node driver v7
+ * BREAKING CHANGE: make UUID schema type return bson UUIDs #15378
+ * BREAKING CHANGE: make findOne(null), find(null), etc. throw an error instead of returning first doc #15019 #14948
+ * BREAKING CHANGE: disallow update pipelines by default, require updatePipeline option #15586 #14424
+ * BREAKING CHANGE: call virtual ref function with subdoc, not top-level doc #14652 #12440 #12363
+ * BREAKING CHANGE(types): make create() and insertOne() params more strict, remove generics to prevent type inference #15587 #15355
+ * BREAKING CHANGE(types): make FilterQuery properties no longer resolve to any in TypeScript #15422
+ * BREAKING CHANGE(types): change `this` to HydratedDocument for default() and required(), HydratedDocument | Query for validate() #15020 #14696
+ * BREAKING CHANGE(types): make id a virtual in TypeScript rather than a property on Document base class #15572 #13079
+ * BREAKING CHANGE(types): consolidate RootQuerySelector, Condition, etc. types with MongoDB driver's #15593
+ * BREAKING CHANGE: asyncify update validators, SchemaType.prototype.doValidate(), save hooks for improved stack traces #15312
+ * BREAKING CHANGE: remove bson as direct dependency, use mongodb/lib/bson instead #15576 #15154
+ * BREAKING CHANGE: remove _executionStack, make validate() async function and call Kareem hooks directly vs through wrappers #15298 #14906
+ * BREAKING CHANGE: remove browser build, move to @mongoosejs/browser instead #15385 #15296
+ * BREAKING CHANGE: remove schematype caster and casterConstructor properties in favor of embeddedSchemaType and Constructor #15513 #15179
+ * BREAKING CHANGE: adding missing pluralizations, fixing pluralization: virus -> viruses #14247 [ItsBradyDavis](https://github.com/ItsBradyDavis)
+ * BREAKING CHANGE: remove connection noListener option #15641 #15640
+ * feat(types): add Schema.create() for TypeScript type inference #15482 #14954
+ * chore: remove examples directory #15597
+
+8.20.0 / 2025-11-17
+===================
+ * feat: cast id parameter based on schema _id type in DocumentArray.id() #15733 #15725 #15724 [Lex-Ashu](Lex-Ashu)
+ * fix: pass parent schema to SchemaType constructors in interpretAsType to make implementing custom container types easier #15700
+ * types(models): default _id type to ObjectId for Document #15688 [Catwallon](https://github.com/Catwallon)
+ * docs: add FAQ entry about DivergentArrayError #15743 [Mario5T](https://github.com/Mario5T)
+ * docs: update browser.md with Mongoose limitations #15744 [YashSharma64](https://github.com/YashSharma64)
+ * chore: add benchmark for large nested array documents (related to #9588) #15742 [Kundan-CR7](https://github.com/Kundan-CR7)
+
 8.19.4 / 2025-11-14
 ===================
  * fix(schema): avoid throwing error on array of unions #15720 #15718

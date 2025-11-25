@@ -20,6 +20,7 @@
 /// <reference path="./types.d.ts" />
 /// <reference path="./utility.d.ts" />
 /// <reference path="./validation.d.ts" />
+/// <reference path="./inferhydrateddoctype.d.ts" />
 /// <reference path="./inferrawdoctype.d.ts" />
 /// <reference path="./inferschematype.d.ts" />
 /// <reference path="./virtuals.d.ts" />
@@ -64,12 +65,14 @@ declare module 'mongoose' {
    * Sanitizes query filters against query selector injection attacks by wrapping
    * any nested objects that have a property whose name starts with `$` in a `$eq`.
    */
-  export function sanitizeFilter<T>(filter: FilterQuery<T>): FilterQuery<T>;
+  export function sanitizeFilter<T>(filter: QueryFilter<T>): QueryFilter<T>;
 
   /** Gets mongoose options */
   export function get<K extends keyof MongooseOptions>(key: K): MongooseOptions[K];
 
   export function omitUndefined<T extends Record<string, any>>(val: T): T;
+
+  export type HydratedDocFromModel<M extends Model<any>> = ReturnType<M['hydrate']>;
 
   /* ! ignore */
   export type CompileModelOptions = {
@@ -87,14 +90,20 @@ declare module 'mongoose' {
     ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
     ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
     ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
-    HydratedDocument<
-      InferSchemaType<TSchema>,
-      ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-      ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
-      ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
-      ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>
-    >,
-    TSchema
+    // If first schema generic param is set, that means we have an explicit raw doc type,
+    // so user should also specify a hydrated doc type if the auto inferred one isn't correct.
+    IsItRecordAndNotAny<ObtainSchemaGeneric<TSchema, 'EnforcedDocType'>> extends true
+      ? ObtainSchemaGeneric<TSchema, 'THydratedDocumentType'>
+      : HydratedDocument<
+        InferSchemaType<TSchema>,
+        ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+        ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+        ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+        InferSchemaType<TSchema>,
+        ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>
+      >,
+    TSchema,
+    ObtainSchemaGeneric<TSchema, 'TLeanResultType'>
   > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
   export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
@@ -158,25 +167,27 @@ declare module 'mongoose' {
 
   /** Helper type for getting the hydrated document type from the raw document type. The hydrated document type is what `new MyModel()` returns. */
   export type HydratedDocument<
-    DocType,
+    HydratedDocPathsType,
     TOverrides = {},
     TQueryHelpers = {},
     TVirtuals = {},
-    TSchemaOptions = {}
+    RawDocType = HydratedDocPathsType,
+    TSchemaOptions = DefaultSchemaOptions
   > = IfAny<
-    DocType,
+    HydratedDocPathsType,
     any,
     TOverrides extends Record<string, never> ?
-      Document<unknown, TQueryHelpers, DocType, TVirtuals, TSchemaOptions> & Default__v<Require_id<DocType>, TSchemaOptions> :
+      Document<unknown, TQueryHelpers, RawDocType, TVirtuals, TSchemaOptions> & Default__v<Require_id<HydratedDocPathsType>, TSchemaOptions> :
       IfAny<
         TOverrides,
-        Document<unknown, TQueryHelpers, DocType, TVirtuals, TSchemaOptions> & Default__v<Require_id<DocType>, TSchemaOptions>,
-        Document<unknown, TQueryHelpers, DocType, TVirtuals, TSchemaOptions> & MergeType<
-          Default__v<Require_id<DocType>, TSchemaOptions>,
+        Document<unknown, TQueryHelpers, RawDocType, TVirtuals, TSchemaOptions> & Default__v<Require_id<HydratedDocPathsType>, TSchemaOptions>,
+        Document<unknown, TQueryHelpers, RawDocType, TVirtuals, TSchemaOptions> & MergeType<
+          Default__v<Require_id<HydratedDocPathsType>, TSchemaOptions>,
           TOverrides
         >
       >
   >;
+
   export type HydratedSingleSubdocument<
     DocType,
     TOverrides = {}
@@ -214,6 +225,7 @@ declare module 'mongoose' {
     ObtainSchemaGeneric<TSchema, 'TInstanceMethods'> & ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
     ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
     ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+    InferSchemaType<TSchema>,
     ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>
   >;
 
@@ -287,7 +299,16 @@ declare module 'mongoose' {
       ObtainDocumentType<any, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
       ResolveSchemaOptions<TSchemaOptions>
     >,
-    THydratedDocumentType = HydratedDocument<FlatRecord<DocType>, TVirtuals & TInstanceMethods, {}, TVirtuals, ResolveSchemaOptions<TSchemaOptions>>
+    THydratedDocumentType = HydratedDocument<
+      DocType,
+      AddDefaultId<DocType, TVirtuals, TSchemaOptions> & TInstanceMethods,
+      TQueryHelpers,
+      AddDefaultId<DocType, TVirtuals, TSchemaOptions>,
+      IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : DocType,
+      ResolveSchemaOptions<TSchemaOptions>
+    >,
+    TSchemaDefinition = SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType, THydratedDocumentType>,
+    LeanResultType = IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : Default__v<Require_id<BufferToBinary<FlattenMaps<DocType>>>>
   >
     extends events.EventEmitter {
     /**
@@ -311,6 +332,69 @@ declare module 'mongoose' {
       > | ResolveSchemaOptions<TSchemaOptions>
     );
 
+    /* Creates a new schema with the given definition and options. Equivalent to `new Schema(definition, options)`, but with better automatic type inference. */
+    static create<
+      TSchemaDefinition extends SchemaDefinition<undefined, RawDocType, THydratedDocumentType>,
+      TSchemaOptions extends DefaultSchemaOptions,
+      RawDocType extends ApplySchemaOptions<
+        InferRawDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>,
+        ResolveSchemaOptions<TSchemaOptions>
+      >,
+      THydratedDocumentType extends AnyObject = HydratedDocument<
+        InferHydratedDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>,
+        TSchemaOptions extends { methods: infer M } ? M : {},
+        TSchemaOptions extends { query: any } ? TSchemaOptions['query'] : {},
+        TSchemaOptions extends { virtuals: any } ? TSchemaOptions['virtuals'] : {},
+        RawDocType
+      >
+    >(def: TSchemaDefinition): Schema<
+      RawDocType,
+      Model<RawDocType, any, any, any>,
+      TSchemaOptions extends { methods: infer M } ? M : {},
+      TSchemaOptions extends { query: any } ? TSchemaOptions['query'] : {},
+      TSchemaOptions extends { virtuals: any } ? TSchemaOptions['virtuals'] : {},
+      TSchemaOptions extends { statics: any } ? TSchemaOptions['statics'] : {},
+      TSchemaOptions,
+      ApplySchemaOptions<
+        ObtainDocumentType<any, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
+        ResolveSchemaOptions<TSchemaOptions>
+      >,
+      THydratedDocumentType,
+      TSchemaDefinition,
+      ApplySchemaOptions<
+        InferRawDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>, { bufferToBinary: true }>,
+        ResolveSchemaOptions<TSchemaOptions>
+      >
+    >;
+
+    static create<
+      TSchemaDefinition extends SchemaDefinition<undefined, RawDocType, THydratedDocumentType>,
+      TSchemaOptions extends SchemaOptions<InferRawDocType<TSchemaDefinition>>,
+      RawDocType extends ApplySchemaOptions<
+        InferRawDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>,
+        ResolveSchemaOptions<TSchemaOptions>
+      >,
+      THydratedDocumentType extends AnyObject = HydratedDocument<InferHydratedDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>>
+    >(def: TSchemaDefinition, options: TSchemaOptions): Schema<
+      RawDocType,
+      Model<RawDocType, any, any, any>,
+      TSchemaOptions extends { methods: infer M } ? M : {},
+      TSchemaOptions extends { query: any } ? TSchemaOptions['query'] : {},
+      TSchemaOptions extends { virtuals: any } ? TSchemaOptions['virtuals'] : {},
+      TSchemaOptions extends { statics: any } ? TSchemaOptions['statics'] : {},
+      TSchemaOptions,
+      ApplySchemaOptions<
+        ObtainDocumentType<any, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
+        ResolveSchemaOptions<TSchemaOptions>
+      >,
+      THydratedDocumentType,
+      TSchemaDefinition,
+      ApplySchemaOptions<
+        InferRawDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>, { bufferToBinary: true }>,
+        ResolveSchemaOptions<TSchemaOptions>
+      >
+    >;
+
     /** Adds key path / schema type pairs to this schema. */
     add(obj: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType> | Schema, prefix?: string): this;
 
@@ -331,7 +415,7 @@ declare module 'mongoose' {
     clearIndexes(): this;
 
     /** Returns a copy of this schema */
-    clone<T = this>(): T;
+    clone(): this;
 
     discriminator<DisSchema = Schema>(name: string | number, schema: DisSchema, options?: DiscriminatorOptions): this;
 
@@ -410,7 +494,7 @@ declare module 'mongoose' {
     post<T = Query<any, any>>(method: MongooseQueryMiddleware | MongooseQueryMiddleware[] | RegExp, options: SchemaPostOptions & { errorHandler: true }, fn: ErrorHandlingMiddlewareWithOption<T>): this;
     post<T = THydratedDocumentType>(method: MongooseDocumentMiddleware | MongooseDocumentMiddleware[] | RegExp, options: SchemaPostOptions & { errorHandler: true }, fn: ErrorHandlingMiddlewareWithOption<T>): this;
     post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPostOptions & { errorHandler: true }, fn: ErrorHandlingMiddlewareWithOption<T, Array<any>>): this;
-    post<T = TModelType>(method: 'insertMany' | RegExp, options: SchemaPostOptions & { errorHandler: true }, fn: ErrorHandlingMiddlewareWithOption<T>): this;
+    post(method: 'insertMany' | RegExp, options: SchemaPostOptions & { errorHandler: true }, fn: ErrorHandlingMiddlewareWithOption<TModelType>): this;
 
     // this = never since it never happens
     post<T = never>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: SchemaPostOptions & { document: false, query: false }, fn: PostMiddlewareFunction<never, never>): this;
@@ -451,14 +535,14 @@ declare module 'mongoose' {
     // method aggregate and insertMany with PostMiddlewareFunction
     post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: PostMiddlewareFunction<T, Array<AggregateExtract<T>>>): this;
     post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, Array<AggregateExtract<T>>>): this;
-    post<T = TModelType>(method: 'insertMany' | RegExp, fn: PostMiddlewareFunction<T, T>): this;
-    post<T = TModelType>(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<T, T>): this;
+    post(method: 'insertMany' | RegExp, fn: PostMiddlewareFunction<TModelType, TModelType>): this;
+    post(method: 'insertMany' | RegExp, options: SchemaPostOptions, fn: PostMiddlewareFunction<TModelType, TModelType>): this;
 
     // method aggregate and insertMany with ErrorHandlingMiddlewareFunction
     post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: ErrorHandlingMiddlewareFunction<T, Array<any>>): this;
     post<T extends Aggregate<any>>(method: 'aggregate' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T, Array<any>>): this;
-    post<T = TModelType>(method: 'bulkWrite' | 'createCollection' | 'insertMany' | RegExp, fn: ErrorHandlingMiddlewareFunction<T>): this;
-    post<T = TModelType>(method: 'bulkWrite' | 'createCollection' | 'insertMany' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<T>): this;
+    post(method: 'bulkWrite' | 'createCollection' | 'insertMany' | RegExp, fn: ErrorHandlingMiddlewareFunction<TModelType>): this;
+    post(method: 'bulkWrite' | 'createCollection' | 'insertMany' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<TModelType>): this;
 
     /** Defines a pre hook for the model. */
     // this = never since it never happens
@@ -493,31 +577,28 @@ declare module 'mongoose' {
     // method aggregate
     pre<T extends Aggregate<any>>(method: 'aggregate' | RegExp, fn: PreMiddlewareFunction<T>): this;
     /* method insertMany */
-    pre<T = TModelType>(
+    pre(
       method: 'insertMany' | RegExp,
       fn: (
-        this: T,
-        next: (err?: CallbackError) => void,
+        this: TModelType,
         docs: any | Array<any>,
         options?: InsertManyOptions & { lean?: boolean }
       ) => void | Promise<void>
     ): this;
     /* method bulkWrite */
-    pre<T = TModelType>(
+    pre(
       method: 'bulkWrite' | RegExp,
       fn: (
-        this: T,
-        next: (err?: CallbackError) => void,
+        this: TModelType,
         ops: Array<AnyBulkWriteOperation<any>>,
         options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions
       ) => void | Promise<void>
     ): this;
     /* method createCollection */
-    pre<T = TModelType>(
+    pre(
       method: 'createCollection' | RegExp,
       fn: (
-        this: T,
-        next: (err?: CallbackError) => void,
+        this: TModelType,
         options?: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'>
       ) => void | Promise<void>
     ): this;
@@ -561,7 +642,7 @@ declare module 'mongoose' {
     virtuals: TVirtuals;
 
     /** Returns the virtual type with the given `name`. */
-    virtualpath<T = THydratedDocumentType>(name: string): VirtualType<T> | null;
+    virtualpath(name: string): VirtualType<THydratedDocumentType> | null;
 
     static ObjectId: typeof Schema.Types.ObjectId;
   }
@@ -570,7 +651,7 @@ declare module 'mongoose' {
   export type StringSchemaDefinition = typeof String | 'string' | 'String' | typeof Schema.Types.String | Schema.Types.String;
   export type BooleanSchemaDefinition = typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean | Schema.Types.Boolean;
   export type DateSchemaDefinition = DateConstructor | 'date' | 'Date' | typeof Schema.Types.Date | Schema.Types.Date;
-  export type ObjectIdSchemaDefinition = 'ObjectId' | 'ObjectID' | typeof Schema.Types.ObjectId | Schema.Types.ObjectId | Types.ObjectId;
+  export type ObjectIdSchemaDefinition = 'ObjectId' | 'ObjectID' | typeof Schema.Types.ObjectId | Schema.Types.ObjectId | Types.ObjectId | typeof Types.ObjectId;
   export type BufferSchemaDefinition = typeof Buffer | 'buffer' | 'Buffer' | typeof Schema.Types.Buffer;
   export type Decimal128SchemaDefinition = 'decimal128' | 'Decimal128' | typeof Schema.Types.Decimal128 | Schema.Types.Decimal128 | Types.Decimal128;
   export type BigintSchemaDefinition = 'bigint' | 'BigInt' | typeof Schema.Types.BigInt | Schema.Types.BigInt | typeof BigInt | BigInt;
@@ -591,7 +672,7 @@ declare module 'mongoose' {
 
   export type SchemaDefinitionProperty<T = undefined, EnforcedDocType = any, THydratedDocumentType = HydratedDocument<EnforcedDocType>> =
     // ThisType intersection here avoids corrupting ThisType for SchemaTypeOptions (see test gh11828)
-    | SchemaDefinitionWithBuiltInClass<T> & ThisType<EnforcedDocType>
+    | SchemaDefinitionWithBuiltInClass<T> & ThisType<THydratedDocumentType>
     | SchemaTypeOptions<T extends undefined ? any : T, EnforcedDocType, THydratedDocumentType>
     | typeof SchemaType
     | Schema<any, any, any>
@@ -601,7 +682,7 @@ declare module 'mongoose' {
     | SchemaDefinition<T, EnforcedDocType, THydratedDocumentType>
     | SchemaDefinition<Unpacked<T>, EnforcedDocType, THydratedDocumentType>[]
     | typeof Schema.Types.Mixed
-    | MixedSchemaTypeOptions<EnforcedDocType>;
+    | MixedSchemaTypeOptions<EnforcedDocType, THydratedDocumentType>;
 
   export type SchemaDefinition<T = undefined, EnforcedDocType = any, THydratedDocumentType = HydratedDocument<EnforcedDocType>> = T extends undefined
     ? { [path: string]: SchemaDefinitionProperty; }
@@ -610,7 +691,7 @@ declare module 'mongoose' {
   export type AnyArray<T> = T[] | ReadonlyArray<T>;
   export type ExtractMongooseArray<T> = T extends Types.Array<any> ? AnyArray<Unpacked<T>> : T;
 
-  export interface MixedSchemaTypeOptions<EnforcedDocType> extends SchemaTypeOptions<Schema.Types.Mixed, EnforcedDocType> {
+  export interface MixedSchemaTypeOptions<EnforcedDocType, THydratedDocumentType> extends SchemaTypeOptions<Schema.Types.Mixed, EnforcedDocType, THydratedDocumentType> {
     type: typeof Schema.Types.Mixed;
   }
 
@@ -656,7 +737,7 @@ declare module 'mongoose' {
     count?: boolean;
 
     /** Add an extra match condition to `populate()`. */
-    match?: FilterQuery<any> | ((doc: Record<string, any>, virtual?: this) => Record<string, any> | null);
+    match?: QueryFilter<any> | ((doc: Record<string, any>, virtual?: this) => Record<string, any> | null);
 
     /** Add a default `limit` to the `populate()` query. */
     limit?: number;
@@ -844,6 +925,25 @@ declare module 'mongoose' {
                     : BufferToBinary<T[K]>;
           } : T;
 
+    /**
+    * Converts any Buffer properties into "{ type: 'buffer', data: [1, 2, 3] }" format for JSON serialization
+    */
+    export type UUIDToJSON<T> = T extends mongodb.UUID
+      ? string
+      : T extends Document
+        ? T
+        : T extends TreatAsPrimitives
+          ? T
+          : T extends Record<string, any> ? {
+            [K in keyof T]: T[K] extends mongodb.UUID
+              ? string
+              : T[K] extends Types.DocumentArray<infer ItemType>
+                  ? Types.DocumentArray<UUIDToJSON<ItemType>>
+                  : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+                    ? HydratedSingleSubdocument<SubdocType>
+                    : UUIDToJSON<T[K]>;
+          } : T;
+
   /**
    * Converts any ObjectId properties into strings for JSON serialization
    */
@@ -903,7 +1003,9 @@ declare module 'mongoose' {
     FlattenMaps<
       BufferToJSON<
         ObjectIdToString<
-          DateToString<T>
+          UUIDToJSON<
+            DateToString<T>
+          >
         >
       >
     >
@@ -929,6 +1031,8 @@ declare module 'mongoose' {
   export function overwriteMiddlewareResult(val: any): Kareem.OverwriteMiddlewareResult;
 
   export function skipMiddlewareFunction(val: any): Kareem.SkipWrappedFunction;
+
+  export function overwriteMiddlewareArguments(val: any): Kareem.OverwriteArguments;
 
   export default mongoose;
 }

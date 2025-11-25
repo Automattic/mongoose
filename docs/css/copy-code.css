@@ -1,0 +1,43 @@
+/* Base button placement & visibility */
+.copy-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+
+  opacity: 0;
+  transform: translateY(-3px);
+  transition: opacity 0.18s ease, transform 0.18s ease, color 0.2s ease;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #666; /* default icon color */
+}
+
+/* Show button only when the code block is hovered */
+pre:hover .copy-btn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Hover state always forces black — applies to both icons */
+.copy-btn:hover {
+  color: #000 !important;
+}
+
+/* Tick icon uses the same neutral grey so hover can override cleanly */
+.copy-btn.copied {
+  color: #666;
+}
+
+/* Icon sizing + smooth color transition */
+.copy-btn svg {
+  width: 20px;
+  height: 20px;
+  transition: color 0.2s ease;
+}

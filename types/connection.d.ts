@@ -186,16 +186,25 @@ declare module 'mongoose' {
       collection?: string,
       options?: CompileModelOptions
     ): Model<
-    InferSchemaType<TSchema>,
-    ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
-    ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-    {},
-    HydratedDocument<
-    InferSchemaType<TSchema>,
-    ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-    ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>
-    >,
-    TSchema> & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
+      InferSchemaType<TSchema>,
+      ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+      ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+      ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+      // If first schema generic param is set, that means we have an explicit raw doc type,
+      // so user should also specify a hydrated doc type if the auto inferred one isn't correct.
+      IsItRecordAndNotAny<ObtainSchemaGeneric<TSchema, 'EnforcedDocType'>> extends true
+        ? ObtainSchemaGeneric<TSchema, 'THydratedDocumentType'>
+        : HydratedDocument<
+          InferSchemaType<TSchema>,
+          ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+          ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+          ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+          InferSchemaType<TSchema>,
+          ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>
+        >,
+      TSchema,
+      ObtainSchemaGeneric<TSchema, 'TLeanResultType'>
+    > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
     model<T, U, TQueryHelpers = {}>(
       name: string,
       schema?: Schema<T, any, any, TQueryHelpers, any, any, any>,
@@ -273,7 +282,7 @@ declare module 'mongoose' {
     transaction<ReturnType = unknown>(fn: (session: mongodb.ClientSession) => Promise<ReturnType>, options?: mongodb.TransactionOptions): Promise<ReturnType>;
 
     /** Switches to a different database using the same connection pool. */
-    useDb(name: string, options?: { useCache?: boolean, noListener?: boolean }): Connection;
+    useDb(name: string, options?: { useCache?: boolean }): Connection;
 
     /** The username specified in the URI */
     readonly user: string;

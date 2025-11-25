@@ -83,7 +83,7 @@ describe('types.documentarray', function() {
     sub1.title = 'Hello again to all my friends';
     let id = sub1.id;
 
-    let a = new MongooseDocumentArray([sub1]);
+    let a = new MongooseDocumentArray([sub1], 'test', null);
     assert.equal(a.id(id).title, 'Hello again to all my friends');
     assert.equal(a.id(sub1._id).title, 'Hello again to all my friends');
 
@@ -186,8 +186,23 @@ describe('types.documentarray', function() {
 
     a = new MongooseDocumentArray([sub]);
     assert.equal(a.id(id).title, 'Hello again to all my friends');
+  });
 
+  it('#id with custom schematype (gh-15725)', function() {
+    const schema = new Schema({ _id: Number, name: String });
+    const Subdocument = TestDoc(schema);
 
+    const sub1 = new Subdocument();
+    sub1._id = 42;
+    sub1.title = 'Hello again to all my friends';
+
+    const parentDoc = { $__: true, $__schema: new Schema({ subdocs: [schema] }) };
+
+    const a = new MongooseDocumentArray([sub1], 'subdocs', parentDoc);
+    assert.equal(a.id('42').title, 'Hello again to all my friends');
+    assert.equal(a.id(sub1.id).title, 'Hello again to all my friends');
+    assert.ok(!a.id('43'));
+    assert.ok(!a.id('not a number'));
   });
 
   describe('inspect', function() {
@@ -301,9 +316,8 @@ describe('types.documentarray', function() {
   describe('push()', function() {
     it('does not re-cast instances of its embedded doc', async function() {
       const child = new Schema({ name: String, date: Date });
-      child.pre('save', function(next) {
+      child.pre('save', function() {
         this.date = new Date();
-        next();
       });
       const schema = new Schema({ children: [child] });
       const M = db.model('Test', schema);
@@ -469,10 +483,9 @@ describe('types.documentarray', function() {
   describe('invalidate()', function() {
     it('works', async function() {
       const schema = new Schema({ docs: [{ name: 'string' }] });
-      schema.pre('validate', function(next) {
+      schema.pre('validate', function() {
         const subdoc = this.docs[this.docs.length - 1];
         subdoc.invalidate('name', 'boo boo', '%');
-        next();
       });
       mongoose.deleteModel(/Test/);
       const T = mongoose.model('Test', schema);
@@ -786,6 +799,6 @@ describe('types.documentarray', function() {
         someCustomOption: 'test 42'
       }]
     });
-    assert.strictEqual(schema.path('docArr').$embeddedSchemaType.options.someCustomOption, 'test 42');
+    assert.strictEqual(schema.path('docArr').getEmbeddedSchemaType().options.someCustomOption, 'test 42');
   });
 });

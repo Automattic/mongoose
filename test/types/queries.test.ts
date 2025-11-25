@@ -840,6 +840,8 @@ async function gh15779() {
 
   const v8Filter = getV8FilterQuery({ age: { $gt: 18 } });
 
+  v8Filter.name = 'test';
+
   expectAssignable<typeof v8Filter.age>(42);
   expectNotAssignable<typeof v8Filter.age>('taco');
 }

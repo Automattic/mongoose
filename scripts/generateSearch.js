@@ -20,6 +20,8 @@ markdown.setOptions({
 // 5.13.5 -> 5.x, 6.8.2 -> 6.x, etc.
 version = version.slice(0, version.indexOf('.')) + '.x';
 
+console.log('Generating search for version', version);
+
 const contentSchema = new mongoose.Schema({
   title: { type: String, required: true },
   body: { type: String, required: true },
@@ -69,10 +71,12 @@ function generateContents() {
         el = $(el);
         const title = el.text();
         const html = el.nextUntil('h3').html();
+        const id = el.prop('id');
+        const baseUrl = filename.replace('.md', '.html').replace(/^docs/, '');
         const content = new Content({
           title: `${file.title}: ${title}`,
           body: html,
-          url: `${filename.replace('.md', '.html').replace(/^docs/, '')}#${el.prop('id')}`
+          url: id ? `${baseUrl}#${id}` : baseUrl
         });
 
         content.validateSync();
@@ -100,10 +104,12 @@ function generateContents() {
         el = $(el);
         const title = el.text();
         const html = el.nextUntil('h3').html();
+        const id = el.prop('id');
+        const baseUrl = filename.replace('.pug', '.html').replace(/^docs/, '');
         const content = new Content({
           title: `${file.title}: ${title}`,
           body: html,
-          url: `${filename.replace('.pug', '.html').replace(/^docs/, '')}#${el.prop('id')}`
+          url: id ? `${baseUrl}#${id}` : baseUrl
         });
 
         content.validateSync();
@@ -116,12 +122,16 @@ function generateContents() {
 }
 
 async function generateSearch(config) {
+  console.log('Connect to', config.uri);
   await mongoose.connect(config.uri, { dbName: 'mongoose' });
 
   // wait for the index to be created
+  console.log('Init Content model...');
   await Content.init();
 
+  console.log('Deleting existing content...');
   await Content.deleteMany({ version });
+  console.log('Deleted content for version', version);
 
   const contents = generateContents();
 
@@ -131,7 +141,7 @@ async function generateSearch(config) {
   let doneCount = 0;
   console.log('Search Content to save:', contents.length);
   for (const content of contents) {
-    if (version === '8.x') {
+    if (version === '9.x') {
       let url = content.url.startsWith('/') ? content.url : `/${content.url}`;
       if (!url.startsWith('/docs')) {
         url = '/docs' + url;

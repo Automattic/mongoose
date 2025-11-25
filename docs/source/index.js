@@ -4,11 +4,11 @@
 let sponsors = [];
 try {
   sponsors = require('../data/sponsors.json');
-} catch (err) {}
+} catch {}
 let jobs = [];
 try {
   jobs = require('../data/jobs.json');
-} catch (err) {}
+} catch {}
 
 const api = require('./api');
 
@@ -66,6 +66,7 @@ docs['docs/migrating_to_5.md'] = { guide: true, title: 'Migrating to Mongoose 5'
 docs['docs/migrating_to_6.md'] = { guide: true, title: 'Migrating to Mongoose 6', markdown: true };
 docs['docs/migrating_to_7.md'] = { guide: true, title: 'Migrating to Mongoose 7', markdown: true };
 docs['docs/migrating_to_8.md'] = { guide: true, title: 'Migrating to Mongoose 8', markdown: true };
+docs['docs/migrating_to_9.md'] = { guide: true, title: 'Migrating to Mongoose 9', markdown: true };
 docs['docs/connections.md'] = { guide: true, title: 'Connecting to MongoDB', markdown: true };
 docs['docs/lambda.md'] = { guide: true, title: 'Using Mongoose With AWS Lambda', markdown: true };
 docs['docs/geojson.md'] = { guide: true, title: 'Using GeoJSON', acquit: true, markdown: true };

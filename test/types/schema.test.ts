@@ -22,10 +22,13 @@ import {
   Query,
   model,
   ValidateOpts,
-  BufferToBinary,
-  CallbackWithoutResultAndOptionalError
+  CallbackWithoutResultAndOptionalError,
+  InferRawDocTypeFromSchema,
+  InferHydratedDocTypeFromSchema,
+  FlatRecord,
+  InferHydratedDocType
 } from 'mongoose';
-import { Binary, BSON } from 'mongodb';
+import { BSON, Binary, UUID } from 'mongodb';
 import { expectType, expectError, expectAssignable } from 'tsd';
 import { ObtainDocumentPathType, ResolvePathType } from '../../types/inferschematype';
 
@@ -133,7 +136,7 @@ const ProfileSchemaDef2: SchemaDefinition<IProfile> = {
   age: Schema.Types.Number
 };
 
-const ProfileSchema2: Schema<IProfile, Model<IProfile>> = new Schema<IProfile>(ProfileSchemaDef2);
+const ProfileSchema2: Schema<IProfile, Model<IProfile>> = new Schema<IProfile, Model<IProfile>>(ProfileSchemaDef2);
 
 const UserSchemaDef: SchemaDefinition<IUser> = {
   email: String,
@@ -923,23 +926,23 @@ async function gh12593() {
   const testSchema = new Schema({ x: { type: Schema.Types.UUID } });
 
   type Example = InferSchemaType<typeof testSchema>;
-  expectType<{ x?: Buffer | null }>({} as Example);
+  expectType<{ x?: UUID | null }>({} as Example);
 
   const Test = model('Test', testSchema);
 
   const doc = await Test.findOne({ x: '4709e6d9-61fd-435e-b594-d748eb196d8f' }).orFail();
-  expectType<Buffer | undefined | null>(doc.x);
+  expectType<UUID | undefined | null>(doc.x);
 
   const doc2 = new Test({ x: '4709e6d9-61fd-435e-b594-d748eb196d8f' });
-  expectType<Buffer | undefined | null>(doc2.x);
+  expectType<UUID | undefined | null>(doc2.x);
 
   const doc3 = await Test.findOne({}).orFail().lean();
-  expectType<Binary | undefined | null>(doc3.x);
+  expectType<UUID | undefined | null>(doc3.x);
 
   const arrSchema = new Schema({ arr: [{ type: Schema.Types.UUID }] });
 
   type ExampleArr = InferSchemaType<typeof arrSchema>;
-  expectType<{ arr: Buffer[] }>({} as ExampleArr);
+  expectType<{ arr: UUID[] }>({} as ExampleArr);
 }
 
 function gh12562() {
@@ -1082,6 +1085,8 @@ function stringEnumArrayInfer() {
   expectAssignable<StringEnum[] | null | undefined>({} as StringEnumExample['active']);
   type RawStringEnumExample = InferRawDocType<typeof schemaDefinition>;
   expectAssignable<StringEnum[] | null | undefined>({} as RawStringEnumExample['active']);
+  type HydratedStringEnumExample = InferHydratedDocType<typeof schemaDefinition>;
+  expectAssignable<StringEnum[] | null | undefined>({} as HydratedStringEnumExample['active']);
 
   const schemaDefinitionRequired = {
     active: { type: [String], enum: StringEnum, required: true }
@@ -1243,15 +1248,15 @@ function gh13633() {
   schema.pre('updateOne', { document: true, query: false }, function(next) {
   });
 
-  schema.pre('updateOne', { document: true, query: false }, function(next, options) {
+  schema.pre('updateOne', { document: true, query: false }, function(options) {
     expectType<Record<string, any> | undefined>(options);
   });
 
   schema.post('save', function(res, next) {
   });
-  schema.pre('insertMany', function(next, docs) {
+  schema.pre('insertMany', function(docs) {
   });
-  schema.pre('insertMany', function(next, docs, options) {
+  schema.pre('insertMany', function(docs, options) {
     expectType<(InsertManyOptions & { lean?: boolean }) | undefined>(options);
   });
 }
@@ -1306,12 +1311,24 @@ async function gh13797() {
   interface IUser {
     name: string;
   }
-  new Schema<IUser>({ name: { type: String, required: function() {
-    expectType<IUser>(this); return true;
-  } } });
-  new Schema<IUser>({ name: { type: String, default: function() {
-    expectType<IUser>(this); return '';
-  } } });
+  new Schema<IUser>({
+    name: {
+      type: String,
+      required: function() {
+        expectAssignable<HydratedDocument<IUser>>(this);
+        return true;
+      }
+    }
+  });
+  new Schema<IUser>({
+    name: {
+      type: String,
+      default: function() {
+        expectAssignable<HydratedDocument<IUser>>(this);
+        return '';
+      }
+    }
+  });
 }
 
 declare const brand: unique symbol;
@@ -1603,12 +1620,17 @@ function gh14696() {
 
   const x: ValidateOpts<unknown, User> = {
     validator(v: any) {
-      expectAssignable<User>(this);
-      return !v || this.name === 'super admin';
+      expectAssignable<User | Query<unknown, User>>(this);
+      return !v || this instanceof Query || this.name === 'super admin';
     }
   };
 
-  const userSchema = new Schema<User>({
+  interface IUserMethods {
+    isSuperAdmin(): boolean;
+  }
+
+  type UserModelType = Model<User, {}, IUserMethods>;
+  const userSchema = new Schema<User, UserModelType, IUserMethods>({
     name: {
       type: String,
       required: [true, 'Name on card is required']
@@ -1618,8 +1640,11 @@ function gh14696() {
       default: false,
       validate: {
         validator(v: any) {
-          expectAssignable<User>(this);
-          return !v || this.name === 'super admin';
+          expectAssignable<User | Query<unknown, User>>(this);
+          if (!v) {
+            return true;
+          }
+          return this.get('name') === 'super admin' || (!(this instanceof Query) && this.isSuperAdmin());
         }
       }
     },
@@ -1628,8 +1653,12 @@ function gh14696() {
       default: false,
       validate: {
         async validator(v: any) {
-          expectAssignable<User>(this);
-          return !v || this.name === 'super admin';
+          expectAssignable<User | Query<unknown, User>>(this);
+          if (this instanceof Query) {
+            const doc = await this.clone().findOne().orFail();
+            return doc.isSuperAdmin();
+          }
+          return !v || this.get('name') === 'super admin';
         }
       }
     }
@@ -1677,7 +1706,7 @@ function gh13215() {
     date: Date;
   };
 
-  expectType<User>({} as RawDocType);
+  expectType<User & { _id: Types.ObjectId }>({} as RawDocType);
 
   const schema = new Schema(schemaDefinition, schemaOptions);
   type SchemaType = InferSchemaType<typeof schema>;
@@ -1770,7 +1799,8 @@ async function gh14451() {
     myMap: {
       type: Map,
       of: String
-    }
+    },
+    myUUID: 'UUID'
   });
 
   const Test = model('Test', exampleSchema);
@@ -1784,7 +1814,8 @@ async function gh14451() {
       subdocProp?: string | undefined | null
     } | null,
     docArr: { nums: number[], times: string[] }[],
-    myMap?: Record<string, string> | null | undefined
+    myMap?: Record<string, string> | null | undefined,
+    myUUID?: string | null | undefined
   }>({} as TestJSON);
 }
 
@@ -1943,6 +1974,50 @@ function gh15516() {
   });
 }
 
+function testInferRawDocTypeFromSchema() {
+  const schema = new Schema({
+    name: String,
+    arr: [Number],
+    docArr: [{ name: { type: String, required: true } }],
+    subdoc: new Schema({
+      answer: { type: Number, required: true }
+    }),
+    map: { type: Map, of: String }
+  });
+
+  type RawDocType = InferRawDocTypeFromSchema<typeof schema>;
+
+  expectType<{
+    name?: string | null | undefined,
+    arr: number[],
+    docArr: { name: string }[],
+    subdoc?: { answer: number } | null | undefined,
+    map?: Record<string, string> | null | undefined
+  }>({} as RawDocType);
+}
+
+function testInferHydratedDocTypeFromSchema() {
+  const schema = new Schema({
+    name: String,
+    arr: [Number],
+    docArr: [{ name: { type: String, required: true } }],
+    subdoc: new Schema({ answer: { type: Number, required: true } }),
+    map: { type: Map, of: String }
+  });
+
+  type HydratedDocType = InferHydratedDocTypeFromSchema<typeof schema>;
+
+  type Expected = HydratedDocument<{
+    name?: string | null | undefined,
+    arr: number[],
+    docArr: Types.DocumentArray<{ name: string }>,
+    subdoc?: { answer: number } | null | undefined,
+    map?: Map<string, string> | null | undefined
+  }, { id: string }, {}, { id: string }>;
+
+  expectType<Expected>({} as HydratedDocType);
+}
+
 function gh15536() {
   const UserModelNameRequiredCustom = model('User', new Schema(
     {
@@ -1998,4 +2073,16 @@ function autoInferredNestedMaps() {
   const TestModel = model('Test', schema);
   const doc = new TestModel({ nestedMap: new Map([['1', new Map([['2', 'value']])]]) });
   expectType<Map<string, Map<string, string>>>(doc.nestedMap);
+}
+
+function gh15751() {
+  const schema = new Schema({
+    myId: {
+      type: Types.ObjectId,
+      required: true
+    }
+  });
+  const TestModel = model('Test', schema);
+  const doc = new TestModel();
+  expectType<Types.ObjectId>(doc.myId);
 }

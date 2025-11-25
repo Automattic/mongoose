@@ -902,9 +902,8 @@ describe('model: updateOne:', function() {
       let numPres = 0;
       let numPosts = 0;
       const band = new Schema({ members: [String] });
-      band.pre('updateOne', function(next) {
+      band.pre('updateOne', function() {
         ++numPres;
-        next();
       });
       band.post('updateOne', function() {
         ++numPosts;
@@ -1237,9 +1236,8 @@ describe('model: updateOne:', function() {
     it('middleware update with exec (gh-3549)', async function() {
       const Schema = mongoose.Schema({ name: String });
 
-      Schema.pre('updateOne', function(next) {
+      Schema.pre('updateOne', function() {
         this.updateOne({ name: 'Val' });
-        next();
       });
 
       const Model = db.model('Test', Schema);
@@ -2682,6 +2680,36 @@ describe('model: updateOne: ', function() {
     assert.equal(doc.age, 20);
   });
 
+  it('overwriting immutable createdAt with bulkWrite (gh-15781)', async function() {
+    const start = new Date().valueOf();
+    const schema = Schema({
+      createdAt: {
+        type: mongoose.Schema.Types.Date,
+        immutable: true
+      },
+      name: String
+    }, { timestamps: true });
+
+    const Model = db.model('Test', schema);
+
+    await Model.create({ name: 'gh-15781' });
+    let doc = await Model.collection.findOne({ name: 'gh-15781' });
+    assert.ok(doc.createdAt.valueOf() >= start);
+
+    const createdAt = new Date('2011-06-01');
+    assert.ok(createdAt.valueOf() < start.valueOf());
+    await Model.bulkWrite([{
+      updateOne: {
+        filter: { _id: doc._id },
+        update: { name: 'gh-15781 update', createdAt },
+        overwriteImmutable: true,
+        timestamps: false
+      }
+    }]);
+    doc = await Model.collection.findOne({ name: 'gh-15781 update' });
+    assert.equal(doc.createdAt.valueOf(), createdAt.valueOf());
+  });
+
   it('updates buffers with `runValidators` successfully (gh-8580)', async function() {
     const Test = db.model('Test', Schema({
       data: { type: Buffer, required: true }
@@ -2766,10 +2794,16 @@ describe('model: updateOne: ', function() {
       const Model = db.model('Test', schema);
 
       await Model.create({ oldProp: 'test' });
+
+      assert.throws(
+        () => Model.updateOne({}, [{ $set: { newProp: 'test2' } }]),
+        /Cannot pass an array to query updates unless the `updatePipeline` option is set/
+      );
+
       await Model.updateOne({}, [
         { $set: { newProp: 'test2' } },
         { $unset: ['oldProp'] }
-      ]);
+      ], { updatePipeline: true });
       let doc = await Model.findOne();
       assert.equal(doc.newProp, 'test2');
       assert.strictEqual(doc.oldProp, void 0);
@@ -2778,7 +2812,7 @@ describe('model: updateOne: ', function() {
       await Model.updateOne({}, [
         { $addFields: { oldProp: 'test3' } },
         { $project: { newProp: 0 } }
-      ]);
+      ], { updatePipeline: true });
       doc = await Model.findOne();
       assert.equal(doc.oldProp, 'test3');
       assert.strictEqual(doc.newProp, void 0);
@@ -2792,7 +2826,7 @@ describe('model: updateOne: ', function() {
       await Model.updateOne({}, [
         { $set: { newProp: 'test2' } },
         { $unset: 'oldProp' }
-      ]);
+      ], { updatePipeline: true });
       const doc = await Model.findOne();
       assert.equal(doc.newProp, 'test2');
       assert.strictEqual(doc.oldProp, void 0);
@@ -2805,8 +2839,11 @@ describe('model: updateOne: ', function() {
       const updatedAt = cat.updatedAt;
 
       await new Promise(resolve => setTimeout(resolve), 50);
-      const updated = await Cat.findOneAndUpdate({ _id: cat._id },
-        [{ $set: { name: 'Raikou' } }], { new: true });
+      const updated = await Cat.findOneAndUpdate(
+        { _id: cat._id },
+        [{ $set: { name: 'Raikou' } }],
+        { new: true, updatePipeline: true }
+      );
       assert.ok(updated.updatedAt.getTime() > updatedAt.getTime());
     });
   });

@@ -270,6 +270,12 @@ function processFile(props) {
       ctx.constructorWasUndefined = true;
     }
 
+    // Skip properties without tags to prevent iteration errors
+    // See: https://github.com/Automattic/mongoose/issues/15764
+    if (!prop.tags || !Array.isArray(prop.tags)) {
+      continue;
+    }
+
     for (const __tag of prop.tags) {
       // the following has been done, because otherwise no type could be applied for intellisense
       /** @type {TagObject} */

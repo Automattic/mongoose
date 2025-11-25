@@ -167,5 +167,6 @@ async function gh15359() {
     { model: 'Test', name: 'updateOne', filter: { name: 'test4' }, update: { $set: { num: 'not a number' } } }
   ], { ordered: false });
   expectType<number>(res3.insertedCount);
+  expectError(res3.validationErrors);
   expectType<Error[] | undefined>(res3.mongoose?.validationErrors);
 }

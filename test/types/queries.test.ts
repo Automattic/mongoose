@@ -851,7 +851,7 @@ async function gh15779() {
   TestModel.findOne(query);
   TestModel.deleteMany(query);
 }
-  
+
 async function gh15786() {
   interface IDoc {
     nmae: string;

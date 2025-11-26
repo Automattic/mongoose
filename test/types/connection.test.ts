@@ -167,7 +167,7 @@ async function gh15359() {
   const res3 = await conn.bulkWrite([
     { model: 'Test', name: 'updateOne', filter: { name: 'test5' }, update: { $set: { num: 42 } } },
     { model: 'Test', name: 'updateOne', filter: { name: 'test4' }, update: { $set: { num: 'not a number' } } }
-    ], { ordered: false });
+  ], { ordered: false });
   expectType<number>(res3.insertedCount);
   expectError((res3 as typeof res3 & { validationErrors?: unknown }).validationErrors);
   expectType<Error[] | undefined>(res3.mongoose?.validationErrors);

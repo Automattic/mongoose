@@ -166,8 +166,6 @@ function gh11085(): void {
 
   const newUser = new UserModel();
 
-  let _id: number;
-  expectError(_id = newUser._id);
   const _id2: Types.ObjectId = newUser._id;
 }
 

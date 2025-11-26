@@ -804,8 +804,8 @@ async function gh15786() {
   }
 
   interface DocStatics {
-          m1(): void;
-          m2(): void;
+    m1(): void;
+    m2(): void;
   }
 
   const schema = new Schema<IDoc, Model<IDoc>, {}, {}, {}, DocStatics>({});

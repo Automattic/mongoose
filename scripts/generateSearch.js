@@ -63,14 +63,17 @@ function generateContents() {
       content.validateSync();
 
       const $ = cheerio.load(text);
-
       contents.push(content);
 
-      // Break up individual h3's into separate content for more fine grained search
+      // Break up h3's into additional content entries
       $('h3').each((index, el) => {
         el = $(el);
         const title = el.text();
         const html = el.nextUntil('h3').html();
+
+        // *** FIXED: Skip empty HTML blocks ***
+        if (!html || html.trim() === '') return;
+
         const id = el.prop('id');
         const baseUrl = filename.replace('.md', '.html').replace(/^docs/, '');
         const content = new Content({
@@ -82,6 +85,7 @@ function generateContents() {
         content.validateSync();
         contents.push(content);
       });
+
     } else if (file.guide) {
       let text = fs.readFileSync(filename, 'utf8');
       text = text.substring(text.indexOf('block content') + 'block content\n'.length);
@@ -96,14 +100,17 @@ function generateContents() {
       content.validateSync();
 
       const $ = cheerio.load(text);
-
       contents.push(content);
 
-      // Break up individual h3's into separate content for more fine grained search
+      // Break up h3's into additional content entries
       $('h3').each((index, el) => {
         el = $(el);
         const title = el.text();
         const html = el.nextUntil('h3').html();
+
+        // *** FIXED: Skip empty HTML blocks ***
+        if (!html || html.trim() === '') return;
+
         const id = el.prop('id');
         const baseUrl = filename.replace('.pug', '.html').replace(/^docs/, '');
         const content = new Content({
@@ -137,48 +144,39 @@ async function generateSearch(config) {
 
   const promises = [];
   let lastPrint = 0;
-
   let doneCount = 0;
+
   console.log('Search Content to save:', contents.length);
+
   for (const content of contents) {
-    if (version === '9.x') {
-      let url = content.url.startsWith('/') ? content.url : `/${content.url}`;
-      if (!url.startsWith('/docs')) {
-        url = '/docs' + url;
-      }
-      content.url = url;
-    } else {
-      let url = content.url.startsWith('/') ? content.url : `/${content.url}`;
-      if (!url.startsWith('/docs')) {
-        url = '/docs' + url;
-      }
-      content.url = `/docs/${version}${url}`;
+    let url = content.url.startsWith('/') ? content.url : `/${content.url}`;
+    if (!url.startsWith('/docs')) {
+      url = '/docs' + url;
     }
+    content.url = version === '9.x' ? url : `/docs/${version}${url}`;
+
     const promise = content.save().then(() => {
       doneCount += 1;
       const nowDate = Date.now();
-      // only print every 2 seconds, or if it is the first or last element
       if (nowDate - lastPrint > 2000 || doneCount === contents.length || doneCount === 1) {
         lastPrint = nowDate;
         console.log(`${doneCount} / ${contents.length}`);
       }
     });
+
     promises.push(promise);
   }
 
   await Promise.allSettled(promises);
 
-  const results = await Content.
-    find({ $text: { $search: 'validate' }, version }, { score: { $meta: 'textScore' } }).
-    sort({ score: { $meta: 'textScore' } }).
-    limit(10);
+  const results = await Content
+    .find({ $text: { $search: 'validate' }, version }, { score: { $meta: 'textScore' } })
+    .sort({ score: { $meta: 'textScore' } })
+    .limit(10);
 
   console.log(results.map(res => res.url));
 
   console.log(`Added ${contents.length} Search Content`);
-
-  // this likely should not be done as part of this script, but by the caller,
-  // but this script is currently the only one that connects in the website generation.
   await mongoose.disconnect();
 }
 
@@ -186,7 +184,7 @@ function getConfig() {
   const config = require('../.config.js');
 
   if (!config || !config.uri) {
-    throw new Error('No Config or config.URI given, please create a .config.js file with those values in the root of the repository');
+    throw new Error('No Config or config.uri given, please create a .config.js file with those values in the root of the repository');
   }
 
   return config;
@@ -195,7 +193,6 @@ function getConfig() {
 module.exports.generateSearch = generateSearch;
 module.exports.getConfig = getConfig;
 
-// only run the following code if this file is the main module / entry file
 if (isMain) {
   (async function main() {
     const config = getConfig();

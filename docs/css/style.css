@@ -31,8 +31,8 @@ body[data-theme="light"] {
 /* Theme Toggle Button for Homepage */
 #theme-toggle {
   position: fixed;
-  top: 10px;
-  left: 10px;
+  bottom: 20px;
+  right: 20px;
   z-index: 1000;
   background-color: rgba(255, 255, 255, 0.9);
   border: 1px solid #ddd;

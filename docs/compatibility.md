@@ -11,10 +11,11 @@
     }
 </style>
 
-Mongoose relies on the [MongoDB Node.js Driver](http://mongodb.github.io/node-mongodb-native/) to talk to MongoDB.
-You can refer to [this table](https://www.mongodb.com/docs/drivers/node/current/compatibility/) for up-to-date information as to which version of the MongoDB driver supports which version of MongoDB.
+Mongoose relies on the [MongoDB Node.js Driver](https://www.mongodb.com/docs/drivers/node/current/) to communicate with MongoDB.
 
-Below are the [semver](http://semver.org/) ranges representing which versions of mongoose are compatible with the listed versions of MongoDB server.
+You can refer to [this table](https://www.mongodb.com/docs/drivers/compatibility/?driver-language=javascript&javascript-driver-framework=nodejs) for up-to-date information as to which version of the MongoDB driver supports which version of the MongoDB server.
+
+Below are the [SemVer](http://semver.org/) ranges representing which versions of mongoose are compatible with the listed versions of MongoDB server.
 
 | MongoDB Server |                    Mongoose                    |
 | :------------: | :--------------------------------------------: |
@@ -27,4 +28,4 @@ Below are the [semver](http://semver.org/) ranges representing which versions of
 |    `4.0.x`     |       `^6.0.0 \| ^7.0.0 \| ^8.0.0 <8.16.0`     |
 |    `3.6.x`     |       `^6.0.0 \| ^7.0.0 \| ^8.0.0 <8.8.0`      |
 
-Mongoose `^6.5.0` also works with MongoDB server 7.x. But not all new MongoDB server 7.x features are supported by Mongoose 6.x.
+Mongoose `^6.5.0` also works with MongoDB server 7.x. But not all new MongoDB server 7.x features are supported by Mongoose 6.x. To verify that your version of Mongoose is compatible based on the table able, use the [online SemVer checker](https://jubianchi.github.io/semver-check/#/).

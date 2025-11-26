@@ -801,6 +801,7 @@ function gh15671() {
 
 async function gh15786() {
   interface IDoc {
+    nmae: string;
   }
 
   interface DocStatics {

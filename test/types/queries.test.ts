@@ -844,4 +844,10 @@ async function gh15779() {
 
   expectAssignable<typeof v8Filter.age>(42);
   expectNotAssignable<typeof v8Filter.age>('taco');
+
+  const TestModel = model('Test', new Schema({ age: Number, name: String }));
+  const query = TestModel.find({ age: { $gt: 18 } });
+  TestModel.find(query); // Should compile without errors
+  TestModel.findOne(query);
+  TestModel.deleteMany(query);
 }

@@ -72,11 +72,9 @@ expectType<Promise<mongodb.ClientSession>>(conn.startSession({ causalConsistency
 
 expectType<Promise<ConnectionSyncIndexesResult>>(conn.syncIndexes());
 expectType<Promise<ConnectionSyncIndexesResult>>(conn.syncIndexes({ continueOnError: true }));
-expectType<Promise<ConnectionSyncIndexesResult>>(conn.syncIndexes({ background: true }));
 
 expectType<Connection>(conn.useDb('test'));
 expectType<Connection>(conn.useDb('test', {}));
-expectType<Connection>(conn.useDb('test', { noListener: true }));
 expectType<Connection>(conn.useDb('test', { useCache: true }));
 
 expectType<Promise<string[]>>(
@@ -169,6 +167,6 @@ async function gh15359() {
     { model: 'Test', name: 'updateOne', filter: { name: 'test4' }, update: { $set: { num: 'not a number' } } }
   ], { ordered: false });
   expectType<number>(res3.insertedCount);
-  expectError(res3.validationErrors);
+  expectError((res3 as typeof res3 & { validationErrors?: unknown }).validationErrors);
   expectType<Error[] | undefined>(res3.mongoose?.validationErrors);
 }

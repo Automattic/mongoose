@@ -167,10 +167,10 @@ function gh11085(): void {
   const newUser = new UserModel();
 
   expectError(() => {
-      const wrong: number = newUser._id;
-});
+  const wrong: number = newUser._id;
+  });
 
-const _id2: Types.ObjectId = newUser._id;
+  const _id2: Types.ObjectId = newUser._id;
 }
 
 function gh11435() {

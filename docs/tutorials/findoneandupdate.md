@@ -7,6 +7,7 @@ However, there are some cases where you need to use [`findOneAndUpdate()`](https
 * [Atomic Updates](#atomic-updates)
 * [Upsert](#upsert)
 * [The `includeResultMetadata` Option](#includeresultmetadata)
+* [Removing Fields with `undefined`](#removing-fields-with-undefined)
 * [Updating Discriminator Keys](#updating-discriminator-keys)
 
 ## Getting Started
@@ -87,6 +88,87 @@ Here's what the `res` object from the above example looks like:
      __v: 0,
      age: 29 },
   ok: 1 }
+```
+
+## Removing Fields with `undefined` {#removing-fields-with-undefined}
+
+Mongoose automatically applies the `convertSetUndefinedToUnset` plugin to every schema. This plugin automatically converts `undefined` values in update operations to `$unset` operations, which removes the field from the document.
+
+**No setup required** - this plugin is built-in and works automatically for all schemas.
+
+### Using `$set` with `undefined`
+
+When you use `$set` with `undefined`, Mongoose automatically converts it to `$unset`:
+
+```javascript
+const schema = new Schema({ name: String, age: Number });
+const User = mongoose.model('User', schema);
+
+// Create a document
+await User.create({ name: 'John', age: 30 });
+
+// Remove the 'age' field by setting it to undefined
+await User.updateOne({ name: 'John' }, { $set: { age: undefined } });
+
+// The 'age' field is now removed from the document
+const user = await User.findOne({ name: 'John' });
+console.log(user.age); // undefined
+console.log('age' in user.toObject()); // false
+```
+
+### Direct assignment with `undefined`
+
+You can also use direct assignment (without `$set`) to remove fields:
+
+```javascript
+// Remove the 'age' field using direct assignment
+await User.updateOne({ name: 'John' }, { age: undefined });
+
+// The 'age' field is now removed
+const user = await User.findOne({ name: 'John' });
+console.log('age' in user.toObject()); // false
+```
+
+### Nested fields
+
+The plugin also works with nested fields using dot notation:
+
+```javascript
+const schema = new Schema({
+  name: String,
+  profile: {
+    bio: String,
+    website: String
+  }
+});
+const User = mongoose.model('User', schema);
+
+await User.create({ name: 'John', profile: { bio: 'Developer', website: 'example.com' } });
+
+// Remove nested fields
+await User.updateOne({ name: 'John' }, { $set: { 'profile.website': undefined } });
+
+const user = await User.findOne({ name: 'John' });
+console.log(user.profile.website); // undefined
+console.log('website' in user.profile); // false
+```
+
+### Works with all update operations
+
+This feature works with all update query methods:
+
+```javascript
+// Works with updateOne
+await User.updateOne({ name: 'John' }, { $set: { age: undefined } });
+
+// Works with updateMany
+await User.updateMany({}, { $set: { age: undefined } });
+
+// Works with findOneAndUpdate
+await User.findOneAndUpdate({ name: 'John' }, { $set: { age: undefined } }, { new: true });
+
+// Works with update (deprecated)
+await User.update({ name: 'John' }, { $set: { age: undefined } });
 ```
 
 ## Updating Discriminator Keys

@@ -105,6 +105,9 @@ Mongoose. Here's a couple:
 * [mongoose-lean-virtuals](http://plugins.mongoosejs.io/plugins/lean-virtuals): Attach virtuals to the results of Mongoose queries when using [`.lean()`](api/query.html#query_Query-lean).
 * [mongoose-cast-aggregation](https://www.npmjs.com/package/mongoose-cast-aggregation)
 
+> [!NOTE]
+> These plugins are external npm packages, not part of Mongoose core. While the Mongoose team maintains them, please verify each plugin is actively maintained and compatible with your Mongoose version before using it in production.
+
 You can find a full list of officially supported plugins on [Mongoose's plugins search site](https://plugins.mongoosejs.io/).
 
 ## Community

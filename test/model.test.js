@@ -6522,7 +6522,7 @@ describe('Model', function() {
   });
 
   describe('bulkSave() (gh-9673)', function() {
-    it('saves new documents', async function() {
+    it('saves new documents', async function () {
 
       const userSchema = new Schema({
         name: { type: String }
@@ -6545,7 +6545,77 @@ describe('Model', function() {
           'Hafez2_gh-9673-1'
         ]
       );
+    });
 
+    it('increments version key on successful save (gh-15800)', async function() {
+      // Arrange
+      const userSchema = new Schema({
+        name: [String],
+        email: { type: String, minLength: 3 }
+      });
+
+      const User = db.model('User', userSchema);
+      const user1 = new User({ name: ['123'], email: '12314' });
+      await user1.save();
+
+      // Act
+      const user = await User.findOne({ _id: user1._id });
+      assert.ok(user);
+
+      // Before, __v should be 0
+      assert.equal(user.__v, 0);
+
+      // markModified on array field (triggers $set)
+      user.markModified('name');
+      await User.bulkSave([user]);
+
+      const dbUser1 = await User.findById(user._id);
+      assert.equal(dbUser1.__v, 1);
+      assert.equal(user.__v, 1);
+
+      // Update another path and markModified
+      user.email = '1375';
+      await User.bulkSave([user]);
+      const dbUser2 = await User.findById(user._id);
+      assert.equal(dbUser2.__v, 1);
+      assert.equal(user.__v, 1);
+
+      let reloaded = await User.findById(user._id);
+      assert.equal(reloaded.__v, 1);
+
+      user.email = '1';
+      await assert.rejects(
+        () => User.bulkSave([user]),
+        /email.*is shorter than the minimum allowed length/
+      );
+      assert.equal(user.__v, 1);
+
+      reloaded = await User.findById(user._id);
+      assert.equal(reloaded.__v, 1);
+    });
+
+    it('saves new documents with ordered: false (gh-15495)', async function() {
+      const userSchema = new Schema({
+        name: { type: String }
+      });
+
+      const User = db.model('User', userSchema);
+
+
+      await User.bulkSave([
+        new User({ name: 'Hafez1_gh-9673-1' }),
+        new User({ name: 'Hafez2_gh-9673-1' })
+      ], { ordered: false });
+
+      const users = await User.find().sort('name');
+
+      assert.deepEqual(
+        users.map(user => user.name),
+        [
+          'Hafez1_gh-9673-1',
+          'Hafez2_gh-9673-1'
+        ]
+      );
     });
 
     it('updates documents', async function() {

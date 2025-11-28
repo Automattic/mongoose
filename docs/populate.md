@@ -586,6 +586,10 @@ example. But, if you decide to allow users to also comment on articles or
 other comments, you'll need to add more properties to your schema. You'll
 also need an extra `populate()` call for every property, unless you use
 [mongoose-autopopulate](https://www.npmjs.com/package/mongoose-autopopulate).
+
+> [!NOTE]
+> `mongoose-autopopulate` is an external plugin. Please verify the plugin is actively maintained and compatible with your Mongoose version before using it in production.
+
 Using `refPath` means you only need 2 schema paths and one `populate()` call
 regardless of how many models your `commentSchema` can point to.
 
@@ -895,8 +899,7 @@ const libraries = await Library.find().populate('books.$*.author');
 
 ## Populate in Middleware {#populate-middleware}
 
-You can populate in either pre or post [hooks](http://mongoosejs.com/docs/middleware.html). If you want to
-always populate a certain field, check out the [mongoose-autopopulate plugin](http://npmjs.com/package/mongoose-autopopulate).
+You can populate in either pre or post [hooks](http://mongoosejs.com/docs/middleware.html).
 
 ```javascript
 // Always attach `populate()` to `find()` calls
@@ -904,6 +907,12 @@ MySchema.pre('find', function() {
   this.populate('user');
 });
 ```
+
+If you want to always populate certain fields, you can use Mongoose middleware as shown above. Alternatively, you can use
+the [mongoose-autopopulate plugin](http://npmjs.com/package/mongoose-autopopulate).
+
+> [!WARNING]
+> `mongoose-autopopulate` is an external plugin not maintained by the Mongoose team. Before using it, verify the plugin is actively maintained and compatible with your Mongoose version. The middleware approach shown above is recommended for most use cases.
 
 ```javascript
 // Always `populate()` after `find()` calls. Useful if you want to selectively populate
@@ -961,7 +970,7 @@ userSchema.pre('find', function(next) {
 });
 ```
 
-Alternatively, you can check out the [mongoose-autopopulate plugin](http://npmjs.com/package/mongoose-autopopulate).
+Alternatively, you can use the [mongoose-autopopulate plugin](http://npmjs.com/package/mongoose-autopopulate), though please verify it is actively maintained and compatible with your Mongoose version before using it in production.
 
 ## Transform populated documents {#transform-populated-documents}
 

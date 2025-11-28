@@ -827,6 +827,31 @@ function gh15671() {
   };
 }
 
+async function gh15779() {
+  type Entity = {
+    id: string;
+    age: number;
+    name: string;
+  };
+
+  function getV8FilterQuery(filter: QueryFilter<Entity>): QueryFilter<Entity> {
+    return { ...filter, deletedAt: null };
+  }
+
+  const v8Filter = getV8FilterQuery({ age: { $gt: 18 } });
+
+  v8Filter.name = 'test';
+
+  expectAssignable<typeof v8Filter.age>(42);
+  expectNotAssignable<typeof v8Filter.age>('taco');
+
+  const TestModel = model('Test', new Schema({ age: Number, name: String }));
+  const query = TestModel.find({ age: { $gt: 18 } });
+  TestModel.find(query); // Should compile without errors
+  TestModel.findOne(query);
+  TestModel.deleteMany(query);
+}
+
 async function gh15786() {
   interface IDoc {
     nmae: string;

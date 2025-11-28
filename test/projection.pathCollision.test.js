@@ -1,3 +1,5 @@
+'use strict';
+
 const mongoose = require('../');
 const { Schema, model } = mongoose;
 const assert = require('assert');
@@ -20,3 +22,4 @@ describe('Fix projection collision', function() {
     assert.deepStrictEqual(proj, { subd: 0 });
   });
 });
+

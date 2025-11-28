@@ -351,4 +351,26 @@ describe('utils', function() {
       assert.equal(utils.toCollectionName('test', pluralize), 'tests');
     });
   });
+
+  describe('null checks', function() {
+    // regression test: previously these would crash with "Cannot read property 'length' of null"
+    // or similar errors. now they should fail gracefully.
+    it('utils.last() handles null/undefined inputs', function() {
+      assert.strictEqual(utils.last(null), undefined);
+      assert.strictEqual(utils.last(undefined), undefined);
+    });
+
+    // merge shouldn't blow up if the source object is missing
+    it('utils.merge() returns target if source is null/undefined', function() {
+      const target = { foo: 'bar' };
+      assert.strictEqual(utils.merge(target, null), target);
+      assert.strictEqual(utils.merge(target, undefined), target);
+    });
+
+    // just return empty array if we can't get values from nothing
+    it('utils.object.vals() returns empty array for null/undefined', function() {
+      assert.deepStrictEqual(utils.object.vals(null), []);
+      assert.deepStrictEqual(utils.object.vals(undefined), []);
+    });
+  });
 });

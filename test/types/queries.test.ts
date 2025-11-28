@@ -826,3 +826,17 @@ function gh15671() {
     };
   };
 }
+
+async function gh15786() {
+  interface IDoc {
+    nmae: string;
+  }
+
+  interface DocStatics {
+    m1(): void;
+    m2(): void;
+  }
+
+  const schema = new Schema<IDoc, Model<IDoc>, {}, {}, {}, DocStatics>({});
+  schema.static({ m1() {} } as DocStatics);
+}

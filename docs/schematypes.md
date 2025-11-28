@@ -203,6 +203,9 @@ plugin automatically populates paths if you set `autopopulate: true` in your
 SchemaType options. Mongoose comes with support for several built-in
 SchemaType options, like `lowercase` in the above example.
 
+> [!NOTE]
+> When using external plugins like `mongoose-autopopulate`, verify the plugin is compatible with your Mongoose version before use.
+
 The `lowercase` option only works for strings. There are certain options
 which apply for all schema types, and some that apply for specific schema
 types.

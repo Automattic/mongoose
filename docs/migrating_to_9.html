@@ -104,47 +104,46 @@ mongoose.<span class="hljs-title function_">set</span>(<span class="hljs-string"
 mongoose.<span class="hljs-title function_">isValidObjectId</span>(<span class="hljs-number">6</span>);
 
 <span class="hljs-comment">// Works in Mongoose 8, throws in Mongoose 9</span>
-<span class="hljs-keyword">new</span> mongoose.<span class="hljs-property">Types</span>.<span class="hljs-title class_">ObjectId</span>(<span class="hljs-number">6</span>);
-
-## <span class="hljs-title class_">Subdocument</span> <span class="hljs-string">`deleteOne()`</span> hooks execute only when subdocument is deleted
-
-<span class="hljs-title class_">Currently</span>, calling <span class="hljs-string">`deleteOne()`</span> on a subdocument will execute the <span class="hljs-string">`deleteOne()`</span> hooks on the subdocument regardless <span class="hljs-keyword">of</span> whether the subdocument is actually deleted.
-
-<span class="hljs-string">``</span><span class="hljs-string">`javascript
-const SubSchema = new Schema({
-  myValue: {
-    type: String
+<span class="hljs-keyword">new</span> mongoose.<span class="hljs-property">Types</span>.<span class="hljs-title class_">ObjectId</span>(<span class="hljs-number">6</span>);</code></pre><h2 id="subdocument-deleteone-hooks-execute-only-when-subdocument-is-deleted">
+        <a href="#subdocument-deleteone-hooks-execute-only-when-subdocument-is-deleted">
+          Subdocument <code>deleteOne()</code> hooks execute only when subdocument is deleted
+        </a>
+      </h2>
+<p>Currently, calling <code>deleteOne()</code> on a subdocument will execute the <code>deleteOne()</code> hooks on the subdocument regardless of whether the subdocument is actually deleted.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">SubSchema</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">myValue</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>
   }
 }, {});
-let count = 0;
-SubSchema.pre(&#x27;deleteOne&#x27;, { document: true, query: false }, function(next) {
+<span class="hljs-keyword">let</span> count = <span class="hljs-number">0</span>;
+<span class="hljs-title class_">SubSchema</span>.<span class="hljs-title function_">pre</span>(<span class="hljs-string">&#x27;deleteOne&#x27;</span>, { <span class="hljs-attr">document</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">query</span>: <span class="hljs-literal">false</span> }, <span class="hljs-keyword">function</span>(<span class="hljs-params">next</span>) {
   count++;
-  next();
+  <span class="hljs-title function_">next</span>();
 });
-const schema = new Schema({
-  foo: {
-    type: String,
-    required: true
+<span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">foo</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,
+    <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>
   },
-  mySubdoc: {
-    type: [SubSchema],
-    required: true
+  <span class="hljs-attr">mySubdoc</span>: {
+    <span class="hljs-attr">type</span>: [<span class="hljs-title class_">SubSchema</span>],
+    <span class="hljs-attr">required</span>: <span class="hljs-literal">true</span>
   }
-}, { minimize: false, collection: &#x27;test&#x27; });
+}, { <span class="hljs-attr">minimize</span>: <span class="hljs-literal">false</span>, <span class="hljs-attr">collection</span>: <span class="hljs-string">&#x27;test&#x27;</span> });
 
-const Model = db.model(&#x27;TestModel&#x27;, schema);
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Model</span> = db.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;TestModel&#x27;</span>, schema);
 
-const newModel = {
-  foo: &#x27;bar&#x27;,
-  mySubdoc: [{ myValue: &#x27;some value&#x27; }]
+<span class="hljs-keyword">const</span> newModel = {
+  <span class="hljs-attr">foo</span>: <span class="hljs-string">&#x27;bar&#x27;</span>,
+  <span class="hljs-attr">mySubdoc</span>: [{ <span class="hljs-attr">myValue</span>: <span class="hljs-string">&#x27;some value&#x27;</span> }]
 };
-const doc = await Model.create(newModel);
+<span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">create</span>(newModel);
 
-// In Mongoose 8, the following would trigger the `</span>deleteOne<span class="hljs-string">` hook, even if `</span>doc<span class="hljs-string">` is not saved or deleted.
-doc.mySubdoc[0].deleteOne();
+<span class="hljs-comment">// In Mongoose 8, the following would trigger the `deleteOne` hook, even if `doc` is not saved or deleted.</span>
+doc.<span class="hljs-property">mySubdoc</span>[<span class="hljs-number">0</span>].<span class="hljs-title function_">deleteOne</span>();
 
-// In Mongoose 9, you would need to either `</span><span class="hljs-title function_">save</span>()<span class="hljs-string">` or `</span><span class="hljs-title function_">deleteOne</span>()<span class="hljs-string">` on `</span>doc<span class="hljs-string">` to trigger the subdocument `</span>deleteOne<span class="hljs-string">` hook.
-await doc.save();</span></code></pre><h2 id="hooks-for-custom-methods-and-statics-no-longer-support-callbacks">
+<span class="hljs-comment">// In Mongoose 9, you would need to either `save()` or `deleteOne()` on `doc` to trigger the subdocument `deleteOne` hook.</span>
+<span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">save</span>();</code></pre><h2 id="hooks-for-custom-methods-and-statics-no-longer-support-callbacks">
         <a href="#hooks-for-custom-methods-and-statics-no-longer-support-callbacks">
           Hooks for custom methods and statics no longer support callbacks
         </a>

@@ -16,14 +16,14 @@ declare module 'mongoose' {
     SchemaDefinition,
     TSchemaOptions extends Record<any, any> = DefaultSchemaOptions,
     TTransformOptions = { bufferToBinary: false }
-  > = Require_id<ApplySchemaOptions<{
+  > = ApplySchemaOptions<{
     [
     K in keyof (RequiredPaths<SchemaDefinition, TSchemaOptions['typeKey']> &
     OptionalPaths<SchemaDefinition, TSchemaOptions['typeKey']>)
     ]: IsPathRequired<SchemaDefinition[K], TSchemaOptions['typeKey']> extends true
       ? ObtainRawDocumentPathType<SchemaDefinition[K], TSchemaOptions['typeKey'], TTransformOptions>
       : ObtainRawDocumentPathType<SchemaDefinition[K], TSchemaOptions['typeKey'], TTransformOptions> | null;
-  }, TSchemaOptions>>;
+  }, TSchemaOptions>;
 
   export type InferRawDocType<
     SchemaDefinition,

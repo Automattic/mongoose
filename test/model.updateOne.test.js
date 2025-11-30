@@ -2680,34 +2680,53 @@ describe('model: updateOne: ', function() {
     assert.equal(doc.age, 20);
   });
 
-  it('overwriting immutable createdAt with bulkWrite (gh-15781)', async function() {
-    const start = new Date().valueOf();
-    const schema = Schema({
-      createdAt: {
-        type: mongoose.Schema.Types.Date,
-        immutable: true
-      },
-      name: String
-    }, { timestamps: true });
+  describe('bulkWrite overwriteImmutable option (gh-15781)', function() {
+    it('updateOne can update immutable field with overwriteImmutable: true', async function() {
+      // Arrange
+      const { User } = createTestContext();
+      const user = await User.create({ name: 'John', ssn: '123-45-6789' });
 
-    const Model = db.model('Test', schema);
+      // Act
+      await User.bulkWrite([{
+        updateOne: {
+          filter: { _id: user._id },
+          update: { ssn: '999-99-9999' },
+          overwriteImmutable: true
+        }
+      }]);
 
-    await Model.create({ name: 'gh-15781' });
-    let doc = await Model.collection.findOne({ name: 'gh-15781' });
-    assert.ok(doc.createdAt.valueOf() >= start);
+      // Assert
+      const updatedUser = await User.findById(user._id);
+      assert.strictEqual(updatedUser.ssn, '999-99-9999');
+    });
 
-    const createdAt = new Date('2011-06-01');
-    assert.ok(createdAt.valueOf() < start.valueOf());
-    await Model.bulkWrite([{
-      updateOne: {
-        filter: { _id: doc._id },
-        update: { name: 'gh-15781 update', createdAt },
-        overwriteImmutable: true,
-        timestamps: false
-      }
-    }]);
-    doc = await Model.collection.findOne({ name: 'gh-15781 update' });
-    assert.equal(doc.createdAt.valueOf(), createdAt.valueOf());
+    it('updateMany can update immutable field with overwriteImmutable: true', async function() {
+      // Arrange
+      const { User } = createTestContext();
+      const user = await User.create({ name: 'Alice', ssn: '111-11-1111' });
+
+      // Act
+      await User.bulkWrite([{
+        updateMany: {
+          filter: { _id: user._id },
+          update: { ssn: '000-00-0000' },
+          overwriteImmutable: true
+        }
+      }]);
+
+      // Assert
+      const updatedUser = await User.findById(user._id);
+      assert.strictEqual(updatedUser.ssn, '000-00-0000');
+    });
+
+    function createTestContext() {
+      const userSchema = new Schema({
+        name: String,
+        ssn: { type: String, immutable: true }
+      });
+      const User = db.model('User', userSchema);
+      return { User };
+    }
   });
 
   it('updates buffers with `runValidators` successfully (gh-8580)', async function() {

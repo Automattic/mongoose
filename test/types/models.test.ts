@@ -17,11 +17,13 @@ import mongoose, {
   createConnection,
   connection,
   model,
-  ObtainSchemaGeneric
+  ObtainSchemaGeneric,
+  UpdateOneModel,
+  UpdateManyModel
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
-import { ModifyResult, UpdateOneModel, ChangeStreamInsertDocument, ObjectId } from 'mongodb';
+import { ModifyResult, UpdateOneModel as MongoUpdateOneModel, ChangeStreamInsertDocument, ObjectId } from 'mongodb';
 
 function rawDocSyntax(): void {
   interface ITest {
@@ -1088,4 +1090,37 @@ async function gh15693() {
   const leanInst = await User.findOne({}).lean().orFail();
   User.schema.methods.printName.apply(leanInst);
 
+}
+
+async function gh15781() {
+  const userSchema = new Schema({
+    createdAt: { type: Date, immutable: true },
+    name: String
+  }, { timestamps: true });
+
+  const User = model('User', userSchema);
+
+  await User.bulkWrite([
+    {
+      updateOne: {
+        filter: { name: 'John' },
+        update: { createdAt: new Date() },
+        overwriteImmutable: true,
+        timestamps: false
+      }
+    },
+    {
+      updateMany: {
+        filter: { name: 'Jane' },
+        update: { createdAt: new Date() },
+        overwriteImmutable: true,
+        timestamps: false
+      }
+    }
+  ]);
+
+  expectType<boolean | undefined>({} as UpdateOneModel['timestamps']);
+  expectType<boolean | undefined>({} as UpdateOneModel['overwriteImmutable']);
+  expectType<boolean | undefined>({} as UpdateManyModel['timestamps']);
+  expectType<boolean | undefined>({} as UpdateManyModel['overwriteImmutable']);
 }

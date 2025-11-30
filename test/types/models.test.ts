@@ -14,10 +14,8 @@ import mongoose, {
   UpdateQuery,
   UpdateWriteOpResult,
   WithLevel1NestedPaths,
-  createConnection,
   connection,
   model,
-  ObtainSchemaGeneric,
   UpdateOneModel,
   UpdateManyModel
 } from 'mongoose';
@@ -415,7 +413,7 @@ function gh11911() {
   const Animal = model<IAnimal>('Animal', animalSchema);
 
   const changes: UpdateQuery<IAnimal> = {};
-  expectAssignable<UpdateOneModel>({
+  expectAssignable<MongoUpdateOneModel>({
     filter: {},
     update: changes
   });
@@ -509,7 +507,7 @@ function gh12100() {
 })();
 
 
-function modelRemoveOptions() {
+async function modelRemoveOptions() {
   const cmodel = model('Test', new Schema());
 
   const res: DeleteResult = await cmodel.deleteOne({}, {});

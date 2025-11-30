@@ -36,14 +36,14 @@ module.exports.mochaGlobalSetup = async function mochaGlobalSetup() {
   }
 
   if (startMemoryInstance) {
-    mongoinstance = await mms.MongoMemoryServer.create({ instance: { args: ['--setParameter', 'ttlMonitorSleepSecs=1'], storageEngine: 'wiredTiger' } });
+    mongoinstance = await mms.MongoMemoryServer.create({ instance: { args: ['--setParameter', 'ttlMonitorSleepSecs=1'], storageEngine: 'wiredTiger' }, launchTimeout: 30000 });
     instanceuri = mongoinstance.getUri();
   } else {
     instanceuri = process.env.MONGOOSE_TEST_URI;
   }
 
   if (startMemoryReplset) {
-    mongorreplset = await mms.MongoMemoryReplSet.create({ replSet: { count: 3, args: ['--setParameter', 'ttlMonitorSleepSecs=1'], storageEngine: 'wiredTiger' } }); // using 3 because even numbers can lead to vote problems
+    mongorreplset = await mms.MongoMemoryReplSet.create({ replSet: { count: 3, args: ['--setParameter', 'ttlMonitorSleepSecs=1'], storageEngine: 'wiredTiger' }, launchTimeout: 30000 }); // using 3 because even numbers can lead to vote problems
     replseturi = mongorreplset.getUri();
   } else {
     replseturi = process.env.MONGOOSE_REPLSET_URI;

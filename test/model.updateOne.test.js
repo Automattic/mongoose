@@ -777,7 +777,7 @@ describe('model: updateOne:', function() {
       assert.ok(!!error);
       assert.equal(Object.keys(error.errors).length, 1);
       assert.equal(Object.keys(error.errors)[0], 'steak');
-      assert.equal(error.errors.steak, '`tofu` is not a valid enum value for path `steak`.');
+      assert.equal(error.errors.steak, 'ValidatorError: `tofu` is not a valid enum value for path `steak`.');
 
       error = await Breakfast.updateOne({}, { $set: { steak: 'sirloin', eggs: 6, bacon: 'none' } }, updateOptions).then(() => null, err => err);
       assert.ok(!!error);

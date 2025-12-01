@@ -1060,7 +1060,7 @@ describe('model: findOneAndUpdate:', function() {
 
       assert.equal(Object.keys(error.errors).length, 1);
       assert.equal(Object.keys(error.errors)[0], 'steak');
-      assert.equal(error.errors.steak, '`tofu` is not a valid enum value for path `steak`.');
+      assert.equal(error.errors.steak, 'ValidatorError: `tofu` is not a valid enum value for path `steak`.');
 
       error = await Breakfast.findOneAndUpdate(
         {},

@@ -17,7 +17,7 @@ declare module 'mongoose' {
     TStaticMethods = {},
     TVirtuals = {},
     THydratedDocumentType = HydratedDocument<DocType, TVirtuals & TInstanceMethods, QueryHelpers>,
-    TModelType = Model<DocType, QueryHelpers, TInstanceMethods, TVirtuals, THydratedDocumentType>
+    TModelType = Model<DocType, QueryHelpers, TInstanceMethods, TVirtuals, any, any>
   > {
     /**
      * By default, Mongoose's init() function creates all the indexes defined in your model's schema by

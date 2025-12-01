@@ -738,4 +738,22 @@ describe('insertMany()', function() {
     assert.equal(err.message, 'postInsertManyError');
     assert.ok(err.stack.includes('postInsertManyError'));
   });
+
+  it('insertMany() exposes validation errors with ordered false and rawResult false (gh-15771)', async function() {
+    const schema = new Schema({ name: { type: String, required: true } });
+    const Movie = db.model('Movie', schema);
+
+    const result = await Movie.insertMany([
+      { foo: 'invalid 1' },
+      { name: 'valid movie' },
+      { bar: 'invalid 2' }
+    ], { ordered: false, rawResult: false });
+
+    assert.equal(result.length, 1);
+    assert.equal(result[0].name, 'valid movie');
+    assert.ok(result.validationErrors);
+    assert.equal(result.validationErrors.length, 2);
+    assert.ok(result.validationErrors[0].errors['name']);
+    assert.ok(result.validationErrors[1].errors['name']);
+  });
 });

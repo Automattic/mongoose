@@ -660,6 +660,41 @@ describe('document', function() {
     assert.equal(doc._doc.iWillNotBeDelete, true);
     assert.equal(doc._doc.nested.iWillNotBeDeleteToo, true);
   });
+  it('skips toObject() call when minimize: false during save (gh-XXXX)', async function() {
+    // Schema with minimize: false - should skip toObject()
+    const schema = new Schema({
+      name: String,
+      data: Object
+    }, { minimize: false });
+
+    const Test = db.model('Test', schema);
+    const doc = new Test({ name: 'test1', data: { foo: 'bar' } });
+
+    // Spy on toObject to verify it's not called
+    const toObjectSpy = sinon.spy(doc, 'toObject');
+    
+    await doc.save();
+    
+    assert.equal(toObjectSpy.callCount, 0, 'toObject should not be called when minimize: false');
+    toObjectSpy.restore();
+
+    // Schema with minimize: true (default) - should call toObject()
+    const schema2 = new Schema({
+      name: String,
+      data: Object
+    });
+
+    const Test2 = db.model('Test2', schema2);
+    const doc2 = new Test2({ name: 'test2', data: { foo: 'bar' } });
+
+    const toObjectSpy2 = sinon.spy(doc2, 'toObject');
+    
+    await doc2.save();
+    
+    assert.ok(toObjectSpy2.callCount > 0, 'toObject should be called when minimize is not explicitly false');
+    toObjectSpy2.restore();
+  });
+
 
   describe('toObject', function() {
     it('does not apply toObject functions of subdocuments to root document', async function() {

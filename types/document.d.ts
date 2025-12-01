@@ -10,7 +10,7 @@ declare module 'mongoose' {
     [key: string]: any;
   }
 
-  class ModifiedPathsSnapshot {}
+  class ModifiedPathsSnapshot { }
 
   /**
    * Generic types for Document:
@@ -302,9 +302,9 @@ declare module 'mongoose' {
     toJSON(options: ToObjectOptions & { virtuals: true }): Require_id<DocType & TVirtuals>;
 
     // Default - no special options
-    toJSON(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;
+    toJSON(options?: ToObjectOptions): ApplyFlattenObjectIds<ApplyVersionKey<Default__v<Require_id<DocType>, ResolveSchemaOptions<TSchemaOptions>>, ResolveSchemaOptions<TSchemaOptions>, 'toJSON'>, ResolveSchemaOptions<TSchemaOptions>, 'toJSON'>;
 
-    toJSON<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
+    toJSON<T>(options?: ToObjectOptions): ApplyFlattenObjectIds<ApplyVersionKey<Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>, ResolveSchemaOptions<TSchemaOptions>, 'toJSON'>, ResolveSchemaOptions<TSchemaOptions>, 'toJSON'>;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
     // flattenMaps: false (default) cases
@@ -350,9 +350,9 @@ declare module 'mongoose' {
     toObject(options: ToObjectOptions & { virtuals: true }): Require_id<DocType & TVirtuals>;
 
     // Default - no special options
-    toObject(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;
+    toObject(options?: ToObjectOptions): ApplyFlattenObjectIds<ApplyVersionKey<Default__v<Require_id<DocType>, ResolveSchemaOptions<TSchemaOptions>>, ResolveSchemaOptions<TSchemaOptions>, 'toObject'>, ResolveSchemaOptions<TSchemaOptions>, 'toObject'>;
 
-    toObject<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
+    toObject<T>(options?: ToObjectOptions): ApplyFlattenObjectIds<ApplyVersionKey<Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>, ResolveSchemaOptions<TSchemaOptions>, 'toObject'>, ResolveSchemaOptions<TSchemaOptions>, 'toObject'>;
 
     /** Clears the modified state on the specified path. */
     unmarkModified<T extends keyof DocType>(path: T): void;

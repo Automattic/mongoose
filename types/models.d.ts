@@ -303,8 +303,8 @@ declare module 'mongoose' {
     SessionStarter {
     new <DocType = Partial<TRawDocType>>(doc?: DocType, fields?: any | null, options?: AnyObject): THydratedDocumentType;
 
-    aggregate<R = any>(pipeline?: PipelineStage[], options?: AggregateOptions): Aggregate<Array<R>>;
-    aggregate<R = any>(pipeline: PipelineStage[]): Aggregate<Array<R>>;
+    aggregate<R = any>(pipeline?: PipelineStage<TRawDocType>[], options?: AggregateOptions): Aggregate<Array<R>>;
+    aggregate<R = any>(pipeline: PipelineStage<TRawDocType>[]): Aggregate<Array<R>>;
 
     /** Base Mongoose instance the model uses. */
     base: Mongoose;

@@ -97,6 +97,56 @@ describe('schema', function() {
       await Test.path('state').doValidate('open');
     });
 
+    it('number enum', async function() {
+      const Test = new Schema({
+        status: { type: Number, enum: [1, 2, 3, null] },
+        priority: { type: Number }
+      });
+
+      assert.ok(Test.path('status') instanceof SchemaTypes.Number);
+      assert.deepEqual(Test.path('status').enumValues, [1, 2, 3, null]);
+      assert.equal(Test.path('status').validators.length, 1);
+
+      Test.path('status').enum(4, 5);
+
+      assert.deepEqual(Test.path('status').enumValues, [1, 2, 3, null, 4, 5]);
+
+      // with SchemaTypes validate method
+      Test.path('priority').enum({
+        values: [10, 20, 30],
+        message: 'enum validator failed for path `{PATH}`: test'
+      });
+
+      assert.equal(Test.path('priority').validators.length, 1);
+      assert.deepEqual(Test.path('priority').enumValues, [10, 20, 30]);
+
+      await assert.rejects(Test.path('status').doValidate(6), ValidatorError);
+
+      // allow unsetting enums
+      await Test.path('status').doValidate(undefined);
+
+      await Test.path('status').doValidate(null);
+
+      await assert.rejects(
+        Test.path('status').doValidate(99),
+        ValidatorError
+      );
+
+      await assert.rejects(
+        Test.path('priority').doValidate(40),
+        err => {
+          assert.ok(err instanceof ValidatorError);
+          assert.equal(err.message,
+            'enum validator failed for path `priority`: test');
+          return true;
+        }
+      );
+
+      await Test.path('status').doValidate(1);
+
+      await Test.path('status').doValidate(2);
+    });
+
     it('string regexp', async function() {
       const Test = new Schema({
         simple: { type: String, match: /[a-z]/ }

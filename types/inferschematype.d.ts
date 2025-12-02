@@ -114,7 +114,7 @@ declare module 'mongoose' {
 
   type ResolveSchemaOptions<T> = MergeType<DefaultSchemaOptions, T>;
 
-  type ApplySchemaOptions<T, O = DefaultSchemaOptions> = Default__v<ResolveTimestamps<T, O>, O>;
+  type ApplySchemaOptions<T, O = DefaultSchemaOptions> = ResolveTimestamps<T, O>;
 
   type DefaultTimestampProps = {
     createdAt: NativeDate;

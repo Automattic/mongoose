@@ -2089,8 +2089,8 @@ function gh15751() {
 
 function gh15798() {
   const schema1 = new Schema({ name: String }, { statics: { testMe() { } }, versionKey: false });
-  model("M1", schema1).testMe();
+  model('M1', schema1).testMe();
 
   const schema2 = new Schema({ name: String }, { statics: { testMe() { } }, timestamps: true });
-  model("M2", schema2).testMe();
+  model('M2', schema2).testMe();
 }

@@ -1,7 +1,7 @@
 extends layout
 
 append style
-  link(rel="stylesheet", href=`${versions.versionedPath}/docs/css/api.css?v=${Date.now()}`)
+  link(rel="stylesheet", href=`${versions.versionedPath}/docs/css/api.css?v=${versions.version}`)
   script(src=`${versions.versionedPath}/docs/js/api-bold-current-nav.js`)
   script(src=`${versions.versionedPath}/docs/js/convert-old-anchorid.js`)
 

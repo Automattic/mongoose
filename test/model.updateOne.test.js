@@ -2707,7 +2707,7 @@ describe('model: updateOne: ', function() {
     assert.equal(doc.age, 20);
   });
 
-  describe.only('bulkWrite overwriteImmutable option (gh-15781)', function() {
+  describe('bulkWrite overwriteImmutable option (gh-15781)', function() {
     it('updateOne can update immutable field with overwriteImmutable: true', async function() {
       // Arrange
       const { User } = createTestContext();

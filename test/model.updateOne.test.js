@@ -2680,7 +2680,7 @@ describe('model: updateOne: ', function() {
     assert.equal(doc.age, 20);
   });
 
-  describe('bulkWrite overwriteImmutable option (gh-15781)', function() {
+  describe.only('bulkWrite overwriteImmutable option (gh-15781)', function() {
     it('updateOne can update immutable field with overwriteImmutable: true', async function() {
       // Arrange
       const { User } = createTestContext();
@@ -2761,46 +2761,47 @@ describe('model: updateOne: ', function() {
         assert.equal(updatesDocs[0].createdAt.valueOf(), createdAt.valueOf());
         assert.equal(updatesDocs[1].createdAt.valueOf(), createdAt.valueOf());
       });
-    }
 
-    it('can not update immutable fields without overwriteImmutable: true', async function() {
+      it(`can not update immutable fields without overwriteImmutable: true and timestamps: ${timestamps}`, async function() {
       // Arrange
-      const { User } = createTestContext();
-      const users = await User.create([
-        { name: 'Bob', ssn: '222-22-2222' },
-        { name: 'Eve', ssn: '333-33-3333' }
-      ]);
-      const newCreatedAt = new Date('2020-01-01');
+        const { User } = createTestContext();
+        const users = await User.create([
+          { name: 'Bob', ssn: '222-22-2222' },
+          { name: 'Eve', ssn: '333-33-3333' }
+        ]);
+        const newCreatedAt = new Date('2020-01-01');
 
-      // Act
-      await User.bulkWrite([
-        {
-          updateOne: {
-            filter: { _id: users[0]._id },
-            update: { ssn: '888-88-8888', createdAt: newCreatedAt }
+        // Act
+        await User.bulkWrite([
+          {
+            updateOne: {
+              filter: { _id: users[0]._id },
+              update: { ssn: '888-88-8888', createdAt: newCreatedAt }
+            },
+            timestamps
+          },
+          {
+            updateMany: {
+              filter: { _id: users[1]._id },
+              update: { ssn: '777-77-7777', createdAt: newCreatedAt }
+            },
+            timestamps
           }
-
-        },
-        {
-          updateMany: {
-            filter: { _id: users[1]._id },
-            update: { ssn: '777-77-7777', createdAt: newCreatedAt }
-          }
-        }
-      ]);
+        ]);
 
 
-      // Assert
-      const [updatedUser1, updatedUser2] = await Promise.all([
-        User.findById(users[0]._id),
-        User.findById(users[1]._id)
-      ]);
-      assert.strictEqual(updatedUser1.ssn, '222-22-2222');
-      assert.notStrictEqual(updatedUser1.createdAt.valueOf(), newCreatedAt.valueOf());
+        // Assert
+        const [updatedUser1, updatedUser2] = await Promise.all([
+          User.findById(users[0]._id),
+          User.findById(users[1]._id)
+        ]);
+        assert.strictEqual(updatedUser1.ssn, '222-22-2222');
+        assert.notStrictEqual(updatedUser1.createdAt.valueOf(), newCreatedAt.valueOf());
 
-      assert.strictEqual(updatedUser2.ssn, '333-33-3333');
-      assert.notStrictEqual(updatedUser2.createdAt.valueOf(), newCreatedAt.valueOf());
-    });
+        assert.strictEqual(updatedUser2.ssn, '333-33-3333');
+        assert.notStrictEqual(updatedUser2.createdAt.valueOf(), newCreatedAt.valueOf());
+      });
+    }
 
     function createTestContext() {
       const userSchema = new Schema({

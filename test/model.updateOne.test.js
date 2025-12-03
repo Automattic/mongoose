@@ -2723,7 +2723,7 @@ describe('model: updateOne: ', function() {
       assert.strictEqual(updatedUser.createdAt.valueOf(), customCreatedAt.valueOf());
     });
 
-    for (const timestamps of [true, false, null, undefined])
+    for (const timestamps of [true, false, null, undefined]) {
       it(`overwriting immutable createdAt with bulkWrite (gh-15781) when \`timestamps\` is \`${timestamps}\``, async function() {
         // Arrange
         const schema = Schema({ name: String }, { timestamps: true });
@@ -2761,6 +2761,46 @@ describe('model: updateOne: ', function() {
         assert.equal(updatesDocs[0].createdAt.valueOf(), createdAt.valueOf());
         assert.equal(updatesDocs[1].createdAt.valueOf(), createdAt.valueOf());
       });
+    }
+
+    it('can not update immutable fields without overwriteImmutable: true', async function() {
+      // Arrange
+      const { User } = createTestContext();
+      const users = await User.create([
+        { name: 'Bob', ssn: '222-22-2222' },
+        { name: 'Eve', ssn: '333-33-3333' }
+      ]);
+      const newCreatedAt = new Date('2020-01-01');
+
+      // Act
+      await User.bulkWrite([
+        {
+          updateOne: {
+            filter: { _id: users[0]._id },
+            update: { ssn: '888-88-8888', createdAt: newCreatedAt }
+          }
+
+        },
+        {
+          updateMany: {
+            filter: { _id: users[1]._id },
+            update: { ssn: '777-77-7777', createdAt: newCreatedAt }
+          }
+        }
+      ]);
+
+
+      // Assert
+      const [updatedUser1, updatedUser2] = await Promise.all([
+        User.findById(users[0]._id),
+        User.findById(users[1]._id)
+      ]);
+      assert.strictEqual(updatedUser1.ssn, '222-22-2222');
+      assert.notStrictEqual(updatedUser1.createdAt.valueOf(), newCreatedAt.valueOf());
+
+      assert.strictEqual(updatedUser2.ssn, '333-33-3333');
+      assert.notStrictEqual(updatedUser2.createdAt.valueOf(), newCreatedAt.valueOf());
+    });
 
     function createTestContext() {
       const userSchema = new Schema({

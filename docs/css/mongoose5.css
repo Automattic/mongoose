@@ -171,7 +171,7 @@ h4 a:focus-visible {
 }
 
 .logo-text {
-  color: var(--link-color);
+  color: #800;
   font-size: 20pt;
   position: relative;
   top: 0px;
@@ -676,7 +676,7 @@ li.version ul.pure-menu-children {
 /* Theme Toggle Button */
 #theme-toggle {
   position: fixed;
-  bottom: 20px;
+  top: 20px;
   right: 20px;
   z-index: 1000;
   background-color: var(--bg-secondary);
@@ -751,6 +751,7 @@ li.version ul.pure-menu-children {
 /* On mobile, adjust position */
 @media (max-width: 1160px) {
   #theme-toggle {
+    top: auto;
     bottom: 15px;
     right: 15px;
   }

@@ -9,18 +9,18 @@ declare module 'mongoose' {
   type QueryTypeCasting<T> = T extends string
     ? StringQueryTypeCasting
     : T extends Types.ObjectId
-      ? ObjectIdQueryTypeCasting
-      : T extends Types.UUID
-        ? UUIDQueryTypeCasting
-        : T extends Buffer
-          ? BufferQueryCasting
-          : T extends NativeDate
-            ? DateQueryTypeCasting
-            : T;
+    ? ObjectIdQueryTypeCasting
+    : T extends Types.UUID
+    ? UUIDQueryTypeCasting
+    : T extends Buffer
+    ? BufferQueryCasting
+    : T extends NativeDate
+    ? DateQueryTypeCasting
+    : T;
 
   export type ApplyBasicQueryCasting<T> = QueryTypeCasting<T> | QueryTypeCasting<T[]> | (T extends (infer U)[] ? QueryTypeCasting<U> : T) | null;
 
-  type _QueryFilter<T> = ({ [P in keyof T]?: mongodb.Condition<ApplyBasicQueryCasting<T[P]>>; } & mongodb.RootFilterOperators<{ [P in keyof T]?: ApplyBasicQueryCasting<T[P]>; }>);
+  type _QueryFilter<T> = ({ [P in keyof T]?: mongodb.Condition<ApplyBasicQueryCasting<T[P]>>; } & mongodb.RootFilterOperators<{ [P in keyof T]?: ApplyBasicQueryCasting<T[P]>; }> & Record<string, any>);
   type QueryFilter<T> = IsItRecordAndNotAny<T> extends true ? _QueryFilter<WithLevel1NestedPaths<T>> : _QueryFilter<Record<string, any>>;
 
   type MongooseBaseQueryOptionKeys =
@@ -177,14 +177,14 @@ declare module 'mongoose' {
 
   type MergePopulatePaths<RawDocType, ResultType, QueryOp, Paths, TQueryHelpers, TDocOverrides = Record<string, never>> = QueryOp extends QueryOpThatReturnsDocument
     ? ResultType extends null
-      ? ResultType
-      : ResultType extends (infer U)[]
-        ? U extends Document
-          ? HydratedDocument<MergeType<RawDocType, Paths>, TDocOverrides, TQueryHelpers>[]
-          : (MergeType<U, Paths>)[]
-        : ResultType extends Document
-          ? HydratedDocument<MergeType<RawDocType, Paths>, TDocOverrides, TQueryHelpers>
-          : MergeType<ResultType, Paths>
+    ? ResultType
+    : ResultType extends (infer U)[]
+    ? U extends Document
+    ? HydratedDocument<MergeType<RawDocType, Paths>, TDocOverrides, TQueryHelpers>[]
+    : (MergeType<U, Paths>)[]
+    : ResultType extends Document
+    ? HydratedDocument<MergeType<RawDocType, Paths>, TDocOverrides, TQueryHelpers>
+    : MergeType<ResultType, Paths>
     : MergeType<ResultType, Paths>;
 
   class Query<ResultType, DocType, THelpers = {}, RawDocType = unknown, QueryOp = 'find', TDocOverrides = Record<string, never>> implements SessionOperation {
@@ -350,8 +350,8 @@ declare module 'mongoose' {
     ): QueryWithHelpers<
       Array<
         DocKey extends keyof WithLevel1NestedPaths<DocType>
-          ? WithoutUndefined<Unpacked<WithLevel1NestedPaths<DocType>[DocKey]>>
-          : ResultType
+        ? WithoutUndefined<Unpacked<WithLevel1NestedPaths<DocType>[DocKey]>>
+        : ResultType
       >,
       DocType,
       THelpers,
@@ -366,8 +366,8 @@ declare module 'mongoose' {
     ): QueryWithHelpers<
       Array<
         DocKey extends keyof WithLevel1NestedPaths<DocType>
-          ? WithoutUndefined<Unpacked<WithLevel1NestedPaths<DocType>[DocKey]>>
-          : ResultType
+        ? WithoutUndefined<Unpacked<WithLevel1NestedPaths<DocType>[DocKey]>>
+        : ResultType
       >,
       DocType,
       THelpers,
@@ -561,62 +561,62 @@ declare module 'mongoose' {
     /** Sets the lean option. */
     lean(): QueryWithHelpers<
       ResultType extends null
-        ? GetLeanResultType<RawDocType, ResultType, QueryOp> | null
-        : GetLeanResultType<RawDocType, ResultType, QueryOp>,
+      ? GetLeanResultType<RawDocType, ResultType, QueryOp> | null
+      : GetLeanResultType<RawDocType, ResultType, QueryOp>,
       DocType,
       THelpers,
       RawDocType,
       QueryOp,
       TDocOverrides
-      >;
+    >;
     lean(
       val: true | LeanOptions
     ): QueryWithHelpers<
       ResultType extends null
-        ? GetLeanResultType<RawDocType, ResultType, QueryOp> | null
-        : GetLeanResultType<RawDocType, ResultType, QueryOp>,
+      ? GetLeanResultType<RawDocType, ResultType, QueryOp> | null
+      : GetLeanResultType<RawDocType, ResultType, QueryOp>,
       DocType,
       THelpers,
       RawDocType,
       QueryOp,
       TDocOverrides
-      >;
+    >;
     lean(
       val: false
     ): QueryWithHelpers<
       ResultType extends AnyArray<any>
-        ? DocType[]
-        : ResultType extends null
-          ? DocType | null
-          : DocType,
+      ? DocType[]
+      : ResultType extends null
+      ? DocType | null
+      : DocType,
       DocType,
       THelpers,
       RawDocType,
       QueryOp,
       TDocOverrides
-      >;
+    >;
     lean<LeanResultType = RawDocType>(): QueryWithHelpers<
       ResultType extends null
-        ? LeanResultType | null
-        : LeanResultType,
+      ? LeanResultType | null
+      : LeanResultType,
       DocType,
       THelpers,
       RawDocType,
       QueryOp,
       TDocOverrides
-      >;
+    >;
     lean<LeanResultType = RawDocType>(
       val: boolean | LeanOptions
     ): QueryWithHelpers<
       ResultType extends null
-        ? LeanResultType | null
-        : LeanResultType,
+      ? LeanResultType | null
+      : LeanResultType,
       DocType,
       THelpers,
       RawDocType,
       QueryOp,
       TDocOverrides
-      >;
+    >;
 
     /** Specifies the maximum number of documents the query will return. */
     limit(val: number): this;
@@ -797,12 +797,12 @@ declare module 'mongoose' {
         {},
         ResultType,
         ResultType extends any[]
-          ? ResultType extends HydratedDocument<any>[]
-            ? HydratedDocument<RawDocTypeOverride>[]
-            : RawDocTypeOverride[]
-          : (ResultType extends HydratedDocument<any>
-            ? HydratedDocument<RawDocTypeOverride>
-            : RawDocTypeOverride) | (null extends ResultType ? null : never)
+        ? ResultType extends HydratedDocument<any>[]
+        ? HydratedDocument<RawDocTypeOverride>[]
+        : RawDocTypeOverride[]
+        : (ResultType extends HydratedDocument<any>
+          ? HydratedDocument<RawDocTypeOverride>
+          : RawDocTypeOverride) | (null extends ResultType ? null : never)
       >,
       DocType,
       THelpers,

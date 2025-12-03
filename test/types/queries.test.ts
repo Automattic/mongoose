@@ -38,11 +38,11 @@ const schema: Schema<ITest, Model<ITest, QueryHelpers>, {}, QueryHelpers> = new 
   endDate: Date
 });
 
-schema.query._byName = function(name: string): QueryWithHelpers<ITest[], ITest, QueryHelpers> {
+schema.query._byName = function (name: string): QueryWithHelpers<ITest[], ITest, QueryHelpers> {
   return this.find({ name });
 };
 
-schema.query.byName = function(name: string): QueryWithHelpers<ITest[], ITest, QueryHelpers> {
+schema.query.byName = function (name: string): QueryWithHelpers<ITest[], ITest, QueryHelpers> {
   expectError(this.notAQueryHelper());
   return this._byName(name);
 };
@@ -156,12 +156,12 @@ const p1: Record<string, number> = Test.find().projection('age docs.id');
 const p2: Record<string, number> | null = Test.find().projection();
 const p3: null = Test.find().projection(null);
 
-expectError(Test.find({ }, { name: 'ss' })); // Only 0 and 1 are allowed
+expectError(Test.find({}, { name: 'ss' })); // Only 0 and 1 are allowed
 Test.find({}, { name: 3 });
 Test.find({}, { name: true, age: false, endDate: true, tags: 1 });
 Test.find({}, { name: true, age: false, endDate: true });
 Test.find({}, { name: false, age: false, tags: false, child: { name: false }, docs: { myId: false, id: true } });
-expectError(Test.find({ }, { tags: { something: 1 } })); // array of strings or numbers should only be allowed to be a boolean or 1 and 0
+expectError(Test.find({}, { tags: { something: 1 } })); // array of strings or numbers should only be allowed to be a boolean or 1 and 0
 Test.find({}, { name: true, age: true, endDate: true, tags: 1, child: { name: true }, docs: { myId: true, id: true } }); // This should be allowed
 Test.find({}, { name: 1, age: 1, endDate: 1, tags: 1, child: { name: 1 }, docs: { myId: 1, id: 1 } }); // This should be allowed
 Test.find({}, { _id: 0, name: 1, age: 1, endDate: 1, tags: 1, child: 1, docs: 1 }); // _id is an exception and should be allowed to be excluded
@@ -378,7 +378,7 @@ function gh14397() {
 }
 
 function gh12091() {
-  interface IUser{
+  interface IUser {
     friendsNames: string[];
   }
   const userSchema = new Schema<IUser>({
@@ -412,19 +412,19 @@ async function gh12342_manual() {
 
   interface ProjectQueryHelpers {
     byName(name: string): QueryWithHelpers<
-    HydratedDocument<Project>[],
-    HydratedDocument<Project>,
-    ProjectQueryHelpers
+      HydratedDocument<Project>[],
+      HydratedDocument<Project>,
+      ProjectQueryHelpers
     >
   }
 
   type ProjectModelType = Model<Project, ProjectQueryHelpers>;
 
   const ProjectSchema = new Schema<
-  Project,
-  Model<Project, ProjectQueryHelpers>,
-  {},
-  ProjectQueryHelpers
+    Project,
+    Model<Project, ProjectQueryHelpers>,
+    {},
+    ProjectQueryHelpers
   >({
     name: String,
     stars: Number
@@ -515,9 +515,9 @@ async function gh13142() {
       projection: Projection,
       options: Options
     ): Promise<
-        Options['lean'] extends true
-          ? Pick<Blog, Extract<keyof Projection, keyof Blog>> | null
-          : HydratedDocument<Pick<Blog, Extract<keyof Projection, keyof Blog>>> | null
+      Options['lean'] extends true
+      ? Pick<Blog, Extract<keyof Projection, keyof Blog>> | null
+      : HydratedDocument<Pick<Blog, Extract<keyof Projection, keyof Blog>>> | null
     > {
       return this.blogModel.findOne(filter, projection, options);
     }
@@ -588,7 +588,7 @@ function gh14190() {
   );
   expectAssignable<
     ModifyResult<ReturnType<(typeof UserModel)['hydrate']>>
-      >(res);
+  >(res);
 
   const res2 = await UserModel.find().findByIdAndDelete(
     '0'.repeat(24),
@@ -596,7 +596,7 @@ function gh14190() {
   );
   expectAssignable<
     ModifyResult<ReturnType<(typeof UserModel)['hydrate']>>
-      >(res2);
+  >(res2);
 }
 
 function mongooseQueryOptions() {
@@ -717,7 +717,7 @@ function gh14510() {
   // From https://stackoverflow.com/questions/56505560/how-to-fix-ts2322-could-be-instantiated-with-a-different-subtype-of-constraint:
   // "Never assign a concrete type to a generic type parameter, consider it as read-only!"
   // This function is generally something you shouldn't do in TypeScript, can work around it with `as` though.
-  function findById<ModelType extends {_id: Types.ObjectId | string}>(model: Model<ModelType>, _id: Types.ObjectId | string) {
+  function findById<ModelType extends { _id: Types.ObjectId | string }>(model: Model<ModelType>, _id: Types.ObjectId | string) {
     return model.find({ _id: _id } as QueryFilter<ModelType>);
   }
 }
@@ -863,5 +863,10 @@ async function gh15786() {
   }
 
   const schema = new Schema<IDoc, Model<IDoc>, {}, {}, {}, DocStatics>({});
-  schema.static({ m1() {} } as DocStatics);
+  schema.static({ m1() { } } as DocStatics);
+}
+
+function gh15854() {
+  const filter = { foo: 'hi' } as mongoose.QueryFilter<{ foo: string }>;
+  filter.foo; // Should not error: Property 'foo' does not exist on type '_QueryFilter<{ foo: string; }>'
 }

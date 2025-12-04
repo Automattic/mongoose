@@ -1,6 +1,6 @@
 # Middleware
 
-Middleware (also called pre and post *hooks*) are functions which are passed
+Middleware (also called pre and post _hooks_) are functions which are passed
 control during execution of asynchronous functions. Middleware is specified
 on the schema level and is useful for writing [plugins](plugins.html).
 
@@ -29,68 +29,68 @@ Document middleware is supported for the following document functions.
 In Mongoose, a document is an instance of a `Model` class.
 In document middleware functions, `this` refers to the document. To access the model, use `this.constructor`.
 
-* [validate](api/document.html#document_Document-validate)
-* [save](api/model.html#model_Model-save)
-* [updateOne](api/document.html#document_Document-updateOne)
-* [deleteOne](api/model.html#model_Model-deleteOne)
-* [init](api/document.html#document_Document-init) (note: init hooks are [synchronous](#synchronous))
+- [validate](api/document.html#document_Document-validate)
+- [save](api/model.html#model_Model-save)
+- [updateOne](api/document.html#document_Document-updateOne)
+- [deleteOne](api/model.html#model_Model-deleteOne)
+- [init](api/document.html#document_Document-init) (note: init hooks are [synchronous](#synchronous))
 
 Query middleware is supported for the following Query functions.
 Query middleware executes when you call `exec()` or `then()` on a Query object, or `await` on a Query object.
 In query middleware functions, `this` refers to the query.
 
-* [count](api/query.html#query_Query-count)
-* [countDocuments](api/query.html#query_Query-countDocuments)
-* [deleteMany](api/query.html#query_Query-deleteMany)
-* [deleteOne](api/query.html#query_Query-deleteOne)
-* [estimatedDocumentCount](api/query.html#query_Query-estimatedDocumentCount)
-* [find](api/query.html#query_Query-find)
-* [findOne](api/query.html#query_Query-findOne)
-* [findOneAndDelete](api/query.html#query_Query-findOneAndDelete)
-* [findOneAndReplace](api/query.html#query_Query-findOneAndReplace)
-* [findOneAndUpdate](api/query.html#query_Query-findOneAndUpdate)
-* [replaceOne](api/query.html#query_Query-replaceOne)
-* [updateOne](api/query.html#query_Query-updateOne)
-* [updateMany](api/query.html#query_Query-updateMany)
-* [validate](validation.html#update-validators)
+- [count](api/query.html#query_Query-count)
+- [countDocuments](api/query.html#query_Query-countDocuments)
+- [deleteMany](api/query.html#query_Query-deleteMany)
+- [deleteOne](api/query.html#query_Query-deleteOne)
+- [estimatedDocumentCount](api/query.html#query_Query-estimatedDocumentCount)
+- [find](api/query.html#query_Query-find)
+- [findOne](api/query.html#query_Query-findOne)
+- [findOneAndDelete](api/query.html#query_Query-findOneAndDelete)
+- [findOneAndReplace](api/query.html#query_Query-findOneAndReplace)
+- [findOneAndUpdate](api/query.html#query_Query-findOneAndUpdate)
+- [replaceOne](api/query.html#query_Query-replaceOne)
+- [updateOne](api/query.html#query_Query-updateOne)
+- [updateMany](api/query.html#query_Query-updateMany)
+- [validate](validation.html#update-validators)
 
 Aggregate middleware is for `MyModel.aggregate()`.
 Aggregate middleware executes when you call `exec()` on an aggregate object.
 In aggregate middleware, `this` refers to the [aggregation object](api/model.html#model_Model-aggregate).
 
-* [aggregate](api/model.html#model_Model-aggregate)
+- [aggregate](api/model.html#model_Model-aggregate)
 
 Model middleware is supported for the following model functions.
-Don't confuse model middleware and document middleware: model middleware hooks into *static* functions on a `Model` class, document middleware hooks into *methods* on a `Model` class.
+Don't confuse model middleware and document middleware: model middleware hooks into _static_ functions on a `Model` class, document middleware hooks into _methods_ on a `Model` class.
 In model middleware functions, `this` refers to the model.
 
-* [bulkWrite](api/model.html#model_Model-bulkWrite)
-* [createCollection](api/model.html#model_Model-createCollection)
-* [insertMany](api/model.html#model_Model-insertMany)
+- [bulkWrite](api/model.html#model_Model-bulkWrite)
+- [createCollection](api/model.html#model_Model-createCollection)
+- [insertMany](api/model.html#model_Model-insertMany)
 
 Here are the possible strings that can be passed to `pre()`
 
-* aggregate
-* bulkWrite
-* count
-* countDocuments
-* createCollection
-* deleteOne
-* deleteMany
-* estimatedDocumentCount
-* find
-* findOne
-* findOneAndDelete
-* findOneAndReplace
-* findOneAndUpdate
-* init
-* insertMany
-* replaceOne
-* save
-* update
-* updateOne
-* updateMany
-* validate
+- aggregate
+- bulkWrite
+- count
+- countDocuments
+- createCollection
+- deleteOne
+- deleteMany
+- estimatedDocumentCount
+- find
+- findOne
+- findOneAndDelete
+- findOneAndReplace
+- findOneAndUpdate
+- init
+- insertMany
+- replaceOne
+- save
+- update
+- updateOne
+- updateMany
+- validate
 
 All middleware types support pre and post hooks.
 How pre and post hooks work is described in more detail below.
@@ -110,19 +110,19 @@ To register `deleteOne` middleware as document middleware, use `schema.pre('dele
 
 ```javascript
 const childSchema = new mongoose.Schema({
-  name: String
+  name: String,
 });
 
 const mainSchema = new mongoose.Schema({
-  child: [childSchema]
+  child: [childSchema],
 });
 
-mainSchema.pre('findOneAndUpdate', function() {
-  console.log('Middleware on parent document'); // Will be executed
+mainSchema.pre("findOneAndUpdate", function () {
+  console.log("Middleware on parent document"); // Will be executed
 });
 
-childSchema.pre('findOneAndUpdate', function() {
-  console.log('Middleware on subdocument'); // Will not be executed
+childSchema.pre("findOneAndUpdate", function () {
+  console.log("Middleware on subdocument"); // Will not be executed
 });
 ```
 
@@ -131,8 +131,10 @@ childSchema.pre('findOneAndUpdate', function() {
 Pre middleware functions are executed one after another.
 
 ```javascript
-const schema = new Schema({ /* ... */ });
-schema.pre('save', function() {
+const schema = new Schema({
+  /* ... */
+});
+schema.pre("save", function () {
   // do stuff
 });
 ```
@@ -141,18 +143,17 @@ You can also use a function that returns a promise, including async functions.
 Mongoose will wait until the promise resolves to move on to the next middleware.
 
 ```javascript
-schema.pre('save', function() {
-  return doStuff().
-    then(() => doMoreStuff());
+schema.pre("save", function () {
+  return doStuff().then(() => doMoreStuff());
 });
 
 // Or, using async functions
-schema.pre('save', async function() {
+schema.pre("save", async function () {
   await doStuff();
   await doMoreStuff();
 });
 
-schema.pre('save', function() {
+schema.pre("save", function () {
   // Will execute **after** `await doMoreStuff()` is done
 });
 ```
@@ -161,12 +162,12 @@ schema.pre('save', function() {
 
 Middleware is useful for atomizing model logic. Here are some other ideas:
 
-* complex validation
-* removing dependent documents (removing a user removes all their blogposts)
-* asynchronous defaults
-* asynchronous tasks that a certain action triggers
-* updating denormalized data on other documents
-* saving change records
+- complex validation
+- removing dependent documents (removing a user removes all their blogposts)
+- asynchronous defaults
+- asynchronous tasks that a certain action triggers
+- updating denormalized data on other documents
+- saving change records
 
 ### Errors in Pre Hooks {#error-handling}
 
@@ -176,27 +177,27 @@ and/or reject the returned promise. There are several ways to report an
 error in middleware:
 
 ```javascript
-schema.pre('save', function() {
-  const err = new Error('something went wrong');
+schema.pre("save", function () {
+  const err = new Error("something went wrong");
   throw err;
 });
 
-schema.pre('save', function() {
+schema.pre("save", function () {
   // You can also return a promise that rejects
   return new Promise((resolve, reject) => {
-    reject(new Error('something went wrong'));
+    reject(new Error("something went wrong"));
   });
 });
 
-schema.pre('save', function() {
+schema.pre("save", function () {
   // You can also throw a synchronous error
-  throw new Error('something went wrong');
+  throw new Error("something went wrong");
 });
 
-schema.pre('save', async function() {
+schema.pre("save", async function () {
   await Promise.resolve();
   // You can also throw an error in an `async` function
-  throw new Error('something went wrong');
+  throw new Error("something went wrong");
 });
 
 // later...
@@ -211,21 +212,21 @@ try {
 
 ## Post middleware {#post}
 
-[post](api.html#schema_Schema-post) middleware are executed *after*
+[post](api.html#schema_Schema-post) middleware are executed _after_
 the hooked method and all of its `pre` middleware have completed.
 
 ```javascript
-schema.post('init', function(doc) {
-  console.log('%s has been initialized from the db', doc._id);
+schema.post("init", function (doc) {
+  console.log("%s has been initialized from the db", doc._id);
 });
-schema.post('validate', function(doc) {
-  console.log('%s has been validated (but not saved yet)', doc._id);
+schema.post("validate", function (doc) {
+  console.log("%s has been validated (but not saved yet)", doc._id);
 });
-schema.post('save', function(doc) {
-  console.log('%s has been saved', doc._id);
+schema.post("save", function (doc) {
+  console.log("%s has been saved", doc._id);
 });
-schema.post('deleteOne', function(doc) {
-  console.log('%s has been deleted', doc._id);
+schema.post("deleteOne", function (doc) {
+  console.log("%s has been deleted", doc._id);
 });
 ```
 
@@ -235,17 +236,17 @@ If your post hook function takes at least 2 parameters, mongoose will assume the
 
 ```javascript
 // Takes 2 parameters: this is an asynchronous post hook
-schema.post('save', function(doc, next) {
-  setTimeout(function() {
-    console.log('post1');
+schema.post("save", function (doc, next) {
+  setTimeout(function () {
+    console.log("post1");
     // Kick off the second post hook
     next();
   }, 10);
 });
 
 // Will not execute until the first middleware calls `next()`
-schema.post('save', function(doc, next) {
-  console.log('post2');
+schema.post("save", function (doc, next) {
+  console.log("post2");
   next();
 });
 ```
@@ -255,15 +256,15 @@ If you pass an async function that takes at least 2 parameters, you are still re
 However, you can also pass in an async function that takes less than 2 parameters, and Mongoose will wait for the promise to resolve.
 
 ```javascript
-schema.post('save', async function(doc) {
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  console.log('post1');
+schema.post("save", async function (doc) {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  console.log("post1");
   // If less than 2 parameters, no need to call `next()`
 });
 
-schema.post('save', async function(doc, next) {
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  console.log('post1');
+schema.post("save", async function (doc, next) {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  console.log("post1");
   // If there's a `next` parameter, you need to call `next()`.
   next();
 });
@@ -279,13 +280,13 @@ middleware will not fire.
 const schema = new mongoose.Schema({ name: String });
 
 // Compile a model from the schema
-const User = mongoose.model('User', schema);
+const User = mongoose.model("User", schema);
 
 // Mongoose will **not** call the middleware function, because
 // this middleware was defined after the model was compiled
-schema.pre('save', () => console.log('Hello from pre save'));
+schema.pre("save", () => console.log("Hello from pre save"));
 
-const user = new User({ name: 'test' });
+const user = new User({ name: "test" });
 user.save();
 ```
 
@@ -297,12 +298,12 @@ The below script will print out "Hello from pre save":
 const schema = new mongoose.Schema({ name: String });
 // Mongoose will call this middleware function, because this script adds
 // the middleware to the schema before compiling the model.
-schema.pre('save', () => console.log('Hello from pre save'));
+schema.pre("save", () => console.log("Hello from pre save"));
 
 // Compile a model from the schema
-const User = mongoose.model('User', schema);
+const User = mongoose.model("User", schema);
 
-const user = new User({ name: 'test' });
+const user = new User({ name: "test" });
 user.save();
 ```
 
@@ -316,7 +317,7 @@ const schema = new mongoose.Schema({ name: String });
 
 // Once you `require()` this file, you can no longer add any middleware
 // to this schema.
-module.exports = mongoose.model('User', schema);
+module.exports = mongoose.model("User", schema);
 ```
 
 ## Save/Validate Hooks {#order}
@@ -327,17 +328,17 @@ that all `pre('validate')` and `post('validate')` hooks get called
 **before** any `pre('save')` hooks.
 
 ```javascript
-schema.pre('validate', function() {
-  console.log('this gets printed first');
+schema.pre("validate", function () {
+  console.log("this gets printed first");
 });
-schema.post('validate', function() {
-  console.log('this gets printed second');
+schema.post("validate", function () {
+  console.log("this gets printed second");
 });
-schema.pre('save', function() {
-  console.log('this gets printed third');
+schema.pre("save", function () {
+  console.log("this gets printed third");
 });
-schema.post('save', function() {
-  console.log('this gets printed fourth');
+schema.post("save", function () {
+  console.log("this gets printed fourth");
 });
 ```
 
@@ -348,13 +349,13 @@ For query middleware, we recommend using `this`, which will be a [Mongoose Query
 
 ```javascript
 const userSchema = new Schema({ name: String, age: Number });
-userSchema.pre('findOneAndUpdate', function() {
+userSchema.pre("findOneAndUpdate", function () {
   console.log(this.getFilter()); // { name: 'John' }
   console.log(this.getUpdate()); // { age: 30 }
 });
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model("User", userSchema);
 
-await User.findOneAndUpdate({ name: 'John' }, { $set: { age: 30 } });
+await User.findOneAndUpdate({ name: "John" }, { $set: { age: 30 } });
 ```
 
 Mongoose also passes the 1st parameter to the hooked function, like `save()`, as the 1st argument to your `pre('save')` function.
@@ -362,13 +363,51 @@ You should use the argument to get access to the `save()` call's `options`, beca
 
 ```javascript
 const userSchema = new Schema({ name: String, age: Number });
-userSchema.pre('save', function(options) {
+userSchema.pre("save", function (options) {
   options.validateModifiedOnly; // true
 });
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model("User", userSchema);
 
-const doc = new User({ name: 'John', age: 30 });
+const doc = new User({ name: "John", age: 30 });
 await doc.save({ validateModifiedOnly: true });
+```
+
+For `deleteOne()` document middleware, options are **not** passed as a parameter.
+If you need to pass custom options to `deleteOne()` middleware, you can use the document's `$locals` property:
+
+```javascript
+const userSchema = new Schema({ name: String, age: Number });
+userSchema.pre("deleteOne", { document: true, query: false }, function () {
+  // Access custom data via $locals
+  console.log(this.$locals.requestId); // 'abc123'
+});
+const User = mongoose.model("User", userSchema);
+
+const doc = await User.findOne();
+doc.$locals.requestId = "abc123";
+await doc.deleteOne();
+```
+
+Alternatively, you can create a custom method that wraps `deleteOne()`:
+
+```javascript
+const userSchema = new Schema({ name: String, age: Number });
+
+userSchema.methods.deleteOneWithContext = async function (context) {
+  this.$locals.deleteContext = context;
+  return this.deleteOne();
+};
+
+userSchema.pre("deleteOne", { document: true, query: false }, function () {
+  const context = this.$locals.deleteContext;
+  console.log(context.requestId); // 'abc123'
+  console.log(context.userId); // 'user-456'
+});
+
+const User = mongoose.model("User", userSchema);
+
+const doc = await User.findOne();
+await doc.deleteOneWithContext({ requestId: "abc123", userId: "user-456" });
 ```
 
 ## Naming Conflicts {#naming}
@@ -376,7 +415,9 @@ await doc.save({ validateModifiedOnly: true });
 Mongoose has both query and document hooks for `deleteOne()`.
 
 ```javascript
-schema.pre('deleteOne', function() { console.log('Removing!'); });
+schema.pre("deleteOne", function () {
+  console.log("Removing!");
+});
 
 // Does **not** print "Removing!". Document middleware for `deleteOne` is not executed by default
 await doc.deleteOne();
@@ -387,19 +428,19 @@ await Model.deleteOne();
 
 You can pass options to [`Schema.pre()`](api.html#schema_Schema-pre)
 and [`Schema.post()`](api.html#schema_Schema-post) to switch whether
-Mongoose calls your `deleteOne()` hook for [`Document.prototype.deleteOne()`](api/model.html#Model.prototype.deleteOne())
-or [`Query.prototype.deleteOne()`](api/query.html#Query.prototype.deleteOne()). Note here that you need to set both `document` and `query` properties in the passed object:
+Mongoose calls your `deleteOne()` hook for [`Document.prototype.deleteOne()`](<api/model.html#Model.prototype.deleteOne()>)
+or [`Query.prototype.deleteOne()`](<api/query.html#Query.prototype.deleteOne()>). Note here that you need to set both `document` and `query` properties in the passed object:
 
 ```javascript
 // Only document middleware
-schema.pre('deleteOne', { document: true, query: false }, function() {
-  console.log('Deleting doc!');
+schema.pre("deleteOne", { document: true, query: false }, function () {
+  console.log("Deleting doc!");
 });
 
 // Only query middleware. This will get called when you do `Model.deleteOne()`
 // but not `doc.deleteOne()`.
-schema.pre('deleteOne', { query: true, document: false }, function() {
-  console.log('Deleting!');
+schema.pre("deleteOne", { query: true, document: false }, function () {
+  console.log("Deleting!");
 });
 ```
 
@@ -408,15 +449,15 @@ Unlike `deleteOne` and `updateOne`, `validate` middleware applies to `Document.p
 
 ```javascript
 const schema = new mongoose.Schema({ name: String });
-schema.pre('validate', function() {
-  console.log('Document validate');
+schema.pre("validate", function () {
+  console.log("Document validate");
 });
-schema.pre('validate', { query: true, document: false }, function() {
-  console.log('Query validate');
+schema.pre("validate", { query: true, document: false }, function () {
+  console.log("Query validate");
 });
-const Test = mongoose.model('Test', schema);
+const Test = mongoose.model("Test", schema);
 
-const doc = new Test({ name: 'foo' });
+const doc = new Test({ name: "foo" });
 
 // Prints "Document validate"
 await doc.validate();
@@ -433,17 +474,17 @@ Pre and post `save()` hooks are **not** executed on `update()`,
 Mongoose 4.0 introduced distinct hooks for these functions.
 
 ```javascript
-schema.pre('find', function() {
+schema.pre("find", function () {
   console.log(this instanceof mongoose.Query); // true
   this.start = Date.now();
 });
 
-schema.post('find', function(result) {
+schema.post("find", function (result) {
   console.log(this instanceof mongoose.Query); // true
   // prints returned documents
-  console.log('find() returned ' + JSON.stringify(result));
+  console.log("find() returned " + JSON.stringify(result));
   // prints number of milliseconds the query took
-  console.log('find() took ' + (Date.now() - this.start) + ' milliseconds');
+  console.log("find() took " + (Date.now() - this.start) + " milliseconds");
 });
 ```
 
@@ -457,7 +498,7 @@ For instance, if you wanted to add an `updatedAt` timestamp to every
 `updateOne()` call, you would use the following pre hook.
 
 ```javascript
-schema.pre('updateOne', function() {
+schema.pre("updateOne", function () {
   this.set({ updatedAt: new Date() });
 });
 ```
@@ -467,7 +508,7 @@ You **cannot** access the document being updated in `pre('updateOne')` or
 that will be updated, you need to execute an explicit query for the document.
 
 ```javascript
-schema.pre('findOneAndUpdate', async function() {
+schema.pre("findOneAndUpdate", async function () {
   const docToUpdate = await this.model.findOne(this.getQuery());
   console.log(docToUpdate); // The document that `findOneAndUpdate()` will modify
 });
@@ -479,17 +520,17 @@ document middleware hooks into [`Document#updateOne()`](api/document.html#docume
 rather than `Query#updateOne()`.
 
 ```javascript
-schema.pre('updateOne', { document: true, query: false }, function() {
-  console.log('Updating');
+schema.pre("updateOne", { document: true, query: false }, function () {
+  console.log("Updating");
 });
-const Model = mongoose.model('Test', schema);
+const Model = mongoose.model("Test", schema);
 
 const doc = new Model();
-await doc.updateOne({ $set: { name: 'test' } }); // Prints "Updating"
+await doc.updateOne({ $set: { name: "test" } }); // Prints "Updating"
 
 // Doesn't print "Updating", because `Query#updateOne()` doesn't fire
 // document middleware.
-await Model.updateOne({}, { $set: { name: 'test' } });
+await Model.updateOne({}, { $set: { name: "test" } });
 ```
 
 ## Error Handling Middleware {#error-handling-middleware}
@@ -509,22 +550,22 @@ const schema = new Schema({
     type: String,
     // Will trigger a MongoServerError with code 11000 when
     // you save a duplicate
-    unique: true
-  }
+    unique: true,
+  },
 });
 
 // Handler **must** take 3 parameters: the error that occurred, the document
 // in question, and the `next()` function
-schema.post('save', function(error, doc, next) {
-  if (error.name === 'MongoServerError' && error.code === 11000) {
-    next(new Error('There was a duplicate key error'));
+schema.post("save", function (error, doc, next) {
+  if (error.name === "MongoServerError" && error.code === 11000) {
+    next(new Error("There was a duplicate key error"));
   } else {
     next();
   }
 });
 
 // Will trigger the `post('save')` error handler
-Person.create([{ name: 'Axl Rose' }, { name: 'Axl Rose' }]);
+Person.create([{ name: "Axl Rose" }, { name: "Axl Rose" }]);
 ```
 
 Error handling middleware also works with query middleware. You can
@@ -535,19 +576,19 @@ errors.
 // The same E11000 error can occur when you call `updateOne()`
 // This function **must** take exactly 3 parameters.
 
-schema.post('updateOne', function(error, res, next) {
-  if (error.name === 'MongoServerError' && error.code === 11000) {
-    throw new Error('There was a duplicate key error');
+schema.post("updateOne", function (error, res, next) {
+  if (error.name === "MongoServerError" && error.code === 11000) {
+    throw new Error("There was a duplicate key error");
   } else {
     next();
   }
 });
 
-const people = [{ name: 'Axl Rose' }, { name: 'Slash' }];
+const people = [{ name: "Axl Rose" }, { name: "Slash" }];
 await Person.create(people);
 
 // Throws "There was a duplicate key error"
-await Person.updateOne({ name: 'Slash' }, { $set: { name: 'Axl Rose' } });
+await Person.updateOne({ name: "Slash" }, { $set: { name: "Axl Rose" } });
 ```
 
 Error handling middleware can transform an error, but it can't remove the error.
@@ -564,7 +605,7 @@ add a [`$match` stage](api/aggregate.html#aggregate_Aggregate-match) to the begi
 of each [aggregation pipeline](https://www.mongodb.com/docs/manual/core/aggregation-pipeline/).
 
 ```javascript
-customerSchema.pre('aggregate', function() {
+customerSchema.pre("aggregate", function () {
   // Add a $match state to the beginning of each pipeline.
   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
 });

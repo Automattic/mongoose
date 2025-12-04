@@ -455,6 +455,67 @@ describe('model middleware', function() {
     assert.equal(postCalled, 1);
   });
 
+  it('deleteOne hooks can access custom options via $locals', async function() {
+    const schema = new Schema({
+      name: String
+    });
+
+    let capturedContext = null;
+    schema.pre('deleteOne', { document: true, query: false }, function() {
+      // Access custom data via $locals
+      capturedContext = this.$locals.deleteContext;
+    });
+
+    const Model = db.model('Test', schema);
+    await Model.create({ name: 'foo' });
+
+    const doc = await Model.findOne();
+    
+    // Set custom context via $locals
+    doc.$locals.deleteContext = {
+      requestId: 'req-12345',
+      userId: 'user-789',
+      reason: 'test deletion'
+    };
+    
+    await doc.deleteOne();
+
+    assert.ok(capturedContext);
+    assert.equal(capturedContext.requestId, 'req-12345');
+    assert.equal(capturedContext.userId, 'user-789');
+    assert.equal(capturedContext.reason, 'test deletion');
+  });
+
+  it('deleteOne hooks work with custom wrapper methods', async function() {
+    const schema = new Schema({
+      name: String
+    });
+
+    schema.methods.deleteOneWithContext = async function(context) {
+      this.$locals.deleteContext = context;
+      return this.deleteOne();
+    };
+
+    let capturedContext = null;
+    schema.pre('deleteOne', { document: true, query: false }, function() {
+      capturedContext = this.$locals.deleteContext;
+    });
+
+    const Model = db.model('Test', schema);
+    await Model.create({ name: 'bar' });
+
+    const doc = await Model.findOne();
+    
+    await doc.deleteOneWithContext({
+      requestId: 'req-67890',
+      userId: 'user-456'
+    });
+
+    assert.ok(capturedContext);
+    assert.equal(capturedContext.requestId, 'req-67890');
+    assert.equal(capturedContext.userId, 'user-456');
+  });
+
   describe('createCollection middleware', function() {
     it('calls createCollection hooks', async function() {
       const schema = new Schema({ name: String }, { autoCreate: true });

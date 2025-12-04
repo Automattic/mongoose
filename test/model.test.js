@@ -7327,7 +7327,7 @@ describe('Model', function() {
     });
 
     it('insertMany should throw an error if there were operations that failed validation, ' +
-       'but all operations that passed validation succeeded (gh-14572) (gh-13256)', async function() {
+        'but all operations that passed validation succeeded (gh-14572) (gh-13256)', async function() {
       const userSchema = new Schema({
         age: { type: Number }
       });
@@ -8628,7 +8628,7 @@ describe('Model', function() {
   });
 
   it('insertMany should throw an error if there were operations that failed validation, ' +
-     'but all operations that passed validation succeeded (gh-13256)', async function() {
+      'but all operations that passed validation succeeded (gh-13256)', async function() {
     const userSchema = new Schema({
       age: { type: Number }
     });

@@ -18,7 +18,11 @@
   function applyTheme(theme, skipSetStorage) {
     document.documentElement.setAttribute('data-theme', theme);
     if (!skipSetStorage) {
-      localStorage.setItem(STORAGE_KEY, theme);
+      try {
+        localStorage.setItem(STORAGE_KEY, theme);
+      } catch (e) {
+        // Silently fail - theme will still work for current session
+      }
     }
     const isDark = theme === 'dark';
     document.documentElement.classList.toggle(CODE_THEME_CLASS, isDark);

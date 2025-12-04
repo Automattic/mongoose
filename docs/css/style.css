@@ -18,12 +18,12 @@ body {
 }
 
 /* Manual theme overrides */
-body[data-theme="dark"] {
+[data-theme="dark"] {
   background-color: var(--bg-primary, #1a1a1a);
   color: var(--text-secondary, #c0c0c0);
 }
 
-body[data-theme="light"] {
+[data-theme="light"] {
   background-color: var(--bg-primary, #ffffff);
   color: var(--text-secondary, #333);
 }
@@ -31,7 +31,6 @@ body[data-theme="light"] {
 /* Theme Toggle Button for Homepage */
 #theme-toggle {
   position: fixed;
-  top: auto;
   bottom: 20px;
   right: 20px;
   z-index: 1000;
@@ -42,7 +41,7 @@ body[data-theme="light"] {
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-body[data-theme="dark"] #theme-toggle {
+[data-theme="dark"] #theme-toggle {
   background-color: rgba(26, 26, 26, 0.9);
   border-color: #444;
 }
@@ -186,15 +185,13 @@ pre code {
 }
 
 /* Dark mode for homepage code blocks */
-@media (prefers-color-scheme: dark) {
-  pre {
-    background: var(--code-bg, #2d2d2d);
-    border-color: var(--border-color, #444);
-  }
-  code {
-    color: var(--code-text, #e0e0e0);
-    background-color: var(--code-bg, #2d2d2d);
-  }
+[data-theme="dark"] pre {
+  background: var(--code-bg, #2d2d2d);
+  border-color: var(--border-color, #444);
+}
+[data-theme="dark"] code {
+  color: var(--code-text, #e0e0e0);
+  background-color: var(--code-bg, #2d2d2d);
 }
 #header {
   text-align: center;
@@ -221,6 +218,7 @@ h2 a {
   font-size: 146px;
   font-weight: 100;
   text-indent: -23px;
+  color: #800;
 }
 .load #header .mongoose {
   letter-spacing: -14px;
@@ -231,6 +229,10 @@ h2 a {
   text-shadow: 1px 1px #f8f8f8;
   text-align: center;
   margin: 7px 0;
+}
+[data-theme="dark"] .tagline {
+  color: #f8f8f8;
+  text-shadow: 1px 1px #222;
 }
 .blurb {
   text-align: center;
@@ -254,7 +256,6 @@ h2 a {
 #links li {
   display: inline-block;
   margin: 0 15px;
-  background-color: #FEFEFE;
 }
 #links a {
   background: #444;

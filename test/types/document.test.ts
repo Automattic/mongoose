@@ -620,3 +620,55 @@ async function gh15578() {
     expectType<number>(jsonWithVersionKey.taco);
   }
 }
+
+function testFlattenUUIDs() {
+  interface RawDocType {
+    _id: Types.UUID;
+    uuid: Types.UUID;
+  }
+
+  const ASchema = new Schema<RawDocType>({
+    _id: Schema.Types.UUID,
+    uuid: Schema.Types.UUID
+  });
+
+  const AModel = model<RawDocType>('UUIDModel', ASchema);
+
+  const a = new AModel({
+    uuid: new Types.UUID()
+  });
+
+  // Test flattenUUIDs: true converts UUIDs to strings
+  const toObjectFlattened: Omit<RawDocType, '_id' | 'uuid'> & { _id: string, uuid: string } = a.toObject({ flattenUUIDs: true });
+  const toJSONFlattened: Omit<RawDocType, '_id' | 'uuid'> & { _id: string, uuid: string } = a.toJSON({ flattenUUIDs: true });
+
+  expectType<string>(toObjectFlattened._id);
+  expectType<string>(toObjectFlattened.uuid);
+  expectType<string>(toJSONFlattened._id);
+  expectType<string>(toJSONFlattened.uuid);
+
+  // Test with virtuals
+  const toObjectWithVirtuals: Omit<RawDocType, '_id' | 'uuid'> & { _id: string, uuid: string } = a.toObject({ flattenUUIDs: true, virtuals: true });
+  const toJSONWithVirtuals: Omit<RawDocType, '_id' | 'uuid'> & { _id: string, uuid: string } = a.toJSON({ flattenUUIDs: true, virtuals: true });
+
+  expectType<string>(toObjectWithVirtuals._id);
+  expectType<string>(toObjectWithVirtuals.uuid);
+  expectType<string>(toJSONWithVirtuals._id);
+  expectType<string>(toJSONWithVirtuals.uuid);
+
+  // Test flattenUUIDs: false (default behavior - should remain UUID)
+  const toObjectNotFlattened = a.toObject({ flattenUUIDs: false });
+  const toJSONNotFlattened = a.toJSON({ flattenUUIDs: false });
+  expectType<Types.UUID>(toObjectNotFlattened._id);
+  expectType<Types.UUID>(toObjectNotFlattened.uuid);
+  expectType<Types.UUID>(toJSONNotFlattened._id);
+  expectType<Types.UUID>(toJSONNotFlattened.uuid);
+
+  // Test default (no flattenUUIDs option - should remain UUID)
+  const toObjectDefault = a.toObject();
+  const toJSONDefault = a.toJSON();
+  expectType<Types.UUID>(toObjectDefault._id);
+  expectType<Types.UUID>(toObjectDefault.uuid);
+  expectType<Types.UUID>(toJSONDefault._id);
+  expectType<Types.UUID>(toJSONDefault.uuid);
+}

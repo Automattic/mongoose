@@ -22,9 +22,7 @@
     }
     const isDark = theme === 'dark';
     document.documentElement.classList.toggle(CODE_THEME_CLASS, isDark);
-    if (document.body) {
-      document.body.classList.toggle(CODE_THEME_CLASS, isDark);
-    }
+    document.body.classList.toggle(CODE_THEME_CLASS, isDark);
   }
 
   const theme = localStorage.getItem(STORAGE_KEY) || (prefersDarkQuery?.matches ? 'dark' : 'light');

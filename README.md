@@ -13,15 +13,15 @@ Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed 
 
 The official documentation website is [mongoosejs.com](http://mongoosejs.com/).
 
-Mongoose 9.0.0 was released on November 21, 2025. You can find more details on [backwards breaking changes in 9.0.0 on our docs site](https://mongoosejs.com/docs/migrating_to_9.html).
+Mongoose 9.0.0 was released on November 21, 2024. You can find more details on [backwards breaking changes in 9.0.0 on our docs site](https://mongoosejs.com/docs/migrating_to_9.html).
 
 ## Support
 
-* [Stack Overflow](http://stackoverflow.com/questions/tagged/mongoose)
-* [Bug Reports](https://github.com/Automattic/mongoose/issues/)
-* [Mongoose Slack Channel](http://slack.mongoosejs.io/)
-* [Help Forum](http://groups.google.com/group/mongoose-orm)
-* [MongoDB Support](https://www.mongodb.com/docs/manual/support/)
+- [Stack Overflow](http://stackoverflow.com/questions/tagged/mongoose)
+- [Bug Reports](https://github.com/Automattic/mongoose/issues/)
+- [Mongoose Slack Channel](http://slack.mongoosejs.io/)
+- [Help Forum](http://groups.google.com/group/mongoose-orm)
+- [MongoDB Support](https://www.mongodb.com/docs/manual/support/)
 
 ## Plugins
 
@@ -32,7 +32,7 @@ Check out the [plugins search site](http://plugins.mongoosejs.io/) to see hundre
 Pull requests are always welcome! Please base pull requests against the `master`
 branch and follow the [contributing guide](https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md).
 
-If your pull requests makes documentation changes, please do **not**
+If your pull requests make documentation changes, please do **not**
 modify any `.html` files. The `.html` files are compiled code, so please make
 your changes in `docs/*.pug`, `lib/*.js`, or `test/docs/*.js`.
 
@@ -40,7 +40,7 @@ View all 400+ [contributors](https://github.com/Automattic/mongoose/graphs/contr
 
 ## Installation
 
-First install [Node.js](http://nodejs.org/) and [MongoDB](https://www.mongodb.org/downloads). Then:
+First install [Node.js](http://nodejs.org/) and [MongoDB](https://www.mongodb.org/downloads).
 
 Then install the `mongoose` package using your preferred package manager:
 
@@ -74,22 +74,23 @@ Mongoose 6.8.0 also includes alpha support for [Deno](https://deno.land/).
 
 ```javascript
 // Using Node.js `require()`
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 // Using ES6 imports
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 ```
 
 Or, using [Deno's `createRequire()` for CommonJS support](https://deno.land/std@0.113.0/node/README.md?source=#commonjs-modules-loading) as follows.
 
 ```javascript
-import { createRequire } from 'https://deno.land/std@0.177.0/node/module.ts';
+import { createRequire } from "https://deno.land/std@0.177.0/node/module.ts";
 const require = createRequire(import.meta.url);
 
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-mongoose.connect('mongodb://127.0.0.1:27017/test')
-  .then(() => console.log('Connected!'));
+mongoose
+  .connect("mongodb://127.0.0.1:27017/test")
+  .then(() => console.log("Connected!"));
 ```
 
 You can then run the above script using the following.
@@ -113,12 +114,12 @@ First, we need to define a connection. If your app uses only one database, you s
 Both `connect` and `createConnection` take a `mongodb://` URI, or the parameters `host, database, port, options`.
 
 ```js
-await mongoose.connect('mongodb://127.0.0.1/my_database');
+await mongoose.connect("mongodb://127.0.0.1/my_database");
 ```
 
 Once connected, the `open` event is fired on the `Connection` instance. If you're using `mongoose.connect`, the `Connection` is `mongoose.connection`. Otherwise, `mongoose.createConnection` return value is a `Connection`.
 
-**Note:** *If the local connection fails then try using 127.0.0.1 instead of localhost. Sometimes issues may arise when the local hostname has been changed.*
+**Note:** _If the local connection fails then try using 127.0.0.1 instead of localhost. Sometimes issues may arise when the local hostname has been changed._
 
 **Important!** Mongoose buffers all the commands until it's connected to the database. This means that you don't have to wait until it connects to MongoDB in order to define models, run queries, etc.
 
@@ -134,42 +135,42 @@ const BlogPost = new Schema({
   author: ObjectId,
   title: String,
   body: String,
-  date: Date
+  date: Date,
 });
 ```
 
 Aside from defining the structure of your documents and the types of data you're storing, a Schema handles the definition of:
 
-* [Validators](http://mongoosejs.com/docs/validation.html) (async and sync)
-* [Defaults](http://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-default)
-* [Getters](http://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-get)
-* [Setters](http://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-set)
-* [Indexes](http://mongoosejs.com/docs/guide.html#indexes)
-* [Middleware](http://mongoosejs.com/docs/middleware.html)
-* [Methods](http://mongoosejs.com/docs/guide.html#methods) definition
-* [Statics](http://mongoosejs.com/docs/guide.html#statics) definition
-* [Plugins](http://mongoosejs.com/docs/plugins.html)
-* [pseudo-JOINs](http://mongoosejs.com/docs/populate.html)
+- [Validators](http://mongoosejs.com/docs/validation.html) (async and sync)
+- [Defaults](http://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-default)
+- [Getters](http://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-get)
+- [Setters](http://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-set)
+- [Indexes](http://mongoosejs.com/docs/guide.html#indexes)
+- [Middleware](http://mongoosejs.com/docs/middleware.html)
+- [Methods](http://mongoosejs.com/docs/guide.html#methods) definition
+- [Statics](http://mongoosejs.com/docs/guide.html#statics) definition
+- [Plugins](http://mongoosejs.com/docs/plugins.html)
+- [pseudo-JOINs](http://mongoosejs.com/docs/populate.html)
 
 The following example shows some of these features:
 
 ```js
 const Comment = new Schema({
-  name: { type: String, default: 'hahaha' },
+  name: { type: String, default: "hahaha" },
   age: { type: Number, min: 18, index: true },
   bio: { type: String, match: /[a-z]/ },
   date: { type: Date, default: Date.now },
-  buff: Buffer
+  buff: Buffer,
 });
 
 // a setter
-Comment.path('name').set(function(v) {
+Comment.path("name").set(function (v) {
   return capitalize(v);
 });
 
 // middleware
-Comment.pre('save', function(next) {
-  notify(this.get('email'));
+Comment.pre("save", function (next) {
+  notify(this.get("email"));
   next();
 });
 ```
@@ -181,19 +182,19 @@ Take a look at the example in [`examples/schema/schema.js`](https://github.com/A
 Once we define a model through `mongoose.model('ModelName', mySchema)`, we can access it through the same function
 
 ```js
-const MyModel = mongoose.model('ModelName');
+const MyModel = mongoose.model("ModelName");
 ```
 
 Or just do it all at once
 
 ```js
-const MyModel = mongoose.model('ModelName', mySchema);
+const MyModel = mongoose.model("ModelName", mySchema);
 ```
 
-The first argument is the *singular* name of the collection your model is for. **Mongoose automatically looks for the *plural* version of your model name.** For example, if you use
+The first argument is the _singular_ name of the collection your model is for. **Mongoose automatically looks for the _plural_ version of your model name.** For example, if you use
 
 ```js
-const MyModel = mongoose.model('Ticket', mySchema);
+const MyModel = mongoose.model("Ticket", mySchema);
 ```
 
 Then `MyModel` will use the **tickets** collection, not the **ticket** collection. For more details read the [model docs](https://mongoosejs.com/docs/api/mongoose.html#mongoose_Mongoose-model).
@@ -202,7 +203,7 @@ Once we have our model, we can then instantiate it, and save it:
 
 ```js
 const instance = new MyModel();
-instance.my.key = 'hello';
+instance.my.key = "hello";
 await instance.save();
 ```
 
@@ -215,7 +216,9 @@ await MyModel.find({});
 You can also `findOne`, `findById`, `update`, etc.
 
 ```js
-const instance = await MyModel.findOne({ /* ... */ });
+const instance = await MyModel.findOne({
+  /* ... */
+});
 console.log(instance.my.key); // 'hello'
 ```
 
@@ -224,8 +227,8 @@ For more details check out [the docs](http://mongoosejs.com/docs/queries.html).
 **Important!** If you opened a separate connection using `mongoose.createConnection()` but attempt to access the model through `mongoose.model('ModelName')` it will not work as expected since it is not hooked up to an active db connection. In this case access your model through the connection you created:
 
 ```js
-const conn = mongoose.createConnection('your connection string');
-const MyModel = conn.model('ModelName', schema);
+const conn = mongoose.createConnection("your connection string");
+const MyModel = conn.model("ModelName", schema);
 const m = new MyModel();
 await m.save(); // works
 ```
@@ -233,8 +236,8 @@ await m.save(); // works
 vs
 
 ```js
-const conn = mongoose.createConnection('your connection string');
-const MyModel = mongoose.model('ModelName', schema);
+const conn = mongoose.createConnection("your connection string");
+const MyModel = mongoose.model("ModelName", schema);
 const m = new MyModel();
 await m.save(); // does not work b/c the default connection object was never connected
 ```
@@ -251,13 +254,13 @@ Where `Comment` is a `Schema` we created. This means that creating embedded docu
 
 ```js
 // retrieve my model
-const BlogPost = mongoose.model('BlogPost');
+const BlogPost = mongoose.model("BlogPost");
 
 // create a blog post
 const post = new BlogPost();
 
 // create a comment
-post.comments.push({ title: 'My comment' });
+post.comments.push({ title: "My comment" });
 
 await post.save();
 ```
@@ -283,9 +286,9 @@ You can intercept method arguments via middleware.
 For example, this would allow you to broadcast changes about your Documents every time someone `set`s a path in your Document to a new value:
 
 ```js
-schema.pre('set', function(next, path, val, typel) {
+schema.pre("set", function (next, path, val, type) {
   // `this` is the current Document
-  this.emit('set', path, val);
+  this.emit("set", path, val);
 
   // Pass control to the next pre
   next();
@@ -297,7 +300,7 @@ Moreover, you can mutate the incoming `method` arguments so that subsequent midd
 ```js
 schema.pre(method, function firstPre(next, methodArg1, methodArg2) {
   // Mutate methodArg1
-  next('altered-' + methodArg1.toString(), methodArg2);
+  next("altered-" + methodArg1.toString(), methodArg2);
 });
 
 // pre declaration is chainable
@@ -325,16 +328,16 @@ new Schema({
   broken: { type: Boolean },
   asset: {
     name: String,
-    type: String // uh oh, it broke. asset will be interpreted as String
-  }
+    type: String, // uh oh, it broke. asset will be interpreted as String
+  },
 });
 
 new Schema({
   works: { type: Boolean },
   asset: {
     name: String,
-    type: { type: String } // works. asset is an object with a type property
-  }
+    type: { type: String }, // works. asset is an object with a type property
+  },
 });
 ```
 
@@ -354,24 +357,24 @@ and [acquit](https://github.com/vkarpov15/acquit).
 
 ### MongoDB Runners
 
-* [run-rs](https://www.npmjs.com/package/run-rs)
-* [mongodb-memory-server](https://www.npmjs.com/package/mongodb-memory-server)
-* [mongodb-topology-manager](https://www.npmjs.com/package/mongodb-topology-manager)
+- [run-rs](https://www.npmjs.com/package/run-rs)
+- [mongodb-memory-server](https://www.npmjs.com/package/mongodb-memory-server)
+- [mongodb-topology-manager](https://www.npmjs.com/package/mongodb-topology-manager)
 
 ### Unofficial CLIs
 
-* [mongoosejs-cli](https://www.npmjs.com/package/mongoosejs-cli)
+- [mongoosejs-cli](https://www.npmjs.com/package/mongoosejs-cli)
 
 ### Data Seeding
 
-* [dookie](https://www.npmjs.com/package/dookie)
-* [seedgoose](https://www.npmjs.com/package/seedgoose)
-* [mongoose-data-seed](https://www.npmjs.com/package/mongoose-data-seed)
+- [dookie](https://www.npmjs.com/package/dookie)
+- [seedgoose](https://www.npmjs.com/package/seedgoose)
+- [mongoose-data-seed](https://www.npmjs.com/package/mongoose-data-seed)
 
 ### Express Session Stores
 
-* [connect-mongodb-session](https://www.npmjs.com/package/connect-mongodb-session)
-* [connect-mongo](https://www.npmjs.com/package/connect-mongo)
+- [connect-mongodb-session](https://www.npmjs.com/package/connect-mongodb-session)
+- [connect-mongo](https://www.npmjs.com/package/connect-mongo)
 
 ## License
 

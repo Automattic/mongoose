@@ -13,8 +13,8 @@
   --code-bg: #f5f5f5;
   --code-text: #333;
   --menu-bg: #eee;
-  --menu-hover: rgba(0,0,0, 0.1);
-  --menu-selected: rgba(0,0,0, 0.15);
+  --menu-hover: rgba(0, 0, 0, 0.1);
+  --menu-selected: rgba(0, 0, 0, 0.15);
   --shadow: rgba(0, 0, 0, 0.1);
   --focus-ring: #0971B2;
   --focus-ring-width: 3px;

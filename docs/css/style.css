@@ -1,10 +1,123 @@
 body {
   font-family: 'Open Sans', Helvetica, Arial, FreeSans;
-  color: #333;
+  color: var(--text-secondary, #333);
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
   padding: 0;
   margin: 0;
+  background-color: var(--bg-primary, #ffffff);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark mode support for homepage */
+@media (prefers-color-scheme: dark) {
+  body:not([data-theme="light"]) {
+    background-color: var(--bg-primary, #1a1a1a);
+    color: var(--text-secondary, #c0c0c0);
+  }
+}
+
+/* Manual theme overrides */
+[data-theme="dark"] {
+  background-color: var(--bg-primary, #1a1a1a);
+  color: var(--text-secondary, #c0c0c0);
+}
+
+[data-theme="light"] {
+  background-color: var(--bg-primary, #ffffff);
+  color: var(--text-secondary, #333);
+}
+
+/* Theme Toggle Button for Homepage */
+#theme-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+[data-theme="dark"] #theme-toggle {
+  background-color: rgba(26, 26, 26, 0.9);
+  border-color: #444;
+}
+
+#theme-toggle-btn {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #333;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+body[data-theme="dark"] #theme-toggle-btn {
+  color: #e0e0e0;
+}
+
+#theme-toggle-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+body[data-theme="dark"] #theme-toggle-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+#theme-toggle-btn:active {
+  transform: scale(0.95);
+}
+
+#theme-toggle-btn:focus-visible {
+  outline: 3px solid #0971B2;
+  outline-offset: 2px;
+}
+
+body[data-theme="dark"] #theme-toggle-btn:focus-visible {
+  outline-color: #4a9eff;
+}
+
+#theme-icon-light,
+#theme-icon-dark {
+  position: absolute;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  width: 20px;
+  height: 20px;
+}
+
+/* Default: show moon icon (for light/system mode) */
+#theme-icon-dark {
+  opacity: 1;
+  transform: rotate(0deg);
+}
+
+#theme-icon-light {
+  opacity: 0;
+  transform: rotate(90deg);
+  pointer-events: none;
+}
+
+/* In dark mode: show sun icon, hide moon icon */
+[data-theme="dark"] #theme-icon-light {
+  opacity: 1;
+  transform: rotate(0deg);
+  pointer-events: auto;
+}
+
+[data-theme="dark"] #theme-icon-dark {
+  opacity: 0;
+  transform: rotate(90deg);
+  pointer-events: none;
 }
 
 /* location.hash */
@@ -21,13 +134,19 @@ body {
 }
 
 a {
-  color: #800;
+  color: var(--link-color, #800);
   -webkit-transition-property: opacity, -webkit-transform, color, background-color, padding, -webkit-box-shadow;
   -webkit-transition-duration: 0.15s;
   -webkit-transition-timing-function: ease-out;
+  transition: opacity 0.15s ease-out, color 0.15s ease-out;
 }
 a:hover {
   opacity: 0.8;
+}
+a:focus-visible {
+  outline: 3px solid var(--focus-ring, #0971B2);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 #wrap {
   width: 600px;
@@ -43,20 +162,36 @@ h1 {
 }
 
 pre {
-  background: #eee;
-  padding: 5px;
-  border-radius: 3px;
+  background: var(--code-bg, #eee);
+  padding: 12px 16px;
+  border-radius: 6px;
   overflow-x: auto;
+  border: 1px solid var(--border-color, #ddd);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 code {
-  color: #333;
+  color: var(--code-text, #333);
   font-size: 11px;
   font-family: Consolas, "Liberation Mono", Courier, monospace;
+  background-color: var(--code-bg, #eee);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 pre code {
   border: 0 none;
   padding: 1.2em;
   overflow-x: auto;
+  background-color: transparent;
+}
+
+/* Dark mode for homepage code blocks */
+[data-theme="dark"] pre {
+  background: var(--code-bg, #2d2d2d);
+  border-color: var(--border-color, #444);
+}
+[data-theme="dark"] code {
+  color: var(--code-text, #e0e0e0);
+  background-color: var(--code-bg, #2d2d2d);
 }
 #header {
   text-align: center;
@@ -83,6 +218,7 @@ h2 a {
   font-size: 146px;
   font-weight: 100;
   text-indent: -23px;
+  color: #800;
 }
 .load #header .mongoose {
   letter-spacing: -14px;
@@ -93,6 +229,10 @@ h2 a {
   text-shadow: 1px 1px #f8f8f8;
   text-align: center;
   margin: 7px 0;
+}
+[data-theme="dark"] .tagline {
+  color: #f8f8f8;
+  text-shadow: 1px 1px #222;
 }
 .blurb {
   text-align: center;
@@ -116,7 +256,6 @@ h2 a {
 #links li {
   display: inline-block;
   margin: 0 15px;
-  background-color: #FEFEFE;
 }
 #links a {
   background: #444;

@@ -33,7 +33,7 @@ pre {
   transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
-/* Improve code block copy functionality */
+/* Enable absolute positioning for copy button and improve hover effect */
 pre {
   position: relative;
 }

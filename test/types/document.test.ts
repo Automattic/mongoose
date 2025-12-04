@@ -670,8 +670,8 @@ function testFlattenUUIDs() {
   });
 
   // Test flattenUUIDs: true converts UUIDs to strings
-  const toObjectFlattened: Omit<RawDocType, '_id' | 'uuid'> & { _id: string, uuid: string } = a.toObject({ flattenUUIDs: true });
-  const toJSONFlattened: Omit<RawDocType, '_id' | 'uuid'> & { _id: string, uuid: string } = a.toJSON({ flattenUUIDs: true });
+  const toObjectFlattened = a.toObject({ flattenUUIDs: true });
+  const toJSONFlattened = a.toJSON({ flattenUUIDs: true });
 
   expectType<string>(toObjectFlattened._id);
   expectType<string>(toObjectFlattened.uuid);
@@ -679,8 +679,8 @@ function testFlattenUUIDs() {
   expectType<string>(toJSONFlattened.uuid);
 
   // Test with virtuals
-  const toObjectWithVirtuals: Omit<RawDocType, '_id' | 'uuid'> & { _id: string, uuid: string } = a.toObject({ flattenUUIDs: true, virtuals: true });
-  const toJSONWithVirtuals: Omit<RawDocType, '_id' | 'uuid'> & { _id: string, uuid: string } = a.toJSON({ flattenUUIDs: true, virtuals: true });
+  const toObjectWithVirtuals = a.toObject({ flattenUUIDs: true, virtuals: true });
+  const toJSONWithVirtuals = a.toJSON({ flattenUUIDs: true, virtuals: true });
 
   expectType<string>(toObjectWithVirtuals._id);
   expectType<string>(toObjectWithVirtuals.uuid);

@@ -99,7 +99,7 @@
     "test-tsd": "node ./test/types/check-types-filename && tsd --full",
     "setup-test-encryption": "node scripts/setup-encryption-tests.js",
     "test-encryption": "mocha --exit ./test/encryption/*.test.js",
-    "tdd": "mocha ./test/*.test.js --inspect --watch --recursive --watch-files ./**/*.{js,ts}",
+    "tdd": "mocha --watch --inspect --recursive ./test/*.test.js --watch-files lib/**/*.js test/**/*.js",
     "test-coverage": "nyc --reporter=html --reporter=text npm test",
     "ts-benchmark": "cd ./benchmarks/typescript/simple && npm install && npm run benchmark | node ../../../scripts/tsc-diagnostics-check",
     "attest-benchmark": "node ./benchmarks/typescript/infer.bench.mts"

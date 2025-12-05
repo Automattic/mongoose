@@ -224,6 +224,8 @@ declare module 'mongoose' {
     upsert?: boolean;
     /** When false, do not add timestamps. When true, overrides the `timestamps` option set in the `bulkWrite` options. */
     timestamps?: boolean;
+    /** When true, allows updating fields that are marked as `immutable` in the schema. */
+    overwriteImmutable?: boolean;
   }
 
   export interface UpdateManyModel<TSchema = AnyObject> {
@@ -241,6 +243,8 @@ declare module 'mongoose' {
     upsert?: boolean;
     /** When false, do not add timestamps. When true, overrides the `timestamps` option set in the `bulkWrite` options. */
     timestamps?: boolean;
+    /** When true, allows updating fields that are marked as `immutable` in the schema. */
+    overwriteImmutable?: boolean;
   }
 
   export interface DeleteOneModel<TSchema = AnyObject> {

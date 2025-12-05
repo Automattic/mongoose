@@ -1,3 +1,9 @@
+8.20.2 / 2025-12-05
+===================
+ * fix(model): bump version if necessary after successful bulkSave() #15809 #15800
+ * fix(bulkWrite): pass overwriteImmutable option to castUpdate fixes #15789 #15782 #15781
+ * types(schema): allow calling schema.static() with as TStatics #15794 #15780
+
 7.8.8 / 2025-12-04
 ==================
  * fix(bulkWrite): pass overwriteImmutable option to castUpdate fixes #15789 #15782 #15781

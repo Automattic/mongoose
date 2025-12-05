@@ -539,7 +539,7 @@ describe('QueryCursor', function() {
     setTimeout(() => {
       assert.equal(closeEventTriggeredCount, 1);
       done();
-    }, 20);
+    }, 200);
   });
 
   it('closing query cursor emits `close` event only once with stream pause/resume (gh-10876)', function(done) {

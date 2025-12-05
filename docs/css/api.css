@@ -12,6 +12,28 @@
   height: 100%;
   padding-bottom: 10px;
   overflow-y: auto;
+  background-color: var(--menu-bg, #fafafa);
+  border-left: 1px solid var(--border-color, #ddd);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color, #ddd) var(--menu-bg, #fafafa);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.api-nav::-webkit-scrollbar {
+  width: 8px;
+}
+
+.api-nav::-webkit-scrollbar-track {
+  background: var(--menu-bg, #fafafa);
+}
+
+.api-nav::-webkit-scrollbar-thumb {
+  background-color: var(--border-color, #ddd);
+  border-radius: 4px;
+}
+
+.api-nav::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-muted, #777);
 }
 
 .api-nav .nav-item-title {
@@ -24,7 +46,18 @@
 }
 
 .api-nav a {
-  color: #777;
+  color: var(--text-muted, #777);
+  transition: color 0.2s ease;
+}
+
+.api-nav a:hover {
+  color: var(--link-color, #0971B2);
+}
+
+.api-nav a:focus-visible {
+  outline: 3px solid var(--focus-ring, #0971B2);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 .api-nav .nav-item-sub {
@@ -54,9 +87,44 @@
   margin-top: 3em;
 }
 
+/* Responsive API navigation */
 @media (max-width: 1785px) {
   .api-nav {
     display: none;
+  }
+}
+
+/* Tablet: Show API nav as collapsible sidebar */
+@media (min-width: 1400px) and (max-width: 1785px) {
+  .api-nav {
+    display: block;
+    left: auto;
+    right: 0;
+    width: 280px;
+    z-index: 10;
+  }
+}
+
+/* Mobile: API nav as bottom sheet or hidden */
+@media (max-width: 1400px) {
+  .api-nav {
+    display: none;
+  }
+  
+  /* Optionally show as bottom sheet on mobile */
+  .api-nav.mobile-open {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    height: 50vh;
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--border-color, #ddd);
+    border-radius: 8px 8px 0 0;
+    box-shadow: 0 -2px 8px var(--shadow, rgba(0, 0, 0, 0.1));
   }
 }
 
@@ -166,4 +234,37 @@ hr.separate-api {
 
 .deprecated {
   color: #ff0000;
+  font-weight: 600;
+}
+
+/* Accessibility improvements */
+.method-type:focus-visible,
+.api-nav .nav-item-title:focus-visible {
+  outline: 3px solid var(--focus-ring, #0971B2);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Dark mode support for API page */
+@media (prefers-color-scheme: dark) {
+  .api-nav {
+    background-color: var(--menu-bg, #252525);
+    border-left-color: var(--border-color, #444);
+  }
+  
+  .api-nav a {
+    color: var(--text-muted, #888);
+  }
+  
+  .api-nav a:hover {
+    color: var(--link-color, #4a9eff);
+  }
+  
+  .native-ad {
+    background-color: var(--bg-secondary, #2d2d2d);
+  }
+  
+  .native-ad a {
+    color: var(--text-primary, #e0e0e0);
+  }
 }

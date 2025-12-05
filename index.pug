@@ -5,6 +5,7 @@ html(lang='en')
     meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
     title Mongoose ODM v#{package.version}
     link(href="//fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Droid+Sans+Mono|Open+Sans:400,700|Linden+Hill|Quattrocento:400,700|News+Cycle:400,700|Antic+Slab|Cabin+Condensed:400,700", rel="stylesheet", type="text/css")
+    link(href="docs/css/mongoose5.css", rel="stylesheet")
     link(href="docs/css/style.css", rel="stylesheet")
     link(href="docs/css/github.css", rel="stylesheet")
     link(href="docs/css/carbonads.css", rel="stylesheet")
@@ -45,6 +46,10 @@ html(lang='en')
       }
 
   body
+    #theme-toggle
+      button#theme-toggle-btn(aria-label="Toggle dark mode" title="Toggle dark/light theme")
+        <svg id="theme-icon-light" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg id="theme-icon-dark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     a(class="github-fork-ribbon" href="https://github.com/Automattic/mongoose" data-ribbon="Fork me on GitHub" title="Fork me on GitHub" target="_blank").
       Fork me on GitHub
     #wrap.homepage
@@ -153,5 +158,6 @@ html(lang='en')
             Sponsor [Mongoose on OpenCollective](https://opencollective.com/mongoose) to get your company's logo above!
 
     p#footer Licensed under MIT.
+    script(src="docs/js/theme-toggle.js")
     script.
       document.body.className = 'load';

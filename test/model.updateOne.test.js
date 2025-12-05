@@ -2681,133 +2681,178 @@ describe('model: updateOne: ', function() {
   });
 
   describe('bulkWrite overwriteImmutable option (gh-15781)', function() {
-    it('updateOne can update immutable field with overwriteImmutable: true', async function() {
-      // Arrange
-      const { User } = createTestContext();
-      const user = await User.create({ name: 'John', ssn: '123-45-6789' });
-      const customCreatedAt = new Date('2020-01-01');
-
-      // Act
-      await User.bulkWrite([{
-        updateOne: {
-          filter: { _id: user._id },
-          update: { createdAt: customCreatedAt, ssn: '999-99-9999' },
-          overwriteImmutable: true
-        }
-      }]);
-
-      // Assert
-      const updatedUser = await User.findById(user._id);
-      assert.strictEqual(updatedUser.ssn, '999-99-9999');
-      assert.strictEqual(updatedUser.createdAt.valueOf(), customCreatedAt.valueOf());
-    });
-
-    it('updateMany can update immutable field with overwriteImmutable: true', async function() {
-      // Arrange
-      const { User } = createTestContext();
-      const user = await User.create({ name: 'Alice', ssn: '111-11-1111' });
-      const customCreatedAt = new Date('2020-01-01');
-
-      // Act
-      await User.bulkWrite([{
-        updateMany: {
-          filter: { _id: user._id },
-          update: { createdAt: customCreatedAt, ssn: '000-00-0000' },
-          overwriteImmutable: true
-        }
-      }]);
-
-      // Assert
-      const updatedUser = await User.findById(user._id);
-      assert.strictEqual(updatedUser.ssn, '000-00-0000');
-      assert.strictEqual(updatedUser.createdAt.valueOf(), customCreatedAt.valueOf());
-    });
-
-    for (const timestamps of [true, false, null, undefined]) {
-      it(`overwriting immutable createdAt with bulkWrite (gh-15781) when \`timestamps\` is \`${timestamps}\``, async function() {
-        // Arrange
-        const schema = Schema({ name: String }, { timestamps: true });
-
-        const Model = db.model('Test', schema);
-
-        const doc1 = await Model.create({ name: 'gh-15781-1' });
-        const doc2 = await Model.create({ name: 'gh-15781-2' });
-
-        // Act
-        const createdAt = new Date('2011-06-01');
-
-        await Model.bulkWrite([
-          {
-            updateOne: {
-              filter: { _id: doc1._id },
-              update: { createdAt },
-              overwriteImmutable: true,
-              timestamps
-            }
-          },
-          {
-            updateMany: {
-              filter: { _id: doc2._id },
-              update: { createdAt },
-              overwriteImmutable: true,
-              timestamps
-            }
-          }
-        ]);
-
-        // Assert
-        const updatesDocs = await Model.find({ _id: { $in: [doc1._id, doc2._id] } });
-
-        assert.equal(updatesDocs[0].createdAt.valueOf(), createdAt.valueOf());
-        assert.equal(updatesDocs[1].createdAt.valueOf(), createdAt.valueOf());
-      });
-
-      it(`can not update immutable fields without overwriteImmutable: true and timestamps: ${timestamps}`, async function() {
+    for (const operationName of ['updateOne', 'updateMany']) {
+      it(`\`${operationName}\` can update immutable field with overwriteImmutable: true`, async function() {
       // Arrange
         const { User } = createTestContext();
-        const users = await User.create([
-          { name: 'Bob', ssn: '222-22-2222' },
-          { name: 'Eve', ssn: '333-33-3333' }
-        ]);
+        const user = await User.create({ name: 'John', ssn: '123-45-6789' });
+        const customCreatedAt = new Date('2020-01-01');
+
+        // Act
+        await User.bulkWrite([{
+          [operationName]: {
+            filter: { _id: user._id },
+            update: { createdAt: customCreatedAt, ssn: '999-99-9999' },
+            overwriteImmutable: true
+          }
+        }]);
+
+        // Assert
+        const updatedUser = await User.findById(user._id);
+        assert.strictEqual(updatedUser.ssn, '999-99-9999');
+        assert.strictEqual(updatedUser.createdAt.valueOf(), customCreatedAt.valueOf());
+      });
+
+      it(`should allow overwriting nested createdAt with overwriteImmutable (${operationName})`, async function() {
+        // Arrange
+        const { User } = createTestContext({ nestedTimestamps: true });
+        const user = await User.create({ name: 'John' });
+        const customCreatedAt = new Date('2020-01-01');
+
+        // Act
+        await User.bulkWrite([{
+          [operationName]: {
+            filter: { _id: user._id },
+            update: { 'meta.createdAt': customCreatedAt },
+            overwriteImmutable: true
+          }
+        }]);
+
+        // Assert
+        const updated = await User.findById(user._id);
+        assert.strictEqual(updated.meta.createdAt.valueOf(), customCreatedAt.valueOf());
+      });
+
+      it(`should not overwrite nested createdAt without overwriteImmutable in ${operationName}`, async function() {
+        // Arrange
+        const { User } = createTestContext({ nestedTimestamps: true });
+        const user = await User.create({ name: 'Bob' });
+        const originalCreatedAt = user.meta.createdAt;
         const newCreatedAt = new Date('2020-01-01');
 
         // Act
-        await User.bulkWrite([
-          {
-            updateOne: {
-              filter: { _id: users[0]._id },
-              update: { ssn: '888-88-8888', createdAt: newCreatedAt }
-            },
-            timestamps
-          },
-          {
-            updateMany: {
-              filter: { _id: users[1]._id },
-              update: { ssn: '777-77-7777', createdAt: newCreatedAt }
-            },
-            timestamps
+        await User.bulkWrite([{
+          [operationName]: {
+            filter: { _id: user._id },
+            update: { 'meta.createdAt': newCreatedAt }
           }
-        ]);
-
+        }]);
 
         // Assert
-        const [updatedUser1, updatedUser2] = await Promise.all([
-          User.findById(users[0]._id),
-          User.findById(users[1]._id)
-        ]);
-        assert.strictEqual(updatedUser1.ssn, '222-22-2222');
-        assert.notStrictEqual(updatedUser1.createdAt.valueOf(), newCreatedAt.valueOf());
+        const updated = await User.findById(user._id);
+        assert.strictEqual(updated.meta.createdAt.valueOf(), originalCreatedAt.valueOf());
+      });
 
-        assert.strictEqual(updatedUser2.ssn, '333-33-3333');
-        assert.notStrictEqual(updatedUser2.createdAt.valueOf(), newCreatedAt.valueOf());
+      it(`upsert should set createdAt on insert even with overwriteImmutable: true when no createdAt provided in \`${operationName}\``, async function() {
+        // Arrange
+        const { User } = createTestContext();
+        const uniqueName = uuidv7();
+
+        // Act - upsert with overwriteImmutable but WITHOUT providing createdAt
+        await User.bulkWrite([{
+          [operationName]: {
+            filter: { name: uniqueName },
+            update: { $set: { name: uniqueName } },
+            upsert: true,
+            overwriteImmutable: true
+          }
+        }]);
+
+        // Assert - createdAt should still be set on the new document
+        const inserted = await User.findOne({ name: uniqueName });
+        assert.ok(inserted, 'Document should be inserted');
+        assert.ok(inserted.createdAt, 'createdAt should be set on upserted document');
+        assert.ok(inserted.createdAt instanceof Date, 'createdAt should be a Date');
+      });
+
+      for (const timestamps of [true, false, null, undefined]) {
+        it(`overwriting immutable createdAt with bulkWrite (gh-15781) when \`timestamps\` is \`${timestamps}\` for \`${operationName}\``, async function() {
+          // Arrange
+          const schema = Schema({ name: String }, { timestamps: true });
+          const Model = db.model('Test', schema);
+          const doc = await Model.create({ name: 'gh-15781' });
+
+
+          // Act
+          const createdAt = new Date('2011-06-01');
+
+          await Model.bulkWrite([
+            {
+              [operationName]: {
+                filter: { _id: doc._id },
+                update: { createdAt },
+                overwriteImmutable: true,
+                timestamps
+              }
+            }
+          ]);
+
+          // Assert
+          const updatedDoc = await Model.findById(doc._id);
+
+          assert.equal(updatedDoc.createdAt.valueOf(), createdAt.valueOf());
+        });
+
+        it(`can not update immutable fields without overwriteImmutable: true and timestamps: ${timestamps} for ${operationName}`, async function() {
+          // Arrange
+          const { User } = createTestContext();
+          const user = await User.create({ name: 'Bob', ssn: '222-22-2222' });
+          const newCreatedAt = new Date('2020-01-01');
+
+          // Act
+          await User.bulkWrite([
+            {
+              [operationName]: {
+                filter: { _id: user._id },
+                update: { ssn: '888-88-8888', createdAt: newCreatedAt }
+              },
+              timestamps
+            }
+          ]);
+
+
+          // Assert
+          assert.strictEqual(user.ssn, '222-22-2222');
+          assert.notStrictEqual(user.createdAt.valueOf(), newCreatedAt.valueOf());
+        });
+      }
+      it('bulkWrite respects timestamps: { updatedAt: false } to skip updatedAt only', async function() {
+      // Arrange
+        const schema = new Schema({ name: String }, { timestamps: true });
+        const Model = db.model('Test', schema);
+        const doc = await Model.create({ name: 'test' });
+        const originalUpdatedAt = doc.updatedAt;
+
+        // Wait to ensure time difference
+        await new Promise(resolve => setTimeout(resolve, 1));
+
+        // Act - update with timestamps: { updatedAt: false }
+        await Model.bulkWrite([{
+          [operationName]: {
+            filter: { _id: doc._id },
+            update: { name: 'updated' },
+            timestamps: { updatedAt: false }
+          }
+        }]);
+
+        // Assert - updatedAt should NOT have changed
+        const updated = await Model.findById(doc._id);
+        assert.strictEqual(updated.name, 'updated');
+        assert.strictEqual(updated.updatedAt.valueOf(), originalUpdatedAt.valueOf());
       });
     }
 
-    function createTestContext() {
+
+    function createTestContext(options = {}) {
+      const timestampsOption = options.nestedTimestamps
+        ? { createdAt: 'meta.createdAt', updatedAt: 'meta.updatedAt' }
+        : true;
+
       const userSchema = new Schema({
         name: String,
         ssn: { type: String, immutable: true }
-      }, { timestamps: true });
+      }, { timestamps: timestampsOption });
+
       const User = db.model('User', userSchema);
       return { User };
     }

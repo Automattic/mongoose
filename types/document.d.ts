@@ -287,6 +287,10 @@ declare module 'mongoose' {
     toJSON(options: ToObjectOptions & { flattenMaps: true, virtuals: true }): FlattenMaps<Require_id<DocType & TVirtuals>>;
     toJSON(options: ToObjectOptions & { flattenMaps: true }): FlattenMaps<Require_id<DocType>>;
 
+    // flattenUUIDs overloads
+    toJSON(options: ToObjectOptions & { flattenUUIDs: true, virtuals: true }): UUIDToString<Require_id<DocType & TVirtuals>>;
+    toJSON(options: ToObjectOptions & { flattenUUIDs: true }): UUIDToString<Require_id<DocType>>;
+
     // Handle versionKey: false (regardless of the others - most specific overloads should come first)
     toJSON(options: ToObjectOptions & { versionKey: false, flattenMaps: true, flattenObjectIds: true, virtuals: true }): ObjectIdToString<Omit<FlattenMaps<Require_id<DocType & TVirtuals>>, '__v'>>;
     toJSON(options: ToObjectOptions & { versionKey: false, flattenMaps: false, flattenObjectIds: true, virtuals: true }): ObjectIdToString<Omit<Require_id<DocType & TVirtuals>, '__v'>>;
@@ -334,6 +338,10 @@ declare module 'mongoose' {
     toObject(options: ToObjectOptions & { flattenObjectIds: true }): ObjectIdToString<Require_id<DocType>>;
     toObject(options: ToObjectOptions & { flattenMaps: true, virtuals: true }): FlattenMaps<Require_id<DocType & TVirtuals>>;
     toObject(options: ToObjectOptions & { flattenMaps: true }): FlattenMaps<Require_id<DocType>>;
+
+    // flattenUUIDs overloads
+    toObject(options: ToObjectOptions & { flattenUUIDs: true, virtuals: true }): UUIDToString<Require_id<DocType & TVirtuals>>;
+    toObject(options: ToObjectOptions & { flattenUUIDs: true }): UUIDToString<Require_id<DocType>>;
 
     // Handle versionKey: false (regardless of the others - most specific overloads should come first)
     toObject(options: ToObjectOptions & { versionKey: false, flattenMaps: true, flattenObjectIds: true, virtuals: true }): ObjectIdToString<Omit<FlattenMaps<Require_id<DocType & TVirtuals>>, '__v'>>;

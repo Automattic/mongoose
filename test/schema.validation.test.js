@@ -147,6 +147,63 @@ describe('schema', function() {
       await Test.path('status').doValidate(2);
     });
 
+    it('buffer enum', async function() {
+      const Test = new Schema({
+        buf: { type: Buffer, enum: [Buffer.from('a'), Buffer.from('b'), null] },
+        data: { type: Buffer }
+      });
+
+      assert.ok(Test.path('buf') instanceof SchemaTypes.Buffer);
+      const actualBufs = Test.path('buf').enumValues.map(v => v ? Buffer.from(v) : v);
+      assert.deepEqual(actualBufs, [Buffer.from('a'), Buffer.from('b'), null]);
+      assert.equal(Test.path('buf').validators.length, 1);
+
+      Test.path('buf').enum(Buffer.from('c'), Buffer.from('d'));
+
+      const updatedBufs = Test.path('buf').enumValues.map(v => v ? Buffer.from(v) : v);
+      assert.deepEqual(
+        updatedBufs,
+        [Buffer.from('a'), Buffer.from('b'), null, Buffer.from('c'), Buffer.from('d')]
+      );
+
+      // with SchemaTypes validate method
+      Test.path('data').enum({
+        values: [Buffer.from('x'), Buffer.from('y')],
+        message: 'enum validator failed for path `{PATH}`: test'
+      });
+
+      assert.equal(Test.path('data').validators.length, 1);
+      const dataBufs = Test.path('data').enumValues.map(v => v ? Buffer.from(v) : v)
+      assert.deepEqual(dataBufs, [Buffer.from('x'), Buffer.from('y')]);
+
+      await assert.rejects(Test.path('buf').doValidate(Buffer.from('zzz')), ValidatorError);
+
+      // allow unsetting enums
+      await Test.path('buf').doValidate(undefined);
+
+      await Test.path('buf').doValidate(null);
+
+      await assert.rejects(
+        Test.path('buf').doValidate(Buffer.from('nope')),
+        ValidatorError
+      );
+
+      await assert.rejects(
+        Test.path('data').doValidate(Buffer.from('bad')),
+        err => {
+          assert.ok(err instanceof ValidatorError);
+          assert.equal(err.message,
+            'enum validator failed for path `data`: test');
+          return true;
+        }
+      );
+
+      await Test.path('buf').doValidate(Buffer.from('a'));
+      await Test.path('buf').doValidate(Buffer.from('b'));
+      await Test.path('data').doValidate(Buffer.from('x'));
+      await Test.path('data').doValidate(Buffer.from('y'));
+    });
+
     it('string regexp', async function() {
       const Test = new Schema({
         simple: { type: String, match: /[a-z]/ }

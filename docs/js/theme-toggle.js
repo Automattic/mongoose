@@ -1,6 +1,5 @@
+'use strict';
 (function() {
-  'use strict';
-
   const STORAGE_KEY = 'mongoose-theme';
   const CODE_THEME_CLASS = 'code-theme-dark';
   const supportsMatchMedia = typeof window !== 'undefined' && typeof window.matchMedia === 'function';
@@ -20,7 +19,8 @@
     if (!skipSetStorage) {
       try {
         localStorage.setItem(STORAGE_KEY, theme);
-      } catch (e) {
+        // eslint-disable-next-line no-unused-vars
+      } catch (err) {
         // Silently fail - theme will still work for current session
       }
     }

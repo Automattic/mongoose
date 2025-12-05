@@ -1,3 +1,8 @@
+7.8.8 / 2025-12-04
+==================
+ * fix(bulkWrite): pass overwriteImmutable option to castUpdate fixes #15789 #15782 #15781
+ * fix(model): bump version if necessary after successful bulkSave() #15800
+
 7.8.7 / 2025-04-30
 ==================
  *  types(aggregate): allow calling project() with a string #15304 #15300

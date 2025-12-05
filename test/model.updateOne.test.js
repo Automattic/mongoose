@@ -2682,7 +2682,7 @@ describe('model: updateOne: ', function() {
     assert.equal(doc.age, 20);
   });
 
-  it('overwriting immutable createdAt with bulkWrite (gh-15781)', async function () {
+  it('overwriting immutable createdAt with bulkWrite (gh-15781)', async function() {
     const start = new Date().valueOf();
     const schema = Schema({
       createdAt: {

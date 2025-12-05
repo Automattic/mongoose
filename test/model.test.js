@@ -6522,7 +6522,7 @@ describe('Model', function() {
   });
 
   describe('bulkSave() (gh-9673)', function() {
-    it('saves new documents', async function () {
+    it('saves new documents', async function() {
 
       const userSchema = new Schema({
         name: { type: String }

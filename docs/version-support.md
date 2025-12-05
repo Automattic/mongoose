@@ -5,7 +5,7 @@
 Released on **November 21, 2025**, Mongoose 9 is the latest major version.
 All new features, improvements, and bug fixes are delivered to 8.x—so if you want the best experience, this is the version to use.
 
-* **Latest release:** [9.0.0](https://mongoosejs.com/docs/index.html)  
+* **Latest release:** [9.0.1](https://mongoosejs.com/docs/index.html)  
 * **Docs:** https://mongoosejs.com/docs
 
 ## Mongoose 8 (Prior Version)
@@ -13,7 +13,7 @@ All new features, improvements, and bug fixes are delivered to 8.x—so if you w
 Released on **October 31, 2023**, Mongoose 8 was the latest major version until 9.0.0 was released.  
 All new features, improvements, and bug fixes are still delivered to 8.x until at least February 1, 2026.
 
-* **Latest release:** [8.20.1](https://mongoosejs.com/docs/index.html)  
+* **Latest release:** [8.20.2](https://mongoosejs.com/docs/index.html)  
 * **Docs:** https://mongoosejs.com/docs/8.x/
 
 ## Mongoose 7 (Legacy)
@@ -21,7 +21,7 @@ All new features, improvements, and bug fixes are still delivered to 8.x until a
 Mongoose 7.x was released on **February 27, 2023** and is now in **legacy support**.  
 It still receives important fixes when needed, but it’s no longer the primary development focus.
 
-* **Latest release:** [7.8.7](https://mongoosejs.com/docs/7.x/docs/guide.html)  
+* **Latest release:** [7.8.8](https://mongoosejs.com/docs/7.x/docs/guide.html)  
 * **Docs:** https://mongoosejs.com/docs/7.x/
 
 ## Mongoose 6 (Limited Maintenance)

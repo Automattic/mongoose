@@ -12,11 +12,16 @@ import mongoose, {
   Schema,
   Types,
   UpdateQuery,
-  UpdateWriteOpResult
+  UpdateWriteOpResult,
+  connection,
+  model,
+  UpdateOneModel,
+  WithLevel1NestedPaths,
+  UpdateManyModel
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
-import { UpdateOneModel, ChangeStreamInsertDocument, ObjectId } from 'mongodb';
+import { UpdateOneModel as MongoUpdateOneModel, ChangeStreamInsertDocument, ObjectId, ModifyResult } from 'mongodb';
 
 function rawDocSyntax(): void {
   interface ITest {

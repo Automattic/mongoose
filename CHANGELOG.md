@@ -1,3 +1,18 @@
+9.0.1 / 2025-12-05
+==================
+ * perf: use native Buffer.equals() for buffer comparison #15821 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(model): fix overwriteImmutable not working with timestamps: true, add overwriteImmutable types re #15781 #15819 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(bulkWrite): pass overwriteImmutable option to castUpdate fixes #15782 #15781 [jhaayushkumar](https://github.com/jhaayushkumar)
+ * fix(schema): Add enumValues property to Number enum for consistency with String enum #15824 [AkaHarshit](https://github.com/AkaHarshit)
+ * fix: incorrect variable bug in double casting #15849 #15848 [lomesh2312](https://github.com/lomesh2312)
+ * fix: clear timeout in collection operations #15852 [techcodie](https://github.com/techcodie)
+ * types(query+model): use function overrides instead of | Query<any, any> to support using Query as filter #15791 #15779
+ * docs(migrating_to_9): clarify removing next() from pre middleware #15813
+ * docs: add dark mode support and CSS improvements #15753
+ * docs: Mongoose compatibility page updates #15797 [alexbevi](https://github.com/alexbevi)
+ * docs: Add closing backticks to code block in migration guide #15783 [isnifer](https://github.com/isnifer)
+ * docs: fix documentation link in connection.js #15804 [salittle0](https://github.com/salittle0)
+
 8.20.2 / 2025-12-05
 ===================
  * fix(model): bump version if necessary after successful bulkSave() #15809 #15800

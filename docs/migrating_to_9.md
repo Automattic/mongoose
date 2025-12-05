@@ -10,6 +10,31 @@ There are several backwards-breaking changes you should be aware of when migrati
 
 If you're still on Mongoose 7.x or earlier, please read the [Mongoose 7.x to 8.x migration guide](migrating_to_8.html) and upgrade to Mongoose 8.x first before upgrading to Mongoose 9.
 
+## Pre middleware no longer supports `next()`
+
+In Mongoose 9, pre middleware no longer receives a `next()` parameter.
+Instead, you should use `async` functions or promises to handle async pre middleware.
+
+```javascript
+// Worked in Mongoose 8.x, no longer supported in Mongoose 9!
+schema.pre('save', function(next) {
+  // Do something async
+  next();
+});
+
+// Mongoose 9.x example usage
+schema.pre('save', async function() {
+  // Do something async
+});
+// or use promises:
+schema.pre('save', function() {
+  return new Promise((resolve, reject) => {
+    // Do something async
+    resolve();
+  });
+});
+```
+
 ## `Schema.prototype.doValidate()` now returns a promise
 
 `Schema.prototype.doValidate()` now returns a promise that rejects with a validation error if one occurred.
@@ -36,37 +61,6 @@ try {
   // Handle validation error
 }
 ```
-
-## Errors in middleware functions take priority over `next()` calls
-
-In Mongoose 8.x, if a middleware function threw an error after calling `next()`, that error would be ignored.
-
-```javascript
-schema.pre('save', function(next) {
-  next();
-  // In Mongoose 8, this error will not get reported, because you already called next()
-  throw new Error('woops!');
-});
-```
-
-In Mongoose 9, errors in the middleware function take priority, so the above `save()` would throw an error.
-
-## `next()` no longer supports passing arguments to the next middleware
-
-Previously, you could call `next(null, 'new arg')` in a hook and the args to the next middleware would get overwritten by 'new arg'.
-
-```javascript
-schema.pre('save', function(next, options) {
-  options; // options passed to `save()`
-  next(null, 'new arg');
-});
-
-schema.pre('save', function(next, arg) {
-  arg; // In Mongoose 8, this would be 'new arg', overwrote the options passed to `save()`
-});
-```
-
-In Mongoose 9, `next(null, 'new arg')` doesn't overwrite the args to the next middleware.
 
 ## Update pipelines disallowed by default
 

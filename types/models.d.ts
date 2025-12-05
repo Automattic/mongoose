@@ -172,6 +172,46 @@ declare module 'mongoose' {
 
   interface RemoveOptions extends SessionOption, Omit<mongodb.DeleteOptions, 'session'> {}
 
+  interface MongooseBulkWritePerOperationOptions {
+    /** Skip validation for this operation. */
+    skipValidation?: boolean;
+    /** When false, do not add timestamps. When true, overrides the `timestamps` option set in the `bulkWrite` options. */
+    timestamps?: boolean;
+  }
+
+  interface MongooseBulkUpdatePerOperationOptions extends MongooseBulkWritePerOperationOptions {
+    /** When true, allows updating fields that are marked as `immutable` in the schema. */
+    overwriteImmutable?: boolean;
+    /** When false, do not set default values on insert. */
+    setDefaultsOnInsert?: boolean;
+  }
+
+  export type InsertOneModel<TSchema extends mongodb.Document = mongodb.Document> =
+    mongodb.InsertOneModel<TSchema> & MongooseBulkWritePerOperationOptions;
+
+  export type ReplaceOneModel<TSchema extends mongodb.Document = mongodb.Document> =
+    mongodb.ReplaceOneModel<TSchema> & MongooseBulkWritePerOperationOptions;
+
+  export type UpdateOneModel<TSchema extends mongodb.Document = mongodb.Document> =
+    mongodb.UpdateOneModel<TSchema> & MongooseBulkUpdatePerOperationOptions;
+
+  export type UpdateManyModel<TSchema extends mongodb.Document = mongodb.Document> =
+    mongodb.UpdateManyModel<TSchema> & MongooseBulkUpdatePerOperationOptions;
+
+  export type DeleteOneModel<TSchema extends mongodb.Document = mongodb.Document> =
+    mongodb.DeleteOneModel<TSchema>;
+
+  export type DeleteManyModel<TSchema extends mongodb.Document = mongodb.Document> =
+    mongodb.DeleteManyModel<TSchema>;
+
+  export type AnyBulkWriteOperation<TSchema extends mongodb.Document = mongodb.Document> =
+    | { insertOne: InsertOneModel<TSchema> }
+    | { replaceOne: ReplaceOneModel<TSchema> }
+    | { updateOne: UpdateOneModel<TSchema> }
+    | { updateMany: UpdateManyModel<TSchema> }
+    | { deleteOne: DeleteOneModel<TSchema> }
+    | { deleteMany: DeleteManyModel<TSchema> };
+
   const Model: Model<any>;
 
   export type AnyBulkWriteOperation<TSchema = AnyObject> = {
@@ -320,12 +360,12 @@ declare module 'mongoose' {
      */
     bulkWrite<DocContents = TRawDocType>(
       writes: Array<AnyBulkWriteOperation<DocContents>>,
-      options: MongooseBulkWriteOptions & { ordered: false }
-    ): Promise<MongooseBulkWriteResult>;
+      options: mongodb.BulkWriteOptions & MongooseBulkWriteOptions & { ordered: false }
+    ): Promise<mongodb.BulkWriteResult & { mongoose?: { validationErrors: Error[] } }>;
     bulkWrite<DocContents = TRawDocType>(
       writes: Array<AnyBulkWriteOperation<DocContents>>,
       options?: MongooseBulkWriteOptions
-    ): Promise<MongooseBulkWriteResult>;
+    ): Promise<mongodb.BulkWriteResult>;
 
     /**
      * Sends multiple `save()` calls in a single `bulkWrite()`. This is faster than

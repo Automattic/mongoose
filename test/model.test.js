@@ -6396,6 +6396,52 @@ describe('Model', function() {
 
   });
 
+  it('bulkWrite can disable timestamps with insertOne and replaceOne (gh-15782)', async function() {
+    const userSchema = new Schema({
+      name: String
+    }, { timestamps: true });
+
+    const User = db.model('User', userSchema);
+
+    const user = await User.create({ name: 'Hafez' });
+
+    await User.bulkWrite([
+      { insertOne: { document: { name: 'insertOne-test' }, timestamps: false } },
+      { replaceOne: { filter: { _id: user._id }, replacement: { name: 'replaceOne-test' }, timestamps: false } }
+    ]);
+
+    const insertedDoc = await User.findOne({ name: 'insertOne-test' });
+    assert.strictEqual(insertedDoc.createdAt, undefined);
+    assert.strictEqual(insertedDoc.updatedAt, undefined);
+
+    const replacedDoc = await User.findOne({ name: 'replaceOne-test' });
+    assert.strictEqual(replacedDoc.createdAt, undefined);
+    assert.strictEqual(replacedDoc.updatedAt, undefined);
+  });
+
+  it('bulkWrite insertOne and replaceOne respect per-op timestamps: true when global is false (gh-15782)', async function() {
+    const userSchema = new Schema({
+      name: String
+    }, { timestamps: true });
+
+    const User = db.model('User', userSchema);
+
+    const user = await User.create({ name: 'Hafez' });
+
+    await User.bulkWrite([
+      { insertOne: { document: { name: 'insertOne-test' }, timestamps: true } },
+      { replaceOne: { filter: { _id: user._id }, replacement: { name: 'replaceOne-test' }, timestamps: true } }
+    ], { timestamps: false });
+
+    const insertedDoc = await User.findOne({ name: 'insertOne-test' });
+    assert.ok(insertedDoc.createdAt instanceof Date);
+    assert.ok(insertedDoc.updatedAt instanceof Date);
+
+    const replacedDoc = await User.findOne({ name: 'replaceOne-test' });
+    assert.ok(replacedDoc.createdAt instanceof Date);
+    assert.ok(replacedDoc.updatedAt instanceof Date);
+  });
+
   it('bulkwrite should not change updatedAt on subdocs when timestamps set to false (gh-13611)', async function() {
 
     const postSchema = new Schema({

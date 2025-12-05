@@ -1,3 +1,8 @@
+7.8.8 / 2025-12-04
+==================
+ * fix(bulkWrite): pass overwriteImmutable option to castUpdate fixes #15789 #15782 #15781
+ * fix(model): bump version if necessary after successful bulkSave() #15800
+
 8.20.1 / 2025-11-20
 ===================
  * types: correct Model.schema type and fix unknown check for this param type in schema.methods #15750 #15693

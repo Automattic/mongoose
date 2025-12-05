@@ -272,11 +272,11 @@ declare module 'mongoose' {
      * round trip to the MongoDB server.
      */
     bulkWrite<DocContents = TRawDocType>(
-      writes: Array<AnyBulkWriteOperation<DocContents>>,
+      writes: Array<AnyBulkWriteOperation<DocContents extends mongodb.Document ? DocContents : any>>,
       options: mongodb.BulkWriteOptions & MongooseBulkWriteOptions & { ordered: false }
     ): Promise<mongodb.BulkWriteResult & { mongoose?: { validationErrors: Error[] } }>;
     bulkWrite<DocContents = TRawDocType>(
-      writes: Array<AnyBulkWriteOperation<DocContents>>,
+      writes: Array<AnyBulkWriteOperation<DocContents extends mongodb.Document ? DocContents : any>>,
       options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions
     ): Promise<mongodb.BulkWriteResult>;
 

@@ -4,6 +4,14 @@ html(lang='en')
     meta(charset="utf-8")
     meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
     title Mongoose v#{package.version}: #{title}
+    //- Inline script to prevent flash of wrong theme - must run before CSS loads
+    script.
+      (function() {
+        var theme = localStorage.getItem('mongoose-theme');
+        if (theme) {
+          document.documentElement.setAttribute('data-theme', theme);
+        }
+      })();
     include ./includes/favicon
     block style
 

@@ -13,6 +13,8 @@ pre code {
   padding: 0;
   font-size: 1em;
   color: var(--code-text, #222);
+  line-height: 1.6;
+  display: block;
 }
 
 pre {
@@ -56,6 +58,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
   background: var(--code-bg, #f8f8f8);
   -webkit-text-size-adjust: none;
   transition: background-color 0.3s ease, color 0.3s ease;
+  line-height: 1.6;
 }
 
 .hljs-comment,

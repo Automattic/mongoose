@@ -133,7 +133,6 @@ pre {
   overflow-x: auto;
   border: 1px solid var(--border-color);
   transition: background-color 0.3s ease, border-color 0.3s ease;
-  line-height: 1.5;
 }
 code {
   color: var(--code-text);

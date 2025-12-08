@@ -26,19 +26,19 @@
     --bg-primary: #1a1a1a;
     --bg-secondary: #2d2d2d;
     --bg-tertiary: #252525;
-    --text-primary: #e0e0e0;
-    --text-secondary: #c0c0c0;
-    --text-muted: #888888;
-    --link-color: #4a9eff;
-    --link-hover: #6bb3ff;
+    --text-primary: #f0f0f0;
+    --text-secondary: #d8d8d8;
+    --text-muted: #a0a0a0;
+    --link-color: #5aabff;
+    --link-hover: #7dbfff;
     --border-color: #444444;
     --code-bg: #2d2d2d;
-    --code-text: #e0e0e0;
+    --code-text: #e8e8e8;
     --menu-bg: #252525;
     --menu-hover: rgba(255,255,255, 0.1);
     --menu-selected: rgba(255,255,255, 0.15);
     --shadow: rgba(0, 0, 0, 0.3);
-    --focus-ring: #4a9eff;
+    --focus-ring: #5aabff;
   }
 }
 
@@ -47,19 +47,19 @@
   --bg-primary: #1a1a1a;
   --bg-secondary: #2d2d2d;
   --bg-tertiary: #252525;
-  --text-primary: #e0e0e0;
-  --text-secondary: #c0c0c0;
-  --text-muted: #888888;
-  --link-color: #4a9eff;
-  --link-hover: #6bb3ff;
+  --text-primary: #f0f0f0;
+  --text-secondary: #d8d8d8;
+  --text-muted: #a0a0a0;
+  --link-color: #5aabff;
+  --link-hover: #7dbfff;
   --border-color: #444444;
   --code-bg: #2d2d2d;
-  --code-text: #e0e0e0;
+  --code-text: #e8e8e8;
   --menu-bg: #252525;
   --menu-hover: rgba(255,255,255, 0.1);
   --menu-selected: rgba(255,255,255, 0.15);
   --shadow: rgba(0, 0, 0, 0.3);
-  --focus-ring: #4a9eff;
+  --focus-ring: #5aabff;
 }
 
 /* Light mode override */
@@ -179,6 +179,24 @@ h4 a:focus-visible {
   text-transform: none;
 }
 
+/* Dark mode logo adjustments for better contrast */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .logo-text {
+    color: #ff6b6b;
+  }
+  :root:not([data-theme="light"]) #logo {
+    content: url('/docs/images/mongoose5_62x30_transparent_light.png');
+  }
+}
+
+[data-theme="dark"] .logo-text {
+  color: #ff6b6b;
+}
+
+[data-theme="dark"] #logo {
+  content: url('/docs/images/mongoose5_62x30_transparent_light.png');
+}
+
 .pure-menu-item {
   font-size: 12pt;
   padding-top: 0px;
@@ -187,6 +205,11 @@ h4 a:focus-visible {
 .pure-menu-link {
   padding-top: 2px;
   padding-bottom: 2px;
+  color: var(--text-secondary);
+}
+
+.pure-menu-link:hover {
+  color: var(--text-primary);
 }
 
 /* change sub-item lists to be more dense */
@@ -222,6 +245,7 @@ li.version {
 
 li.version ul.pure-menu-children {
   border: 1px solid var(--border-color);
+  background-color: var(--menu-bg);
 }
 
 #logo-container {
@@ -539,8 +563,8 @@ li.version ul.pure-menu-children {
   right: 0px;
   width: 190px;
   text-align: center;
-  border: 1px solid #ddd;
-  background-color: #fff;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
 }
 
 #jobs img {
@@ -553,11 +577,11 @@ li.version ul.pure-menu-children {
 }
 
 #jobs .job-listing:hover {
-  background-color: #ddd;
+  background-color: var(--menu-hover);
 }
 
 #jobs .company {
-  color: black;
+  color: var(--text-primary);
 }
 
 #jobs .title {
@@ -565,7 +589,7 @@ li.version ul.pure-menu-children {
 }
 
 #jobs .location {
-  color: black;
+  color: var(--text-secondary);
   margin-top: 0.25em;
   font-size: 0.75em;
 }
@@ -580,14 +604,14 @@ li.version ul.pure-menu-children {
 #jobs .jobs-view-more {
   margin: 1em;
   font-size: 0.95em;
-  color: #777777;
+  color: var(--text-muted);
   padding: 0.25em;
   border-radius: 3px;
-  background-color: #eee;
+  background-color: var(--bg-secondary);
 }
 
 #jobs .jobs-view-more a {
-  color: black;
+  color: var(--text-primary);
 }
 
 @media (max-width: 1360px) {
@@ -755,4 +779,70 @@ li.version ul.pure-menu-children {
     bottom: 15px;
     right: 15px;
   }
+}
+
+/* Mongoose brand buttons */
+.mongoose-btn-outline,
+.mongoose-btn-solid {
+  border-radius: 3px;
+  padding: 3px 30px;
+  cursor: pointer;
+  font-size: inherit;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.mongoose-btn-outline {
+  border: 1px solid #800;
+  color: #800;
+  background-color: transparent;
+}
+
+.mongoose-btn-outline:hover {
+  background-color: rgba(136, 0, 0, 0.1);
+}
+
+.mongoose-btn-solid {
+  border: 1px solid transparent;
+  color: white;
+  background-color: #800;
+}
+
+.mongoose-btn-solid:hover {
+  background-color: #990000;
+}
+
+/* Dark mode button colors */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .mongoose-btn-outline {
+    border-color: #ff6b6b;
+    color: #ff6b6b;
+  }
+  :root:not([data-theme="light"]) .mongoose-btn-outline:hover {
+    background-color: rgba(255, 107, 107, 0.1);
+  }
+  :root:not([data-theme="light"]) .mongoose-btn-solid {
+    background-color: #ff6b6b;
+    color: #1a1a1a;
+  }
+  :root:not([data-theme="light"]) .mongoose-btn-solid:hover {
+    background-color: #ff8585;
+  }
+}
+
+[data-theme="dark"] .mongoose-btn-outline {
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+[data-theme="dark"] .mongoose-btn-outline:hover {
+  background-color: rgba(255, 107, 107, 0.1);
+}
+
+[data-theme="dark"] .mongoose-btn-solid {
+  background-color: #ff6b6b;
+  color: #1a1a1a;
+}
+
+[data-theme="dark"] .mongoose-btn-solid:hover {
+  background-color: #ff8585;
 }

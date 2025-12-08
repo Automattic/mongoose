@@ -221,6 +221,14 @@ h2 a {
   text-indent: -23px;
   color: #800;
 }
+[data-theme="dark"] #header .mongoose {
+  color: #ff6b6b;
+}
+@media (prefers-color-scheme: dark) {
+  body:not([data-theme="light"]) #header .mongoose {
+    color: #ff6b6b;
+  }
+}
 .load #header .mongoose {
   letter-spacing: -14px;
 }
@@ -244,6 +252,16 @@ h2 a {
 .tagline a, .blurb a {
   text-decoration: none;
   color: #800;
+}
+[data-theme="dark"] .tagline a,
+[data-theme="dark"] .blurb a {
+  color: #ff6b6b;
+}
+@media (prefers-color-scheme: dark) {
+  body:not([data-theme="light"]) .tagline a,
+  body:not([data-theme="light"]) .blurb a {
+    color: #ff6b6b;
+  }
 }
 #links {
   margin: 50px 10px 20px;
@@ -287,6 +305,22 @@ h2 a {
 #follow #version span {
   position: relative;
   top: -4px;
+}
+/* GitHub buttons iframe - use color-scheme to make iframe bg transparent in dark mode */
+.github-btn {
+  background: transparent;
+}
+[data-theme="dark"] .github-btn {
+  color-scheme: light;
+  filter: invert(0.85) hue-rotate(180deg);
+  background: transparent;
+}
+@media (prefers-color-scheme: dark) {
+  body:not([data-theme="light"]) .github-btn {
+    color-scheme: light;
+    filter: invert(0.85) hue-rotate(180deg);
+    background: transparent;
+  }
 }
 #what {
   margin-bottom: 32px;

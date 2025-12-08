@@ -222,11 +222,11 @@ h2 a {
   color: #800;
 }
 [data-theme="dark"] #header .mongoose {
-  color: #ff6b6b;
+  color: #FFB4B4;
 }
 @media (prefers-color-scheme: dark) {
   body:not([data-theme="light"]) #header .mongoose {
-    color: #ff6b6b;
+    color: #FFB4B4;
   }
 }
 .load #header .mongoose {
@@ -255,12 +255,12 @@ h2 a {
 }
 [data-theme="dark"] .tagline a,
 [data-theme="dark"] .blurb a {
-  color: #ff6b6b;
+  color: #FFB4B4;
 }
 @media (prefers-color-scheme: dark) {
   body:not([data-theme="light"]) .tagline a,
   body:not([data-theme="light"]) .blurb a {
-    color: #ff6b6b;
+    color: #FFB4B4;
   }
 }
 #links {

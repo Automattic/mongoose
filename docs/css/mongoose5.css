@@ -182,7 +182,7 @@ h4 a:focus-visible {
 /* Dark mode logo adjustments for better contrast */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .logo-text {
-    color: #ff6b6b;
+    color: #FFB4B4;
   }
   :root:not([data-theme="light"]) #logo {
     content: url('/docs/images/mongoose5_62x30_transparent_light.png');
@@ -190,7 +190,7 @@ h4 a:focus-visible {
 }
 
 [data-theme="dark"] .logo-text {
-  color: #ff6b6b;
+  color: #FFB4B4;
 }
 
 [data-theme="dark"] #logo {
@@ -814,24 +814,24 @@ li.version ul.pure-menu-children {
 /* Dark mode button colors */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .mongoose-btn-outline {
-    border-color: #ff6b6b;
-    color: #ff6b6b;
+    border-color: #FFB4B4;
+    color: #FFB4B4;
   }
   :root:not([data-theme="light"]) .mongoose-btn-outline:hover {
     background-color: rgba(255, 107, 107, 0.1);
   }
   :root:not([data-theme="light"]) .mongoose-btn-solid {
-    background-color: #ff6b6b;
+    background-color: #FFB4B4;
     color: #1a1a1a;
   }
   :root:not([data-theme="light"]) .mongoose-btn-solid:hover {
-    background-color: #ff8585;
+    background-color: #FFCECE;
   }
 }
 
 [data-theme="dark"] .mongoose-btn-outline {
-  border-color: #ff6b6b;
-  color: #ff6b6b;
+  border-color: #FFB4B4;
+  color: #FFB4B4;
 }
 
 [data-theme="dark"] .mongoose-btn-outline:hover {
@@ -839,10 +839,10 @@ li.version ul.pure-menu-children {
 }
 
 [data-theme="dark"] .mongoose-btn-solid {
-  background-color: #ff6b6b;
+  background-color: #FFB4B4;
   color: #1a1a1a;
 }
 
 [data-theme="dark"] .mongoose-btn-solid:hover {
-  background-color: #ff8585;
+  background-color: #FFCECE;
 }

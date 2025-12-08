@@ -246,6 +246,25 @@ hr.separate-api {
 }
 
 /* Dark mode support for API page */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .api-nav {
+    background-color: var(--menu-bg);
+    border-left-color: var(--border-color);
+  }
+  :root:not([data-theme="light"]) .api-nav a {
+    color: var(--text-muted);
+  }
+  :root:not([data-theme="light"]) .api-nav a:hover {
+    color: var(--link-color);
+  }
+  :root:not([data-theme="light"]) .native-ad {
+    background-color: var(--bg-secondary);
+  }
+  :root:not([data-theme="light"]) .native-ad a {
+    color: var(--text-primary);
+  }
+}
+
 [data-theme="dark"] .api-nav {
   background-color: var(--menu-bg);
   border-left-color: var(--border-color);

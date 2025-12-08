@@ -133,6 +133,7 @@ pre {
   overflow-x: auto;
   border: 1px solid var(--border-color);
   transition: background-color 0.3s ease, border-color 0.3s ease;
+  line-height: 1.5;
 }
 code {
   color: var(--code-text);
@@ -149,15 +150,6 @@ pre code {
   background-color: transparent;
 }
 
-/* Dark mode for homepage code blocks */
-[data-theme="dark"] pre {
-  background: var(--code-bg);
-  border-color: var(--border-color);
-}
-[data-theme="dark"] code {
-  color: var(--code-text);
-  background-color: var(--code-bg);
-}
 #header {
   text-align: center;
   padding-top: 20px;
@@ -248,14 +240,19 @@ h2 a {
   position: relative;
   top: -4px;
 }
-/* GitHub buttons iframe - use color-scheme to make iframe bg transparent in dark mode */
+/* GitHub buttons iframe - use filter to invert colors in dark mode */
 .github-btn {
   background: transparent;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .github-btn {
+    color-scheme: light;
+    filter: invert(0.85) hue-rotate(180deg);
+  }
 }
 [data-theme="dark"] .github-btn {
   color-scheme: light;
   filter: invert(0.85) hue-rotate(180deg);
-  background: transparent;
 }
 #what {
   margin-bottom: 32px;

@@ -169,126 +169,142 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 }
 
 /* Dark mode support for syntax highlighting */
-.code-theme-dark code {
-  background-color: var(--code-bg, #2d2d2d);
-  color: var(--link-color, #4a9eff);
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) code {
+    background-color: var(--code-bg);
+    color: var(--link-color);
+  }
+  :root:not([data-theme="light"]) pre {
+    background-color: var(--code-bg);
+    border-color: var(--border-color);
+    color: var(--code-text);
+  }
+  :root:not([data-theme="light"]) .hljs {
+    background: var(--code-bg);
+    color: var(--code-text);
+  }
 }
 
-.code-theme-dark pre {
-  background-color: var(--code-bg, #2d2d2d);
-  border-color: var(--border-color, #444);
-  color: var(--code-text, #e0e0e0);
+[data-theme="dark"] code {
+  background-color: var(--code-bg);
+  color: var(--link-color);
 }
 
-.code-theme-dark .hljs {
-  background: var(--code-bg, #2d2d2d);
-  color: var(--code-text, #e0e0e0);
+[data-theme="dark"] pre {
+  background-color: var(--code-bg);
+  border-color: var(--border-color);
+  color: var(--code-text);
 }
 
-.code-theme-dark .hljs-comment,
-.code-theme-dark .diff .hljs-header,
-.code-theme-dark .hljs-javadoc {
+[data-theme="dark"] .hljs {
+  background: var(--code-bg);
+  color: var(--code-text);
+}
+
+[data-theme="dark"] .hljs-comment,
+[data-theme="dark"] .diff .hljs-header,
+[data-theme="dark"] .hljs-javadoc {
   color: #6a9955;
 }
 
-.code-theme-dark .hljs-keyword,
-.code-theme-dark .css .rule .hljs-keyword,
-.code-theme-dark .hljs-winutils,
-.code-theme-dark .nginx .hljs-title,
-.code-theme-dark .hljs-subst,
-.code-theme-dark .hljs-request,
-.code-theme-dark .hljs-status {
+[data-theme="dark"] .hljs-keyword,
+[data-theme="dark"] .css .rule .hljs-keyword,
+[data-theme="dark"] .hljs-winutils,
+[data-theme="dark"] .nginx .hljs-title,
+[data-theme="dark"] .hljs-subst,
+[data-theme="dark"] .hljs-request,
+[data-theme="dark"] .hljs-status {
   color: #569cd6;
   font-weight: bold;
 }
 
-.code-theme-dark .hljs-number,
-.code-theme-dark .hljs-hexcolor,
-.code-theme-dark .ruby .hljs-constant {
+[data-theme="dark"] .hljs-number,
+[data-theme="dark"] .hljs-hexcolor,
+[data-theme="dark"] .ruby .hljs-constant {
   color: #b5cea8;
 }
 
-.code-theme-dark .hljs-string,
-.code-theme-dark .hljs-tag .hljs-value,
-.code-theme-dark .hljs-phpdoc,
-.code-theme-dark .hljs-dartdoc,
-.code-theme-dark .tex .hljs-formula {
+[data-theme="dark"] .hljs-string,
+[data-theme="dark"] .hljs-tag .hljs-value,
+[data-theme="dark"] .hljs-phpdoc,
+[data-theme="dark"] .hljs-dartdoc,
+[data-theme="dark"] .tex .hljs-formula {
   color: #ce9178;
 }
 
-.code-theme-dark .hljs-title,
-.code-theme-dark .hljs-id,
-.code-theme-dark .scss .hljs-preprocessor {
+[data-theme="dark"] .hljs-title,
+[data-theme="dark"] .hljs-id,
+[data-theme="dark"] .scss .hljs-preprocessor {
   color: #d7ba7d;
   font-weight: bold;
 }
 
-.code-theme-dark .hljs-class .hljs-title,
-.code-theme-dark .hljs-type,
-.code-theme-dark .vhdl .hljs-literal,
-.code-theme-dark .tex .hljs-command {
+[data-theme="dark"] .hljs-class .hljs-title,
+[data-theme="dark"] .hljs-type,
+[data-theme="dark"] .vhdl .hljs-literal,
+[data-theme="dark"] .tex .hljs-command {
   color: #4ec9b0;
   font-weight: bold;
 }
 
-.code-theme-dark .hljs-tag,
-.code-theme-dark .hljs-tag .hljs-title,
-.code-theme-dark .hljs-rules .hljs-property,
-.code-theme-dark .django .hljs-tag .hljs-keyword {
+[data-theme="dark"] .hljs-tag,
+[data-theme="dark"] .hljs-tag .hljs-title,
+[data-theme="dark"] .hljs-rules .hljs-property,
+[data-theme="dark"] .django .hljs-tag .hljs-keyword {
   color: #569cd6;
   font-weight: normal;
 }
 
-.code-theme-dark .hljs-attribute,
-.code-theme-dark .hljs-variable,
-.code-theme-dark .lisp .hljs-body {
+[data-theme="dark"] .hljs-attribute,
+[data-theme="dark"] .hljs-variable,
+[data-theme="dark"] .lisp .hljs-body {
   color: #9cdcfe;
 }
 
-.code-theme-dark .hljs-regexp {
+[data-theme="dark"] .hljs-regexp {
   color: #d16969;
 }
 
-.code-theme-dark .hljs-symbol,
-.code-theme-dark .ruby .hljs-symbol .hljs-string,
-.code-theme-dark .lisp .hljs-keyword,
-.code-theme-dark .clojure .hljs-keyword,
-.code-theme-dark .scheme .hljs-keyword,
-.code-theme-dark .tex .hljs-special,
-.code-theme-dark .hljs-prompt {
+[data-theme="dark"] .hljs-symbol,
+[data-theme="dark"] .ruby .hljs-symbol .hljs-string,
+[data-theme="dark"] .lisp .hljs-keyword,
+[data-theme="dark"] .clojure .hljs-keyword,
+[data-theme="dark"] .scheme .hljs-keyword,
+[data-theme="dark"] .tex .hljs-special,
+[data-theme="dark"] .hljs-prompt {
   color: #c586c0;
 }
 
-.code-theme-dark .hljs-built_in {
+[data-theme="dark"] .hljs-built_in {
   color: #4fc1ff;
 }
 
-.code-theme-dark .hljs-preprocessor,
-.code-theme-dark .hljs-pragma,
-.code-theme-dark .hljs-pi,
-.code-theme-dark .hljs-doctype,
-.code-theme-dark .hljs-shebang,
-.code-theme-dark .hljs-cdata {
+[data-theme="dark"] .hljs-preprocessor,
+[data-theme="dark"] .hljs-pragma,
+[data-theme="dark"] .hljs-pi,
+[data-theme="dark"] .hljs-doctype,
+[data-theme="dark"] .hljs-shebang,
+[data-theme="dark"] .hljs-cdata {
   color: #808080;
   font-weight: bold;
 }
 
-.code-theme-dark .hljs-deletion {
+[data-theme="dark"] .hljs-deletion {
   background: #5a1d1d;
   color: #f48771;
 }
 
-.code-theme-dark .hljs-addition {
+[data-theme="dark"] .hljs-addition {
   background: #1e3a1e;
   color: #b5cea8;
 }
 
-.code-theme-dark .diff .hljs-change {
+[data-theme="dark"] .diff .hljs-change {
   background: #2d4d2d;
   color: #4ec9b0;
 }
 
-.code-theme-dark .hljs-chunk {
+[data-theme="dark"] .hljs-chunk {
   color: #808080;
 }
 

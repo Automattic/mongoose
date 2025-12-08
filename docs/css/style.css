@@ -1,31 +1,12 @@
 body {
   font-family: 'Open Sans', Helvetica, Arial, FreeSans;
-  color: var(--text-secondary, #333);
+  color: var(--text-secondary);
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
   padding: 0;
   margin: 0;
-  background-color: var(--bg-primary, #ffffff);
+  background-color: var(--bg-primary);
   transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-/* Dark mode support for homepage */
-@media (prefers-color-scheme: dark) {
-  body:not([data-theme="light"]) {
-    background-color: var(--bg-primary, #1a1a1a);
-    color: var(--text-secondary, #c0c0c0);
-  }
-}
-
-/* Manual theme overrides */
-[data-theme="dark"] {
-  background-color: var(--bg-primary, #1a1a1a);
-  color: var(--text-secondary, #c0c0c0);
-}
-
-[data-theme="light"] {
-  background-color: var(--bg-primary, #ffffff);
-  color: var(--text-secondary, #333);
 }
 
 /* Theme Toggle Button for Homepage */
@@ -275,13 +256,6 @@ h2 a {
   color-scheme: light;
   filter: invert(0.85) hue-rotate(180deg);
   background: transparent;
-}
-@media (prefers-color-scheme: dark) {
-  body:not([data-theme="light"]) .github-btn {
-    color-scheme: light;
-    filter: invert(0.85) hue-rotate(180deg);
-    background: transparent;
-  }
 }
 #what {
   margin-bottom: 32px;

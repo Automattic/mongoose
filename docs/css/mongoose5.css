@@ -1,6 +1,6 @@
 /* CSS Custom Properties for Theming */
-:root {
-  /* Light mode colors */
+/* Light mode (default) - JS sets data-theme based on system preference */
+:root, [data-theme="light"] {
   --bg-primary: #ffffff;
   --bg-secondary: #eee;
   --bg-tertiary: #fafafa;
@@ -18,6 +18,7 @@
   --shadow: rgba(0, 0, 0, 0.1);
   --focus-ring: #0971B2;
   --focus-ring-width: 3px;
+  --focus-ring-shadow: rgba(9, 113, 178, 0.1);
   /* Brand colors */
   --brand-primary: #800;
   --brand-primary-hover: #990000;
@@ -29,38 +30,7 @@
   --tagline-text-shadow: #f8f8f8;
 }
 
-/* Dark mode colors */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg-primary: #1a1a1a;
-    --bg-secondary: #2d2d2d;
-    --bg-tertiary: #252525;
-    --text-primary: #f0f0f0;
-    --text-secondary: #d8d8d8;
-    --text-muted: #a0a0a0;
-    --link-color: #5aabff;
-    --link-hover: #7dbfff;
-    --border-color: #444444;
-    --code-bg: #2d2d2d;
-    --code-text: #e8e8e8;
-    --menu-bg: #252525;
-    --menu-hover: rgba(255,255,255, 0.1);
-    --menu-selected: rgba(255,255,255, 0.15);
-    --shadow: rgba(0, 0, 0, 0.3);
-    --focus-ring: #5aabff;
-    /* Brand colors */
-    --brand-primary: #FFB4B4;
-    --brand-primary-hover: #FFCECE;
-    --brand-primary-subtle: rgba(255, 107, 107, 0.1);
-    /* Button colors */
-    --btn-bg: #444;
-    --btn-text-shadow: #222;
-    /* Tagline text shadow */
-    --tagline-text-shadow: #222;
-  }
-}
-
-/* Manual dark mode override */
+/* Dark mode - applied via JS based on system preference or user toggle */
 [data-theme="dark"] {
   --bg-primary: #1a1a1a;
   --bg-secondary: #2d2d2d;
@@ -74,10 +44,11 @@
   --code-bg: #2d2d2d;
   --code-text: #e8e8e8;
   --menu-bg: #252525;
-  --menu-hover: rgba(255,255,255, 0.1);
-  --menu-selected: rgba(255,255,255, 0.15);
+  --menu-hover: rgba(255, 255, 255, 0.1);
+  --menu-selected: rgba(255, 255, 255, 0.15);
   --shadow: rgba(0, 0, 0, 0.3);
   --focus-ring: #5aabff;
+  --focus-ring-shadow: rgba(74, 158, 255, 0.2);
   /* Brand colors */
   --brand-primary: #FFB4B4;
   --brand-primary-hover: #FFCECE;
@@ -87,35 +58,6 @@
   --btn-text-shadow: #222;
   /* Tagline text shadow */
   --tagline-text-shadow: #222;
-}
-
-/* Light mode override */
-[data-theme="light"] {
-  --bg-primary: #ffffff;
-  --bg-secondary: #eee;
-  --bg-tertiary: #fafafa;
-  --text-primary: #000000;
-  --text-secondary: #333333;
-  --text-muted: #777777;
-  --link-color: #0971B2;
-  --link-hover: #065a8f;
-  --border-color: #ddd;
-  --code-bg: #f5f5f5;
-  --code-text: #333;
-  --menu-bg: #eee;
-  --menu-hover: rgba(0,0,0, 0.1);
-  --menu-selected: rgba(0,0,0, 0.15);
-  --shadow: rgba(0, 0, 0, 0.1);
-  --focus-ring: #0971B2;
-  /* Brand colors */
-  --brand-primary: #800;
-  --brand-primary-hover: #990000;
-  --brand-primary-subtle: rgba(136, 0, 0, 0.1);
-  /* Button colors */
-  --btn-bg: #444;
-  --btn-text-shadow: #222;
-  /* Tagline text shadow */
-  --tagline-text-shadow: #f8f8f8;
 }
 
 html {
@@ -216,12 +158,6 @@ h4 a:focus-visible {
 }
 
 /* Dark mode logo image swap */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) #logo {
-    content: url('/docs/images/mongoose5_62x30_transparent_light.png');
-  }
-}
-
 [data-theme="dark"] #logo {
   content: url('/docs/images/mongoose5_62x30_transparent_light.png');
 }
@@ -348,13 +284,7 @@ li.version ul.pure-menu-children {
 .search input:focus {
   outline: none;
   border-color: var(--focus-ring);
-  box-shadow: 0 0 0 2px rgba(9, 113, 178, 0.1);
-}
-
-@media (prefers-color-scheme: dark) {
-  .search input:focus {
-    box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
-  }
+  box-shadow: 0 0 0 2px var(--focus-ring-shadow);
 }
 
 #search-input-nav {

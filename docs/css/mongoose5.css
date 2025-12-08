@@ -18,6 +18,15 @@
   --shadow: rgba(0, 0, 0, 0.1);
   --focus-ring: #0971B2;
   --focus-ring-width: 3px;
+  /* Brand colors */
+  --brand-primary: #800;
+  --brand-primary-hover: #990000;
+  --brand-primary-subtle: rgba(136, 0, 0, 0.1);
+  /* Button colors */
+  --btn-bg: #444;
+  --btn-text-shadow: #222;
+  /* Tagline text shadow */
+  --tagline-text-shadow: #f8f8f8;
 }
 
 /* Dark mode colors */
@@ -39,6 +48,15 @@
     --menu-selected: rgba(255,255,255, 0.15);
     --shadow: rgba(0, 0, 0, 0.3);
     --focus-ring: #5aabff;
+    /* Brand colors */
+    --brand-primary: #FFB4B4;
+    --brand-primary-hover: #FFCECE;
+    --brand-primary-subtle: rgba(255, 107, 107, 0.1);
+    /* Button colors */
+    --btn-bg: #444;
+    --btn-text-shadow: #222;
+    /* Tagline text shadow */
+    --tagline-text-shadow: #222;
   }
 }
 
@@ -60,6 +78,15 @@
   --menu-selected: rgba(255,255,255, 0.15);
   --shadow: rgba(0, 0, 0, 0.3);
   --focus-ring: #5aabff;
+  /* Brand colors */
+  --brand-primary: #FFB4B4;
+  --brand-primary-hover: #FFCECE;
+  --brand-primary-subtle: rgba(255, 107, 107, 0.1);
+  /* Button colors */
+  --btn-bg: #444;
+  --btn-text-shadow: #222;
+  /* Tagline text shadow */
+  --tagline-text-shadow: #222;
 }
 
 /* Light mode override */
@@ -80,6 +107,15 @@
   --menu-selected: rgba(0,0,0, 0.15);
   --shadow: rgba(0, 0, 0, 0.1);
   --focus-ring: #0971B2;
+  /* Brand colors */
+  --brand-primary: #800;
+  --brand-primary-hover: #990000;
+  --brand-primary-subtle: rgba(136, 0, 0, 0.1);
+  /* Button colors */
+  --btn-bg: #444;
+  --btn-text-shadow: #222;
+  /* Tagline text shadow */
+  --tagline-text-shadow: #f8f8f8;
 }
 
 html {
@@ -171,7 +207,7 @@ h4 a:focus-visible {
 }
 
 .logo-text {
-  color: #800;
+  color: var(--brand-primary);
   font-size: 20pt;
   position: relative;
   top: 0px;
@@ -179,18 +215,11 @@ h4 a:focus-visible {
   text-transform: none;
 }
 
-/* Dark mode logo adjustments for better contrast */
+/* Dark mode logo image swap */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .logo-text {
-    color: #FFB4B4;
-  }
   :root:not([data-theme="light"]) #logo {
     content: url('/docs/images/mongoose5_62x30_transparent_light.png');
   }
-}
-
-[data-theme="dark"] .logo-text {
-  color: #FFB4B4;
 }
 
 [data-theme="dark"] #logo {
@@ -792,57 +821,21 @@ li.version ul.pure-menu-children {
 }
 
 .mongoose-btn-outline {
-  border: 1px solid #800;
-  color: #800;
+  border: 1px solid var(--brand-primary);
+  color: var(--brand-primary);
   background-color: transparent;
 }
 
 .mongoose-btn-outline:hover {
-  background-color: rgba(136, 0, 0, 0.1);
+  background-color: var(--brand-primary-subtle);
 }
 
 .mongoose-btn-solid {
   border: 1px solid transparent;
-  color: white;
-  background-color: #800;
+  color: var(--bg-primary);
+  background-color: var(--brand-primary);
 }
 
 .mongoose-btn-solid:hover {
-  background-color: #990000;
-}
-
-/* Dark mode button colors */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .mongoose-btn-outline {
-    border-color: #FFB4B4;
-    color: #FFB4B4;
-  }
-  :root:not([data-theme="light"]) .mongoose-btn-outline:hover {
-    background-color: rgba(255, 107, 107, 0.1);
-  }
-  :root:not([data-theme="light"]) .mongoose-btn-solid {
-    background-color: #FFB4B4;
-    color: #1a1a1a;
-  }
-  :root:not([data-theme="light"]) .mongoose-btn-solid:hover {
-    background-color: #FFCECE;
-  }
-}
-
-[data-theme="dark"] .mongoose-btn-outline {
-  border-color: #FFB4B4;
-  color: #FFB4B4;
-}
-
-[data-theme="dark"] .mongoose-btn-outline:hover {
-  background-color: rgba(255, 107, 107, 0.1);
-}
-
-[data-theme="dark"] .mongoose-btn-solid {
-  background-color: #FFB4B4;
-  color: #1a1a1a;
-}
-
-[data-theme="dark"] .mongoose-btn-solid:hover {
-  background-color: #FFCECE;
+  background-color: var(--brand-primary-hover);
 }

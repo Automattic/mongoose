@@ -16,10 +16,10 @@ body {
   right: 20px;
   bottom: auto;
   z-index: 1000;
-  background-color: var(--bg-primary, rgba(255, 255, 255, 0.9));
-  border: 1px solid var(--border-color, #ddd);
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
   border-radius: 50%;
-  box-shadow: 0 2px 8px var(--shadow, rgba(0, 0, 0, 0.1));
+  box-shadow: 0 2px 8px var(--shadow);
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
@@ -35,12 +35,12 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  color: var(--text-secondary, #333);
+  color: var(--text-secondary);
   transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 #theme-toggle-btn:hover {
-  background-color: var(--menu-hover, rgba(0, 0, 0, 0.1));
+  background-color: var(--menu-hover);
 }
 
 #theme-toggle-btn:active {
@@ -48,7 +48,7 @@ body {
 }
 
 #theme-toggle-btn:focus-visible {
-  outline: 3px solid var(--focus-ring, #0971B2);
+  outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -88,7 +88,7 @@ body {
 /* location.hash */
 :target::before {
   content: ">>> ";
-  color: var(--link-color, #1371C9);
+  color: var(--link-color);
   font-weight: bold;
   font-size: 20px;
 }
@@ -99,7 +99,7 @@ body {
 }
 
 a {
-  color: var(--link-color, #800);
+  color: var(--link-color);
   -webkit-transition-property: opacity, -webkit-transform, color, background-color, padding, -webkit-box-shadow;
   -webkit-transition-duration: 0.15s;
   -webkit-transition-timing-function: ease-out;
@@ -109,7 +109,7 @@ a:hover {
   opacity: 0.8;
 }
 a:focus-visible {
-  outline: 3px solid var(--focus-ring, #0971B2);
+  outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -127,18 +127,18 @@ h1 {
 }
 
 pre {
-  background: var(--code-bg, #eee);
+  background: var(--code-bg);
   padding: 12px 16px;
   border-radius: 6px;
   overflow-x: auto;
-  border: 1px solid var(--border-color, #ddd);
+  border: 1px solid var(--border-color);
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 code {
-  color: var(--code-text, #333);
+  color: var(--code-text);
   font-size: 11px;
   font-family: Consolas, "Liberation Mono", Courier, monospace;
-  background-color: var(--code-bg, #eee);
+  background-color: var(--code-bg);
   padding: 2px 6px;
   border-radius: 4px;
 }
@@ -151,12 +151,12 @@ pre code {
 
 /* Dark mode for homepage code blocks */
 [data-theme="dark"] pre {
-  background: var(--code-bg, #2d2d2d);
-  border-color: var(--border-color, #444);
+  background: var(--code-bg);
+  border-color: var(--border-color);
 }
 [data-theme="dark"] code {
-  color: var(--code-text, #e0e0e0);
-  background-color: var(--code-bg, #2d2d2d);
+  color: var(--code-text);
+  background-color: var(--code-bg);
 }
 #header {
   text-align: center;
@@ -183,15 +183,15 @@ h2 a {
   font-size: 146px;
   font-weight: 100;
   text-indent: -23px;
-  color: var(--brand-primary, #800);
+  color: var(--brand-primary);
 }
 .load #header .mongoose {
   letter-spacing: -14px;
 }
 .tagline {
-  color: var(--text-secondary, #333);
+  color: var(--text-secondary);
   font-size: 25px;
-  text-shadow: 1px 1px var(--tagline-text-shadow, #f8f8f8);
+  text-shadow: 1px 1px var(--tagline-text-shadow);
   text-align: center;
   margin: 7px 0;
 }
@@ -203,7 +203,7 @@ h2 a {
 }
 .tagline a, .blurb a {
   text-decoration: none;
-  color: var(--brand-primary, #800);
+  color: var(--brand-primary);
 }
 #links {
   margin: 50px 10px 20px;
@@ -219,7 +219,7 @@ h2 a {
   margin: 0 15px;
 }
 #links a {
-  background: var(--btn-bg, #444);
+  background: var(--btn-bg);
   padding: 9px 0px;
   border-radius: 3px;
   color: white;
@@ -227,7 +227,7 @@ h2 a {
   display: inline-block;
   text-decoration: none;
   text-transform: lowercase;
-  text-shadow: 1px 1px 7px var(--btn-text-shadow, #222);
+  text-shadow: 1px 1px 7px var(--btn-text-shadow);
 }
 #follow {
   margin-bottom: 36px;
@@ -336,7 +336,7 @@ h2 a {
     margin: 0 12px;
   }
   #links a {
-    background: var(--btn-bg, #444);
+    background: var(--btn-bg);
     padding: 7px 34px;
     font-size: 15px;
   }
@@ -386,7 +386,7 @@ h2 a {
 
 #tidelift-button {
   display: inline-block;
-  background-color: var(--btn-bg, #444);
+  background-color: var(--btn-bg);
   padding-top: 9px;
   padding-left: 15px;
   padding-right: 15px;
@@ -396,7 +396,7 @@ h2 a {
   font-size: 20px;
   display: inline-block;
   text-decoration: none;
-  text-shadow: 1px 1px 7px var(--btn-text-shadow, #222);
+  text-shadow: 1px 1px 7px var(--btn-text-shadow);
   margin: auto;
 }
 #tidelift-button span {

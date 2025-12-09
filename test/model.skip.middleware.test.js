@@ -232,6 +232,21 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         assert.strictEqual(getSubdocPreCount(), 1);
         assert.strictEqual(getSubdocPostCount(), 1);
       });
+
+      it('parent.save() skips validate middleware when validateBeforeSave: false, even with middleware: false', async function() {
+        // Arrange
+        const { Parent, getParentPreCount, getParentPostCount, getSubdocPreCount, getSubdocPostCount } = createTestContext({ hookName: 'validate' });
+        const doc = new Parent({ child: { name: 'test' } });
+
+        // Act
+        await doc.save({ middleware: false, validateBeforeSave: false });
+
+        // Assert - validateBeforeSave: false skips validation entirely, so validate hooks don't run
+        assert.strictEqual(getParentPreCount(), 0);
+        assert.strictEqual(getParentPostCount(), 0);
+        assert.strictEqual(getSubdocPreCount(), 0);
+        assert.strictEqual(getSubdocPostCount(), 0);
+      });
     });
 
     function createTestContext({ hookName }) {

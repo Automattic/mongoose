@@ -178,12 +178,12 @@ h4 a:focus-visible {
   width: 62px;
   height: 30px;
   position: relative;
-  top: 5px;
+  top: 7px;
   background-color: var(--brand-primary);
   -webkit-mask-image: url('/docs/images/mongoose.svg');
   mask-image: url('/docs/images/mongoose.svg');
-  -webkit-mask-size: contain;
-  mask-size: contain;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   -webkit-mask-position: center;

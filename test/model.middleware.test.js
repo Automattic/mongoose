@@ -625,7 +625,7 @@ describe('model middleware', function() {
       assert.strictEqual(res, 'skipMiddlewareFunction test');
     });
 
-    describe.only('pre-hook errors should propagate (gh-15881)', function() {
+    describe('pre-hook errors should propagate (gh-15881)', function() {
       for (const ordered of [true, false]) {
         it(`bulkWrite() should throw when pre-hook throws an error (ordered: ${ordered})`, async function() {
           // Arrange

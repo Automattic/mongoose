@@ -739,7 +739,7 @@ describe('insertMany()', function() {
     assert.ok(err.stack.includes('postInsertManyError'));
   });
 
-  describe.only('pre-hook errors should propagate', function() {
+  describe('pre-hook errors should propagate', function() {
     it('insertMany() should throw when pre-hook throws an error', async function() {
       // Arrange
       const preHookError = new Error('Pre-hook error - should stop insertMany');

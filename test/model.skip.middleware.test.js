@@ -54,7 +54,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
     for (const [operation, runOperation] of Object.entries(operations)) {
       describe(operation, function() {
         it('skips pre/post hooks when middleware: false', async function() {
-        // Arrange
+          // Arrange
           const { User, getPreCount, getPostCount } = createTestContext(operation);
 
           // Act
@@ -66,7 +66,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         });
 
         it('runs hooks normally without middleware option', async function() {
-        // Arrange
+          // Arrange
           const { User, getPreCount, getPostCount } = createTestContext(operation);
 
           // Act
@@ -78,7 +78,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         });
 
         it('skips only pre hooks when middleware: { pre: false }', async function() {
-        // Arrange
+          // Arrange
           const { User, getPreCount, getPostCount } = createTestContext(operation);
 
           // Act
@@ -90,7 +90,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         });
 
         it('skips only post hooks when middleware: { post: false }', async function() {
-        // Arrange
+          // Arrange
           const { User, getPreCount, getPostCount } = createTestContext(operation);
 
           // Act

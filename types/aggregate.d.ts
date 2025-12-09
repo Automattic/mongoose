@@ -5,6 +5,11 @@ declare module 'mongoose' {
   type AggregateExtract<P> = P extends Aggregate<infer T> ? T : never;
 
   interface AggregateOptions extends Omit<mongodb.AggregateOptions & mongodb.Abortable, 'session'>, SessionOption {
+    /**
+     * If set to `false`, skip all pre and post middleware for this operation.
+     * Can also be an object `{ pre: boolean, post: boolean }` for granular control.
+     */
+    middleware?: boolean | SkipMiddlewareOptions;
     [key: string]: any;
   }
 

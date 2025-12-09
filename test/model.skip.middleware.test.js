@@ -11,7 +11,7 @@ const assert = require('assert');
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
-describe.only('middleware option to skip hooks (gh-8768)', function() {
+describe('middleware option to skip hooks (gh-8768)', function() {
   let db;
 
   before(function() {

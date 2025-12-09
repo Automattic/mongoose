@@ -188,7 +188,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
     });
 
     describe('validate hooks', function() {
-      it('parent.save() skips both parent and subdoc validate middleware when middleware: false', async function() {
+      it('parent.save() still runs validate middleware when middleware: false', async function() {
         // Arrange
         const { Parent, getParentPreCount, getParentPostCount, getSubdocPreCount, getSubdocPostCount } = createTestContext({ hookName: 'validate' });
         const doc = new Parent({ child: { name: 'test' } });
@@ -196,14 +196,14 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         // Act
         await doc.save({ middleware: false });
 
-        // Assert - validate is skipped entirely when middleware: false
-        assert.strictEqual(getParentPreCount(), 0);
-        assert.strictEqual(getParentPostCount(), 0);
-        assert.strictEqual(getSubdocPreCount(), 0);
-        assert.strictEqual(getSubdocPostCount(), 0);
+        // Assert - validation runs regardless of middleware option (use validateBeforeSave: false to skip)
+        assert.strictEqual(getParentPreCount(), 1);
+        assert.strictEqual(getParentPostCount(), 1);
+        assert.strictEqual(getSubdocPreCount(), 1);
+        assert.strictEqual(getSubdocPostCount(), 1);
       });
 
-      it('parent.save() skips all validate middleware when middleware.pre is false (validateBeforeSave is a pre-save hook)', async function() {
+      it('parent.save() still runs validate middleware when middleware.pre is false', async function() {
         // Arrange
         const { Parent, getParentPreCount, getParentPostCount, getSubdocPreCount, getSubdocPostCount } = createTestContext({ hookName: 'validate' });
         const doc = new Parent({ child: { name: 'test' } });
@@ -211,15 +211,14 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         // Act
         await doc.save({ middleware: { pre: false } });
 
-        // Assert - validateBeforeSave is a pre-save hook, so when pre hooks are skipped,
-        // validation doesn't run at all (neither pre nor post validate hooks)
-        assert.strictEqual(getParentPreCount(), 0);
-        assert.strictEqual(getParentPostCount(), 0);
-        assert.strictEqual(getSubdocPreCount(), 0);
-        assert.strictEqual(getSubdocPostCount(), 0);
+        // Assert - validation runs regardless of middleware option (use validateBeforeSave: false to skip)
+        assert.strictEqual(getParentPreCount(), 1);
+        assert.strictEqual(getParentPostCount(), 1);
+        assert.strictEqual(getSubdocPreCount(), 1);
+        assert.strictEqual(getSubdocPostCount(), 1);
       });
 
-      it('parent.save() runs all validate middleware when middleware.post is false (validateBeforeSave is a pre-save hook)', async function() {
+      it('parent.save() still runs validate middleware when middleware.post is false', async function() {
         // Arrange
         const { Parent, getParentPreCount, getParentPostCount, getSubdocPreCount, getSubdocPostCount } = createTestContext({ hookName: 'validate' });
         const doc = new Parent({ child: { name: 'test' } });
@@ -227,8 +226,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         // Act
         await doc.save({ middleware: { post: false } });
 
-        // Assert - validateBeforeSave is a pre-save hook which still runs when only post is skipped,
-        // so validation runs normally with all its hooks
+        // Assert - validation runs regardless of middleware option (use validateBeforeSave: false to skip)
         assert.strictEqual(getParentPreCount(), 1);
         assert.strictEqual(getParentPostCount(), 1);
         assert.strictEqual(getSubdocPreCount(), 1);

@@ -34,15 +34,15 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg-primary: #1a1a1a;
-    --bg-secondary: #2d2d2d;
+    --bg-secondary: #252525;
     --bg-tertiary: #252525;
     --text-primary: #f0f0f0;
     --text-secondary: #d8d8d8;
     --text-muted: #a0a0a0;
-    --link-color: #FFB4B4;
-    --link-hover: #FFCECE;
+    --link-color: #7BC3FF;
+    --link-hover: #8AD0FF;
     --border-color: #444444;
-    --code-bg: #2d2d2d;
+    --code-bg: #252525;
     --code-text: #e8e8e8;
     --menu-bg: #252525;
     --menu-hover: rgba(255, 255, 255, 0.1);
@@ -51,8 +51,8 @@
     --focus-ring: #FFB4B4;
     --focus-ring-shadow: rgba(255, 180, 180, 0.2);
     /* Brand colors */
-    --brand-primary: #FFB4B4;
-    --brand-primary-hover: #FFCECE;
+    --brand-primary: #FF5E5E;
+    --brand-primary-hover: #F55;
     --brand-primary-subtle: rgba(255, 180, 180, 0.1);
     /* Button colors */
     --btn-bg: #444;
@@ -70,10 +70,10 @@
   --text-primary: #f0f0f0;
   --text-secondary: #d8d8d8;
   --text-muted: #a0a0a0;
-  --link-color: #FFB4B4;
-  --link-hover: #FFCECE;
+  --link-color: #7BC3FF;
+  --link-hover: #8AD0FF;
   --border-color: #444444;
-  --code-bg: #2d2d2d;
+  --code-bg: #252525;
   --code-text: #e8e8e8;
   --menu-bg: #252525;
   --menu-hover: rgba(255, 255, 255, 0.1);
@@ -82,8 +82,8 @@
   --focus-ring: #FFB4B4;
   --focus-ring-shadow: rgba(255, 180, 180, 0.2);
   /* Brand colors */
-  --brand-primary: #FFB4B4;
-  --brand-primary-hover: #FFCECE;
+  --brand-primary: #FF5E5E;
+  --brand-primary-hover: #F55;
   --brand-primary-subtle: rgba(255, 180, 180, 0.1);
   /* Button colors */
   --btn-bg: #444;
@@ -221,7 +221,7 @@ h4 a:focus-visible {
   padding-bottom: 0px;
 }
 
-.pure-menu-link:hover, 
+.pure-menu-link:hover,
 .pure-menu-link.selected {
   background-color: var(--menu-hover);
 }

@@ -624,5 +624,86 @@ describe('model middleware', function() {
       }]);
       assert.strictEqual(res, 'skipMiddlewareFunction test');
     });
+
+    describe('pre-hook errors should propagate (gh-15881)', function() {
+      for (const ordered of [true, false]) {
+        it(`bulkWrite() should throw when pre-hook throws an error (ordered: ${ordered})`, async function() {
+          // Arrange
+          const preHookError = new Error('Pre-hook error - should stop bulkWrite');
+          const { User } = createTestContext({ preHookError });
+
+          // Act
+          const error = await User.bulkWrite([{
+            insertOne: { document: { name: 'Sam' } }
+          }], { ordered }).then(() => null, err => err);
+
+          // Assert
+          assert.ok(error);
+          assert.equal(error.message, preHookError.message);
+        });
+      }
+
+      it('bulkWrite() should not execute operations when pre-hook throws', async function() {
+        // Arrange
+        const preHookError = new Error('Pre-hook error - should stop bulkWrite');
+        const { User } = createTestContext({ preHookError });
+
+        // Act
+        await User.bulkWrite([{
+          insertOne: { document: { name: 'Sam' } }
+        }]).catch(() => null);
+
+        // Assert
+        const count = await User.countDocuments();
+        assert.equal(count, 0);
+      });
+
+      it('bulkWrite() should call error post hook when pre-hook throws', async function() {
+        // Arrange
+        let errorPostHookCalled = false;
+        let normalPostHookCalled = false;
+        const preHookError = new Error('Pre-hook error - should stop bulkWrite');
+        const { User } = createTestContext({
+          preHookError,
+          postHook: function() {
+            normalPostHookCalled = true;
+          },
+          errorPostHook: function(error, _res, next) {
+            if (error && error.message === preHookError.message) {
+              errorPostHookCalled = true;
+            }
+            next(error);
+          }
+        });
+
+        // Act
+        await User.bulkWrite([{
+          insertOne: { document: { name: 'Sam' } }
+        }]).catch(() => {});
+
+        // Assert
+        assert.equal(errorPostHookCalled, true);
+        assert.equal(normalPostHookCalled, false);
+      });
+
+      function createTestContext(options) {
+        const schema = new Schema({ name: String });
+
+        schema.pre('bulkWrite', function() {
+          throw options.preHookError;
+        });
+
+        if (options.postHook) {
+          schema.post('bulkWrite', options.postHook);
+        }
+
+        if (options.errorPostHook) {
+          schema.post('bulkWrite', options.errorPostHook);
+        }
+
+        const User = db.model('User', schema);
+        return { User };
+      }
+    });
   });
 });

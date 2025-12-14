@@ -876,6 +876,6 @@ async function gh15779_2() {
   const JobModel = model<Job>('Job', jobSchema);
 
   const jobs = await JobModel.aggregate<Job>([
-    { $match: {} as QueryFilter<Job> },
+    { $match: {} as QueryFilter<Job> }
   ]);
 }

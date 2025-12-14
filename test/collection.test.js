@@ -51,17 +51,18 @@ describe('collections:', function() {
     await db.close();
   });
 
-  it('returns a promise if buffering and callback with find() (gh-14184)', function(done) {
+  it('returns a promise if buffering and callback with find() (gh-14184)', function() {
     db = mongoose.createConnection();
     const collection = db.collection('gh14184');
     collection.opts.bufferTimeoutMS = 100;
 
-    collection.find({ foo: 'bar' }, {}, (err, docs) => {
-      assert.ok(err);
-      assert.ok(err.message.includes('buffering timed out after 100ms'));
-      assert.equal(docs, undefined);
-      done();
-    });
+    return collection.find({ foo: 'bar' }, {}).then(
+      () => assert.ok(false),
+      err => {
+        assert.ok(err);
+        assert.ok(err.message.includes('buffering timed out after 100ms'));
+      }
+    );
   });
 
   it('handles bufferTimeoutMS in schemaUserProvidedOptions', async function() {

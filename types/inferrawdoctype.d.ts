@@ -97,7 +97,7 @@ declare module 'mongoose' {
       ResolveRawPathType<Options['of'] extends ReadonlyArray<infer Item> ? Item : never>
     : PathValueType extends ArrayConstructor ? any[]
     : PathValueType extends typeof Schema.Types.Mixed ? any
-    : IfEquals<PathValueType, ObjectConstructor> extends true ? any
+    : PathValueType extends ObjectConstructor ? any
     : IfEquals<PathValueType, {}> extends true ? any
     : PathValueType extends typeof SchemaType ? PathValueType['prototype']
     : PathValueType extends Record<string, any> ? InferRawDocType<PathValueType>

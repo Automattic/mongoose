@@ -1,4 +1,4 @@
-import { InferRawDocType, type InferPojoType, type ResolveTimestamps, type Schema, type Types } from 'mongoose';
+import { InferRawDocType, type InferRawDocTypeWithout_id, type ResolveTimestamps, type Schema, type Types } from 'mongoose';
 import { expectType } from 'tsd';
 
 function inferPojoType() {
@@ -20,7 +20,7 @@ function inferPojoType() {
     }
   };
 
-  type UserType = InferPojoType< typeof schemaDefinition>;
+  type UserType = InferRawDocTypeWithout_id<typeof schemaDefinition>;
   expectType<{ email: string, password: string, dateOfBirth: Date }>({} as UserType);
 }
 function gh14839() {

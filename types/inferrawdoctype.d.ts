@@ -12,7 +12,7 @@ declare module 'mongoose' {
     ? ObtainSchemaGeneric<TSchema, 'EnforcedDocType'>
     : FlattenMaps<SubdocsToPOJOs<ObtainSchemaGeneric<TSchema, 'DocType'>>>;
 
-  export type InferPojoType<
+  export type InferRawDocTypeWithout_id<
     SchemaDefinition,
     TSchemaOptions extends Record<any, any> = DefaultSchemaOptions,
     TTransformOptions = { bufferToBinary: false }
@@ -29,7 +29,7 @@ declare module 'mongoose' {
     SchemaDefinition,
     TSchemaOptions extends Record<any, any> = DefaultSchemaOptions,
     TTransformOptions = { bufferToBinary: false }
-  > = Require_id<InferPojoType<SchemaDefinition, TSchemaOptions, TTransformOptions>>;
+  > = Require_id<InferRawDocTypeWithout_id<SchemaDefinition, TSchemaOptions, TTransformOptions>>;
 
   /**
    * @summary Allows users to optionally choose their own type for a schema field for stronger typing.

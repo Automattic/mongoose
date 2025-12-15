@@ -2626,7 +2626,7 @@ describe('Model', function() {
       assert.equal(nestedCheck.location[0].zip, 34512);
       assert.equal(nestedCheck.name, 'Quiz');
     });
-    it('should allow saving parent paths of whitelisted paths (gh-15850)', async function () {
+    it('should allow saving parent paths of whitelisted paths (gh-15850)', async function() {
       const schema = new Schema({
         nested: {
           a: Number,

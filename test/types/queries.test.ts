@@ -810,5 +810,5 @@ async function gh15786() {
   }
 
   const schema = new Schema<IDoc, Model<IDoc>, {}, {}, {}, DocStatics>({});
-  schema.static({ m1() {} } as DocStatics);
+  schema.static({ m1() {} });
 }

@@ -1999,3 +1999,20 @@ function autoInferredNestedMaps() {
   const doc = new TestModel({ nestedMap: new Map([['1', new Map([['2', 'value']])]]) });
   expectType<Map<string, Map<string, string>>>(doc.nestedMap);
 }
+
+function gh15878() {
+  const schema = new Schema({
+    name: {
+      type: String,
+      default: null
+    },
+    age: {
+      type: Number,
+      default: () => null
+    }
+  });
+  const TestModel = model('Test', schema);
+  const doc = new TestModel({ name: 'John', age: 30 });
+  expectType<string | null | undefined>(doc.name);
+  expectType<number | null | undefined>(doc.age);
+}

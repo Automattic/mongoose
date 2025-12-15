@@ -127,13 +127,6 @@ declare module 'mongoose' {
     : T;
 }
 
-type IsPathDefaultNullish<PathType> =
-  PathType extends { default: undefined } ? true
-  : PathType extends { default: null } ? true
-  : PathType extends { default: (...args: any[]) => undefined } ? true
-  : PathType extends { default: (...args: any[]) => null } ? true
-  : false;
-
 type RequiredPropertyDefinition =
   | {
       required: true | string | [true, string | undefined] | { isRequired: true };
@@ -152,14 +145,9 @@ type IsPathRequired<P, TypeKey extends string = DefaultTypeKey> =
     P extends { required: false } ?
       false
     : true
-  : P extends Record<TypeKey, ArrayConstructor | any[]> ?
-    IsPathDefaultNullish<P> extends true ?
-      false
-    : true
-  : P extends Record<TypeKey, any> ?
-    P extends { default: any } ?
-      IsPathDefaultNullish<P> extends true ? false : true
-    : false
+  : P extends { default: undefined | null | ((...args: any[]) => undefined) | ((...args: any[]) => null) } ? false
+  : P extends { default: any } ? true
+  : P extends Record<TypeKey, ArrayConstructor | any[]> ? true
   : false;
 
 /**

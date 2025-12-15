@@ -2086,3 +2086,20 @@ function gh15751() {
   const doc = new TestModel();
   expectType<Types.ObjectId>(doc.myId);
 }
+
+function gh15878() {
+  const schema = new Schema({
+    name: {
+      type: String,
+      default: null
+    },
+    age: {
+      type: Number,
+      default: () => null
+    }
+  });
+  const TestModel = model('Test', schema);
+  const doc = new TestModel({ name: 'John', age: 30 });
+  expectType<string | null | undefined>(doc.name);
+  expectType<number | null | undefined>(doc.age);
+}

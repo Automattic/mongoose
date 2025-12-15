@@ -150,6 +150,41 @@ describe('document', function() {
       const found = await Test.findOne({ _id: doc._id });
       assert.strictEqual(found, null);
     });
+
+    it('sets $isDeleted to true after successful delete (gh-15878)', async function() {
+      const schema = new Schema({ name: String });
+      const Product = db.model('Test', schema);
+
+      const product = await Product.create({ name: 'test product' });
+      assert.strictEqual(product.$isDeleted(), false);
+
+      const result = await product.deleteOne();
+      assert.strictEqual(product.$isDeleted(), true);
+      assert.strictEqual(result.deletedCount, 1);
+
+      // Verify document was actually deleted
+      const found = await Product.findById(product._id);
+      assert.strictEqual(found, null);
+
+      // Verify deleteOne is a no-op when $isDeleted is true
+      const result2 = await product.deleteOne();
+      assert.strictEqual(result2, undefined);
+      assert.strictEqual(product.$isDeleted(), true);
+    });
+
+    it('does not set $isDeleted if delete fails', async function() {
+      const schema = new Schema({ name: String });
+      const Product = db.model('Test', schema);
+
+      const product = await Product.create({ name: 'test product' });
+      await Product.deleteOne({ _id: product._id }); // Delete using static method
+
+      assert.strictEqual(product.$isDeleted(), false);
+
+      // Try to delete again - should result in 0 deletedCount
+      await product.deleteOne();
+      assert.strictEqual(product.$isDeleted(), false);
+    });
   });
 
   describe('updateOne', function() {

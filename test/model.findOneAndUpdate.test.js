@@ -14,7 +14,7 @@ const Utils = require('../lib/utils');
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 const DocumentObjectId = mongoose.Types.ObjectId;
-const isEqual = require('lodash.isequal');
+const { isDeepStrictEqual } = require('util');
 const isEqualWith = require('lodash.isequalwith');
 const util = require('./util');
 const uuid = require('uuid');
@@ -696,7 +696,7 @@ describe('model: findOneAndUpdate:', function() {
     assert.equal(null, doc.name);
   });
 
-  it('can do various deep equal checks (lodash.isEqual, lodash.isEqualWith, assert.deepEqual, utils.deepEqual) on object id after findOneAndUpdate (gh-2070)', async function() {
+  it('can do various deep equal checks (util.isDeepStrictEqual, lodash.isEqualWith, assert.deepEqual, utils.deepEqual) on object id after findOneAndUpdate (gh-2070)', async function() {
     const userSchema = new Schema({
       name: String,
       contacts: [{
@@ -725,14 +725,14 @@ describe('model: findOneAndUpdate:', function() {
     // Re: commends on https://github.com/mongodb/js-bson/commit/aa0b54597a0af28cce3530d2144af708e4b66bf0
     // Deep equality checks no longer work as expected with node 0.10.
     // Please file an issue if this is a problem for you
-    assert.ok(isEqual(doc.contacts[0].account, a2._id));
+    assert.ok(isDeepStrictEqual(doc.contacts[0].account, a2._id));
 
     const doc2 = await User.findOne({ name: 'parent' });
 
     assert.deepEqual(doc2.contacts[0].account, a2._id);
     assert.ok(Utils.deepEqual(doc2.contacts[0].account, a2._id));
     assert.ok(isEqualWith(doc2.contacts[0].account, a2._id, compareBuffers));
-    assert.ok(isEqual(doc2.contacts[0].account, a2._id));
+    assert.ok(isDeepStrictEqual(doc2.contacts[0].account, a2._id));
 
     function compareBuffers(a, b) {
       if (Buffer.isBuffer(a) && Buffer.isBuffer(b)) {

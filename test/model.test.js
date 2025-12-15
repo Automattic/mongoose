@@ -21,6 +21,7 @@ const ObjectId = Schema.Types.ObjectId;
 const DocumentObjectId = mongoose.Types.ObjectId;
 const EmbeddedDocument = mongoose.Types.Subdocument;
 const MongooseError = mongoose.Error;
+const ObjectParameterError = require('../lib/error/objectParameter');
 
 describe('Model', function() {
   let db;
@@ -9092,6 +9093,31 @@ describe('Model', function() {
         }
       ]);
       assert.strictEqual(doc.name, 'Test2');
+    });
+  });
+  describe('gh-15812', function() {
+    it('should throw ObjectParameterError when init is called with null', function() {
+      const doc = new mongoose.Document({}, new mongoose.Schema({ name: String }));
+      try {
+        doc.init(null);
+        assert.fail('Should have thrown an error');
+      } catch (error) {
+        assert.ok(error instanceof ObjectParameterError);
+        assert.strictEqual(error.name, 'ObjectParameterError');
+        assert.ok(error.message.includes('Parameter "doc" to init() must be an object'));
+      }
+    });
+
+    it('should throw ObjectParameterError when init is called with undefined', function() {
+      const doc = new mongoose.Document({}, new mongoose.Schema({ name: String }));
+      try {
+        doc.init(undefined);
+        assert.fail('Should have thrown an error');
+      } catch (error) {
+        assert.ok(error instanceof ObjectParameterError);
+        assert.strictEqual(error.name, 'ObjectParameterError');
+        assert.ok(error.message.includes('Parameter "doc" to init() must be an object'));
+      }
     });
   });
 });

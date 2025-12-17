@@ -100,10 +100,10 @@ declare module 'mongoose' {
       {
         EnforcedDocType: EnforcedDocType;
         M: M;
-        TInstanceMethods: TInstanceMethods;
-        TQueryHelpers: TQueryHelpers;
-        TVirtuals: AddDefaultId<DocType, TVirtuals, TSchemaOptions>;
-        TStaticMethods: TStaticMethods;
+        TInstanceMethods: IfEquals<TInstanceMethods, {}, TSchemaOptions extends { methods: infer M } ? M : {}, TInstanceMethods>;
+        TQueryHelpers: IfEquals<TQueryHelpers, {}, TSchemaOptions extends { query: infer Q } ? Q : {}, TQueryHelpers>;
+        TVirtuals: AddDefaultId<DocType, IfEquals<TVirtuals, {}, TSchemaOptions extends { virtuals: infer V } ? V : {}, TVirtuals>, TSchemaOptions>;
+        TStaticMethods: IfEquals<TStaticMethods, {}, TSchemaOptions extends { statics: infer S } ? S : {}, TStaticMethods>;
         TSchemaOptions: TSchemaOptions;
         DocType: DocType;
         THydratedDocumentType: THydratedDocumentType;

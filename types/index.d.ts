@@ -345,7 +345,8 @@ declare module 'mongoose' {
         TSchemaOptions extends { methods: infer M } ? M : {},
         TSchemaOptions extends { query: any } ? TSchemaOptions['query'] : {},
         TSchemaOptions extends { virtuals: any } ? TSchemaOptions['virtuals'] : {},
-        RawDocType
+        RawDocType,
+        ResolveSchemaOptions<TSchemaOptions>
       >
     >(def: TSchemaDefinition): Schema<
       RawDocType,
@@ -374,7 +375,14 @@ declare module 'mongoose' {
         InferRawDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>,
         ResolveSchemaOptions<TSchemaOptions>
       >,
-      THydratedDocumentType extends AnyObject = HydratedDocument<InferHydratedDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>>
+      THydratedDocumentType extends AnyObject = HydratedDocument<
+        InferHydratedDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>,
+        TSchemaOptions extends { methods: infer M } ? M : {},
+        TSchemaOptions extends { query: any } ? TSchemaOptions['query'] : {},
+        TSchemaOptions extends { virtuals: any } ? TSchemaOptions['virtuals'] : {},
+        RawDocType,
+        ResolveSchemaOptions<TSchemaOptions>
+      >
     >(def: TSchemaDefinition, options: TSchemaOptions): Schema<
       RawDocType,
       Model<RawDocType, any, any, any>,

@@ -2087,6 +2087,34 @@ function gh15751() {
   expectType<Types.ObjectId>(doc.myId);
 }
 
+function testNewSchemaWithMethodsAndVirtuals() {
+  const schema = new Schema(
+    { name: String },
+    {
+      virtuals: {
+        upperName: {
+          get(): string | undefined {
+            return this.name?.toUpperCase();
+          }
+        }
+      },
+      methods: {
+        greet(greeting: string) {
+          return `${greeting}, ${this.name}`;
+        }
+      }
+    }
+  );
+
+  const TestModel = model('Test', schema);
+  const doc = new TestModel({ name: 'test' });
+
+  const greeting = doc.greet('Hello');
+  expectType<string>(greeting);
+
+  expectType<string | undefined>(doc.upperName);
+}
+
 function gh15878() {
   const schema = new Schema({
     name: {

@@ -146,7 +146,7 @@ declare module 'mongoose' {
    * @param {T} T Function type to extract 'this' parameter from.
    * @param {F} F Fallback type to return if 'this' parameter does not exist.
    */
-  type ThisParameter<T, F> = T extends { (this: infer This): void } ? This : F;
+  type ThisParameter<T, F> = T extends { (this: infer This, ...args: never): void } ? This : F;
 
   /**
    * @summary Decorates all functions in an object with 'this' parameter.

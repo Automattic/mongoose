@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "9.0.1",
+  "version": "9.0.2",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -102,6 +102,7 @@
     "tdd": "mocha --watch --inspect --recursive ./test/*.test.js --watch-files lib/**/*.js test/**/*.js",
     "test-coverage": "nyc --reporter=html --reporter=text npm test",
     "ts-benchmark": "cd ./benchmarks/typescript/simple && npm install && npm run benchmark | node ../../../scripts/tsc-diagnostics-check",
+    "ts-benchmark:local": "node ./scripts/create-tarball && cd ./benchmarks/typescript/simple && rm -rf ./node_modules && npm install && npm run benchmark | node ../../../scripts/tsc-diagnostics-check",
     "attest-benchmark": "node ./benchmarks/typescript/infer.bench.mts"
   },
   "main": "./index.js",

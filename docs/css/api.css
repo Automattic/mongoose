@@ -247,24 +247,41 @@ hr.separate-api {
 
 /* Dark mode support for API page */
 @media (prefers-color-scheme: dark) {
-  .api-nav {
-    background-color: var(--menu-bg, #252525);
-    border-left-color: var(--border-color, #444);
+  :root:not([data-theme="light"]) .api-nav {
+    background-color: var(--menu-bg);
+    border-left-color: var(--border-color);
   }
-  
-  .api-nav a {
-    color: var(--text-muted, #888);
+  :root:not([data-theme="light"]) .api-nav a {
+    color: var(--text-muted);
   }
-  
-  .api-nav a:hover {
-    color: var(--link-color, #4a9eff);
+  :root:not([data-theme="light"]) .api-nav a:hover {
+    color: var(--link-color);
   }
-  
-  .native-ad {
-    background-color: var(--bg-secondary, #2d2d2d);
+  :root:not([data-theme="light"]) .native-ad {
+    background-color: var(--bg-secondary);
   }
-  
-  .native-ad a {
-    color: var(--text-primary, #e0e0e0);
+  :root:not([data-theme="light"]) .native-ad a {
+    color: var(--text-primary);
   }
+}
+
+[data-theme="dark"] .api-nav {
+  background-color: var(--menu-bg);
+  border-left-color: var(--border-color);
+}
+
+[data-theme="dark"] .api-nav a {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .api-nav a:hover {
+  color: var(--link-color);
+}
+
+[data-theme="dark"] .native-ad {
+  background-color: var(--bg-secondary);
+}
+
+[data-theme="dark"] .native-ad a {
+  color: var(--text-primary);
 }

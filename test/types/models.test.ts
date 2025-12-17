@@ -1068,11 +1068,18 @@ async function gh15693() {
   }
 
   interface UserMethods {
+    printNamePrefixed(this: IUser, prefix: string): void;
     printName(this: IUser): void;
     getName(): string;
   }
 
   const schema = new Schema<IUser, Model<IUser>, UserMethods>({ name: { type: String, required: true } });
+  schema.method('printNamePrefixed', function printName(this: IUser, prefix: string) {
+    expectError(this.isModified('name'));
+    expectError(this.doesNotExist());
+    expectType<string>(this.name);
+    console.log(prefix + this.name);
+  });
   schema.method('printName', function printName(this: IUser) {
     expectError(this.isModified('name'));
     expectError(this.doesNotExist());
@@ -1087,7 +1094,7 @@ async function gh15693() {
 
   const leanInst = await User.findOne({}).lean().orFail();
   User.schema.methods.printName.apply(leanInst);
-
+  User.schema.methods.printNamePrefixed.call(leanInst, '');
 }
 
 async function gh15781() {

@@ -12348,8 +12348,8 @@ describe('document', function() {
     assert.ok(clonedDoc.arr.isMongooseArray);
     assert.ok(!clonedDoc.arr.isMongooseDocumentArray);
 
-    assert.deepEqual(doc.subdocArray[0], clonedDoc.subdocArray[0]);
-    assert.deepEqual(doc.subdoc, clonedDoc.subdoc);
+    assert.deepEqual(doc.subdocArray[0].toObject(), clonedDoc.subdocArray[0].toObject());
+    assert.deepEqual(doc.subdoc.toObject(), clonedDoc.subdoc.toObject());
     assert.deepEqual(doc.arr, [99]);
   });
 

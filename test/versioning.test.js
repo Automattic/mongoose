@@ -660,4 +660,76 @@ describe('versioning', function() {
     const fromDb = await Model.findById(doc);
     assert.strictEqual(fromDb.meta.versionKey, 0);
   });
+
+  describe('version mode accumulation (gh-15888)', function() {
+    const VERSION_ALL = mongoose.Document.VERSION_ALL;
+
+    it('combines VERSION_INC and VERSION_WHERE when pull and index set happen together', async function() {
+      // Arrange
+      const { User, user } = await createTestContext();
+
+      // Act
+      user.items.pull(user.items[0]._id); // VERSION_INC ($pull is an array atomic op)
+      user.tags[0] = 'modified'; // VERSION_WHERE (modifying array element by index)
+      user.$__delta();
+      const versionMode = user.$__.version;
+      await user.save();
+
+      // Assert
+      const afterSave = await User.findById(user._id);
+      assert.strictEqual(versionMode, VERSION_ALL, 'version mode should be VERSION_ALL (3)');
+      assert.strictEqual(user.__v, 1, '__v should be incremented in memory after pull');
+      assert.strictEqual(afterSave.__v, 1, '__v should be incremented in db after pull');
+    });
+
+    it('rejects stale update after pull when another client modifies by index', async function() {
+      // Arrange
+      const { User, user } = await createTestContext();
+      const clientA = await User.findById(user._id);
+      const clientB = await User.findById(user._id);
+
+      // Act - Client A: pull + set index
+      clientA.items.pull(clientA.items[0]._id); // VERSION_INC
+      clientA.tags[0] = 'modified'; // VERSION_WHERE
+      await clientA.save();
+
+      // Client B: stale view, updates by index
+      clientB.items[1].name = 'updated'; // VERSION_WHERE
+      const err = await clientB.save().then(() => null, err => err);
+
+      // Assert
+      assert.ok(err, 'save should throw VersionError due to stale __v');
+      assert.strictEqual(err.name, 'VersionError');
+    });
+
+    it('combines VERSION_WHERE and VERSION_INC regardless of operation order', async function() {
+      // Arrange
+      const { User, user } = await createTestContext();
+
+      // Act - set index first (VERSION_WHERE) then push (VERSION_INC)
+      user.tags[0] = 'modified'; // VERSION_WHERE
+      user.items.push({ name: 'item4' }); // VERSION_INC
+      user.$__delta();
+      const versionMode = user.$__.version;
+      await user.save();
+
+      // Assert
+      const afterSave = await User.findById(user._id);
+      assert.strictEqual(versionMode, VERSION_ALL, 'version mode should be VERSION_ALL (3)');
+      assert.strictEqual(afterSave.__v, 1, '__v should be incremented after push');
+    });
+
+    async function createTestContext() {
+      const schema = new Schema({
+        items: [{ name: String }],
+        tags: [String]
+      });
+      const User = db.model('Test', schema);
+      const user = await User.create({
+        items: [{ name: 'item1' }, { name: 'item2' }, { name: 'item3' }],
+        tags: ['tag1', 'tag2']
+      });
+      return { User, user };
+    }
+  });
 });

@@ -1,3 +1,15 @@
+9.0.2 / 2025-12-17
+==================
+ * fix(model): trigger error post hook on bulkwrite when pre-hook throws an error #15882 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): use bitwise OR to accumulate version mode flags #15893 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * types(queries): apply Mongoose casting to default MongoDB driver _id in RootFilterOperators #15891 #15887 #15779
+ * types(schema): correctly infer virtuals, methods on hydrated doc type from schema options #15892
+ * types: fixed this parameter type detection for methods with arguments #15885 [I-Enderlord-I](https://github.com/I-Enderlord-I)
+ * types: export InferRawDocTypeWithout_id to replicate Mongoose 8 InferRawDocType behavior #15815 #15814 [JavaScriptBach](https://github.com/JavaScriptBach)
+ * docs: improve colors on dark mode #15879 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(model): add overwriteImmutable option #15884 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * refactor: remove internal callbacks for buffering #15890
+
 8.20.3 / 2025-12-15
 ===================
  * perf: use Object.hasOwn instead of Object#hasOwnProperty #15875 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

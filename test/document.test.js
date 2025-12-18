@@ -12348,9 +12348,63 @@ describe('document', function() {
     assert.ok(clonedDoc.arr.isMongooseArray);
     assert.ok(!clonedDoc.arr.isMongooseDocumentArray);
 
-    assert.deepEqual(doc.subdocArray[0], clonedDoc.subdocArray[0]);
-    assert.deepEqual(doc.subdoc, clonedDoc.subdoc);
+    assert.deepEqual(doc.subdocArray[0].toObject(), clonedDoc.subdocArray[0].toObject());
+    assert.deepEqual(doc.subdoc.toObject(), clonedDoc.subdoc.toObject());
     assert.deepEqual(doc.arr, [99]);
+  });
+
+  it('updates subdocument parents when cloning (gh-15901)', async function() {
+    const addressSchema = new Schema({
+      street: String,
+      city: String,
+      image: new Schema({ url: String })
+    });
+
+    const userSchema = new Schema({
+      name: String,
+      addresses: [addressSchema],
+      bestFriend: { type: Schema.Types.ObjectId, ref: 'User' }
+    });
+
+    const User = db.model('User', userSchema);
+
+    const bestFriend = new User({
+      name: 'Best Friend'
+    });
+
+    const user = new User({
+      name: 'Test User',
+      addresses: [{ street: '123 Main St', city: 'Boston', image: { url: 'google.com' } }],
+      bestFriend: bestFriend._id
+    });
+
+    user.bestFriend = bestFriend;
+
+    assert.ok(user.populated('bestFriend'));
+    assert.ok(user.bestFriend instanceof User);
+
+    const clonedUser = user.$clone();
+
+    // Check cloned subdoc parent pointers
+    assert.ok(
+      clonedUser.addresses[0].$parent() === clonedUser,
+      'cloned subdocument $parent() should return cloned document'
+    );
+    assert.ok(
+      clonedUser.addresses[0].image.$parent() === clonedUser.addresses[0],
+      'cloned nested subdocument $parent() should return cloned subdocument'
+    );
+
+    // Check that cloning with populated path works
+    assert.ok(clonedUser.populated('bestFriend'));
+    assert.ok(clonedUser.bestFriend instanceof User);
+    assert.notStrictEqual(clonedUser.bestFriend, bestFriend); // clone should not share instance
+    assert.deepStrictEqual(clonedUser.bestFriend.toObject(), bestFriend.toObject());
+    assert.equal(
+      clonedUser.bestFriend.$parent(),
+      clonedUser,
+      'populated doc $parent() should return cloned document'
+    );
   });
 
   it('can create document with document array and top-level key named `schema` (gh-12480)', async function() {

@@ -2626,6 +2626,30 @@ describe('Model', function() {
       assert.equal(nestedCheck.location[0].zip, 34512);
       assert.equal(nestedCheck.name, 'Quiz');
     });
+    it('should allow saving parent paths of whitelisted paths (gh-15850)', async function() {
+      const schema = new Schema({
+        nested: {
+          a: Number,
+          b: Number
+        }
+      });
+
+      const Model = db.model('Test', schema);
+
+      const doc = new Model({ nested: { a: 1, b: 1 } });
+      await doc.save();
+
+      // Modify the parent path
+      doc.nested = { a: 2, b: 2 };
+
+      // Try to save ONLY nested.a
+      // This should allow the update to nested.a to go through, even if it means saving the whole nested object
+      await doc.save({ pathsToSave: ['nested.a'] });
+
+      const found = await Model.findById(doc._id);
+      assert.strictEqual(found.nested.a, 2);
+      assert.strictEqual(found.nested.b, 1);
+    });
   });
 
 

@@ -151,7 +151,7 @@ describe('document', function() {
       assert.strictEqual(found, null);
     });
 
-    it('sets $isDeleted to true after successful delete (gh-15878)', async function() {
+    it('sets $isDeleted to true after successful delete (gh-15858)', async function() {
       const schema = new Schema({ name: String });
       const Product = db.model('Test', schema);
 

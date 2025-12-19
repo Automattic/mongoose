@@ -1,3 +1,8 @@
+8.20.4 / 2025-12-18
+===================
+ * fix(model): ensure $isDeleted is set after calling doc.deleteOne() successfully #15898
+ * fix(document): use bitwise OR to accumulate version mode flags #15893 #15888 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
 9.0.2 / 2025-12-17
 ==================
  * fix(model): trigger error post hook on bulkwrite when pre-hook throws an error #15882 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

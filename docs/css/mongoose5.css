@@ -1,6 +1,6 @@
 /* CSS Custom Properties for Theming */
-:root {
-  /* Light mode colors */
+/* Light mode (default) */
+:root, [data-theme="light"] {
   --bg-primary: #ffffff;
   --bg-secondary: #eee;
   --bg-tertiary: #fafafa;
@@ -18,68 +18,78 @@
   --shadow: rgba(0, 0, 0, 0.1);
   --focus-ring: #0971B2;
   --focus-ring-width: 3px;
+  --focus-ring-shadow: rgba(9, 113, 178, 0.1);
+  /* Brand colors */
+  --brand-primary: #800;
+  --brand-primary-hover: #990000;
+  --brand-primary-subtle: rgba(136, 0, 0, 0.1);
+  /* Button colors */
+  --btn-bg: #444;
+  --btn-text-shadow: #222;
+  /* Tagline text shadow */
+  --tagline-text-shadow: #f8f8f8;
 }
 
-/* Dark mode colors */
+/* Dark mode - system preference (no-JS fallback) or manual toggle */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg-primary: #1a1a1a;
-    --bg-secondary: #2d2d2d;
+    --bg-secondary: #252525;
     --bg-tertiary: #252525;
-    --text-primary: #e0e0e0;
-    --text-secondary: #c0c0c0;
-    --text-muted: #888888;
-    --link-color: #4a9eff;
-    --link-hover: #6bb3ff;
+    --text-primary: #f0f0f0;
+    --text-secondary: #d8d8d8;
+    --text-muted: #a0a0a0;
+    --link-color: #7BC3FF;
+    --link-hover: #8AD0FF;
     --border-color: #444444;
-    --code-bg: #2d2d2d;
-    --code-text: #e0e0e0;
+    --code-bg: #252525;
+    --code-text: #e8e8e8;
     --menu-bg: #252525;
-    --menu-hover: rgba(255,255,255, 0.1);
-    --menu-selected: rgba(255,255,255, 0.15);
+    --menu-hover: rgba(255, 255, 255, 0.1);
+    --menu-selected: rgba(255, 255, 255, 0.15);
     --shadow: rgba(0, 0, 0, 0.3);
-    --focus-ring: #4a9eff;
+    --focus-ring: #FFB4B4;
+    --focus-ring-shadow: rgba(255, 180, 180, 0.2);
+    /* Brand colors */
+    --brand-primary: #FF5E5E;
+    --brand-primary-hover: #F55;
+    --brand-primary-subtle: rgba(255, 180, 180, 0.1);
+    /* Button colors */
+    --btn-bg: #444;
+    --btn-text-shadow: #222;
+    /* Tagline text shadow */
+    --tagline-text-shadow: #222;
   }
 }
 
-/* Manual dark mode override */
+/* Dark mode - manual toggle (overrides system preference) */
 [data-theme="dark"] {
   --bg-primary: #1a1a1a;
   --bg-secondary: #2d2d2d;
   --bg-tertiary: #252525;
-  --text-primary: #e0e0e0;
-  --text-secondary: #c0c0c0;
-  --text-muted: #888888;
-  --link-color: #4a9eff;
-  --link-hover: #6bb3ff;
+  --text-primary: #f0f0f0;
+  --text-secondary: #d8d8d8;
+  --text-muted: #a0a0a0;
+  --link-color: #7BC3FF;
+  --link-hover: #8AD0FF;
   --border-color: #444444;
-  --code-bg: #2d2d2d;
-  --code-text: #e0e0e0;
+  --code-bg: #252525;
+  --code-text: #e8e8e8;
   --menu-bg: #252525;
-  --menu-hover: rgba(255,255,255, 0.1);
-  --menu-selected: rgba(255,255,255, 0.15);
+  --menu-hover: rgba(255, 255, 255, 0.1);
+  --menu-selected: rgba(255, 255, 255, 0.15);
   --shadow: rgba(0, 0, 0, 0.3);
-  --focus-ring: #4a9eff;
-}
-
-/* Light mode override */
-[data-theme="light"] {
-  --bg-primary: #ffffff;
-  --bg-secondary: #eee;
-  --bg-tertiary: #fafafa;
-  --text-primary: #000000;
-  --text-secondary: #333333;
-  --text-muted: #777777;
-  --link-color: #0971B2;
-  --link-hover: #065a8f;
-  --border-color: #ddd;
-  --code-bg: #f5f5f5;
-  --code-text: #333;
-  --menu-bg: #eee;
-  --menu-hover: rgba(0,0,0, 0.1);
-  --menu-selected: rgba(0,0,0, 0.15);
-  --shadow: rgba(0, 0, 0, 0.1);
-  --focus-ring: #0971B2;
+  --focus-ring: #FFB4B4;
+  --focus-ring-shadow: rgba(255, 180, 180, 0.2);
+  /* Brand colors */
+  --brand-primary: #FF5E5E;
+  --brand-primary-hover: #F55;
+  --brand-primary-subtle: rgba(255, 180, 180, 0.1);
+  /* Button colors */
+  --btn-bg: #444;
+  --btn-text-shadow: #222;
+  /* Tagline text shadow */
+  --tagline-text-shadow: #222;
 }
 
 html {
@@ -164,20 +174,31 @@ h4 a:focus-visible {
 }
 
 #logo {
+  display: inline-block;
   width: 62px;
   height: 30px;
   position: relative;
-  top: 5px;
+  top: 7px;
+  background-color: var(--brand-primary);
+  -webkit-mask-image: url('/docs/images/mongoose.svg');
+  mask-image: url('/docs/images/mongoose.svg');
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
 }
 
 .logo-text {
-  color: #800;
+  color: var(--brand-primary);
   font-size: 20pt;
   position: relative;
   top: 0px;
   left: 10px;
   text-transform: none;
 }
+
 
 .pure-menu-item {
   font-size: 12pt;
@@ -187,6 +208,11 @@ h4 a:focus-visible {
 .pure-menu-link {
   padding-top: 2px;
   padding-bottom: 2px;
+  color: var(--text-secondary);
+}
+
+.pure-menu-link:hover {
+  color: var(--text-primary);
 }
 
 /* change sub-item lists to be more dense */
@@ -195,7 +221,7 @@ h4 a:focus-visible {
   padding-bottom: 0px;
 }
 
-.pure-menu-link:hover, 
+.pure-menu-link:hover,
 .pure-menu-link.selected {
   background-color: var(--menu-hover);
 }
@@ -222,6 +248,7 @@ li.version {
 
 li.version ul.pure-menu-children {
   border: 1px solid var(--border-color);
+  background-color: var(--menu-bg);
 }
 
 #logo-container {
@@ -295,13 +322,7 @@ li.version ul.pure-menu-children {
 .search input:focus {
   outline: none;
   border-color: var(--focus-ring);
-  box-shadow: 0 0 0 2px rgba(9, 113, 178, 0.1);
-}
-
-@media (prefers-color-scheme: dark) {
-  .search input:focus {
-    box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
-  }
+  box-shadow: 0 0 0 2px var(--focus-ring-shadow);
 }
 
 #search-input-nav {
@@ -539,8 +560,8 @@ li.version ul.pure-menu-children {
   right: 0px;
   width: 190px;
   text-align: center;
-  border: 1px solid #ddd;
-  background-color: #fff;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
 }
 
 #jobs img {
@@ -553,11 +574,11 @@ li.version ul.pure-menu-children {
 }
 
 #jobs .job-listing:hover {
-  background-color: #ddd;
+  background-color: var(--menu-hover);
 }
 
 #jobs .company {
-  color: black;
+  color: var(--text-primary);
 }
 
 #jobs .title {
@@ -565,7 +586,7 @@ li.version ul.pure-menu-children {
 }
 
 #jobs .location {
-  color: black;
+  color: var(--text-secondary);
   margin-top: 0.25em;
   font-size: 0.75em;
 }
@@ -580,14 +601,14 @@ li.version ul.pure-menu-children {
 #jobs .jobs-view-more {
   margin: 1em;
   font-size: 0.95em;
-  color: #777777;
+  color: var(--text-muted);
   padding: 0.25em;
   border-radius: 3px;
-  background-color: #eee;
+  background-color: var(--bg-secondary);
 }
 
 #jobs .jobs-view-more a {
-  color: black;
+  color: var(--text-primary);
 }
 
 @media (max-width: 1360px) {
@@ -755,4 +776,34 @@ li.version ul.pure-menu-children {
     bottom: 15px;
     right: 15px;
   }
+}
+
+/* Mongoose brand buttons */
+.mongoose-btn-outline,
+.mongoose-btn-solid {
+  border-radius: 3px;
+  padding: 3px 30px;
+  cursor: pointer;
+  font-size: inherit;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.mongoose-btn-outline {
+  border: 1px solid var(--brand-primary);
+  color: var(--brand-primary);
+  background-color: transparent;
+}
+
+.mongoose-btn-outline:hover {
+  background-color: var(--brand-primary-subtle);
+}
+
+.mongoose-btn-solid {
+  border: 1px solid transparent;
+  color: var(--bg-primary);
+  background-color: var(--brand-primary);
+}
+
+.mongoose-btn-solid:hover {
+  background-color: var(--brand-primary-hover);
 }

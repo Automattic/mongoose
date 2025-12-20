@@ -21,6 +21,7 @@ const ObjectId = Schema.Types.ObjectId;
 const DocumentObjectId = mongoose.Types.ObjectId;
 const EmbeddedDocument = mongoose.Types.Subdocument;
 const MongooseError = mongoose.Error;
+const ObjectParameterError = require('../lib/error/objectParameter');
 
 describe('Model', function() {
   let db;
@@ -6376,6 +6377,52 @@ describe('Model', function() {
 
   });
 
+  it('bulkWrite can disable timestamps with insertOne and replaceOne (gh-15782)', async function() {
+    const userSchema = new Schema({
+      name: String
+    }, { timestamps: true });
+
+    const User = db.model('User', userSchema);
+
+    const user = await User.create({ name: 'Hafez' });
+
+    await User.bulkWrite([
+      { insertOne: { document: { name: 'insertOne-test' }, timestamps: false } },
+      { replaceOne: { filter: { _id: user._id }, replacement: { name: 'replaceOne-test' }, timestamps: false } }
+    ]);
+
+    const insertedDoc = await User.findOne({ name: 'insertOne-test' });
+    assert.strictEqual(insertedDoc.createdAt, undefined);
+    assert.strictEqual(insertedDoc.updatedAt, undefined);
+
+    const replacedDoc = await User.findOne({ name: 'replaceOne-test' });
+    assert.strictEqual(replacedDoc.createdAt, undefined);
+    assert.strictEqual(replacedDoc.updatedAt, undefined);
+  });
+
+  it('bulkWrite insertOne and replaceOne respect per-op timestamps: true when global is false (gh-15782)', async function() {
+    const userSchema = new Schema({
+      name: String
+    }, { timestamps: true });
+
+    const User = db.model('User', userSchema);
+
+    const user = await User.create({ name: 'Hafez' });
+
+    await User.bulkWrite([
+      { insertOne: { document: { name: 'insertOne-test' }, timestamps: true } },
+      { replaceOne: { filter: { _id: user._id }, replacement: { name: 'replaceOne-test' }, timestamps: true } }
+    ], { timestamps: false });
+
+    const insertedDoc = await User.findOne({ name: 'insertOne-test' });
+    assert.ok(insertedDoc.createdAt instanceof Date);
+    assert.ok(insertedDoc.updatedAt instanceof Date);
+
+    const replacedDoc = await User.findOne({ name: 'replaceOne-test' });
+    assert.ok(replacedDoc.createdAt instanceof Date);
+    assert.ok(replacedDoc.updatedAt instanceof Date);
+  });
+
   it('bulkwrite should not change updatedAt on subdocs when timestamps set to false (gh-13611)', async function() {
 
     const postSchema = new Schema({
@@ -7177,6 +7224,53 @@ describe('Model', function() {
           'Hafez2_gh-9673-1'
         ]
       );
+    });
+
+    it('increments version key on successful save (gh-15800)', async function() {
+      // Arrange
+      const userSchema = new Schema({
+        name: [String],
+        email: { type: String, minLength: 3 }
+      });
+
+      const User = db.model('User', userSchema);
+      const user1 = new User({ name: ['123'], email: '12314' });
+      await user1.save();
+
+      // Act
+      const user = await User.findOne({ _id: user1._id });
+      assert.ok(user);
+
+      // Before, __v should be 0
+      assert.equal(user.__v, 0);
+
+      // markModified on array field (triggers $set)
+      user.markModified('name');
+      await User.bulkSave([user]);
+
+      const dbUser1 = await User.findById(user._id);
+      assert.equal(dbUser1.__v, 1);
+      assert.equal(user.__v, 1);
+
+      // Update another path and markModified
+      user.email = '1375';
+      await User.bulkSave([user]);
+      const dbUser2 = await User.findById(user._id);
+      assert.equal(dbUser2.__v, 1);
+      assert.equal(user.__v, 1);
+
+      let reloaded = await User.findById(user._id);
+      assert.equal(reloaded.__v, 1);
+
+      user.email = '1';
+      await assert.rejects(
+        () => User.bulkSave([user]),
+        /email.*is shorter than the minimum allowed length/
+      );
+      assert.equal(user.__v, 1);
+
+      reloaded = await User.findById(user._id);
+      assert.equal(reloaded.__v, 1);
     });
 
     it('saves new documents with ordered: false (gh-15495)', async function() {
@@ -9162,6 +9256,31 @@ describe('Model', function() {
         }
       ]);
       assert.strictEqual(doc.name, 'Test2');
+    });
+  });
+  describe('gh-15812', function() {
+    it('should throw ObjectParameterError when init is called with null', function() {
+      const doc = new mongoose.Document({}, new mongoose.Schema({ name: String }));
+      try {
+        doc.init(null);
+        assert.fail('Should have thrown an error');
+      } catch (error) {
+        assert.ok(error instanceof ObjectParameterError);
+        assert.strictEqual(error.name, 'ObjectParameterError');
+        assert.ok(error.message.includes('Parameter "doc" to init() must be an object'));
+      }
+    });
+
+    it('should throw ObjectParameterError when init is called with undefined', function() {
+      const doc = new mongoose.Document({}, new mongoose.Schema({ name: String }));
+      try {
+        doc.init(undefined);
+        assert.fail('Should have thrown an error');
+      } catch (error) {
+        assert.ok(error instanceof ObjectParameterError);
+        assert.strictEqual(error.name, 'ObjectParameterError');
+        assert.ok(error.message.includes('Parameter "doc" to init() must be an object'));
+      }
     });
   });
 });

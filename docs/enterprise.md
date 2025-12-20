@@ -9,10 +9,10 @@ reduce risk, and improve code health, while paying the maintainers of the
 exact dependencies you use.
 
 <a href="https://tidelift.com/subscription/pkg/npm-mongoose?utm_source=npm-mongoose&utm_medium=referral&utm_campaign=enterprise">
-  <button style="border-radius: 3px;padding: 3px;padding-left: 30px;padding-right: 30px;border: 1px solid #800;color: #800;">Learn More</button>
+  <button class="mongoose-btn-outline">Learn More</button>
 </a>
 <a href="https://tidelift.com/subscription/request-a-demo?utm_source=npm-mongoose&utm_medium=referral&utm_campaign=enterprise">
-  <button style="border-radius: 3px;padding: 3px;padding-left: 30px;padding-right: 30px;border: 1px solid transparent;color: white;background-color: #800;">Request a Demo</button>
+  <button class="mongoose-btn-solid">Request a Demo</button>
 </a>
 
 ## Enterprise-ready open source software—managed for you
@@ -64,8 +64,8 @@ grappling with esoteric open source trivia, and more time building your own
 applications—and your business.
 
 <a href="https://tidelift.com/subscription/pkg/npm-mongoose?utm_source=npm-mongoose&utm_medium=referral&utm_campaign=enterprise">
-  <button style="border-radius: 3px;padding: 3px;padding-left: 30px;padding-right: 30px;border: 1px solid #800;color: #800;">Learn More</button>
+  <button class="mongoose-btn-outline">Learn More</button>
 </a>
 <a href="https://tidelift.com/subscription/request-a-demo?utm_source=npm-mongoose&utm_medium=referral&utm_campaign=enterprise">
-  <button style="border-radius: 3px;padding: 3px;padding-left: 30px;padding-right: 30px;border: 1px solid transparent;color: white;background-color: #800;">Request a Demo</button>
+  <button class="mongoose-btn-solid">Request a Demo</button>
 </a>

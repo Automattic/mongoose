@@ -651,3 +651,47 @@ async function gh15578() {
     expectType<number>(jsonWithVersionKey.taco);
   }
 }
+
+async function gh15858() {
+  // Test that id virtual is available when using model<T>() with explicit generic
+  interface IUser {
+    name: string;
+    email: string;
+  }
+
+  const userSchema = new Schema<IUser>({
+    name: { type: String, required: true },
+    email: { type: String, required: true }
+  });
+
+  const User = model<IUser>('User', userSchema);
+
+  const user = new User({
+    name: 'Bill',
+    email: 'bill@initech.com'
+  });
+
+  // id virtual should be available
+  expectType<string>(user.id);
+
+  // Test that id virtual is NOT added when doc type already has id
+  interface IUserWithId {
+    id: number;
+    name: string;
+  }
+
+  const userWithIdSchema = new Schema<IUserWithId>({
+    id: { type: Number, required: true },
+    name: { type: String, required: true }
+  });
+
+  const UserWithId = model<IUserWithId>('UserWithId', userWithIdSchema);
+
+  const userWithId = new UserWithId({
+    id: 123,
+    name: 'Jane'
+  });
+
+  // id should be number, not string virtual
+  expectType<number>(userWithId.id);
+}

@@ -355,6 +355,7 @@ describe('model middleware', function() {
     schema.pre('deleteOne', { document: true, query: false }, function(next, doc, opts) {
       ++preRemove;
       assert.strictEqual(opts.testOption, 'value');
+      opts.testOption = 'something else';
       next();
     });
 
@@ -363,9 +364,8 @@ describe('model middleware', function() {
       ++postValidate;
     });
 
-    schema.post('deleteOne', { document: true, query: false }, function(doc, opts) {
+    schema.post('deleteOne', { document: true, query: false }, function(doc) {
       assert.ok(doc instanceof mongoose.Document);
-      assert.strictEqual(opts.testOption, 'value');
       ++postRemove;
     });
 

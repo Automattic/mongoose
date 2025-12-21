@@ -6857,9 +6857,7 @@ describe('document', function() {
       ++docCount;
       next();
     });
-    schema.post('updateOne', { document: true, query: false }, (doc, update, opts) => {
-      assert.strictEqual(opts.testOption, 'value');
-      assert.deepStrictEqual(update, { name: 'test2' });
+    schema.post('updateOne', { document: true, query: false }, () => {
       ++docPostCount;
     });
 

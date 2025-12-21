@@ -652,7 +652,7 @@ async function gh15578() {
   }
 }
 
-async function gh15858() {
+async function gh15900() {
   // Test that id virtual is available when using model<T>() with explicit generic
   interface IUser {
     name: string;

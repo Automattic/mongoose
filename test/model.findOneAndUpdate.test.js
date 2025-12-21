@@ -361,7 +361,7 @@ describe('model: findOneAndUpdate:', function() {
 
     await post.save();
 
-    await Promise.all(Array(4).fill(null).map(async () => {
+    await Promise.all(Array(4).fill(null).map(async() => {
       await BlogPost.findOneAndUpdate({ _id: post._id }, { $inc: { 'meta.visitors': 1 } });
     }));
 
@@ -1341,7 +1341,7 @@ describe('model: findOneAndUpdate:', function() {
       assert.equal(called, 1);
     });
 
-    it('single nested doc cast errors (gh-3602)', async () => {
+    it('single nested doc cast errors (gh-3602)', async() => {
       const AddressSchema = new Schema({
         street: {
           type: Number

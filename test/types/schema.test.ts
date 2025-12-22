@@ -2015,8 +2015,6 @@ function testInferHydratedDocTypeFromSchema() {
     map?: Map<string, string> | null | undefined
   }, { id: string }, {}, { id: string }>;
 
-  // Use expectAssignable because the inferred TSchemaOptions from schema
-  // differs from the default in Expected, but the types are compatible
   expectAssignable<Expected>({} as HydratedDocType);
 }
 

@@ -607,6 +607,10 @@ async function gh15578() {
     const toJSONWithVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: true, flattenObjectIds: true });
     const toJSONWithoutVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: false, flattenObjectIds: true });
 
+    // When passing options, __v should still be present
+    expectType<number>(a.toObject({ flattenObjectIds: true }).__v);
+    expectType<number>(a.toJSON({ flattenObjectIds: true }).__v);
+
     const objWithoutVersionKey = a.toObject({ versionKey: false });
     const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
     expectError(objWithoutVersionKey.__v);
@@ -639,6 +643,10 @@ async function gh15578() {
     const toJSONFlattened: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ flattenObjectIds: true });
     const toJSONWithVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: true, flattenObjectIds: true });
     const toJSONWithoutVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: false, flattenObjectIds: true });
+
+    // When passing options, custom version key should still be present
+    expectType<number>(a.toObject({ flattenObjectIds: true }).taco);
+    expectType<number>(a.toJSON({ flattenObjectIds: true }).taco);
 
     const objWithoutVersionKey = a.toObject({ versionKey: false });
     const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
@@ -788,4 +796,35 @@ function testCombinedFlattenOptions() {
   expectType<string>(allFourJSON.uuid);
   expectType<Record<string, string>>(allFourJSON.tags);
   expectType<string>(allFourJSON.displayName);
+}
+
+function testObjectIdsInsideMaps() {
+  // Test that ObjectIds/UUIDs nested inside Map values are correctly converted
+  interface DocWithMapOfObjectIds {
+    _id: Types.ObjectId;
+    userRefs: Map<string, { oderId: Types.ObjectId }>;
+    uuidRefs: Map<string, { refId: Types.UUID }>;
+  }
+
+  const schema = new Schema<DocWithMapOfObjectIds>({
+    userRefs: { type: Map, of: { oderId: Schema.Types.ObjectId } },
+    uuidRefs: { type: Map, of: { refId: Schema.Types.UUID } }
+  });
+
+  const Model = model<DocWithMapOfObjectIds>('MapOfObjectIds', schema);
+  const doc = new Model({});
+
+  // When using flattenMaps + flattenObjectIds, ObjectIds inside Map values should be converted
+  const flattened = doc.toObject({ flattenMaps: true, flattenObjectIds: true });
+  expectType<Record<string, { oderId: string }>>(flattened.userRefs);
+
+  // When using flattenMaps + flattenUUIDs, UUIDs inside Map values should be converted
+  const flattenedUUIDs = doc.toObject({ flattenMaps: true, flattenUUIDs: true });
+  expectType<Record<string, { refId: string }>>(flattenedUUIDs.uuidRefs);
+
+  // All three together
+  const allThree = doc.toObject({ flattenMaps: true, flattenObjectIds: true, flattenUUIDs: true });
+  expectType<Record<string, { oderId: string }>>(allThree.userRefs);
+  expectType<Record<string, { refId: string }>>(allThree.uuidRefs);
+  expectType<string>(allThree._id);
 }

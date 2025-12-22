@@ -253,52 +253,12 @@ declare module 'mongoose' {
     set(value: string | Record<string, any>): this;
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
-    // Most specific overloads first (all four options)
-    toJSON(options: ToObjectOptions & { flattenUUIDs: true, flattenObjectIds: true, flattenMaps: true, virtuals: true }): UUIDToString<ObjectIdToString<FlattenMaps<Require_id<DocType & TVirtuals>>>>;
-    // Triple combinations
-    toJSON(options: ToObjectOptions & { flattenUUIDs: true, flattenObjectIds: true, flattenMaps: true }): UUIDToString<ObjectIdToString<FlattenMaps<Require_id<DocType>>>>;
-    toJSON(options: ToObjectOptions & { flattenUUIDs: true, flattenObjectIds: true, virtuals: true }): UUIDToString<ObjectIdToString<Require_id<DocType & TVirtuals>>>;
-    toJSON(options: ToObjectOptions & { flattenUUIDs: true, flattenMaps: true, virtuals: true }): UUIDToString<FlattenMaps<Require_id<DocType & TVirtuals>>>;
-    toJSON(options: ToObjectOptions & { flattenObjectIds: true, flattenMaps: true, virtuals: true }): ObjectIdToString<FlattenMaps<Require_id<DocType & TVirtuals>>>;
-    // Double combinations
-    toJSON(options: ToObjectOptions & { flattenUUIDs: true, flattenObjectIds: true }): UUIDToString<ObjectIdToString<Require_id<DocType>>>;
-    toJSON(options: ToObjectOptions & { flattenUUIDs: true, flattenMaps: true }): UUIDToString<FlattenMaps<Require_id<DocType>>>;
-    toJSON(options: ToObjectOptions & { flattenUUIDs: true, virtuals: true }): UUIDToString<Require_id<DocType & TVirtuals>>;
-    toJSON(options: ToObjectOptions & { flattenObjectIds: true, flattenMaps: true }): ObjectIdToString<FlattenMaps<Require_id<DocType>>>;
-    toJSON(options: ToObjectOptions & { flattenObjectIds: true, virtuals: true }): ObjectIdToString<Require_id<DocType & TVirtuals>>;
-    toJSON(options: ToObjectOptions & { flattenMaps: true, virtuals: true }): FlattenMaps<Require_id<DocType & TVirtuals>>;
-    // Single-option overloads
-    toJSON(options: ToObjectOptions & { flattenObjectIds: true }): ObjectIdToString<Require_id<DocType>>;
-    toJSON(options: ToObjectOptions & { flattenUUIDs: true }): UUIDToString<Require_id<DocType>>;
-    toJSON(options: ToObjectOptions & { flattenMaps: true }): FlattenMaps<Require_id<DocType>>;
-    toJSON(options: ToObjectOptions & { virtuals: true }): Require_id<DocType & TVirtuals>;
-    toJSON(options: ToObjectOptions & { versionKey: false }): Omit<Require_id<DocType>, '__v'>;
-    // Default - no options
+    toJSON<O extends ToObjectOptions>(options: O): ToObjectReturnType<DocType, TVirtuals, O, TSchemaOptions>;
     toJSON(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;
     toJSON<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
-    // Most specific overloads first (all four options)
-    toObject(options: ToObjectOptions & { flattenUUIDs: true, flattenObjectIds: true, flattenMaps: true, virtuals: true }): UUIDToString<ObjectIdToString<FlattenMaps<Require_id<DocType & TVirtuals>>>>;
-    // Triple combinations
-    toObject(options: ToObjectOptions & { flattenUUIDs: true, flattenObjectIds: true, flattenMaps: true }): UUIDToString<ObjectIdToString<FlattenMaps<Require_id<DocType>>>>;
-    toObject(options: ToObjectOptions & { flattenUUIDs: true, flattenObjectIds: true, virtuals: true }): UUIDToString<ObjectIdToString<Require_id<DocType & TVirtuals>>>;
-    toObject(options: ToObjectOptions & { flattenUUIDs: true, flattenMaps: true, virtuals: true }): UUIDToString<FlattenMaps<Require_id<DocType & TVirtuals>>>;
-    toObject(options: ToObjectOptions & { flattenObjectIds: true, flattenMaps: true, virtuals: true }): ObjectIdToString<FlattenMaps<Require_id<DocType & TVirtuals>>>;
-    // Double combinations
-    toObject(options: ToObjectOptions & { flattenUUIDs: true, flattenObjectIds: true }): UUIDToString<ObjectIdToString<Require_id<DocType>>>;
-    toObject(options: ToObjectOptions & { flattenUUIDs: true, flattenMaps: true }): UUIDToString<FlattenMaps<Require_id<DocType>>>;
-    toObject(options: ToObjectOptions & { flattenUUIDs: true, virtuals: true }): UUIDToString<Require_id<DocType & TVirtuals>>;
-    toObject(options: ToObjectOptions & { flattenObjectIds: true, flattenMaps: true }): ObjectIdToString<FlattenMaps<Require_id<DocType>>>;
-    toObject(options: ToObjectOptions & { flattenObjectIds: true, virtuals: true }): ObjectIdToString<Require_id<DocType & TVirtuals>>;
-    toObject(options: ToObjectOptions & { flattenMaps: true, virtuals: true }): FlattenMaps<Require_id<DocType & TVirtuals>>;
-    // Single-option overloads
-    toObject(options: ToObjectOptions & { flattenObjectIds: true }): ObjectIdToString<Require_id<DocType>>;
-    toObject(options: ToObjectOptions & { flattenUUIDs: true }): UUIDToString<Require_id<DocType>>;
-    toObject(options: ToObjectOptions & { flattenMaps: true }): FlattenMaps<Require_id<DocType>>;
-    toObject(options: ToObjectOptions & { virtuals: true }): Require_id<DocType & TVirtuals>;
-    toObject(options: ToObjectOptions & { versionKey: false }): Omit<Require_id<DocType>, '__v'>;
-    // Default - no options
+    toObject<O extends ToObjectOptions>(options: O): ToObjectReturnType<DocType, TVirtuals, O, TSchemaOptions>;
     toObject(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;
     toObject<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
 

@@ -1925,7 +1925,7 @@ async function testInferHydratedDocTypeFromSchema() {
     } & { _id: Types.ObjectId }
   >;
 
-  expectAssignable<Expected>({} as HydratedDocType);
+  expectType<Expected>({} as HydratedDocType);
 
   const def = {
     name: String,

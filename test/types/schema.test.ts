@@ -2015,7 +2015,7 @@ function testInferHydratedDocTypeFromSchema() {
     map?: Map<string, string> | null | undefined
   }, { id: string }, {}, { id: string }>;
 
-  expectAssignable<Expected>({} as HydratedDocType);
+  expectType<Expected>({} as HydratedDocType);
 }
 
 function gh15536() {

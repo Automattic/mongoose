@@ -672,3 +672,89 @@ function testFlattenUUIDs() {
   expectType<Types.UUID>(toJSONDefault._id);
   expectType<Types.UUID>(toJSONDefault.uuid);
 }
+
+function testCombinedFlattenOptions() {
+  interface RawDocType {
+    _id: Types.ObjectId;
+    uuid: Types.UUID;
+    name: string;
+    tags: Map<string, string>;
+  }
+
+  interface Virtuals {
+    displayName: string;
+  }
+
+  const ASchema = new Schema<RawDocType, Model<RawDocType, {}, {}, Virtuals>, {}, {}, Virtuals>({
+    uuid: Schema.Types.UUID,
+    name: String,
+    tags: { type: Map, of: String }
+  });
+
+  ASchema.virtual('displayName').get(function() {
+    return this.name.toUpperCase();
+  });
+
+  const AModel = model<RawDocType, Model<RawDocType, {}, {}, Virtuals>>('CombinedModel', ASchema);
+
+  const a = new AModel({
+    uuid: new Types.UUID(),
+    name: 'Test',
+    tags: new Map([['key', 'value']])
+  });
+
+  // Test flattenUUIDs + flattenObjectIds
+  const uuidAndObjectId = a.toObject({ flattenUUIDs: true, flattenObjectIds: true });
+  expectType<string>(uuidAndObjectId._id);
+  expectType<string>(uuidAndObjectId.uuid);
+
+  // Test flattenUUIDs + flattenMaps
+  const uuidAndMaps = a.toObject({ flattenUUIDs: true, flattenMaps: true });
+  expectType<string>(uuidAndMaps.uuid);
+  expectType<Record<string, string>>(uuidAndMaps.tags);
+
+  // Test flattenUUIDs + virtuals
+  const uuidAndVirtuals = a.toObject({ flattenUUIDs: true, virtuals: true });
+  expectType<string>(uuidAndVirtuals.uuid);
+  expectType<string>(uuidAndVirtuals.displayName);
+
+  // Test flattenObjectIds + flattenMaps
+  const objectIdAndMaps = a.toObject({ flattenObjectIds: true, flattenMaps: true });
+  expectType<string>(objectIdAndMaps._id);
+  expectType<Record<string, string>>(objectIdAndMaps.tags);
+
+  // Test flattenObjectIds + virtuals
+  const objectIdAndVirtuals = a.toObject({ flattenObjectIds: true, virtuals: true });
+  expectType<string>(objectIdAndVirtuals._id);
+  expectType<string>(objectIdAndVirtuals.displayName);
+
+  // Test flattenMaps + virtuals
+  const mapsAndVirtuals = a.toObject({ flattenMaps: true, virtuals: true });
+  expectType<Record<string, string>>(mapsAndVirtuals.tags);
+  expectType<string>(mapsAndVirtuals.displayName);
+
+  // Test triple combinations
+  const uuidObjectIdMaps = a.toObject({ flattenUUIDs: true, flattenObjectIds: true, flattenMaps: true });
+  expectType<string>(uuidObjectIdMaps._id);
+  expectType<string>(uuidObjectIdMaps.uuid);
+  expectType<Record<string, string>>(uuidObjectIdMaps.tags);
+
+  const uuidObjectIdVirtuals = a.toObject({ flattenUUIDs: true, flattenObjectIds: true, virtuals: true });
+  expectType<string>(uuidObjectIdVirtuals._id);
+  expectType<string>(uuidObjectIdVirtuals.uuid);
+  expectType<string>(uuidObjectIdVirtuals.displayName);
+
+  // Test all four options
+  const allFour = a.toObject({ flattenUUIDs: true, flattenObjectIds: true, flattenMaps: true, virtuals: true });
+  expectType<string>(allFour._id);
+  expectType<string>(allFour.uuid);
+  expectType<Record<string, string>>(allFour.tags);
+  expectType<string>(allFour.displayName);
+
+  // Same tests for toJSON
+  const allFourJSON = a.toJSON({ flattenUUIDs: true, flattenObjectIds: true, flattenMaps: true, virtuals: true });
+  expectType<string>(allFourJSON._id);
+  expectType<string>(allFourJSON.uuid);
+  expectType<Record<string, string>>(allFourJSON.tags);
+  expectType<string>(allFourJSON.displayName);
+}

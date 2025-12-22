@@ -177,7 +177,7 @@ declare module 'mongoose' {
     HydratedDocPathsType,
     any,
     TOverrides extends Record<string, never> ?
-      Document<unknown, TQueryHelpers, RawDocType, TVirtuals, TSchemaOptions> & Default__v<Require_id<HydratedDocPathsType>, TSchemaOptions> :
+      Document<unknown, TQueryHelpers, RawDocType, TVirtuals, TSchemaOptions> & Default__v<Require_id<HydratedDocPathsType>, TSchemaOptions> & AddDefaultId<HydratedDocPathsType, {}, TSchemaOptions> :
       IfAny<
         TOverrides,
         Document<unknown, TQueryHelpers, RawDocType, TVirtuals, TSchemaOptions> & Default__v<Require_id<HydratedDocPathsType>, TSchemaOptions>,
@@ -347,7 +347,8 @@ declare module 'mongoose' {
         TSchemaOptions extends { methods: infer M } ? M : {},
         TSchemaOptions extends { query: any } ? TSchemaOptions['query'] : {},
         TSchemaOptions extends { virtuals: any } ? TSchemaOptions['virtuals'] : {},
-        RawDocType
+        RawDocType,
+        ResolveSchemaOptions<TSchemaOptions>
       >
     >(def: TSchemaDefinition): Schema<
       RawDocType,
@@ -376,7 +377,14 @@ declare module 'mongoose' {
         InferRawDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>,
         ResolveSchemaOptions<TSchemaOptions>
       >,
-      THydratedDocumentType extends AnyObject = HydratedDocument<InferHydratedDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>>
+      THydratedDocumentType extends AnyObject = HydratedDocument<
+        InferHydratedDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>,
+        TSchemaOptions extends { methods: infer M } ? M : {},
+        TSchemaOptions extends { query: any } ? TSchemaOptions['query'] : {},
+        TSchemaOptions extends { virtuals: any } ? TSchemaOptions['virtuals'] : {},
+        RawDocType,
+        ResolveSchemaOptions<TSchemaOptions>
+      >
     >(def: TSchemaDefinition, options: TSchemaOptions): Schema<
       RawDocType,
       Model<RawDocType, any, any, any>,
@@ -625,8 +633,7 @@ declare module 'mongoose' {
 
     /** Adds static "class" methods to Models compiled from this schema. */
     static<K extends keyof TStaticMethods>(name: K, fn: TStaticMethods[K]): this;
-    static(obj: { [F in keyof TStaticMethods]: TStaticMethods[F] }): this;
-    static(obj: { [F in keyof TStaticMethods]: TStaticMethods[F] } & { [name: string]: (this: TModelType, ...args: any[]) => any }): this;
+    static(obj: Partial<TStaticMethods> & { [name: string]: (this: TModelType, ...args: any[]) => any }): this;
     static(name: string, fn: (this: TModelType, ...args: any[]) => any): this;
 
     /** Object of currently defined statics on this schema. */

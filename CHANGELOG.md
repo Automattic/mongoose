@@ -1,3 +1,53 @@
+8.20.4 / 2025-12-18
+===================
+ * fix(model): ensure $isDeleted is set after calling doc.deleteOne() successfully #15898
+ * fix(document): use bitwise OR to accumulate version mode flags #15893 #15888 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
+9.0.2 / 2025-12-17
+==================
+ * fix(model): trigger error post hook on bulkwrite when pre-hook throws an error #15882 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): use bitwise OR to accumulate version mode flags #15893 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * types(queries): apply Mongoose casting to default MongoDB driver _id in RootFilterOperators #15891 #15887 #15779
+ * types(schema): correctly infer virtuals, methods on hydrated doc type from schema options #15892
+ * types: fixed this parameter type detection for methods with arguments #15885 [I-Enderlord-I](https://github.com/I-Enderlord-I)
+ * types: export InferRawDocTypeWithout_id to replicate Mongoose 8 InferRawDocType behavior #15815 #15814 [JavaScriptBach](https://github.com/JavaScriptBach)
+ * docs: improve colors on dark mode #15879 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(model): add overwriteImmutable option #15884 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * refactor: remove internal callbacks for buffering #15890
+
+8.20.3 / 2025-12-15
+===================
+ * perf: use Object.hasOwn instead of Object#hasOwnProperty #15875 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix: improve error when calling Document.prototype.init() with null/undefined #15812 [Vegapunk-debug](https://github.com/Vegapunk-debug)
+ * types(schema): avoid treating paths with default: null as required #15889
+ * types(schema): allow partial statics to schema.statics() #15780
+
+9.0.1 / 2025-12-05
+==================
+ * perf: use native Buffer.equals() for buffer comparison #15821 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(model): fix overwriteImmutable not working with timestamps: true, add overwriteImmutable types re #15781 #15819 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(bulkWrite): pass overwriteImmutable option to castUpdate fixes #15782 #15781 [jhaayushkumar](https://github.com/jhaayushkumar)
+ * fix(schema): Add enumValues property to Number enum for consistency with String enum #15824 [AkaHarshit](https://github.com/AkaHarshit)
+ * fix: incorrect variable bug in double casting #15849 #15848 [lomesh2312](https://github.com/lomesh2312)
+ * fix: clear timeout in collection operations #15852 [techcodie](https://github.com/techcodie)
+ * types(query+model): use function overrides instead of | Query<any, any> to support using Query as filter #15791 #15779
+ * docs(migrating_to_9): clarify removing next() from pre middleware #15813
+ * docs: add dark mode support and CSS improvements #15753
+ * docs: Mongoose compatibility page updates #15797 [alexbevi](https://github.com/alexbevi)
+ * docs: Add closing backticks to code block in migration guide #15783 [isnifer](https://github.com/isnifer)
+ * docs: fix documentation link in connection.js #15804 [salittle0](https://github.com/salittle0)
+
+8.20.2 / 2025-12-05
+===================
+ * fix(model): bump version if necessary after successful bulkSave() #15809 #15800
+ * fix(bulkWrite): pass overwriteImmutable option to castUpdate fixes #15789 #15782 #15781
+ * types(schema): allow calling schema.static() with as TStatics #15794 #15780
+
+7.8.8 / 2025-12-04
+==================
+ * fix(bulkWrite): pass overwriteImmutable option to castUpdate fixes #15789 #15782 #15781
+ * fix(model): bump version if necessary after successful bulkSave() #15800
+
 9.0.0 / 2025-11-21
 ==================
  * BREAKING CHANGE: drop support for callback-based pre middleware, e.g. `next()` in `pre()` hooks

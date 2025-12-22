@@ -100,10 +100,10 @@ declare module 'mongoose' {
       {
         EnforcedDocType: EnforcedDocType;
         M: M;
-        TInstanceMethods: TInstanceMethods;
-        TQueryHelpers: TQueryHelpers;
-        TVirtuals: AddDefaultId<DocType, TVirtuals, TSchemaOptions>;
-        TStaticMethods: TStaticMethods;
+        TInstanceMethods: IfEquals<TInstanceMethods, {}, TSchemaOptions extends { methods: infer M } ? M : {}, TInstanceMethods>;
+        TQueryHelpers: IfEquals<TQueryHelpers, {}, TSchemaOptions extends { query: infer Q } ? Q : {}, TQueryHelpers>;
+        TVirtuals: AddDefaultId<DocType, IfEquals<TVirtuals, {}, TSchemaOptions extends { virtuals: infer V } ? V : {}, TVirtuals>, TSchemaOptions>;
+        TStaticMethods: IfEquals<TStaticMethods, {}, TSchemaOptions extends { statics: infer S } ? S : {}, TStaticMethods>;
         TSchemaOptions: TSchemaOptions;
         DocType: DocType;
         THydratedDocumentType: THydratedDocumentType;
@@ -136,11 +136,6 @@ declare module 'mongoose' {
     : T;
 }
 
-type IsPathDefaultUndefined<PathType> =
-  PathType extends { default: undefined } ? true
-  : PathType extends { default: (...args: any[]) => undefined } ? true
-  : false;
-
 type RequiredPropertyDefinition =
   | {
       required: true | string | [true, string | undefined] | { isRequired: true };
@@ -159,15 +154,16 @@ type IsPathRequired<P, TypeKey extends string = DefaultTypeKey> =
     P extends { required: false } ?
       false
     : true
-  : P extends Record<TypeKey, ArrayConstructor | any[]> ?
-    IsPathDefaultUndefined<P> extends true ?
-      false
-    : true
-  : P extends Record<TypeKey, any> ?
-    P extends { default: any } ?
-      IfEquals<P['default'], undefined, false, true>
-    : false
+  : P extends { default: undefined | null | ((...args: any[]) => undefined) | ((...args: any[]) => null) } ? false
+  : P extends { default: any } ? true
+  : P extends Record<TypeKey, ArrayConstructor | any[]> ? true
   : false;
+
+// Internal type used to efficiently check for never or any types
+// can be efficiently checked like:
+// `[T] extends [neverOrAny] ? T : ...`
+// to avoid edge cases
+type neverOrAny = ' ~neverOrAny~';
 
 /**
  * @summary A Utility to obtain schema's required path keys.
@@ -251,6 +247,7 @@ type UnionToType<T extends readonly any[]> = T[number] extends infer U
 
 type IsSchemaTypeFromBuiltinClass<T> =
   T extends typeof String ? true
+  : unknown extends Buffer ? false
   : T extends typeof Number ? true
   : T extends typeof Boolean ? true
   : T extends typeof Buffer ? true
@@ -268,7 +265,6 @@ type IsSchemaTypeFromBuiltinClass<T> =
   : T extends NativeDate ? true
   : T extends typeof Schema.Types.Mixed ? true
   : T extends Types.UUID ? true
-  : unknown extends Buffer ? false
   : T extends Buffer ? true
   : false;
 
@@ -284,12 +280,10 @@ type ResolvePathType<
   Options extends SchemaTypeOptions<PathValueType> = {},
   TypeKey extends string = DefaultSchemaOptions['typeKey'],
   TypeHint = never
-> = IfEquals<
-  TypeHint,
-  never,
-  PathValueType extends Schema ? InferSchemaType<PathValueType>
+> = [TypeHint] extends [never]
+  ? PathValueType extends Schema ? InferSchemaType<PathValueType>
   : PathValueType extends AnyArray<infer Item> ?
-    IfEquals<Item, never> extends true
+    [Item] extends [never]
       ? any[]
       : Item extends Schema ?
         // If Item is a schema, infer its type.
@@ -328,7 +322,7 @@ type ResolvePathType<
     : never
   : PathValueType extends ArrayConstructor ? any[]
   : PathValueType extends typeof Schema.Types.Mixed ? any
-  : IfEquals<PathValueType, ObjectConstructor> extends true ? any
+  : PathValueType extends ObjectConstructor ? any
   : IfEquals<PathValueType, {}> extends true ? any
   : PathValueType extends typeof SchemaType ? PathValueType['prototype']
   : PathValueType extends Record<string, any> ?
@@ -339,6 +333,5 @@ type ResolvePathType<
         typeKey: TypeKey;
       }
     >
-  : unknown,
-  TypeHint
->;
+  : unknown
+  : TypeHint;

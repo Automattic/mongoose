@@ -1,16 +1,94 @@
 body {
   font-family: 'Open Sans', Helvetica, Arial, FreeSans;
-  color: #333;
+  color: var(--text-secondary);
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
   padding: 0;
   margin: 0;
+  background-color: var(--bg-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Theme Toggle Button for Homepage */
+#theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  bottom: auto;
+  z-index: 1000;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px var(--shadow);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+#theme-toggle-btn {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+#theme-toggle-btn:hover {
+  background-color: var(--menu-hover);
+}
+
+#theme-toggle-btn:active {
+  transform: scale(0.95);
+}
+
+#theme-toggle-btn:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+#theme-icon-light,
+#theme-icon-dark {
+  position: absolute;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  width: 20px;
+  height: 20px;
+}
+
+/* Default: show moon icon (for light/system mode) */
+#theme-icon-dark {
+  opacity: 1;
+  transform: rotate(0deg);
+}
+
+#theme-icon-light {
+  opacity: 0;
+  transform: rotate(90deg);
+  pointer-events: none;
+}
+
+/* In dark mode: show sun icon, hide moon icon */
+[data-theme="dark"] #theme-icon-light {
+  opacity: 1;
+  transform: rotate(0deg);
+  pointer-events: auto;
+}
+
+[data-theme="dark"] #theme-icon-dark {
+  opacity: 0;
+  transform: rotate(90deg);
+  pointer-events: none;
 }
 
 /* location.hash */
 :target::before {
   content: ">>> ";
-  color: #1371C9;
+  color: var(--link-color);
   font-weight: bold;
   font-size: 20px;
 }
@@ -21,13 +99,19 @@ body {
 }
 
 a {
-  color: #800;
+  color: var(--link-color);
   -webkit-transition-property: opacity, -webkit-transform, color, background-color, padding, -webkit-box-shadow;
   -webkit-transition-duration: 0.15s;
   -webkit-transition-timing-function: ease-out;
+  transition: opacity 0.15s ease-out, color 0.15s ease-out;
 }
 a:hover {
   opacity: 0.8;
+}
+a:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 #wrap {
   width: 600px;
@@ -43,21 +127,28 @@ h1 {
 }
 
 pre {
-  background: #eee;
-  padding: 5px;
-  border-radius: 3px;
+  background: var(--code-bg);
+  padding: 12px 16px;
+  border-radius: 6px;
   overflow-x: auto;
+  border: 1px solid var(--border-color);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 code {
-  color: #333;
+  color: var(--code-text);
   font-size: 11px;
   font-family: Consolas, "Liberation Mono", Courier, monospace;
+  background-color: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 pre code {
   border: 0 none;
   padding: 1.2em;
   overflow-x: auto;
+  background-color: transparent;
 }
+
 #header {
   text-align: center;
   padding-top: 20px;
@@ -83,14 +174,15 @@ h2 a {
   font-size: 146px;
   font-weight: 100;
   text-indent: -23px;
+  color: var(--brand-primary);
 }
 .load #header .mongoose {
   letter-spacing: -14px;
 }
 .tagline {
-  color: #333;
+  color: var(--text-secondary);
   font-size: 25px;
-  text-shadow: 1px 1px #f8f8f8;
+  text-shadow: 1px 1px var(--tagline-text-shadow);
   text-align: center;
   margin: 7px 0;
 }
@@ -102,7 +194,7 @@ h2 a {
 }
 .tagline a, .blurb a {
   text-decoration: none;
-  color: #800;
+  color: var(--brand-primary);
 }
 #links {
   margin: 50px 10px 20px;
@@ -116,10 +208,9 @@ h2 a {
 #links li {
   display: inline-block;
   margin: 0 15px;
-  background-color: #FEFEFE;
 }
 #links a {
-  background: #444;
+  background: var(--btn-bg);
   padding: 9px 0px;
   border-radius: 3px;
   color: white;
@@ -127,7 +218,7 @@ h2 a {
   display: inline-block;
   text-decoration: none;
   text-transform: lowercase;
-  text-shadow: 1px 1px 7px #222;
+  text-shadow: 1px 1px 7px var(--btn-text-shadow);
 }
 #follow {
   margin-bottom: 36px;
@@ -147,6 +238,20 @@ h2 a {
 #follow #version span {
   position: relative;
   top: -4px;
+}
+/* GitHub buttons iframe - use filter to invert colors in dark mode */
+.github-btn {
+  background: transparent;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .github-btn {
+    color-scheme: light;
+    filter: invert(0.85) hue-rotate(180deg);
+  }
+}
+[data-theme="dark"] .github-btn {
+  color-scheme: light;
+  filter: invert(0.85) hue-rotate(180deg);
 }
 #what {
   margin-bottom: 32px;
@@ -227,7 +332,7 @@ h2 a {
     margin: 0 12px;
   }
   #links a {
-    background: #444;
+    background: var(--btn-bg);
     padding: 7px 34px;
     font-size: 15px;
   }
@@ -277,7 +382,7 @@ h2 a {
 
 #tidelift-button {
   display: inline-block;
-  background-color: #444;
+  background-color: var(--btn-bg);
   padding-top: 9px;
   padding-left: 15px;
   padding-right: 15px;
@@ -287,7 +392,7 @@ h2 a {
   font-size: 20px;
   display: inline-block;
   text-decoration: none;
-  text-shadow: 1px 1px 7px #222;
+  text-shadow: 1px 1px 7px var(--btn-text-shadow);
   margin: auto;
 }
 #tidelift-button span {

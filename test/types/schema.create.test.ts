@@ -1645,7 +1645,7 @@ function gh13215() {
   >;
   type User = {
     userName: string;
-    date: Date;
+    date: NativeDate;
   } & { _id: Types.ObjectId };
 
   expectType<User>({} as RawDocType);
@@ -1654,11 +1654,18 @@ function gh13215() {
   type SchemaType = InferSchemaType<typeof schema>;
   expectType<{
     userName: string;
-    date: Date;
+    date: NativeDate;
     _id: Types.ObjectId;
   }>({} as SchemaType);
   type HydratedDoc = ObtainSchemaGeneric<typeof schema, 'THydratedDocumentType'>;
-  expectType<HydratedDocument<User>>({} as HydratedDoc);
+  expectType<HydratedDocument<
+    User,
+    {},
+    {},
+    {},
+    { userName: string; date: NativeDate; _id: Types.ObjectId; },
+    ResolveSchemaOptions<typeof schemaOptions>
+  >>({} as HydratedDoc);
 }
 
 function gh14825() {
@@ -1918,7 +1925,7 @@ async function testInferHydratedDocTypeFromSchema() {
     } & { _id: Types.ObjectId }
   >;
 
-  expectType<Expected>({} as HydratedDocType);
+  expectAssignable<Expected>({} as HydratedDocType);
 
   const def = {
     name: String,

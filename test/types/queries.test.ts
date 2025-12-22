@@ -863,5 +863,19 @@ async function gh15786() {
   }
 
   const schema = new Schema<IDoc, Model<IDoc>, {}, {}, {}, DocStatics>({});
-  schema.static({ m1() {} } as DocStatics);
+  schema.static({ m1() {} });
+}
+
+async function gh15779_2() {
+  interface Job {
+    _id: Types.ObjectId;
+    name: string;
+  }
+
+  const jobSchema = new Schema<Job>({ name: String });
+  const JobModel = model<Job>('Job', jobSchema);
+
+  const jobs = await JobModel.aggregate<Job>([
+    { $match: {} as QueryFilter<Job> }
+  ]);
 }

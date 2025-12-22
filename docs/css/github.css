@@ -1,31 +1,47 @@
 code {
-  background-color: #eee;
-  padding: 2px 4px;
+  background-color: var(--code-bg, #eee);
+  padding: 2px 6px;
   font-size: 0.9em;
-  color: #800;
+  color: var(--link-color, #800);
   border-radius: 4px;
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 pre code {
   background-color: transparent;
   padding: 0;
   font-size: 1em;
-  color: #222;
+  color: var(--code-text, #222);
+  line-height: 1.6;
+  display: block;
 }
 
 pre {
   display: block;
-  padding: 9.5px;
-  margin: 10px 0 10px;
+  padding: 12px 16px;
+  margin: 16px 0;
   font-size: 13px;
-  line-height: 1.42857143;
-  color: #333;
-  word-break: break-all;
-  word-wrap: break-word;
-  background-color: #f5f5f5;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+  line-height: 1.6;
+  color: var(--code-text, #333);
+  word-break: break-word;
+  overflow-wrap: break-word;
+  overflow-x: auto;
+  background-color: var(--code-bg, #f5f5f5);
+  border: 1px solid var(--border-color, #ccc);
+  border-radius: 6px;
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  box-shadow: 0 1px 3px var(--shadow, rgba(0, 0, 0, 0.1));
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Enable absolute positioning for copy button and improve hover effect */
+pre {
+  position: relative;
+}
+
+pre:hover {
+  box-shadow: 0 2px 6px var(--shadow, rgba(0, 0, 0, 0.15));
 }
 
 /*
@@ -38,9 +54,11 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
   display: block;
   overflow-x: auto;
   padding: 0.5em;
-  color: #333;
-  background: #f8f8f8;
+  color: var(--code-text, #333);
+  background: var(--code-bg, #f8f8f8);
   -webkit-text-size-adjust: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  line-height: 1.6;
 }
 
 .hljs-comment,
@@ -151,4 +169,181 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 
 .hljs-chunk {
   color: #aaa;
+}
+
+/* Dark mode support for syntax highlighting */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) code {
+    background-color: var(--code-bg);
+    color: var(--link-color);
+  }
+  :root:not([data-theme="light"]) pre {
+    background-color: var(--code-bg);
+    border-color: var(--border-color);
+    color: var(--code-text);
+  }
+  :root:not([data-theme="light"]) .hljs {
+    background: var(--code-bg);
+    color: var(--code-text);
+  }
+}
+
+[data-theme="dark"] code {
+  background-color: var(--code-bg);
+  color: var(--link-color);
+}
+
+[data-theme="dark"] pre {
+  background-color: var(--code-bg);
+  border-color: var(--border-color);
+  color: var(--code-text);
+}
+
+[data-theme="dark"] .hljs {
+  background: var(--code-bg);
+  color: var(--code-text);
+}
+
+[data-theme="dark"] .hljs-comment,
+[data-theme="dark"] .diff .hljs-header,
+[data-theme="dark"] .hljs-javadoc {
+  color: #6a9955;
+}
+
+[data-theme="dark"] .hljs-keyword,
+[data-theme="dark"] .css .rule .hljs-keyword,
+[data-theme="dark"] .hljs-winutils,
+[data-theme="dark"] .nginx .hljs-title,
+[data-theme="dark"] .hljs-subst,
+[data-theme="dark"] .hljs-request,
+[data-theme="dark"] .hljs-status {
+  color: #569cd6;
+  font-weight: bold;
+}
+
+[data-theme="dark"] .hljs-number,
+[data-theme="dark"] .hljs-hexcolor,
+[data-theme="dark"] .ruby .hljs-constant {
+  color: #b5cea8;
+}
+
+[data-theme="dark"] .hljs-string,
+[data-theme="dark"] .hljs-tag .hljs-value,
+[data-theme="dark"] .hljs-phpdoc,
+[data-theme="dark"] .hljs-dartdoc,
+[data-theme="dark"] .tex .hljs-formula {
+  color: #ce9178;
+}
+
+[data-theme="dark"] .hljs-title,
+[data-theme="dark"] .hljs-id,
+[data-theme="dark"] .scss .hljs-preprocessor {
+  color: #d7ba7d;
+  font-weight: bold;
+}
+
+[data-theme="dark"] .hljs-class .hljs-title,
+[data-theme="dark"] .hljs-type,
+[data-theme="dark"] .vhdl .hljs-literal,
+[data-theme="dark"] .tex .hljs-command {
+  color: #4ec9b0;
+  font-weight: bold;
+}
+
+[data-theme="dark"] .hljs-tag,
+[data-theme="dark"] .hljs-tag .hljs-title,
+[data-theme="dark"] .hljs-rules .hljs-property,
+[data-theme="dark"] .django .hljs-tag .hljs-keyword {
+  color: #569cd6;
+  font-weight: normal;
+}
+
+[data-theme="dark"] .hljs-attribute,
+[data-theme="dark"] .hljs-variable,
+[data-theme="dark"] .lisp .hljs-body {
+  color: #9cdcfe;
+}
+
+[data-theme="dark"] .hljs-regexp {
+  color: #d16969;
+}
+
+[data-theme="dark"] .hljs-symbol,
+[data-theme="dark"] .ruby .hljs-symbol .hljs-string,
+[data-theme="dark"] .lisp .hljs-keyword,
+[data-theme="dark"] .clojure .hljs-keyword,
+[data-theme="dark"] .scheme .hljs-keyword,
+[data-theme="dark"] .tex .hljs-special,
+[data-theme="dark"] .hljs-prompt {
+  color: #c586c0;
+}
+
+[data-theme="dark"] .hljs-built_in {
+  color: #4fc1ff;
+}
+
+[data-theme="dark"] .hljs-preprocessor,
+[data-theme="dark"] .hljs-pragma,
+[data-theme="dark"] .hljs-pi,
+[data-theme="dark"] .hljs-doctype,
+[data-theme="dark"] .hljs-shebang,
+[data-theme="dark"] .hljs-cdata {
+  color: #808080;
+  font-weight: bold;
+}
+
+[data-theme="dark"] .hljs-deletion {
+  background: #5a1d1d;
+  color: #f48771;
+}
+
+[data-theme="dark"] .hljs-addition {
+  background: #1e3a1e;
+  color: #b5cea8;
+}
+
+[data-theme="dark"] .diff .hljs-change {
+  background: #2d4d2d;
+  color: #4ec9b0;
+}
+
+[data-theme="dark"] .hljs-chunk {
+  color: #808080;
+}
+
+/* Accessibility: Ensure sufficient contrast for code */
+code,
+pre,
+.hljs {
+  /* WCAG AA compliant contrast ratios */
+  min-height: 1.5em;
+}
+
+/* Improve code block readability on small screens */
+@media (max-width: 768px) {
+  pre {
+    font-size: 12px;
+    padding: 10px;
+    margin: 12px 0;
+  }
+
+  code {
+    font-size: 0.85em;
+    padding: 2px 4px;
+  }
+}
+
+/* Print styles for code blocks */
+@media print {
+  pre {
+    border: 1px solid #ccc;
+    page-break-inside: avoid;
+    background: #f5f5f5;
+    color: #000;
+  }
+
+  code {
+    background: #f0f0f0;
+    color: #000;
+  }
 }

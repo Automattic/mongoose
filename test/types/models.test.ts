@@ -14,14 +14,14 @@ import mongoose, {
   UpdateQuery,
   UpdateWriteOpResult,
   WithLevel1NestedPaths,
-  createConnection,
   connection,
   model,
-  ObtainSchemaGeneric
+  UpdateOneModel,
+  UpdateManyModel
 } from 'mongoose';
 import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
-import { ModifyResult, UpdateOneModel, ChangeStreamInsertDocument, ObjectId } from 'mongodb';
+import { ModifyResult, UpdateOneModel as MongoUpdateOneModel, ChangeStreamInsertDocument, ObjectId } from 'mongodb';
 
 function rawDocSyntax(): void {
   interface ITest {
@@ -413,7 +413,7 @@ function gh11911() {
   const Animal = model<IAnimal>('Animal', animalSchema);
 
   const changes: UpdateQuery<IAnimal> = {};
-  expectAssignable<UpdateOneModel>({
+  expectAssignable<MongoUpdateOneModel>({
     filter: {},
     update: changes
   });
@@ -507,7 +507,7 @@ function gh12100() {
 })();
 
 
-function modelRemoveOptions() {
+async function modelRemoveOptions() {
   const cmodel = model('Test', new Schema());
 
   const res: DeleteResult = await cmodel.deleteOne({}, {});
@@ -1068,11 +1068,18 @@ async function gh15693() {
   }
 
   interface UserMethods {
+    printNamePrefixed(this: IUser, prefix: string): void;
     printName(this: IUser): void;
     getName(): string;
   }
 
   const schema = new Schema<IUser, Model<IUser>, UserMethods>({ name: { type: String, required: true } });
+  schema.method('printNamePrefixed', function printName(this: IUser, prefix: string) {
+    expectError(this.isModified('name'));
+    expectError(this.doesNotExist());
+    expectType<string>(this.name);
+    console.log(prefix + this.name);
+  });
   schema.method('printName', function printName(this: IUser) {
     expectError(this.isModified('name'));
     expectError(this.doesNotExist());
@@ -1087,5 +1094,38 @@ async function gh15693() {
 
   const leanInst = await User.findOne({}).lean().orFail();
   User.schema.methods.printName.apply(leanInst);
+  User.schema.methods.printNamePrefixed.call(leanInst, '');
+}
 
+async function gh15781() {
+  const userSchema = new Schema({
+    createdAt: { type: Date, immutable: true },
+    name: String
+  }, { timestamps: true });
+
+  const User = model('User', userSchema);
+
+  await User.bulkWrite([
+    {
+      updateOne: {
+        filter: { name: 'John' },
+        update: { createdAt: new Date() },
+        overwriteImmutable: true,
+        timestamps: false
+      }
+    },
+    {
+      updateMany: {
+        filter: { name: 'Jane' },
+        update: { createdAt: new Date() },
+        overwriteImmutable: true,
+        timestamps: false
+      }
+    }
+  ]);
+
+  expectType<boolean | undefined>({} as UpdateOneModel['timestamps']);
+  expectType<boolean | undefined>({} as UpdateOneModel['overwriteImmutable']);
+  expectType<boolean | undefined>({} as UpdateManyModel['timestamps']);
+  expectType<boolean | undefined>({} as UpdateManyModel['overwriteImmutable']);
 }

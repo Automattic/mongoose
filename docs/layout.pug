@@ -4,14 +4,22 @@ html(lang='en')
     meta(charset="utf-8")
     meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
     title Mongoose v#{package.version}: #{title}
+    //- Inline script to prevent flash of wrong theme - must run before CSS loads
+    script.
+      (function() {
+        var theme = localStorage.getItem('mongoose-theme');
+        if (theme) {
+          document.documentElement.setAttribute('data-theme', theme);
+        }
+      })();
     include ./includes/favicon
     block style
 
       link(rel="stylesheet", href="https://unpkg.com/purecss@1.0.1/build/pure-min.css", integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47", crossorigin="anonymous")
 
       link(rel="stylesheet", href="https://fonts.googleapis.com/css?family=Open+Sans")
-      link(rel="stylesheet", href=`${versions.versionedPath}/docs/css/github.css`)
-      link(rel="stylesheet", href=`${versions.versionedPath}/docs/css/mongoose5.css`)
+      link(rel="stylesheet", href=`${versions.versionedPath}/docs/css/mongoose5.css?v=${Date.now()}`)
+      link(rel="stylesheet", href=`${versions.versionedPath}/docs/css/github.css?v=${Date.now()}`)
       link(rel="stylesheet", href=`${versions.versionedPath}/docs/css/carbonads.css`)
       link(rel="stylesheet", href=`${versions.versionedPath}/docs/css/copy-code.css`)
 
@@ -23,18 +31,22 @@ html(lang='en')
   body
     block layout
       #layout
+        #theme-toggle
+          button#theme-toggle-btn(aria-label="Toggle dark mode" title="Toggle dark/light theme")
+            <svg id="theme-icon-light" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            <svg id="theme-icon-dark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         #mobile-menu
           a#menuLink.menu-link(href='#menu')
             <svg width="100%" height="100%" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg>
           #mobile-logo-container
             a(href="/")
-              img#logo(src=`${versions.versionedPath}/docs/images/mongoose5_62x30_transparent.png`)
+              span#logo(role="img" aria-label="Mongoose logo")
               span.logo-text mongoose
         #menu
           nav.pure-menu
             #logo-container.pure-menu-heading
               a(href="/")
-                img#logo(src=`${versions.versionedPath}/docs/images/mongoose5_62x30_transparent.png`)
+                span#logo(role="img" aria-label="Mongoose logo")
                 span.logo-text mongoose
             ul.pure-menu-list#navbar
               li.pure-menu-horizontal.pure-menu-item.pure-menu-has-children.pure-menu-allow-hover.version
@@ -174,5 +186,6 @@ html(lang='en')
 
         script(type="text/javascript" src=`${versions.versionedPath}/docs/js/navbar-search.js`)
         script(type="text/javascript" src=`${versions.versionedPath}/docs/js/mobile-navbar-toggle.js`)
+        script(type="text/javascript" src=`${versions.versionedPath}/docs/js/theme-toggle.js`)
 
         script(type="text/javascript" src=`${versions.versionedPath}/docs/js/copy-code.js`)

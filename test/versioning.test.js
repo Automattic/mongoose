@@ -732,4 +732,62 @@ describe('versioning', function() {
       return { User, user };
     }
   });
+
+  describe('optimisticConcurrency with array of fields preserves default array versioning (gh-15809)', function() {
+    const VERSION_INC = mongoose.Document.VERSION_INC;
+    const VERSION_WHERE = mongoose.Document.VERSION_WHERE;
+    const VERSION_ALL = mongoose.Document.VERSION_ALL;
+
+    it('sets VERSION_INC when pushing to array with optimisticConcurrency array option', async function() {
+      // Arrange
+      const { user } = await createTestContext();
+
+      // Act
+      user.tags.push('new-tag');
+      user.$__delta();
+
+      // Assert
+      assert.strictEqual(user.$__.version, VERSION_INC);
+    });
+
+    it('sets VERSION_WHERE when modifying array by index with optimisticConcurrency array option', async function() {
+      // Arrange
+      const { user } = await createTestContext();
+
+      // Act
+      user.tags.set(0, 'modified');
+      user.$__delta();
+
+      // Assert
+      assert.strictEqual(user.$__.version, VERSION_WHERE);
+    });
+
+    it('sets VERSION_ALL when modifying optimisticConcurrency field', async function() {
+      // Arrange
+      const { user } = await createTestContext();
+
+      // Act
+      user.balance = 200;
+      user.$__delta();
+
+      // Assert
+      assert.strictEqual(user.$__.version, VERSION_ALL);
+    });
+
+    async function createTestContext() {
+      const schema = new Schema({
+        balance: Number,
+        tags: [String]
+      }, { optimisticConcurrency: ['balance'] });
+
+      const User = db.model('Test', schema);
+
+      const user = await User.create({
+        balance: 100,
+        tags: ['tag1', 'tag2']
+      });
+
+      return { user };
+    }
+  });
 });

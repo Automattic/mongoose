@@ -1324,7 +1324,7 @@ describe('schema', function() {
       }
     });
 
-    describe('`enum` accepts an object to support TypeScript enums (gh-9546) (gh-9535)', function() {
+    describe('`enum` accepts an object to support TypeScript enums (gh-9546) (gh-9535) (gh-15913)', function() {
       it('strings', function() {
         // Arrange
         const userSchema = new Schema({
@@ -1419,6 +1419,43 @@ describe('schema', function() {
 
         // Assert
         assert.ifError(err);
+      });
+
+      it('supports TypeScript-style enums (numeric reverse-mapping and string enums)', function() {
+        const tsNumericEnum = {
+          0: 'Zero',
+          1: 'One',
+          Zero: 0,
+          One: 1
+        };
+
+        const tsStringEnum = {
+          Alpha: 'ALPHA',
+          Beta: 'BETA'
+        };
+
+        const userSchema = new Schema({
+          status: {
+            type: Number,
+            enum: tsNumericEnum
+          },
+          kind: {
+            type: String,
+            enum: tsStringEnum
+          }
+        });
+
+        const User = mongoose.model('User_gh15913_ts_' + random(), userSchema);
+
+        // invalid numeric and string values should fail
+        const badUser = new User({ status: 2, kind: 'GAMMA' });
+        const err = badUser.validateSync();
+        assert.ok(err);
+        assert.ok(err.errors.status);
+
+        // valid values should pass
+        const goodUser = new User({ status: 1, kind: 'BETA' });
+        assert.ifError(goodUser.validateSync());
       });
     });
 

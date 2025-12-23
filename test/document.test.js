@@ -6850,7 +6850,7 @@ describe('document', function() {
     let docRegexCount = 0;
     let docPostRegexCount = 0;
 
-    schema.pre('updateOne', { document: false, query: true }, function () {
+    schema.pre('updateOne', { document: false, query: true }, function() {
       ++queryCount;
       assert.strictEqual(this.options.testOption, 'newValue');
     });
@@ -6864,7 +6864,6 @@ describe('document', function() {
     schema.post('updateOne', { document: true, query: false }, () => {
       ++docPostCount;
     });
-
 
 
     schema.pre(/^updateOne$/, { document: true, query: false }, () => ++docRegexCount);

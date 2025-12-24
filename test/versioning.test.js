@@ -733,7 +733,7 @@ describe('versioning', function() {
     }
   });
 
-  describe('optimisticConcurrency with array of fields preserves default array versioning (gh-15809)', function() {
+  describe('optimisticConcurrency with array of fields preserves default array versioning (gh-15912)', function() {
     const VERSION_INC = mongoose.Document.VERSION_INC;
     const VERSION_WHERE = mongoose.Document.VERSION_WHERE;
     const VERSION_ALL = mongoose.Document.VERSION_ALL;

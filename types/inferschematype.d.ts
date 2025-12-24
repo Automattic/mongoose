@@ -112,7 +112,12 @@ declare module 'mongoose' {
       }[alias]
     : unknown;
 
-  type ResolveSchemaOptions<T> = MergeType<DefaultSchemaOptions, T>;
+  type TypesAreEqual<A, B> = [A] extends [B] ? [B] extends [A] ? true : false : false;
+
+  type ResolveSchemaOptions<T> =
+    keyof T extends never ? DefaultSchemaOptions :
+    TypesAreEqual<T, DefaultSchemaOptions> extends true ? DefaultSchemaOptions :
+    MergeType<DefaultSchemaOptions, T>;
 
   type ApplySchemaOptions<T, O = DefaultSchemaOptions> = ResolveTimestamps<T, O>;
 

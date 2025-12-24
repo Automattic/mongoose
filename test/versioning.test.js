@@ -732,4 +732,58 @@ describe('versioning', function() {
       return { User, user };
     }
   });
+
+  describe('optimisticConcurrency with { exclude: [] } option (gh-15915)', function() {
+    const VERSION_ALL = mongoose.Document.VERSION_ALL;
+
+    it('sets VERSION_ALL when modifying non-excluded field', async function() {
+      // Arrange
+      const { user } = await createTestContext();
+
+      // Act
+      user.balance = 200;
+      user.$__delta();
+
+      // Assert
+      assert.strictEqual(user.$__.version, VERSION_ALL);
+    });
+
+    it('does not set version when modifying only excluded fields', async function() {
+      // Arrange
+      const { user } = await createTestContext();
+
+      // Act
+      user.name = 'changed';
+      user.$__delta();
+
+      // Assert
+      assert.strictEqual(user.$__.version, undefined);
+    });
+
+    it('sets VERSION_ALL when modifying both excluded and non-excluded fields', async function() {
+      // Arrange
+      const { user } = await createTestContext();
+
+      // Act
+      user.name = 'changed';
+      user.balance = 200;
+      user.$__delta();
+
+      // Assert
+      assert.strictEqual(user.$__.version, VERSION_ALL);
+    });
+
+    async function createTestContext() {
+      const schema = new Schema({
+        name: String,
+        balance: Number
+      }, { optimisticConcurrency: { exclude: ['name'] } });
+      const User = db.model('Test', schema);
+      const user = await User.create({
+        name: 'test',
+        balance: 100
+      });
+      return { User, user };
+    }
+  });
 });

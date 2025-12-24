@@ -1148,7 +1148,7 @@ async function gh15910() {
   const test: mongoose.AnyBulkWriteOperation<FooType>[] = [
     {
       updateOne: {
-        filter: query, // Error here
+        filter: query,
         update: {
           $set: {
             date: new Date()

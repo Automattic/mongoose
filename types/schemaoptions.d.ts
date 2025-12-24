@@ -111,8 +111,9 @@ declare module 'mongoose' {
     /**
      * Optimistic concurrency is a strategy to ensure the document you're updating didn't change between when you
      * loaded it using find() or findOne(), and when you update it using save(). Set to `true` to enable
-     * optimistic concurrency. Set to string array to enable optimistic concurrency for only certain fields,
-     * or `{ exclude: string[] }` to define a list of fields to ignore for optimistic concurrency.
+     * optimistic concurrency for all fields. Set to a string array to add optimistic concurrency for specific fields
+     * in addition to the default array versioning. Set to `{ exclude: string[] }` to enable optimistic concurrency
+     * for all fields except the specified ones.
      */
     optimisticConcurrency?: boolean | string[] | { exclude: string[] };
     /**

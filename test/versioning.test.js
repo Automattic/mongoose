@@ -733,7 +733,7 @@ describe('versioning', function() {
     }
   });
 
-  describe('optimisticConcurrency', function() {
+  describe('optimisticConcurrency (gh-15912) (gh-15915)', function() {
     const VERSION_ALL = mongoose.Document.VERSION_ALL;
 
     describe('optimisticConcurrency: true', function() {

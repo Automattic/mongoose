@@ -13,9 +13,10 @@ const fixtures = require('./mocha-fixtures.js');
 
 await fixtures.mochaGlobalSetup();
 
+// Script path must come before args, otherwise Deno interprets them as its own CLI flags
 const child_args = [
-  ...Deno.args,
-  resolve(fileURLToPath(import.meta.url), '../deno_mocha.mjs')
+  resolve(fileURLToPath(import.meta.url), '../deno_mocha.mjs'),
+  ...Deno.args
 ];
 
 const child = spawn(process.execPath, child_args, { stdio: 'inherit' });

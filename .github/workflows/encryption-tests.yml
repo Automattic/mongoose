@@ -48,4 +48,4 @@ jobs:
       - name: Setup Tests
         run: npm run setup-test-encryption
       - name: Run Tests
-        run: npm run test-encryption
+        run: npm run test-encryption:ci

@@ -9282,6 +9282,25 @@ describe('Model', function() {
         assert.ok(error.message.includes('Parameter "doc" to init() must be an object'));
       }
     });
+
+    it('should only select _id when checking document existence', async function() {
+      // Arrange
+      const testSchema = new Schema({ name: String, largeField: Buffer });
+      const Test = db.model('Test', testSchema);
+      const doc = await Test.create({ name: 'test', largeField: Buffer.alloc(1024) });
+
+      const findOneSpy = sinon.spy(Test.collection, 'findOne');
+
+      // Act
+      await doc.save();
+
+      // Assert
+      assert.equal(findOneSpy.calledOnce, true);
+      const callArgs = findOneSpy.firstCall.args;
+      assert.deepEqual(callArgs[1].projection, { _id: 1 });
+
+      findOneSpy.restore();
+    });
   });
 });
 

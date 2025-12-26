@@ -96,6 +96,7 @@
     "test": "mocha --exit ./test/*.test.js",
     "test:ci": "mocha --reporter min --exit ./test/*.test.js",
     "test-deno": "deno run --allow-env --allow-read --allow-net --allow-run --allow-sys --allow-write ./test/deno.mjs",
+    "test-deno:ci": "deno run --allow-env --allow-read --allow-net --allow-run --allow-sys --allow-write ./test/deno.mjs --reporter min",
     "test-rs": "START_REPLICA_SET=1 mocha --timeout 30000 --exit ./test/*.test.js",
     "test-rs:ci": "START_REPLICA_SET=1 mocha --reporter min --timeout 30000 --exit ./test/*.test.js",
     "test-tsd": "node ./test/types/check-types-filename && tsd --full",

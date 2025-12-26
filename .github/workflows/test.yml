@@ -103,7 +103,7 @@ jobs:
       - run: deno --version
       - run: npm install
       - name: Run Deno tests
-        run: npm run test-deno
+        run: npm run test-deno:ci
 
   test-atlas-cli:
     runs-on: ubuntu-22.04

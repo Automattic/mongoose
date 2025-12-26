@@ -2,7 +2,7 @@ declare module 'mongoose' {
   /**
      * [Stages reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation-pipeline/#aggregation-pipeline-stages)
      */
-  export type PipelineStage =
+  export type PipelineStage<TSchema = any> =
     | PipelineStage.AddFields
     | PipelineStage.Bucket
     | PipelineStage.BucketAuto
@@ -19,7 +19,7 @@ declare module 'mongoose' {
     | PipelineStage.Limit
     | PipelineStage.ListSessions
     | PipelineStage.Lookup
-    | PipelineStage.Match
+    | PipelineStage.Match<TSchema>
     | PipelineStage.Merge
     | PipelineStage.Out
     | PipelineStage.PlanCacheStats
@@ -114,7 +114,7 @@ declare module 'mongoose' {
       $facet: Record<string, FacetPipelineStage[]>;
     }
 
-    export type FacetPipelineStage = Exclude<PipelineStage, PipelineStage.CollStats | PipelineStage.Facet | PipelineStage.GeoNear | PipelineStage.IndexStats | PipelineStage.Out | PipelineStage.Merge | PipelineStage.PlanCacheStats>;
+    export type FacetPipelineStage<TSchema=any> = Exclude<PipelineStage<TSchema>, PipelineStage.CollStats | PipelineStage.Facet | PipelineStage.GeoNear | PipelineStage.IndexStats | PipelineStage.Out | PipelineStage.Merge | PipelineStage.PlanCacheStats>;
 
     export interface GeoNear {
       /** [`$geoNear` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/geoNear/) */
@@ -182,9 +182,9 @@ declare module 'mongoose' {
       }
     }
 
-    export interface Match {
+    export interface Match<TSchema = any> {
       /** [`$match` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/match/) */
-      $match: QueryFilter<any>;
+      $match: QueryFilter<TSchema>;
     }
 
     export interface Merge {

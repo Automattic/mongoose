@@ -1212,7 +1212,7 @@ await house.save();
 ```
 
 You can also set `optimisticConcurrency` to an array of field names to only use optimistic concurrency when one of those fields is modified.
-Note that setting `optimisticConcurrency` to an array of field names **disables the default array versioning behavior**.
+Note that setting `optimisticConcurrency` to an array of field names **replaces the default array versioning behavior**.
 For example, if you set `optimisticConcurrency: ['status']`, Mongoose will only throw a `VersionError` if `status` is modified concurrently, and will **not** throw a `VersionError` if an array like `photos` is modified concurrently.
 
 ```javascript
@@ -1223,7 +1223,7 @@ const House = mongoose.model('House', Schema({
 ```
 
 You can also set `optimisticConcurrency` to an object with an `exclude` property to exclude certain fields from optimistic concurrency.
-This enables optimistic concurrency for all fields except the excluded fields, while still disabling default array versioning.
+This enables optimistic concurrency for all fields except the excluded fields, while still replacing default array versioning behavior.
 
 ```javascript
 const House = mongoose.model('House', Schema({

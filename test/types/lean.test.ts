@@ -1,5 +1,6 @@
 import mongoose, { Schema, model, Types, InferSchemaType, FlattenMaps, HydratedDocument, Model, Document, PopulatedDoc } from 'mongoose';
-import { expectAssignable, expectType } from 'tsd';
+import { expectAssignable } from 'tsd';
+import { Expect, Equal } from './helpers';
 
 function gh10345() {
   (function() {
@@ -45,7 +46,7 @@ async function gh11761() {
   {
     // make sure _id has been added to the type
     const { _id, ...thing1 } = (await ThingModel.create({ name: 'thing1' })).toObject();
-    expectType<Types.ObjectId>(_id);
+    Expect<Equal<typeof _id, Types.ObjectId>>();
 
     console.log({ _id, thing1 });
   }
@@ -56,7 +57,7 @@ async function gh11761() {
       return;
     }
     const { _id, ...thing2 } = foundDoc;
-    expectType<Types.ObjectId>(foundDoc._id);
+    Expect<Equal<typeof _id, Types.ObjectId>>();
   }
 }
 
@@ -115,13 +116,13 @@ async function _11767() {
   // expectError<Function>(examFound.questions.$pop);
   // popoulated shouldn't be on the question doc because it shouldn't
   // be a mongoose subdocument anymore
-  expectType<string[]>(examFound.questions[0].answers);
+  Expect<Equal<typeof examFound.questions[0]['answers'], string[]>>();
 
   const examFound2 = await ExamModel.findOne().exec();
   if (!examFound2) return;
   const examFound2Obj = examFound2.toObject();
 
-  expectType<string[]>(examFound2Obj.questions[0].answers);
+  Expect<Equal<typeof examFound2Obj.questions[0]['answers'], string[]>>();
 }
 
 async function gh13010() {
@@ -139,7 +140,7 @@ async function gh13010() {
   });
 
   const country = await CountryModel.findOne().lean().orFail().exec();
-  expectType<Record<string, string>>(country.name);
+  Expect<Equal<typeof country.name, Record<string, string>>>();
 }
 
 async function gh13010_1() {
@@ -157,7 +158,8 @@ async function gh13010_1() {
   });
 
   const country = await CountryModel.findOne().lean().orFail().exec();
-  expectType<Record<string, string>>(country.name);
+
+  Expect<Equal<typeof country.name, Record<string, string>>>();
 }
 
 async function gh13345_1() {
@@ -193,7 +195,8 @@ async function gh13345_2() {
 
   const place = await PlaceModel.findOne().lean().orFail().exec();
   expectAssignable<FlattenMaps<Place>>(place);
-  expectType<Record<string, string>>(place.images[0].description);
+
+  Expect<Equal<typeof place.images[0]['description'], Record<string, string>>>();
 }
 
 async function gh13345_3() {
@@ -374,7 +377,7 @@ async function leanFalse() {
   type TestDocument = ReturnType<(typeof Test)['hydrate']>;
 
   const doc = await Test.findOne().orFail().lean(false);
-  expectType<TestDocument>(doc);
+  Expect<Equal<typeof doc, TestDocument>>();
 }
 
 async function gh15583() {
@@ -394,7 +397,7 @@ async function gh15583() {
   const TestModel = model('Test', schema);
 
   const testDoc = await TestModel.findOne().lean<TRawDocType & { transformed: boolean }>().orFail();
-  expectType<boolean>(testDoc.transformed);
+  Expect<Equal<typeof testDoc.transformed, boolean>>();
 }
 
 async function gh15583_2() {

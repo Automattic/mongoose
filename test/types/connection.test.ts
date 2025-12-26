@@ -2,18 +2,24 @@ import { createConnection, Schema, Collection, Connection, ConnectionSyncIndexes
 import * as mongodb from 'mongodb';
 import { expectAssignable, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
+import { Expect, Equal } from './helpers';
 
-expectType<Connection>(createConnection());
-expectType<Connection>(createConnection('mongodb://127.0.0.1:27017/test'));
-expectType<Connection>(createConnection('mongodb://127.0.0.1:27017/test', { appName: 'mongoose' }));
+Expect<Equal<ReturnType<typeof createConnection>, Connection>>();
+const createConnectionWithUri = () => createConnection('mongodb://127.0.0.1:27017/test');
+Expect<Equal<ReturnType<typeof createConnectionWithUri>, Connection>>();
+const createConnectionWithUriAndOptions = () => createConnection('mongodb://127.0.0.1:27017/test', { appName: 'mongoose' });
+Expect<Equal<ReturnType<typeof createConnectionWithUriAndOptions>, Connection>>();
 
 const conn = createConnection();
 
 expectAssignable<Model<{ name: string }, any, any, any>>(conn.model('Test', new Schema<{ name: string }>({ name: { type: String } })));
-expectType<Model<{ name: string }>>(conn.model<{ name: string }>('Test', new Schema({ name: { type: String } })));
+const modelWithRawDocType = conn.model<{ name: string }>('Test', new Schema({ name: { type: String } }));
+Expect<Equal<typeof modelWithRawDocType, Model<{ name: string }>>>();
 
-expectType<Promise<Connection>>(conn.openUri('mongodb://127.0.0.1:27017/test'));
-expectType<Promise<Connection>>(conn.openUri('mongodb://127.0.0.1:27017/test', { bufferCommands: true }));
+const openUriWithUri = () => conn.openUri('mongodb://127.0.0.1:27017/test');
+Expect<Equal<ReturnType<typeof openUriWithUri>, Promise<Connection>>>();
+const openUriWithUriAndOptions = () => conn.openUri('mongodb://127.0.0.1:27017/test', { appName: 'mongoose' });
+Expect<Equal<ReturnType<typeof openUriWithUriAndOptions>, Promise<Connection>>>();
 
 conn.readyState === 0;
 conn.readyState === 99;
@@ -21,28 +27,33 @@ conn.readyState === 99;
 // @ts-expect-error
 conn.readyState = 0;
 
-expectType<Promise<Record<string, Error | mongodb.Collection<any>>>>(
-  conn.createCollections()
-);
+const collections = conn.createCollections();
+Expect<Equal<typeof collections, Promise<Record<string, Error | mongodb.Collection<any>>>>>();
 
-expectType<Connection>(new Connection());
-expectType<Promise<Connection>>(new Connection().asPromise());
+Expect<Equal<ReturnType<(typeof conn)['asPromise']>, Promise<Connection>>>();
 
-expectType<Promise<mongodb.Collection<{ [key: string]: any }>>>(conn.createCollection('some'));
+const createCollectionResult = conn.createCollection('some');
+Expect<Equal<typeof createCollectionResult, Promise<mongodb.Collection<{ [key: string]: any }>>>>();
 
-expectType<Promise<void>>(conn.dropCollection('some'));
+const dropCollectionResult = conn.dropCollection('some');
+Expect<Equal<typeof dropCollectionResult, Promise<void>>>();
 
 // @ts-expect-error
 conn.deleteModel();
-expectType<Connection>(conn.deleteModel('something'));
-expectType<Connection>(conn.deleteModel(/.+/));
+const deleteModelWithString = () => conn.deleteModel('something');
+Expect<Equal<ReturnType<typeof deleteModelWithString>, Connection>>();
+const deleteModelWithRegexp = () => conn.deleteModel(/.+/);
+Expect<Equal<ReturnType<typeof deleteModelWithRegexp>, Connection>>();
 
-expectType<Array<string>>(conn.modelNames());
+const modelNames = conn.modelNames();
+Expect<Equal<typeof modelNames, string[]>>();
 
-expectType<Promise<void>>(createConnection('mongodb://127.0.0.1:27017/test').close());
-expectType<Promise<void>>(createConnection('mongodb://127.0.0.1:27017/test').close(true));
+const close = () => createConnection('mongodb://127.0.0.1:27017/test').close();
+Expect<Equal<ReturnType<typeof close>, Promise<void>>>();
+const closeWithForce = () => createConnection('mongodb://127.0.0.1:27017/test').close(true);
+Expect<Equal<ReturnType<typeof closeWithForce>, Promise<void>>>();
 
-expectType<mongodb.Db | undefined>(conn.db);
+Expect<Equal<typeof conn.db, mongodb.Db | undefined>>();
 
 expectType<mongodb.MongoClient>(conn.getClient());
 expectType<Connection>(conn.setClient(new mongodb.MongoClient('mongodb://127.0.0.1:27017/test')));

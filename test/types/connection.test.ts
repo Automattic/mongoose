@@ -1,25 +1,20 @@
 import { createConnection, Schema, Collection, Connection, ConnectionSyncIndexesResult, InferSchemaType, Model, connection, HydratedDocument, Query } from 'mongoose';
 import * as mongodb from 'mongodb';
-import { expectAssignable, expectType } from 'tsd';
+import { expectAssignable } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
-import { Expect, Equal } from './helpers';
+import { ExpectType } from './helpers';
 
-Expect<Equal<ReturnType<typeof createConnection>, Connection>>();
-const createConnectionWithUri = () => createConnection('mongodb://127.0.0.1:27017/test');
-Expect<Equal<ReturnType<typeof createConnectionWithUri>, Connection>>();
-const createConnectionWithUriAndOptions = () => createConnection('mongodb://127.0.0.1:27017/test', { appName: 'mongoose' });
-Expect<Equal<ReturnType<typeof createConnectionWithUriAndOptions>, Connection>>();
+ExpectType<Connection>()(createConnection());
+ExpectType<Connection>()(createConnection('mongodb://127.0.0.1:27017/test'));
+ExpectType<Connection>()(createConnection('mongodb://127.0.0.1:27017/test', { appName: 'mongoose' }));
 
 const conn = createConnection();
 
 expectAssignable<Model<{ name: string }, any, any, any>>(conn.model('Test', new Schema<{ name: string }>({ name: { type: String } })));
-const modelWithRawDocType = conn.model<{ name: string }>('Test', new Schema({ name: { type: String } }));
-Expect<Equal<typeof modelWithRawDocType, Model<{ name: string }>>>();
+ExpectType<Model<{ name: string }>>()(conn.model<{ name: string }>('Test', new Schema({ name: { type: String } })));
 
-const openUriWithUri = () => conn.openUri('mongodb://127.0.0.1:27017/test');
-Expect<Equal<ReturnType<typeof openUriWithUri>, Promise<Connection>>>();
-const openUriWithUriAndOptions = () => conn.openUri('mongodb://127.0.0.1:27017/test', { appName: 'mongoose' });
-Expect<Equal<ReturnType<typeof openUriWithUriAndOptions>, Promise<Connection>>>();
+ExpectType<Promise<Connection>>()(conn.openUri('mongodb://127.0.0.1:27017/test'));
+ExpectType<Promise<Connection>>()(conn.openUri('mongodb://127.0.0.1:27017/test', { bufferCommands: true }));
 
 conn.readyState === 0;
 conn.readyState === 99;
@@ -27,48 +22,44 @@ conn.readyState === 99;
 // @ts-expect-error
 conn.readyState = 0;
 
-const collections = conn.createCollections();
-Expect<Equal<typeof collections, Promise<Record<string, Error | mongodb.Collection<any>>>>>();
 
-Expect<Equal<ReturnType<(typeof conn)['asPromise']>, Promise<Connection>>>();
+ExpectType<Promise<Record<string, Error | mongodb.Collection<any>>>>()(
+  conn.createCollections()
+);
 
-const createCollectionResult = conn.createCollection('some');
-Expect<Equal<typeof createCollectionResult, Promise<mongodb.Collection<{ [key: string]: any }>>>>();
+ExpectType<Connection>()(new Connection());
+ExpectType<Promise<Connection>>()(new Connection().asPromise());
 
-const dropCollectionResult = conn.dropCollection('some');
-Expect<Equal<typeof dropCollectionResult, Promise<void>>>();
+ExpectType<Promise<mongodb.Collection<{ [key: string]: any }>>>()(conn.createCollection('some'));
+
+ExpectType<Promise<void>>()(conn.dropCollection('some'));
 
 // @ts-expect-error
 conn.deleteModel();
-const deleteModelWithString = () => conn.deleteModel('something');
-Expect<Equal<ReturnType<typeof deleteModelWithString>, Connection>>();
-const deleteModelWithRegexp = () => conn.deleteModel(/.+/);
-Expect<Equal<ReturnType<typeof deleteModelWithRegexp>, Connection>>();
+ExpectType<Connection>()(conn.deleteModel('something'));
+ExpectType<Connection>()(conn.deleteModel(/.+/));
 
-const modelNames = conn.modelNames();
-Expect<Equal<typeof modelNames, string[]>>();
+ExpectType<Array<string>>()(conn.modelNames());
 
-const close = () => createConnection('mongodb://127.0.0.1:27017/test').close();
-Expect<Equal<ReturnType<typeof close>, Promise<void>>>();
-const closeWithForce = () => createConnection('mongodb://127.0.0.1:27017/test').close(true);
-Expect<Equal<ReturnType<typeof closeWithForce>, Promise<void>>>();
+ExpectType<Promise<void>>()(createConnection('mongodb://127.0.0.1:27017/test').close());
+ExpectType<Promise<void>>()(createConnection('mongodb://127.0.0.1:27017/test').close(true));
 
-Expect<Equal<typeof conn.db, mongodb.Db | undefined>>();
+ExpectType<mongodb.Db | undefined>()(conn.db);
 
-expectType<mongodb.MongoClient>(conn.getClient());
-expectType<Connection>(conn.setClient(new mongodb.MongoClient('mongodb://127.0.0.1:27017/test')));
+ExpectType<mongodb.MongoClient>()(conn.getClient());
+ExpectType<Connection>()(conn.setClient(new mongodb.MongoClient('mongodb://127.0.0.1:27017/test')));
 
-expectType<Promise<string>>(conn.transaction(async(res) => {
-  expectType<mongodb.ClientSession>(res);
+ExpectType<Promise<string>>()(conn.transaction(async(res) => {
+  ExpectType<mongodb.ClientSession>()(res);
   return 'a';
 }));
-expectType<Promise<string>>(conn.transaction(async(res) => {
-  expectType<mongodb.ClientSession>(res);
+ExpectType<Promise<string>>()(conn.transaction(async(res) => {
+  ExpectType<mongodb.ClientSession>()(res);
   return 'a';
 }, { readConcern: 'majority' }));
 
-expectType<Promise<string>>(conn.withSession(async(res) => {
-  expectType<mongodb.ClientSession>(res);
+ExpectType<Promise<string>>()(conn.withSession(async(res) => {
+  ExpectType<mongodb.ClientSession>()(res);
   return 'a';
 }));
 
@@ -81,24 +72,24 @@ conn.host = 'invalid';
 // @ts-expect-error
 conn.port = 'invalid';
 
-expectType<Collection>(conn.collection('test'));
-expectType<mongodb.Collection | undefined>(conn.db?.collection('test'));
+ExpectType<Collection>()(conn.collection('test'));
+ExpectType<mongodb.Collection | undefined>()(conn.db?.collection('test'));
 
-expectType<Promise<mongodb.ClientSession>>(conn.startSession());
-expectType<Promise<mongodb.ClientSession>>(conn.startSession({ causalConsistency: true }));
+ExpectType<Promise<mongodb.ClientSession>>()(conn.startSession());
+ExpectType<Promise<mongodb.ClientSession>>()(conn.startSession({ causalConsistency: true }));
 
-expectType<Promise<ConnectionSyncIndexesResult>>(conn.syncIndexes());
-expectType<Promise<ConnectionSyncIndexesResult>>(conn.syncIndexes({ continueOnError: true }));
+ExpectType<Promise<ConnectionSyncIndexesResult>>()(conn.syncIndexes());
+ExpectType<Promise<ConnectionSyncIndexesResult>>()(conn.syncIndexes({ continueOnError: true }));
 
-expectType<Connection>(conn.useDb('test'));
-expectType<Connection>(conn.useDb('test', {}));
-expectType<Connection>(conn.useDb('test', { useCache: true }));
+ExpectType<Connection>()(conn.useDb('test'));
+ExpectType<Connection>()(conn.useDb('test', {}));
+ExpectType<Connection>()(conn.useDb('test', { useCache: true }));
 
-expectType<Promise<string[]>>(
+ExpectType<Promise<string[]>>()(
   conn.listCollections().then(collections => collections.map(coll => coll.name))
 );
 
-expectType<Promise<string[]>>(
+ExpectType<Promise<string[]>>()(
   conn.listDatabases().then(dbs => dbs.databases.map(db => db.name))
 );
 
@@ -110,22 +101,22 @@ export function autoTypedModelConnection() {
   // Model-functions-test
   // Create should works with arbitrary objects.
     const randomObject = await AutoTypedModel.create({ unExistKey: 'unExistKey', description: 'st' } as Partial<InferSchemaType<typeof AutoTypedSchema>>);
-    expectType<AutoTypedSchemaType['schema']['userName']>(randomObject.userName);
+    ExpectType<AutoTypedSchemaType['schema']['userName']>()(randomObject.userName);
 
     const testDoc1 = await AutoTypedModel.create({ userName: 'M0_0a' });
-    expectType<AutoTypedSchemaType['schema']['userName']>(testDoc1.userName);
-    expectType<AutoTypedSchemaType['schema']['description']>(testDoc1.description);
+    ExpectType<AutoTypedSchemaType['schema']['userName']>()(testDoc1.userName);
+    ExpectType<AutoTypedSchemaType['schema']['description']>()(testDoc1.description);
 
     const testDoc2 = await AutoTypedModel.insertMany([{ userName: 'M0_0a' }]);
-    expectType<AutoTypedSchemaType['schema']['userName']>(testDoc2[0].userName);
-    expectType<AutoTypedSchemaType['schema']['description'] | undefined>(testDoc2[0]?.description);
+    ExpectType<AutoTypedSchemaType['schema']['userName']>()(testDoc2[0].userName);
+    ExpectType<AutoTypedSchemaType['schema']['description'] | undefined>()(testDoc2[0]?.description);
 
     const testDoc3 = await AutoTypedModel.findOne({ userName: 'M0_0a' });
-    expectType<AutoTypedSchemaType['schema']['userName'] | undefined>(testDoc3?.userName);
-    expectType<AutoTypedSchemaType['schema']['description'] | undefined>(testDoc3?.description);
+    ExpectType<AutoTypedSchemaType['schema']['userName'] | undefined>()(testDoc3?.userName);
+    ExpectType<AutoTypedSchemaType['schema']['description'] | undefined>()(testDoc3?.description);
 
     // Model-statics-functions-test
-    expectType<ReturnType<AutoTypedSchemaType['statics']['staticFn']>>(AutoTypedModel.staticFn());
+    ExpectType<ReturnType<AutoTypedSchemaType['statics']['staticFn']>>()(AutoTypedModel.staticFn());
 
   })();
   return AutoTypedModel;
@@ -172,21 +163,21 @@ function schemaInstanceMethodsAndQueryHelpersOnConnection() {
 
 async function gh15359() {
   const res = await conn.bulkWrite([{ model: 'Test', name: 'insertOne', document: { name: 'test1' } }]);
-  expectType<number>(res.insertedCount);
+  ExpectType<number>()(res.insertedCount);
   // @ts-expect-error
   res.mongoose.validationErrors;
 
   const res2 = await conn.bulkWrite([{ model: 'Test', name: 'insertOne', document: { name: 'test2' } }], { ordered: false });
-  expectType<number>(res2.insertedCount);
-  expectType<Error[] | undefined>(res2.mongoose?.validationErrors);
+  ExpectType<number>()(res2.insertedCount);
+  ExpectType<Error[] | undefined>()(res2.mongoose?.validationErrors);
 
   const res3 = await conn.bulkWrite([
     { model: 'Test', name: 'updateOne', filter: { name: 'test5' }, update: { $set: { num: 42 } } },
     { model: 'Test', name: 'updateOne', filter: { name: 'test4' }, update: { $set: { num: 'not a number' } } }
   ], { ordered: false });
-  expectType<number>(res3.insertedCount);
+  ExpectType<number>()(res3.insertedCount);
 
   // @ts-expect-error
   res3.mongoose.validationErrors;
-  expectType<Error[] | undefined>(res3.mongoose?.validationErrors);
+  ExpectType<Error[] | undefined>()(res3.mongoose?.validationErrors);
 }

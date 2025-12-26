@@ -1,5 +1,5 @@
 import { Schema, model, Document, Expression, PipelineStage, Types, Model, Aggregate } from 'mongoose';
-import { Expect, Equal } from './helpers';
+import { ExpectType } from './helpers';
 
 const schema = new Schema({ name: { type: 'String' } });
 
@@ -25,9 +25,8 @@ async function run() {
   const res2: Array<ITest> = await Test.aggregate<ITest>([{ $match: { name: 'foo' } }]);
   console.log(res2[0].name);
 
-  const agg = Test.aggregate<ITest>([{ $match: { name: 'foo' } }]);
-  Expect<Equal<(typeof agg)['options']['maxTimeMS'], number | undefined>>();
-  Expect<Equal<(typeof agg)['options']['allowDiskUse'], boolean | undefined>>();
+  ExpectType<number | undefined>()(Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).options.maxTimeMS);
+  ExpectType<boolean | undefined>()(Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).options.allowDiskUse);
   Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).option({ maxTimeMS: 222 });
 
   await Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).cursor().eachAsync(async(res) => {
@@ -40,43 +39,32 @@ async function run() {
 
   function eachAsync(): void {
     Test.aggregate().cursor().eachAsync((doc) => {
-      Expect<Equal<typeof doc, any>>();
+      ExpectType<any>()(doc);
     });
     Test.aggregate().cursor().eachAsync((docs) => {
-      Expect<Equal<typeof docs, any[]>>();
+      ExpectType<any[]>()(docs);
     }, { batchSize: 2 });
     Test.aggregate().cursor<ITest>().eachAsync((doc) => {
-      Expect<Equal<typeof doc, ITest>>();
+      ExpectType<ITest>()(doc);
     });
     Test.aggregate().cursor<ITest>().eachAsync((docs) => {
-      Expect<Equal<typeof docs, ITest[]>>();
+      ExpectType<ITest[]>()(docs);
     }, { batchSize: 2 });
   }
 
   // Aggregate.prototype.sort()
-  const agg2 = Test.aggregate<ITest>();
-  let docs = await Test.aggregate<ITest>().sort('-name');
-  Expect<Equal<typeof docs, ITest[]>>();
-  docs = await Test.aggregate<ITest>().sort({ name: 1 });
-  Expect<Equal<typeof docs, ITest[]>>();
-  docs = await Test.aggregate<ITest>().sort({ name: -1 });
-  Expect<Equal<typeof docs, ITest[]>>();
-  docs = await Test.aggregate<ITest>().sort({ name: 'asc' });
-  Expect<Equal<typeof docs, ITest[]>>();
-  docs = await Test.aggregate<ITest>().sort({ name: 'ascending' });
-  Expect<Equal<typeof docs, ITest[]>>();
-  docs = await Test.aggregate<ITest>().sort({ name: 'desc' });
-  Expect<Equal<typeof docs, ITest[]>>();
-  docs = await Test.aggregate<ITest>().sort({ name: 'descending' });
-  Expect<Equal<typeof docs, ITest[]>>();
-  docs = await Test.aggregate<ITest>().sort({ name: { $meta: 'textScore' } });
-  Expect<Equal<typeof docs, ITest[]>>();
+  ExpectType<ITest[]>()(await Test.aggregate<ITest>().sort('-name'));
+  ExpectType<ITest[]>()(await Test.aggregate<ITest>().sort({ name: 1 }));
+  ExpectType<ITest[]>()(await Test.aggregate<ITest>().sort({ name: -1 }));
+  ExpectType<ITest[]>()(await Test.aggregate<ITest>().sort({ name: 'asc' }));
+  ExpectType<ITest[]>()(await Test.aggregate<ITest>().sort({ name: 'ascending' }));
+  ExpectType<ITest[]>()(await Test.aggregate<ITest>().sort({ name: 'desc' }));
+  ExpectType<ITest[]>()(await Test.aggregate<ITest>().sort({ name: 'descending' }));
+  ExpectType<ITest[]>()(await Test.aggregate<ITest>().sort({ name: { $meta: 'textScore' } }));
 
   // Aggregate.prototype.model()
-  const model = Test.aggregate<ITest>().model();
-  Expect<Equal<typeof model, Model<any>>>();
-  const agg3 = Test.aggregate<ITest>().model(AnotherTest);
-  Expect<Equal<typeof agg3, Aggregate<ITest[]>>>();
+  ExpectType<Model<any>>()(Test.aggregate<ITest>().model());
+  ExpectType<Aggregate<ITest[]>>()(Test.aggregate<ITest>().model(AnotherTest));
 }
 
 function gh12017_1() {

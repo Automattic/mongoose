@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import { Expect, Equal } from './helpers';
+import { ExpectType } from './helpers';
 
 Object.values(mongoose.models).forEach(model => {
   model.modelName;
@@ -23,15 +23,14 @@ function gh10746() {
   let testVar: A;
   testVar = 'A string';
   testVar = 'B string';
-  Expect<Equal<typeof testVar, string>>();
+  ExpectType<string>()(testVar);
 }
 
 function gh10957() {
   type TestType = { name: string };
   const obj: TestType = { name: 'foo' };
 
-  const ret = mongoose.trusted(obj);
-  Expect<Equal<typeof ret, TestType>>();
+  ExpectType<TestType>()(mongoose.trusted(obj));
 }
 
 function connectionStates() {

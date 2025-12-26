@@ -71,10 +71,10 @@ jobs:
       # Create ./node_modules/mongoose-separate-require-instance for testing multiple require instances
       - run: npm run create-separate-require-instance
       - name: NPM Test without Coverage
-        run: npm test
+        run: npm run test:ci
         if: matrix.coverage != true
       - name: NPM Test with Coverage
-        run: npm run test-coverage
+        run: npm run test-coverage:ci
         if: matrix.coverage == true
 
   test-deno:
@@ -123,7 +123,7 @@ jobs:
           node-version: 22
       - run: npm install
       - name: Run tests
-        run: npm test
+        run: npm run test:ci
       - name: Stop deployment
         run: atlas deployments stop mycluster
 
@@ -142,7 +142,7 @@ jobs:
           node-version: 22
       - run: npm install
       - name: Test
-        run: npm run test-rs
+        run: npm run test-rs:ci
 
   dependency-review:
     name: Dependency Review

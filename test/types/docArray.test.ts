@@ -1,5 +1,5 @@
 import { Schema, model, Model, Types, InferSchemaType } from 'mongoose';
-import { expectError, expectType } from 'tsd';
+import { expectType } from 'tsd';
 
 async function gh10293() {
   interface ITest {
@@ -32,7 +32,8 @@ function gh13087() {
     };
   }
 
-  expectError(new Types.DocumentArray<Book>([1, 2, 3]));
+  // @ts-expect-error
+  new Types.DocumentArray<Book>([1, 2, 3]);
 
   const locationSchema = new Schema(
     {

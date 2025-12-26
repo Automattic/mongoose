@@ -1,6 +1,6 @@
 import { createConnection, Schema, Collection, Connection, ConnectionSyncIndexesResult, InferSchemaType, Model, connection, HydratedDocument, Query } from 'mongoose';
 import * as mongodb from 'mongodb';
-import { expectAssignable, expectError, expectType } from 'tsd';
+import { expectAssignable, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
 
 expectType<Connection>(createConnection());
@@ -18,7 +18,8 @@ expectType<Promise<Connection>>(conn.openUri('mongodb://127.0.0.1:27017/test', {
 conn.readyState === 0;
 conn.readyState === 99;
 
-expectError(conn.readyState = 0);
+// @ts-expect-error
+conn.readyState = 0;
 
 expectType<Promise<Record<string, Error | mongodb.Collection<any>>>>(
   conn.createCollections()
@@ -31,7 +32,8 @@ expectType<Promise<mongodb.Collection<{ [key: string]: any }>>>(conn.createColle
 
 expectType<Promise<void>>(conn.dropCollection('some'));
 
-expectError(conn.deleteModel());
+// @ts-expect-error
+conn.deleteModel();
 expectType<Connection>(conn.deleteModel('something'));
 expectType<Connection>(conn.deleteModel(/.+/));
 
@@ -59,10 +61,14 @@ expectType<Promise<string>>(conn.withSession(async(res) => {
   return 'a';
 }));
 
-expectError(conn.user = 'invalid');
-expectError(conn.pass = 'invalid');
-expectError(conn.host = 'invalid');
-expectError(conn.port = 'invalid');
+// @ts-expect-error
+conn.user = 'invalid';
+// @ts-expect-error
+conn.pass = 'invalid';
+// @ts-expect-error
+conn.host = 'invalid';
+// @ts-expect-error
+conn.port = 'invalid';
 
 expectType<Collection>(conn.collection('test'));
 expectType<mongodb.Collection | undefined>(conn.db?.collection('test'));
@@ -156,7 +162,8 @@ function schemaInstanceMethodsAndQueryHelpersOnConnection() {
 async function gh15359() {
   const res = await conn.bulkWrite([{ model: 'Test', name: 'insertOne', document: { name: 'test1' } }]);
   expectType<number>(res.insertedCount);
-  expectError(res.mongoose.validationErrors);
+  // @ts-expect-error
+  res.mongoose.validationErrors;
 
   const res2 = await conn.bulkWrite([{ model: 'Test', name: 'insertOne', document: { name: 'test2' } }], { ordered: false });
   expectType<number>(res2.insertedCount);
@@ -167,6 +174,8 @@ async function gh15359() {
     { model: 'Test', name: 'updateOne', filter: { name: 'test4' }, update: { $set: { num: 'not a number' } } }
   ], { ordered: false });
   expectType<number>(res3.insertedCount);
-  expectError(res3.validationErrors);
+
+  // @ts-expect-error
+  res3.mongoose.validationErrors;
   expectType<Error[] | undefined>(res3.mongoose?.validationErrors);
 }

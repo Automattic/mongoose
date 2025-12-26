@@ -12,7 +12,7 @@ import {
   ResolveSchemaOptions
 } from 'mongoose';
 import { DeleteResult } from 'mongodb';
-import { expectAssignable, expectError, expectNotAssignable, expectType } from 'tsd';
+import { expectAssignable, expectNotAssignable, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
 import { autoTypedModelConnection } from './connection.test';
 import { AutoTypedSchemaType } from './schema.test';
@@ -373,7 +373,8 @@ async function gh12959() {
   expectType<Types.ObjectId>(doc._id);
   expectType<number>(doc.__v);
 
-  expectError(doc.subdocArray[0].__v);
+  // @ts-expect-error
+  doc.subdocArray[0].__v;
 }
 
 async function gh14876() {
@@ -517,7 +518,8 @@ function gh13079() {
   const TestModel5 = model('Test', schema5);
 
   const doc5 = new TestModel5({ name: 'taco' });
-  expectError(doc5.id);
+  // @ts-expect-error
+  doc5.id;
 }
 
 async function gh15578() {
@@ -543,8 +545,10 @@ async function gh15578() {
 
     const objWithoutVersionKey = a.toObject({ versionKey: false });
     const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
-    expectError(objWithoutVersionKey.__v);
-    expectError(jsonWithoutVersionKey.__v);
+    // @ts-expect-error
+    objWithoutVersionKey.__v;
+    // @ts-expect-error
+    jsonWithoutVersionKey.__v;
 
     const objWithVersionKey = a.toObject();
     const jsonWithVersionKey = a.toJSON();
@@ -578,8 +582,10 @@ async function gh15578() {
 
     const objWithoutVersionKey = a.toObject({ versionKey: false });
     const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
-    expectError(objWithoutVersionKey.taco);
-    expectError(jsonWithoutVersionKey.taco);
+    // @ts-expect-error
+    objWithoutVersionKey.__v;
+    // @ts-expect-error
+    jsonWithoutVersionKey.__v;
 
     const objWithVersionKey = a.toObject();
     const jsonWithVersionKey = a.toJSON();
@@ -609,8 +615,10 @@ async function gh15578() {
 
     const objWithoutVersionKey = a.toObject({ versionKey: false });
     const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
-    expectError(objWithoutVersionKey.__v);
-    expectError(jsonWithoutVersionKey.__v);
+    // @ts-expect-error
+    objWithoutVersionKey.__v;
+    // @ts-expect-error
+    jsonWithoutVersionKey.__v;
 
     const objWithVersionKey = a.toObject();
     const jsonWithVersionKey = a.toJSON();
@@ -642,8 +650,10 @@ async function gh15578() {
 
     const objWithoutVersionKey = a.toObject({ versionKey: false });
     const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
-    expectError(objWithoutVersionKey.taco);
-    expectError(jsonWithoutVersionKey.taco);
+    // @ts-expect-error
+    objWithoutVersionKey.__v;
+    // @ts-expect-error
+    jsonWithoutVersionKey.__v;
 
     const objWithVersionKey = a.toObject();
     const jsonWithVersionKey = a.toJSON();

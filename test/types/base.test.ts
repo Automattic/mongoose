@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import { expectError, expectType } from 'tsd';
+import { expectType } from 'tsd';
 
 Object.values(mongoose.models).forEach(model => {
   model.modelName;
@@ -73,7 +73,8 @@ function setAsObject() {
     updatePipeline: true
   });
 
-  expectError(mongoose.set({ invalid: true }));
+  // @ts-expect-error
+  mongoose.set({ invalid: true });
 }
 
 const x: { name: string } = mongoose.omitUndefined({ name: 'foo' });

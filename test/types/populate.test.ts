@@ -1,7 +1,7 @@
 import mongoose, { Schema, model, Document, PopulatedDoc, Types, HydratedDocument, SchemaTypeOptions, Model } from 'mongoose';
 // Use the mongodb ObjectId to make instanceof calls possible
 import { ObjectId } from 'mongodb';
-import { expectAssignable, expectError, expectType } from 'tsd';
+import { expectAssignable, expectType } from 'tsd';
 
 interface Child {
   name: string;
@@ -37,7 +37,8 @@ ParentModel.
       throw new Error('should be populated');
     } else {
       const name = leanChild.name;
-      expectError(leanChild.save());
+      // @ts-expect-error
+      leanChild.save();
     }
   });
 
@@ -177,8 +178,10 @@ function gh11503() {
   User.findOne({}).populate('friends').then(user => {
     if (!user) return;
     expectType<Types.ObjectId>(user?.friends[0]);
-    expectError(user?.friends[0].blocked);
-    expectError(user?.friends.map(friend => friend.blocked));
+    // @ts-expect-error
+    user?.friends[0].blocked;
+    // @ts-expect-error
+    user?.friends.map(friend => friend.blocked);
   });
 
   User.findOne({}).populate<{ friends: Friend[] }>('friends').then(user => {

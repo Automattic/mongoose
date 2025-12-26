@@ -18,7 +18,8 @@ schema.pre<Query<any, any>>('find', async function() {
 });
 
 schema.pre<Query<any, any>>('find', async function() {
-  expectError(this.notAFunction());
+  // @ts-expect-error
+  this.notAFunction();
 });
 
 schema.pre<Aggregate<any>>('aggregate', async function() {

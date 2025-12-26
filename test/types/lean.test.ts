@@ -1,5 +1,5 @@
 import mongoose, { Schema, model, Types, InferSchemaType, FlattenMaps, HydratedDocument, Model, Document, PopulatedDoc } from 'mongoose';
-import { expectAssignable, expectError, expectType } from 'tsd';
+import { expectAssignable, expectType } from 'tsd';
 
 function gh10345() {
   (function() {
@@ -26,10 +26,12 @@ function gh10345() {
     const doc = new UserModel({ name: 'test' });
 
     const leanDoc = doc.toObject<User>();
-    expectError(leanDoc.id = 43);
+    // @ts-expect-error
+    leanDoc.id = 43;
 
     const doc2 = await UserModel.findOne().orFail().lean();
-    expectError(doc2.id = 43);
+    // @ts-expect-error
+    doc2.id = 43;
   })();
 }
 
@@ -406,24 +408,30 @@ async function gh15583_2() {
   const TestModel = model('Test', schema);
 
   const testDoc = await TestModel.findOne().orFail();
-  expectError(testDoc.save());
+  // @ts-expect-error
+  testDoc.save();
 
   const testDoc2 = await TestModel.findById('anything').lean().orFail();
-  expectError(testDoc2.save());
+  // @ts-expect-error
+  testDoc2.save();
 
   const testDocs = await TestModel.find().lean().exec();
   for (const doc of testDocs) {
-    expectError(doc.save());
+    // @ts-expect-error
+    doc.save();
   }
 
   const testDoc3 = await TestModel.findOneAndUpdate({}, { name: 'test' }).lean().orFail();
-  expectError(testDoc3.save());
+  // @ts-expect-error
+  testDoc3.save();
 
   const testDoc4 = await TestModel.findOneAndReplace({}, { name: 'test' }).lean().orFail();
-  expectError(testDoc4.save());
+  // @ts-expect-error
+  testDoc4.save();
 
   const testDoc5 = await TestModel.findOneAndDelete({}).lean().orFail();
-  expectError(testDoc5.save());
+  // @ts-expect-error
+  testDoc5.save();
 
   const schema2 = new Schema(
     { name: String },
@@ -432,22 +440,29 @@ async function gh15583_2() {
   const TestModel2 = model('Test', schema2);
 
   const testDoc6 = await TestModel2.findOne().orFail();
-  expectError(testDoc6.save());
+  // @ts-expect-error
+  testDoc6.save();
 
   const testDoc7 = await TestModel2.findById('anything').lean().orFail();
-  expectError(testDoc7.save());
+  // @ts-expect-error
+  testDoc7.save();
 
   const testDocs2 = await TestModel2.find().lean().exec();
   for (const doc of testDocs2) {
-    expectError(doc.save());
+    // @ts-expect-error
+    doc.save();
   }
 
   const testDoc8 = await TestModel2.findOneAndUpdate({}, { name: 'test' }).lean().orFail();
-  expectError(testDoc8.save());
+  // @ts-expect-error
+  testDoc8.save();
 
   const testDoc9 = await TestModel2.findOneAndReplace({}, { name: 'test' }).lean().orFail();
-  expectError(testDoc9.save());
+  // @ts-expect-error
+  testDoc9.save();
 
   const testDoc10 = await TestModel2.findOneAndDelete({}).lean().orFail();
-  expectError(testDoc10.save());
+  // @ts-expect-error
+  testDoc10.save();
+
 }

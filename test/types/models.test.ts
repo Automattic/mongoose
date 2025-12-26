@@ -19,7 +19,7 @@ import mongoose, {
   UpdateOneModel,
   UpdateManyModel
 } from 'mongoose';
-import { expectAssignable, expectError, expectType } from 'tsd';
+import { expectAssignable, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
 import { ModifyResult, UpdateOneModel as MongoUpdateOneModel, ChangeStreamInsertDocument, ObjectId } from 'mongodb';
 
@@ -251,7 +251,8 @@ function inheritance() {
 
 Project.createCollection({ expires: '5 seconds' });
 Project.createCollection({ expireAfterSeconds: 5 });
-expectError(Project.createCollection({ expireAfterSeconds: '5 seconds' }));
+// @ts-expect-error
+Project.createCollection({ expireAfterSeconds: '5 seconds' });
 
 function bulkWrite() {
 
@@ -341,15 +342,16 @@ async function overwriteBulkWriteContents() {
 
   const BaseModel = model<BaseModelClassDoc>('test', baseModelClassSchema);
 
-  expectError(BaseModel.bulkWrite<{ testy: string }>([
+  BaseModel.bulkWrite<{ testy: string }>([
     {
       insertOne: {
         document: {
+          // @ts-expect-error
           test: 'hello'
         }
       }
     }
-  ]));
+  ]);
 
   BaseModel.bulkWrite<{ testy: string }>([
     {
@@ -779,7 +781,8 @@ function gh13897() {
   const Document = model<IDocument>('Document', documentSchema);
   const doc = new Document({ name: 'foo' });
   expectType<Date>(doc.createdAt);
-  expectError(new Document<IDocument>({ name: 'foo' }));
+  // @ts-expect-error
+  new Document<IDocument>({ name: 'foo' });
 }
 
 async function gh14026() {
@@ -1075,14 +1078,18 @@ async function gh15693() {
 
   const schema = new Schema<IUser, Model<IUser>, UserMethods>({ name: { type: String, required: true } });
   schema.method('printNamePrefixed', function printName(this: IUser, prefix: string) {
-    expectError(this.isModified('name'));
-    expectError(this.doesNotExist());
+    // @ts-expect-error
+    this.isModified('name');
+    // @ts-expect-error
+    this.doesNotExist();
     expectType<string>(this.name);
     console.log(prefix + this.name);
   });
   schema.method('printName', function printName(this: IUser) {
-    expectError(this.isModified('name'));
-    expectError(this.doesNotExist());
+    // @ts-expect-error
+    this.isModified('name');
+    // @ts-expect-error
+    this.doesNotExist();
     expectType<string>(this.name);
     console.log(this.name);
   });

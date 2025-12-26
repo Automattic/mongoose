@@ -1,5 +1,5 @@
 import mongoose, { Schema, model, Types, HydratedDocument } from 'mongoose';
-import { expectError, expectType } from 'tsd';
+import { expectType } from 'tsd';
 
 const schema = new Schema({ name: { type: 'String' } });
 
@@ -60,7 +60,8 @@ Test.insertMany({ name: 'test' }, {}).then(docs => {
 Test.insertMany({ name: 'test' }, { lean: true }).then(docs => {
   expectType<Types.ObjectId>(docs[0]._id);
   expectType<string>(docs[0].name);
-  expectError(docs[0].isNew);
+  // @ts-expect-error
+  docs[0].isNew;
 });
 
 Test.insertMany({ name: 'test' }).then(docs => {
@@ -90,7 +91,8 @@ Test.insertMany([{ name: 'test' }], { rawResult: true }).then(result => {
 Test.insertMany([{ name: 'test' }], { lean: true }).then(docs => {
   expectType<Types.ObjectId>(docs[0]._id);
   expectType<string>(docs[0].name);
-  expectError(docs[0].isNew);
+  // @ts-expect-error
+  docs[0].isNew;
 });
 
 Test.insertMany([{ name: 'test' }], { lean: false }).then(docs => {

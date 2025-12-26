@@ -28,7 +28,7 @@ import {
   InferHydratedDocTypeFromSchema
 } from 'mongoose';
 import { Binary, BSON, UUID } from 'mongodb';
-import { expectType, expectError, expectAssignable } from 'tsd';
+import { expectType, expectAssignable } from 'tsd';
 import { ObtainDocumentPathType, ResolvePathType } from '../../types/inferschematype';
 
 enum Genre {
@@ -111,13 +111,20 @@ movieSchema.index({ tile: 'desc' });
 movieSchema.index({ tile: 'hashed' });
 movieSchema.index({ tile: 'geoHaystack' });
 
-expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: 2 }); // test invalid number
-expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: -2 }); // test invalid number
-expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: '' }); // test empty string
-expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: 'invalid' }); // test invalid string
-expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: new Date() }); // test invalid type
-expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: true }); // test that booleans are not allowed
-expectError<Parameters<typeof movieSchema['index']>[0]>({ tile: false }); // test that booleans are not allowed
+// @ts-expect-error
+movieSchema.index({ tile: 2 }); // test invalid number
+// @ts-expect-error
+movieSchema.index({ tile: -2 }); // test invalid number
+// @ts-expect-error
+movieSchema.index({ tile: '' }); // test empty string
+// @ts-expect-error
+movieSchema.index({ tile: 'invalid' }); // test invalid string
+// @ts-expect-error
+movieSchema.index({ tile: new Date() }); // test invalid type
+// @ts-expect-error
+movieSchema.index({ tile: true }); // test that booleans are not allowed
+// @ts-expect-error
+movieSchema.index({ tile: false }); // test that booleans are not allowed
 
 // Using `SchemaDefinition`
 interface IProfile {
@@ -153,12 +160,12 @@ async function gh9857() {
   type UserSchemaDefinition = SchemaDefinition<User>;
   type UserModel = Model<UserDocument>;
 
-  let u: UserSchemaDefinition;
-  expectError(u = {
+  const u: UserSchemaDefinition = {
+    // @ts-expect-error
     name: { type: String },
     active: { type: Boolean },
     points: Number
-  });
+  };
 }
 
 function gh10261() {
@@ -347,7 +354,8 @@ function gh11435(): void {
 
 // timeSeries
 Schema.create({}, { expires: '5 seconds' });
-expectError(Schema.create({}, { expireAfterSeconds: '5 seconds' }));
+// @ts-expect-error
+Schema.create({}, { expireAfterSeconds: '5 seconds' });
 Schema.create({}, { expireAfterSeconds: 5 });
 
 function gh10900(): void {
@@ -596,8 +604,10 @@ batchSchema2.discriminator('event', eventSchema2);
 
 function encryptionType() {
   const keyId = new BSON.UUID();
-  expectError<Schema>(Schema.create({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'newFakeEncryptionType' }));
-  expectError<Schema>(Schema.create({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 1 }));
+  // @ts-expect-error
+  Schema.create({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'newFakeEncryptionType' });
+  // @ts-expect-error
+  Schema.create({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 1 });
 
   expectType<Schema>(Schema.create({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'queryableEncryption' }));
   expectType<Schema>(Schema.create({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'csfle' }));
@@ -673,7 +683,8 @@ function gh11987() {
   });
 
   expectType<SchemaType<string>>(userSchema.path<'name'>('name'));
-  expectError(userSchema.path<'foo'>('name'));
+  // @ts-expect-error
+  userSchema.path<'foo'>('name');
   expectType<SchemaTypeOptions<string>>(userSchema.path<'name'>('name').OptionsConstructor);
 }
 
@@ -808,23 +819,29 @@ function pluginOptions() {
   // could not add strict tests that the parameters are inferred correctly, because i dont know how this would be done in tsd
 
   // test basic inferrence
-  expectError(schema.plugin(pluginFunction, {})); // should error because "option2" is not optional
+  // @ts-expect-error
+  schema.plugin(pluginFunction, {}); // should error because "option2" is not optional
   schema.plugin(pluginFunction, { option2: 0 });
   schema.plugin(pluginFunction, { option1: 'string', option2: 1 });
-  expectError(schema.plugin(pluginFunction, { option1: 'string' })); // should error because "option2" is not optional
-  expectError(schema.plugin(pluginFunction, { option2: 'string' })); // should error because "option2" type is "number"
-  expectError(schema.plugin(pluginFunction, { option1: 0 })); // should error because "option1" type is "string"
+  // @ts-expect-error
+  schema.plugin(pluginFunction, { option1: 'string' }); // should error because "option2" is not optional
+  // @ts-expect-error
+  schema.plugin(pluginFunction, { option2: 'string' }); // should error because "option2" type is "number"
+  // @ts-expect-error
+  schema.plugin(pluginFunction, { option1: 0 }); // should error because "option1" type is "string"
 
   // test plugins without options defined
   function pluginFunction2(schema: Schema<any>) {
     return; // empty function, to satisfy lint option
   }
   schema.plugin(pluginFunction2);
-  expectError(schema.plugin(pluginFunction2, {})); // should error because no options argument is defined
+  // @ts-expect-error
+  schema.plugin(pluginFunction2, {}); // should error because no options argument is defined
 
   // test overwriting options
   schema.plugin<any, SomePluginOptions>(pluginFunction2, { option2: 0 });
-  expectError(schema.plugin<any, SomePluginOptions>(pluginFunction2, {})); // should error because "option2" is not optional
+  // @ts-expect-error
+  schema.plugin<any, SomePluginOptions>(pluginFunction2, {}); // should error because "option2" is not optional
 }
 
 function gh12205() {
@@ -1257,7 +1274,8 @@ function gh13800() {
   autoTypedSchema.method('fullName', function fullName() {
     expectType<string>(this.firstName);
     expectType<string>(this.lastName);
-    expectError<string>(this.someOtherField);
+    // @ts-expect-error
+    this.someOtherField;
   });
 }
 
@@ -1368,7 +1386,8 @@ function gh14028_methods() {
         // Expect methods to still have access to `this` type
         expectType<string>(this.firstName);
         // As InstanceMethods type is not specified, expect type of this.fullName to be undefined
-        expectError<IUserMethods['fullName']>(this.fullName);
+        // @ts-expect-error
+        this.fullName;
         return this.firstName + ' ' + this.lastName;
       }
     }
@@ -1376,7 +1395,8 @@ function gh14028_methods() {
 
   const User3 = model('User2', schema3);
   const user3 = new User3({ firstName: 'John', lastName: 'Doe', age: 20 });
-  expectError<string>(user3.fullName());
+  // @ts-expect-error
+  user3.fullName();
 }
 
 function gh14028_statics() {

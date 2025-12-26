@@ -115,15 +115,12 @@ async function _11767() {
   // expectError<Function>(examFound.questions.$pop);
   // popoulated shouldn't be on the question doc because it shouldn't
   // be a mongoose subdocument anymore
-  // expectError(examFound.questions[0]!.populated);
   expectType<string[]>(examFound.questions[0].answers);
 
   const examFound2 = await ExamModel.findOne().exec();
   if (!examFound2) return;
   const examFound2Obj = examFound2.toObject();
 
-  // expectError(examFound2Obj.questions.$pop);
-  // expectError(examFound2Obj.questions[0].populated);
   expectType<string[]>(examFound2Obj.questions[0].answers);
 }
 

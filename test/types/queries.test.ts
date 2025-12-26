@@ -19,7 +19,7 @@ import mongoose, {
 } from 'mongoose';
 import mongodb from 'mongodb';
 import { ModifyResult, ObjectId } from 'mongodb';
-import { expectAssignable, expectError, expectNotAssignable, expectType } from 'tsd';
+import { expectAssignable, expectNotAssignable, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
 
 interface QueryHelpers {
@@ -561,16 +561,19 @@ async function gh13224() {
 
   const u2 = await UserModel.findOne().select<{ name?: string }>(['name']).orFail();
   expectType<string | undefined>(u2.name);
-  expectError(u2.age);
+  // @ts-expect-error
+  u2.age;
   expectAssignable<Function>(u2.toObject);
 
   const users = await UserModel.find().select<{ name?: string }>(['name']);
   const u3 = users[0];
   expectType<string | undefined>(u3!.name);
-  expectError(u3!.age);
+  // @ts-expect-error
+  u3!.age;
   expectAssignable<Function>(u3.toObject);
 
-  expectError(UserModel.findOne().select<{ notInSchema: string }>(['name']).orFail());
+  // @ts-expect-error
+  await UserModel.findOne().select<{ notInSchema: string }>(['name']).orFail();
 }
 
 function gh13630() {
@@ -751,7 +754,9 @@ async function gh15526() {
     .select<SelectType>(selection)
     .orFail();
   expectType<string | undefined | null>(u1.name);
-  expectError(u1.age);
+
+  // @ts-expect-error
+  u1.age;
 }
 
 async function gh14173() {
@@ -811,9 +816,12 @@ async function gh12064() {
   const TestModel = model('Model', schema);
 
   await TestModel.findOne({ 'subdoc.subdocProp': { $gt: 0 }, 'nested.nestedProp': { $in: ['foo', 'bar'] }, 'documentArray.documentArrayProp': { $ne: true } });
-  expectError(TestModel.findOne({ 'subdoc.subdocProp': 'taco tuesday' }));
-  expectError(TestModel.findOne({ 'nested.nestedProp': true }));
-  expectError(TestModel.findOne({ 'documentArray.documentArrayProp': 'taco' }));
+  // @ts-expect-error
+  TestModel.findOne({ 'subdoc.subdocProp': 'taco tuesday' });
+  // @ts-expect-error
+  TestModel.findOne({ 'nested.nestedProp': true });
+  // @ts-expect-error
+  TestModel.findOne({ 'documentArray.documentArrayProp': 'taco' });
 }
 
 function gh15671() {

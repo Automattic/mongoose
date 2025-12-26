@@ -9285,21 +9285,25 @@ describe('Model', function() {
 
     it('should only select _id when checking document existence', async function() {
       // Arrange
-      const testSchema = new Schema({ name: String, largeField: Buffer });
-      const Test = db.model('Test', testSchema);
-      const doc = await Test.create({ name: 'test', largeField: Buffer.alloc(1024) });
+      const userSchema = new Schema({ name: String, avatar: Buffer });
+      const User = db.model('User', userSchema);
+      const user = await User.create({ name: 'test', avatar: Buffer.alloc(16) });
+      try {
+        const findOneSpy = sinon.spy(User.collection, 'findOne');
 
-      const findOneSpy = sinon.spy(Test.collection, 'findOne');
+        // Act
+        await user.save();
 
-      // Act
-      await doc.save();
+        // Assert
+        assert.equal(findOneSpy.calledOnce, true);
+        const callArgs = findOneSpy.firstCall.args;
+        assert.deepEqual(callArgs[1].projection, { _id: 1 });
 
-      // Assert
-      assert.equal(findOneSpy.calledOnce, true);
-      const callArgs = findOneSpy.firstCall.args;
-      assert.deepEqual(callArgs[1].projection, { _id: 1 });
-
-      findOneSpy.restore();
+        const returnedDoc = await findOneSpy.firstCall.returnValue;
+        assert.deepEqual(Object.keys(returnedDoc), ['_id']);
+      } finally {
+        sinon.restore();
+      }
     });
   });
 });

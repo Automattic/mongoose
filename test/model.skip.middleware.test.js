@@ -3,6 +3,7 @@
 /**
  * Test dependencies.
  */
+const { builtInMiddleware } = require('../lib/schema/symbols');
 
 const start = require('./common');
 
@@ -457,6 +458,25 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       assert.strictEqual(getUserHookRan(), false);
       assert.ok(err);
       assert.strictEqual(err.name, 'ValidationError');
+    });
+
+    it('all internal plugins have builtInMiddleware symbol', function() {
+      // Arrange - schema with built-in features but no user hooks
+      const userSchema = new Schema({ name: String }, { timestamps: true, shardKey: { name: 1 } });
+      db.model('Test', userSchema); // Plugins are applied at model creation
+
+      // Act
+      const pres = Array.from(userSchema.s.hooks._pres.values()).flat();
+      const posts = Array.from(userSchema.s.hooks._posts.values()).flat();
+      const allHooks = [...pres, ...posts];
+
+      // Assert - all hooks should be built-in (no user hooks were added)
+      const hooksWithoutSymbol = allHooks.filter(hook => !hook.fn[builtInMiddleware]);
+      assert.deepStrictEqual(
+        hooksWithoutSymbol.map(h => h.fn.name),
+        [],
+        'All internal plugin hooks should have builtInMiddleware symbol'
+      );
     });
 
     function createTestContext({ hookName }) {

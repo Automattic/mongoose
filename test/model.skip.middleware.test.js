@@ -383,4 +383,102 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       return { User };
     }
   });
+
+  describe('Built-in middleware still runs when user middleware is skipped', function() {
+    it('save() sets timestamps when middleware: false', async function() {
+      // Arrange
+      const { User, getUserHookRan } = createTestContext({ hookName: 'save' });
+      const user = new User({ name: 'test' });
+
+      // Act
+      await user.save({ middleware: false });
+
+      // Assert
+      assert.strictEqual(getUserHookRan(), false);
+      assert.ok(user.createdAt);
+      assert.ok(user.updatedAt);
+    });
+
+    it('findOneAndUpdate() updates timestamps when middleware: false', async function() {
+      // Arrange
+      const { User, getUserHookRan } = createTestContext({ hookName: 'findOneAndUpdate' });
+      const user = await User.create({ name: 'test' });
+      const originalUpdatedAt = user.updatedAt;
+      await new Promise(resolve => setTimeout(resolve, 1));
+
+      // Act
+      const updated = await User.findOneAndUpdate(
+        { _id: user._id },
+        { name: 'updated' },
+        { new: true, middleware: false }
+      );
+
+      // Assert
+      assert.strictEqual(getUserHookRan(), false);
+      assert.ok(updated.updatedAt > originalUpdatedAt);
+    });
+
+    it('bulkSave() sets timestamps when middleware: false', async function() {
+      // Arrange
+      const { User, getUserHookRan } = createTestContext({ hookName: 'save' });
+      const user = new User({ name: 'test' });
+
+      // Act
+      await User.bulkSave([user], { middleware: false });
+
+      // Assert
+      assert.strictEqual(getUserHookRan(), false);
+      assert.ok(user.createdAt);
+      assert.ok(user.updatedAt);
+    });
+
+    it('save() skips user hooks on subdocuments when middleware: false', async function() {
+      // Arrange
+      const { User, getUserHookRan, getChildHookRan } = createTestContext({ hookName: 'save' });
+      const user = new User({ name: 'test', child: { name: 'child' } });
+
+      // Act
+      await user.save({ middleware: false });
+
+      // Assert
+      assert.strictEqual(getUserHookRan(), false);
+      assert.strictEqual(getChildHookRan(), false);
+    });
+
+    it('save() runs validation when middleware: false', async function() {
+      // Arrange
+      const { User, getUserHookRan } = createTestContext({ hookName: 'save' });
+      const user = new User({});
+
+      // Act
+      const err = await user.save({ middleware: false }).then(() => null, err => err);
+
+      // Assert
+      assert.strictEqual(getUserHookRan(), false);
+      assert.ok(err);
+      assert.strictEqual(err.name, 'ValidationError');
+    });
+
+    function createTestContext({ hookName }) {
+      let userHookRan = false;
+      let childHookRan = false;
+
+      const childSchema = new Schema({ name: String });
+      childSchema.pre('save', function() { childHookRan = true; });
+
+      const userSchema = new Schema({
+        name: { type: String, required: true },
+        child: childSchema
+      }, { timestamps: true });
+      userSchema.pre(hookName, function() { userHookRan = true; });
+
+      const User = db.model('User', userSchema);
+
+      return {
+        User,
+        getUserHookRan: () => userHookRan,
+        getChildHookRan: () => childHookRan
+      };
+    }
+  });
 });

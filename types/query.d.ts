@@ -25,6 +25,7 @@ declare module 'mongoose' {
 
   type MongooseBaseQueryOptionKeys =
     | 'context'
+    | 'middleware'
     | 'multipleCastError'
     | 'overwriteDiscriminatorKey'
     | 'overwriteImmutable'
@@ -165,6 +166,12 @@ declare module 'mongoose' {
      */
     updatePipeline?: boolean;
     writeConcern?: mongodb.WriteConcern;
+
+    /**
+     * If set to `false`, skip all pre and post middleware for this operation.
+     * Can also be an object `{ pre: boolean, post: boolean }` for granular control.
+     */
+    middleware?: boolean | SkipMiddlewareOptions;
 
     [other: string]: any;
   }

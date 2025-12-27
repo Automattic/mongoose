@@ -37,6 +37,11 @@ declare module 'mongoose' {
     strict?: boolean | 'throw';
     /** When false, do not add timestamps to documents. Can be overridden at the operation level. */
     timestamps?: boolean;
+    /**
+     * If set to `false`, skip all pre and post middleware for this operation.
+     * Can also be an object `{ pre: boolean, post: boolean }` for granular control.
+     */
+    middleware?: boolean | SkipMiddlewareOptions;
   }
 
   interface MongooseBulkSaveOptions extends mongodb.BulkWriteOptions {
@@ -71,6 +76,11 @@ declare module 'mongoose' {
     ordered?: boolean;
     lean?: boolean;
     throwOnValidationError?: boolean;
+    /**
+     * If set to `false`, skip all pre and post middleware for this operation.
+     * Can also be an object `{ pre: boolean, post: boolean }` for granular control.
+     */
+    middleware?: boolean | SkipMiddlewareOptions;
   }
 
   interface InsertManyResult<T> extends mongodb.InsertManyResult<T> {
@@ -163,6 +173,11 @@ declare module 'mongoose' {
     validateModifiedOnly?: boolean;
     w?: number | string;
     wtimeout?: number;
+    /**
+     * If set to `false`, skip all pre and post middleware for this operation.
+     * Can also be an object `{ pre: boolean, post: boolean }` for granular control.
+     */
+    middleware?: boolean | SkipMiddlewareOptions;
   }
 
   interface CreateOptions extends SaveOptions {

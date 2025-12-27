@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import { expectType } from 'tsd';
+import { ExpectType } from './helpers';
 import * as bson from 'bson';
 
 function gh12537() {
@@ -9,7 +9,7 @@ function gh12537() {
   const doc = new model({});
 
   const v = new bson.ObjectId('somehex');
-  expectType<string>(v._id.toHexString());
+  ExpectType<string>()(v._id.toHexString());
 
   doc._id = new bson.ObjectId('somehex');
 }

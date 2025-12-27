@@ -16,6 +16,7 @@ import { expectAssignable, expectNotAssignable, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
 import { autoTypedModelConnection } from './connection.test';
 import { AutoTypedSchemaType } from './schema.test';
+import { ExpectType } from './helpers';
 
 const Drink = model('Drink', new Schema({
   name: String
@@ -42,8 +43,8 @@ const Test = model<ITest>('Test', schema);
 void async function main() {
   const doc = await Test.findOne().orFail();
 
-  expectType<DeleteResult>(await doc.deleteOne());
-  expectType<TestDocument | null>(await doc.deleteOne().findOne());
+  ExpectType<DeleteResult>()(await doc.deleteOne());
+  ExpectType<TestDocument | null>()(await doc.deleteOne().findOne());
   expectAssignable<{ _id: Types.ObjectId, name?: string } | null>(await doc.deleteOne().findOne().lean());
   expectNotAssignable<TestDocument | null>(await doc.deleteOne().findOne().lean());
 }();
@@ -92,7 +93,7 @@ function testMethods(): void {
   const UserModel = model<IUser, User>('User', schema);
 
   const doc = new UserModel({ first: 'test', last: 'test' });
-  expectType<string>(doc.fullName());
+  ExpectType<string>()(doc.fullName());
 }
 
 function testRequiredId(): void {
@@ -148,7 +149,7 @@ async function gh11117(): Promise<void> {
     }
   ]);
   const json = items[0].toJSON();
-  expectType<Date>(json.someDate);
+  ExpectType<Date>()(json.someDate);
 }
 
 function gh11085(): void {
@@ -176,7 +177,7 @@ function gh11435() {
   const ItemSchema = new Schema<Item>({ name: String });
 
   ItemSchema.pre('validate', function preValidate() {
-    expectType<Model<unknown>>(this.$model('Item1'));
+    ExpectType<Model<unknown>>()(this.$model('Item1'));
   });
 }
 
@@ -189,12 +190,12 @@ function autoTypedDocument() {
   const AutoTypedModel = autoTypedModel();
   const AutoTypeModelInstance = new AutoTypedModel({ unExistProperty: 1, description: 2 });
 
-  expectType<AutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);
-  expectType<AutoTypedSchemaType['schema']['favoritDrink']>(AutoTypeModelInstance.favoritDrink);
-  expectType<AutoTypedSchemaType['schema']['favoritColorMode']>(AutoTypeModelInstance.favoritColorMode);
+  ExpectType<AutoTypedSchemaType['schema']['userName']>()(AutoTypeModelInstance.userName);
+  ExpectType<AutoTypedSchemaType['schema']['favoritDrink']>()(AutoTypeModelInstance.favoritDrink);
+  ExpectType<AutoTypedSchemaType['schema']['favoritColorMode']>()(AutoTypeModelInstance.favoritColorMode);
 
   // Document-Methods-tests
-  expectType<ReturnType<AutoTypedSchemaType['methods']['instanceFn']>>(new AutoTypedModel().instanceFn());
+  ExpectType<ReturnType<AutoTypedSchemaType['methods']['instanceFn']>>()(new AutoTypedModel().instanceFn());
 
 }
 
@@ -202,12 +203,12 @@ function autoTypedDocumentConnection() {
   const AutoTypedModel = autoTypedModelConnection();
   const AutoTypeModelInstance = new AutoTypedModel({ unExistProperty: 1, description: 2 });
 
-  expectType<AutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);
-  expectType<AutoTypedSchemaType['schema']['favoritDrink']>(AutoTypeModelInstance.favoritDrink);
-  expectType<AutoTypedSchemaType['schema']['favoritColorMode']>(AutoTypeModelInstance.favoritColorMode);
+  ExpectType<AutoTypedSchemaType['schema']['userName']>()(AutoTypeModelInstance.userName);
+  ExpectType<AutoTypedSchemaType['schema']['favoritDrink']>()(AutoTypeModelInstance.favoritDrink);
+  ExpectType<AutoTypedSchemaType['schema']['favoritColorMode']>()(AutoTypeModelInstance.favoritColorMode);
 
   // Document-Methods-tests
-  expectType<ReturnType<AutoTypedSchemaType['methods']['instanceFn']>>(new AutoTypedModel().instanceFn());
+  ExpectType<ReturnType<AutoTypedSchemaType['methods']['instanceFn']>>()(new AutoTypedModel().instanceFn());
 
 }
 
@@ -261,8 +262,8 @@ async function gh11960() {
       nestedArray: [{ dummy: 'hello again' }]
     });
 
-    expectType<ParentDocument>(doc);
-    expectType<Map<string, string> | undefined>(doc.map);
+    ExpectType<ParentDocument>()(doc);
+    ExpectType<Map<string, string> | undefined>()(doc.map);
     doc.nested!.parent();
     doc.nestedArray?.[0].parentArray();
   }
@@ -275,8 +276,8 @@ async function gh11960() {
       nestedArray: [{ dummy: 'hello again' }]
     });
 
-    expectType<ParentDocument>(doc);
-    expectType<Map<string, string> | undefined>(doc.map);
+    ExpectType<ParentDocument>()(doc);
+    ExpectType<Map<string, string> | undefined>()(doc.map);
     doc.nested!.parent();
     doc.nestedArray?.[0].parentArray();
   }
@@ -305,27 +306,15 @@ function gh13878() {
   });
   const User = model('User', schema);
   const user = new User({ name: 'John', age: 30 });
-  expectType<typeof User>(user.$model());
-  expectType<typeof User>(user.model());
+  ExpectType<typeof User>()(user.$model());
+  ExpectType<typeof User>()(user.model());
 }
 
 function gh13094() {
   type UserDocumentNever = HydratedDocument<{ name: string }, Record<string, never>>;
 
   const doc: UserDocumentNever = null as any;
-  expectType<string>(doc.name);
-
-  // The following currently fails.
-  /* type UserDocumentUnknown = HydratedDocument<{ name: string }, Record<string, unknown>>;
-
-  const doc2: UserDocumentUnknown = null as any;
-  expectType<string>(doc2.name); */
-
-  // The following currently fails.
-  /* type UserDocumentAny = HydratedDocument<{ name: string }, Record<string, any>>;
-
-  const doc3: UserDocumentAny = null as any;
-  expectType<string>(doc3.name); */
+  ExpectType<string>()(doc.name);
 }
 
 function gh13738() {
@@ -355,9 +344,9 @@ function gh13738() {
 
   const person = new Person({ name: 'person', dob: new Date(), settings: { alerts: { sms: true }, theme: 'light' } });
 
-  expectType<number>(person.get('age'));
-  expectType<Date>(person.get('dob'));
-  expectType<{ theme: string; alerts: { sms: boolean } }>(person.get('settings'));
+  ExpectType<number>()(person.get('age'));
+  ExpectType<Date>()(person.get('dob'));
+  ExpectType<{ theme: string; alerts: { sms: boolean } }>()(person.get('settings'));
 }
 
 async function gh12959() {
@@ -370,10 +359,10 @@ async function gh12959() {
   const Model = model('test', schema);
 
   const doc = await Model.findById('id').orFail();
-  expectType<Types.ObjectId>(doc._id);
-  expectType<number>(doc.__v);
+  ExpectType<Types.ObjectId>()(doc._id);
+  ExpectType<number>()(doc.__v);
 
-  // @ts-expect-error
+  // @ts-expect-error version key shouldn't be defined on subdocs
   doc.subdocArray[0].__v;
 }
 
@@ -421,8 +410,8 @@ async function gh14876() {
 
   const depopulatedCar = populatedCar.depopulate<{ owner: Types.ObjectId }>('owner');
 
-  expectType<UserObjectInterface>(populatedCar.owner);
-  expectType<Types.ObjectId>(depopulatedCar.owner);
+  ExpectType<UserObjectInterface>()(populatedCar.owner);
+  ExpectType<Types.ObjectId>()(depopulatedCar.owner);
 }
 
 async function gh15077() {
@@ -473,8 +462,8 @@ async function gh15316() {
 
   const doc = new TestModel({ name: 'taco' });
 
-  expectType<string>(doc.toJSON({ virtuals: true }).upper);
-  expectType<string>(doc.toObject({ virtuals: true }).upper);
+  ExpectType<string>()(doc.toJSON({ virtuals: true }).upper);
+  ExpectType<string>()(doc.toObject({ virtuals: true }).upper);
 }
 
 function gh13079() {
@@ -484,7 +473,7 @@ function gh13079() {
   const TestModel = model('Test', schema);
 
   const doc = new TestModel({ name: 'taco' });
-  expectType<string>(doc.id);
+  ExpectType<string>()(doc.id);
 
   const schema2 = new Schema({
     id: { type: Number, required: true },
@@ -493,7 +482,7 @@ function gh13079() {
   const TestModel2 = model('Test', schema2);
 
   const doc2 = new TestModel2({ name: 'taco' });
-  expectType<number>(doc2.id);
+  ExpectType<number>()(doc2.id);
 
   const schema3 = new Schema<{ name: string }>({
     name: { type: String, required: true }
@@ -501,7 +490,7 @@ function gh13079() {
   const TestModel3 = model('Test', schema3);
 
   const doc3 = new TestModel3({ name: 'taco' });
-  expectType<string>(doc3.id);
+  ExpectType<string>()(doc3.id);
 
   const schema4 = new Schema<{ name: string, id: number }>({
     id: { type: Number, required: true },
@@ -510,7 +499,7 @@ function gh13079() {
   const TestModel4 = model('Test', schema4);
 
   const doc4 = new TestModel4({ name: 'taco' });
-  expectType<number>(doc4.id);
+  ExpectType<number>()(doc4.id);
 
   const schema5 = new Schema({
     name: { type: String, required: true }
@@ -518,7 +507,7 @@ function gh13079() {
   const TestModel5 = model('Test', schema5);
 
   const doc5 = new TestModel5({ name: 'taco' });
-  // @ts-expect-error
+  // @ts-expect-error should not be defined because id option is set to false
   doc5.id;
 }
 
@@ -545,15 +534,15 @@ async function gh15578() {
 
     const objWithoutVersionKey = a.toObject({ versionKey: false });
     const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
-    // @ts-expect-error
+    // @ts-expect-error should not be defined because versionKey is set to false
     objWithoutVersionKey.__v;
-    // @ts-expect-error
+    // @ts-expect-error should not be defined because versionKey is set to false
     jsonWithoutVersionKey.__v;
 
     const objWithVersionKey = a.toObject();
     const jsonWithVersionKey = a.toJSON();
-    expectType<number>(objWithVersionKey.__v);
-    expectType<number>(jsonWithVersionKey.__v);
+    ExpectType<number>()(objWithVersionKey.__v);
+    ExpectType<number>()(jsonWithVersionKey.__v);
   }
 
   function withDocTypeAndVersionKey() {
@@ -582,15 +571,15 @@ async function gh15578() {
 
     const objWithoutVersionKey = a.toObject({ versionKey: false });
     const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
-    // @ts-expect-error
+    // @ts-expect-error should not be defined because versionKey is set to false
     objWithoutVersionKey.__v;
-    // @ts-expect-error
+    // @ts-expect-error should not be defined because versionKey is set to false
     jsonWithoutVersionKey.__v;
 
     const objWithVersionKey = a.toObject();
     const jsonWithVersionKey = a.toJSON();
-    expectType<number>(objWithVersionKey.taco);
-    expectType<number>(jsonWithVersionKey.taco);
+    ExpectType<number>()(objWithVersionKey.taco);
+    ExpectType<number>()(jsonWithVersionKey.taco);
   }
 
   function autoInferred() {
@@ -615,15 +604,15 @@ async function gh15578() {
 
     const objWithoutVersionKey = a.toObject({ versionKey: false });
     const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
-    // @ts-expect-error
+    // @ts-expect-error should not be defined because versionKey is set to false
     objWithoutVersionKey.__v;
-    // @ts-expect-error
+    // @ts-expect-error should not be defined because versionKey is set to false
     jsonWithoutVersionKey.__v;
 
     const objWithVersionKey = a.toObject();
     const jsonWithVersionKey = a.toJSON();
-    expectType<number>(objWithVersionKey.__v);
-    expectType<number>(jsonWithVersionKey.__v);
+    ExpectType<number>()(objWithVersionKey.__v);
+    ExpectType<number>()(jsonWithVersionKey.__v);
   }
 
   function autoInferredWithCustomVersionKey() {
@@ -650,15 +639,15 @@ async function gh15578() {
 
     const objWithoutVersionKey = a.toObject({ versionKey: false });
     const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
-    // @ts-expect-error
+    // @ts-expect-error should not be defined because versionKey is set to false
     objWithoutVersionKey.__v;
-    // @ts-expect-error
+    // @ts-expect-error should not be defined because versionKey is set to false
     jsonWithoutVersionKey.__v;
 
     const objWithVersionKey = a.toObject();
     const jsonWithVersionKey = a.toJSON();
-    expectType<number>(objWithVersionKey.taco);
-    expectType<number>(jsonWithVersionKey.taco);
+    ExpectType<number>()(objWithVersionKey.taco);
+    ExpectType<number>()(jsonWithVersionKey.taco);
   }
 }
 
@@ -682,7 +671,7 @@ async function gh15900() {
   });
 
   // id virtual should be available
-  expectType<string>(user.id);
+  ExpectType<string>()(user.id);
 
   // Test that id virtual is NOT added when doc type already has id
   interface IUserWithId {
@@ -703,5 +692,5 @@ async function gh15900() {
   });
 
   // id should be number, not string virtual
-  expectType<number>(userWithId.id);
+  ExpectType<number>()(userWithId.id);
 }

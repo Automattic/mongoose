@@ -1,5 +1,5 @@
 import { InferRawDocType, type InferRawDocTypeWithout_id, type ResolveTimestamps, type Schema, type Types } from 'mongoose';
-import { expectType } from 'tsd';
+import { ExpectType } from './helpers';
 
 function inferPojoType() {
   const schemaDefinition = {
@@ -21,7 +21,7 @@ function inferPojoType() {
   };
 
   type UserType = InferRawDocTypeWithout_id<typeof schemaDefinition>;
-  expectType<{ email: string, password: string, dateOfBirth: Date }>({} as UserType);
+  ExpectType<{ email: string, password: string, dateOfBirth: Date }>()({} as UserType);
 }
 function gh14839() {
   const schemaDefinition = {
@@ -43,7 +43,7 @@ function gh14839() {
   };
 
   type UserType = InferRawDocType< typeof schemaDefinition>;
-  expectType<{ email: string, password: string, dateOfBirth: Date } & { _id: Types.ObjectId }>({} as UserType);
+  ExpectType<{ email: string, password: string, dateOfBirth: Date } & { _id: Types.ObjectId }>()({} as UserType);
 }
 
 function optionality() {
@@ -58,7 +58,7 @@ function optionality() {
   };
 
   type UserType = InferRawDocType<typeof schemaDefinition>;
-  expectType<{ name: string; dateOfBirth?: number | null | undefined } & { _id: Types.ObjectId }>({} as UserType);
+  ExpectType<{ name: string; dateOfBirth?: number | null | undefined } & { _id: Types.ObjectId }>()({} as UserType);
 }
 
 type SchemaOptionsWithTimestamps<t> = {
@@ -81,10 +81,12 @@ function Timestamps() {
   };
 
   type UserType = InferRawDocType<typeof schemaDefinition, SchemaOptionsWithTimestamps<true>>;
-  expectType < {
+  ExpectType<{
     name: string;
     dateOfBirth?: number | null | undefined;
-  } & { createdAt: NativeDate; updatedAt: NativeDate; } & { _id: Types.ObjectId }>({} as UserType);
+  } & { createdAt: NativeDate; updatedAt: NativeDate; } & { _id: Types.ObjectId }>()(
+    {} as UserType
+  );
 
   type Resolved = ResolveTimestamps<
     { foo: true },
@@ -95,7 +97,7 @@ function Timestamps() {
     }
   >;
 
-  expectType<Resolved>(
+  ExpectType<Resolved>()(
     {} as {
       foo: true;
       bar: NativeDate;
@@ -113,14 +115,14 @@ function DefinitionTypes() {
     schemaInstance: Schema.Types.String;
   }>;
 
-  expectType<{
+  ExpectType<{
     lowercaseString?: string | null | undefined;
     uppercaseString?: string | null | undefined;
     stringConstructor?: string | null | undefined;
     schemaConstructor?: string | null | undefined;
     stringInstance?: string | null | undefined;
     schemaInstance?: string | null | undefined;
-  } & { _id: Types.ObjectId }>({} as Actual);
+  } & { _id: Types.ObjectId }>()({} as Actual);
 }
 
 function MoreDefinitionTypes() {
@@ -133,24 +135,24 @@ function MoreDefinitionTypes() {
     objectIdInstance: Schema.Types.ObjectId;
   }>;
 
-  expectType<{
+  ExpectType<{
     numberString?: number | null | undefined;
     // these should not fallback to Boolean, which has no methods
     objectIdConstructor?: Types.ObjectId | null | undefined;
     objectIdInstance?: Types.ObjectId | null | undefined;
-  } & { _id: Types.ObjectId }>({} as Actual);
+  } & { _id: Types.ObjectId }>()({} as Actual);
 }
 
 function HandlesAny() {
   type ActualShallow = InferRawDocType<any>;
-  expectType<{ [x: PropertyKey]: any } & { _id: unknown }>({} as ActualShallow);
+  ExpectType<{ [x: PropertyKey]: any } & { _id: unknown }>()({} as ActualShallow);
   type ActualNested = InferRawDocType<Record<string, any>>;
-  expectType<{ [x: string]: any } & { _id: unknown }>({} as ActualNested);
+  ExpectType<{ [x: string]: any } & { _id: unknown }>()({} as ActualNested);
 }
 
 function gh15699() {
   const schema = { unTypedArray: [] } as const;
 
   type TSchema = InferRawDocType<typeof schema>;
-  expectType<any[] | null | undefined>({} as unknown as TSchema['unTypedArray']);
+  ExpectType<any[] | null | undefined>()({} as unknown as TSchema['unTypedArray']);
 }

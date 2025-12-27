@@ -19,8 +19,9 @@ import mongoose, {
 } from 'mongoose';
 import mongodb from 'mongodb';
 import { ModifyResult, ObjectId } from 'mongodb';
-import { expectAssignable, expectNotAssignable, expectType } from 'tsd';
+import { expectAssignable, expectNotAssignable } from 'tsd';
 import { autoTypedModel } from './models.test';
+import { ExpectType } from './helpers';
 
 interface QueryHelpers {
   _byName(this: QueryWithHelpers<any, ITest, QueryHelpers>, name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;
@@ -43,7 +44,7 @@ schema.query._byName = function(name: string): QueryWithHelpers<ITest[], ITest, 
 };
 
 schema.query.byName = function(name: string): QueryWithHelpers<ITest[], ITest, QueryHelpers> {
-  // @ts-expect-error
+  // @ts-expect-error not a method on query instances
   this.notAQueryHelper();
   return this._byName(name);
 };
@@ -71,7 +72,7 @@ interface ITest {
 }
 
 type X = mongoose.WithLevel1NestedPaths<ITest>;
-expectType<number | undefined>({} as X['docs.id']);
+ExpectType<number | undefined>()({} as X['docs.id']);
 
 const Test = model<ITest, Model<ITest, QueryHelpers>>('Test', schema);
 
@@ -176,31 +177,31 @@ Test.find({}, { someOtherField: 1 }); // This should be allowed since it's not a
 Test.find({}, { name: { $slice: 1 } });
 Test.find({}, { tags: { $slice: 1 } }); // $slice should be allowed on arrays
 Test.find({}, { tags: { $slice: [1, 2] } }); // $slice with the format of [ <number to skip>, <number to return> ] should also be allowed on arrays
-// @ts-expect-error
-Test.find({}, { age: { $elemMatch: {} } }); // $elemMatch should not be allowed on non arrays
+// @ts-expect-error $elemMatch should not be allowed on non arrays
+Test.find({}, { age: { $elemMatch: {} } });
 Test.find({}, { docs: { $elemMatch: { id: 'aa' } } }); // $elemMatch should be allowed on arrays
-// @ts-expect-error
-Test.find({}, { tags: { $slice: 1, $elemMatch: {} } }); // $elemMatch and $slice should not be allowed together
+// @ts-expect-error $elemMatch and $slice should not be allowed together
+Test.find({}, { tags: { $slice: 1, $elemMatch: {} } });
 Test.find({}, { age: 1, tags: { $slice: 5 } }); // $slice should be allowed in inclusion projection
 Test.find({}, { age: 0, tags: { $slice: 5 } }); // $slice should be allowed in exclusion projection
 Test.find({}, { age: 1, tags: { $elemMatch: {} } }); // $elemMatch should be allowed in inclusion projection
 Test.find({}, { age: 0, tags: { $elemMatch: {} } }); // $elemMatch should be allowed in exclusion projection
-// @ts-expect-error
-Test.find({}, { 'docs.id': 'taco' }); // Dot notation should be allowed and does not accept any
-// @ts-expect-error
-Test.find({}, { docs: { id: '1' } }); // Dot notation should be able to use a combination with objects
+// @ts-expect-error Dot notation should be allowed and does not accept any
+Test.find({}, { 'docs.id': 'taco' });
+// @ts-expect-error Dot notation should be able to use a combination with objects
+Test.find({}, { docs: { id: '1' } });
 Test.find({}, { docs: { id: false } }); // Dot notation should be allowed with valid values - should correctly handle arrays
 Test.find({}, { docs: { id: true } }); // Dot notation should be allowed with valid values - should correctly handle arrays
 Test.find({ docs: { $elemMatch: { id: 1 } } }, { 'docs.$': 1 }); // $ projection should be allowed
 Test.find({}, { child: 1 }); // Dot notation should be able to use a combination with objects
 // Test.find({}, { 'docs.profiles': { name: 1 } }); // 3 levels deep not supported
-// @ts-expect-error
-Test.find({}, { 'docs.profiles': { name: 'aa' } }); // should support a combination of dot notation and objects
-// @ts-expect-error
+// @ts-expect-error should support a combination of dot notation and objects
+Test.find({}, { 'docs.profiles': { name: 'aa' } });
+// @ts-expect-error should not allow projecting inherited methods in nested objects
 Test.find({}, { endDate: { toString: 1 } });
-// @ts-expect-error
+// @ts-expect-error should not allow projecting inherited methods in nested objects
 Test.find({}, { tags: { trim: 1 } });
-// @ts-expect-error
+// @ts-expect-error should not allow projecting inherited methods in nested objects
 Test.find({}, { child: { toJSON: 1 } });
 Test.find({}, { age: 1, _id: 0 });
 Test.find({}, { name: 0, age: 0, _id: 1 });
@@ -216,15 +217,15 @@ Test.find().sort(undefined);
 Test.find().sort(null);
 Test.find().sort([['key', 'ascending']]);
 Test.find().sort([['key1', 'ascending'], ['key2', 'descending']]);
-// @ts-expect-error
+// @ts-expect-error must be one of allowed sort values
 Test.find().sort({ name: 2 });
-// @ts-expect-error
+// @ts-expect-error must be one of allowed sort values
 Test.find().sort({ name: 'invalidSortOrder' });
-// @ts-expect-error
+// @ts-expect-error value must be one of allowed sort values
 Test.find().sort([['key', 'invalid']]);
-// @ts-expect-error
+// @ts-expect-error value must be one of allowed sort values
 Test.find().sort([['key', false]]);
-// @ts-expect-error
+// @ts-expect-error must be array of entries not array of primitives
 Test.find().sort(['invalid']);
 
 // Super generic query
@@ -241,10 +242,10 @@ function testGenericQuery(): void {
 
 function eachAsync(): void {
   Test.find().cursor().eachAsync((doc) => {
-    expectType<HydratedDocument<ITest, {}, QueryHelpers>>(doc);
+    ExpectType<HydratedDocument<ITest, {}, QueryHelpers>>()(doc);
   });
   Test.find().cursor().eachAsync((docs) => {
-    expectType<HydratedDocument<ITest, {}, QueryHelpers>[]>(docs);
+    ExpectType<HydratedDocument<ITest, {}, QueryHelpers>[]>()(docs);
   }, { batchSize: 2 });
 }
 
@@ -313,7 +314,8 @@ async function gh11156(): Promise<void> {
 
   const User: Model<IUser> = model<IUser>('User', schema);
 
-  expectType<{ name: string }>(await User.findOne<Pick<IUser, 'name'>>({}).orFail());
+  const doc = await User.findOne<Pick<IUser, 'name'>>({}).orFail();
+  ExpectType<{ name: string }>()(doc);
 }
 
 async function gh11041(): Promise<void> {
@@ -333,7 +335,7 @@ async function gh11041(): Promise<void> {
   // 3. Create a Model.
   const MyModel = model<User>('User', schema);
 
-  expectType<HydratedDocument<User> | null>(await MyModel.findOne({}).populate('someField').exec());
+  ExpectType<HydratedDocument<User> | null>()(await MyModel.findOne({}).populate('someField').exec());
 }
 
 async function gh11306(): Promise<void> {
@@ -353,14 +355,14 @@ async function gh11306(): Promise<void> {
   // 3. Create a Model.
   const MyModel = model<User>('User', schema);
 
-  expectType<unknown[]>(await MyModel.distinct('notThereInSchema'));
-  expectType<string[]>(await MyModel.distinct('name'));
+  ExpectType<unknown[]>()(await MyModel.distinct('notThereInSchema'));
+  ExpectType<string[]>()(await MyModel.distinct('name'));
 }
 
 function autoTypedQuery() {
   const AutoTypedModel = autoTypedModel();
   const query = AutoTypedModel.find();
-  expectType<typeof query>(AutoTypedModel.find().byUserName(''));
+  ExpectType<typeof query>()(AutoTypedModel.find().byUserName(''));
 }
 
 function gh11964() {
@@ -457,7 +459,7 @@ async function gh12342_manual() {
   // 2nd param to `model()` is the Model class to return.
   const ProjectModel = model<Project, ProjectModelType>('Project', schema);
 
-  expectType<HydratedDocument<Project>[]>(
+  ExpectType<HydratedDocument<Project>[]>()(
     await ProjectModel.findOne().where('stars').gt(1000).byName('mongoose')
   );
 }
@@ -498,16 +500,16 @@ async function gh11602(): Promise<void> {
     includeResultMetadata: true
   });
 
-  // @ts-expect-error
+  // @ts-expect-error should not exist
   updateResult.lastErrorObject?.modifiedCount;
-  expectType<boolean | undefined>(updateResult.lastErrorObject?.updatedExisting);
-  expectType<ObjectId | undefined>(updateResult.lastErrorObject?.upserted);
+  ExpectType<boolean | undefined>()(updateResult.lastErrorObject?.updatedExisting);
+  ExpectType<ObjectId | undefined>()(updateResult.lastErrorObject?.upserted);
 
   ModelType.findOneAndUpdate({}, {}, { returnDocument: 'before' });
   ModelType.findOneAndUpdate({}, {}, { returnDocument: 'after' });
   ModelType.findOneAndUpdate({}, {}, { returnDocument: undefined });
   ModelType.findOneAndUpdate({}, {}, {});
-  // @ts-expect-error
+  // @ts-expect-error returnDocument should be 'before' or 'after'
   ModelType.findOneAndUpdate({}, {}, { returnDocument: 'not-before-or-after' });
 }
 
@@ -547,7 +549,7 @@ async function gh13142() {
     { lean: true }
   );
   if (!blog) return;
-  expectType<Pick<Blog, Extract<keyof { content: 1 }, keyof Blog>>>(blog);
+  ExpectType<Pick<Blog, Extract<keyof { content: 1 }, keyof Blog>>>()(blog);
 }
 
 async function gh13224() {
@@ -555,24 +557,24 @@ async function gh13224() {
   const UserModel = model('User', userSchema);
 
   const u1 = await UserModel.findOne().select(['name']).orFail();
-  expectType<string | undefined | null>(u1.name);
-  expectType<number | undefined | null>(u1.age);
+  ExpectType<string | undefined | null>()(u1.name);
+  ExpectType<number | undefined | null>()(u1.age);
   expectAssignable<Function>(u1.toObject);
 
   const u2 = await UserModel.findOne().select<{ name?: string }>(['name']).orFail();
-  expectType<string | undefined>(u2.name);
-  // @ts-expect-error
+  ExpectType<string | undefined>()(u2.name);
+  // @ts-expect-error excluded from projection
   u2.age;
   expectAssignable<Function>(u2.toObject);
 
   const users = await UserModel.find().select<{ name?: string }>(['name']);
   const u3 = users[0];
-  expectType<string | undefined>(u3!.name);
-  // @ts-expect-error
+  ExpectType<string | undefined>()(u3!.name);
+  // @ts-expect-error excluded from projection
   u3!.age;
   expectAssignable<Function>(u3.toObject);
 
-  // @ts-expect-error
+  // @ts-expect-error cannot project fields that aren't in the schema
   await UserModel.findOne().select<{ notInSchema: string }>(['name']).orFail();
 }
 
@@ -600,7 +602,7 @@ function gh14190() {
   const UserModel = model('User', userSchema);
 
   const doc = await UserModel.findByIdAndDelete('0'.repeat(24));
-  expectType<ReturnType<(typeof UserModel)['hydrate']> | null>(doc);
+  ExpectType<ReturnType<(typeof UserModel)['hydrate']> | null>()(doc);
 
   const res = await UserModel.findByIdAndDelete(
     '0'.repeat(24),
@@ -722,9 +724,9 @@ async function gh14545() {
   const myDoc = await M.findOne({}).exec();
 
   const myProjections = await M.find({}).select<SlimTest>({ prop: 1 }).exec();
-  expectType<SlimTestDocument[]>(myProjections);
+  ExpectType<SlimTestDocument[]>()(myProjections);
   const myProjection = await M.findOne({}).select<SlimTest>({ prop: 1 }).exec();
-  expectType<SlimTestDocument | null>(myProjection);
+  ExpectType<SlimTestDocument | null>()(myProjection);
 }
 
 function gh14841() {
@@ -753,9 +755,9 @@ async function gh15526() {
   const u1 = await UserModel.findOne()
     .select<SelectType>(selection)
     .orFail();
-  expectType<string | undefined | null>(u1.name);
+  ExpectType<string | undefined | null>()(u1.name);
 
-  // @ts-expect-error
+  // @ts-expect-error excluded from projection
   u1.age;
 }
 
@@ -816,11 +818,11 @@ async function gh12064() {
   const TestModel = model('Model', schema);
 
   await TestModel.findOne({ 'subdoc.subdocProp': { $gt: 0 }, 'nested.nestedProp': { $in: ['foo', 'bar'] }, 'documentArray.documentArrayProp': { $ne: true } });
-  // @ts-expect-error
+  // @ts-expect-error incorrect type
   TestModel.findOne({ 'subdoc.subdocProp': 'taco tuesday' });
-  // @ts-expect-error
+  // @ts-expect-error incorrect type
   TestModel.findOne({ 'nested.nestedProp': true });
-  // @ts-expect-error
+  // @ts-expect-error incorrect type
   TestModel.findOne({ 'documentArray.documentArrayProp': 'taco' });
 }
 

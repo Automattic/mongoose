@@ -73,7 +73,7 @@ function setAsObject() {
     updatePipeline: true
   });
 
-  // @ts-expect-error
+  // @ts-expect-error should error out if an invalid option is provided
   mongoose.set({ invalid: true });
 }
 

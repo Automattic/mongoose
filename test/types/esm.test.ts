@@ -1,7 +1,7 @@
 import type * as mongoose from 'mongoose';
 import mongooseESM from 'mongoose';
 import * as mongooseDefault from 'mongoose';
-import { expectType } from 'tsd';
+import { ExpectType } from './helpers';
 
-expectType<typeof mongoose>(mongooseESM);
-expectType<typeof mongoose>(mongooseDefault);
+ExpectType<typeof mongoose>()(mongooseESM);
+ExpectType<typeof mongoose>()(mongooseDefault);

@@ -27,11 +27,11 @@ function gh10345() {
     const doc = new UserModel({ name: 'test' });
 
     const leanDoc = doc.toObject<User>();
-    // @ts-expect-error
+    // @ts-expect-error id shouldn't exist on lean docs
     leanDoc.id = 43;
 
     const doc2 = await UserModel.findOne().orFail().lean();
-    // @ts-expect-error
+    // @ts-expect-error id shouldn't exist on lean docs
     doc2.id = 43;
   })();
 }
@@ -408,29 +408,29 @@ async function gh15583_2() {
   const TestModel = model('Test', schema);
 
   const testDoc = await TestModel.findOne().orFail();
-  // @ts-expect-error
+  // @ts-expect-error should not exist on lean docs
   testDoc.save();
 
   const testDoc2 = await TestModel.findById('anything').lean().orFail();
-  // @ts-expect-error
+  // @ts-expect-error should not exist on lean docs
   testDoc2.save();
 
   const testDocs = await TestModel.find().lean().exec();
   for (const doc of testDocs) {
-    // @ts-expect-error
+    // @ts-expect-error should not exist on lean docs
     doc.save();
   }
 
   const testDoc3 = await TestModel.findOneAndUpdate({}, { name: 'test' }).lean().orFail();
-  // @ts-expect-error
+  // @ts-expect-error should not exist on lean docs
   testDoc3.save();
 
   const testDoc4 = await TestModel.findOneAndReplace({}, { name: 'test' }).lean().orFail();
-  // @ts-expect-error
+  // @ts-expect-error should not exist on lean docs
   testDoc4.save();
 
   const testDoc5 = await TestModel.findOneAndDelete({}).lean().orFail();
-  // @ts-expect-error
+  // @ts-expect-error should not exist on lean docs
   testDoc5.save();
 
   const schema2 = new Schema(
@@ -440,29 +440,29 @@ async function gh15583_2() {
   const TestModel2 = model('Test', schema2);
 
   const testDoc6 = await TestModel2.findOne().orFail();
-  // @ts-expect-error
+  // @ts-expect-error should not exist on lean docs
   testDoc6.save();
 
   const testDoc7 = await TestModel2.findById('anything').lean().orFail();
-  // @ts-expect-error
+  // @ts-expect-error should not exist on lean docs
   testDoc7.save();
 
   const testDocs2 = await TestModel2.find().lean().exec();
   for (const doc of testDocs2) {
-    // @ts-expect-error
+    // @ts-expect-error should not exist on lean docs
     doc.save();
   }
 
   const testDoc8 = await TestModel2.findOneAndUpdate({}, { name: 'test' }).lean().orFail();
-  // @ts-expect-error
+  // @ts-expect-error should not exist on lean docs
   testDoc8.save();
 
   const testDoc9 = await TestModel2.findOneAndReplace({}, { name: 'test' }).lean().orFail();
-  // @ts-expect-error
+  // @ts-expect-error should not exist on lean docs
   testDoc9.save();
 
   const testDoc10 = await TestModel2.findOneAndDelete({}).lean().orFail();
-  // @ts-expect-error
+  // @ts-expect-error should not exist on lean docs
   testDoc10.save();
 
 }

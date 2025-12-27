@@ -1,7 +1,8 @@
 import mongoose, { Schema, model, Document, PopulatedDoc, Types, HydratedDocument, SchemaTypeOptions, Model } from 'mongoose';
 // Use the mongodb ObjectId to make instanceof calls possible
 import { ObjectId } from 'mongodb';
-import { expectAssignable, expectType } from 'tsd';
+import { expectAssignable } from 'tsd';
+import { ExpectType } from './helpers';
 
 interface Child {
   name: string;
@@ -37,7 +38,7 @@ ParentModel.
       throw new Error('should be populated');
     } else {
       const name = leanChild.name;
-      // @ts-expect-error
+      // @ts-expect-error not defined on lean doc
       leanChild.save();
     }
   });
@@ -177,19 +178,19 @@ function gh11503() {
 
   User.findOne({}).populate('friends').then(user => {
     if (!user) return;
-    expectType<Types.ObjectId>(user?.friends[0]);
-    // @ts-expect-error
+    ExpectType<Types.ObjectId>()(user?.friends[0]);
+    // @ts-expect-error not populated by default
     user?.friends[0].blocked;
-    // @ts-expect-error
+    // @ts-expect-error not populated by default
     user?.friends.map(friend => friend.blocked);
   });
 
   User.findOne({}).populate<{ friends: Friend[] }>('friends').then(user => {
     if (!user) return;
     expectAssignable<Friend>(user?.friends[0]);
-    expectType<boolean>(user?.friends[0].blocked);
+    ExpectType<boolean>()(user?.friends[0].blocked);
     const firstFriendBlockedValue = user?.friends.map(friend => friend)[0];
-    expectType<boolean>(firstFriendBlockedValue?.blocked);
+    ExpectType<boolean>()(firstFriendBlockedValue?.blocked);
   });
 }
 
@@ -247,10 +248,10 @@ async function _11532() {
   const leanResult = await populateQuery.lean();
 
   if (!populateResult) return;
-  expectType<string>(populateResult.child.name);
+  ExpectType<string>()(populateResult.child.name);
 
   if (!leanResult) return;
-  expectType<string>(leanResult.child.name);
+  ExpectType<string>()(leanResult.child.name);
 }
 
 async function gh11710() {
@@ -275,7 +276,7 @@ async function gh11710() {
 
   // Populate with `Paths` generic `{ child: Child }` to override `child` path
   const doc = await ParentModel.findOne({}).populate<Pick<PopulatedParent, 'child'>>('child').orFail();
-  expectType<Child | null>(doc.child);
+  ExpectType<Child | null>()(doc.child);
 }
 
 async function gh11758() {
@@ -302,7 +303,7 @@ async function gh11758() {
     name: 'Parent'
   }).$assertPopulated<{ nestedChild: NestedChild }>('nestedChild');
 
-  expectType<string>(parent.nestedChild.name);
+  ExpectType<string>()(parent.nestedChild.name);
 
   await parent.save();
 }
@@ -399,9 +400,9 @@ function gh14441() {
     .populate<{ child: Child }>('child')
     .orFail()
     .then(doc => {
-      expectType<string>(doc.child.name);
+      ExpectType<string>()(doc.child.name);
       const docObject = doc.toObject();
-      expectType<string>(docObject.child.name);
+      ExpectType<string>()(docObject.child.name);
     });
 
   ParentModel.findOne({})
@@ -409,16 +410,16 @@ function gh14441() {
     .lean()
     .orFail()
     .then(doc => {
-      expectType<string>(doc.child.name);
+      ExpectType<string>()(doc.child.name);
     });
 
   ParentModel.find({})
     .populate<{ child: Child }>('child')
     .orFail()
     .then(docs => {
-      expectType<string>(docs[0]!.child.name);
+      ExpectType<string>()(docs[0]!.child.name);
       const docObject = docs[0]!.toObject();
-      expectType<string>(docObject.child.name);
+      ExpectType<string>()(docObject.child.name);
     });
 }
 
@@ -459,8 +460,8 @@ async function gh14574() {
     .populate<{ friend: HydratedDocument<User, UserMethods> }>('friend')
     .orFail()
     .exec();
-  expectType<string>(user.fullName());
-  expectType<string>(user.friend.fullName());
+  ExpectType<string>()(user.fullName());
+  ExpectType<string>()(user.friend.fullName());
 }
 
 async function gh15111() {
@@ -553,5 +554,5 @@ async function gh15111() {
   const parents = await ParentModel.find().populate<{ child: ChildInstance }>(
     'child'
   );
-  expectType<string>(parents[0].fullName);
+  ExpectType<string>()(parents[0].fullName);
 }

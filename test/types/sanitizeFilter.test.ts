@@ -1,7 +1,7 @@
 import { QueryFilter, sanitizeFilter } from 'mongoose';
-import { expectType } from 'tsd';
+import { ExpectType } from './helpers';
 
 const data = { username: 'val', pwd: { $ne: null } };
 type Data = typeof data;
 
-expectType<QueryFilter<Data>>(sanitizeFilter<typeof data>(data));
+ExpectType<QueryFilter<Data>>()(sanitizeFilter<typeof data>(data));

@@ -19,9 +19,8 @@ ExpectType<Promise<Connection>>()(conn.openUri('mongodb://127.0.0.1:27017/test',
 conn.readyState === 0;
 conn.readyState === 99;
 
-// @ts-expect-error
+// @ts-expect-error should not be allowed to update readyState
 conn.readyState = 0;
-
 
 ExpectType<Promise<Record<string, Error | mongodb.Collection<any>>>>()(
   conn.createCollections()
@@ -34,7 +33,7 @@ ExpectType<Promise<mongodb.Collection<{ [key: string]: any }>>>()(conn.createCol
 
 ExpectType<Promise<void>>()(conn.dropCollection('some'));
 
-// @ts-expect-error
+// @ts-expect-error cannot call deleteModel with no args
 conn.deleteModel();
 ExpectType<Connection>()(conn.deleteModel('something'));
 ExpectType<Connection>()(conn.deleteModel(/.+/));
@@ -63,13 +62,13 @@ ExpectType<Promise<string>>()(conn.withSession(async(res) => {
   return 'a';
 }));
 
-// @ts-expect-error
+// @ts-expect-error cannot update user property
 conn.user = 'invalid';
-// @ts-expect-error
+// @ts-expect-error cannot update pass property
 conn.pass = 'invalid';
-// @ts-expect-error
+// @ts-expect-error cannot update host property
 conn.host = 'invalid';
-// @ts-expect-error
+// @ts-expect-error cannot update port property
 conn.port = 'invalid';
 
 ExpectType<Collection>()(conn.collection('test'));
@@ -164,7 +163,7 @@ function schemaInstanceMethodsAndQueryHelpersOnConnection() {
 async function gh15359() {
   const res = await conn.bulkWrite([{ model: 'Test', name: 'insertOne', document: { name: 'test1' } }]);
   ExpectType<number>()(res.insertedCount);
-  // @ts-expect-error
+  // @ts-expect-error should not be defined unless option is set
   res.mongoose.validationErrors;
 
   const res2 = await conn.bulkWrite([{ model: 'Test', name: 'insertOne', document: { name: 'test2' } }], { ordered: false });
@@ -177,7 +176,7 @@ async function gh15359() {
   ], { ordered: false });
   ExpectType<number>()(res3.insertedCount);
 
-  // @ts-expect-error
+  // @ts-expect-error should not be defined unless option is set
   res3.mongoose.validationErrors;
   ExpectType<Error[] | undefined>()(res3.mongoose?.validationErrors);
 }

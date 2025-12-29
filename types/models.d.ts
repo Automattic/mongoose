@@ -191,26 +191,26 @@ declare module 'mongoose' {
 
   export type ReplaceOneModel<TSchema extends mongodb.Document = mongodb.Document> =
     Omit<mongodb.ReplaceOneModel<TSchema>, 'filter'> &
-    { filter: QueryFilter<TSchema> } &
+    { filter: FilterQuery<TSchema> } &
     MongooseBulkUpdatePerOperationOptions;
 
   export type UpdateOneModel<TSchema extends mongodb.Document = mongodb.Document> =
     Omit<mongodb.UpdateOneModel<TSchema>, 'filter'> &
-    { filter: QueryFilter<TSchema> } &
+    { filter: FilterQuery<TSchema> } &
     MongooseBulkUpdatePerOperationOptions;
 
   export type UpdateManyModel<TSchema extends mongodb.Document = mongodb.Document> =
     Omit<mongodb.UpdateManyModel<TSchema>, 'filter'> &
-    { filter: QueryFilter<TSchema> } &
+    { filter: FilterQuery<TSchema> } &
     MongooseBulkUpdatePerOperationOptions;
 
   export type DeleteOneModel<TSchema extends mongodb.Document = mongodb.Document> =
     Omit<mongodb.DeleteOneModel<TSchema>, 'filter'> &
-    { filter: QueryFilter<TSchema> };
+    { filter: FilterQuery<TSchema> };
 
   export type DeleteManyModel<TSchema extends mongodb.Document = mongodb.Document> =
     Omit<mongodb.DeleteManyModel<TSchema>, 'filter'> &
-    { filter: QueryFilter<TSchema> };
+    { filter: FilterQuery<TSchema> };
 
   export type AnyBulkWriteOperation<TSchema extends mongodb.Document = mongodb.Document> =
     | { insertOne: InsertOneModel<TSchema> }

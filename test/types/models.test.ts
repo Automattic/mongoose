@@ -1102,7 +1102,7 @@ async function gh15910() {
 
   const FooModel = model<FooType>('foo', fooSchema);
 
-  const query: mongoose.QueryFilter<FooType> = {
+  const query: mongoose.FilterQuery<FooType> = {
     date: { $lte: new Date() }
   };
 

@@ -468,9 +468,14 @@ declare module 'mongoose' {
     pre<T = never>(method: MongooseDistinctDocumentMiddleware | MongooseDistinctDocumentMiddleware[] | RegExp, options: SchemaPreOptions & { document: false, query: boolean }, fn: PreMiddlewareFunction<T>): this;
     // this = Union of Document and Query, could be called with any of them
     pre<T = THydratedDocumentType | Query<any, any>>(
-      method: MongooseQueryAndDocumentMiddleware | MongooseQueryAndDocumentMiddleware[] | RegExp,
+      method: 'updateOne' | RegExp,
       options: SchemaPreOptions & { document: true, query: true },
-      fn: PreMiddlewareFunction<T>
+      fn: PreUpdateOneMiddlewareFunction<T>
+    ): this;
+    pre<T = THydratedDocumentType | Query<any, any>>(
+      method: 'deleteOne' | RegExp,
+      options: SchemaPreOptions & { document: true, query: true },
+      fn: PreDeleteOneMiddlewareFunction<T>
     ): this;
     // this = Document
     pre<T = THydratedDocumentType>(method: 'save', fn: PreSaveMiddlewareFunction<T>): this;
@@ -478,9 +483,14 @@ declare module 'mongoose' {
     pre<T = THydratedDocumentType>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], fn: PreMiddlewareFunction<T>): this;
     pre<T = THydratedDocumentType>(method: MongooseDistinctDocumentMiddleware|MongooseDistinctDocumentMiddleware[], options: SchemaPreOptions, fn: PreMiddlewareFunction<T>): this;
     pre<T = THydratedDocumentType>(
-      method: MongooseQueryAndDocumentMiddleware | MongooseQueryAndDocumentMiddleware[] | RegExp,
+      method: 'updateOne' | RegExp,
       options: SchemaPreOptions & { document: true },
-      fn: PreMiddlewareFunction<T>
+      fn: PreUpdateOneMiddlewareFunction<T>
+    ): this;
+    pre<T = THydratedDocumentType>(
+      method: 'deleteOne' | RegExp,
+      options: SchemaPreOptions & { document: true },
+      fn: PreDeleteOneMiddlewareFunction<T>
     ): this;
     pre<T = THydratedDocumentType>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: SchemaPreOptions & { document: true, query: false }, fn: PreMiddlewareFunction<T>): this;
     // this = Query

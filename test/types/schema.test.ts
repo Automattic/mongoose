@@ -1248,7 +1248,8 @@ function gh13633() {
   schema.pre('updateOne', { document: true, query: false }, function(next) {
   });
 
-  schema.pre('updateOne', { document: true, query: false }, function(options) {
+  schema.pre('updateOne', { document: true, query: false }, function(doc, update, options) {
+    expectType<Record<string, any> | undefined>(update);
     expectType<Record<string, any> | undefined>(options);
   });
 

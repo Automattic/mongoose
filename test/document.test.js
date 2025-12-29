@@ -6905,9 +6905,20 @@ describe('document', function() {
     let docRegexCount = 0;
     let docPostRegexCount = 0;
 
-    schema.pre('updateOne', () => ++queryCount);
-    schema.pre('updateOne', { document: true, query: false }, () => ++docCount);
-    schema.post('updateOne', { document: true, query: false }, () => ++docPostCount);
+    schema.pre('updateOne', { document: false, query: true }, function() {
+      ++queryCount;
+      assert.strictEqual(this.options.testOption, 'newValue');
+    });
+    schema.pre('updateOne', { document: true, query: false }, (doc, update, opts) => {
+      assert.strictEqual(opts.testOption, 'value');
+      assert.deepStrictEqual(update, { name: 'test2' });
+      opts.testOption = 'newValue';
+      ++docCount;
+    });
+    schema.post('updateOne', { document: true, query: false }, () => {
+      ++docPostCount;
+    });
+
 
     schema.pre(/^updateOne$/, { document: true, query: false }, () => ++docRegexCount);
     schema.post(/^updateOne$/, { document: true, query: false }, () => ++docPostRegexCount);
@@ -6929,7 +6940,7 @@ describe('document', function() {
     assert.equal(docRegexCount, 0);
     assert.equal(docPostRegexCount, 0);
 
-    await doc.updateOne({ name: 'test2' });
+    await doc.updateOne({ name: 'test2' }, { testOption: 'value' });
 
     assert.equal(queryCount, 1);
     assert.equal(docCount, 1);

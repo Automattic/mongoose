@@ -1,3 +1,9 @@
+8.21.0 / 2025-12-29
+===================
+ * feat(document): add support for getAtomics() to allow custom container types to utilize atomics #15817
+ * feat(document+model): pass options to pre('deleteOne') and update+options to pre('updateOne') hooks #15908 #15870
+ * fix: add support for typescript style enums #15914 #15913 [mjfwebb](https://github.com/mjfwebb)
+
 8.20.4 / 2025-12-18
 ===================
  * fix(model): ensure $isDeleted is set after calling doc.deleteOne() successfully #15898

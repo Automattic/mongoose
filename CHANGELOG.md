@@ -1,3 +1,26 @@
+8.20.4 / 2025-12-18
+===================
+ * fix(model): ensure $isDeleted is set after calling doc.deleteOne() successfully #15898
+ * fix(document): use bitwise OR to accumulate version mode flags #15893 #15888 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
+8.20.3 / 2025-12-15
+===================
+ * perf: use Object.hasOwn instead of Object#hasOwnProperty #15875 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix: improve error when calling Document.prototype.init() with null/undefined #15812 [Vegapunk-debug](https://github.com/Vegapunk-debug)
+ * types(schema): avoid treating paths with default: null as required #15889
+ * types(schema): allow partial statics to schema.statics() #15780
+
+8.20.2 / 2025-12-05
+===================
+ * fix(model): bump version if necessary after successful bulkSave() #15809 #15800
+ * fix(bulkWrite): pass overwriteImmutable option to castUpdate fixes #15789 #15782 #15781
+ * types(schema): allow calling schema.static() with as TStatics #15794 #15780
+
+7.8.8 / 2025-12-04
+==================
+ * fix(bulkWrite): pass overwriteImmutable option to castUpdate fixes #15789 #15782 #15781
+ * fix(model): bump version if necessary after successful bulkSave() #15800
+
 8.20.1 / 2025-11-20
 ===================
  * types: correct Model.schema type and fix unknown check for this param type in schema.methods #15750 #15693

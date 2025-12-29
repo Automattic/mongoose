@@ -172,94 +172,47 @@ declare module 'mongoose' {
 
   interface RemoveOptions extends SessionOption, Omit<mongodb.DeleteOptions, 'session'> {}
 
+  interface MongooseBulkWritePerOperationOptions {
+    /** Skip validation for this operation. */
+    skipValidation?: boolean;
+    /** When false, do not add timestamps. When true, overrides the `timestamps` option set in the `bulkWrite` options. */
+    timestamps?: boolean;
+  }
+
+  interface MongooseBulkUpdatePerOperationOptions extends MongooseBulkWritePerOperationOptions {
+    /** When true, allows updating fields that are marked as `immutable` in the schema. */
+    overwriteImmutable?: boolean;
+    /** When false, do not set default values on insert. */
+    setDefaultsOnInsert?: boolean;
+  }
+
+  export type InsertOneModel<TSchema extends mongodb.Document = mongodb.Document> =
+    mongodb.InsertOneModel<TSchema> & MongooseBulkWritePerOperationOptions;
+
+  export type ReplaceOneModel<TSchema extends mongodb.Document = mongodb.Document> =
+    mongodb.ReplaceOneModel<TSchema> & MongooseBulkWritePerOperationOptions;
+
+  export type UpdateOneModel<TSchema extends mongodb.Document = mongodb.Document> =
+    mongodb.UpdateOneModel<TSchema> & MongooseBulkUpdatePerOperationOptions;
+
+  export type UpdateManyModel<TSchema extends mongodb.Document = mongodb.Document> =
+    mongodb.UpdateManyModel<TSchema> & MongooseBulkUpdatePerOperationOptions;
+
+  export type DeleteOneModel<TSchema extends mongodb.Document = mongodb.Document> =
+    mongodb.DeleteOneModel<TSchema>;
+
+  export type DeleteManyModel<TSchema extends mongodb.Document = mongodb.Document> =
+    mongodb.DeleteManyModel<TSchema>;
+
+  export type AnyBulkWriteOperation<TSchema extends mongodb.Document = mongodb.Document> =
+    | { insertOne: InsertOneModel<TSchema> }
+    | { replaceOne: ReplaceOneModel<TSchema> }
+    | { updateOne: UpdateOneModel<TSchema> }
+    | { updateMany: UpdateManyModel<TSchema> }
+    | { deleteOne: DeleteOneModel<TSchema> }
+    | { deleteMany: DeleteManyModel<TSchema> };
+
   const Model: Model<any>;
-
-  export type AnyBulkWriteOperation<TSchema = AnyObject> = {
-    insertOne: InsertOneModel<TSchema>;
-  } | {
-    replaceOne: ReplaceOneModel<TSchema>;
-  } | {
-    updateOne: UpdateOneModel<TSchema>;
-  } | {
-    updateMany: UpdateManyModel<TSchema>;
-  } | {
-    deleteOne: DeleteOneModel<TSchema>;
-  } | {
-    deleteMany: DeleteManyModel<TSchema>;
-  };
-
-  export interface InsertOneModel<TSchema> {
-    document: mongodb.OptionalId<TSchema>;
-    /** When false, do not add timestamps. When true, overrides the `timestamps` option set in the `bulkWrite` options. */
-    timestamps?: boolean;
-  }
-
-  export interface ReplaceOneModel<TSchema = AnyObject> {
-    /** The filter to limit the replaced document. */
-    filter: RootFilterQuery<TSchema>;
-    /** The document with which to replace the matched document. */
-    replacement: mongodb.WithoutId<TSchema>;
-    /** Specifies a collation. */
-    collation?: mongodb.CollationOptions;
-    /** The index to use. If specified, then the query system will only consider plans using the hinted index. */
-    hint?: mongodb.Hint;
-    /** When true, creates a new document if no document matches the query. */
-    upsert?: boolean;
-    /** When false, do not add timestamps. When true, overrides the `timestamps` option set in the `bulkWrite` options. */
-    timestamps?: boolean;
-  }
-
-  export interface UpdateOneModel<TSchema = AnyObject> {
-    /** The filter to limit the updated documents. */
-    filter: RootFilterQuery<TSchema>;
-    /** A document or pipeline containing update operators. */
-    update: UpdateQuery<TSchema>;
-    /** A set of filters specifying to which array elements an update should apply. */
-    arrayFilters?: AnyObject[];
-    /** Specifies a collation. */
-    collation?: mongodb.CollationOptions;
-    /** The index to use. If specified, then the query system will only consider plans using the hinted index. */
-    hint?: mongodb.Hint;
-    /** When true, creates a new document if no document matches the query. */
-    upsert?: boolean;
-    /** When false, do not add timestamps. When true, overrides the `timestamps` option set in the `bulkWrite` options. */
-    timestamps?: boolean;
-  }
-
-  export interface UpdateManyModel<TSchema = AnyObject> {
-    /** The filter to limit the updated documents. */
-    filter: RootFilterQuery<TSchema>;
-    /** A document or pipeline containing update operators. */
-    update: UpdateQuery<TSchema>;
-    /** A set of filters specifying to which array elements an update should apply. */
-    arrayFilters?: AnyObject[];
-    /** Specifies a collation. */
-    collation?: mongodb.CollationOptions;
-    /** The index to use. If specified, then the query system will only consider plans using the hinted index. */
-    hint?: mongodb.Hint;
-    /** When true, creates a new document if no document matches the query. */
-    upsert?: boolean;
-    /** When false, do not add timestamps. When true, overrides the `timestamps` option set in the `bulkWrite` options. */
-    timestamps?: boolean;
-  }
-
-  export interface DeleteOneModel<TSchema = AnyObject> {
-    /** The filter to limit the deleted documents. */
-    filter: RootFilterQuery<TSchema>;
-    /** Specifies a collation. */
-    collation?: mongodb.CollationOptions;
-    /** The index to use. If specified, then the query system will only consider plans using the hinted index. */
-    hint?: mongodb.Hint;
-  }
-
-  export interface DeleteManyModel<TSchema = AnyObject> {
-    /** The filter to limit the deleted documents. */
-    filter: RootFilterQuery<TSchema>;
-    /** Specifies a collation. */
-    collation?: mongodb.CollationOptions;
-    /** The index to use. If specified, then the query system will only consider plans using the hinted index. */
-    hint?: mongodb.Hint;
-  }
 
   type HasLeanOption<TSchema> = 'lean' extends keyof ObtainSchemaGeneric<TSchema, 'TSchemaOptions'> ?
     ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>['lean'] extends Record<string, any> ?
@@ -319,13 +272,13 @@ declare module 'mongoose' {
      * round trip to the MongoDB server.
      */
     bulkWrite<DocContents = TRawDocType>(
-      writes: Array<AnyBulkWriteOperation<DocContents>>,
-      options: MongooseBulkWriteOptions & { ordered: false }
-    ): Promise<MongooseBulkWriteResult>;
+      writes: Array<AnyBulkWriteOperation<DocContents extends mongodb.Document ? DocContents : any>>,
+      options: mongodb.BulkWriteOptions & MongooseBulkWriteOptions & { ordered: false }
+    ): Promise<mongodb.BulkWriteResult & { mongoose?: { validationErrors: Error[] } }>;
     bulkWrite<DocContents = TRawDocType>(
-      writes: Array<AnyBulkWriteOperation<DocContents>>,
-      options?: MongooseBulkWriteOptions
-    ): Promise<MongooseBulkWriteResult>;
+      writes: Array<AnyBulkWriteOperation<DocContents extends mongodb.Document ? DocContents : any>>,
+      options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions
+    ): Promise<mongodb.BulkWriteResult>;
 
     /**
      * Sends multiple `save()` calls in a single `bulkWrite()`. This is faster than

@@ -23,7 +23,8 @@ const path = require('path');
 
 const mocha = new Mocha({
   timeout: 8000,
-  ...(args.g ? { fgrep: '' + args.g } : {})
+  ...(args.g ? { fgrep: '' + args.g } : {}),
+  ...(args.reporter ? { reporter: '' + args.reporter } : {})
 });
 
 // the following is required because mocha somehow does not load "require" options and so needs to be manually set-up

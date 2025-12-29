@@ -1,3 +1,23 @@
+9.1.0 / 2025-12-29
+===================
+ * feat(model): make pathsToSave handle saving just a subpath of a modified path #15896
+ * feat(document+model): pass options to pre('deleteOne') and update+options to pre('updateOne') hooks #15908 #15870
+ * feat(versioning): optimistic concurrency exclude option, update docs for optimisticConcurrency options #15917 #15915 #15912 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(document): add support for getAtomics() to allow custom container types to utilize atomics #15817
+ * fix: add support for typescript style enums #15914 #15913 [mjfwebb](https://github.com/mjfwebb)
+ * types(models): support Mongoose query casting in AnyBulkWriteOperation filter property #15918 #15910
+
+8.21.0 / 2025-12-29
+===================
+ * feat(document+model): pass options to pre('deleteOne') and update+options to pre('updateOne') hooks #15908 #15870
+ * feat(document): add support for getAtomics() to allow custom container types to utilize atomics #15817
+ * fix: add support for typescript style enums #15914 #15913 [mjfwebb](https://github.com/mjfwebb)
+
+8.20.4 / 2025-12-18
+===================
+ * fix(model): ensure $isDeleted is set after calling doc.deleteOne() successfully #15898
+ * fix(document): use bitwise OR to accumulate version mode flags #15893 #15888 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
 9.0.2 / 2025-12-17
 ==================
  * fix(model): trigger error post hook on bulkwrite when pre-hook throws an error #15882 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

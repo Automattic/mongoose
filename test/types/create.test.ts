@@ -1,4 +1,4 @@
-import { Schema, model, Types, HydratedDocument } from 'mongoose';
+import mongoose, { Schema, model, Types, HydratedDocument } from 'mongoose';
 import { expectError, expectType } from 'tsd';
 
 const schema = new Schema({ name: { type: 'String' } });
@@ -209,3 +209,16 @@ async function createWithRawDocTypeNo_id() {
 }
 
 createWithAggregateErrors();
+
+async function gh15902() {
+  class ProviderMongoDbMongooseImpl<K extends Record<string, unknown>> {
+    public constructor(
+      private readonly model: mongoose.Model<K>
+    ) {}
+
+    public async createOne(resource: K): Promise<K> {
+      const doc = await this.model.create(resource);
+      return doc.toObject() as K;
+    }
+  }
+}

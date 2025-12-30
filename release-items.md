@@ -29,7 +29,7 @@ For 8.x
 
 ## major releases
 
-- create docs/migrating_to_x.md
-- update default version in docs/js/search.js
-- create branch for previous major version, like `9.x`
-- update previous major version branch's `publish.yml` to publish to a tag that isn't latest, like `9x` or similar
+* create docs/migrating_to_x.md
+* update default version in docs/js/search.js
+* create branch for previous major version, like `9.x`
+* update previous major version branch's `publish.yml` to publish to a tag that isn't latest, like `9x` or similar

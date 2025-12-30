@@ -255,6 +255,8 @@ declare module 'mongoose' {
     set(path: string | Record<string, any>, val: any, options?: DocumentSetOptions): this;
     set(value: string | Record<string, any>): this;
 
+    toBSON(): Require_id<DocType>;
+
     /** The return value of this method is used in calls to JSON.stringify(doc). */
     toJSON(options: ToObjectOptions & { versionKey: false, virtuals: true, flattenObjectIds: true }): Omit<ObjectIdToString<FlattenMaps<Require_id<DocType & TVirtuals>>>, '__v'>;
     toJSON(options: ToObjectOptions & { virtuals: true, flattenObjectIds: true }): ObjectIdToString<FlattenMaps<Default__v<Require_id<DocType & TVirtuals>, ResolveSchemaOptions<TSchemaOptions>>>>;

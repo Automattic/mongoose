@@ -15127,6 +15127,28 @@ describe('document', function() {
     await user.validate(null);
     await assert.rejects(() => user.validate({}), /Path `test` is required/);
   });
+
+  it('supports updateOne with update pipeline', async function() {
+    const schema = new Schema({ name: String, age: Number });
+    const Person = db.model('Person', schema);
+
+    const doc = new Person({ name: 'test' });
+    await doc.updateOne(
+      [
+        {
+          $set: {
+            age: {
+              $round: [
+                { $add: ['age', 1] },
+                0
+              ]
+            }
+          }
+        }
+      ],
+      { updatePipeline: true }
+    );
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

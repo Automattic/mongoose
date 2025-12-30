@@ -1,3 +1,8 @@
+9.1.1 / 2025-12-30
+==================
+ * fix(document): avoid 'Cannot mix array and object updates' on doc.updateOne() with pipeline #15928
+ * docs: update default search version to 9.x #15926 #15925
+
 9.1.0 / 2025-12-29
 ===================
  * feat(model): make pathsToSave handle saving just a subpath of a modified path #15896

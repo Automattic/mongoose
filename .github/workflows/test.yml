@@ -62,7 +62,7 @@ jobs:
 
       - name: Load MongoDB binary cache
         id: cache-mongodb-binaries
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/mongodb-binaries
           key: ${{ matrix.os }}-${{ matrix.mongodb }}
@@ -92,7 +92,7 @@ jobs:
           node-version: 22
       - name: Load MongoDB binary cache
         id: cache-mongodb-binaries
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.cache/mongodb-binaries
           key: deno-${{ env.MONGOMS_VERSION }}

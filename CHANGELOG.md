@@ -1,3 +1,8 @@
+9.1.2 / 2025-01-05
+==================
+ * fix(subdocs): pass options to pre-save hooks for subdocs #15921 #15920 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * perf(model): select only _id when checking document existence during save() #15919 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
 9.1.1 / 2025-12-30
 ==================
  * fix(document): avoid 'Cannot mix array and object updates' on doc.updateOne() with pipeline #15928

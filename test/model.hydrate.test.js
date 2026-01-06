@@ -355,14 +355,13 @@ describe('model', function() {
 
       // Test with strict: 'throw' - should throw on extra fields
       assert.throws(() => {
-        const doc3 = Model.hydrate({
+        Model.hydrate({
           _id: '000000000000000000000003',
           name: 'Bob',
           age: 35,
           extraField: 'should throw'
         }, null, { strict: 'throw' });
-        doc3.set('anotherExtraField', 'value');
-      }, /Field `anotherExtraField` is not in schema/);
+      }, /Field `extraField` is not in schema/);
 
       // Test with default schema strict mode (should use schema's strict: true)
       const doc4 = Model.hydrate({

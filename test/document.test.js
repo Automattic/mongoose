@@ -7139,7 +7139,7 @@ describe('document', function() {
 
     for (const flattenUUIDs of [false, undefined]) {
       it(`does not convert UUIDs when flattenUUIDs is \`${flattenUUIDs}\``, function() {
-      // Arrange
+        // Arrange
         const { User, UUID } = createTestContext();
         const testUUID = new UUID('12345678-1234-1234-1234-123456789012');
         const user = new User({

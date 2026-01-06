@@ -7163,6 +7163,27 @@ describe('document', function() {
     }
 
 
+    it('converts UUIDs inside Maps when both flattenMaps and flattenUUIDs are true', function() {
+      // Arrange
+      const { User, UUID } = createTestContext();
+      const user = new User({
+        _id: new UUID('00000000-0000-0000-0000-000000000000'),
+        uuidMap: new Map([
+          ['first', { refId: new UUID('11111111-1111-1111-1111-111111111111') }],
+          ['second', { refId: new UUID('22222222-2222-2222-2222-222222222222') }]
+        ])
+      });
+
+      // Act
+      const userObj = user.toObject({ flattenMaps: true, flattenUUIDs: true });
+
+      // Assert
+      assert.deepStrictEqual(userObj.uuidMap, {
+        first: { refId: '11111111-1111-1111-1111-111111111111' },
+        second: { refId: '22222222-2222-2222-2222-222222222222' }
+      });
+    });
+
     function createTestContext() {
       const UUID = mongoose.Types.UUID;
       const userSchema = new Schema({
@@ -7172,7 +7193,8 @@ describe('document', function() {
           uuid: 'UUID'
         },
         subdocument: new Schema({ _id: 'UUID' }),
-        documentArray: [new Schema({ _id: 'UUID' })]
+        documentArray: [new Schema({ _id: 'UUID' })],
+        uuidMap: { type: Map, of: new Schema({ refId: 'UUID' }, { _id: false }) }
       }, { versionKey: false });
 
       const User = db.model('User', userSchema);

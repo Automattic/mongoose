@@ -59,6 +59,132 @@ describe('insertMany()', function() {
     assert.ok(!docs[1].createdAt);
   });
 
+  it('insertMany() with timestamps option createdAt: false, updatedAt: true', async function() {
+    const schema = new Schema({ name: String }, { timestamps: true });
+    const User = db.model('User', schema);
+    const start = Date.now();
+
+    const data = [{ name: 'User1' }, { name: 'User2' }];
+    const result = await User.insertMany(data, {
+      timestamps: { createdAt: false, updatedAt: true }
+    });
+
+    assert.equal(result.length, 2);
+    assert.ok(!result[0].createdAt);
+    assert.ok(!result[1].createdAt);
+    assert.ok(result[0].updatedAt);
+    assert.ok(result[1].updatedAt);
+    assert.ok(result[0].updatedAt.valueOf() >= start);
+    assert.ok(result[1].updatedAt.valueOf() >= start);
+
+    const docs = await User.find();
+    assert.equal(docs.length, 2);
+    assert.ok(!docs[0].createdAt);
+    assert.ok(!docs[1].createdAt);
+    assert.ok(docs[0].updatedAt);
+    assert.ok(docs[1].updatedAt);
+  });
+
+  it('insertMany() with timestamps option createdAt: true, updatedAt: false', async function() {
+    const schema = new Schema({ name: String }, { timestamps: true });
+    const User = db.model('User', schema);
+    const start = Date.now();
+
+    const data = [{ name: 'User1' }, { name: 'User2' }];
+    const result = await User.insertMany(data, {
+      timestamps: { createdAt: true, updatedAt: false }
+    });
+
+    assert.equal(result.length, 2);
+    assert.ok(result[0].createdAt);
+    assert.ok(result[1].createdAt);
+    assert.ok(!result[0].updatedAt);
+    assert.ok(!result[1].updatedAt);
+    assert.ok(result[0].createdAt.valueOf() >= start);
+    assert.ok(result[1].createdAt.valueOf() >= start);
+
+    const docs = await User.find();
+    assert.equal(docs.length, 2);
+    assert.ok(docs[0].createdAt);
+    assert.ok(docs[1].createdAt);
+    assert.ok(!docs[0].updatedAt);
+    assert.ok(!docs[1].updatedAt);
+  });
+
+  it('insertMany() with timestamps option both false', async function() {
+    const schema = new Schema({ name: String }, { timestamps: true });
+    const User = db.model('User', schema);
+
+    const data = [{ name: 'User1' }, { name: 'User2' }];
+    const result = await User.insertMany(data, {
+      timestamps: { createdAt: false, updatedAt: false }
+    });
+
+    assert.equal(result.length, 2);
+    assert.ok(!result[0].createdAt);
+    assert.ok(!result[1].createdAt);
+    assert.ok(!result[0].updatedAt);
+    assert.ok(!result[1].updatedAt);
+
+    const docs = await User.find();
+    assert.equal(docs.length, 2);
+    assert.ok(!docs[0].createdAt);
+    assert.ok(!docs[1].createdAt);
+    assert.ok(!docs[0].updatedAt);
+    assert.ok(!docs[1].updatedAt);
+  });
+
+  it('insertMany() with timestamps: false disables all timestamps', async function() {
+    const schema = new Schema({ name: String }, { timestamps: true });
+    const User = db.model('User', schema);
+
+    const data = [{ name: 'User1' }, { name: 'User2' }];
+    const result = await User.insertMany(data, {
+      timestamps: false
+    });
+
+    assert.equal(result.length, 2);
+    assert.ok(!result[0].createdAt);
+    assert.ok(!result[1].createdAt);
+    assert.ok(!result[0].updatedAt);
+    assert.ok(!result[1].updatedAt);
+
+    const docs = await User.find();
+    assert.equal(docs.length, 2);
+    assert.ok(!docs[0].createdAt);
+    assert.ok(!docs[1].createdAt);
+    assert.ok(!docs[0].updatedAt);
+    assert.ok(!docs[1].updatedAt);
+  });
+
+  it('insertMany() with custom timestamp field names and timestamps option', async function() {
+    const schema = new Schema({ name: String }, {
+      timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
+    });
+    const User = db.model('User', schema);
+    const start = Date.now();
+
+    const data = [{ name: 'User1' }, { name: 'User2' }];
+    const result = await User.insertMany(data, {
+      timestamps: { createdAt: false, updatedAt: true }
+    });
+
+    assert.equal(result.length, 2);
+    assert.ok(!result[0].created_at);
+    assert.ok(!result[1].created_at);
+    assert.ok(result[0].updated_at);
+    assert.ok(result[1].updated_at);
+    assert.ok(result[0].updated_at.valueOf() >= start);
+    assert.ok(result[1].updated_at.valueOf() >= start);
+
+    const docs = await User.find();
+    assert.equal(docs.length, 2);
+    assert.ok(!docs[0].created_at);
+    assert.ok(!docs[1].created_at);
+    assert.ok(docs[0].updated_at);
+    assert.ok(docs[1].updated_at);
+  });
+
   it('insertMany() with nested timestamps (gh-12060)', async function() {
     const childSchema = new Schema({ name: { type: String } }, {
       _id: false,

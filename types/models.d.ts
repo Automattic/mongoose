@@ -71,6 +71,7 @@ declare module 'mongoose' {
     ordered?: boolean;
     lean?: boolean;
     throwOnValidationError?: boolean;
+    timestamps?: boolean | QueryTimestampsConfig;
   }
 
   interface InsertManyResult<T> extends mongodb.InsertManyResult<T> {

@@ -802,12 +802,12 @@ function testObjectIdsInsideMaps() {
   // Test that ObjectIds/UUIDs nested inside Map values are correctly converted
   interface DocWithMapOfObjectIds {
     _id: Types.ObjectId;
-    userRefs: Map<string, { oderId: Types.ObjectId }>;
+    userRefs: Map<string, { orderId: Types.ObjectId }>;
     uuidRefs: Map<string, { refId: Types.UUID }>;
   }
 
   const schema = new Schema<DocWithMapOfObjectIds>({
-    userRefs: { type: Map, of: { oderId: Schema.Types.ObjectId } },
+    userRefs: { type: Map, of: { orderId: Schema.Types.ObjectId } },
     uuidRefs: { type: Map, of: { refId: Schema.Types.UUID } }
   });
 
@@ -816,7 +816,7 @@ function testObjectIdsInsideMaps() {
 
   // When using flattenMaps + flattenObjectIds, ObjectIds inside Map values should be converted
   const flattened = doc.toObject({ flattenMaps: true, flattenObjectIds: true });
-  expectType<Record<string, { oderId: string }>>(flattened.userRefs);
+  expectType<Record<string, { orderId: string }>>(flattened.userRefs);
 
   // When using flattenMaps + flattenUUIDs, UUIDs inside Map values should be converted
   const flattenedUUIDs = doc.toObject({ flattenMaps: true, flattenUUIDs: true });
@@ -824,7 +824,7 @@ function testObjectIdsInsideMaps() {
 
   // All three together
   const allThree = doc.toObject({ flattenMaps: true, flattenObjectIds: true, flattenUUIDs: true });
-  expectType<Record<string, { oderId: string }>>(allThree.userRefs);
+  expectType<Record<string, { orderId: string }>>(allThree.userRefs);
   expectType<Record<string, { refId: string }>>(allThree.uuidRefs);
   expectType<string>(allThree._id);
 }

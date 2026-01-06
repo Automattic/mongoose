@@ -938,7 +938,7 @@ declare module 'mongoose' {
     /**
     * Converts any UUID properties into strings for JSON serialization
     */
-    export type UUIDToString<T> = T extends Types.UUID
+    export type UUIDToJSON<T> = T extends Types.UUID
       ? string
       : T extends mongodb.UUID
         ? string
@@ -952,17 +952,11 @@ declare module 'mongoose' {
                 : T[K] extends mongodb.UUID
                   ? string
                   : T[K] extends Types.DocumentArray<infer ItemType>
-                      ? Types.DocumentArray<UUIDToString<ItemType>>
+                      ? Types.DocumentArray<UUIDToJSON<ItemType>>
                       : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
-                        ? HydratedSingleSubdocument<UUIDToString<SubdocType>>
-                        : UUIDToString<T[K]>;
+                        ? HydratedSingleSubdocument<UUIDToJSON<SubdocType>>
+                        : UUIDToJSON<T[K]>;
             } : T;
-
-    /**
-    * Alias for UUIDToString for backwards compatibility.
-    * @deprecated Use UUIDToString instead.
-    */
-    export type UUIDToJSON<T> = UUIDToString<T>;
 
   /**
    * Converts any ObjectId properties into strings for JSON serialization
@@ -1023,7 +1017,7 @@ declare module 'mongoose' {
     FlattenMaps<
       BufferToJSON<
         ObjectIdToString<
-          UUIDToString<
+          UUIDToJSON<
             DateToString<T>
           >
         >

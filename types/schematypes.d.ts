@@ -513,6 +513,15 @@ declare module 'mongoose' {
         static defaultOptions: Record<string, any>;
       }
 
+      class DocumentArrayElement extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: 'DocumentArrayElement';
+        readonly schemaName: 'DocumentArrayElement';
+
+        /** Default options for this SchemaType */
+        static defaultOptions: Record<string, any>;
+      }
+
       class Map extends SchemaType {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'Map';

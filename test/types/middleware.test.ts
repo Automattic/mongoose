@@ -1,7 +1,7 @@
 import { Schema, model, Model, Document, SaveOptions, Query, Aggregate, HydratedDocument, PreSaveMiddlewareFunction, ModifyResult, AnyBulkWriteOperation } from 'mongoose';
-import { expectNotType, expectAssignable } from 'tsd';
+import { expectNotType } from 'tsd';
 import { CreateCollectionOptions } from 'mongodb';
-import { ExpectType } from './helpers';
+import { ExpectAssignable, ExpectType } from './helpers';
 
 const preMiddlewareFn: PreSaveMiddlewareFunction<Document> = function(opts) {
   this.$markValid('name');
@@ -168,7 +168,7 @@ function gh11257() {
   });
 
   schema.pre('save', { document: true }, function() {
-    expectAssignable<HydratedDocument<User>>(this);
+    ExpectAssignable<HydratedDocument<User>>()(this);
   });
 
   schema.pre('updateOne', { document: true, query: false }, function() {
@@ -186,7 +186,7 @@ function gh13601() {
   });
 
   testSchema.pre('deleteOne', { document: true }, function() {
-    expectAssignable<Document>(this);
+    ExpectAssignable<Document>()(this);
   });
 }
 

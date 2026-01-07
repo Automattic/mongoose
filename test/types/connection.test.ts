@@ -1,8 +1,7 @@
 import { createConnection, Schema, Collection, Connection, ConnectionSyncIndexesResult, InferSchemaType, Model, connection, HydratedDocument, Query } from 'mongoose';
 import * as mongodb from 'mongodb';
-import { expectAssignable } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
-import { ExpectType } from './helpers';
+import { ExpectAssignable, ExpectType } from './helpers';
 
 ExpectType<Connection>()(createConnection());
 ExpectType<Connection>()(createConnection('mongodb://127.0.0.1:27017/test'));
@@ -10,7 +9,7 @@ ExpectType<Connection>()(createConnection('mongodb://127.0.0.1:27017/test', { ap
 
 const conn = createConnection();
 
-expectAssignable<Model<{ name: string }, any, any, any>>(conn.model('Test', new Schema<{ name: string }>({ name: { type: String } })));
+ExpectAssignable<Model<{ name: string }, any, any, any>>()(conn.model('Test', new Schema<{ name: string }>({ name: { type: String } })));
 ExpectType<Model<{ name: string }>>()(conn.model<{ name: string }>('Test', new Schema({ name: { type: String } })));
 
 ExpectType<Promise<Connection>>()(conn.openUri('mongodb://127.0.0.1:27017/test'));

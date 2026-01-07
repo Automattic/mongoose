@@ -1,8 +1,7 @@
 import mongoose, { Schema, model, Document, PopulatedDoc, Types, HydratedDocument, SchemaTypeOptions, Model } from 'mongoose';
 // Use the mongodb ObjectId to make instanceof calls possible
 import { ObjectId } from 'mongodb';
-import { expectAssignable } from 'tsd';
-import { ExpectType } from './helpers';
+import { ExpectAssignable, ExpectType } from './helpers';
 
 interface Child {
   name: string;
@@ -187,7 +186,7 @@ function gh11503() {
 
   User.findOne({}).populate<{ friends: Friend[] }>('friends').then(user => {
     if (!user) return;
-    expectAssignable<Friend>(user?.friends[0]);
+    ExpectAssignable<Friend>()(user?.friends[0]);
     ExpectType<boolean>()(user?.friends[0].blocked);
     const firstFriendBlockedValue = user?.friends.map(friend => friend)[0];
     ExpectType<boolean>()(firstFriendBlockedValue?.blocked);

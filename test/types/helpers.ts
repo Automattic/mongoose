@@ -6,3 +6,6 @@ export declare function Expect<T extends true>(): void;
 
 export declare const ExpectType: <Expected>() =>
   <Actual>(value: Equal<Actual, Expected> extends true ? Actual : never) => void;
+
+export declare const ExpectAssignable: <Expected>() =>
+  <Actual extends Expected>(value: Actual) => void;

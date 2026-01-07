@@ -12,11 +12,11 @@ import {
   ResolveSchemaOptions
 } from 'mongoose';
 import { DeleteResult } from 'mongodb';
-import { expectAssignable, expectNotAssignable, expectType } from 'tsd';
+import { expectNotAssignable } from 'tsd';
 import { autoTypedModel } from './models.test';
 import { autoTypedModelConnection } from './connection.test';
 import { AutoTypedSchemaType } from './schema.test';
-import { ExpectType } from './helpers';
+import { ExpectAssignable, ExpectType } from './helpers';
 
 const Drink = model('Drink', new Schema({
   name: String
@@ -45,7 +45,7 @@ void async function main() {
 
   ExpectType<DeleteResult>()(await doc.deleteOne());
   ExpectType<TestDocument | null>()(await doc.deleteOne().findOne());
-  expectAssignable<{ _id: Types.ObjectId, name?: string } | null>(await doc.deleteOne().findOne().lean());
+  ExpectAssignable<{ _id: Types.ObjectId, name?: string } | null>()(await doc.deleteOne().findOne().lean());
   expectNotAssignable<TestDocument | null>(await doc.deleteOne().findOne().lean());
 }();
 
@@ -66,8 +66,8 @@ void async function run() {
   test.validateSync({ pathsToSkip: 'name age' });
   test.validateSync({ pathsToSkip: 'name age', blub: 1 });
   const x = test.save();
-  expectAssignable<Promise<ITest & { _id: any; }>>(test.save());
-  expectAssignable<Promise<ITest & { _id: any; }>>(test.save({}));
+  ExpectAssignable<Promise<ITest & { _id: any; }>>()(test.save());
+  ExpectAssignable<Promise<ITest & { _id: any; }>>()(test.save({}));
 })();
 
 function gh10526<U extends ITest>(arg1: Model<U>) {

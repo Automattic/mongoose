@@ -19,10 +19,9 @@ import mongoose, {
   UpdateOneModel,
   UpdateManyModel
 } from 'mongoose';
-import { expectAssignable } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
 import { ModifyResult, UpdateOneModel as MongoUpdateOneModel, ChangeStreamInsertDocument, ObjectId } from 'mongodb';
-import { ExpectType } from './helpers';
+import { ExpectAssignable, ExpectType } from './helpers';
 
 function rawDocSyntax(): void {
   interface ITest {
@@ -85,7 +84,7 @@ async function insertManyTest() {
   ExpectType<Types.ObjectId>()(res.insertedIds[0]);
 
   const res2 = await Test.insertMany([{ foo: 'bar' }], { ordered: false, rawResult: true });
-  expectAssignable<Error | Object | ReturnType<(typeof Test)['hydrate']>>(res2.mongoose.results[0]);
+  ExpectAssignable<Error | Object | ReturnType<(typeof Test)['hydrate']>>()(res2.mongoose.results[0]);
 }
 
 function gh13930() {
@@ -416,7 +415,7 @@ function gh11911() {
   const Animal = model<IAnimal>('Animal', animalSchema);
 
   const changes: UpdateQuery<IAnimal> = {};
-  expectAssignable<MongoUpdateOneModel>({
+  ExpectAssignable<MongoUpdateOneModel>()({
     filter: {},
     update: changes
   });
@@ -584,7 +583,7 @@ async function gh12319() {
     typeof projectSchema
   >;
 
-  expectAssignable<ProjectModelHydratedDoc>(await ProjectModel.findOne().orFail());
+  ExpectAssignable<ProjectModelHydratedDoc>()(await ProjectModel.findOne().orFail());
 }
 
 function findWithId() {
@@ -689,7 +688,7 @@ async function gh13705() {
   ExpectType<ExpectedLeanDoc | null>()(findOneAndUpdateRes);
 
   const findOneAndUpdateResWithMetadata = await TestModel.findOneAndUpdate({}, {}, { lean: true, includeResultMetadata: true });
-  expectAssignable<ModifyResult<ExpectedLeanDoc>>(findOneAndUpdateResWithMetadata);
+  ExpectAssignable<ModifyResult<ExpectedLeanDoc>>()(findOneAndUpdateResWithMetadata);
 }
 
 async function gh13746() {
@@ -732,7 +731,7 @@ function gh13904() {
   }
   const Test = model<ITest>('Test', schema);
 
-  expectAssignable<Promise<InsertManyResult<ITest>>>(Test.insertMany(
+  ExpectAssignable<Promise<InsertManyResult<ITest>>>()(Test.insertMany(
     [{ name: 'test' }],
     {
       ordered: false,
@@ -1039,7 +1038,7 @@ async function gh15437() {
   const doc1 = PersonModel.hydrate(data, 'name age');
   ExpectType<string>()(doc1.name);
   ExpectType<number>()(doc1.age);
-  expectAssignable<undefined | null | string>(doc1.address);
+  ExpectAssignable<undefined | null | string>()(doc1.address);
 }
 
 async function customModelInstanceWithStatics() {

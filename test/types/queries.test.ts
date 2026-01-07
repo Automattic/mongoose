@@ -19,9 +19,9 @@ import mongoose, {
 } from 'mongoose';
 import mongodb from 'mongodb';
 import { ModifyResult, ObjectId } from 'mongodb';
-import { expectAssignable, expectNotAssignable } from 'tsd';
+import { expectNotAssignable } from 'tsd';
 import { autoTypedModel } from './models.test';
-import { ExpectType } from './helpers';
+import { ExpectAssignable, ExpectType } from './helpers';
 
 interface QueryHelpers {
   _byName(this: QueryWithHelpers<any, ITest, QueryHelpers>, name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;
@@ -392,8 +392,8 @@ function gh14397() {
   let idCondition: Condition<WithId<TestUser>['id']>;
   let filter: QueryFilter<WithId<TestUser>>;
 
-  expectAssignable<typeof idCondition>(id);
-  expectAssignable<typeof filter>({ id });
+  ExpectAssignable<typeof idCondition>()(id);
+  ExpectAssignable<typeof filter>()({ id });
 }
 
 function gh12091() {
@@ -483,7 +483,7 @@ async function gh12342_auto() {
 
   const ProjectModel = model('Project', ProjectSchema);
 
-  expectAssignable<HydratedDocument<Project>[]>(
+  ExpectAssignable<HydratedDocument<Project>[]>()(
     await ProjectModel.findOne().where('stars').gt(1000).byName('mongoose')
   );
 }
@@ -559,20 +559,20 @@ async function gh13224() {
   const u1 = await UserModel.findOne().select(['name']).orFail();
   ExpectType<string | undefined | null>()(u1.name);
   ExpectType<number | undefined | null>()(u1.age);
-  expectAssignable<Function>(u1.toObject);
+  ExpectAssignable<Function>()(u1.toObject);
 
   const u2 = await UserModel.findOne().select<{ name?: string }>(['name']).orFail();
   ExpectType<string | undefined>()(u2.name);
   // @ts-expect-error excluded from projection
   u2.age;
-  expectAssignable<Function>(u2.toObject);
+  ExpectAssignable<Function>()(u2.toObject);
 
   const users = await UserModel.find().select<{ name?: string }>(['name']);
   const u3 = users[0];
   ExpectType<string | undefined>()(u3!.name);
   // @ts-expect-error excluded from projection
   u3!.age;
-  expectAssignable<Function>(u3.toObject);
+  ExpectAssignable<Function>()(u3.toObject);
 
   // @ts-expect-error cannot project fields that aren't in the schema
   await UserModel.findOne().select<{ notInSchema: string }>(['name']).orFail();
@@ -587,14 +587,14 @@ function gh13630() {
     }
   }
 
-  expectAssignable<UpdateQueryKnownOnly<User>>({ $set: { name: 'John' } });
-  expectAssignable<UpdateQueryKnownOnly<User>>({ $unset: { phone: 'test' } });
-  expectAssignable<UpdateQueryKnownOnly<User>>({ $set: { nested: { test: 'foo' } } });
+  ExpectAssignable<UpdateQueryKnownOnly<User>>()({ $set: { name: 'John' } });
+  ExpectAssignable<UpdateQueryKnownOnly<User>>()({ $unset: { phone: 'test' } });
+  ExpectAssignable<UpdateQueryKnownOnly<User>>()({ $set: { nested: { test: 'foo' } } });
   expectNotAssignable<UpdateQueryKnownOnly<User>>({ $set: { namee: 'foo' } });
   expectNotAssignable<UpdateQueryKnownOnly<User>>({ $set: { 'nested.test': 'foo' } });
 
   const x: UpdateQueryKnownOnly<User> = { $set: { name: 'John' } };
-  expectAssignable<UpdateQuery<User>>(x);
+  ExpectAssignable<UpdateQuery<User>>()(x);
 }
 
 function gh14190() {
@@ -608,17 +608,17 @@ function gh14190() {
     '0'.repeat(24),
     { includeResultMetadata: true }
   );
-  expectAssignable<
+  ExpectAssignable<
     ModifyResult<ReturnType<(typeof UserModel)['hydrate']>>
-      >(res);
+      >()(res);
 
   const res2 = await UserModel.find().findByIdAndDelete(
     '0'.repeat(24),
     { includeResultMetadata: true }
   );
-  expectAssignable<
+  ExpectAssignable<
     ModifyResult<ReturnType<(typeof UserModel)['hydrate']>>
-      >(res2);
+      >()(res2);
 }
 
 function mongooseQueryOptions() {
@@ -869,7 +869,7 @@ async function gh15779() {
 
   v8Filter.name = 'test';
 
-  expectAssignable<typeof v8Filter.age>(42);
+  ExpectAssignable<typeof v8Filter.age>()(42);
   expectNotAssignable<typeof v8Filter.age>('taco');
 
   const TestModel = model('Test', new Schema({ age: Number, name: String }));

@@ -1,6 +1,5 @@
 import mongoose, { Schema, model, Types, InferSchemaType, FlattenMaps, HydratedDocument, Model, Document, PopulatedDoc } from 'mongoose';
-import { expectAssignable } from 'tsd';
-import { Expect, Equal } from './helpers';
+import { ExpectAssignable, Expect, Equal } from './helpers';
 
 function gh10345() {
   (function() {
@@ -176,7 +175,7 @@ async function gh13345_1() {
   const PlaceModel = model('Place', placeSchema);
 
   const place = await PlaceModel.findOne().lean().orFail().exec();
-  expectAssignable<Place>(place);
+  ExpectAssignable<Place>()(place);
 }
 
 async function gh13345_2() {
@@ -194,7 +193,7 @@ async function gh13345_2() {
   const PlaceModel = model('Place', placeSchema);
 
   const place = await PlaceModel.findOne().lean().orFail().exec();
-  expectAssignable<FlattenMaps<Place>>(place);
+  ExpectAssignable<FlattenMaps<Place>>()(place);
 
   Expect<Equal<typeof place.images[0]['description'], Record<string, string>>>();
 }
@@ -213,7 +212,7 @@ async function gh13345_3() {
   const PlaceModel = model('Place', placeSchema);
 
   const place = await PlaceModel.findOne().lean().orFail().exec();
-  expectAssignable<Place>(place);
+  ExpectAssignable<Place>()(place);
 }
 
 async function gh13382() {
@@ -223,7 +222,7 @@ async function gh13382() {
   const Test = model('Test', schema);
 
   const res = await Test.updateOne({}, { name: 'bar' }).lean();
-  expectAssignable<{ matchedCount: number, modifiedCount: number }>(res);
+  ExpectAssignable<{ matchedCount: number, modifiedCount: number }>()(res);
 }
 
 async function gh15057() {

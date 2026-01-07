@@ -30,9 +30,8 @@ import {
   InferHydratedDocType
 } from 'mongoose';
 import { BSON, Binary, UUID } from 'mongodb';
-import { expectAssignable } from 'tsd';
 import { ObtainDocumentPathType, ResolvePathType } from '../../types/inferschematype';
-import { ExpectType } from './helpers';
+import { ExpectAssignable, ExpectType } from './helpers';
 
 enum Genre {
   Action,
@@ -545,19 +544,19 @@ export function autoTypedSchema() {
   }, {
     statics: {
       staticFn() {
-        expectAssignable<Model<InferSchemaType<typeof AutoTypedSchema>>>(this);
+        ExpectAssignable<Model<InferSchemaType<typeof AutoTypedSchema>>>()(this);
         return 'Returned from staticFn' as const;
       }
     },
     methods: {
       instanceFn() {
-        expectAssignable<HydratedDocument<InferSchemaType<typeof AutoTypedSchema>>>(this);
+        ExpectAssignable<HydratedDocument<InferSchemaType<typeof AutoTypedSchema>>>()(this);
         return 'Returned from DocumentInstanceFn' as const;
       }
     },
     query: {
       byUserName(userName) {
-        expectAssignable<Query<unknown, InferSchemaType<typeof AutoTypedSchema>>>(this);
+        ExpectAssignable<Query<unknown, InferSchemaType<typeof AutoTypedSchema>>>()(this);
         return this.where({ userName });
       }
     }
@@ -997,10 +996,10 @@ function gh12590() {
   type User = InferSchemaType<typeof UserSchema>;
 
   const path = UserSchema.path('hashed_password');
-  expectAssignable<SchemaType<any, HydratedDocument<User>>>(path);
+  ExpectAssignable<SchemaType<any, HydratedDocument<User>>>()(path);
 
   UserSchema.path('hashed_password').validate(function(v) {
-    expectAssignable<HydratedDocument<User>>(this);
+    ExpectAssignable<HydratedDocument<User>>()(this);
     if (this._password && this._password.length < 8) {
       this.invalidate('password', 'Password must be at least 8 characters.');
     }
@@ -1083,7 +1082,7 @@ function stringEnumInfer() {
   );
 
   type StringEnumRequiredExample = InferSchemaType<typeof stringEnumSchemaRequired>;
-  expectAssignable<StringEnum>({} as StringEnumRequiredExample['active']);
+  ExpectAssignable<StringEnum>()({} as StringEnumRequiredExample['active']);
 }
 function stringEnumArrayInfer() {
   enum StringEnum {
@@ -1101,11 +1100,11 @@ function stringEnumArrayInfer() {
   );
 
   type StringEnumExample = InferSchemaType<typeof stringEnumSchema>;
-  expectAssignable<StringEnum[] | null | undefined>({} as StringEnumExample['active']);
+  ExpectAssignable<StringEnum[] | null | undefined>()({} as StringEnumExample['active']);
   type RawStringEnumExample = InferRawDocType<typeof schemaDefinition>;
-  expectAssignable<StringEnum[] | null | undefined>({} as RawStringEnumExample['active']);
+  ExpectAssignable<StringEnum[] | null | undefined>()({} as RawStringEnumExample['active']);
   type HydratedStringEnumExample = InferHydratedDocType<typeof schemaDefinition>;
-  expectAssignable<StringEnum[] | null | undefined>({} as HydratedStringEnumExample['active']);
+  ExpectAssignable<StringEnum[] | null | undefined>()({} as HydratedStringEnumExample['active']);
 
   const schemaDefinitionRequired = {
     active: { type: [String], enum: StringEnum, required: true }
@@ -1117,9 +1116,9 @@ function stringEnumArrayInfer() {
   );
 
   type StringEnumRequiredExample = InferSchemaType<typeof stringEnumSchemaRequired>;
-  expectAssignable<StringEnum[]>({} as StringEnumRequiredExample['active']);
+  ExpectAssignable<StringEnum[]>()({} as StringEnumRequiredExample['active']);
   type RawStringEnumRequiredExample = InferRawDocType<typeof schemaDefinitionRequired>;
-  expectAssignable<StringEnum[] | null | undefined>({} as RawStringEnumRequiredExample['active']);
+  ExpectAssignable<StringEnum[] | null | undefined>()({} as RawStringEnumRequiredExample['active']);
 }
 
 function gh12882() {
@@ -1336,7 +1335,7 @@ async function gh13797() {
     name: {
       type: String,
       required: function() {
-        expectAssignable<HydratedDocument<IUser>>(this);
+        ExpectAssignable<HydratedDocument<IUser>>()(this);
         return true;
       }
     }
@@ -1345,7 +1344,7 @@ async function gh13797() {
     name: {
       type: String,
       default: function() {
-        expectAssignable<HydratedDocument<IUser>>(this);
+        ExpectAssignable<HydratedDocument<IUser>>()(this);
         return '';
       }
     }
@@ -1624,13 +1623,13 @@ function gh13772() {
 
   const TestModel = model('User', schema);
   type RawDocType = InferRawDocType<typeof schemaDefinition>;
-  expectAssignable<
+  ExpectAssignable<
     { name?: string | null, docArr?: Array<{ name?: string | null }> | null }
-  >({} as RawDocType);
+  >()({} as RawDocType);
 
   const doc = new TestModel();
-  expectAssignable<RawDocType>(doc.toObject());
-  expectAssignable<RawDocType>(doc.toJSON());
+  ExpectAssignable<RawDocType>()(doc.toObject());
+  ExpectAssignable<RawDocType>()(doc.toJSON());
 }
 
 function gh14696() {
@@ -1642,7 +1641,7 @@ function gh14696() {
 
   const x: ValidateOpts<unknown, User> = {
     validator(v: any) {
-      expectAssignable<User | Query<unknown, User>>(this);
+      ExpectAssignable<User | Query<unknown, User>>()(this);
       return !v || this instanceof Query || this.name === 'super admin';
     }
   };
@@ -1662,7 +1661,7 @@ function gh14696() {
       default: false,
       validate: {
         validator(v: any) {
-          expectAssignable<User | Query<unknown, User>>(this);
+          ExpectAssignable<User | Query<unknown, User>>()(this);
           if (!v) {
             return true;
           }
@@ -1675,7 +1674,7 @@ function gh14696() {
       default: false,
       validate: {
         async validator(v: any) {
-          expectAssignable<User | Query<unknown, User>>(this);
+          ExpectAssignable<User | Query<unknown, User>>()(this);
           if (this instanceof Query) {
             const doc = await this.clone().findOne().orFail();
             return doc.isSuperAdmin();
@@ -1698,13 +1697,13 @@ function gh14748() {
 
   const subdoc = schema.path('singleNested')
     .cast<HydratedArraySubdocument<{ name: string }>>({ name: 'bar' });
-  expectAssignable<{ name: string }>(subdoc);
+  ExpectAssignable<{ name: string }>()(subdoc);
 
   const subdoc2 = schema.path('singleNested').cast({ name: 'bar' });
-  expectAssignable<{ name: string }>(subdoc2);
+  ExpectAssignable<{ name: string }>()(subdoc2);
 
   const subdoc3 = schema.path<Schema.Types.Subdocument<{ name: string }>>('singleNested').cast({ name: 'bar' });
-  expectAssignable<{ name: string }>(subdoc3);
+  ExpectAssignable<{ name: string }>()(subdoc3);
 }
 
 function gh13215() {
@@ -1755,18 +1754,18 @@ function gh14825() {
     userName: string;
   };
 
-  expectAssignable<User>({} as RawDocType);
+  ExpectAssignable<User>()({} as RawDocType);
 
   const schema = new Schema(schemaDefinition, schemaOptions);
   type SchemaType = InferSchemaType<typeof schema>;
-  expectAssignable<User>({} as SchemaType);
+  ExpectAssignable<User>()({} as SchemaType);
 }
 
 function gh8389() {
   const schema = new Schema({ name: String, tags: [String] });
 
-  expectAssignable<SchemaType<any> | undefined>(schema.path('name').getEmbeddedSchemaType());
-  expectAssignable<SchemaType<any> | undefined>(schema.path('tags').getEmbeddedSchemaType());
+  ExpectAssignable<SchemaType<any> | undefined>()(schema.path('name').getEmbeddedSchemaType());
+  ExpectAssignable<SchemaType<any> | undefined>()(schema.path('tags').getEmbeddedSchemaType());
 }
 
 function gh14879() {
@@ -2158,7 +2157,7 @@ function gh15878() {
 
 function gh15915() {
   type OptimisticConcurrencyType = SchemaOptions['optimisticConcurrency'];
-  expectType<boolean | string[] | { exclude: string[] } | undefined>({} as OptimisticConcurrencyType);
+  ExpectType<boolean | string[] | { exclude: string[] } | undefined>()({} as OptimisticConcurrencyType);
 
   // optimisticConcurrency: boolean
   new Schema({ name: String }, { optimisticConcurrency: true });
@@ -2173,6 +2172,8 @@ function gh15915() {
   new Schema({ name: String, balance: Number }, { optimisticConcurrency: { exclude: ['name', 'balance'] } });
 
   // invalid types
-  expectError(new Schema({ name: String }, { optimisticConcurrency: 'invalid' }));
-  expectError(new Schema({ name: String }, { optimisticConcurrency: { invalid: ['name'] } }));
+  // @ts-expect-error invalid option
+  new Schema({ name: String }, { optimisticConcurrency: 'invalid' });
+  // @ts-expect-error invalid option
+  new Schema({ name: String }, { optimisticConcurrency: { invalid: ['name'] } });
 }

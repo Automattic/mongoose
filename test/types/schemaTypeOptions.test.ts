@@ -15,7 +15,6 @@ import {
   ObjectIdSchemaDefinition,
   StringSchemaDefinition
 } from 'mongoose';
-import { expectError } from 'tsd';
 import { ExpectType } from './helpers';
 
 (new SchemaTypeOptions<boolean>()) instanceof SchemaTypeOptions;
@@ -48,12 +47,18 @@ function index() {
   new SchemaTypeOptions<string>().index = 'descending';
   new SchemaTypeOptions<string>().index = 'desc';
 
-  expectError<SchemaTypeOptions<string>['index']>(''); // test empty string value
-  expectError<SchemaTypeOptions<string>['index']>('invalid'); // test invalid string value
-  expectError<SchemaTypeOptions<string>['index']>(0); // test invalid number
-  expectError<SchemaTypeOptions<string>['index']>(2); // test invalid number
-  expectError<SchemaTypeOptions<string>['index']>(-2); // test invalid number
-  expectError<SchemaTypeOptions<string>['index']>(new Date()); // test invalid type
+  // @ts-expect-error test empty string value
+  new SchemaTypeOptions<string>().index = '';
+  // @ts-expect-error test invalid string value
+  new SchemaTypeOptions<string>().index = 'invalid';
+  // @ts-expect-error test invalid number
+  new SchemaTypeOptions<string>().index = 0;
+  // @ts-expect-error test invalid number
+  new SchemaTypeOptions<string>().index = 2;
+  // @ts-expect-error test invalid number
+  new SchemaTypeOptions<string>().index = -2;
+  // @ts-expect-error test invalid type
+  new SchemaTypeOptions<string>().index = new Date();
 }
 
 function defaultOptions() {
@@ -92,21 +97,28 @@ function encrypt() {
   new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, queries: undefined };
 
   // empty object
-  expectError<SchemaTypeOptions<string>['encrypt']>({});
+  // @ts-expect-error
+  new SchemaTypeOptions<string>()['encrypt'] = {};
 
   // invalid keyId
-  expectError<SchemaTypeOptions<string>['encrypt']>({ keyId: 'fakeId' });
+  // @ts-expect-error
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId: 'fakeId' };
 
   // missing keyId
-  expectError<SchemaTypeOptions<string>['encrypt']>({ queries: 'equality' });
-  expectError<SchemaTypeOptions<string>['encrypt']>({ algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic' });
+  // @ts-expect-error
+  new SchemaTypeOptions<string>()['encrypt'] = { queries: 'equality' };
+  // @ts-expect-error
+  new SchemaTypeOptions<string>()['encrypt'] = { algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic' };
 
   // invalid algorithm
-  expectError<SchemaTypeOptions<string>['encrypt']>({ keyId: uuid, algorithm: 'SHA_FAKE_ALG' });
+  // @ts-expect-error
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, algorithm: 'SHA_FAKE_ALG' };
 
   // invalid queries
-  expectError<SchemaTypeOptions<string>['encrypt']>({ keyId: uuid, queries: 'fakeQueryOption' });
+  // @ts-expect-error
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, queries: 'fakeQueryOption' };
 
   // invalid input option
-  expectError<SchemaTypeOptions<string>['encrypt']>({ keyId: uuid, invalidKey: 'fakeKeyOption' });
+  // @ts-expect-error
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, invalidKey: 'fakeKeyOption' };
 }

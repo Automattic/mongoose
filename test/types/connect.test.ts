@@ -1,5 +1,4 @@
 import mongoose, { connect } from 'mongoose';
-import { expectType } from 'tsd';
 import { ExpectType } from './helpers';
 
 // Promise

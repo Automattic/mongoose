@@ -15,6 +15,7 @@ import {
   ObtainSchemaGeneric,
   ResolveSchemaOptions,
   SchemaDefinition,
+  SchemaOptions,
   SchemaTypeOptions,
   Model,
   SchemaType,
@@ -1266,7 +1267,8 @@ function gh13633() {
   schema.pre('updateOne', { document: true, query: false }, function(next) {
   });
 
-  schema.pre('updateOne', { document: true, query: false }, function(options) {
+  schema.pre('updateOne', { document: true, query: false }, function(doc, update, options) {
+    ExpectType<Record<string, any> | undefined>()(update);
     ExpectType<Record<string, any> | undefined>()(options);
   });
 
@@ -2152,4 +2154,25 @@ function gh15878() {
   const doc = new TestModel({ name: 'John', age: 30 });
   ExpectType<string | null | undefined>()(doc.name);
   ExpectType<number | null | undefined>()(doc.age);
+}
+
+function gh15915() {
+  type OptimisticConcurrencyType = SchemaOptions['optimisticConcurrency'];
+  expectType<boolean | string[] | { exclude: string[] } | undefined>({} as OptimisticConcurrencyType);
+
+  // optimisticConcurrency: boolean
+  new Schema({ name: String }, { optimisticConcurrency: true });
+  new Schema({ name: String }, { optimisticConcurrency: false });
+
+  // optimisticConcurrency: string[]
+  new Schema({ name: String, balance: Number }, { optimisticConcurrency: ['balance'] });
+  new Schema({ name: String, balance: Number }, { optimisticConcurrency: ['name', 'balance'] });
+
+  // optimisticConcurrency: { exclude: string[] }
+  new Schema({ name: String, balance: Number }, { optimisticConcurrency: { exclude: ['name'] } });
+  new Schema({ name: String, balance: Number }, { optimisticConcurrency: { exclude: ['name', 'balance'] } });
+
+  // invalid types
+  expectError(new Schema({ name: String }, { optimisticConcurrency: 'invalid' }));
+  expectError(new Schema({ name: String }, { optimisticConcurrency: { invalid: ['name'] } }));
 }

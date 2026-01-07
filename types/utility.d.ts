@@ -15,7 +15,7 @@ declare module 'mongoose' {
         // If not a document, then return the type. Otherwise, get the DocType.
         ? NonNullable<T[P]>
         : Extract<NonNullable<T[P]>, Document> extends Document<any, any, infer DocType, any>
-          ? DocType
+          ? DocType | Exclude<NonNullable<T[P]>, Document>
           : never
       // Handle nested paths
       : P extends `${infer Key}.${infer Rest}`

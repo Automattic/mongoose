@@ -1368,8 +1368,15 @@ describe('encryption integration tests', () => {
         collections.sort((a, b) => {
           // depending on what letter name starts with, `name` might come before the two queryable encryption collections or after them.
           // this sort function always puts the `name` collection first, and the two QE collections after it.
-          if (!a.includes('enxcol_')) return -1;
+          const aIsEnxcol = a.includes('enxcol_');
+          const bIsEnxcol = b.includes('enxcol_');
 
+          if (!aIsEnxcol && bIsEnxcol) {
+            return -1;
+          }
+          if (aIsEnxcol && !bIsEnxcol) {
+            return 1;
+          }
           return a.localeCompare(b);
         });
         assert.deepEqual(collections, [

@@ -38,6 +38,17 @@ declare module 'mongoose' {
     this: ThisType,
     opts?: Record<string, any>
   ) => void | Promise<void> | Kareem.SkipWrappedFunction;
+  type PreDeleteOneMiddlewareFunction<ThisType = any> = (
+    this: ThisType,
+    doc: ThisType,
+    opts?: Record<string, any>
+  ) => void | Promise<void> | Kareem.SkipWrappedFunction;
+  type PreUpdateOneMiddlewareFunction<ThisType = any> = (
+    this: ThisType,
+    doc: ThisType,
+    update?: Record<string, any>,
+    opts?: Record<string, any>
+  ) => void | Promise<void> | Kareem.SkipWrappedFunction;
   type PreSaveMiddlewareFunction<ThisType = any> = (
     this: ThisType,
     opts: SaveOptions

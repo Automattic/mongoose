@@ -4755,6 +4755,31 @@ describe('document', function() {
       assert.equal(doc.children[0].text, 'test');
     });
 
+    it('pre save hooks on subdocs receive save options (gh-15920)', async function() {
+      // Arrange
+      let receivedOptions = null;
+
+      const addressSchema = new Schema({ city: String });
+      addressSchema.pre('save', function(options) {
+        receivedOptions = options;
+      });
+
+      const userSchema = new Schema({
+        name: String,
+        address: addressSchema
+      });
+
+      const User = db.model('User', userSchema);
+
+      // Act
+      const user = new User({ name: 'John', address: { city: 'New York' } });
+      await user.save({ customOption: 'test123' });
+
+      // Assert
+      assert.ok(receivedOptions, 'Subdoc pre save hook should receive options');
+      assert.strictEqual(receivedOptions.customOption, 'test123');
+    });
+
     it('post hooks on array child subdocs run after save (gh-5085) (gh-6926)', function() {
       const subSchema = new Schema({
         val: String
@@ -6905,9 +6930,20 @@ describe('document', function() {
     let docRegexCount = 0;
     let docPostRegexCount = 0;
 
-    schema.pre('updateOne', () => ++queryCount);
-    schema.pre('updateOne', { document: true, query: false }, () => ++docCount);
-    schema.post('updateOne', { document: true, query: false }, () => ++docPostCount);
+    schema.pre('updateOne', { document: false, query: true }, function() {
+      ++queryCount;
+      assert.strictEqual(this.options.testOption, 'newValue');
+    });
+    schema.pre('updateOne', { document: true, query: false }, (doc, update, opts) => {
+      assert.strictEqual(opts.testOption, 'value');
+      assert.deepStrictEqual(update, { name: 'test2' });
+      opts.testOption = 'newValue';
+      ++docCount;
+    });
+    schema.post('updateOne', { document: true, query: false }, () => {
+      ++docPostCount;
+    });
+
 
     schema.pre(/^updateOne$/, { document: true, query: false }, () => ++docRegexCount);
     schema.post(/^updateOne$/, { document: true, query: false }, () => ++docPostRegexCount);
@@ -6929,7 +6965,7 @@ describe('document', function() {
     assert.equal(docRegexCount, 0);
     assert.equal(docPostRegexCount, 0);
 
-    await doc.updateOne({ name: 'test2' });
+    await doc.updateOne({ name: 'test2' }, { testOption: 'value' });
 
     assert.equal(queryCount, 1);
     assert.equal(docCount, 1);
@@ -15090,6 +15126,28 @@ describe('document', function() {
     const user = new User();
     await user.validate(null);
     await assert.rejects(() => user.validate({}), /Path `test` is required/);
+  });
+
+  it('supports updateOne with update pipeline', async function() {
+    const schema = new Schema({ name: String, age: Number });
+    const Person = db.model('Person', schema);
+
+    const doc = new Person({ name: 'test' });
+    await doc.updateOne(
+      [
+        {
+          $set: {
+            age: {
+              $round: [
+                { $add: ['age', 1] },
+                0
+              ]
+            }
+          }
+        }
+      ],
+      { updatePipeline: true }
+    );
   });
 });
 

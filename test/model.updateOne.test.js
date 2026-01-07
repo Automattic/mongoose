@@ -3016,6 +3016,25 @@ describe('model: updateOne: ', function() {
     assert.ok(fromDb.nested.updatedAt > doc.nested.updatedAt);
   });
 
+  it('includes update previews when mixing array and object updates', function() {
+    const schema = Schema({ name: String });
+    const Model = db.model('UpdatePreview', schema);
+
+    const currentUpdate = { $set: { name: 'A' } };
+    const incomingUpdate = [{ $set: { name: 'B' } }];
+    const query = Model.updateOne({ name: 'Start' }, currentUpdate);
+
+    assert.throws(() => {
+      query.updateOne({ name: 'Start' }, incomingUpdate, { updatePipeline: true });
+    }, err => {
+      assert.strictEqual(
+        err.message,
+        'Cannot mix array and object updates (current: { \'$set\': { name: \'A\' } }, incoming: [ { \'$set\': { name: \'B\' } } ])'
+      );
+      return true;
+    });
+  });
+
   describe('mongodb 42 features', function() {
     before(async function() {
       const version = await start.mongodVersion();

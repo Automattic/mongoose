@@ -1136,3 +1136,34 @@ async function gh15781() {
   ExpectType<boolean | undefined>()({} as UpdateManyModel['timestamps']);
   ExpectType<boolean | undefined>()({} as UpdateManyModel['overwriteImmutable']);
 }
+
+async function gh15910() {
+  interface FooType {
+    _id: Types.ObjectId;
+    date: Date;
+  }
+  const fooSchema = new Schema<FooType>({
+    date: { type: Date, required: true }
+  });
+
+  const FooModel = model<FooType>('foo', fooSchema);
+
+  const query: mongoose.QueryFilter<FooType> = {
+    date: { $lte: new Date() }
+  };
+
+  const test: mongoose.AnyBulkWriteOperation<FooType>[] = [
+    {
+      updateOne: {
+        filter: query,
+        update: {
+          $set: {
+            date: new Date()
+          }
+        }
+      }
+    }
+  ];
+
+  await FooModel.bulkWrite(test);
+}

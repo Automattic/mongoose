@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import { MergeType, WithTimestamps } from 'mongoose';
 import { ExpectType } from './helpers';
+=======
+import { MergeType, WithTimestamps, WithLevel1NestedPaths, PopulatedDoc, Document, Types } from 'mongoose';
+import { expectType, expectAssignable } from 'tsd';
+>>>>>>> master
 
 type A = { a: string, c: number };
 type B = { a: number, b: string };
@@ -29,3 +34,19 @@ ExpectType<string>()({} as D['a']);
 ExpectType<string>()({} as D['b']);
 ExpectType<Date>()({} as D['created']);
 ExpectType<Date>()({} as D['modified']);
+
+// Test WithLevel1NestedPaths preserves non-Document parts of PopulatedDoc union types
+interface RefSchema {
+  name: string;
+}
+
+interface SchemaWithPopulatedRef {
+  refField: PopulatedDoc<Document<Types.ObjectId, {}, RefSchema> & RefSchema, Types.ObjectId>;
+}
+
+type NestedPaths = WithLevel1NestedPaths<SchemaWithPopulatedRef>;
+
+// The refField type should be a union that includes RefSchema and ObjectId
+// This ensures that PopulatedDoc fields can be queried with both the populated document and the raw ID
+expectAssignable<NestedPaths['refField']>({ name: 'test' } as RefSchema);
+expectAssignable<NestedPaths['refField']>(new Types.ObjectId());

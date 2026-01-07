@@ -1,3 +1,33 @@
+9.1.2 / 2025-01-05
+==================
+ * fix(subdocs): pass options to pre-save hooks for subdocs #15921 #15920 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * perf(model): select only _id when checking document existence during save() #15919 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
+9.1.1 / 2025-12-30
+==================
+ * fix(document): avoid 'Cannot mix array and object updates' on doc.updateOne() with pipeline #15928
+ * docs: update default search version to 9.x #15926 #15925
+
+9.1.0 / 2025-12-29
+===================
+ * feat(model): make pathsToSave handle saving just a subpath of a modified path #15896
+ * feat(document+model): pass options to pre('deleteOne') and update+options to pre('updateOne') hooks #15908 #15870
+ * feat(versioning): optimistic concurrency exclude option, update docs for optimisticConcurrency options #15917 #15915 #15912 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(document): add support for getAtomics() to allow custom container types to utilize atomics #15817
+ * perf: optimize Object.keys() checks and optional chaining #15865 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix: add support for typescript style enums #15914 #15913 [mjfwebb](https://github.com/mjfwebb)
+ * fix(document): when cloning a doc with subdocs, make sure the subdocs parent is the cloned doc #15904 #15901
+ * types(models): support Mongoose query casting in AnyBulkWriteOperation filter property #15918 #15910
+ * types: allow calling create() with TRawDocType for better generics support #15903 #15902
+ * types(document): add id virtual getter by default to HydrateDocument<> if TOverrides is Record<string, never> #15906 #15900
+ * docs(schema): add lean to list of schema options #15907 #15894 #12081
+
+8.21.0 / 2025-12-29
+===================
+ * feat(document+model): pass options to pre('deleteOne') and update+options to pre('updateOne') hooks #15908 #15870
+ * feat(document): add support for getAtomics() to allow custom container types to utilize atomics #15817
+ * fix: add support for typescript style enums #15914 #15913 [mjfwebb](https://github.com/mjfwebb)
+
 8.20.4 / 2025-12-18
 ===================
  * fix(model): ensure $isDeleted is set after calling doc.deleteOne() successfully #15898

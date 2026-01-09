@@ -1,5 +1,4 @@
 import { Schema, model, Model, Document, SaveOptions, Query, Aggregate, HydratedDocument, PreSaveMiddlewareFunction, ModifyResult, AnyBulkWriteOperation } from 'mongoose';
-import { expectNotType } from 'tsd';
 import { CreateCollectionOptions } from 'mongodb';
 import { ExpectAssignable, ExpectType } from './helpers';
 

@@ -1,5 +1,4 @@
 import { Schema, model, Model, Document, SaveOptions, Query, Aggregate, HydratedDocument, PreSaveMiddlewareFunction } from 'mongoose';
-import { expectNotType } from 'tsd';
 import { ExpectAssignable, ExpectType } from './helpers';
 
 interface IDocument extends Document {
@@ -23,7 +22,8 @@ schema.pre('save', function() {
 
 schema.post('save', function(res) {
   ExpectAssignable<HydratedDocument<IDocument>>()(this);
-  expectNotType<Query<any, any>>(res);
+  // @ts-expect-error res should be a document, no query type
+  const v: Query<any, any> = res;
 });
 
 schema.pre('save', { document: true, query: false }, function() {
@@ -32,7 +32,8 @@ schema.pre('save', { document: true, query: false }, function() {
 
 schema.post('save', { document: true, query: false }, function(res) {
   ExpectAssignable<HydratedDocument<IDocument>>()(this);
-  expectNotType<Query<any, any>>(res);
+  // @ts-expect-error res should be a document, no query type
+  const v: Query<any, any> = res;
 });
 
 schema.pre('save', { document: true, query: true }, function() {
@@ -41,7 +42,8 @@ schema.pre('save', { document: true, query: true }, function() {
 
 schema.post('save', { document: true, query: true }, function(res) {
   ExpectAssignable<HydratedDocument<IDocument>>()(this);
-  expectNotType<Query<any, any>>(res);
+  // @ts-expect-error res should be a document, no query type
+  const v: Query<any, any> = res;
 });
 
 schema.pre('save', { document: false, query: true }, function() {
@@ -50,7 +52,7 @@ schema.pre('save', { document: false, query: true }, function() {
 
 schema.post('save', { document: false, query: true }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<unknown>()(res);
 });
 
 schema.pre('save', { document: false, query: false }, function() {
@@ -59,7 +61,7 @@ schema.pre('save', { document: false, query: false }, function() {
 
 schema.post('save', { document: false, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<unknown>()(res);
 });
 
 schema.pre('init', function() {
@@ -72,7 +74,7 @@ schema.pre('estimatedDocumentCount', function() {
 
 schema.post('estimatedDocumentCount', function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('estimatedDocumentCount', { document: false, query: true }, function() {
@@ -81,7 +83,7 @@ schema.pre('estimatedDocumentCount', { document: false, query: true }, function(
 
 schema.post('estimatedDocumentCount', { document: false, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('estimatedDocumentCount', { document: true, query: true }, function() {
@@ -90,7 +92,7 @@ schema.pre('estimatedDocumentCount', { document: true, query: true }, function()
 
 schema.post('estimatedDocumentCount', { document: true, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('estimatedDocumentCount', { document: true, query: false }, function() {
@@ -99,7 +101,7 @@ schema.pre('estimatedDocumentCount', { document: true, query: false }, function(
 
 schema.post('estimatedDocumentCount', { document: true, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('estimatedDocumentCount', { document: false, query: false }, function() {
@@ -108,7 +110,7 @@ schema.pre('estimatedDocumentCount', { document: false, query: false }, function
 
 schema.post('estimatedDocumentCount', { document: false, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('countDocuments', function() {
@@ -117,7 +119,7 @@ schema.pre('countDocuments', function() {
 
 schema.post('countDocuments', function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('countDocuments', { document: false, query: true }, function() {
@@ -126,7 +128,7 @@ schema.pre('countDocuments', { document: false, query: true }, function() {
 
 schema.post('countDocuments', { document: false, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('countDocuments', { document: true, query: true }, function() {
@@ -135,7 +137,7 @@ schema.pre('countDocuments', { document: true, query: true }, function() {
 
 schema.post('countDocuments', { document: true, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('countDocuments', { document: true, query: false }, function() {
@@ -144,7 +146,7 @@ schema.pre('countDocuments', { document: true, query: false }, function() {
 
 schema.post('countDocuments', { document: true, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('countDocuments', { document: false, query: false }, function() {
@@ -153,7 +155,7 @@ schema.pre('countDocuments', { document: false, query: false }, function() {
 
 schema.post('countDocuments', { document: false, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('deleteMany', function() {
@@ -162,7 +164,7 @@ schema.pre('deleteMany', function() {
 
 schema.post('deleteMany', function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('deleteMany', { document: false, query: true }, function() {
@@ -171,7 +173,7 @@ schema.pre('deleteMany', { document: false, query: true }, function() {
 
 schema.post('deleteMany', { document: false, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('deleteMany', { document: true, query: true }, function() {
@@ -180,7 +182,7 @@ schema.pre('deleteMany', { document: true, query: true }, function() {
 
 schema.post('deleteMany', { document: true, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('deleteMany', { document: true, query: false }, function() {
@@ -189,7 +191,7 @@ schema.pre('deleteMany', { document: true, query: false }, function() {
 
 schema.post('deleteMany', { document: true, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('deleteMany', { document: false, query: false }, function() {
@@ -198,7 +200,7 @@ schema.pre('deleteMany', { document: false, query: false }, function() {
 
 schema.post('deleteMany', { document: false, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('distinct', function() {
@@ -207,7 +209,7 @@ schema.pre('distinct', function() {
 
 schema.post('distinct', function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('distinct', { document: false, query: true }, function() {
@@ -216,7 +218,7 @@ schema.pre('distinct', { document: false, query: true }, function() {
 
 schema.post('distinct', { document: false, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('distinct', { document: true, query: true }, function() {
@@ -225,7 +227,7 @@ schema.pre('distinct', { document: true, query: true }, function() {
 
 schema.post('distinct', { document: true, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('distinct', { document: true, query: false }, function() {
@@ -234,7 +236,7 @@ schema.pre('distinct', { document: true, query: false }, function() {
 
 schema.post('distinct', { document: true, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('distinct', { document: false, query: false }, function() {
@@ -243,7 +245,7 @@ schema.pre('distinct', { document: false, query: false }, function() {
 
 schema.post('distinct', { document: false, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('find', function() {
@@ -252,7 +254,7 @@ schema.pre('find', function() {
 
 schema.post('find', function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('find', { document: false, query: true }, function() {
@@ -261,7 +263,7 @@ schema.pre('find', { document: false, query: true }, function() {
 
 schema.post('find', { document: false, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('find', { document: true, query: true }, function() {
@@ -270,7 +272,7 @@ schema.pre('find', { document: true, query: true }, function() {
 
 schema.post('find', { document: true, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('find', { document: true, query: false }, function() {
@@ -279,7 +281,7 @@ schema.pre('find', { document: true, query: false }, function() {
 
 schema.post('find', { document: true, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('find', { document: false, query: false }, function() {
@@ -288,7 +290,7 @@ schema.pre('find', { document: false, query: false }, function() {
 
 schema.post('find', { document: false, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('findOne', function() {
@@ -297,7 +299,7 @@ schema.pre('findOne', function() {
 
 schema.post('findOne', function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('findOne', { document: false, query: true }, function() {
@@ -306,7 +308,7 @@ schema.pre('findOne', { document: false, query: true }, function() {
 
 schema.post('findOne', { document: false, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('findOne', { document: true, query: true }, function() {
@@ -315,7 +317,7 @@ schema.pre('findOne', { document: true, query: true }, function() {
 
 schema.post('findOne', { document: true, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('findOne', { document: true, query: false }, function() {
@@ -324,7 +326,7 @@ schema.pre('findOne', { document: true, query: false }, function() {
 
 schema.post('findOne', { document: true, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('findOne', { document: false, query: false }, function() {
@@ -333,7 +335,7 @@ schema.pre('findOne', { document: false, query: false }, function() {
 
 schema.post('findOne', { document: false, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('findOneAndDelete', function() {
@@ -342,7 +344,7 @@ schema.pre('findOneAndDelete', function() {
 
 schema.post('findOneAndDelete', function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('findOneAndDelete', { document: false, query: true }, function() {
@@ -351,7 +353,7 @@ schema.pre('findOneAndDelete', { document: false, query: true }, function() {
 
 schema.post('findOneAndDelete', { document: false, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('findOneAndDelete', { document: true, query: true }, function() {
@@ -360,7 +362,7 @@ schema.pre('findOneAndDelete', { document: true, query: true }, function() {
 
 schema.post('findOneAndDelete', { document: true, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('findOneAndDelete', { document: true, query: false }, function() {
@@ -369,7 +371,7 @@ schema.pre('findOneAndDelete', { document: true, query: false }, function() {
 
 schema.post('findOneAndDelete', { document: true, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('findOneAndDelete', { document: false, query: false }, function() {
@@ -378,7 +380,7 @@ schema.pre('findOneAndDelete', { document: false, query: false }, function() {
 
 schema.post('findOneAndDelete', { document: false, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('findOneAndReplace', function() {
@@ -387,7 +389,7 @@ schema.pre('findOneAndReplace', function() {
 
 schema.post('findOneAndReplace', function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('findOneAndReplace', { document: false, query: true }, function() {
@@ -396,7 +398,7 @@ schema.pre('findOneAndReplace', { document: false, query: true }, function() {
 
 schema.post('findOneAndReplace', { document: false, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('findOneAndReplace', { document: true, query: true }, function() {
@@ -405,7 +407,7 @@ schema.pre('findOneAndReplace', { document: true, query: true }, function() {
 
 schema.post('findOneAndReplace', { document: true, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('findOneAndReplace', { document: true, query: false }, function() {
@@ -414,7 +416,7 @@ schema.pre('findOneAndReplace', { document: true, query: false }, function() {
 
 schema.post('findOneAndReplace', { document: true, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('findOneAndReplace', { document: false, query: false }, function() {
@@ -423,7 +425,7 @@ schema.pre('findOneAndReplace', { document: false, query: false }, function() {
 
 schema.post('findOneAndReplace', { document: false, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('findOneAndUpdate', function() {
@@ -432,7 +434,7 @@ schema.pre('findOneAndUpdate', function() {
 
 schema.post('findOneAndUpdate', function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('findOneAndUpdate', { document: false, query: true }, function() {
@@ -441,7 +443,7 @@ schema.pre('findOneAndUpdate', { document: false, query: true }, function() {
 
 schema.post('findOneAndUpdate', { document: false, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('findOneAndUpdate', { document: true, query: true }, function() {
@@ -450,7 +452,7 @@ schema.pre('findOneAndUpdate', { document: true, query: true }, function() {
 
 schema.post('findOneAndUpdate', { document: true, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('findOneAndUpdate', { document: true, query: false }, function() {
@@ -459,7 +461,7 @@ schema.pre('findOneAndUpdate', { document: true, query: false }, function() {
 
 schema.post('findOneAndUpdate', { document: true, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('findOneAndUpdate', { document: false, query: false }, function() {
@@ -468,7 +470,7 @@ schema.pre('findOneAndUpdate', { document: false, query: false }, function() {
 
 schema.post('findOneAndUpdate', { document: false, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('replaceOne', function() {
@@ -477,7 +479,7 @@ schema.pre('replaceOne', function() {
 
 schema.post('replaceOne', function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('replaceOne', { document: false, query: true }, function() {
@@ -486,7 +488,7 @@ schema.pre('replaceOne', { document: false, query: true }, function() {
 
 schema.post('replaceOne', { document: false, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('replaceOne', { document: true, query: true }, function() {
@@ -495,7 +497,7 @@ schema.pre('replaceOne', { document: true, query: true }, function() {
 
 schema.post('replaceOne', { document: true, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('replaceOne', { document: true, query: false }, function() {
@@ -504,7 +506,7 @@ schema.pre('replaceOne', { document: true, query: false }, function() {
 
 schema.post('replaceOne', { document: true, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('replaceOne', { document: false, query: false }, function() {
@@ -513,7 +515,7 @@ schema.pre('replaceOne', { document: false, query: false }, function() {
 
 schema.post('replaceOne', { document: false, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('updateMany', function() {
@@ -522,7 +524,7 @@ schema.pre('updateMany', function() {
 
 schema.post('updateMany', function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('updateMany', { document: false, query: true }, function() {
@@ -531,7 +533,7 @@ schema.pre('updateMany', { document: false, query: true }, function() {
 
 schema.post('updateMany', { document: false, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('updateMany', { document: true, query: true }, function() {
@@ -540,7 +542,7 @@ schema.pre('updateMany', { document: true, query: true }, function() {
 
 schema.post('updateMany', { document: true, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('updateMany', { document: true, query: false }, function() {
@@ -549,7 +551,7 @@ schema.pre('updateMany', { document: true, query: false }, function() {
 
 schema.post('updateMany', { document: true, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('updateMany', { document: false, query: false }, function() {
@@ -558,7 +560,7 @@ schema.pre('updateMany', { document: false, query: false }, function() {
 
 schema.post('updateMany', { document: false, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('updateOne', function() {
@@ -567,7 +569,7 @@ schema.pre('updateOne', function() {
 
 schema.post('updateOne', function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('updateOne', { document: false, query: true }, function() {
@@ -576,7 +578,7 @@ schema.pre('updateOne', { document: false, query: true }, function() {
 
 schema.post('updateOne', { document: false, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('updateOne', { document: true, query: false }, function() {
@@ -585,7 +587,7 @@ schema.pre('updateOne', { document: true, query: false }, function() {
 
 schema.post('updateOne', { document: true, query: false }, function(res) {
   ExpectAssignable<HydratedDocument<IDocument>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectAssignable<HydratedDocument<IDocument>>()(res);
 });
 
 schema.pre('updateOne', { document: true, query: true }, function() {
@@ -594,7 +596,7 @@ schema.pre('updateOne', { document: true, query: true }, function() {
 
 schema.post('updateOne', { document: true, query: true }, function(res) {
   ExpectAssignable<Query<any, any>|HydratedDocument<IDocument>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('updateOne', { document: false, query: false }, function() {
@@ -603,7 +605,7 @@ schema.pre('updateOne', { document: false, query: false }, function() {
 
 schema.post('updateOne', { document: false, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('deleteOne', function() {
@@ -612,7 +614,7 @@ schema.pre('deleteOne', function() {
 
 schema.post('deleteOne', function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('deleteOne', { document: false, query: true }, function() {
@@ -621,7 +623,7 @@ schema.pre('deleteOne', { document: false, query: true }, function() {
 
 schema.post('deleteOne', { document: false, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('deleteOne', { document: true, query: false }, function() {
@@ -630,7 +632,7 @@ schema.pre('deleteOne', { document: true, query: false }, function() {
 
 schema.post('deleteOne', { document: true, query: false }, function(res) {
   ExpectAssignable<HydratedDocument<IDocument>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectAssignable<HydratedDocument<IDocument>>()(res);
 });
 
 schema.pre('deleteOne', { document: true, query: true }, function() {
@@ -639,7 +641,7 @@ schema.pre('deleteOne', { document: true, query: true }, function() {
 
 schema.post('deleteOne', { document: true, query: true }, function(res) {
   ExpectAssignable<Query<any, any>|HydratedDocument<IDocument>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre('deleteOne', { document: false, query: false }, function() {
@@ -648,7 +650,7 @@ schema.pre('deleteOne', { document: false, query: false }, function() {
 
 schema.post('deleteOne', { document: false, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], function() {
@@ -657,7 +659,7 @@ schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct'
 
 schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: false, query: true }, function() {
@@ -666,7 +668,7 @@ schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct'
 
 schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: false, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: true, query: true }, function() {
@@ -675,7 +677,7 @@ schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct'
 
 schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: true, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: true, query: false }, function() {
@@ -684,7 +686,7 @@ schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct'
 
 schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: true, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: false, query: false }, function() {
@@ -693,7 +695,7 @@ schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct'
 
 schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany'], { document: false, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], function() {
@@ -702,7 +704,7 @@ schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct'
 
 schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: false, query: true }, function() {
@@ -711,7 +713,7 @@ schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct'
 
 schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: false, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: true, query: false }, function() {
@@ -720,7 +722,7 @@ schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct'
 
 schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: true, query: false }, function(res) {
   ExpectAssignable<HydratedDocument<IDocument>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectAssignable<HydratedDocument<IDocument>>()(res);
 });
 
 schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: true, query: true }, function() {
@@ -729,7 +731,7 @@ schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct'
 
 schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: true, query: true }, function(res) {
   ExpectAssignable<Query<any, any>|HydratedDocument<IDocument>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: false, query: false }, function() {
@@ -738,7 +740,7 @@ schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct'
 
 schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne'], { document: false, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], function() {
@@ -747,7 +749,7 @@ schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct'
 
 schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], function(res) {
   ExpectAssignable<Query<any, any>|HydratedDocument<IDocument>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: false, query: true }, function() {
@@ -756,7 +758,7 @@ schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct'
 
 schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: false, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: true, query: false }, function() {
@@ -765,7 +767,7 @@ schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct'
 
 schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: true, query: false }, function(res) {
   ExpectAssignable<HydratedDocument<IDocument>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectAssignable<HydratedDocument<IDocument>>()(res);
 });
 
 schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: true, query: true }, function() {
@@ -774,7 +776,7 @@ schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct'
 
 schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: true, query: true }, function(res) {
   ExpectAssignable<Query<any, any>|HydratedDocument<IDocument>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: false, query: false }, function() {
@@ -783,7 +785,7 @@ schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct'
 
 schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'updateOne', 'deleteOne', 'validate'], { document: false, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'updateOne', 'deleteOne', 'validate'], function() {
@@ -792,7 +794,7 @@ schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct'
 
 schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'updateOne', 'deleteOne', 'validate'], function(res) {
   ExpectAssignable<Query<any, any>|HydratedDocument<IDocument>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'updateOne', 'deleteOne', 'validate'], { document: false, query: true }, function() {
@@ -801,7 +803,7 @@ schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct'
 
 schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'updateOne', 'deleteOne', 'validate'], { document: false, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'updateOne', 'deleteOne', 'validate'], { document: true, query: false }, function() {
@@ -810,7 +812,7 @@ schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct'
 
 schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'updateOne', 'deleteOne', 'validate'], { document: true, query: false }, function(res) {
   ExpectAssignable<HydratedDocument<IDocument>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectAssignable<HydratedDocument<IDocument>>()(res);
 });
 
 schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'updateOne', 'deleteOne', 'validate'], { document: true, query: true }, function() {
@@ -819,7 +821,7 @@ schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct'
 
 schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'updateOne', 'deleteOne', 'validate'], { document: true, query: true }, function(res) {
   ExpectAssignable<Query<any, any>|HydratedDocument<IDocument>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'updateOne', 'deleteOne', 'validate'], { document: false, query: false }, function() {
@@ -828,7 +830,7 @@ schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct'
 
 schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'updateOne', 'deleteOne', 'validate'], { document: false, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre(['save', 'updateOne', 'deleteOne', 'validate'], function() {
@@ -837,7 +839,7 @@ schema.pre(['save', 'updateOne', 'deleteOne', 'validate'], function() {
 
 schema.post(['save', 'updateOne', 'deleteOne', 'validate'], function(res) {
   ExpectAssignable<Query<any, any>|HydratedDocument<IDocument>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre(['save', 'updateOne', 'deleteOne', 'validate'], { document: false, query: true }, function() {
@@ -846,7 +848,7 @@ schema.pre(['save', 'updateOne', 'deleteOne', 'validate'], { document: false, qu
 
 schema.post(['save', 'updateOne', 'deleteOne', 'validate'], { document: false, query: true }, function(res) {
   ExpectType<Query<any, any>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre(['save', 'updateOne', 'deleteOne', 'validate'], { document: true, query: false }, function() {
@@ -855,7 +857,7 @@ schema.pre(['save', 'updateOne', 'deleteOne', 'validate'], { document: true, que
 
 schema.post(['save', 'updateOne', 'deleteOne', 'validate'], { document: true, query: false }, function(res) {
   ExpectAssignable<HydratedDocument<IDocument>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectAssignable<HydratedDocument<IDocument>>()(res);
 });
 
 schema.pre(['save', 'updateOne', 'deleteOne', 'validate'], { document: true, query: true }, function() {
@@ -864,7 +866,7 @@ schema.pre(['save', 'updateOne', 'deleteOne', 'validate'], { document: true, que
 
 schema.post(['save', 'updateOne', 'deleteOne', 'validate'], { document: true, query: true }, function(res) {
   ExpectAssignable<Query<any, any>|HydratedDocument<IDocument>>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 schema.pre(['save', 'updateOne', 'deleteOne', 'validate'], { document: false, query: false }, function() {
@@ -873,7 +875,7 @@ schema.pre(['save', 'updateOne', 'deleteOne', 'validate'], { document: false, qu
 
 schema.post(['save', 'updateOne', 'deleteOne', 'validate'], { document: false, query: false }, function(res) {
   ExpectType<never>()(this);
-  expectNotType<Query<any, any>>(res);
+  ExpectType<any>()(res);
 });
 
 /* end of generated tests */

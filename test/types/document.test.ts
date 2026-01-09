@@ -12,7 +12,6 @@ import {
   ResolveSchemaOptions
 } from 'mongoose';
 import { DeleteResult } from 'mongodb';
-import { expectNotAssignable } from 'tsd';
 import { autoTypedModel } from './models.test';
 import { autoTypedModelConnection } from './connection.test';
 import { AutoTypedSchemaType } from './schema.test';
@@ -46,7 +45,8 @@ void async function main() {
   ExpectType<DeleteResult>()(await doc.deleteOne());
   ExpectType<TestDocument | null>()(await doc.deleteOne().findOne());
   ExpectAssignable<{ _id: Types.ObjectId, name?: string } | null>()(await doc.deleteOne().findOne().lean());
-  expectNotAssignable<TestDocument | null>(await doc.deleteOne().findOne().lean());
+  // @ts-expect-error invalid assignment
+  const v: TestDocument | null = await doc.deleteOne().findOne().lean();
 }();
 
 

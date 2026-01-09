@@ -19,7 +19,6 @@ import mongoose, {
 } from 'mongoose';
 import mongodb from 'mongodb';
 import { ModifyResult, ObjectId } from 'mongodb';
-import { expectNotAssignable } from 'tsd';
 import { autoTypedModel } from './models.test';
 import { ExpectAssignable, ExpectType } from './helpers';
 
@@ -590,8 +589,10 @@ function gh13630() {
   ExpectAssignable<UpdateQueryKnownOnly<User>>()({ $set: { name: 'John' } });
   ExpectAssignable<UpdateQueryKnownOnly<User>>()({ $unset: { phone: 'test' } });
   ExpectAssignable<UpdateQueryKnownOnly<User>>()({ $set: { nested: { test: 'foo' } } });
-  expectNotAssignable<UpdateQueryKnownOnly<User>>({ $set: { namee: 'foo' } });
-  expectNotAssignable<UpdateQueryKnownOnly<User>>({ $set: { 'nested.test': 'foo' } });
+  // @ts-expect-error invalid assignment
+  const q1: UpdateQueryKnownOnly<User> = { $set: { namee: 'foo' } };
+  // @ts-expect-error invalid assignment
+  const q2: UpdateQueryKnownOnly<User> = { $set: { 'nested.test': 'foo' } };
 
   const x: UpdateQueryKnownOnly<User> = { $set: { name: 'John' } };
   ExpectAssignable<UpdateQuery<User>>()(x);
@@ -869,8 +870,10 @@ async function gh15779() {
 
   v8Filter.name = 'test';
 
+  type AgeType = typeof v8Filter.age;
   ExpectAssignable<typeof v8Filter.age>()(42);
-  expectNotAssignable<typeof v8Filter.age>('taco');
+  // @ts-expect-error invalid assignment
+  const a1: AgeType = 'taco';
 
   const TestModel = model('Test', new Schema({ age: Number, name: String }));
   const query = TestModel.find({ age: { $gt: 18 } });

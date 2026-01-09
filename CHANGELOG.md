@@ -1,4 +1,12 @@
-9.1.2 / 2025-01-05
+9.1.3 / 2026-01-09
+==================
+ * fix(model): support timestamps option to insertMany() as both boolean and QueryTimestampsConfig #15941 #15938
+ * fix(query): include preview of current and incoming update in error when merging normal update with pipeline #15939 #15928
+ * types(model): apply basic type casting to paths underneath subdocuments #15948 #15947
+ * types(utility): make WithLevel1NestedPaths correctly handle PopulatedDoc and other TypeScript unions with Document members #15942 #15923
+ * docs(schema): expose "DocumentArrayElement" #15590 [hasezoey](https://github.com/hasezoey)
+
+9.1.2 / 2026-01-05
 ==================
  * fix(subdocs): pass options to pre-save hooks for subdocs #15921 #15920 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
  * perf(model): select only _id when checking document existence during save() #15919 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

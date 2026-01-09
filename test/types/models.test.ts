@@ -1168,19 +1168,19 @@ async function gh15947() {
       type: new Schema({
         _id: {
           type: Schema.Types.ObjectId,
-          required: true,
+          required: true
         },
         field1: {
           type: String,
           required: true,
-          trim: true,
+          trim: true
         },
         field2: {
           type: Number,
-          required: false,
-        },
+          required: false
+        }
       }),
-      required: true,
+      required: true
     },
     docArr: [{ _id: 'ObjectId' }]
   });

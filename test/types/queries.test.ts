@@ -598,7 +598,7 @@ function gh13630() {
   ExpectAssignable<UpdateQuery<User>>()(x);
 }
 
-function gh14190() {
+async function gh14190() {
   const userSchema = new Schema({ name: String, age: Number });
   const UserModel = model('User', userSchema);
 

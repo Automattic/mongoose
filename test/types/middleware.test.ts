@@ -129,7 +129,7 @@ function gh11480(): void {
   const UserSchema = new Schema<IUserSchema>({ name: { type: String } });
 
   UserSchema.pre('save', function() {
-    expectNotType<any>(this);
+    ExpectAssignable<HydratedDocument<IUserSchema>>()(this);
   });
 }
 

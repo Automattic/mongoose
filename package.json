@@ -57,7 +57,6 @@
     "nyc": "15.1.0",
     "pug": "3.0.3",
     "sinon": "21.0.1",
-    "tsd": "0.33.0",
     "typescript": "5.9.3",
     "typescript-eslint": "^8.31.1",
     "uuid": "11.1.0"
@@ -99,7 +98,7 @@
     "test-deno:ci": "npm run test-deno -- --reporter min",
     "test-rs": "START_REPLICA_SET=1 mocha --timeout 30000 --exit ./test/*.test.js",
     "test-rs:ci": "npm run test-rs -- --reporter min",
-    "test-tsd": "node ./test/types/check-types-filename && tsd --full",
+    "test:types": "tsc --project test/types/tsconfig.json",
     "setup-test-encryption": "node scripts/setup-encryption-tests.js",
     "test-encryption": "mocha --exit ./test/encryption/*.test.js",
     "test-encryption:ci": "npm run test-encryption -- --reporter min",
@@ -131,18 +130,5 @@
   "funding": {
     "type": "opencollective",
     "url": "https://opencollective.com/mongoose"
-  },
-  "tsd": {
-    "directory": "test/types",
-    "compilerOptions": {
-      "esModuleInterop": false,
-      "strict": true,
-      "allowSyntheticDefaultImports": true,
-      "strictPropertyInitialization": false,
-      "noImplicitAny": false,
-      "strictNullChecks": true,
-      "module": "commonjs",
-      "target": "ES2022"
-    }
   }
 }

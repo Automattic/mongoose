@@ -71,6 +71,7 @@ declare module 'mongoose' {
     ordered?: boolean;
     lean?: boolean;
     throwOnValidationError?: boolean;
+    timestamps?: boolean | QueryTimestampsConfig;
   }
 
   interface InsertManyResult<T> extends mongodb.InsertManyResult<T> {
@@ -237,7 +238,11 @@ declare module 'mongoose' {
       ? (Record<KeyType, ValueType> | Array<[KeyType, ValueType]> | T[K])
       : NonNullable<T[K]> extends Types.DocumentArray<infer RawSubdocType>
          ? RawSubdocType[] | T[K]
-         : QueryTypeCasting<T[K]>;
+         : NonNullable<T[K]> extends Document<any, any, infer RawSubdocType>
+           ? ApplyBasicCreateCasting<RawSubdocType> | T[K]
+           : NonNullable<T[K]> extends Record<string, any>
+             ? ApplyBasicCreateCasting<T[K]> | T[K]
+             : QueryTypeCasting<T[K]>;
   };
 
   type HasLeanOption<TSchema> = 'lean' extends keyof ObtainSchemaGeneric<TSchema, 'TSchemaOptions'> ?

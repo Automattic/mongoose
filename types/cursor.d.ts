@@ -1,8 +1,12 @@
 declare module 'mongoose' {
+  import { Readable } from 'stream';
 
-  import stream = require('stream');
-
-  type CursorFlag = 'tailable' | 'oplogReplay' | 'noCursorTimeout' | 'awaitData' | 'partial';
+  type CursorFlag =
+    | 'tailable'
+    | 'oplogReplay'
+    | 'noCursorTimeout'
+    | 'awaitData'
+    | 'partial';
 
   interface EachAsyncOptions {
     parallel?: number;
@@ -11,57 +15,75 @@ declare module 'mongoose' {
     signal?: AbortSignal;
   }
 
-  class Cursor<DocType = any, Options = never, NextResultType = DocType | null> extends stream.Readable {
-    [Symbol.asyncIterator](): Cursor<IteratorResult<DocType>, Options, IteratorResult<DocType>>;
+  /**
+   * Mongoose Cursor
+   */
+  class Cursor<
+    DocType = unknown,
+    Options extends Record<string, any> = Record<string, never>,
+    NextResultType = DocType | null
+  > extends Readable {
+    /**
+     * Async iterator support
+     */
+    [Symbol.asyncIterator](): AsyncIterator<DocType>;
 
+    /**
+     * Explicit async cleanup (Node 20+)
+     */
     [Symbol.asyncDispose](): Promise<void>;
 
     /**
-     * Adds a [cursor flag](https://mongodb.github.io/node-mongodb-native/4.9/classes/FindCursor.html#addCursorFlag).
-     * Useful for setting the `noCursorTimeout` and `tailable` flags.
+     * Add a MongoDB cursor flag
      */
     addCursorFlag(flag: CursorFlag, value: boolean): this;
 
     /**
-     * Marks this cursor as closed. Will stop streaming and subsequent calls to
-     * `next()` will error.
+     * Close the cursor
      */
     close(): Promise<void>;
 
     /**
-     * Destroy this cursor, closing the underlying cursor. Will stop streaming
-     * and subsequent calls to `next()` will error.
+     * Destroy the cursor immediately
      */
-    destroy(): this;
+    destroy(error?: Error): this;
 
     /**
-     * Rewind this cursor to its uninitialized state. Any options that are present on the cursor will
-     * remain in effect. Iterating this cursor will cause new queries to be sent to the server, even
-     * if the resultant data has already been retrieved by this cursor.
+     * Reset cursor to initial state
      */
     rewind(): this;
 
     /**
-     * Execute `fn` for every document(s) in the cursor. If batchSize is provided
-     * `fn` will be executed for each batch of documents. If `fn` returns a promise,
-     * will wait for the promise to resolve before iterating on to the next one.
-     * Returns a promise that resolves when done.
+     * Iterate documents one by one
      */
-    eachAsync(fn: (doc: DocType[], i: number) => any, options: EachAsyncOptions & { batchSize: number }): Promise<void>;
-    eachAsync(fn: (doc: DocType, i: number) => any, options?: EachAsyncOptions): Promise<void>;
+    eachAsync(
+      fn: (doc: DocType, index: number) => unknown | Promise<unknown>,
+      options?: EachAsyncOptions
+    ): Promise<void>;
 
     /**
-     * Registers a transform function which subsequently maps documents retrieved
-     * via the streams interface or `.next()`
+     * Iterate documents in batches
      */
-    map<ResultType>(fn: (res: DocType) => ResultType): Cursor<ResultType, Options>;
+    eachAsync(
+      fn: (docs: DocType[], index: number) => unknown | Promise<unknown>,
+      options: EachAsyncOptions & { batchSize: number }
+    ): Promise<void>;
 
     /**
-     * Get the next document from this cursor. Will return `null` when there are
-     * no documents left.
+     * Transform cursor results
+     */
+    map<ResultType>(
+      fn: (doc: DocType) => ResultType
+    ): Cursor<ResultType, Options>;
+
+    /**
+     * Fetch next document
      */
     next(): Promise<NextResultType>;
 
-    options: Options;
+    /**
+     * Cursor options (read-only)
+     */
+    readonly options: Options;
   }
 }

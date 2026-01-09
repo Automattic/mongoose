@@ -96,29 +96,23 @@ function encrypt() {
   new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, queries: 'range' };
   new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, queries: undefined };
 
-  // empty object
-  // @ts-expect-error
+  // @ts-expect-error empty object
   new SchemaTypeOptions<string>()['encrypt'] = {};
 
-  // invalid keyId
-  // @ts-expect-error
+  // @ts-expect-error invalid keyId
   new SchemaTypeOptions<string>()['encrypt'] = { keyId: 'fakeId' };
 
-  // missing keyId
-  // @ts-expect-error
+  // @ts-expect-error missing keyId
   new SchemaTypeOptions<string>()['encrypt'] = { queries: 'equality' };
-  // @ts-expect-error
+  // @ts-expect-error invalid algorithm
   new SchemaTypeOptions<string>()['encrypt'] = { algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic' };
 
-  // invalid algorithm
-  // @ts-expect-error
+  // @ts-expect-error invalid algorithm
   new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, algorithm: 'SHA_FAKE_ALG' };
 
-  // invalid queries
-  // @ts-expect-error
+  // @ts-expect-error invalid queries
   new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, queries: 'fakeQueryOption' };
 
-  // invalid input option
-  // @ts-expect-error
+  // @ts-expect-error invalid input option
   new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, invalidKey: 'fakeKeyOption' };
 }

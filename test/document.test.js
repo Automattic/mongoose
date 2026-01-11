@@ -12478,7 +12478,7 @@ describe('document', function() {
     );
   });
 
-  describe('$clone() edge cases (gh-15901)', function() {
+  describe('$clone() edge cases (gh-15954)', function() {
     it('updates Map subdocument parent references', function() {
       // Arrange
       const { user } = createTestContext();

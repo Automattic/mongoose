@@ -12523,6 +12523,17 @@ describe('document', function() {
       assert.strictEqual(clonedUser.addresses[0].city, 'Miami', 'remaining cloned address should be Miami');
     });
 
+    it('cloned Map should be a MongooseMap', function() {
+      // Arrange
+      const { user } = createTestContext();
+
+      // Act
+      const clonedUser = user.$clone();
+
+      // Assert
+      assert.ok(clonedUser.images.$isMongooseMap, 'cloned images should be a MongooseMap');
+    });
+
     function createTestContext() {
       const imageSchema = new Schema({ url: String });
       const addressSchema = new Schema({ city: String });

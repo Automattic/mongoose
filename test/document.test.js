@@ -12534,19 +12534,51 @@ describe('document', function() {
       assert.ok(clonedUser.images.$isMongooseMap, 'cloned images should be a MongooseMap');
     });
 
+    it('nested and sibling document arrays have isolated parentArray references', function() {
+      // Arrange
+      const { user } = createTestContext();
+
+      // Act
+      const clonedUser = user.$clone();
+
+      // Assert - addresses[0].contacts should not pollute phones[0].parentArray
+      assert.strictEqual(
+        clonedUser.addresses[0].parentArray(),
+        clonedUser.addresses,
+        'address parentArray should be addresses array'
+      );
+      assert.strictEqual(
+        clonedUser.addresses[0].contacts[0].parentArray(),
+        clonedUser.addresses[0].contacts,
+        'nested contact parentArray should be contacts array'
+      );
+      assert.strictEqual(
+        clonedUser.phones[0].parentArray(),
+        clonedUser.phones,
+        'phone parentArray should be phones array, not polluted by nested contacts'
+      );
+    });
+
     function createTestContext() {
       const imageSchema = new Schema({ url: String });
-      const addressSchema = new Schema({ city: String });
+      const contactSchema = new Schema({ email: String });
+      const addressSchema = new Schema({
+        city: String,
+        contacts: [contactSchema]
+      });
+      const phoneSchema = new Schema({ number: String });
       const userSchema = new Schema({
         name: String,
         images: { type: Map, of: imageSchema },
-        addresses: [addressSchema]
+        addresses: [addressSchema],
+        phones: [phoneSchema]
       });
       const User = db.model('User', userSchema);
       const user = new User({
         name: 'John',
         images: new Map([['avatar', { url: 'https://example.com/avatar.jpg' }]]),
-        addresses: [{ city: 'Denver' }, { city: 'Miami' }]
+        addresses: [{ city: 'Denver', contacts: [{ email: 'john@test.com' }] }, { city: 'Miami', contacts: [] }],
+        phones: [{ number: '555-1234' }]
       });
       return { User, user };
     }

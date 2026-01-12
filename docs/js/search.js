@@ -2,7 +2,7 @@
 
 const root = 'https://mongoose-js.netlify.app/.netlify/functions';
 
-const defaultVersion = '8.x';
+const defaultVersion = '9.x';
 const versionFromUrl = window.location.pathname.match(/^\/docs\/(\d+\.x)/);
 const version = versionFromUrl ? versionFromUrl[1] : defaultVersion;
 

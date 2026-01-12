@@ -320,8 +320,10 @@ describe('model middleware', function() {
       ++preValidate;
     });
 
-    schema.pre('deleteOne', { document: true, query: false }, function() {
+    schema.pre('deleteOne', { document: true, query: false }, function(doc, opts) {
       ++preRemove;
+      assert.strictEqual(opts.testOption, 'value');
+      opts.testOption = 'something else';
     });
 
     schema.post('validate', function(doc) {
@@ -344,7 +346,7 @@ describe('model middleware', function() {
     assert.equal(preRemove, 0);
     assert.equal(postRemove, 0);
 
-    await test.deleteOne();
+    await test.deleteOne({ testOption: 'value' });
     assert.equal(preValidate, 1);
     assert.equal(postValidate, 1);
     assert.equal(preRemove, 1);

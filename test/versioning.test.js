@@ -732,4 +732,165 @@ describe('versioning', function() {
       return { User, user };
     }
   });
+
+  describe('optimisticConcurrency (gh-15912) (gh-15915)', function() {
+    const VERSION_ALL = mongoose.Document.VERSION_ALL;
+
+    describe('optimisticConcurrency: true', function() {
+      it('sets VERSION_ALL when modifying any field', async function() {
+        // Arrange
+        const { user } = await createTestContext({ optimisticConcurrency: true });
+
+        // Act
+        user.balance = 200;
+        user.$__delta();
+
+        // Assert
+        assert.strictEqual(user.$__.version, VERSION_ALL);
+      });
+
+      it('sets VERSION_ALL when modifying array field', async function() {
+        // Arrange
+        const { user } = await createTestContext({ optimisticConcurrency: true });
+
+        // Act
+        user.friends.push('c');
+        user.$__delta();
+
+        // Assert
+        assert.strictEqual(user.$__.version, VERSION_ALL);
+      });
+    });
+
+    describe('optimisticConcurrency: string[]', function() {
+      it('sets VERSION_ALL when modifying specified field', async function() {
+        // Arrange
+        const { user } = await createTestContext({ optimisticConcurrency: ['balance'] });
+
+        // Act
+        user.balance = 200;
+        user.$__delta();
+
+        // Assert
+        assert.strictEqual(user.$__.version, VERSION_ALL);
+      });
+
+      it('sets VERSION_ALL when modifying specified array field', async function() {
+        // Arrange
+        const { user } = await createTestContext({ optimisticConcurrency: ['friends'] });
+
+        // Act
+        user.friends.push('c');
+        user.$__delta();
+
+        // Assert
+        assert.strictEqual(user.$__.version, VERSION_ALL);
+      });
+
+      it('does not set version when modifying non-specified field', async function() {
+        // Arrange
+        const { user } = await createTestContext({ optimisticConcurrency: ['balance'] });
+
+        // Act
+        user.name = 'changed';
+        user.$__delta();
+
+        // Assert
+        assert.strictEqual(user.$__.version, undefined);
+      });
+
+      it('does not set version when modifying non-specified array field', async function() {
+        // Arrange
+        const { user } = await createTestContext({ optimisticConcurrency: ['balance'] });
+
+        // Act
+        user.friends.push('new-friend');
+        user.$__delta();
+
+        // Assert
+        assert.strictEqual(user.$__.version, undefined);
+      });
+    });
+
+    describe('optimisticConcurrency: { exclude: [] }', function() {
+      it('sets VERSION_ALL when modifying non-excluded field', async function() {
+        // Arrange
+        const { user } = await createTestContext({ optimisticConcurrency: { exclude: ['name'] } });
+
+        // Act
+        user.balance = 200;
+        user.$__delta();
+
+        // Assert
+        assert.strictEqual(user.$__.version, VERSION_ALL);
+      });
+
+      it('sets VERSION_ALL when modifying non-excluded array field', async function() {
+        // Arrange
+        const { user } = await createTestContext({ optimisticConcurrency: { exclude: ['name'] } });
+
+        // Act
+        user.friends.push('c');
+        user.$__delta();
+
+        // Assert
+        assert.strictEqual(user.$__.version, VERSION_ALL);
+      });
+
+      it('does not set version when modifying only excluded field', async function() {
+        // Arrange
+        const { user } = await createTestContext({ optimisticConcurrency: { exclude: ['name'] } });
+
+        // Act
+        user.name = 'changed';
+        user.$__delta();
+
+        // Assert
+        assert.strictEqual(user.$__.version, undefined);
+      });
+
+      it('does not set version when modifying only excluded array field', async function() {
+        // Arrange
+        const { user } = await createTestContext({ optimisticConcurrency: { exclude: ['friends'] } });
+
+        // Act
+        user.friends.push('new-friend');
+        user.$__delta();
+
+        // Assert
+        assert.strictEqual(user.$__.version, undefined);
+      });
+
+      it('sets VERSION_ALL when modifying both excluded and non-excluded fields', async function() {
+        // Arrange
+        const { user } = await createTestContext({ optimisticConcurrency: { exclude: ['name'] } });
+
+        // Act
+        user.name = 'changed';
+        user.balance = 200;
+        user.$__delta();
+
+        // Assert
+        assert.strictEqual(user.$__.version, VERSION_ALL);
+      });
+    });
+
+    async function createTestContext({ optimisticConcurrency }) {
+      const schema = new Schema({
+        name: String,
+        balance: Number,
+        friends: [String]
+      }, { optimisticConcurrency });
+
+      const User = db.model('Test', schema);
+
+      const user = await User.create({
+        name: 'test',
+        balance: 100,
+        friends: ['alice', 'bob']
+      });
+
+      return { user };
+    }
+  });
 });

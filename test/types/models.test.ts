@@ -1129,3 +1129,70 @@ async function gh15781() {
   expectType<boolean | undefined>({} as UpdateManyModel['timestamps']);
   expectType<boolean | undefined>({} as UpdateManyModel['overwriteImmutable']);
 }
+
+async function gh15910() {
+  interface FooType {
+    _id: Types.ObjectId;
+    date: Date;
+  }
+  const fooSchema = new Schema<FooType>({
+    date: { type: Date, required: true }
+  });
+
+  const FooModel = model<FooType>('foo', fooSchema);
+
+  const query: mongoose.QueryFilter<FooType> = {
+    date: { $lte: new Date() }
+  };
+
+  const test: mongoose.AnyBulkWriteOperation<FooType>[] = [
+    {
+      updateOne: {
+        filter: query,
+        update: {
+          $set: {
+            date: new Date()
+          }
+        }
+      }
+    }
+  ];
+
+  await FooModel.bulkWrite(test);
+}
+
+async function gh15947() {
+  const schema = new Schema({
+    name: String,
+    subdocument: {
+      type: new Schema({
+        _id: {
+          type: Schema.Types.ObjectId,
+          required: true
+        },
+        field1: {
+          type: String,
+          required: true,
+          trim: true
+        },
+        field2: {
+          type: Number,
+          required: false
+        }
+      }),
+      required: true
+    },
+    docArr: [{ _id: 'ObjectId' }]
+  });
+  const TestModel = model('Test', schema);
+  await TestModel.create({
+    name: 'test',
+    subdocument: {
+      // Should allow strings for ObjectIds
+      _id: '6951265a11a2b0976013be20',
+      field1: 'test',
+      field2: 1
+    },
+    docArr: [{ _id: '6951265a11a2b0976013be20' }]
+  });
+}

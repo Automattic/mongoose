@@ -81,6 +81,7 @@ declare module 'mongoose' {
      * Can also be an object `{ pre: boolean, post: boolean }` for granular control.
      */
     middleware?: boolean | SkipMiddlewareOptions;
+    timestamps?: boolean | QueryTimestampsConfig;
   }
 
   interface InsertManyResult<T> extends mongodb.InsertManyResult<T> {
@@ -205,19 +206,27 @@ declare module 'mongoose' {
     mongodb.InsertOneModel<TSchema> & MongooseBulkWritePerOperationOptions;
 
   export type ReplaceOneModel<TSchema extends mongodb.Document = mongodb.Document> =
-    mongodb.ReplaceOneModel<TSchema> & MongooseBulkWritePerOperationOptions;
+    Omit<mongodb.ReplaceOneModel<TSchema>, 'filter'> &
+    { filter: QueryFilter<TSchema> } &
+    MongooseBulkUpdatePerOperationOptions;
 
   export type UpdateOneModel<TSchema extends mongodb.Document = mongodb.Document> =
-    mongodb.UpdateOneModel<TSchema> & MongooseBulkUpdatePerOperationOptions;
+    Omit<mongodb.UpdateOneModel<TSchema>, 'filter'> &
+    { filter: QueryFilter<TSchema> } &
+    MongooseBulkUpdatePerOperationOptions;
 
   export type UpdateManyModel<TSchema extends mongodb.Document = mongodb.Document> =
-    mongodb.UpdateManyModel<TSchema> & MongooseBulkUpdatePerOperationOptions;
+    Omit<mongodb.UpdateManyModel<TSchema>, 'filter'> &
+    { filter: QueryFilter<TSchema> } &
+    MongooseBulkUpdatePerOperationOptions;
 
   export type DeleteOneModel<TSchema extends mongodb.Document = mongodb.Document> =
-    mongodb.DeleteOneModel<TSchema>;
+    Omit<mongodb.DeleteOneModel<TSchema>, 'filter'> &
+    { filter: QueryFilter<TSchema> };
 
   export type DeleteManyModel<TSchema extends mongodb.Document = mongodb.Document> =
-    mongodb.DeleteManyModel<TSchema>;
+    Omit<mongodb.DeleteManyModel<TSchema>, 'filter'> &
+    { filter: QueryFilter<TSchema> };
 
   export type AnyBulkWriteOperation<TSchema extends mongodb.Document = mongodb.Document> =
     | { insertOne: InsertOneModel<TSchema> }
@@ -244,7 +253,11 @@ declare module 'mongoose' {
       ? (Record<KeyType, ValueType> | Array<[KeyType, ValueType]> | T[K])
       : NonNullable<T[K]> extends Types.DocumentArray<infer RawSubdocType>
          ? RawSubdocType[] | T[K]
-         : QueryTypeCasting<T[K]>;
+         : NonNullable<T[K]> extends Document<any, any, infer RawSubdocType>
+           ? ApplyBasicCreateCasting<RawSubdocType> | T[K]
+           : NonNullable<T[K]> extends Record<string, any>
+             ? ApplyBasicCreateCasting<T[K]> | T[K]
+             : QueryTypeCasting<T[K]>;
   };
 
   type HasLeanOption<TSchema> = 'lean' extends keyof ObtainSchemaGeneric<TSchema, 'TSchemaOptions'> ?

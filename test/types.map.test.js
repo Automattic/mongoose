@@ -1818,4 +1818,34 @@ describe('Map', function() {
       $inc: { __v: 1 }
     });
   });
+
+  it('validates nested map subdocuments loaded via init() (gh-15957)', async function() {
+    const employeeSchema = new Schema({
+      name: { type: String, minlength: 2 }
+    });
+    const teamSchema = new Schema({
+      employees: { type: Map, of: employeeSchema }
+    });
+    const companySchema = new Schema({
+      teams: { type: Map, of: teamSchema }
+    });
+    const Company = db.model('Company', companySchema);
+
+    const company = new Company();
+    company.init({
+      _id: new mongoose.Types.ObjectId(),
+      teams: {
+        engineering: {
+          employees: {
+            john: { name: 'X' } // Invalid: minlength is 2
+          }
+        }
+      }
+    });
+
+    const error = await company.validate().then(() => null, err => err);
+
+    assert.ok(error, 'Validation should fail for invalid nested map subdocument');
+    assert.ok(error.errors['teams.engineering.employees.john.name']);
+  });
 });

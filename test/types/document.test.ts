@@ -478,6 +478,17 @@ async function gh15316() {
   expectType<string>(doc.toObject({ virtuals: true }).upper);
 }
 
+async function toBSON() {
+  const schema = new Schema({
+    name: String
+  });
+
+  const Model = model('test', schema);
+
+  const doc = new Model({ name: 'test' });
+  expectType<{ name?: string | null } & { _id: Types.ObjectId }>(doc.toBSON());
+}
+
 async function gh15578() {
   function withDocType() {
     interface RawDocType {

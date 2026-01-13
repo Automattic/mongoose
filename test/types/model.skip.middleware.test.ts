@@ -1,4 +1,4 @@
-import { Schema, model, SkipMiddlewareOptions, QueryOptions, SaveOptions, InsertManyOptions, MongooseBulkWriteOptions, AggregateOptions } from 'mongoose';
+import { Schema, model, SkipMiddlewareOptions, QueryOptions, SaveOptions, InsertManyOptions, MongooseBulkWriteOptions, MongooseBulkSaveOptions, AggregateOptions } from 'mongoose';
 import { expectAssignable, expectType } from 'tsd';
 
 async function gh8768() {
@@ -19,6 +19,7 @@ async function gh8768() {
   expectType<boolean | SkipMiddlewareOptions | undefined>({} as SaveOptions['middleware']);
   expectType<boolean | SkipMiddlewareOptions | undefined>({} as InsertManyOptions['middleware']);
   expectType<boolean | SkipMiddlewareOptions | undefined>({} as MongooseBulkWriteOptions['middleware']);
+  expectType<boolean | SkipMiddlewareOptions | undefined>({} as MongooseBulkSaveOptions['middleware']);
   expectType<boolean | SkipMiddlewareOptions | undefined>({} as AggregateOptions['middleware']);
 
   // QueryOptions
@@ -72,6 +73,11 @@ async function gh8768() {
   await doc.save({ middleware: false });
   await doc.save({ middleware: { pre: false } });
   await doc.save({ middleware: { post: false } });
+
+  // MongooseBulkSaveOptions
+  await Test.bulkSave([doc], { middleware: false });
+  await Test.bulkSave([doc], { middleware: { pre: false } });
+  await Test.bulkSave([doc], { middleware: { post: false } });
 
   // AggregateOptions
   const agg = Test.aggregate([]);

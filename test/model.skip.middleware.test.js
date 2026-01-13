@@ -276,10 +276,85 @@ describe('middleware option to skip hooks (gh-8768)', function() {
     }
   });
 
+  describe('deleteOne hooks on removed subdocs', function() {
+    it('parent.save() skips subdoc deleteOne pre hooks when middleware: false', async function() {
+      // Arrange
+      const { Parent, getSubdocPreCount } = createTestContext();
+      const doc = await Parent.create({ children: [{ name: 'child1' }] });
+      doc.children[0].deleteOne();
+
+      // Act
+      await doc.save({ middleware: false });
+
+      // Assert
+      assert.strictEqual(getSubdocPreCount(), 0);
+    });
+
+    it('parent.save() skips subdoc deleteOne post hooks when middleware: false', async function() {
+      // Arrange
+      const { Parent, getSubdocPostCount } = createTestContext();
+      const doc = await Parent.create({ children: [{ name: 'child1' }] });
+      doc.children[0].deleteOne();
+
+      // Act
+      await doc.save({ middleware: false });
+
+      // Assert
+      assert.strictEqual(getSubdocPostCount(), 0);
+    });
+
+    it('parent.save() skips only pre deleteOne hooks when middleware: { pre: false }', async function() {
+      // Arrange
+      const { Parent, getSubdocPreCount, getSubdocPostCount } = createTestContext();
+      const doc = await Parent.create({ children: [{ name: 'child1' }] });
+      doc.children[0].deleteOne();
+
+      // Act
+      await doc.save({ middleware: { pre: false } });
+
+      // Assert
+      assert.strictEqual(getSubdocPreCount(), 0);
+      assert.strictEqual(getSubdocPostCount(), 1);
+    });
+
+    it('parent.save() skips only post deleteOne hooks when middleware: { post: false }', async function() {
+      // Arrange
+      const { Parent, getSubdocPreCount, getSubdocPostCount } = createTestContext();
+      const doc = await Parent.create({ children: [{ name: 'child1' }] });
+      doc.children[0].deleteOne();
+
+      // Act
+      await doc.save({ middleware: { post: false } });
+
+      // Assert
+      assert.strictEqual(getSubdocPreCount(), 1);
+      assert.strictEqual(getSubdocPostCount(), 0);
+    });
+
+    function createTestContext() {
+      const childSchema = new Schema({ name: String });
+      const parentSchema = new Schema({ children: [childSchema] });
+
+      let subdocPreCount = 0;
+      let subdocPostCount = 0;
+
+      childSchema.pre('deleteOne', { document: true, query: false }, function() { ++subdocPreCount; });
+      childSchema.post('deleteOne', { document: true, query: false }, function() { ++subdocPostCount; });
+
+      const Parent = db.model('Parent', parentSchema);
+
+      return {
+        Parent,
+        getSubdocPreCount: () => subdocPreCount,
+        getSubdocPostCount: () => subdocPostCount
+      };
+    }
+  });
+
   describe('Document instance operations', function() {
     it('doc.updateOne() skips middleware when middleware: false', async function() {
       // Arrange
-      const { Model, getPreCount, getPostCount } = createTestContext();
+      const { Model, getPreCount, getPostCount } = createTestContext({ hookName: 'updateOne' });
       const doc = await Model.create({ x: 'test' });
 
       // Act
@@ -292,14 +367,66 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       assert.strictEqual(found.y, 'updated');
     });
 
-    function createTestContext() {
+    it('doc.deleteOne() skips middleware when middleware: false', async function() {
+      // Arrange
+      const { Model, getPreCount, getPostCount } = createTestContext({ hookName: 'deleteOne' });
+      const doc = await Model.create({ x: 'test' });
+
+      // Act
+      await doc.deleteOne({ middleware: false });
+
+      // Assert
+      assert.strictEqual(getPreCount(), 0);
+      assert.strictEqual(getPostCount(), 0);
+    });
+
+    it('doc.deleteOne() skips only pre hooks when middleware: { pre: false }', async function() {
+      // Arrange
+      const { Model, getPreCount, getPostCount } = createTestContext({ hookName: 'deleteOne' });
+      const doc = await Model.create({ x: 'test' });
+
+      // Act
+      await doc.deleteOne({ middleware: { pre: false } });
+
+      // Assert
+      assert.strictEqual(getPreCount(), 0);
+      assert.strictEqual(getPostCount(), 1);
+    });
+
+    it('doc.deleteOne() skips only post hooks when middleware: { post: false }', async function() {
+      // Arrange
+      const { Model, getPreCount, getPostCount } = createTestContext({ hookName: 'deleteOne' });
+      const doc = await Model.create({ x: 'test' });
+
+      // Act
+      await doc.deleteOne({ middleware: { post: false } });
+
+      // Assert
+      assert.strictEqual(getPreCount(), 1);
+      assert.strictEqual(getPostCount(), 0);
+    });
+
+    it('doc.deleteOne() skips subdoc deleteOne hooks when middleware: false', async function() {
+      // Arrange
+      const { Parent, getSubdocPreCount, getSubdocPostCount } = createSubdocTestContext();
+      const doc = await Parent.create({ children: [{ name: 'child1' }] });
+
+      // Act
+      await doc.deleteOne({ middleware: false });
+
+      // Assert
+      assert.strictEqual(getSubdocPreCount(), 0);
+      assert.strictEqual(getSubdocPostCount(), 0);
+    });
+
+    function createTestContext({ hookName }) {
       const schema = new Schema({ x: String, y: String });
 
       let preCount = 0;
       let postCount = 0;
 
-      schema.pre('updateOne', { document: true, query: false }, function() { ++preCount; });
-      schema.post('updateOne', { document: true, query: false }, function() { ++postCount; });
+      schema.pre(hookName, { document: true, query: false }, function() { ++preCount; });
+      schema.post(hookName, { document: true, query: false }, function() { ++postCount; });
 
       const Model = db.model('Test', schema);
 
@@ -307,6 +434,25 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         Model,
         getPreCount: () => preCount,
         getPostCount: () => postCount
+      };
+    }
+
+    function createSubdocTestContext() {
+      const childSchema = new Schema({ name: String });
+      const parentSchema = new Schema({ children: [childSchema] });
+
+      let subdocPreCount = 0;
+      let subdocPostCount = 0;
+
+      childSchema.pre('deleteOne', { document: true, query: false }, function() { ++subdocPreCount; });
+      childSchema.post('deleteOne', { document: true, query: false }, function() { ++subdocPostCount; });
+
+      const Parent = db.model('Parent', parentSchema);
+
+      return {
+        Parent,
+        getSubdocPreCount: () => subdocPreCount,
+        getSubdocPostCount: () => subdocPostCount
       };
     }
   });
@@ -433,6 +579,45 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       assert.ok(user.updatedAt);
     });
 
+    it('bulkSave() skips post hooks when middleware: false', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createBulkSaveTestContext();
+      const user = new User({ name: 'test' });
+
+      // Act
+      await User.bulkSave([user], { middleware: false });
+
+      // Assert
+      assert.strictEqual(getPreCount(), 0);
+      assert.strictEqual(getPostCount(), 0);
+    });
+
+    it('bulkSave() skips only pre hooks when middleware: { pre: false }', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createBulkSaveTestContext();
+      const user = new User({ name: 'test' });
+
+      // Act
+      await User.bulkSave([user], { middleware: { pre: false } });
+
+      // Assert
+      assert.strictEqual(getPreCount(), 0);
+      assert.strictEqual(getPostCount(), 1);
+    });
+
+    it('bulkSave() skips only post hooks when middleware: { post: false }', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createBulkSaveTestContext();
+      const user = new User({ name: 'test' });
+
+      // Act
+      await User.bulkSave([user], { middleware: { post: false } });
+
+      // Assert
+      assert.strictEqual(getPreCount(), 1);
+      assert.strictEqual(getPostCount(), 0);
+    });
+
     it('save() skips user hooks on subdocuments when middleware: false', async function() {
       // Arrange
       const { User, getUserHookRan, getChildHookRan } = createTestContext({ hookName: 'save' });
@@ -498,6 +683,23 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         User,
         getUserHookRan: () => userHookRan,
         getChildHookRan: () => childHookRan
+      };
+    }
+
+    function createBulkSaveTestContext() {
+      let preCount = 0;
+      let postCount = 0;
+
+      const userSchema = new Schema({ name: String });
+      userSchema.pre('save', function() { ++preCount; });
+      userSchema.post('save', function() { ++postCount; });
+
+      const User = db.model('User', userSchema);
+
+      return {
+        User,
+        getPreCount: () => preCount,
+        getPostCount: () => postCount
       };
     }
   });

@@ -28,6 +28,9 @@ const schema = new Schema(
 );
 ```
 
+If you are using automatic schema inference, you should define virtuals using the `virtuals` option in the schema constructor as shown above.
+Mongoose will not automatically infer any virtuals you define using `Schema.prototype.virtual()`.
+
 Note that Mongoose does **not** include virtuals in the returned type from `InferSchemaType`.
 That is because `InferSchemaType` returns a value similar to the raw document interface, which represents the structure of the data stored in MongoDB.
 

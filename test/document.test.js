@@ -328,7 +328,6 @@ describe('document', function() {
         nested: { field: String }
       });
       const TestModel = mongoose.model('gh15961', schema);
-      
       // Should not throw when Jest or other tools inspect the prototype
       assert.doesNotThrow(() => {
         const val = TestModel.prototype.nested;

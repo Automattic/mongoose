@@ -322,7 +322,20 @@ describe('document', function() {
 
       assert.ok(doc.oids !== doc2.oids);
     });
+
+    it('should not crash when accessing nested path on prototype (gh-15961)', function() {
+      const schema = new mongoose.Schema({
+        nested: { field: String }
+      });
+      const TestModel = mongoose.model('gh15961', schema);
+      // Should not throw when Jest or other tools inspect the prototype
+      assert.doesNotThrow(() => {
+        const val = TestModel.prototype.nested;
+        assert.strictEqual(val, undefined);
+      });
+    });
   });
+
 
   it('test shortcut setters', function() {
     const doc = new TestDocument();

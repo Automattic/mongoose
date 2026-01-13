@@ -84,6 +84,9 @@ schema.virtual('fullName').get(function() {
 });
 ```
 
+If you explicitly define the `UserVirtuals` interface, you should define your virtuals using `schema.virtual()` as shown above.
+We recommend `schema.virtual()` over the `virtuals` option to the Schema constructor shown in the "Automatically Inferred Types" section because the `virtuals` option won't allow you to access other virtuals on `this`.
+
 ## Override the Type of `this` in Your Virtual
 
 In case the value of `this` in your virtual is incorrect for some reason, you can always override it using the generic parameter in the `virtual()` function.

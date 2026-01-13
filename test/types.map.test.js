@@ -1822,7 +1822,7 @@ describe('Map', function() {
   describe('validates nested map subdocuments loaded via init() (gh-15957)', function() {
     it('fails validation for invalid data', async function() {
       // Arrange
-      const { company } = createTestContext({ employeeMinLength: 2, employeeName: 'X' });
+      const { company } = createTestContext({ employeeNameMinLength: 2, employeeName: 'X' });
 
       // Act
       const error = await company.validate().then(() => null, err => err);
@@ -1834,7 +1834,7 @@ describe('Map', function() {
 
     it('passes validation for valid data', async function() {
       // Arrange
-      const { company } = createTestContext({ employeeMinLength: 2, employeeName: 'John' });
+      const { company } = createTestContext({ employeeNameMinLength: 2, employeeName: 'John' });
 
       // Act
       const error = await company.validate().then(() => null, err => err);
@@ -1845,7 +1845,7 @@ describe('Map', function() {
 
     it('works with validateSync()', function() {
       // Arrange
-      const { company } = createTestContext({ employeeMinLength: 2, employeeName: 'X' });
+      const { company } = createTestContext({ employeeNameMinLength: 2, employeeName: 'X' });
 
       // Act
       const error = company.validateSync();
@@ -1855,9 +1855,9 @@ describe('Map', function() {
       assert.ok(error.errors['teams.engineering.employees.john.name']);
     });
 
-    function createTestContext({ employeeMinLength, employeeName }) {
+    function createTestContext({ employeeNameMinLength, employeeName }) {
       const employeeSchema = new Schema({
-        name: { type: String, minlength: employeeMinLength }
+        name: { type: String, minlength: employeeNameMinLength }
       });
       const teamSchema = new Schema({
         employees: { type: Map, of: employeeSchema }

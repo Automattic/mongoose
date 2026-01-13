@@ -1819,33 +1819,67 @@ describe('Map', function() {
     });
   });
 
-  it('validates nested map subdocuments loaded via init() (gh-15957)', async function() {
-    const employeeSchema = new Schema({
-      name: { type: String, minlength: 2 }
-    });
-    const teamSchema = new Schema({
-      employees: { type: Map, of: employeeSchema }
-    });
-    const companySchema = new Schema({
-      teams: { type: Map, of: teamSchema }
-    });
-    const Company = db.model('Company', companySchema);
+  describe('validates nested map subdocuments loaded via init() (gh-15957)', function() {
+    it('fails validation for invalid data', async function() {
+      // Arrange
+      const { company } = createTestContext({ employeeMinLength: 2, employeeName: 'X' });
 
-    const company = new Company();
-    company.init({
-      _id: new mongoose.Types.ObjectId(),
-      teams: {
-        engineering: {
-          employees: {
-            john: { name: 'X' } // Invalid: minlength is 2
+      // Act
+      const error = await company.validate().then(() => null, err => err);
+
+      // Assert
+      assert.ok(error);
+      assert.ok(error.errors['teams.engineering.employees.john.name']);
+    });
+
+    it('passes validation for valid data', async function() {
+      // Arrange
+      const { company } = createTestContext({ employeeMinLength: 2, employeeName: 'John' });
+
+      // Act
+      const error = await company.validate().then(() => null, err => err);
+
+      // Assert
+      assert.strictEqual(error, null);
+    });
+
+    it('works with validateSync()', function() {
+      // Arrange
+      const { company } = createTestContext({ employeeMinLength: 2, employeeName: 'X' });
+
+      // Act
+      const error = company.validateSync();
+
+      // Assert
+      assert.ok(error);
+      assert.ok(error.errors['teams.engineering.employees.john.name']);
+    });
+
+    function createTestContext({ employeeMinLength, employeeName }) {
+      const employeeSchema = new Schema({
+        name: { type: String, minlength: employeeMinLength }
+      });
+      const teamSchema = new Schema({
+        employees: { type: Map, of: employeeSchema }
+      });
+      const companySchema = new Schema({
+        teams: { type: Map, of: teamSchema }
+      });
+      const Company = db.model('Company', companySchema);
+
+      const company = new Company();
+      company.init({
+        _id: new mongoose.Types.ObjectId(),
+        teams: {
+          engineering: {
+            employees: {
+              john: { name: employeeName }
+            }
           }
         }
-      }
-    });
+      });
 
-    const error = await company.validate().then(() => null, err => err);
-
-    assert.ok(error, 'Validation should fail for invalid nested map subdocument');
-    assert.ok(error.errors['teams.engineering.employees.john.name']);
+      return { company };
+    }
   });
 });

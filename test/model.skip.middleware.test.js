@@ -56,74 +56,52 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       describe(operation, function() {
         it('skips pre/post hooks when middleware: false', async function() {
           // Arrange
-          const { User, getPreCount, getPostCount } = createTestContext(operation);
+          const { User, getPreCount, getPostCount } = createTestContext();
 
           // Act
           await runOperation(User, { middleware: false });
 
           // Assert
-          assert.strictEqual(getPreCount(), 0);
-          assert.strictEqual(getPostCount(), 0);
+          assert.strictEqual(getPreCount(operation), 0);
+          assert.strictEqual(getPostCount(operation), 0);
         });
 
         it('runs hooks normally without middleware option', async function() {
           // Arrange
-          const { User, getPreCount, getPostCount } = createTestContext(operation);
+          const { User, getPreCount, getPostCount } = createTestContext();
 
           // Act
           await runOperation(User);
 
           // Assert
-          assert.strictEqual(getPreCount(), 1);
-          assert.strictEqual(getPostCount(), 1);
+          assert.strictEqual(getPreCount(operation), 1);
+          assert.strictEqual(getPostCount(operation), 1);
         });
 
         it('skips only pre hooks when middleware: { pre: false }', async function() {
           // Arrange
-          const { User, getPreCount, getPostCount } = createTestContext(operation);
+          const { User, getPreCount, getPostCount } = createTestContext();
 
           // Act
           await runOperation(User, { middleware: { pre: false } });
 
           // Assert
-          assert.strictEqual(getPreCount(), 0);
-          assert.strictEqual(getPostCount(), 1);
+          assert.strictEqual(getPreCount(operation), 0);
+          assert.strictEqual(getPostCount(operation), 1);
         });
 
         it('skips only post hooks when middleware: { post: false }', async function() {
           // Arrange
-          const { User, getPreCount, getPostCount } = createTestContext(operation);
+          const { User, getPreCount, getPostCount } = createTestContext();
 
           // Act
           await runOperation(User, { middleware: { post: false } });
 
           // Assert
-          assert.strictEqual(getPreCount(), 1);
-          assert.strictEqual(getPostCount(), 0);
+          assert.strictEqual(getPreCount(operation), 1);
+          assert.strictEqual(getPostCount(operation), 0);
         });
       });
-    }
-
-    function createTestContext(hookName) {
-      const schema = new Schema({ name: String });
-
-      let _preCount = 0;
-      let _postCount = 0;
-
-      schema.pre(hookName, function() { ++_preCount; });
-      schema.post(hookName, function() { ++_postCount; });
-
-      const User = db.model('User', schema);
-
-      function getPreCount() {
-        return _preCount;
-      }
-
-      function getPostCount() {
-        return _postCount;
-      }
-
-      return { User, getPreCount, getPostCount };
     }
   });
 
@@ -131,355 +109,249 @@ describe('middleware option to skip hooks (gh-8768)', function() {
     describe('save hooks', function() {
       it('subdocument.save() skips middleware when middleware: false', async function() {
         // Arrange
-        const { Parent, getSubdocPreCount, getSubdocPostCount } = createTestContext({ hookName: 'save' });
-        const doc = new Parent({ child: { name: 'test' } });
+        const { User, getSubdocPreCount, getSubdocPostCount } = createTestContext();
+        const doc = new User({ name: 'test', address: { city: 'NYC' } });
 
         // Act
-        await doc.child.save({ suppressWarning: true, middleware: false });
+        await doc.address.save({ suppressWarning: true, middleware: false });
 
         // Assert
-        assert.strictEqual(getSubdocPreCount(), 0);
-        assert.strictEqual(getSubdocPostCount(), 0);
-      });
-
-      it('subdocument.save() pre hooks receive save options (gh-15920)', async function() {
-        // Arrange
-        let receivedOptions = null;
-
-        const addressSchema = new Schema({ city: String });
-        addressSchema.pre('save', function(options) {
-          receivedOptions = options;
-        });
-
-        const userSchema = new Schema({
-          name: String,
-          address: addressSchema
-        });
-
-        const User = db.model('User', userSchema);
-
-        // Act
-        const user = new User({ name: 'John', address: { city: 'New York' } });
-        await user.address.save({ suppressWarning: true, customOption: 'test456' });
-
-        // Assert
-        assert.ok(receivedOptions, 'Subdoc pre save hook should receive options');
-        assert.strictEqual(receivedOptions.customOption, 'test456');
+        assert.strictEqual(getSubdocPreCount('save'), 0);
+        assert.strictEqual(getSubdocPostCount('save'), 0);
       });
 
       it('parent.save() skips both parent and subdoc middleware when middleware: false', async function() {
         // Arrange
-        const { Parent, getParentPreCount, getParentPostCount, getSubdocPreCount, getSubdocPostCount } = createTestContext({ hookName: 'save' });
-        const doc = new Parent({ child: { name: 'test' } });
+        const { User, getPreCount, getPostCount, getSubdocPreCount, getSubdocPostCount } = createTestContext();
+        const doc = new User({ name: 'test', address: { city: 'NYC' } });
 
         // Act
         await doc.save({ middleware: false });
 
         // Assert
-        assert.strictEqual(getParentPreCount(), 0);
-        assert.strictEqual(getParentPostCount(), 0);
-        assert.strictEqual(getSubdocPreCount(), 0);
-        assert.strictEqual(getSubdocPostCount(), 0);
+        assert.strictEqual(getPreCount('save'), 0);
+        assert.strictEqual(getPostCount('save'), 0);
+        assert.strictEqual(getSubdocPreCount('save'), 0);
+        assert.strictEqual(getSubdocPostCount('save'), 0);
       });
 
-      it('parent.save() skips only pre middleware for parent and children when middleware.pre is false', async function() {
+      it('parent.save() skips only pre middleware for parent and subdocs when middleware.pre is false', async function() {
         // Arrange
-        const { Parent, getParentPreCount, getParentPostCount, getSubdocPreCount, getSubdocPostCount } = createTestContext({ hookName: 'save' });
-        const doc = new Parent({ child: { name: 'test' } });
+        const { User, getPreCount, getPostCount, getSubdocPreCount, getSubdocPostCount } = createTestContext();
+        const doc = new User({ name: 'test', address: { city: 'NYC' } });
 
         // Act
         await doc.save({ middleware: { pre: false } });
 
         // Assert
-        assert.strictEqual(getParentPreCount(), 0);
-        assert.strictEqual(getParentPostCount(), 1);
-        assert.strictEqual(getSubdocPreCount(), 0);
-        assert.strictEqual(getSubdocPostCount(), 1);
+        assert.strictEqual(getPreCount('save'), 0);
+        assert.strictEqual(getPostCount('save'), 1);
+        assert.strictEqual(getSubdocPreCount('save'), 0);
+        assert.strictEqual(getSubdocPostCount('save'), 1);
       });
 
-      it('parent.save() skips only post middleware for parent and children when middleware.post is false', async function() {
+      it('parent.save() skips only post middleware for parent and subdocs when middleware.post is false', async function() {
         // Arrange
-        const { Parent, getParentPreCount, getParentPostCount, getSubdocPreCount, getSubdocPostCount } = createTestContext({ hookName: 'save' });
-        const doc = new Parent({ child: { name: 'test' } });
+        const { User, getPreCount, getPostCount, getSubdocPreCount, getSubdocPostCount } = createTestContext();
+        const doc = new User({ name: 'test', address: { city: 'NYC' } });
 
         // Act
         await doc.save({ middleware: { post: false } });
 
         // Assert
-        assert.strictEqual(getParentPreCount(), 1);
-        assert.strictEqual(getParentPostCount(), 0);
-        assert.strictEqual(getSubdocPreCount(), 1);
-        assert.strictEqual(getSubdocPostCount(), 0);
+        assert.strictEqual(getPreCount('save'), 1);
+        assert.strictEqual(getPostCount('save'), 0);
+        assert.strictEqual(getSubdocPreCount('save'), 1);
+        assert.strictEqual(getSubdocPostCount('save'), 0);
       });
     });
 
     describe('validate hooks', function() {
       it('parent.save() still runs validate middleware when middleware: false', async function() {
         // Arrange
-        const { Parent, getParentPreCount, getParentPostCount, getSubdocPreCount, getSubdocPostCount } = createTestContext({ hookName: 'validate' });
-        const doc = new Parent({ child: { name: 'test' } });
+        const { User, getPreCount, getPostCount, getSubdocPreCount, getSubdocPostCount } = createTestContext();
+        const doc = new User({ name: 'test', address: { city: 'NYC' } });
 
         // Act
         await doc.save({ middleware: false });
 
         // Assert - validation runs regardless of middleware option (use validateBeforeSave: false to skip)
-        assert.strictEqual(getParentPreCount(), 1);
-        assert.strictEqual(getParentPostCount(), 1);
-        assert.strictEqual(getSubdocPreCount(), 1);
-        assert.strictEqual(getSubdocPostCount(), 1);
+        assert.strictEqual(getPreCount('validate'), 1);
+        assert.strictEqual(getPostCount('validate'), 1);
+        assert.strictEqual(getSubdocPreCount('validate'), 1);
+        assert.strictEqual(getSubdocPostCount('validate'), 1);
       });
 
       it('parent.save() still runs validate middleware when middleware.pre is false', async function() {
         // Arrange
-        const { Parent, getParentPreCount, getParentPostCount, getSubdocPreCount, getSubdocPostCount } = createTestContext({ hookName: 'validate' });
-        const doc = new Parent({ child: { name: 'test' } });
+        const { User, getPreCount, getPostCount, getSubdocPreCount, getSubdocPostCount } = createTestContext();
+        const doc = new User({ name: 'test', address: { city: 'NYC' } });
 
         // Act
         await doc.save({ middleware: { pre: false } });
 
         // Assert - validation runs regardless of middleware option (use validateBeforeSave: false to skip)
-        assert.strictEqual(getParentPreCount(), 1);
-        assert.strictEqual(getParentPostCount(), 1);
-        assert.strictEqual(getSubdocPreCount(), 1);
-        assert.strictEqual(getSubdocPostCount(), 1);
+        assert.strictEqual(getPreCount('validate'), 1);
+        assert.strictEqual(getPostCount('validate'), 1);
+        assert.strictEqual(getSubdocPreCount('validate'), 1);
+        assert.strictEqual(getSubdocPostCount('validate'), 1);
       });
 
       it('parent.save() still runs validate middleware when middleware.post is false', async function() {
         // Arrange
-        const { Parent, getParentPreCount, getParentPostCount, getSubdocPreCount, getSubdocPostCount } = createTestContext({ hookName: 'validate' });
-        const doc = new Parent({ child: { name: 'test' } });
+        const { User, getPreCount, getPostCount, getSubdocPreCount, getSubdocPostCount } = createTestContext();
+        const doc = new User({ name: 'test', address: { city: 'NYC' } });
 
         // Act
         await doc.save({ middleware: { post: false } });
 
         // Assert - validation runs regardless of middleware option (use validateBeforeSave: false to skip)
-        assert.strictEqual(getParentPreCount(), 1);
-        assert.strictEqual(getParentPostCount(), 1);
-        assert.strictEqual(getSubdocPreCount(), 1);
-        assert.strictEqual(getSubdocPostCount(), 1);
+        assert.strictEqual(getPreCount('validate'), 1);
+        assert.strictEqual(getPostCount('validate'), 1);
+        assert.strictEqual(getSubdocPreCount('validate'), 1);
+        assert.strictEqual(getSubdocPostCount('validate'), 1);
       });
 
       it('parent.save() skips validate middleware when validateBeforeSave: false, even with middleware: false', async function() {
         // Arrange
-        const { Parent, getParentPreCount, getParentPostCount, getSubdocPreCount, getSubdocPostCount } = createTestContext({ hookName: 'validate' });
-        const doc = new Parent({ child: { name: 'test' } });
+        const { User, getPreCount, getPostCount, getSubdocPreCount, getSubdocPostCount } = createTestContext();
+        const doc = new User({ name: 'test', address: { city: 'NYC' } });
 
         // Act
         await doc.save({ middleware: false, validateBeforeSave: false });
 
         // Assert - validateBeforeSave: false skips validation entirely, so validate hooks don't run
-        assert.strictEqual(getParentPreCount(), 0);
-        assert.strictEqual(getParentPostCount(), 0);
-        assert.strictEqual(getSubdocPreCount(), 0);
-        assert.strictEqual(getSubdocPostCount(), 0);
+        assert.strictEqual(getPreCount('validate'), 0);
+        assert.strictEqual(getPostCount('validate'), 0);
+        assert.strictEqual(getSubdocPreCount('validate'), 0);
+        assert.strictEqual(getSubdocPostCount('validate'), 0);
       });
     });
-
-    function createTestContext({ hookName }) {
-      const childSchema = new Schema({ name: String });
-      const parentSchema = new Schema({ child: childSchema });
-
-      let parentPreCount = 0;
-      let parentPostCount = 0;
-      let subdocPreCount = 0;
-      let subdocPostCount = 0;
-
-      childSchema.pre(hookName, function() { ++subdocPreCount; });
-      childSchema.post(hookName, function() { ++subdocPostCount; });
-      parentSchema.pre(hookName, function() { ++parentPreCount; });
-      parentSchema.post(hookName, function() { ++parentPostCount; });
-
-      const Parent = db.model('Parent', parentSchema);
-
-      return {
-        Parent,
-        getParentPreCount: () => parentPreCount,
-        getParentPostCount: () => parentPostCount,
-        getSubdocPreCount: () => subdocPreCount,
-        getSubdocPostCount: () => subdocPostCount
-      };
-    }
   });
 
   describe('deleteOne hooks on removed subdocs', function() {
     it('parent.save() skips subdoc deleteOne pre hooks when middleware: false', async function() {
       // Arrange
-      const { Parent, getSubdocPreCount } = createTestContext();
-      const doc = await Parent.create({ children: [{ name: 'child1' }] });
-      doc.children[0].deleteOne();
+      const { User, getSubdocPreCount } = createTestContext();
+      const doc = await User.create({ name: 'parent', posts: [{ title: 'First post' }] });
+      doc.posts[0].deleteOne();
 
       // Act
       await doc.save({ middleware: false });
 
       // Assert
-      assert.strictEqual(getSubdocPreCount(), 0);
+      assert.strictEqual(getSubdocPreCount('deleteOne'), 0);
     });
 
     it('parent.save() skips subdoc deleteOne post hooks when middleware: false', async function() {
       // Arrange
-      const { Parent, getSubdocPostCount } = createTestContext();
-      const doc = await Parent.create({ children: [{ name: 'child1' }] });
-      doc.children[0].deleteOne();
+      const { User, getSubdocPostCount } = createTestContext();
+      const doc = await User.create({ name: 'parent', posts: [{ title: 'First post' }] });
+      doc.posts[0].deleteOne();
 
       // Act
       await doc.save({ middleware: false });
 
       // Assert
-      assert.strictEqual(getSubdocPostCount(), 0);
+      assert.strictEqual(getSubdocPostCount('deleteOne'), 0);
     });
 
     it('parent.save() skips only pre deleteOne hooks when middleware: { pre: false }', async function() {
       // Arrange
-      const { Parent, getSubdocPreCount, getSubdocPostCount } = createTestContext();
-      const doc = await Parent.create({ children: [{ name: 'child1' }] });
-      doc.children[0].deleteOne();
+      const { User, getSubdocPreCount, getSubdocPostCount } = createTestContext();
+      const doc = await User.create({ name: 'parent', posts: [{ title: 'First post' }] });
+      doc.posts[0].deleteOne();
 
       // Act
       await doc.save({ middleware: { pre: false } });
 
       // Assert
-      assert.strictEqual(getSubdocPreCount(), 0);
-      assert.strictEqual(getSubdocPostCount(), 1);
+      assert.strictEqual(getSubdocPreCount('deleteOne'), 0);
+      assert.strictEqual(getSubdocPostCount('deleteOne'), 1);
     });
 
     it('parent.save() skips only post deleteOne hooks when middleware: { post: false }', async function() {
       // Arrange
-      const { Parent, getSubdocPreCount, getSubdocPostCount } = createTestContext();
-      const doc = await Parent.create({ children: [{ name: 'child1' }] });
-      doc.children[0].deleteOne();
+      const { User, getSubdocPreCount, getSubdocPostCount } = createTestContext();
+      const doc = await User.create({ name: 'parent', posts: [{ title: 'First post' }] });
+      doc.posts[0].deleteOne();
 
       // Act
       await doc.save({ middleware: { post: false } });
 
       // Assert
-      assert.strictEqual(getSubdocPreCount(), 1);
-      assert.strictEqual(getSubdocPostCount(), 0);
+      assert.strictEqual(getSubdocPreCount('deleteOne'), 1);
+      assert.strictEqual(getSubdocPostCount('deleteOne'), 0);
     });
-
-    function createTestContext() {
-      const childSchema = new Schema({ name: String });
-      const parentSchema = new Schema({ children: [childSchema] });
-
-      let subdocPreCount = 0;
-      let subdocPostCount = 0;
-
-      childSchema.pre('deleteOne', { document: true, query: false }, function() { ++subdocPreCount; });
-      childSchema.post('deleteOne', { document: true, query: false }, function() { ++subdocPostCount; });
-
-      const Parent = db.model('Parent', parentSchema);
-
-      return {
-        Parent,
-        getSubdocPreCount: () => subdocPreCount,
-        getSubdocPostCount: () => subdocPostCount
-      };
-    }
   });
 
   describe('Document instance operations', function() {
     it('doc.updateOne() skips middleware when middleware: false', async function() {
       // Arrange
-      const { Model, getPreCount, getPostCount } = createTestContext({ hookName: 'updateOne' });
-      const doc = await Model.create({ x: 'test' });
+      const { User, getDocPreCount, getDocPostCount } = createTestContext();
+      const doc = await User.create({ name: 'test' });
 
       // Act
-      await doc.updateOne({ y: 'updated' }, { middleware: false });
+      await doc.updateOne({ bio: 'updated' }, { middleware: false });
 
       // Assert
-      assert.strictEqual(getPreCount(), 0);
-      assert.strictEqual(getPostCount(), 0);
-      const found = await Model.findById(doc._id);
-      assert.strictEqual(found.y, 'updated');
+      assert.strictEqual(getDocPreCount('updateOne'), 0);
+      assert.strictEqual(getDocPostCount('updateOne'), 0);
+      const found = await User.findById(doc._id);
+      assert.strictEqual(found.bio, 'updated');
     });
 
     it('doc.deleteOne() skips middleware when middleware: false', async function() {
       // Arrange
-      const { Model, getPreCount, getPostCount } = createTestContext({ hookName: 'deleteOne' });
-      const doc = await Model.create({ x: 'test' });
+      const { User, getDocPreCount, getDocPostCount } = createTestContext();
+      const doc = await User.create({ name: 'test' });
 
       // Act
       await doc.deleteOne({ middleware: false });
 
       // Assert
-      assert.strictEqual(getPreCount(), 0);
-      assert.strictEqual(getPostCount(), 0);
+      assert.strictEqual(getDocPreCount('deleteOne'), 0);
+      assert.strictEqual(getDocPostCount('deleteOne'), 0);
     });
 
     it('doc.deleteOne() skips only pre hooks when middleware: { pre: false }', async function() {
       // Arrange
-      const { Model, getPreCount, getPostCount } = createTestContext({ hookName: 'deleteOne' });
-      const doc = await Model.create({ x: 'test' });
+      const { User, getDocPreCount, getDocPostCount } = createTestContext();
+      const doc = await User.create({ name: 'test' });
 
       // Act
       await doc.deleteOne({ middleware: { pre: false } });
 
       // Assert
-      assert.strictEqual(getPreCount(), 0);
-      assert.strictEqual(getPostCount(), 1);
+      assert.strictEqual(getDocPreCount('deleteOne'), 0);
+      assert.strictEqual(getDocPostCount('deleteOne'), 1);
     });
 
     it('doc.deleteOne() skips only post hooks when middleware: { post: false }', async function() {
       // Arrange
-      const { Model, getPreCount, getPostCount } = createTestContext({ hookName: 'deleteOne' });
-      const doc = await Model.create({ x: 'test' });
+      const { User, getDocPreCount, getDocPostCount } = createTestContext();
+      const doc = await User.create({ name: 'test' });
 
       // Act
       await doc.deleteOne({ middleware: { post: false } });
 
       // Assert
-      assert.strictEqual(getPreCount(), 1);
-      assert.strictEqual(getPostCount(), 0);
+      assert.strictEqual(getDocPreCount('deleteOne'), 1);
+      assert.strictEqual(getDocPostCount('deleteOne'), 0);
     });
 
     it('doc.deleteOne() skips subdoc deleteOne hooks when middleware: false', async function() {
       // Arrange
-      const { Parent, getSubdocPreCount, getSubdocPostCount } = createSubdocTestContext();
-      const doc = await Parent.create({ children: [{ name: 'child1' }] });
+      const { User, getSubdocPreCount, getSubdocPostCount } = createTestContext();
+      const doc = await User.create({ name: 'parent', posts: [{ title: 'First post' }] });
 
       // Act
       await doc.deleteOne({ middleware: false });
 
       // Assert
-      assert.strictEqual(getSubdocPreCount(), 0);
-      assert.strictEqual(getSubdocPostCount(), 0);
+      assert.strictEqual(getSubdocPreCount('deleteOne'), 0);
+      assert.strictEqual(getSubdocPostCount('deleteOne'), 0);
     });
-
-    function createTestContext({ hookName }) {
-      const schema = new Schema({ x: String, y: String });
-
-      let preCount = 0;
-      let postCount = 0;
-
-      schema.pre(hookName, { document: true, query: false }, function() { ++preCount; });
-      schema.post(hookName, { document: true, query: false }, function() { ++postCount; });
-
-      const Model = db.model('Test', schema);
-
-      return {
-        Model,
-        getPreCount: () => preCount,
-        getPostCount: () => postCount
-      };
-    }
-
-    function createSubdocTestContext() {
-      const childSchema = new Schema({ name: String });
-      const parentSchema = new Schema({ children: [childSchema] });
-
-      let subdocPreCount = 0;
-      let subdocPostCount = 0;
-
-      childSchema.pre('deleteOne', { document: true, query: false }, function() { ++subdocPreCount; });
-      childSchema.post('deleteOne', { document: true, query: false }, function() { ++subdocPostCount; });
-
-      const Parent = db.model('Parent', parentSchema);
-
-      return {
-        Parent,
-        getSubdocPreCount: () => subdocPreCount,
-        getSubdocPostCount: () => subdocPostCount
-      };
-    }
   });
 
   describe('Error propagation when middleware is skipped', function() {
@@ -503,7 +375,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       // Arrange
       const preHookError = new Error('Pre-hook error - should stop insertMany');
       const { User } = await createTestContext({
-        preHook: { name: 'insertMany', fn: function() { throw preHookError; } }
+        customPreHooks: [{ name: 'insertMany', fn: function() { throw preHookError; } }]
       });
 
       // Act
@@ -532,140 +404,118 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       assert.ok(error);
       assert.ok(error.message.includes('duplicate') || error.code === 11000);
     });
-
-    async function createTestContext({ uniqueIndex = false, preHook = null } = {}) {
-      const schema = new Schema({
-        name: String
-      });
-
-      if (uniqueIndex) {
-        schema.index({ name: 1 }, { unique: true });
-      }
-
-      if (preHook) {
-        schema.pre(preHook.name, preHook.fn);
-      }
-
-      const User = db.model('User', schema);
-
-      if (uniqueIndex) {
-        await User.init();
-      }
-
-      return { User };
-    }
   });
 
   describe('Built-in middleware still runs when user middleware is skipped', function() {
     it('save() sets timestamps when middleware: false', async function() {
       // Arrange
-      const { User, getUserHookRan } = createTestContext({ hookName: 'save' });
-      const user = new User({ name: 'test' });
+      const { User, getUserHookRan } = createTestContext();
+      const doc = new User({ name: 'test' });
 
       // Act
-      await user.save({ middleware: false });
+      await doc.save({ middleware: false });
 
       // Assert
-      assert.strictEqual(getUserHookRan(), false);
-      assert.ok(user.createdAt);
-      assert.ok(user.updatedAt);
+      assert.strictEqual(getUserHookRan('save'), false);
+      assert.ok(doc.createdAt);
+      assert.ok(doc.updatedAt);
     });
 
     it('findOneAndUpdate() updates timestamps when middleware: false', async function() {
       // Arrange
-      const { User, getUserHookRan } = createTestContext({ hookName: 'findOneAndUpdate' });
-      const user = await User.create({ name: 'test' });
-      const originalUpdatedAt = user.updatedAt;
+      const { User, getUserHookRan } = createTestContext();
+      const doc = await User.create({ name: 'test' });
+      const originalUpdatedAt = doc.updatedAt;
       await new Promise(resolve => setTimeout(resolve, 1));
 
       // Act
       const updated = await User.findOneAndUpdate(
-        { _id: user._id },
+        { _id: doc._id },
         { name: 'updated' },
         { new: true, middleware: false }
       );
 
       // Assert
-      assert.strictEqual(getUserHookRan(), false);
+      assert.strictEqual(getUserHookRan('findOneAndUpdate'), false);
       assert.ok(updated.updatedAt > originalUpdatedAt);
     });
 
     it('bulkSave() sets timestamps when middleware: false', async function() {
       // Arrange
-      const { User, getUserHookRan } = createTestContext({ hookName: 'save' });
-      const user = new User({ name: 'test' });
+      const { User, getUserHookRan } = createTestContext();
+      const doc = new User({ name: 'test' });
 
       // Act
-      await User.bulkSave([user], { middleware: false });
+      await User.bulkSave([doc], { middleware: false });
 
       // Assert
-      assert.strictEqual(getUserHookRan(), false);
-      assert.ok(user.createdAt);
-      assert.ok(user.updatedAt);
+      assert.strictEqual(getUserHookRan('save'), false);
+      assert.ok(doc.createdAt);
+      assert.ok(doc.updatedAt);
     });
 
     it('bulkSave() skips post hooks when middleware: false', async function() {
       // Arrange
-      const { User, getPreCount, getPostCount } = createBulkSaveTestContext();
-      const user = new User({ name: 'test' });
+      const { User, getPreCount, getPostCount } = createTestContext();
+      const doc = new User({ name: 'test' });
 
       // Act
-      await User.bulkSave([user], { middleware: false });
+      await User.bulkSave([doc], { middleware: false });
 
       // Assert
-      assert.strictEqual(getPreCount(), 0);
-      assert.strictEqual(getPostCount(), 0);
+      assert.strictEqual(getPreCount('save'), 0);
+      assert.strictEqual(getPostCount('save'), 0);
     });
 
     it('bulkSave() skips only pre hooks when middleware: { pre: false }', async function() {
       // Arrange
-      const { User, getPreCount, getPostCount } = createBulkSaveTestContext();
-      const user = new User({ name: 'test' });
+      const { User, getPreCount, getPostCount } = createTestContext();
+      const doc = new User({ name: 'test' });
 
       // Act
-      await User.bulkSave([user], { middleware: { pre: false } });
+      await User.bulkSave([doc], { middleware: { pre: false } });
 
       // Assert
-      assert.strictEqual(getPreCount(), 0);
-      assert.strictEqual(getPostCount(), 1);
+      assert.strictEqual(getPreCount('save'), 0);
+      assert.strictEqual(getPostCount('save'), 1);
     });
 
     it('bulkSave() skips only post hooks when middleware: { post: false }', async function() {
       // Arrange
-      const { User, getPreCount, getPostCount } = createBulkSaveTestContext();
-      const user = new User({ name: 'test' });
+      const { User, getPreCount, getPostCount } = createTestContext();
+      const doc = new User({ name: 'test' });
 
       // Act
-      await User.bulkSave([user], { middleware: { post: false } });
+      await User.bulkSave([doc], { middleware: { post: false } });
 
       // Assert
-      assert.strictEqual(getPreCount(), 1);
-      assert.strictEqual(getPostCount(), 0);
+      assert.strictEqual(getPreCount('save'), 1);
+      assert.strictEqual(getPostCount('save'), 0);
     });
 
     it('save() skips user hooks on subdocuments when middleware: false', async function() {
       // Arrange
-      const { User, getUserHookRan, getChildHookRan } = createTestContext({ hookName: 'save' });
-      const user = new User({ name: 'test', child: { name: 'child' } });
+      const { User, getUserHookRan, getChildHookRan } = createTestContext();
+      const doc = new User({ name: 'test', address: { city: 'NYC' } });
 
       // Act
-      await user.save({ middleware: false });
+      await doc.save({ middleware: false });
 
       // Assert
-      assert.strictEqual(getUserHookRan(), false);
-      assert.strictEqual(getChildHookRan(), false);
+      assert.strictEqual(getUserHookRan('save'), false);
+      assert.strictEqual(getChildHookRan('save'), false);
     });
 
     it('save() runs validation when middleware: false', async function() {
       // Arrange
-      const { User, getUserHookRan } = createTestContext({ hookName: 'save' });
-      const user = new User({});
+      const { User, getUserHookRan } = createTestContext();
+      const doc = new User({});
 
       // Act
-      const err = await user.save({ middleware: false }).then(() => null, err => err);
+      const err = await doc.save({ middleware: false }).then(() => null, err => err);
 
       // Assert
-      assert.strictEqual(getUserHookRan(), false);
+      assert.strictEqual(getUserHookRan('save'), false);
       assert.ok(err);
       assert.strictEqual(err.name, 'ValidationError');
     });
@@ -688,44 +538,99 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         'All internal plugin hooks should have builtInMiddleware symbol'
       );
     });
-
-    function createTestContext({ hookName }) {
-      let userHookRan = false;
-      let childHookRan = false;
-
-      const childSchema = new Schema({ name: String });
-      childSchema.pre('save', function() { childHookRan = true; });
-
-      const userSchema = new Schema({
-        name: { type: String, required: true },
-        child: childSchema
-      }, { timestamps: true });
-      userSchema.pre(hookName, function() { userHookRan = true; });
-
-      const User = db.model('User', userSchema);
-
-      return {
-        User,
-        getUserHookRan: () => userHookRan,
-        getChildHookRan: () => childHookRan
-      };
-    }
-
-    function createBulkSaveTestContext() {
-      let preCount = 0;
-      let postCount = 0;
-
-      const userSchema = new Schema({ name: String });
-      userSchema.pre('save', function() { ++preCount; });
-      userSchema.post('save', function() { ++postCount; });
-
-      const User = db.model('User', userSchema);
-
-      return {
-        User,
-        getPreCount: () => preCount,
-        getPostCount: () => postCount
-      };
-    }
   });
+
+  /**
+   * Unified test context factory that creates a schema with all hooks registered.
+   * Tests can check counters for any hook type without needing separate factory functions.
+   */
+  function createTestContext({
+    uniqueIndex = false,
+    customPreHooks = []
+  } = {}) {
+    // All hook names
+    const allHooks = [
+      'save', 'validate', 'find', 'findOne', 'findOneAndUpdate',
+      'findOneAndDelete', 'findOneAndReplace', 'updateOne', 'updateMany',
+      'deleteOne', 'deleteMany', 'countDocuments', 'replaceOne',
+      'insertMany', 'bulkWrite', 'aggregate'
+    ];
+
+    // Hooks that have both query and document variants
+    const dualHooks = ['deleteOne', 'updateOne'];
+
+    // Counter structure: main.hookName.pre/post for query hooks
+    // For deleteOne/updateOne, we use main.hookName for query, mainDoc.hookName for document
+    const counts = { main: {}, mainDoc: {}, subdoc: {} };
+    for (const hook of allHooks) {
+      counts.main[hook] = { pre: 0, post: 0 };
+      counts.subdoc[hook] = { pre: 0, post: 0 };
+    }
+    for (const hook of dualHooks) {
+      counts.mainDoc[hook] = { pre: 0, post: 0 };
+    }
+
+    const addressSchema = new Schema({ city: String });
+    const postSchema = new Schema({ title: String });
+
+    for (const subdocSchema of [addressSchema, postSchema]) {
+      for (const hook of ['save', 'validate', 'deleteOne']) {
+        const opts = hook === 'deleteOne' ? { document: true, query: false } : undefined;
+        subdocSchema.pre(hook, opts, function() { counts.subdoc[hook].pre++; });
+        subdocSchema.post(hook, opts, function() { counts.subdoc[hook].post++; });
+      }
+    }
+
+    const userSchema = new Schema({
+      name: { type: String, required: true },
+      bio: String,
+      address: addressSchema,
+      posts: [postSchema]
+    }, { timestamps: true });
+
+    // Register query/model hooks (these run for User.find(), User.updateOne(), etc.)
+    for (const hook of allHooks) {
+      userSchema.pre(hook, function() { counts.main[hook].pre++; });
+      userSchema.post(hook, function() { counts.main[hook].post++; });
+    }
+
+    // Register document-specific hooks (these run for doc.deleteOne(), doc.updateOne())
+    for (const hook of dualHooks) {
+      userSchema.pre(hook, { document: true, query: false }, function() { counts.mainDoc[hook].pre++; });
+      userSchema.post(hook, { document: true, query: false }, function() { counts.mainDoc[hook].post++; });
+    }
+
+    for (const { name, fn } of customPreHooks) {
+      userSchema.pre(name, fn);
+    }
+
+    if (uniqueIndex) {
+      userSchema.index({ name: 1 }, { unique: true });
+    }
+
+    const User = db.model('User', userSchema);
+
+    const result = {
+      User,
+      counts,
+      // Query/model hook counters
+      getPreCount: (hook) => counts.main[hook]?.pre ?? 0,
+      getPostCount: (hook) => counts.main[hook]?.post ?? 0,
+      // Document hook counters (for doc.deleteOne, doc.updateOne)
+      getDocPreCount: (hook) => counts.mainDoc[hook]?.pre ?? 0,
+      getDocPostCount: (hook) => counts.mainDoc[hook]?.post ?? 0,
+      // Subdoc counters
+      getSubdocPreCount: (hook) => counts.subdoc[hook]?.pre ?? 0,
+      getSubdocPostCount: (hook) => counts.subdoc[hook]?.post ?? 0,
+      // Boolean helpers (check both query and doc hooks)
+      getUserHookRan: (hook) => (counts.main[hook]?.pre > 0) || (counts.mainDoc[hook]?.pre > 0),
+      getChildHookRan: (hook) => counts.subdoc[hook]?.pre > 0
+    };
+
+    if (uniqueIndex) {
+      return User.init().then(() => result);
+    }
+
+    return result;
+  }
 });

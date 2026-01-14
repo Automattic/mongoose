@@ -167,7 +167,7 @@ declare module 'mongoose' {
     updatePipeline?: boolean;
     writeConcern?: mongodb.WriteConcern;
 
-    /** set to `false` to skip all user middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
+    /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
     middleware?: boolean | SkipMiddlewareOptions;
 
     [other: string]: any;

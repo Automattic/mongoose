@@ -37,7 +37,7 @@ declare module 'mongoose' {
     strict?: boolean | 'throw';
     /** When false, do not add timestamps to documents. Can be overridden at the operation level. */
     timestamps?: boolean;
-    /** set to `false` to skip all user middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
+    /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
     middleware?: boolean | SkipMiddlewareOptions;
   }
 
@@ -45,7 +45,7 @@ declare module 'mongoose' {
     timestamps?: boolean;
     session?: ClientSession;
     validateBeforeSave?: boolean;
-    /** set to `false` to skip all user middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
+    /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
     middleware?: boolean | SkipMiddlewareOptions;
   }
 
@@ -75,7 +75,7 @@ declare module 'mongoose' {
     ordered?: boolean;
     lean?: boolean;
     throwOnValidationError?: boolean;
-    /** set to `false` to skip all user middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
+    /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
     middleware?: boolean | SkipMiddlewareOptions;
     timestamps?: boolean | QueryTimestampsConfig;
   }
@@ -170,7 +170,7 @@ declare module 'mongoose' {
     validateModifiedOnly?: boolean;
     w?: number | string;
     wtimeout?: number;
-    /** set to `false` to skip all user middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
+    /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
     middleware?: boolean | SkipMiddlewareOptions;
   }
 

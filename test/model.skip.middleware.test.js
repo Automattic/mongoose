@@ -142,6 +142,31 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         assert.strictEqual(getSubdocPostCount(), 0);
       });
 
+      it('subdocument.save() pre hooks receive save options (gh-15920)', async function() {
+        // Arrange
+        let receivedOptions = null;
+
+        const addressSchema = new Schema({ city: String });
+        addressSchema.pre('save', function(options) {
+          receivedOptions = options;
+        });
+
+        const userSchema = new Schema({
+          name: String,
+          address: addressSchema
+        });
+
+        const User = db.model('User', userSchema);
+
+        // Act
+        const user = new User({ name: 'John', address: { city: 'New York' } });
+        await user.address.save({ suppressWarning: true, customOption: 'test456' });
+
+        // Assert
+        assert.ok(receivedOptions, 'Subdoc pre save hook should receive options');
+        assert.strictEqual(receivedOptions.customOption, 'test456');
+      });
+
       it('parent.save() skips both parent and subdoc middleware when middleware: false', async function() {
         // Arrange
         const { Parent, getParentPreCount, getParentPostCount, getSubdocPreCount, getSubdocPostCount } = createTestContext({ hookName: 'save' });

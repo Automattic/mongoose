@@ -4780,31 +4780,6 @@ describe('document', function() {
       assert.strictEqual(receivedOptions.customOption, 'test123');
     });
 
-    it('pre save hooks on subdocs receive save options when calling subdoc.save() directly (gh-15920)', async function() {
-      // Arrange
-      let receivedOptions = null;
-
-      const addressSchema = new Schema({ city: String });
-      addressSchema.pre('save', function(options) {
-        receivedOptions = options;
-      });
-
-      const userSchema = new Schema({
-        name: String,
-        address: addressSchema
-      });
-
-      const User = db.model('User', userSchema);
-
-      // Act
-      const user = new User({ name: 'John', address: { city: 'New York' } });
-      await user.address.save({ suppressWarning: true, customOption: 'test456' });
-
-      // Assert
-      assert.ok(receivedOptions, 'Subdoc pre save hook should receive options');
-      assert.strictEqual(receivedOptions.customOption, 'test456');
-    });
-
     it('post hooks on array child subdocs run after save (gh-5085) (gh-6926)', function() {
       const subSchema = new Schema({
         val: String

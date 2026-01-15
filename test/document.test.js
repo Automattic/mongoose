@@ -4768,7 +4768,7 @@ describe('document', function() {
       assert.equal(doc.children[0].text, 'test');
     });
 
-    it('pre save hooks on subdocs receive save options (gh-15920)', async function() {
+    it('pre save hooks on subdocs receive save options when calling `doc.save()` (gh-15920)', async function() {
       // Arrange
       let receivedOptions = null;
 
@@ -4793,7 +4793,7 @@ describe('document', function() {
       assert.strictEqual(receivedOptions.customOption, 'test123');
     });
 
-    it('pre save hooks on subdocs receive save options when calling subdoc.save() directly (gh-15920)', async function() {
+    it('pre save hooks on subdocs receive save options when calling `subdoc.save()` directly (gh-15920)', async function() {
       // Arrange
       let receivedOptions = null;
 

@@ -1,9 +1,20 @@
-import { Schema, model, SkipMiddlewareOptions, QueryOptions, SaveOptions, InsertManyOptions, MongooseBulkWriteOptions, MongooseBulkSaveOptions, AggregateOptions } from 'mongoose';
+import {
+  Schema,
+  model,
+  SkipMiddlewareOptions,
+  QueryOptions,
+  SaveOptions,
+  InsertManyOptions,
+  MongooseBulkWriteOptions,
+  MongooseBulkSaveOptions,
+  AggregateOptions
+} from 'mongoose';
 import { expectAssignable, expectType } from 'tsd';
 
 async function gh8768() {
-  const schema = new Schema({ name: String });
-  const Test = model('Test', schema);
+  const addressSchema = new Schema({ city: String });
+  const schema = new Schema({ name: String, address: addressSchema });
+  const User = model('User', schema);
 
   // SkipMiddlewareOptions type
   expectAssignable<SkipMiddlewareOptions>({});
@@ -22,67 +33,84 @@ async function gh8768() {
   expectType<boolean | SkipMiddlewareOptions | undefined>({} as MongooseBulkSaveOptions['middleware']);
   expectType<boolean | SkipMiddlewareOptions | undefined>({} as AggregateOptions['middleware']);
 
-  // QueryOptions
-  Test.find({}, null, { middleware: false });
-  Test.find({}, null, { middleware: { pre: false } });
-  Test.find({}, null, { middleware: { post: false } });
-  Test.find({}, null, { middleware: { pre: false, post: true } });
-  Test.findOne({}, null, { middleware: false });
-  Test.findOne({}, null, { middleware: { pre: false } });
-  Test.findOne({}, null, { middleware: { post: false } });
-  Test.findOneAndUpdate({}, {}, { middleware: false });
-  Test.findOneAndUpdate({}, {}, { middleware: { pre: false } });
-  Test.findOneAndUpdate({}, {}, { middleware: { post: false } });
-  Test.findOneAndDelete({}, { middleware: false });
-  Test.findOneAndDelete({}, { middleware: { pre: false } });
-  Test.findOneAndDelete({}, { middleware: { post: false } });
-  Test.findOneAndReplace({}, {}, { middleware: false });
-  Test.findOneAndReplace({}, {}, { middleware: { pre: false } });
-  Test.findOneAndReplace({}, {}, { middleware: { post: false } });
-  Test.updateOne({}, {}, { middleware: false });
-  Test.updateOne({}, {}, { middleware: { pre: false } });
-  Test.updateOne({}, {}, { middleware: { post: false } });
-  Test.updateMany({}, {}, { middleware: false });
-  Test.updateMany({}, {}, { middleware: { pre: false } });
-  Test.updateMany({}, {}, { middleware: { post: false } });
-  Test.deleteOne({}, { middleware: false });
-  Test.deleteOne({}, { middleware: { pre: false } });
-  Test.deleteOne({}, { middleware: { post: false } });
-  Test.deleteMany({}, { middleware: false });
-  Test.deleteMany({}, { middleware: { pre: false } });
-  Test.deleteMany({}, { middleware: { post: false } });
-  Test.countDocuments({}, { middleware: false });
-  Test.countDocuments({}, { middleware: { pre: false } });
-  Test.countDocuments({}, { middleware: { post: false } });
-  Test.replaceOne({}, {}, { middleware: false });
-  Test.replaceOne({}, {}, { middleware: { pre: false } });
-  Test.replaceOne({}, {}, { middleware: { post: false } });
+  // QueryOptions - Query operations
+  User.find({}, null, { middleware: false });
+  User.find({}, null, { middleware: { pre: false } });
+  User.find({}, null, { middleware: { post: false } });
+  User.find({}, null, { middleware: { pre: false, post: true } });
+  User.findOne({}, null, { middleware: false });
+  User.findOne({}, null, { middleware: { pre: false } });
+  User.findOne({}, null, { middleware: { post: false } });
+  User.findOneAndUpdate({}, {}, { middleware: false });
+  User.findOneAndUpdate({}, {}, { middleware: { pre: false } });
+  User.findOneAndUpdate({}, {}, { middleware: { post: false } });
+  User.findOneAndDelete({}, { middleware: false });
+  User.findOneAndDelete({}, { middleware: { pre: false } });
+  User.findOneAndDelete({}, { middleware: { post: false } });
+  User.findOneAndReplace({}, {}, { middleware: false });
+  User.findOneAndReplace({}, {}, { middleware: { pre: false } });
+  User.findOneAndReplace({}, {}, { middleware: { post: false } });
+  User.updateOne({}, {}, { middleware: false });
+  User.updateOne({}, {}, { middleware: { pre: false } });
+  User.updateOne({}, {}, { middleware: { post: false } });
+  User.updateMany({}, {}, { middleware: false });
+  User.updateMany({}, {}, { middleware: { pre: false } });
+  User.updateMany({}, {}, { middleware: { post: false } });
+  User.deleteOne({}, { middleware: false });
+  User.deleteOne({}, { middleware: { pre: false } });
+  User.deleteOne({}, { middleware: { post: false } });
+  User.deleteMany({}, { middleware: false });
+  User.deleteMany({}, { middleware: { pre: false } });
+  User.deleteMany({}, { middleware: { post: false } });
+  User.countDocuments({}, { middleware: false });
+  User.countDocuments({}, { middleware: { pre: false } });
+  User.countDocuments({}, { middleware: { post: false } });
+  User.replaceOne({}, {}, { middleware: false });
+  User.replaceOne({}, {}, { middleware: { pre: false } });
+  User.replaceOne({}, {}, { middleware: { post: false } });
+  User.distinct('name', {}, { middleware: false });
+  User.distinct('name', {}, { middleware: { pre: false } });
+  User.distinct('name', {}, { middleware: { post: false } });
+  User.estimatedDocumentCount({ middleware: false });
+  User.estimatedDocumentCount({ middleware: { pre: false } });
+  User.estimatedDocumentCount({ middleware: { post: false } });
 
   // InsertManyOptions
-  await Test.insertMany([{}], { middleware: false });
-  await Test.insertMany([{}], { middleware: { pre: false } });
-  await Test.insertMany([{}], { middleware: { post: false } });
+  await User.insertMany([{}], { middleware: false });
+  await User.insertMany([{}], { middleware: { pre: false } });
+  await User.insertMany([{}], { middleware: { post: false } });
 
   // MongooseBulkWriteOptions
-  await Test.bulkWrite([], { middleware: false });
-  await Test.bulkWrite([], { middleware: { pre: false } });
-  await Test.bulkWrite([], { middleware: { post: false } });
+  await User.bulkWrite([], { middleware: false });
+  await User.bulkWrite([], { middleware: { pre: false } });
+  await User.bulkWrite([], { middleware: { post: false } });
 
-  // SaveOptions
-  const doc = new Test({ name: 'test' });
-  await doc.save({ middleware: false });
-  await doc.save({ middleware: { pre: false } });
-  await doc.save({ middleware: { post: false } });
+  // SaveOptions - doc.save()
+  const user = new User({ name: 'test' });
+  await user.save({ middleware: false });
+  await user.save({ middleware: { pre: false } });
+  await user.save({ middleware: { post: false } });
+
+  // SaveOptions - doc.validate()
+  await user.validate({ middleware: false });
+  await user.validate({ middleware: { pre: false } });
+  await user.validate({ middleware: { post: false } });
 
   // MongooseBulkSaveOptions
-  await Test.bulkSave([doc], { middleware: false });
-  await Test.bulkSave([doc], { middleware: { pre: false } });
-  await Test.bulkSave([doc], { middleware: { post: false } });
+  await User.bulkSave([user], { middleware: false });
+  await User.bulkSave([user], { middleware: { pre: false } });
+  await User.bulkSave([user], { middleware: { post: false } });
 
   // AggregateOptions
-  const agg = Test.aggregate([]);
-  agg.options.middleware = false;
-  agg.options.middleware = { pre: false };
-  agg.options.middleware = { post: false };
-  agg.options.middleware = { pre: false, post: true };
+  User.aggregate([], { middleware: false });
+  User.aggregate([], { middleware: { pre: false } });
+  User.aggregate([], { middleware: { post: false } });
+
+  // Document instance operations - user.updateOne(), user.deleteOne()
+  await user.updateOne({}, { middleware: false });
+  await user.updateOne({}, { middleware: { pre: false } });
+  await user.updateOne({}, { middleware: { post: false } });
+  await user.deleteOne({ middleware: false });
+  await user.deleteOne({ middleware: { pre: false } });
+  await user.deleteOne({ middleware: { post: false } });
 }

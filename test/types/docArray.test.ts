@@ -20,7 +20,7 @@ async function gh10293() {
   testSchema.methods.getArrayOfArray = function(this: InstanceType<typeof TestModel>): string[][] { // <-- function to return Array of Array
     const test = this.toObject();
 
-    ExpectType<string[][]>()(test.arrayOfArray);
+    ExpectType<string[][]>(test.arrayOfArray);
     return test.arrayOfArray; // <-- error here if the issue persisted
   };
 }
@@ -70,13 +70,14 @@ function gh13087() {
   }
 
   const { points } = getTestRouteData();
-  ExpectType<Types.DocumentArray<{
+  type ExpectedPointsType = Types.DocumentArray<{
     name: string;
     location: {
       type: 'Point';
       coordinates: number[];
     };
-  }>>()(points);
+  }>;
+  ExpectType<ExpectedPointsType>(points);
 }
 
 async function gh13424() {
@@ -92,7 +93,7 @@ async function gh13424() {
   const TestModel = model('Test', testSchema);
 
   const doc = new TestModel();
-  ExpectType<Types.ObjectId>()(doc.subDocArray[0]._id);
+  ExpectType<Types.ObjectId>(doc.subDocArray[0]._id);
 }
 
 async function gh14367() {
@@ -123,10 +124,10 @@ async function gh14367() {
   );
 
   type IUser = InferSchemaType<typeof UserSchema>;
-  ExpectType<string | null | undefined>()({} as IUser['reminders'][0]['type']);
-  ExpectType<Date | null | undefined>()({} as IUser['reminders'][0]['date']);
-  ExpectType<boolean | null | undefined>()({} as IUser['reminders'][0]['toggle']);
-  ExpectType<string | null | undefined>()({} as IUser['avatar']);
+  ExpectType<string | null | undefined>({} as IUser['reminders'][0]['type']);
+  ExpectType<Date | null | undefined>({} as IUser['reminders'][0]['date']);
+  ExpectType<boolean | null | undefined>({} as IUser['reminders'][0]['toggle']);
+  ExpectType<string | null | undefined>({} as IUser['avatar']);
 }
 
 function gh14469() {
@@ -158,10 +159,10 @@ function gh14469() {
   const doc = new UserModel({ names: [{ firstName: 'John' }] });
 
   const jsonDoc = doc?.toJSON();
-  ExpectType<string>()(jsonDoc?.names[0]?.firstName);
+  ExpectType<string>(jsonDoc?.names[0]?.firstName);
 
   const jsonNames = doc?.names[0]?.toJSON();
-  ExpectType<string>()(jsonNames?.firstName);
+  ExpectType<string>(jsonNames?.firstName);
 }
 
 function gh15041() {
@@ -178,5 +179,5 @@ function gh15041() {
 
   const doc = new TestModel({ subdocArray: [{ name: 'John', age: 30 }] });
   type TestModelDoc = ReturnType<(typeof TestModel)['hydrate']>
-  ExpectType<TestModelDoc['subdocArray'][0][]>()(doc.subdocArray.splice(0, 1, { name: 'Bill' }));
+  ExpectType<TestModelDoc['subdocArray'][0][]>(doc.subdocArray.splice(0, 1, { name: 'Bill' }));
 }

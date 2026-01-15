@@ -71,7 +71,7 @@ interface ITest {
 }
 
 type X = mongoose.WithLevel1NestedPaths<ITest>;
-ExpectType<number | undefined>()({} as X['docs.id']);
+ExpectType<number | undefined>({} as X['docs.id']);
 
 const Test = model<ITest, Model<ITest, QueryHelpers>>('Test', schema);
 
@@ -241,10 +241,10 @@ function testGenericQuery(): void {
 
 function eachAsync(): void {
   Test.find().cursor().eachAsync((doc) => {
-    ExpectType<HydratedDocument<ITest, {}, QueryHelpers>>()(doc);
+    ExpectType<HydratedDocument<ITest, {}, QueryHelpers>>(doc);
   });
   Test.find().cursor().eachAsync((docs) => {
-    ExpectType<HydratedDocument<ITest, {}, QueryHelpers>[]>()(docs);
+    ExpectType<HydratedDocument<ITest, {}, QueryHelpers>[]>(docs);
   }, { batchSize: 2 });
 }
 
@@ -314,7 +314,7 @@ async function gh11156(): Promise<void> {
   const User: Model<IUser> = model<IUser>('User', schema);
 
   const doc = await User.findOne<Pick<IUser, 'name'>>({}).orFail();
-  ExpectType<{ name: string }>()(doc);
+  ExpectType<{ name: string }>(doc);
 }
 
 async function gh11041(): Promise<void> {
@@ -334,7 +334,7 @@ async function gh11041(): Promise<void> {
   // 3. Create a Model.
   const MyModel = model<User>('User', schema);
 
-  ExpectType<HydratedDocument<User> | null>()(await MyModel.findOne({}).populate('someField').exec());
+  ExpectType<HydratedDocument<User> | null>(await MyModel.findOne({}).populate('someField').exec());
 }
 
 async function gh11306(): Promise<void> {
@@ -354,14 +354,14 @@ async function gh11306(): Promise<void> {
   // 3. Create a Model.
   const MyModel = model<User>('User', schema);
 
-  ExpectType<unknown[]>()(await MyModel.distinct('notThereInSchema'));
-  ExpectType<string[]>()(await MyModel.distinct('name'));
+  ExpectType<unknown[]>(await MyModel.distinct('notThereInSchema'));
+  ExpectType<string[]>(await MyModel.distinct('name'));
 }
 
 function autoTypedQuery() {
   const AutoTypedModel = autoTypedModel();
   const query = AutoTypedModel.find();
-  ExpectType<typeof query>()(AutoTypedModel.find().byUserName(''));
+  ExpectType<typeof query>(AutoTypedModel.find().byUserName(''));
 }
 
 function gh11964() {
@@ -458,7 +458,7 @@ async function gh12342_manual() {
   // 2nd param to `model()` is the Model class to return.
   const ProjectModel = model<Project, ProjectModelType>('Project', schema);
 
-  ExpectType<HydratedDocument<Project>[]>()(
+  ExpectType<HydratedDocument<Project>[]>(
     await ProjectModel.findOne().where('stars').gt(1000).byName('mongoose')
   );
 }
@@ -501,8 +501,8 @@ async function gh11602(): Promise<void> {
 
   // @ts-expect-error should not exist
   updateResult.lastErrorObject?.modifiedCount;
-  ExpectType<boolean | undefined>()(updateResult.lastErrorObject?.updatedExisting);
-  ExpectType<ObjectId | undefined>()(updateResult.lastErrorObject?.upserted);
+  ExpectType<boolean | undefined>(updateResult.lastErrorObject?.updatedExisting);
+  ExpectType<ObjectId | undefined>(updateResult.lastErrorObject?.upserted);
 
   ModelType.findOneAndUpdate({}, {}, { returnDocument: 'before' });
   ModelType.findOneAndUpdate({}, {}, { returnDocument: 'after' });
@@ -548,7 +548,7 @@ async function gh13142() {
     { lean: true }
   );
   if (!blog) return;
-  ExpectType<Pick<Blog, Extract<keyof { content: 1 }, keyof Blog>>>()(blog);
+  ExpectType<Pick<Blog, Extract<keyof { content: 1 }, keyof Blog>>>(blog);
 }
 
 async function gh13224() {
@@ -556,19 +556,19 @@ async function gh13224() {
   const UserModel = model('User', userSchema);
 
   const u1 = await UserModel.findOne().select(['name']).orFail();
-  ExpectType<string | undefined | null>()(u1.name);
-  ExpectType<number | undefined | null>()(u1.age);
+  ExpectType<string | undefined | null>(u1.name);
+  ExpectType<number | undefined | null>(u1.age);
   ExpectAssignable<Function>()(u1.toObject);
 
   const u2 = await UserModel.findOne().select<{ name?: string }>(['name']).orFail();
-  ExpectType<string | undefined>()(u2.name);
+  ExpectType<string | undefined>(u2.name);
   // @ts-expect-error excluded from projection
   u2.age;
   ExpectAssignable<Function>()(u2.toObject);
 
   const users = await UserModel.find().select<{ name?: string }>(['name']);
   const u3 = users[0];
-  ExpectType<string | undefined>()(u3!.name);
+  ExpectType<string | undefined>(u3!.name);
   // @ts-expect-error excluded from projection
   u3!.age;
   ExpectAssignable<Function>()(u3.toObject);
@@ -603,7 +603,7 @@ async function gh14190() {
   const UserModel = model('User', userSchema);
 
   const doc = await UserModel.findByIdAndDelete('0'.repeat(24));
-  ExpectType<ReturnType<(typeof UserModel)['hydrate']> | null>()(doc);
+  ExpectType<ReturnType<(typeof UserModel)['hydrate']> | null>(doc);
 
   const res = await UserModel.findByIdAndDelete(
     '0'.repeat(24),
@@ -725,9 +725,9 @@ async function gh14545() {
   const myDoc = await M.findOne({}).exec();
 
   const myProjections = await M.find({}).select<SlimTest>({ prop: 1 }).exec();
-  ExpectType<SlimTestDocument[]>()(myProjections);
+  ExpectType<SlimTestDocument[]>(myProjections);
   const myProjection = await M.findOne({}).select<SlimTest>({ prop: 1 }).exec();
-  ExpectType<SlimTestDocument | null>()(myProjection);
+  ExpectType<SlimTestDocument | null>(myProjection);
 }
 
 function gh14841() {
@@ -756,7 +756,7 @@ async function gh15526() {
   const u1 = await UserModel.findOne()
     .select<SelectType>(selection)
     .orFail();
-  ExpectType<string | undefined | null>()(u1.name);
+  ExpectType<string | undefined | null>(u1.name);
 
   // @ts-expect-error excluded from projection
   u1.age;

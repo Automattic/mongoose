@@ -31,17 +31,17 @@ function basicLoadClassPattern() {
   const MyModel = model<MyCombinedDocument, MyCombinedModel>('MyClass', schema as any);
 
   // Static function should work
-  ExpectType<number>()(MyModel.myStatic());
+  ExpectType<number>(MyModel.myStatic());
 
   // Instance method should work
   const doc = new MyModel();
-  ExpectType<number>()(doc.myMethod());
+  ExpectType<number>(doc.myMethod());
 
   // Getter should work
-  ExpectType<number>()(doc.myVirtual);
+  ExpectType<number>(doc.myVirtual);
 
   // Schema property should be typed
-  ExpectType<string>()(doc.property1);
+  ExpectType<string>(doc.property1);
 }
 
 
@@ -82,21 +82,21 @@ function thisParameterPattern() {
   const MyModel = model<MyCombinedDocument, MyCombinedModel>('MyClass2', schema as any);
 
   // Test static
-  ExpectType<number>()(MyModel.myStatic());
+  ExpectType<number>(MyModel.myStatic());
 
   const doc = new MyModel({ property1: 'test' });
 
   // Instance method returns string
-  ExpectType<string>()(doc.myMethod());
+  ExpectType<string>(doc.myMethod());
 
   // Schema field is typed correctly
-  ExpectType<string>()(doc.property1);
+  ExpectType<string>(doc.property1);
 
 
   // Getter works at runtime, but TypeScript can't type `this` in getters.
   // So we accept `any`.
   const virtual = doc.myVirtual;
-  ExpectType<any>()(virtual);
+  ExpectType<any>(virtual);
 }
 
 
@@ -137,16 +137,16 @@ function toObjectToJSONTest() {
   const pojo = doc.toObject();
 
   // Schema property is still typed
-  ExpectType<string>()(pojo.property1);
+  ExpectType<string>(pojo.property1);
 
   // TS still thinks class method exists (wrong at runtime)
-  ExpectType<() => number>()(pojo.myMethod);
+  ExpectType<() => number>(pojo.myMethod);
 
   // Same caveat applies to toJSON()
   const json = doc.toJSON();
 
-  ExpectType<() => number>()(json.myMethod);
-  ExpectType<string>()(json.property1);
+  ExpectType<() => number>(json.myMethod);
+  ExpectType<string>(json.property1);
 }
 
 

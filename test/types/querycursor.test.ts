@@ -9,19 +9,19 @@ type ITest = ReturnType<(typeof Test)['hydrate']>;
 
 Test.find().cursor().
   eachAsync(async(doc: ITest) => {
-    ExpectType<Types.ObjectId>()(doc._id);
-    ExpectType<string | undefined | null>()(doc.name);
+    ExpectType<Types.ObjectId>(doc._id);
+    ExpectType<string | undefined | null>(doc.name);
   }).
   then(() => console.log('Done!'));
 
 Test.find().cursor().
   eachAsync(async(doc: ITest, i) => {
-    ExpectType<Types.ObjectId>()(doc._id);
-    ExpectType<number>()(i);
+    ExpectType<Types.ObjectId>(doc._id);
+    ExpectType<number>(i);
   }).
   then(() => console.log('Done!'));
 
-Test.find().cursor().next().then((doc) => ExpectType<ITest | null>()(doc));
+Test.find().cursor().next().then((doc) => ExpectType<ITest | null>(doc));
 
 async function gh14374() {
   // `Parent` represents the object as it is stored in MongoDB
@@ -44,6 +44,6 @@ async function gh14374() {
 
   const cursor = ParentModel.find({}).populate<{ child: Child }>('child').cursor();
   for await (const doc of cursor) {
-    ExpectType<Child>()(doc.child);
+    ExpectType<Child>(doc.child);
   }
 }

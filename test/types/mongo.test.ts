@@ -9,7 +9,7 @@ function gh12537() {
   const doc = new model({});
 
   const v = new bson.ObjectId('somehex');
-  ExpectType<string>()(v._id.toHexString());
+  ExpectType<string>(v._id.toHexString());
 
   doc._id = new bson.ObjectId('somehex');
 }

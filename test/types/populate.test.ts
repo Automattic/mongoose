@@ -177,7 +177,7 @@ function gh11503() {
 
   User.findOne({}).populate('friends').then(user => {
     if (!user) return;
-    ExpectType<Types.ObjectId>()(user?.friends[0]);
+    ExpectType<Types.ObjectId>(user?.friends[0]);
     // @ts-expect-error not populated by default
     user?.friends[0].blocked;
     // @ts-expect-error not populated by default
@@ -187,9 +187,9 @@ function gh11503() {
   User.findOne({}).populate<{ friends: Friend[] }>('friends').then(user => {
     if (!user) return;
     ExpectAssignable<Friend>()(user?.friends[0]);
-    ExpectType<boolean>()(user?.friends[0].blocked);
+    ExpectType<boolean>(user?.friends[0].blocked);
     const firstFriendBlockedValue = user?.friends.map(friend => friend)[0];
-    ExpectType<boolean>()(firstFriendBlockedValue?.blocked);
+    ExpectType<boolean>(firstFriendBlockedValue?.blocked);
   });
 }
 
@@ -247,10 +247,10 @@ async function _11532() {
   const leanResult = await populateQuery.lean();
 
   if (!populateResult) return;
-  ExpectType<string>()(populateResult.child.name);
+  ExpectType<string>(populateResult.child.name);
 
   if (!leanResult) return;
-  ExpectType<string>()(leanResult.child.name);
+  ExpectType<string>(leanResult.child.name);
 }
 
 async function gh11710() {
@@ -275,7 +275,7 @@ async function gh11710() {
 
   // Populate with `Paths` generic `{ child: Child }` to override `child` path
   const doc = await ParentModel.findOne({}).populate<Pick<PopulatedParent, 'child'>>('child').orFail();
-  ExpectType<Child | null>()(doc.child);
+  ExpectType<Child | null>(doc.child);
 }
 
 async function gh11758() {
@@ -302,7 +302,7 @@ async function gh11758() {
     name: 'Parent'
   }).$assertPopulated<{ nestedChild: NestedChild }>('nestedChild');
 
-  ExpectType<string>()(parent.nestedChild.name);
+  ExpectType<string>(parent.nestedChild.name);
 
   await parent.save();
 }
@@ -399,9 +399,9 @@ function gh14441() {
     .populate<{ child: Child }>('child')
     .orFail()
     .then(doc => {
-      ExpectType<string>()(doc.child.name);
+      ExpectType<string>(doc.child.name);
       const docObject = doc.toObject();
-      ExpectType<string>()(docObject.child.name);
+      ExpectType<string>(docObject.child.name);
     });
 
   ParentModel.findOne({})
@@ -409,16 +409,16 @@ function gh14441() {
     .lean()
     .orFail()
     .then(doc => {
-      ExpectType<string>()(doc.child.name);
+      ExpectType<string>(doc.child.name);
     });
 
   ParentModel.find({})
     .populate<{ child: Child }>('child')
     .orFail()
     .then(docs => {
-      ExpectType<string>()(docs[0]!.child.name);
+      ExpectType<string>(docs[0]!.child.name);
       const docObject = docs[0]!.toObject();
-      ExpectType<string>()(docObject.child.name);
+      ExpectType<string>(docObject.child.name);
     });
 }
 
@@ -459,8 +459,8 @@ async function gh14574() {
     .populate<{ friend: HydratedDocument<User, UserMethods> }>('friend')
     .orFail()
     .exec();
-  ExpectType<string>()(user.fullName());
-  ExpectType<string>()(user.friend.fullName());
+  ExpectType<string>(user.fullName());
+  ExpectType<string>(user.friend.fullName());
 }
 
 async function gh15111() {
@@ -553,5 +553,5 @@ async function gh15111() {
   const parents = await ParentModel.find().populate<{ child: ChildInstance }>(
     'child'
   );
-  ExpectType<string>()(parents[0].fullName);
+  ExpectType<string>(parents[0].fullName);
 }

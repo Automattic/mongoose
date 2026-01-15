@@ -487,7 +487,7 @@ export function autoTypedSchema() {
 
   type InferredTestSchemaType = InferSchemaType<typeof TestSchema>;
 
-  ExpectType<TestSchemaType>()({} as InferredTestSchemaType);
+  ExpectType<TestSchemaType>({} as InferredTestSchemaType);
 
   const SchemaWithCustomTypeKey = Schema.create({
     name: {
@@ -498,7 +498,7 @@ export function autoTypedSchema() {
     typeKey: 'customTypeKey'
   } as const);
 
-  ExpectType<string>()({} as InferSchemaType<typeof SchemaWithCustomTypeKey>['name']);
+  ExpectType<string>({} as InferSchemaType<typeof SchemaWithCustomTypeKey>['name']);
 
   const AutoTypedSchema = Schema.create({
     userName: {
@@ -542,13 +542,13 @@ export function autoTypedSchema() {
   }, {
     statics: {
       staticFn() {
-        ExpectType<Model<InferSchemaType<typeof AutoTypedSchema>>>()(this);
+        ExpectType<Model<InferSchemaType<typeof AutoTypedSchema>>>(this);
         return 'Returned from staticFn' as const;
       }
     },
     methods: {
       instanceFn() {
-        ExpectType<HydratedDocument<InferSchemaType<typeof AutoTypedSchema>>>()(this);
+        ExpectType<HydratedDocument<InferSchemaType<typeof AutoTypedSchema>>>(this);
         return 'Returned from DocumentInstanceFn' as const;
       }
     },
@@ -665,9 +665,9 @@ function gh12003() {
   type BaseSchemaType = InferSchemaType<typeof BaseSchema>;
 
   type TSchemaOptions = ResolveSchemaOptions<ObtainSchemaGeneric<typeof BaseSchema, 'TSchemaOptions'>>;
-  ExpectType<'type'>()({} as TSchemaOptions['typeKey']);
+  ExpectType<'type'>({} as TSchemaOptions['typeKey']);
 
-  ExpectType<{ name?: string | null } & { _id: Types.ObjectId }>()({} as BaseSchemaType);
+  ExpectType<{ name?: string | null } & { _id: Types.ObjectId }>({} as BaseSchemaType);
 }
 
 function gh11987() {
@@ -683,10 +683,10 @@ function gh11987() {
     organization: { type: Schema.Types.ObjectId, ref: 'Organization' }
   });
 
-  ExpectType<SchemaType<string>>()(userSchema.path<'name'>('name'));
+  ExpectType<SchemaType<string>>(userSchema.path<'name'>('name'));
   // @ts-expect-error foo is not a valid path
   userSchema.path<'foo'>('name');
-  ExpectType<SchemaTypeOptions<string>>()(userSchema.path<'name'>('name').OptionsConstructor);
+  ExpectType<SchemaTypeOptions<string>>(userSchema.path<'name'>('name').OptionsConstructor);
 }
 
 function gh12030() {
@@ -703,9 +703,7 @@ function gh12030() {
       username: { type: String }
     }
   ]>;
-  ExpectType<Types.DocumentArray<{
-    username?: string | null
-  }>>()({} as A);
+  ExpectType<Types.DocumentArray<{ username?: string | null }>>({} as A);
 
   type B = ObtainDocumentType<{
     users: [
@@ -714,23 +712,20 @@ function gh12030() {
       }
     ]
   }>;
-  ExpectType<{
-    users: Types.DocumentArray<{
-      username?: string | null
-    }>;
-  }>()({} as B);
+  ExpectType<{ users: Types.DocumentArray<{ username?: string | null }>; }>({} as B);
 
-  ExpectType<{
+  type ExpectedSchema1Type = {
     users: Array<{
       username?: string | null
     } & { _id: Types.ObjectId }>;
-  } & { _id: Types.ObjectId }>()({} as InferSchemaType<typeof Schema1>);
+  } & { _id: Types.ObjectId };
+  ExpectType<ExpectedSchema1Type>({} as InferSchemaType<typeof Schema1>);
 
   const Schema2 = Schema.create({
     createdAt: { type: Date, default: Date.now }
   });
 
-  ExpectType<{ createdAt: Date } & { _id: Types.ObjectId }>()({} as InferSchemaType<typeof Schema2>);
+  ExpectType<{ createdAt: Date } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema2>);
 
   const Schema3 = Schema.create({
     users: [
@@ -741,46 +736,45 @@ function gh12030() {
     ]
   });
 
-  ExpectType<{
+  type Schema3ExpectedType = {
     users: Array<{
       credit: number;
       username?: string | null;
     } & { _id: Types.ObjectId }>;
-  } & { _id: Types.ObjectId }>()({} as InferSchemaType<typeof Schema3>);
+  } & { _id: Types.ObjectId };
+  ExpectType<Schema3ExpectedType>({} as InferSchemaType<typeof Schema3>);
 
   type RawDocType3 = ObtainSchemaGeneric<typeof Schema3, 'DocType'>;
   type HydratedDoc3 = ObtainSchemaGeneric<typeof Schema3, 'THydratedDocumentType'>;
-  ExpectType<
-    HydratedDocument<{
-      users: Types.DocumentArray<
-        { credit: number; username?: string | null; } & { _id: Types.ObjectId },
-        Types.Subdocument<
-          Types.ObjectId,
-          unknown,
-          { credit: number; username?: string | null; } & { _id: Types.ObjectId }
-        > & { credit: number; username?: string | null; } & { _id: Types.ObjectId }
-      >;
-    } & { _id: Types.ObjectId }, {}, {}, {}, RawDocType3>
-  >()({} as HydratedDoc3);
-  ExpectType<
-    Types.Subdocument<
-      Types.ObjectId,
-      unknown,
-      { credit: number; username?: string | null; } & { _id: Types.ObjectId }
-    > & { credit: number; username?: string | null; } & { _id: Types.ObjectId }
-  >()({} as HydratedDoc3['users'][0]);
+  type ExpectedHydratedDoc3Type = HydratedDocument<{
+    users: Types.DocumentArray<
+      { credit: number; username?: string | null; } & { _id: Types.ObjectId },
+      Types.Subdocument<
+        Types.ObjectId,
+        unknown,
+        { credit: number; username?: string | null; } & { _id: Types.ObjectId }
+      > & { credit: number; username?: string | null; } & { _id: Types.ObjectId }
+    >;
+  } & { _id: Types.ObjectId }, {}, {}, {}, RawDocType3>;
+  ExpectType<ExpectedHydratedDoc3Type>({} as HydratedDoc3);
+  type ExpectedHydratedDoc3UsersType = Types.Subdocument<
+    Types.ObjectId,
+    unknown,
+    { credit: number; username?: string | null; } & { _id: Types.ObjectId }
+  > & { credit: number; username?: string | null; } & { _id: Types.ObjectId };
+  ExpectType<ExpectedHydratedDoc3UsersType>({} as HydratedDoc3['users'][0]);
 
   const Schema4 = Schema.create({
     data: { type: { role: String }, default: {} }
   } as const);
 
-  ExpectType<{ data: { role?: string | null } & { _id: Types.ObjectId } } & { _id: Types.ObjectId }>()({} as InferSchemaType<typeof Schema4>);
+  ExpectType<{ data: { role?: string | null } & { _id: Types.ObjectId } } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema4>);
 
   const Schema5 = Schema.create({
     data: { type: { role: Object }, default: {} }
   });
 
-  ExpectType<{ data: { role?: any } & { _id: Types.ObjectId } } & { _id: Types.ObjectId }>()({} as InferSchemaType<typeof Schema5>);
+  ExpectType<{ data: { role?: any } & { _id: Types.ObjectId } } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema5>);
 
   const Schema6 = Schema.create({
     track: {
@@ -795,12 +789,13 @@ function gh12030() {
     }
   });
 
-  ExpectType<{
-    track?:({
+  type ExpectedSchema6Type = {
+    track?: ({
       backupCount: number;
       count: number;
     } & { _id: Types.ObjectId }) | null;
-      } & { _id: Types.ObjectId }>()({} as InferSchemaType<typeof Schema6>);
+  } & { _id: Types.ObjectId };
+  ExpectType<ExpectedSchema6Type>({} as InferSchemaType<typeof Schema6>);
 
 }
 
@@ -857,19 +852,19 @@ function gh12205() {
 
   const Campaign = model('Campaign', campaignSchema);
   const doc = new Campaign();
-  ExpectType<Types.ObjectId>()(doc.client);
+  ExpectType<Types.ObjectId>(doc.client);
 
   type ICampaign = InferSchemaType<typeof campaignSchema>;
-  ExpectType<{ client: Types.ObjectId } & { _id: Types.ObjectId }>()({} as ICampaign);
+  ExpectType<{ client: Types.ObjectId } & { _id: Types.ObjectId }>({} as ICampaign);
 
   type A = ObtainDocumentType<{ client: { type: Schema.Types.ObjectId, required: true } }>;
-  ExpectType<{ client: Types.ObjectId }>()({} as A);
+  ExpectType<{ client: Types.ObjectId }>({} as A);
 
   type Foo = ObtainDocumentPathType<{ type: Schema.Types.ObjectId, required: true }, 'type'>;
-  ExpectType<Types.ObjectId>()({} as Foo);
+  ExpectType<Types.ObjectId>({} as Foo);
 
   type Bar = ResolvePathType<Schema.Types.ObjectId, { required: true }>;
-  ExpectType<Types.ObjectId>()({} as Bar);
+  ExpectType<Types.ObjectId>({} as Bar);
 
   /* type Baz = Schema.Types.ObjectId extends typeof Schema.Types.ObjectId ? string : number;
   ExpectType<string>({} as Baz); */
@@ -881,30 +876,28 @@ function gh12450() {
     user: { type: Schema.Types.ObjectId }
   });
 
-  ExpectType<{
-    user?: Types.ObjectId | null;
-  } & { _id: Types.ObjectId }>()({} as InferSchemaType<typeof ObjectIdSchema>);
+  ExpectType<{ user?: Types.ObjectId | null; } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof ObjectIdSchema>);
 
   const Schema2 = Schema.create({
     createdAt: { type: Date, required: true },
     decimalValue: { type: Schema.Types.Decimal128, required: true }
   });
 
-  ExpectType<{ createdAt: Date, decimalValue: Types.Decimal128 } & { _id: Types.ObjectId }>()({} as InferSchemaType<typeof Schema2>);
+  ExpectType<{ createdAt: Date, decimalValue: Types.Decimal128 } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema2>);
 
   const Schema3 = Schema.create({
     createdAt: { type: Date, required: true },
     decimalValue: { type: Schema.Types.Decimal128 }
   });
 
-  ExpectType<{ createdAt: Date, decimalValue?: Types.Decimal128 | null } & { _id: Types.ObjectId }>()({} as InferSchemaType<typeof Schema3>);
+  ExpectType<{ createdAt: Date, decimalValue?: Types.Decimal128 | null } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema3>);
 
   const Schema4 = Schema.create({
     createdAt: { type: Date },
     decimalValue: { type: Schema.Types.Decimal128 }
   });
 
-  ExpectType<{ createdAt?: Date | null, decimalValue?: Types.Decimal128 | null } & { _id: Types.ObjectId }>()({} as InferSchemaType<typeof Schema4>);
+  ExpectType<{ createdAt?: Date | null, decimalValue?: Types.Decimal128 | null } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema4>);
 }
 
 function gh12242() {
@@ -915,7 +908,7 @@ function gh12242() {
   );
 
   type Example = InferSchemaType<typeof dbExample>;
-  ExpectType<0 | 1>()({} as Example['active']);
+  ExpectType<0 | 1>({} as Example['active']);
 }
 
 function testInferTimestamps() {
@@ -928,7 +921,7 @@ function testInferTimestamps() {
   // an error "Parameter type { createdAt: Date; updatedAt: Date; name?: string | undefined; }
   // is not identical to argument type { createdAt: NativeDate; updatedAt: NativeDate; } &
   // { name?: string | undefined; }"
-  ExpectType<{ createdAt: Date, updatedAt: Date } & { name?: string | null } & { _id: Types.ObjectId }>()({} as WithTimestamps);
+  ExpectType<{ createdAt: Date, updatedAt: Date } & { name?: string | null } & { _id: Types.ObjectId }>({} as WithTimestamps);
 
   const schema2 = Schema.create({
     name: String
@@ -940,10 +933,9 @@ function testInferTimestamps() {
   });
 
   type WithTimestamps2 = InferSchemaType<typeof schema2>;
-  ExpectType<
-    { createdAt: Date, updatedAt: Date } &
-    { name?: string | null } & { _id: Types.ObjectId }
-  >()({} as WithTimestamps2);
+  type ExpectedWithTimestamps2Type = { createdAt: Date, updatedAt: Date } &
+    { name?: string | null } & { _id: Types.ObjectId };
+  ExpectType<ExpectedWithTimestamps2Type>({} as WithTimestamps2);
 }
 
 function gh12431() {
@@ -953,33 +945,32 @@ function gh12431() {
   });
 
   type Example = InferSchemaType<typeof testSchema>;
-  ExpectType<
-    { testDate?: Date | null, testDecimal?: Types.Decimal128 | null } &
-    { _id: Types.ObjectId }
-  >()({} as Example);
+  type ExpectedExampleType = { testDate?: Date | null, testDecimal?: Types.Decimal128 | null } &
+    { _id: Types.ObjectId };
+  ExpectType<ExpectedExampleType>({} as Example);
 }
 
 async function gh12593() {
   const testSchema = Schema.create({ x: { type: Schema.Types.UUID } });
 
   type Example = InferSchemaType<typeof testSchema>;
-  ExpectType<{ x?: UUID | null } & { _id: Types.ObjectId }>()({} as Example);
+  ExpectType<{ x?: UUID | null } & { _id: Types.ObjectId }>({} as Example);
 
   const Test = model('Test', testSchema);
 
   const doc = await Test.findOne({ x: '4709e6d9-61fd-435e-b594-d748eb196d8f' }).orFail();
-  ExpectType<UUID | undefined | null>()(doc.x);
+  ExpectType<UUID | undefined | null>(doc.x);
 
   const doc2 = new Test({ x: '4709e6d9-61fd-435e-b594-d748eb196d8f' });
-  ExpectType<UUID | undefined | null>()(doc2.x);
+  ExpectType<UUID | undefined | null>(doc2.x);
 
   const doc3 = await Test.findOne({}).orFail().lean();
-  ExpectType<UUID | undefined | null>()(doc3.x);
+  ExpectType<UUID | undefined | null>(doc3.x);
 
   const arrSchema = Schema.create({ arr: [{ type: Schema.Types.UUID }] });
 
   type ExampleArr = InferSchemaType<typeof arrSchema>;
-  ExpectType<{ arr: UUID[] } & { _id: Types.ObjectId }>()({} as ExampleArr);
+  ExpectType<{ arr: UUID[] } & { _id: Types.ObjectId }>({} as ExampleArr);
 }
 
 function gh12562() {
@@ -1015,10 +1006,10 @@ function gh12590() {
   type User = InferSchemaType<typeof UserSchema>;
 
   const path = UserSchema.path('hashed_password');
-  ExpectType<SchemaType<any, HydratedDocument<User>>>()(path);
+  ExpectType<SchemaType<any, HydratedDocument<User>>>(path);
 
   UserSchema.path('hashed_password').validate(function(v) {
-    ExpectType<HydratedDocument<User>>()(this);
+    ExpectType<HydratedDocument<User>>(this);
     if (this._password && this._password.length < 8) {
       this.invalidate('password', 'Password must be at least 8 characters.');
     }
@@ -1038,20 +1029,19 @@ function gh12611() {
   });
 
   type Props = InferSchemaType<typeof firstSchema>;
-  ExpectType<{
+  type ExpectedPropsType = {
     description: string;
     skills: Types.ObjectId[];
     anotherField?: string | null;
-  } & { _id: Types.ObjectId }>()({} as Props);
+  } & { _id: Types.ObjectId };
+  ExpectType<ExpectedPropsType>({} as Props);
 }
 
 function gh12782() {
   const schemaObj = { test: { type: String, required: true } };
   const schema = Schema.create(schemaObj);
   type Props = InferSchemaType<typeof schema>;
-  ExpectType<{
-    test: string
-  } & { _id: Types.ObjectId }>()({} as Props);
+  ExpectType<{ test: string } & { _id: Types.ObjectId }>({} as Props);
 }
 
 function gh12816() {
@@ -1066,7 +1056,7 @@ function gh12869() {
   );
 
   type ExampleConst = InferSchemaType<typeof dbExampleConst>;
-  ExpectType<'foo' | 'bar'>()({} as ExampleConst['active']);
+  ExpectType<'foo' | 'bar'>({} as ExampleConst['active']);
 
   const dbExample = Schema.create(
     {
@@ -1075,7 +1065,7 @@ function gh12869() {
   );
 
   type Example = InferSchemaType<typeof dbExample>;
-  ExpectType<'foo' | 'bar'>()({} as Example['active']);
+  ExpectType<'foo' | 'bar'>({} as Example['active']);
 }
 
 function gh12882() {
@@ -1101,9 +1091,7 @@ function gh12882() {
     }
   } as const);
   type tArrNum = InferSchemaType<typeof arrNum>;
-  ExpectType<{
-    fooArray: number[]
-  } & { _id: Types.ObjectId }>()({} as tArrNum);
+  ExpectType<{ fooArray: number[] } & { _id: Types.ObjectId }>({} as tArrNum);
   // Array of object with key named "type"
   const arrType = Schema.create({
     fooArray: {
@@ -1121,12 +1109,13 @@ function gh12882() {
     }
   });
   type tArrType = InferSchemaType<typeof arrType>;
-  ExpectType<{
+  type ExpectedTArrType = {
     fooArray: Array<{
       type: string;
       foo: number;
     } & { _id: Types.ObjectId }>
-  } & { _id: Types.ObjectId }>()({} as tArrType);
+  } & { _id: Types.ObjectId };
+  ExpectType<ExpectedTArrType>({} as tArrType);
   // Readonly array of strings
   const rArrString = Schema.create({
     fooArray: {
@@ -1138,9 +1127,7 @@ function gh12882() {
     }
   });
   type rTArrString = InferSchemaType<typeof rArrString>;
-  ExpectType<{
-    fooArray: string[]
-  } & { _id: Types.ObjectId }>()({} as rTArrString);
+  ExpectType<{ fooArray: string[] } & { _id: Types.ObjectId }>({} as rTArrString);
   // Readonly array of numbers using string definition
   const rArrNum = Schema.create({
     fooArray: {
@@ -1152,9 +1139,7 @@ function gh12882() {
     }
   });
   type rTArrNum = InferSchemaType<typeof rArrNum>;
-  ExpectType<{
-    fooArray: number[]
-  } & { _id: Types.ObjectId }>()({} as rTArrNum);
+  ExpectType<{ fooArray: number[] } & { _id: Types.ObjectId }>({} as rTArrNum);
   // Readonly array of object with key named "type"
   const rArrType = Schema.create({
     fooArray: {
@@ -1172,12 +1157,13 @@ function gh12882() {
     }
   });
   type rTArrType = InferSchemaType<typeof rArrType>;
-  ExpectType<{
+  type ExpectedArrType = {
     fooArray: Array<{
       type: string;
       foo: number;
     } & { _id: Types.ObjectId }>
-  } & { _id: Types.ObjectId }>()({} as rTArrType);
+  } & { _id: Types.ObjectId };
+  ExpectType<ExpectedArrType>({} as rTArrType);
 }
 
 function gh13534() {
@@ -1187,7 +1173,7 @@ function gh13534() {
   const Test = model('Test', schema);
 
   const doc = new Test({ myId: '0'.repeat(24) });
-  ExpectType<Types.ObjectId>()(doc.myId);
+  ExpectType<Types.ObjectId>(doc.myId);
 }
 
 function maps() {
@@ -1197,11 +1183,11 @@ function maps() {
   const Test = model('Test', schema);
 
   const doc = new Test({ myMap: { answer: 42 } });
-  ExpectType<Map<string, number>>()(doc.myMap);
-  ExpectType<number | undefined>()(doc.myMap!.get('answer'));
+  ExpectType<Map<string, number>>(doc.myMap);
+  ExpectType<number | undefined>(doc.myMap!.get('answer'));
 
   const obj = doc.toObject();
-  ExpectType<Record<string, number>>()(obj.myMap);
+  ExpectType<Record<string, number>>(obj.myMap);
 }
 
 function gh13514() {
@@ -1227,8 +1213,8 @@ function gh13633() {
   });
 
   schema.pre('updateOne', { document: true, query: false }, function(doc, update, options) {
-    ExpectType<Record<string, any> | undefined>()(update);
-    ExpectType<Record<string, any> | undefined>()(options);
+    ExpectType<Record<string, any> | undefined>(update);
+    ExpectType<Record<string, any> | undefined>(options);
   });
 
   schema.post('save', function(res, next) {
@@ -1236,19 +1222,19 @@ function gh13633() {
   schema.pre('insertMany', function(docs) {
   });
   schema.pre('insertMany', function(docs, options) {
-    ExpectType<(InsertManyOptions & { lean?: boolean }) | undefined>()(options);
+    ExpectType<(InsertManyOptions & { lean?: boolean }) | undefined>(options);
   });
 }
 
 function gh13702() {
   const schema = Schema.create({ name: String });
-  ExpectType<[IndexDefinition, IndexOptions][]>()(schema.indexes());
+  ExpectType<[IndexDefinition, IndexOptions][]>(schema.indexes());
 }
 
 function gh13780() {
   const schema = Schema.create({ num: Schema.Types.BigInt });
   type InferredType = InferSchemaType<typeof schema>;
-  ExpectType<bigint | undefined | null>()(null as unknown as InferredType['num']);
+  ExpectType<bigint | undefined | null>(null as unknown as InferredType['num']);
 }
 
 function gh13800() {
@@ -1268,10 +1254,10 @@ function gh13800() {
     lastName: { type: String, required: true }
   });
   schema.method('fullName', function fullName() {
-    ExpectType<string>()(this.firstName);
-    ExpectType<string>()(this.lastName);
-    ExpectType<string>()(this.someOtherField);
-    ExpectType<IUserMethods['fullName']>()(this.fullName);
+    ExpectType<string>(this.firstName);
+    ExpectType<string>(this.lastName);
+    ExpectType<string>(this.someOtherField);
+    ExpectType<IUserMethods['fullName']>(this.fullName);
   });
 
   // Auto Typed Schema
@@ -1280,8 +1266,8 @@ function gh13800() {
     lastName: { type: String, required: true }
   });
   autoTypedSchema.method('fullName', function fullName() {
-    ExpectType<string>()(this.firstName);
-    ExpectType<string>()(this.lastName);
+    ExpectType<string>(this.firstName);
+    ExpectType<string>(this.lastName);
     // @ts-expect-error field not defined on schema
     this.someOtherField;
   });
@@ -1313,8 +1299,8 @@ function gh14002() {
     userId: { type: String, required: true, __rawDocTypeHint: userIdTypeHint, __hydratedDocTypeHint: userIdTypeHint }
   } as const;
   const schema = Schema.create(schemaDef);
-  ExpectType<IUser & { _id: Types.ObjectId }>()({} as InferSchemaType<typeof schema>);
-  ExpectType<UserId>()({} as InferHydratedDocType<typeof schemaDef>['userId']);
+  ExpectType<IUser & { _id: Types.ObjectId }>({} as InferSchemaType<typeof schema>);
+  ExpectType<UserId>({} as InferHydratedDocType<typeof schemaDef>['userId']);
 }
 
 function gh14028_methods() {
@@ -1339,12 +1325,12 @@ function gh14028_methods() {
     methods: {
       fullName() {
         // Expect type of `this` to have fullName method
-        ExpectType<IUserMethods['fullName']>()(this.fullName);
+        ExpectType<IUserMethods['fullName']>(this.fullName);
         return this.firstName + ' ' + this.lastName;
       },
       isAdult() {
         // Expect type of `this` to have isAdult method
-        ExpectType<IUserMethods['isAdult']>()(this.isAdult);
+        ExpectType<IUserMethods['isAdult']>(this.isAdult);
         return this.age >= 18;
       }
     }
@@ -1357,8 +1343,8 @@ function gh14028_methods() {
   user.isAdult();
 
   // Expect type of methods to be inferred if accessed directly
-  ExpectType<IUserMethods['fullName']>()(schema.methods.fullName);
-  ExpectType<IUserMethods['isAdult']>()(schema.methods.isAdult);
+  ExpectType<IUserMethods['fullName']>(schema.methods.fullName);
+  ExpectType<IUserMethods['isAdult']>(schema.methods.isAdult);
 
   // Define methods outside of schema
   const schema2 = new Schema<IUser, UserModel, IUserMethods>({
@@ -1368,12 +1354,12 @@ function gh14028_methods() {
   });
 
   schema2.methods.fullName = function fullName() {
-    ExpectType<IUserMethods['fullName']>()(this.fullName);
+    ExpectType<IUserMethods['fullName']>(this.fullName);
     return this.firstName + ' ' + this.lastName;
   };
 
   schema2.methods.isAdult = function isAdult() {
-    ExpectType<IUserMethods['isAdult']>()(this.isAdult);
+    ExpectType<IUserMethods['isAdult']>(this.isAdult);
     return true;
   };
 
@@ -1392,7 +1378,7 @@ function gh14028_methods() {
     methods: {
       fullName() {
         // Expect methods to still have access to `this` type
-        ExpectType<string>()(this.firstName);
+        ExpectType<string>(this.firstName);
         // @ts-expect-error As InstanceMethods type is not specified, expect type of this.fullName to be undefined
         this.fullName;
         return this.firstName + ' ' + this.lastName;
@@ -1426,8 +1412,8 @@ function gh14028_statics() {
   }, {
     statics: {
       createWithFullName(name: string) {
-        ExpectType<IUserStatics['createWithFullName']>()(schema.statics.createWithFullName);
-        ExpectType<UserModel['create']>()(this.create);
+        ExpectType<IUserStatics['createWithFullName']>(schema.statics.createWithFullName);
+        ExpectType<UserModel['create']>(this.create);
 
         const [firstName, lastName] = name.split(' ');
         return this.create({ firstName, lastName });
@@ -1453,7 +1439,7 @@ function gh13424() {
   const TestModel = model('TestModel', Schema.create(testSchema));
 
   const doc = new TestModel({});
-  ExpectType<Types.ObjectId>()(doc.subDocArray[0]._id);
+  ExpectType<Types.ObjectId>(doc.subDocArray[0]._id);
 }
 
 function gh14147() {
@@ -1464,7 +1450,7 @@ function gh14147() {
   const AffiliateModel = model('Affiliate', affiliateSchema);
 
   const doc = new AffiliateModel();
-  ExpectType<bigint>()(doc.balance);
+  ExpectType<bigint>(doc.balance);
 }
 
 function gh14235() {
@@ -1490,7 +1476,7 @@ function gh14496() {
     },
     // `errors['name']` will be "Oops!"
     message: (props) => {
-      ExpectType<Error | undefined>()(props.reason);
+      ExpectType<Error | undefined>(props.reason);
       return 'test';
     }
   });
@@ -1675,24 +1661,26 @@ function gh13215() {
     date: NativeDate;
   } & { _id: Types.ObjectId };
 
-  ExpectType<User>()({} as RawDocType);
+  ExpectType<User>({} as RawDocType);
 
   const schema = Schema.create(schemaDefinition, schemaOptions);
   type SchemaType = InferSchemaType<typeof schema>;
-  ExpectType<{
+  type ExpectedSchemaType = {
     userName: string;
     date: NativeDate;
     _id: Types.ObjectId;
-  }>()({} as SchemaType);
+  };
+  ExpectType<ExpectedSchemaType>({} as SchemaType);
   type HydratedDoc = ObtainSchemaGeneric<typeof schema, 'THydratedDocumentType'>;
-  ExpectType<HydratedDocument<
+  type ExpectedHydratedDoc = HydratedDocument<
     User,
     {},
     {},
     {},
     { userName: string; date: NativeDate; _id: Types.ObjectId; },
     ResolveSchemaOptions<typeof schemaOptions>
-  >>()({} as HydratedDoc);
+  >;
+  ExpectType<ExpectedHydratedDoc>({} as HydratedDoc);
 }
 
 function gh14825() {
@@ -1747,13 +1735,13 @@ async function gh14950() {
   const TestModel = model('Test', SightingSchema);
   const doc = await TestModel.findOne().orFail();
 
-  ExpectType<string>()(doc.location!.type);
-  ExpectType<Types.Array<number>>()(doc.location!.coordinates);
+  ExpectType<string>(doc.location!.type);
+  ExpectType<Types.Array<number>>(doc.location!.coordinates);
 
   const lean = await TestModel.findOne().lean().orFail();
 
-  ExpectType<string>()(lean.location!.type);
-  ExpectType<number[]>()(lean.location!.coordinates);
+  ExpectType<string>(lean.location!.type);
+  ExpectType<number[]>(lean.location!.coordinates);
 }
 
 async function gh14902() {
@@ -1772,8 +1760,8 @@ async function gh14902() {
   const Test = model('Test', exampleSchema);
 
   const doc = await Test.findOne().lean().orFail();
-  ExpectType<Binary | null | undefined>()(doc.image);
-  ExpectType<Binary | null | undefined>()(doc.subdoc!.testBuf);
+  ExpectType<Binary | null | undefined>(doc.image);
+  ExpectType<Binary | null | undefined>(doc.subdoc!.testBuf);
 }
 
 async function gh14451() {
@@ -1814,9 +1802,9 @@ async function gh12959() {
   const TestModel = model('Test', schema);
 
   const doc = await TestModel.findOne().orFail();
-  ExpectType<number>()(doc.__v);
+  ExpectType<number>(doc.__v);
   const leanDoc = await TestModel.findOne().lean().orFail();
-  ExpectType<number>()(leanDoc.__v);
+  ExpectType<number>(leanDoc.__v);
 }
 
 async function gh15236() {
@@ -1837,7 +1825,7 @@ async function schemaDouble() {
   const TestModel = model('Test', schema);
 
   const doc = await TestModel.findOne().orFail();
-  ExpectType<Types.Double | null | undefined>()(doc.balance);
+  ExpectType<Types.Double | null | undefined>(doc.balance);
 }
 
 function gh15301() {
@@ -1881,8 +1869,8 @@ function gh15412() {
   type ScheduleEntryDoc = ReturnType<typeof ScheduleEntry['hydrate']>
 
   ScheduleEntrySchema.post('init', function(this: ScheduleEntryDoc, _res: any, next: CallbackWithoutResultAndOptionalError) {
-    ExpectType<Date>()(this.startDate);
-    ExpectType<Date | null | undefined>()(this.endDate);
+    ExpectType<Date>(this.startDate);
+    ExpectType<Date | null | undefined>(this.endDate);
     next();
   });
 }
@@ -1917,7 +1905,7 @@ function testInferRawDocTypeFromSchema() {
     map?: Record<string, string> | null | undefined;
   } & { _id: Types.ObjectId };
 
-  ExpectType<Expected>()({} as RawDocType);
+  ExpectType<Expected>({} as RawDocType);
 }
 
 async function testInferHydratedDocTypeFromSchema() {
@@ -1952,7 +1940,7 @@ async function testInferHydratedDocTypeFromSchema() {
     } & { _id: Types.ObjectId }
   >;
 
-  ExpectType<Expected>()({} as HydratedDocType);
+  ExpectType<Expected>({} as HydratedDocType);
 
   const def = {
     name: String,
@@ -1961,10 +1949,11 @@ async function testInferHydratedDocTypeFromSchema() {
     map: { type: Map, of: String }
   } as const;
   type InferredHydratedDocType = InferHydratedDocType<typeof def>;
-  ExpectType<{
+  type ExpectedInferredHydratedDocType = {
     name?: string | null | undefined,
     arr?: Types.Array<number> | null | undefined,
     docArr?: Types.DocumentArray<{ name: string } & { _id: Types.ObjectId }> | null | undefined,
     map?: Map<string, string> | null | undefined
-  } & { _id: Types.ObjectId }>()({} as InferredHydratedDocType);
+  } & { _id: Types.ObjectId };
+  ExpectType<ExpectedInferredHydratedDocType>({} as InferredHydratedDocType);
 }

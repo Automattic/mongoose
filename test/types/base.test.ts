@@ -23,14 +23,14 @@ function gh10746() {
   let testVar: A;
   testVar = 'A string';
   testVar = 'B string';
-  ExpectType<string>()(testVar);
+  ExpectType<string>(testVar);
 }
 
 function gh10957() {
   type TestType = { name: string };
   const obj: TestType = { name: 'foo' };
 
-  ExpectType<TestType>()(mongoose.trusted(obj));
+  ExpectType<TestType>(mongoose.trusted(obj));
 }
 
 function connectionStates() {

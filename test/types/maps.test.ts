@@ -83,5 +83,5 @@ function gh13755() {
 
   const TestModel = model('Test', testSchema);
   const doc = new TestModel();
-  ExpectType<Map<string, string> | undefined | null>()(doc.instance);
+  ExpectType<Map<string, string> | undefined | null>(doc.instance);
 }

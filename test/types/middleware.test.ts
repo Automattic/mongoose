@@ -31,12 +31,12 @@ schema.post<Aggregate<any>>('aggregate', async function(res: Array<any>) {
 });
 
 schema.post<Aggregate<ITest>>('aggregate', function(res, next) {
-  ExpectType<ITest[]>()(res);
+  ExpectType<ITest[]>(res);
   next();
 });
 
 schema.post<Query<ITest, ITest>>('save', function(res, next) {
-  ExpectType<Query<ITest, ITest>>()(res);
+  ExpectType<Query<ITest, ITest>>(res);
   next();
 });
 
@@ -53,7 +53,7 @@ schema.pre('save', function() {
 });
 
 schema.post<ITest>('save', function(res, next) {
-  ExpectType<ITest>()(res);
+  ExpectType<ITest>(res);
   next();
 });
 
@@ -94,28 +94,28 @@ schema.pre('createCollection', function(opts?: CreateCollectionOptions) {
 
 schema.pre<Query<number, any>>('estimatedDocumentCount', function() {});
 schema.post<Query<number, any>>('estimatedDocumentCount', function(count, next) {
-  ExpectType<number>()(count);
+  ExpectType<number>(count);
   next();
 });
 
 schema.pre<Query<number, any>>('countDocuments', function() {});
 schema.post<Query<number, any>>('countDocuments', function(count, next) {
-  ExpectType<number>()(count);
+  ExpectType<number>(count);
   next();
 });
 
 schema.post<Query<ITest, ITest>>('findOneAndDelete', function(res, next) {
-  ExpectType<ITest | ModifyResult<ITest> | null>()(res);
+  ExpectType<ITest | ModifyResult<ITest> | null>(res);
   next();
 });
 
 schema.post<Query<ITest, ITest>>('findOneAndUpdate', function(res, next) {
-  ExpectType<ITest | ModifyResult<ITest> | null>()(res);
+  ExpectType<ITest | ModifyResult<ITest> | null>(res);
   next();
 });
 
 schema.post<Query<ITest, ITest>>('findOneAndReplace', function(res, next) {
-  ExpectType<ITest | ModifyResult<ITest> | null>()(res);
+  ExpectType<ITest | ModifyResult<ITest> | null>(res);
   next();
 });
 
@@ -147,7 +147,7 @@ function gh12583() {
   });
 
   userSchema.post('save', { errorHandler: true }, function(error, doc, next) {
-    ExpectType<Error>()(error);
+    ExpectType<Error>(error);
     console.log(error.name);
     console.log(doc.name);
   });
@@ -234,7 +234,7 @@ function gh15242WithVirtuals() {
       validate: {
         validator: async function(this: ValidatorThis, postTime: Date): Promise<boolean> {
           if (!(this instanceof Query)) {
-            ExpectType<number>()(this.myVirtual);
+            ExpectType<number>(this.myVirtual);
           }
           return true;
         }

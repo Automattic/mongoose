@@ -5,6 +5,7 @@ declare module 'mongoose' {
   type pathsToSkip = string[] | string;
 
   interface ValidateOptions {
+    /** List of paths to skip. If set, Mongoose will validate every modified path that is not in this list. */
     pathsToSkip?: pathsToSkip;
     /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
     middleware?: boolean | SkipMiddlewareOptions;
@@ -368,13 +369,13 @@ declare module 'mongoose' {
     updateOne(update?: UpdateQuery<this> | UpdateWithAggregationPipeline, options?: QueryOptions | null): Query<any, this>;
 
     /** Executes registered validation rules for this document. */
-    validate<T extends keyof DocType>(pathsToValidate?: T | T[], options?: AnyObject): Promise<void>;
-    validate(pathsToValidate?: pathsToValidate, options?: AnyObject): Promise<void>;
+    validate<T extends keyof DocType>(pathsToValidate?: T | T[], options?: Omit<ValidateOptions, 'pathsToSkip'> & AnyObject): Promise<void>;
+    validate(pathsToValidate?: pathsToValidate, options?: Omit<ValidateOptions, 'pathsToSkip'> & AnyObject): Promise<void>;
     validate(options: ValidateOptions): Promise<void>;
 
     /** Executes registered validation rules (skipping asynchronous validators) for this document. */
     validateSync(options: ValidateOptions & { [k: string]: any }): Error.ValidationError | null;
-    validateSync<T extends keyof DocType>(pathsToValidate?: T | T[], options?: AnyObject): Error.ValidationError | null;
-    validateSync(pathsToValidate?: pathsToValidate, options?: AnyObject): Error.ValidationError | null;
+    validateSync<T extends keyof DocType>(pathsToValidate?: T | T[], options?: Omit<ValidateOptions, 'pathsToSkip'> & AnyObject): Error.ValidationError | null;
+    validateSync(pathsToValidate?: pathsToValidate, options?: Omit<ValidateOptions, 'pathsToSkip'> & AnyObject): Error.ValidationError | null;
   }
 }

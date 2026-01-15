@@ -491,6 +491,20 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       assert.strictEqual(getChildHookRan('save'), false);
     });
 
+    it('save() still triggers subdoc save hooks mechanism when middleware: false', async function() {
+      // Arrange
+      const { User, getChildHookRan } = createTestContext();
+      const user = new User({ name: 'test', address: { city: 'NYC' } });
+
+      // Act
+      await user.save({ middleware: false });
+
+      // Assert - subdoc timestamps should be set (proves saveSubdocs built-in hook ran)
+      assert.strictEqual(getChildHookRan('save'), false);
+      assert.ok(user.address.createdAt, 'Subdoc createdAt should be set');
+      assert.ok(user.address.updatedAt, 'Subdoc updatedAt should be set');
+    });
+
     it('save() runs validation when middleware: false', async function() {
       // Arrange
       const { User, getUserHookRan } = createTestContext();
@@ -550,8 +564,8 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       counts.document[hook] = { pre: 0, post: 0 };
     }
 
-    const addressSchema = new Schema({ city: String });
-    const postSchema = new Schema({ title: String });
+    const addressSchema = new Schema({ city: String }, { timestamps: true });
+    const postSchema = new Schema({ title: String }, { timestamps: true });
     const userSchema = new Schema({
       name: { type: String, required: true },
       bio: String,

@@ -51,7 +51,8 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       bulkWrite: (User, options) => User.bulkWrite([{ insertOne: { document: { name: 'John' } } }], options),
       aggregate: (User, options) => User.aggregate([{ $match: {} }], options),
       distinct: (User, options) => User.distinct('name', {}, options),
-      estimatedDocumentCount: (User, options) => User.estimatedDocumentCount(options)
+      estimatedDocumentCount: (User, options) => User.estimatedDocumentCount(options),
+      createCollection: (User, options) => User.createCollection(options)
     };
 
     for (const [operation, runOperation] of Object.entries(operations)) {
@@ -145,6 +146,56 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         assert.strictEqual(getPreCount('save'), 1);
         assert.strictEqual(getPostCount('save'), 0);
       });
+    });
+  });
+
+  describe('aggregate().explain()', function() {
+    it('skips pre/post hooks when middleware: false', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createTestContext();
+
+      // Act
+      await User.aggregate([{ $match: {} }]).option({ middleware: false }).explain();
+
+      // Assert
+      assert.strictEqual(getPreCount('aggregate'), 0);
+      assert.strictEqual(getPostCount('aggregate'), 0);
+    });
+
+    it('runs hooks normally without middleware option', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createTestContext();
+
+      // Act
+      await User.aggregate([{ $match: {} }]).explain();
+
+      // Assert
+      assert.strictEqual(getPreCount('aggregate'), 1);
+      assert.strictEqual(getPostCount('aggregate'), 1);
+    });
+
+    it('skips only pre hooks when middleware: { pre: false }', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createTestContext();
+
+      // Act
+      await User.aggregate([{ $match: {} }]).option({ middleware: { pre: false } }).explain();
+
+      // Assert
+      assert.strictEqual(getPreCount('aggregate'), 0);
+      assert.strictEqual(getPostCount('aggregate'), 1);
+    });
+
+    it('skips only post hooks when middleware: { post: false }', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createTestContext();
+
+      // Act
+      await User.aggregate([{ $match: {} }]).option({ middleware: { post: false } }).explain();
+
+      // Assert
+      assert.strictEqual(getPreCount('aggregate'), 1);
+      assert.strictEqual(getPostCount('aggregate'), 0);
     });
   });
 
@@ -550,7 +601,8 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       'save', 'validate', 'find', 'findOne', 'findOneAndUpdate',
       'findOneAndDelete', 'findOneAndReplace', 'updateOne', 'updateMany',
       'deleteOne', 'deleteMany', 'countDocuments', 'replaceOne',
-      'insertMany', 'bulkWrite', 'aggregate', 'distinct', 'estimatedDocumentCount'
+      'insertMany', 'bulkWrite', 'aggregate', 'distinct', 'estimatedDocumentCount',
+      'createCollection'
     ];
     const documentHookNames = ['deleteOne', 'updateOne'];
     const subdocHookNames = ['save', 'validate', 'deleteOne'];
@@ -571,7 +623,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       bio: String,
       address: addressSchema,
       posts: [postSchema]
-    }, { timestamps: true });
+    }, { timestamps: true, autoCreate: false });
 
 
     for (const subdocSchema of [addressSchema, postSchema]) {

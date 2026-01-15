@@ -85,6 +85,11 @@ async function gh8768() {
   await User.bulkWrite([], { middleware: { pre: false } });
   await User.bulkWrite([], { middleware: { post: false } });
 
+  // CreateCollectionOptions
+  await User.createCollection({ middleware: false });
+  await User.createCollection({ middleware: { pre: false } });
+  await User.createCollection({ middleware: { post: false } });
+
   // SaveOptions - doc.save()
   const user = new User({ name: 'test' });
   await user.save({ middleware: false });
@@ -105,6 +110,16 @@ async function gh8768() {
   User.aggregate([], { middleware: false });
   User.aggregate([], { middleware: { pre: false } });
   User.aggregate([], { middleware: { post: false } });
+
+  // Query.prototype.setOptions() chain method
+  User.find().setOptions({ middleware: false });
+  User.find().setOptions({ middleware: { pre: false } });
+  User.find().setOptions({ middleware: { post: false } });
+
+  // Aggregate.prototype.option() chain method
+  User.aggregate().option({ middleware: false });
+  User.aggregate().option({ middleware: { pre: false } });
+  User.aggregate().option({ middleware: { post: false } });
 
   // Document instance operations - user.updateOne(), user.deleteOne()
   await user.updateOne({}, { middleware: false });

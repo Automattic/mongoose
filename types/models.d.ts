@@ -368,7 +368,7 @@ declare module 'mongoose' {
      * mongoose will not create the collection for the model until any documents are
      * created. Use this method to create the collection explicitly.
      */
-    createCollection<T extends mongodb.Document>(options?: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'>): Promise<mongodb.Collection<T>>;
+    createCollection<T extends mongodb.Document>(options?: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'> & { middleware?: boolean | SkipMiddlewareOptions }): Promise<mongodb.Collection<T>>;
 
     /**
      * Create an [Atlas search index](https://www.mongodb.com/docs/atlas/atlas-search/create-index/).

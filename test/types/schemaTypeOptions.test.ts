@@ -15,7 +15,7 @@ import {
   ObjectIdSchemaDefinition,
   StringSchemaDefinition
 } from 'mongoose';
-import { ExpectType } from './helpers';
+import { ExpectType } from './util/assertions';
 
 (new SchemaTypeOptions<boolean>()) instanceof SchemaTypeOptions;
 

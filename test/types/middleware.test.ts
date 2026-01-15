@@ -1,6 +1,6 @@
 import { Schema, model, Model, Document, SaveOptions, Query, Aggregate, HydratedDocument, PreSaveMiddlewareFunction, ModifyResult, AnyBulkWriteOperation } from 'mongoose';
 import { CreateCollectionOptions } from 'mongodb';
-import { ExpectAssignable, ExpectType } from './helpers';
+import { ExpectAssignable, ExpectType } from './util/assertions';
 
 const preMiddlewareFn: PreSaveMiddlewareFunction<Document> = function(opts) {
   this.$markValid('name');

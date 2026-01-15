@@ -15,7 +15,7 @@ import { DeleteResult } from 'mongodb';
 import { autoTypedModel } from './models.test';
 import { autoTypedModelConnection } from './connection.test';
 import { AutoTypedSchemaType } from './schema.test';
-import { ExpectAssignable, ExpectType } from './helpers';
+import { ExpectAssignable, ExpectType } from './util/assertions';
 
 const Drink = model('Drink', new Schema({
   name: String

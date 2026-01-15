@@ -1,5 +1,5 @@
 import { Schema, model, Document, Model, Types } from 'mongoose';
-import { ExpectType } from './helpers';
+import { ExpectType } from './util/assertions';
 
 // Basic usage of `loadClass` with TypeScript
 function basicLoadClassPattern() {

@@ -29,7 +29,7 @@ import {
 } from 'mongoose';
 import { Binary, BSON, UUID } from 'mongodb';
 import { ObtainDocumentPathType, ResolvePathType } from '../../types/inferschematype';
-import { ExpectAssignable, ExpectType } from './helpers';
+import { ExpectAssignable, ExpectType } from './util/assertions';
 
 enum Genre {
   Action,

@@ -1,5 +1,5 @@
 import { Document, Model, Schema, model, InferSchemaType, ObtainSchemaGeneric } from 'mongoose';
-import { ExpectType } from './helpers';
+import { ExpectType } from './util/assertions';
 
 interface IPerson {
   _id: number;

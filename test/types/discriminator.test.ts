@@ -1,5 +1,5 @@
 import mongoose, { Model, Schema, SchemaOptions, Types, model, HydratedDocFromModel, InferSchemaType } from 'mongoose';
-import { ExpectType } from './helpers';
+import { ExpectType } from './util/assertions';
 
 const schema = new Schema({ name: { type: 'String' } });
 

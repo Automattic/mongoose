@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import { ExpectType } from './helpers';
+import { ExpectType } from './util/assertions';
 
 Object.values(mongoose.models).forEach(model => {
   model.modelName;

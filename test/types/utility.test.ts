@@ -1,4 +1,4 @@
-import { ExpectAssignable, ExpectType } from './helpers';
+import { ExpectAssignable, ExpectType } from './util/assertions';
 import { MergeType, WithTimestamps, WithLevel1NestedPaths, PopulatedDoc, Document, Types } from 'mongoose';
 
 type A = { a: string, c: number };

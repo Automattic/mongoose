@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
 import { ObjectId } from 'mongodb';
-import { ExpectType } from './helpers';
+import { ExpectType } from './util/assertions';
 
 ExpectType<true>(mongoose.isObjectIdOrHexString(new ObjectId()));
 ExpectType<true>(mongoose.isObjectIdOrHexString(new mongoose.Types.ObjectId()));

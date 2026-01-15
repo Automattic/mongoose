@@ -21,7 +21,7 @@ import mongoose, {
 } from 'mongoose';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
 import { ModifyResult, UpdateOneModel as MongoUpdateOneModel, ChangeStreamInsertDocument, ObjectId } from 'mongodb';
-import { ExpectAssignable, ExpectType } from './helpers';
+import { ExpectAssignable, ExpectType } from './util/assertions';
 
 function rawDocSyntax(): void {
   interface ITest {

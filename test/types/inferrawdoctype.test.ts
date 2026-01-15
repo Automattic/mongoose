@@ -1,5 +1,5 @@
 import { InferRawDocType, type InferRawDocTypeWithout_id, type ResolveTimestamps, type Schema, type Types } from 'mongoose';
-import { ExpectType } from './helpers';
+import { ExpectType } from './util/assertions';
 
 function inferPojoType() {
   const schemaDefinition = {

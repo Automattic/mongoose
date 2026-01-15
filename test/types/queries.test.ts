@@ -20,7 +20,7 @@ import mongoose, {
 import mongodb from 'mongodb';
 import { ModifyResult, ObjectId } from 'mongodb';
 import { autoTypedModel } from './models.test';
-import { ExpectAssignable, ExpectType } from './helpers';
+import { ExpectAssignable, ExpectType } from './util/assertions';
 
 interface QueryHelpers {
   _byName(this: QueryWithHelpers<any, ITest, QueryHelpers>, name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;

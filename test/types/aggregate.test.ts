@@ -1,5 +1,5 @@
 import { Schema, model, Document, Expression, PipelineStage, Types, Model, Aggregate } from 'mongoose';
-import { ExpectType } from './helpers';
+import { ExpectType } from './util/assertions';
 
 const schema = new Schema({ name: { type: 'String' } });
 

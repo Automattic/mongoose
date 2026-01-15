@@ -1,5 +1,5 @@
 import { QueryFilter, sanitizeFilter } from 'mongoose';
-import { ExpectType } from './helpers';
+import { ExpectType } from './util/assertions';
 
 const data = { username: 'val', pwd: { $ne: null } };
 type Data = typeof data;

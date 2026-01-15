@@ -1,5 +1,5 @@
 import { Schema, model, Model, Types, InferSchemaType } from 'mongoose';
-import { ExpectType } from './helpers';
+import { ExpectType } from './util/assertions';
 
 async function gh10293() {
   interface ITest {

@@ -1,7 +1,7 @@
 import { createConnection, Schema, Collection, Connection, ConnectionSyncIndexesResult, InferSchemaType, Model, connection, HydratedDocument, Query } from 'mongoose';
 import * as mongodb from 'mongodb';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
-import { ExpectAssignable, ExpectType } from './helpers';
+import { ExpectAssignable, ExpectType } from './util/assertions';
 
 ExpectType<Connection>(createConnection());
 ExpectType<Connection>(createConnection('mongodb://127.0.0.1:27017/test'));

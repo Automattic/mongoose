@@ -7,7 +7,7 @@ import {
   HydratedArraySubdocument,
   HydratedSingleSubdocument
 } from 'mongoose';
-import { ExpectAssignable } from './helpers';
+import { ExpectAssignable } from './util/assertions';
 
 const childSchema = new Schema({ name: String });
 

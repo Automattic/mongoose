@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import { ExpectType } from './helpers';
+import { ExpectType } from './util/assertions';
 import * as bson from 'bson';
 
 function gh12537() {

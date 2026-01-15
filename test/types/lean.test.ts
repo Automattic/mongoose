@@ -1,5 +1,5 @@
 import mongoose, { Schema, model, Types, InferSchemaType, FlattenMaps, HydratedDocument, Model, Document, PopulatedDoc } from 'mongoose';
-import { ExpectAssignable, ExpectType, Equal } from './helpers';
+import { ExpectAssignable, ExpectType } from './util/assertions';
 
 function gh10345() {
   (function() {

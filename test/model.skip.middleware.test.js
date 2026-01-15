@@ -199,6 +199,62 @@ describe('middleware option to skip hooks (gh-8768)', function() {
     });
   });
 
+  describe('init hooks via query options', function() {
+    it('skips pre/post init hooks when middleware: false', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createTestContext();
+      await User.create({ name: 'test' });
+
+      // Act
+      await User.findOne({}, null, { middleware: false });
+
+      // Assert - find hooks should be skipped, but so should init hooks
+      assert.strictEqual(getPreCount('find'), 0);
+      assert.strictEqual(getPostCount('find'), 0);
+      assert.strictEqual(getPreCount('init'), 0);
+      assert.strictEqual(getPostCount('init'), 0);
+    });
+
+    it('runs init hooks normally without middleware option', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createTestContext();
+      await User.create({ name: 'test' });
+
+      // Act
+      await User.findOne({});
+
+      // Assert
+      assert.strictEqual(getPreCount('init'), 1);
+      assert.strictEqual(getPostCount('init'), 1);
+    });
+
+    it('skips only pre init hooks when middleware: { pre: false }', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createTestContext();
+      await User.create({ name: 'test' });
+
+      // Act
+      await User.findOne({}, null, { middleware: { pre: false } });
+
+      // Assert
+      assert.strictEqual(getPreCount('init'), 0);
+      assert.strictEqual(getPostCount('init'), 1);
+    });
+
+    it('skips only post init hooks when middleware: { post: false }', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createTestContext();
+      await User.create({ name: 'test' });
+
+      // Act
+      await User.findOne({}, null, { middleware: { post: false } });
+
+      // Assert
+      assert.strictEqual(getPreCount('init'), 1);
+      assert.strictEqual(getPostCount('init'), 0);
+    });
+  });
+
   describe('Subdocument operations', function() {
     describe('save hooks', function() {
       describe('subdocument.save()', function() {
@@ -602,7 +658,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       'findOneAndDelete', 'findOneAndReplace', 'updateOne', 'updateMany',
       'deleteOne', 'deleteMany', 'countDocuments', 'replaceOne',
       'insertMany', 'bulkWrite', 'aggregate', 'distinct', 'estimatedDocumentCount',
-      'createCollection'
+      'createCollection', 'init'
     ];
     const documentHookNames = ['deleteOne', 'updateOne'];
     const subdocHookNames = ['save', 'validate', 'deleteOne'];

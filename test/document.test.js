@@ -322,7 +322,20 @@ describe('document', function() {
 
       assert.ok(doc.oids !== doc2.oids);
     });
+
+    it('should not crash when accessing nested path on prototype (gh-15961)', function() {
+      const schema = new mongoose.Schema({
+        nested: { field: String }
+      });
+      const TestModel = mongoose.model('gh15961', schema);
+      // Should not throw when Jest or other tools inspect the prototype
+      assert.doesNotThrow(() => {
+        const val = TestModel.prototype.nested;
+        assert.strictEqual(val, undefined);
+      });
+    });
   });
+
 
   it('test shortcut setters', function() {
     const doc = new TestDocument();
@@ -12501,6 +12514,112 @@ describe('document', function() {
       clonedUser,
       'populated doc $parent() should return cloned document'
     );
+  });
+
+  describe('$clone() edge cases (gh-15954)', function() {
+    it('updates Map subdocument parent references', function() {
+      // Arrange
+      const { user } = createTestContext();
+
+      // Act
+      const clonedUser = user.$clone();
+
+      // Assert
+      assert.strictEqual(
+        clonedUser.images.get('avatar').$parent(),
+        clonedUser,
+        'cloned Map subdocument $parent() should return cloned document'
+      );
+    });
+
+    it('updates parentArray() to point to cloned array', function() {
+      // Arrange
+      const { user } = createTestContext();
+
+      // Act
+      const clonedUser = user.$clone();
+
+      // Assert
+      assert.strictEqual(
+        clonedUser.addresses[0].parentArray(),
+        clonedUser.addresses,
+        'cloned subdoc parentArray() should return cloned array'
+      );
+    });
+
+    it('deleteOne() on cloned subdoc does not affect original', function() {
+      // Arrange
+      const { user } = createTestContext();
+
+      // Act
+      const clonedUser = user.$clone();
+      clonedUser.addresses[0].deleteOne();
+
+      // Assert
+      assert.strictEqual(user.addresses.length, 2, 'original document array should be unchanged');
+      assert.strictEqual(clonedUser.addresses.length, 1, 'cloned document array should have element removed');
+      assert.strictEqual(clonedUser.addresses[0].city, 'Miami', 'remaining cloned address should be Miami');
+    });
+
+    it('cloned Map should be a MongooseMap', function() {
+      // Arrange
+      const { user } = createTestContext();
+
+      // Act
+      const clonedUser = user.$clone();
+
+      // Assert
+      assert.ok(clonedUser.images.$isMongooseMap, 'cloned images should be a MongooseMap');
+    });
+
+    it('nested and sibling document arrays have isolated parentArray references', function() {
+      // Arrange
+      const { user } = createTestContext();
+
+      // Act
+      const clonedUser = user.$clone();
+
+      // Assert - addresses[0].contacts should not pollute phones[0].parentArray
+      assert.strictEqual(
+        clonedUser.addresses[0].parentArray(),
+        clonedUser.addresses,
+        'address parentArray should be addresses array'
+      );
+      assert.strictEqual(
+        clonedUser.addresses[0].contacts[0].parentArray(),
+        clonedUser.addresses[0].contacts,
+        'nested contact parentArray should be contacts array'
+      );
+      assert.strictEqual(
+        clonedUser.phones[0].parentArray(),
+        clonedUser.phones,
+        'phone parentArray should be phones array, not polluted by nested contacts'
+      );
+    });
+
+    function createTestContext() {
+      const imageSchema = new Schema({ url: String });
+      const contactSchema = new Schema({ email: String });
+      const addressSchema = new Schema({
+        city: String,
+        contacts: [contactSchema]
+      });
+      const phoneSchema = new Schema({ number: String });
+      const userSchema = new Schema({
+        name: String,
+        images: { type: Map, of: imageSchema },
+        addresses: [addressSchema],
+        phones: [phoneSchema]
+      });
+      const User = db.model('User', userSchema);
+      const user = new User({
+        name: 'John',
+        images: new Map([['avatar', { url: 'https://example.com/avatar.jpg' }]]),
+        addresses: [{ city: 'Denver', contacts: [{ email: 'john@test.com' }] }, { city: 'Miami', contacts: [] }],
+        phones: [{ number: '555-1234' }]
+      });
+      return { User, user };
+    }
   });
 
   it('can create document with document array and top-level key named `schema` (gh-12480)', async function() {

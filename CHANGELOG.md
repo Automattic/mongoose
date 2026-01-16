@@ -1,3 +1,10 @@
+9.1.4 / 2026-01-15
+==================
+ * fix: attach sessions to docs retrieved by cursor #15953 #15949 [mjfwalsh](https://github.com/mjfwalsh)
+ * fix(model): make hydrate() handle nested schema arrays #15964 #15956
+ * fix(clone): fix parent doc for map subdocuments and array subdocuments #15958 #15954 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix: prevent crash when accessing nested paths on prototype #15962 #15961 [som14062005](https://github.com/som14062005)
+
 9.1.3 / 2026-01-09
 ==================
  * fix(model): support timestamps option to insertMany() as both boolean and QueryTimestampsConfig #15941 #15938

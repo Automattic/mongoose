@@ -1,4 +1,4 @@
-import { InferRawDocType, type InferRawDocTypeWithout_id, type ResolveTimestamps, type Schema, type Types } from 'mongoose';
+import mongoose, { InferRawDocType, type InferRawDocTypeWithout_id, type ResolveTimestamps, type Schema, type Types, FlattenMaps } from 'mongoose';
 import { expectType } from 'tsd';
 
 function inferPojoType() {
@@ -153,4 +153,36 @@ function gh15699() {
 
   type TSchema = InferRawDocType<typeof schema>;
   expectType<any[] | null | undefined>({} as unknown as TSchema['unTypedArray']);
+}
+
+function gh13772RawType() {
+  const childSchema = new mongoose.Schema({ name: String });
+
+  const parentSchemaDef = {
+    children: [childSchema],
+    child: childSchema
+  };
+
+  type RawParentDoc = InferRawDocType<typeof parentSchemaDef>;
+
+  expectType<{
+    children: (FlattenMaps<{ name?: string | null | undefined }> & { _id: Types.ObjectId })[];
+    child?: (FlattenMaps<{ name?: string | null | undefined }> & { _id: Types.ObjectId }) | null | undefined;
+  } & { _id: Types.ObjectId }>({} as RawParentDoc);
+}
+
+function gh13772WithIdFalse() {
+  const childSchema = new mongoose.Schema({ name: String }, { _id: false });
+
+  const parentSchemaDef = {
+    children: [childSchema],
+    child: childSchema
+  };
+
+  type RawParentDoc = InferRawDocType<typeof parentSchemaDef>;
+
+  expectType<{
+    children: FlattenMaps<{ name?: string | null | undefined }>[];
+    child?: FlattenMaps<{ name?: string | null | undefined }> | null | undefined;
+  } & { _id: Types.ObjectId }>({} as RawParentDoc);
 }

@@ -20,7 +20,7 @@
   "type": "commonjs",
   "license": "MIT",
   "dependencies": {
-    "kareem": "3.1.0",
+    "kareem": "github:AbdelrahmanHafez/kareem#feat/add-filter-option-to-exec-pre-sync",
     "mongodb": "~7.0",
     "mpath": "0.9.0",
     "mquery": "6.0.0",

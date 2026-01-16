@@ -37,12 +37,16 @@ declare module 'mongoose' {
     strict?: boolean | 'throw';
     /** When false, do not add timestamps to documents. Can be overridden at the operation level. */
     timestamps?: boolean;
+    /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
+    middleware?: boolean | SkipMiddlewareOptions;
   }
 
   interface MongooseBulkSaveOptions extends mongodb.BulkWriteOptions {
     timestamps?: boolean;
     session?: ClientSession;
     validateBeforeSave?: boolean;
+    /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
+    middleware?: boolean | SkipMiddlewareOptions;
   }
 
   /**
@@ -71,6 +75,8 @@ declare module 'mongoose' {
     ordered?: boolean;
     lean?: boolean;
     throwOnValidationError?: boolean;
+    /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
+    middleware?: boolean | SkipMiddlewareOptions;
     timestamps?: boolean | QueryTimestampsConfig;
   }
 
@@ -164,6 +170,8 @@ declare module 'mongoose' {
     validateModifiedOnly?: boolean;
     w?: number | string;
     wtimeout?: number;
+    /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
+    middleware?: boolean | SkipMiddlewareOptions;
   }
 
   interface CreateOptions extends SaveOptions {
@@ -360,7 +368,7 @@ declare module 'mongoose' {
      * mongoose will not create the collection for the model until any documents are
      * created. Use this method to create the collection explicitly.
      */
-    createCollection<T extends mongodb.Document>(options?: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'>): Promise<mongodb.Collection<T>>;
+    createCollection<T extends mongodb.Document>(options?: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'> & { middleware?: boolean | SkipMiddlewareOptions }): Promise<mongodb.Collection<T>>;
 
     /**
      * Create an [Atlas search index](https://www.mongodb.com/docs/atlas/atlas-search/create-index/).

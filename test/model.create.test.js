@@ -189,6 +189,7 @@ describe('model', function() {
         });
 
         const Test = db.model('gh4038Test', testSchema);
+        await Test.init();
         const data = [];
         for (let i = 0; i < 11; i++) {
           data.push({ name: 'Test' + Math.abs(i - 4) });

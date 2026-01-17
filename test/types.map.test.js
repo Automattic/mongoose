@@ -1819,8 +1819,8 @@ describe('Map', function() {
     });
   });
 
-  describe('validates nested map subdocuments loaded via init() (gh-15957)', function() {
-    it('fails validation for invalid data', async function() {
+  describe('nested map subdocuments loaded via init() (gh-15957) (gh-15969)', function() {
+    it('fails validation for invalid data (gh-15957)', async function() {
       // Arrange
       const { company } = createTestContext({ employeeNameMinLength: 2, employeeName: 'X' });
 
@@ -1829,10 +1829,10 @@ describe('Map', function() {
 
       // Assert
       assert.ok(error);
-      assert.ok(error.errors['teams.engineering.employees.john.name']);
+      assert.ok(error.errors['teams.engineering.employees.X.name']);
     });
 
-    it('passes validation for valid data', async function() {
+    it('passes validation for valid data (gh-15957)', async function() {
       // Arrange
       const { company } = createTestContext({ employeeNameMinLength: 2, employeeName: 'John' });
 
@@ -1843,7 +1843,7 @@ describe('Map', function() {
       assert.strictEqual(error, null);
     });
 
-    it('works with validateSync()', function() {
+    it('works with validateSync() (gh-15957)', function() {
       // Arrange
       const { company } = createTestContext({ employeeNameMinLength: 2, employeeName: 'X' });
 
@@ -1852,10 +1852,40 @@ describe('Map', function() {
 
       // Assert
       assert.ok(error);
-      assert.ok(error.errors['teams.engineering.employees.john.name']);
+      assert.ok(error.errors['teams.engineering.employees.X.name']);
     });
 
-    function createTestContext({ employeeNameMinLength, employeeName }) {
+    it('deleteOne() removes subdocument from nested map and tracks change (gh-15969)', function() {
+      // Arrange
+      const { company } = createTestContext();
+      const john = company.teams.get('engineering').employees.get('john');
+
+      // Act
+      john.deleteOne();
+
+      // Assert
+      assert.strictEqual(company.teams.get('engineering').employees.get('john'), null);
+      assert.deepStrictEqual(company.getChanges(), {
+        $set: { 'teams.engineering.employees.john': null }
+      });
+    });
+
+    it('clear() on nested map produces correct update path (gh-15969)', function() {
+      // Arrange
+      const { company } = createTestContext();
+      const employeesMap = company.teams.get('engineering').employees;
+
+      // Act
+      employeesMap.clear();
+
+      // Assert
+      assert.strictEqual(employeesMap.size, 0);
+      assert.deepStrictEqual(company.getChanges(), {
+        $set: { 'teams.engineering.employees': new Map() }
+      });
+    });
+
+    function createTestContext({ employeeNameMinLength, employeeName = 'john' } = {}) {
       const employeeSchema = new Schema({
         name: { type: String, minlength: employeeNameMinLength }
       });
@@ -1865,6 +1895,7 @@ describe('Map', function() {
       const companySchema = new Schema({
         teams: { type: Map, of: teamSchema }
       });
+
       const Company = db.model('Company', companySchema);
 
       const company = new Company();
@@ -1873,13 +1904,14 @@ describe('Map', function() {
         teams: {
           engineering: {
             employees: {
-              john: { name: employeeName }
+              [employeeName]: { name: employeeName },
+              sarah: { name: 'Sarah' }
             }
           }
         }
       });
 
-      return { company };
+      return { Company, company };
     }
   });
 });

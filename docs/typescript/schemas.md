@@ -68,9 +68,9 @@ If automatic type inference doesn't work for you, you can define a separate raw 
 ```typescript
 import { Schema } from 'mongoose';
 
-// Raw document interface. Contains the data type as it will be stored
-// in MongoDB. So you can ObjectId, Buffer, and other custom primitive data types.
-// But no Mongoose document arrays or subdocuments.
+// Raw document interface. Represents the data types as they are stored in MongoDB.
+// This allows the use of ObjectId, Buffer, and other custom primitive data types,
+// but excludes Mongoose document arrays and subdocuments.
 interface User {
   name: string;
   email: string;

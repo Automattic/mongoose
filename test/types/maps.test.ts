@@ -1,5 +1,5 @@
 import { Schema, model, Document, Model, Types } from 'mongoose';
-import { expectType } from 'tsd';
+import { ExpectType } from './util/assertions';
 
 interface ITest {
   map1: Map<string, number>,
@@ -83,5 +83,5 @@ function gh13755() {
 
   const TestModel = model('Test', testSchema);
   const doc = new TestModel();
-  expectType<Map<string, string> | undefined | null>(doc.instance);
+  ExpectType<Map<string, string> | undefined | null>(doc.instance);
 }

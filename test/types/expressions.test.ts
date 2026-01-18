@@ -1,6 +1,5 @@
 import { PipelineStage } from 'mongoose';
 import type { Expression } from 'mongoose';
-import { expectError, expectType } from 'tsd';
 
 // ArithmeticExpressionOperators
 

@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import { expectError, expectType } from 'tsd';
+import { ExpectType } from './util/assertions';
 
 Object.values(mongoose.models).forEach(model => {
   model.modelName;
@@ -23,14 +23,14 @@ function gh10746() {
   let testVar: A;
   testVar = 'A string';
   testVar = 'B string';
-  expectType<string>(testVar);
+  ExpectType<string>(testVar);
 }
 
 function gh10957() {
   type TestType = { name: string };
   const obj: TestType = { name: 'foo' };
 
-  expectType<TestType>(mongoose.trusted(obj));
+  ExpectType<TestType>(mongoose.trusted(obj));
 }
 
 function connectionStates() {
@@ -73,7 +73,8 @@ function setAsObject() {
     updatePipeline: true
   });
 
-  expectError(mongoose.set({ invalid: true }));
+  // @ts-expect-error should error out if an invalid option is provided
+  mongoose.set({ invalid: true });
 }
 
 const x: { name: string } = mongoose.omitUndefined({ name: 'foo' });

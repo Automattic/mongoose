@@ -1,5 +1,5 @@
 import { Schema, model, Document, Expression, PipelineStage, Types, Model, Aggregate } from 'mongoose';
-import { expectType } from 'tsd';
+import { ExpectType } from './util/assertions';
 
 const schema = new Schema({ name: { type: 'String' } });
 
@@ -25,8 +25,8 @@ async function run() {
   const res2: Array<ITest> = await Test.aggregate<ITest>([{ $match: { name: 'foo' } }]);
   console.log(res2[0].name);
 
-  expectType<number | undefined>(Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).options.maxTimeMS);
-  expectType<boolean | undefined>(Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).options.allowDiskUse);
+  ExpectType<number | undefined>(Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).options.maxTimeMS);
+  ExpectType<boolean | undefined>(Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).options.allowDiskUse);
   Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).option({ maxTimeMS: 222 });
 
   await Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).cursor().eachAsync(async(res) => {
@@ -39,32 +39,32 @@ async function run() {
 
   function eachAsync(): void {
     Test.aggregate().cursor().eachAsync((doc) => {
-      expectType<any>(doc);
+      ExpectType<any>(doc);
     });
     Test.aggregate().cursor().eachAsync((docs) => {
-      expectType<any[]>(docs);
+      ExpectType<any[]>(docs);
     }, { batchSize: 2 });
     Test.aggregate().cursor<ITest>().eachAsync((doc) => {
-      expectType<ITest>(doc);
+      ExpectType<ITest>(doc);
     });
     Test.aggregate().cursor<ITest>().eachAsync((docs) => {
-      expectType<ITest[]>(docs);
+      ExpectType<ITest[]>(docs);
     }, { batchSize: 2 });
   }
 
   // Aggregate.prototype.sort()
-  expectType<ITest[]>(await Test.aggregate<ITest>().sort('-name'));
-  expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 1 }));
-  expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: -1 }));
-  expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 'asc' }));
-  expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 'ascending' }));
-  expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 'desc' }));
-  expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 'descending' }));
-  expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: { $meta: 'textScore' } }));
+  ExpectType<ITest[]>(await Test.aggregate<ITest>().sort('-name'));
+  ExpectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 1 }));
+  ExpectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: -1 }));
+  ExpectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 'asc' }));
+  ExpectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 'ascending' }));
+  ExpectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 'desc' }));
+  ExpectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 'descending' }));
+  ExpectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: { $meta: 'textScore' } }));
 
   // Aggregate.prototype.model()
-  expectType<Model<any>>(Test.aggregate<ITest>().model());
-  expectType<Aggregate<ITest[]>>(Test.aggregate<ITest>().model(AnotherTest));
+  ExpectType<Model<any>>(Test.aggregate<ITest>().model());
+  ExpectType<Aggregate<ITest[]>>(Test.aggregate<ITest>().model(AnotherTest));
 }
 
 function gh12017_1() {

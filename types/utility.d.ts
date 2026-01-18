@@ -131,7 +131,7 @@ declare module 'mongoose' {
   /**
    * @summary Checks if two types are identical.
    * @param {T} T The first type to be compared with {@link U}.
-   * @param {U} U The seconde type to be compared with {@link T}.
+   * @param {U} U The second type to be compared with {@link T}.
    * @param {Y} Y A type to be returned if {@link T} &  {@link U} are identical.
    * @param {N} N A type to be returned if {@link T} &  {@link U} are not identical.
    */

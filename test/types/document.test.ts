@@ -476,6 +476,41 @@ async function gh15316() {
   expectType<string>(doc.toObject({ virtuals: true }).upper);
 }
 
+function gh15965() {
+  const FooSchema = new Schema({
+    foo: { type: String }
+  });
+
+  const PodcastSchema = new Schema({
+    a: { type: FooSchema },
+    b: { type: FooSchema, required: true },
+    c: { type: String },
+    d: { type: String, required: true }
+  }, {
+    timestamps: true,
+    virtuals: {
+      hello: { get() { return 'hello world'; } }
+    }
+  });
+  const RootModel = model('Root', PodcastSchema);
+  const root = new RootModel({ b: { foo: 'b' }, d: 'd' });
+  const obj = root.toObject({
+    flattenMaps: true,
+    flattenObjectIds: true,
+    versionKey: true,
+    virtuals: true
+  });
+
+  expectType<string>(obj.id);
+  expectType<string | null | undefined>(obj.a?.foo);
+  expectType<string | null | undefined>(obj.b.foo);
+  expectType<string | null | undefined>(obj.c);
+  expectType<string>(obj.d);
+  expectType<string>(obj.hello);
+  expectType<Date>(obj.createdAt);
+  expectType<Date>(obj.updatedAt);
+}
+
 function gh13079() {
   const schema = new Schema({
     name: { type: String, required: true }

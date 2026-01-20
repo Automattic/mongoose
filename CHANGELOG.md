@@ -1,3 +1,11 @@
+9.1.5 / 2026-01-20
+==================
+* fix(map): validate map subdocument when loaded with init #15960 #15957 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+* fix(discriminator): prevent indexes and callQueue duplication with shared nested schemas #15974 #15966 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+* fix(subdocuments): do not pass parent path on init #15970 #15969 #15682 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+* types(inferrawdoctype): correct handling for subdocs and doc arrays #15967 #13772
+* docs: improve grammar and clarity in TypeScript schema comments #15971 [harshsinghpujari](https://github.com/harshsinghpujari)
+
 9.1.4 / 2026-01-15
 ==================
  * fix: attach sessions to docs retrieved by cursor #15953 #15949 [mjfwalsh](https://github.com/mjfwalsh)

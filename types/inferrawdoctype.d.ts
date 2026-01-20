@@ -29,7 +29,9 @@ declare module 'mongoose' {
     SchemaDefinition,
     TSchemaOptions extends Record<any, any> = DefaultSchemaOptions,
     TTransformOptions = { bufferToBinary: false }
-  > = Require_id<InferRawDocTypeWithout_id<SchemaDefinition, TSchemaOptions, TTransformOptions>>;
+  > = TSchemaOptions extends { _id: false }
+    ? InferRawDocTypeWithout_id<SchemaDefinition, TSchemaOptions, TTransformOptions>
+    : Require_id<InferRawDocTypeWithout_id<SchemaDefinition, TSchemaOptions, TTransformOptions>>;
 
   /**
    * @summary Allows users to optionally choose their own type for a schema field for stronger typing.
@@ -88,12 +90,25 @@ declare module 'mongoose' {
      > =
        IsNotNever<TypeHint> extends true ? TypeHint
        : [PathValueType] extends [neverOrAny] ? PathValueType
-       : PathValueType extends Schema<infer RawDocType, any, any, any, any, any, any, any, any, infer TSchemaDefinition> ? IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : InferRawDocType<TSchemaDefinition, DefaultSchemaOptions, TTransformOptions>
+     : PathValueType extends Schema<infer RawDocType, any, any, any, any, any, infer TSchemaOptions, infer DocType, any, infer TSchemaDefinition> ?
+         IsItRecordAndNotAny<RawDocType> extends true ?
+         RawDocType :
+         string extends keyof TSchemaDefinition ?
+          TSchemaOptions extends { _id: false } ?
+            FlattenMaps<SubdocsToPOJOs<DocType>> :
+            Require_id<FlattenMaps<SubdocsToPOJOs<DocType>>> :
+          InferRawDocType<TSchemaDefinition, TSchemaOptions & Record<any, any>, TTransformOptions>
        : PathValueType extends ReadonlyArray<infer Item> ?
          IfEquals<Item, never> extends true ? any[]
-         : Item extends Schema<infer RawDocType, any, any, any, any, any, any, any, any, infer TSchemaDefinition> ?
+         : Item extends Schema<infer RawDocType, any, any, any, any, any, infer TSchemaOptions, infer DocType, any, infer TSchemaDefinition> ?
            // If Item is a schema, infer its type.
-           Array<IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : InferRawDocType<TSchemaDefinition, DefaultSchemaOptions, TTransformOptions>>
+           Array<IsItRecordAndNotAny<RawDocType> extends true ?
+            RawDocType :
+            string extends keyof TSchemaDefinition ?
+              TSchemaOptions extends { _id: false } ?
+                FlattenMaps<SubdocsToPOJOs<DocType>> :
+                Require_id<FlattenMaps<SubdocsToPOJOs<DocType>>> :
+              InferRawDocType<TSchemaDefinition, TSchemaOptions & Record<any, any>, TTransformOptions>>
          : TypeKey extends keyof Item ?
            Item[TypeKey] extends Function | String ?
              // If Item has a type key that's a string or a callable, it must be a scalar,

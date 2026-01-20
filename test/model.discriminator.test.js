@@ -2480,4 +2480,31 @@ describe('model', function() {
       ]
     });
   });
+
+  it('does not duplicate callQueue when base and discriminator schemas share nested schema (gh-15966)', function() {
+    // Arrange
+    const addressSchema = new Schema({ city: String, street: String }, { _id: false });
+    const orderSchemaDefinition = {
+      customerId: { type: Schema.Types.ObjectId },
+      billingAddress: addressSchema,
+      shippingAddress: addressSchema,
+      notes: [{ message: String }]
+    };
+
+    const orderSchema = new Schema(orderSchemaDefinition);
+    orderSchema.queue('testMethod', ['arg1']);
+
+    const Order = db.model('Order', orderSchema);
+    const wholesaleOrderSchema = new Schema(orderSchemaDefinition);
+
+    // Act
+    Order.discriminator('WholesaleOrder', wholesaleOrderSchema, { clone: false });
+
+    // Assert - callQueue should have exactly 1 entry from base, not duplicated
+    const testMethodCalls = wholesaleOrderSchema.callQueue.filter(
+      ([methodName]) => methodName === 'testMethod'
+    );
+    assert.strictEqual(testMethodCalls.length, 1);
+  });
+
 });

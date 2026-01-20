@@ -213,11 +213,11 @@ function gh13772WithSchemaCreateIdFalse() {
 
   type RawParentDoc = InferRawDocType<typeof parentSchemaDef>;
 
-  // Schema.create goes through InferRawDocType<TSchemaDefinition> path which adds _id
+  // Schema.create with _id: false - child subdocs should not have _id
   expectType<{
-    children:({ name?: string | null | undefined } & { _id: Types.ObjectId })[];
-    child?: ({ name?: string | null | undefined } & { _id: Types.ObjectId }) | null | undefined;
-      } & { _id: Types.ObjectId }>({} as RawParentDoc);
+    children: { name?: string | null | undefined }[];
+    child?: { name?: string | null | undefined } | null | undefined;
+  } & { _id: Types.ObjectId }>({} as RawParentDoc);
 }
 
 function gh13772WithExplicitDocType() {

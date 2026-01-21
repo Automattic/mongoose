@@ -9306,6 +9306,50 @@ describe('Model', function() {
       }
     });
   });
+
+  describe('bulkWrite - custom currentTime', async function() {
+    it('should use custom currentTime', async function() {
+
+      const bulkPersonSchema = new Schema(
+        {
+          name: { type: String, required: true },
+          created_at: { type: Number },
+          updated_at: { type: Number }
+        },
+        {
+          timestamps: {
+            createdAt: 'created_at',
+            updatedAt: 'updated_at',
+            currentTime: () => Date.now().valueOf() / 1000
+          }
+        }
+      );
+
+      const isUnixSeconds = (value) => value > 1e9 && value < 1e10;
+
+      const BulkPerson = db.model('BulkPerson', bulkPersonSchema);
+
+      const alice = await BulkPerson.create({ name: 'Alice' });
+      const bob = await BulkPerson.create({ name: 'Bob' });
+
+
+      await BulkPerson.bulkWrite([
+        { insertOne: { document: { name: 'David' } } },
+        { replaceOne: { filter: { _id: alice._id }, replacement: { name: 'Alice 2' } } },
+        { updateOne: { filter: { _id: bob._id }, update: { name: 'Bob 2' } } },
+        { updateOne: { filter: { name: 'Charlie' }, update: { name: 'Charlie' }, upsert: true } }
+      ]);
+
+      const allPeople = await BulkPerson.find().lean().exec();
+      for (const person of allPeople) {
+        assert.ok(isUnixSeconds(person.created_at));
+        assert.ok(isUnixSeconds(person.updated_at));
+      }
+
+      await BulkPerson.deleteMany({});
+
+    });
+  });
 });
 
 

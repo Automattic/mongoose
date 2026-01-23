@@ -4490,6 +4490,18 @@ describe('Query', function() {
     assert.strictEqual(query._mongooseOptions.populate.friends.options.readConcern, 'local');
   });
 
+  it('does not error out if strict "throw" and db document has extra fields', async function() {
+    const schema = new Schema({
+      name: String,
+      age: Number
+    }, { strict: 'throw' });
+    const Person = db.model('Person', schema);
+
+    await Person.collection.insertOne({ name: 'test strict throw', extraProperty: 'test' });
+    const doc = await Person.findOne({ name: 'test strict throw' });
+    assert.strictEqual(doc.get('extraProperty'), 'test');
+  });
+
   describe('Query with requireFilter', function() {
     let Person;
     let _id;

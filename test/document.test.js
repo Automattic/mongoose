@@ -12403,6 +12403,80 @@ describe('document', function() {
     );
   });
 
+  describe('$clone() edge cases (gh-15901)', function() {
+    it('updates Map subdocument parent references', function() {
+      // Arrange
+      const { user } = createTestContext();
+
+      // Act
+      const clonedUser = user.$clone();
+
+      // Assert
+      assert.strictEqual(
+        clonedUser.images.get('avatar').$parent(),
+        clonedUser,
+        'cloned Map subdocument $parent() should return cloned document'
+      );
+    });
+
+    it('updates parentArray() to point to cloned array', function() {
+      // Arrange
+      const { user } = createTestContext();
+
+      // Act
+      const clonedUser = user.$clone();
+
+      // Assert
+      assert.strictEqual(
+        clonedUser.addresses[0].parentArray(),
+        clonedUser.addresses,
+        'cloned subdoc parentArray() should return cloned array'
+      );
+    });
+
+    it('deleteOne() on cloned subdoc does not affect original', function() {
+      // Arrange
+      const { user } = createTestContext();
+
+      // Act
+      const clonedUser = user.$clone();
+      clonedUser.addresses[0].deleteOne();
+
+      // Assert
+      assert.strictEqual(user.addresses.length, 2, 'original document array should be unchanged');
+      assert.strictEqual(clonedUser.addresses.length, 1, 'cloned document array should have element removed');
+      assert.strictEqual(clonedUser.addresses[0].city, 'Miami', 'remaining cloned address should be Miami');
+    });
+
+    it('cloned Map should be a MongooseMap', function() {
+      // Arrange
+      const { user } = createTestContext();
+
+      // Act
+      const clonedUser = user.$clone();
+
+      // Assert
+      assert.ok(clonedUser.images.$isMongooseMap, 'cloned images should be a MongooseMap');
+    });
+
+    function createTestContext() {
+      const imageSchema = new Schema({ url: String });
+      const addressSchema = new Schema({ city: String });
+      const userSchema = new Schema({
+        name: String,
+        images: { type: Map, of: imageSchema },
+        addresses: [addressSchema]
+      });
+      const User = db.model('User', userSchema);
+      const user = new User({
+        name: 'John',
+        images: new Map([['avatar', { url: 'https://example.com/avatar.jpg' }]]),
+        addresses: [{ city: 'Denver' }, { city: 'Miami' }]
+      });
+      return { User, user };
+    }
+  });
+
   describe('$clone() edge cases (gh-15954)', function() {
     it('updates Map subdocument parent references', function() {
       // Arrange

@@ -318,5 +318,43 @@ describe('model', function() {
 
       assert.ok(!hydrated.stories[1].article);
     });
+
+    it('applies virtuals to doubly-nested arrays (gh-15956)', function() {
+      const innerSchema = new Schema({ name: String });
+      innerSchema.virtual('computed');
+
+      const schema = new Schema({
+        matrix: [[innerSchema]]
+      });
+
+      const Model = db.model('Test3', schema);
+
+      const raw = {
+        _id: new mongoose.Types.ObjectId(),
+        matrix: [
+          [
+            { name: 'a', computed: 'virtual-a' },
+            { name: 'b', computed: 'virtual-b' }
+          ],
+          [
+            { name: 'c', computed: 'virtual-c' }
+          ]
+        ]
+      };
+
+      const doc = Model.hydrate(raw, null, { virtuals: true });
+
+      assert.strictEqual(doc.matrix[0][0].name, 'a');
+      assert.strictEqual(doc.matrix[0][0].computed, 'virtual-a');
+      assert.strictEqual(doc.matrix[0][1].name, 'b');
+      assert.strictEqual(doc.matrix[0][1].computed, 'virtual-b');
+      assert.strictEqual(doc.matrix[1][0].name, 'c');
+      assert.strictEqual(doc.matrix[1][0].computed, 'virtual-c');
+
+      // Test without virtuals option - should not apply virtuals
+      const doc2 = Model.hydrate(raw, null);
+      assert.strictEqual(doc2.matrix[0][0].name, 'a');
+      assert.strictEqual(doc2.matrix[0][0].computed, undefined);
+    });
   });
 });

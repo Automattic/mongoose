@@ -1,4 +1,27 @@
-9.1.2 / 2025-01-05
+9.1.5 / 2026-01-20
+==================
+* fix(map): validate map subdocument when loaded with init #15960 #15957 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+* fix(discriminator): prevent indexes and callQueue duplication with shared nested schemas #15974 #15966 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+* fix(subdocuments): do not pass parent path on init #15970 #15969 #15682 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+* types(inferrawdoctype): correct handling for subdocs and doc arrays #15967 #13772
+* docs: improve grammar and clarity in TypeScript schema comments #15971 [harshsinghpujari](https://github.com/harshsinghpujari)
+
+9.1.4 / 2026-01-15
+==================
+ * fix: attach sessions to docs retrieved by cursor #15953 #15949 [mjfwalsh](https://github.com/mjfwalsh)
+ * fix(model): make hydrate() handle nested schema arrays #15964 #15956
+ * fix(clone): fix parent doc for map subdocuments and array subdocuments #15958 #15954 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix: prevent crash when accessing nested paths on prototype #15962 #15961 [som14062005](https://github.com/som14062005)
+
+9.1.3 / 2026-01-09
+==================
+ * fix(model): support timestamps option to insertMany() as both boolean and QueryTimestampsConfig #15941 #15938
+ * fix(query): include preview of current and incoming update in error when merging normal update with pipeline #15939 #15928
+ * types(model): apply basic type casting to paths underneath subdocuments #15948 #15947
+ * types(utility): make WithLevel1NestedPaths correctly handle PopulatedDoc and other TypeScript unions with Document members #15942 #15923
+ * docs(schema): expose "DocumentArrayElement" #15590 [hasezoey](https://github.com/hasezoey)
+
+9.1.2 / 2026-01-05
 ==================
  * fix(subdocs): pass options to pre-save hooks for subdocs #15921 #15920 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
  * perf(model): select only _id when checking document existence during save() #15919 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

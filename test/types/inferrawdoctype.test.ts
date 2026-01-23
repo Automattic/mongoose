@@ -1,4 +1,4 @@
-import { InferRawDocType, type InferRawDocTypeWithout_id, type ResolveTimestamps, type Schema, type Types } from 'mongoose';
+import mongoose, { InferRawDocType, type InferRawDocTypeWithout_id, type ResolveTimestamps, type Schema, type Types, FlattenMaps } from 'mongoose';
 import { ExpectType } from './util/assertions';
 
 function inferPojoType() {
@@ -156,4 +156,105 @@ function gh15699() {
 
   type TSchema = InferRawDocType<typeof schema>;
   ExpectType<any[] | null | undefined>({} as unknown as TSchema['unTypedArray']);
+}
+
+function gh13772RawType() {
+  const childSchema = new mongoose.Schema({ name: String });
+
+  const parentSchemaDef = {
+    children: [childSchema],
+    child: childSchema
+  };
+
+  type RawParentDoc = InferRawDocType<typeof parentSchemaDef>;
+
+  ExpectType<{
+    children:(FlattenMaps<{ name?: string | null | undefined }> & { _id: Types.ObjectId })[];
+    child?: (FlattenMaps<{ name?: string | null | undefined }> & { _id: Types.ObjectId }) | null | undefined;
+      } & { _id: Types.ObjectId }>({} as RawParentDoc);
+}
+
+function gh13772WithIdFalse() {
+  const childSchema = new mongoose.Schema({ name: String }, { _id: false });
+
+  const parentSchemaDef = {
+    children: [childSchema],
+    child: childSchema
+  };
+
+  type RawParentDoc = InferRawDocType<typeof parentSchemaDef>;
+
+  ExpectType<{
+    children: FlattenMaps<{ name?: string | null | undefined }>[];
+    child?: FlattenMaps<{ name?: string | null | undefined }> | null | undefined;
+  } & { _id: Types.ObjectId }>({} as RawParentDoc);
+}
+
+function gh13772WithSchemaCreate() {
+  const childSchema = mongoose.Schema.create({ name: String });
+
+  const parentSchemaDef = {
+    children: [childSchema],
+    child: childSchema
+  };
+
+  type RawParentDoc = InferRawDocType<typeof parentSchemaDef>;
+
+  ExpectType<{
+    children:({ name?: string | null | undefined } & { _id: Types.ObjectId })[];
+    child?: ({ name?: string | null | undefined } & { _id: Types.ObjectId }) | null | undefined;
+      } & { _id: Types.ObjectId }>({} as RawParentDoc);
+}
+
+function gh13772WithSchemaCreateIdFalse() {
+  const childSchema = mongoose.Schema.create({ name: String }, { _id: false });
+
+  const parentSchemaDef = {
+    children: [childSchema],
+    child: childSchema
+  };
+
+  type RawParentDoc = InferRawDocType<typeof parentSchemaDef>;
+
+  // Schema.create with _id: false - child subdocs should not have _id
+  ExpectType<{
+    children: { name?: string | null | undefined }[];
+    child?: { name?: string | null | undefined } | null | undefined;
+  } & { _id: Types.ObjectId }>({} as RawParentDoc);
+}
+
+function gh13772WithExplicitDocType() {
+  type ChildDocType = { name?: string | null };
+  const childSchema = new mongoose.Schema<ChildDocType>({ name: String });
+
+  const parentSchemaDef = {
+    children: [childSchema],
+    child: childSchema
+  };
+
+  type RawParentDoc = InferRawDocType<typeof parentSchemaDef>;
+
+  // Explicit DocType is used directly as RawDocType
+  ExpectType<{
+    children: ChildDocType[];
+    child?: ChildDocType | null | undefined;
+  } & { _id: Types.ObjectId }>({} as RawParentDoc);
+}
+
+function gh13772WithExplicitDocTypeIdFalse() {
+  type ChildDocType = { name?: string | null };
+  const childSchema = new mongoose.Schema<ChildDocType>({ name: String }, { _id: false });
+
+  const parentSchemaDef = {
+    children: [childSchema],
+    child: childSchema
+  };
+
+  type RawParentDoc = InferRawDocType<typeof parentSchemaDef>;
+
+  // Explicit DocType is used directly as RawDocType
+  ExpectType<{
+    children: ChildDocType[];
+    child?: ChildDocType | null | undefined;
+  } & { _id: Types.ObjectId }>({} as RawParentDoc);
 }

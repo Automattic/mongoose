@@ -9306,6 +9306,130 @@ describe('Model', function() {
       }
     });
   });
+
+  describe('bulkWrite - custom currentTime', function() {
+    it('should use custom currentTime', async function() {
+      // Arrange
+      const FIXED_DATE = new Date('2026-01-01');
+      const schema = new Schema(
+        { name: { type: String, required: true } },
+        { timestamps: { currentTime: () => FIXED_DATE } }
+      );
+
+      const Model = db.model('BulkPerson', schema);
+
+      await Model.insertMany([
+        { name: 'Alice' },
+        { name: 'Bob' },
+        { name: 'Eve' },
+        { name: 'Frank' }
+      ], { timestamps: false });
+      const [alice, bob, eve, frank] = await Model.find().sort({ name: 1 });
+
+      // Act
+      await Model.bulkWrite([
+        { insertOne: { document: { name: 'David' } } },
+        { replaceOne: { filter: { _id: alice._id }, replacement: { name: 'Alice' } } },
+        { updateOne: { filter: { _id: bob._id }, update: { $set: { name: 'Bob' } } } },
+        { updateOne: { filter: { name: 'Charlie' }, update: { $set: { name: 'Charlie' } }, upsert: true } },
+        { updateMany: { filter: { _id: { $in: [eve._id, frank._id] } }, update: { $set: { name: 'updated' } } } }
+      ]);
+
+      // Assert
+      const [newDavid, newAlice, newBob, newCharlie, newEve, newFrank] = await Promise.all([
+        Model.findOne({ name: 'David' }),
+        Model.findById(alice._id),
+        Model.findById(bob._id),
+        Model.findOne({ name: 'Charlie' }),
+        Model.findById(eve._id),
+        Model.findById(frank._id)
+      ]);
+
+      // insertOne
+      assert.deepStrictEqual(newDavid.createdAt, FIXED_DATE);
+      assert.deepStrictEqual(newDavid.updatedAt, FIXED_DATE);
+
+      // replaceOne
+      assert.deepStrictEqual(newAlice.createdAt, FIXED_DATE);
+      assert.deepStrictEqual(newAlice.updatedAt, FIXED_DATE);
+
+      // updateOne (existing doc)
+      assert.strictEqual(newBob.createdAt, undefined);
+      assert.deepStrictEqual(newBob.updatedAt, FIXED_DATE);
+
+      // updateOne with upsert (new doc)
+      assert.deepStrictEqual(newCharlie.createdAt, FIXED_DATE);
+      assert.deepStrictEqual(newCharlie.updatedAt, FIXED_DATE);
+
+      // updateMany (existing docs)
+      assert.strictEqual(newEve.createdAt, undefined);
+      assert.deepStrictEqual(newEve.updatedAt, FIXED_DATE);
+      assert.strictEqual(newFrank.createdAt, undefined);
+      assert.deepStrictEqual(newFrank.updatedAt, FIXED_DATE);
+    });
+  });
+
+  describe('bulkWrite - custom currentTime', function() {
+    it('should use custom currentTime', async function() {
+      // Arrange
+      const FIXED_DATE = new Date('2026-01-01');
+      const schema = new Schema(
+        { name: { type: String, required: true } },
+        { timestamps: { currentTime: () => FIXED_DATE } }
+      );
+
+      const Model = db.model('BulkPerson', schema);
+
+      await Model.insertMany([
+        { name: 'Alice' },
+        { name: 'Bob' },
+        { name: 'Eve' },
+        { name: 'Frank' }
+      ], { timestamps: false });
+      const [alice, bob, eve, frank] = await Model.find().sort({ name: 1 });
+
+      // Act
+      await Model.bulkWrite([
+        { insertOne: { document: { name: 'David' } } },
+        { replaceOne: { filter: { _id: alice._id }, replacement: { name: 'Alice' } } },
+        { updateOne: { filter: { _id: bob._id }, update: { $set: { name: 'Bob' } } } },
+        { updateOne: { filter: { name: 'Charlie' }, update: { $set: { name: 'Charlie' } }, upsert: true } },
+        { updateMany: { filter: { _id: { $in: [eve._id, frank._id] } }, update: { $set: { name: 'updated' } } } }
+      ]);
+
+      // Assert
+      const [newDavid, newAlice, newBob, newCharlie, newEve, newFrank] = await Promise.all([
+        Model.findOne({ name: 'David' }),
+        Model.findById(alice._id),
+        Model.findById(bob._id),
+        Model.findOne({ name: 'Charlie' }),
+        Model.findById(eve._id),
+        Model.findById(frank._id)
+      ]);
+
+      // insertOne
+      assert.deepStrictEqual(newDavid.createdAt, FIXED_DATE);
+      assert.deepStrictEqual(newDavid.updatedAt, FIXED_DATE);
+
+      // replaceOne
+      assert.deepStrictEqual(newAlice.createdAt, FIXED_DATE);
+      assert.deepStrictEqual(newAlice.updatedAt, FIXED_DATE);
+
+      // updateOne (existing doc)
+      assert.strictEqual(newBob.createdAt, undefined);
+      assert.deepStrictEqual(newBob.updatedAt, FIXED_DATE);
+
+      // updateOne with upsert (new doc)
+      assert.deepStrictEqual(newCharlie.createdAt, FIXED_DATE);
+      assert.deepStrictEqual(newCharlie.updatedAt, FIXED_DATE);
+
+      // updateMany (existing docs)
+      assert.strictEqual(newEve.createdAt, undefined);
+      assert.deepStrictEqual(newEve.updatedAt, FIXED_DATE);
+      assert.strictEqual(newFrank.createdAt, undefined);
+      assert.deepStrictEqual(newFrank.updatedAt, FIXED_DATE);
+    });
+  });
 });
 
 

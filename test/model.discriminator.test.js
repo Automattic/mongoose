@@ -2388,4 +2388,123 @@ describe('model', function() {
     assert.equal(documentPreSaveHooks.length, 1);
     assert.equal(documentPreSaveHooks[0], discriminator);
   });
+
+  it('does not duplicate _indexes when base and discriminator schemas share nested schema (gh-15966)', async function() {
+    // Arrange
+    const addressSchema = new Schema({ city: String, street: String }, { _id: false });
+    const orderSchemaDefinition = {
+      customerId: { type: Schema.Types.ObjectId },
+      createdAt: Date,
+      orderNumber: String,
+      billingAddress: addressSchema,
+      shippingAddress: addressSchema,
+      notes: [{ message: String }]
+    };
+
+    const orderSchema = new Schema(orderSchemaDefinition);
+    orderSchema.index({ customerId: 1, createdAt: -1 });
+    orderSchema.index({ orderNumber: 1, customerId: 1 });
+    orderSchema.index({ 'billingAddress.city': 1, customerId: 1 });
+
+    const Order = db.model('Order', orderSchema);
+    const wholesaleOrderSchema = new Schema(orderSchemaDefinition);
+
+    // Act
+    const WholesaleOrder = Order.discriminator('WholesaleOrder', wholesaleOrderSchema, { clone: false });
+    const wholesaleDiff = await WholesaleOrder.diffIndexes();
+    const orderDiff = await Order.diffIndexes();
+
+    // Assert
+    assert.deepStrictEqual(orderSchema._indexes, [
+      [{ customerId: 1, createdAt: -1 }, {}],
+      [{ orderNumber: 1, customerId: 1 }, {}],
+      [{ 'billingAddress.city': 1, customerId: 1 }, {}]
+    ]);
+    assert.deepStrictEqual(wholesaleOrderSchema._indexes, []);
+
+    assert.deepStrictEqual(orderDiff, {
+      toDrop: [],
+      toCreate: [
+        { customerId: 1, createdAt: -1 },
+        { orderNumber: 1, customerId: 1 },
+        { 'billingAddress.city': 1, customerId: 1 }
+      ]
+    });
+    assert.deepStrictEqual(wholesaleDiff, {
+      toDrop: [],
+      toCreate: []
+    });
+  });
+
+  it('preserves discriminator-specific indexes (gh-15966)', async function() {
+    // Arrange
+    const addressSchema = new Schema({ city: String, street: String }, { _id: false });
+    const orderSchemaDefinition = {
+      customerId: { type: Schema.Types.ObjectId },
+      billingAddress: addressSchema,
+      shippingAddress: addressSchema
+    };
+
+    const orderSchema = new Schema(orderSchemaDefinition);
+    orderSchema.index({ customerId: 1 });
+
+    const Order = db.model('Order', orderSchema);
+
+    const wholesaleOrderSchema = new Schema({ ...orderSchemaDefinition, vendorCode: String });
+    wholesaleOrderSchema.index({ vendorCode: 1 });
+
+    // Act
+    const WholesaleOrder = Order.discriminator('WholesaleOrder', wholesaleOrderSchema, { clone: false });
+    const orderDiff = await Order.diffIndexes();
+    const wholesaleDiff = await WholesaleOrder.diffIndexes();
+
+    // Assert
+    assert.deepStrictEqual(orderSchema._indexes, [
+      [{ customerId: 1 }, {}]
+    ]);
+    assert.deepStrictEqual(wholesaleOrderSchema._indexes, [
+      [{ vendorCode: 1 }, { partialFilterExpression: { __t: 'WholesaleOrder' } }]
+    ]);
+
+    assert.deepStrictEqual(orderDiff, {
+      toDrop: [],
+      toCreate: [
+        { customerId: 1 }
+      ]
+    });
+
+    assert.deepStrictEqual(wholesaleDiff, {
+      toDrop: [],
+      toCreate: [
+        { vendorCode: 1 }
+      ]
+    });
+  });
+
+  it('does not duplicate callQueue when base and discriminator schemas share nested schema (gh-15966)', function() {
+    // Arrange
+    const addressSchema = new Schema({ city: String, street: String }, { _id: false });
+    const orderSchemaDefinition = {
+      customerId: { type: Schema.Types.ObjectId },
+      billingAddress: addressSchema,
+      shippingAddress: addressSchema,
+      notes: [{ message: String }]
+    };
+
+    const orderSchema = new Schema(orderSchemaDefinition);
+    orderSchema.queue('testMethod', ['arg1']);
+
+    const Order = db.model('Order', orderSchema);
+    const wholesaleOrderSchema = new Schema(orderSchemaDefinition);
+
+    // Act
+    Order.discriminator('WholesaleOrder', wholesaleOrderSchema, { clone: false });
+
+    // Assert - callQueue should have exactly 1 entry from base, not duplicated
+    const testMethodCalls = wholesaleOrderSchema.callQueue.filter(
+      ([methodName]) => methodName === 'testMethod'
+    );
+    assert.strictEqual(testMethodCalls.length, 1);
+  });
+
 });

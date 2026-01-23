@@ -252,6 +252,8 @@ declare module 'mongoose' {
     set(path: string | Record<string, any>, val: any, options?: DocumentSetOptions): this;
     set(value: string | Record<string, any>): this;
 
+    toBSON(): Require_id<DocType>;
+
     /** The return value of this method is used in calls to JSON.stringify(doc). */
     toJSON<O extends ToObjectOptions>(options: O): ToObjectReturnType<DocType, TVirtuals, O, TSchemaOptions>;
     toJSON(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;

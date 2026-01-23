@@ -9121,47 +9121,65 @@ describe('Model', function() {
     });
   });
 
-  describe('bulkWrite - custom currentTime', async function() {
+  describe('bulkWrite - custom currentTime', function() {
     it('should use custom currentTime', async function() {
-
-      const bulkPersonSchema = new Schema(
-        {
-          name: { type: String, required: true },
-          created_at: { type: Number },
-          updated_at: { type: Number }
-        },
-        {
-          timestamps: {
-            createdAt: 'created_at',
-            updatedAt: 'updated_at',
-            currentTime: () => Date.now().valueOf() / 1000
-          }
-        }
+      // Arrange
+      const FIXED_DATE = new Date('2026-01-01');
+      const schema = new Schema(
+        { name: { type: String, required: true } },
+        { timestamps: { currentTime: () => FIXED_DATE } }
       );
 
-      const isUnixSeconds = (value) => value > 1e9 && value < 1e10;
+      const Model = db.model('BulkPerson', schema);
 
-      const BulkPerson = db.model('BulkPerson', bulkPersonSchema);
+      await Model.insertMany([
+        { name: 'Alice' },
+        { name: 'Bob' },
+        { name: 'Eve' },
+        { name: 'Frank' }
+      ], { timestamps: false });
+      const [alice, bob, eve, frank] = await Model.find().sort({ name: 1 });
 
-      const alice = await BulkPerson.create({ name: 'Alice' });
-      const bob = await BulkPerson.create({ name: 'Bob' });
-
-
-      await BulkPerson.bulkWrite([
+      // Act
+      await Model.bulkWrite([
         { insertOne: { document: { name: 'David' } } },
-        { replaceOne: { filter: { _id: alice._id }, replacement: { name: 'Alice 2' } } },
-        { updateOne: { filter: { _id: bob._id }, update: { name: 'Bob 2' } } },
-        { updateOne: { filter: { name: 'Charlie' }, update: { name: 'Charlie' }, upsert: true } }
+        { replaceOne: { filter: { _id: alice._id }, replacement: { name: 'Alice' } } },
+        { updateOne: { filter: { _id: bob._id }, update: { $set: { name: 'Bob' } } } },
+        { updateOne: { filter: { name: 'Charlie' }, update: { $set: { name: 'Charlie' } }, upsert: true } },
+        { updateMany: { filter: { _id: { $in: [eve._id, frank._id] } }, update: { $set: { name: 'updated' } } } }
       ]);
 
-      const allPeople = await BulkPerson.find().lean().exec();
-      for (const person of allPeople) {
-        assert.ok(isUnixSeconds(person.created_at));
-        assert.ok(isUnixSeconds(person.updated_at));
-      }
+      // Assert
+      const [newDavid, newAlice, newBob, newCharlie, newEve, newFrank] = await Promise.all([
+        Model.findOne({ name: 'David' }),
+        Model.findById(alice._id),
+        Model.findById(bob._id),
+        Model.findOne({ name: 'Charlie' }),
+        Model.findById(eve._id),
+        Model.findById(frank._id)
+      ]);
 
-      await BulkPerson.deleteMany({});
+      // insertOne
+      assert.deepStrictEqual(newDavid.createdAt, FIXED_DATE);
+      assert.deepStrictEqual(newDavid.updatedAt, FIXED_DATE);
 
+      // replaceOne
+      assert.deepStrictEqual(newAlice.createdAt, FIXED_DATE);
+      assert.deepStrictEqual(newAlice.updatedAt, FIXED_DATE);
+
+      // updateOne (existing doc)
+      assert.strictEqual(newBob.createdAt, undefined);
+      assert.deepStrictEqual(newBob.updatedAt, FIXED_DATE);
+
+      // updateOne with upsert (new doc)
+      assert.deepStrictEqual(newCharlie.createdAt, FIXED_DATE);
+      assert.deepStrictEqual(newCharlie.updatedAt, FIXED_DATE);
+
+      // updateMany (existing docs)
+      assert.strictEqual(newEve.createdAt, undefined);
+      assert.deepStrictEqual(newEve.updatedAt, FIXED_DATE);
+      assert.strictEqual(newFrank.createdAt, undefined);
+      assert.deepStrictEqual(newFrank.updatedAt, FIXED_DATE);
     });
   });
 });

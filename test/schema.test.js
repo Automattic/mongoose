@@ -3310,7 +3310,7 @@ describe('schema', function() {
     assert.ok(subdoc instanceof mongoose.Document);
     assert.equal(subdoc.getAnswer(), 42);
   });
-  it('throws "already has an index" error if duplicate index definition (gh-15056)', function() {
+  it('warns on duplicate index definition when createIndexes is called (gh-15056)', async function() {
     sinon.stub(utils, 'warn').callsFake(() => {});
     try {
       const ObjectKeySchema = new mongoose.Schema({
@@ -3323,30 +3323,45 @@ describe('schema', function() {
           type: String,
           required: false
         }
-      });
+      }, { autoIndex: false });
 
       ObjectKeySchema.index({ key: 1 });
-      assert.equal(utils.warn.getCalls().length, 1);
-      let [message] = utils.warn.getCalls()[0].args;
-      assert.equal(
-        message,
-        'Duplicate schema index on {"key":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.'
-      );
-
       ObjectKeySchema.index({ key: 1, type: 1 });
-      assert.equal(utils.warn.getCalls().length, 1);
       ObjectKeySchema.index({ key: 1, type: 1 });
-      assert.equal(utils.warn.getCalls().length, 2);
-      [message] = utils.warn.getCalls()[1].args;
-      assert.equal(
-        message,
-        'Duplicate schema index on {"key":1,"type":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.'
-      );
-
       ObjectKeySchema.index({ type: 1, key: 1 });
       ObjectKeySchema.index({ key: 1, type: -1 });
       ObjectKeySchema.index({ key: 1, type: 1 }, { unique: true, name: 'special index' });
+
+      // No warnings yet - warnings are deferred to createIndexes
+      assert.equal(utils.warn.getCalls().length, 0);
+
+      const Test = db.model('gh15056', ObjectKeySchema);
+      // createIndexes() will error because MongoDB refuses to create duplicate indexes,
+      // but the warning should still be emitted before the error
+      await Test.createIndexes().catch(() => {});
+
+      // Should have 2 warnings: one for duplicate { key: 1 }, one for duplicate { key: 1, type: 1 }
       assert.equal(utils.warn.getCalls().length, 2);
+
+      let [message] = utils.warn.getCalls()[0].args;
+      assert.ok(
+        message.includes('Duplicate schema index on {"key":1}'),
+        'First warning should mention {"key":1}'
+      );
+      assert.ok(
+        message.includes('for model "gh15056"'),
+        'Warning should include model name'
+      );
+
+      [message] = utils.warn.getCalls()[1].args;
+      assert.ok(
+        message.includes('Duplicate schema index on {"key":1,"type":1}'),
+        'Second warning should mention {"key":1,"type":1}'
+      );
+      assert.ok(
+        message.includes('for model "gh15056"'),
+        'Warning should include model name'
+      );
     } finally {
       sinon.restore();
     }

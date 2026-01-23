@@ -119,7 +119,7 @@ function generateContents() {
 
 async function generateSearch(config) {
   console.log('Connect to', config.uri);
-  await mongoose.connect(config.uri, { dbName: 'mongoose' });
+  await mongoose.connect(config.uri);
 
   // wait for the index to be created
   console.log('Init Content model...');

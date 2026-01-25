@@ -11716,7 +11716,7 @@ describe('model: populate:', function() {
     assert.equal(section.subdoc.subSection.name, 'foo');
   });
 
-  it('handles match function with nested populate where match references a populated field (gh-XXXXX)', async function() {
+  it('handles match function with nested populate where match references a populated field (mongodb-js/mongoose-autopopulate#112)', async function() {
     // Scenario: Parent has children, children have a reference to Category.
     // We want to populate children with a match function that filters by category,
     // AND also populate the category field on children.
@@ -11786,5 +11786,61 @@ describe('model: populate:', function() {
     assert.equal(leanDoc.children[1].name, 'Child 3');
     assert.equal(leanDoc.children[0].category.name, 'Category A');
     assert.equal(leanDoc.children[1].category.name, 'Category A');
+  });
+
+  it('handles match function when nested populate is defined in pre find hook (mongodb-js/mongoose-autopopulate#112)', async function() {
+    // Scenario: Child model has a pre('find') hook that auto-populates category.
+    // Parent populates children with a match function filtering by category.
+    // The issue: the hook runs during populate query, so sift sees populated docs.
+
+    const categorySchema = new Schema({
+      name: String
+    });
+    const Category = db.model('Category', categorySchema);
+
+    const childSchema = new Schema({
+      name: String,
+      category: { type: Schema.Types.ObjectId, ref: 'Category' }
+    });
+
+    // Auto-populate category on all find queries
+    childSchema.pre('find', function() {
+      this.populate('category');
+    });
+
+    const Child = db.model('Child', childSchema);
+
+    const parentSchema = new Schema({
+      name: String,
+      children: [{ type: Schema.Types.ObjectId, ref: 'Child' }]
+    });
+    const Parent = db.model('Parent', parentSchema);
+
+    // Create test data
+    const category1 = await Category.create({ name: 'Category A' });
+    const category2 = await Category.create({ name: 'Category B' });
+
+    const child1 = await Child.create({ name: 'Child 1', category: category1._id });
+    const child2 = await Child.create({ name: 'Child 2', category: category2._id });
+    const child3 = await Child.create({ name: 'Child 3', category: category1._id });
+
+    const parent = await Parent.create({
+      name: 'Parent',
+      children: [child1._id, child2._id, child3._id]
+    });
+
+    // Populate children with match function - the pre('find') hook will auto-populate category
+    const doc = await Parent.findById(parent._id).populate({
+      path: 'children',
+      match: () => ({ category: category1._id })
+    });
+
+    // Should only have children with category1
+    assert.equal(doc.children.length, 2);
+    assert.equal(doc.children[0].name, 'Child 1');
+    assert.equal(doc.children[1].name, 'Child 3');
+    // Category should be populated via the hook
+    assert.equal(doc.children[0].category.name, 'Category A');
+    assert.equal(doc.children[1].category.name, 'Category A');
   });
 });

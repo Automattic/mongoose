@@ -11715,4 +11715,76 @@ describe('model: populate:', function() {
     section = await Section.findById(section).populate('subdoc.subSection');
     assert.equal(section.subdoc.subSection.name, 'foo');
   });
+
+  it('handles match function with nested populate where match references a populated field (gh-XXXXX)', async function() {
+    // Scenario: Parent has children, children have a reference to Category.
+    // We want to populate children with a match function that filters by category,
+    // AND also populate the category field on children.
+    // mongodb-js/mongoose-autopopulate#112 pointed out that there was an issue in
+    // this case where the parent -> children populate would break if it had a
+    // `match` function because that `match` would be applied against the populated
+    // version of the child.
+    const categorySchema = new Schema({
+      name: String
+    });
+    const Category = db.model('Category', categorySchema);
+
+    const childSchema = new Schema({
+      name: String,
+      category: { type: Schema.Types.ObjectId, ref: 'Category' }
+    });
+    const Child = db.model('Child', childSchema);
+
+    const parentSchema = new Schema({
+      name: String,
+      children: [{ type: Schema.Types.ObjectId, ref: 'Child' }]
+    });
+    const Parent = db.model('Parent', parentSchema);
+
+    // Create test data
+    const category1 = await Category.create({ name: 'Category A' });
+    const category2 = await Category.create({ name: 'Category B' });
+
+    const child1 = await Child.create({ name: 'Child 1', category: category1._id });
+    const child2 = await Child.create({ name: 'Child 2', category: category2._id });
+    const child3 = await Child.create({ name: 'Child 3', category: category1._id });
+
+    const parent = await Parent.create({
+      name: 'Parent',
+      children: [child1._id, child2._id, child3._id]
+    });
+
+    // Populate children with match function filtering by category,
+    // and also populate the category field on each child
+    const doc = await Parent.findById(parent._id).populate({
+      path: 'children',
+      match: () => ({ category: category1._id }),
+      populate: {
+        path: 'category'
+      }
+    });
+
+    // Should only have children with category1
+    assert.equal(doc.children.length, 2);
+    assert.equal(doc.children[0].name, 'Child 1');
+    assert.equal(doc.children[1].name, 'Child 3');
+    // Category should be populated
+    assert.equal(doc.children[0].category.name, 'Category A');
+    assert.equal(doc.children[1].category.name, 'Category A');
+
+    // Also test with lean
+    const leanDoc = await Parent.findById(parent._id).populate({
+      path: 'children',
+      match: () => ({ category: category1._id }),
+      populate: {
+        path: 'category'
+      }
+    }).lean();
+
+    assert.equal(leanDoc.children.length, 2);
+    assert.equal(leanDoc.children[0].name, 'Child 1');
+    assert.equal(leanDoc.children[1].name, 'Child 3');
+    assert.equal(leanDoc.children[0].category.name, 'Category A');
+    assert.equal(leanDoc.children[1].category.name, 'Category A');
+  });
 });

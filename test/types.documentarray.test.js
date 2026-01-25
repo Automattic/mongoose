@@ -801,4 +801,100 @@ describe('types.documentarray', function() {
     });
     assert.strictEqual(schema.path('docArr').getEmbeddedSchemaType().options.someCustomOption, 'test 42');
   });
+
+  it('updates __index when reassigning array with reordered subdocs (gh-15973)', async function() {
+    const childSchema = new mongoose.Schema({
+      id: Number,
+      v: Number
+    });
+
+    const parentSchema = new mongoose.Schema({
+      _id: String,
+      array: {
+        type: [childSchema],
+        _id: false
+      }
+    });
+
+    const Test = db.model('Test', parentSchema);
+
+    await Test.deleteOne({ _id: 'test' });
+    await Test.create({
+      _id: 'test',
+      array: [
+        { id: 1, v: 0 },
+        { id: 2, v: 0 }
+      ]
+    });
+
+    const doc = await Test.findById('test').orFail();
+
+    // Reassign array with elements in reversed order
+    doc.array = [doc.array[1], doc.array[0]];
+    await doc.save();
+
+    // Modify the first element (which was originally at index 1)
+    doc.array[0].v = 999;
+
+    // The modified path should be array.0.v, not array.1.v
+    assert.ok(doc.modifiedPaths().includes('array.0.v'));
+    assert.ok(!doc.modifiedPaths().includes('array.1.v'));
+
+    await doc.save();
+
+    const fetched = await Test.findById('test').orFail().lean();
+    assert.strictEqual(fetched.array[0].v, 999);
+    assert.strictEqual(fetched.array[1].v, 0);
+  });
+
+  it('clones subdoc when same subdoc reference appears multiple times in array (gh-15973)', async function() {
+    const childSchema = new mongoose.Schema({
+      id: Number,
+      v: Number
+    });
+
+    const parentSchema = new mongoose.Schema({
+      _id: String,
+      array: {
+        type: [childSchema],
+        _id: false
+      }
+    });
+
+    const Test = db.model('Test', parentSchema);
+
+    await Test.deleteOne({ _id: 'test' });
+    await Test.create({
+      _id: 'test',
+      array: [{ id: 1, v: 0 }]
+    });
+
+    const doc = await Test.findById('test').orFail();
+
+    // Add the same subdocument twice
+    const subdoc = doc.array[0];
+    doc.array = [subdoc, subdoc];
+
+    // The two array elements should be different objects (cloned)
+    assert.notStrictEqual(doc.array[0], doc.array[1]);
+    assert.strictEqual(doc.array[0].__index, 0);
+    assert.strictEqual(doc.array[1].__index, 1);
+
+    await doc.save();
+
+    // Modify only the second element
+    doc.array[1].v = 999;
+
+    // Should only affect array[1], not array[0]
+    assert.strictEqual(doc.array[0].v, 0);
+    assert.strictEqual(doc.array[1].v, 999);
+    assert.ok(doc.modifiedPaths().includes('array.1.v'));
+    assert.ok(!doc.modifiedPaths().includes('array.0.v'));
+
+    await doc.save();
+
+    const fetched = await Test.findById('test').orFail().lean();
+    assert.strictEqual(fetched.array[0].v, 0);
+    assert.strictEqual(fetched.array[1].v, 999);
+  });
 });

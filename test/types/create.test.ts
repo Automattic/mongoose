@@ -1,5 +1,5 @@
 import mongoose, { Schema, model, Types, HydratedDocument } from 'mongoose';
-import { expectError, expectType } from 'tsd';
+import { ExpectType } from './util/assertions';
 
 const schema = new Schema({ name: { type: 'String' } });
 
@@ -11,116 +11,118 @@ interface ITest {
 const Test = model<ITest>('Test', schema);
 
 Test.create({ _id: '000000000000000000000000', name: 'test' }).then(doc => {
-  expectType<Types.ObjectId>(doc._id);
-  expectType<string>(doc.name);
-  expectType<boolean>(doc.isNew);
+  ExpectType<Types.ObjectId>(doc._id);
+  ExpectType<string>(doc.name);
+  ExpectType<boolean>(doc.isNew);
 });
 
 Test.create({ _id: new Types.ObjectId('000000000000000000000000'), name: 'test' }).then((doc) => {
-  expectType<Types.ObjectId>(doc._id);
-  expectType<string>(doc.name);
-  expectType<boolean>(doc.isNew);
+  ExpectType<Types.ObjectId>(doc._id);
+  ExpectType<string>(doc.name);
+  ExpectType<boolean>(doc.isNew);
 });
 
 Test.create([{ name: 'test' }], { validateBeforeSave: false }).then(docs => {
-  expectType<Types.ObjectId>(docs[0]._id);
-  expectType<string>(docs[0].name);
-  expectType<boolean>(docs[0].isNew);
+  ExpectType<Types.ObjectId>(docs[0]._id);
+  ExpectType<string>(docs[0].name);
+  ExpectType<boolean>(docs[0].isNew);
 });
 
 Test.create({ name: 'test' }, { name: 'test2' }).then(docs => {
-  expectType<Types.ObjectId>(docs[0]._id);
-  expectType<string>(docs[0].name);
-  expectType<Types.ObjectId>(docs[1]._id);
-  expectType<string>(docs[1].name);
+  ExpectType<Types.ObjectId>(docs[0]._id);
+  ExpectType<string>(docs[0].name);
+  ExpectType<Types.ObjectId>(docs[1]._id);
+  ExpectType<string>(docs[1].name);
 });
 
 Test.create([{ name: 'test' }], { validateBeforeSave: true }).then(docs => {
-  expectType<Types.ObjectId>(docs[0]._id);
-  expectType<string>(docs[0].name);
+  ExpectType<Types.ObjectId>(docs[0]._id);
+  ExpectType<string>(docs[0].name);
 });
 
 Test.create({}).then(doc => {
-  expectType<string>(doc.name);
+  ExpectType<string>(doc.name);
 });
 
 Test.create([{}]).then(docs => {
-  expectType<string>(docs[0].name);
+  ExpectType<string>(docs[0].name);
 });
 
 Test.create({ name: 'test' });
 Test.create({ _id: new Types.ObjectId('0'.repeat(24)), name: 'test' });
 
 Test.insertMany({ name: 'test' }, {}).then(docs => {
-  expectType<Types.ObjectId>(docs[0]._id);
-  expectType<string>(docs[0].name);
-  expectType<boolean>(docs[0].isNew);
+  ExpectType<Types.ObjectId>(docs[0]._id);
+  ExpectType<string>(docs[0].name);
+  ExpectType<boolean>(docs[0].isNew);
 });
 
 Test.insertMany({ name: 'test' }, { lean: true }).then(docs => {
-  expectType<Types.ObjectId>(docs[0]._id);
-  expectType<string>(docs[0].name);
-  expectError(docs[0].isNew);
+  ExpectType<Types.ObjectId>(docs[0]._id);
+  ExpectType<string>(docs[0].name);
+  // @ts-expect-error should not be defined on lean doc
+  docs[0].isNew;
 });
 
 Test.insertMany({ name: 'test' }).then(docs => {
-  expectType<Types.ObjectId>(docs[0]._id);
-  expectType<string>(docs[0].name);
-  expectType<boolean>(docs[0].isNew);
+  ExpectType<Types.ObjectId>(docs[0]._id);
+  ExpectType<string>(docs[0].name);
+  ExpectType<boolean>(docs[0].isNew);
 });
 
 Test.insertMany({ name: 'test' }, {}).then(docs => {
-  expectType<Types.ObjectId>(docs[0]._id);
-  expectType<string>(docs[0].name);
-  expectType<boolean>(docs[0].isNew);
+  ExpectType<Types.ObjectId>(docs[0]._id);
+  ExpectType<string>(docs[0].name);
+  ExpectType<boolean>(docs[0].isNew);
 });
 
 Test.insertMany([{ name: 'test' }], { rawResult: true }).then(result => {
-  expectType<boolean>(result.acknowledged);
-  expectType<number>(result.insertedCount);
-  expectType<{ [key: number]: Types.ObjectId; }>(result.insertedIds);
+  ExpectType<boolean>(result.acknowledged);
+  ExpectType<number>(result.insertedCount);
+  ExpectType<{ [key: number]: Types.ObjectId; }>(result.insertedIds);
 });
 
 Test.insertMany([{ name: 'test' }], { rawResult: true }).then(result => {
-  expectType<boolean>(result.acknowledged);
-  expectType<number>(result.insertedCount);
-  expectType<{ [key: number]: Types.ObjectId; }>(result.insertedIds);
+  ExpectType<boolean>(result.acknowledged);
+  ExpectType<number>(result.insertedCount);
+  ExpectType<{ [key: number]: Types.ObjectId; }>(result.insertedIds);
 });
 
 Test.insertMany([{ name: 'test' }], { lean: true }).then(docs => {
-  expectType<Types.ObjectId>(docs[0]._id);
-  expectType<string>(docs[0].name);
-  expectError(docs[0].isNew);
+  ExpectType<Types.ObjectId>(docs[0]._id);
+  ExpectType<string>(docs[0].name);
+  // @ts-expect-error should not be defined on lean doc
+  docs[0].isNew;
 });
 
 Test.insertMany([{ name: 'test' }], { lean: false }).then(docs => {
-  expectType<Types.ObjectId>(docs[0]._id);
-  expectType<string>(docs[0].name);
-  expectType<boolean>(docs[0].isNew);
+  ExpectType<Types.ObjectId>(docs[0]._id);
+  ExpectType<string>(docs[0].name);
+  ExpectType<boolean>(docs[0].isNew);
 });
 
 Test.insertMany([{ name: 'test' }], { }).then(docs => {
-  expectType<Types.ObjectId>(docs[0]._id);
-  expectType<string>(docs[0].name);
-  expectType<boolean>(docs[0].isNew);
+  ExpectType<Types.ObjectId>(docs[0]._id);
+  ExpectType<string>(docs[0].name);
+  ExpectType<boolean>(docs[0].isNew);
 });
 
 Test.insertMany([{ name: 'test' }]).then(docs => {
-  expectType<Types.ObjectId>(docs[0]._id);
-  expectType<string>(docs[0].name);
-  expectType<boolean>(docs[0].isNew);
+  ExpectType<Types.ObjectId>(docs[0]._id);
+  ExpectType<string>(docs[0].name);
+  ExpectType<boolean>(docs[0].isNew);
 });
 
 Test.insertMany({ _id: '000000000000000000000000', name: 'test' }).then(docs => {
-  expectType<Types.ObjectId>(docs[0]._id);
-  expectType<string>(docs[0].name);
-  expectType<boolean>(docs[0].isNew);
+  ExpectType<Types.ObjectId>(docs[0]._id);
+  ExpectType<string>(docs[0].name);
+  ExpectType<boolean>(docs[0].isNew);
 });
 
 Test.insertMany({ _id: new Types.ObjectId('000000000000000000000000'), name: 'test' }).then(docs => {
-  expectType<Types.ObjectId>(docs[0]._id);
-  expectType<string>(docs[0].name);
-  expectType<boolean>(docs[0].isNew);
+  ExpectType<Types.ObjectId>(docs[0]._id);
+  ExpectType<string>(docs[0].name);
+  ExpectType<boolean>(docs[0].isNew);
 });
 
 (async() => {
@@ -131,25 +133,25 @@ Test.insertMany({ _id: new Types.ObjectId('000000000000000000000000'), name: 'te
 })();
 
 async function createWithAggregateErrors() {
-  expectType<(HydratedDocument<ITest>)[]>(await Test.create([{}]));
-  expectType<(HydratedDocument<ITest> | Error)[]>(await Test.create([{}], { aggregateErrors: true }));
+  ExpectType<(HydratedDocument<ITest>)[]>(await Test.create([{}]));
+  ExpectType<(HydratedDocument<ITest> | Error)[]>(await Test.create([{}], { aggregateErrors: true }));
 }
 
 async function createWithSubdoc() {
   const schema = new Schema({ name: String, registeredAt: Date, subdoc: new Schema({ prop: { type: String, required: true } }) });
   const TestModel = model('Test', schema);
   const doc = await TestModel.create({ name: 'test', registeredAt: '2022-06-01', subdoc: { prop: 'value' } });
-  expectType<string | null | undefined>(doc.name);
-  expectType<Date | null | undefined>(doc.registeredAt);
-  expectType<string>(doc.subdoc!.prop);
+  ExpectType<string | null | undefined>(doc.name);
+  ExpectType<Date | null | undefined>(doc.registeredAt);
+  ExpectType<string>(doc.subdoc!.prop);
 }
 
 async function createWithDocArray() {
   const schema = new Schema({ name: String, subdocs: [new Schema({ prop: { type: String, required: true } })] });
   const TestModel = model('Test', schema);
   const doc = await TestModel.create({ name: 'test', subdocs: [{ prop: 'value' }] });
-  expectType<string | null | undefined>(doc.name);
-  expectType<string>(doc.subdocs[0].prop);
+  ExpectType<string | null | undefined>(doc.name);
+  ExpectType<string>(doc.subdocs[0].prop);
 }
 
 async function createWithMapOfSubdocs() {
@@ -163,12 +165,12 @@ async function createWithMapOfSubdocs() {
   const TestModel = model('Test', schema);
 
   const doc = await TestModel.create({ name: 'test', subdocMap: { taco: { prop: 'beef' } } });
-  expectType<string | null | undefined>(doc.name);
-  expectType<string>(doc.subdocMap!.get('taco')!.prop);
+  ExpectType<string | null | undefined>(doc.name);
+  ExpectType<string>(doc.subdocMap!.get('taco')!.prop);
 
   const doc2 = await TestModel.create({ name: 'test', subdocMap: [['taco', { prop: 'beef' }]] });
-  expectType<string | null | undefined>(doc2.name);
-  expectType<string>(doc2.subdocMap!.get('taco')!.prop);
+  ExpectType<string | null | undefined>(doc2.name);
+  ExpectType<string>(doc2.subdocMap!.get('taco')!.prop);
 }
 
 async function createWithSubdocs() {
@@ -182,9 +184,9 @@ async function createWithSubdocs() {
   const TestModel = model('Test', schema);
 
   const doc = await TestModel.create({ name: 'test', subdoc: { prop: 'test 1' } });
-  expectType<string | null | undefined>(doc.name);
-  expectType<string>(doc.subdoc!.prop);
-  expectType<string>(doc.subdoc!.otherProp);
+  ExpectType<string | null | undefined>(doc.name);
+  ExpectType<string>(doc.subdoc!.prop);
+  ExpectType<string>(doc.subdoc!.otherProp);
 }
 
 async function createWithRawDocTypeNo_id() {
@@ -200,12 +202,12 @@ async function createWithRawDocTypeNo_id() {
   const TestModel = model<RawDocType>('Test', schema);
 
   const doc = await TestModel.create({ _id: '0'.repeat(24), name: 'test' });
-  expectType<string>(doc.name);
-  expectType<Types.ObjectId>(doc._id);
+  ExpectType<string>(doc.name);
+  ExpectType<Types.ObjectId>(doc._id);
 
   const doc2 = await TestModel.create({ name: 'test', _id: new Types.ObjectId() });
-  expectType<string>(doc2.name);
-  expectType<Types.ObjectId>(doc2._id);
+  ExpectType<string>(doc2.name);
+  ExpectType<Types.ObjectId>(doc2._id);
 }
 
 createWithAggregateErrors();

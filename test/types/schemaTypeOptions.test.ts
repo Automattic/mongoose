@@ -15,23 +15,23 @@ import {
   ObjectIdSchemaDefinition,
   StringSchemaDefinition
 } from 'mongoose';
-import { expectError, expectType } from 'tsd';
+import { ExpectType } from './util/assertions';
 
 (new SchemaTypeOptions<boolean>()) instanceof SchemaTypeOptions;
 
-expectType<BooleanSchemaDefinition | undefined>(new SchemaTypeOptions<boolean>().type);
-expectType<NumberSchemaDefinition | undefined>(new SchemaTypeOptions<number>().type);
-expectType<DateSchemaDefinition | undefined>(new SchemaTypeOptions<Date>().type);
-expectType<StringSchemaDefinition | undefined>(new SchemaTypeOptions<string>().type);
-expectType<SchemaDefinition<typeof Map> | undefined>(new SchemaTypeOptions<Map<any, any>>().type);
-expectType<SchemaDefinition<typeof Buffer> | undefined>(new SchemaTypeOptions<Buffer>().type);
-expectType<ObjectIdSchemaDefinition | undefined>(new SchemaTypeOptions<Types.ObjectId>().type);
-expectType<AnyArray<ObjectIdSchemaDefinition> | AnyArray<SchemaTypeOptions<ObjectId>> | undefined>(new SchemaTypeOptions<Types.ObjectId[]>().type);
-expectType<(AnyArray<Schema<any, any, any>> | AnyArray<SchemaDefinition<Unpacked<object[]>>> | AnyArray<SchemaTypeOptions<Unpacked<object[]>>>) | undefined>(new SchemaTypeOptions<object[]>().type);
-expectType<AnyArray<StringSchemaDefinition> | AnyArray<SchemaTypeOptions<string>> | undefined>(new SchemaTypeOptions<string[]>().type);
-expectType<AnyArray<NumberSchemaDefinition> | AnyArray<SchemaTypeOptions<number>> | undefined>(new SchemaTypeOptions<number[]>().type);
-expectType<AnyArray<BooleanSchemaDefinition> | AnyArray<SchemaTypeOptions<boolean>> | undefined>(new SchemaTypeOptions<boolean[]>().type);
-expectType<(Function | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<Function> | Function | AnyArray<Function>) | undefined>(new SchemaTypeOptions<Function>().type);
+ExpectType<BooleanSchemaDefinition | undefined>(new SchemaTypeOptions<boolean>().type);
+ExpectType<NumberSchemaDefinition | undefined>(new SchemaTypeOptions<number>().type);
+ExpectType<DateSchemaDefinition | undefined>(new SchemaTypeOptions<Date>().type);
+ExpectType<StringSchemaDefinition | undefined>(new SchemaTypeOptions<string>().type);
+ExpectType<SchemaDefinition<typeof Map> | undefined>(new SchemaTypeOptions<Map<any, any>>().type);
+ExpectType<SchemaDefinition<typeof Buffer> | undefined>(new SchemaTypeOptions<Buffer>().type);
+ExpectType<ObjectIdSchemaDefinition | undefined>(new SchemaTypeOptions<Types.ObjectId>().type);
+ExpectType<AnyArray<ObjectIdSchemaDefinition> | AnyArray<SchemaTypeOptions<ObjectId>> | undefined>(new SchemaTypeOptions<Types.ObjectId[]>().type);
+ExpectType<AnyArray<Schema<any, any, any>> | AnyArray<SchemaDefinition<Unpacked<object[]>>> | AnyArray<SchemaTypeOptions<Unpacked<object[]>>> | undefined>(new SchemaTypeOptions<object[]>().type);
+ExpectType<AnyArray<StringSchemaDefinition> | AnyArray<SchemaTypeOptions<string>> | undefined>(new SchemaTypeOptions<string[]>().type);
+ExpectType<AnyArray<NumberSchemaDefinition> | AnyArray<SchemaTypeOptions<number>> | undefined>(new SchemaTypeOptions<number[]>().type);
+ExpectType<AnyArray<BooleanSchemaDefinition> | AnyArray<SchemaTypeOptions<boolean>> | undefined>(new SchemaTypeOptions<boolean[]>().type);
+ExpectType<Function | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<Function> | Function | AnyArray<Function> | undefined>(new SchemaTypeOptions<Function>().type);
 
 function index() {
   new SchemaTypeOptions<string>().index = true;
@@ -47,33 +47,39 @@ function index() {
   new SchemaTypeOptions<string>().index = 'descending';
   new SchemaTypeOptions<string>().index = 'desc';
 
-  expectError<SchemaTypeOptions<string>['index']>(''); // test empty string value
-  expectError<SchemaTypeOptions<string>['index']>('invalid'); // test invalid string value
-  expectError<SchemaTypeOptions<string>['index']>(0); // test invalid number
-  expectError<SchemaTypeOptions<string>['index']>(2); // test invalid number
-  expectError<SchemaTypeOptions<string>['index']>(-2); // test invalid number
-  expectError<SchemaTypeOptions<string>['index']>(new Date()); // test invalid type
+  // @ts-expect-error test empty string value
+  new SchemaTypeOptions<string>().index = '';
+  // @ts-expect-error test invalid string value
+  new SchemaTypeOptions<string>().index = 'invalid';
+  // @ts-expect-error test invalid number
+  new SchemaTypeOptions<string>().index = 0;
+  // @ts-expect-error test invalid number
+  new SchemaTypeOptions<string>().index = 2;
+  // @ts-expect-error test invalid number
+  new SchemaTypeOptions<string>().index = -2;
+  // @ts-expect-error test invalid type
+  new SchemaTypeOptions<string>().index = new Date();
 }
 
 function defaultOptions() {
   // property "defaultOptions" may not be defined on the base "SchemaType", but is explicitly defined on all mongoose provided Schema.Types
   // https://github.com/Automattic/mongoose/blob/5528a6428bb08091c03d868e249c2e5a30144a71/lib/schematype.js#L55
-  expectType<Record<string, any> | undefined>(SchemaType.defaultOptions);
-  expectType<Record<string, any>>(Schema.Types.String.defaultOptions);
-  expectType<Record<string, any>>(Schema.Types.Boolean.defaultOptions);
-  expectType<Record<string, any>>(Schema.Types.Array.defaultOptions);
-  expectType<Record<string, any>>(Schema.Types.Buffer.defaultOptions);
-  expectType<Record<string, any>>(Schema.Types.Date.defaultOptions);
-  expectType<Record<string, any>>(Schema.Types.Decimal128.defaultOptions);
-  expectType<Record<string, any>>(Schema.Types.Int32.defaultOptions);
-  expectType<Record<string, any>>(Schema.Types.DocumentArray.defaultOptions);
-  expectType<Record<string, any>>(Schema.Types.Map.defaultOptions);
-  expectType<Record<string, any>>(Schema.Types.Mixed.defaultOptions);
-  expectType<Record<string, any>>(Schema.Types.Number.defaultOptions);
-  expectType<Record<string, any>>(Schema.Types.ObjectId.defaultOptions);
-  expectType<Record<string, any>>(Schema.Types.Double.defaultOptions);
-  expectType<Record<string, any>>(Schema.Types.Subdocument.defaultOptions);
-  expectType<Record<string, any>>(Schema.Types.UUID.defaultOptions);
+  ExpectType<Record<string, any> | undefined>(SchemaType.defaultOptions);
+  ExpectType<Record<string, any>>(Schema.Types.String.defaultOptions);
+  ExpectType<Record<string, any>>(Schema.Types.Boolean.defaultOptions);
+  ExpectType<Record<string, any>>(Schema.Types.Array.defaultOptions);
+  ExpectType<Record<string, any>>(Schema.Types.Buffer.defaultOptions);
+  ExpectType<Record<string, any>>(Schema.Types.Date.defaultOptions);
+  ExpectType<Record<string, any>>(Schema.Types.Decimal128.defaultOptions);
+  ExpectType<Record<string, any>>(Schema.Types.Int32.defaultOptions);
+  ExpectType<Record<string, any>>(Schema.Types.DocumentArray.defaultOptions);
+  ExpectType<Record<string, any>>(Schema.Types.Map.defaultOptions);
+  ExpectType<Record<string, any>>(Schema.Types.Mixed.defaultOptions);
+  ExpectType<Record<string, any>>(Schema.Types.Number.defaultOptions);
+  ExpectType<Record<string, any>>(Schema.Types.ObjectId.defaultOptions);
+  ExpectType<Record<string, any>>(Schema.Types.Double.defaultOptions);
+  ExpectType<Record<string, any>>(Schema.Types.Subdocument.defaultOptions);
+  ExpectType<Record<string, any>>(Schema.Types.UUID.defaultOptions);
 }
 
 function encrypt() {
@@ -90,22 +96,23 @@ function encrypt() {
   new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, queries: 'range' };
   new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, queries: undefined };
 
-  // empty object
-  expectError<SchemaTypeOptions<string>['encrypt']>({});
+  // @ts-expect-error empty object
+  new SchemaTypeOptions<string>()['encrypt'] = {};
 
-  // invalid keyId
-  expectError<SchemaTypeOptions<string>['encrypt']>({ keyId: 'fakeId' });
+  // @ts-expect-error invalid keyId
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId: 'fakeId' };
 
-  // missing keyId
-  expectError<SchemaTypeOptions<string>['encrypt']>({ queries: 'equality' });
-  expectError<SchemaTypeOptions<string>['encrypt']>({ algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic' });
+  // @ts-expect-error missing keyId
+  new SchemaTypeOptions<string>()['encrypt'] = { queries: 'equality' };
+  // @ts-expect-error invalid algorithm
+  new SchemaTypeOptions<string>()['encrypt'] = { algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic' };
 
-  // invalid algorithm
-  expectError<SchemaTypeOptions<string>['encrypt']>({ keyId: uuid, algorithm: 'SHA_FAKE_ALG' });
+  // @ts-expect-error invalid algorithm
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, algorithm: 'SHA_FAKE_ALG' };
 
-  // invalid queries
-  expectError<SchemaTypeOptions<string>['encrypt']>({ keyId: uuid, queries: 'fakeQueryOption' });
+  // @ts-expect-error invalid queries
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, queries: 'fakeQueryOption' };
 
-  // invalid input option
-  expectError<SchemaTypeOptions<string>['encrypt']>({ keyId: uuid, invalidKey: 'fakeKeyOption' });
+  // @ts-expect-error invalid input option
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, invalidKey: 'fakeKeyOption' };
 }

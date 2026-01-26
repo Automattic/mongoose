@@ -800,9 +800,7 @@ function pluginOptions() {
   const schema = new Schema({});
   ExpectType<Schema<any>>(schema.plugin(pluginFunction)); // test that chaining would be possible
 
-  // could not add strict tests that the parameters are inferred correctly, because i dont know how this would be done in tsd
-
-  // test basic inferrence
+  // test basic inference
   // @ts-expect-error should error because "option2" is not optional
   schema.plugin(pluginFunction, {});
   schema.plugin(pluginFunction, { option2: 0 });

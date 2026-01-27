@@ -944,13 +944,9 @@ declare module 'mongoose' {
     FlattenMaps<
       BufferToJSON<
         ObjectIdToString<
-<<<<<<< HEAD
-          DateToString<T>
-=======
           UUIDToString<
             DateToString<T>
           >
->>>>>>> 2f7db7c98 (feat(document): add flattenUUIDs option to `toObject()` and `toJSON()`)
         >
       >
     >

@@ -15,6 +15,8 @@ const sinon = require('sinon');
 const util = require('./util');
 const utils = require('../lib/utils');
 
+const { Binary } = require('bson');
+
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
@@ -7111,11 +7113,11 @@ describe('document', function() {
         const obj = user.toObject({ flattenUUIDs });
 
         // Assert
-        assert.ok(obj._id instanceof UUID);
-        assert.ok(obj.uuid instanceof UUID);
-        assert.ok(obj.nested.uuid instanceof UUID);
-        assert.ok(obj.subdocument._id instanceof UUID);
-        assert.ok(obj.documentArray[0]._id instanceof UUID);
+        assert.ok(obj._id instanceof Binary);
+        assert.ok(obj.uuid instanceof Binary);
+        assert.ok(obj.nested.uuid instanceof Binary);
+        assert.ok(obj.subdocument._id instanceof Binary);
+        assert.ok(obj.documentArray[0]._id instanceof Binary);
       });
     }
 

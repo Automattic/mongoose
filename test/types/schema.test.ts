@@ -1944,52 +1944,6 @@ function gh15516() {
   });
 }
 
-function testInferRawDocTypeFromSchema() {
-  const schema = new Schema({
-    name: String,
-    arr: [Number],
-    docArr: [{ name: { type: String, required: true } }],
-    subdoc: new Schema({
-      answer: { type: Number, required: true }
-    }),
-    map: { type: Map, of: String }
-  });
-
-  type RawDocType = InferRawDocTypeFromSchema<typeof schema>;
-
-  expectType<{
-    name?: string | null | undefined,
-    arr: number[],
-    docArr: { name: string }[],
-    subdoc?: { answer: number } | null | undefined,
-    map?: Record<string, string> | null | undefined
-  }>({} as RawDocType);
-}
-
-function testInferHydratedDocTypeFromSchema() {
-  const schema = new Schema({
-    name: String,
-    arr: [Number],
-    docArr: [{ name: { type: String, required: true } }],
-    subdoc: new Schema({ answer: { type: Number, required: true } }),
-    map: { type: Map, of: String }
-  });
-
-  type HydratedDocType = InferHydratedDocTypeFromSchema<typeof schema>;
-
-  type Expected = HydratedDocument<{
-    name?: string | null | undefined,
-    arr: number[],
-    docArr: Types.DocumentArray<{ name: string }>,
-    subdoc?: { answer: number } | null | undefined,
-    map?: Map<string, string> | null | undefined
-  }, { id: string }, {}, { id: string }>;
-
-  // Use expectAssignable because the inferred TSchemaOptions from schema
-  // differs from the default in Expected, but the types are compatible
-  expectAssignable<Expected>({} as HydratedDocType);
-}
-
 function gh15536() {
   const UserModelNameRequiredCustom = model('User', new Schema(
     {

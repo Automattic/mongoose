@@ -491,14 +491,14 @@ function gh15965() {
     virtuals: true
   });
 
-  expectType<string>(obj.id);
-  expectType<string | null | undefined>(obj.a?.foo);
-  expectType<string | null | undefined>(obj.b.foo);
-  expectType<string | null | undefined>(obj.c);
-  expectType<string>(obj.d);
-  expectType<string>(obj.hello);
-  expectType<Date>(obj.createdAt);
-  expectType<Date>(obj.updatedAt);
+  ExpectType<string>(obj.id);
+  ExpectType<string | null | undefined>(obj.a?.foo);
+  ExpectType<string | null | undefined>(obj.b.foo);
+  ExpectType<string | null | undefined>(obj.c);
+  ExpectType<string>(obj.d);
+  ExpectType<string>(obj.hello);
+  ExpectType<Date>(obj.createdAt);
+  ExpectType<Date>(obj.updatedAt);
 }
 
 function gh13079() {
@@ -649,8 +649,8 @@ async function gh15578() {
     const toJSONWithoutVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: false, flattenObjectIds: true });
 
     // When passing options, __v should still be present
-    expectType<number>(a.toObject({ flattenObjectIds: true }).__v);
-    expectType<number>(a.toJSON({ flattenObjectIds: true }).__v);
+    ExpectType<number>(a.toObject({ flattenObjectIds: true }).__v);
+    ExpectType<number>(a.toJSON({ flattenObjectIds: true }).__v);
 
     const objWithoutVersionKey = a.toObject({ versionKey: false });
     const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
@@ -688,8 +688,8 @@ async function gh15578() {
     const toJSONWithoutVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: false, flattenObjectIds: true });
 
     // When passing options, custom version key should still be present
-    expectType<number>(a.toObject({ flattenObjectIds: true }).taco);
-    expectType<number>(a.toJSON({ flattenObjectIds: true }).taco);
+    ExpectType<number>(a.toObject({ flattenObjectIds: true }).taco);
+    ExpectType<number>(a.toJSON({ flattenObjectIds: true }).taco);
 
     const objWithoutVersionKey = a.toObject({ versionKey: false });
     const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
@@ -726,35 +726,35 @@ function testFlattenUUIDs() {
   const toObjectFlattened = a.toObject({ flattenUUIDs: true });
   const toJSONFlattened = a.toJSON({ flattenUUIDs: true });
 
-  expectType<string>(toObjectFlattened._id);
-  expectType<string>(toObjectFlattened.uuid);
-  expectType<string>(toJSONFlattened._id);
-  expectType<string>(toJSONFlattened.uuid);
+  ExpectType<string>(toObjectFlattened._id);
+  ExpectType<string>(toObjectFlattened.uuid);
+  ExpectType<string>(toJSONFlattened._id);
+  ExpectType<string>(toJSONFlattened.uuid);
 
   // Test with virtuals
   const toObjectWithVirtuals = a.toObject({ flattenUUIDs: true, virtuals: true });
   const toJSONWithVirtuals = a.toJSON({ flattenUUIDs: true, virtuals: true });
 
-  expectType<string>(toObjectWithVirtuals._id);
-  expectType<string>(toObjectWithVirtuals.uuid);
-  expectType<string>(toJSONWithVirtuals._id);
-  expectType<string>(toJSONWithVirtuals.uuid);
+  ExpectType<string>(toObjectWithVirtuals._id);
+  ExpectType<string>(toObjectWithVirtuals.uuid);
+  ExpectType<string>(toJSONWithVirtuals._id);
+  ExpectType<string>(toJSONWithVirtuals.uuid);
 
   // Test flattenUUIDs: false (default behavior - should remain UUID)
   const toObjectNotFlattened = a.toObject({ flattenUUIDs: false });
   const toJSONNotFlattened = a.toJSON({ flattenUUIDs: false });
-  expectType<Types.UUID>(toObjectNotFlattened._id);
-  expectType<Types.UUID>(toObjectNotFlattened.uuid);
-  expectType<Types.UUID>(toJSONNotFlattened._id);
-  expectType<Types.UUID>(toJSONNotFlattened.uuid);
+  ExpectType<Types.UUID>(toObjectNotFlattened._id);
+  ExpectType<Types.UUID>(toObjectNotFlattened.uuid);
+  ExpectType<Types.UUID>(toJSONNotFlattened._id);
+  ExpectType<Types.UUID>(toJSONNotFlattened.uuid);
 
   // Test default (no flattenUUIDs option - should remain UUID)
   const toObjectDefault = a.toObject();
   const toJSONDefault = a.toJSON();
-  expectType<Types.UUID>(toObjectDefault._id);
-  expectType<Types.UUID>(toObjectDefault.uuid);
-  expectType<Types.UUID>(toJSONDefault._id);
-  expectType<Types.UUID>(toJSONDefault.uuid);
+  ExpectType<Types.UUID>(toObjectDefault._id);
+  ExpectType<Types.UUID>(toObjectDefault.uuid);
+  ExpectType<Types.UUID>(toJSONDefault._id);
+  ExpectType<Types.UUID>(toJSONDefault.uuid);
 }
 
 function testCombinedFlattenOptions() {
@@ -789,58 +789,58 @@ function testCombinedFlattenOptions() {
 
   // Test flattenUUIDs + flattenObjectIds
   const uuidAndObjectId = a.toObject({ flattenUUIDs: true, flattenObjectIds: true });
-  expectType<string>(uuidAndObjectId._id);
-  expectType<string>(uuidAndObjectId.uuid);
+  ExpectType<string>(uuidAndObjectId._id);
+  ExpectType<string>(uuidAndObjectId.uuid);
 
   // Test flattenUUIDs + flattenMaps
   const uuidAndMaps = a.toObject({ flattenUUIDs: true, flattenMaps: true });
-  expectType<string>(uuidAndMaps.uuid);
-  expectType<Record<string, string>>(uuidAndMaps.tags);
+  ExpectType<string>(uuidAndMaps.uuid);
+  ExpectType<Record<string, string>>(uuidAndMaps.tags);
 
   // Test flattenUUIDs + virtuals
   const uuidAndVirtuals = a.toObject({ flattenUUIDs: true, virtuals: true });
-  expectType<string>(uuidAndVirtuals.uuid);
-  expectType<string>(uuidAndVirtuals.displayName);
+  ExpectType<string>(uuidAndVirtuals.uuid);
+  ExpectType<string>(uuidAndVirtuals.displayName);
 
   // Test flattenObjectIds + flattenMaps
   const objectIdAndMaps = a.toObject({ flattenObjectIds: true, flattenMaps: true });
-  expectType<string>(objectIdAndMaps._id);
-  expectType<Record<string, string>>(objectIdAndMaps.tags);
+  ExpectType<string>(objectIdAndMaps._id);
+  ExpectType<Record<string, string>>(objectIdAndMaps.tags);
 
   // Test flattenObjectIds + virtuals
   const objectIdAndVirtuals = a.toObject({ flattenObjectIds: true, virtuals: true });
-  expectType<string>(objectIdAndVirtuals._id);
-  expectType<string>(objectIdAndVirtuals.displayName);
+  ExpectType<string>(objectIdAndVirtuals._id);
+  ExpectType<string>(objectIdAndVirtuals.displayName);
 
   // Test flattenMaps + virtuals
   const mapsAndVirtuals = a.toObject({ flattenMaps: true, virtuals: true });
-  expectType<Record<string, string>>(mapsAndVirtuals.tags);
-  expectType<string>(mapsAndVirtuals.displayName);
+  ExpectType<Record<string, string>>(mapsAndVirtuals.tags);
+  ExpectType<string>(mapsAndVirtuals.displayName);
 
   // Test triple combinations
   const uuidObjectIdMaps = a.toObject({ flattenUUIDs: true, flattenObjectIds: true, flattenMaps: true });
-  expectType<string>(uuidObjectIdMaps._id);
-  expectType<string>(uuidObjectIdMaps.uuid);
-  expectType<Record<string, string>>(uuidObjectIdMaps.tags);
+  ExpectType<string>(uuidObjectIdMaps._id);
+  ExpectType<string>(uuidObjectIdMaps.uuid);
+  ExpectType<Record<string, string>>(uuidObjectIdMaps.tags);
 
   const uuidObjectIdVirtuals = a.toObject({ flattenUUIDs: true, flattenObjectIds: true, virtuals: true });
-  expectType<string>(uuidObjectIdVirtuals._id);
-  expectType<string>(uuidObjectIdVirtuals.uuid);
-  expectType<string>(uuidObjectIdVirtuals.displayName);
+  ExpectType<string>(uuidObjectIdVirtuals._id);
+  ExpectType<string>(uuidObjectIdVirtuals.uuid);
+  ExpectType<string>(uuidObjectIdVirtuals.displayName);
 
   // Test all four options
   const allFour = a.toObject({ flattenUUIDs: true, flattenObjectIds: true, flattenMaps: true, virtuals: true });
-  expectType<string>(allFour._id);
-  expectType<string>(allFour.uuid);
-  expectType<Record<string, string>>(allFour.tags);
-  expectType<string>(allFour.displayName);
+  ExpectType<string>(allFour._id);
+  ExpectType<string>(allFour.uuid);
+  ExpectType<Record<string, string>>(allFour.tags);
+  ExpectType<string>(allFour.displayName);
 
   // Same tests for toJSON
   const allFourJSON = a.toJSON({ flattenUUIDs: true, flattenObjectIds: true, flattenMaps: true, virtuals: true });
-  expectType<string>(allFourJSON._id);
-  expectType<string>(allFourJSON.uuid);
-  expectType<Record<string, string>>(allFourJSON.tags);
-  expectType<string>(allFourJSON.displayName);
+  ExpectType<string>(allFourJSON._id);
+  ExpectType<string>(allFourJSON.uuid);
+  ExpectType<Record<string, string>>(allFourJSON.tags);
+  ExpectType<string>(allFourJSON.displayName);
 }
 
 function testObjectIdsInsideMaps() {
@@ -861,17 +861,17 @@ function testObjectIdsInsideMaps() {
 
   // When using flattenMaps + flattenObjectIds, ObjectIds inside Map values should be converted
   const flattened = doc.toObject({ flattenMaps: true, flattenObjectIds: true });
-  expectType<Record<string, { orderId: string }>>(flattened.userRefs);
+  ExpectType<Record<string, { orderId: string }>>(flattened.userRefs);
 
   // When using flattenMaps + flattenUUIDs, UUIDs inside Map values should be converted
   const flattenedUUIDs = doc.toObject({ flattenMaps: true, flattenUUIDs: true });
-  expectType<Record<string, { refId: string }>>(flattenedUUIDs.uuidRefs);
+  ExpectType<Record<string, { refId: string }>>(flattenedUUIDs.uuidRefs);
 
   // All three together
   const allThree = doc.toObject({ flattenMaps: true, flattenObjectIds: true, flattenUUIDs: true });
-  expectType<Record<string, { orderId: string }>>(allThree.userRefs);
-  expectType<Record<string, { refId: string }>>(allThree.uuidRefs);
-  expectType<string>(allThree._id);
+  ExpectType<Record<string, { orderId: string }>>(allThree.userRefs);
+  ExpectType<Record<string, { refId: string }>>(allThree.uuidRefs);
+  ExpectType<string>(allThree._id);
 }
 
 async function gh15900() {

@@ -1221,7 +1221,7 @@ function hydrateWithStrictOption() {
     extraField: 'value'
   }, undefined, { strict: false });
 
-  expectType<ReturnType<(typeof TestModel)['hydrate']>>(doc1);
+  ExpectType<ReturnType<(typeof TestModel)['hydrate']>>(doc1);
 
   // Test with strict: true
   const doc2 = TestModel.hydrate({
@@ -1230,7 +1230,7 @@ function hydrateWithStrictOption() {
     age: 25
   }, undefined, { strict: true });
 
-  expectType<ReturnType<(typeof TestModel)['hydrate']>>(doc2);
+  ExpectType<ReturnType<(typeof TestModel)['hydrate']>>(doc2);
 
   // Test with strict: 'throw'
   const doc3 = TestModel.hydrate({
@@ -1239,7 +1239,7 @@ function hydrateWithStrictOption() {
     age: 35
   }, undefined, { strict: 'throw' });
 
-  expectType<ReturnType<(typeof TestModel)['hydrate']>>(doc3);
+  ExpectType<ReturnType<(typeof TestModel)['hydrate']>>(doc3);
 
   // Test without strict option
   const doc4 = TestModel.hydrate({
@@ -1248,5 +1248,5 @@ function hydrateWithStrictOption() {
     age: 28
   });
 
-  expectType<ReturnType<(typeof TestModel)['hydrate']>>(doc4);
+  ExpectType<ReturnType<(typeof TestModel)['hydrate']>>(doc4);
 }

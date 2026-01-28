@@ -1914,4 +1914,75 @@ describe('Map', function() {
       return { Company, company };
     }
   });
+
+  describe('nested Maps inside DocumentArray elements loaded via init() (gh-15678)', function() {
+    it('map.set() on a Map inside a DocumentArray element produces correct paths', function() {
+      // Arrange
+      const { company } = createTestContext();
+
+      // Act
+      company.events.get('techConf')[0].ratings.set('content', 5);
+
+      // Assert
+      assert.deepStrictEqual(company.getChanges(), {
+        $set: { 'events.techConf.0.ratings.content': 5 }
+      });
+    });
+
+    it('map.set() with subdocument value inside a DocumentArray element produces correct paths', function() {
+      // Arrange
+      const { company } = createTestContext();
+
+      // Act
+      company.events.get('techConf')[0].speakers.set('panelist', { name: 'Bob' });
+
+      // Assert
+      assert.deepStrictEqual(company.getChanges(), {
+        $set: { 'events.techConf.0.speakers.panelist': { name: 'Bob' } }
+      });
+    });
+
+    it('validation reports correct paths for nested Maps inside DocumentArray elements', async function() {
+      // Arrange
+      const { company } = createTestContext({ speakerNameMinLength: 2 });
+
+      // Act
+      company.events.get('techConf')[0].speakers.set('guest', { name: 'X' });
+      const error = await company.validate().then(() => null, err => err);
+
+      // Assert
+      assert.ok(error);
+      assert.ok(error.errors['events.techConf.0.speakers.guest.name']);
+    });
+
+    function createTestContext({ speakerNameMinLength } = {}) {
+      const speakerSchema = new Schema({
+        name: { type: String, minlength: speakerNameMinLength }
+      }, { _id: false });
+
+      const sessionSchema = new Schema({
+        title: String,
+        speakers: { type: Map, of: speakerSchema },
+        ratings: { type: Map, of: Number }
+      }, { _id: false });
+
+      const companySchema = new Schema({
+        events: { type: Map, of: [sessionSchema] }
+      });
+
+      const Company = db.model('Company', companySchema);
+
+      const company = new Company();
+      company.init({
+        _id: new mongoose.Types.ObjectId(),
+        events: {
+          techConf: [
+            { title: 'Keynote', speakers: { host: { name: 'Alice' } }, ratings: { overall: 4 } }
+          ]
+        }
+      });
+
+      return { Company, company };
+    }
+  });
 });

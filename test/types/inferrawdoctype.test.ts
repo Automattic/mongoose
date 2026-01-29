@@ -304,4 +304,34 @@ function gh15988() {
     name: string;
     data: { role?: string | null | undefined } & { _id: Types.ObjectId };
   } & { _id: Types.ObjectId }>({} as Doc2);
+
+  // Test subdocument with _id: false - should NOT have _id
+  const schemaDef3 = {
+    name: {
+      type: String,
+      required: true
+    },
+    coordinates: {
+      type: {
+        latitude: {
+          type: Number,
+          required: true
+        },
+        longitude: {
+          type: Number,
+          required: true
+        }
+      },
+      required: true,
+      _id: false
+    }
+  } as const;
+
+  type Doc3 = InferRawDocType<typeof schemaDef3>;
+
+  // Subdocuments with _id: false should not have _id added
+  expectType<{
+    name: string;
+    coordinates: { latitude: number; longitude: number };
+  } & { _id: Types.ObjectId }>({} as Doc3);
 }

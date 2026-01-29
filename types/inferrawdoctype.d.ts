@@ -149,7 +149,10 @@ declare module 'mongoose' {
          keyof Options extends never ?
            // No Options means this is a nested path (no _id)
            InferRawDocTypeWithout_id<PathValueType>
-         : // Options present means this came from a { type: {...} } definition (subdocument with _id)
+         : Options extends { _id: false } ?
+           // Subdocument with _id: false
+           InferRawDocTypeWithout_id<PathValueType>
+         : // Subdocument with _id (default)
            InferRawDocType<PathValueType>
        : unknown;
 }

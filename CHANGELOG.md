@@ -1,3 +1,11 @@
+8.21.1 / 2026-01-23
+===================
+* fix(clone): fix parent doc for map subdocuments and array subdocuments #15958 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+* fix(document): when cloning a doc with subdocs, make sure the subdocs parent is the cloned doc #15904 #15901
+* fix: respect currentTime schema option in bulkWrite updates #15976 [sderrow](https://github.com/sderrow)
+* types(models): support Mongoose query casting in AnyBulkWriteOperation filter property #15910
+* types: add toBSON() to documents #15927
+
 9.1.5 / 2026-01-20
 ==================
 * fix(map): validate map subdocument when loaded with init #15960 #15957 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

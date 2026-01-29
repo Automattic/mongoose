@@ -145,6 +145,11 @@ declare module 'mongoose' {
        : IfEquals<PathValueType, ObjectConstructor> extends true ? any
        : IfEquals<PathValueType, {}> extends true ? any
        : PathValueType extends typeof SchemaType ? PathValueType['prototype']
-       : PathValueType extends Record<string, any> ? InferRawDocType<PathValueType>
+       : PathValueType extends Record<string, any> ?
+         keyof Options extends never ?
+           // No Options means this is a nested path (no _id)
+           InferRawDocTypeWithout_id<PathValueType>
+         : // Options present means this came from a { type: {...} } definition (subdocument with _id)
+           InferRawDocType<PathValueType>
        : unknown;
 }

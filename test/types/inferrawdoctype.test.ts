@@ -255,3 +255,53 @@ function gh13772WithExplicitDocTypeIdFalse() {
     child?: ChildDocType | null | undefined;
   } & { _id: Types.ObjectId }>({} as RawParentDoc);
 }
+
+function gh15988() {
+  // Test nested path (no type key) - should NOT have _id
+  const locationSchemaDef = {
+    name: {
+      type: String,
+      required: true
+    },
+    coordinates: {
+      latitude: {
+        type: Number,
+        required: true
+      },
+      longitude: {
+        type: Number,
+        required: true
+      }
+    }
+  } as const;
+
+  type Location = InferRawDocType<typeof locationSchemaDef>;
+
+  // Nested paths should not have _id added
+  expectType<{
+    name: string;
+    coordinates?: { latitude: number; longitude: number } | null | undefined;
+  } & { _id: Types.ObjectId }>({} as Location);
+
+  // Test subdocument (has type key with object value) - should have _id
+  const schemaDef2 = {
+    name: {
+      type: String,
+      required: true
+    },
+    data: {
+      type: {
+        role: String
+      },
+      default: {}
+    }
+  } as const;
+
+  type Doc2 = InferRawDocType<typeof schemaDef2>;
+
+  // Subdocuments (defined with type: {...}) should have _id added
+  expectType<{
+    name: string;
+    data: { role?: string | null | undefined } & { _id: Types.ObjectId };
+  } & { _id: Types.ObjectId }>({} as Doc2);
+}

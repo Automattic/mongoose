@@ -784,10 +784,10 @@ function gh12030() {
   });
 
   expectType<{
-    track?:({
+    track?:{
       backupCount: number;
       count: number;
-    } & { _id: Types.ObjectId }) | null;
+    } | null;
       } & { _id: Types.ObjectId }>({} as InferSchemaType<typeof Schema6>);
 
 }

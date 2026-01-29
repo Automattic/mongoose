@@ -11844,7 +11844,7 @@ describe('model: populate:', function() {
     assert.equal(doc.children[1].category.name, 'Category A');
   });
 
-  it('does not mix deferred populates from pre-find hooks between different models with refPath (gh-15xxx)', async function() {
+  it('does not mix deferred populates from pre-find hooks between different models with refPath (mongodb-js/mongoose-autopopulate#112)', async function() {
     // Scenario: Using refPath to populate from different models (Child and Pet).
     // Each model has a pre('find') hook that auto-populates a different field.
     // Bug: deferred populates from hooks were collected globally across all models,
@@ -11922,5 +11922,58 @@ describe('model: populate:', function() {
     // Pet should have species populated (from Pet's pre-find hook)
     assert.equal(petItem.item.name, 'Fido');
     assert.equal(petItem.item.species.name, 'Dog');
+  });
+
+  it('deferred sub-populate respects strictPopulate and _fullPath (mongodb-js/mongoose-autopopulate#112)', async function() {
+    // When sub-populate is deferred (due to match function), it should still:
+    // 1. Set _fullPath correctly for proper error messages
+    // 2. Respect strictPopulate option
+    // 3. Set _localModel so strictPopulate check works
+
+    const categorySchema = new Schema({ name: String });
+    const Category = db.model('Category', categorySchema);
+
+    const childSchema = new Schema({
+      name: String,
+      category: { type: Schema.Types.ObjectId, ref: 'Category' }
+    });
+    const Child = db.model('Child', childSchema);
+
+    const parentSchema = new Schema({
+      name: String,
+      children: [{ type: Schema.Types.ObjectId, ref: 'Child' }]
+    });
+    const Parent = db.model('Parent', parentSchema);
+
+    const category = await Category.create({ name: 'Test Category' });
+    const child = await Child.create({ name: 'Test Child', category: category._id });
+    const parent = await Parent.create({ name: 'Test Parent', children: [child._id] });
+
+    // Test that deferred sub-populate throws strictPopulate error with correct path
+    const err = await Parent.findById(parent._id).populate({
+      path: 'children',
+      match: () => ({}), // Triggers deferred populate
+      populate: {
+        path: 'nonExistentField',
+        strictPopulate: true
+      }
+    }).then(() => null, err => err);
+
+    assert.ok(err);
+    assert.ok(err.message.includes('children.nonExistentField'), 'Error should include full path');
+    assert.ok(err.message.includes('strictPopulate'), 'Error should mention strictPopulate');
+
+    // Test that valid deferred sub-populate still works
+    const doc = await Parent.findById(parent._id).populate({
+      path: 'children',
+      match: () => ({}),
+      populate: {
+        path: 'category',
+        strictPopulate: true
+      }
+    });
+
+    assert.equal(doc.children.length, 1);
+    assert.equal(doc.children[0].category.name, 'Test Category');
   });
 });

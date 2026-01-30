@@ -1272,6 +1272,11 @@ const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
 
 // `Test` collection will be a timeseries collection
 const Test = db.model('Test', schema);
+// Explicitly create the collection if `autoCreate` is false. You need to
+// create the collection before using it - if you insert a document before
+// creating the collection, MongoDB will create a normal collection without
+// timeseries.
+await Test.createCollection();
 ```
 
 ## option: skipVersioning {#skipVersioning}

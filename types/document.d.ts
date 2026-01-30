@@ -259,12 +259,12 @@ declare module 'mongoose' {
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
     toJSON<O extends ToObjectOptions>(options: O): ToObjectReturnType<DocType, TVirtuals, O, TSchemaOptions>;
-    toJSON(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;
+    toJSON(): Default__v<Require_id<FlattenMaps<DocType>>, TSchemaOptions>;
     toJSON<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
     toObject<O extends ToObjectOptions>(options: O): ToObjectReturnType<DocType, TVirtuals, O, TSchemaOptions>;
-    toObject(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;
+    toObject(): Default__v<Require_id<DocType>, TSchemaOptions>;
     toObject<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
 
     /** Clears the modified state on the specified path. */

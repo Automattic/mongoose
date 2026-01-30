@@ -353,6 +353,6 @@ function gh15988() {
   // Subdocuments (defined with type: {...}) should have _id added, but optional since no `required` or `default`
   expectType<{
     name: string;
-    data?: ({ role?: string | null | undefined } & { _id: Types.ObjectId }) | null | undefined;
-  } & { _id: Types.ObjectId }>({} as Doc4);
+    data?:({ role?: string | null | undefined } & { _id: Types.ObjectId }) | null | undefined;
+      } & { _id: Types.ObjectId }>({} as Doc4);
 }

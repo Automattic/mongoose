@@ -334,4 +334,25 @@ function gh15988() {
     name: string;
     coordinates: { latitude: number; longitude: number };
   } & { _id: Types.ObjectId }>({} as Doc3);
+
+  // Test subdocument (has type key with object value) with no options - should have _id
+  const schemaDef4 = {
+    name: {
+      type: String,
+      required: true
+    },
+    data: {
+      type: {
+        role: String
+      }
+    }
+  } as const;
+
+  type Doc4 = InferRawDocType<typeof schemaDef4>;
+
+  // Subdocuments (defined with type: {...}) should have _id added, but optional since no `required` or `default`
+  expectType<{
+    name: string;
+    data?: ({ role?: string | null | undefined } & { _id: Types.ObjectId }) | null | undefined;
+  } & { _id: Types.ObjectId }>({} as Doc4);
 }

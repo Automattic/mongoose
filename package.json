@@ -30,6 +30,7 @@
   "devDependencies": {
     "@ark/attest": "0.56.0",
     "@mongodb-js/mongodb-downloader": "^1.0.0",
+    "@types/node": "^18.16.0",
     "acquit": "1.4.0",
     "acquit-ignore": "0.2.2",
     "acquit-require": "0.1.1",

@@ -355,4 +355,82 @@ function gh15988() {
     name: string;
     data?:({ role?: string | null | undefined } & { _id: Types.ObjectId }) | null | undefined;
       } & { _id: Types.ObjectId }>({} as Doc4);
+
+  // Test 1: Array of subdocuments - should have _id
+  const schemaDef5 = {
+    users: [{
+      name: { type: String, required: true },
+      email: String
+    }]
+  } as const;
+
+  type Doc5 = InferRawDocType<typeof schemaDef5>;
+
+  // Arrays of subdocuments should have _id added to each element
+  expectType<{
+    users?: Array<{ name: string; email?: string | null | undefined } & { _id: Types.ObjectId }> | null | undefined;
+  } & { _id: Types.ObjectId }>({} as Doc5);
+
+  // Test 2: Array of nested paths (no type key in array element) - should have _id (arrays are always subdocs)
+  const schemaDef6 = {
+    locations: [{
+      latitude: Number,
+      longitude: Number
+    }]
+  } as const;
+
+  type Doc6 = InferRawDocType<typeof schemaDef6>;
+
+  // Arrays of objects are subdocuments, so they get _id
+  expectType<{
+    locations?: Array<{ latitude?: number | null | undefined; longitude?: number | null | undefined } & { _id: Types.ObjectId }> | null | undefined;
+  } & { _id: Types.ObjectId }>({} as Doc6);
+
+  // Test 3: Custom typeKey - nested path should not have _id
+  const schemaDef7 = {
+    name: {
+      $type: String,
+      required: true
+    },
+    coordinates: {
+      latitude: {
+        $type: Number,
+        required: true
+      },
+      longitude: {
+        $type: Number,
+        required: true
+      }
+    }
+  } as const;
+
+  type Doc7 = InferRawDocType<typeof schemaDef7, { typeKey: '$type' }>;
+
+  // With custom typeKey, nested paths (no $type key) should still not have _id
+  expectType<{
+    name: string;
+    coordinates?: { latitude: number; longitude: number } | null | undefined;
+  } & { _id: Types.ObjectId }>({} as Doc7);
+
+  // Test 4: Custom typeKey - subdocument should have _id
+  const schemaDef8 = {
+    name: {
+      $type: String,
+      required: true
+    },
+    data: {
+      $type: {
+        role: String
+      },
+      default: {}
+    }
+  } as const;
+
+  type Doc8 = InferRawDocType<typeof schemaDef8, { typeKey: '$type' }>;
+
+  // With custom typeKey, subdocuments (with $type key) should have _id
+  expectType<{
+    name: string;
+    data: { role?: string | null | undefined } & { _id: Types.ObjectId };
+  } & { _id: Types.ObjectId }>({} as Doc8);
 }

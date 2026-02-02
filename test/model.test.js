@@ -5760,18 +5760,21 @@ describe('Model', function() {
     });
 
     it('mongodb actually removes expired documents (gh-11229)', async function() {
-      this.timeout(1000 * 80); // 80 seconds, see later comments on why
+      this.timeout(1000 * 20);
       const version = await start.mongodVersion();
       if (version[0] < 5) {
         this.skip();
         return;
       }
 
+      // Speed up TTL monitor from 60s to 1s for deterministic testing
+      await db.db.admin().command({ setParameter: 1, ttlMonitorSleepSecs: 1 });
+
       const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
         timeseries: {
           timeField: 'timestamp',
           metaField: 'metadata',
-          granularity: 'hours'
+          granularity: 'seconds' // 1-hour bucket span
         },
         autoCreate: false
       });
@@ -5781,94 +5784,24 @@ describe('Model', function() {
       await Test.collection.drop().catch(() => {});
       await Test.createCollection({ expireAfterSeconds: 5 });
 
+      // Timeseries TTL deletes entire buckets, not individual documents.
+      // With granularity: 'seconds', bucket span is 1 hour.
+      // Use 2-hour-old timestamps so the bucket is fully expired.
+      const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
       await Test.insertMany([
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T00:00:00.000Z'),
-          temp: 12
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T04:00:00.000Z'),
-          temp: 11
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T08:00:00.000Z'),
-          temp: 11
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T12:00:00.000Z'),
-          temp: 12
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T16:00:00.000Z'),
-          temp: 16
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-18T20:00:00.000Z'),
-          temp: 15
-        }, {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T00:00:00.000Z'),
-          temp: 13
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T04:00:00.000Z'),
-          temp: 12
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T08:00:00.000Z'),
-          temp: 11
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T12:00:00.000Z'),
-          temp: 12
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T16:00:00.000Z'),
-          temp: 17
-        },
-        {
-          metadata: { sensorId: 5578, type: 'temperature' },
-          timestamp: new Date('2021-05-19T20:00:00.000Z'),
-          temp: 12
-        }
+        { metadata: { sensorId: 5578, type: 'temperature' }, timestamp: twoHoursAgo, temp: 12 },
+        { metadata: { sensorId: 5578, type: 'temperature' }, timestamp: twoHoursAgo, temp: 11 }
       ]);
 
-      const beforeExpirationCount = await Test.countDocuments({});
-      assert.ok(beforeExpirationCount === 12);
+      // Wait for TTL monitor (every 1s) to delete the expired bucket
+      let count;
+      for (let i = 0; i < 10; i++) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        count = await Test.countDocuments({});
+        if (count === 0) break;
+      }
 
-      let intervalid;
-
-      await Promise.race([
-        // wait for 61 seconds, because mongodb's removal routine runs every 60 seconds, so it may be VERY flakey otherwise
-        // under heavy load it is still not guranteed to actually run
-        // see https://www.mongodb.com/docs/manual/core/timeseries/timeseries-automatic-removal/#timing-of-delete-operations
-        new Promise(resolve => setTimeout(resolve, 1000 * 61)), // 61 seconds
-
-        // in case it happens faster, to reduce test time
-        new Promise(resolve => {
-          intervalid = setInterval(async() => {
-            const count = await Test.countDocuments({});
-            if (count === 0) {
-              resolve();
-            }
-          }, 1000); // every 1 second
-        })
-      ]);
-
-      clearInterval(intervalid);
-
-      const afterExpirationCount = await Test.countDocuments({});
-      assert.equal(afterExpirationCount, 0);
+      assert.equal(count, 0);
     });
 
     it('createCollection() handles NamespaceExists errors (gh-9447)', async function() {

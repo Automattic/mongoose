@@ -5774,7 +5774,7 @@ describe('Model', function() {
         timeseries: {
           timeField: 'timestamp',
           metaField: 'metadata',
-          granularity: 'seconds' // 1-hour bucket span
+          granularity: 'seconds' // results in 1-hour bucket span
         },
         autoCreate: false
       });

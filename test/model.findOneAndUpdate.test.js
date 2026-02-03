@@ -2309,9 +2309,19 @@ describe('model: findOneAndUpdate:', function() {
 
     describe('mongoose.set() options', function() {
       const originalReturnDocument = mongoose.get('returnDocument');
+      const originalReturnOriginal = mongoose.get('returnOriginal');
 
       afterEach(function() {
-        mongoose.set('returnDocument', originalReturnDocument);
+        if (originalReturnDocument == null) {
+          delete mongoose.options.returnDocument;
+        } else {
+          mongoose.set('returnDocument', originalReturnDocument);
+        }
+        if (originalReturnOriginal == null) {
+          delete mongoose.options.returnOriginal;
+        } else {
+          mongoose.set('returnOriginal', originalReturnOriginal);
+        }
       });
 
       it('mongoose.set(\'returnOriginal\') emits deprecation warning', function() {

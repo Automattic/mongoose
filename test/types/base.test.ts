@@ -61,6 +61,13 @@ function gh15756() {
   mongoose.set('updatePipeline', true);
 }
 
+function gh15972() {
+  mongoose.set('returnDocument', 'before');
+  mongoose.set('returnDocument', 'after');
+  expectError(mongoose.set('returnDocument', 'invalid'));
+  expectError(mongoose.set('returnDocument', true));
+}
+
 function gh12100() {
   mongoose.syncIndexes({ continueOnError: true, sparse: true });
   mongoose.syncIndexes({ continueOnError: false, sparse: true });

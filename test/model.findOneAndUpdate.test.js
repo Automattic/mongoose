@@ -10,7 +10,7 @@ const CastError = require('../lib/error/cast');
 const assert = require('assert');
 const mongoose = start.mongoose;
 const random = require('./util').random;
-const Utils = require('../lib/utils');
+const utils = require('../lib/utils');
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 const DocumentObjectId = mongoose.Types.ObjectId;
@@ -19,6 +19,7 @@ const { isDeepStrictEqual } = require('util');
 const isEqualWith = require('lodash.isequalwith');
 const util = require('./util');
 const uuid = require('uuid');
+const sinon = require('sinon');
 
 describe('model: findOneAndUpdate:', function() {
   let Comments;
@@ -210,7 +211,7 @@ describe('model: findOneAndUpdate:', function() {
       assert.ok(updatedDoc.items);
       assert.ok(updatedDoc.items instanceof Array);
       assert.ok(updatedDoc.items.length, 3);
-      assert.ok(Utils.isObject(updatedDoc.items[0].address));
+      assert.ok(utils.isObject(updatedDoc.items[0].address));
       assert.ok(Object.keys(updatedDoc.items[0].address).length, 0);
     });
   });
@@ -721,7 +722,7 @@ describe('model: findOneAndUpdate:', function() {
     );
 
     assert.deepEqual(doc.contacts[0].account, a2._id);
-    assert.ok(Utils.deepEqual(doc.contacts[0].account, a2._id));
+    assert.ok(utils.deepEqual(doc.contacts[0].account, a2._id));
     assert.ok(isEqualWith(doc.contacts[0].account, a2._id, compareBuffers));
     // Re: commends on https://github.com/mongodb/js-bson/commit/aa0b54597a0af28cce3530d2144af708e4b66bf0
     // Deep equality checks no longer work as expected with node 0.10.
@@ -732,7 +733,7 @@ describe('model: findOneAndUpdate:', function() {
     const doc2 = await User.findOne({ name: 'parent' });
 
     assert.deepEqual(doc2.contacts[0].account, a2._id);
-    assert.ok(Utils.deepEqual(doc2.contacts[0].account, a2._id));
+    assert.ok(utils.deepEqual(doc2.contacts[0].account, a2._id));
     assert.ok(isEqualWith(doc2.contacts[0].account, a2._id, compareBuffers));
     assert.ok(isEqual(doc2.contacts[0].account, a2._id));
     assert.ok(isDeepStrictEqual(doc2.contacts[0].account, a2._id));
@@ -2228,5 +2229,80 @@ describe('model: findOneAndUpdate:', function() {
     assert.ok(err);
     assert.equal(err.name, 'CastError');
     assert.equal(err.path, 'accessories.0.additionals.0.k');
+  });
+
+  describe('deprecation warnings for `new` and `returnOriginal` options (gh-15972)', function() {
+    afterEach(function() {
+      sinon.restore();
+    });
+
+    const operations = [
+      { operationName: 'findOneAndUpdate', filter: {} },
+      { operationName: 'findByIdAndUpdate', filter: '0'.repeat(24) },
+      { operationName: 'findOneAndReplace', filter: {} }
+    ];
+
+    const deprecatedOptions = [
+      { options: { new: true }, optionName: 'new', replacement: 'returnDocument: \'after\'' },
+      { options: { new: false }, optionName: 'new', replacement: 'returnDocument: \'before\'' },
+      { options: { returnOriginal: true }, optionName: 'returnOriginal', replacement: 'returnDocument: \'before\'' },
+      { options: { returnOriginal: false }, optionName: 'returnOriginal', replacement: 'returnDocument: \'after\'' }
+    ];
+
+    for (const { operationName, filter } of operations) {
+      for (const { options, optionName, replacement } of deprecatedOptions) {
+        it(`${operationName}: emits deprecation warning when using \`${JSON.stringify(options)}\``, async function() {
+          // Arrange
+          const { User } = createTestContext();
+
+          // Act
+          await User[operationName](filter, { name: 'new value' }, options);
+
+          // Assert
+          const calls = utils.warn.getCalls();
+          assert.strictEqual(calls.length, 1);
+          const [message] = calls[0].args;
+          assert.ok(
+            message.includes(optionName) && message.includes('returnDocument'),
+            `Expected warning to mention '${optionName}' and 'returnDocument', got: ${message}`
+          );
+          assert.ok(
+            message.includes(replacement),
+            `Expected warning to suggest "${replacement}", got: ${message}`
+          );
+        });
+      }
+
+      it(`${operationName}: does not emit warning when using \`returnDocument\``, async function() {
+        // Arrange
+        const { User } = createTestContext();
+
+        // Act
+        await User[operationName](filter, { name: 'updated' }, { returnDocument: 'after' });
+
+        // Assert
+        assert.strictEqual(utils.warn.getCalls().length, 0);
+      });
+    }
+
+    it('default returnDocument behavior returns document before update', async function() {
+      // Arrange
+      const { User } = createTestContext();
+      await User.create({ name: 'original' });
+
+      // Act
+      const result = await User.findOneAndUpdate({ name: 'original' }, { name: 'updated' });
+
+      // Assert
+      assert.strictEqual(result.name, 'original');
+      assert.strictEqual(utils.warn.getCalls().length, 0);
+    });
+
+    function createTestContext() {
+      sinon.stub(utils, 'warn');
+      const userSchema = new Schema({ name: String });
+      const User = db.model('User', userSchema);
+      return { User };
+    }
   });
 });

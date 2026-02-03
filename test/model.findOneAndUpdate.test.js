@@ -2236,73 +2236,139 @@ describe('model: findOneAndUpdate:', function() {
       sinon.restore();
     });
 
-    const operations = [
-      { operationName: 'findOneAndUpdate', filter: {} },
-      { operationName: 'findByIdAndUpdate', filter: '0'.repeat(24) },
-      { operationName: 'findOneAndReplace', filter: {} }
-    ];
+    describe('query operation warnings', function() {
+      const operations = [
+        { operationName: 'findOneAndUpdate', filter: {} },
+        { operationName: 'findByIdAndUpdate', filter: '0'.repeat(24) },
+        { operationName: 'findOneAndReplace', filter: {} }
+      ];
 
-    const deprecatedOptions = [
-      { options: { new: true }, optionName: 'new', replacement: 'returnDocument: \'after\'' },
-      { options: { new: false }, optionName: 'new', replacement: 'returnDocument: \'before\'' },
-      { options: { returnOriginal: true }, optionName: 'returnOriginal', replacement: 'returnDocument: \'before\'' },
-      { options: { returnOriginal: false }, optionName: 'returnOriginal', replacement: 'returnDocument: \'after\'' }
-    ];
+      const deprecatedOptions = [
+        { options: { new: true }, optionName: 'new', replacement: 'returnDocument: \'after\'' },
+        { options: { new: false }, optionName: 'new', replacement: 'returnDocument: \'before\'' },
+        { options: { returnOriginal: true }, optionName: 'returnOriginal', replacement: 'returnDocument: \'before\'' },
+        { options: { returnOriginal: false }, optionName: 'returnOriginal', replacement: 'returnDocument: \'after\'' }
+      ];
 
-    for (const { operationName, filter } of operations) {
-      for (const { options, optionName, replacement } of deprecatedOptions) {
-        it(`${operationName}: emits deprecation warning when using \`${JSON.stringify(options)}\``, async function() {
+      for (const { operationName, filter } of operations) {
+        for (const { options, optionName, replacement } of deprecatedOptions) {
+          it(`${operationName}: emits deprecation warning when using \`${JSON.stringify(options)}\``, async function() {
+            // Arrange
+            const { User } = createTestContext();
+
+            // Act
+            await User[operationName](filter, { name: 'new value' }, options);
+
+            // Assert
+            const calls = utils.warn.getCalls();
+            assert.strictEqual(calls.length, 1);
+            const [message] = calls[0].args;
+            assert.ok(
+              message.includes(optionName) && message.includes('returnDocument'),
+              `Expected warning to mention '${optionName}' and 'returnDocument', got: ${message}`
+            );
+            assert.ok(
+              message.includes(replacement),
+              `Expected warning to suggest "${replacement}", got: ${message}`
+            );
+          });
+        }
+
+        it(`${operationName}: does not emit warning when using \`returnDocument\``, async function() {
           // Arrange
           const { User } = createTestContext();
 
           // Act
-          await User[operationName](filter, { name: 'new value' }, options);
+          await User[operationName](filter, { name: 'updated' }, { returnDocument: 'after' });
 
           // Assert
-          const calls = utils.warn.getCalls();
-          assert.strictEqual(calls.length, 1);
-          const [message] = calls[0].args;
-          assert.ok(
-            message.includes(optionName) && message.includes('returnDocument'),
-            `Expected warning to mention '${optionName}' and 'returnDocument', got: ${message}`
-          );
-          assert.ok(
-            message.includes(replacement),
-            `Expected warning to suggest "${replacement}", got: ${message}`
-          );
+          assert.strictEqual(utils.warn.getCalls().length, 0);
         });
       }
 
-      it(`${operationName}: does not emit warning when using \`returnDocument\``, async function() {
+      it('default returnDocument behavior returns document before update', async function() {
         // Arrange
         const { User } = createTestContext();
+        await User.create({ name: 'original' });
 
         // Act
-        await User[operationName](filter, { name: 'updated' }, { returnDocument: 'after' });
+        const result = await User.findOneAndUpdate({ name: 'original' }, { name: 'updated' });
+
+        // Assert
+        assert.strictEqual(result.name, 'original');
+        assert.strictEqual(utils.warn.getCalls().length, 0);
+      });
+
+      function createTestContext() {
+        sinon.stub(utils, 'warn');
+        const userSchema = new Schema({ name: String });
+        const User = db.model('User', userSchema);
+        return { User };
+      }
+    });
+
+    describe('mongoose.set() options', function() {
+      const originalReturnDocument = mongoose.get('returnDocument');
+
+      afterEach(function() {
+        mongoose.set('returnDocument', originalReturnDocument);
+      });
+
+      it('mongoose.set(\'returnOriginal\') emits deprecation warning', function() {
+        // Arrange
+        sinon.stub(utils, 'warn');
+
+        // Act
+        mongoose.set('returnOriginal', false);
+
+        // Assert
+        const calls = utils.warn.getCalls();
+        assert.strictEqual(calls.length, 1);
+        const [message] = calls[0].args;
+        assert.ok(
+          message.includes('returnOriginal') && message.includes('returnDocument'),
+          `Expected warning to mention 'returnOriginal' and 'returnDocument', got: ${message}`
+        );
+      });
+
+      it('mongoose.set(\'returnDocument\') does not emit warning', function() {
+        // Arrange
+        sinon.stub(utils, 'warn');
+
+        // Act
+        mongoose.set('returnDocument', 'after');
 
         // Assert
         assert.strictEqual(utils.warn.getCalls().length, 0);
       });
-    }
 
-    it('default returnDocument behavior returns document before update', async function() {
-      // Arrange
-      const { User } = createTestContext();
-      await User.create({ name: 'original' });
+      it('mongoose.set(\'returnDocument\', \'after\') returns updated document', async function() {
+        // Arrange
+        mongoose.set('returnDocument', 'after');
+        const userSchema = new Schema({ name: String });
+        const User = db.model('User', userSchema);
+        await User.create({ name: 'original' });
 
-      // Act
-      const result = await User.findOneAndUpdate({ name: 'original' }, { name: 'updated' });
+        // Act
+        const result = await User.findOneAndUpdate({ name: 'original' }, { name: 'updated' });
 
-      // Assert
-      assert.strictEqual(result.name, 'original');
-      assert.strictEqual(utils.warn.getCalls().length, 0);
+        // Assert
+        assert.strictEqual(result.name, 'updated');
+      });
+
+      it('mongoose.set(\'returnDocument\', \'before\') returns original document', async function() {
+        // Arrange
+        mongoose.set('returnDocument', 'before');
+        const userSchema = new Schema({ name: String });
+        const User = db.model('User', userSchema);
+        await User.create({ name: 'original' });
+
+        // Act
+        const result = await User.findOneAndUpdate({ name: 'original' }, { name: 'updated' });
+
+        // Assert
+        assert.strictEqual(result.name, 'original');
+      });
     });
-
-    function createTestContext() {
-      sinon.stub(utils, 'warn');
-      const userSchema = new Schema({ name: String });
-      const User = db.model('User', userSchema);
-      return { User };
-    }
   });
 });

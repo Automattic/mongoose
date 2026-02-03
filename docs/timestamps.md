@@ -22,7 +22,7 @@ await doc.save();
 console.log(doc.createdAt); // 2022-02-26T16:37:48.244Z
 console.log(doc.updatedAt); // 2022-02-26T16:37:48.307Z
 
-doc = await User.findOneAndUpdate({ _id: doc._id }, { name: 'test3' }, { new: true });
+doc = await User.findOneAndUpdate({ _id: doc._id }, { name: 'test3' }, { returnDocument: 'after' });
 console.log(doc.createdAt); // 2022-02-26T16:37:48.244Z
 console.log(doc.updatedAt); // 2022-02-26T16:37:48.366Z
 ```
@@ -51,7 +51,7 @@ console.log(doc.updatedAt); // 2022-02-26T17:08:13.991Z
 doc = await User.findOneAndUpdate(
   { _id: doc._id },
   { name: 'test3', createdAt: new Date(0), updatedAt: new Date(0) },
-  { new: true }
+  { returnDocument: 'after' }
 );
 console.log(doc.createdAt); // 2022-02-26T17:08:13.930Z
 console.log(doc.updatedAt); // 2022-02-26T17:08:14.008Z
@@ -66,7 +66,7 @@ Calling `replaceOne()` or `findOneAndReplace()` will update the `createdAt` time
 doc = await User.findOneAndReplace(
   { _id: doc._id },
   { name: 'test3' },
-  { new: true }
+  { returnDocument: 'after' }
 );
 console.log(doc.createdAt); // 2022-02-26T17:08:14.008Z
 console.log(doc.updatedAt); // 2022-02-26T17:08:14.008Z
@@ -80,7 +80,7 @@ doc = await User.findOneAndReplace(
     createdAt: new Date('2022-06-01'),
     updatedAt: new Date('2022-06-01')
   },
-  { new: true }
+  { returnDocument: 'after' }
 );
 console.log(doc.createdAt); // 2022-06-01T00:00:00.000Z
 console.log(doc.updatedAt); // 2022-06-01T00:00:00.000Z

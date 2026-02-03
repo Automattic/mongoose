@@ -124,9 +124,10 @@ declare module 'mongoose' {
      * `findByIdAndUpdate`, and `findOneAndReplace()` to false. This is equivalent to
      * setting the `new` option to `true` for `findOneAndX()` calls by default. Read our
      * `findOneAndUpdate()` [tutorial](https://mongoosejs.com/docs/tutorials/findoneandupdate.html)
-     * for more information.
+     * for more information. Use `returnDocument: 'before' | 'after'` in individual queries instead.
      *
      * @default true
+     * @deprecated
      */
     returnOriginal?: boolean;
 

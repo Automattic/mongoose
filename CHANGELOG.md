@@ -1,11 +1,11 @@
-8.22.1 / 2025-02-04
+8.22.1 / 2026-02-04
 ==================
  * fix: handle other top-level query operators in sanitizeFilter
  * fix(document): when cloning a doc with subdocs, make sure the subdocs parent is the cloned doc #15904 #15901
  * types(models): support Mongoose query casting in AnyBulkWriteOperation filter property #15910
  * types: add toBSON() to documents #15927
 
-7.8.9 / 2025-02-04
+7.8.9 / 2026-02-04
 ==================
  * fix: handle other top-level query operators in sanitizeFilter
 

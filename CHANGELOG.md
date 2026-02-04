@@ -1,3 +1,9 @@
+6.13.9 / 2026-02-04
+===================
+ * fix: handle other top-level query operators in sanitizeFilter
+ * types(aggregate): add $firstN, $lastN, $bottom, $bottomN, $minN and $maxN operators #15303 #15299
+ * docs(compatibility): add note that Mongoose ^6.5 works with MongoDB server 7.x #15427
+
 6.13.8 / 2025-01-20
 ===================
  * chore: remove coverage output from bundle

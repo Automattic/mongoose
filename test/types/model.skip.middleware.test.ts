@@ -9,7 +9,7 @@ import {
   MongooseBulkSaveOptions,
   AggregateOptions
 } from 'mongoose';
-import { expectAssignable, expectType } from 'tsd';
+import { ExpectAssignable, ExpectType } from './util/assertions';
 
 async function gh8768() {
   const addressSchema = new Schema({ city: String });
@@ -17,21 +17,21 @@ async function gh8768() {
   const User = model('User', schema);
 
   // SkipMiddlewareOptions type
-  expectAssignable<SkipMiddlewareOptions>({});
-  expectAssignable<SkipMiddlewareOptions>({ pre: false });
-  expectAssignable<SkipMiddlewareOptions>({ post: false });
-  expectAssignable<SkipMiddlewareOptions>({ pre: false, post: true });
-  expectAssignable<SkipMiddlewareOptions>({ pre: true, post: false });
-  expectType<boolean | undefined>({} as SkipMiddlewareOptions['pre']);
-  expectType<boolean | undefined>({} as SkipMiddlewareOptions['post']);
+  ExpectAssignable<SkipMiddlewareOptions>()({});
+  ExpectAssignable<SkipMiddlewareOptions>()({ pre: false });
+  ExpectAssignable<SkipMiddlewareOptions>()({ post: false });
+  ExpectAssignable<SkipMiddlewareOptions>()({ pre: false, post: true });
+  ExpectAssignable<SkipMiddlewareOptions>()({ pre: true, post: false });
+  ExpectType<boolean | undefined>({} as SkipMiddlewareOptions['pre']);
+  ExpectType<boolean | undefined>({} as SkipMiddlewareOptions['post']);
 
   // Verify middleware option types are strictly boolean | SkipMiddlewareOptions | undefined
-  expectType<boolean | SkipMiddlewareOptions | undefined>({} as QueryOptions['middleware']);
-  expectType<boolean | SkipMiddlewareOptions | undefined>({} as SaveOptions['middleware']);
-  expectType<boolean | SkipMiddlewareOptions | undefined>({} as InsertManyOptions['middleware']);
-  expectType<boolean | SkipMiddlewareOptions | undefined>({} as MongooseBulkWriteOptions['middleware']);
-  expectType<boolean | SkipMiddlewareOptions | undefined>({} as MongooseBulkSaveOptions['middleware']);
-  expectType<boolean | SkipMiddlewareOptions | undefined>({} as AggregateOptions['middleware']);
+  ExpectType<boolean | SkipMiddlewareOptions | undefined>({} as QueryOptions['middleware']);
+  ExpectType<boolean | SkipMiddlewareOptions | undefined>({} as SaveOptions['middleware']);
+  ExpectType<boolean | SkipMiddlewareOptions | undefined>({} as InsertManyOptions['middleware']);
+  ExpectType<boolean | SkipMiddlewareOptions | undefined>({} as MongooseBulkWriteOptions['middleware']);
+  ExpectType<boolean | SkipMiddlewareOptions | undefined>({} as MongooseBulkSaveOptions['middleware']);
+  ExpectType<boolean | SkipMiddlewareOptions | undefined>({} as AggregateOptions['middleware']);
 
   // QueryOptions - Query operations
   User.find({}, null, { middleware: false });

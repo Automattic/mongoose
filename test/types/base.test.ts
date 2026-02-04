@@ -64,8 +64,10 @@ function gh15756() {
 function gh15972() {
   mongoose.set('returnDocument', 'before');
   mongoose.set('returnDocument', 'after');
-  expectError(mongoose.set('returnDocument', 'invalid'));
-  expectError(mongoose.set('returnDocument', true));
+  // @ts-expect-error 'invalid' is not a valid returnDocument option
+  mongoose.set('returnDocument', 'invalid');
+  // @ts-expect-error true is not a valid returnDocument option
+  mongoose.set('returnDocument', true);
 }
 
 function gh12100() {

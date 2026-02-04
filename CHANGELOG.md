@@ -1,4 +1,4 @@
-7.8.9 / 2025-02-04
+7.8.9 / 2026-02-04
 ==================
  * fix: handle other top-level query operators in sanitizeFilter
 

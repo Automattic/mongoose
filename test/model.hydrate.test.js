@@ -319,7 +319,7 @@ describe('model', function() {
       assert.ok(!hydrated.stories[1].article);
     });
 
-    it('applies virtuals to doubly-nested arrays (gh-15956)', function() {
+    it('applies virtuals to doubly-nested arrays (gh-15956)', function () {
       const innerSchema = new Schema({ name: String });
       innerSchema.virtual('computed');
 
@@ -355,6 +355,64 @@ describe('model', function() {
       const doc2 = Model.hydrate(raw, null);
       assert.strictEqual(doc2.matrix[0][0].name, 'a');
       assert.strictEqual(doc2.matrix[0][0].computed, undefined);
+    });
+
+    it('handles strict option to control non-schema properties', function() {
+      const strictSchema = new Schema({
+        name: String,
+        age: Number
+      }, { strict: true });
+
+      const Model = db.model('Test3', strictSchema);
+
+      // Test with strict: false - should allow extra fields
+      const doc1 = Model.hydrate({
+        _id: '000000000000000000000001',
+        name: 'John',
+        age: 30,
+        extraField: 'not in schema'
+      }, null, { strict: false });
+
+      assert.equal(doc1.name, 'John');
+      assert.equal(doc1.age, 30);
+      assert.equal(doc1.extraField, 'not in schema');
+      assert.equal(doc1.get('extraField'), 'not in schema');
+
+      // Test with strict: true - should store extra fields but not expose them as properties
+      const doc2 = Model.hydrate({
+        _id: '000000000000000000000002',
+        name: 'Jane',
+        age: 25,
+        extraField: 'should be ignored'
+      }, null, { strict: true });
+
+      assert.equal(doc2.name, 'Jane');
+      assert.equal(doc2.age, 25);
+      assert.equal(doc2.extraField, undefined);
+      assert.equal(doc2.get('extraField'), 'should be ignored');
+
+      // Test with strict: 'throw' - should throw on extra fields
+      assert.throws(() => {
+        Model.hydrate({
+          _id: '000000000000000000000003',
+          name: 'Bob',
+          age: 35,
+          extraField: 'should throw'
+        }, null, { strict: 'throw' });
+      }, /Field `extraField` is not in schema/);
+
+      // Test with default schema strict mode (should use schema's strict: true)
+      const doc4 = Model.hydrate({
+        _id: '000000000000000000000004',
+        name: 'Alice',
+        age: 28,
+        extraField: 'uses schema default'
+      });
+
+      assert.equal(doc4.name, 'Alice');
+      assert.equal(doc4.age, 28);
+      assert.equal(doc4.extraField, undefined);
+      assert.equal(doc4.get('extraField'), 'uses schema default');
     });
   });
 });

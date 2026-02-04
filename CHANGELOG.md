@@ -1,10 +1,25 @@
+8.22.1 / 2025-02-04
+==================
+ * fix: handle other top-level query operators in sanitizeFilter
+ * fix(document): when cloning a doc with subdocs, make sure the subdocs parent is the cloned doc #15904 #15901
+ * types(models): support Mongoose query casting in AnyBulkWriteOperation filter property #15910
+ * types: add toBSON() to documents #15927
+
+7.8.9 / 2025-02-04
+==================
+ * fix: handle other top-level query operators in sanitizeFilter
+
+8.22.0 / 2026-01-27
+===================
+ * feat(model): allow passing strict option to hydrate() #15944 #15940
+
 8.21.1 / 2026-01-23
 ===================
-* fix(clone): fix parent doc for map subdocuments and array subdocuments #15958 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
-* fix(document): when cloning a doc with subdocs, make sure the subdocs parent is the cloned doc #15904 #15901
-* fix: respect currentTime schema option in bulkWrite updates #15976 [sderrow](https://github.com/sderrow)
-* types(models): support Mongoose query casting in AnyBulkWriteOperation filter property #15910
-* types: add toBSON() to documents #15927
+ * fix(clone): fix parent doc for map subdocuments and array subdocuments #15958 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): when cloning a doc with subdocs, make sure the subdocs parent is the cloned doc #15904 #15901
+ * fix: respect currentTime schema option in bulkWrite updates #15976 [sderrow](https://github.com/sderrow)
+ * types(models): support Mongoose query casting in AnyBulkWriteOperation filter property #15910
+ * types: add toBSON() to documents #15927
 
 9.1.5 / 2026-01-20
 ==================

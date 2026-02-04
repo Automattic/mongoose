@@ -230,6 +230,8 @@ declare module 'mongoose' {
     flattenMaps?: boolean;
     /** if true, convert any ObjectIds in the result to 24 character hex strings. */
     flattenObjectIds?: boolean;
+    /** if true, convert any UUIDs in the result to 36 character hex strings. */
+    flattenUUIDs?: boolean;
     /** apply all getters (path and virtual getters) */
     getters?: boolean;
     /** remove empty objects (defaults to true) */
@@ -855,6 +857,35 @@ declare module 'mongoose' {
           } : T;
 
   /**
+   * Converts any UUID properties into strings for JSON serialization
+   */
+  export type UUIDToString<T> = T extends Types.UUID
+    ? string
+    : T extends mongodb.UUID
+      ? string
+      : T extends Document
+        ? T
+        : T extends TreatAsPrimitives
+          ? T
+          : T extends Record<string, any> ? {
+            [K in keyof T]: T[K] extends Types.UUID
+              ? string
+              : T[K] extends mongodb.UUID
+                ? string
+                : T[K] extends Types.DocumentArray<infer ItemType>
+                    ? Types.DocumentArray<UUIDToString<ItemType>>
+                    : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+                      ? HydratedSingleSubdocument<UUIDToString<SubdocType>>
+                      : UUIDToString<T[K]>;
+          } : T;
+
+  /**
+   * Alias for UUIDToString for backwards compatibility.
+   * @deprecated Use UUIDToString instead.
+   */
+  export type UUIDToJSON<T> = UUIDToString<T>;
+
+  /**
    * Converts any ObjectId properties into strings for JSON serialization
    */
   export type ObjectIdToString<T> = T extends mongodb.ObjectId
@@ -913,11 +944,84 @@ declare module 'mongoose' {
     FlattenMaps<
       BufferToJSON<
         ObjectIdToString<
-          DateToString<T>
+          UUIDToString<
+            DateToString<T>
+          >
         >
       >
     >
   >;
+
+  /**
+   * Helper types for computing toObject/toJSON return types based on options.
+   * These compose transforms conditionally to avoid combinatorial explosion of overloads.
+   */
+  type ApplyVirtuals<T, TVirtuals, O> =
+    O extends { virtuals: true } ? T & TVirtuals : T;
+
+  type GetVersionKeyName<TSchemaOptions> =
+    TSchemaOptions extends { versionKey: infer VK }
+      ? VK extends string ? VK : '__v'
+      : '__v';
+
+  type ApplyVersionKey<T, O, TSchemaOptions = {}> =
+    O extends { versionKey: false } ? Omit<T, GetVersionKeyName<TSchemaOptions>> : T;
+
+  /**
+   * Single-pass type that applies all flatten transforms (flattenMaps, flattenObjectIds, flattenUUIDs)
+   * in one recursive traversal. This avoids TypeScript's "union type too complex" error that occurs
+   * when nesting separate recursive transform types.
+   *
+   * By handling all transforms in one pass, we correctly handle ObjectIds/UUIDs nested inside Maps
+   * since we recurse into Map values during the same traversal that converts ObjectIds/UUIDs.
+   */
+  type ApplyFlattenTransforms<T, O> =
+    // Handle ObjectId first (before TreatAsPrimitives since ObjectId is in TreatAsPrimitives)
+    T extends mongodb.ObjectId
+      ? O extends { flattenObjectIds: true } ? string : T
+    // Handle UUID (both Types.UUID and mongodb.UUID)
+    : T extends Types.UUID
+      ? O extends { flattenUUIDs: true } ? string : T
+    : T extends mongodb.UUID
+      ? O extends { flattenUUIDs: true } ? string : T
+    // Handle Map - flatten to Record and recurse into values
+    : T extends Map<any, infer V>
+      ? O extends { flattenMaps: true }
+        ? Record<string, ApplyFlattenTransforms<V, O>>
+        : T
+    // Don't recurse into Documents
+    : T extends Document
+      ? T
+    // Don't modify primitives
+    : T extends TreatAsPrimitives
+      ? T
+    // Handle DocumentArray - recurse into items
+    : T extends Types.DocumentArray<infer ItemType>
+      ? Types.DocumentArray<ApplyFlattenTransforms<ItemType, O>>
+    // Handle Subdocument - recurse into subdoc type
+    : T extends Types.Subdocument<unknown, unknown, infer SubdocType>
+      ? HydratedSingleSubdocument<ApplyFlattenTransforms<SubdocType, O>>
+    // Handle regular objects - recurse into properties
+    : T extends Record<string, any>
+      ? { [K in keyof T]: ApplyFlattenTransforms<T[K], O> }
+    : T;
+
+  /**
+   * Computes the return type of toObject/toJSON based on the provided options.
+   * Uses a single-pass transform for flatten operations to correctly handle all combinations.
+   */
+  export type ToObjectReturnType<DocType, TVirtuals, O extends ToObjectOptions, TSchemaOptions = {}> =
+    ApplyVersionKey<
+      Default__v<
+        ApplyFlattenTransforms<
+          ApplyVirtuals<Require_id<DocType>, TVirtuals, O>,
+          O
+        >,
+        TSchemaOptions
+      >,
+      O,
+      TSchemaOptions
+    >;
 
   /**
    * Separate type is needed for properties of union type (for example, Types.DocumentArray | undefined) to apply conditional check to each member of it

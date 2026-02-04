@@ -15,6 +15,8 @@ const sinon = require('sinon');
 const util = require('./util');
 const utils = require('../lib/utils');
 
+const { Binary } = require('bson');
+
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
@@ -7031,6 +7033,132 @@ describe('document', function() {
       },
       documentArray: [{ _id: '3'.repeat(24) }]
     });
+  });
+
+  describe('`flattenUUIDs` option (gh-15021)', function() {
+    it('converts UUIDs to strings in toObject()', function() {
+      // Arrange
+      const { User, UUID } = createTestContext();
+      const user = new User({
+        _id: new UUID('00000000-0000-0000-0000-000000000000'),
+        uuid: new UUID('11111111-1111-1111-1111-111111111111'),
+        nested: {
+          uuid: new UUID('22222222-2222-2222-2222-222222222222')
+        },
+        subdocument: {
+          _id: new UUID('33333333-3333-3333-3333-333333333333')
+        },
+        documentArray: [{ _id: new UUID('44444444-4444-4444-4444-444444444444') }]
+      });
+
+      // Act
+      const userObj = user.toObject({ flattenUUIDs: true });
+
+      // Assert
+      assert.deepStrictEqual(userObj, {
+        _id: '00000000-0000-0000-0000-000000000000',
+        uuid: '11111111-1111-1111-1111-111111111111',
+        nested: {
+          uuid: '22222222-2222-2222-2222-222222222222'
+        },
+        subdocument: {
+          _id: '33333333-3333-3333-3333-333333333333'
+        },
+        documentArray: [{ _id: '44444444-4444-4444-4444-444444444444' }]
+      });
+    });
+
+    it('converts UUIDs to strings in toJSON()', function() {
+      // Arrange
+      const { User, UUID } = createTestContext();
+      const user = new User({
+        _id: new UUID('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+        uuid: new UUID('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'),
+        nested: { uuid: new UUID('cccccccc-cccc-cccc-cccc-cccccccccccc') },
+        subdocument: { _id: new UUID('dddddddd-dddd-dddd-dddd-dddddddddddd') },
+        documentArray: [{ _id: new UUID('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee') }]
+      });
+
+      // Act
+      const userJSON = user.toJSON({ flattenUUIDs: true });
+
+      // Assert
+      assert.deepStrictEqual(userJSON, {
+        _id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+        uuid: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        nested: {
+          uuid: 'cccccccc-cccc-cccc-cccc-cccccccccccc'
+        },
+        subdocument: {
+          _id: 'dddddddd-dddd-dddd-dddd-dddddddddddd'
+        },
+        documentArray: [{ _id: 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee' }]
+      });
+    });
+
+    for (const flattenUUIDs of [false, undefined]) {
+      it(`does not convert UUIDs when flattenUUIDs is \`${flattenUUIDs}\``, function() {
+        // Arrange
+        const { User, UUID } = createTestContext();
+        const testUUID = new UUID('12345678-1234-1234-1234-123456789012');
+        const user = new User({
+          _id: testUUID,
+          uuid: testUUID,
+          nested: { uuid: testUUID },
+          subdocument: { _id: testUUID },
+          documentArray: [{ _id: testUUID }]
+        });
+
+        // Act
+        const obj = user.toObject({ flattenUUIDs });
+
+        // Assert
+        assert.ok(obj._id instanceof Binary);
+        assert.ok(obj.uuid instanceof Binary);
+        assert.ok(obj.nested.uuid instanceof Binary);
+        assert.ok(obj.subdocument._id instanceof Binary);
+        assert.ok(obj.documentArray[0]._id instanceof Binary);
+      });
+    }
+
+
+    it('converts UUIDs inside Maps when both flattenMaps and flattenUUIDs are true', function() {
+      // Arrange
+      const { User, UUID } = createTestContext();
+      const user = new User({
+        _id: new UUID('00000000-0000-0000-0000-000000000000'),
+        uuidMap: new Map([
+          ['first', { refId: new UUID('11111111-1111-1111-1111-111111111111') }],
+          ['second', { refId: new UUID('22222222-2222-2222-2222-222222222222') }]
+        ])
+      });
+
+      // Act
+      const userObj = user.toObject({ flattenMaps: true, flattenUUIDs: true });
+
+      // Assert
+      assert.deepStrictEqual(userObj.uuidMap, {
+        first: { refId: '11111111-1111-1111-1111-111111111111' },
+        second: { refId: '22222222-2222-2222-2222-222222222222' }
+      });
+    });
+
+    function createTestContext() {
+      const UUID = mongoose.Types.UUID;
+      const userSchema = new Schema({
+        _id: 'UUID',
+        uuid: 'UUID',
+        nested: {
+          uuid: 'UUID'
+        },
+        subdocument: new Schema({ _id: 'UUID' }),
+        documentArray: [new Schema({ _id: 'UUID' })],
+        uuidMap: { type: Map, of: new Schema({ refId: 'UUID' }, { _id: false }) }
+      }, { versionKey: false });
+
+      const User = db.model('User', userSchema);
+      return { User, UUID };
+    }
   });
 
   it('`collection` property with strict: false (gh-7276)', async function() {

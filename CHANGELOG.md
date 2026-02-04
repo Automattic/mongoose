@@ -1,3 +1,7 @@
+7.8.9 / 2025-02-04
+==================
+ * fix: handle other top-level query operators in sanitizeFilter
+
 7.8.8 / 2025-12-04
 ==================
  * fix(bulkWrite): pass overwriteImmutable option to castUpdate fixes #15789 #15782 #15781

@@ -1,11 +1,20 @@
-8.22.1 / 2025-02-04
+9.1.6 / 2026-02-04
+==================
+ * fix: handle other top-level query operators in sanitizeFilter
+ * fix(types): fix toObject() type inference with timestamps + virtuals #15975 #15965 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(populate): defer subpopulate until after match functions to avoid comparing populated subdocs #15981 mongodb-js/mongoose-autopopulate#112
+ * fix(DocumentArray): correctly clone subdocument when updating document array #15978 #15973
+ * fix(documentArray): fix change tracking for documentArrays in nested maps #15983 #15970 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs: clarify that you need to explicitly create timeseries collection before inserting document #15990 #15986
+
+8.22.1 / 2026-02-04
 ==================
  * fix: handle other top-level query operators in sanitizeFilter
  * fix(document): when cloning a doc with subdocs, make sure the subdocs parent is the cloned doc #15904 #15901
  * types(models): support Mongoose query casting in AnyBulkWriteOperation filter property #15910
  * types: add toBSON() to documents #15927
 
-7.8.9 / 2025-02-04
+7.8.9 / 2026-02-04
 ==================
  * fix: handle other top-level query operators in sanitizeFilter
 

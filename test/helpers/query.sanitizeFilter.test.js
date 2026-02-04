@@ -40,13 +40,13 @@ describe('sanitizeFilter', function() {
   });
 
   it('handles $not', function() {
-    let obj = { username: 'val', pwd: { $not: { $ne: 'my secret' } } };
+    const obj = { username: 'val', pwd: { $not: { $ne: 'my secret' } } };
     sanitizeFilter(obj);
     assert.deepEqual(obj, { username: 'val', pwd: { $eq: { $not: { $ne: 'my secret' } } } });
   });
 
   it('handles $jsonSchema', function() {
-    let obj = {
+    const obj = {
       $jsonSchema: {
         bsonType: 'object',
         required: ['pwd'],
@@ -69,22 +69,22 @@ describe('sanitizeFilter', function() {
     });
   });
 
-  it('handles $where', function () {
-    let obj = { $where: 'true' };
+  it('handles $where', function() {
+    const obj = { $where: 'true' };
     assert.throws(
       () => sanitizeFilter(obj),
       /\$where is not allowed with sanitizeFilter/
     );
 
-    const whereFunc = function() { return true };
+    const whereFunc = function() { return true; };
     obj.$where = trusted(whereFunc);
     sanitizeFilter(obj);
     assert.deepEqual(obj, { $where: whereFunc });
   });
 
-  it('handles $expr', function () {
+  it('handles $expr', function() {
     const func = function() { return true; };
-    let obj = {
+    const obj = {
       $expr: {
         $function: { body: func }
       }
@@ -99,8 +99,8 @@ describe('sanitizeFilter', function() {
     assert.deepEqual(obj, { $expr: { $function: { body: func } } });
   });
 
-  it('handles $text', function () {
-    let obj = {
+  it('handles $text', function() {
+    const obj = {
       $text: {
         $search: 'test'
       }

@@ -1,3 +1,7 @@
+7.8.9 / 2025-02-04
+==================
+ * fix: handle other top-level query operators in sanitizeFilter
+
 8.22.0 / 2026-01-27
 ===================
  * feat(model): allow passing strict option to hydrate() #15944 #15940

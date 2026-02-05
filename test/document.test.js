@@ -10858,7 +10858,6 @@ describe('document', function() {
       assert.deepEqual(Object.keys(err2.errors), ['age']);
     });
 
-    // skip until gh-10367 is implemented
     it('support `pathsToSkip` option for `Model.validate()`', async function() {
       const User = getUserModel();
       const err1 = await User.validate({}, { pathsToSkip: ['age'] }).then(() => null, err => err);

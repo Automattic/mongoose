@@ -150,11 +150,11 @@ declare module 'mongoose' {
        : PathValueType extends Record<string, any> ?
          IsNestedPath extends true ?
            // Nested path (no type key) - no _id
-           InferRawDocTypeWithout_id<PathValueType>
+           InferRawDocTypeWithout_id<PathValueType, { typeKey: TypeKey }, TTransformOptions>
          : Options extends { _id: false } ?
            // Subdocument with _id: false
-           InferRawDocTypeWithout_id<PathValueType>
+           InferRawDocTypeWithout_id<PathValueType, { typeKey: TypeKey }, TTransformOptions>
          : // Subdocument with _id (default)
-           InferRawDocType<PathValueType>
+           InferRawDocType<PathValueType, { typeKey: TypeKey }, TTransformOptions>
        : unknown;
 }

@@ -26,22 +26,17 @@ In the following example, `doc` initially only has `name` and `_id` properties.
 [require:Tutorial.*findOneAndUpdate.*basic case]
 ```
 
-You should set the `new` option to `true` to return the document **after** `update` was applied.
+You should set the `returnDocument` option to `'after'` to return the document **after** `update` was applied.
 
 ```acquit
-[require:Tutorial.*findOneAndUpdate.*new option]
+[require:Tutorial.*findOneAndUpdate.*returnDocument option]
 ```
 
 Mongoose's `findOneAndUpdate()` is slightly different from [the MongoDB Node.js driver's `findOneAndUpdate()`](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#findOneAndUpdate) because it returns the document itself, not a [result object](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#~findAndModifyWriteOpResult).
 
-As an alternative to the `new` option, you can also use the `returnOriginal` option.
-`returnOriginal: false` is equivalent to `new: true`. The `returnOriginal` option
-exists for consistency with the [the MongoDB Node.js driver's `findOneAndUpdate()`](http://mongodb.github.io/node-mongodb-native/3.1/api/Collection.html#findOneAndUpdate),
-which has the same option.
-
-```acquit
-[require:Tutorial.*findOneAndUpdate.*returnOriginal option]
-```
+The `new` and `returnOriginal` options are **deprecated** in favor of `returnDocument`.
+Use `returnDocument: 'after'` instead of `new: true` or `returnOriginal: false`.
+Use `returnDocument: 'before'` instead of `new: false` or `returnOriginal: true`.
 
 ## Atomic Updates
 

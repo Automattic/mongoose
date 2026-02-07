@@ -22,7 +22,7 @@ await doc.save();
 console.log(doc.createdAt); // 2022-02-26T16:37:48.244Z
 console.log(doc.updatedAt); // 2022-02-26T16:37:48.307Z
 
-doc = await User.findOneAndUpdate({ _id: doc._id }, { name: 'test3' }, { new: true });
+doc = await User.findOneAndUpdate({ _id: doc._id }, { name: 'test3' }, { returnDocument: 'after' });
 console.log(doc.createdAt); // 2022-02-26T16:37:48.244Z
 console.log(doc.updatedAt); // 2022-02-26T16:37:48.366Z
 ```
@@ -51,7 +51,7 @@ console.log(doc.updatedAt); // 2022-02-26T17:08:13.991Z
 doc = await User.findOneAndUpdate(
   { _id: doc._id },
   { name: 'test3', createdAt: new Date(0), updatedAt: new Date(0) },
-  { new: true }
+  { returnDocument: 'after' }
 );
 console.log(doc.createdAt); // 2022-02-26T17:08:13.930Z
 console.log(doc.updatedAt); // 2022-02-26T17:08:14.008Z
@@ -66,7 +66,7 @@ Calling `replaceOne()` or `findOneAndReplace()` will update the `createdAt` time
 doc = await User.findOneAndReplace(
   { _id: doc._id },
   { name: 'test3' },
-  { new: true }
+  { returnDocument: 'after' }
 );
 console.log(doc.createdAt); // 2022-02-26T17:08:14.008Z
 console.log(doc.updatedAt); // 2022-02-26T17:08:14.008Z
@@ -80,7 +80,7 @@ doc = await User.findOneAndReplace(
     createdAt: new Date('2022-06-01'),
     updatedAt: new Date('2022-06-01')
   },
-  { new: true }
+  { returnDocument: 'after' }
 );
 console.log(doc.createdAt); // 2022-06-01T00:00:00.000Z
 console.log(doc.updatedAt); // 2022-06-01T00:00:00.000Z
@@ -120,7 +120,7 @@ console.log(doc.updatedAt); // 2022-02-26T23:28:54.264Z
 // Similarly, setting `timestamps: false` on a query tells Mongoose to skip updating
 // `updatedAt`.
 doc = await User.findOneAndUpdate({ _id: doc._id }, { name: 'test3' }, {
-  new: true,
+  returnDocument: 'after',
   timestamps: false
 });
 console.log(doc.updatedAt); // 2022-02-26T23:28:54.264Z
@@ -159,7 +159,7 @@ let doc = await User.create({ name: 'test' });
 // To update `updatedAt`, do a `findOneAndUpdate()` with `timestamps: false` and
 // `updatedAt` set to the value you want
 doc = await User.findOneAndUpdate({ _id: doc._id }, { updatedAt: new Date(0) }, {
-  new: true,
+  returnDocument: 'after',
   timestamps: false
 });
 console.log(doc.updatedAt); // 1970-01-01T00:00:00.000Z
@@ -167,7 +167,7 @@ console.log(doc.updatedAt); // 1970-01-01T00:00:00.000Z
 // To update `createdAt`, you also need to set `strict: false` because `createdAt`
 // is immutable
 doc = await User.findOneAndUpdate({ _id: doc._id }, { createdAt: new Date(0) }, {
-  new: true,
+  returnDocument: 'after',
   timestamps: false,
   strict: false
 });

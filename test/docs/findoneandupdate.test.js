@@ -64,31 +64,14 @@ describe('Tutorial: findOneAndUpdate()', function() {
     // acquit:ignore:end
   });
 
-  it('new option', async function() {
+  it('returnDocument option', async function() {
     const filter = { name: 'Jean-Luc Picard' };
     const update = { age: 59 };
 
     // `doc` is the document _after_ `update` was applied because of
-    // `new: true`
+    // `returnDocument: 'after'`
     const doc = await Character.findOneAndUpdate(filter, update, {
-      new: true
-    });
-    doc.name; // 'Jean-Luc Picard'
-    doc.age; // 59
-    // acquit:ignore:start
-    assert.equal(doc.name, 'Jean-Luc Picard');
-    assert.equal(doc.age, 59);
-    // acquit:ignore:end
-  });
-
-  it('returnOriginal option', async function() {
-    const filter = { name: 'Jean-Luc Picard' };
-    const update = { age: 59 };
-
-    // `doc` is the document _after_ `update` was applied because of
-    // `returnOriginal: false`
-    const doc = await Character.findOneAndUpdate(filter, update, {
-      returnOriginal: false
+      returnDocument: 'after'
     });
     doc.name; // 'Jean-Luc Picard'
     doc.age; // 59

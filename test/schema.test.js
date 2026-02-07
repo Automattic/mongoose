@@ -963,6 +963,45 @@ describe('schema', function() {
       assert.equal(Tobi.options._id, true);
     });
 
+    it('treats `strict: undefined` as not provided and defaults to true', function() {
+      const schema = new Schema({ name: String }, { strict: undefined });
+      assert.strictEqual(schema.options.strict, true);
+    });
+
+    it('treats `strict: undefined` as not provided and falls back to global strict option', function() {
+      const m = new mongoose.Mongoose();
+      m.set('strict', 'throw');
+
+      const schema = new m.Schema({ name: String }, { strict: undefined });
+      assert.strictEqual(schema.options.strict, 'throw');
+    });
+
+    it('treats `strictQuery: undefined` as not provided and defaults to false', function() {
+      const schema = new Schema({ name: String }, { strictQuery: undefined });
+      assert.strictEqual(schema.options.strictQuery, false);
+    });
+
+    it('treats `strictQuery: undefined` as not provided and falls back to global strictQuery option', function() {
+      const m = new mongoose.Mongoose();
+      m.set('strictQuery', true);
+
+      const schema = new m.Schema({ name: String }, { strictQuery: undefined });
+      assert.strictEqual(schema.options.strictQuery, true);
+    });
+
+    it('treats `id: undefined` as not provided and defaults to true', function() {
+      const schema = new Schema({ name: String }, { id: undefined });
+      assert.strictEqual(schema.options.id, true);
+    });
+
+    it('treats `id: undefined` as not provided and falls back to global id option', function() {
+      const m = new mongoose.Mongoose();
+      m.set('id', false);
+
+      const schema = new m.Schema({ name: String }, { id: undefined });
+      assert.strictEqual(schema.options.id, false);
+    });
+
     it('setting', function() {
       let Tobi = new Schema({}, { collection: 'users' });
 

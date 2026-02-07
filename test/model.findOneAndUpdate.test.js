@@ -2308,28 +2308,16 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     describe('mongoose.set() options', function() {
-      const originalReturnDocument = mongoose.get('returnDocument');
-      const originalReturnOriginal = mongoose.get('returnOriginal');
-
-      afterEach(function() {
-        if (originalReturnDocument == null) {
-          delete mongoose.options.returnDocument;
-        } else {
-          mongoose.set('returnDocument', originalReturnDocument);
-        }
-        if (originalReturnOriginal == null) {
-          delete mongoose.options.returnOriginal;
-        } else {
-          mongoose.set('returnOriginal', originalReturnOriginal);
-        }
-      });
+      let m;
+      afterEach(() => m?.disconnect());
 
       it('mongoose.set(\'returnOriginal\') emits deprecation warning', function() {
         // Arrange
+        m = new mongoose.Mongoose();
         sinon.stub(utils, 'warn');
 
         // Act
-        mongoose.set('returnOriginal', false);
+        m.set('returnOriginal', false);
 
         // Assert
         const calls = utils.warn.getCalls();
@@ -2343,10 +2331,11 @@ describe('model: findOneAndUpdate:', function() {
 
       it('mongoose.set(\'returnDocument\') does not emit warning', function() {
         // Arrange
+        m = new mongoose.Mongoose();
         sinon.stub(utils, 'warn');
 
         // Act
-        mongoose.set('returnDocument', 'after');
+        m.set('returnDocument', 'after');
 
         // Assert
         assert.strictEqual(utils.warn.getCalls().length, 0);
@@ -2354,13 +2343,11 @@ describe('model: findOneAndUpdate:', function() {
 
       it('mongoose.set(\'returnDocument\', \'after\') returns updated document', async function() {
         // Arrange
-        mongoose.set('returnDocument', 'after');
-        const userSchema = new Schema({ name: String });
-        const User = db.model('User', userSchema);
-        await User.create({ name: 'original' });
+        const { User } = await createTestContext({ returnDocument: 'after' });
+        const user = await User.create({ name: 'original' });
 
         // Act
-        const result = await User.findOneAndUpdate({ name: 'original' }, { name: 'updated' });
+        const result = await User.findOneAndUpdate({ _id: user._id }, { name: 'updated' });
 
         // Assert
         assert.strictEqual(result.name, 'updated');
@@ -2368,17 +2355,51 @@ describe('model: findOneAndUpdate:', function() {
 
       it('mongoose.set(\'returnDocument\', \'before\') returns original document', async function() {
         // Arrange
-        mongoose.set('returnDocument', 'before');
-        const userSchema = new Schema({ name: String });
-        const User = db.model('User', userSchema);
-        await User.create({ name: 'original' });
+        const { User } = await createTestContext({ returnDocument: 'before' });
+        const user = await User.create({ name: 'original' });
 
         // Act
-        const result = await User.findOneAndUpdate({ name: 'original' }, { name: 'updated' });
+        const result = await User.findOneAndUpdate({ _id: user._id }, { name: 'updated' });
 
         // Assert
         assert.strictEqual(result.name, 'original');
       });
+
+      it('throws error when setting returnOriginal after returnDocument is set', function() {
+        // Arrange
+        m = new mongoose.Mongoose();
+        m.set('returnDocument', 'after');
+
+        // Act & Assert
+        assert.throws(
+          () => m.set('returnOriginal', false),
+          /Cannot set `returnOriginal` when `returnDocument` is already set/
+        );
+      });
+
+      it('throws error when setting returnDocument after returnOriginal is set', function() {
+        // Arrange
+        m = new mongoose.Mongoose();
+        sinon.stub(utils, 'warn');
+        m.set('returnOriginal', false);
+
+        // Act & Assert
+        assert.throws(
+          () => m.set('returnDocument', 'after'),
+          /Cannot set `returnDocument` when `returnOriginal` is already set/
+        );
+      });
+
+      async function createTestContext(globalOptions) {
+        m = new mongoose.Mongoose();
+        for (const [key, value] of Object.entries(globalOptions)) {
+          m.set(key, value);
+        }
+        const conn = await m.connect(start.uri);
+        const userSchema = new m.Schema({ name: String });
+        const User = conn.model('User', userSchema);
+        return { User };
+      }
     });
   });
 });

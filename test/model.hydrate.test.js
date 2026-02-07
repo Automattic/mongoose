@@ -357,13 +357,13 @@ describe('model', function() {
       assert.strictEqual(doc2.matrix[0][0].computed, undefined);
     });
 
-    it.skip('handles strict option to control non-schema properties', function() {
+    it('handles strict option to control non-schema properties', function() {
       const strictSchema = new Schema({
         name: String,
         age: Number
       }, { strict: true });
 
-      const Model = db.model('Test3', strictSchema);
+      const Model = db.model('TestHydrateStrict', strictSchema);
 
       // Test with strict: false - should allow extra fields
       const doc1 = Model.hydrate({

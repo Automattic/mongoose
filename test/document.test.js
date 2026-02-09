@@ -15,8 +15,6 @@ const sinon = require('sinon');
 const util = require('./util');
 const utils = require('../lib/utils');
 
-const { Binary } = require('bson');
-
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;

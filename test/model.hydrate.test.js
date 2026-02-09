@@ -357,10 +357,10 @@ describe('model', function() {
       assert.strictEqual(doc2.matrix[0][0].computed, undefined);
     });
 
-    describe('strict option (gh-15940)', function () {
+    describe('strict option (gh-15940)', function() {
       beforeEach(() => db.deleteModel(/.*/));
 
-      it('strict: false exposes extra fields as document properties', function () {
+      it('strict: false exposes extra fields as document properties', function() {
         // Arrange
         const { Person } = createTestContext();
 
@@ -379,7 +379,7 @@ describe('model', function() {
         assert.strictEqual(person.get('extraField'), 'not in schema');
       });
 
-      it('strict: true stores extra fields but does not expose them as properties', function () {
+      it('strict: true stores extra fields but does not expose them as properties', function() {
         // Arrange
         const { Person } = createTestContext();
 
@@ -398,7 +398,7 @@ describe('model', function() {
         assert.strictEqual(person.get('extraField'), 'should be ignored');
       });
 
-      it('strict: "throw" throws error when hydrating document with extra fields', function () {
+      it('strict: "throw" throws error when hydrating document with extra fields', function() {
         // Arrange
         const { Person } = createTestContext();
 
@@ -413,7 +413,7 @@ describe('model', function() {
         }, /Field `extraField` is not in schema/);
       });
 
-      it('uses schema strict mode when no strict option provided', function () {
+      it('uses schema strict mode when no strict option provided', function() {
         // Arrange
         const { Person } = createTestContext();
 
@@ -450,7 +450,8 @@ describe('model', function() {
         age: Number
       }, { strict: true });
 
-      const Model = db.model('Test3', strictSchema);
+      db.deleteModel(/Test/);
+      const Model = db.model('Test', strictSchema);
 
       // Test with strict: false - should allow extra fields
       const doc1 = Model.hydrate({

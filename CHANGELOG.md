@@ -1,3 +1,15 @@
+9.2.0 / 2026-02-09
+==================
+ * feat: add option to skip middleware #15883 #8768 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(model): delay "Duplicate schema index" warning until createIndexes runs to include model name in the warning #15979
+ * feat(model): add strict option to Model.hydrate(...) #15940 #15977
+ * feat(document): add flattenUUIDs option to toObject() and toJSON() #15864 #15021 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(schema): treat undefined as not provided for strict, strictQuery and id options #16004 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * types(inferrawdoctype): avoid adding _id to nested paths and handle _id: false in options + schema definition #15989
+ * types: fix toObject() type inference with timestamps + virtuals #15975 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * types(models): remove dead MapReduce and GeoSearch types #15984
+ * test(types): remove tsd in favor of tsc + test utilities #15951 #15696
+
 8.23.0 / 2026-02-09
 ===================
  * feat(document): add flattenUUIDs option to toObject() and toJSON() (backport #15021 to 8.x)

@@ -11009,13 +11009,12 @@ describe('document', function() {
       assert.deepEqual(Object.keys(err2.errors), ['age']);
     });
 
-    // skip until gh-10367 is implemented
-    it.skip('support `pathsToSkip` option for `Model.validate()`', async function() {
+    it('support `pathsToSkip` option for `Model.validate()`', async function() {
       const User = getUserModel();
-      const err1 = await User.validate({}, { pathsToSkip: ['age'] });
+      const err1 = await User.validate({}, { pathsToSkip: ['age'] }).then(() => null, err => err);
       assert.deepEqual(Object.keys(err1.errors), ['name']);
 
-      const err2 = await User.validate({}, { pathsToSkip: ['name'] });
+      const err2 = await User.validate({}, { pathsToSkip: ['name'] }).then(() => null, err => err);
       assert.deepEqual(Object.keys(err2.errors), ['age']);
     });
 

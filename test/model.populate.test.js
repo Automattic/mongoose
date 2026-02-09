@@ -11715,4 +11715,265 @@ describe('model: populate:', function() {
     section = await Section.findById(section).populate('subdoc.subSection');
     assert.equal(section.subdoc.subSection.name, 'foo');
   });
+
+  it('handles match function with nested populate where match references a populated field (mongodb-js/mongoose-autopopulate#112)', async function() {
+    // Scenario: Parent has children, children have a reference to Category.
+    // We want to populate children with a match function that filters by category,
+    // AND also populate the category field on children.
+    // mongodb-js/mongoose-autopopulate#112 pointed out that there was an issue in
+    // this case where the parent -> children populate would break if it had a
+    // `match` function because that `match` would be applied against the populated
+    // version of the child.
+    const categorySchema = new Schema({
+      name: String
+    });
+    const Category = db.model('Category', categorySchema);
+
+    const childSchema = new Schema({
+      name: String,
+      category: { type: Schema.Types.ObjectId, ref: 'Category' }
+    });
+    const Child = db.model('Child', childSchema);
+
+    const parentSchema = new Schema({
+      name: String,
+      children: [{ type: Schema.Types.ObjectId, ref: 'Child' }]
+    });
+    const Parent = db.model('Parent', parentSchema);
+
+    // Create test data
+    const category1 = await Category.create({ name: 'Category A' });
+    const category2 = await Category.create({ name: 'Category B' });
+
+    const child1 = await Child.create({ name: 'Child 1', category: category1._id });
+    const child2 = await Child.create({ name: 'Child 2', category: category2._id });
+    const child3 = await Child.create({ name: 'Child 3', category: category1._id });
+
+    const parent = await Parent.create({
+      name: 'Parent',
+      children: [child1._id, child2._id, child3._id]
+    });
+
+    // Populate children with match function filtering by category,
+    // and also populate the category field on each child
+    const doc = await Parent.findById(parent._id).populate({
+      path: 'children',
+      match: () => ({ category: category1._id }),
+      populate: {
+        path: 'category'
+      }
+    });
+
+    // Should only have children with category1
+    assert.equal(doc.children.length, 2);
+    assert.equal(doc.children[0].name, 'Child 1');
+    assert.equal(doc.children[1].name, 'Child 3');
+    // Category should be populated
+    assert.equal(doc.children[0].category.name, 'Category A');
+    assert.equal(doc.children[1].category.name, 'Category A');
+
+    // Also test with lean
+    const leanDoc = await Parent.findById(parent._id).populate({
+      path: 'children',
+      match: () => ({ category: category1._id }),
+      populate: {
+        path: 'category'
+      }
+    }).lean();
+
+    assert.equal(leanDoc.children.length, 2);
+    assert.equal(leanDoc.children[0].name, 'Child 1');
+    assert.equal(leanDoc.children[1].name, 'Child 3');
+    assert.equal(leanDoc.children[0].category.name, 'Category A');
+    assert.equal(leanDoc.children[1].category.name, 'Category A');
+  });
+
+  it('handles match function when nested populate is defined in pre find hook (mongodb-js/mongoose-autopopulate#112)', async function() {
+    // Scenario: Child model has a pre('find') hook that auto-populates category.
+    // Parent populates children with a match function filtering by category.
+    // The issue: the hook runs during populate query, so sift sees populated docs.
+
+    const categorySchema = new Schema({
+      name: String
+    });
+    const Category = db.model('Category', categorySchema);
+
+    const childSchema = new Schema({
+      name: String,
+      category: { type: Schema.Types.ObjectId, ref: 'Category' }
+    });
+
+    // Auto-populate category on all find queries
+    childSchema.pre('find', function() {
+      this.populate('category');
+    });
+
+    const Child = db.model('Child', childSchema);
+
+    const parentSchema = new Schema({
+      name: String,
+      children: [{ type: Schema.Types.ObjectId, ref: 'Child' }]
+    });
+    const Parent = db.model('Parent', parentSchema);
+
+    // Create test data
+    const category1 = await Category.create({ name: 'Category A' });
+    const category2 = await Category.create({ name: 'Category B' });
+
+    const child1 = await Child.create({ name: 'Child 1', category: category1._id });
+    const child2 = await Child.create({ name: 'Child 2', category: category2._id });
+    const child3 = await Child.create({ name: 'Child 3', category: category1._id });
+
+    const parent = await Parent.create({
+      name: 'Parent',
+      children: [child1._id, child2._id, child3._id]
+    });
+
+    // Populate children with match function - the pre('find') hook will auto-populate category
+    const doc = await Parent.findById(parent._id).populate({
+      path: 'children',
+      match: () => ({ category: category1._id })
+    });
+
+    // Should only have children with category1
+    assert.equal(doc.children.length, 2);
+    assert.equal(doc.children[0].name, 'Child 1');
+    assert.equal(doc.children[1].name, 'Child 3');
+    // Category should be populated via the hook
+    assert.equal(doc.children[0].category.name, 'Category A');
+    assert.equal(doc.children[1].category.name, 'Category A');
+  });
+
+  it('does not mix deferred populates from pre-find hooks between different models with refPath (mongodb-js/mongoose-autopopulate#112)', async function() {
+    // Scenario: Using refPath to populate from different models (Child and Pet).
+    // Each model has a pre('find') hook that auto-populates a different field.
+    // Bug: deferred populates from hooks were collected globally across all models,
+    // then applied to ALL children, so Child's 'category' populate would incorrectly
+    // be applied to Pet docs and vice versa.
+
+    const categorySchema = new Schema({ name: String });
+    const Category = db.model('Category', categorySchema);
+
+    const speciesSchema = new Schema({ name: String });
+    const Species = db.model('Species', speciesSchema);
+
+    // Child has a pre('find') hook that auto-populates category
+    const childSchema = new Schema({
+      name: String,
+      category: { type: Schema.Types.ObjectId, ref: 'Category' }
+    });
+    childSchema.pre('find', function() {
+      this.populate('category');
+    });
+    const Child = db.model('Child', childSchema);
+
+    // Pet has a pre('find') hook that auto-populates species
+    const petSchema = new Schema({
+      name: String,
+      species: { type: Schema.Types.ObjectId, ref: 'Species' }
+    });
+    petSchema.pre('find', function() {
+      this.populate('species');
+    });
+    const Pet = db.model('Pet', petSchema);
+
+    // Parent uses refPath to dynamically reference either Child or Pet
+    const parentSchema = new Schema({
+      name: String,
+      items: [{
+        item: { type: Schema.Types.ObjectId, refPath: 'items.itemModel' },
+        itemModel: { type: String, enum: ['Child', 'Pet'] }
+      }]
+    });
+    const Parent = db.model('Parent', parentSchema);
+
+    // Create test data
+    const category1 = await Category.create({ name: 'Category A' });
+    const species1 = await Species.create({ name: 'Dog' });
+
+    const child1 = await Child.create({ name: 'Child 1', category: category1._id });
+    const pet1 = await Pet.create({ name: 'Fido', species: species1._id });
+
+    const parent = await Parent.create({
+      name: 'Parent',
+      items: [
+        { item: child1._id, itemModel: 'Child' },
+        { item: pet1._id, itemModel: 'Pet' }
+      ]
+    });
+
+    // Populate items.item with match function - the pre('find') hooks will add
+    // model-specific sub-populates that should NOT be mixed between models
+    const doc = await Parent.findById(parent._id).populate({
+      path: 'items.item',
+      match: () => ({}) // Match all, triggers deferred populate logic
+    });
+
+    // Verify both items are populated correctly
+    assert.equal(doc.items.length, 2);
+
+    const childItem = doc.items.find(i => i.itemModel === 'Child');
+    const petItem = doc.items.find(i => i.itemModel === 'Pet');
+
+    // Child should have category populated (from Child's pre-find hook)
+    assert.equal(childItem.item.name, 'Child 1');
+    assert.equal(childItem.item.category.name, 'Category A');
+
+    // Pet should have species populated (from Pet's pre-find hook)
+    assert.equal(petItem.item.name, 'Fido');
+    assert.equal(petItem.item.species.name, 'Dog');
+  });
+
+  it('deferred sub-populate respects strictPopulate and _fullPath (mongodb-js/mongoose-autopopulate#112)', async function() {
+    // When sub-populate is deferred (due to match function), it should still:
+    // 1. Set _fullPath correctly for proper error messages
+    // 2. Respect strictPopulate option
+    // 3. Set _localModel so strictPopulate check works
+
+    const categorySchema = new Schema({ name: String });
+    const Category = db.model('Category', categorySchema);
+
+    const childSchema = new Schema({
+      name: String,
+      category: { type: Schema.Types.ObjectId, ref: 'Category' }
+    });
+    const Child = db.model('Child', childSchema);
+
+    const parentSchema = new Schema({
+      name: String,
+      children: [{ type: Schema.Types.ObjectId, ref: 'Child' }]
+    });
+    const Parent = db.model('Parent', parentSchema);
+
+    const category = await Category.create({ name: 'Test Category' });
+    const child = await Child.create({ name: 'Test Child', category: category._id });
+    const parent = await Parent.create({ name: 'Test Parent', children: [child._id] });
+
+    // Test that deferred sub-populate throws strictPopulate error with correct path
+    const err = await Parent.findById(parent._id).populate({
+      path: 'children',
+      match: () => ({}), // Triggers deferred populate
+      populate: {
+        path: 'nonExistentField',
+        strictPopulate: true
+      }
+    }).then(() => null, err => err);
+
+    assert.ok(err);
+    assert.ok(err.message.includes('children.nonExistentField'), 'Error should include full path');
+    assert.ok(err.message.includes('strictPopulate'), 'Error should mention strictPopulate');
+
+    // Test that valid deferred sub-populate still works
+    const doc = await Parent.findById(parent._id).populate({
+      path: 'children',
+      match: () => ({}),
+      populate: {
+        path: 'category',
+        strictPopulate: true
+      }
+    });
+
+    assert.equal(doc.children.length, 1);
+    assert.equal(doc.children[0].category.name, 'Test Category');
+  });
 });

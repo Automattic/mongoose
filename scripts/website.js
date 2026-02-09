@@ -357,7 +357,7 @@ ${md.split('\n').map(line => '    ' + line).join('\n')}
 const cpc = `
 <div class="sponsored-ad">
   <a href="https://localizejs.com/?utm_campaign=Mongoose&utm_source=mongoose&utm_medium=banner">
-    <img src="/docs/images/localize-mongoose-ad-banner-2x.jpg">
+    <img src="https://res.cloudinary.com/drfhhq8wu/image/upload/v1770464125/localize2_acgiup.webp">
   </a>
 </div>
 `;

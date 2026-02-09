@@ -209,8 +209,18 @@ function processName(input) {
 }
 
 // helper function to keep translating array types to string consistent
-function convertTypesToString(types) {
-  return Array.isArray(types) ? types.join('|') : types;
+// typesDescription is used as fallback when types contains '[object Object]'
+// (happens with string literal types like 'before'|'after' due to dox/jsdoctypeparser bug)
+function convertTypesToString(types, typesDescription) {
+  if (!Array.isArray(types)) {
+    return types;
+  }
+  const result = types.join('|');
+  if (result.includes('[object Object]') && typesDescription) {
+    // Strip HTML code tags from typesDescription: <code>foo</code> -> foo
+    return typesDescription.replace(/<\/?code>/g, '');
+  }
+  return result;
 }
 
 /**
@@ -295,12 +305,12 @@ function processFile(props) {
           ctx.name = tag.name;
           // only assign "type" if there are types
           if (tag.types.length > 0) {
-            ctx.type = convertTypesToString(tag.types);
+            ctx.type = convertTypesToString(tag.types, tag.typesDescription);
           }
 
           break;
         case 'type':
-          ctx.type = convertTypesToString(tag.types);
+          ctx.type = convertTypesToString(tag.types, tag.typesDescription);
           break;
         case 'static':
           ctx.type = 'property';
@@ -359,7 +369,7 @@ function processFile(props) {
             tag.types.push('null');
           }
           if (tag.types) {
-            tag.types = convertTypesToString(tag.types);
+            tag.types = convertTypesToString(tag.types, tag.typesDescription);
           }
           ctx[tag.type].push(tag);
           if (tag.name != null && tag.name.startsWith('[') && tag.name.endsWith(']') && tag.name.includes('.')) {

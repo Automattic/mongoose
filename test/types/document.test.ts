@@ -12,10 +12,10 @@ import {
   ResolveSchemaOptions
 } from 'mongoose';
 import { DeleteResult } from 'mongodb';
-import { expectAssignable, expectError, expectNotAssignable, expectType } from 'tsd';
 import { autoTypedModel } from './models.test';
 import { autoTypedModelConnection } from './connection.test';
 import { AutoTypedSchemaType } from './schema.test';
+import { ExpectAssignable, ExpectType } from './util/assertions';
 
 const Drink = model('Drink', new Schema({
   name: String
@@ -42,10 +42,11 @@ const Test = model<ITest>('Test', schema);
 void async function main() {
   const doc = await Test.findOne().orFail();
 
-  expectType<DeleteResult>(await doc.deleteOne());
-  expectType<TestDocument | null>(await doc.deleteOne().findOne());
-  expectAssignable<{ _id: Types.ObjectId, name?: string } | null>(await doc.deleteOne().findOne().lean());
-  expectNotAssignable<TestDocument | null>(await doc.deleteOne().findOne().lean());
+  ExpectType<DeleteResult>(await doc.deleteOne());
+  ExpectType<TestDocument | null>(await doc.deleteOne().findOne());
+  ExpectAssignable<{ _id: Types.ObjectId, name?: string } | null>()(await doc.deleteOne().findOne().lean());
+  // @ts-expect-error invalid assignment
+  const v: TestDocument | null = await doc.deleteOne().findOne().lean();
 }();
 
 
@@ -65,8 +66,8 @@ void async function run() {
   test.validateSync({ pathsToSkip: 'name age' });
   test.validateSync({ pathsToSkip: 'name age', blub: 1 });
   const x = test.save();
-  expectAssignable<Promise<ITest & { _id: any; }>>(test.save());
-  expectAssignable<Promise<ITest & { _id: any; }>>(test.save({}));
+  ExpectAssignable<Promise<ITest & { _id: any; }>>()(test.save());
+  ExpectAssignable<Promise<ITest & { _id: any; }>>()(test.save({}));
 })();
 
 function gh10526<U extends ITest>(arg1: Model<U>) {
@@ -92,7 +93,7 @@ function testMethods(): void {
   const UserModel = model<IUser, User>('User', schema);
 
   const doc = new UserModel({ first: 'test', last: 'test' });
-  expectType<string>(doc.fullName());
+  ExpectType<string>(doc.fullName());
 }
 
 function testRequiredId(): void {
@@ -148,7 +149,7 @@ async function gh11117(): Promise<void> {
     }
   ]);
   const json = items[0].toJSON();
-  expectType<Date>(json.someDate);
+  ExpectType<Date>(json.someDate);
 }
 
 function gh11085(): void {
@@ -176,7 +177,7 @@ function gh11435() {
   const ItemSchema = new Schema<Item>({ name: String });
 
   ItemSchema.pre('validate', function preValidate() {
-    expectType<Model<unknown>>(this.$model('Item1'));
+    ExpectType<Model<unknown>>(this.$model('Item1'));
   });
 }
 
@@ -189,12 +190,12 @@ function autoTypedDocument() {
   const AutoTypedModel = autoTypedModel();
   const AutoTypeModelInstance = new AutoTypedModel({ unExistProperty: 1, description: 2 });
 
-  expectType<AutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);
-  expectType<AutoTypedSchemaType['schema']['favoritDrink']>(AutoTypeModelInstance.favoritDrink);
-  expectType<AutoTypedSchemaType['schema']['favoritColorMode']>(AutoTypeModelInstance.favoritColorMode);
+  ExpectType<AutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);
+  ExpectType<AutoTypedSchemaType['schema']['favoritDrink']>(AutoTypeModelInstance.favoritDrink);
+  ExpectType<AutoTypedSchemaType['schema']['favoritColorMode']>(AutoTypeModelInstance.favoritColorMode);
 
   // Document-Methods-tests
-  expectType<ReturnType<AutoTypedSchemaType['methods']['instanceFn']>>(new AutoTypedModel().instanceFn());
+  ExpectType<ReturnType<AutoTypedSchemaType['methods']['instanceFn']>>(new AutoTypedModel().instanceFn());
 
 }
 
@@ -202,12 +203,12 @@ function autoTypedDocumentConnection() {
   const AutoTypedModel = autoTypedModelConnection();
   const AutoTypeModelInstance = new AutoTypedModel({ unExistProperty: 1, description: 2 });
 
-  expectType<AutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);
-  expectType<AutoTypedSchemaType['schema']['favoritDrink']>(AutoTypeModelInstance.favoritDrink);
-  expectType<AutoTypedSchemaType['schema']['favoritColorMode']>(AutoTypeModelInstance.favoritColorMode);
+  ExpectType<AutoTypedSchemaType['schema']['userName']>(AutoTypeModelInstance.userName);
+  ExpectType<AutoTypedSchemaType['schema']['favoritDrink']>(AutoTypeModelInstance.favoritDrink);
+  ExpectType<AutoTypedSchemaType['schema']['favoritColorMode']>(AutoTypeModelInstance.favoritColorMode);
 
   // Document-Methods-tests
-  expectType<ReturnType<AutoTypedSchemaType['methods']['instanceFn']>>(new AutoTypedModel().instanceFn());
+  ExpectType<ReturnType<AutoTypedSchemaType['methods']['instanceFn']>>(new AutoTypedModel().instanceFn());
 
 }
 
@@ -261,8 +262,8 @@ async function gh11960() {
       nestedArray: [{ dummy: 'hello again' }]
     });
 
-    expectType<ParentDocument>(doc);
-    expectType<Map<string, string> | undefined>(doc.map);
+    ExpectType<ParentDocument>(doc);
+    ExpectType<Map<string, string> | undefined>(doc.map);
     doc.nested!.parent();
     doc.nestedArray?.[0].parentArray();
   }
@@ -275,8 +276,8 @@ async function gh11960() {
       nestedArray: [{ dummy: 'hello again' }]
     });
 
-    expectType<ParentDocument>(doc);
-    expectType<Map<string, string> | undefined>(doc.map);
+    ExpectType<ParentDocument>(doc);
+    ExpectType<Map<string, string> | undefined>(doc.map);
     doc.nested!.parent();
     doc.nestedArray?.[0].parentArray();
   }
@@ -305,27 +306,15 @@ function gh13878() {
   });
   const User = model('User', schema);
   const user = new User({ name: 'John', age: 30 });
-  expectType<typeof User>(user.$model());
-  expectType<typeof User>(user.model());
+  ExpectType<typeof User>(user.$model());
+  ExpectType<typeof User>(user.model());
 }
 
 function gh13094() {
   type UserDocumentNever = HydratedDocument<{ name: string }, Record<string, never>>;
 
   const doc: UserDocumentNever = null as any;
-  expectType<string>(doc.name);
-
-  // The following currently fails.
-  /* type UserDocumentUnknown = HydratedDocument<{ name: string }, Record<string, unknown>>;
-
-  const doc2: UserDocumentUnknown = null as any;
-  expectType<string>(doc2.name); */
-
-  // The following currently fails.
-  /* type UserDocumentAny = HydratedDocument<{ name: string }, Record<string, any>>;
-
-  const doc3: UserDocumentAny = null as any;
-  expectType<string>(doc3.name); */
+  ExpectType<string>(doc.name);
 }
 
 function gh13738() {
@@ -355,9 +344,9 @@ function gh13738() {
 
   const person = new Person({ name: 'person', dob: new Date(), settings: { alerts: { sms: true }, theme: 'light' } });
 
-  expectType<number>(person.get('age'));
-  expectType<Date>(person.get('dob'));
-  expectType<{ theme: string; alerts: { sms: boolean } }>(person.get('settings'));
+  ExpectType<number>(person.get('age'));
+  ExpectType<Date>(person.get('dob'));
+  ExpectType<{ theme: string; alerts: { sms: boolean } }>(person.get('settings'));
 }
 
 async function gh12959() {
@@ -370,10 +359,11 @@ async function gh12959() {
   const Model = model('test', schema);
 
   const doc = await Model.findById('id').orFail();
-  expectType<Types.ObjectId>(doc._id);
-  expectType<number>(doc.__v);
+  ExpectType<Types.ObjectId>(doc._id);
+  ExpectType<number>(doc.__v);
 
-  expectError(doc.subdocArray[0].__v);
+  // @ts-expect-error version key shouldn't be defined on subdocs
+  doc.subdocArray[0].__v;
 }
 
 async function gh14876() {
@@ -420,8 +410,8 @@ async function gh14876() {
 
   const depopulatedCar = populatedCar.depopulate<{ owner: Types.ObjectId }>('owner');
 
-  expectType<UserObjectInterface>(populatedCar.owner);
-  expectType<Types.ObjectId>(depopulatedCar.owner);
+  ExpectType<UserObjectInterface>(populatedCar.owner);
+  ExpectType<Types.ObjectId>(depopulatedCar.owner);
 }
 
 async function gh15077() {
@@ -472,8 +462,43 @@ async function gh15316() {
 
   const doc = new TestModel({ name: 'taco' });
 
-  expectType<string>(doc.toJSON({ virtuals: true }).upper);
-  expectType<string>(doc.toObject({ virtuals: true }).upper);
+  ExpectType<string>(doc.toJSON({ virtuals: true }).upper);
+  ExpectType<string>(doc.toObject({ virtuals: true }).upper);
+}
+
+function gh15965() {
+  const FooSchema = new Schema({
+    foo: { type: String }
+  });
+
+  const PodcastSchema = new Schema({
+    a: { type: FooSchema },
+    b: { type: FooSchema, required: true },
+    c: { type: String },
+    d: { type: String, required: true }
+  }, {
+    timestamps: true,
+    virtuals: {
+      hello: { get() { return 'hello world'; } }
+    }
+  });
+  const RootModel = model('Root', PodcastSchema);
+  const root = new RootModel({ b: { foo: 'b' }, d: 'd' });
+  const obj = root.toObject({
+    flattenMaps: true,
+    flattenObjectIds: true,
+    versionKey: true,
+    virtuals: true
+  });
+
+  ExpectType<string>(obj.id);
+  ExpectType<string | null | undefined>(obj.a?.foo);
+  ExpectType<string | null | undefined>(obj.b.foo);
+  ExpectType<string | null | undefined>(obj.c);
+  ExpectType<string>(obj.d);
+  ExpectType<string>(obj.hello);
+  ExpectType<Date>(obj.createdAt);
+  ExpectType<Date>(obj.updatedAt);
 }
 
 function gh13079() {
@@ -483,7 +508,7 @@ function gh13079() {
   const TestModel = model('Test', schema);
 
   const doc = new TestModel({ name: 'taco' });
-  expectType<string>(doc.id);
+  ExpectType<string>(doc.id);
 
   const schema2 = new Schema({
     id: { type: Number, required: true },
@@ -492,7 +517,7 @@ function gh13079() {
   const TestModel2 = model('Test', schema2);
 
   const doc2 = new TestModel2({ name: 'taco' });
-  expectType<number>(doc2.id);
+  ExpectType<number>(doc2.id);
 
   const schema3 = new Schema<{ name: string }>({
     name: { type: String, required: true }
@@ -500,7 +525,7 @@ function gh13079() {
   const TestModel3 = model('Test', schema3);
 
   const doc3 = new TestModel3({ name: 'taco' });
-  expectType<string>(doc3.id);
+  ExpectType<string>(doc3.id);
 
   const schema4 = new Schema<{ name: string, id: number }>({
     id: { type: Number, required: true },
@@ -509,7 +534,7 @@ function gh13079() {
   const TestModel4 = model('Test', schema4);
 
   const doc4 = new TestModel4({ name: 'taco' });
-  expectType<number>(doc4.id);
+  ExpectType<number>(doc4.id);
 
   const schema5 = new Schema({
     name: { type: String, required: true }
@@ -517,7 +542,8 @@ function gh13079() {
   const TestModel5 = model('Test', schema5);
 
   const doc5 = new TestModel5({ name: 'taco' });
-  expectError(doc5.id);
+  // @ts-expect-error should not be defined because id option is set to false
+  doc5.id;
 }
 
 async function toBSON() {
@@ -528,7 +554,7 @@ async function toBSON() {
   const Model = model('test', schema);
 
   const doc = new Model({ name: 'test' });
-  expectType<{ name?: string | null } & { _id: Types.ObjectId }>(doc.toBSON());
+  ExpectType<{ name?: string | null } & { _id: Types.ObjectId }>(doc.toBSON());
 }
 
 async function gh15578() {
@@ -554,13 +580,15 @@ async function gh15578() {
 
     const objWithoutVersionKey = a.toObject({ versionKey: false });
     const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
-    expectError(objWithoutVersionKey.__v);
-    expectError(jsonWithoutVersionKey.__v);
+    // @ts-expect-error should not be defined because versionKey is set to false
+    objWithoutVersionKey.__v;
+    // @ts-expect-error should not be defined because versionKey is set to false
+    jsonWithoutVersionKey.__v;
 
     const objWithVersionKey = a.toObject();
     const jsonWithVersionKey = a.toJSON();
-    expectType<number>(objWithVersionKey.__v);
-    expectType<number>(jsonWithVersionKey.__v);
+    ExpectType<number>(objWithVersionKey.__v);
+    ExpectType<number>(jsonWithVersionKey.__v);
   }
 
   function withDocTypeAndVersionKey() {
@@ -589,13 +617,15 @@ async function gh15578() {
 
     const objWithoutVersionKey = a.toObject({ versionKey: false });
     const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
-    expectError(objWithoutVersionKey.taco);
-    expectError(jsonWithoutVersionKey.taco);
+    // @ts-expect-error should not be defined because versionKey is set to false
+    objWithoutVersionKey.__v;
+    // @ts-expect-error should not be defined because versionKey is set to false
+    jsonWithoutVersionKey.__v;
 
     const objWithVersionKey = a.toObject();
     const jsonWithVersionKey = a.toJSON();
-    expectType<number>(objWithVersionKey.taco);
-    expectType<number>(jsonWithVersionKey.taco);
+    ExpectType<number>(objWithVersionKey.taco);
+    ExpectType<number>(jsonWithVersionKey.taco);
   }
 
   function autoInferred() {
@@ -618,15 +648,21 @@ async function gh15578() {
     const toJSONWithVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: true, flattenObjectIds: true });
     const toJSONWithoutVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: false, flattenObjectIds: true });
 
+    // When passing options, __v should still be present
+    ExpectType<number>(a.toObject({ flattenObjectIds: true }).__v);
+    ExpectType<number>(a.toJSON({ flattenObjectIds: true }).__v);
+
     const objWithoutVersionKey = a.toObject({ versionKey: false });
     const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
-    expectError(objWithoutVersionKey.__v);
-    expectError(jsonWithoutVersionKey.__v);
+    // @ts-expect-error should not be defined because versionKey is set to false
+    objWithoutVersionKey.__v;
+    // @ts-expect-error should not be defined because versionKey is set to false
+    jsonWithoutVersionKey.__v;
 
     const objWithVersionKey = a.toObject();
     const jsonWithVersionKey = a.toJSON();
-    expectType<number>(objWithVersionKey.__v);
-    expectType<number>(jsonWithVersionKey.__v);
+    ExpectType<number>(objWithVersionKey.__v);
+    ExpectType<number>(jsonWithVersionKey.__v);
   }
 
   function autoInferredWithCustomVersionKey() {
@@ -651,16 +687,191 @@ async function gh15578() {
     const toJSONWithVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: true, flattenObjectIds: true });
     const toJSONWithoutVirtuals: Omit<RawDocType, '_id'> & { _id: string } = a.toJSON({ virtuals: false, flattenObjectIds: true });
 
+    // When passing options, custom version key should still be present
+    ExpectType<number>(a.toObject({ flattenObjectIds: true }).taco);
+    ExpectType<number>(a.toJSON({ flattenObjectIds: true }).taco);
+
     const objWithoutVersionKey = a.toObject({ versionKey: false });
     const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
-    expectError(objWithoutVersionKey.taco);
-    expectError(jsonWithoutVersionKey.taco);
+    // @ts-expect-error should not be defined because versionKey is set to false
+    objWithoutVersionKey.__v;
+    // @ts-expect-error should not be defined because versionKey is set to false
+    jsonWithoutVersionKey.__v;
 
     const objWithVersionKey = a.toObject();
     const jsonWithVersionKey = a.toJSON();
-    expectType<number>(objWithVersionKey.taco);
-    expectType<number>(jsonWithVersionKey.taco);
+    ExpectType<number>(objWithVersionKey.taco);
+    ExpectType<number>(jsonWithVersionKey.taco);
   }
+}
+
+function testFlattenUUIDs() {
+  interface RawDocType {
+    _id: Types.UUID;
+    uuid: Types.UUID;
+  }
+
+  const ASchema = new Schema<RawDocType>({
+    _id: Schema.Types.UUID,
+    uuid: Schema.Types.UUID
+  });
+
+  const AModel = model<RawDocType>('UUIDModel', ASchema);
+
+  const a = new AModel({
+    uuid: new Types.UUID()
+  });
+
+  // Test flattenUUIDs: true converts UUIDs to strings
+  const toObjectFlattened = a.toObject({ flattenUUIDs: true });
+  const toJSONFlattened = a.toJSON({ flattenUUIDs: true });
+
+  ExpectType<string>(toObjectFlattened._id);
+  ExpectType<string>(toObjectFlattened.uuid);
+  ExpectType<string>(toJSONFlattened._id);
+  ExpectType<string>(toJSONFlattened.uuid);
+
+  // Test with virtuals
+  const toObjectWithVirtuals = a.toObject({ flattenUUIDs: true, virtuals: true });
+  const toJSONWithVirtuals = a.toJSON({ flattenUUIDs: true, virtuals: true });
+
+  ExpectType<string>(toObjectWithVirtuals._id);
+  ExpectType<string>(toObjectWithVirtuals.uuid);
+  ExpectType<string>(toJSONWithVirtuals._id);
+  ExpectType<string>(toJSONWithVirtuals.uuid);
+
+  // Test flattenUUIDs: false (default behavior - should remain UUID)
+  const toObjectNotFlattened = a.toObject({ flattenUUIDs: false });
+  const toJSONNotFlattened = a.toJSON({ flattenUUIDs: false });
+  ExpectType<Types.UUID>(toObjectNotFlattened._id);
+  ExpectType<Types.UUID>(toObjectNotFlattened.uuid);
+  ExpectType<Types.UUID>(toJSONNotFlattened._id);
+  ExpectType<Types.UUID>(toJSONNotFlattened.uuid);
+
+  // Test default (no flattenUUIDs option - should remain UUID)
+  const toObjectDefault = a.toObject();
+  const toJSONDefault = a.toJSON();
+  ExpectType<Types.UUID>(toObjectDefault._id);
+  ExpectType<Types.UUID>(toObjectDefault.uuid);
+  ExpectType<Types.UUID>(toJSONDefault._id);
+  ExpectType<Types.UUID>(toJSONDefault.uuid);
+}
+
+function testCombinedFlattenOptions() {
+  interface RawDocType {
+    _id: Types.ObjectId;
+    uuid: Types.UUID;
+    name: string;
+    tags: Map<string, string>;
+  }
+
+  interface Virtuals {
+    displayName: string;
+  }
+
+  const ASchema = new Schema<RawDocType, Model<RawDocType, {}, {}, Virtuals>, {}, {}, Virtuals>({
+    uuid: Schema.Types.UUID,
+    name: String,
+    tags: { type: Map, of: String }
+  });
+
+  ASchema.virtual('displayName').get(function() {
+    return this.name.toUpperCase();
+  });
+
+  const AModel = model<RawDocType, Model<RawDocType, {}, {}, Virtuals>>('CombinedModel', ASchema);
+
+  const a = new AModel({
+    uuid: new Types.UUID(),
+    name: 'Test',
+    tags: new Map([['key', 'value']])
+  });
+
+  // Test flattenUUIDs + flattenObjectIds
+  const uuidAndObjectId = a.toObject({ flattenUUIDs: true, flattenObjectIds: true });
+  ExpectType<string>(uuidAndObjectId._id);
+  ExpectType<string>(uuidAndObjectId.uuid);
+
+  // Test flattenUUIDs + flattenMaps
+  const uuidAndMaps = a.toObject({ flattenUUIDs: true, flattenMaps: true });
+  ExpectType<string>(uuidAndMaps.uuid);
+  ExpectType<Record<string, string>>(uuidAndMaps.tags);
+
+  // Test flattenUUIDs + virtuals
+  const uuidAndVirtuals = a.toObject({ flattenUUIDs: true, virtuals: true });
+  ExpectType<string>(uuidAndVirtuals.uuid);
+  ExpectType<string>(uuidAndVirtuals.displayName);
+
+  // Test flattenObjectIds + flattenMaps
+  const objectIdAndMaps = a.toObject({ flattenObjectIds: true, flattenMaps: true });
+  ExpectType<string>(objectIdAndMaps._id);
+  ExpectType<Record<string, string>>(objectIdAndMaps.tags);
+
+  // Test flattenObjectIds + virtuals
+  const objectIdAndVirtuals = a.toObject({ flattenObjectIds: true, virtuals: true });
+  ExpectType<string>(objectIdAndVirtuals._id);
+  ExpectType<string>(objectIdAndVirtuals.displayName);
+
+  // Test flattenMaps + virtuals
+  const mapsAndVirtuals = a.toObject({ flattenMaps: true, virtuals: true });
+  ExpectType<Record<string, string>>(mapsAndVirtuals.tags);
+  ExpectType<string>(mapsAndVirtuals.displayName);
+
+  // Test triple combinations
+  const uuidObjectIdMaps = a.toObject({ flattenUUIDs: true, flattenObjectIds: true, flattenMaps: true });
+  ExpectType<string>(uuidObjectIdMaps._id);
+  ExpectType<string>(uuidObjectIdMaps.uuid);
+  ExpectType<Record<string, string>>(uuidObjectIdMaps.tags);
+
+  const uuidObjectIdVirtuals = a.toObject({ flattenUUIDs: true, flattenObjectIds: true, virtuals: true });
+  ExpectType<string>(uuidObjectIdVirtuals._id);
+  ExpectType<string>(uuidObjectIdVirtuals.uuid);
+  ExpectType<string>(uuidObjectIdVirtuals.displayName);
+
+  // Test all four options
+  const allFour = a.toObject({ flattenUUIDs: true, flattenObjectIds: true, flattenMaps: true, virtuals: true });
+  ExpectType<string>(allFour._id);
+  ExpectType<string>(allFour.uuid);
+  ExpectType<Record<string, string>>(allFour.tags);
+  ExpectType<string>(allFour.displayName);
+
+  // Same tests for toJSON
+  const allFourJSON = a.toJSON({ flattenUUIDs: true, flattenObjectIds: true, flattenMaps: true, virtuals: true });
+  ExpectType<string>(allFourJSON._id);
+  ExpectType<string>(allFourJSON.uuid);
+  ExpectType<Record<string, string>>(allFourJSON.tags);
+  ExpectType<string>(allFourJSON.displayName);
+}
+
+function testObjectIdsInsideMaps() {
+  // Test that ObjectIds/UUIDs nested inside Map values are correctly converted
+  interface DocWithMapOfObjectIds {
+    _id: Types.ObjectId;
+    userRefs: Map<string, { orderId: Types.ObjectId }>;
+    uuidRefs: Map<string, { refId: Types.UUID }>;
+  }
+
+  const schema = new Schema<DocWithMapOfObjectIds>({
+    userRefs: { type: Map, of: { orderId: Schema.Types.ObjectId } },
+    uuidRefs: { type: Map, of: { refId: Schema.Types.UUID } }
+  });
+
+  const Model = model<DocWithMapOfObjectIds>('MapOfObjectIds', schema);
+  const doc = new Model({});
+
+  // When using flattenMaps + flattenObjectIds, ObjectIds inside Map values should be converted
+  const flattened = doc.toObject({ flattenMaps: true, flattenObjectIds: true });
+  ExpectType<Record<string, { orderId: string }>>(flattened.userRefs);
+
+  // When using flattenMaps + flattenUUIDs, UUIDs inside Map values should be converted
+  const flattenedUUIDs = doc.toObject({ flattenMaps: true, flattenUUIDs: true });
+  ExpectType<Record<string, { refId: string }>>(flattenedUUIDs.uuidRefs);
+
+  // All three together
+  const allThree = doc.toObject({ flattenMaps: true, flattenObjectIds: true, flattenUUIDs: true });
+  ExpectType<Record<string, { orderId: string }>>(allThree.userRefs);
+  ExpectType<Record<string, { refId: string }>>(allThree.uuidRefs);
+  ExpectType<string>(allThree._id);
 }
 
 async function gh15900() {
@@ -683,7 +894,7 @@ async function gh15900() {
   });
 
   // id virtual should be available
-  expectType<string>(user.id);
+  ExpectType<string>(user.id);
 
   // Test that id virtual is NOT added when doc type already has id
   interface IUserWithId {
@@ -704,5 +915,5 @@ async function gh15900() {
   });
 
   // id should be number, not string virtual
-  expectType<number>(userWithId.id);
+  ExpectType<number>(userWithId.id);
 }

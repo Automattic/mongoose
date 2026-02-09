@@ -1,10 +1,50 @@
+9.2.0 / 2026-02-09
+==================
+ * feat: add option to skip middleware #15883 #8768 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(model): delay "Duplicate schema index" warning until createIndexes runs to include model name in the warning #15979
+ * feat(model): add strict option to Model.hydrate(...) #15940 #15977
+ * feat(document): add flattenUUIDs option to toObject() and toJSON() #15864 #15021 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(schema): treat undefined as not provided for strict, strictQuery and id options #16004 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * types(inferrawdoctype): avoid adding _id to nested paths and handle _id: false in options + schema definition #15989
+ * types: fix toObject() type inference with timestamps + virtuals #15975 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * types(models): remove dead MapReduce and GeoSearch types #15984
+ * test(types): remove tsd in favor of tsc + test utilities #15951 #15696
+
+8.23.0 / 2026-02-09
+===================
+ * feat(document): add flattenUUIDs option to toObject() and toJSON() (backport #15021 to 8.x)
+
+9.1.6 / 2026-02-04
+==================
+ * fix: handle other top-level query operators in sanitizeFilter
+ * fix(types): fix toObject() type inference with timestamps + virtuals #15975 #15965 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(populate): defer subpopulate until after match functions to avoid comparing populated subdocs #15981 mongodb-js/mongoose-autopopulate#112
+ * fix(DocumentArray): correctly clone subdocument when updating document array #15978 #15973
+ * fix(documentArray): fix change tracking for documentArrays in nested maps #15983 #15970 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs: clarify that you need to explicitly create timeseries collection before inserting document #15990 #15986
+
+8.22.1 / 2026-02-04
+==================
+ * fix: handle other top-level query operators in sanitizeFilter
+ * fix(document): when cloning a doc with subdocs, make sure the subdocs parent is the cloned doc #15904 #15901
+ * types(models): support Mongoose query casting in AnyBulkWriteOperation filter property #15910
+ * types: add toBSON() to documents #15927
+
+7.8.9 / 2026-02-04
+==================
+ * fix: handle other top-level query operators in sanitizeFilter
+
+8.22.0 / 2026-01-27
+===================
+ * feat(model): allow passing strict option to hydrate() #15944 #15940
+
 8.21.1 / 2026-01-23
 ===================
-* fix(clone): fix parent doc for map subdocuments and array subdocuments #15958 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
-* fix(document): when cloning a doc with subdocs, make sure the subdocs parent is the cloned doc #15904 #15901
-* fix: respect currentTime schema option in bulkWrite updates #15976 [sderrow](https://github.com/sderrow)
-* types(models): support Mongoose query casting in AnyBulkWriteOperation filter property #15910
-* types: add toBSON() to documents #15927
+ * fix(clone): fix parent doc for map subdocuments and array subdocuments #15958 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): when cloning a doc with subdocs, make sure the subdocs parent is the cloned doc #15904 #15901
+ * fix: respect currentTime schema option in bulkWrite updates #15976 [sderrow](https://github.com/sderrow)
+ * types(models): support Mongoose query casting in AnyBulkWriteOperation filter property #15910
+ * types: add toBSON() to documents #15927
 
 9.1.5 / 2026-01-20
 ==================

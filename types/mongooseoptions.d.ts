@@ -120,13 +120,17 @@ declare module 'mongoose' {
     overwriteModels?: boolean;
 
     /**
-     * If `false`, changes the default `returnOriginal` option to `findOneAndUpdate()`,
-     * `findByIdAndUpdate`, and `findOneAndReplace()` to false. This is equivalent to
-     * setting the `new` option to `true` for `findOneAndX()` calls by default. Read our
-     * `findOneAndUpdate()` [tutorial](https://mongoosejs.com/docs/tutorials/findoneandupdate.html)
-     * for more information.
+     * Set the default value for the `returnDocument` option to `findOneAndUpdate()`,
+     * `findByIdAndUpdate()`, and `findOneAndReplace()`.
+     * - `'before'`: Return the document before the update was applied.
+     * - `'after'`: Return the document after the update was applied.
      *
-     * @default true
+     * @default 'before'
+     */
+    returnDocument?: 'before' | 'after';
+
+    /**
+     * @deprecated Use `returnDocument` instead.
      */
     returnOriginal?: boolean;
 

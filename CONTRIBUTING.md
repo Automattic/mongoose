@@ -43,7 +43,7 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
   * or to execute a single test `npm test -- -g 'some regexp that matches the test description'`
   * any mocha flags can be specified with `-- <mocha flags here>`
   * For example, you can use `npm test -- -R spec` to use the spec reporter, rather than the dot reporter (by default, the test output looks like a bunch of dots)
-  * execute `npm run test-tsd` to run the typescript tests
+  * execute `npm run test:types` to run the typescript type tests
   * execute `npm run ts-benchmark` to run the typescript benchmark "performance test" for a single time.
   * execute `npm run ts-benchmark-watch` to run the typescript benchmark "performance test" while watching changes on types folder. Note: Make sure to commit all changes before executing this command.
 * in order to run tests that require an cluster with encryption locally, run `npm run setup-test-encryption` followed by `npm run test-encryption`. Alternatively, you can start an encrypted cluster using the `scripts/configure-cluster-with-encryption.sh` file.

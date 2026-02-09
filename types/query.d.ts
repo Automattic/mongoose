@@ -25,6 +25,7 @@ declare module 'mongoose' {
 
   type MongooseBaseQueryOptionKeys =
     | 'context'
+    | 'middleware'
     | 'multipleCastError'
     | 'overwriteDiscriminatorKey'
     | 'overwriteImmutable'
@@ -95,6 +96,9 @@ declare module 'mongoose' {
      * By default, `findOneAndUpdate()` returns the document as it was **before**
      * `update` was applied. If you set `new: true`, `findOneAndUpdate()` will
      * instead give you the object after `update` was applied.
+     * Use `returnDocument: 'after'` instead of `new: true`, or `returnDocument: 'before'` instead of `new: false`.
+     *
+     * @deprecated
      */
     new?: boolean;
 
@@ -112,10 +116,14 @@ declare module 'mongoose' {
     readPreference?: string | mongodb.ReadPreferenceMode;
     /**
      * An alias for the `new` option. `returnOriginal: false` is equivalent to `new: true`.
+     * Use `returnDocument: 'after'` instead of `returnOriginal: false`, or `returnDocument: 'before'` instead of `returnOriginal: true`.
+     *
+     * @deprecated
      */
     returnOriginal?: boolean;
     /**
-     * Another alias for the `new` option. `returnOriginal` is deprecated so this should be used.
+     * Has two possible values, `'before'` and `'after'`. By default, it will return the document before the update was applied.
+     * @default 'before'
      */
     returnDocument?: 'before' | 'after';
     /**
@@ -165,6 +173,9 @@ declare module 'mongoose' {
      */
     updatePipeline?: boolean;
     writeConcern?: mongodb.WriteConcern;
+
+    /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
+    middleware?: boolean | SkipMiddlewareOptions;
 
     [other: string]: any;
   }

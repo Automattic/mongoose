@@ -18,6 +18,7 @@ on the schema level and is useful for writing [plugins](plugins.html).
   <li><a href="#error-handling-middleware">Error Handling Middleware</a></li>
   <li><a href="#aggregate">Aggregation Hooks</a></li>
   <li><a href="#synchronous">Synchronous Hooks</a></li>
+  <li><a href="#skipping">Skipping Middleware</a></li>
 </ul>
 
 ## Types of Middleware
@@ -39,10 +40,10 @@ Query middleware is supported for the following Query functions.
 Query middleware executes when you call `exec()` or `then()` on a Query object, or `await` on a Query object.
 In query middleware functions, `this` refers to the query.
 
-* [count](api/query.html#query_Query-count)
 * [countDocuments](api/query.html#query_Query-countDocuments)
 * [deleteMany](api/query.html#query_Query-deleteMany)
 * [deleteOne](api/query.html#query_Query-deleteOne)
+* [distinct](api/query.html#query_Query-distinct)
 * [estimatedDocumentCount](api/query.html#query_Query-estimatedDocumentCount)
 * [find](api/query.html#query_Query-find)
 * [findOne](api/query.html#query_Query-findOne)
@@ -72,11 +73,11 @@ Here are the possible strings that can be passed to `pre()`
 
 * aggregate
 * bulkWrite
-* count
 * countDocuments
 * createCollection
-* deleteOne
 * deleteMany
+* deleteOne
+* distinct
 * estimatedDocumentCount
 * find
 * findOne
@@ -87,9 +88,8 @@ Here are the possible strings that can be passed to `pre()`
 * insertMany
 * replaceOne
 * save
-* update
-* updateOne
 * updateMany
+* updateOne
 * validate
 
 All middleware types support pre and post hooks.
@@ -592,6 +592,40 @@ rejections.
 ```acquit
 [require:post init hooks.*error]
 ```
+
+## Skipping Middleware {#skipping}
+
+You can skip user-defined middleware using the `middleware` option. This is useful for performance-critical operations or when you need to bypass hooks temporarily.
+
+### Skip All User Middleware
+
+Pass `middleware: false` to skip all user-defined pre and post hooks:
+
+```javascript
+// Skip all user middleware on save
+await doc.save({ middleware: false });
+
+// Skip all user middleware on queries
+await Model.find({}, null, { middleware: false });
+await Model.updateOne({}, { name: 'test' }, { middleware: false });
+
+// Skip all user middleware on aggregation
+await Model.aggregate([]).option({ middleware: false });
+```
+
+### Skip Only Pre or Post Hooks
+
+You can selectively skip only pre or post hooks:
+
+```javascript
+// Skip only pre hooks, post hooks still run
+await doc.save({ middleware: { pre: false } });
+
+// Skip only post hooks, pre hooks still run
+await Model.find({}, null, { middleware: { post: false } });
+```
+
+**Note:** Built-in Mongoose middleware (timestamps, validation, etc.) always runs regardless of this option. Only user-defined middleware registered via `schema.pre()` and `schema.post()` is skipped.
 
 ## Next Up {#next}
 

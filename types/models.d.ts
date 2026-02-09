@@ -37,12 +37,16 @@ declare module 'mongoose' {
     strict?: boolean | 'throw';
     /** When false, do not add timestamps to documents. Can be overridden at the operation level. */
     timestamps?: boolean;
+    /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
+    middleware?: boolean | SkipMiddlewareOptions;
   }
 
   interface MongooseBulkSaveOptions extends mongodb.BulkWriteOptions {
     timestamps?: boolean;
     session?: ClientSession;
     validateBeforeSave?: boolean;
+    /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
+    middleware?: boolean | SkipMiddlewareOptions;
   }
 
   /**
@@ -59,6 +63,7 @@ declare module 'mongoose' {
     setters?: boolean;
     hydratedPopulatedDocs?: boolean;
     virtuals?: boolean;
+    strict?: boolean | 'throw';
   }
 
   interface InsertManyOptions extends
@@ -71,6 +76,8 @@ declare module 'mongoose' {
     ordered?: boolean;
     lean?: boolean;
     throwOnValidationError?: boolean;
+    /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
+    middleware?: boolean | SkipMiddlewareOptions;
     timestamps?: boolean | QueryTimestampsConfig;
   }
 
@@ -81,59 +88,6 @@ declare module 'mongoose' {
   type UpdateWriteOpResult = mongodb.UpdateResult;
   type UpdateResult = mongodb.UpdateResult;
   type DeleteResult = mongodb.DeleteResult;
-
-  interface MapReduceOptions<T, K, R> {
-    map: Function | string;
-    reduce: (key: K, vals: T[]) => R;
-    /** query filter object. */
-    query?: any;
-    /** sort input objects using this key */
-    sort?: any;
-    /** max number of documents */
-    limit?: number;
-    /** keep temporary data default: false */
-    keeptemp?: boolean;
-    /** finalize function */
-    finalize?: (key: K, val: R) => R;
-    /** scope variables exposed to map/reduce/finalize during execution */
-    scope?: any;
-    /** it is possible to make the execution stay in JS. Provided in MongoDB > 2.0.X default: false */
-    jsMode?: boolean;
-    /** provide statistics on job execution time. default: false */
-    verbose?: boolean;
-    readPreference?: string;
-    /** sets the output target for the map reduce job. default: {inline: 1} */
-    out?: {
-      /** the results are returned in an array */
-      inline?: number;
-      /**
-       * {replace: 'collectionName'} add the results to collectionName: the
-       * results replace the collection
-       */
-      replace?: string;
-      /**
-       * {reduce: 'collectionName'} add the results to collectionName: if
-       * dups are detected, uses the reducer / finalize functions
-       */
-      reduce?: string;
-      /**
-       * {merge: 'collectionName'} add the results to collectionName: if
-       * dups exist the new docs overwrite the old
-       */
-      merge?: string;
-    };
-  }
-
-  interface GeoSearchOptions {
-    /** x,y point to search for */
-    near: number[];
-    /** the maximum distance from the point near that a result can be */
-    maxDistance: number;
-    /** The maximum number of results to return */
-    limit?: number;
-    /** return the raw object instead of the Mongoose Model */
-    lean?: boolean;
-  }
 
   interface ModifyResult<T> {
     value: Default__v<Require_id<T>> | null;
@@ -164,6 +118,8 @@ declare module 'mongoose' {
     validateModifiedOnly?: boolean;
     w?: number | string;
     wtimeout?: number;
+    /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
+    middleware?: boolean | SkipMiddlewareOptions;
   }
 
   interface CreateOptions extends SaveOptions {
@@ -360,7 +316,7 @@ declare module 'mongoose' {
      * mongoose will not create the collection for the model until any documents are
      * created. Use this method to create the collection explicitly.
      */
-    createCollection<T extends mongodb.Document>(options?: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'>): Promise<mongodb.Collection<T>>;
+    createCollection<T extends mongodb.Document>(options?: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'> & { middleware?: boolean | SkipMiddlewareOptions }): Promise<mongodb.Collection<T>>;
 
     /**
      * Create an [Atlas search index](https://www.mongodb.com/docs/atlas/atlas-search/create-index/).

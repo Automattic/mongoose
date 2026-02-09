@@ -1,6 +1,6 @@
 import { Schema, model, Model, Document, SaveOptions, Query, Aggregate, HydratedDocument, PreSaveMiddlewareFunction, ModifyResult, AnyBulkWriteOperation } from 'mongoose';
-import { expectError, expectType, expectNotType, expectAssignable } from 'tsd';
 import { CreateCollectionOptions } from 'mongodb';
+import { ExpectAssignable, ExpectType } from './util/assertions';
 
 const preMiddlewareFn: PreSaveMiddlewareFunction<Document> = function(opts) {
   this.$markValid('name');
@@ -18,7 +18,8 @@ schema.pre<Query<any, any>>('find', async function() {
 });
 
 schema.pre<Query<any, any>>('find', async function() {
-  expectError(this.notAFunction());
+  // @ts-expect-error not defined on query instances
+  this.notAFunction();
 });
 
 schema.pre<Aggregate<any>>('aggregate', async function() {
@@ -30,12 +31,12 @@ schema.post<Aggregate<any>>('aggregate', async function(res: Array<any>) {
 });
 
 schema.post<Aggregate<ITest>>('aggregate', function(res, next) {
-  expectType<ITest[]>(res);
+  ExpectType<ITest[]>(res);
   next();
 });
 
 schema.post<Query<ITest, ITest>>('save', function(res, next) {
-  expectType<Query<ITest, ITest>>(res);
+  ExpectType<Query<ITest, ITest>>(res);
   next();
 });
 
@@ -52,7 +53,7 @@ schema.pre('save', function() {
 });
 
 schema.post<ITest>('save', function(res, next) {
-  expectType<ITest>(res);
+  ExpectType<ITest>(res);
   next();
 });
 
@@ -93,28 +94,28 @@ schema.pre('createCollection', function(opts?: CreateCollectionOptions) {
 
 schema.pre<Query<number, any>>('estimatedDocumentCount', function() {});
 schema.post<Query<number, any>>('estimatedDocumentCount', function(count, next) {
-  expectType<number>(count);
+  ExpectType<number>(count);
   next();
 });
 
 schema.pre<Query<number, any>>('countDocuments', function() {});
 schema.post<Query<number, any>>('countDocuments', function(count, next) {
-  expectType<number>(count);
+  ExpectType<number>(count);
   next();
 });
 
 schema.post<Query<ITest, ITest>>('findOneAndDelete', function(res, next) {
-  expectType<ITest | ModifyResult<ITest> | null>(res);
+  ExpectType<ITest | ModifyResult<ITest> | null>(res);
   next();
 });
 
 schema.post<Query<ITest, ITest>>('findOneAndUpdate', function(res, next) {
-  expectType<ITest | ModifyResult<ITest> | null>(res);
+  ExpectType<ITest | ModifyResult<ITest> | null>(res);
   next();
 });
 
 schema.post<Query<ITest, ITest>>('findOneAndReplace', function(res, next) {
-  expectType<ITest | ModifyResult<ITest> | null>(res);
+  ExpectType<ITest | ModifyResult<ITest> | null>(res);
   next();
 });
 
@@ -128,7 +129,7 @@ function gh11480(): void {
   const UserSchema = new Schema<IUserSchema>({ name: { type: String } });
 
   UserSchema.pre('save', function() {
-    expectNotType<any>(this);
+    ExpectAssignable<HydratedDocument<IUserSchema>>()(this);
   });
 }
 
@@ -146,7 +147,7 @@ function gh12583() {
   });
 
   userSchema.post('save', { errorHandler: true }, function(error, doc, next) {
-    expectType<Error>(error);
+    ExpectType<Error>(error);
     console.log(error.name);
     console.log(doc.name);
   });
@@ -166,7 +167,7 @@ function gh11257() {
   });
 
   schema.pre('save', { document: true }, function() {
-    expectAssignable<HydratedDocument<User>>(this);
+    ExpectAssignable<HydratedDocument<User>>()(this);
   });
 
   schema.pre('updateOne', { document: true, query: false }, function() {
@@ -184,7 +185,7 @@ function gh13601() {
   });
 
   testSchema.pre('deleteOne', { document: true }, function() {
-    expectAssignable<Document>(this);
+    ExpectAssignable<Document>()(this);
   });
 }
 
@@ -233,7 +234,7 @@ function gh15242WithVirtuals() {
       validate: {
         validator: async function(this: ValidatorThis, postTime: Date): Promise<boolean> {
           if (!(this instanceof Query)) {
-            expectType<number>(this.myVirtual);
+            ExpectType<number>(this.myVirtual);
           }
           return true;
         }

@@ -1,6 +1,5 @@
 import { ObjectId } from 'mongodb';
 import type { PipelineStage } from 'mongoose';
-import { expectError, expectType } from 'tsd';
 
 /**
  * $addFields:

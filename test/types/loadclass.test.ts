@@ -1,6 +1,5 @@
 import { Schema, model, Document, Model, Types } from 'mongoose';
-import { expectType, expectError } from 'tsd';
-
+import { ExpectType } from './util/assertions';
 
 // Basic usage of `loadClass` with TypeScript
 function basicLoadClassPattern() {
@@ -32,17 +31,17 @@ function basicLoadClassPattern() {
   const MyModel = model<MyCombinedDocument, MyCombinedModel>('MyClass', schema as any);
 
   // Static function should work
-  expectType<number>(MyModel.myStatic());
+  ExpectType<number>(MyModel.myStatic());
 
   // Instance method should work
   const doc = new MyModel();
-  expectType<number>(doc.myMethod());
+  ExpectType<number>(doc.myMethod());
 
   // Getter should work
-  expectType<number>(doc.myVirtual);
+  ExpectType<number>(doc.myVirtual);
 
   // Schema property should be typed
-  expectType<string>(doc.property1);
+  ExpectType<string>(doc.property1);
 }
 
 
@@ -68,7 +67,6 @@ function thisParameterPattern() {
     // TypeScript does NOT allow `this` parameters in getters/setters.
     // So we show an example error here.
     get myVirtual() {
-      expectError(this.property1);
       // @ts-expect-error: getter does not support `this` typing
       return this.property1;
     }
@@ -84,21 +82,21 @@ function thisParameterPattern() {
   const MyModel = model<MyCombinedDocument, MyCombinedModel>('MyClass2', schema as any);
 
   // Test static
-  expectType<number>(MyModel.myStatic());
+  ExpectType<number>(MyModel.myStatic());
 
   const doc = new MyModel({ property1: 'test' });
 
   // Instance method returns string
-  expectType<string>(doc.myMethod());
+  ExpectType<string>(doc.myMethod());
 
   // Schema field is typed correctly
-  expectType<string>(doc.property1);
+  ExpectType<string>(doc.property1);
 
 
   // Getter works at runtime, but TypeScript can't type `this` in getters.
   // So we accept `any`.
   const virtual = doc.myVirtual;
-  expectType<any>(virtual);
+  ExpectType<any>(virtual);
 }
 
 
@@ -139,16 +137,16 @@ function toObjectToJSONTest() {
   const pojo = doc.toObject();
 
   // Schema property is still typed
-  expectType<string>(pojo.property1);
+  ExpectType<string>(pojo.property1);
 
   // TS still thinks class method exists (wrong at runtime)
-  expectType<() => number>(pojo.myMethod);
+  ExpectType<() => number>(pojo.myMethod);
 
   // Same caveat applies to toJSON()
   const json = doc.toJSON();
 
-  expectType<() => number>(json.myMethod);
-  expectType<string>(json.property1);
+  ExpectType<() => number>(json.myMethod);
+  ExpectType<string>(json.property1);
 }
 
 
@@ -174,4 +172,3 @@ function getterLimitationTest() {
     _id: Types.ObjectId;
   }
 }
-

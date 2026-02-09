@@ -1,5 +1,5 @@
-import mongoose, { Document, Model, Schema, SchemaDefinition, SchemaOptions, Types, model, HydratedDocFromModel, InferSchemaType } from 'mongoose';
-import { expectType } from 'tsd';
+import mongoose, { Model, Schema, SchemaOptions, Types, model, HydratedDocFromModel, InferSchemaType } from 'mongoose';
+import { ExpectType } from './util/assertions';
 
 const schema = new Schema({ name: { type: 'String' } });
 
@@ -110,11 +110,11 @@ function gh15535() {
   const ChildModel = ParentModel.discriminator('child', ChildSchema);
 
   const doc = new ChildModel({});
-  expectType<string>(doc.field1);
-  expectType<number | null | undefined>(doc.field2);
-  expectType<number | null | undefined>(doc.getField2());
-  expectType<string | null | undefined>(doc.field3);
-  expectType<string | null | undefined>(doc.getField3());
+  ExpectType<string>(doc.field1);
+  ExpectType<number | null | undefined>(doc.field2);
+  ExpectType<number | null | undefined>(doc.getField2());
+  ExpectType<string | null | undefined>(doc.field3);
+  ExpectType<string | null | undefined>(doc.getField3());
 }
 
 async function gh15600() {
@@ -132,17 +132,17 @@ async function gh15600() {
   const BaseModel = model('Base', baseSchema);
 
   const baseRes = await BaseModel.findByName('test');
-  expectType<string | null | undefined>(baseRes!.name);
+  ExpectType<string | null | undefined>(baseRes!.name);
 
   // Discriminator model inheriting base static methods
   const discriminatorSchema = new Schema({ extra: String });
   const DiscriminatorModel = BaseModel.discriminator('Discriminator', discriminatorSchema);
 
   const res = await DiscriminatorModel.findByName('test');
-  expectType<string | null | undefined>(res!.name);
+  ExpectType<string | null | undefined>(res!.name);
 
   const doc = await BaseModel.create(
     { __t: 'Discriminator', name: 'test', extra: 'test' } as InferSchemaType<typeof baseSchema>
   ) as HydratedDocFromModel<typeof DiscriminatorModel>;
-  expectType<string | null | undefined>(doc.extra);
+  ExpectType<string | null | undefined>(doc.extra);
 }

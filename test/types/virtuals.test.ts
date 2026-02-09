@@ -1,5 +1,5 @@
 import { Document, Model, Schema, model, InferSchemaType, ObtainSchemaGeneric } from 'mongoose';
-import { expectType } from 'tsd';
+import { ExpectType } from './util/assertions';
 
 interface IPerson {
   _id: number;
@@ -84,7 +84,7 @@ function gh11543() {
     lastName: { type: String, required: true }
   });
 
-  expectType<PetVirtuals>(personSchema.virtuals);
+  ExpectType<PetVirtuals>(personSchema.virtuals);
 }
 
 async function autoTypedVirtuals() {
@@ -101,11 +101,11 @@ async function autoTypedVirtuals() {
     virtuals: {
       domain: {
         get() {
-          expectType<Document<any, any, { email: string }> & AutoTypedSchemaType>(this);
+          ExpectType<Document<any, any, { email: string }> & AutoTypedSchemaType>(this);
           return this.email.slice(this.email.indexOf('@') + 1);
         },
         set() {
-          expectType<Document<any, any, AutoTypedSchemaType> & AutoTypedSchemaType>(this);
+          ExpectType<Document<any, any, AutoTypedSchemaType> & AutoTypedSchemaType>(this);
         },
         options: {}
       }
@@ -116,10 +116,10 @@ async function autoTypedVirtuals() {
   const TestModel = model('AutoTypedVirtuals', testSchema);
 
   const doc = new TestModel();
-  expectType<string>(doc.domain);
+  ExpectType<string>(doc.domain);
 
-  expectType<AutoTypedSchemaType & VirtualsType>({} as InferredDocType);
+  ExpectType<AutoTypedSchemaType & VirtualsType>({} as InferredDocType);
 
   const doc2 = await TestModel.findOne().orFail();
-  expectType<string>(doc2.domain);
+  ExpectType<string>(doc2.domain);
 }

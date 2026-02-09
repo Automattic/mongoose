@@ -34,6 +34,13 @@ declare module 'mongoose' {
   type SchemaPreOptions = MiddlewareOptions;
   type SchemaPostOptions = MiddlewareOptions;
 
+  interface SkipMiddlewareOptions {
+    /** If `false`, skip pre middleware. */
+    pre?: boolean;
+    /** If `false`, skip post middleware. */
+    post?: boolean;
+  }
+
   type PreMiddlewareFunction<ThisType = any> = (
     this: ThisType,
     opts?: Record<string, any>

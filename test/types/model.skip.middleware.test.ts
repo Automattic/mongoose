@@ -9,7 +9,7 @@ import {
   MongooseBulkSaveOptions,
   AggregateOptions
 } from 'mongoose';
-import { ExpectType, ExpectAssignable } from './util/assertions';
+import { ExpectAssignable, ExpectType } from './util/assertions';
 
 async function gh8768() {
   const addressSchema = new Schema({ city: String });

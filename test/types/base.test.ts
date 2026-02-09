@@ -61,6 +61,15 @@ function gh15756() {
   mongoose.set('updatePipeline', true);
 }
 
+function gh15972() {
+  mongoose.set('returnDocument', 'before');
+  mongoose.set('returnDocument', 'after');
+  // @ts-expect-error 'invalid' is not a valid returnDocument option
+  mongoose.set('returnDocument', 'invalid');
+  // @ts-expect-error true is not a valid returnDocument option
+  mongoose.set('returnDocument', true);
+}
+
 function gh12100() {
   mongoose.syncIndexes({ continueOnError: true, sparse: true });
   mongoose.syncIndexes({ continueOnError: false, sparse: true });

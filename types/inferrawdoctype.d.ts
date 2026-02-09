@@ -63,7 +63,8 @@ declare module 'mongoose' {
      : {},
      TypeKey,
      TTransformOptions,
-     RawDocTypeHint<PathValueType>
+     RawDocTypeHint<PathValueType>,
+     TypeKey extends keyof PathValueType ? false : true
    >;
 
   type neverOrAny = ' ~neverOrAny~';
@@ -86,7 +87,8 @@ declare module 'mongoose' {
        Options extends SchemaTypeOptions<PathValueType> = {},
        TypeKey extends string = DefaultSchemaOptions['typeKey'],
        TTransformOptions = { bufferToBinary: false },
-       TypeHint = never
+       TypeHint = never,
+       IsNestedPath extends boolean = false
      > =
        IsNotNever<TypeHint> extends true ? TypeHint
        : [PathValueType] extends [neverOrAny] ? PathValueType
@@ -145,6 +147,14 @@ declare module 'mongoose' {
        : IfEquals<PathValueType, ObjectConstructor> extends true ? any
        : IfEquals<PathValueType, {}> extends true ? any
        : PathValueType extends typeof SchemaType ? PathValueType['prototype']
-       : PathValueType extends Record<string, any> ? InferRawDocType<PathValueType>
+       : PathValueType extends Record<string, any> ?
+         IsNestedPath extends true ?
+           // Nested path (no type key) - no _id
+           InferRawDocTypeWithout_id<PathValueType, { typeKey: TypeKey }, TTransformOptions>
+         : Options extends { _id: false } ?
+           // Subdocument with _id: false
+           InferRawDocTypeWithout_id<PathValueType, { typeKey: TypeKey }, TTransformOptions>
+         : // Subdocument with _id (default)
+           InferRawDocType<PathValueType, { typeKey: TypeKey }, TTransformOptions>
        : unknown;
 }

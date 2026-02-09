@@ -281,7 +281,7 @@ function gh15988() {
   type Location = InferRawDocType<typeof locationSchemaDef>;
 
   // Nested paths should not have _id added
-  expectType<{
+  ExpectType<{
     name: string;
     coordinates?: { latitude: number; longitude: number } | null | undefined;
   } & { _id: Types.ObjectId }>({} as Location);
@@ -303,7 +303,7 @@ function gh15988() {
   type Doc2 = InferRawDocType<typeof schemaDef2>;
 
   // Subdocuments (defined with type: {...}) should have _id added
-  expectType<{
+  ExpectType<{
     name: string;
     data: { role?: string | null | undefined } & { _id: Types.ObjectId };
   } & { _id: Types.ObjectId }>({} as Doc2);
@@ -333,7 +333,7 @@ function gh15988() {
   type Doc3 = InferRawDocType<typeof schemaDef3>;
 
   // Subdocuments with _id: false should not have _id added
-  expectType<{
+  ExpectType<{
     name: string;
     coordinates: { latitude: number; longitude: number };
   } & { _id: Types.ObjectId }>({} as Doc3);
@@ -354,7 +354,7 @@ function gh15988() {
   type Doc4 = InferRawDocType<typeof schemaDef4>;
 
   // Subdocuments (defined with type: {...}) should have _id added, but optional since no `required` or `default`
-  expectType<{
+  ExpectType<{
     name: string;
     data?:({ role?: string | null | undefined } & { _id: Types.ObjectId }) | null | undefined;
       } & { _id: Types.ObjectId }>({} as Doc4);
@@ -370,7 +370,7 @@ function gh15988() {
   type Doc5 = InferRawDocType<typeof schemaDef5>;
 
   // Arrays of subdocuments should have _id added to each element
-  expectType<{
+  ExpectType<{
     users?: Array<{ name: string; email?: string | null | undefined } & { _id: Types.ObjectId }> | null | undefined;
   } & { _id: Types.ObjectId }>({} as Doc5);
 
@@ -385,7 +385,7 @@ function gh15988() {
   type Doc6 = InferRawDocType<typeof schemaDef6>;
 
   // Arrays of objects are subdocuments, so they get _id
-  expectType<{
+  ExpectType<{
     locations?: Array<{ latitude?: number | null | undefined; longitude?: number | null | undefined } & { _id: Types.ObjectId }> | null | undefined;
   } & { _id: Types.ObjectId }>({} as Doc6);
 
@@ -410,7 +410,7 @@ function gh15988() {
   type Doc7 = InferRawDocType<typeof schemaDef7, { typeKey: '$type' }>;
 
   // With custom typeKey, nested paths (no $type key) should still not have _id
-  expectType<{
+  ExpectType<{
     name: string;
     coordinates?: { latitude: number; longitude: number } | null | undefined;
   } & { _id: Types.ObjectId }>({} as Doc7);
@@ -432,7 +432,7 @@ function gh15988() {
   type Doc8 = InferRawDocType<typeof schemaDef8, { typeKey: '$type' }>;
 
   // With custom typeKey, subdocuments (with $type key) should have _id
-  expectType<{
+  ExpectType<{
     name: string;
     data: { role?: string | null | undefined } & { _id: Types.ObjectId };
   } & { _id: Types.ObjectId }>({} as Doc8);

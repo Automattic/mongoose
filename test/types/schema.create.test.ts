@@ -793,7 +793,7 @@ function gh12030() {
     track?: ({
       backupCount: number;
       count: number;
-    } & { _id: Types.ObjectId }) | null;
+    }) | null;
   } & { _id: Types.ObjectId };
   ExpectType<ExpectedSchema6Type>({} as InferSchemaType<typeof Schema6>);
 

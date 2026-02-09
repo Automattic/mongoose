@@ -1,3 +1,7 @@
+8.23.0 / 2026-02-09
+===================
+ * feat(document): add flattenUUIDs option to toObject() and toJSON() (backport #15021 to 8.x)
+
 9.1.6 / 2026-02-04
 ==================
  * fix: handle other top-level query operators in sanitizeFilter

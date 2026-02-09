@@ -357,13 +357,101 @@ describe('model', function() {
       assert.strictEqual(doc2.matrix[0][0].computed, undefined);
     });
 
-    it.skip('handles strict option to control non-schema properties', function() {
+    describe('strict option (gh-15940)', function() {
+      beforeEach(() => db.deleteModel(/.*/));
+
+      it('strict: false exposes extra fields as document properties', function() {
+        // Arrange
+        const { Person } = createTestContext();
+
+        // Act
+        const person = Person.hydrate({
+          _id: '0'.repeat(24),
+          name: 'John',
+          age: 30,
+          extraField: 'not in schema'
+        }, null, { strict: false });
+
+        // Assert
+        assert.strictEqual(person.name, 'John');
+        assert.strictEqual(person.age, 30);
+        assert.strictEqual(person.extraField, 'not in schema');
+        assert.strictEqual(person.get('extraField'), 'not in schema');
+      });
+
+      it('strict: true stores extra fields but does not expose them as properties', function() {
+        // Arrange
+        const { Person } = createTestContext();
+
+        // Act
+        const person = Person.hydrate({
+          _id: '0'.repeat(24),
+          name: 'Jane',
+          age: 25,
+          extraField: 'should be ignored'
+        }, null, { strict: true });
+
+        // Assert
+        assert.strictEqual(person.name, 'Jane');
+        assert.strictEqual(person.age, 25);
+        assert.strictEqual(person.extraField, undefined);
+        assert.strictEqual(person.get('extraField'), 'should be ignored');
+      });
+
+      it('strict: "throw" throws error when hydrating document with extra fields', function() {
+        // Arrange
+        const { Person } = createTestContext();
+
+        // Act & Assert
+        assert.throws(() => {
+          Person.hydrate({
+            _id: '0'.repeat(24),
+            name: 'Bob',
+            age: 35,
+            extraField: 'should throw'
+          }, null, { strict: 'throw' });
+        }, /Field `extraField` is not in schema/);
+      });
+
+      it('uses schema strict mode when no strict option provided', function() {
+        // Arrange
+        const { Person } = createTestContext();
+
+        // Act
+        const person = Person.hydrate({
+          _id: '0'.repeat(24),
+          name: 'Alice',
+          age: 28,
+          extraField: 'uses schema default'
+        });
+
+        // Assert
+        assert.strictEqual(person.name, 'Alice');
+        assert.strictEqual(person.age, 28);
+        assert.strictEqual(person.extraField, undefined);
+        assert.strictEqual(person.get('extraField'), 'uses schema default');
+      });
+
+      function createTestContext() {
+        const personSchema = new Schema({
+          name: String,
+          age: Number
+        }, { strict: true });
+
+        const Person = db.model('HydrateStrictPerson', personSchema);
+
+        return { Person };
+      }
+    });
+
+    it('handles strict option to control non-schema properties', function() {
       const strictSchema = new Schema({
         name: String,
         age: Number
       }, { strict: true });
 
-      const Model = db.model('Test3', strictSchema);
+      db.deleteModel(/Test/);
+      const Model = db.model('Test', strictSchema);
 
       // Test with strict: false - should allow extra fields
       const doc1 = Model.hydrate({

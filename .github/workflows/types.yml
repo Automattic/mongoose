@@ -2,13 +2,13 @@ name: Typescript Types
 on:
   pull_request:
     paths:
-      - '.github/workflows/tsd.yml'
+      - '.github/workflows/types.yml'
       - 'package.json'
       - 'types/**'
       - 'test/types/**'
   push:
     paths:
-      - '.github/workflows/tsd.yml'
+      - '.github/workflows/types.yml'
       - 'package.json'
       - 'types/**'
       - 'test/types/**'
@@ -48,4 +48,4 @@ jobs:
       - run: npm install
 
       - name: Typings
-        run: npm run test-tsd
+        run: npm run test:types

@@ -15,8 +15,6 @@ const sinon = require('sinon');
 const util = require('./util');
 const utils = require('../lib/utils');
 
-const { Binary } = require('bson');
-
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
@@ -4770,7 +4768,7 @@ describe('document', function() {
       assert.equal(doc.children[0].text, 'test');
     });
 
-    it('pre save hooks on subdocs receive save options (gh-15920)', async function() {
+    it('pre save hooks on subdocs receive save options when calling `doc.save()` (gh-15920)', async function() {
       // Arrange
       let receivedOptions = null;
 
@@ -4793,6 +4791,31 @@ describe('document', function() {
       // Assert
       assert.ok(receivedOptions, 'Subdoc pre save hook should receive options');
       assert.strictEqual(receivedOptions.customOption, 'test123');
+    });
+
+    it('pre save hooks on subdocs receive save options when calling `subdoc.save()` directly (gh-15920)', async function() {
+      // Arrange
+      let receivedOptions = null;
+
+      const addressSchema = new Schema({ city: String });
+      addressSchema.pre('save', function(options) {
+        receivedOptions = options;
+      });
+
+      const userSchema = new Schema({
+        name: String,
+        address: addressSchema
+      });
+
+      const User = db.model('User', userSchema);
+
+      // Act
+      const user = new User({ name: 'John', address: { city: 'New York' } });
+      await user.address.save({ suppressWarning: true, customOption: 'test456' });
+
+      // Assert
+      assert.ok(receivedOptions, 'Subdoc pre save hook should receive options');
+      assert.strictEqual(receivedOptions.customOption, 'test456');
     });
 
     it('post hooks on array child subdocs run after save (gh-5085) (gh-6926)', function() {
@@ -7205,11 +7228,11 @@ describe('document', function() {
         const obj = user.toObject({ flattenUUIDs });
 
         // Assert
-        assert.ok(obj._id instanceof Binary);
-        assert.ok(obj.uuid instanceof Binary);
-        assert.ok(obj.nested.uuid instanceof Binary);
-        assert.ok(obj.subdocument._id instanceof Binary);
-        assert.ok(obj.documentArray[0]._id instanceof Binary);
+        assert.ok(obj._id instanceof UUID);
+        assert.ok(obj.uuid instanceof UUID);
+        assert.ok(obj.nested.uuid instanceof UUID);
+        assert.ok(obj.subdocument._id instanceof UUID);
+        assert.ok(obj.documentArray[0]._id instanceof UUID);
       });
     }
 

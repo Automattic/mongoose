@@ -917,3 +917,172 @@ async function gh15900() {
   // id should be number, not string virtual
   ExpectType<number>(userWithId.id);
 }
+
+function testFlattenUUIDs() {
+  interface RawDocType {
+    _id: Types.UUID;
+    uuid: Types.UUID;
+  }
+
+  const ASchema = new Schema<RawDocType>({
+    _id: Schema.Types.UUID,
+    uuid: Schema.Types.UUID
+  });
+
+  const AModel = model<RawDocType>('UUIDModel', ASchema);
+
+  const a = new AModel({
+    uuid: new Types.UUID()
+  });
+
+  // Test flattenUUIDs: true converts UUIDs to strings
+  const toObjectFlattened = a.toObject({ flattenUUIDs: true });
+  const toJSONFlattened = a.toJSON({ flattenUUIDs: true });
+
+  ExpectType<string>(toObjectFlattened._id);
+  ExpectType<string>(toObjectFlattened.uuid);
+  ExpectType<string>(toJSONFlattened._id);
+  ExpectType<string>(toJSONFlattened.uuid);
+
+  // Test with virtuals
+  const toObjectWithVirtuals = a.toObject({ flattenUUIDs: true, virtuals: true });
+  const toJSONWithVirtuals = a.toJSON({ flattenUUIDs: true, virtuals: true });
+
+  ExpectType<string>(toObjectWithVirtuals._id);
+  ExpectType<string>(toObjectWithVirtuals.uuid);
+  ExpectType<string>(toJSONWithVirtuals._id);
+  ExpectType<string>(toJSONWithVirtuals.uuid);
+
+  // Test flattenUUIDs: false (default behavior - should remain UUID)
+  const toObjectNotFlattened = a.toObject({ flattenUUIDs: false });
+  const toJSONNotFlattened = a.toJSON({ flattenUUIDs: false });
+  ExpectType<Types.UUID>(toObjectNotFlattened._id);
+  ExpectType<Types.UUID>(toObjectNotFlattened.uuid);
+  ExpectType<Types.UUID>(toJSONNotFlattened._id);
+  ExpectType<Types.UUID>(toJSONNotFlattened.uuid);
+
+  // Test default (no flattenUUIDs option - should remain UUID)
+  const toObjectDefault = a.toObject();
+  const toJSONDefault = a.toJSON();
+  ExpectType<Types.UUID>(toObjectDefault._id);
+  ExpectType<Types.UUID>(toObjectDefault.uuid);
+  ExpectType<Types.UUID>(toJSONDefault._id);
+  ExpectType<Types.UUID>(toJSONDefault.uuid);
+}
+
+function testCombinedFlattenOptions() {
+  interface RawDocType {
+    _id: Types.ObjectId;
+    uuid: Types.UUID;
+    name: string;
+    tags: Map<string, string>;
+  }
+
+  interface Virtuals {
+    displayName: string;
+  }
+
+  const ASchema = new Schema<RawDocType, Model<RawDocType, {}, {}, Virtuals>, {}, {}, Virtuals>({
+    uuid: Schema.Types.UUID,
+    name: String,
+    tags: { type: Map, of: String }
+  });
+
+  ASchema.virtual('displayName').get(function() {
+    return this.name.toUpperCase();
+  });
+
+  const AModel = model<RawDocType, Model<RawDocType, {}, {}, Virtuals>>('CombinedModel', ASchema);
+
+  const a = new AModel({
+    uuid: new Types.UUID(),
+    name: 'Test',
+    tags: new Map([['key', 'value']])
+  });
+
+  // Test flattenUUIDs + flattenObjectIds
+  const uuidAndObjectId = a.toObject({ flattenUUIDs: true, flattenObjectIds: true });
+  ExpectType<string>(uuidAndObjectId._id);
+  ExpectType<string>(uuidAndObjectId.uuid);
+
+  // Test flattenUUIDs + flattenMaps
+  const uuidAndMaps = a.toObject({ flattenUUIDs: true, flattenMaps: true });
+  ExpectType<string>(uuidAndMaps.uuid);
+  ExpectType<Record<string, string>>(uuidAndMaps.tags);
+
+  // Test flattenUUIDs + virtuals
+  const uuidAndVirtuals = a.toObject({ flattenUUIDs: true, virtuals: true });
+  ExpectType<string>(uuidAndVirtuals.uuid);
+  ExpectType<string>(uuidAndVirtuals.displayName);
+
+  // Test flattenObjectIds + flattenMaps
+  const objectIdAndMaps = a.toObject({ flattenObjectIds: true, flattenMaps: true });
+  ExpectType<string>(objectIdAndMaps._id);
+  ExpectType<Record<string, string>>(objectIdAndMaps.tags);
+
+  // Test flattenObjectIds + virtuals
+  const objectIdAndVirtuals = a.toObject({ flattenObjectIds: true, virtuals: true });
+  ExpectType<string>(objectIdAndVirtuals._id);
+  ExpectType<string>(objectIdAndVirtuals.displayName);
+
+  // Test flattenMaps + virtuals
+  const mapsAndVirtuals = a.toObject({ flattenMaps: true, virtuals: true });
+  ExpectType<Record<string, string>>(mapsAndVirtuals.tags);
+  ExpectType<string>(mapsAndVirtuals.displayName);
+
+  // Test triple combinations
+  const uuidObjectIdMaps = a.toObject({ flattenUUIDs: true, flattenObjectIds: true, flattenMaps: true });
+  ExpectType<string>(uuidObjectIdMaps._id);
+  ExpectType<string>(uuidObjectIdMaps.uuid);
+  ExpectType<Record<string, string>>(uuidObjectIdMaps.tags);
+
+  const uuidObjectIdVirtuals = a.toObject({ flattenUUIDs: true, flattenObjectIds: true, virtuals: true });
+  ExpectType<string>(uuidObjectIdVirtuals._id);
+  ExpectType<string>(uuidObjectIdVirtuals.uuid);
+  ExpectType<string>(uuidObjectIdVirtuals.displayName);
+
+  // Test all four options
+  const allFour = a.toObject({ flattenUUIDs: true, flattenObjectIds: true, flattenMaps: true, virtuals: true });
+  ExpectType<string>(allFour._id);
+  ExpectType<string>(allFour.uuid);
+  ExpectType<Record<string, string>>(allFour.tags);
+  ExpectType<string>(allFour.displayName);
+
+  // Same tests for toJSON
+  const allFourJSON = a.toJSON({ flattenUUIDs: true, flattenObjectIds: true, flattenMaps: true, virtuals: true });
+  ExpectType<string>(allFourJSON._id);
+  ExpectType<string>(allFourJSON.uuid);
+  ExpectType<Record<string, string>>(allFourJSON.tags);
+  ExpectType<string>(allFourJSON.displayName);
+}
+
+function testObjectIdsInsideMaps() {
+  // Test that ObjectIds/UUIDs nested inside Map values are correctly converted
+  interface DocWithMapOfObjectIds {
+    _id: Types.ObjectId;
+    userRefs: Map<string, { oderId: Types.ObjectId }>;
+    uuidRefs: Map<string, { refId: Types.UUID }>;
+  }
+
+  const schema = new Schema<DocWithMapOfObjectIds>({
+    userRefs: { type: Map, of: { oderId: Schema.Types.ObjectId } },
+    uuidRefs: { type: Map, of: { refId: Schema.Types.UUID } }
+  });
+
+  const Model = model<DocWithMapOfObjectIds>('MapOfObjectIds', schema);
+  const doc = new Model({});
+
+  // When using flattenMaps + flattenObjectIds, ObjectIds inside Map values should be converted
+  const flattened = doc.toObject({ flattenMaps: true, flattenObjectIds: true });
+  ExpectType<Record<string, { oderId: string }>>(flattened.userRefs);
+
+  // When using flattenMaps + flattenUUIDs, UUIDs inside Map values should be converted
+  const flattenedUUIDs = doc.toObject({ flattenMaps: true, flattenUUIDs: true });
+  ExpectType<Record<string, { refId: string }>>(flattenedUUIDs.uuidRefs);
+
+  // All three together
+  const allThree = doc.toObject({ flattenMaps: true, flattenObjectIds: true, flattenUUIDs: true });
+  ExpectType<Record<string, { oderId: string }>>(allThree.userRefs);
+  ExpectType<Record<string, { refId: string }>>(allThree.uuidRefs);
+  ExpectType<string>(allThree._id);
+}

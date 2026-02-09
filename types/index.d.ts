@@ -969,6 +969,35 @@ declare module 'mongoose' {
             } : T;
 
   /**
+   * Converts any UUID properties into strings for JSON serialization
+   */
+  export type UUIDToString<T> = T extends Types.UUID
+    ? string
+    : T extends mongodb.UUID
+      ? string
+      : T extends Document
+        ? T
+        : T extends TreatAsPrimitives
+          ? T
+          : T extends Record<string, any> ? {
+            [K in keyof T]: T[K] extends Types.UUID
+              ? string
+              : T[K] extends mongodb.UUID
+                ? string
+                : T[K] extends Types.DocumentArray<infer ItemType>
+                    ? Types.DocumentArray<UUIDToString<ItemType>>
+                    : T[K] extends Types.Subdocument<unknown, unknown, infer SubdocType>
+                      ? HydratedSingleSubdocument<UUIDToString<SubdocType>>
+                      : UUIDToString<T[K]>;
+          } : T;
+
+  /**
+   * Alias for UUIDToString for backwards compatibility.
+   * @deprecated Use UUIDToString instead.
+   */
+  export type UUIDToJSON<T> = UUIDToString<T>;
+
+  /**
    * Converts any ObjectId properties into strings for JSON serialization
    */
   export type ObjectIdToString<T> = T extends mongodb.ObjectId

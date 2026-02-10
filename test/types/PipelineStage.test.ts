@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import type { PipelineStage } from 'mongoose';
+import type { PipelineStage, QueryFilter } from 'mongoose';
 
 /**
  * $addFields:
@@ -574,3 +574,21 @@ const vectorSearchStages: PipelineStage[] = [
     }
   }
 ];
+
+function gh16006() {
+  interface MyDoc {
+    _id: string;
+    name: string;
+  }
+
+  const matchCriteria: QueryFilter<MyDoc> = {
+    _id: 'foobar',
+    name: 'test'
+  };
+
+  const pipeline: PipelineStage[] = [
+    {
+      $match: matchCriteria
+    }
+  ];
+}

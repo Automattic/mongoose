@@ -501,6 +501,28 @@ function gh15965() {
   ExpectType<Date>(obj.updatedAt);
 }
 
+function gh15965SubdocToObject() {
+  const documentSchema = new Schema({
+    title: { type: String, required: true },
+    text: { type: String, required: true }
+  });
+
+  const podcastSchema = new Schema({
+    documents: [documentSchema]
+  }, {
+    timestamps: true,
+    virtuals: { hello: { get() { return 'world'; } } }
+  });
+
+  const Podcast = model('Podcast', podcastSchema);
+  const podcast = new Podcast({ documents: [{ title: 'test', text: 'body' }] });
+  const subdoc = podcast.documents[0];
+
+  const obj = subdoc.toObject({ flattenObjectIds: true, versionKey: false, virtuals: true });
+  ExpectType<string>(obj.title);
+  ExpectType<string>(obj.text);
+}
+
 function gh13079() {
   const schema = new Schema({
     name: { type: String, required: true }

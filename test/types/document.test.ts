@@ -519,8 +519,13 @@ function gh15965SubdocToObject() {
   const subdoc = podcast.documents[0];
 
   const obj = subdoc.toObject({ flattenObjectIds: true, versionKey: false, virtuals: true });
-  ExpectType<string>(obj.title);
-  ExpectType<string>(obj.text);
+
+  // @ts-expect-error title should be string, not any
+  const _titleCheck: number = obj.title;
+  // @ts-expect-error text should be string, not any
+  const _textCheck: number = obj.text;
+  // @ts-expect-error no index signature: nonexistent properties should be a type error
+  obj.doesNotExist;
 }
 
 function gh13079() {

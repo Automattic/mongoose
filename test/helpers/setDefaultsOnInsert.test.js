@@ -88,6 +88,25 @@ describe('setDefaultsOnInsert', function() {
     assert.equal(update.$setOnInsert['time.resolved'], 42);
   });
 
+  it('does not crash if default function uses `this`', function() {
+    const schema = new Schema({
+      referralConversion: {
+        type: String,
+        default: function() {
+          return this.get('name');
+        }
+      },
+      name: { type: String }
+    });
+
+    const opts = { upsert: true, setDefaultsOnInsert: true };
+    let update = { $set: { name: 'foo' } };
+    const context = { get: (key) => key === 'name' ? 'bar' : undefined };
+    // Should not throw "Cannot read properties of null (reading 'get')"
+    update = setDefaultsOnInsert({}, schema, update, opts, context);
+    assert.equal(update.$setOnInsert['referralConversion'], 'bar');
+  });
+
   it('skips default if parent is $set (gh-12279)', function() {
     const SubscriptionsConfigSchema = Schema({
       hasPaidSubscription: { type: Boolean, required: true },

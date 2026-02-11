@@ -2171,11 +2171,11 @@ function gh15915() {
   new Schema({ name: String, balance: Number }, { optimisticConcurrency: { exclude: ['name', 'balance'] } });
 
   // invalid types
-  new Schema({ name: String }, { 
+  new Schema({ name: String }, {
     // @ts-expect-error  Type 'string' is not assignable to type 'boolean | string[] | { exclude: string[]; } | undefined'.
     optimisticConcurrency: 'invalid'
   });
-  new Schema({ name: String }, { optimisticConcurrency: { 
+  new Schema({ name: String }, { optimisticConcurrency: {
     // @ts-expect-error  'invalid' does not exist in type 'string[] | { exclude: string[]; }'.
     invalid: ['name'] }
   });

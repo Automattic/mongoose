@@ -354,7 +354,7 @@ function gh11435(): void {
 
 // timeSeries
 Schema.create({}, { expires: '5 seconds' });
-Schema.create({}, 
+Schema.create({},
   // @ts-expect-error  Type 'string' is not assignable to type 'number'.
   { expireAfterSeconds: '5 seconds' }
 );

@@ -99,9 +99,9 @@ function encrypt() {
   // @ts-expect-error  Type '{}' is not assignable to type 'EncryptSchemaTypeOptions | undefined'.
   new SchemaTypeOptions<string>()['encrypt'] = {};
 
-  new SchemaTypeOptions<string>()['encrypt'] = { 
+  new SchemaTypeOptions<string>()['encrypt'] = {
     // @ts-expect-error  Type 'string' is not assignable to type '[Binary]'.
-    keyId: 'fakeId' 
+    keyId: 'fakeId'
   };
 
   // @ts-expect-error  Property 'keyId' is missing in type '{ queries: "equality"; }'
@@ -111,14 +111,14 @@ function encrypt() {
     algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
   };
 
-  new SchemaTypeOptions<string>()['encrypt'] = { 
+  new SchemaTypeOptions<string>()['encrypt'] = {
     // @ts-expect-error  Type 'UUID' is not assignable to type '[Binary]'.
     keyId: uuid,
     // @ts-expect-error  Type '"SHA_FAKE_ALG"' is not assignable to type '"AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic" | "AEAD_AES_256_CBC_HMAC_SHA_512-Random"'.
     algorithm: 'SHA_FAKE_ALG'
   };
 
-  new SchemaTypeOptions<string>()['encrypt'] = { 
+  new SchemaTypeOptions<string>()['encrypt'] = {
     keyId: uuid,
     // @ts-expect-error  Type '"fakeQueryOption"' is not assignable to type '"equality" | "range" | undefined'.
     queries: 'fakeQueryOption'

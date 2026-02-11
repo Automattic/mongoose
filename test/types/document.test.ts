@@ -45,7 +45,7 @@ void async function main() {
   ExpectType<DeleteResult>(await doc.deleteOne());
   ExpectType<TestDocument | null>(await doc.deleteOne().findOne());
   ExpectAssignable<{ _id: Types.ObjectId, name?: string } | null>()(await doc.deleteOne().findOne().lean());
-  // @ts-expect-error invalid assignment
+  // @ts-expect-error  Type '(ITestBase & ...) | null' is not assignable to type '(Document... | null'.
   const v: TestDocument | null = await doc.deleteOne().findOne().lean();
 }();
 
@@ -362,7 +362,7 @@ async function gh12959() {
   ExpectType<Types.ObjectId>(doc._id);
   ExpectType<number>(doc.__v);
 
-  // @ts-expect-error version key shouldn't be defined on subdocs
+  // @ts-expect-error  Property '__v' does not exist on type
   doc.subdocArray[0].__v;
 }
 
@@ -542,7 +542,7 @@ function gh13079() {
   const TestModel5 = model('Test', schema5);
 
   const doc5 = new TestModel5({ name: 'taco' });
-  // @ts-expect-error should not be defined because id option is set to false
+  // @ts-expect-error  Property 'id' does not exist on type
   doc5.id;
 }
 
@@ -580,9 +580,9 @@ async function gh15578() {
 
     const objWithoutVersionKey = a.toObject({ versionKey: false });
     const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
-    // @ts-expect-error should not be defined because versionKey is set to false
+    // @ts-expect-error  Property '__v' does not exist on type
     objWithoutVersionKey.__v;
-    // @ts-expect-error should not be defined because versionKey is set to false
+    // @ts-expect-error  Property '__v' does not exist on type
     jsonWithoutVersionKey.__v;
 
     const objWithVersionKey = a.toObject();
@@ -617,9 +617,9 @@ async function gh15578() {
 
     const objWithoutVersionKey = a.toObject({ versionKey: false });
     const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
-    // @ts-expect-error should not be defined because versionKey is set to false
+    // @ts-expect-error  Property '__v' does not exist on type
     objWithoutVersionKey.__v;
-    // @ts-expect-error should not be defined because versionKey is set to false
+    // @ts-expect-error  Property '__v' does not exist on type
     jsonWithoutVersionKey.__v;
 
     const objWithVersionKey = a.toObject();
@@ -654,9 +654,9 @@ async function gh15578() {
 
     const objWithoutVersionKey = a.toObject({ versionKey: false });
     const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
-    // @ts-expect-error should not be defined because versionKey is set to false
+    // @ts-expect-error  Property '__v' does not exist on type
     objWithoutVersionKey.__v;
-    // @ts-expect-error should not be defined because versionKey is set to false
+    // @ts-expect-error  Property '__v' does not exist on type
     jsonWithoutVersionKey.__v;
 
     const objWithVersionKey = a.toObject();
@@ -693,9 +693,9 @@ async function gh15578() {
 
     const objWithoutVersionKey = a.toObject({ versionKey: false });
     const jsonWithoutVersionKey = a.toJSON({ versionKey: false });
-    // @ts-expect-error should not be defined because versionKey is set to false
+    // @ts-expect-error  Property '__v' does not exist on type
     objWithoutVersionKey.__v;
-    // @ts-expect-error should not be defined because versionKey is set to false
+    // @ts-expect-error  Property '__v' does not exist on type
     jsonWithoutVersionKey.__v;
 
     const objWithVersionKey = a.toObject();

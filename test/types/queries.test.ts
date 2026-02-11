@@ -43,7 +43,7 @@ schema.query._byName = function(name: string): QueryWithHelpers<ITest[], ITest, 
 };
 
 schema.query.byName = function(name: string): QueryWithHelpers<ITest[], ITest, QueryHelpers> {
-  // @ts-expect-error not a method on query instances
+  // @ts-expect-error  Property 'notAQueryHelper' does not exist on type
   this.notAQueryHelper();
   return this._byName(name);
 };
@@ -157,14 +157,15 @@ const p1: Record<string, number> = Test.find().projection('age docs.id');
 const p2: Record<string, number> | null = Test.find().projection();
 const p3: null = Test.find().projection(null);
 
-// @ts-expect-error Only 0 and 1 are allowed
-Test.find({ }, { name: 'ss' });
+
+// @ts-expect-error  No overload matches this call.
+Test.find({ }, { name: 'ss' }); // Only 0 and 1 are allowed
 Test.find({}, { name: 3 });
 Test.find({}, { name: true, age: false, endDate: true, tags: 1 });
 Test.find({}, { name: true, age: false, endDate: true });
 Test.find({}, { name: false, age: false, tags: false, child: { name: false }, docs: { myId: false, id: true } });
-// @ts-expect-error array of strings or numbers should only be allowed to be a boolean or 1 and 0
-Test.find({}, { tags: { something: 1 } });
+// @ts-expect-error  No overload matches this call.
+Test.find({}, { tags: { something: 1 } }); // Array of strings or numbers should only be allowed to be a boolean or 1 and 0
 Test.find({}, { name: true, age: true, endDate: true, tags: 1, child: { name: true }, docs: { myId: true, id: true } }); // This should be allowed
 Test.find({}, { name: 1, age: 1, endDate: 1, tags: 1, child: { name: 1 }, docs: { myId: 1, id: 1 } }); // This should be allowed
 Test.find({}, { _id: 0, name: 1, age: 1, endDate: 1, tags: 1, child: 1, docs: 1 }); // _id is an exception and should be allowed to be excluded
@@ -172,36 +173,36 @@ Test.find({}, { name: 0, age: 0, endDate: 0, tags: 0, child: 0, docs: 0 }); // T
 Test.find({}, { name: 0, age: 0, endDate: 0, tags: 0, child: { name: 0 }, docs: { myId: 0, id: 0 } }); // This should be allowed
 Test.find({}, { name: 1, age: 1, _id: 0 }); // This should be allowed since _id is an exception
 Test.find({}, { someOtherField: 1 }); // This should be allowed since it's not a field in the schema
-// @ts-expect-error $slice should only be allowed on arrays
-Test.find({}, { name: { $slice: 1 } });
+// @ts-expect-error  No overload matches this call.
+Test.find({}, { name: { $slice: 1 } }); // $slice should only be allowed on arrays
 Test.find({}, { tags: { $slice: 1 } }); // $slice should be allowed on arrays
 Test.find({}, { tags: { $slice: [1, 2] } }); // $slice with the format of [ <number to skip>, <number to return> ] should also be allowed on arrays
-// @ts-expect-error $elemMatch should not be allowed on non arrays
-Test.find({}, { age: { $elemMatch: {} } });
+// @ts-expect-error  No overload matches this call.
+Test.find({}, { age: { $elemMatch: {} } }); // $elemMatch should not be allowed on non arrays
 Test.find({}, { docs: { $elemMatch: { id: 'aa' } } }); // $elemMatch should be allowed on arrays
-// @ts-expect-error $elemMatch and $slice should not be allowed together
-Test.find({}, { tags: { $slice: 1, $elemMatch: {} } });
+// @ts-expect-error  No overload matches this call.
+Test.find({}, { tags: { $slice: 1, $elemMatch: {} } }); // $elemMatch and $slice should not be allowed together
 Test.find({}, { age: 1, tags: { $slice: 5 } }); // $slice should be allowed in inclusion projection
 Test.find({}, { age: 0, tags: { $slice: 5 } }); // $slice should be allowed in exclusion projection
 Test.find({}, { age: 1, tags: { $elemMatch: {} } }); // $elemMatch should be allowed in inclusion projection
 Test.find({}, { age: 0, tags: { $elemMatch: {} } }); // $elemMatch should be allowed in exclusion projection
-// @ts-expect-error Dot notation should be allowed and does not accept any
-Test.find({}, { 'docs.id': 'taco' });
-// @ts-expect-error Dot notation should be able to use a combination with objects
-Test.find({}, { docs: { id: '1' } });
+// @ts-expect-error  No overload matches this call.
+Test.find({}, { 'docs.id': 'taco' }); // Dot notation should be allowed and does not accept any
+// @ts-expect-error  No overload matches this call.
+Test.find({}, { docs: { id: '1' } }); // Dot notation should be able to use a combination with objects
 Test.find({}, { docs: { id: false } }); // Dot notation should be allowed with valid values - should correctly handle arrays
 Test.find({}, { docs: { id: true } }); // Dot notation should be allowed with valid values - should correctly handle arrays
 Test.find({ docs: { $elemMatch: { id: 1 } } }, { 'docs.$': 1 }); // $ projection should be allowed
 Test.find({}, { child: 1 }); // Dot notation should be able to use a combination with objects
 // Test.find({}, { 'docs.profiles': { name: 1 } }); // 3 levels deep not supported
-// @ts-expect-error should support a combination of dot notation and objects
-Test.find({}, { 'docs.profiles': { name: 'aa' } });
-// @ts-expect-error should not allow projecting inherited methods in nested objects
-Test.find({}, { endDate: { toString: 1 } });
-// @ts-expect-error should not allow projecting inherited methods in nested objects
-Test.find({}, { tags: { trim: 1 } });
-// @ts-expect-error should not allow projecting inherited methods in nested objects
-Test.find({}, { child: { toJSON: 1 } });
+// @ts-expect-error  No overload matches this call.
+Test.find({}, { 'docs.profiles': { name: 'aa' } }); // should support a combination of dot notation and objects
+// @ts-expect-error  No overload matches this call.
+Test.find({}, { endDate: { toString: 1 } }); // should not allow projecting inherited methods in nested objects
+// @ts-expect-error  No overload matches this call.
+Test.find({}, { tags: { trim: 1 } }); // should not allow projecting inherited methods in nested objects
+// @ts-expect-error  No overload matches this call.
+Test.find({}, { child: { toJSON: 1 } }); // should not allow projecting inherited methods in nested objects
 Test.find({}, { age: 1, _id: 0 });
 Test.find({}, { name: 0, age: 0, _id: 1 });
 
@@ -216,15 +217,15 @@ Test.find().sort(undefined);
 Test.find().sort(null);
 Test.find().sort([['key', 'ascending']]);
 Test.find().sort([['key1', 'ascending'], ['key2', 'descending']]);
-// @ts-expect-error must be one of allowed sort values
+// @ts-expect-error  Argument of type '{ name: 2; }' is not assignable
 Test.find().sort({ name: 2 });
-// @ts-expect-error must be one of allowed sort values
+// @ts-expect-error  Argument of type '{ name: "invalidSortOrder"; }' is not assignable
 Test.find().sort({ name: 'invalidSortOrder' });
-// @ts-expect-error value must be one of allowed sort values
+// @ts-expect-error  Type '"invalid"' is not assignable to type 'SortOrder'.
 Test.find().sort([['key', 'invalid']]);
-// @ts-expect-error value must be one of allowed sort values
+// @ts-expect-error  Type 'false' is not assignable to type 'SortOrder'.
 Test.find().sort([['key', false]]);
-// @ts-expect-error must be array of entries not array of primitives
+// @ts-expect-error  Type 'string' is not assignable to type '[string, SortOrder]'.
 Test.find().sort(['invalid']);
 
 // Super generic query
@@ -499,7 +500,7 @@ async function gh11602(): Promise<void> {
     includeResultMetadata: true
   });
 
-  // @ts-expect-error should not exist
+  // @ts-expect-error  Property 'modifiedCount' does not exist on type
   updateResult.lastErrorObject?.modifiedCount;
   ExpectType<boolean | undefined>(updateResult.lastErrorObject?.updatedExisting);
   ExpectType<ObjectId | undefined>(updateResult.lastErrorObject?.upserted);
@@ -508,8 +509,8 @@ async function gh11602(): Promise<void> {
   ModelType.findOneAndUpdate({}, {}, { returnDocument: 'after' });
   ModelType.findOneAndUpdate({}, {}, { returnDocument: undefined });
   ModelType.findOneAndUpdate({}, {}, {});
-  // @ts-expect-error returnDocument should be 'before' or 'after'
-  ModelType.findOneAndUpdate({}, {}, { returnDocument: 'not-before-or-after' });
+  // @ts-expect-error  No overload matches this call.
+  ModelType.findOneAndUpdate({}, {}, { returnDocument: 'not-before-or-after' }); // returnDocument should be 'before' or 'after'
 }
 
 async function gh13142() {
@@ -562,18 +563,18 @@ async function gh13224() {
 
   const u2 = await UserModel.findOne().select<{ name?: string }>(['name']).orFail();
   ExpectType<string | undefined>(u2.name);
-  // @ts-expect-error excluded from projection
+  // @ts-expect-error  Property 'age' does not exist on type
   u2.age;
   ExpectAssignable<Function>()(u2.toObject);
 
   const users = await UserModel.find().select<{ name?: string }>(['name']);
   const u3 = users[0];
   ExpectType<string | undefined>(u3!.name);
-  // @ts-expect-error excluded from projection
+  // @ts-expect-error  Property 'age' does not exist on type
   u3!.age;
   ExpectAssignable<Function>()(u3.toObject);
 
-  // @ts-expect-error cannot project fields that aren't in the schema
+  // @ts-expect-error  Type '{ notInSchema: string; }' has no properties in common with type '{ name?: any; age?: any; _id?: any; __v?: any; }'.
   await UserModel.findOne().select<{ notInSchema: string }>(['name']).orFail();
 }
 
@@ -589,9 +590,9 @@ function gh13630() {
   ExpectAssignable<UpdateQueryKnownOnly<User>>()({ $set: { name: 'John' } });
   ExpectAssignable<UpdateQueryKnownOnly<User>>()({ $unset: { phone: 'test' } });
   ExpectAssignable<UpdateQueryKnownOnly<User>>()({ $set: { nested: { test: 'foo' } } });
-  // @ts-expect-error invalid assignment
+  // @ts-expect-error  'namee' does not exist in type 'AnyKeys<User>'.
   const q1: UpdateQueryKnownOnly<User> = { $set: { namee: 'foo' } };
-  // @ts-expect-error invalid assignment
+  // @ts-expect-error  ''nested.test'' does not exist in type 'AnyKeys<User>'.
   const q2: UpdateQueryKnownOnly<User> = { $set: { 'nested.test': 'foo' } };
 
   const x: UpdateQueryKnownOnly<User> = { $set: { name: 'John' } };
@@ -758,7 +759,7 @@ async function gh15526() {
     .orFail();
   ExpectType<string | undefined | null>(u1.name);
 
-  // @ts-expect-error excluded from projection
+  // @ts-expect-error  Property 'age' does not exist on type
   u1.age;
 }
 
@@ -819,11 +820,11 @@ async function gh12064() {
   const TestModel = model('Model', schema);
 
   await TestModel.findOne({ 'subdoc.subdocProp': { $gt: 0 }, 'nested.nestedProp': { $in: ['foo', 'bar'] }, 'documentArray.documentArrayProp': { $ne: true } });
-  // @ts-expect-error incorrect type
+  // @ts-expect-error  No overload matches this call.
   TestModel.findOne({ 'subdoc.subdocProp': 'taco tuesday' });
-  // @ts-expect-error incorrect type
+  // @ts-expect-error  No overload matches this call.
   TestModel.findOne({ 'nested.nestedProp': true });
-  // @ts-expect-error incorrect type
+  // @ts-expect-error  No overload matches this call.
   TestModel.findOne({ 'documentArray.documentArrayProp': 'taco' });
 }
 
@@ -872,7 +873,7 @@ async function gh15779() {
 
   type AgeType = typeof v8Filter.age;
   ExpectAssignable<typeof v8Filter.age>()(42);
-  // @ts-expect-error invalid assignment
+  // @ts-expect-error  Type '"taco"' is not assignable to type 'Condition<ApplyBasicQueryCasting<number>> | undefined'.
   const a1: AgeType = 'taco';
 
   const TestModel = model('Test', new Schema({ age: Number, name: String }));

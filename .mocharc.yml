@@ -2,6 +2,8 @@ reporter: spec # better to identify failing / slow tests than "dot"
 ui: bdd # explicitly setting, even though it is mocha default
 require:
   - test/mocha-fixtures.js
+node-option:
+  - disable-warning=MONGOOSE
 extension:
   - test.js
 watch-files:

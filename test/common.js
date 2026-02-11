@@ -7,19 +7,6 @@
 const mongoose = require('../index');
 const Collection = mongoose.Collection;
 const assert = require('assert');
-// Suppress MONGOOSE warnings in tests to avoid polluting test output.
-// Tests that need to assert on warnings use sinon.stub(utils, 'warn') or
-// sinon.stub(process, 'emitWarning') which intercept before this handler.
-const _originalEmitWarning = process.emitWarning;
-process.emitWarning = function suppressedEmitWarning(message, options) {
-  if (options?.code === 'MONGOOSE') {
-    if (typeof message !== 'string') {
-      throw new Error('`utils.warn` should be called with a string, got: ' + typeof message);
-    }
-    return;
-  }
-  return _originalEmitWarning.apply(this, arguments);
-};
 
 const collectionNames = new Map();
 

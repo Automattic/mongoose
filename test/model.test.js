@@ -2882,8 +2882,25 @@ describe('Model', function() {
       assert.deepStrictEqual(productFromDb.metadata.labels.toObject(), ['sale', 'featured']);
     });
 
-    function createTestContext() {
+    it('should preserve custom versionKey when filtering pathsToSave', async function() {
+      // Arrange
+      const { Product } = createTestContext({ versionKey: 'productVersion' });
+      const product = await Product.create({ name: 'Laptop', tags: ['electronics'] });
+      const productFromDb = await Product.findById(product._id);
+      productFromDb.tags.push('sale');
+
+      // Act
+      await productFromDb.save({ pathsToSave: ['tags'] });
+
+      // Assert
+      const saved = await Product.findById(product._id);
+      assert.deepStrictEqual(saved.tags.toObject(), ['electronics', 'sale']);
+      assert.strictEqual(saved.productVersion, 1);
+    });
+
+    function createTestContext({ versionKey } = {}) {
       const commentSchema = new Schema({ text: String, likes: Number });
+      const schemaOptions = versionKey ? { versionKey } : {};
       const productSchema = new Schema({
         name: String,
         description: String,
@@ -2894,7 +2911,7 @@ describe('Model', function() {
           views: Number,
           labels: [String]
         }
-      });
+      }, schemaOptions);
 
       const Product = db.model('Product', productSchema);
       return { Product };

@@ -2897,12 +2897,26 @@ describe('Model', function() {
       // Act
       await product.save({ pathsToSave: ['name'] });
 
-      // Assert
+      // Assert - no $inc/__v since the array ops that triggered versioning were filtered out
       const capturedUpdate = updateOneSpy.getCall(0).args[1];
       assert.deepStrictEqual(capturedUpdate, {
-        $set: { name: 'UPDATED' },
-        $inc: { __v: 1 }
+        $set: { name: 'UPDATED' }
       });
+    });
+
+    it('should not send updateOne to MongoDB when pathsToSave filters out all changes', async function() {
+      // Arrange
+      const { Product } = createTestContext();
+      const product = await Product.create({ name: 'original', description: 'product 123' });
+      product.description = 'product 123';
+      product.name = 'UPDATED';
+      const updateOneSpy = sinon.spy(Product.collection, 'updateOne');
+
+      // Act
+      await product.save({ pathsToSave: ['description'] });
+
+      // Assert
+      assert.strictEqual(updateOneSpy.callCount, 0);
     });
 
     it('should preserve custom versionKey when filtering pathsToSave', async function() {

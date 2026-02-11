@@ -1,3 +1,10 @@
+9.2.1 / 2026-02-11
+==================
+ * types(query): allow assigning QueryFilter<DocType> to QueryFilter<any> #16020
+ * types: duplicate identifier 'UUIDToJSON' in mongoosejs 9.2.0 #16023
+ * types: preserve subdocument toObject() field types when using virtuals + versionKey options #16021 #15965 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(mongoose): add missing options to mongoose.set() docs #16019
+
 9.2.0 / 2026-02-09
 ==================
  * feat: add option to skip middleware #15883 #8768 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

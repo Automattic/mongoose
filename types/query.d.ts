@@ -20,8 +20,18 @@ declare module 'mongoose' {
 
   export type ApplyBasicQueryCasting<T> = QueryTypeCasting<T> | QueryTypeCasting<T[]> | (T extends (infer U)[] ? QueryTypeCasting<U> : T) | null;
 
-  type _QueryFilter<T> = ({ [P in keyof T]?: mongodb.Condition<ApplyBasicQueryCasting<T[P]>>; } & mongodb.RootFilterOperators<{ [P in keyof mongodb.WithId<T>]?: ApplyBasicQueryCasting<mongodb.WithId<T>[P]>; }>);
-  type QueryFilter<T> = IsItRecordAndNotAny<T> extends true ? _QueryFilter<WithLevel1NestedPaths<T>> : _QueryFilter<Record<string, any>>;
+  type _QueryFilter<T> = (
+    { [P in keyof T]?: mongodb.Condition<ApplyBasicQueryCasting<T[P]>>; } &
+    mongodb.RootFilterOperators<{ [P in keyof mongodb.WithId<T>]?: ApplyBasicQueryCasting<mongodb.WithId<T>[P]>; }>
+  );
+  type _QueryFilterLooseId<T> = (
+    { [P in keyof T]?: mongodb.Condition<ApplyBasicQueryCasting<T[P]>>; } &
+    mongodb.RootFilterOperators<
+      { [P in keyof T]?: ApplyBasicQueryCasting<T[P]>; } &
+      { _id?: any; }
+    >
+  );
+  type QueryFilter<T> = IsItRecordAndNotAny<T> extends true ? _QueryFilter<WithLevel1NestedPaths<T>> : _QueryFilterLooseId<Record<string, any>>;
 
   type MongooseBaseQueryOptionKeys =
     | 'context'

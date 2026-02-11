@@ -2630,6 +2630,8 @@ describe('Model', function() {
   });
 
   describe('pathsToSave should filter all update operators', function() {
+    afterEach(() => sinon.restore());
+
     it('should not crash when document has no modifications', async function() {
       // Arrange
       const { Product } = createTestContext();
@@ -2880,6 +2882,27 @@ describe('Model', function() {
       assert.strictEqual(productFromDb.name, 'original');
       assert.strictEqual(productFromDb.metadata.views, 200);
       assert.deepStrictEqual(productFromDb.metadata.labels.toObject(), ['sale', 'featured']);
+    });
+
+    it('should not send empty operator objects to MongoDB after filtering', async function() {
+      // Arrange
+      const { Product } = createTestContext();
+      const updateOneSpy = sinon.spy(Product.collection, 'updateOne');
+      const product = await Product.create({ name: 'original', counter: 0, tags: ['v1'], description: 'keep me' });
+      product.name = 'UPDATED';
+      product.$inc('counter', 5);
+      product.tags.push('v2');
+      product.description = undefined;
+
+      // Act
+      await product.save({ pathsToSave: ['name'] });
+
+      // Assert
+      const capturedUpdate = updateOneSpy.getCall(0).args[1];
+      assert.deepStrictEqual(capturedUpdate, {
+        $set: { name: 'UPDATED' },
+        $inc: { __v: 1 }
+      });
     });
 
     it('should preserve custom versionKey when filtering pathsToSave', async function() {

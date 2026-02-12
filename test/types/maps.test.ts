@@ -1,4 +1,4 @@
-import { Schema, model, Document, Model, Types } from 'mongoose';
+import { Schema, model, Model, Types } from 'mongoose';
 import { ExpectType } from './util/assertions';
 
 interface ITest {

@@ -67,7 +67,7 @@ function thisParameterPattern() {
     // TypeScript does NOT allow `this` parameters in getters/setters.
     // So we show an example error here.
     get myVirtual() {
-      // @ts-expect-error: getter does not support `this` typing
+      // @ts-expect-error  Property 'property1' does not exist on type 'MyClass'.
       return this.property1;
     }
   }
@@ -162,7 +162,7 @@ function getterLimitationTest() {
     name: string;
 
     // TS errors if you try `this` in getter
-    // @ts-expect-error TS2784: 'this' parameters are not allowed in getters
+    // @ts-expect-error  'get' and 'set' accessors cannot declare 'this' parameters.
     get test(this: TestDoc): string {
       return this.name;
     }

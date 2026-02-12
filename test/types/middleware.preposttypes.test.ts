@@ -22,7 +22,7 @@ schema.pre('save', function() {
 
 schema.post('save', function(res) {
   ExpectAssignable<HydratedDocument<IDocument>>()(this);
-  // @ts-expect-error res should be a document, no query type
+  // @ts-expect-error  Type 'Document...' is missing the following properties from type 'Query...'
   const v: Query<any, any> = res;
 });
 
@@ -32,7 +32,7 @@ schema.pre('save', { document: true, query: false }, function() {
 
 schema.post('save', { document: true, query: false }, function(res) {
   ExpectAssignable<HydratedDocument<IDocument>>()(this);
-  // @ts-expect-error res should be a document, no query type
+  // @ts-expect-error  Type 'Document...' is missing the following properties from type 'Query...'
   const v: Query<any, any> = res;
 });
 
@@ -42,7 +42,7 @@ schema.pre('save', { document: true, query: true }, function() {
 
 schema.post('save', { document: true, query: true }, function(res) {
   ExpectAssignable<HydratedDocument<IDocument>>()(this);
-  // @ts-expect-error res should be a document, no query type
+  // @ts-expect-error  Type 'Document...' is missing the following properties from type 'Query...'
   const v: Query<any, any> = res;
 });
 

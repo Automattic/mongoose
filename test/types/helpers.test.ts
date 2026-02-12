@@ -10,7 +10,7 @@ ExpectType<false>(mongoose.isObjectIdOrHexString(new Error()));
 ExpectType<true>(mongoose.isValidObjectId(new ObjectId()));
 ExpectType<true>(mongoose.isValidObjectId(new mongoose.Types.ObjectId()));
 ExpectType<boolean>(mongoose.isValidObjectId('12345'));
-// @ts-expect-error cannot be called without arguments
+// @ts-expect-error  Expected 1 arguments, but got 0.
 mongoose.isValidObjectId();
 
 ExpectType<Date>(mongoose.now());

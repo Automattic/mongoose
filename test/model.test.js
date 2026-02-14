@@ -2628,6 +2628,485 @@ describe('Model', function() {
     });
   });
 
+  describe('pathsToSave should filter all update operators', function() {
+    afterEach(() => sinon.restore());
+
+    it('should not crash when document has no modifications', async function() {
+      // Arrange
+      const { Product } = createTestContext();
+      const product = await Product.create({ name: 'default', counter: 0, tags: ['v1'] });
+      await Product.updateOne({ _id: product._id }, { $set: { name: 'DB Updated' } });
+
+      // Act
+      await product.save({ pathsToSave: ['name'] });
+
+      // Assert
+      const productFromDb = await Product.findById(product._id);
+      assert.strictEqual(productFromDb.name, 'DB Updated');
+    });
+
+    it('should not reset document state when save has no changes', async function() {
+      // Arrange
+      const { Product } = createTestContext();
+      const product = await Product.create({ name: 'default', counter: 0, tags: ['v1'] });
+      const resetSpy = sinon.spy(product, '$__reset');
+
+      // Act
+      await product.save();
+
+      // Assert
+      assert.strictEqual(resetSpy.callCount, 0);
+    });
+
+    it('should filter $pullAll, $pull, and $addToSet simultaneously', async function() {
+      // Arrange
+      const { Product } = createTestContext();
+      const product = await Product.create({
+        name: 'original',
+        tags: ['javascript', 'typescript'],
+        comments: [{ text: 'hello' }, { text: 'world' }],
+        metadata: { views: 0, labels: ['sale', 'featured', 'new'] }
+      });
+      product.name = 'UPDATED';
+      product.tags.pull('typescript');
+      product.comments.pull(product.comments[0]);
+      product.metadata.labels.addToSet('clearance');
+      product.metadata.views = 999;
+
+      // Act
+      await product.save({ pathsToSave: ['name'] });
+
+      // Assert - in-memory document retains all modifications
+      assert.strictEqual(product.name, 'UPDATED');
+      assert.deepStrictEqual(product.tags.toObject(), ['javascript']);
+      assert.strictEqual(product.comments.length, 1);
+      assert.deepStrictEqual(product.metadata.labels.toObject(), ['sale', 'featured', 'new', 'clearance']);
+      assert.strictEqual(product.metadata.views, 999);
+      // DB only has the saved path
+      const productFromDb = await Product.findById(product._id);
+      assert.strictEqual(productFromDb.name, 'UPDATED');
+      assert.deepStrictEqual(productFromDb.tags.toObject(), ['javascript', 'typescript']);
+      assert.strictEqual(productFromDb.comments.length, 2);
+      assert.deepStrictEqual(productFromDb.metadata.labels.toObject(), ['sale', 'featured', 'new']);
+      assert.strictEqual(productFromDb.metadata.views, 0);
+    });
+
+    it('should filter $inc, $push, and $unset simultaneously', async function() {
+      // Arrange
+      const { Product } = createTestContext();
+      const product = await Product.create({ name: 'original', counter: 0, tags: ['v1'], description: 'keep me' });
+      product.name = 'UPDATED';
+      product.$inc('counter', 5);
+      product.tags.push('v2');
+      product.description = undefined;
+
+      // Act
+      await product.save({ pathsToSave: ['name'] });
+
+      // Assert - in-memory document retains all modifications
+      assert.strictEqual(product.name, 'UPDATED');
+      assert.strictEqual(product.counter, 5);
+      assert.deepStrictEqual(product.tags.toObject(), ['v1', 'v2']);
+      assert.strictEqual(product.description, undefined);
+      // DB only has the saved path
+      const productFromDb = await Product.findById(product._id);
+      assert.strictEqual(productFromDb.name, 'UPDATED');
+      assert.strictEqual(productFromDb.counter, 0);
+      assert.deepStrictEqual(productFromDb.tags.toObject(), ['v1']);
+      assert.strictEqual(productFromDb.description, 'keep me');
+    });
+
+    it('should save included paths and filter excluded paths across operators', async function() {
+      // Arrange
+      const { Product } = createTestContext();
+      const product = await Product.create({ name: 'original', counter: 0, tags: ['v1'] });
+      product.name = 'UPDATED';
+      product.$inc('counter', 5);
+      product.tags.push('v2');
+
+      // Act
+      await product.save({ pathsToSave: ['name', 'tags'] });
+
+      // Assert - in-memory document retains all modifications
+      assert.strictEqual(product.name, 'UPDATED');
+      assert.strictEqual(product.counter, 5);
+      assert.deepStrictEqual(product.tags.toObject(), ['v1', 'v2']);
+      // DB has saved paths, filtered path unchanged
+      const productFromDb = await Product.findById(product._id);
+      assert.strictEqual(productFromDb.name, 'UPDATED');
+      assert.strictEqual(productFromDb.counter, 0);
+      assert.deepStrictEqual(productFromDb.tags.toObject(), ['v1', 'v2']);
+    });
+
+    it('should save $inc and $unset when paths are in pathsToSave', async function() {
+      // Arrange
+      const { Product } = createTestContext();
+      const product = await Product.create({ name: 'original', counter: 0, description: 'remove me' });
+      product.name = 'UPDATED';
+      product.$inc('counter', 3);
+      product.description = undefined;
+
+      // Act
+      await product.save({ pathsToSave: ['counter', 'description'] });
+
+      // Assert
+      const productFromDb = await Product.findById(product._id);
+      assert.strictEqual(productFromDb.name, 'original');
+      assert.strictEqual(productFromDb.counter, 3);
+      assert.strictEqual(productFromDb.description, undefined);
+    });
+
+    it('should save $push and $addToSet when paths are in pathsToSave', async function() {
+      // Arrange
+      const { Product } = createTestContext();
+      const product = await Product.create({
+        name: 'original',
+        tags: ['javascript'],
+        metadata: { views: 0, labels: ['sale'] }
+      });
+      product.name = 'UPDATED';
+      product.tags.push('typescript');
+      product.metadata.labels.addToSet('featured');
+
+      // Act
+      await product.save({ pathsToSave: ['tags', 'metadata.labels'] });
+
+      // Assert
+      const productFromDb = await Product.findById(product._id);
+      assert.strictEqual(productFromDb.name, 'original');
+      assert.deepStrictEqual(productFromDb.tags.toObject(), ['javascript', 'typescript']);
+      assert.deepStrictEqual(productFromDb.metadata.labels.toObject(), ['sale', 'featured']);
+    });
+
+    it('should save $pullAll, $pull, and $pop when paths are in pathsToSave', async function() {
+      // Arrange
+      const { Product } = createTestContext();
+      const product = await Product.create({
+        name: 'original',
+        tags: ['javascript', 'typescript'],
+        comments: [{ text: 'hello' }, { text: 'world' }],
+        metadata: { views: 0, labels: ['sale', 'featured', 'new'] }
+      });
+      product.name = 'UPDATED';
+      product.tags.pull('typescript');
+      product.comments.pull(product.comments[0]);
+      product.metadata.labels.pop();
+
+      // Act
+      await product.save({ pathsToSave: ['tags', 'comments', 'metadata.labels'] });
+
+      // Assert
+      const productFromDb = await Product.findById(product._id);
+      assert.strictEqual(productFromDb.name, 'original');
+      assert.deepStrictEqual(productFromDb.tags.toObject(), ['javascript']);
+      assert.strictEqual(productFromDb.comments.length, 1);
+      assert.strictEqual(productFromDb.comments[0].text, 'world');
+      assert.deepStrictEqual(productFromDb.metadata.labels.toObject(), ['sale', 'featured']);
+    });
+
+    it('should save dot-separated path and filter sibling nested paths', async function() {
+      // Arrange
+      const { Product } = createTestContext();
+      const product = await Product.create({ name: 'original', metadata: { views: 100, labels: ['sale'] } });
+      product.name = 'UPDATED';
+      product.metadata.views = 200;
+      product.metadata.labels.push('featured');
+
+      // Act
+      await product.save({ pathsToSave: ['metadata.views'] });
+
+      // Assert
+      const productFromDb = await Product.findById(product._id);
+      assert.strictEqual(productFromDb.name, 'original');
+      assert.strictEqual(productFromDb.metadata.views, 200);
+      assert.deepStrictEqual(productFromDb.metadata.labels.toObject(), ['sale']);
+    });
+
+    it('should save $push on dot-separated paths when in pathsToSave', async function() {
+      // Arrange
+      const { Product } = createTestContext();
+      const product = await Product.create({ name: 'original', metadata: { views: 100, labels: ['sale'] } });
+      product.name = 'UPDATED';
+      product.metadata.views = 200;
+      product.metadata.labels.push('featured');
+
+      // Act
+      await product.save({ pathsToSave: ['metadata.labels'] });
+
+      // Assert
+      const productFromDb = await Product.findById(product._id);
+      assert.strictEqual(productFromDb.name, 'original');
+      assert.strictEqual(productFromDb.metadata.views, 100);
+      assert.deepStrictEqual(productFromDb.metadata.labels.toObject(), ['sale', 'featured']);
+    });
+
+    it('should filter $push on dot-separated paths not in pathsToSave', async function() {
+      // Arrange
+      const { Product } = createTestContext();
+      const product = await Product.create({ name: 'original', metadata: { views: 100, labels: ['sale'] } });
+      product.metadata.views = 200;
+      product.metadata.labels.push('featured');
+
+      // Act
+      await product.save({ pathsToSave: ['metadata.views'] });
+
+      // Assert
+      const productFromDb = await Product.findById(product._id);
+      assert.strictEqual(productFromDb.metadata.views, 200);
+      assert.deepStrictEqual(productFromDb.metadata.labels.toObject(), ['sale']);
+    });
+
+    it('should save dot-separated subdocument array path and filter sibling paths', async function() {
+      // Arrange
+      const { Product } = createTestContext();
+      const product = await Product.create({
+        name: 'original',
+        comments: [{ text: 'hello', likes: 0 }, { text: 'world', likes: 0 }]
+      });
+      product.name = 'UPDATED';
+      product.comments[0].text = 'changed';
+      product.comments[0].likes = 5;
+
+      // Act
+      await product.save({ pathsToSave: ['comments.0.text'] });
+
+      // Assert
+      const productFromDb = await Product.findById(product._id);
+      assert.strictEqual(productFromDb.name, 'original');
+      assert.strictEqual(productFromDb.comments[0].text, 'changed');
+      assert.strictEqual(productFromDb.comments[0].likes, 0);
+      assert.strictEqual(productFromDb.comments[1].text, 'world');
+    });
+
+    it('should save parent path that includes dot-separated operator paths', async function() {
+      // Arrange
+      const { Product } = createTestContext();
+      const product = await Product.create({ name: 'original', metadata: { views: 100, labels: ['sale'] } });
+      product.name = 'UPDATED';
+      product.metadata.labels.push('featured');
+      product.metadata.views = 200;
+
+      // Act
+      await product.save({ pathsToSave: ['metadata'] });
+
+      // Assert
+      const productFromDb = await Product.findById(product._id);
+      assert.strictEqual(productFromDb.name, 'original');
+      assert.strictEqual(productFromDb.metadata.views, 200);
+      assert.deepStrictEqual(productFromDb.metadata.labels.toObject(), ['sale', 'featured']);
+    });
+
+    it('should not send empty operator objects to MongoDB after filtering', async function() {
+      // Arrange
+      const { Product } = createTestContext();
+      const updateOneSpy = sinon.spy(Product.collection, 'updateOne');
+      const product = await Product.create({ name: 'original', counter: 0, tags: ['v1'], description: 'keep me' });
+      product.name = 'UPDATED';
+      product.$inc('counter', 5);
+      product.tags.push('v2');
+      product.description = undefined;
+
+      // Act
+      await product.save({ pathsToSave: ['name'] });
+
+      // Assert - no $inc/__v since the array ops that triggered versioning were filtered out
+      const capturedUpdate = updateOneSpy.getCall(0).args[1];
+      assert.deepStrictEqual(capturedUpdate, {
+        $set: { name: 'UPDATED' }
+      });
+    });
+
+    it('should not send updateOne to MongoDB when pathsToSave filters out all changes', async function() {
+      // Arrange
+      const { Product } = createTestContext();
+      const product = await Product.create({ name: 'original', description: 'product 123' });
+      product.description = 'product 123';
+      product.name = 'UPDATED';
+      const updateOneSpy = sinon.spy(Product.collection, 'updateOne');
+
+      // Act
+      await product.save({ pathsToSave: ['description'] });
+
+      // Assert
+      assert.strictEqual(updateOneSpy.callCount, 0);
+    });
+
+    it('should skip optimistic concurrency array version check when pathsToSave excludes modified paths', async function() {
+      // Arrange
+      const { Product } = createTestContext({ optimisticConcurrency: ['name'] });
+      const product = await Product.create({ name: 'original', counter: 0 });
+      product.name = 'UPDATED';
+      const findOneSpy = sinon.spy(Product.collection, 'findOne');
+      const updateOneSpy = sinon.spy(Product.collection, 'updateOne');
+
+      // Act
+      await product.save({ pathsToSave: ['counter'] });
+
+      // Assert
+      assert.strictEqual(updateOneSpy.callCount, 0);
+      assert.strictEqual(findOneSpy.callCount, 1);
+      const where = findOneSpy.getCall(0).args[0];
+      assert.strictEqual(where.__v, undefined);
+    });
+
+    it('should skip optimistic concurrency exclude version check when pathsToSave excludes modified paths', async function() {
+      // Arrange
+      const { Product } = createTestContext({ optimisticConcurrency: { exclude: ['counter'] } });
+      const product = await Product.create({ name: 'original', counter: 0 });
+      product.name = 'UPDATED';
+      const findOneSpy = sinon.spy(Product.collection, 'findOne');
+      const updateOneSpy = sinon.spy(Product.collection, 'updateOne');
+
+      // Act
+      await product.save({ pathsToSave: ['counter'] });
+
+      // Assert
+      assert.strictEqual(updateOneSpy.callCount, 0);
+      assert.strictEqual(findOneSpy.callCount, 1);
+      const where = findOneSpy.getCall(0).args[0];
+      assert.strictEqual(where.__v, undefined);
+    });
+
+    it('should keep unsaved paths dirty so a subsequent save() persists them', async function() {
+      // Arrange
+      const { Product } = createTestContext();
+      const product = await Product.create({ name: 'original', counter: 0, tags: ['v1'] });
+      product.name = 'UPDATED';
+      product.counter = 5;
+      product.tags.push('v2');
+
+      // Act
+      await product.save({ pathsToSave: ['name'] });
+
+      // Assert - unsaved paths should still be dirty
+      assert.strictEqual(product.isModified('counter'), true);
+      assert.strictEqual(product.isModified('tags'), true);
+      assert.strictEqual(product.isModified('name'), false);
+
+      // Assert - a subsequent save should persist the remaining changes
+      await product.save();
+      const saved = await Product.findById(product._id);
+      assert.strictEqual(saved.name, 'UPDATED');
+      assert.strictEqual(saved.counter, 5);
+      assert.deepStrictEqual(saved.tags.toObject(), ['v1', 'v2']);
+    });
+
+    it('should use $push not $set for unsaved array ops on subsequent save()', async function() {
+      // Arrange
+      const { Product } = createTestContext();
+      const product = await Product.create({ name: 'original', tags: ['v1'] });
+      product.name = 'UPDATED';
+      product.tags.push('v2');
+
+      // Act
+      await product.save({ pathsToSave: ['name'] });
+      const updateOneSpy = sinon.spy(Product.collection, 'updateOne');
+      await product.save();
+
+      // Assert - should use $push, not $set the whole array
+      const capturedUpdate = updateOneSpy.getCall(0).args[1];
+      assert.deepStrictEqual(capturedUpdate, {
+        $push: { tags: { $each: ['v2'] } },
+        $inc: { __v: 1 }
+      });
+    });
+
+    it('should persist unsaved $inc on subsequent save()', async function() {
+      // Arrange
+      const { Product } = createTestContext();
+      const product = await Product.create({ name: 'original', counter: 0 });
+      product.name = 'UPDATED';
+      product.$inc('counter', 5);
+
+      // Act
+      await product.save({ pathsToSave: ['name'] });
+      await product.save();
+
+      // Assert
+      const saved = await Product.findById(product._id);
+      assert.strictEqual(saved.name, 'UPDATED');
+      assert.strictEqual(saved.counter, 5);
+    });
+
+    it('should keep unsaved default paths dirty so a subsequent save() persists them', async function() {
+      // Arrange: use insertOne to bypass mongoose defaults, then hydrate
+      const { Product } = createTestContext({ defaults: true });
+      await Product.collection.insertOne({ name: 'Laptop' });
+      const product = await Product.findOne({ name: 'Laptop' });
+      product.name = 'UPDATED';
+
+      // Act - status has a default of 'active' applied during hydration
+      assert.strictEqual(product.$isDefault('status'), true);
+      assert.strictEqual(product.status, 'active');
+      await product.save({ pathsToSave: ['name'] });
+
+      // Assert - default path should still be pending save
+      assert.strictEqual(product.$isDefault('status'), true);
+      await product.save();
+      const saved = await Product.findOne({ name: 'UPDATED' });
+      assert.strictEqual(saved.status, 'active');
+    });
+
+    it('should preserve custom versionKey when filtering pathsToSave', async function() {
+      // Arrange
+      const { Product } = createTestContext({ versionKey: 'productVersion' });
+      const product = await Product.create({ name: 'Laptop', tags: ['electronics'] });
+      const productFromDb = await Product.findById(product._id);
+      productFromDb.tags.push('sale');
+
+      // Act
+      await productFromDb.save({ pathsToSave: ['tags'] });
+
+      // Assert
+      const saved = await Product.findById(product._id);
+      assert.deepStrictEqual(saved.tags.toObject(), ['electronics', 'sale']);
+      assert.strictEqual(saved.productVersion, 1);
+    });
+
+    it('should keep using pathsToSave as default pathsToValidate', async function() {
+      // Arrange
+      const { Product } = createTestContext({ validation: true });
+      const product = await Product.create({ name: 'Laptop', rating: 5 });
+      product.name = 'Updated';
+      product.rating = 0;
+
+      // Act
+      await product.save({ pathsToSave: ['name'] });
+
+      // Assert
+      const saved = await Product.findById(product._id);
+      assert.strictEqual(saved.name, 'Updated');
+      assert.strictEqual(saved.rating, 5);
+    });
+
+    function createTestContext({ versionKey, defaults, validation, optimisticConcurrency } = {}) {
+      const commentSchema = new Schema({ text: String, likes: Number });
+      const schemaOptions = {};
+      if (versionKey != null) {
+        schemaOptions.versionKey = versionKey;
+      }
+      if (optimisticConcurrency != null) {
+        schemaOptions.optimisticConcurrency = optimisticConcurrency;
+      }
+      const productSchema = new Schema({
+        name: String,
+        description: String,
+        counter: Number,
+        rating: validation ? { type: Number, validate: v => v == null || v >= 1 } : Number,
+        status: defaults ? { type: String, default: 'active' } : String,
+        tags: [String],
+        comments: [commentSchema],
+        metadata: {
+          views: Number,
+          labels: [String]
+        }
+      }, schemaOptions);
+
+      const Product = db.model('Product', productSchema);
+      return { Product };
+    }
+  });
+
 
   describe('_delta()', function() {
     it('should overwrite arrays when directly set (gh-1126)', async function() {

@@ -959,6 +959,29 @@ describe('model: findOneAndUpdate:', function() {
       assert.equal(1, count);
     });
 
+    it('includes dot-notation filter paths in upserted document with sub-schema default (gh-16030)', async function() {
+      const extraPropsSchema = new Schema({ location: String });
+      const s = new Schema({
+        nickName: String,
+        lastName: String,
+        extraProps: { type: extraPropsSchema, default: {} }
+      });
+      const Test = db.model('Test', s);
+
+      const filter = { 'extraProps.location': 'Foo' };
+      const update = {
+        $setOnInsert: { nickName: 'Roo' },
+        $set: { lastName: 'Goo' }
+      };
+      const options = { upsert: true, new: true, setDefaultsOnInsert: true };
+
+      const res = await Test.findOneAndUpdate(filter, update, options);
+
+      assert.equal(res.lastName, 'Goo');
+      assert.equal(res.nickName, 'Roo');
+      assert.equal(res.extraProps.location, 'Foo');
+    });
+
     it('skips setting defaults within maps (gh-7909)', async function() {
       const socialMediaHandleSchema = Schema({ links: [String] });
       const profileSchema = Schema({

@@ -11976,4 +11976,546 @@ describe('model: populate:', function() {
     assert.equal(doc.children.length, 1);
     assert.equal(doc.children[0].category.name, 'Test Category');
   });
+
+  describe('function refPath (gh-16028)', function() {
+    describe('top-level doc', function() {
+      it('should populate with function refPath', async function() {
+        // Arrange
+        const { Comment, BlogPost } = createTestContext();
+        const blogPost = await BlogPost.create({ title: 'Intro to Mongoose' });
+        await Comment.create({ body: 'Great post!', targetModel: 'BlogPost', target: blogPost._id });
+
+        // Act
+        const commentFromDb = await Comment.findOne().populate('target');
+
+        // Assert
+        assert.equal(commentFromDb.target.title, 'Intro to Mongoose');
+      });
+
+      it('should populate via doc.populate()', async function() {
+        // Arrange
+        const { Comment, BlogPost } = createTestContext();
+        const blogPost = await BlogPost.create({ title: 'Intro to Mongoose' });
+        const comment = await Comment.create({ body: 'Great post!', targetModel: 'BlogPost', target: blogPost._id });
+
+        // Act
+        const commentFromDb = await Comment.findById(comment._id);
+        await commentFromDb.populate('target');
+
+        // Assert
+        assert.equal(commentFromDb.target.title, 'Intro to Mongoose');
+      });
+
+      it('should populate when different docs reference different models', async function() {
+        // Arrange
+        const { Comment, BlogPost, Product } = createTestContext();
+        const blogPost = await BlogPost.create({ title: 'Intro to Mongoose' });
+        const product = await Product.create({ name: 'Widget' });
+        await Comment.create([
+          { body: 'Great post!', targetModel: 'BlogPost', target: blogPost._id },
+          { body: 'Nice product!', targetModel: 'Product', target: product._id }
+        ]);
+
+        // Act
+        const comments = await Comment.find().sort('body').populate('target');
+
+        // Assert
+        assert.equal(comments[0].target.title, 'Intro to Mongoose');
+        assert.equal(comments[1].target.name, 'Widget');
+      });
+
+      it('should pass plain path (no prefix) to refPath function', async function() {
+        // Arrange
+        const { Comment, BlogPost, getRefPathCalls } = createTestContext();
+        const blogPost = await BlogPost.create({ title: 'Intro to Mongoose' });
+        await Comment.create({ targetModel: 'BlogPost', target: blogPost._id });
+
+        // Act
+        const commentFromDb = await Comment.findOne().populate('target');
+
+        // Assert
+        const calls = getRefPathCalls();
+        assert.strictEqual(calls.length, 1);
+        assert.strictEqual(calls[0].thisEqualsDoc, true);
+        assert.strictEqual(calls[0].doc, commentFromDb);
+        assert.strictEqual(calls[0].path, 'target');
+      });
+
+      function createTestContext() {
+        const refPathCalls = [];
+
+        const blogPostSchema = new Schema({ title: String });
+        const BlogPost = db.model('BlogPost', blogPostSchema);
+
+        const productSchema = new Schema({ name: String });
+        const Product = db.model('Product', productSchema);
+
+        const commentSchema = new Schema({
+          body: String,
+          targetModel: String,
+          target: {
+            type: Schema.Types.ObjectId,
+            refPath: function(doc, path) {
+              refPathCalls.push({ thisEqualsDoc: this === doc, doc, path });
+              return 'targetModel';
+            }
+          }
+        });
+        const Comment = db.model('Comment', commentSchema);
+
+        return { Comment, BlogPost, Product, getRefPathCalls: () => refPathCalls };
+      }
+    });
+
+    describe('subdoc arrays', function() {
+      it('should populate where each subdoc references a different model', async function() {
+        // Arrange
+        const { Inbox, BlogPost, Product } = createTestContext();
+        const blogPost = await BlogPost.create({ title: 'Intro to Mongoose' });
+        const product = await Product.create({ name: 'Widget' });
+        await Inbox.create({
+          notifications: [
+            { targetModel: 'BlogPost', target: blogPost._id },
+            { targetModel: 'Product', target: product._id }
+          ]
+        });
+
+        // Act
+        const inbox = await Inbox.findOne().populate('notifications.target');
+
+        // Assert
+        assert.equal(inbox.notifications[0].target.title, 'Intro to Mongoose');
+        assert.equal(inbox.notifications[1].target.name, 'Widget');
+      });
+
+      it('should populate when some subdocs have null target', async function() {
+        // Arrange
+        const { Inbox, BlogPost } = createTestContext();
+        const blogPost = await BlogPost.create({ title: 'Intro to Mongoose' });
+        await Inbox.create({
+          notifications: [
+            { targetModel: 'BlogPost', target: blogPost._id },
+            { targetModel: 'Product', target: null }
+          ]
+        });
+
+        // Act
+        const inbox = await Inbox.findOne().populate('notifications.target');
+
+        // Assert
+        assert.equal(inbox.notifications[0].target.title, 'Intro to Mongoose');
+        assert.strictEqual(inbox.notifications[1].target, null);
+      });
+
+      it('should pass correct `this`, doc, and indexed path args', async function() {
+        // Arrange
+        const { Inbox, BlogPost, getRefPathCalls } = createTestContext();
+        const blogPost = await BlogPost.create({ title: 'Intro to Mongoose' });
+        await Inbox.create({
+          notifications: [{ targetModel: 'BlogPost', target: blogPost._id }]
+        });
+
+        // Act
+        const inbox = await Inbox.findOne().populate('notifications.target');
+
+        // Assert
+        const calls = getRefPathCalls();
+        assert.strictEqual(calls.length, 1);
+        assert.strictEqual(calls[0].thisEqualsDoc, true);
+        assert.strictEqual(calls[0].doc, inbox.notifications[0]);
+        assert.strictEqual(calls[0].path, 'notifications.0.target');
+      });
+
+      it('should pass distinct indexed paths for each subdoc', async function() {
+        // Arrange
+        const { Inbox, BlogPost, Product, getRefPathCalls } = createTestContext();
+        const blogPost = await BlogPost.create({ title: 'Intro to Mongoose' });
+        const product = await Product.create({ name: 'Widget' });
+        await Inbox.create({
+          notifications: [
+            { targetModel: 'BlogPost', target: blogPost._id },
+            { targetModel: 'Product', target: product._id },
+            { targetModel: 'BlogPost', target: blogPost._id }
+          ]
+        });
+
+        // Act
+        const inbox = await Inbox.findOne().populate('notifications.target');
+
+        // Assert
+        const calls = getRefPathCalls();
+        assert.strictEqual(calls.length, 3);
+        assert.strictEqual(calls[0].thisEqualsDoc, true);
+        assert.strictEqual(calls[0].doc, inbox.notifications[0]);
+        assert.strictEqual(calls[0].path, 'notifications.0.target');
+        assert.strictEqual(calls[1].thisEqualsDoc, true);
+        assert.strictEqual(calls[1].doc, inbox.notifications[1]);
+        assert.strictEqual(calls[1].path, 'notifications.1.target');
+        assert.strictEqual(calls[2].thisEqualsDoc, true);
+        assert.strictEqual(calls[2].doc, inbox.notifications[2]);
+        assert.strictEqual(calls[2].path, 'notifications.2.target');
+      });
+
+      it('should pass indexed path with lean queries', async function() {
+        // Arrange
+        const { Inbox, BlogPost, getRefPathCalls } = createTestContext();
+        const blogPost = await BlogPost.create({ title: 'Intro to Mongoose' });
+        await Inbox.create({
+          notifications: [{ targetModel: 'BlogPost', target: blogPost._id }]
+        });
+
+        // Act
+        const inbox = await Inbox.findOne().populate('notifications.target').lean();
+
+        // Assert
+        assert.equal(inbox.notifications[0].target.title, 'Intro to Mongoose');
+        const calls = getRefPathCalls();
+        assert.strictEqual(calls.length, 1);
+        assert.strictEqual(calls[0].thisEqualsDoc, true);
+        assert.strictEqual(calls[0].doc, inbox.notifications[0]);
+        assert.strictEqual(calls[0].path, 'notifications.0.target');
+      });
+
+      it('should populate via doc.populate()', async function() {
+        // Arrange
+        const { Inbox, BlogPost, getRefPathCalls } = createTestContext();
+        const blogPost = await BlogPost.create({ title: 'Intro to Mongoose' });
+        await Inbox.create({
+          notifications: [{ targetModel: 'BlogPost', target: blogPost._id }]
+        });
+
+        // Act
+        const inbox = await Inbox.findOne();
+        await inbox.populate('notifications.target');
+
+        // Assert
+        assert.equal(inbox.notifications[0].target.title, 'Intro to Mongoose');
+        const calls = getRefPathCalls();
+        assert.strictEqual(calls.length, 1);
+        assert.strictEqual(calls[0].thisEqualsDoc, true);
+        assert.strictEqual(calls[0].doc, inbox.notifications[0]);
+        assert.strictEqual(calls[0].path, 'notifications.0.target');
+      });
+
+      it('should populate when refPath returns different paths per subdoc', async function() {
+        // Arrange
+        const blogPostSchema = new Schema({ title: String });
+        const BlogPost = db.model('BlogPost', blogPostSchema);
+
+        const productSchema = new Schema({ name: String });
+        const Product = db.model('Product', productSchema);
+
+        const notificationSchema = new Schema({
+          blogPostModel: String,
+          productModel: String,
+          kind: String,
+          target: {
+            type: Schema.Types.ObjectId,
+            refPath: function(_doc, path) {
+              const kind = this.get ? this.get('kind') : _doc.kind;
+              return kind === 'blog'
+                ? path.replace('.target', '.blogPostModel')
+                : path.replace('.target', '.productModel');
+            }
+          }
+        });
+
+        const inboxSchema = new Schema({ notifications: [notificationSchema] });
+        const Inbox = db.model('Inbox', inboxSchema);
+
+        const blogPost = await BlogPost.create({ title: 'Intro to Mongoose' });
+        const product = await Product.create({ name: 'Widget' });
+        await Inbox.create({
+          notifications: [
+            { kind: 'blog', blogPostModel: 'BlogPost', target: blogPost._id },
+            { kind: 'product', productModel: 'Product', target: product._id }
+          ]
+        });
+
+        // Act
+        const inbox = await Inbox.findOne().populate('notifications.target');
+
+        // Assert
+        assert.equal(inbox.notifications[0].target.title, 'Intro to Mongoose');
+        assert.equal(inbox.notifications[1].target.name, 'Widget');
+      });
+
+      it('should pass consistent indexed path in $set and populate', async function() {
+        // Arrange
+        const blogPostSchema = new Schema({ title: String });
+        const BlogPost = db.model('BlogPost', blogPostSchema);
+
+        const refPathCalls = [];
+        const notificationSchema = new Schema({
+          targetModel: String,
+          target: {
+            type: Schema.Types.ObjectId,
+            refPath: function(_doc, path) {
+              refPathCalls.push(path);
+              return path.replace('.target', '.targetModel');
+            }
+          }
+        });
+        const inboxSchema = new Schema({ notifications: [notificationSchema] });
+        const Inbox = db.model('Inbox', inboxSchema);
+
+        const blogPost = await BlogPost.create({ title: 'Intro to Mongoose' });
+
+        // Act - $set during construction, then populate
+        await Inbox.create({
+          notifications: [{ targetModel: 'BlogPost', target: blogPost }]
+        });
+        await Inbox.findOne().populate('notifications.target');
+
+        // Assert - both calls get the same indexed path
+        assert.strictEqual(refPathCalls.length, 2);
+        assert.strictEqual(refPathCalls[0], 'notifications.0.target');
+        assert.strictEqual(refPathCalls[1], 'notifications.0.target');
+      });
+
+      it('should not break string refPath', async function() {
+        // Arrange
+        const blogPostSchema = new Schema({ title: String });
+        const BlogPost = db.model('BlogPost', blogPostSchema);
+
+        const productSchema = new Schema({ name: String });
+        const Product = db.model('Product', productSchema);
+
+        // String refPath on subdoc arrays is root-relative (e.g., 'notifications.targetModel')
+        const notificationSchema = new Schema({
+          targetModel: String,
+          target: {
+            type: Schema.Types.ObjectId,
+            refPath: 'notifications.targetModel'
+          }
+        });
+        const inboxSchema = new Schema({ notifications: [notificationSchema] });
+        const Inbox = db.model('Inbox', inboxSchema);
+
+        const blogPost = await BlogPost.create({ title: 'Intro to Mongoose' });
+        const product = await Product.create({ name: 'Widget' });
+        await Inbox.create({
+          notifications: [
+            { targetModel: 'BlogPost', target: blogPost._id },
+            { targetModel: 'Product', target: product._id }
+          ]
+        });
+
+        // Act
+        const inbox = await Inbox.findOne().populate('notifications.target');
+
+        // Assert
+        assert.equal(inbox.notifications[0].target.title, 'Intro to Mongoose');
+        assert.equal(inbox.notifications[1].target.name, 'Widget');
+      });
+
+      function createTestContext() {
+        const refPathCalls = [];
+
+        const blogPostSchema = new Schema({ title: String });
+        const BlogPost = db.model('BlogPost', blogPostSchema);
+
+        const productSchema = new Schema({ name: String });
+        const Product = db.model('Product', productSchema);
+
+        const notificationSchema = new Schema({
+          targetModel: String,
+          target: {
+            type: Schema.Types.ObjectId,
+            refPath: function(doc, path) {
+              refPathCalls.push({ thisEqualsDoc: this === doc, doc, path });
+              return path.replace('.target', '.targetModel');
+            }
+          }
+        });
+        const inboxSchema = new Schema({ notifications: [notificationSchema] });
+        const Inbox = db.model('Inbox', inboxSchema);
+
+        return { Inbox, BlogPost, Product, getRefPathCalls: () => refPathCalls };
+      }
+    });
+
+    describe('deeply nested arrays', function() {
+      it('should populate', async function() {
+        // Arrange
+        const { Dashboard, BlogPost, Product } = createTestContext();
+        const blogPost = await BlogPost.create({ title: 'Intro to Mongoose' });
+        const product = await Product.create({ name: 'Widget' });
+        await Dashboard.create({
+          channels: [{
+            notifications: [
+              { targetModel: 'BlogPost', target: blogPost._id },
+              { targetModel: 'Product', target: product._id }
+            ]
+          }]
+        });
+
+        // Act
+        const dashboard = await Dashboard.findOne()
+          .populate('channels.notifications.target');
+
+        // Assert
+        assert.equal(dashboard.channels[0].notifications[0].target.title, 'Intro to Mongoose');
+        assert.equal(dashboard.channels[0].notifications[1].target.name, 'Widget');
+      });
+
+      it('should pass fully indexed path', async function() {
+        // Arrange
+        const { Dashboard, BlogPost, Product, getRefPathCalls } = createTestContext();
+        const blogPost = await BlogPost.create({ title: 'Intro to Mongoose' });
+        const product = await Product.create({ name: 'Widget' });
+        await Dashboard.create({
+          channels: [{
+            notifications: [
+              { targetModel: 'BlogPost', target: blogPost._id },
+              { targetModel: 'Product', target: product._id }
+            ]
+          }]
+        });
+
+        // Act
+        const dashboard = await Dashboard.findOne()
+          .populate('channels.notifications.target');
+
+        // Assert
+        assert.equal(dashboard.channels[0].notifications[0].target.title, 'Intro to Mongoose');
+        assert.equal(dashboard.channels[0].notifications[1].target.name, 'Widget');
+        const calls = getRefPathCalls();
+        assert.strictEqual(calls.length, 2);
+        assert.strictEqual(calls[0].thisEqualsDoc, true);
+        assert.strictEqual(calls[0].doc, dashboard.channels[0].notifications[0]);
+        assert.strictEqual(calls[0].path, 'channels.0.notifications.0.target');
+        assert.strictEqual(calls[1].thisEqualsDoc, true);
+        assert.strictEqual(calls[1].doc, dashboard.channels[0].notifications[1]);
+        assert.strictEqual(calls[1].path, 'channels.0.notifications.1.target');
+      });
+
+      function createTestContext() {
+        const refPathCalls = [];
+
+        const blogPostSchema = new Schema({ title: String });
+        const BlogPost = db.model('BlogPost', blogPostSchema);
+
+        const productSchema = new Schema({ name: String });
+        const Product = db.model('Product', productSchema);
+
+        const notificationSchema = new Schema({
+          targetModel: String,
+          target: {
+            type: Schema.Types.ObjectId,
+            refPath: function(doc, path) {
+              refPathCalls.push({ thisEqualsDoc: this === doc, doc, path });
+              return path.replace('.target', '.targetModel');
+            }
+          }
+        });
+        const channelSchema = new Schema({ notifications: [notificationSchema] });
+        const dashboardSchema = new Schema({ channels: [channelSchema] });
+        const Dashboard = db.model('Dashboard', dashboardSchema);
+
+        return { Dashboard, BlogPost, Product, getRefPathCalls: () => refPathCalls };
+      }
+    });
+
+    describe('single nested subdoc', function() {
+      it('should populate and pass path without array index', async function() {
+        // Arrange
+        const refPathCalls = [];
+
+        const blogPostSchema = new Schema({ title: String });
+        const BlogPost = db.model('BlogPost', blogPostSchema);
+
+        const metadataSchema = new Schema({
+          targetModel: String,
+          target: {
+            type: Schema.Types.ObjectId,
+            refPath: function(doc, path) {
+              refPathCalls.push({ thisEqualsDoc: this === doc, doc, path });
+              return path.replace('.target', '.targetModel');
+            }
+          }
+        });
+        const postSchema = new Schema({ title: String, metadata: metadataSchema });
+        const Post = db.model('Post', postSchema);
+
+        const blogPost = await BlogPost.create({ title: 'Referenced Post' });
+
+        // Passing _id does not trigger refPath during $set (no model to check)
+        await Post.create({
+          title: 'Post with ID',
+          metadata: { targetModel: 'BlogPost', target: blogPost._id }
+        });
+        assert.strictEqual(refPathCalls.length, 0);
+
+        // Passing a document triggers refPath during $set to verify the model
+        const createdPost = await Post.create({
+          title: 'Post with Doc',
+          metadata: { targetModel: 'BlogPost', target: blogPost }
+        });
+        assert.strictEqual(refPathCalls.length, 1);
+        assert.strictEqual(refPathCalls[0].thisEqualsDoc, true);
+        assert.strictEqual(refPathCalls[0].doc, createdPost.metadata);
+        assert.strictEqual(refPathCalls[0].path, 'metadata.target');
+
+        // Act
+        const post = await Post.findOne({ title: 'Post with Doc' }).populate('metadata.target');
+
+        // Assert
+        assert.equal(post.metadata.target.title, 'Referenced Post');
+        assert.strictEqual(refPathCalls.length, 2);
+        assert.strictEqual(refPathCalls[1].thisEqualsDoc, true);
+        assert.strictEqual(refPathCalls[1].doc, post.metadata);
+        assert.strictEqual(refPathCalls[1].path, 'metadata.target');
+      });
+    });
+
+    describe('shared schema across multiple arrays', function() {
+      it('should populate with distinct indexed paths per array', async function() {
+        // Arrange
+        const refPathCalls = [];
+
+        const userSchema = new Schema({ name: String });
+        const User = db.model('User', userSchema);
+
+        const agentSchema = new Schema({ vendor: String });
+        const Agent = db.model('Agent', agentSchema);
+
+        const subSchema = new Schema({
+          kind: String,
+          item: {
+            type: Schema.Types.ObjectId,
+            refPath: function(doc, path) {
+              refPathCalls.push({ thisEqualsDoc: this === doc, doc, path });
+              return path.replace(/\.item$/, '.kind');
+            }
+          }
+        });
+        const recordSchema = new Schema({ users: [subSchema], agents: [subSchema] });
+        const Record = db.model('Record', recordSchema);
+
+        const user = await User.create({ name: 'Hafez' });
+        const agent = await Agent.create({ vendor: 'chrome' });
+        await Record.create({
+          users: [{ kind: 'User', item: user._id }],
+          agents: [{ kind: 'Agent', item: agent._id }]
+        });
+
+        // Act
+        const record = await Record.findOne()
+          .populate('users.item')
+          .populate('agents.item');
+
+        // Assert
+        assert.equal(record.users[0].item.name, 'Hafez');
+        assert.equal(record.agents[0].item.vendor, 'chrome');
+        assert.strictEqual(refPathCalls.length, 2);
+        assert.strictEqual(refPathCalls[0].thisEqualsDoc, true);
+        assert.strictEqual(refPathCalls[0].doc, record.users[0]);
+        assert.strictEqual(refPathCalls[0].path, 'users.0.item');
+        assert.strictEqual(refPathCalls[1].thisEqualsDoc, true);
+        assert.strictEqual(refPathCalls[1].doc, record.agents[0]);
+        assert.strictEqual(refPathCalls[1].path, 'agents.0.item');
+      });
+    });
+  });
 });

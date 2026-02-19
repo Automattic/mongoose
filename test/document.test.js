@@ -13,6 +13,7 @@ const assert = require('assert');
 const idGetter = require('../lib/helpers/schema/idGetter');
 const sinon = require('sinon');
 const util = require('./util');
+const isBsonType = require('../lib/helpers/isBsonType');
 const utils = require('../lib/utils');
 
 const mongoose = start.mongoose;
@@ -3176,6 +3177,98 @@ describe('document', function() {
 
       assert.equal(parent.childId.name, 'test');
       assert.ok(parent.otherId instanceof mongoose.Types.ObjectId);
+    });
+
+    describe('function refPath (gh-16028)', function() {
+      it('should treat assigned document as its id when creating', async function() {
+        // Arrange
+        const { User, ActivityLog } = createTestContext();
+        const user = await User.create({ name: 'Hafez' });
+
+        // Act
+        const activityLog = await ActivityLog.create({ targetModel: 'User', targetUser: user });
+
+        // Assert
+        const found = await ActivityLog.findById(activityLog._id);
+        assert.ok(isBsonType(found.targetUser, 'ObjectId'));
+        assert.ok(found.targetUser.equals(user._id));
+      });
+
+      it('should populate from database when refPath is a function', async function() {
+        // Arrange
+        const { User, ActivityLog } = createTestContext();
+        const user = await User.create({ name: 'Hafez' });
+        await ActivityLog.create({ targetModel: 'User', targetUser: user._id });
+
+        // Act
+        const found = await ActivityLog.findOne().populate('targetUser');
+
+        // Assert
+        assert.equal(found.targetUser.name, 'Hafez');
+      });
+
+      it('should pass `this`, doc, and path to function refPath', async function() {
+        // Arrange
+        const { User, ActivityLog, getRefPathArgs } = createTestContext();
+        const user = await User.create({ name: 'Hafez' });
+
+        // Act
+        const activityLog = await ActivityLog.create({ targetModel: 'User', targetUser: user });
+
+        // Assert
+        const refPathArgs = getRefPathArgs();
+        assert.ok(refPathArgs);
+        assert.strictEqual(refPathArgs.refPathThis, refPathArgs.doc);
+        assert.strictEqual(refPathArgs.doc, activityLog);
+        assert.strictEqual(refPathArgs.path, 'targetUser');
+
+        assert.strictEqual(refPathArgs.refPathThis.targetModel, 'User');
+        assert.strictEqual(refPathArgs.refPathThis, activityLog);
+      });
+
+      it('should work with string refPath when assigning a document (baseline)', async function() {
+        // Arrange
+        const { User, ActivityLog } = createTestContext({ refPath: 'targetModel' });
+        const user = await User.create({ name: 'Hafez' });
+
+        // Act
+        const activityLog = await ActivityLog.create({ targetModel: 'User', targetUser: user });
+        const found = await ActivityLog.findById(activityLog._id).populate('targetUser');
+
+        // Assert
+        assert.equal(found.targetUser.name, 'Hafez');
+      });
+
+
+      function createTestContext({ refPath } = {}) {
+        let refPathArgs = null;
+
+        const userSchema = new Schema({ name: String });
+        const User = db.model('User', userSchema);
+
+        const activityLogSchema = new Schema({
+          targetModel: String,
+          targetUser: {
+            type: Schema.Types.ObjectId,
+            refPath: refPath || function(doc, path) {
+              refPathArgs = {
+                refPathThis: this,
+                doc,
+                path
+              };
+              return 'targetModel';
+            }
+          }
+        });
+
+        const ActivityLog = db.model('ActivityLog', activityLogSchema);
+
+        return {
+          User,
+          ActivityLog,
+          getRefPathArgs: () => refPathArgs
+        };
+      }
     });
 
     it('doesnt skipId for single nested subdocs (gh-4008)', async function() {

@@ -3245,6 +3245,34 @@ describe('document', function() {
           assert.equal(activityLogFromDb.targetUser.name, 'Hafez');
         });
 
+        it('should use MongooseError if function refPath returns a non-string during $set', async function() {
+          // Arrange
+          const userSchema = new Schema({ name: String });
+          const User = db.model('User', userSchema);
+
+          const activityLogSchema = new Schema({
+            targetModel: String,
+            targetUser: {
+              type: Schema.Types.ObjectId,
+              refPath: function() {
+                return { path: 'targetModel' };
+              }
+            }
+          });
+          const ActivityLog = db.model('ActivityLog', activityLogSchema);
+
+          const user = await User.create({ name: 'Hafez' });
+
+          // Act
+          const err = await ActivityLog.create({ targetModel: 'User', targetUser: user }).
+            then(() => null, err => err);
+
+          // Assert
+          assert.equal(err.name, 'ValidationError');
+          assert.equal(err.errors.targetUser.reason.name, 'MongooseError');
+          assert.ok(/`refPath` must be a string/.test(err.errors.targetUser.reason.message));
+        });
+
         function createTestContext({ refPath } = {}) {
           let refPathArgs = null;
 

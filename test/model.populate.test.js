@@ -12041,6 +12041,33 @@ describe('model: populate:', function() {
         assert.strictEqual(calls[0].path, 'target');
       });
 
+      it('should throw MongooseError if function refPath returns a non-string during populate', async function() {
+        // Arrange
+        const blogPostSchema = new Schema({ title: String });
+        const BlogPost = db.model('BlogPost', blogPostSchema);
+
+        const commentSchema = new Schema({
+          targetModel: String,
+          target: {
+            type: Schema.Types.ObjectId,
+            refPath: function() {
+              return { path: 'targetModel' };
+            }
+          }
+        });
+        const Comment = db.model('Comment', commentSchema);
+
+        const blogPost = await BlogPost.create({ title: 'Intro to Mongoose' });
+        await Comment.create({ targetModel: 'BlogPost', target: blogPost._id });
+
+        // Act
+        const err = await Comment.findOne().populate('target').then(() => null, err => err);
+
+        // Assert
+        assert.equal(err.name, 'MongooseError');
+        assert.ok(/`refPath` must be a string/.test(err.message));
+      });
+
       function createTestContext() {
         const refPathCalls = [];
 

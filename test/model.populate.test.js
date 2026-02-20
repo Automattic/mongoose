@@ -10378,6 +10378,51 @@ describe('model: populate:', function() {
     assert.equal(row.values.get(createList._id.toString()).valueObject.name, 'test');
   });
 
+  it('calls function refPath for each map subdocument when populating `$*` path', async function() {
+    const refPathCalls = [];
+
+    const userSchema = Schema({ name: String });
+    const productSchema = Schema({ title: String });
+    const User = db.model('User', userSchema);
+    const Product = db.model('Product', productSchema);
+
+    const rowValuesSchema = Schema({
+      valueModel: String,
+      valueObject: {
+        type: mongoose.Schema.Types.ObjectId,
+        refPath: function(doc, path) {
+          refPathCalls.push({ thisEqualsDoc: this === doc, doc, path });
+          return path.replace(/\.valueObject$/, '.valueModel');
+        }
+      }
+    });
+
+    const rowSchema = Schema({
+      values: { type: mongoose.Schema.Types.Map, of: rowValuesSchema }
+    });
+    const Row = db.model('Row', rowSchema);
+
+    const user = await User.create({ name: 'test' });
+    const product = await Product.create({ title: 'test product' });
+
+    await Row.create({
+      values: {
+        alpha: { valueModel: 'User', valueObject: user._id },
+        beta: { valueModel: 'Product', valueObject: product._id }
+      }
+    });
+
+    const row = await Row.findOne().populate('values.$*.valueObject');
+
+    assert.equal(row.values.get('alpha').valueObject.name, 'test');
+    assert.equal(row.values.get('beta').valueObject.title, 'test product');
+    assert.equal(refPathCalls.length, 2);
+    assert.equal(refPathCalls[0].thisEqualsDoc, true);
+    assert.equal(refPathCalls[1].thisEqualsDoc, true);
+    assert.equal(refPathCalls[0].path, 'values.alpha.valueObject');
+    assert.equal(refPathCalls[1].path, 'values.beta.valueObject');
+  });
+
   it('handles virtual populate with `justOne` underneath document array and sort (gh-12730) (gh-10552)', async function() {
     const shiftSchema = new mongoose.Schema({
       employeeId: mongoose.Types.ObjectId,

@@ -12390,6 +12390,32 @@ describe('model: populate:', function() {
         assert.strictEqual(calls[1].path, 'channels.0.notifications.1.target');
       });
 
+      it('should pass correct indexed path with lean and multiple parent array elements', async function() {
+        // Arrange
+        const { Dashboard, BlogPost, Product, getRefPathCalls } = createTestContext();
+        const blogPost = await BlogPost.create({ title: 'Intro to Mongoose' });
+        const product = await Product.create({ name: 'Widget' });
+        await Dashboard.create({
+          channels: [
+            { notifications: [{ targetModel: 'BlogPost', target: blogPost._id }] },
+            { notifications: [{ targetModel: 'Product', target: product._id }] }
+          ]
+        });
+
+        // Act
+        const dashboard = await Dashboard.findOne()
+          .populate('channels.notifications.target')
+          .lean();
+
+        // Assert
+        assert.equal(dashboard.channels[0].notifications[0].target.title, 'Intro to Mongoose');
+        assert.equal(dashboard.channels[1].notifications[0].target.name, 'Widget');
+        const calls = getRefPathCalls();
+        assert.strictEqual(calls.length, 2);
+        assert.strictEqual(calls[0].path, 'channels.0.notifications.0.target');
+        assert.strictEqual(calls[1].path, 'channels.1.notifications.0.target');
+      });
+
       function createTestContext() {
         const refPathCalls = [];
 

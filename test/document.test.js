@@ -3225,6 +3225,8 @@ describe('document', function() {
           await activityLog.save();
 
           // Assert
+          assert.ok(activityLog.populated('targetUser'));
+          assert.strictEqual(activityLog.targetUser.name, 'Hafez');
           const activityLogFromDb = await ActivityLog.findById(activityLog._id);
           assert.ok(isBsonType(activityLogFromDb.targetUser, 'ObjectId'));
           assert.ok(activityLogFromDb.targetUser.equals(user._id));

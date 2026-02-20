@@ -369,19 +369,27 @@ const mongooseComRegex = /(?:href=")(https:\/\/mongoosejs\.com\/?)/g;
 const versionedDocs = /docs\/\d/;
 
 /**
- * Map urls (https://mongoosejs.com/) to local paths
+ * Map urls the given urls to their latest or local paths
  * @param {String} block The String block to look for urls
  * @param {String} currentUrl The URL the block is for (non-versioned)
  */
 function mapURLs(block, currentUrl) {
+  return mapURLsMongoDb(mapURLsMongoose(block, currentUrl));
+}
+
+/**
+ * Map <https://mongoosejs.com/> to local paths
+ * @param {String} block The String block to look for urls
+ * @param {String} currentUrl The URL the block is for (non-versioned)
+ */
+function mapURLsMongoose(block, currentUrl) {
   let match;
 
   let out = '';
   let lastIndex = 0;
 
   while ((match = mongooseComRegex.exec(block)) !== null) {
-    // console.log("match", match);
-    // cant just use "match.index" byitself, because of the extra "href=\"" condition, which is not factored in in "match.index"
+    // cant just use "match.index" by itself, because of the extra "href=\"" condition, which is not factored in in "match.index"
     const startIndex = match.index + match[0].length - match[1].length;
     out += block.slice(lastIndex, startIndex);
     lastIndex = startIndex + match[1].length;
@@ -412,6 +420,45 @@ function mapURLs(block, currentUrl) {
         out += '/';
       }
     }
+  }
+
+  out += block.slice(lastIndex);
+
+  return out;
+}
+
+/** Find all urls that are href's and start with "https://mongodb.github.io/node-mongodb-native/MAJOR.MINOR/" */
+const mongodbRegex = /(?:href=")https:\/\/mongodb\.github\.io\/node-mongodb-native\/(\d+\.\d+\/)/g;
+/** The regex to extract the MAJOR.MINOR version from the package dependencies field */
+const mongodbDepRegex = /\d+\.\d+/;
+let currentMongodbVersion = undefined;
+
+/**
+ * Map <https://mongodb.github.io/node-mongodb-native/MAJOR.MINOR/> urls to their current mongodb's version.
+ * @param {String} block The String block to look for urls
+ */
+function mapURLsMongoDb(block) {
+  if (currentMongodbVersion === undefined) {
+    currentMongodbVersion = pkg?.dependencies?.['mongodb']?.match(mongodbDepRegex)?.[0];
+    if (currentMongodbVersion === undefined) {
+      console.warn('Cannot replace mongodb version links due to not being able to extract version from dependencies!');
+      return block;
+    }
+  }
+
+  let match;
+
+  let out = '';
+  let lastIndex = 0;
+
+  while ((match = mongodbRegex.exec(block)) !== null) {
+    // cant just use "match.index" by itself, because of the extra "href=\"" condition, which is not factored in in "match.index"
+    const startIndex = match.index + match[0].length - match[1].length;
+    out += block.slice(lastIndex, startIndex);
+    lastIndex = startIndex + match[1].length;
+
+    out += currentMongodbVersion;
+    out += '/';
   }
 
   out += block.slice(lastIndex);

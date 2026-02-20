@@ -960,46 +960,41 @@ describe('model: findOneAndUpdate:', function() {
     });
 
     it('includes dot-notation filter paths in upserted document with sub-schema default (gh-16030)', async function() {
-      const extraPropsSchema = new Schema({ location: String });
-      const s = new Schema({
-        nickName: String,
+      const addressSchema = new Schema({ city: String });
+      const userSchema = new Schema({
+        firstName: String,
         lastName: String,
-        extraProps: { type: extraPropsSchema, default: {} }
+        address: { type: addressSchema, default: {} }
       });
-      const Test = db.model('Test', s);
+      const User = db.model('User', userSchema);
 
-      const filter = { 'extraProps.location': 'Foo' };
-      const update = {
-        $setOnInsert: { nickName: 'Roo' },
-        $set: { lastName: 'Goo' }
-      };
-      const options = { upsert: true, new: true, setDefaultsOnInsert: true };
+      const foundUser = await User.findOneAndUpdate(
+        { 'address.city': 'New York' },
+        { $setOnInsert: { firstName: 'John' }, $set: { lastName: 'Smith' } },
+        { upsert: true, new: true, setDefaultsOnInsert: true });
 
-      const res = await Test.findOneAndUpdate(filter, update, options);
-
-      assert.equal(res.lastName, 'Goo');
-      assert.equal(res.nickName, 'Roo');
-      assert.equal(res.extraProps.location, 'Foo');
+      assert.equal(foundUser.lastName, 'Smith');
+      assert.equal(foundUser.firstName, 'John');
+      assert.equal(foundUser.address.city, 'New York');
     });
 
     it('applies sub-schema default on upsert when filter has no dot-notation path (gh-16030)', async function() {
-      const extraPropsSchema = new Schema({ location: String });
-      const s = new Schema({
-        nickName: String,
+      const addressSchema = new Schema({ city: String });
+      const userSchema = new Schema({
+        firstName: String,
         lastName: String,
-        extraProps: { type: extraPropsSchema, default: { location: 'Bar' } }
+        address: { type: addressSchema, default: { city: 'Chicago' } }
       });
-      const Test = db.model('Test', s);
+      const User = db.model('User', userSchema);
 
-      const filter = { nickName: 'Roo' };
-      const update = { $set: { lastName: 'Goo' } };
-      const options = { upsert: true, new: true, setDefaultsOnInsert: true };
+      const foundUser = await User.findOneAndUpdate(
+        { firstName: 'John' },
+        { $set: { lastName: 'Smith' } },
+        { upsert: true, new: true, setDefaultsOnInsert: true });
 
-      const res = await Test.findOneAndUpdate(filter, update, options);
-
-      assert.equal(res.lastName, 'Goo');
-      assert.equal(res.nickName, 'Roo');
-      assert.equal(res.extraProps.location, 'Bar');
+      assert.equal(foundUser.lastName, 'Smith');
+      assert.equal(foundUser.firstName, 'John');
+      assert.equal(foundUser.address.city, 'Chicago');
     });
 
     it('skips setting defaults within maps (gh-7909)', async function() {

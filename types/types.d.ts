@@ -84,7 +84,7 @@ declare module 'mongoose' {
     class ObjectId extends mongodb.ObjectId {
     }
 
-    class Subdocument<IdType = any, TQueryHelpers = any, DocType = any> extends Document<IdType, TQueryHelpers, DocType> {
+    class Subdocument<IdType = any, TQueryHelpers = any, DocType = any, TVirtuals = {}, TSchemaOptions = {}> extends Document<IdType, TQueryHelpers, DocType, TVirtuals, TSchemaOptions> {
       $isSingleNested: true;
 
       /** Returns the top level document of this sub-document. */
@@ -97,7 +97,7 @@ declare module 'mongoose' {
       $parent(): Document;
     }
 
-    class ArraySubdocument<IdType = any, TQueryHelpers = unknown, DocType = unknown> extends Subdocument<IdType, TQueryHelpers, DocType> {
+    class ArraySubdocument<IdType = any, TQueryHelpers = unknown, DocType = unknown, TVirtuals = {}, TSchemaOptions = {}> extends Subdocument<IdType, TQueryHelpers, DocType, TVirtuals, TSchemaOptions> {
       /** Returns this sub-documents parent array. */
       parentArray(): Types.DocumentArray<unknown>;
     }

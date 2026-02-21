@@ -1,6 +1,5 @@
 {
   "$schema": "https://tstyche.org/schemas/config.json",
-  "checkDeclarationFiles": false,
   "testFileMatch": [
     "test/types/*.test.*"
   ]

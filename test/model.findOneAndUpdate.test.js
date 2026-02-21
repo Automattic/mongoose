@@ -959,6 +959,44 @@ describe('model: findOneAndUpdate:', function() {
       assert.equal(1, count);
     });
 
+    it('includes dot-notation filter paths in upserted document with sub-schema default (gh-16030)', async function() {
+      const addressSchema = new Schema({ city: String });
+      const userSchema = new Schema({
+        firstName: String,
+        lastName: String,
+        address: { type: addressSchema, default: {} }
+      });
+      const User = db.model('User', userSchema);
+
+      const foundUser = await User.findOneAndUpdate(
+        { 'address.city': 'New York' },
+        { $setOnInsert: { firstName: 'John' }, $set: { lastName: 'Smith' } },
+        { upsert: true, new: true, setDefaultsOnInsert: true });
+
+      assert.equal(foundUser.lastName, 'Smith');
+      assert.equal(foundUser.firstName, 'John');
+      assert.equal(foundUser.address.city, 'New York');
+    });
+
+    it('applies sub-schema default on upsert when filter has no dot-notation path (gh-16030)', async function() {
+      const addressSchema = new Schema({ city: String });
+      const userSchema = new Schema({
+        firstName: String,
+        lastName: String,
+        address: { type: addressSchema, default: { city: 'Chicago' } }
+      });
+      const User = db.model('User', userSchema);
+
+      const foundUser = await User.findOneAndUpdate(
+        { firstName: 'John' },
+        { $set: { lastName: 'Smith' } },
+        { upsert: true, new: true, setDefaultsOnInsert: true });
+
+      assert.equal(foundUser.lastName, 'Smith');
+      assert.equal(foundUser.firstName, 'John');
+      assert.equal(foundUser.address.city, 'Chicago');
+    });
+
     it('skips setting defaults within maps (gh-7909)', async function() {
       const socialMediaHandleSchema = Schema({ links: [String] });
       const profileSchema = Schema({

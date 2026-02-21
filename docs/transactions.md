@@ -23,7 +23,7 @@ const db = await mongoose.createConnection(mongodbUri).asPromise();
 const session = await db.startSession();
 ```
 
-In practice, you should use either the [`session.withTransaction()` helper](https://mongodb.github.io/node-mongodb-native/3.2/api/ClientSession.html#withTransaction)
+In practice, you should use either the [`session.withTransaction()` helper](https://mongodb.github.io/node-mongodb-native/7.0/api/ClientSession.html#withTransaction)
 or Mongoose's `Connection#transaction()` function to run a transaction. The `session.withTransaction()` helper handles:
 
 * Creating a transaction
@@ -36,7 +36,7 @@ or Mongoose's `Connection#transaction()` function to run a transaction. The `ses
 ```
 
 For more information on the `ClientSession#withTransaction()` function, please see
-[the MongoDB Node.js driver docs](https://mongodb.github.io/node-mongodb-native/3.2/api/ClientSession.html#withTransaction).
+[the MongoDB Node.js driver docs](https://mongodb.github.io/node-mongodb-native/7.0/api/ClientSession.html#withTransaction).
 
 Mongoose's `Connection#transaction()` function is a wrapper around `withTransaction()` that
 integrates Mongoose change tracking with transactions.

@@ -159,7 +159,8 @@ This is MongoDB's official package for setting up encryption keys.
 npm install mongodb-client-encryption
 ```
 
-You also need to make sure you've installed [mongocryptd](https://www.mongodb.com/docs/manual/core/queryable-encryption/reference/mongocryptd/).
+<!--TODO: the following links may need to be updated, due to mongodb not having pages for "mongocryptd" in 8.0+-->
+You also need to make sure you've installed [mongocryptd](https://www.mongodb.com/docs/v7.0/core/queryable-encryption/reference/mongocryptd/).
 mongocryptd is a separate process from the MongoDB server that you need to run to work with field level encryption.
 You can either run mongocryptd yourself, or make sure it is on the system PATH and the MongoDB Node.js driver will run it for you.
 [You can read more about mongocryptd here](https://www.mongodb.com/docs/v5.0/reference/security-client-side-encryption-appendix/#mongocryptd).

@@ -194,7 +194,9 @@ async function run() {
       keyVaultNamespace,
       kmsProviders,
       // If using crypt_shared, you can specify the path to crypt_shared
-      // by uncommenting the following code
+      // by uncommenting the following code.
+      // SHARED_LIB_PATH should be the path to the shared lib file, not
+      // the directory containing the shared lib file.
       // extraOptions: {
       //  cryptSharedLibPath: process.env.SHARED_LIB_PATH
       // }

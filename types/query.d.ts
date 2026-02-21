@@ -212,7 +212,7 @@ declare module 'mongoose' {
     _mongooseOptions: QueryOptions<RawDocType>;
 
     /**
-     * Returns a wrapper around a [mongodb driver cursor](https://mongodb.github.io/node-mongodb-native/4.9/classes/FindCursor.html).
+     * Returns a wrapper around a [mongodb driver cursor](https://mongodb.github.io/node-mongodb-native/7.0/classes/FindCursor.html).
      * A QueryCursor exposes a Streams3 interface, as well as a `.next()` function.
      * This is equivalent to calling `.cursor()` with no arguments.
      */
@@ -296,7 +296,7 @@ declare module 'mongoose' {
     ): QueryWithHelpers<number, DocType, THelpers, RawDocType, 'countDocuments', TDocOverrides>;
 
     /**
-     * Returns a wrapper around a [mongodb driver cursor](https://mongodb.github.io/node-mongodb-native/4.9/classes/FindCursor.html).
+     * Returns a wrapper around a [mongodb driver cursor](https://mongodb.github.io/node-mongodb-native/7.0/classes/FindCursor.html).
      * A QueryCursor exposes a Streams3 interface, as well as a `.next()` function.
      */
     cursor(options?: QueryOptions<RawDocType>): Cursor<Unpacked<ResultType>, QueryOptions<RawDocType>>;

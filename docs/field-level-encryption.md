@@ -206,7 +206,7 @@ async function run() {
 }
 ```
 
-Once you have an encryption key, you can create a separate Mongoose connection with a [`schemaMap`](https://mongodb.github.io/node-mongodb-native/5.6/interfaces/AutoEncryptionOptions.html#schemaMap) that defines which fields are encrypted using JSON schema syntax as follows.
+Once you have an encryption key, you can create a separate Mongoose connection with a [`schemaMap`](https://mongodb.github.io/node-mongodb-native/7.0/interfaces/AutoEncryptionOptions.html#schemaMap) that defines which fields are encrypted using JSON schema syntax as follows.
 
 ```javascript
 /* Step 2: connect using schema map and new key */

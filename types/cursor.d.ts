@@ -17,7 +17,7 @@ declare module 'mongoose' {
     [Symbol.asyncDispose](): Promise<void>;
 
     /**
-     * Adds a [cursor flag](https://mongodb.github.io/node-mongodb-native/4.9/classes/FindCursor.html#addCursorFlag).
+     * Adds a [cursor flag](https://mongodb.github.io/node-mongodb-native/7.0/classes/FindCursor.html#addCursorFlag).
      * Useful for setting the `noCursorTimeout` and `tailable` flags.
      */
     addCursorFlag(flag: CursorFlag, value: boolean): this;

@@ -192,13 +192,13 @@ async function run() {
   const conn = await mongoose.createConnection(uri, {
     autoEncryption: {
       keyVaultNamespace,
-      kmsProviders
-    },
-    // If using crypt_shared, you can specify the path to crypt_shared
-    // by uncommenting the following code
-    // extraOptions: {
-    //  cryptSharedLibPath: process.env.SHARED_LIB_PATH
-    // }
+      kmsProviders,
+      // If using crypt_shared, you can specify the path to crypt_shared
+      // by uncommenting the following code
+      // extraOptions: {
+      //  cryptSharedLibPath: process.env.SHARED_LIB_PATH
+      // }
+    }
   }).asPromise();
   const encryption = new ClientEncryption(conn.getClient(), {
     keyVaultNamespace,
@@ -235,7 +235,12 @@ await mongoose.connect('mongodb://127.0.0.1:27017/mongoose_test', {
           }
         }
       }
-    }
+    },
+    // If using crypt_shared, you can specify the path to crypt_shared
+    // by uncommenting the following code
+    // extraOptions: {
+    //  cryptSharedLibPath: process.env.SHARED_LIB_PATH
+    // }
   }
 });
 ```

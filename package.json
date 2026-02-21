@@ -82,7 +82,7 @@
     "docs:prepare:publish:6x": "git checkout 6.x && git merge 6.x && npm run docs:clean:stable && env DOCS_DEPLOY=true npm run docs:generate && mv ./docs/6.x ./tmp && git checkout gh-pages && npm run docs:copy:tmp:6x",
     "docs:prepare:publish:7x": "env DOCS_DEPLOY=true npm run docs:generate && git checkout gh-pages && rm -rf ./docs/7.x && mv ./tmp ./docs/7.x",
     "docs:prepare:publish:8x": "env DOCS_DEPLOY=true npm run docs:generate && git checkout gh-pages && rm -rf ./docs/8.x && mv ./tmp ./docs/8.x",
-    "docs:check-links": "linkinator http://127.0.0.1:8089 --silent --recurse",
+    "docs:check-links": "linkinator http://127.0.0.1:8089 --silent --recurse --skip cdn.carbonads.com --skip m.servedby-buysellads.com --skip \"127\\.0\\.0\\.1:8089\/docs\/\\d+.x\"",
     "docs:update-mongodb-links": "node ./scripts/update-mongodb-links.js",
     "lint": "eslint .",
     "lint-js": "eslint . --ext .js --ext .cjs",

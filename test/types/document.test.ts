@@ -501,6 +501,33 @@ function gh15965() {
   ExpectType<Date>(obj.updatedAt);
 }
 
+function gh15965SubdocToObject() {
+  const documentSchema = new Schema({
+    title: { type: String, required: true },
+    text: { type: String, required: true }
+  });
+
+  const podcastSchema = new Schema({
+    documents: [documentSchema]
+  }, {
+    timestamps: true,
+    virtuals: { hello: { get() { return 'world'; } } }
+  });
+
+  const Podcast = model('Podcast', podcastSchema);
+  const podcast = new Podcast({ documents: [{ title: 'test', text: 'body' }] });
+  const subdoc = podcast.documents[0];
+
+  const obj = subdoc.toObject({ flattenObjectIds: true, versionKey: false, virtuals: true });
+
+  // @ts-expect-error title should be string, not any
+  const _titleCheck: number = obj.title;
+  // @ts-expect-error text should be string, not any
+  const _textCheck: number = obj.text;
+  // @ts-expect-error no index signature: nonexistent properties should be a type error
+  obj.doesNotExist;
+}
+
 function gh13079() {
   const schema = new Schema({
     name: { type: String, required: true }

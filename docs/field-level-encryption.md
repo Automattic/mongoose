@@ -162,9 +162,9 @@ npm install mongodb-client-encryption
 You also need to make sure you've installed either [mongocryptd](https://www.mongodb.com/docs/v7.0/core/queryable-encryption/reference/mongocryptd/) or the [crypt_shared library](https://www.mongodb.com/docs/manual/core/csfle/reference/install-library/).
 mongocryptd is a separate process from the MongoDB server that you need to run to work with field level encryption.
 You can either run mongocryptd yourself, or make sure it is on the system PATH and the MongoDB Node.js driver will run it for you.
-[You can read more about mongocryptd here](https://www.mongodb.com/docs/v5.0/reference/security-client-side-encryption-appendix/#mongocryptd). The shared library is a `.so` file that you can download from the [MongoDB Download Center](https://www.mongodb.com/try/download/enterprise).
+[You can read more about mongocryptd here](https://www.mongodb.com/docs/v5.0/reference/security-client-side-encryption-appendix/#mongocryptd). The shared library is a dynamic library that you can download from the [MongoDB Download Center](https://www.mongodb.com/try/download/enterprise).
 
-Once you've set up and run mongocryptd, first you need to create a new encryption key as follows.
+Once you've set up your client-side field level encryption environment, you first need to create a new encryption key as follows.
 Keep in mind that the following example is a simple example to help you get started.
 The encryption key in the following example is insecure; MongoDB recommends using a [KMS](https://www.mongodb.com/docs/v5.0/core/security-client-side-encryption-key-management/).
 

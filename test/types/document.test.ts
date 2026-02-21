@@ -520,11 +520,11 @@ function gh15965SubdocToObject() {
 
   const obj = subdoc.toObject({ flattenObjectIds: true, versionKey: false, virtuals: true });
 
-  // @ts-expect-error title should be string, not any
+  // @ts-expect-error  Type 'string' is not assignable to type 'number'.
   const _titleCheck: number = obj.title;
-  // @ts-expect-error text should be string, not any
+  // @ts-expect-error  Type 'string' is not assignable to type 'number'.
   const _textCheck: number = obj.text;
-  // @ts-expect-error no index signature: nonexistent properties should be a type error
+  // @ts-expect-error  Property 'doesNotExist' does not exist on type
   obj.doesNotExist;
 }
 

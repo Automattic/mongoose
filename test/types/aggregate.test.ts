@@ -159,3 +159,25 @@ async function gh15300() {
 
   await TestModel.aggregate().project('a b -_id');
 }
+
+function gh16033() {
+  const schema = new Schema({ text: String, published: Boolean });
+  const Item = model('ItemGh16033', schema);
+
+  const basePipeline = Item.aggregate().match({ published: true });
+
+  Item.aggregate()
+    .match({ text: 'example' })
+    .unionWith({
+      coll: 'other_items',
+      pipeline: basePipeline.pipelineForUnionWith()
+    });
+
+  Item.aggregate()
+    .match({ text: 'example' })
+    .unionWith({
+      coll: 'other_items',
+      // @ts-expect-error `pipeline()` can contain stages that are invalid for `$unionWith`
+      pipeline: basePipeline.pipeline()
+    });
+}

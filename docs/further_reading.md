@@ -183,9 +183,10 @@ concepts in SQL.
 
 <hr/>
 
-<a class="pluralsight-link" style="padding: 20px" href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose">
+<!--TODO: image url does not exist anymore (404-->
+<!-- <a class="pluralsight-link" style="padding: 20px" href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose">
   <img src="https://developer.mozilla.org/mdn-social-share.cd6c4a5a.png" style="width: 140px" alt="Express Tutorial Part 3: Using a Database (with Mongoose)">
-</a>
+</a> -->
 
 <a class="pluralsight-title" href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose">
   <i>Express Tutorial Part 3: Using a Database (with Mongoose)</i> on Mozilla Developer Network

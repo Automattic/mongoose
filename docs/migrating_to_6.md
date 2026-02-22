@@ -512,7 +512,7 @@ await Test.findOne().populate('parents');
 
 The MongoDB Node driver version that Mongoose 6 uses relies on a [URL parser module](https://npmjs.com/package/whatwg-url) that has several known compatibility issues with other npm packages.
 This can lead to errors like `Invalid URL: mongodb+srv://username:password@development.xyz.mongodb.net/abc` if you use one of the incompatible packages.
-[You can find a list of incompatible packages here](https://mongoosejs.com/docs/incompatible_packages).
+[You can find a list of incompatible packages here](https://mongoosejs.com/docs/incompatible_packages.html).
 
 ## Removed `reconnectTries` and `reconnectInterval` options {#removed-reconnecttries-and-reconnectinterval-options}
 

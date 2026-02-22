@@ -14,7 +14,7 @@ declare module 'mongoose' {
     cleanIndexes(options?: { toDrop?: string[], hideIndexes?: boolean }): Promise<string[]>;
 
     /**
-     * Similar to `ensureIndexes()`, except for it uses the [`createIndex`](https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#createIndex)
+     * Similar to `ensureIndexes()`, except for it uses the [`createIndex`](https://mongodb.github.io/node-mongodb-native/7.0/classes/Collection.html#createIndex)
      * function.
      */
     createIndexes(options?: mongodb.CreateIndexesOptions): Promise<void>;

@@ -696,7 +696,7 @@ describe('model', function() {
           });
         } catch (error) {
           threw = true;
-          assert.equal(error.name, 'MongooseError');
+          assert.equal(error.name, 'MongooseError', error);
           assert.equal(error.message, 'Discriminator "defaultAdvisor" not ' +
             'found for model "Test"');
         }

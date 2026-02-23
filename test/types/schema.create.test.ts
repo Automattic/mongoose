@@ -111,19 +111,19 @@ movieSchema.index({ tile: 'desc' });
 movieSchema.index({ tile: 'hashed' });
 movieSchema.index({ tile: 'geoHaystack' });
 
-// @ts-expect-error test invalid number
+// @ts-expect-error  Type '2' is not assignable to type 'IndexDirection'.
 movieSchema.index({ tile: 2 });
-// @ts-expect-error test invalid number
+// @ts-expect-error  Type '-2' is not assignable to type 'IndexDirection'.
 movieSchema.index({ tile: -2 });
-// @ts-expect-error test empty string
+// @ts-expect-error  Type '""' is not assignable to type 'IndexDirection'.
 movieSchema.index({ tile: '' });
-// @ts-expect-error test invalid string
+// @ts-expect-error Type '"invalid"' is not assignable to type 'IndexDirection'.
 movieSchema.index({ tile: 'invalid' });
-// @ts-expect-error test invalid type
+// @ts-expect-error  Type 'Date' is not assignable to type 'IndexDirection'.
 movieSchema.index({ tile: new Date() });
-// @ts-expect-error test that booleans are not allowed
+// @ts-expect-error  Type 'true' is not assignable to type 'IndexDirection'.
 movieSchema.index({ tile: true });
-// @ts-expect-error test that booleans are not allowed
+// @ts-expect-error  Type 'false' is not assignable to type 'IndexDirection'.
 movieSchema.index({ tile: false });
 
 // Using `SchemaDefinition`
@@ -161,7 +161,7 @@ async function gh9857() {
   type UserModel = Model<UserDocument>;
 
   const u: UserSchemaDefinition = {
-    // @ts-expect-error incorrect type based on raw doc interface, should be number
+    // @ts-expect-error  Type '{ type: StringConstructor; }' is not assignable to type 'SchemaDefinitionProperty<number, any, any> | undefined'.
     name: { type: String },
     active: { type: Boolean },
     points: Number
@@ -354,8 +354,10 @@ function gh11435(): void {
 
 // timeSeries
 Schema.create({}, { expires: '5 seconds' });
-// @ts-expect-error expireAfterSeconds should be a number
-Schema.create({}, { expireAfterSeconds: '5 seconds' });
+Schema.create({},
+  // @ts-expect-error  Type 'string' is not assignable to type 'number'.
+  { expireAfterSeconds: '5 seconds' }
+);
 Schema.create({}, { expireAfterSeconds: 5 });
 
 function gh10900(): void {
@@ -604,10 +606,14 @@ batchSchema2.discriminator('event', eventSchema2);
 
 function encryptionType() {
   const keyId = new BSON.UUID();
-  // @ts-expect-error invalid encryptionType
-  Schema.create({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'newFakeEncryptionType' });
-  // @ts-expect-error invalid encryptionType
-  Schema.create({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 1 });
+  Schema.create({ name: { type: String, encrypt: { keyId } } },
+    // @ts-expect-error  Type '"newFakeEncryptionType"' is not assignable to type '"csfle" | "queryableEncryption" | undefined'.
+    { encryptionType: 'newFakeEncryptionType' }
+  );
+  Schema.create({ name: { type: String, encrypt: { keyId } } },
+    // @ts-expect-error  Type 'number' is not assignable to type '"csfle" | "queryableEncryption" | undefined'.
+    { encryptionType: 1 }
+  );
 
   const encryptedSchema1 = Schema.create({ name: { type: String, encrypt: { keyId } } }, { encryptionType: 'queryableEncryption' });
   ExpectAssignable<Schema>()(encryptedSchema1);
@@ -684,7 +690,7 @@ function gh11987() {
   });
 
   ExpectType<SchemaType<string>>(userSchema.path<'name'>('name'));
-  // @ts-expect-error foo is not a valid path
+  // @ts-expect-error  Type '"foo"' does not satisfy the constraint 'keyof IUser'.
   userSchema.path<'foo'>('name');
   ExpectType<SchemaTypeOptions<string>>(userSchema.path<'name'>('name').OptionsConstructor);
 }
@@ -813,15 +819,15 @@ function pluginOptions() {
   ExpectAssignable<Schema<any>>()(schema.plugin(pluginFunction)); // test that chaining would be possible
 
   // test basic inference
-  // @ts-expect-error should error because "option2" is not optional
+  // @ts-expect-error  Property 'option2' is missing in type '{}' but required in type 'SomePluginOptions'.
   schema.plugin(pluginFunction, {});
   schema.plugin(pluginFunction, { option2: 0 });
   schema.plugin(pluginFunction, { option1: 'string', option2: 1 });
-  // @ts-expect-error should error because "option2" is not optional
+  // @ts-expect-error  Property 'option2' is missing in type '{ option1: string; }' but required in type 'SomePluginOptions'.
   schema.plugin(pluginFunction, { option1: 'string' });
-  // @ts-expect-error should error because "option2" type is "number"
+  // @ts-expect-error  Type 'string' is not assignable to type 'number'.
   schema.plugin(pluginFunction, { option2: 'string' });
-  // @ts-expect-error should error because "option1" type is "string"
+  // @ts-expect-error  Type 'number' is not assignable to type 'string'.
   schema.plugin(pluginFunction, { option1: 0 });
 
   // test plugins without options defined
@@ -829,12 +835,12 @@ function pluginOptions() {
     return; // empty function, to satisfy lint option
   }
   schema.plugin(pluginFunction2);
-  // @ts-expect-error should error because no options argument is defined
+  // @ts-expect-error  Argument of type '{}' is not assignable to parameter of type 'undefined'.
   schema.plugin(pluginFunction2, {});
 
   // test overwriting options
   schema.plugin<any, SomePluginOptions>(pluginFunction2, { option2: 0 });
-  // @ts-expect-error should error because "option2" is not optional
+  // @ts-expect-error  Property 'option2' is missing in type '{}' but required in type 'SomePluginOptions'.
   schema.plugin<any, SomePluginOptions>(pluginFunction2, {});
 }
 
@@ -1266,7 +1272,7 @@ function gh13800() {
   autoTypedSchema.method('fullName', function fullName() {
     ExpectType<string>(this.firstName);
     ExpectType<string>(this.lastName);
-    // @ts-expect-error field not defined on schema
+    // @ts-expect-error  Property 'someOtherField' does not exist on type
     this.someOtherField;
   });
 }
@@ -1377,7 +1383,7 @@ function gh14028_methods() {
       fullName() {
         // Expect methods to still have access to `this` type
         ExpectType<string>(this.firstName);
-        // @ts-expect-error As InstanceMethods type is not specified, expect type of this.fullName to be undefined
+        // @ts-expect-error  Property 'fullName' does not exist on type
         this.fullName;
         return this.firstName + ' ' + this.lastName;
       }
@@ -1386,7 +1392,7 @@ function gh14028_methods() {
 
   const User3 = model('User2', schema3);
   const user3 = new User3({ firstName: 'John', lastName: 'Doe', age: 20 });
-  // @ts-expect-error not defined because UserModelWithoutMethods does not have methods types
+  // @ts-expect-error  Property 'fullName' does not exist on type
   user3.fullName();
 }
 

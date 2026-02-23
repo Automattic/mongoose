@@ -1250,3 +1250,30 @@ function hydrateWithStrictOption() {
 
   ExpectType<ReturnType<(typeof TestModel)['hydrate']>>(doc4);
 }
+
+async function gh16032() {
+  interface IEmail {
+    _id: string;
+    to: string;
+    subject: string;
+  }
+
+  type EmailInstance = mongoose.HydratedDocument<IEmail>;
+  type EmailModelType = mongoose.Model<IEmail, {}, {}, {}, EmailInstance>;
+
+  const emailSchema = new Schema<IEmail, EmailModelType>({
+    _id: { type: mongoose.Schema.Types.String, required: true },
+    to: { type: mongoose.Schema.Types.String, required: true },
+    subject: { type: mongoose.Schema.Types.String, required: true }
+  }, { _id: false });
+
+  const Email = model<IEmail, EmailModelType>('Email', emailSchema);
+
+  const emails: EmailInstance[] = [
+    new Email({ _id: 'msg-001', to: 'a@example.com', subject: 'Hello' }),
+    new Email({ _id: 'msg-002', to: 'b@example.com', subject: 'World' })
+  ];
+
+  // This should work without type error - bulkSave should accept documents with custom _id types
+  await Email.bulkSave(emails);
+}

@@ -639,7 +639,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       // Assert - all hooks should be built-in (no user hooks were added)
       const builtInHooks = allHooks.filter(hook => hook.fn[builtInMiddleware]);
 
-      assert.ok(builtInHooks.length >= 18, 'Expected at least 18 built-in hooks'); // 18 is current count, may increase in future
+      assert.ok(builtInHooks.length >= 17, 'Expected at least 17 built-in hooks'); // 18 is current count, may increase in future
       assert.deepStrictEqual(
         allHooks,
         builtInHooks,

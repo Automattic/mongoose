@@ -99,7 +99,7 @@
     "test-deno:ci": "npm run test-deno -- --reporter min",
     "test-rs": "START_REPLICA_SET=1 mocha --timeout 30000 --exit ./test/*.test.js",
     "test-rs:ci": "npm run test-rs -- --reporter min",
-    "test:types": "tsc --project test/types/tsconfig.json && tstyche",
+    "test:types": "tstyche",
     "setup-test-encryption": "node scripts/setup-encryption-tests.js",
     "test-encryption": "mocha --exit ./test/encryption/*.test.js",
     "test-encryption:ci": "npm run test-encryption -- --reporter min",

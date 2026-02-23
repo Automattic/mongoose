@@ -1,3 +1,13 @@
+9.2.2 / 2026-02-23
+==================
+ * fix(document): make `pathsToSave` filter all update operators and preserve unsaved state #16027
+ * fix(setDefaultsOnInsert): check child filter paths before applying defaults, fix dot-notation handling, and prevent prototype pollution #16031 #16030
+ * fix(populate): make `refPath` work as a function, including map paths with `$*` #16035 #16028
+ * perf: optimize `pathsToSave` and indexed-path checks for subdocuments
+ * types: remove duplicate definition of `UUIDToJSON` type #16029
+ * docs(field-level-encryption): clarify crypt_shared library usage and move `extraOptions` under `autoEncryption` #16026 #16015
+ * test(types): introduce TSTyche for type testing #16024
+
 9.2.1 / 2026-02-11
 ==================
  * types(query): allow assigning QueryFilter<DocType> to QueryFilter<any> #16020

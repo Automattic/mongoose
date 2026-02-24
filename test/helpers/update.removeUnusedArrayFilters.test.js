@@ -11,9 +11,9 @@ describe('removeUnusedArrayFilters', function() {
         'requests.$[i].status.bb': 'ON_GOING'
       }
     };
-    const arrayFilters = [{ $or: [{ 'i.no': 1 }] }];
+    const options = { arrayFilters: [{ $or: [{ 'i.no': 1 }] }] };
 
-    const ret = removeUnusedArrayFilters(update, arrayFilters);
-    assert.deepEqual(ret, [{ $or: [{ 'i.no': 1 }] }]);
+    removeUnusedArrayFilters(update, options);
+    assert.deepEqual(options.arrayFilters, [{ $or: [{ 'i.no': 1 }] }]);
   });
 });

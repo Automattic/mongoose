@@ -590,6 +590,10 @@ Using `refPath` means you only need 2 schema paths and one `populate()` call
 regardless of how many models your `commentSchema` can point to.
 
 You could also assign a function to `refPath`, which means Mongoose selects a refPath depending on a value on the document being populated.
+The function must return the **path** to the field that stores the model name.
+Mongoose passes `(doc, path)` where `path` is root-relative.
+For array elements, `path` includes indexes (for example, `'items.0.entityId'`).
+Mongoose uses the same `path` value during both assignment/casting and `populate()`.
 
 ```javascript
 const commentSchema = new Schema({
@@ -601,8 +605,11 @@ const commentSchema = new Schema({
   entityId: {
     type: Schema.Types.ObjectId,
     required: true,
-    refPath: function () {
-      return this.commentType === 'review' ? this.reviewEntityModel : this.commentEntityModel; // 'this' refers to the document being populated
+    refPath: function() {
+      // `this` refers to the document/subdocument being processed
+      return this.commentType === 'review' ?
+        'reviewEntityModel' :
+        'commentEntityModel';
     }
   },
   commentEntityModel: {
@@ -617,6 +624,35 @@ const commentSchema = new Schema({
   }
 });
 ```
+
+When the populated path is inside an array of subdocuments, a static string
+`refPath` like `'items.targetModel'` does not work because each array element
+needs an indexed path (like `'items.0.targetModel'`).
+
+Use a function `refPath` in this case:
+
+```javascript
+const orderSchema = new Schema({
+  items: [{
+    targetModel: {
+      type: String,
+      enum: ['Product', 'Service'],
+      required: true
+    },
+    target: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      refPath: function(doc, path) {
+        return path.replace(/\.target$/, '.targetModel');
+      }
+    }
+  }]
+});
+```
+
+For example, if Mongoose is processing `items.0.target`, `path` is
+`'items.0.target'`, so the function returns `'items.0.targetModel'`.
+This pattern works consistently for both `populate()` and document assignment.
 
 ## Dynamic References via `ref` {#dynamic-ref}
 

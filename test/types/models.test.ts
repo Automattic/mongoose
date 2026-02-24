@@ -1022,6 +1022,31 @@ async function gh15369() {
   }
 }
 
+async function gh16032() {
+  interface IEmail {
+    _id: string;
+    to: string;
+    subject: string;
+  }
+
+  type EmailInstance = HydratedDocument<IEmail>;
+  type EmailModelType = Model<IEmail, {}, {}, {}, EmailInstance>;
+
+  const emailSchema = new Schema<IEmail, EmailModelType>({
+    _id: { type: Schema.Types.String, required: true },
+    to: { type: Schema.Types.String, required: true },
+    subject: { type: Schema.Types.String, required: true }
+  }, { _id: false });
+
+  const Email = model<IEmail, EmailModelType>('Email', emailSchema);
+  const emails: EmailInstance[] = [
+    new Email({ _id: 'msg-001', to: 'a@example.com', subject: 'Hello' }),
+    new Email({ _id: 'msg-002', to: 'b@example.com', subject: 'World' })
+  ];
+
+  await Email.bulkSave(emails);
+}
+
 async function gh15437() {
   interface Person {
     name: string;

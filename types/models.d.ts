@@ -273,7 +273,7 @@ declare module 'mongoose' {
      * sending multiple `save()` calls because with `bulkSave()` there is only one
      * network round trip to the MongoDB server.
      */
-    bulkSave(documents: Array<Document>, options?: MongooseBulkSaveOptions): Promise<MongooseBulkWriteResult>;
+    bulkSave(documents: Array<THydratedDocumentType>, options?: MongooseBulkSaveOptions): Promise<MongooseBulkWriteResult>;
 
     /** Collection the model uses. */
     collection: Collection;

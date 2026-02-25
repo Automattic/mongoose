@@ -251,7 +251,7 @@ function inheritance() {
 
 Project.createCollection({ expires: '5 seconds' });
 Project.createCollection({ expireAfterSeconds: 5 });
-// @ts-expect-error expireAfterSeconds must be a number
+// @ts-expect-error  Type 'string' is not assignable to type 'number'.
 Project.createCollection({ expireAfterSeconds: '5 seconds' });
 
 function bulkWrite() {
@@ -346,7 +346,7 @@ async function overwriteBulkWriteContents() {
     {
       insertOne: {
         document: {
-          // @ts-expect-error incorrect property name test -> testy
+          // @ts-expect-error  'test' does not exist in type 'OptionalId<{ testy: string; }>'.
           test: 'hello'
         }
       }
@@ -781,8 +781,10 @@ function gh13897() {
   const Document = model<IDocument>('Document', documentSchema);
   const doc = new Document({ name: 'foo' });
   ExpectType<Date>(doc.createdAt);
-  // @ts-expect-error missing createdAt and updatedAt
-  new Document<IDocument>({ name: 'foo' });
+  new Document<IDocument>(
+    // @ts-expect-error  Type '{ name: string; }' is missing the following properties from type 'IDocument': createdAt, updatedAt
+    { name: 'foo' }
+  );
 }
 
 async function gh14026() {
@@ -1020,6 +1022,31 @@ async function gh15369() {
   }
 }
 
+async function gh16032() {
+  interface IEmail {
+    _id: string;
+    to: string;
+    subject: string;
+  }
+
+  type EmailInstance = HydratedDocument<IEmail>;
+  type EmailModelType = Model<IEmail, {}, {}, {}, EmailInstance>;
+
+  const emailSchema = new Schema<IEmail, EmailModelType>({
+    _id: { type: Schema.Types.String, required: true },
+    to: { type: Schema.Types.String, required: true },
+    subject: { type: Schema.Types.String, required: true }
+  }, { _id: false });
+
+  const Email = model<IEmail, EmailModelType>('Email', emailSchema);
+  const emails: EmailInstance[] = [
+    new Email({ _id: 'msg-001', to: 'a@example.com', subject: 'Hello' }),
+    new Email({ _id: 'msg-002', to: 'b@example.com', subject: 'World' })
+  ];
+
+  await Email.bulkSave(emails);
+}
+
 async function gh15437() {
   interface Person {
     name: string;
@@ -1079,17 +1106,17 @@ async function gh15693() {
 
   const schema = new Schema<IUser, Model<IUser>, UserMethods>({ name: { type: String, required: true } });
   schema.method('printNamePrefixed', function printName(this: IUser, prefix: string) {
-    // @ts-expect-error not defined on lean doc
+    // @ts-expect-error  Property 'isModified' does not exist on type 'IUser'.
     this.isModified('name');
-    // @ts-expect-error not defined - testing `this` is not any
+    // @ts-expect-error  Property 'doesNotExist' does not exist on type 'IUser'.
     this.doesNotExist();
     ExpectType<string>(this.name);
     console.log(prefix + this.name);
   });
   schema.method('printName', function printName(this: IUser) {
-    // @ts-expect-error not defined on lean doc
+    // @ts-expect-error  Property 'isModified' does not exist on type 'IUser'.
     this.isModified('name');
-    // @ts-expect-error not defined - testing `this` is not any
+    // @ts-expect-error  Property 'doesNotExist' does not exist on type 'IUser'.
     this.doesNotExist();
     ExpectType<string>(this.name);
     console.log(this.name);

@@ -189,9 +189,6 @@ declare module 'mongoose' {
    * - vanilla arrays of POJOs for document arrays
    * - POJOs and array of arrays for maps
    */
-  /* type ApplyBasicCreateCasting<T> = {
-    [K in keyof T]: NonNullable<T[K]> extends string | number | boolean | symbol | bigint | void | Date | RegExp ? QueryTypeCasting<T[K]> : NonNullable<T[K]> extends object ? ApplyBasicCreateCasting<T[K]> : T[K];
-  }; */
 
   type TreatAsPrimitivesForTransforms = null | undefined | string | number | boolean | symbol | bigint | void | Date | RegExp | ((...arguments_: any[]) => unknown) | (new (...arguments_: any[]) => unknown) | mongodb.ObjectId | mongodb.Binary | NativeDate | mongodb.UUID;
   type ApplyBasicCreateCasting<T> = ApplyBasicCreateCastingInternal<T>;

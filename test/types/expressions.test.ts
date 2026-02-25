@@ -164,26 +164,31 @@ const dateFromParts: Expression = {
   }
 };
 
+interface State {
+  count: number;
+  sum: number;
+}
+
 const accumulator: Expression = {
   $accumulator:
   {
-    init: function() { // Set the initial state
+    init: function(): State { // Set the initial state
       return { count: 0, sum: 0 };
     },
-    accumulate: function(state, numCopies) { // Define how to update the state
+    accumulate: function(state: State, numCopies: number) { // Define how to update the state
       return {
         count: state.count + 1,
         sum: state.sum + numCopies
       };
     },
     accumulateArgs: ['$copies'], // Argument required by the accumulate function
-    merge: function(state1, state2) { // When the operator performs a merge,
+    merge: function(state1: State, state2: State) { // When the operator performs a merge,
       return { // add the fields from the two states
         count: state1.count + state2.count,
         sum: state1.sum + state2.sum
       };
     },
-    finalize: function(state) { // After collecting the results from all documents,
+    finalize: function(state: State) { // After collecting the results from all documents,
       return (state.sum / state.count); // calculate the average
     },
     lang: 'js'
@@ -201,7 +206,7 @@ const bsonSize: Expression = { $bsonSize: '$current_task' };
 const functionExpr: Expression = {
   $function:
   {
-    body: function(name) {
+    body: function(name: string) {
       return name == 'Detlef';
     },
     args: ['$name'],

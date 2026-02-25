@@ -12,11 +12,13 @@ declare module 'mongoose' {
       ? ObjectIdQueryTypeCasting
       : T extends Types.UUID
         ? UUIDQueryTypeCasting
-        : T extends Buffer
-          ? BufferQueryCasting
-          : T extends NativeDate
-            ? DateQueryTypeCasting
-            : T;
+        : T extends NativeDate
+          ? DateQueryTypeCasting
+          : unknown extends Buffer // Non-node environments or missing @types/node
+            ? T
+            : T extends Buffer
+              ? BufferQueryCasting
+              : T;
 
   export type ApplyBasicQueryCasting<T> = QueryTypeCasting<T> | QueryTypeCasting<T[]> | (T extends (infer U)[] ? QueryTypeCasting<U> : T) | null;
 

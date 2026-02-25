@@ -189,16 +189,32 @@ declare module 'mongoose' {
    * - vanilla arrays of POJOs for document arrays
    * - POJOs and array of arrays for maps
    */
-  type ApplyBasicCreateCasting<T> = {
-    [K in keyof T]: NonNullable<T[K]> extends Map<infer KeyType extends string, infer ValueType>
-      ? (Record<KeyType, ValueType> | Array<[KeyType, ValueType]> | T[K])
-      : NonNullable<T[K]> extends Types.DocumentArray<infer RawSubdocType>
-         ? RawSubdocType[] | T[K]
-         : NonNullable<T[K]> extends Document<any, any, infer RawSubdocType>
-           ? ApplyBasicCreateCasting<RawSubdocType> | T[K]
-           : NonNullable<T[K]> extends Record<string, any>
-             ? ApplyBasicCreateCasting<T[K]> | T[K]
-             : QueryTypeCasting<T[K]>;
+  /* type ApplyBasicCreateCasting<T> = {
+    [K in keyof T]: NonNullable<T[K]> extends string | number | boolean | symbol | bigint | void | Date | RegExp ? QueryTypeCasting<T[K]> : NonNullable<T[K]> extends object ? ApplyBasicCreateCasting<T[K]> : T[K];
+  }; */
+
+  type TreatAsPrimitivesForTransforms = null | undefined | string | number | boolean | symbol | bigint | void | Date | RegExp | ((...arguments_: any[]) => unknown) | (new (...arguments_: any[]) => unknown) | mongodb.ObjectId | mongodb.Binary | NativeDate | mongodb.UUID;
+  type ApplyBasicCreateCasting<T> = ApplyBasicCreateCastingInternal<T>;
+  type ApplyBasicCreateCastingInternal<T> =
+    T extends TreatAsPrimitivesForTransforms
+      ? QueryTypeCasting<NonNullable<T>>
+      : T extends Map<infer KeyType extends string, infer ValueType>
+        ? Record<KeyType, ApplyBasicCreateCastingInternal<ValueType>> | Array<[KeyType, ApplyBasicCreateCastingInternal<ValueType>]> | T
+        : T extends Types.DocumentArray<infer RawSubdocType>
+          ? Array<ApplyBasicCreateCastingInternal<RawSubdocType>> | T
+          : T extends Types.Subdocument<any, any, infer RawSubdocType>
+            ? ApplyBasicCreateCastingInternal<RawSubdocType> | T
+            : T extends Document<any, any, infer RawSubdocType>
+              ? ApplyBasicCreateCastingInternal<RawSubdocType> | T
+              : T extends Array<infer ItemType>
+                ? Array<ApplyBasicCreateCastingInternal<ItemType>>
+                : T extends ReadonlyArray<infer ItemType>
+                  ? ReadonlyArray<ApplyBasicCreateCastingInternal<ItemType>>
+                  : T extends object
+                    ? ApplyBasicCreateCastingObject<T>
+                    : QueryTypeCasting<T>;
+  type ApplyBasicCreateCastingObject<ObjectType extends object> = {
+    [KeyType in keyof ObjectType]?: ApplyBasicCreateCastingInternal<ObjectType[KeyType]>;
   };
 
   type HasLeanOption<TSchema> = 'lean' extends keyof ObtainSchemaGeneric<TSchema, 'TSchemaOptions'> ?

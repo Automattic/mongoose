@@ -189,16 +189,19 @@ declare module 'mongoose' {
    * - vanilla arrays of POJOs for document arrays
    * - POJOs and array of arrays for maps
    */
+  type CreateObjectWithExtraKeys<T> = T & Record<string, unknown>;
   type ApplyBasicCreateCasting<T> = {
     [K in keyof T]: NonNullable<T[K]> extends Map<infer KeyType extends string, infer ValueType>
       ? (Record<KeyType, ValueType> | Array<[KeyType, ValueType]> | T[K])
       : NonNullable<T[K]> extends Types.DocumentArray<infer RawSubdocType>
          ? RawSubdocType[] | T[K]
          : NonNullable<T[K]> extends Document<any, any, infer RawSubdocType>
-           ? ApplyBasicCreateCasting<RawSubdocType> | T[K]
-           : NonNullable<T[K]> extends Record<string, any>
-             ? ApplyBasicCreateCasting<T[K]> | T[K]
-             : QueryTypeCasting<T[K]>;
+           ? CreateObjectWithExtraKeys<ApplyBasicCreateCasting<RawSubdocType>> | T[K]
+           : NonNullable<T[K]> extends TreatAsPrimitives
+              ? QueryTypeCasting<T[K]>
+              : NonNullable<T[K]> extends object
+                ? CreateObjectWithExtraKeys<ApplyBasicCreateCasting<T[K]>> | T[K]
+                : QueryTypeCasting<T[K]>;
   };
 
   type HasLeanOption<TSchema> = 'lean' extends keyof ObtainSchemaGeneric<TSchema, 'TSchemaOptions'> ?

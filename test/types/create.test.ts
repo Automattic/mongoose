@@ -1,5 +1,6 @@
 import mongoose, { Schema, model, Types, HydratedDocument } from 'mongoose';
 import { ExpectType } from './util/assertions';
+import { expectTypeOf } from 'expect-type';
 
 const schema = new Schema({ name: { type: 'String' } });
 
@@ -223,4 +224,67 @@ async function gh15902() {
       return doc.toObject() as K;
     }
   }
+}
+
+function gh16012() {
+  interface IDecimal {
+    base: number;
+    exponent: number;
+  }
+
+  interface IDecimalVirtuals {
+    value: number;
+  }
+
+  type DecimalInstance = mongoose.HydratedSingleSubdocument<IDecimal, IDecimalVirtuals>;
+  type DecimalModelType = mongoose.Model<IDecimal, {}, {}, IDecimalVirtuals, DecimalInstance>;
+  type DecimalSchemaOptions = mongoose.SchemaOptions<
+    IDecimal,
+    {},
+    {},
+    {},
+    IDecimalVirtuals,
+    DecimalInstance,
+    DecimalModelType
+  >;
+
+  const decimalSchema = new mongoose.Schema<
+    IDecimal,
+    DecimalModelType,
+    {},
+    {},
+    IDecimalVirtuals,
+    {},
+    DecimalSchemaOptions,
+    IDecimal,
+    DecimalInstance
+  >({
+    base: Number,
+    exponent: Number
+  }, {
+    _id: false,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+  });
+
+  decimalSchema.virtual('value').set((value: number, _virtual, doc) => doc.set({ base: value, exponent: 1 }));
+
+  const ParentModel = mongoose.model('Gh16012', new mongoose.Schema({
+    quantity: decimalSchema
+  }));
+
+  // @ts-expect-error  Type 'number' does not satisfy the constraint '"Expected: number, Actual: never"'.
+  expectTypeOf({} as never).toEqualTypeOf<number>();
+
+  // Any type ok for unknown fields - strict mode strips them out unless virtual
+  ParentModel.create({ quantity: { value: 10 } });
+  ParentModel.create({ quantity: { value: '10' } });
+
+  // type must match for known fields
+  ParentModel.create({ quantity: { exponent: 10 } });
+  ParentModel.create({ quantity: { base: 10 } });
+  // @ts-expect-error  No overload matches this call.
+  ParentModel.create({ quantity: { exponent: '10' } });
+  // @ts-expect-error  No overload matches this call.
+  ParentModel.create({ quantity: { base: '10' } });
 }

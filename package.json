@@ -20,6 +20,7 @@
   "type": "commonjs",
   "license": "MIT",
   "dependencies": {
+    "expect-type": "^1.3.0",
     "kareem": "3.2.0",
     "mongodb": "~7.0",
     "mpath": "0.9.0",

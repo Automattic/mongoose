@@ -674,38 +674,6 @@ describe('document', function() {
     assert.equal(doc.val, 'test2');
   });
 
-  it('casts setDefaultsOnInsert defaults with null parent doc context', async function() {
-    const castContexts = [];
-    const schema = new Schema({
-      name: String,
-      slug: {
-        type: String,
-        default: function() {
-          return this.get('name');
-        }
-      }
-    });
-    const slugPath = schema.path('slug');
-    const originalCast = slugPath.cast.bind(slugPath);
-    slugPath.cast = function(v, doc, init, prev, options) {
-      castContexts.push(doc);
-      return originalCast(v, doc, init, prev, options);
-    };
-    const TestModel = db.model('TestSetDefaultsOnInsertSetterContext', schema);
-
-    await TestModel.updateOne(
-      { name: 'foo' },
-      { $set: { name: 'foo' } },
-      { upsert: true, setDefaultsOnInsert: true }
-    );
-
-    assert.equal(castContexts.length, 1);
-    assert.strictEqual(castContexts[0], null);
-
-    const doc = await TestModel.findOne({ name: 'foo' });
-    assert.equal(doc.slug, 'foo');
-  });
-
   it('allows you to skip validation on save (gh-2981)', async function() {
     const schema = new Schema({ name: { type: String, required: true } });
     const MyModel = db.model('Test', schema);

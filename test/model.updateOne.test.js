@@ -624,6 +624,35 @@ describe('model: updateOne:', function() {
 
     });
 
+    it('setDefaultsOnInsert does not run setters on default values (gh-16025)', async function() {
+      const setterContexts = [];
+      const schema = new Schema({
+        name: String,
+        slug: {
+          type: String,
+          default: function() {
+            return this.get('name');
+          },
+          set: function(v) {
+            setterContexts.push(this);
+            return v;
+          }
+        }
+      });
+      const Test = db.model('TestSetDefaultsOnInsertSetterContext', schema);
+
+      await Test.updateOne(
+        { name: 'foo' },
+        { $set: { name: 'foo' } },
+        { upsert: true, setDefaultsOnInsert: true }
+      );
+
+      assert.equal(setterContexts.length, 0);
+
+      const doc = await Test.findOne({ name: 'foo' });
+      assert.equal(doc.slug, 'foo');
+    });
+
     it('avoids nested paths if setting parent path (gh-4911)', function(done) {
       const EmbeddedSchema = mongoose.Schema({
         embeddedField: String

@@ -64,9 +64,9 @@ function gh15756() {
 function gh15972() {
   mongoose.set('returnDocument', 'before');
   mongoose.set('returnDocument', 'after');
-  // @ts-expect-error 'invalid' is not a valid returnDocument option
+  // @ts-expect-error  Argument of type '"invalid"' is not assignable to parameter of type '"before" | "after" | undefined'.
   mongoose.set('returnDocument', 'invalid');
-  // @ts-expect-error true is not a valid returnDocument option
+  // @ts-expect-error  Argument of type 'true' is not assignable to parameter of type '"before" | "after" | undefined'.
   mongoose.set('returnDocument', true);
 }
 
@@ -82,7 +82,7 @@ function setAsObject() {
     updatePipeline: true
   });
 
-  // @ts-expect-error should error out if an invalid option is provided
+  // @ts-expect-error  'invalid' does not exist in type
   mongoose.set({ invalid: true });
 }
 

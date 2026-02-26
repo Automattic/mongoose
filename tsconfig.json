@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "strict": true,
-    "strictNullChecks": true,
+    "types": ["node"],
     "paths": {
       "mongoose" : ["./types/index.d.ts"]
     }

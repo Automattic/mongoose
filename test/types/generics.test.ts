@@ -13,7 +13,7 @@ class Repository<T> {
 }
 
 class Foo {
-  name: string;
+  name!: string;
 }
 
 type Test = Repository<Foo>;

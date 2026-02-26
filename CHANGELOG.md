@@ -1,3 +1,7 @@
+9.2.3 / 2026-02-26
+==================
+ * types(model): make bulkSave() correctly take array of THydratedDocumentType #16032
+
 9.2.2 / 2026-02-23
 ==================
  * fix(document): make `pathsToSave` filter all update operators and preserve unsaved state #16027

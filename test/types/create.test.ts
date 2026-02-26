@@ -273,7 +273,7 @@ function gh16012() {
     quantity: decimalSchema
   }));
 
-  // @ts-expect-error  Type 'number' does not satisfy the constraint '"Expected: number, Actual: never"'.
+  // @ts-expect-error Type 'number' does not satisfy the constraint '"Expected: number, Actual: never"'.
   expectTypeOf({} as never).toEqualTypeOf<number>();
 
   // Any type ok for unknown fields - strict mode strips them out unless virtual

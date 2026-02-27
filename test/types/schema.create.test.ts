@@ -2001,12 +2001,12 @@ function gh16046() {
         }
       },
       methods: {
-        myMethod: function () {
+        myMethod: function() {
           ExpectType<string | null | undefined>(this.placeholder);
         }
       },
       statics: {
-        myStaticMethod: function () {
+        myStaticMethod: function() {
           ExpectType<string>(this.modelName);
         }
       }

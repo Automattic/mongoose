@@ -119,6 +119,11 @@ declare module 'mongoose' {
     TypesAreEqual<T, DefaultSchemaOptions> extends true ? DefaultSchemaOptions :
     MergeType<DefaultSchemaOptions, T>;
 
+  type ResolveVirtuals<TSchemaOptions, RawDocType> =
+    ResolveSchemaOptions<TSchemaOptions> extends { virtuals: infer V }
+      ? AddDefaultId<RawDocType, V, ResolveSchemaOptions<TSchemaOptions>>
+      : {};
+
   type ApplySchemaOptions<T, O = DefaultSchemaOptions> = ResolveTimestamps<T, O>;
 
   type DefaultTimestampProps = {

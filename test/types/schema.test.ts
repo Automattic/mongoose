@@ -2196,7 +2196,7 @@ function gh16046() {
       },
       statics: {
         myStaticMethod: function() {
-          console.log('placeholder', this.modelName);
+          ExpectType<string>(this.modelName);
         }
       }
     }
@@ -2221,7 +2221,7 @@ function gh16046() {
       },
       methods: {
         myMethod: function() {
-          console.log('placeholder', this.save);
+          ExpectType<string | null | undefined>(this.placeholder);
         }
       },
       statics: {

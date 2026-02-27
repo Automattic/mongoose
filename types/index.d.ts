@@ -346,7 +346,7 @@ declare module 'mongoose' {
         InferHydratedDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>,
         TSchemaOptions extends { methods: infer M } ? M : {},
         TSchemaOptions extends { query: any } ? TSchemaOptions['query'] : {},
-        TSchemaOptions extends { virtuals: any } ? TSchemaOptions['virtuals'] : {},
+        ResolveVirtuals<TSchemaOptions, RawDocType>,
         RawDocType,
         ResolveSchemaOptions<TSchemaOptions>
       >
@@ -355,7 +355,7 @@ declare module 'mongoose' {
       Model<RawDocType, any, any, any>,
       TSchemaOptions extends { methods: infer M } ? M : {},
       TSchemaOptions extends { query: any } ? TSchemaOptions['query'] : {},
-      TSchemaOptions extends { virtuals: any } ? TSchemaOptions['virtuals'] : {},
+      ResolveVirtuals<TSchemaOptions, RawDocType>,
       TSchemaOptions extends { statics: any } ? TSchemaOptions['statics'] : {},
       TSchemaOptions,
       ApplySchemaOptions<
@@ -371,33 +371,34 @@ declare module 'mongoose' {
     >;
 
     static create<
-      TSchemaDefinition extends SchemaDefinition<undefined, RawDocType, THydratedDocumentType>,
+      TSchemaDefinition extends SchemaDefinition<undefined, RawDocType, any>,
       TSchemaOptions extends SchemaOptions<InferRawDocType<TSchemaDefinition>>,
       RawDocType extends ApplySchemaOptions<
         InferRawDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>,
         ResolveSchemaOptions<TSchemaOptions>
       >,
-      THydratedDocumentType extends AnyObject = HydratedDocument<
-        InferHydratedDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>,
-        TSchemaOptions extends { methods: infer M } ? M : {},
-        TSchemaOptions extends { query: any } ? TSchemaOptions['query'] : {},
-        TSchemaOptions extends { virtuals: any } ? TSchemaOptions['virtuals'] : {},
-        RawDocType,
-        ResolveSchemaOptions<TSchemaOptions>
-      >
+      TMethods = TSchemaOptions extends { methods: infer M } ? { [K in keyof M]: OmitThisParameter<M[K]> } : {},
+      TStatics = TSchemaOptions extends { statics: infer S } ? { [K in keyof S]: OmitThisParameter<S[K]> } : {}
     >(def: TSchemaDefinition, options: TSchemaOptions): Schema<
       RawDocType,
       Model<RawDocType, any, any, any>,
-      TSchemaOptions extends { methods: infer M } ? M : {},
+      TMethods,
       TSchemaOptions extends { query: any } ? TSchemaOptions['query'] : {},
-      TSchemaOptions extends { virtuals: any } ? TSchemaOptions['virtuals'] : {},
-      TSchemaOptions extends { statics: any } ? TSchemaOptions['statics'] : {},
+      ResolveVirtuals<TSchemaOptions, RawDocType>,
+      TStatics,
       TSchemaOptions,
       ApplySchemaOptions<
         ObtainDocumentType<any, RawDocType, ResolveSchemaOptions<TSchemaOptions>>,
         ResolveSchemaOptions<TSchemaOptions>
       >,
-      THydratedDocumentType,
+      HydratedDocument<
+        InferHydratedDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>>,
+        TMethods,
+        TSchemaOptions extends { query: any } ? TSchemaOptions['query'] : {},
+        ResolveVirtuals<TSchemaOptions, RawDocType>,
+        RawDocType,
+        ResolveSchemaOptions<TSchemaOptions>
+      >,
       TSchemaDefinition,
       ApplySchemaOptions<
         InferRawDocType<TSchemaDefinition, ResolveSchemaOptions<TSchemaOptions>, { bufferToBinary: true }>,

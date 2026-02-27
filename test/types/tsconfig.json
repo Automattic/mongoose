@@ -4,15 +4,11 @@
     "esModuleInterop": false,
     "strict": true,
     "allowSyntheticDefaultImports": true,
-    "strictPropertyInitialization": false,
-    "noImplicitAny": false,
-    "strictNullChecks": true,
     "module": "commonjs",
     "target": "ES2022",
     "noEmit": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["node"]
   },
-  "include": [
-    "*.test.ts"
-  ]
+  "include": ["**/*"]
 }

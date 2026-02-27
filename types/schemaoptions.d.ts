@@ -258,7 +258,7 @@ declare module 'mongoose' {
     /**
      * Virtual paths.
      */
-    virtuals?: SchemaOptionsVirtualsPropertyType<DocType, TVirtuals, TInstanceMethods>,
+    virtuals?: SchemaOptionsVirtualsPropertyType<any, TVirtuals, THydratedDocumentType>,
 
     /**
      * Set to `true` to default to overwriting models with the same name when calling `mongoose.model()`, as opposed to throwing an `OverwriteModelError`.

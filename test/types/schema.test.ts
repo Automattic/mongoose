@@ -2179,3 +2179,60 @@ function gh15915() {
     invalid: ['name'] }
   });
 }
+
+function gh16046() {
+  const issueOneSchema = new Schema(
+    { placeholder: String },
+    {
+      timestamps: true,
+      virtuals: {
+        votes: {
+          options: {
+            ref: 'IssueTwo',
+            localField: '_id',
+            foreignField: 'issueOneId'
+          }
+        }
+      },
+      statics: {
+        myStaticMethod: function() {
+          console.log('placeholder', this.modelName);
+        }
+      }
+    }
+  );
+
+  const IssueOne = model('IssueOne', issueOneSchema);
+
+  IssueOne.myStaticMethod();
+
+  const issueTwoSchema = new Schema(
+    { placeholder: String },
+    {
+      timestamps: true,
+      virtuals: {
+        votes: {
+          options: {
+            ref: 'IssueTwo',
+            localField: '_id',
+            foreignField: 'issueOneId'
+          }
+        }
+      },
+      methods: {
+        myMethod: function() {
+          console.log('placeholder', this.save);
+        }
+      },
+      statics: {
+        myStaticMethod: function() {
+          console.log('placeholder', this.modelName);
+        }
+      }
+    }
+  );
+
+  const IssueTwo = model('IssueTwo', issueTwoSchema);
+  (new IssueTwo()).myMethod();
+  IssueTwo.myStaticMethod();
+}

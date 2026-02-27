@@ -47,17 +47,17 @@ function index() {
   new SchemaTypeOptions<string>().index = 'descending';
   new SchemaTypeOptions<string>().index = 'desc';
 
-  // @ts-expect-error test empty string value
+  // @ts-expect-error  Type '""' is not assignable to type 'boolean | IndexDirection | IndexOptions | undefined'.
   new SchemaTypeOptions<string>().index = '';
-  // @ts-expect-error test invalid string value
+  // @ts-expect-error  Type '"invalid"' is not assignable to type 'boolean | IndexDirection | IndexOptions | undefined'.
   new SchemaTypeOptions<string>().index = 'invalid';
-  // @ts-expect-error test invalid number
+  // @ts-expect-error  Type '0' is not assignable to type 'boolean | IndexDirection | IndexOptions | undefined'.
   new SchemaTypeOptions<string>().index = 0;
-  // @ts-expect-error test invalid number
+  // @ts-expect-error  Type '2' is not assignable to type 'boolean | IndexDirection | IndexOptions | undefined'.
   new SchemaTypeOptions<string>().index = 2;
-  // @ts-expect-error test invalid number
+  // @ts-expect-error  Type '-2' is not assignable to type 'boolean | IndexDirection | IndexOptions | undefined'.
   new SchemaTypeOptions<string>().index = -2;
-  // @ts-expect-error test invalid type
+  // @ts-expect-error  Type 'Date' is not assignable to type 'boolean | IndexDirection | IndexOptions | undefined'.
   new SchemaTypeOptions<string>().index = new Date();
 }
 
@@ -96,23 +96,37 @@ function encrypt() {
   new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, queries: 'range' };
   new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, queries: undefined };
 
-  // @ts-expect-error empty object
+  // @ts-expect-error  Type '{}' is not assignable to type 'EncryptSchemaTypeOptions | undefined'.
   new SchemaTypeOptions<string>()['encrypt'] = {};
 
-  // @ts-expect-error invalid keyId
-  new SchemaTypeOptions<string>()['encrypt'] = { keyId: 'fakeId' };
+  new SchemaTypeOptions<string>()['encrypt'] = {
+    // @ts-expect-error  Type 'string' is not assignable to type '[Binary]'.
+    keyId: 'fakeId'
+  };
 
-  // @ts-expect-error missing keyId
+  // @ts-expect-error  Property 'keyId' is missing in type '{ queries: "equality"; }'
   new SchemaTypeOptions<string>()['encrypt'] = { queries: 'equality' };
-  // @ts-expect-error invalid algorithm
-  new SchemaTypeOptions<string>()['encrypt'] = { algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic' };
+  // @ts-expect-error  Property 'keyId' is missing in type '{ algorithm: "AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic"; }'
+  new SchemaTypeOptions<string>()['encrypt'] = {
+    algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
+  };
 
-  // @ts-expect-error invalid algorithm
-  new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, algorithm: 'SHA_FAKE_ALG' };
+  new SchemaTypeOptions<string>()['encrypt'] = {
+    // @ts-expect-error  Type 'UUID' is not assignable to type '[Binary]'.
+    keyId: uuid,
+    // @ts-expect-error  Type '"SHA_FAKE_ALG"' is not assignable to type '"AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic" | "AEAD_AES_256_CBC_HMAC_SHA_512-Random"'.
+    algorithm: 'SHA_FAKE_ALG'
+  };
 
-  // @ts-expect-error invalid queries
-  new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, queries: 'fakeQueryOption' };
+  new SchemaTypeOptions<string>()['encrypt'] = {
+    keyId: uuid,
+    // @ts-expect-error  Type '"fakeQueryOption"' is not assignable to type '"equality" | "range" | undefined'.
+    queries: 'fakeQueryOption'
+  };
 
-  // @ts-expect-error invalid input option
-  new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, invalidKey: 'fakeKeyOption' };
+  new SchemaTypeOptions<string>()['encrypt'] = {
+    // @ts-expect-error  Type 'UUID' is not assignable to type '[Binary]'.
+    keyId: uuid,
+    invalidKey: 'fakeKeyOption'
+  };
 }

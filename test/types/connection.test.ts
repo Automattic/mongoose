@@ -18,7 +18,7 @@ ExpectType<Promise<Connection>>(conn.openUri('mongodb://127.0.0.1:27017/test', {
 conn.readyState === 0;
 conn.readyState === 99;
 
-// @ts-expect-error should not be allowed to update readyState
+// @ts-expect-error  Cannot assign to 'readyState' because it is a read-only property.
 conn.readyState = 0;
 
 ExpectType<Promise<Record<string, Error | mongodb.Collection<any>>>>(
@@ -32,7 +32,7 @@ ExpectType<Promise<mongodb.Collection<{ [key: string]: any }>>>(conn.createColle
 
 ExpectType<Promise<void>>(conn.dropCollection('some'));
 
-// @ts-expect-error cannot call deleteModel with no args
+// @ts-expect-error  Expected 1 arguments, but got 0.
 conn.deleteModel();
 ExpectType<Connection>(conn.deleteModel('something'));
 ExpectType<Connection>(conn.deleteModel(/.+/));
@@ -61,13 +61,13 @@ ExpectType<Promise<string>>(conn.withSession(async(res) => {
   return 'a';
 }));
 
-// @ts-expect-error cannot update user property
+// @ts-expect-error  Cannot assign to 'user' because it is a read-only property.
 conn.user = 'invalid';
-// @ts-expect-error cannot update pass property
+// @ts-expect-error  Cannot assign to 'pass' because it is a read-only property.
 conn.pass = 'invalid';
-// @ts-expect-error cannot update host property
+// @ts-expect-error  Cannot assign to 'host' because it is a read-only property.
 conn.host = 'invalid';
-// @ts-expect-error cannot update port property
+// @ts-expect-error  Cannot assign to 'port' because it is a read-only property.
 conn.port = 'invalid';
 
 ExpectType<Collection>(conn.collection('test'));
@@ -162,7 +162,7 @@ function schemaInstanceMethodsAndQueryHelpersOnConnection() {
 async function gh15359() {
   const res = await conn.bulkWrite([{ model: 'Test', name: 'insertOne', document: { name: 'test1' } }]);
   ExpectType<number>(res.insertedCount);
-  // @ts-expect-error should not be defined unless option is set
+  // @ts-expect-error  Property 'mongoose' does not exist on type 'ClientBulkWriteResult'.
   res.mongoose.validationErrors;
 
   const res2 = await conn.bulkWrite([{ model: 'Test', name: 'insertOne', document: { name: 'test2' } }], { ordered: false });
@@ -175,7 +175,7 @@ async function gh15359() {
   ], { ordered: false });
   ExpectType<number>(res3.insertedCount);
 
-  // @ts-expect-error should not be defined unless option is set
+  // @ts-expect-error  'res3.mongoose' is possibly 'undefined'.
   res3.mongoose.validationErrors;
   ExpectType<Error[] | undefined>(res3.mongoose?.validationErrors);
 }

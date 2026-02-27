@@ -159,12 +159,12 @@ This is MongoDB's official package for setting up encryption keys.
 npm install mongodb-client-encryption
 ```
 
-You also need to make sure you've installed [mongocryptd](https://www.mongodb.com/docs/manual/core/queryable-encryption/reference/mongocryptd/).
+You also need to make sure you've installed either [mongocryptd](https://www.mongodb.com/docs/v7.0/core/queryable-encryption/reference/mongocryptd/) or the [crypt_shared library](https://www.mongodb.com/docs/manual/core/csfle/reference/install-library/).
 mongocryptd is a separate process from the MongoDB server that you need to run to work with field level encryption.
 You can either run mongocryptd yourself, or make sure it is on the system PATH and the MongoDB Node.js driver will run it for you.
-[You can read more about mongocryptd here](https://www.mongodb.com/docs/v5.0/reference/security-client-side-encryption-appendix/#mongocryptd).
+[You can read more about mongocryptd here](https://www.mongodb.com/docs/v5.0/reference/security-client-side-encryption-appendix/#mongocryptd). The shared library is a dynamic library that you can download from the [MongoDB Download Center](https://www.mongodb.com/try/download/enterprise).
 
-Once you've set up and run mongocryptd, first you need to create a new encryption key as follows.
+Once you've set up your client-side field level encryption environment, you first need to create a new encryption key as follows.
 Keep in mind that the following example is a simple example to help you get started.
 The encryption key in the following example is insecure; MongoDB recommends using a [KMS](https://www.mongodb.com/docs/v5.0/core/security-client-side-encryption-key-management/).
 
@@ -192,7 +192,14 @@ async function run() {
   const conn = await mongoose.createConnection(uri, {
     autoEncryption: {
       keyVaultNamespace,
-      kmsProviders
+      kmsProviders,
+      // If using crypt_shared, you can specify the path to crypt_shared
+      // by uncommenting the following code.
+      // SHARED_LIB_PATH should be the path to the shared lib file, not
+      // the directory containing the shared lib file.
+      // extraOptions: {
+      //  cryptSharedLibPath: process.env.SHARED_LIB_PATH
+      // }
     }
   }).asPromise();
   const encryption = new ClientEncryption(conn.getClient(), {
@@ -230,7 +237,12 @@ await mongoose.connect('mongodb://127.0.0.1:27017/mongoose_test', {
           }
         }
       }
-    }
+    },
+    // If using crypt_shared, you can specify the path to crypt_shared
+    // by uncommenting the following code
+    // extraOptions: {
+    //  cryptSharedLibPath: process.env.SHARED_LIB_PATH
+    // }
   }
 });
 ```

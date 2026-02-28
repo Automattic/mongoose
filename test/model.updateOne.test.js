@@ -926,6 +926,19 @@ describe('model: updateOne:', function() {
     return M.updateOne({ _id: doc._id }, { notInSchema: 1 }).exec();
   });
 
+  it('handles nullish update with arrayFilters', async function() {
+    const schema = new Schema({ toppings: [{ name: String }] });
+    const Breakfast = db.model('Test', schema);
+
+    const query = Breakfast.updateOne({}, { $set: { 'toppings.$[t].name': 'eggs' } }, {
+      arrayFilters: [{ 't.name': 'bacon' }]
+    });
+    query.setUpdate(null);
+
+    const res = await query;
+    assert.equal(res.acknowledged, false);
+  });
+
   describe('middleware', function() {
     it('can specify pre and post hooks', async function() {
       let numPres = 0;

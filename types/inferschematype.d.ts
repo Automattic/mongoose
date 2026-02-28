@@ -18,6 +18,7 @@ import {
   Schema,
   SchemaType,
   SchemaTypeOptions,
+  Show,
   StringSchemaDefinition,
   Types,
   UnionSchemaDefinition,
@@ -250,6 +251,27 @@ type UnionToType<T extends readonly any[]> = T[number] extends infer U
   ? ResolvePathType<U>
   : never;
 
+type EmbeddedDiscriminatorKey<TSchema extends Schema<any>> = TSchema extends Schema<any, any, any, any, any, any, infer TSchemaOptions>
+  ? TSchemaOptions extends { discriminatorKey: infer TDiscriminatorKey }
+  ? TDiscriminatorKey extends string
+    ? string extends TDiscriminatorKey ? '__t' : TDiscriminatorKey
+    : '__t'
+  : '__t'
+  : '__t';
+
+type EmbeddedDiscriminatorPathType<
+  TSchema extends Schema<any>,
+  TDiscriminators
+> = TDiscriminators extends Record<string, Schema<any>>
+  ? {
+    [TDiscriminatorName in Extract<keyof TDiscriminators, string>]: Show<
+      Omit<InferSchemaType<TSchema>, EmbeddedDiscriminatorKey<TSchema>> &
+      Omit<InferSchemaType<TDiscriminators[TDiscriminatorName]>, EmbeddedDiscriminatorKey<TSchema>> &
+      Record<EmbeddedDiscriminatorKey<TSchema>, TDiscriminatorName>
+    >
+  }[Extract<keyof TDiscriminators, string>]
+  : never;
+
 type IsSchemaTypeFromBuiltinClass<T> =
   T extends typeof String ? true
   : unknown extends Buffer ? false
@@ -286,7 +308,10 @@ type ResolvePathType<
   TypeKey extends string = DefaultSchemaOptions['typeKey'],
   TypeHint = never
 > = [TypeHint] extends [never]
-  ? PathValueType extends Schema ? InferSchemaType<PathValueType>
+  ? PathValueType extends Schema ?
+    Options extends { discriminators: infer TDiscriminators } ?
+      EmbeddedDiscriminatorPathType<PathValueType, TDiscriminators>
+    : InferSchemaType<PathValueType>
   : PathValueType extends AnyArray<infer Item> ?
     [Item] extends [never]
       ? any[]

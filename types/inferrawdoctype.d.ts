@@ -8,6 +8,28 @@ import {
 import { Binary, UUID } from 'mongodb';
 
 declare module 'mongoose' {
+  type EmbeddedRawDiscriminatorKey<TSchema extends Schema<any>> = TSchema extends Schema<any, any, any, any, any, any, infer TSchemaOptions>
+    ? TSchemaOptions extends { discriminatorKey: infer TDiscriminatorKey }
+      ? TDiscriminatorKey extends string
+        ? string extends TDiscriminatorKey ? '__t' : TDiscriminatorKey
+        : '__t'
+      : '__t'
+    : '__t';
+
+  type EmbeddedRawDiscriminatorPathType<
+    TSchema extends Schema<any>,
+    TDiscriminators,
+    TTransformOptions = { bufferToBinary: false }
+  > = TDiscriminators extends Record<string, Schema<any>>
+    ? {
+      [TDiscriminatorName in Extract<keyof TDiscriminators, string>]: Show<
+        Omit<InferRawDocTypeFromSchema<TSchema>, EmbeddedRawDiscriminatorKey<TSchema>> &
+        Omit<InferRawDocTypeFromSchema<TDiscriminators[TDiscriminatorName]>, EmbeddedRawDiscriminatorKey<TSchema>> &
+        Record<EmbeddedRawDiscriminatorKey<TSchema>, TDiscriminatorName>
+      >
+    }[Extract<keyof TDiscriminators, string>]
+    : never;
+
   export type InferRawDocTypeFromSchema<TSchema extends Schema<any>> = IsItRecordAndNotAny<ObtainSchemaGeneric<TSchema, 'EnforcedDocType'>> extends true
     ? ObtainSchemaGeneric<TSchema, 'EnforcedDocType'>
     : FlattenMaps<SubdocsToPOJOs<ObtainSchemaGeneric<TSchema, 'DocType'>>>;
@@ -93,6 +115,8 @@ declare module 'mongoose' {
        IsNotNever<TypeHint> extends true ? TypeHint
        : [PathValueType] extends [neverOrAny] ? PathValueType
      : PathValueType extends Schema<infer RawDocType, any, any, any, any, any, infer TSchemaOptions, infer DocType, any, infer TSchemaDefinition> ?
+         Options extends { discriminators: infer TDiscriminators } ?
+           EmbeddedRawDiscriminatorPathType<PathValueType, TDiscriminators, TTransformOptions> :
          IsItRecordAndNotAny<RawDocType> extends true ?
          RawDocType :
          string extends keyof TSchemaDefinition ?

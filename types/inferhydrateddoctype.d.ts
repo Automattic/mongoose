@@ -8,6 +8,27 @@ import {
 import { UUID } from 'mongodb';
 
 declare module 'mongoose' {
+  type EmbeddedHydratedDiscriminatorKey<TSchema extends Schema<any>> = TSchema extends Schema<any, any, any, any, any, any, infer TSchemaOptions>
+    ? TSchemaOptions extends { discriminatorKey: infer TDiscriminatorKey }
+      ? TDiscriminatorKey extends string
+        ? string extends TDiscriminatorKey ? '__t' : TDiscriminatorKey
+        : '__t'
+      : '__t'
+    : '__t';
+
+  type EmbeddedHydratedDiscriminatorPathType<
+    TSchema extends Schema<any>,
+    TDiscriminators
+  > = TDiscriminators extends Record<string, Schema<any>>
+    ? {
+      [TDiscriminatorName in Extract<keyof TDiscriminators, string>]: Show<
+        Omit<InferHydratedDocTypeFromSchema<TSchema>, EmbeddedHydratedDiscriminatorKey<TSchema>> &
+        Omit<InferHydratedDocTypeFromSchema<TDiscriminators[TDiscriminatorName]>, EmbeddedHydratedDiscriminatorKey<TSchema>> &
+        Record<EmbeddedHydratedDiscriminatorKey<TSchema>, TDiscriminatorName>
+      >
+    }[Extract<keyof TDiscriminators, string>]
+    : never;
+
   export type InferHydratedDocTypeFromSchema<TSchema extends Schema<any>> = ObtainSchemaGeneric<TSchema, 'THydratedDocumentType'>;
 
   /**
@@ -70,6 +91,8 @@ declare module 'mongoose' {
   type ResolveHydratedPathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}, TypeKey extends string = DefaultSchemaOptions['typeKey'], TypeHint = never> =
     IsNotNever<TypeHint> extends true ? TypeHint
     : PathValueType extends Schema<any, any, any, any, any, any, any, any, infer THydratedDocumentType> ?
+      Options extends { discriminators: infer TDiscriminators } ?
+        EmbeddedHydratedDiscriminatorPathType<PathValueType, TDiscriminators> :
       THydratedDocumentType :
         PathValueType extends AnyArray<infer Item> ?
           IfEquals<Item, never, any[], Item extends Schema<infer EmbeddedRawDocType, any, any, any, any, any, any, any, infer EmbeddedHydratedDocType extends AnyObject, infer TSchemaDefition> ?

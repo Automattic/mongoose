@@ -215,6 +215,9 @@ declare module 'mongoose' {
     /** If set, specifies the type of this map's values. Mongoose will cast this map's values to the given type. */
     of?: Function | SchemaDefinitionProperty<any> | (Function | SchemaDefinitionProperty<any>)[];
 
+    /** If set on a subdocument path, defines embedded discriminators keyed by discriminator name. */
+    discriminators?: Record<string, Schema<any, any, any>>;
+
     /** If true, uses Mongoose's default `_id` settings. Only allowed for ObjectIds */
     auto?: boolean;
 

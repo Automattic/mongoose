@@ -177,7 +177,7 @@ function gh16033() {
     .match({ text: 'example' })
     .unionWith({
       coll: 'other_items',
-      // @ts-expect-error `pipeline()` can contain stages that are invalid for `$unionWith`
+      // @ts-expect-error  Type 'PipelineStage[]' is not assignable to type 'UnionWithPipelineStage[]'.
       pipeline: basePipeline.pipeline()
     });
 }

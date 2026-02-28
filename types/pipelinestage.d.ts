@@ -115,6 +115,7 @@ declare module 'mongoose' {
     }
 
     export type FacetPipelineStage = Exclude<PipelineStage, PipelineStage.CollStats | PipelineStage.Facet | PipelineStage.GeoNear | PipelineStage.IndexStats | PipelineStage.Out | PipelineStage.Merge | PipelineStage.PlanCacheStats>;
+    export type UnionWithPipelineStage = Exclude<PipelineStage, PipelineStage.Out | PipelineStage.Merge>;
 
     export interface GeoNear {
       /** [`$geoNear` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/geoNear/) */
@@ -303,8 +304,8 @@ declare module 'mongoose' {
       /** [`$unionWith` reference](https://www.mongodb.com/docs/manual/reference/operator/aggregation/unionWith/) */
       $unionWith:
       | string
-      | { coll: string; pipeline?: Exclude<PipelineStage, PipelineStage.Out | PipelineStage.Merge>[] }
-      | { coll?: string; pipeline: Exclude<PipelineStage, PipelineStage.Out | PipelineStage.Merge>[] }
+      | { coll: string; pipeline?: UnionWithPipelineStage[] }
+      | { coll?: string; pipeline: UnionWithPipelineStage[] }
     }
 
     export interface Unset {

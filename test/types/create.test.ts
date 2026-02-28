@@ -60,7 +60,7 @@ Test.insertMany({ name: 'test' }, {}).then(docs => {
 Test.insertMany({ name: 'test' }, { lean: true }).then(docs => {
   ExpectType<Types.ObjectId>(docs[0]._id);
   ExpectType<string>(docs[0].name);
-  // @ts-expect-error should not be defined on lean doc
+  // @ts-expect-error  Property 'isNew' does not exist on type
   docs[0].isNew;
 });
 
@@ -91,7 +91,7 @@ Test.insertMany([{ name: 'test' }], { rawResult: true }).then(result => {
 Test.insertMany([{ name: 'test' }], { lean: true }).then(docs => {
   ExpectType<Types.ObjectId>(docs[0]._id);
   ExpectType<string>(docs[0].name);
-  // @ts-expect-error should not be defined on lean doc
+  // @ts-expect-error  Property 'isNew' does not exist on type
   docs[0].isNew;
 });
 

@@ -32,8 +32,14 @@ function gh13087() {
     };
   }
 
-  // @ts-expect-error cannot create document array with primitive values
-  new Types.DocumentArray<Book>([1, 2, 3]);
+  new Types.DocumentArray<Book>([
+    // @ts-expect-error  Type 'number' is not assignable to type 'AnyObject'.
+    1,
+    // @ts-expect-error  Type 'number' is not assignable to type 'AnyObject'.
+    2,
+    // @ts-expect-error  Type 'number' is not assignable to type 'AnyObject'.
+    3
+  ]);
 
   const locationSchema = new Schema(
     {

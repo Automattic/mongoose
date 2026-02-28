@@ -37,7 +37,7 @@ ParentModel.
       throw new Error('should be populated');
     } else {
       const name = leanChild.name;
-      // @ts-expect-error not defined on lean doc
+      // @ts-expect-error  Property 'save' does not exist on type 'Child'.
       leanChild.save();
     }
   });
@@ -178,9 +178,9 @@ function gh11503() {
   User.findOne({}).populate('friends').then(user => {
     if (!user) return;
     ExpectType<Types.ObjectId>(user?.friends[0]);
-    // @ts-expect-error not populated by default
+    // @ts-expect-error  Property 'blocked' does not exist on type 'ObjectId'.
     user?.friends[0].blocked;
-    // @ts-expect-error not populated by default
+    // @ts-expect-error  Property 'blocked' does not exist on type 'ObjectId'.
     user?.friends.map(friend => friend.blocked);
   });
 

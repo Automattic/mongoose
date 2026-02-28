@@ -18,7 +18,7 @@ schema.pre<Query<any, any>>('find', async function() {
 });
 
 schema.pre<Query<any, any>>('find', async function() {
-  // @ts-expect-error not defined on query instances
+  // @ts-expect-error  Property 'notAFunction' does not exist on type
   this.notAFunction();
 });
 

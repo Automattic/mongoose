@@ -2522,12 +2522,13 @@ describe('Model', function() {
       const error = await b.save().then(() => null, err => err);
       assert.ok(error);
     });
-    it('should clear $versionError and saveOptions after saved (gh-8040)', async function() {
+    it('should clear $versionError and saveOptions after saved for existing docs (gh-8040)', async function() {
       const schema = new Schema({ name: String });
       const Model = db.model('Test', schema);
-      const doc = new Model({
+      const doc = await Model.create({
         name: 'Fonger'
       });
+      doc.name = 'Fong';
 
       const savePromise = doc.save();
       assert.ok(doc.$__.$versionError);

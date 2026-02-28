@@ -103,7 +103,7 @@ describe('setDefaultsOnInsert', function() {
     let update = { $set: { name: 'foo' } };
     const context = { get: (key) => key === 'name' ? 'bar' : undefined };
     // Should not throw "Cannot read properties of null (reading 'get')"
-    update = setDefaultsOnInsert({}, schema, update, opts, context);
+    update = setDefaultsOnInsert({}, schema, update, opts, {}, context);
     assert.equal(update.$setOnInsert['referralConversion'], 'bar');
   });
 

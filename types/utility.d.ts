@@ -89,11 +89,37 @@ declare module 'mongoose' {
     ? U
     : T;
 
-  type DeepPartial<T> =
-    T extends TreatAsPrimitives ? T :
-    T extends Array<infer U> ? DeepPartial<U>[] :
-    T extends Record<string, any> ? { [K in keyof T]?: DeepPartial<T[K]> } :
-    T;
+  type DeepPartial<T> = DeepPartialInternal<T>;
+  type DeepPartialInternal<T> =
+    T extends TreatAsPrimitivesForTransforms
+      ? T
+      : T extends Map<infer KeyType, infer ValueType>
+        ? PartialMap<KeyType, ValueType>
+        : T extends Set<infer ItemType>
+          ? PartialSet<ItemType>
+          : T extends ReadonlyMap<infer KeyType, infer ValueType>
+            ? PartialReadonlyMap<KeyType, ValueType>
+            : T extends ReadonlySet<infer ItemType>
+              ? PartialReadonlySet<ItemType>
+              : T extends object
+                ? T extends ReadonlyArray<infer ItemType>
+                  ? ItemType[] extends T
+                    ? readonly ItemType[] extends T
+                      ? ReadonlyArray<DeepPartialInternal<ItemType | undefined>>
+                      : Array<DeepPartialInternal<ItemType | undefined>>
+                    : PartialObject<T>
+                  : PartialObject<T>
+                : unknown;
+
+  type PartialMap<KeyType, ValueType> =
+    {} & Map<DeepPartialInternal<KeyType>, DeepPartialInternal<ValueType>>;
+  type PartialSet<T> = {} & Set<DeepPartialInternal<T>>;
+  type PartialReadonlyMap<KeyType, ValueType> =
+    {} & ReadonlyMap<DeepPartialInternal<KeyType>, DeepPartialInternal<ValueType>>;
+  type PartialReadonlySet<T> = {} & ReadonlySet<DeepPartialInternal<T>>;
+  type PartialObject<ObjectType extends object> = {
+    [KeyType in keyof ObjectType]?: DeepPartialInternal<ObjectType[KeyType]>;
+  };
 
   type UnpackedIntersection<T, U> = T extends null
     ? null

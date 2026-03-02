@@ -2226,6 +2226,7 @@ function gh16046() {
       },
       statics: {
         myStaticMethod: function() {
+          ExpectType<string>(this.modelName);
           console.log('placeholder', this.modelName);
         }
       }

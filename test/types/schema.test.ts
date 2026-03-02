@@ -378,10 +378,10 @@ export function autoTypedSchema() {
   // Test auto schema type obtaining with all possible path types.
 
   class Int8 extends SchemaType {
-    constructor(key, options) {
+    constructor(key: string, options: Record<string, any>) {
       super(key, options, 'Int8');
     }
-    cast(val) {
+    cast(val: unknown) {
       let _val = Number(val);
       if (isNaN(_val)) {
         throw new Error('Int8: ' + val + ' is not a number');
@@ -1887,8 +1887,7 @@ function gh15301() {
     }
   });
 
-  const timeStringToObject = (time) => {
-    if (typeof time !== 'string') return time;
+  const timeStringToObject = (time: string) => {
     const [hours, minutes] = time.split(':');
     return { hours: parseInt(hours), minutes: parseInt(minutes) };
   };
@@ -2179,4 +2178,62 @@ function gh15915() {
     // @ts-expect-error  'invalid' does not exist in type 'string[] | { exclude: string[]; }'.
     invalid: ['name'] }
   });
+}
+
+function gh16046() {
+  const issueOneSchema = new Schema(
+    { placeholder: String },
+    {
+      timestamps: true,
+      virtuals: {
+        votes: {
+          options: {
+            ref: 'IssueTwo',
+            localField: '_id',
+            foreignField: 'issueOneId'
+          }
+        }
+      },
+      statics: {
+        myStaticMethod: function() {
+          ExpectType<string>(this.modelName);
+        }
+      }
+    }
+  );
+
+  const IssueOne = model('IssueOne', issueOneSchema);
+
+  IssueOne.myStaticMethod();
+
+  const issueTwoSchema = new Schema(
+    { placeholder: String },
+    {
+      timestamps: true,
+      virtuals: {
+        votes: {
+          options: {
+            ref: 'IssueTwo',
+            localField: '_id',
+            foreignField: 'issueOneId'
+          }
+        }
+      },
+      methods: {
+        myMethod: function() {
+          ExpectType<string | null | undefined>(this.placeholder);
+        }
+      },
+      statics: {
+        myStaticMethod: function() {
+          ExpectType<string>(this.modelName);
+          console.log('placeholder', this.modelName);
+        }
+      }
+    }
+  );
+
+  const IssueTwo = model('IssueTwo', issueTwoSchema);
+  (new IssueTwo()).myMethod();
+  IssueTwo.myStaticMethod();
 }

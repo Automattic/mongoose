@@ -159,7 +159,7 @@ function getterLimitationTest() {
   }
 
   class TestGetter {
-    name: string;
+    name!: string;
 
     // TS errors if you try `this` in getter
     // @ts-expect-error  'get' and 'set' accessors cannot declare 'this' parameters.

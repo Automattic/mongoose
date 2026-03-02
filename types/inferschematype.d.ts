@@ -119,6 +119,11 @@ declare module 'mongoose' {
     TypesAreEqual<T, DefaultSchemaOptions> extends true ? DefaultSchemaOptions :
     MergeType<DefaultSchemaOptions, T>;
 
+  /*!
+   * ResolveVirtuals resolves the virtuals option from the schema options.
+   * Adds the default `id` virtual if it is not disabled in schema options or
+   * overwritten in the RawDocType.
+   */
   type ResolveVirtuals<TSchemaOptions, RawDocType> =
     ResolveSchemaOptions<TSchemaOptions> extends { virtuals: infer V }
       ? AddDefaultId<RawDocType, V, ResolveSchemaOptions<TSchemaOptions>>

@@ -1,6 +1,12 @@
+import { expectTypeOf } from 'expect-type';
+
 export declare function Expect<T extends true>(): void;
 
-export declare const ExpectType: <Expected>(value: Expected) => void;
+export const ExpectType = <Expected>(value: unknown): void => {
+  expectTypeOf(value).toEqualTypeOf<Expected>();
+};
 
-export declare const ExpectAssignable: <Expected>() =>
-  <Actual extends Expected>(value: Actual) => void;
+export const ExpectAssignable = <Expected>() =>
+  <Actual>(value: Actual): void => {
+    expectTypeOf(value).toMatchTypeOf<Expected>();
+  };

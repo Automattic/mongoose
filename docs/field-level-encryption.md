@@ -18,9 +18,8 @@ You can read more about CSFLE on the [MongoDB CSFLE documentation](https://www.m
 
 ## Automatic FLE in Mongoose
 
-Mongoose supports the declaration of encrypted schemas - schemas that, when connected to a model, utilize MongoDB's Client Side
-Field Level Encryption or Queryable Encryption under the hood.  Mongoose automatically generates either an `encryptedFieldsMap` or a
-`schemaMap` when instantiating a MongoClient and encrypts fields on write and decrypts fields on reads.
+Mongoose supports the declaration of encrypted schemas - schemas that, when connected to a model, utilize MongoDB's Client Side Field Level Encryption or Queryable Encryption under the hood.
+Mongoose automatically generates either an `encryptedFieldsMap` or a `schemaMap` based on models that are registered when Mongoose connects, and encrypts fields on write and decrypts fields on reads.
 
 ### Encryption types
 
@@ -29,8 +28,8 @@ See [choosing an in-use encryption approach](https://www.mongodb.com/docs/v7.3/c
 
 ###  Declaring Encrypted Schemas
 
-The following schema declares two properties, `name` and `ssn`.  `ssn` is encrypted using queryable encryption, and
-is configured for equality queries:
+The following schema declares two properties, `name` and `ssn`.
+`ssn` is encrypted using queryable encryption, and is configured for equality queries:
 
 ```javascript
 const encryptedUserSchema = new Schema({ 
@@ -56,17 +55,36 @@ Not all schematypes are supported for CSFLE and QE.  For an overview of supporte
 
 ### Registering Models
 
-Encrypted schemas can be registered on the global mongoose object or on a specific connection, so long as models are registered before the connection
-is established:
+Encrypted schemas can be registered on the global mongoose object or on a specific connection, as long as models are registered **before the connection is established**:
 
 ```javascript
-// specific connection
-const GlobalUserModel = mongoose.model('User', encryptedUserSchema);
+// Registering models on the Mongoose global: register models before calling `connect()`
+// so Mongoose knows about the models and can generate `schemaMap` when connecting.
+mongoose.model('User', userSchema);
+await mongoose.connect(mongodbConnectionString, {
+  // Configure auto encryption
+  autoEncryption: {
+    keyVaultNamespace: 'datakeys.datakeys',
+    kmsProviders
+  }
+});
 
-// specific connection
-const connection = mongoose.createConnection();
-const UserModel = connection.model('User', encryptedUserSchema);
+// Registering models on a new connection: call `createConnection()` with no arguments to
+// create a connection without connecting. Then register your models and call `openUri()`
+// so Mongoose knows about the models and can generate `schemaMap` when connecting`.
+const conn = mongoose.createConnection();
+conn.model('User', userSchema);
+await conn.openUri(mongodbConnectionString, {
+  // Configure auto encryption
+  autoEncryption: {
+    keyVaultNamespace: 'datakeys.datakeys',
+    kmsProviders
+  }
+});
 ```
+
+If you register models after connecting to MongoDB, you are responsible for passing the `schemaMap` option.
+Mongoose can only automatically generate `schemaMap` for models that are registered on the connection when you call `createConnection(uri)`, `connect(uri)`, or `openUri(uri)`.
 
 ### Connecting and configuring encryption options
 

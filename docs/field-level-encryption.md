@@ -100,8 +100,8 @@ await conn.openUri(mongodbConnectionString, {
 });
 ```
 
-If you register models after connecting to MongoDB, you are responsible for passing the `schemaMap` option.
-Mongoose can only automatically generate `schemaMap` for models that are registered on the connection when you call `createConnection(uri)`, `connect(uri)`, or `openUri(uri)`.
+If you register models after connecting to MongoDB, you are responsible for passing the `schemaMap` and/or `encryptedFieldsMap` options.
+Mongoose can only automatically generate `schemaMap` or `encryptedFieldsMap` for models that are registered on the connection when you call `createConnection(uri)`, `connect(uri)`, or `openUri(uri)`.
 
 ### Connecting and configuring encryption options
 

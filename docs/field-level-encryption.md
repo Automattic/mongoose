@@ -39,7 +39,7 @@ const encryptedUserSchema = new Schema({
     // 1
     encrypt: { 
       keyId: '<uuid string of key id>',
-      queries: 'equality'
+      queries: { queryType: 'equality' }
     }
   }
   // 2
@@ -52,6 +52,23 @@ To declare a field as encrypted, you must:
 2. Choose an encryption type for the schema and configure the schema for the encryption type
 
 Not all schematypes are supported for CSFLE and QE.  For an overview of supported BSON types, refer to MongoDB's documentation.
+
+Alternatively, you can use CSFLE (non-queryable encryption) as follows.
+
+```javascript
+const encryptedUserSchema = new Schema({ 
+  name: String,
+  ssn: { 
+    type: String, 
+    // 1
+    encrypt: { 
+      keyId: ['<uuid string of key id>'], // Make sure this is an array
+      queries: { queryType: 'equality' }
+    }
+  }
+  // 2
+}, { encryptionType: 'csfle' });
+```
 
 ### Registering Models
 

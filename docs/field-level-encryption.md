@@ -88,7 +88,7 @@ await mongoose.connect(mongodbConnectionString, {
 
 // Registering models on a new connection: call `createConnection()` with no arguments to
 // create a connection without connecting. Then register your models and call `openUri()`
-// so Mongoose knows about the models and can generate `schemaMap` when connecting`.
+// so Mongoose knows about the models and can generate `schemaMap` when connecting.
 const conn = mongoose.createConnection();
 conn.model('User', userSchema);
 await conn.openUri(mongodbConnectionString, {

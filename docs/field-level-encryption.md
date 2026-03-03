@@ -63,7 +63,7 @@ const encryptedUserSchema = new Schema({
     // 1
     encrypt: { 
       keyId: ['<uuid string of key id>'], // Make sure this is an array
-      queries: { queryType: 'equality' }
+      algorithm: 'AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic'
     }
   }
   // 2

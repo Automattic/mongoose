@@ -213,7 +213,7 @@ declare module 'mongoose' {
     _id?: boolean;
 
     /** Embedded discriminators for this path. Only allowed for subdocuments and subdocument arrays. */
-    discriminators?: Record<string, Schema<any, any, any>>;
+    discriminators?: Record<string, Schema>;
 
     /** If set, specifies the type of this map's values. Mongoose will cast this map's values to the given type. */
     of?: Function | SchemaDefinitionProperty<any> | (Function | SchemaDefinitionProperty<any>)[];

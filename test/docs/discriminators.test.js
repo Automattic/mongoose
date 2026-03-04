@@ -292,7 +292,7 @@ describe('discriminator docs', function() {
           Purchased: purchasedSchema
         }
       }
-    ] });
+      ] });
 
     const Batch = db.model('EventBatch', batchSchema);
 

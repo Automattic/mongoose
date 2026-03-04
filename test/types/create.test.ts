@@ -60,7 +60,7 @@ Test.insertMany({ name: 'test' }, {}).then(docs => {
 Test.insertMany({ name: 'test' }, { lean: true }).then(docs => {
   expect(docs[0]._id).type.toBe<Types.ObjectId>();
   expect(docs[0].name).type.toBe<string>();
-  expect(docs[0]).type.not.toHaveProperty("isNew");
+  expect(docs[0]).type.not.toHaveProperty('isNew');
 });
 
 Test.insertMany({ name: 'test' }).then(docs => {
@@ -90,7 +90,7 @@ Test.insertMany([{ name: 'test' }], { rawResult: true }).then(result => {
 Test.insertMany([{ name: 'test' }], { lean: true }).then(docs => {
   expect(docs[0]._id).type.toBe<Types.ObjectId>();
   expect(docs[0].name).type.toBe<string>();
-  expect(docs[0]).type.not.toHaveProperty("isNew");
+  expect(docs[0]).type.not.toHaveProperty('isNew');
 });
 
 Test.insertMany([{ name: 'test' }], { lean: false }).then(docs => {

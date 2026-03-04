@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "9.2.3",
+  "version": "9.2.4",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -35,7 +35,7 @@
     "acquit": "1.4.0",
     "acquit-ignore": "0.2.2",
     "acquit-require": "0.1.1",
-    "ajv": "8.17.1",
+    "ajv": "8.18.0",
     "c8": "11.0.0",
     "cheerio": "^1.2",
     "dox": "1.0.0",

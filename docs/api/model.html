@@ -1,10 +1,10 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v9.2.3: Model</title><script>(function() {
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Mongoose v9.2.4: Model</title><script>(function() {
   var theme = localStorage.getItem('mongoose-theme');
   if (theme) {
     document.documentElement.setAttribute('data-theme', theme);
   }
-})();</script><link rel="apple-touch-icon" sizes="57x57" href="/docs/images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="/docs/images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="/docs/images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="/docs/images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="/docs/images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="/docs/images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="/docs/images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="/docs/images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="/docs/images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="/docs/images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="/docs/images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="/docs/images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="/docs/images/favicon/favicon-16x16.png"><link rel="manifest" href="/docs/images/favicon/manifest.json"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/mongoose5.css?v=1772135406263"><link rel="stylesheet" href="/docs/css/github.css?v=1772135406263"><link rel="stylesheet" href="/docs/css/carbonads.css"><link rel="stylesheet" href="/docs/css/copy-code.css"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="/docs/images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/api.css"><script src="/docs/js/api-bold-current-nav.js"></script><script src="/docs/js/convert-old-anchorid.js"></script><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/css/inlinecpc.css"></head><body><div id="layout"><div id="theme-toggle"><button id="theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle dark/light theme"><svg id="theme-icon-light" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-<svg id="theme-icon-dark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button></div><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><svg width="100%" height="100%" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></a><div id="mobile-logo-container"><a href="/"><span id="logo" role="img" aria-label="Mongoose logo"></span><span class="logo-text">mongoose</span></a></div></div><div id="menu"><nav class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><span id="logo" role="img" aria-label="Mongoose logo"></span><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="/docs/index.html">Version 9.2.3</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/index.html">Version 8.23.0</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/index.html">Version 7.8.8</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/index.html">Version 6.13.9</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">API</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_9.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/version-support.html">Version Support</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></nav></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/lib/model.js" target="_blank">
+})();</script><link rel="apple-touch-icon" sizes="57x57" href="/docs/images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="/docs/images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="/docs/images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="/docs/images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="/docs/images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="/docs/images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="/docs/images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="/docs/images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="/docs/images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="/docs/images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="/docs/images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="/docs/images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="/docs/images/favicon/favicon-16x16.png"><link rel="manifest" href="/docs/images/favicon/manifest.json"><link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans"><link rel="stylesheet" href="/docs/css/mongoose5.css?v=1772583403655"><link rel="stylesheet" href="/docs/css/github.css?v=1772583403655"><link rel="stylesheet" href="/docs/css/carbonads.css"><link rel="stylesheet" href="/docs/css/copy-code.css"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="/docs/images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="/docs/css/api.css"><script src="/docs/js/api-bold-current-nav.js"></script><script src="/docs/js/convert-old-anchorid.js"></script><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/css/inlinecpc.css"></head><body><div id="layout"><div id="theme-toggle"><button id="theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle dark/light theme"><svg id="theme-icon-light" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+<svg id="theme-icon-dark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button></div><div id="mobile-menu"><a class="menu-link" id="menuLink" href="#menu"><svg width="100%" height="100%" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></a><div id="mobile-logo-container"><a href="/"><span id="logo" role="img" aria-label="Mongoose logo"></span><span class="logo-text">mongoose</span></a></div></div><div id="menu"><nav class="pure-menu"><div class="pure-menu-heading" id="logo-container"><a href="/"><span id="logo" role="img" aria-label="Mongoose logo"></span><span class="logo-text">mongoose</span></a></div><ul class="pure-menu-list" id="navbar"><li class="pure-menu-horizontal pure-menu-item pure-menu-has-children pure-menu-allow-hover version"><a class="pure-menu-link" href="/docs/index.html">Version 9.2.4</a><ul class="pure-menu-children"><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/8.x/index.html">Version 8.23.0</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/7.x/index.html">Version 7.8.8</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/6.x/index.html">Version 6.13.9</a></li></ul></li><li class="pure-menu-item search"><input id="search-input-nav" type="text" placeholder="Search"><button id="search-button-nav"><img src="/docs/images/search.svg"></button></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/index.html">Quick Start</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/guides.html">Guides</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/guide.html">Schemas</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/connections.html">Connections</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/models.html">Models</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/documents.html">Documents</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/queries.html">Queries</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/validation.html">Validation</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/middleware.html">Middleware</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/populate.html">Populate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/discriminators.html">Discriminators</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/plugins.html">Plugins</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/timestamps.html">Timestamps</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/transactions.html">Transactions</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/typescript.html">TypeScript</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">API</a><ul class="pure-menu-list"><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schema.html">Schema</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/connection.html">Connection</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/document.html">Document</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link selected" href="/docs/api/model.html">Model</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/query.html">Query</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="pure-menu-item sub-item"><a class="pure-menu-link" href="/docs/api/virtualtype.html">VirtualType</a></li></ul></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/migrating_to_9.html">Migration Guide</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/version-support.html">Version Support</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/faq.html">FAQ</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/further_reading.html">Further Reading</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="pure-menu-item"><a class="pure-menu-link" href="/docs/sponsors.html" >Sponsors</a></li></ul><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script></div></nav></div><div class="container"><div id="content"><a class="edit-docs-link" href="https://github.com/Automattic/mongoose/blob/master/lib/model.js" target="_blank">
 <img src="/docs/images/pencil.svg" />
 </a><h1>Model</h1><script type="text/javascript" src="//m.servedby-buysellads.com/monetization.custom.js"></script><link rel="stylesheet" href="/docs/css/inlinecpc.css"><div id="native-direct"></div><script>(function() {
 if (typeof _bsa !== 'undefined' && _bsa) {
@@ -21,15 +21,15 @@ template: `
 );
 }
 })();</script><div class="api-nav"><div class="api-nav-content"><div class="nav-item" id="nav-Mongoose"><div class="nav-item-title"><a href="mongoose.html">Mongoose</a></div></div><div class="nav-item" id="nav-Schema"><div class="nav-item-title"><a href="schema.html">Schema</a></div></div><div class="nav-item" id="nav-Connection"><div class="nav-item-title"><a href="connection.html">Connection</a></div></div><div class="nav-item" id="nav-Document"><div class="nav-item-title"><a href="document.html">Document</a></div></div><div class="nav-item" id="nav-Model"><div class="nav-item-title" style="font-weight: bold"><a href="model.html">Model</a></div><ul class="nav-item-sub"><li><a href="#Model()"><code>Model()</code></a></li><li><a href="#Model.$where()"><code>Model.$where()</code></a></li><li><a href="#Model.aggregate()"><code>Model.aggregate()</code></a></li><li><a href="#Model.applyDefaults()"><code>Model.applyDefaults()</code></a></li><li><a href="#Model.applyTimestamps()"><code>Model.applyTimestamps()</code></a></li><li><a href="#Model.applyVirtuals()"><code>Model.applyVirtuals()</code></a></li><li><a href="#Model.bulkSave()"><code>Model.bulkSave()</code></a></li><li><a href="#Model.bulkWrite()"><code>Model.bulkWrite()</code></a></li><li><a href="#Model.castObject()"><code>Model.castObject()</code></a></li><li><a href="#Model.cleanIndexes()"><code>Model.cleanIndexes()</code></a></li><li><a href="#Model.clientEncryption()"><code>Model.clientEncryption()</code></a></li><li><a href="#Model.countDocuments()"><code>Model.countDocuments()</code></a></li><li><a href="#Model.create()"><code>Model.create()</code></a></li><li><a href="#Model.createCollection()"><code>Model.createCollection()</code></a></li><li><a href="#Model.createIndexes()"><code>Model.createIndexes()</code></a></li><li><a href="#Model.createSearchIndex()"><code>Model.createSearchIndex()</code></a></li><li><a href="#Model.createSearchIndexes()"><code>Model.createSearchIndexes()</code></a></li><li><a href="#Model.db"><code>Model.db</code></a></li><li><a href="#Model.deleteMany()"><code>Model.deleteMany()</code></a></li><li><a href="#Model.deleteOne()"><code>Model.deleteOne()</code></a></li><li><a href="#Model.diffIndexes()"><code>Model.diffIndexes()</code></a></li><li><a href="#Model.discriminator()"><code>Model.discriminator()</code></a></li><li><a href="#Model.distinct()"><code>Model.distinct()</code></a></li><li><a href="#Model.dropSearchIndex()"><code>Model.dropSearchIndex()</code></a></li><li><a href="#Model.ensureIndexes()"><code>Model.ensureIndexes()</code></a></li><li><a href="#Model.estimatedDocumentCount()"><code>Model.estimatedDocumentCount()</code></a></li><li><a href="#Model.events"><code>Model.events</code></a></li><li><a href="#Model.exists()"><code>Model.exists()</code></a></li><li><a href="#Model.find()"><code>Model.find()</code></a></li><li><a href="#Model.findById()"><code>Model.findById()</code></a></li><li><a href="#Model.findByIdAndDelete()"><code>Model.findByIdAndDelete()</code></a></li><li><a href="#Model.findByIdAndUpdate()"><code>Model.findByIdAndUpdate()</code></a></li><li><a href="#Model.findOne()"><code>Model.findOne()</code></a></li><li><a href="#Model.findOneAndDelete()"><code>Model.findOneAndDelete()</code></a></li><li><a href="#Model.findOneAndReplace()"><code>Model.findOneAndReplace()</code></a></li><li><a href="#Model.findOneAndUpdate()"><code>Model.findOneAndUpdate()</code></a></li><li><a href="#Model.hydrate()"><code>Model.hydrate()</code></a></li><li><a href="#Model.init()"><code>Model.init()</code></a></li><li><a href="#Model.insertMany()"><code>Model.insertMany()</code></a></li><li><a href="#Model.insertOne()"><code>Model.insertOne()</code></a></li><li><a href="#Model.inspect()"><code>Model.inspect()</code></a></li><li><a href="#Model.listIndexes()"><code>Model.listIndexes()</code></a></li><li><a href="#Model.listSearchIndexes()"><code>Model.listSearchIndexes()</code></a></li><li><a href="#Model.namespace()"><code>Model.namespace()</code></a></li><li><a href="#Model.populate()"><code>Model.populate()</code></a></li><li><a href="#Model.prototype.$model()"><code>Model.prototype.$model()</code></a></li><li><a href="#Model.prototype.$where"><code>Model.prototype.$where</code></a></li><li><a href="#Model.prototype.base"><code>Model.prototype.base</code></a></li><li><a href="#Model.prototype.baseModelName"><code>Model.prototype.baseModelName</code></a></li><li><a href="#Model.prototype.collection"><code>Model.prototype.collection</code></a></li><li><a href="#Model.prototype.collection"><code>Model.prototype.collection</code></a></li><li><a href="#Model.prototype.db"><code>Model.prototype.db</code></a></li><li><a href="#Model.prototype.deleteOne()"><code>Model.prototype.deleteOne()</code></a></li><li><a href="#Model.prototype.discriminators"><code>Model.prototype.discriminators</code></a></li><li><a href="#Model.prototype.increment()"><code>Model.prototype.increment()</code></a></li><li><a href="#Model.prototype.model()"><code>Model.prototype.model()</code></a></li><li><a href="#Model.prototype.modelName"><code>Model.prototype.modelName</code></a></li><li><a href="#Model.prototype.save()"><code>Model.prototype.save()</code></a></li><li><a href="#Model.recompileSchema()"><code>Model.recompileSchema()</code></a></li><li><a href="#Model.replaceOne()"><code>Model.replaceOne()</code></a></li><li><a href="#Model.schema"><code>Model.schema</code></a></li><li><a href="#Model.startSession()"><code>Model.startSession()</code></a></li><li><a href="#Model.syncIndexes()"><code>Model.syncIndexes()</code></a></li><li><a href="#Model.translateAliases()"><code>Model.translateAliases()</code></a></li><li><a href="#Model.updateMany()"><code>Model.updateMany()</code></a></li><li><a href="#Model.updateOne()"><code>Model.updateOne()</code></a></li><li><a href="#Model.updateSearchIndex()"><code>Model.updateSearchIndex()</code></a></li><li><a href="#Model.useConnection()"><code>Model.useConnection()</code></a></li><li><a href="#Model.validate()"><code>Model.validate()</code></a></li><li><a href="#Model.watch()"><code>Model.watch()</code></a></li><li><a href="#Model.where()"><code>Model.where()</code></a></li></ul></div><div class="nav-item" id="nav-Query"><div class="nav-item-title"><a href="query.html">Query</a></div></div><div class="nav-item" id="nav-QueryCursor"><div class="nav-item-title"><a href="querycursor.html">QueryCursor</a></div></div><div class="nav-item" id="nav-Aggregate"><div class="nav-item-title"><a href="aggregate.html">Aggregate</a></div></div><div class="nav-item" id="nav-AggregationCursor"><div class="nav-item-title"><a href="aggregationcursor.html">AggregationCursor</a></div></div><div class="nav-item" id="nav-SchemaType"><div class="nav-item-title"><a href="schematype.html">SchemaType</a></div></div><div class="nav-item" id="nav-VirtualType"><div class="nav-item-title"><a href="virtualtype.html">VirtualType</a></div></div><div class="nav-item" id="nav-Error"><div class="nav-item-title"><a href="error.html">Error</a></div></div><div class="nav-item" id="nav-SchemaArray"><div class="nav-item-title"><a href="schemaarray.html">SchemaArray</a></div></div><div class="nav-item" id="nav-SchemaDocumentArray"><div class="nav-item-title"><a href="schemadocumentarray.html">SchemaDocumentArray</a></div></div><div class="nav-item" id="nav-SchemaSubdocument"><div class="nav-item-title"><a href="schemasubdocument.html">SchemaSubdocument</a></div></div><div class="nav-item" id="nav-SchemaBoolean"><div class="nav-item-title"><a href="schemaboolean.html">SchemaBoolean</a></div></div><div class="nav-item" id="nav-SchemaBuffer"><div class="nav-item-title"><a href="schemabuffer.html">SchemaBuffer</a></div></div><div class="nav-item" id="nav-SchemaNumber"><div class="nav-item-title"><a href="schemanumber.html">SchemaNumber</a></div></div><div class="nav-item" id="nav-SchemaObjectId"><div class="nav-item-title"><a href="schemaobjectid.html">SchemaObjectId</a></div></div><div class="nav-item" id="nav-SchemaString"><div class="nav-item-title"><a href="schemastring.html">SchemaString</a></div></div><div class="nav-item" id="nav-SchemaUuid"><div class="nav-item-title"><a href="schemauuid.html">SchemaUuid</a></div></div><div class="nav-item" id="nav-DocumentArray"><div class="nav-item-title"><a href="documentarray.html">DocumentArray</a></div></div><div class="nav-item" id="nav-Subdocument"><div class="nav-item-title"><a href="subdocument.html">Subdocument</a></div></div><div class="nav-item" id="nav-ArraySubdocument"><div class="nav-item-title"><a href="arraysubdocument.html">ArraySubdocument</a></div></div><div class="nav-item" id="nav-Buffer"><div class="nav-item-title"><a href="buffer.html">Buffer</a></div></div><div class="nav-item" id="nav-Decimal128"><div class="nav-item-title"><a href="decimal128.html">Decimal128</a></div></div><div class="nav-item" id="nav-Map"><div class="nav-item-title"><a href="map.html">Map</a></div></div><div class="nav-item" id="nav-Array"><div class="nav-item-title"><a href="array.html">Array</a></div></div><div class="nav-item" id="nav-Uuid"><div class="nav-item-title"><a href="uuid.html">Uuid</a></div></div></div></div><div class="api-content"><ul><li><a href="#Model()"><code>Model()</code></a></li><li><a href="#Model.$where()"><code>Model.$where()</code></a></li><li><a href="#Model.aggregate()"><code>Model.aggregate()</code></a></li><li><a href="#Model.applyDefaults()"><code>Model.applyDefaults()</code></a></li><li><a href="#Model.applyTimestamps()"><code>Model.applyTimestamps()</code></a></li><li><a href="#Model.applyVirtuals()"><code>Model.applyVirtuals()</code></a></li><li><a href="#Model.bulkSave()"><code>Model.bulkSave()</code></a></li><li><a href="#Model.bulkWrite()"><code>Model.bulkWrite()</code></a></li><li><a href="#Model.castObject()"><code>Model.castObject()</code></a></li><li><a href="#Model.cleanIndexes()"><code>Model.cleanIndexes()</code></a></li><li><a href="#Model.clientEncryption()"><code>Model.clientEncryption()</code></a></li><li><a href="#Model.countDocuments()"><code>Model.countDocuments()</code></a></li><li><a href="#Model.create()"><code>Model.create()</code></a></li><li><a href="#Model.createCollection()"><code>Model.createCollection()</code></a></li><li><a href="#Model.createIndexes()"><code>Model.createIndexes()</code></a></li><li><a href="#Model.createSearchIndex()"><code>Model.createSearchIndex()</code></a></li><li><a href="#Model.createSearchIndexes()"><code>Model.createSearchIndexes()</code></a></li><li><a href="#Model.db"><code>Model.db</code></a></li><li><a href="#Model.deleteMany()"><code>Model.deleteMany()</code></a></li><li><a href="#Model.deleteOne()"><code>Model.deleteOne()</code></a></li><li><a href="#Model.diffIndexes()"><code>Model.diffIndexes()</code></a></li><li><a href="#Model.discriminator()"><code>Model.discriminator()</code></a></li><li><a href="#Model.distinct()"><code>Model.distinct()</code></a></li><li><a href="#Model.dropSearchIndex()"><code>Model.dropSearchIndex()</code></a></li><li><a href="#Model.ensureIndexes()"><code>Model.ensureIndexes()</code></a></li><li><a href="#Model.estimatedDocumentCount()"><code>Model.estimatedDocumentCount()</code></a></li><li><a href="#Model.events"><code>Model.events</code></a></li><li><a href="#Model.exists()"><code>Model.exists()</code></a></li><li><a href="#Model.find()"><code>Model.find()</code></a></li><li><a href="#Model.findById()"><code>Model.findById()</code></a></li><li><a href="#Model.findByIdAndDelete()"><code>Model.findByIdAndDelete()</code></a></li><li><a href="#Model.findByIdAndUpdate()"><code>Model.findByIdAndUpdate()</code></a></li><li><a href="#Model.findOne()"><code>Model.findOne()</code></a></li><li><a href="#Model.findOneAndDelete()"><code>Model.findOneAndDelete()</code></a></li><li><a href="#Model.findOneAndReplace()"><code>Model.findOneAndReplace()</code></a></li><li><a href="#Model.findOneAndUpdate()"><code>Model.findOneAndUpdate()</code></a></li><li><a href="#Model.hydrate()"><code>Model.hydrate()</code></a></li><li><a href="#Model.init()"><code>Model.init()</code></a></li><li><a href="#Model.insertMany()"><code>Model.insertMany()</code></a></li><li><a href="#Model.insertOne()"><code>Model.insertOne()</code></a></li><li><a href="#Model.inspect()"><code>Model.inspect()</code></a></li><li><a href="#Model.listIndexes()"><code>Model.listIndexes()</code></a></li><li><a href="#Model.listSearchIndexes()"><code>Model.listSearchIndexes()</code></a></li><li><a href="#Model.namespace()"><code>Model.namespace()</code></a></li><li><a href="#Model.populate()"><code>Model.populate()</code></a></li><li><a href="#Model.prototype.$model()"><code>Model.prototype.$model()</code></a></li><li><a href="#Model.prototype.$where"><code>Model.prototype.$where</code></a></li><li><a href="#Model.prototype.base"><code>Model.prototype.base</code></a></li><li><a href="#Model.prototype.baseModelName"><code>Model.prototype.baseModelName</code></a></li><li><a href="#Model.prototype.collection"><code>Model.prototype.collection</code></a></li><li><a href="#Model.prototype.collection"><code>Model.prototype.collection</code></a></li><li><a href="#Model.prototype.db"><code>Model.prototype.db</code></a></li><li><a href="#Model.prototype.deleteOne()"><code>Model.prototype.deleteOne()</code></a></li><li><a href="#Model.prototype.discriminators"><code>Model.prototype.discriminators</code></a></li><li><a href="#Model.prototype.increment()"><code>Model.prototype.increment()</code></a></li><li><a href="#Model.prototype.model()"><code>Model.prototype.model()</code></a></li><li><a href="#Model.prototype.modelName"><code>Model.prototype.modelName</code></a></li><li><a href="#Model.prototype.save()"><code>Model.prototype.save()</code></a></li><li><a href="#Model.recompileSchema()"><code>Model.recompileSchema()</code></a></li><li><a href="#Model.replaceOne()"><code>Model.replaceOne()</code></a></li><li><a href="#Model.schema"><code>Model.schema</code></a></li><li><a href="#Model.startSession()"><code>Model.startSession()</code></a></li><li><a href="#Model.syncIndexes()"><code>Model.syncIndexes()</code></a></li><li><a href="#Model.translateAliases()"><code>Model.translateAliases()</code></a></li><li><a href="#Model.updateMany()"><code>Model.updateMany()</code></a></li><li><a href="#Model.updateOne()"><code>Model.updateOne()</code></a></li><li><a href="#Model.updateSearchIndex()"><code>Model.updateSearchIndex()</code></a></li><li><a href="#Model.useConnection()"><code>Model.useConnection()</code></a></li><li><a href="#Model.validate()"><code>Model.validate()</code></a></li><li><a href="#Model.watch()"><code>Model.watch()</code></a></li><li><a href="#Model.where()"><code>Model.where()</code></a></li></ul><hr class="separate-api-elements"><h3 id="Model()"><a href="#Model()"><code>Model()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>doc</code>
-<span class="method-type">&laquo;Object&raquo;</span> values for initial set</p>
+<span class="method-type">&laquo;object&raquo;</span> values for initial set</p>
 </li><li class="param"><code>[fields]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional object containing the fields that were selected in the query which returned this document. You do <strong>not</strong> need to set this parameter to ensure Mongoose handles your <a href="/docs/api/query.html#Query.prototype.select()">query projection</a>.</p>
+<span class="method-type">&laquo;object&raquo;</span> optional object containing the fields that were selected in the query which returned this document. You do <strong>not</strong> need to set this parameter to ensure Mongoose handles your <a href="/docs/api/query.html#Query.prototype.select()">query projection</a>.</p>
 </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional object containing the options for the document.</p>
+<span class="method-type">&laquo;object&raquo;</span> optional object containing the options for the document.</p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.defaults=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if <code>false</code>, skip applying default values to this document.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if <code>false</code>, skip applying default values to this document.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.skipId=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> By default, Mongoose document if one is not provided and the document&#39;s schema does not override Mongoose&#39;s default <code>_id</code>. Set <code>skipId</code> to <code>true</code> to skip this generation step.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> By default, Mongoose document if one is not provided and the document&#39;s schema does not override Mongoose&#39;s default <code>_id</code>. Set <code>skipId</code> to <code>true</code> to skip this generation step.</p>
 </li></ul></ul><h5>Inherits:</h5><ul><li><span class="method-type"><a href="/docs/api/document.html">&laquo;Document&raquo;</a></span></li></ul><div><p>A Model is a class that&#39;s your primary tool for interacting with MongoDB.
 An instance of a Model is called a <a href="/docs/api/document.html#Document">Document</a>.</p>
 <p>In Mongoose, the term &quot;Model&quot; refers to subclasses of the <code>mongoose.Model</code>
@@ -51,13 +51,13 @@ create subclasses of <code>mongoose.Model</code> as shown below.</p>
 
 <span class="hljs-comment">// You also use a model to create queries:</span>
 <span class="hljs-keyword">const</span> userFromDb = <span class="hljs-keyword">await</span> <span class="hljs-title class_">UserModel</span>.<span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Foo&#x27;</span> });</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.$where()"><a href="#Model.$where()"><code>Model.$where()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>argument</code>
-<span class="method-type">&laquo;String|Function&raquo;</span> is a javascript string or anonymous function</p>
+<span class="method-type">&laquo;string|Function&raquo;</span> is a javascript string or anonymous function</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/api/query.html#Query.prototype.$where">Query.$where</a></span></li></ul><div><p>Creates a <code>Query</code> and specifies a <code>$where</code> condition.</p>
 <p>Sometimes you need to query for things in mongodb using a JavaScript expression. You can do so via <code>find({ $where: javascript })</code>, or you can use the mongoose shortcut method $where via a Query chain or from your mongoose Model.</p>
 <pre><code lang="javascript"><span class="hljs-title class_">Blog</span>.$where(<span class="hljs-string">&#x27;this.username.indexOf(&quot;val&quot;) !== -1&#x27;</span>).<span class="hljs-title function_">exec</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">err, docs</span>) {});</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.aggregate()"><a href="#Model.aggregate()"><code>Model.aggregate()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[pipeline]</code>
 <span class="method-type">&laquo;Array&raquo;</span> aggregation pipeline as an array of objects</p>
 </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> aggregation options</p>
+<span class="method-type">&laquo;object&raquo;</span> aggregation options</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Aggregate&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/api/aggregate.html#Aggregate()">Aggregate</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/applications/aggregation/">MongoDB</a></span></li></ul><div><p>Performs <a href="https://www.mongodb.com/docs/manual/aggregation/">aggregations</a> on the models collection.</p>
 <p>The <code>aggregate</code> itself is returned.</p>
 <p>This function triggers the following middleware.</p>
@@ -102,13 +102,13 @@ create subclasses of <code>mongoose.Model</code> as shown below.</p>
 <li><a href="https://www.mongodb.com/docs/manual/applications/aggregation/">MongoDB Aggregation docs</a></li>
 </ul>
   </div><hr class="separate-api-elements"><h3 id="Model.applyDefaults()"><a href="#Model.applyDefaults()"><code>Model.applyDefaults()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>obj</code>
-<span class="method-type">&laquo;Object|Document&raquo;</span> object or document to apply defaults on</p>
+<span class="method-type">&laquo;object|Document&raquo;</span> object or document to apply defaults on</p>
 </li></ul><div><p>Apply defaults to the given document or POJO.</p>
   </div><hr class="separate-api-elements"><h3 id="Model.applyTimestamps()"><a href="#Model.applyTimestamps()"><code>Model.applyTimestamps()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>obj</code>
-<span class="method-type">&laquo;Object&raquo;</span> object or document to apply virtuals on</p>
+<span class="method-type">&laquo;object&raquo;</span> object or document to apply virtuals on</p>
 </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[options.isUpdate=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if true, treat this as an update: just set updatedAt, skip setting createdAt. If false, set both createdAt and updatedAt</p>
+<span class="method-type">&laquo;object&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[options.isUpdate=false]</code>
+<span class="method-type">&laquo;boolean&raquo;</span> if true, treat this as an update: just set updatedAt, skip setting createdAt. If false, set both createdAt and updatedAt</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.currentTime]</code>
 <span class="method-type">&laquo;Function&raquo;</span> if set, Mongoose will call this function to get the current time.</p>
 </li></ul></ul><div><p>Apply this model&#39;s timestamps to a given POJO, including subdocument timestamps</p>
@@ -124,9 +124,9 @@ create subclasses of <code>mongoose.Model</code> as shown below.</p>
 <span class="hljs-title class_">User</span>.<span class="hljs-title function_">applyTimestamps</span>(obj);
 obj.<span class="hljs-property">createdAt</span>; <span class="hljs-comment">// 2024-06-01T18:00:00.000Z</span>
 obj.<span class="hljs-property">updatedAt</span>; <span class="hljs-comment">// 2024-06-01T18:00:00.000Z</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.applyVirtuals()"><a href="#Model.applyVirtuals()"><code>Model.applyVirtuals()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>obj</code>
-<span class="method-type">&laquo;Object&raquo;</span> object or document to apply virtuals on</p>
+<span class="method-type">&laquo;object&raquo;</span> object or document to apply virtuals on</p>
 </li><li class="param"><code>[virtualsToApply]</code>
-<span class="method-type">&laquo;Array&lt;string&gt;&raquo;</span> optional whitelist of virtuals to apply</p>
+<span class="method-type">&laquo;Array[string]&raquo;</span> optional whitelist of virtuals to apply</p>
 </li></ul><div><p>Apply this model&#39;s virtuals to a given POJO. Virtuals execute with the POJO as the context <code>this</code>.</p>
 <h4 id="example">
         <a href="#example">
@@ -141,26 +141,26 @@ userSchema.<span class="hljs-title function_">virtual</span>(<span class="hljs-s
 <span class="hljs-title class_">User</span>.<span class="hljs-title function_">applyVirtuals</span>(obj);
 obj.<span class="hljs-property">name</span>; <span class="hljs-comment">// &#x27;John&#x27;</span>
 obj.<span class="hljs-property">upper</span>; <span class="hljs-comment">// &#x27;JOHN&#x27;, Mongoose applied the return value of the virtual to the given object</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.bulkSave()"><a href="#Model.bulkSave()"><code>Model.bulkSave()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>documents</code>
-<span class="method-type">&laquo;Array&lt;Document&gt;&raquo;</span> </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> options passed to the underlying <code>bulkWrite()</code></p>
+<span class="method-type">&laquo;Array[Document]&raquo;</span> </li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;object&raquo;</span> options passed to the underlying <code>bulkWrite()</code></p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.timestamps]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> defaults to <code>null</code>, when set to false, mongoose will not add/update timestamps to the documents.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> defaults to <code>null</code>, when set to false, mongoose will not add/update timestamps to the documents.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.session=null]</code>
 <span class="method-type">&laquo;ClientSession&raquo;</span> The session associated with this bulk write. See <a href="/docs/transactions.html">transactions docs</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.w=1]</code>
-<span class="method-type">&laquo;String|number&raquo;</span> The <a href="https://www.mongodb.com/docs/manual/reference/write-concern/">write concern</a>. See <a href="/docs/api/query.html#Query.prototype.w()"><code>Query#w()</code></a> for more information.</p>
+<span class="method-type">&laquo;string|number&raquo;</span> The <a href="https://www.mongodb.com/docs/manual/reference/write-concern/">write concern</a>. See <a href="/docs/api/query.html#Query.prototype.w()"><code>Query#w()</code></a> for more information.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.wtimeout=null]</code>
 <span class="method-type">&laquo;number&raquo;</span> The <a href="https://www.mongodb.com/docs/manual/reference/write-concern/#wtimeout">write concern timeout</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.j=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If false, disable <a href="https://www.mongodb.com/docs/manual/reference/write-concern/#j-option">journal acknowledgement</a></p>
+<span class="method-type">&laquo;boolean&raquo;</span> If false, disable <a href="https://www.mongodb.com/docs/manual/reference/write-concern/#j-option">journal acknowledgement</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.validateBeforeSave=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> set to <code>false</code> to skip Mongoose validation on all documents</p>
+<span class="method-type">&laquo;boolean&raquo;</span> set to <code>false</code> to skip Mongoose validation on all documents</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.middleware=true]</code>
-<span class="method-type">&laquo;Boolean|Object&raquo;</span> set to <code>false</code> to skip all user-defined middleware</p>
+<span class="method-type">&laquo;boolean|object&raquo;</span> set to <code>false</code> to skip all user-defined middleware</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.middleware.pre=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> set to <code>false</code> to skip only pre hooks</p>
+<span class="method-type">&laquo;boolean&raquo;</span> set to <code>false</code> to skip only pre hooks</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.middleware.post=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> set to <code>false</code> to skip only post hooks</p>
+<span class="method-type">&laquo;boolean&raquo;</span> set to <code>false</code> to skip only post hooks</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;BulkWriteResult&raquo;</span> the return value from <code>bulkWrite()</code></li></ul><div><p>Takes an array of documents, gets the changes and inserts/updates documents in the database
 according to whether or not the document is new, or whether it has changes or not.</p>
 <p><code>bulkSave</code> uses <code>bulkWrite</code> under the hood, so it&#39;s mostly useful when dealing with many documents (10K+)</p>
@@ -173,76 +173,76 @@ according to whether or not the document is new, or whether it has changes or no
 <p>Note that <code>bulkSave()</code> will <strong>not</strong> throw an error if only some of the <code>save()</code> calls succeeded.</p>
   </div><hr class="separate-api-elements"><h3 id="Model.bulkWrite()"><a href="#Model.bulkWrite()"><code>Model.bulkWrite()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>ops</code>
 <span class="method-type">&laquo;Array&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[ops.insertOne.document]</code>
-<span class="method-type">&laquo;Object&raquo;</span> The document to insert</p>
+<span class="method-type">&laquo;object&raquo;</span> The document to insert</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[ops.insertOne.timestamps=true]</code>
-<span class="method-type">&laquo;Object&raquo;</span> If false, do not apply <a href="/docs/guide.html#timestamps">timestamps</a> to the operation</p>
+<span class="method-type">&laquo;object&raquo;</span> If false, do not apply <a href="/docs/guide.html#timestamps">timestamps</a> to the operation</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[ops.updateOne.filter]</code>
-<span class="method-type">&laquo;Object&raquo;</span> Update the first document that matches this filter</p>
+<span class="method-type">&laquo;object&raquo;</span> Update the first document that matches this filter</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[ops.updateOne.update]</code>
-<span class="method-type">&laquo;Object&raquo;</span> An object containing <a href="https://www.mongodb.com/docs/manual/reference/operator/update/">update operators</a></p>
+<span class="method-type">&laquo;object&raquo;</span> An object containing <a href="https://www.mongodb.com/docs/manual/reference/operator/update/">update operators</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[ops.updateOne.upsert=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If true, insert a doc if none match</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If true, insert a doc if none match</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[ops.updateOne.timestamps=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If false, do not apply <a href="/docs/guide.html#timestamps">timestamps</a> to the operation</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If false, do not apply <a href="/docs/guide.html#timestamps">timestamps</a> to the operation</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[ops.updateOne.overwriteImmutable=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> Mongoose removes updated immutable properties from <code>update</code> by default (excluding $setOnInsert). Set <code>overwriteImmutable</code> to <code>true</code> to allow updating immutable properties using other update operators.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> Mongoose removes updated immutable properties from <code>update</code> by default (excluding $setOnInsert). Set <code>overwriteImmutable</code> to <code>true</code> to allow updating immutable properties using other update operators.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[ops.updateOne.collation]</code>
-<span class="method-type">&laquo;Object&raquo;</span> The <a href="https://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-collations">MongoDB collation</a> to use</p>
+<span class="method-type">&laquo;object&raquo;</span> The <a href="https://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-collations">MongoDB collation</a> to use</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[ops.updateOne.arrayFilters]</code>
 <span class="method-type">&laquo;Array&raquo;</span> The <a href="https://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-36-array-filters.html">array filters</a> used in <code>update</code></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[ops.updateMany.filter]</code>
-<span class="method-type">&laquo;Object&raquo;</span> Update all the documents that match this filter</p>
+<span class="method-type">&laquo;object&raquo;</span> Update all the documents that match this filter</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[ops.updateMany.update]</code>
-<span class="method-type">&laquo;Object&raquo;</span> An object containing <a href="https://www.mongodb.com/docs/manual/reference/operator/update/">update operators</a></p>
+<span class="method-type">&laquo;object&raquo;</span> An object containing <a href="https://www.mongodb.com/docs/manual/reference/operator/update/">update operators</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[ops.updateMany.upsert=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If true, insert a doc if no documents match <code>filter</code></p>
+<span class="method-type">&laquo;boolean&raquo;</span> If true, insert a doc if no documents match <code>filter</code></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[ops.updateMany.timestamps=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If false, do not apply <a href="/docs/guide.html#timestamps">timestamps</a> to the operation</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If false, do not apply <a href="/docs/guide.html#timestamps">timestamps</a> to the operation</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[ops.updateMany.overwriteImmutable=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> Mongoose removes updated immutable properties from <code>update</code> by default (excluding $setOnInsert). Set <code>overwriteImmutable</code> to <code>true</code> to allow updating immutable properties using other update operators.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> Mongoose removes updated immutable properties from <code>update</code> by default (excluding $setOnInsert). Set <code>overwriteImmutable</code> to <code>true</code> to allow updating immutable properties using other update operators.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[ops.updateMany.collation]</code>
-<span class="method-type">&laquo;Object&raquo;</span> The <a href="https://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-collations">MongoDB collation</a> to use</p>
+<span class="method-type">&laquo;object&raquo;</span> The <a href="https://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-34-collations">MongoDB collation</a> to use</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[ops.updateMany.arrayFilters]</code>
 <span class="method-type">&laquo;Array&raquo;</span> The <a href="https://thecodebarbarian.com/a-nodejs-perspective-on-mongodb-36-array-filters.html">array filters</a> used in <code>update</code></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[ops.deleteOne.filter]</code>
-<span class="method-type">&laquo;Object&raquo;</span> Delete the first document that matches this filter</p>
+<span class="method-type">&laquo;object&raquo;</span> Delete the first document that matches this filter</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[ops.deleteMany.filter]</code>
-<span class="method-type">&laquo;Object&raquo;</span> Delete all documents that match this filter</p>
+<span class="method-type">&laquo;object&raquo;</span> Delete all documents that match this filter</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[ops.replaceOne.filter]</code>
-<span class="method-type">&laquo;Object&raquo;</span> Replace the first document that matches this filter</p>
+<span class="method-type">&laquo;object&raquo;</span> Replace the first document that matches this filter</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[ops.replaceOne.replacement]</code>
-<span class="method-type">&laquo;Object&raquo;</span> The replacement document</p>
+<span class="method-type">&laquo;object&raquo;</span> The replacement document</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[ops.replaceOne.upsert=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If true, insert a doc if no documents match <code>filter</code></p>
+<span class="method-type">&laquo;boolean&raquo;</span> If true, insert a doc if no documents match <code>filter</code></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[ops.replaceOne.timestamps=true]</code>
-<span class="method-type">&laquo;Object&raquo;</span> If false, do not apply <a href="/docs/guide.html#timestamps">timestamps</a> to the operation</p>
+<span class="method-type">&laquo;object&raquo;</span> If false, do not apply <a href="/docs/guide.html#timestamps">timestamps</a> to the operation</p>
 </li></ul><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[options.ordered=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If true, execute writes in order and stop at the first error. If false, execute writes in parallel and continue until all writes have either succeeded or errored.</p>
+<span class="method-type">&laquo;object&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[options.ordered=true]</code>
+<span class="method-type">&laquo;boolean&raquo;</span> If true, execute writes in order and stop at the first error. If false, execute writes in parallel and continue until all writes have either succeeded or errored.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.timestamps=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If false, do not apply <a href="/docs/guide.html#timestamps">timestamps</a> to any operations. Can be overridden at the operation-level.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If false, do not apply <a href="/docs/guide.html#timestamps">timestamps</a> to any operations. Can be overridden at the operation-level.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.session=null]</code>
 <span class="method-type">&laquo;ClientSession&raquo;</span> The session associated with this bulk write. See <a href="/docs/transactions.html">transactions docs</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.w=1]</code>
-<span class="method-type">&laquo;String|number&raquo;</span> The <a href="https://www.mongodb.com/docs/manual/reference/write-concern/">write concern</a>. See <a href="/docs/api/query.html#Query.prototype.w()"><code>Query#w()</code></a> for more information.</p>
+<span class="method-type">&laquo;string|number&raquo;</span> The <a href="https://www.mongodb.com/docs/manual/reference/write-concern/">write concern</a>. See <a href="/docs/api/query.html#Query.prototype.w()"><code>Query#w()</code></a> for more information.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.wtimeout=null]</code>
 <span class="method-type">&laquo;number&raquo;</span> The <a href="https://www.mongodb.com/docs/manual/reference/write-concern/#wtimeout">write concern timeout</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.j=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If false, disable <a href="https://www.mongodb.com/docs/manual/reference/write-concern/#j-option">journal acknowledgement</a></p>
+<span class="method-type">&laquo;boolean&raquo;</span> If false, disable <a href="https://www.mongodb.com/docs/manual/reference/write-concern/#j-option">journal acknowledgement</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.skipValidation=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> Set to true to skip Mongoose schema validation on bulk write operations. Mongoose currently runs validation on <code>insertOne</code> and <code>replaceOne</code> operations by default.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> Set to true to skip Mongoose schema validation on bulk write operations. Mongoose currently runs validation on <code>insertOne</code> and <code>replaceOne</code> operations by default.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.bypassDocumentValidation=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If true, disable <a href="https://www.mongodb.com/docs/manual/core/schema-validation/">MongoDB server-side schema validation</a> for all writes in this bulk.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If true, disable <a href="https://www.mongodb.com/docs/manual/core/schema-validation/">MongoDB server-side schema validation</a> for all writes in this bulk.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.throwOnValidationError=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If true and <code>ordered: false</code>, throw an error if one of the operations failed validation, but all valid operations completed successfully. Note that Mongoose will still send all valid operations to the MongoDB server.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If true and <code>ordered: false</code>, throw an error if one of the operations failed validation, but all valid operations completed successfully. Note that Mongoose will still send all valid operations to the MongoDB server.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.strict=null]</code>
-<span class="method-type">&laquo;Boolean | &quot;throw&quot;&raquo;</span> Overwrites the <a href="/docs/guide.html#strict"><code>strict</code> option</a> on schema. If false, allows filtering and writing fields not defined in the schema for all writes in this bulk.</p>
+<span class="method-type">&laquo;boolean | &quot;throw&quot;&raquo;</span> Overwrites the <a href="/docs/guide.html#strict"><code>strict</code> option</a> on schema. If false, allows filtering and writing fields not defined in the schema for all writes in this bulk.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.middleware=true]</code>
-<span class="method-type">&laquo;Boolean|Object&raquo;</span> set to <code>false</code> to skip all user-defined middleware</p>
+<span class="method-type">&laquo;boolean|object&raquo;</span> set to <code>false</code> to skip all user-defined middleware</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.middleware.pre=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> set to <code>false</code> to skip only pre hooks</p>
+<span class="method-type">&laquo;boolean&raquo;</span> set to <code>false</code> to skip only pre hooks</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.middleware.post=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> set to <code>false</code> to skip only post hooks</p>
+<span class="method-type">&laquo;boolean&raquo;</span> set to <code>false</code> to skip only post hooks</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> resolves to a <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/BulkWriteResult.html"><code>BulkWriteOpResult</code></a> if the operation succeeds</li></ul><div><p>Sends multiple <code>insertOne</code>, <code>updateOne</code>, <code>updateMany</code>, <code>replaceOne</code>,
 <code>deleteOne</code>, and/or <code>deleteMany</code> operations to the MongoDB server in one
 command. This is faster than sending multiple independent operations (e.g.
@@ -303,11 +303,11 @@ If you need to trigger
 <li><code>replaceOne</code></li>
 </ul>
   </div><hr class="separate-api-elements"><h3 id="Model.castObject()"><a href="#Model.castObject()"><code>Model.castObject()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>obj</code>
-<span class="method-type">&laquo;Object&raquo;</span> object or document to cast</p>
+<span class="method-type">&laquo;object&raquo;</span> object or document to cast</p>
 </li><li class="param"><code>options</code>
-<span class="method-type">&laquo;Object&raquo;</span> options passed to castObject</p>
+<span class="method-type">&laquo;object&raquo;</span> options passed to castObject</p>
 </li><li class="param"><code>options.ignoreCastErrors</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>true</code> will not throw a ValidationError and only return values that were successfully cast.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If set to <code>true</code> will not throw a ValidationError and only return values that were successfully cast.</p>
 </li></ul><div><p>Cast the given POJO to the model&#39;s schema</p>
 <h4 id="example">
         <a href="#example">
@@ -320,17 +320,17 @@ If you need to trigger
 obj.<span class="hljs-property">num</span>; <span class="hljs-comment">// 42 as a number</span>
 
 <span class="hljs-title class_">Test</span>.<span class="hljs-title function_">castObject</span>({ <span class="hljs-attr">num</span>: <span class="hljs-string">&#x27;not a number&#x27;</span> }); <span class="hljs-comment">// Throws a ValidationError</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.cleanIndexes()"><a href="#Model.cleanIndexes()"><code>Model.cleanIndexes()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[options.toDrop]</code>
-<span class="method-type">&laquo;Array&lt;String&gt;&raquo;</span> if specified, contains a list of index names to drop</p>
+<span class="method-type">&laquo;object&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[options.toDrop]</code>
+<span class="method-type">&laquo;Array[string]&raquo;</span> if specified, contains a list of index names to drop</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.hideIndexes=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> set to <code>true</code> to hide indexes instead of dropping. Requires MongoDB server 4.4 or higher</p>
-</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&lt;Array&lt;String&gt;&gt;&raquo;</span> list of dropped or hidden index names</li></ul><div><p>Deletes all indexes that aren&#39;t defined in this model&#39;s schema. Used by
+<span class="method-type">&laquo;boolean&raquo;</span> set to <code>true</code> to hide indexes instead of dropping. Requires MongoDB server 4.4 or higher</p>
+</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&lt;Array[string]&gt;&raquo;</span> list of dropped or hidden index names</li></ul><div><p>Deletes all indexes that aren&#39;t defined in this model&#39;s schema. Used by
 <code>syncIndexes()</code>.</p>
 <p>The returned promise resolves to a list of the dropped indexes&#39; names as an array</p>
   </div><hr class="separate-api-elements"><h3 id="Model.clientEncryption()"><a href="#Model.clientEncryption()"><code>Model.clientEncryption()</code></a></h3><div><p>If auto encryption is enabled, returns a ClientEncryption instance that is configured with the same settings that
 Mongoose&#39;s underlying MongoClient is using.  If the client has not yet been configured, returns null.</p>
   </div><hr class="separate-api-elements"><h3 id="Model.countDocuments()"><a href="#Model.countDocuments()"><code>Model.countDocuments()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>filter</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Counts number of documents matching <code>filter</code> in a database collection.</p>
+<span class="method-type">&laquo;object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Counts number of documents matching <code>filter</code> in a database collection.</p>
 <h4 id="example">
         <a href="#example">
           Example:
@@ -351,13 +351,13 @@ and the suggested replacement:</p>
 <li><code>$nearSphere</code>: <a href="https://www.mongodb.com/docs/manual/reference/operator/query/geoWithin/"><code>$geoWithin</code></a> with <a href="https://www.mongodb.com/docs/manual/reference/operator/query/centerSphere/#op._S_centerSphere"><code>$centerSphere</code></a></li>
 </ul>
   </div><hr class="separate-api-elements"><h3 id="Model.create()"><a href="#Model.create()"><code>Model.create()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>docs</code>
-<span class="method-type">&laquo;Array|Object&raquo;</span> Documents to insert, as a spread or array</p>
+<span class="method-type">&laquo;Array|object&raquo;</span> Documents to insert, as a spread or array</p>
 </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> Options passed down to <code>save()</code>. To specify <code>options</code>, <code>docs</code> <strong>must</strong> be an array, not a spread. See <a href="#Model.prototype.save()">Model.save</a> for available options.</p>
+<span class="method-type">&laquo;object&raquo;</span> Options passed down to <code>save()</code>. To specify <code>options</code>, <code>docs</code> <strong>must</strong> be an array, not a spread. See <a href="#Model.prototype.save()">Model.save</a> for available options.</p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.ordered]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> saves the docs in series rather than parallel.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> saves the docs in series rather than parallel.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.aggregateErrors]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> Aggregate Errors instead of throwing the first one that occurs. Default: false</p>
+<span class="method-type">&laquo;boolean&raquo;</span> Aggregate Errors instead of throwing the first one that occurs. Default: false</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Shortcut for saving one or more documents to the database.
 <code>MyModel.create(docs)</code> does <code>new MyModel(doc).save()</code> for every doc in
 docs.</p>
@@ -380,7 +380,7 @@ docs.</p>
 <span class="hljs-comment">// pass an array as the first parameter to `create()` if you want to</span>
 <span class="hljs-comment">// specify options.</span>
 <span class="hljs-keyword">await</span> <span class="hljs-title class_">Character</span>.<span class="hljs-title function_">create</span>([{ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Jean-Luc Picard&#x27;</span> }], { session });</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.createCollection()"><a href="#Model.createCollection()"><code>Model.createCollection()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> see <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Db.html#createCollection">MongoDB driver docs</a></p>
+<span class="method-type">&laquo;object&raquo;</span> see <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Db.html#createCollection">MongoDB driver docs</a></p>
 </li></ul><div><p>Create the collection for this model. By default, if no indexes are specified,
 mongoose will not create the collection for the model until any documents are
 created. Use this method to create the collection explicitly.</p>
@@ -399,14 +399,14 @@ In that case, just use <code>Model.init()</code></p>
 <span class="hljs-title class_">User</span>.<span class="hljs-title function_">createCollection</span>().<span class="hljs-title function_">then</span>(<span class="hljs-keyword">function</span>(<span class="hljs-params">collection</span>) {
   <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Collection is created!&#x27;</span>);
 });</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.createIndexes()"><a href="#Model.createIndexes()"><code>Model.createIndexes()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> internal options</p>
+<span class="method-type">&laquo;object&raquo;</span> internal options</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Similar to <code>ensureIndexes()</code>, except for it uses the <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Db.html#createIndex"><code>createIndex</code></a>
 function.</p>
   </div><hr class="separate-api-elements"><h3 id="Model.createSearchIndex()"><a href="#Model.createSearchIndex()"><code>Model.createSearchIndex()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>description</code>
-<span class="method-type">&laquo;Object&raquo;</span> index options, including <code>name</code> and <code>definition</code></p>
+<span class="method-type">&laquo;object&raquo;</span> index options, including <code>name</code> and <code>definition</code></p>
 </li><li class="param"><code>description.name</code>
-<span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>description.definition</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Create an <a href="https://www.mongodb.com/docs/atlas/atlas-search/create-index/">Atlas search index</a>.
+<span class="method-type">&laquo;string&raquo;</span> </li><li class="param"><code>description.definition</code>
+<span class="method-type">&laquo;object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Create an <a href="https://www.mongodb.com/docs/atlas/atlas-search/create-index/">Atlas search index</a>.
 This function only works when connected to MongoDB Atlas.</p>
 <h4 id="example">
         <a href="#example">
@@ -432,10 +432,10 @@ schema.<span class="hljs-title function_">searchIndex</span>({ <span class="hljs
 <span class="hljs-comment">// Creates the search index defined in the schema</span>
 <span class="hljs-keyword">await</span> <span class="hljs-title class_">Product</span>.<span class="hljs-title function_">createSearchIndexes</span>();</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.db"><a href="#Model.db"><code>Model.db</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Connection instance the model uses.</p>
   </div><hr class="separate-api-elements"><h3 id="Model.deleteMany()"><a href="#Model.deleteMany()"><code>Model.deleteMany()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>conditions</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;object&raquo;</span> </li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.translateAliases=null]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Deletes all of the documents that match <code>conditions</code> from the collection.
 It returns an object with the property <code>deletedCount</code> containing the number of documents deleted.</p>
 <h4 id="example">
@@ -451,10 +451,10 @@ It returns an object with the property <code>deletedCount</code> containing the 
 <p>This function triggers <code>deleteMany</code> query hooks. Read the
 <a href="/docs/middleware.html#naming">middleware docs</a> to learn more.</p>
   </div><hr class="separate-api-elements"><h3 id="Model.deleteOne()"><a href="#Model.deleteOne()"><code>Model.deleteOne()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>conditions</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;object&raquo;</span> </li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.translateAliases=null]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Deletes the first document that matches <code>conditions</code> from the collection.
 It returns an object with the property <code>deletedCount</code> indicating how many documents were deleted.</p>
 <h4 id="example">
@@ -470,9 +470,9 @@ It returns an object with the property <code>deletedCount</code> indicating how 
 <p>This function triggers <code>deleteOne</code> query hooks. Read the
 <a href="/docs/middleware.html#naming">middleware docs</a> to learn more.</p>
   </div><hr class="separate-api-elements"><h3 id="Model.diffIndexes()"><a href="#Model.diffIndexes()"><code>Model.diffIndexes()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[options.indexOptionsToCreate=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If true, <code>toCreate</code> will include both the index spec and the index options, not just the index spec</p>
-</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&lt;Object&gt;&raquo;</span> contains the indexes that would be dropped in MongoDB and indexes that would be created in MongoDB as <code>{ toDrop: string[], toCreate: string[] }</code>.</li></ul><div><p>Does a dry-run of <code>Model.syncIndexes()</code>, returning the indexes that <code>syncIndexes()</code> would drop and create if you were to run <code>syncIndexes()</code>.</p>
+<span class="method-type">&laquo;object&raquo;</span> </li><ul style="margin-top: 0.5em"><li><code>[options.indexOptionsToCreate=false]</code>
+<span class="method-type">&laquo;boolean&raquo;</span> If true, <code>toCreate</code> will include both the index spec and the index options, not just the index spec</p>
+</li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&lt;object&gt;&raquo;</span> contains the indexes that would be dropped in MongoDB and indexes that would be created in MongoDB as <code>{ toDrop: string[], toCreate: string[] }</code>.</li></ul><div><p>Does a dry-run of <code>Model.syncIndexes()</code>, returning the indexes that <code>syncIndexes()</code> would drop and create if you were to run <code>syncIndexes()</code>.</p>
 <h4 id="example">
         <a href="#example">
           Example:
@@ -481,21 +481,21 @@ It returns an object with the property <code>deletedCount</code> indicating how 
 <pre><code lang="javascript"><span class="hljs-keyword">const</span> { toDrop, toCreate } = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">diffIndexes</span>();
 toDrop; <span class="hljs-comment">// Array of strings containing names of indexes that `syncIndexes()` will drop</span>
 toCreate; <span class="hljs-comment">// Array of index specs containing the keys of indexes that `syncIndexes()` will create</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.discriminator()"><a href="#Model.discriminator()"><code>Model.discriminator()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>name</code>
-<span class="method-type">&laquo;String&raquo;</span> discriminator model name</p>
+<span class="method-type">&laquo;string&raquo;</span> discriminator model name</p>
 </li><li class="param"><code>schema</code>
 <span class="method-type">&laquo;Schema&raquo;</span> discriminator model schema</p>
 </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object|String&raquo;</span> If string, same as <code>options.value</code>.</p>
+<span class="method-type">&laquo;object|string&raquo;</span> If string, same as <code>options.value</code>.</p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.value]</code>
-<span class="method-type">&laquo;String&raquo;</span> the string stored in the <code>discriminatorKey</code> property. If not specified, Mongoose uses the <code>name</code> parameter.</p>
+<span class="method-type">&laquo;string&raquo;</span> the string stored in the <code>discriminatorKey</code> property. If not specified, Mongoose uses the <code>name</code> parameter.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.clone=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> By default, <code>discriminator()</code> clones the given <code>schema</code>. Set to <code>false</code> to skip cloning.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> By default, <code>discriminator()</code> clones the given <code>schema</code>. Set to <code>false</code> to skip cloning.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.overwriteModels=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> by default, Mongoose does not allow you to define a discriminator with the same name as another discriminator. Set this to allow overwriting discriminators with the same name.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> by default, Mongoose does not allow you to define a discriminator with the same name as another discriminator. Set this to allow overwriting discriminators with the same name.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.mergeHooks=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> By default, Mongoose merges the base schema&#39;s hooks with the discriminator schema&#39;s hooks. Set this option to <code>false</code> to make Mongoose use the discriminator schema&#39;s hooks instead.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> By default, Mongoose merges the base schema&#39;s hooks with the discriminator schema&#39;s hooks. Set this option to <code>false</code> to make Mongoose use the discriminator schema&#39;s hooks instead.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.mergePlugins=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> By default, Mongoose merges the base schema&#39;s plugins with the discriminator schema&#39;s plugins. Set this option to <code>false</code> to make Mongoose use the discriminator schema&#39;s plugins instead.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> By default, Mongoose merges the base schema&#39;s plugins with the discriminator schema&#39;s plugins. Set this option to <code>false</code> to make Mongoose use the discriminator schema&#39;s plugins instead.</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Model&raquo;</span> The newly created discriminator model</li></ul><div><p>Adds a discriminator type.</p>
 <h4 id="example">
         <a href="#example">
@@ -522,10 +522,10 @@ util.<span class="hljs-title function_">inherits</span>(<span class="hljs-title 
 <span class="hljs-keyword">const</span> employeeSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">boss</span>: <span class="hljs-title class_">ObjectId</span> });
 <span class="hljs-keyword">const</span> <span class="hljs-title class_">Employee</span> = <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">discriminator</span>(<span class="hljs-string">&#x27;Employee&#x27;</span>, employeeSchema, <span class="hljs-string">&#x27;staff&#x27;</span>);
 <span class="hljs-keyword">new</span> <span class="hljs-title class_">Employee</span>().<span class="hljs-property">__t</span>; <span class="hljs-comment">// &quot;staff&quot; because of 3rd argument above</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.distinct()"><a href="#Model.distinct()"><code>Model.distinct()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>field</code>
-<span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>[conditions]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional</p>
+<span class="method-type">&laquo;string&raquo;</span> </li><li class="param"><code>[conditions]</code>
+<span class="method-type">&laquo;object&raquo;</span> optional</p>
 </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional</p>
+<span class="method-type">&laquo;object&raquo;</span> optional</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Creates a Query for a <code>distinct</code> operation.</p>
 <h4 id="example">
         <a href="#example">
@@ -534,7 +534,7 @@ util.<span class="hljs-title function_">inherits</span>(<span class="hljs-title 
       </h4>
 <pre><code lang="javascript"><span class="hljs-keyword">const</span> query = <span class="hljs-title class_">Link</span>.<span class="hljs-title function_">distinct</span>(<span class="hljs-string">&#x27;url&#x27;</span>);
 query.<span class="hljs-title function_">exec</span>();</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.dropSearchIndex()"><a href="#Model.dropSearchIndex()"><code>Model.dropSearchIndex()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>name</code>
-<span class="method-type">&laquo;String&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Delete an existing <a href="https://www.mongodb.com/docs/atlas/atlas-search/create-index/">Atlas search index</a> by name.
+<span class="method-type">&laquo;string&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Delete an existing <a href="https://www.mongodb.com/docs/atlas/atlas-search/create-index/">Atlas search index</a> by name.
 This function only works when connected to MongoDB Atlas.</p>
 <h4 id="example">
         <a href="#example">
@@ -544,7 +544,7 @@ This function only works when connected to MongoDB Atlas.</p>
 <pre><code lang="javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">unique</span>: <span class="hljs-literal">true</span> } });
 <span class="hljs-keyword">const</span> <span class="hljs-title class_">Customer</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Customer&#x27;</span>, schema);
 <span class="hljs-keyword">await</span> <span class="hljs-title class_">Customer</span>.<span class="hljs-title function_">dropSearchIndex</span>(<span class="hljs-string">&#x27;test&#x27;</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.ensureIndexes()"><a href="#Model.ensureIndexes()"><code>Model.ensureIndexes()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> internal options</p>
+<span class="method-type">&laquo;object&raquo;</span> internal options</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Sends <code>createIndex</code> commands to mongo for each index declared in the schema.
 The <code>createIndex</code> commands are sent in series.</p>
 <h4 id="example">
@@ -565,7 +565,7 @@ The <code>createIndex</code> commands are sent in series.</p>
   <span class="hljs-keyword">if</span> (err) <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(err); <span class="hljs-comment">// error occurred during index creation</span>
 });</code></pre><p><em>NOTE: It is not recommended that you run this in production. Index creation may impact database performance depending on your load. Use with caution.</em></p>
   </div><hr class="separate-api-elements"><h3 id="Model.estimatedDocumentCount()"><a href="#Model.estimatedDocumentCount()"><code>Model.estimatedDocumentCount()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Estimates the number of documents in the MongoDB collection. Faster than
+<span class="method-type">&laquo;object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Estimates the number of documents in the MongoDB collection. Faster than
 using <code>countDocuments()</code> for large collections because
 <code>estimatedDocumentCount()</code> uses collection metadata rather than scanning
 the entire collection.</p>
@@ -585,8 +585,8 @@ handling.</p>
 
 <span class="hljs-comment">// Prints a &#x27;CastError&#x27; because of the above handler</span>
 <span class="hljs-keyword">await</span> <span class="hljs-title class_">MyModel</span>.<span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">_id</span>: <span class="hljs-string">&#x27;Not a valid ObjectId&#x27;</span> }).<span class="hljs-title function_">catch</span>(noop);</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.exists()"><a href="#Model.exists()"><code>Model.exists()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>filter</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;object&raquo;</span> </li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Returns a document with <code>_id</code> only if at least one document exists in the database that matches
 the given <code>filter</code>, and <code>null</code> otherwise.</p>
 <p>Under the hood, <code>MyModel.exists({ answer: 42 })</code> is equivalent to
@@ -605,12 +605,12 @@ the given <code>filter</code>, and <code>null</code> otherwise.</p>
 <li><code>findOne()</code></li>
 </ul>
   </div><hr class="separate-api-elements"><h3 id="Model.find()"><a href="#Model.find()"><code>Model.find()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>filter</code>
-<span class="method-type">&laquo;Object|ObjectId&raquo;</span> </li><li class="param"><code>[projection]</code>
-<span class="method-type">&laquo;Object|String|Array[String]&raquo;</span> optional fields to return, see <a href="/docs/api/query.html#Query.prototype.select()"><code>Query.prototype.select()</code></a></p>
+<span class="method-type">&laquo;object|ObjectId&raquo;</span> </li><li class="param"><code>[projection]</code>
+<span class="method-type">&laquo;object|string|Array[string]&raquo;</span> optional fields to return, see <a href="/docs/api/query.html#Query.prototype.select()"><code>Query.prototype.select()</code></a></p>
 </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.translateAliases=null]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/api/query.html#Query.prototype.select()">field selection</a></span></li><li><span class="method-type"><a href="/docs/tutorials/query_casting.html">query casting</a></span></li></ul><div><p>Finds documents.</p>
 <p>Mongoose casts the <code>filter</code> to match the model&#39;s schema before the command is sent.
 See our <a href="/docs/tutorials/query_casting.html">query casting tutorial</a> for
@@ -631,11 +631,11 @@ more information on how Mongoose casts <code>filter</code>.</p>
 
 <span class="hljs-comment">// passing options</span>
 <span class="hljs-keyword">await</span> <span class="hljs-title class_">MyModel</span>.<span class="hljs-title function_">find</span>({ <span class="hljs-attr">name</span>: <span class="hljs-regexp">/john/i</span> }, <span class="hljs-literal">null</span>, { <span class="hljs-attr">skip</span>: <span class="hljs-number">10</span> }).<span class="hljs-title function_">exec</span>();</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.findById()"><a href="#Model.findById()"><code>Model.findById()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>id</code>
-<span class="method-type">&laquo;Any&raquo;</span> value of <code>_id</code> to query by</p>
+<span class="method-type">&laquo;any&raquo;</span> value of <code>_id</code> to query by</p>
 </li><li class="param"><code>[projection]</code>
-<span class="method-type">&laquo;Object|String|Array[String]&raquo;</span> optional fields to return, see <a href="/docs/api/query.html#Query.prototype.select()"><code>Query.prototype.select()</code></a></p>
+<span class="method-type">&laquo;object|string|Array[string]&raquo;</span> optional fields to return, see <a href="/docs/api/query.html#Query.prototype.select()"><code>Query.prototype.select()</code></a></p>
 </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/api/query.html#Query.prototype.select()">field selection</a></span></li><li><span class="method-type"><a href="/docs/tutorials/lean.html">lean queries</a></span></li><li><span class="method-type"><a href="https://masteringjs.io/tutorials/mongoose/find-by-id">findById in Mongoose</a></span></li></ul><div><p>Finds a single document by its _id field. <code>findById(id)</code> is equivalent to <code>findOne({ _id: id })</code>.</p>
 <p>The <code>id</code> is cast based on the Schema before sending the command.</p>
 <p>This function triggers the following middleware.</p>
@@ -652,13 +652,13 @@ more information on how Mongoose casts <code>filter</code>.</p>
 
 <span class="hljs-comment">// select only the adventures name and length</span>
 <span class="hljs-keyword">await</span> <span class="hljs-title class_">Adventure</span>.<span class="hljs-title function_">findById</span>(id, <span class="hljs-string">&#x27;name length&#x27;</span>).<span class="hljs-title function_">exec</span>();</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.findByIdAndDelete()"><a href="#Model.findByIdAndDelete()"><code>Model.findByIdAndDelete()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>id</code>
-<span class="method-type">&laquo;Object|Number|String&raquo;</span> value of <code>_id</code> to query by</p>
+<span class="method-type">&laquo;object|number|string&raquo;</span> value of <code>_id</code> to query by</p>
 </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.strict]</code>
-<span class="method-type">&laquo;Boolean | 'throw'&raquo;</span> overwrites the schema&#39;s <a href="/docs/guide.html#strict">strict mode option</a></p>
+<span class="method-type">&laquo;boolean | 'throw'&raquo;</span> overwrites the schema&#39;s <a href="/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.translateAliases=null]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#Model.findOneAndDelete()">Model.findOneAndDelete</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/findAndModify/">mongodb</a></span></li></ul><div><p>Issue a MongoDB <code>findOneAndDelete()</code> command by a document&#39;s _id field.
 In other words, <code>findByIdAndDelete(id)</code> is a shorthand for
 <code>findOneAndDelete({ _id: id })</code>.</p>
@@ -667,38 +667,38 @@ In other words, <code>findByIdAndDelete(id)</code> is a shorthand for
 <li><code>findOneAndDelete()</code></li>
 </ul>
   </div><hr class="separate-api-elements"><h3 id="Model.findByIdAndUpdate()"><a href="#Model.findByIdAndUpdate()"><code>Model.findByIdAndUpdate()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>id</code>
-<span class="method-type">&laquo;Object|Number|String&raquo;</span> value of <code>_id</code> to query by</p>
+<span class="method-type">&laquo;object|number|string&raquo;</span> value of <code>_id</code> to query by</p>
 </li><li class="param"><code>[update]</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;object&raquo;</span> </li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.returnDocument='before']</code>
 <span class="method-type">&laquo;'before' | 'after'&raquo;</span> Has two possible values, <code>&#39;before&#39;</code> and <code>&#39;after&#39;</code>. By default, it will return the document before the update was applied.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.lean]</code>
-<span class="method-type">&laquo;Object&raquo;</span> if truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document. See <a href="/docs/api/query.html#Query.prototype.lean()"><code>Query.lean()</code></a> and <a href="/docs/tutorials/lean.html">the Mongoose lean tutorial</a>.</p>
+<span class="method-type">&laquo;object&raquo;</span> if truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document. See <a href="/docs/api/query.html#Query.prototype.lean()"><code>Query.lean()</code></a> and <a href="/docs/tutorials/lean.html">the Mongoose lean tutorial</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.session=null]</code>
 <span class="method-type">&laquo;ClientSession&raquo;</span> The session associated with this query. See <a href="/docs/transactions.html">transactions docs</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.strict]</code>
-<span class="method-type">&laquo;Boolean | 'throw'&raquo;</span> overwrites the schema&#39;s <a href="/docs/guide.html#strict">strict mode option</a></p>
+<span class="method-type">&laquo;boolean | 'throw'&raquo;</span> overwrites the schema&#39;s <a href="/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.timestamps=null]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.sort]</code>
-<span class="method-type">&laquo;Object|String&raquo;</span> if multiple docs are found by the conditions, sets the sort order to choose which doc to update.</p>
+<span class="method-type">&laquo;object|string&raquo;</span> if multiple docs are found by the conditions, sets the sort order to choose which doc to update.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.runValidators]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if true, runs <a href="/docs/validation.html#update-validators">update validators</a> on this command. Update validators validate the update operation against the model&#39;s schema</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if true, runs <a href="/docs/validation.html#update-validators">update validators</a> on this command. Update validators validate the update operation against the model&#39;s schema</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.setDefaultsOnInsert=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If <code>setDefaultsOnInsert</code> and <code>upsert</code> are true, mongoose will apply the <a href="/docs/defaults.html">defaults</a> specified in the model&#39;s schema if a new document is created</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If <code>setDefaultsOnInsert</code> and <code>upsert</code> are true, mongoose will apply the <a href="/docs/defaults.html">defaults</a> specified in the model&#39;s schema if a new document is created</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.includeResultMetadata]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if true, returns the full <a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/ModifyResult.html">ModifyResult from the MongoDB driver</a> rather than just the document</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if true, returns the full <a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/ModifyResult.html">ModifyResult from the MongoDB driver</a> rather than just the document</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.upsert=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if true, and no documents found, insert a new document</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if true, and no documents found, insert a new document</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.new=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if true, return the modified document rather than the original</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if true, return the modified document rather than the original</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.select]</code>
-<span class="method-type">&laquo;Object|String&raquo;</span> sets the document fields to return.</p>
+<span class="method-type">&laquo;object|string&raquo;</span> sets the document fields to return.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.translateAliases=null]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.overwriteDiscriminatorKey=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> Mongoose removes discriminator key updates from <code>update</code> by default, set <code>overwriteDiscriminatorKey</code> to <code>true</code> to allow updating the discriminator key</p>
+<span class="method-type">&laquo;boolean&raquo;</span> Mongoose removes discriminator key updates from <code>update</code> by default, set <code>overwriteDiscriminatorKey</code> to <code>true</code> to allow updating the discriminator key</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="#Model.findOneAndUpdate()">Model.findOneAndUpdate</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/findAndModify/">mongodb</a></span></li></ul><div><p>Issues a mongodb findOneAndUpdate command by a document&#39;s _id field.
 <code>findByIdAndUpdate(id, ...)</code> is equivalent to <code>findOneAndUpdate({ _id: id }, ...)</code>.</p>
 <p>Finds a matching document, updates it according to the <code>update</code> arg,
@@ -740,12 +740,12 @@ retrieving the document.</p>
 <pre><code lang="javascript"><span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">findById</span>(id)
 doc.<span class="hljs-property">name</span> = <span class="hljs-string">&#x27;jason bourne&#x27;</span>;
 <span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">save</span>();</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.findOne()"><a href="#Model.findOne()"><code>Model.findOne()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[conditions]</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[projection]</code>
-<span class="method-type">&laquo;Object|String|Array[String]&raquo;</span> optional fields to return, see <a href="/docs/api/query.html#Query.prototype.select()"><code>Query.prototype.select()</code></a></p>
+<span class="method-type">&laquo;object&raquo;</span> </li><li class="param"><code>[projection]</code>
+<span class="method-type">&laquo;object|string|Array[string]&raquo;</span> optional fields to return, see <a href="/docs/api/query.html#Query.prototype.select()"><code>Query.prototype.select()</code></a></p>
 </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.translateAliases=null]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/api/query.html#Query.prototype.select()">field selection</a></span></li><li><span class="method-type"><a href="/docs/tutorials/lean.html">lean queries</a></span></li></ul><div><p>Finds one document.</p>
 <p>The <code>conditions</code> are cast to their respective SchemaTypes before the command is sent.</p>
 <p><em>Note:</em> <code>conditions</code> is optional, and if <code>conditions</code> is null or undefined,
@@ -763,24 +763,24 @@ an arbitrary document. If you&#39;re querying by <code>_id</code>, use <code>fin
 
 <span class="hljs-comment">// Select only the adventures name and length</span>
 <span class="hljs-keyword">await</span> <span class="hljs-title class_">Adventure</span>.<span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">country</span>: <span class="hljs-string">&#x27;Croatia&#x27;</span> }, <span class="hljs-string">&#x27;name length&#x27;</span>).<span class="hljs-title function_">exec</span>();</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.findOneAndDelete()"><a href="#Model.findOneAndDelete()"><code>Model.findOneAndDelete()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>conditions</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;object&raquo;</span> </li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.strict]</code>
-<span class="method-type">&laquo;Boolean | 'throw'&raquo;</span> overwrites the schema&#39;s <a href="/docs/guide.html#strict">strict mode option</a></p>
+<span class="method-type">&laquo;boolean | 'throw'&raquo;</span> overwrites the schema&#39;s <a href="/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.projection=null]</code>
-<span class="method-type">&laquo;Object|String|Array[String]&raquo;</span> optional fields to return, see <a href="/docs/api/query.html#Query.prototype.select()"><code>Query.prototype.select()</code></a></p>
+<span class="method-type">&laquo;object|string|Array[string]&raquo;</span> optional fields to return, see <a href="/docs/api/query.html#Query.prototype.select()"><code>Query.prototype.select()</code></a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.session=null]</code>
 <span class="method-type">&laquo;ClientSession&raquo;</span> The session associated with this query. See <a href="/docs/transactions.html">transactions docs</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.includeResultMetadata]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if true, returns the full <a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/ModifyResult.html">ModifyResult from the MongoDB driver</a> rather than just the document</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if true, returns the full <a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/ModifyResult.html">ModifyResult from the MongoDB driver</a> rather than just the document</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.sort]</code>
-<span class="method-type">&laquo;Object|String&raquo;</span> if multiple docs are found by the conditions, sets the sort order to choose which doc to update.</p>
+<span class="method-type">&laquo;object|string&raquo;</span> if multiple docs are found by the conditions, sets the sort order to choose which doc to update.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.select]</code>
-<span class="method-type">&laquo;Object|String&raquo;</span> sets the document fields to return.</p>
+<span class="method-type">&laquo;object|string&raquo;</span> sets the document fields to return.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.maxTimeMS]</code>
-<span class="method-type">&laquo;Number&raquo;</span> puts a time limit on the query - requires mongodb &gt;= 2.6.0</p>
+<span class="method-type">&laquo;number&raquo;</span> puts a time limit on the query - requires mongodb &gt;= 2.6.0</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.translateAliases=null]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Issue a MongoDB <code>findOneAndDelete()</code> command.</p>
 <p>Finds a matching document, removes it, and returns the found document (if any).</p>
 <p>This function triggers the following middleware.</p>
@@ -801,33 +801,33 @@ retrieving the document.</p>
 <pre><code lang="javascript"><span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">findById</span>(id)
 doc.<span class="hljs-property">name</span> = <span class="hljs-string">&#x27;jason bourne&#x27;</span>;
 <span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">save</span>();</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.findOneAndReplace()"><a href="#Model.findOneAndReplace()"><code>Model.findOneAndReplace()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>filter</code>
-<span class="method-type">&laquo;Object&raquo;</span> Replace the first document that matches this filter</p>
+<span class="method-type">&laquo;object&raquo;</span> Replace the first document that matches this filter</p>
 </li><li class="param"><code>[replacement]</code>
-<span class="method-type">&laquo;Object&raquo;</span> Replace with this document</p>
+<span class="method-type">&laquo;object&raquo;</span> Replace with this document</p>
 </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.returnDocument='before']</code>
 <span class="method-type">&laquo;'before' | 'after'&raquo;</span> Has two possible values, <code>&#39;before&#39;</code> and <code>&#39;after&#39;</code>. By default, it will return the document before the update was applied.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.lean]</code>
-<span class="method-type">&laquo;Object&raquo;</span> if truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document. See <a href="/docs/api/query.html#Query.prototype.lean()"><code>Query.lean()</code></a> and <a href="/docs/tutorials/lean.html">the Mongoose lean tutorial</a>.</p>
+<span class="method-type">&laquo;object&raquo;</span> if truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document. See <a href="/docs/api/query.html#Query.prototype.lean()"><code>Query.lean()</code></a> and <a href="/docs/tutorials/lean.html">the Mongoose lean tutorial</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.session=null]</code>
 <span class="method-type">&laquo;ClientSession&raquo;</span> The session associated with this query. See <a href="/docs/transactions.html">transactions docs</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.strict]</code>
-<span class="method-type">&laquo;Boolean | 'throw'&raquo;</span> overwrites the schema&#39;s <a href="/docs/guide.html#strict">strict mode option</a></p>
+<span class="method-type">&laquo;boolean | 'throw'&raquo;</span> overwrites the schema&#39;s <a href="/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.timestamps=null]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.projection=null]</code>
-<span class="method-type">&laquo;Object|String|Array[String]&raquo;</span> optional fields to return, see <a href="/docs/api/query.html#Query.prototype.select()"><code>Query.prototype.select()</code></a></p>
+<span class="method-type">&laquo;object|string|Array[string]&raquo;</span> optional fields to return, see <a href="/docs/api/query.html#Query.prototype.select()"><code>Query.prototype.select()</code></a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.sort]</code>
-<span class="method-type">&laquo;Object|String&raquo;</span> if multiple docs are found by the conditions, sets the sort order to choose which doc to update.</p>
+<span class="method-type">&laquo;object|string&raquo;</span> if multiple docs are found by the conditions, sets the sort order to choose which doc to update.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.includeResultMetadata]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if true, returns the full <a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/ModifyResult.html">ModifyResult from the MongoDB driver</a> rather than just the document</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if true, returns the full <a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/ModifyResult.html">ModifyResult from the MongoDB driver</a> rather than just the document</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.select]</code>
-<span class="method-type">&laquo;Object|String&raquo;</span> sets the document fields to return.</p>
+<span class="method-type">&laquo;object|string&raquo;</span> sets the document fields to return.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.maxTimeMS]</code>
-<span class="method-type">&laquo;Number&raquo;</span> puts a time limit on the query - requires mongodb &gt;= 2.6.0</p>
+<span class="method-type">&laquo;number&raquo;</span> puts a time limit on the query - requires mongodb &gt;= 2.6.0</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.translateAliases=null]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Issue a MongoDB <code>findOneAndReplace()</code> command.</p>
 <p>Finds a matching document, replaces it with the provided doc, and returns the document.</p>
 <p>This function triggers the following query middleware.</p>
@@ -842,41 +842,41 @@ doc.<span class="hljs-property">name</span> = <span class="hljs-string">&#x27;ja
 <pre><code lang="javascript">A.<span class="hljs-title function_">findOneAndReplace</span>(filter, replacement, options)  <span class="hljs-comment">// return Query</span>
 A.<span class="hljs-title function_">findOneAndReplace</span>(filter, replacement) <span class="hljs-comment">// returns Query</span>
 A.<span class="hljs-title function_">findOneAndReplace</span>()                    <span class="hljs-comment">// returns Query</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.findOneAndUpdate()"><a href="#Model.findOneAndUpdate()"><code>Model.findOneAndUpdate()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[conditions]</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[update]</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;object&raquo;</span> </li><li class="param"><code>[update]</code>
+<span class="method-type">&laquo;object&raquo;</span> </li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.returnDocument='before']</code>
 <span class="method-type">&laquo;'before' | 'after'&raquo;</span> Has two possible values, <code>&#39;before&#39;</code> and <code>&#39;after&#39;</code>. By default, it will return the document before the update was applied.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.lean]</code>
-<span class="method-type">&laquo;Object&raquo;</span> if truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document. See <a href="/docs/api/query.html#Query.prototype.lean()"><code>Query.lean()</code></a> and <a href="/docs/tutorials/lean.html">the Mongoose lean tutorial</a>.</p>
+<span class="method-type">&laquo;object&raquo;</span> if truthy, mongoose will return the document as a plain JavaScript object rather than a mongoose document. See <a href="/docs/api/query.html#Query.prototype.lean()"><code>Query.lean()</code></a> and <a href="/docs/tutorials/lean.html">the Mongoose lean tutorial</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.session=null]</code>
 <span class="method-type">&laquo;ClientSession&raquo;</span> The session associated with this query. See <a href="/docs/transactions.html">transactions docs</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.strict]</code>
-<span class="method-type">&laquo;Boolean | 'throw'&raquo;</span> overwrites the schema&#39;s <a href="/docs/guide.html#strict">strict mode option</a></p>
+<span class="method-type">&laquo;boolean | 'throw'&raquo;</span> overwrites the schema&#39;s <a href="/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.timestamps=null]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.upsert=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if true, and no documents found, insert a new document</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if true, and no documents found, insert a new document</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.projection=null]</code>
-<span class="method-type">&laquo;Object|String|Array[String]&raquo;</span> optional fields to return, see <a href="/docs/api/query.html#Query.prototype.select()"><code>Query.prototype.select()</code></a></p>
+<span class="method-type">&laquo;object|string|Array[string]&raquo;</span> optional fields to return, see <a href="/docs/api/query.html#Query.prototype.select()"><code>Query.prototype.select()</code></a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.new=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if true, return the modified document rather than the original</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if true, return the modified document rather than the original</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.fields]</code>
-<span class="method-type">&laquo;Object|String&raquo;</span> Field selection. Equivalent to <code>.select(fields).findOneAndUpdate()</code></p>
+<span class="method-type">&laquo;object|string&raquo;</span> Field selection. Equivalent to <code>.select(fields).findOneAndUpdate()</code></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.maxTimeMS]</code>
-<span class="method-type">&laquo;Number&raquo;</span> puts a time limit on the query - requires mongodb &gt;= 2.6.0</p>
+<span class="method-type">&laquo;number&raquo;</span> puts a time limit on the query - requires mongodb &gt;= 2.6.0</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.sort]</code>
-<span class="method-type">&laquo;Object|String&raquo;</span> if multiple docs are found by the conditions, sets the sort order to choose which doc to update.</p>
+<span class="method-type">&laquo;object|string&raquo;</span> if multiple docs are found by the conditions, sets the sort order to choose which doc to update.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.runValidators]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if true, runs <a href="/docs/validation.html#update-validators">update validators</a> on this command. Update validators validate the update operation against the model&#39;s schema</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if true, runs <a href="/docs/validation.html#update-validators">update validators</a> on this command. Update validators validate the update operation against the model&#39;s schema</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.setDefaultsOnInsert=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If <code>setDefaultsOnInsert</code> and <code>upsert</code> are true, mongoose will apply the <a href="/docs/defaults.html">defaults</a> specified in the model&#39;s schema if a new document is created</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If <code>setDefaultsOnInsert</code> and <code>upsert</code> are true, mongoose will apply the <a href="/docs/defaults.html">defaults</a> specified in the model&#39;s schema if a new document is created</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.includeResultMetadata]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if true, returns the <a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/ModifyResult.html">raw result from the MongoDB driver</a></p>
+<span class="method-type">&laquo;boolean&raquo;</span> if true, returns the <a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/ModifyResult.html">raw result from the MongoDB driver</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.translateAliases=null]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.overwriteDiscriminatorKey=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> Mongoose removes discriminator key updates from <code>update</code> by default, set <code>overwriteDiscriminatorKey</code> to <code>true</code> to allow updating the discriminator key</p>
+<span class="method-type">&laquo;boolean&raquo;</span> Mongoose removes discriminator key updates from <code>update</code> by default, set <code>overwriteDiscriminatorKey</code> to <code>true</code> to allow updating the discriminator key</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/tutorials/findoneandupdate.html">Tutorial</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/findAndModify/">mongodb</a></span></li></ul><div><p>Issues a mongodb findOneAndUpdate command.</p>
 <p>Finds a matching document, updates it according to the <code>update</code> arg, passing any <code>options</code>. A Query object is returned.</p>
 <h4 id="example">
@@ -918,18 +918,18 @@ retrieving the document.</p>
 <pre><code lang="javascript"><span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">findById</span>(id);
 doc.<span class="hljs-property">name</span> = <span class="hljs-string">&#x27;jason bourne&#x27;</span>;
 <span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">save</span>();</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.hydrate()"><a href="#Model.hydrate()"><code>Model.hydrate()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>obj</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[projection]</code>
-<span class="method-type">&laquo;Object|String|Array[String]&raquo;</span> optional projection containing which fields should be selected for this document</p>
+<span class="method-type">&laquo;object&raquo;</span> </li><li class="param"><code>[projection]</code>
+<span class="method-type">&laquo;object|string|Array[string]&raquo;</span> optional projection containing which fields should be selected for this document</p>
 </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional options</p>
+<span class="method-type">&laquo;object&raquo;</span> optional options</p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.setters=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if true, apply schema setters when hydrating</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if true, apply schema setters when hydrating</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.hydratedPopulatedDocs=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if true, populates the docs if passing pre-populated data</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if true, populates the docs if passing pre-populated data</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.virtuals=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if true, sets any virtuals present on <code>obj</code></p>
+<span class="method-type">&laquo;boolean&raquo;</span> if true, sets any virtuals present on <code>obj</code></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.strict=false]</code>
-<span class="method-type">&laquo;Boolean | 'throw'&raquo;</span> configure strict mode for the hydrated document. In particular, if strict is false, fields not in the schema won&#39;t be stripped out; if strict is &#39;throw&#39;, <code>hydrate()</code> will throw an error if there are any fields that are not in the schema. Defaults to true (silently strip out fields not in the schema).</p>
+<span class="method-type">&laquo;boolean | 'throw'&raquo;</span> configure strict mode for the hydrated document. In particular, if strict is false, fields not in the schema won&#39;t be stripped out; if strict is &#39;throw&#39;, <code>hydrate()</code> will throw an error if there are any fields that are not in the schema. Defaults to true (silently strip out fields not in the schema).</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Document&raquo;</span> document instance</li></ul><div><p>Shortcut for creating a new Document from existing raw data, pre-saved in the DB.
 The document returned has no paths marked as modified initially.</p>
 <h4 id="example">
@@ -964,26 +964,26 @@ For example, if you want to wait for unique indexes to build before continuing w
 
 <span class="hljs-keyword">await</span> <span class="hljs-title class_">Event</span>.<span class="hljs-title function_">init</span>();
 <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Indexes are done building!&#x27;</span>);</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.insertMany()"><a href="#Model.insertMany()"><code>Model.insertMany()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>doc(s)</code>
-<span class="method-type">&laquo;Array | Object | *&raquo;</span> </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> see the <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#insertMany">mongodb driver options</a></p>
+<span class="method-type">&laquo;Array|object|any&raquo;</span> </li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;object&raquo;</span> see the <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#insertMany">mongodb driver options</a></p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.ordered=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if true, will fail fast on the first error encountered. If false, will insert all the documents it can and report errors later. An <code>insertMany()</code> with <code>ordered = false</code> is called an &quot;unordered&quot; <code>insertMany()</code>.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if true, will fail fast on the first error encountered. If false, will insert all the documents it can and report errors later. An <code>insertMany()</code> with <code>ordered = false</code> is called an &quot;unordered&quot; <code>insertMany()</code>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.rawResult=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if false, the returned promise resolves to the documents that passed mongoose document validation. If <code>true</code>, will return the <a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/InsertManyResult.html">raw result from the MongoDB driver</a> with a <code>mongoose</code> property that contains <code>validationErrors</code> and <code>results</code> if this is an unordered <code>insertMany</code>.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if false, the returned promise resolves to the documents that passed mongoose document validation. If <code>true</code>, will return the <a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/InsertManyResult.html">raw result from the MongoDB driver</a> with a <code>mongoose</code> property that contains <code>validationErrors</code> and <code>results</code> if this is an unordered <code>insertMany</code>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.lean=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if <code>true</code>, skips hydrating the documents. This means Mongoose will <strong>not</strong> cast, validate, or apply defaults to any of the documents passed to <code>insertMany()</code>. This option is useful if you need the extra performance, but comes with data integrity risk. Consider using with <a href="#Model.castObject()"><code>castObject()</code></a> and <a href="#Model.applyDefaults()"><code>applyDefaults()</code></a>.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if <code>true</code>, skips hydrating the documents. This means Mongoose will <strong>not</strong> cast, validate, or apply defaults to any of the documents passed to <code>insertMany()</code>. This option is useful if you need the extra performance, but comes with data integrity risk. Consider using with <a href="#Model.castObject()"><code>castObject()</code></a> and <a href="#Model.applyDefaults()"><code>applyDefaults()</code></a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.limit=null]</code>
-<span class="method-type">&laquo;Number&raquo;</span> this limits the number of documents being processed (validation/casting) by mongoose in parallel, this does <strong>NOT</strong> send the documents in batches to MongoDB. Use this option if you&#39;re processing a large number of documents and your app is running out of memory.</p>
+<span class="method-type">&laquo;number&raquo;</span> this limits the number of documents being processed (validation/casting) by mongoose in parallel, this does <strong>NOT</strong> send the documents in batches to MongoDB. Use this option if you&#39;re processing a large number of documents and your app is running out of memory.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.populate=null]</code>
-<span class="method-type">&laquo;String|Object|Array&raquo;</span> populates the result documents. This option is a no-op if <code>rawResult</code> is set.</p>
+<span class="method-type">&laquo;string|object|Array&raquo;</span> populates the result documents. This option is a no-op if <code>rawResult</code> is set.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.throwOnValidationError=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If true and <code>ordered: false</code>, throw an error if one of the operations failed validation, but all valid operations completed successfully.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If true and <code>ordered: false</code>, throw an error if one of the operations failed validation, but all valid operations completed successfully.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.middleware=true]</code>
-<span class="method-type">&laquo;Boolean|Object&raquo;</span> set to <code>false</code> to skip all user-defined middleware</p>
+<span class="method-type">&laquo;boolean|object&raquo;</span> set to <code>false</code> to skip all user-defined middleware</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.middleware.pre=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> set to <code>false</code> to skip only pre hooks</p>
+<span class="method-type">&laquo;boolean&raquo;</span> set to <code>false</code> to skip only pre hooks</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.middleware.post=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> set to <code>false</code> to skip only post hooks</p>
+<span class="method-type">&laquo;boolean&raquo;</span> set to <code>false</code> to skip only post hooks</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> resolving to the raw result from the MongoDB driver if <code>options.rawResult</code> was <code>true</code>, or the documents that passed validation, otherwise</li></ul><div><p>Shortcut for validating an array of documents and inserting them into
 MongoDB if they&#39;re all valid. This function is faster than <code>.create()</code>
 because it only sends one operation to the server, rather than one for each
@@ -1013,9 +1013,9 @@ docs[<span class="hljs-number">0</span>].<span class="hljs-property">name</span>
   { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Star Wars&#x27;</span> },
   { <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;The Empire Strikes Back&#x27;</span> }
 ], { <span class="hljs-attr">rawResult</span>: <span class="hljs-literal">true</span> });</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.insertOne()"><a href="#Model.insertOne()"><code>Model.insertOne()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>doc</code>
-<span class="method-type">&laquo;Object|Document&raquo;</span> Document to insert, as a POJO or Mongoose document</p>
+<span class="method-type">&laquo;object|Document&raquo;</span> Document to insert, as a POJO or Mongoose document</p>
 </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> Options passed down to <code>save()</code>.</p>
+<span class="method-type">&laquo;object&raquo;</span> Options passed down to <code>save()</code>.</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&lt;Document&gt;&raquo;</span> resolves to the saved document</li></ul><div><p>Shortcut for saving one document to the database.
 <code>MyModel.insertOne(obj, options)</code> is almost equivalent to <code>new MyModel(obj).save(options)</code>.
 The difference is that <code>insertOne()</code> checks if <code>obj</code> is already a document, and checks for discriminators.</p>
@@ -1047,7 +1047,7 @@ the same as the indexes defined in your schema depending on whether you
 use the <a href="/docs/guide.html#autoIndex"><code>autoIndex</code> option</a> and if you
 build indexes manually.</p>
   </div><hr class="separate-api-elements"><h3 id="Model.listSearchIndexes()"><a href="#Model.listSearchIndexes()"><code>Model.listSearchIndexes()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&lt;Array&gt;&raquo;</span> </li></ul><div><p>List all <a href="https://www.mongodb.com/docs/atlas/atlas-search/create-index/">Atlas search indexes</a> on this model&#39;s collection.
+<span class="method-type">&laquo;object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&lt;Array&gt;&raquo;</span> </li></ul><div><p>List all <a href="https://www.mongodb.com/docs/atlas/atlas-search/create-index/">Atlas search indexes</a> on this model&#39;s collection.
 This function only works when connected to MongoDB Atlas.</p>
 <h4 id="example">
         <a href="#example">
@@ -1070,7 +1070,7 @@ This function only works when connected to MongoDB Atlas.</p>
 <span class="hljs-title class_">TestModel</span>.<span class="hljs-title function_">namespace</span>(); <span class="hljs-comment">// &#x27;mydb.tests&#x27;</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.populate()"><a href="#Model.populate()"><code>Model.populate()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>docs</code>
 <span class="method-type">&laquo;Document|Array&raquo;</span> Either a single document or array of documents to populate.</p>
 </li><li class="param"><code>options</code>
-<span class="method-type">&laquo;Object|String&raquo;</span> Either the paths to populate or an object specifying all parameters</p>
+<span class="method-type">&laquo;object|string&raquo;</span> Either the paths to populate or an object specifying all parameters</p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.path=null]</code>
 <span class="method-type">&laquo;string&raquo;</span> The path to populate.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.populate=null]</code>
@@ -1082,21 +1082,21 @@ This function only works when connected to MongoDB Atlas.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.clone=false]</code>
 <span class="method-type">&laquo;boolean&raquo;</span> When you do <code>BlogPost.find().populate(&#39;author&#39;)</code>, blog posts with the same author will share 1 copy of an <code>author</code> doc. Enable this option to make Mongoose clone populated docs before assigning them.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.match=null]</code>
-<span class="method-type">&laquo;Object|Function&raquo;</span> Add an additional filter to the populate query. Can be a filter object containing <a href="https://www.mongodb.com/docs/manual/tutorial/query-documents/">MongoDB query syntax</a>, or a function that returns a filter object.</p>
+<span class="method-type">&laquo;object|Function&raquo;</span> Add an additional filter to the populate query. Can be a filter object containing <a href="https://www.mongodb.com/docs/manual/tutorial/query-documents/">MongoDB query syntax</a>, or a function that returns a filter object.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.skipInvalidIds=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> By default, Mongoose throws a cast error if <code>localField</code> and <code>foreignField</code> schemas don&#39;t line up. If you enable this option, Mongoose will instead filter out any <code>localField</code> properties that cannot be casted to <code>foreignField</code>&#39;s schema type.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> By default, Mongoose throws a cast error if <code>localField</code> and <code>foreignField</code> schemas don&#39;t line up. If you enable this option, Mongoose will instead filter out any <code>localField</code> properties that cannot be casted to <code>foreignField</code>&#39;s schema type.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.perDocumentLimit=null]</code>
-<span class="method-type">&laquo;Number&raquo;</span> For legacy reasons, <code>limit</code> with <code>populate()</code> may give incorrect results because it only executes a single query for every document being populated. If you set <code>perDocumentLimit</code>, Mongoose will ensure correct <code>limit</code> per document by executing a separate query for each document to <code>populate()</code>. For example, <code>.find().populate({ path: &#39;test&#39;, perDocumentLimit: 2 })</code> will execute 2 additional queries if <code>.find()</code> returns 2 documents.</p>
+<span class="method-type">&laquo;number&raquo;</span> For legacy reasons, <code>limit</code> with <code>populate()</code> may give incorrect results because it only executes a single query for every document being populated. If you set <code>perDocumentLimit</code>, Mongoose will ensure correct <code>limit</code> per document by executing a separate query for each document to <code>populate()</code>. For example, <code>.find().populate({ path: &#39;test&#39;, perDocumentLimit: 2 })</code> will execute 2 additional queries if <code>.find()</code> returns 2 documents.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.strictPopulate=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> Set to false to allow populating paths that aren&#39;t defined in the given model&#39;s schema.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> Set to false to allow populating paths that aren&#39;t defined in the given model&#39;s schema.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.options=null]</code>
-<span class="method-type">&laquo;Object&raquo;</span> Additional options like <code>limit</code> and <code>lean</code>.</p>
+<span class="method-type">&laquo;object&raquo;</span> Additional options like <code>limit</code> and <code>lean</code>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.transform=null]</code>
 <span class="method-type">&laquo;Function&raquo;</span> Function that Mongoose will call on every populated document that allows you to transform the populated document.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.forceRepopulate=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> Set to <code>false</code> to prevent Mongoose from repopulating paths that are already populated</p>
+<span class="method-type">&laquo;boolean&raquo;</span> Set to <code>false</code> to prevent Mongoose from repopulating paths that are already populated</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.ordered=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> Set to <code>true</code> to execute any populate queries one at a time, as opposed to in parallel. Set this option to <code>true</code> if populating multiple paths or paths with multiple models in transactions.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> Set to <code>true</code> to execute any populate queries one at a time, as opposed to in parallel. Set this option to <code>true</code> if populating multiple paths or paths with multiple models in transactions.</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Populates document references.</p>
 <p>Changed in Mongoose 6: the model you call <code>populate()</code> on should be the
 &quot;local field&quot; model, <strong>not</strong> the &quot;foreign field&quot; model.</p>
@@ -1139,7 +1139,7 @@ This function only works when connected to MongoDB Atlas.</p>
 <span class="hljs-keyword">await</span> <span class="hljs-title class_">User</span>.<span class="hljs-title function_">populate</span>(users, { <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;dog&#x27;</span>, <span class="hljs-attr">select</span>: <span class="hljs-string">&#x27;name&#x27;</span> });
 users[<span class="hljs-number">0</span>].<span class="hljs-property">dog</span>.<span class="hljs-property">name</span>; <span class="hljs-comment">// &#x27;Daisy&#x27;</span>
 users[<span class="hljs-number">0</span>].<span class="hljs-property">dog</span>.<span class="hljs-property">breed</span>; <span class="hljs-comment">// undefined because of `select`</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.prototype.$model()"><a href="#Model.prototype.$model()"><code>Model.prototype.$model()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[name]</code>
-<span class="method-type">&laquo;String&raquo;</span> model name</p>
+<span class="method-type">&laquo;string&raquo;</span> model name</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Model&raquo;</span> </li></ul><div><p>Returns the model instance used to create this document if no <code>name</code> specified.
 If <code>name</code> specified, returns the model with the given <code>name</code>.</p>
 <h4 id="example">
@@ -1184,7 +1184,7 @@ product.<span class="hljs-title function_">deleteOne</span>().<span class="hljs-
 <pre><code lang="javascript"><span class="hljs-keyword">const</span> doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">findById</span>(id);
 doc.<span class="hljs-title function_">increment</span>();
 <span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">save</span>();</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.prototype.model()"><a href="#Model.prototype.model()"><code>Model.prototype.model()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[name]</code>
-<span class="method-type">&laquo;String&raquo;</span> model name</p>
+<span class="method-type">&laquo;string&raquo;</span> model name</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Model&raquo;</span> </li></ul><div><p>Returns the model instance used to create this document if no <code>name</code> specified.
 If <code>name</code> specified, returns the model with the given <code>name</code>.</p>
 <h4 id="example">
@@ -1196,33 +1196,33 @@ If <code>name</code> specified, returns the model with the given <code>name</cod
 doc.$model() === <span class="hljs-title class_">Tank</span>; <span class="hljs-comment">// true</span>
 <span class="hljs-keyword">await</span> doc.$model(<span class="hljs-string">&#x27;User&#x27;</span>).<span class="hljs-title function_">findById</span>(id);</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.prototype.modelName"><a href="#Model.prototype.modelName"><code>Model.prototype.modelName</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>The name of the model</p>
   </div><hr class="separate-api-elements"><h3 id="Model.prototype.save()"><a href="#Model.prototype.save()"><code>Model.prototype.save()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> options optional options</p>
+<span class="method-type">&laquo;object&raquo;</span> options optional options</p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.session=null]</code>
 <span class="method-type">&laquo;Session&raquo;</span> the <a href="https://www.mongodb.com/docs/manual/reference/server-sessions/">session</a> associated with this save operation. If not specified, defaults to the <a href="/docs/api/document.html#Document.prototype.session()">document&#39;s associated session</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.safe]</code>
-<span class="method-type">&laquo;Object&raquo;</span> (DEPRECATED) overrides <a href="/docs/guide.html#safe">schema&#39;s safe option</a>. Use the <code>w</code> option instead.</p>
+<span class="method-type">&laquo;object&raquo;</span> (DEPRECATED) overrides <a href="/docs/guide.html#safe">schema&#39;s safe option</a>. Use the <code>w</code> option instead.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.validateBeforeSave]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> set to false to save without validating.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> set to false to save without validating.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.validateModifiedOnly=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if <code>true</code>, Mongoose will only validate modified paths, as opposed to modified paths and <code>required</code> paths.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if <code>true</code>, Mongoose will only validate modified paths, as opposed to modified paths and <code>required</code> paths.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.w]</code>
-<span class="method-type">&laquo;Number|String&raquo;</span> set the <a href="https://www.mongodb.com/docs/manual/reference/write-concern/#w-option">write concern</a>. Overrides the <a href="/docs/guide.html#writeConcern">schema-level <code>writeConcern</code> option</a></p>
+<span class="method-type">&laquo;number|string&raquo;</span> set the <a href="https://www.mongodb.com/docs/manual/reference/write-concern/#w-option">write concern</a>. Overrides the <a href="/docs/guide.html#writeConcern">schema-level <code>writeConcern</code> option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.j]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> set to true for MongoDB to wait until this <code>save()</code> has been <a href="https://www.mongodb.com/docs/manual/reference/write-concern/#j-option">journaled before resolving the returned promise</a>. Overrides the <a href="/docs/guide.html#writeConcern">schema-level <code>writeConcern</code> option</a></p>
+<span class="method-type">&laquo;boolean&raquo;</span> set to true for MongoDB to wait until this <code>save()</code> has been <a href="https://www.mongodb.com/docs/manual/reference/write-concern/#j-option">journaled before resolving the returned promise</a>. Overrides the <a href="/docs/guide.html#writeConcern">schema-level <code>writeConcern</code> option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.wtimeout]</code>
-<span class="method-type">&laquo;Number&raquo;</span> sets a <a href="https://www.mongodb.com/docs/manual/reference/write-concern/#wtimeout">timeout for the write concern</a>. Overrides the <a href="/docs/guide.html#writeConcern">schema-level <code>writeConcern</code> option</a>.</p>
+<span class="method-type">&laquo;number&raquo;</span> sets a <a href="https://www.mongodb.com/docs/manual/reference/write-concern/#wtimeout">timeout for the write concern</a>. Overrides the <a href="/docs/guide.html#writeConcern">schema-level <code>writeConcern</code> option</a>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.checkKeys=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> the MongoDB driver prevents you from saving keys that start with &#39;$&#39; or contain &#39;.&#39; by default. Set this option to <code>false</code> to skip that check. See <a href="https://docs.mongodb.com/manual/reference/limits/#mongodb-limit-Restrictions-on-Field-Names">restrictions on field names</a></p>
+<span class="method-type">&laquo;boolean&raquo;</span> the MongoDB driver prevents you from saving keys that start with &#39;$&#39; or contain &#39;.&#39; by default. Set this option to <code>false</code> to skip that check. See <a href="https://docs.mongodb.com/manual/reference/limits/#mongodb-limit-Restrictions-on-Field-Names">restrictions on field names</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.timestamps=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if <code>false</code> and <a href="/docs/guide.html#timestamps">timestamps</a> are enabled, skip timestamps for this <code>save()</code>.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if <code>false</code> and <a href="/docs/guide.html#timestamps">timestamps</a> are enabled, skip timestamps for this <code>save()</code>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.pathsToSave]</code>
 <span class="method-type">&laquo;Array&raquo;</span> An array of paths that tell mongoose to only validate and save the paths in <code>pathsToSave</code>.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.middleware=true]</code>
-<span class="method-type">&laquo;Boolean|Object&raquo;</span> set to <code>false</code> to skip all user-defined middleware</p>
+<span class="method-type">&laquo;boolean|object&raquo;</span> set to <code>false</code> to skip all user-defined middleware</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.middleware.pre=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> set to <code>false</code> to skip only pre hooks</p>
+<span class="method-type">&laquo;boolean&raquo;</span> set to <code>false</code> to skip only pre hooks</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.middleware.post=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> set to <code>false</code> to skip only post hooks</p>
+<span class="method-type">&laquo;boolean&raquo;</span> set to <code>false</code> to skip only post hooks</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/middleware.html">middleware</a></span></li></ul><div><p>Saves this document by inserting a new document into the database if <a href="/docs/api/document.html#Document.prototype.isNew">document.isNew</a> is <code>true</code>,
 or sends an <a href="/docs/api/document.html#Document.prototype.updateOne()">updateOne</a> operation with just the modified paths if <code>isNew</code> is <code>false</code>.</p>
 <h4 id="example">
@@ -1257,19 +1257,19 @@ doc.<span class="hljs-property">myVirtual</span>; <span class="hljs-comment">// 
 
 <span class="hljs-title class_">TestModel</span>.<span class="hljs-title function_">recompileSchema</span>();
 doc.<span class="hljs-property">myVirtual</span>; <span class="hljs-comment">// &#x27;Hello from myVirtual&#x27;</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.replaceOne()"><a href="#Model.replaceOne()"><code>Model.replaceOne()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>filter</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>doc</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;object&raquo;</span> </li><li class="param"><code>doc</code>
+<span class="method-type">&laquo;object&raquo;</span> </li><li class="param"><code>[options]</code>
+<span class="method-type">&laquo;object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.strict]</code>
-<span class="method-type">&laquo;Boolean | 'throw'&raquo;</span> overwrites the schema&#39;s <a href="/docs/guide.html#strict">strict mode option</a></p>
+<span class="method-type">&laquo;boolean | 'throw'&raquo;</span> overwrites the schema&#39;s <a href="/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.upsert=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if true, and no documents found, insert a new document</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if true, and no documents found, insert a new document</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.writeConcern=null]</code>
-<span class="method-type">&laquo;Object&raquo;</span> sets the <a href="https://www.mongodb.com/docs/manual/reference/write-concern/">write concern</a> for replica sets. Overrides the <a href="/docs/guide.html#writeConcern">schema-level write concern</a></p>
+<span class="method-type">&laquo;object&raquo;</span> sets the <a href="https://www.mongodb.com/docs/manual/reference/write-concern/">write concern</a> for replica sets. Overrides the <a href="/docs/guide.html#writeConcern">schema-level write concern</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.timestamps=null]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Does nothing if schema-level timestamps are not set.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.translateAliases=null]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/queries.html">Query docs</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/UpdateResult.html">UpdateResult</a></span></li></ul><div><p>Replace the existing document with the given document (no atomic operators like <code>$set</code>).</p>
 <h4 id="example">
         <a href="#example">
@@ -1287,9 +1287,9 @@ res.<span class="hljs-property">upsertedCount</span>; <span class="hljs-comment"
 </ul>
   </div><hr class="separate-api-elements"><h3 id="Model.schema"><a href="#Model.schema"><code>Model.schema</code></a></h3><h5>Type:</h5><ul><li><span class="method-type">&laquo;property&raquo;</span></li></ul><div><p>Schema the model uses.</p>
   </div><hr class="separate-api-elements"><h3 id="Model.startSession()"><a href="#Model.startSession()"><code>Model.startSession()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> see the <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/MongoClient.html#startSession">mongodb driver options</a></p>
+<span class="method-type">&laquo;object&raquo;</span> see the <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/MongoClient.html#startSession">mongodb driver options</a></p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.causalConsistency=true]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> set to false to disable causal consistency</p>
+<span class="method-type">&laquo;boolean&raquo;</span> set to false to disable causal consistency</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&lt;ClientSession&gt;&raquo;</span> promise that resolves to a MongoDB driver <code>ClientSession</code></li></ul><div><p><em>Requires MongoDB &gt;= 3.6.0.</em> Starts a <a href="https://www.mongodb.com/docs/manual/release-notes/3.6/#client-sessions">MongoDB session</a>
 for benefits like causal consistency, <a href="https://www.mongodb.com/docs/manual/core/retryable-writes/">retryable writes</a>,
 and <a href="https://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html">transactions</a>.</p>
@@ -1308,9 +1308,9 @@ and <a href="https://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-tra
 <span class="hljs-comment">// get a doc back from the below query if the query reads from a</span>
 <span class="hljs-comment">// secondary that is experiencing replication lag.</span>
 doc = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Person</span>.<span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;Ned Stark&#x27;</span> }, <span class="hljs-literal">null</span>, { session, <span class="hljs-attr">readPreference</span>: <span class="hljs-string">&#x27;secondary&#x27;</span> });</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.syncIndexes()"><a href="#Model.syncIndexes()"><code>Model.syncIndexes()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> options to pass to <code>ensureIndexes()</code></p>
+<span class="method-type">&laquo;object&raquo;</span> options to pass to <code>ensureIndexes()</code></p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.hideIndexes=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> set to <code>true</code> to hide indexes instead of dropping. Requires MongoDB server 4.4 or higher</p>
+<span class="method-type">&laquo;boolean&raquo;</span> set to <code>true</code> to hide indexes instead of dropping. Requires MongoDB server 4.4 or higher</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Makes the indexes in MongoDB match the indexes defined in this model&#39;s
 schema. This function will drop any indexes that are not defined in
 the model&#39;s schema except the <code>_id</code> index, and build any indexes that
@@ -1338,10 +1338,10 @@ to check what indexes <code>syncIndexes()</code> will drop and create.</p>
 <pre><code lang="javascript"><span class="hljs-keyword">const</span> { toDrop, toCreate } = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Model</span>.<span class="hljs-title function_">diffIndexes</span>();
 toDrop; <span class="hljs-comment">// Array of strings containing names of indexes that `syncIndexes()` will drop</span>
 toCreate; <span class="hljs-comment">// Array of strings containing names of indexes that `syncIndexes()` will create</span></code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.translateAliases()"><a href="#Model.translateAliases()"><code>Model.translateAliases()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>fields</code>
-<span class="method-type">&laquo;Object&raquo;</span> fields/conditions that may contain aliased keys</p>
+<span class="method-type">&laquo;object&raquo;</span> fields/conditions that may contain aliased keys</p>
 </li><li class="param"><code>[errorOnDuplicates]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if true, throw an error if there&#39;s both a key and an alias for that key in <code>fields</code></p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Object&raquo;</span> the translated &#39;pure&#39; fields/conditions</li></ul><div><p>Translate any aliases fields/conditions so the final query or document object is pure</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if true, throw an error if there&#39;s both a key and an alias for that key in <code>fields</code></p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;object&raquo;</span> the translated &#39;pure&#39; fields/conditions</li></ul><div><p>Translate any aliases fields/conditions so the final query or document object is pure</p>
 <h4 id="example">
         <a href="#example">
           Example:
@@ -1360,22 +1360,22 @@ The <code>translateAliases</code> option for queries uses <code>errorOnDuplicate
       </h4>
 <p>Only translate arguments of object type anything else is returned raw</p>
   </div><hr class="separate-api-elements"><h3 id="Model.updateMany()"><a href="#Model.updateMany()"><code>Model.updateMany()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>filter</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>update.</code>
-<span class="method-type">&laquo;Object|Array&raquo;</span> If array, this update will be treated as an update pipeline and not casted.</p>
+<span class="method-type">&laquo;object&raquo;</span> </li><li class="param"><code>update.</code>
+<span class="method-type">&laquo;object|Array&raquo;</span> If array, this update will be treated as an update pipeline and not casted.</p>
 </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.strict]</code>
-<span class="method-type">&laquo;Boolean | 'throw'&raquo;</span> overwrites the schema&#39;s <a href="/docs/guide.html#strict">strict mode option</a></p>
+<span class="method-type">&laquo;boolean | 'throw'&raquo;</span> overwrites the schema&#39;s <a href="/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.upsert=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if true, and no documents found, insert a new document</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if true, and no documents found, insert a new document</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.writeConcern=null]</code>
-<span class="method-type">&laquo;Object&raquo;</span> sets the <a href="https://www.mongodb.com/docs/manual/reference/write-concern/">write concern</a> for replica sets. Overrides the <a href="/docs/guide.html#writeConcern">schema-level write concern</a></p>
+<span class="method-type">&laquo;object&raquo;</span> sets the <a href="https://www.mongodb.com/docs/manual/reference/write-concern/">write concern</a> for replica sets. Overrides the <a href="/docs/guide.html#writeConcern">schema-level write concern</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.timestamps=null]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Does nothing if schema-level timestamps are not set.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.translateAliases=null]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.overwriteDiscriminatorKey=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> Mongoose removes discriminator key updates from <code>update</code> by default, set <code>overwriteDiscriminatorKey</code> to <code>true</code> to allow updating the discriminator key</p>
+<span class="method-type">&laquo;boolean&raquo;</span> Mongoose removes discriminator key updates from <code>update</code> by default, set <code>overwriteDiscriminatorKey</code> to <code>true</code> to allow updating the discriminator key</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/queries.html">Query docs</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/update/#update-command-output">MongoDB docs</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/UpdateResult.html">UpdateResult</a></span></li></ul><div><p>Same as <code>updateOne()</code>, except MongoDB will update <em>all</em> documents that match
 <code>filter</code> (as opposed to just the first one) regardless of the value of
 the <code>multi</code> option.</p>
@@ -1400,22 +1400,22 @@ res.<span class="hljs-property">upsertedCount</span>; <span class="hljs-comment"
 <li><code>updateMany()</code></li>
 </ul>
   </div><hr class="separate-api-elements"><h3 id="Model.updateOne()"><a href="#Model.updateOne()"><code>Model.updateOne()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>filter</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>update.</code>
-<span class="method-type">&laquo;Object|Array&raquo;</span> If array, this update will be treated as an update pipeline and not casted.</p>
+<span class="method-type">&laquo;object&raquo;</span> </li><li class="param"><code>update.</code>
+<span class="method-type">&laquo;object|Array&raquo;</span> If array, this update will be treated as an update pipeline and not casted.</p>
 </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
+<span class="method-type">&laquo;object&raquo;</span> optional see <a href="/docs/api/query.html#Query.prototype.setOptions()"><code>Query.prototype.setOptions()</code></a></p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.strict]</code>
-<span class="method-type">&laquo;Boolean | 'throw'&raquo;</span> overwrites the schema&#39;s <a href="/docs/guide.html#strict">strict mode option</a></p>
+<span class="method-type">&laquo;boolean | 'throw'&raquo;</span> overwrites the schema&#39;s <a href="/docs/guide.html#strict">strict mode option</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.upsert=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if true, and no documents found, insert a new document</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if true, and no documents found, insert a new document</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.writeConcern=null]</code>
-<span class="method-type">&laquo;Object&raquo;</span> sets the <a href="https://www.mongodb.com/docs/manual/reference/write-concern/">write concern</a> for replica sets. Overrides the <a href="/docs/guide.html#writeConcern">schema-level write concern</a></p>
+<span class="method-type">&laquo;object&raquo;</span> sets the <a href="https://www.mongodb.com/docs/manual/reference/write-concern/">write concern</a> for replica sets. Overrides the <a href="/docs/guide.html#writeConcern">schema-level write concern</a></p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.timestamps=null]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If set to <code>false</code> and <a href="/docs/guide.html#timestamps">schema-level timestamps</a> are enabled, skip timestamps for this update. Note that this allows you to overwrite timestamps. Does nothing if schema-level timestamps are not set.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.translateAliases=null]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
+<span class="method-type">&laquo;boolean&raquo;</span> If set to <code>true</code>, translates any schema-defined aliases in <code>filter</code>, <code>projection</code>, <code>update</code>, and <code>distinct</code>. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.</p>
 </li></ul><ul style="margin-top: 0.5em"><li><code>[options.overwriteDiscriminatorKey=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> Mongoose removes discriminator key updates from <code>update</code> by default, set <code>overwriteDiscriminatorKey</code> to <code>true</code> to allow updating the discriminator key</p>
+<span class="method-type">&laquo;boolean&raquo;</span> Mongoose removes discriminator key updates from <code>update</code> by default, set <code>overwriteDiscriminatorKey</code> to <code>true</code> to allow updating the discriminator key</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><h5>See:</h5><ul><li><span class="method-type"><a href="/docs/queries.html">Query docs</a></span></li><li><span class="method-type"><a href="https://www.mongodb.com/docs/manual/reference/command/update/#update-command-output">MongoDB docs</a></span></li><li><span class="method-type"><a href="https://mongodb.github.io/node-mongodb-native/4.9/interfaces/UpdateResult.html">UpdateResult</a></span></li></ul><div><p>Update <em>only</em> the first document that matches <code>filter</code>.</p>
 <ul>
 <li>Use <code>replaceOne()</code> if you want to overwrite an entire document rather than using atomic operators like <code>$set</code>.</li>
@@ -1439,8 +1439,8 @@ res.<span class="hljs-property">upsertedCount</span>; <span class="hljs-comment"
 <li><code>updateOne()</code></li>
 </ul>
   </div><hr class="separate-api-elements"><h3 id="Model.updateSearchIndex()"><a href="#Model.updateSearchIndex()"><code>Model.updateSearchIndex()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>name</code>
-<span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>definition</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Update an existing <a href="https://www.mongodb.com/docs/atlas/atlas-search/create-index/">Atlas search index</a>.
+<span class="method-type">&laquo;string&raquo;</span> </li><li class="param"><code>definition</code>
+<span class="method-type">&laquo;object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&raquo;</span> </li></ul><div><p>Update an existing <a href="https://www.mongodb.com/docs/atlas/atlas-search/create-index/">Atlas search index</a>.
 This function only works when connected to MongoDB Atlas.</p>
 <h4 id="example">
         <a href="#example">
@@ -1449,9 +1449,9 @@ This function only works when connected to MongoDB Atlas.</p>
       </h4>
 <pre><code lang="javascript"><span class="hljs-keyword">const</span> schema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">name</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">unique</span>: <span class="hljs-literal">true</span> } });
 <span class="hljs-keyword">const</span> <span class="hljs-title class_">Customer</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Customer&#x27;</span>, schema);
-<span class="hljs-keyword">await</span> <span class="hljs-title class_">Customer</span>.<span class="hljs-title function_">updateSearchIndex</span>(<span class="hljs-string">&#x27;test&#x27;</span>, { <span class="hljs-attr">mappings</span>: { <span class="hljs-attr">dynamic</span>: <span class="hljs-literal">true</span> } });</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.useConnection()"><a href="#Model.useConnection()"><code>Model.useConnection()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[Connection]</code>
-<span class="method-type">&laquo;&raquo;</span> connection The new connection to use</p>
-</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;&raquo;</span> [Model] this</li></ul><div><p>Changes the Connection instance this model uses to make requests to MongoDB.
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Customer</span>.<span class="hljs-title function_">updateSearchIndex</span>(<span class="hljs-string">&#x27;test&#x27;</span>, { <span class="hljs-attr">mappings</span>: { <span class="hljs-attr">dynamic</span>: <span class="hljs-literal">true</span> } });</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.useConnection()"><a href="#Model.useConnection()"><code>Model.useConnection()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>connection</code>
+<span class="method-type">&laquo;Connection&raquo;</span> The new connection to use</p>
+</li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Model&raquo;</span> this</li></ul><div><p>Changes the Connection instance this model uses to make requests to MongoDB.
 This function is most useful for changing the Connection that a Model defined using <code>mongoose.model()</code> uses
 after initialization.</p>
 <h4 id="example">
@@ -1473,9 +1473,9 @@ conn2.<span class="hljs-title function_">model</span>(<span class="hljs-string">
 mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>); <span class="hljs-comment">// Throws &#x27;MissingSchemaError&#x27;</span></code></pre><p>Note: <code>useConnection()</code> does <strong>not</strong> apply any <a href="/docs/api/connection.html#Connection.prototype.plugin()">connection-level plugins</a> from the new connection.
 If you use <code>useConnection()</code> to switch a model&#39;s connection, the model will still have the old connection&#39;s plugins.</p>
   </div><hr class="separate-api-elements"><h3 id="Model.validate()"><a href="#Model.validate()"><code>Model.validate()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>obj</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li><li class="param"><code>pathsOrOptions</code>
-<span class="method-type">&laquo;Object|Array|String&raquo;</span> </li><li class="param"><code>[context]</code>
-<span class="method-type">&laquo;Object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&lt;Object&gt;&raquo;</span> casted and validated copy of <code>obj</code> if validation succeeded</li></ul><div><p>Casts and validates the given object against this model&#39;s schema, passing the
+<span class="method-type">&laquo;object&raquo;</span> </li><li class="param"><code>pathsOrOptions</code>
+<span class="method-type">&laquo;object|Array|string&raquo;</span> </li><li class="param"><code>[context]</code>
+<span class="method-type">&laquo;object&raquo;</span> </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Promise&lt;object&gt;&raquo;</span> casted and validated copy of <code>obj</code> if validation succeeded</li></ul><div><p>Casts and validates the given object against this model&#39;s schema, passing the
 given <code>context</code> to custom validators.</p>
 <h4 id="example">
         <a href="#example">
@@ -1494,9 +1494,9 @@ given <code>context</code> to custom validators.</p>
   <span class="hljs-title class_">Object</span>.<span class="hljs-title function_">keys</span>(err.<span class="hljs-property">errors</span>); <span class="hljs-comment">// [&#x27;name&#x27;]</span>
 }</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.watch()"><a href="#Model.watch()"><code>Model.watch()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>[pipeline]</code>
 <span class="method-type">&laquo;Array&raquo;</span> </li><li class="param"><code>[options]</code>
-<span class="method-type">&laquo;Object&raquo;</span> see the <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#watch">mongodb driver options</a></p>
+<span class="method-type">&laquo;object&raquo;</span> see the <a href="https://mongodb.github.io/node-mongodb-native/4.9/classes/Collection.html#watch">mongodb driver options</a></p>
 </li><ul style="margin-top: 0.5em"><li><code>[options.hydrate=false]</code>
-<span class="method-type">&laquo;Boolean&raquo;</span> if true and <code>fullDocument: &#39;updateLookup&#39;</code> is set, Mongoose will automatically hydrate <code>fullDocument</code> into a fully fledged Mongoose document</p>
+<span class="method-type">&laquo;boolean&raquo;</span> if true and <code>fullDocument: &#39;updateLookup&#39;</code> is set, Mongoose will automatically hydrate <code>fullDocument</code> into a fully fledged Mongoose document</p>
 </li></ul></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;ChangeStream&raquo;</span> mongoose-specific change stream wrapper, inherits from EventEmitter</li></ul><div><p><em>Requires a replica set running MongoDB &gt;= 3.6.0.</em> Watches the
 underlying collection for changes using
 <a href="https://www.mongodb.com/docs/manual/changeStreams/">MongoDB change streams</a>.</p>
@@ -1522,8 +1522,8 @@ does <strong>not</strong> trigger aggregate middleware.</p>
 <span class="hljs-comment">//   ns: { db: &#x27;mydb&#x27;, coll: &#x27;Person&#x27; },</span>
 <span class="hljs-comment">//   documentKey: { _id: 5a51b125c5500f5aa094c7bd } }</span>
 <span class="hljs-keyword">await</span> doc.<span class="hljs-title function_">deleteOne</span>();</code></pre>  </div><hr class="separate-api-elements"><h3 id="Model.where()"><a href="#Model.where()"><code>Model.where()</code></a></h3><h5>Parameters:</h5><ul class="params"><li class="param"><code>path</code>
-<span class="method-type">&laquo;String&raquo;</span> </li><li class="param"><code>[val]</code>
-<span class="method-type">&laquo;Object&raquo;</span> optional value</p>
+<span class="method-type">&laquo;string&raquo;</span> </li><li class="param"><code>[val]</code>
+<span class="method-type">&laquo;object&raquo;</span> optional value</p>
 </li></ul><h5>Returns:</h5><ul><li><span class="method-type">&laquo;Query&raquo;</span> </li></ul><div><p>Creates a Query, applies the passed conditions, and returns the Query.</p>
 <p>For example, instead of writing:</p>
 <pre><code lang="javascript"><span class="hljs-title class_">User</span>.<span class="hljs-title function_">find</span>({ <span class="hljs-attr">age</span>: { <span class="hljs-attr">$gte</span>: <span class="hljs-number">21</span>, <span class="hljs-attr">$lte</span>: <span class="hljs-number">65</span> } });</code></pre><p>we can instead write:</p>

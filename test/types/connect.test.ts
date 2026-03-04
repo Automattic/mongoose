@@ -1,7 +1,6 @@
 import mongoose, { connect } from 'mongoose';
-import { ExpectType } from './util/assertions';
+import { expect } from 'tstyche';
 
-// Promise
-ExpectType<Promise<typeof mongoose>>(connect('mongodb://127.0.0.1:27017/test'));
-ExpectType<Promise<typeof mongoose>>(connect('mongodb://127.0.0.1:27017/test', {}));
-ExpectType<Promise<typeof mongoose>>(connect('mongodb://127.0.0.1:27017/test', { bufferCommands: true }));
+expect(connect('mongodb://127.0.0.1:27017/test')).type.toBe<Promise<typeof mongoose>>();
+expect(connect('mongodb://127.0.0.1:27017/test', {})).type.toBe<Promise<typeof mongoose>>();
+expect(connect('mongodb://127.0.0.1:27017/test', { bufferCommands: true })).type.toBe<Promise<typeof mongoose>>();

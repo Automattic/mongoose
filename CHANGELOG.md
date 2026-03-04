@@ -1,3 +1,10 @@
+9.2.4 / 2026-03-03
+==================
+ * types(models): allow unknown keys in subdocs while retaining autocomplete suggestions #16048
+ * types(schema): fix issues related to defining timestamps and virtuals with methods and/or statics in schema options #16052 #16046
+ * docs: use lowercase primitive types in JSDoc and fix incorrect `@returns` declarations #16036 #16018
+ * docs(field-level-encryption): improve CSFLE docs with model registration guidance and schema definition example #16065 #16015
+
 9.2.3 / 2026-02-26
 ==================
  * types(model): make bulkSave() correctly take array of THydratedDocumentType #16032

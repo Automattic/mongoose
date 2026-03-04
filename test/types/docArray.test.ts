@@ -1,5 +1,5 @@
 import { Schema, model, Model, Types, InferSchemaType } from 'mongoose';
-import { ExpectType } from './util/assertions';
+import { expect } from 'tstyche';
 
 async function gh10293() {
   interface ITest {
@@ -20,7 +20,7 @@ async function gh10293() {
   testSchema.methods.getArrayOfArray = function(this: InstanceType<typeof TestModel>): string[][] { // <-- function to return Array of Array
     const test = this.toObject();
 
-    ExpectType<string[][]>(test.arrayOfArray);
+    expect(test.arrayOfArray).type.toBe<string[][]>();
     return test.arrayOfArray; // <-- error here if the issue persisted
   };
 }
@@ -32,14 +32,7 @@ function gh13087() {
     };
   }
 
-  new Types.DocumentArray<Book>([
-    // @ts-expect-error  Type 'number' is not assignable to type 'AnyObject'.
-    1,
-    // @ts-expect-error  Type 'number' is not assignable to type 'AnyObject'.
-    2,
-    // @ts-expect-error  Type 'number' is not assignable to type 'AnyObject'.
-    3
-  ]);
+  expect(Types.DocumentArray<Book>).type.not.toBeConstructableWith([1, 2, 3]);
 
   const locationSchema = new Schema(
     {
@@ -83,7 +76,7 @@ function gh13087() {
       coordinates: number[];
     };
   }>;
-  ExpectType<ExpectedPointsType>(points);
+  expect(points).type.toBe<ExpectedPointsType>();
 }
 
 async function gh13424() {
@@ -99,7 +92,7 @@ async function gh13424() {
   const TestModel = model('Test', testSchema);
 
   const doc = new TestModel();
-  ExpectType<Types.ObjectId>(doc.subDocArray[0]._id);
+  expect(doc.subDocArray[0]._id).type.toBe<Types.ObjectId>();
 }
 
 async function gh14367() {
@@ -130,10 +123,10 @@ async function gh14367() {
   );
 
   type IUser = InferSchemaType<typeof UserSchema>;
-  ExpectType<string | null | undefined>({} as IUser['reminders'][0]['type']);
-  ExpectType<Date | null | undefined>({} as IUser['reminders'][0]['date']);
-  ExpectType<boolean | null | undefined>({} as IUser['reminders'][0]['toggle']);
-  ExpectType<string | null | undefined>({} as IUser['avatar']);
+  expect<IUser['reminders'][0]['type']>().type.toBe<string | null | undefined>();
+  expect<IUser['reminders'][0]['date']>().type.toBe<Date | null | undefined>();
+  expect<IUser['reminders'][0]['toggle']>().type.toBe<boolean | null | undefined>();
+  expect<IUser['avatar']>().type.toBe<string | null | undefined>();
 }
 
 function gh14469() {
@@ -165,10 +158,10 @@ function gh14469() {
   const doc = new UserModel({ names: [{ firstName: 'John' }] });
 
   const jsonDoc = doc?.toJSON();
-  ExpectType<string>(jsonDoc?.names[0]?.firstName);
+  expect(jsonDoc?.names[0]?.firstName).type.toBe<string>();
 
   const jsonNames = doc?.names[0]?.toJSON();
-  ExpectType<string>(jsonNames?.firstName);
+  expect(jsonNames?.firstName).type.toBe<string>();
 }
 
 function gh15041() {
@@ -185,5 +178,5 @@ function gh15041() {
 
   const doc = new TestModel({ subdocArray: [{ name: 'John', age: 30 }] });
   type TestModelDoc = ReturnType<(typeof TestModel)['hydrate']>
-  ExpectType<TestModelDoc['subdocArray'][0][]>(doc.subdocArray.splice(0, 1, { name: 'Bill' }));
+  expect(doc.subdocArray.splice(0, 1, { name: 'Bill' })).type.toBe<TestModelDoc['subdocArray'][0][]>();
 }

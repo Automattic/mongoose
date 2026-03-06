@@ -183,8 +183,9 @@ concepts in SQL.
 
 <hr/>
 
+<!--The following cloudinary link is a copy of https://developer.mozilla.org/mdn-social-image.46ac2375.png-->
 <a class="pluralsight-link" style="padding: 20px" href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose">
-  <img src="https://developer.mozilla.org/mdn-social-share.cd6c4a5a.png" style="width: 140px" alt="Express Tutorial Part 3: Using a Database (with Mongoose)">
+  <img src="https://res.cloudinary.com/drfhhq8wu/image/upload/v1772501749/mdn-social-image.46ac2375_ytwsfy.png" style="width: 140px" alt="Express Tutorial Part 3: Using a Database (with Mongoose)">
 </a>
 
 <a class="pluralsight-title" href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose">

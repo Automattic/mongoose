@@ -46,13 +46,32 @@ declare module 'mongoose' {
         : Omit<PathValueType, TypeKey>
       : {},
     TypeKey,
-    HydratedDocTypeHint<PathValueType>
+    HydratedDocTypeHint<PathValueType>,
+    HydratedDiscriminatorEnumType<PathValueType>
   >;
 
   /**
    * @summary Allows users to optionally choose their own type for a schema field for stronger typing.
    */
-  type HydratedDocTypeHint<T> = T extends { __hydratedDocTypeHint: infer U } ? U: never;
+  type HydratedDocTypeHint<T> = T extends { __hydratedDocTypeHint: infer U } ? U
+    : never;
+
+  type ResolveDiscriminatorHydratedPathType<TBaseSchema extends Schema, TDiscriminators> =
+    IsAny<TDiscriminators> extends true ? never
+    : TDiscriminators extends Record<string, any> ?
+      TDiscriminators[keyof TDiscriminators] extends Schema ?
+        MergeType<InferHydratedDocTypeFromSchema<TBaseSchema>, InferHydratedDocTypeFromSchema<TDiscriminators[keyof TDiscriminators]>>
+      : never
+    : never;
+
+  type HydratedDiscriminatorEnumType<T> = string extends keyof T ? never
+    : number extends keyof T ? never
+    : T extends { type: infer BaseType; discriminators: infer TDiscriminators } ?
+      IsAny<BaseType> extends true ? never
+      : BaseType extends Schema ?
+        ResolveDiscriminatorHydratedPathType<BaseType, TDiscriminators>
+      : never
+    : never;
 
   /**
    * Same as inferSchemaType, except:
@@ -67,8 +86,9 @@ declare module 'mongoose' {
    * @param {TypeKey} TypeKey A generic of literal string type. Refers to the property used for path type definition.
    * @returns Type
    */
-  type ResolveHydratedPathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}, TypeKey extends string = DefaultSchemaOptions['typeKey'], TypeHint = never> =
+  type ResolveHydratedPathType<PathValueType, Options extends SchemaTypeOptions<PathValueType> = {}, TypeKey extends string = DefaultSchemaOptions['typeKey'], TypeHint = never, TDiscriminatorEnumType = never> =
     IsNotNever<TypeHint> extends true ? TypeHint
+    : IsNotNever<TDiscriminatorEnumType> extends true ? TDiscriminatorEnumType
     : PathValueType extends Schema<any, any, any, any, any, any, any, any, infer THydratedDocumentType> ?
       THydratedDocumentType :
         PathValueType extends AnyArray<infer Item> ?

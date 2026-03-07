@@ -268,31 +268,31 @@ describe('discriminator docs', function() {
     const eventSchema = new Schema({ message: String },
       { discriminatorKey: 'kind', _id: false });
 
-    const batchSchema = new Schema({ events: [eventSchema] });
-
-    // `batchSchema.path('events')` gets the mongoose `DocumentArray`
-    // For TypeScript, use `schema.path<Schema.Types.DocumentArray>('events')`
-    const docArray = batchSchema.path('events');
-
-    // The `events` array can contain 2 different types of events, a
-    // 'clicked' event that requires an element id that was clicked...
     const clickedSchema = new Schema({
       element: {
         type: String,
         required: true
       }
     }, { _id: false });
-    // Make sure to attach any hooks to `eventSchema` and `clickedSchema`
-    // **before** calling `discriminator()`.
-    const Clicked = docArray.discriminator('Clicked', clickedSchema);
-
-    // ... and a 'purchased' event that requires the product that was purchased.
-    const Purchased = docArray.discriminator('Purchased', new Schema({
+    const purchasedSchema = new Schema({
       product: {
         type: String,
         required: true
       }
-    }, { _id: false }));
+    }, { _id: false });
+
+    // The `events` array can contain 2 different types of events: a
+    // 'clicked' event that requires an element id that was clicked
+    // and a 'purchased' event that requires the product that was purchased.
+    const batchSchema = new Schema({
+      events: [{
+        type: eventSchema,
+        discriminators: {
+          Clicked: clickedSchema,
+          Purchased: purchasedSchema
+        }
+      }
+      ] });
 
     const Batch = db.model('EventBatch', batchSchema);
 
@@ -308,11 +308,9 @@ describe('discriminator docs', function() {
 
     assert.equal(doc.events[0].element, '#hero');
     assert.equal(doc.events[0].message, 'hello');
-    assert.ok(doc.events[0] instanceof Clicked);
 
     assert.equal(doc.events[1].product, 'action-figure-1');
     assert.equal(doc.events[1].message, 'world');
-    assert.ok(doc.events[1] instanceof Purchased);
 
     doc.events.push({ kind: 'Purchased', product: 'action-figure-2' });
 
@@ -321,7 +319,6 @@ describe('discriminator docs', function() {
     assert.equal(doc.events.length, 3);
 
     assert.equal(doc.events[2].product, 'action-figure-2');
-    assert.ok(doc.events[2] instanceof Purchased);
   });
 
   /**
@@ -388,11 +385,15 @@ describe('discriminator docs', function() {
    */
   it('Single nested discriminators', function() {
     const shapeSchema = Schema({ name: String }, { discriminatorKey: 'kind' });
-    const schema = Schema({ shape: shapeSchema });
-
-    // For TypeScript, use `schema.path<Schema.Types.Subdocument>('shape').discriminator(...)`
-    schema.path('shape').discriminator('Circle', Schema({ radius: String }));
-    schema.path('shape').discriminator('Square', Schema({ side: Number }));
+    const schema = Schema({
+      shape: {
+        type: shapeSchema,
+        discriminators: {
+          Circle: Schema({ radius: String }),
+          Square: Schema({ side: Number })
+        }
+      }
+    });
 
     const MyModel = mongoose.model('ShapeTest', schema);
 

@@ -564,6 +564,66 @@ describe('model', function() {
         expected.name = 'Conversion event - updated';
         assert.deepEqual(document.toJSON(), expected);
       });
+
+      it('handles deeply nested paths with discriminators and arrayFilters (gh-15338)', async function() {
+        const eventSchema = new Schema(
+          { message: String },
+          { discriminatorKey: 'kind', _id: false }
+        );
+
+        const batchSchema = new Schema(
+          { events: [eventSchema] },
+          { timestamps: true }
+        );
+
+        const docArray = batchSchema.path('events');
+
+        docArray.discriminator(
+          'Clicked',
+          new Schema({ element: { type: String, required: true } }, { _id: false })
+        );
+
+        docArray.discriminator(
+          'Purchased',
+          new Schema({
+            products: {
+              type: new Schema({ map: { type: Schema.Types.Map, of: String } }, { _id: false })
+            }
+          })
+        );
+
+        const Batch = db.model('gh15338', batchSchema);
+
+        const purchasedId = new mongoose.Types.ObjectId();
+
+        const doc = await Batch.create({
+          events: [
+            { kind: 'Clicked', element: '#hero', message: 'hello' },
+            {
+              kind: 'Purchased',
+              _id: purchasedId,
+              products: { map: { key: 'value' } },
+              message: 'world'
+            }
+          ]
+        });
+
+        const updatedBatch = await Batch.findByIdAndUpdate(
+          doc._id,
+          { 'events.$[event].products.map.key': 'newValue' },
+          {
+            arrayFilters: [
+              {
+                'event._id': purchasedId,
+                'event.kind': 'Purchased'
+              }
+            ],
+            new: true
+          }
+        ).exec();
+
+        assert.equal(updatedBatch.events[1].products.map.get('key'), 'newValue');
+      });
     });
 
     describe('population/reference mapping', function() {

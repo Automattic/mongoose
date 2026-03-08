@@ -437,3 +437,39 @@ function gh15988() {
     data: { role?: string | null | undefined } & { _id: Types.ObjectId };
   } & { _id: Types.ObjectId }>({} as Doc8);
 }
+
+async function gh16053() {
+  const schemaDefinition = new mongoose.Schema({
+    email: {
+      type: String,
+      trim: true,
+      required: true,
+      unique: true,
+      lowercase: true
+    },
+    password: {
+      type: String,
+      required: true
+    },
+    dateOfBirth: {
+      type: Date,
+      required: true
+    }
+  });
+
+  const TestModel = mongoose.model('Test', schemaDefinition);
+  type TestType = mongoose.InferRawDocTypeFromSchema<typeof schemaDefinition>;
+
+  let test: TestType | null;
+
+  async function queryById(id: string) {
+    let test: TestType | null;
+    TestModel.findById(id).lean().then(result => {
+      if (result) {
+        test = result;
+        console.log(result._id);
+        console.log(test._id); // This throws a type error since _id doesn't exist on the type when it should
+      }
+    });
+  }
+}

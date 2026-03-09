@@ -875,6 +875,103 @@ describe('versioning', function() {
       });
     });
 
+    describe('optimisticConcurrency: string[] with nested paths', function() {
+      it('sets VERSION_ALL when modifying child of included parent path', async function() {
+        // Arrange
+        const { user } = await createNestedTestContext({ optimisticConcurrency: ['profile'] });
+
+        // Act
+        user.profile.firstName = 'Bob';
+        user.$__delta();
+
+        // Assert
+        assert.strictEqual(user.$__.version, VERSION_ALL);
+      });
+
+      it('sets VERSION_ALL when modifying parent of included child path', async function() {
+        // Arrange
+        const { user } = await createNestedTestContext({ optimisticConcurrency: ['profile.address.country'] });
+
+        // Act
+        user.profile.address = { street: 'New St', country: 'CA' };
+        user.$__delta();
+
+        // Assert
+        assert.strictEqual(user.$__.version, VERSION_ALL);
+      });
+
+      it('does not set version when modifying unrelated path', async function() {
+        // Arrange
+        const { user } = await createNestedTestContext({ optimisticConcurrency: ['profile.address.country'] });
+
+        // Act
+        user.balance = 200;
+        user.$__delta();
+
+        // Assert
+        assert.strictEqual(user.$__.version, undefined);
+      });
+    });
+
+    describe('optimisticConcurrency: { exclude } with nested paths', function() {
+      it('does not set version when modifying child of excluded parent path', async function() {
+        // Arrange
+        const { user } = await createNestedTestContext({ optimisticConcurrency: { exclude: ['profile'] } });
+
+        // Act
+        user.profile.firstName = 'Bob';
+        user.$__delta();
+
+        // Assert
+        assert.strictEqual(user.$__.version, undefined);
+      });
+
+      it('sets VERSION_ALL when modifying non-excluded path', async function() {
+        // Arrange
+        const { user } = await createNestedTestContext({ optimisticConcurrency: { exclude: ['profile'] } });
+
+        // Act
+        user.balance = 200;
+        user.$__delta();
+
+        // Assert
+        assert.strictEqual(user.$__.version, VERSION_ALL);
+      });
+
+      it('sets VERSION_ALL when modifying both excluded child and non-excluded path', async function() {
+        // Arrange
+        const { user } = await createNestedTestContext({ optimisticConcurrency: { exclude: ['profile'] } });
+
+        // Act
+        user.profile.firstName = 'Bob';
+        user.balance = 200;
+        user.$__delta();
+
+        // Assert
+        assert.strictEqual(user.$__.version, VERSION_ALL);
+      });
+    });
+
+    async function createNestedTestContext({ optimisticConcurrency }) {
+      const profileSchema = new Schema(
+        { firstName: String, lastName: String, address: { street: String, country: String } },
+        { _id: false }
+      );
+      const schema = new Schema({
+        profile: profileSchema,
+        balance: Number
+      }, { optimisticConcurrency });
+
+      const User = db.model('TestNested', schema);
+
+      const user = await User.create({
+        profile: { firstName: 'Alice', lastName: 'Smith', address: { street: 'Main St', country: 'US' } },
+        balance: 100
+      });
+
+      return { user };
+    }
+
     async function createTestContext({ optimisticConcurrency }) {
       const schema = new Schema({
         name: String,

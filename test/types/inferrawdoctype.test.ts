@@ -460,15 +460,11 @@ async function gh16053() {
   const TestModel = mongoose.model('Test', schemaDefinition);
   type TestType = mongoose.InferRawDocTypeFromSchema<typeof schemaDefinition>;
 
-  let test: TestType | null;
-
   async function queryById(id: string) {
-    let test: TestType | null;
     TestModel.findById(id).lean().then(result => {
       if (result) {
-        test = result;
+        ExpectType<FlattenMaps<TestType> & { _id: Types.ObjectId }>(result);
         console.log(result._id);
-        console.log(test._id); // This throws a type error since _id doesn't exist on the type when it should
       }
     });
   }

@@ -1050,6 +1050,7 @@ describe('connections:', function() {
     await new Promise((resolve) => changeStream.on('ready', () => resolve()));
 
     const nextChange = new Promise(resolve => changeStream.on('change', resolve));
+
     await Model.create({ name: 'test2' });
 
     await nextChange;

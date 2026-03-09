@@ -2333,7 +2333,7 @@ function gh16045DocumentArray() {
   const squareDoc = new Model({ shapes: [{ kind: 'Square', side: 10, name: 'b' }] });
 
   for (const doc of [circleDoc, squareDoc]) {
-    for (const shape of doc.shapes ?? []) {
+    for (const shape of doc.shapes!) {
       if (shape.kind === 'Circle') {
         ExpectType<number | null | undefined>(shape.radius);
         ExpectType<{ baseName?: string | null | undefined } | null | undefined>(shape.name);

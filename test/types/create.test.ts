@@ -1,6 +1,5 @@
 import mongoose, { Schema, model, Types, HydratedDocument } from 'mongoose';
-import { ExpectType } from './util/assertions';
-import { expectTypeOf } from 'expect-type';
+import { expect } from 'tstyche';
 
 const schema = new Schema({ name: { type: 'String' } });
 
@@ -12,118 +11,116 @@ interface ITest {
 const Test = model<ITest>('Test', schema);
 
 Test.create({ _id: '000000000000000000000000', name: 'test' }).then(doc => {
-  ExpectType<Types.ObjectId>(doc._id);
-  ExpectType<string>(doc.name);
-  ExpectType<boolean>(doc.isNew);
+  expect(doc._id).type.toBe<Types.ObjectId>();
+  expect(doc.name).type.toBe<string>();
+  expect(doc.isNew).type.toBe<boolean>();
 });
 
 Test.create({ _id: new Types.ObjectId('000000000000000000000000'), name: 'test' }).then((doc) => {
-  ExpectType<Types.ObjectId>(doc._id);
-  ExpectType<string>(doc.name);
-  ExpectType<boolean>(doc.isNew);
+  expect(doc._id).type.toBe<Types.ObjectId>();
+  expect(doc.name).type.toBe<string>();
+  expect(doc.isNew).type.toBe<boolean>();
 });
 
 Test.create([{ name: 'test' }], { validateBeforeSave: false }).then(docs => {
-  ExpectType<Types.ObjectId>(docs[0]._id);
-  ExpectType<string>(docs[0].name);
-  ExpectType<boolean>(docs[0].isNew);
+  expect(docs[0]._id).type.toBe<Types.ObjectId>();
+  expect(docs[0].name).type.toBe<string>();
+  expect(docs[0].isNew).type.toBe<boolean>();
 });
 
 Test.create({ name: 'test' }, { name: 'test2' }).then(docs => {
-  ExpectType<Types.ObjectId>(docs[0]._id);
-  ExpectType<string>(docs[0].name);
-  ExpectType<Types.ObjectId>(docs[1]._id);
-  ExpectType<string>(docs[1].name);
+  expect(docs[0]._id).type.toBe<Types.ObjectId>();
+  expect(docs[0].name).type.toBe<string>();
+  expect(docs[1]._id).type.toBe<Types.ObjectId>();
+  expect(docs[1].name).type.toBe<string>();
 });
 
 Test.create([{ name: 'test' }], { validateBeforeSave: true }).then(docs => {
-  ExpectType<Types.ObjectId>(docs[0]._id);
-  ExpectType<string>(docs[0].name);
+  expect(docs[0]._id).type.toBe<Types.ObjectId>();
+  expect(docs[0].name).type.toBe<string>();
 });
 
 Test.create({}).then(doc => {
-  ExpectType<string>(doc.name);
+  expect(doc.name).type.toBe<string>();
 });
 
 Test.create([{}]).then(docs => {
-  ExpectType<string>(docs[0].name);
+  expect(docs[0].name).type.toBe<string>();
 });
 
 Test.create({ name: 'test' });
 Test.create({ _id: new Types.ObjectId('0'.repeat(24)), name: 'test' });
 
 Test.insertMany({ name: 'test' }, {}).then(docs => {
-  ExpectType<Types.ObjectId>(docs[0]._id);
-  ExpectType<string>(docs[0].name);
-  ExpectType<boolean>(docs[0].isNew);
+  expect(docs[0]._id).type.toBe<Types.ObjectId>();
+  expect(docs[0].name).type.toBe<string>();
+  expect(docs[0].isNew).type.toBe<boolean>();
 });
 
 Test.insertMany({ name: 'test' }, { lean: true }).then(docs => {
-  ExpectType<Types.ObjectId>(docs[0]._id);
-  ExpectType<string>(docs[0].name);
-  // @ts-expect-error  Property 'isNew' does not exist on type
-  docs[0].isNew;
+  expect(docs[0]._id).type.toBe<Types.ObjectId>();
+  expect(docs[0].name).type.toBe<string>();
+  expect(docs[0]).type.not.toHaveProperty('isNew');
 });
 
 Test.insertMany({ name: 'test' }).then(docs => {
-  ExpectType<Types.ObjectId>(docs[0]._id);
-  ExpectType<string>(docs[0].name);
-  ExpectType<boolean>(docs[0].isNew);
+  expect(docs[0]._id).type.toBe<Types.ObjectId>();
+  expect(docs[0].name).type.toBe<string>();
+  expect(docs[0].isNew).type.toBe<boolean>();
 });
 
 Test.insertMany({ name: 'test' }, {}).then(docs => {
-  ExpectType<Types.ObjectId>(docs[0]._id);
-  ExpectType<string>(docs[0].name);
-  ExpectType<boolean>(docs[0].isNew);
+  expect(docs[0]._id).type.toBe<Types.ObjectId>();
+  expect(docs[0].name).type.toBe<string>();
+  expect(docs[0].isNew).type.toBe<boolean>();
 });
 
 Test.insertMany([{ name: 'test' }], { rawResult: true }).then(result => {
-  ExpectType<boolean>(result.acknowledged);
-  ExpectType<number>(result.insertedCount);
-  ExpectType<{ [key: number]: Types.ObjectId; }>(result.insertedIds);
+  expect(result.acknowledged).type.toBe<boolean>();
+  expect(result.insertedCount).type.toBe<number>();
+  expect(result.insertedIds).type.toBe<{ [key: number]: Types.ObjectId; }>();
 });
 
 Test.insertMany([{ name: 'test' }], { rawResult: true }).then(result => {
-  ExpectType<boolean>(result.acknowledged);
-  ExpectType<number>(result.insertedCount);
-  ExpectType<{ [key: number]: Types.ObjectId; }>(result.insertedIds);
+  expect(result.acknowledged).type.toBe<boolean>();
+  expect(result.insertedCount).type.toBe<number>();
+  expect(result.insertedIds).type.toBe<{ [key: number]: Types.ObjectId; }>();
 });
 
 Test.insertMany([{ name: 'test' }], { lean: true }).then(docs => {
-  ExpectType<Types.ObjectId>(docs[0]._id);
-  ExpectType<string>(docs[0].name);
-  // @ts-expect-error  Property 'isNew' does not exist on type
-  docs[0].isNew;
+  expect(docs[0]._id).type.toBe<Types.ObjectId>();
+  expect(docs[0].name).type.toBe<string>();
+  expect(docs[0]).type.not.toHaveProperty('isNew');
 });
 
 Test.insertMany([{ name: 'test' }], { lean: false }).then(docs => {
-  ExpectType<Types.ObjectId>(docs[0]._id);
-  ExpectType<string>(docs[0].name);
-  ExpectType<boolean>(docs[0].isNew);
+  expect(docs[0]._id).type.toBe<Types.ObjectId>();
+  expect(docs[0].name).type.toBe<string>();
+  expect(docs[0].isNew).type.toBe<boolean>();
 });
 
 Test.insertMany([{ name: 'test' }], { }).then(docs => {
-  ExpectType<Types.ObjectId>(docs[0]._id);
-  ExpectType<string>(docs[0].name);
-  ExpectType<boolean>(docs[0].isNew);
+  expect(docs[0]._id).type.toBe<Types.ObjectId>();
+  expect(docs[0].name).type.toBe<string>();
+  expect(docs[0].isNew).type.toBe<boolean>();
 });
 
 Test.insertMany([{ name: 'test' }]).then(docs => {
-  ExpectType<Types.ObjectId>(docs[0]._id);
-  ExpectType<string>(docs[0].name);
-  ExpectType<boolean>(docs[0].isNew);
+  expect(docs[0]._id).type.toBe<Types.ObjectId>();
+  expect(docs[0].name).type.toBe<string>();
+  expect(docs[0].isNew).type.toBe<boolean>();
 });
 
 Test.insertMany({ _id: '000000000000000000000000', name: 'test' }).then(docs => {
-  ExpectType<Types.ObjectId>(docs[0]._id);
-  ExpectType<string>(docs[0].name);
-  ExpectType<boolean>(docs[0].isNew);
+  expect(docs[0]._id).type.toBe<Types.ObjectId>();
+  expect(docs[0].name).type.toBe<string>();
+  expect(docs[0].isNew).type.toBe<boolean>();
 });
 
 Test.insertMany({ _id: new Types.ObjectId('000000000000000000000000'), name: 'test' }).then(docs => {
-  ExpectType<Types.ObjectId>(docs[0]._id);
-  ExpectType<string>(docs[0].name);
-  ExpectType<boolean>(docs[0].isNew);
+  expect(docs[0]._id).type.toBe<Types.ObjectId>();
+  expect(docs[0].name).type.toBe<string>();
+  expect(docs[0].isNew).type.toBe<boolean>();
 });
 
 (async() => {
@@ -134,25 +131,25 @@ Test.insertMany({ _id: new Types.ObjectId('000000000000000000000000'), name: 'te
 })();
 
 async function createWithAggregateErrors() {
-  ExpectType<(HydratedDocument<ITest>)[]>(await Test.create([{}]));
-  ExpectType<(HydratedDocument<ITest> | Error)[]>(await Test.create([{}], { aggregateErrors: true }));
+  expect(await Test.create([{}])).type.toBe<(HydratedDocument<ITest>)[]>();
+  expect(await Test.create([{}], { aggregateErrors: true })).type.toBe<(HydratedDocument<ITest> | Error)[]>();
 }
 
 async function createWithSubdoc() {
   const schema = new Schema({ name: String, registeredAt: Date, subdoc: new Schema({ prop: { type: String, required: true } }) });
   const TestModel = model('Test', schema);
   const doc = await TestModel.create({ name: 'test', registeredAt: '2022-06-01', subdoc: { prop: 'value' } });
-  ExpectType<string | null | undefined>(doc.name);
-  ExpectType<Date | null | undefined>(doc.registeredAt);
-  ExpectType<string>(doc.subdoc!.prop);
+  expect(doc.name).type.toBe<string | null | undefined>();
+  expect(doc.registeredAt).type.toBe<Date | null | undefined>();
+  expect(doc.subdoc!.prop).type.toBe<string>();
 }
 
 async function createWithDocArray() {
   const schema = new Schema({ name: String, subdocs: [new Schema({ prop: { type: String, required: true } })] });
   const TestModel = model('Test', schema);
   const doc = await TestModel.create({ name: 'test', subdocs: [{ prop: 'value' }] });
-  ExpectType<string | null | undefined>(doc.name);
-  ExpectType<string>(doc.subdocs[0].prop);
+  expect(doc.name).type.toBe<string | null | undefined>();
+  expect(doc.subdocs[0].prop).type.toBe<string>();
 }
 
 async function createWithMapOfSubdocs() {
@@ -166,12 +163,12 @@ async function createWithMapOfSubdocs() {
   const TestModel = model('Test', schema);
 
   const doc = await TestModel.create({ name: 'test', subdocMap: { taco: { prop: 'beef' } } });
-  ExpectType<string | null | undefined>(doc.name);
-  ExpectType<string>(doc.subdocMap!.get('taco')!.prop);
+  expect(doc.name).type.toBe<string | null | undefined>();
+  expect(doc.subdocMap!.get('taco')!.prop).type.toBe<string>();
 
   const doc2 = await TestModel.create({ name: 'test', subdocMap: [['taco', { prop: 'beef' }]] });
-  ExpectType<string | null | undefined>(doc2.name);
-  ExpectType<string>(doc2.subdocMap!.get('taco')!.prop);
+  expect(doc2.name).type.toBe<string | null | undefined>();
+  expect(doc2.subdocMap!.get('taco')!.prop).type.toBe<string>();
 }
 
 async function createWithSubdocs() {
@@ -185,9 +182,9 @@ async function createWithSubdocs() {
   const TestModel = model('Test', schema);
 
   const doc = await TestModel.create({ name: 'test', subdoc: { prop: 'test 1' } });
-  ExpectType<string | null | undefined>(doc.name);
-  ExpectType<string>(doc.subdoc!.prop);
-  ExpectType<string>(doc.subdoc!.otherProp);
+  expect(doc.name).type.toBe<string | null | undefined>();
+  expect(doc.subdoc!.prop).type.toBe<string>();
+  expect(doc.subdoc!.otherProp).type.toBe<string>();
 }
 
 async function createWithRawDocTypeNo_id() {
@@ -203,12 +200,12 @@ async function createWithRawDocTypeNo_id() {
   const TestModel = model<RawDocType>('Test', schema);
 
   const doc = await TestModel.create({ _id: '0'.repeat(24), name: 'test' });
-  ExpectType<string>(doc.name);
-  ExpectType<Types.ObjectId>(doc._id);
+  expect(doc.name).type.toBe<string>();
+  expect(doc._id).type.toBe<Types.ObjectId>();
 
   const doc2 = await TestModel.create({ name: 'test', _id: new Types.ObjectId() });
-  ExpectType<string>(doc2.name);
-  ExpectType<Types.ObjectId>(doc2._id);
+  expect(doc2.name).type.toBe<string>();
+  expect(doc2._id).type.toBe<Types.ObjectId>();
 }
 
 createWithAggregateErrors();
@@ -273,9 +270,6 @@ function gh16012() {
     quantity: decimalSchema
   }));
 
-  // @ts-expect-error Type 'number' does not satisfy the constraint '"Expected: number, Actual: never"'.
-  expectTypeOf({} as never).toEqualTypeOf<number>();
-
   // Any type ok for unknown fields - strict mode strips them out unless virtual
   ParentModel.create({ quantity: { value: 10 } });
   ParentModel.create({ quantity: { value: '10' } });
@@ -283,8 +277,6 @@ function gh16012() {
   // type must match for known fields
   ParentModel.create({ quantity: { exponent: 10 } });
   ParentModel.create({ quantity: { base: 10 } });
-  // @ts-expect-error  No overload matches this call.
-  ParentModel.create({ quantity: { exponent: '10' } });
-  // @ts-expect-error  No overload matches this call.
-  ParentModel.create({ quantity: { base: '10' } });
+  expect(ParentModel.create).type.not.toBeCallableWith({ quantity: { exponent: '10' } });
+  expect(ParentModel.create).type.not.toBeCallableWith({ quantity: { base: '10' } });
 }

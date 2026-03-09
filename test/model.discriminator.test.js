@@ -2006,6 +2006,32 @@ describe('model', function() {
     assert(array.arrayEvent[0].element);
   });
 
+  it('supports single nested `discriminators` path option without calling path().discriminator()', async function() {
+    const shapeSchema = new Schema({ name: String }, { discriminatorKey: 'kind', _id: false });
+    const circleSchema = new Schema({ radius: Number }, { _id: false });
+    const squareSchema = new Schema({ side: Number }, { _id: false });
+
+    const schema = new Schema({
+      shape: {
+        type: shapeSchema,
+        discriminators: {
+          Circle: circleSchema,
+          Square: squareSchema
+        }
+      }
+    });
+
+    const Test = db.model('gh_discriminators_path_option', schema);
+    await Test.create({ shape: { kind: 'Circle', radius: 5 } });
+    await Test.create({ shape: { kind: 'Square', side: 10 } });
+
+    const docs = await Test.find().sort({ 'shape.kind': 1 }).lean();
+    assert.equal(docs[0].shape.kind, 'Circle');
+    assert.equal(docs[0].shape.radius, 5);
+    assert.equal(docs[1].shape.kind, 'Square');
+    assert.equal(docs[1].shape.side, 10);
+  });
+
   it('handles discriminators on maps of subdocuments (gh-11720)', async function() {
     const shapeSchema = Schema({ name: String }, { discriminatorKey: 'kind' });
     const schema = Schema({ shape: { type: Map, of: shapeSchema } });

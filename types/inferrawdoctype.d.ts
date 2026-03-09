@@ -10,7 +10,9 @@ import { Binary, UUID } from 'mongodb';
 declare module 'mongoose' {
   export type InferRawDocTypeFromSchema<TSchema extends Schema<any>> = IsItRecordAndNotAny<ObtainSchemaGeneric<TSchema, 'EnforcedDocType'>> extends true
     ? ObtainSchemaGeneric<TSchema, 'EnforcedDocType'>
-    : InferRawDocType<ObtainSchemaGeneric<TSchema, 'TSchemaDefinition'>>;
+    : unknown extends ObtainSchemaGeneric<TSchema, 'TSchemaDefinition'>
+      ? Require_id<FlattenMaps<SubdocsToPOJOs<ObtainSchemaGeneric<TSchema, 'DocType'>>>>
+      : InferRawDocType<ObtainSchemaGeneric<TSchema, 'TSchemaDefinition'>>;
 
   export type InferRawDocTypeWithout_id<
     SchemaDefinition,
@@ -95,7 +97,7 @@ declare module 'mongoose' {
      : PathValueType extends Schema<infer RawDocType, any, any, any, any, any, infer TSchemaOptions, infer DocType, any, infer TSchemaDefinition> ?
          IsItRecordAndNotAny<RawDocType> extends true ?
          RawDocType :
-         string extends keyof TSchemaDefinition ?
+         unknown extends TSchemaDefinition ?
           TSchemaOptions extends { _id: false } ?
             FlattenMaps<SubdocsToPOJOs<DocType>> :
             Require_id<FlattenMaps<SubdocsToPOJOs<DocType>>> :
@@ -106,7 +108,7 @@ declare module 'mongoose' {
            // If Item is a schema, infer its type.
            Array<IsItRecordAndNotAny<RawDocType> extends true ?
             RawDocType :
-            string extends keyof TSchemaDefinition ?
+            unknown extends TSchemaDefinition ?
               TSchemaOptions extends { _id: false } ?
                 FlattenMaps<SubdocsToPOJOs<DocType>> :
                 Require_id<FlattenMaps<SubdocsToPOJOs<DocType>>> :

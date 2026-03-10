@@ -5320,6 +5320,52 @@ describe('Model', function() {
       assert.strictEqual(doc.num, 2);
     });
 
+    it('bulkWrite should return insertedIds in the same order as the arguments (gh-16079)', async function() {
+      const schema = new mongoose.Schema({
+        number: Number
+      });
+      const Model = db.model('gh16079_1', schema);
+      await Model.deleteMany({});
+
+      const ops = new Array(11).fill().map((_, i) => ({ insertOne: { document: { number: i } } }));
+
+      const result = await Model.bulkWrite(ops, { ordered: false });
+
+      const docs = await Promise.all(
+        Object.values(result.insertedIds).map(id => Model.findById(id))
+      );
+
+      const resultNumbers = docs.map(doc => doc.number);
+      const expectedNumbers = ops.map(op => op.insertOne.document.number);
+
+      assert.deepStrictEqual(resultNumbers, expectedNumbers);
+    });
+
+    it('bulkWrite error index should point to the right argument (gh-16079)', async function() {
+      const schema = new mongoose.Schema({
+        number: { type: Number, unique: true }
+      });
+      const Model = db.model('gh16079_2', schema);
+      await Model.deleteMany({});
+      await Model.syncIndexes();
+
+      const ops1 = new Array(11).fill().map((_, i) => ({ insertOne: { document: { number: i } } }));
+      await Model.bulkWrite(ops1);
+
+      const ops2 = new Array(21).fill().map((_, i) => ({ insertOne: { document: { number: 20 - i } } }));
+      try {
+        await Model.bulkWrite(ops2, { ordered: false });
+        assert.fail('Should have thrown BulkWriteError');
+      } catch (error) {
+        assert.ok(error.name === 'MongoBulkWriteError', `Unexpected error name: ${error.name}`);
+
+        const errorNumbers = error.writeErrors.map(({ err }) => ops2[err.index].insertOne.document.number);
+        const expectedNumbers = ops2.slice(-11).map(op => op.insertOne.document.number);
+
+        assert.deepStrictEqual(errorNumbers, expectedNumbers);
+      }
+    });
+
     it('alias with lean virtual (gh-6069)', async function() {
       const schema = new mongoose.Schema({
         name: {

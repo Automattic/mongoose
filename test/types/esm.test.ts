@@ -1,7 +1,7 @@
-import type * as mongoose from 'mongoose';
+import * as mongoose from 'mongoose';
 import mongooseESM from 'mongoose';
 import * as mongooseDefault from 'mongoose';
-import { ExpectType } from './util/assertions';
+import { expect } from 'tstyche';
 
-ExpectType<typeof mongoose>(mongooseESM);
-ExpectType<typeof mongoose>(mongooseDefault);
+expect(mongooseESM).type.toBe(mongoose);
+expect(mongooseDefault).type.toBe(mongoose);

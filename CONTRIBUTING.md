@@ -13,13 +13,13 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
 
 ## Requesting new features
 
-* Before opening a new issue, look for existing [issues](https://github.com/learnboost/mongoose/issues) to avoid duplication. If the issue does not yet exist, [create one](https://github.com/learnboost/mongoose/issues/new).
+* Before opening a new issue, look for existing [issues](https://github.com/Automattic/mongoose/issues) to avoid duplication. If the issue does not yet exist, [create one](https://github.com/Automattic/mongoose/issues/new).
 * Please describe a use case for it
 * Please include test cases if possible
 
 ## Fixing bugs / Adding features
 
-* Before starting to write code, look for existing [issues](https://github.com/learnboost/mongoose/issues). That way you avoid working on something that might not be of interest or that has been addressed already in a different branch. [You can create a new issue on GitHub](https://github.com/learnboost/mongoose/issues/new).
+* Before starting to write code, look for existing [issues](https://github.com/Automattic/mongoose/issues). That way you avoid working on something that might not be of interest or that has been addressed already in a different branch. [You can create a new issue on GitHub](https://github.com/Automattic/mongoose/issues/new).
   * *The source of this project is written in JavaScript, not CoffeeScript or TypeScript. Please write your bug reports in JavaScript that can run in vanilla Node.js*.
 * Fork the [repo](https://github.com/Automattic/mongoose) *or* for small documentation changes, navigate to the source on github and click the [Edit](https://github.com/blog/844-forking-with-the-edit-button) button.
 * Follow the general coding style of the rest of the project:

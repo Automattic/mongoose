@@ -1,5 +1,5 @@
 import mongoose, { Model, Schema, SchemaOptions, Types, model, HydratedDocFromModel, InferSchemaType } from 'mongoose';
-import { ExpectType } from './util/assertions';
+import { expect } from 'tstyche';
 
 const schema = new Schema({ name: { type: 'String' } });
 
@@ -110,11 +110,11 @@ function gh15535() {
   const ChildModel = ParentModel.discriminator('child', ChildSchema);
 
   const doc = new ChildModel({});
-  ExpectType<string>(doc.field1);
-  ExpectType<number | null | undefined>(doc.field2);
-  ExpectType<number | null | undefined>(doc.getField2());
-  ExpectType<string | null | undefined>(doc.field3);
-  ExpectType<string | null | undefined>(doc.getField3());
+  expect(doc.field1).type.toBe<string>();
+  expect(doc.field2).type.toBe<number | null | undefined>();
+  expect(doc.getField2()).type.toBe<number | null | undefined>();
+  expect(doc.field3).type.toBe<string | null | undefined>();
+  expect(doc.getField3()).type.toBe<string | null | undefined>();
 }
 
 async function gh15600() {
@@ -132,17 +132,17 @@ async function gh15600() {
   const BaseModel = model('Base', baseSchema);
 
   const baseRes = await BaseModel.findByName('test');
-  ExpectType<string | null | undefined>(baseRes!.name);
+  expect(baseRes?.name).type.toBe<string | null | undefined>();
 
   // Discriminator model inheriting base static methods
   const discriminatorSchema = new Schema({ extra: String });
   const DiscriminatorModel = BaseModel.discriminator('Discriminator', discriminatorSchema);
 
   const res = await DiscriminatorModel.findByName('test');
-  ExpectType<string | null | undefined>(res!.name);
+  expect(res?.name).type.toBe<string | null | undefined>();
 
   const doc = await BaseModel.create(
     { __t: 'Discriminator', name: 'test', extra: 'test' } as InferSchemaType<typeof baseSchema>
   ) as HydratedDocFromModel<typeof DiscriminatorModel>;
-  ExpectType<string | null | undefined>(doc.extra);
+  expect(doc.extra).type.toBe<string | null | undefined>();
 }

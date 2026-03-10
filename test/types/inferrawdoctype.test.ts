@@ -442,10 +442,7 @@ async function gh16053() {
   const schemaDefinition = new mongoose.Schema({
     email: {
       type: String,
-      trim: true,
       required: true,
-      unique: true,
-      lowercase: true
     },
     password: {
       type: String,

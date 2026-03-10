@@ -914,5 +914,7 @@ async function gh15779_2() {
 async function gh16062() {
   const Test = model('Test', new Schema({ runtime: Number }));
   // @ts-expect-error  No overload matches this call.
-  Test.findOne({ runtime: { $wrong: 100 } });
+  await Test.findOne({ runtime: { $wrong: 100 } });
+  // @ts-expect-error  No overload matches this call.
+  await Test.findOne({ $and: [{ runtime: { $wrong: 100 } }] });
 }

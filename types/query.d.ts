@@ -28,15 +28,24 @@ declare module 'mongoose' {
 
   type StrictCondition<T> = mongodb.AlternativeType<T> | StrictFilterOperators<mongodb.AlternativeType<T>>;
 
+  type _StrictFilter<TSchema> = {
+    [P in keyof TSchema]?: StrictCondition<ApplyBasicQueryCasting<TSchema[P]>>;
+  } & StrictRootFilterOperators<TSchema>;
+
+  type StrictRootFilterOperators<TSchema> = Omit<mongodb.RootFilterOperators<TSchema>, '$and' | '$or' | '$nor'> & {
+    $and?: _StrictFilter<TSchema>[];
+    $or?: _StrictFilter<TSchema>[];
+    $nor?: _StrictFilter<TSchema>[];
+  };
+
   type _QueryFilter<T> = (
     { [P in keyof T]?: StrictCondition<ApplyBasicQueryCasting<T[P]>>; } &
-    mongodb.RootFilterOperators<{ [P in keyof mongodb.WithId<T>]?: ApplyBasicQueryCasting<mongodb.WithId<T>[P]>; }>
+    StrictRootFilterOperators<{ [P in keyof mongodb.WithId<T>]?: ApplyBasicQueryCasting<mongodb.WithId<T>[P]>; }>
   );
   type _QueryFilterLooseId<T> = (
     { [P in keyof T]?: StrictCondition<ApplyBasicQueryCasting<T[P]>>; } &
-    mongodb.RootFilterOperators<
-      { [P in keyof T]?: ApplyBasicQueryCasting<T[P]>; } &
-      { _id?: any; }
+    StrictRootFilterOperators<
+      { [P in keyof T]?: ApplyBasicQueryCasting<T[P]>; }
     >
   );
   type QueryFilter<T> = IsItRecordAndNotAny<T> extends true ? _QueryFilter<WithLevel1NestedPaths<T>> : _QueryFilterLooseId<Record<string, any>>;

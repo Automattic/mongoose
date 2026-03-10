@@ -89,8 +89,8 @@ declare module 'mongoose' {
     $markValid(path: string): void;
 
     /** Returns the model with the given name on this document's associated connection. */
-    $model<ModelType = Model<unknown>>(name: string): ModelType;
-    $model<ModelType = Model<DocType>>(): ModelType;
+    $model<ModelType extends Model<unknown>>(name: string): ModelType;
+    $model<ModelType extends Model<DocType>>(): ModelType;
 
     /**
      * A string containing the current operation that Mongoose is executing
@@ -218,8 +218,8 @@ declare module 'mongoose' {
     markModified(path: string, scope?: any): void;
 
     /** Returns the model with the given name on this document's associated connection. */
-    model<ModelType = Model<unknown>>(name: string): ModelType;
-    model<ModelType = Model<DocType>>(): ModelType;
+    model<ModelType extends Model<unknown>>(name: string): ModelType;
+    model<ModelType extends Model<DocType>>(): ModelType;
 
     /** Returns the list of paths that have been modified. */
     modifiedPaths(options?: { includeChildren?: boolean }): Array<string>;

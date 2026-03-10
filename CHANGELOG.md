@@ -1,3 +1,19 @@
+9.3.0 / 2026-03-10
+==================
+ * feat(schema): support `discriminators` option inline for better TypeScript support #16053
+ * feat(aggregate): add `pipelineForUnionWith()` helper to allow reusing pipelines with `$unionWith` in TypeScript #16033
+ * feat(setDefaultsOnInsert): pass query as context to default functions #16041 #16025
+ * fix: resolve deeply nested discriminator paths in arrayFilters #16072 [Yatin81](https://github.com/Yatin81)
+ * fix(changeStream): emit ready on next tick to allow stream to initialize
+ * fix(connection): handle calling watch() on disconnected connection
+ * fix: remove references to mongodb option "promiseLibrary" [hasezoey](https://github.com/hasezoey)
+ * fix(model+query): backwards compatible validateBeforeSave handling and avoid TypeError in removeUnusedArrayFilters on nullish update
+ * perf(model): remove unnecessary overhead when saving new doc
+ * types(InferRawDocType): fall back to using InferRawDocType instead of pulling non-raw inferred doc type if EnforcedDocType not set #16053
+ * types: add type constraints for `Document#$model()` and `Document#model()` [mrazauskas](https://github.com/mrazauskas)
+ * docs: fix broken links and update MongoDB documentation links #16037 [hasezoey](https://github.com/hasezoey)
+ * docs(contributing): update issue tracker links to Automattic org [AkaHarshit](https://github.com/AkaHarshit)
+
 9.2.4 / 2026-03-03
 ==================
  * types(models): allow unknown keys in subdocs while retaining autocomplete suggestions #16048

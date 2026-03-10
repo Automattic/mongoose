@@ -125,6 +125,9 @@ declare module 'mongoose' {
     /** Returns the current pipeline */
     pipeline(): PipelineStage[];
 
+    /** Returns the current pipeline typed for use in `$unionWith` */
+    pipelineForUnionWith(): PipelineStage.UnionWithPipelineStage[];
+
     /** Appends a new $project operator to this aggregate pipeline. */
     project(arg: PipelineStage.Project['$project'] | string): this;
 

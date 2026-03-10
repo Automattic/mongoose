@@ -10,7 +10,9 @@ import { Binary, UUID } from 'mongodb';
 declare module 'mongoose' {
   export type InferRawDocTypeFromSchema<TSchema extends Schema<any>> = IsItRecordAndNotAny<ObtainSchemaGeneric<TSchema, 'EnforcedDocType'>> extends true
     ? ObtainSchemaGeneric<TSchema, 'EnforcedDocType'>
-    : FlattenMaps<SubdocsToPOJOs<ObtainSchemaGeneric<TSchema, 'DocType'>>>;
+    : unknown extends ObtainSchemaGeneric<TSchema, 'TSchemaDefinition'>
+      ? Require_id<FlattenMaps<SubdocsToPOJOs<ObtainSchemaGeneric<TSchema, 'DocType'>>>>
+      : InferRawDocType<ObtainSchemaGeneric<TSchema, 'TSchemaDefinition'>>;
 
   export type InferRawDocTypeWithout_id<
     SchemaDefinition,
@@ -40,6 +42,23 @@ declare module 'mongoose' {
   type RawDocTypeHint<T> = IsAny<T> extends true ? never
     : T extends { __rawDocTypeHint: infer U } ? U: never;
 
+  type ResolveDiscriminatorRawPathType<TBaseSchema extends Schema, TDiscriminators> =
+    IsAny<TDiscriminators> extends true ? never
+    : TDiscriminators extends Record<string, any> ?
+      TDiscriminators[keyof TDiscriminators] extends Schema ?
+        MergeType<InferRawDocTypeFromSchema<TBaseSchema>, InferRawDocTypeFromSchema<TDiscriminators[keyof TDiscriminators]>>
+      : never
+    : never;
+
+  type RawDiscriminatorEnumType<T> = string extends keyof T ? never
+    : number extends keyof T ? never
+    : T extends { type: infer BaseType; discriminators: infer TDiscriminators } ?
+      IsAny<BaseType> extends true ? never
+      : BaseType extends Schema ?
+        ResolveDiscriminatorRawPathType<BaseType, TDiscriminators>
+      : never
+    : never;
+
   /**
    * @summary Obtains schema Path type.
    * @description Obtains Path type by separating path type from other options and calling {@link ResolveRawPathType}
@@ -64,6 +83,7 @@ declare module 'mongoose' {
      TypeKey,
      TTransformOptions,
      RawDocTypeHint<PathValueType>,
+     RawDiscriminatorEnumType<PathValueType>,
      TypeKey extends keyof PathValueType ? false : true
    >;
 
@@ -88,25 +108,27 @@ declare module 'mongoose' {
        TypeKey extends string = DefaultSchemaOptions['typeKey'],
        TTransformOptions = { bufferToBinary: false },
        TypeHint = never,
+       TDiscriminatorEnumType = never,
        IsNestedPath extends boolean = false
      > =
        IsNotNever<TypeHint> extends true ? TypeHint
+       : IsNotNever<TDiscriminatorEnumType> extends true ? TDiscriminatorEnumType
        : [PathValueType] extends [neverOrAny] ? PathValueType
-     : PathValueType extends Schema<infer RawDocType, any, any, any, any, any, infer TSchemaOptions, infer DocType, any, infer TSchemaDefinition> ?
-         IsItRecordAndNotAny<RawDocType> extends true ?
-         RawDocType :
-         string extends keyof TSchemaDefinition ?
-          TSchemaOptions extends { _id: false } ?
-            FlattenMaps<SubdocsToPOJOs<DocType>> :
-            Require_id<FlattenMaps<SubdocsToPOJOs<DocType>>> :
-          InferRawDocType<TSchemaDefinition, TSchemaOptions & Record<any, any>, TTransformOptions>
+       : PathValueType extends Schema<infer RawDocType, any, any, any, any, any, infer TSchemaOptions, infer DocType, any, infer TSchemaDefinition> ?
+           IsItRecordAndNotAny<RawDocType> extends true ?
+           RawDocType :
+           unknown extends TSchemaDefinition ?
+            TSchemaOptions extends { _id: false } ?
+              FlattenMaps<SubdocsToPOJOs<DocType>> :
+              Require_id<FlattenMaps<SubdocsToPOJOs<DocType>>> :
+            InferRawDocType<TSchemaDefinition, TSchemaOptions & Record<any, any>, TTransformOptions>
        : PathValueType extends ReadonlyArray<infer Item> ?
          IfEquals<Item, never> extends true ? any[]
          : Item extends Schema<infer RawDocType, any, any, any, any, any, infer TSchemaOptions, infer DocType, any, infer TSchemaDefinition> ?
            // If Item is a schema, infer its type.
            Array<IsItRecordAndNotAny<RawDocType> extends true ?
             RawDocType :
-            string extends keyof TSchemaDefinition ?
+            unknown extends TSchemaDefinition ?
               TSchemaOptions extends { _id: false } ?
                 FlattenMaps<SubdocsToPOJOs<DocType>> :
                 Require_id<FlattenMaps<SubdocsToPOJOs<DocType>>> :

@@ -174,7 +174,8 @@ function gh11435() {
   const ItemSchema = new Schema<Item>({ name: String });
 
   ItemSchema.pre('validate', function preValidate() {
-    expect(this.$model('Item1')).type.toBe<unknown>();
+    expect(this.$model('Item1')).type.toBe<Model<unknown>>();
+    expect(this.model('Item1')).type.toBe<Model<unknown>>();
   });
 }
 
@@ -303,8 +304,8 @@ function gh13878() {
   });
   const User = model('User', schema);
   const user = new User({ name: 'John', age: 30 });
-  expect(user.$model()).type.toBe<unknown>();
-  expect(user.model()).type.toBe<unknown>();
+  expect(user.$model()).type.toBeAssignableTo(User);
+  expect(user.model()).type.toBeAssignableTo(User);
 }
 
 function gh13094() {

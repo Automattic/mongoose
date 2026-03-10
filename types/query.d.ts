@@ -18,14 +18,22 @@ declare module 'mongoose' {
             ? DateQueryTypeCasting
             : T;
 
-  export type ApplyBasicQueryCasting<T> = QueryTypeCasting<T> | QueryTypeCasting<T[]> | (T extends (infer U)[] ? QueryTypeCasting<U> : T) | null;
+  export type ApplyBasicQueryCasting<T> = QueryTypeCasting<T> | QueryTypeCasting<T>[] | (T extends (infer U)[] ? QueryTypeCasting<U> : T) | null;
+
+  type RemoveIndexSignature<T> = {
+    [K in keyof T as string extends K ? never : number extends K ? never : symbol extends K ? never : K]: T[K];
+  };
+
+  type StrictFilterOperators<TValue> = RemoveIndexSignature<mongodb.FilterOperators<TValue>>;
+
+  type StrictCondition<T> = mongodb.AlternativeType<T> | StrictFilterOperators<mongodb.AlternativeType<T>>;
 
   type _QueryFilter<T> = (
-    { [P in keyof T]?: mongodb.Condition<ApplyBasicQueryCasting<T[P]>>; } &
+    { [P in keyof T]?: StrictCondition<ApplyBasicQueryCasting<T[P]>>; } &
     mongodb.RootFilterOperators<{ [P in keyof mongodb.WithId<T>]?: ApplyBasicQueryCasting<mongodb.WithId<T>[P]>; }>
   );
   type _QueryFilterLooseId<T> = (
-    { [P in keyof T]?: mongodb.Condition<ApplyBasicQueryCasting<T[P]>>; } &
+    { [P in keyof T]?: StrictCondition<ApplyBasicQueryCasting<T[P]>>; } &
     mongodb.RootFilterOperators<
       { [P in keyof T]?: ApplyBasicQueryCasting<T[P]>; } &
       { _id?: any; }

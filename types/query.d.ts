@@ -201,10 +201,22 @@ declare module 'mongoose' {
       ? ResultType
       : ResultType extends (infer U)[]
         ? U extends Document
-          ? HydratedDocument<MergeType<RawDocType, Paths>, TDocOverrides, TQueryHelpers>[]
+          ? PopulateDocumentResult<
+              HydratedDocument<MergeType<RawDocType, Paths>, TDocOverrides, TQueryHelpers>,
+              {},
+              MergeType<RawDocType, Paths>,
+              RawDocType,
+              TDocOverrides
+            >[]
           : (MergeType<U, Paths>)[]
         : ResultType extends Document
-          ? HydratedDocument<MergeType<RawDocType, Paths>, TDocOverrides, TQueryHelpers>
+          ? PopulateDocumentResult<
+              HydratedDocument<MergeType<RawDocType, Paths>, TDocOverrides, TQueryHelpers>,
+              {},
+              MergeType<RawDocType, Paths>,
+              RawDocType,
+              TDocOverrides
+            >
           : MergeType<ResultType, Paths>
     : MergeType<ResultType, Paths>;
 

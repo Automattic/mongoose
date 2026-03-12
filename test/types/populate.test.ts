@@ -420,6 +420,69 @@ function gh14441() {
       const docObject = docs[0]!.toObject();
       ExpectType<string>(docObject.child.name);
     });
+
+  interface ArrayParent {
+    children?: Types.ObjectId[];
+    title?: string;
+  }
+  const ArrayParentModel = model<ArrayParent>(
+    'ArrayParent',
+    new Schema({
+      title: String,
+      children: [{ type: Schema.Types.ObjectId, ref: 'Child' }]
+    })
+  );
+
+  type PopulatedChildren = {
+    children: mongoose.Types.DocumentArray<mongoose.HydratedDocFromModel<typeof ChildModel>>;
+  };
+
+  ArrayParentModel.findOne({})
+    .orFail()
+    .then(async doc => {
+      const populatedDoc = await doc.populate<PopulatedChildren>('children');
+
+      // Populating changes the path type from ObjectIds to documents, so the result should
+      // not be assignable back to the model's original hydrated type.
+      // @ts-expect-error Type 'PopulateDocumentResult<Document<unknown, {}, ArrayParent, {}, DefaultSchemaOptions> & ArrayParent...'
+      const hydratedDoc: mongoose.HydratedDocFromModel<typeof ArrayParentModel> = populatedDoc;
+      ExpectAssignable<Document<any>>()(populatedDoc);
+      ExpectAssignable<Document<unknown>>()(populatedDoc);
+      ExpectType<string | undefined>(populatedDoc.children[0]?.name);
+      const plainObject = populatedDoc.toObject();
+      ExpectType<string>(plainObject.children[0].name);
+      const depopulatedObject = populatedDoc.toObject({ depopulate: true });
+      ExpectType<Types.ObjectId>(depopulatedObject.children![0]);
+    });
+
+  ArrayParentModel.findOne({})
+    .populate<PopulatedChildren>('children')
+    .orFail()
+    .then(populatedDoc => {
+      ExpectAssignable<Document<any>>()(populatedDoc);
+      ExpectAssignable<Document<unknown>>()(populatedDoc);
+      ExpectType<string | undefined>(populatedDoc.children[0]?.name);
+      const plainObject = populatedDoc.toObject();
+      ExpectType<string>(plainObject.children[0].name);
+      const depopulatedObject = populatedDoc.toObject({ depopulate: true });
+      ExpectType<Types.ObjectId>(depopulatedObject.children![0]);
+    });
+
+  ArrayParentModel.findOne({})
+    .orFail()
+    .then(async doc => {
+      const populatedDoc = await ArrayParentModel.populate<PopulatedChildren>(doc, 'children');
+
+      // @ts-expect-error Type 'PopulateDocumentResult<Document<unknown, {}, ArrayParent, {}, DefaultSchemaOptions> & ArrayParent...'
+      const hydratedDoc: mongoose.HydratedDocFromModel<typeof ArrayParentModel> = populatedDoc;
+      ExpectAssignable<Document<any>>()(populatedDoc);
+      ExpectAssignable<Document<unknown>>()(populatedDoc);
+      ExpectType<string | undefined>(populatedDoc.children[0]?.name);
+      const plainObject = populatedDoc.toObject();
+      ExpectType<string>(plainObject.children[0].name);
+      const depopulatedObject = populatedDoc.toObject({ depopulate: true });
+      ExpectType<Types.ObjectId>(depopulatedObject.children![0]);
+    });
 }
 
 async function gh14574() {

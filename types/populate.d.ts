@@ -8,6 +8,34 @@ declare module 'mongoose' {
     RawId extends RefType = (PopulatedType extends { _id?: RefType; } ? NonNullable<PopulatedType['_id']> : Types.ObjectId) | undefined
   > = PopulatedType | RawId;
 
+  type PopulatedPathsDocumentType<RawDocType, Paths> = UnpackedIntersection<RawDocType, Paths>;
+
+  type PopulatedPathsSerializationReturnType<
+    PopulatedRawDocType,
+    DepopulatedRawDocType,
+    TVirtuals,
+    O extends ToObjectOptions,
+    TSchemaOptions = {}
+  > = O extends { depopulate: true }
+    ? ToObjectReturnType<DepopulatedRawDocType, TVirtuals, O, TSchemaOptions>
+    : ToObjectReturnType<PopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
+
+  type PopulateDocumentResult<
+    Doc,
+    Paths,
+    PopulatedRawDocType,
+    DepopulatedRawDocType = PopulatedRawDocType,
+    TVirtuals = {},
+    TSchemaOptions = {}
+  > = Omit<MergeType<Doc, Paths>, 'toJSON' | 'toObject'> & {
+      toJSON<O extends ToObjectOptions>(options: O): PopulatedPathsSerializationReturnType<PopulatedRawDocType, DepopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
+      toJSON(options?: ToObjectOptions): Default__v<Require_id<PopulatedRawDocType>, TSchemaOptions>;
+      toJSON<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
+      toObject<O extends ToObjectOptions>(options: O): PopulatedPathsSerializationReturnType<PopulatedRawDocType, DepopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
+      toObject(options?: ToObjectOptions): Default__v<Require_id<PopulatedRawDocType>, TSchemaOptions>;
+      toObject<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
+    };
+
   interface PopulateOptions {
     /** space delimited path(s) to populate */
     path: string;

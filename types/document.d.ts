@@ -32,7 +32,7 @@ declare module 'mongoose' {
     _id: T;
 
     /** Assert that a given path or paths is populated. Throws an error if not populated. */
-    $assertPopulated<Paths = {}>(path: string | string[], values?: Partial<Paths>): Omit<this, keyof Paths> & Paths;
+    $assertPopulated<Paths = {}>(path: string | string[], values?: Partial<Paths>): PopulateDocumentResult<this, Paths, PopulatedPathsDocumentType<DocType, Paths>, DocType, TVirtuals, TSchemaOptions>;
 
     /** Clear the document's modified paths. */
     $clearModifiedPaths(): this;
@@ -238,8 +238,8 @@ declare module 'mongoose' {
     $parent(): Document | undefined;
 
     /** Populates document references. */
-    populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<MergeType<this, Paths>>;
-    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<any>, match?: AnyObject, options?: PopulateOptions): Promise<MergeType<this, Paths>>;
+    populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<PopulateDocumentResult<this, Paths, PopulatedPathsDocumentType<DocType, Paths>, DocType, TVirtuals, TSchemaOptions>>;
+    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<any>, match?: AnyObject, options?: PopulateOptions): Promise<PopulateDocumentResult<this, Paths, PopulatedPathsDocumentType<DocType, Paths>, DocType, TVirtuals, TSchemaOptions>>;
 
     /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
     populated(path: string): any;

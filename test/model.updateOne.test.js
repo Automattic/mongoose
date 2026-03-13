@@ -624,18 +624,14 @@ describe('model: updateOne:', function() {
 
     });
 
-    it('setDefaultsOnInsert does not run setters on default values (gh-16025)', async function() {
-      const setterContexts = [];
+    it('setDefaultsOnInsert runs setters on default values (gh-16051)', async function() {
       const schema = new Schema({
         name: String,
         slug: {
           type: String,
-          default: function() {
-            return this.get('name');
-          },
+          default: 'Hello World!',
           set: function(v) {
-            setterContexts.push(this);
-            return v;
+            return v.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
           }
         }
       });
@@ -647,10 +643,8 @@ describe('model: updateOne:', function() {
         { upsert: true, setDefaultsOnInsert: true }
       );
 
-      assert.equal(setterContexts.length, 0);
-
       const doc = await Test.findOne({ name: 'foo' });
-      assert.equal(doc.slug, 'foo');
+      assert.equal(doc.slug, 'hello-world');
     });
 
     it('avoids nested paths if setting parent path (gh-4911)', function(done) {

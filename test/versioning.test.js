@@ -892,5 +892,92 @@ describe('versioning', function() {
 
       return { user };
     }
+
+    describe('nested paths (gh-16054)', function() {
+      it('exclude: excluding parent also excludes child paths', async function() {
+        const profileSchema = new Schema({ firstName: String, lastName: String }, { _id: false });
+        const schema = new Schema({
+          profile: profileSchema,
+          balance: Number
+        }, { optimisticConcurrency: { exclude: ['profile'] } });
+
+        const User = db.model('TestOCNested1', schema);
+        const user = await User.create({ profile: { firstName: 'Alice', lastName: 'Smith' }, balance: 100 });
+
+        user.profile.firstName = 'Bob';
+        user.$__delta();
+
+        assert.strictEqual(user.$__.version, undefined);
+      });
+
+      it('exclude: modifying non-excluded path still triggers version when excluded parent has modified children', async function() {
+        const profileSchema = new Schema({ firstName: String, lastName: String }, { _id: false });
+        const schema = new Schema({
+          profile: profileSchema,
+          balance: Number
+        }, { optimisticConcurrency: { exclude: ['profile'] } });
+
+        const User = db.model('TestOCNested2', schema);
+        const user = await User.create({ profile: { firstName: 'Alice', lastName: 'Smith' }, balance: 100 });
+
+        user.profile.firstName = 'Bob';
+        user.balance = 200;
+        user.$__delta();
+
+        assert.strictEqual(user.$__.version, VERSION_ALL);
+      });
+
+      it('include: including parent also includes child paths', async function() {
+        const profileSchema = new Schema({ firstName: String, lastName: String }, { _id: false });
+        const schema = new Schema({
+          profile: profileSchema,
+          balance: Number
+        }, { optimisticConcurrency: ['profile'] });
+
+        const User = db.model('TestOCNested3', schema);
+        const user = await User.create({ profile: { firstName: 'Alice', lastName: 'Smith' }, balance: 100 });
+
+        user.profile.firstName = 'Bob';
+        user.$__delta();
+
+        assert.strictEqual(user.$__.version, VERSION_ALL);
+      });
+
+      it('include: modifying parent triggers version when child is included', async function() {
+        const addressSchema = new Schema({ street: String, country: String }, { _id: false });
+        const profileSchema = new Schema({ firstName: String, address: addressSchema }, { _id: false });
+        const schema = new Schema({
+          profile: profileSchema,
+          balance: Number
+        }, { optimisticConcurrency: ['profile.address.country'] });
+
+        const User = db.model('TestOCNested4', schema);
+        const user = await User.create({
+          profile: { firstName: 'Alice', address: { street: '123 Main', country: 'US' } },
+          balance: 100
+        });
+
+        user.set('profile.address', { street: '456 Oak', country: 'UK' });
+        user.$__delta();
+
+        assert.strictEqual(user.$__.version, VERSION_ALL);
+      });
+
+      it('include: modifying non-included nested path does not trigger version', async function() {
+        const profileSchema = new Schema({ firstName: String, lastName: String }, { _id: false });
+        const schema = new Schema({
+          profile: profileSchema,
+          balance: Number
+        }, { optimisticConcurrency: ['balance'] });
+
+        const User = db.model('TestOCNested5', schema);
+        const user = await User.create({ profile: { firstName: 'Alice', lastName: 'Smith' }, balance: 100 });
+
+        user.profile.firstName = 'Bob';
+        user.$__delta();
+
+        assert.strictEqual(user.$__.version, undefined);
+      });
+    });
   });
 });

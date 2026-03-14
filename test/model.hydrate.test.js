@@ -79,18 +79,33 @@ describe('model', function() {
       assert.deepEqual(['food'], Object.keys(err.errors));
     });
 
-    it('supports projection (gh-9209)', function() {
+    it('supports projection (gh-16082) (gh-9209)', function() {
       const schema = new Schema({
         prop: String,
         arr: [String]
       });
       const Model = db.model('Test2', schema);
 
-      const doc = Model.hydrate({ prop: 'test' }, { arr: 0 });
-
+      let doc = Model.hydrate({ prop: 'test' }, { arr: 0 });
       assert.equal(doc.isNew, false);
       assert.equal(doc.isModified(), false);
       assert.ok(!doc.$__delta());
+      assert.strictEqual(doc.prop, 'test');
+      // Array implicit default of `[]` shouldn't apply
+      assert.strictEqual(doc.arr, undefined);
+
+      doc = Model.hydrate({ prop: 'test' }, '-arr');
+      assert.equal(doc.isNew, false);
+      assert.equal(doc.isModified(), false);
+      assert.ok(!doc.$__delta());
+      assert.strictEqual(doc.prop, 'test');
+      assert.strictEqual(doc.arr, undefined);
+
+      doc = Model.hydrate({ prop: 'test' }, ['_id']);
+      assert.equal(doc.isNew, false);
+      assert.equal(doc.isModified(), false);
+      assert.ok(!doc.$__delta());
+      assert.ok(!doc.prop);
     });
 
     it('works correctly with model discriminators', function() {

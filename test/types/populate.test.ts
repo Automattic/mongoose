@@ -453,6 +453,37 @@ function gh14441() {
       ExpectType<string>(plainObject.children[0].name);
       const depopulatedObject = populatedDoc.toObject({ depopulate: true });
       ExpectType<Types.ObjectId>(depopulatedObject.children![0]);
+
+      const objectWithVirtuals = populatedDoc.toObject({ virtuals: true });
+      ExpectType<string>(objectWithVirtuals.children![0].name);
+
+      const objectWithFlattenObjectIds = populatedDoc.toObject({ flattenObjectIds: true });
+      ExpectType<string>(objectWithFlattenObjectIds.children![0].name);
+
+      const depopulatedAndFlattened = populatedDoc.toObject({ depopulate: true, flattenObjectIds: true });
+      ExpectType<string>(depopulatedAndFlattened.children![0]);
+
+      const jsonObject = populatedDoc.toJSON();
+      ExpectType<string>(jsonObject.children![0].name);
+      const jsonObjectWithVirtuals = populatedDoc.toJSON({ virtuals: true });
+      ExpectType<string>(jsonObjectWithVirtuals.children![0].name);
+      const jsonDepopulated = populatedDoc.toJSON({ depopulate: true });
+      ExpectType<Types.ObjectId>(jsonDepopulated.children![0]);
+
+      // Known limitation: structural wrappers that drop the marker lose the populated toObject() behavior.
+      const strippedMarkerDoc: Omit<typeof populatedDoc, keyof mongoose.PopulatedDocumentMarker<any, any>> =
+        populatedDoc;
+      const strippedMarkerObject = strippedMarkerDoc.toObject();
+      // @ts-expect-error Property 'name' does not exist on type 'ObjectId'
+      ExpectType<string>(strippedMarkerObject.children![0].name);
+
+      // Known limitation: generic helpers that erase the marker only see the base toObject() typing.
+      function toObjectWithBaseTyping<T extends Document<unknown, any, ArrayParent>>(input: T) {
+        return input.toObject();
+      }
+      const genericObject = toObjectWithBaseTyping(populatedDoc);
+      // Generic helper removed the populated behavior so we only get the raw ObjectId back.
+      ExpectType<Types.ObjectId>(genericObject.children![0]);
     });
 
   ArrayParentModel.findOne({})

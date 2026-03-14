@@ -8,33 +8,49 @@ declare module 'mongoose' {
     RawId extends RefType = (PopulatedType extends { _id?: RefType; } ? NonNullable<PopulatedType['_id']> : Types.ObjectId) | undefined
   > = PopulatedType | RawId;
 
-  type PopulatedPathsDocumentType<RawDocType, Paths> = UnpackedIntersection<RawDocType, Paths>;
+  const mongoosePopulatedDocumentMarker: unique symbol;
 
-  type PopulatedPathsSerializationReturnType<
+  type ExtractDocumentObjectType<T> = T extends infer ObjectType & Document ? FlatRecord<ObjectType> : T;
+
+  type PopulatePathToRawDocType<T> =
+    T extends Types.DocumentArray<any, infer ItemType>
+      ? PopulatePathToRawDocType<ItemType>[]
+      : T extends Array<infer ItemType>
+        ? PopulatePathToRawDocType<ItemType>[]
+        : T extends Document
+          ? SubdocsToPOJOs<ExtractDocumentObjectType<T>>
+          : T extends Record<string, any>
+            ? { [K in keyof T]: PopulatePathToRawDocType<T[K]> }
+            : T;
+
+  type PopulatedPathsDocumentType<RawDocType, Paths> = UnpackedIntersection<RawDocType, PopulatePathToRawDocType<Paths>>;
+
+  type PopulatedDocumentMarker<
     PopulatedRawDocType,
     DepopulatedRawDocType,
-    TVirtuals,
-    O extends ToObjectOptions,
-    TSchemaOptions = {}
-  > = O extends { depopulate: true }
-    ? ToObjectReturnType<DepopulatedRawDocType, TVirtuals, O, TSchemaOptions>
-    : ToObjectReturnType<PopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
+  > = {
+    [mongoosePopulatedDocumentMarker]?: {
+      populated: PopulatedRawDocType,
+      depopulated: DepopulatedRawDocType
+    }
+  };
+
+  type ResolvePopulatedRawDocType<
+    ThisType,
+    FallbackRawDocType,
+    O = never
+  > = ThisType extends PopulatedDocumentMarker<infer PopulatedRawDocType, infer DepopulatedRawDocType>
+    ? O extends { depopulate: true }
+      ? DepopulatedRawDocType
+      : PopulatedRawDocType
+    : FallbackRawDocType;
 
   type PopulateDocumentResult<
     Doc,
     Paths,
     PopulatedRawDocType,
-    DepopulatedRawDocType = PopulatedRawDocType,
-    TVirtuals = {},
-    TSchemaOptions = {}
-  > = Omit<MergeType<Doc, Paths>, 'toJSON' | 'toObject'> & {
-      toJSON<O extends ToObjectOptions>(options: O): PopulatedPathsSerializationReturnType<PopulatedRawDocType, DepopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
-      toJSON(options?: ToObjectOptions): Default__v<Require_id<PopulatedRawDocType>, TSchemaOptions>;
-      toJSON<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
-      toObject<O extends ToObjectOptions>(options: O): PopulatedPathsSerializationReturnType<PopulatedRawDocType, DepopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
-      toObject(options?: ToObjectOptions): Default__v<Require_id<PopulatedRawDocType>, TSchemaOptions>;
-      toObject<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
-    };
+    DepopulatedRawDocType = PopulatedRawDocType
+  > = MergeType<Doc, Paths> & PopulatedDocumentMarker<PopulatedRawDocType, DepopulatedRawDocType>;
 
   interface PopulateOptions {
     /** space delimited path(s) to populate */

@@ -628,10 +628,10 @@ declare module 'mongoose' {
     populate<Paths>(
       docs: Array<any>,
       options: PopulateOptions | Array<PopulateOptions> | string
-    ): Promise<Array<PopulateDocumentResult<THydratedDocumentType, Paths, PopulatedPathsDocumentType<TRawDocType, Paths>, TRawDocType, TVirtuals>>>;
+    ): Promise<Array<PopulateDocumentResult<THydratedDocumentType, Paths, PopulatedPathsDocumentType<TRawDocType, Paths>, TRawDocType>>>;
     populate<Paths>(
       doc: any, options: PopulateOptions | Array<PopulateOptions> | string
-    ): Promise<PopulateDocumentResult<THydratedDocumentType, Paths, PopulatedPathsDocumentType<TRawDocType, Paths>, TRawDocType, TVirtuals>>;
+    ): Promise<PopulateDocumentResult<THydratedDocumentType, Paths, PopulatedPathsDocumentType<TRawDocType, Paths>, TRawDocType>>;
 
     /**
      * Update an existing [Atlas search index](https://www.mongodb.com/docs/atlas/atlas-search/create-index/).

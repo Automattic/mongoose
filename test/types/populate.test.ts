@@ -514,6 +514,42 @@ function gh14441() {
       const depopulatedObject = populatedDoc.toObject({ depopulate: true });
       ExpectType<Types.ObjectId>(depopulatedObject.children![0]);
     });
+
+  interface MultiPopulateParent {
+    firstChild?: Types.ObjectId;
+    secondChild?: Types.ObjectId;
+  }
+
+  const MultiPopulateParentModel = model<MultiPopulateParent>(
+    'MultiPopulateParent',
+    new Schema({
+      firstChild: { type: Schema.Types.ObjectId, ref: 'Child' },
+      secondChild: { type: Schema.Types.ObjectId, ref: 'Child' }
+    })
+  );
+
+  type PopulatedFirstChild = {
+    firstChild: mongoose.HydratedDocFromModel<typeof ChildModel>;
+  };
+
+  type PopulatedSecondChild = {
+    secondChild: mongoose.HydratedDocFromModel<typeof ChildModel>;
+  };
+
+  MultiPopulateParentModel.findOne({})
+    .populate<PopulatedFirstChild>('firstChild')
+    .populate<PopulatedSecondChild>('secondChild')
+    .orFail()
+    .then(populatedDoc => {
+      ExpectType<string | undefined>(populatedDoc.firstChild?.name);
+      ExpectType<string | undefined>(populatedDoc.secondChild?.name);
+      const plainObject = populatedDoc.toObject();
+      ExpectType<string>(plainObject.firstChild!.name);
+      ExpectType<string>(plainObject.secondChild!.name);
+      const depopulatedObject = populatedDoc.toObject({ depopulate: true });
+      ExpectType<Types.ObjectId>(depopulatedObject.firstChild!);
+      ExpectType<Types.ObjectId>(depopulatedObject.secondChild!);
+    });
 }
 
 async function gh14574() {

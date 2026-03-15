@@ -873,7 +873,7 @@ async function gh15779() {
 
   type AgeType = typeof v8Filter.age;
   ExpectAssignable<typeof v8Filter.age>()(42);
-  // @ts-expect-error  Type '"taco"' is not assignable to type 'Condition<ApplyBasicQueryCasting<number>> | undefined'.
+  // @ts-expect-error  Type '"taco"' is not assignable to type 'StrictCondition<ApplyBasicQueryCasting<number>> | undefined'.
   const a1: AgeType = 'taco';
 
   const TestModel = model('Test', new Schema({ age: Number, name: String }));
@@ -909,4 +909,12 @@ async function gh15779_2() {
   const jobs = await JobModel.aggregate<Job>([
     { $match: {} as QueryFilter<Job> }
   ]);
+}
+
+async function gh16062() {
+  const Test = model('Test', new Schema({ runtime: Number }));
+  // @ts-expect-error  No overload matches this call.
+  await Test.findOne({ runtime: { $wrong: 100 } });
+  // @ts-expect-error  No overload matches this call.
+  await Test.findOne({ $and: [{ runtime: { $wrong: 100 } }] });
 }

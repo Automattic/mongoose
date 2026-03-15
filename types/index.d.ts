@@ -1089,6 +1089,9 @@ declare module 'mongoose' {
     // Handle DocumentArray - recurse into items
     : T extends Types.DocumentArray<infer ItemType>
       ? Types.DocumentArray<ApplyFlattenTransforms<ItemType, O>>
+    // Handle plain arrays - recurse into items
+    : T extends Array<infer ItemType>
+      ? ApplyFlattenTransforms<ItemType, O>[]
     // Handle Subdocument - recurse into subdoc type
     : T extends Types.Subdocument<unknown, unknown, infer SubdocType>
       ? HydratedSingleSubdocument<ApplyFlattenTransforms<SubdocType, O>>

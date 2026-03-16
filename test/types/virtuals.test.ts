@@ -93,9 +93,9 @@ async function autoTypedVirtuals() {
   type InferredDocType = AutoTypedSchemaType & ObtainSchemaGeneric<typeof testSchema, 'TVirtuals'>;
   type HydratedDocType = mongoose.HydratedDocument<
     AutoTypedSchemaType,
-    ThisVirtualsType,
+    VirtualsType,
     {},
-    ThisVirtualsType
+    VirtualsType
   >;
 
   const testSchema = new Schema({

@@ -9177,8 +9177,29 @@ describe('Model', function() {
         Model.useConnection();
       }, { message: 'Please provide a connection.' });
     });
-  });
+    it('should throw if passed a non-Connection value (gh-16098)', function() {
+      const schema = new mongoose.Schema({ name: String });
+      const Model = db.model('TestUseConnectionValidation', schema);
 
+      assert.throws(
+        () => Model.useConnection({ not: 'a connection' }),
+        /must be an instance of mongoose\.Connection/
+      );
+      assert.throws(
+        () => Model.useConnection('not a connection'),
+        /must be an instance of mongoose\.Connection/
+      );
+      assert.throws(
+        () => Model.useConnection(42),
+        /must be an instance of mongoose\.Connection/
+      );
+      assert.throws(
+        () => Model.useConnection(null),
+        /Please provide a connection/
+      );
+    });
+  });
+  
   it('insertMany should throw an error if there were operations that failed validation, ' +
       'but all operations that passed validation succeeded (gh-13256)', async function() {
     const userSchema = new Schema({

@@ -91,11 +91,13 @@ async function autoTypedVirtuals() {
   type AutoTypedSchemaType = InferSchemaType<typeof testSchema>;
   type VirtualsType = { domain: string } & { id: string };
   type InferredDocType = AutoTypedSchemaType & ObtainSchemaGeneric<typeof testSchema, 'TVirtuals'>;
+  // Domain is unknown because of circular dep: this is the type of virtuals in the domain getter and setter
+  type ThisVirtualsType = { domain: unknown } & { id: string };
   type HydratedDocType = mongoose.HydratedDocument<
     AutoTypedSchemaType,
-    VirtualsType,
+    ThisVirtualsType,
     {},
-    VirtualsType
+    ThisVirtualsType
   >;
 
   const testSchema = new Schema({

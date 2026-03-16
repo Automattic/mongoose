@@ -1,4 +1,4 @@
-import { Document, Model, Schema, model, InferSchemaType, ObtainSchemaGeneric, Types } from 'mongoose';
+import mongoose, { Document, Model, Schema, model, InferSchemaType, ObtainSchemaGeneric, Types } from 'mongoose';
 import { expect } from 'tstyche';
 
 interface IPerson {

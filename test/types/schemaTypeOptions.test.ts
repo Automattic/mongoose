@@ -15,23 +15,23 @@ import {
   ObjectIdSchemaDefinition,
   StringSchemaDefinition
 } from 'mongoose';
-import { ExpectType } from './util/assertions';
+import { expect } from 'tstyche';
 
 (new SchemaTypeOptions<boolean>()) instanceof SchemaTypeOptions;
 
-ExpectType<BooleanSchemaDefinition | undefined>(new SchemaTypeOptions<boolean>().type);
-ExpectType<NumberSchemaDefinition | undefined>(new SchemaTypeOptions<number>().type);
-ExpectType<DateSchemaDefinition | undefined>(new SchemaTypeOptions<Date>().type);
-ExpectType<StringSchemaDefinition | undefined>(new SchemaTypeOptions<string>().type);
-ExpectType<SchemaDefinition<typeof Map> | undefined>(new SchemaTypeOptions<Map<any, any>>().type);
-ExpectType<SchemaDefinition<typeof Buffer> | undefined>(new SchemaTypeOptions<Buffer>().type);
-ExpectType<ObjectIdSchemaDefinition | undefined>(new SchemaTypeOptions<Types.ObjectId>().type);
-ExpectType<AnyArray<ObjectIdSchemaDefinition> | AnyArray<SchemaTypeOptions<ObjectId>> | undefined>(new SchemaTypeOptions<Types.ObjectId[]>().type);
-ExpectType<AnyArray<Schema<any, any, any>> | AnyArray<SchemaDefinition<Unpacked<object[]>>> | AnyArray<SchemaTypeOptions<Unpacked<object[]>>> | undefined>(new SchemaTypeOptions<object[]>().type);
-ExpectType<AnyArray<StringSchemaDefinition> | AnyArray<SchemaTypeOptions<string>> | undefined>(new SchemaTypeOptions<string[]>().type);
-ExpectType<AnyArray<NumberSchemaDefinition> | AnyArray<SchemaTypeOptions<number>> | undefined>(new SchemaTypeOptions<number[]>().type);
-ExpectType<AnyArray<BooleanSchemaDefinition> | AnyArray<SchemaTypeOptions<boolean>> | undefined>(new SchemaTypeOptions<boolean[]>().type);
-ExpectType<Function | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<Function> | Function | AnyArray<Function> | undefined>(new SchemaTypeOptions<Function>().type);
+expect(new SchemaTypeOptions<boolean>().type).type.toBe<BooleanSchemaDefinition | undefined>();
+expect(new SchemaTypeOptions<number>().type).type.toBe<NumberSchemaDefinition | undefined>();
+expect(new SchemaTypeOptions<Date>().type).type.toBe<DateSchemaDefinition | undefined>();
+expect(new SchemaTypeOptions<string>().type).type.toBe<StringSchemaDefinition | undefined>();
+expect(new SchemaTypeOptions<Map<any, any>>().type).type.toBe<SchemaDefinition<typeof Map> | undefined>();
+expect(new SchemaTypeOptions<Buffer>().type).type.toBe<SchemaDefinition<typeof Buffer> | undefined>();
+expect(new SchemaTypeOptions<Types.ObjectId>().type).type.toBe<ObjectIdSchemaDefinition | undefined>();
+expect(new SchemaTypeOptions<Types.ObjectId[]>().type).type.toBe<AnyArray<ObjectIdSchemaDefinition> | AnyArray<SchemaTypeOptions<ObjectId>> | undefined>();
+expect(new SchemaTypeOptions<object[]>().type).type.toBe<AnyArray<Schema<any, any, any>> | AnyArray<SchemaDefinition<Unpacked<object[]>>> | AnyArray<SchemaTypeOptions<Unpacked<object[]>>> | undefined>();
+expect(new SchemaTypeOptions<string[]>().type).type.toBe<AnyArray<StringSchemaDefinition> | AnyArray<SchemaTypeOptions<string>> | undefined>();
+expect(new SchemaTypeOptions<number[]>().type).type.toBe<AnyArray<NumberSchemaDefinition> | AnyArray<SchemaTypeOptions<number>> | undefined>();
+expect(new SchemaTypeOptions<boolean[]>().type).type.toBe<AnyArray<BooleanSchemaDefinition> | AnyArray<SchemaTypeOptions<boolean>> | undefined>();
+expect(new SchemaTypeOptions<Function>().type).type.toBe<Function | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<Function> | Function | AnyArray<Function> | undefined>();
 
 function index() {
   new SchemaTypeOptions<string>().index = true;
@@ -64,22 +64,22 @@ function index() {
 function defaultOptions() {
   // property "defaultOptions" may not be defined on the base "SchemaType", but is explicitly defined on all mongoose provided Schema.Types
   // https://github.com/Automattic/mongoose/blob/5528a6428bb08091c03d868e249c2e5a30144a71/lib/schematype.js#L55
-  ExpectType<Record<string, any> | undefined>(SchemaType.defaultOptions);
-  ExpectType<Record<string, any>>(Schema.Types.String.defaultOptions);
-  ExpectType<Record<string, any>>(Schema.Types.Boolean.defaultOptions);
-  ExpectType<Record<string, any>>(Schema.Types.Array.defaultOptions);
-  ExpectType<Record<string, any>>(Schema.Types.Buffer.defaultOptions);
-  ExpectType<Record<string, any>>(Schema.Types.Date.defaultOptions);
-  ExpectType<Record<string, any>>(Schema.Types.Decimal128.defaultOptions);
-  ExpectType<Record<string, any>>(Schema.Types.Int32.defaultOptions);
-  ExpectType<Record<string, any>>(Schema.Types.DocumentArray.defaultOptions);
-  ExpectType<Record<string, any>>(Schema.Types.Map.defaultOptions);
-  ExpectType<Record<string, any>>(Schema.Types.Mixed.defaultOptions);
-  ExpectType<Record<string, any>>(Schema.Types.Number.defaultOptions);
-  ExpectType<Record<string, any>>(Schema.Types.ObjectId.defaultOptions);
-  ExpectType<Record<string, any>>(Schema.Types.Double.defaultOptions);
-  ExpectType<Record<string, any>>(Schema.Types.Subdocument.defaultOptions);
-  ExpectType<Record<string, any>>(Schema.Types.UUID.defaultOptions);
+  expect(SchemaType.defaultOptions).type.toBe<Record<string, any> | undefined>();
+  expect(Schema.Types.String.defaultOptions).type.toBe<Record<string, any>>();
+  expect(Schema.Types.Boolean.defaultOptions).type.toBe<Record<string, any>>();
+  expect(Schema.Types.Array.defaultOptions).type.toBe<Record<string, any>>();
+  expect(Schema.Types.Buffer.defaultOptions).type.toBe<Record<string, any>>();
+  expect(Schema.Types.Date.defaultOptions).type.toBe<Record<string, any>>();
+  expect(Schema.Types.Decimal128.defaultOptions).type.toBe<Record<string, any>>();
+  expect(Schema.Types.Int32.defaultOptions).type.toBe<Record<string, any>>();
+  expect(Schema.Types.DocumentArray.defaultOptions).type.toBe<Record<string, any>>();
+  expect(Schema.Types.Map.defaultOptions).type.toBe<Record<string, any>>();
+  expect(Schema.Types.Mixed.defaultOptions).type.toBe<Record<string, any>>();
+  expect(Schema.Types.Number.defaultOptions).type.toBe<Record<string, any>>();
+  expect(Schema.Types.ObjectId.defaultOptions).type.toBe<Record<string, any>>();
+  expect(Schema.Types.Double.defaultOptions).type.toBe<Record<string, any>>();
+  expect(Schema.Types.Subdocument.defaultOptions).type.toBe<Record<string, any>>();
+  expect(Schema.Types.UUID.defaultOptions).type.toBe<Record<string, any>>();
 }
 
 function encrypt() {

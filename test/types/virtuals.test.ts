@@ -91,6 +91,12 @@ async function autoTypedVirtuals() {
   type AutoTypedSchemaType = InferSchemaType<typeof testSchema>;
   type VirtualsType = { domain: string } & { id: string };
   type InferredDocType = AutoTypedSchemaType & ObtainSchemaGeneric<typeof testSchema, 'TVirtuals'>;
+  type HydratedDocType = mongoose.HydratedDocument<
+    AutoTypedSchemaType,
+    ThisVirtualsType,
+    {},
+    ThisVirtualsType
+  >;
 
   const testSchema = new Schema({
     email: {
@@ -101,11 +107,11 @@ async function autoTypedVirtuals() {
     virtuals: {
       domain: {
         get() {
-          expect(this).type.toBe<Document<unknown, {}, { email: string }> & AutoTypedSchemaType & { _id: Types.ObjectId, __v: number, domain: unknown, id: string }>();
+          expect(this).type.toBe<HydratedDocType>();
           return this.email.slice(this.email.indexOf('@') + 1);
         },
         set() {
-          expect(this).type.toBe<Document<unknown, {}, { email: string }> & AutoTypedSchemaType & { _id: Types.ObjectId, __v: number, domain: unknown, id: string }>();
+          expect(this).type.toBe<HydratedDocType>();
         },
         options: {}
       }

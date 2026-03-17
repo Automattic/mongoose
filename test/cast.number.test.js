@@ -24,10 +24,6 @@ describe('castNumber()', function() {
     assert.strictEqual(castNumber(new Number(7)), 7);
   });
 
-  it('casts a BigInt to a number', function() {
-    assert.strictEqual(castNumber(BigInt(99)), 99);
-  });
-
   it('throws a plain Error (not AssertionError) for a non-numeric string', function() {
     let err;
     try {

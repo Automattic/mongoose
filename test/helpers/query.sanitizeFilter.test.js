@@ -15,6 +15,12 @@ describe('sanitizeFilter', function() {
     assert.deepEqual(obj, { username: 'val', pwd: { $eq: { $ne: null } } });
   });
 
+  it('sanitizes nested query selectors', function() {
+    const obj = { user: { pwd: { $ne: null } } };
+    sanitizeFilter(obj);
+    assert.deepEqual(obj, { user: { pwd: { $eq: { $ne: null } } } });
+  });
+
   it('ignores explicitly defined query selectors', function() {
     let obj = { username: 'val', pwd: 'my secret' };
     sanitizeFilter(obj);

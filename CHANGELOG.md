@@ -1,3 +1,14 @@
+9.3.1 / 2026-03-17
+==================
+ * fix(model): handle passing string projection to `hydrate()` #16082
+ * fix(model): fix `bulkWrite()` sorting #16079 #16080 [pnkov](https://github.com/pnkov)
+ * fix(QueryCursor): fix wrong `this` context in QueryCursor close callback #16104 [techcodie](https://github.com/techcodie)
+ * types(schema): infer schema options correctly for model context in statics #16046 #16102
+ * types(schema): fix type definition for `HydratedDocType` in `autoTypedVirtuals` #16083
+ * types(plugin): allow passing model with custom TStatics into `Schema.prototype.plugin()` #16090 #16086
+ * chore: use `MongooseError` instead of `Error` in schema, model, and aggregate #15995 [mahmoodhamdi](https://github.com/mahmoodhamdi)
+ * docs(projection): clean up jsdoc for `parseProjection()`
+
 9.3.0 / 2026-03-10
 ==================
  * feat(schema): support `discriminators` option inline for better TypeScript support #16053

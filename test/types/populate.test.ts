@@ -1,7 +1,7 @@
 import mongoose, { Schema, model, Document, PopulatedDoc, Types, HydratedDocument, SchemaTypeOptions, Model } from 'mongoose';
 // Use the mongodb ObjectId to make instanceof calls possible
 import { ObjectId } from 'mongodb';
-import { ExpectAssignable, ExpectType } from './util/assertions';
+import { expect } from 'tstyche';
 
 interface Child {
   name: string;
@@ -37,8 +37,7 @@ ParentModel.
       throw new Error('should be populated');
     } else {
       const name = leanChild.name;
-      // @ts-expect-error  Property 'save' does not exist on type 'Child'.
-      leanChild.save();
+      expect(leanChild).type.not.toHaveProperty('save');
     }
   });
 
@@ -177,19 +176,19 @@ function gh11503() {
 
   User.findOne({}).populate('friends').then(user => {
     if (!user) return;
-    ExpectType<Types.ObjectId>(user?.friends[0]);
-    // @ts-expect-error  Property 'blocked' does not exist on type 'ObjectId'.
-    user?.friends[0].blocked;
-    // @ts-expect-error  Property 'blocked' does not exist on type 'ObjectId'.
-    user?.friends.map(friend => friend.blocked);
+    expect(user?.friends[0]).type.toBe<Types.ObjectId>();
+    expect(user?.friends[0]).type.not.toHaveProperty('blocked');
+    user?.friends.map(friend => {
+      expect(friend).type.not.toHaveProperty('blocked');
+    });
   });
 
   User.findOne({}).populate<{ friends: Friend[] }>('friends').then(user => {
     if (!user) return;
-    ExpectAssignable<Friend>()(user?.friends[0]);
-    ExpectType<boolean>(user?.friends[0].blocked);
+    expect(user?.friends[0]).type.toBe<Friend>();
+    expect(user?.friends[0].blocked).type.toBe<boolean>();
     const firstFriendBlockedValue = user?.friends.map(friend => friend)[0];
-    ExpectType<boolean>(firstFriendBlockedValue?.blocked);
+    expect(firstFriendBlockedValue?.blocked).type.toBe<boolean>();
   });
 }
 
@@ -247,10 +246,10 @@ async function _11532() {
   const leanResult = await populateQuery.lean();
 
   if (!populateResult) return;
-  ExpectType<string>(populateResult.child.name);
+  expect(populateResult.child.name).type.toBe<string>();
 
   if (!leanResult) return;
-  ExpectType<string>(leanResult.child.name);
+  expect(leanResult.child.name).type.toBe<string>();
 }
 
 async function gh11710() {
@@ -275,7 +274,7 @@ async function gh11710() {
 
   // Populate with `Paths` generic `{ child: Child }` to override `child` path
   const doc = await ParentModel.findOne({}).populate<Pick<PopulatedParent, 'child'>>('child').orFail();
-  ExpectType<Child | null>(doc.child);
+  expect(doc.child).type.toBe<Child | null>();
 }
 
 async function gh11758() {
@@ -302,7 +301,7 @@ async function gh11758() {
     name: 'Parent'
   }).$assertPopulated<{ nestedChild: NestedChild }>('nestedChild');
 
-  ExpectType<string>(parent.nestedChild.name);
+  expect(parent.nestedChild.name).type.toBe<string>();
 
   await parent.save();
 }
@@ -399,9 +398,9 @@ function gh14441() {
     .populate<{ child: Child }>('child')
     .orFail()
     .then(doc => {
-      ExpectType<string>(doc.child.name);
+      expect(doc.child.name).type.toBe<string>();
       const docObject = doc.toObject();
-      ExpectType<string>(docObject.child.name);
+      expect(docObject.child.name).type.toBe<string>();
     });
 
   ParentModel.findOne({})
@@ -409,16 +408,16 @@ function gh14441() {
     .lean()
     .orFail()
     .then(doc => {
-      ExpectType<string>(doc.child.name);
+      expect(doc.child.name).type.toBe<string>();
     });
 
   ParentModel.find({})
     .populate<{ child: Child }>('child')
     .orFail()
     .then(docs => {
-      ExpectType<string>(docs[0]!.child.name);
+      expect(docs[0]!.child.name).type.toBe<string>();
       const docObject = docs[0]!.toObject();
-      ExpectType<string>(docObject.child.name);
+      expect(docObject.child.name).type.toBe<string>();
     });
 }
 
@@ -459,8 +458,8 @@ async function gh14574() {
     .populate<{ friend: HydratedDocument<User, UserMethods> }>('friend')
     .orFail()
     .exec();
-  ExpectType<string>(user.fullName());
-  ExpectType<string>(user.friend.fullName());
+  expect(user.fullName()).type.toBe<string>();
+  expect(user.friend.fullName()).type.toBe<string>();
 }
 
 async function gh15111() {
@@ -553,5 +552,5 @@ async function gh15111() {
   const parents = await ParentModel.find().populate<{ child: ChildInstance }>(
     'child'
   );
-  ExpectType<string>(parents[0].fullName);
+  expect(parents[0].fullName).type.toBe<string>();
 }

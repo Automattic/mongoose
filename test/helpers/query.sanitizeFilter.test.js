@@ -39,6 +39,16 @@ describe('sanitizeFilter', function() {
     assert.deepEqual(obj, { $nor: [{ username: 'val' }, { pwd: { $eq: { $ne: 'my secret' } } }] });
   });
 
+  it('does not double-wrap values already wrapped in $eq', function() {
+    const filter = { username: 'val', pwd: { $eq: { $ne: null } } };
+    const before = JSON.parse(JSON.stringify(filter));
+
+    const result = sanitizeFilter(filter);
+
+    assert.strictEqual(result, filter);
+    assert.deepStrictEqual(result, before);
+  });
+
   it('handles $not', function() {
     const obj = { username: 'val', pwd: { $not: { $ne: 'my secret' } } };
     sanitizeFilter(obj);

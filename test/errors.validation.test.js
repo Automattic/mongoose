@@ -247,6 +247,14 @@ describe('ValidationError', function() {
       const result = ValidatorError.prototype.formatMessage(message, props);
       assert.equal(result, 'I had eggs and bacon for breakfast');
     });
+
+    it('replaces repeated placeholders', function() {
+      const props = { base: 'eggs' };
+      const message = '{BASE} and {BASE}';
+
+      const result = ValidatorError.prototype.formatMessage(message, props);
+      assert.equal(result, 'eggs and eggs');
+    });
   });
 
   it('JSON.stringify() with message (gh-5309) (gh-9296)', function() {

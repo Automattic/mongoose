@@ -42,7 +42,7 @@ Mongoose's `Connection#transaction()` function is a wrapper around `withTransact
 integrates Mongoose change tracking with transactions.
 For example, suppose you `save()` a document in a transaction that later fails.
 The changes in that document are not persisted to MongoDB.
-The `Connection#transaction()` function informs Mongoose change tracking that the `save()` was rolled back, and marks all fields that were changed in the transaction as modified.
+The `Connection#transaction()` function informs Mongoose change tracking that the `save()` was rolled back, and marks all fields that were changed in the transaction as modified. This ensures that if you attempt to `save()` the document again, Mongoose will know which paths were changed and send them to the database.
 
 ```javascript
 const doc = new Person({ name: 'Will Riker' });

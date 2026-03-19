@@ -164,6 +164,13 @@ declare module 'mongoose' {
      * Returns the changes that happened to the document
      * in the format that will be sent to MongoDB.
      */
+    $getChanges(): UpdateQuery<this>;
+
+    /**
+     * Returns the changes that happened to the document
+     * in the format that will be sent to MongoDB.
+     * @deprecated Use `$getChanges()` instead.
+     */
     getChanges(): UpdateQuery<this>;
 
     /** Signal that we desire an increment of this documents version. */

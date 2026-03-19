@@ -34,4 +34,42 @@ describe('sanitizeFilter', function() {
     sanitizeFilter(obj);
     assert.deepEqual(obj, { $or: [{ username: 'val' }, { pwd: { $eq: { $ne: 'my secret' } } }] });
   });
+
+  it('handles $nor (gh-16114)', function() {
+    const obj = { $nor: [{ username: 'val' }, { pwd: { $ne: 'my secret' } }] };
+    sanitizeFilter(obj);
+    assert.deepEqual(obj, { $nor: [{ username: 'val' }, { pwd: { $eq: { $ne: 'my secret' } } }] });
+  });
+
+  it('handles nested selector objects (gh-16114)', function() {
+    const obj = { nested: { pwd: { $ne: null } } };
+    sanitizeFilter(obj);
+    assert.deepEqual(obj, { nested: { pwd: { $eq: { $ne: null } } } });
+  });
+
+  it('handles deeply nested selector objects (gh-16114)', function() {
+    const obj = { a: { b: { c: { $gt: 5 } } } };
+    sanitizeFilter(obj);
+    assert.deepEqual(obj, { a: { b: { c: { $eq: { $gt: 5 } } } } });
+  });
+
+  it('does not modify nested objects without dollar keys (gh-16114)', function() {
+    const obj = { nested: { field1: 'value1', field2: 42 } };
+    sanitizeFilter(obj);
+    assert.deepEqual(obj, { nested: { field1: 'value1', field2: 42 } });
+  });
+
+  it('handles mixed top-level and nested selectors (gh-16114)', function() {
+    const obj = {
+      topLevel: { $ne: null },
+      nested: { pwd: { $ne: null } },
+      safe: 'value'
+    };
+    sanitizeFilter(obj);
+    assert.deepEqual(obj, {
+      topLevel: { $eq: { $ne: null } },
+      nested: { pwd: { $eq: { $ne: null } } },
+      safe: 'value'
+    });
+  });
 });

@@ -841,7 +841,7 @@ You can overwrite the `match` option when calling `populate()` as follows.
 ```javascript
 // Overwrite the `match` option specified in `AuthorSchema.virtual()` for this
 // single `populate()` call.
-await Author.findOne().populate({ path: posts, match: {} });
+await Author.findOne().populate({ path: 'posts', match: {} });
 ```
 
 You can also set the `match` option to a function in your `populate()` call.
@@ -849,7 +849,7 @@ If you want to merge your `populate()` match option, rather than overwriting, us
 
 ```javascript
 await Author.findOne().populate({
-  path: posts,
+  path: 'posts',
   // Add `isDeleted: false` to the virtual's default `match`, so the `match`
   // option would be `{ tags: author.favoriteTags, isDeleted: false }`
   match: (author, virtual) => ({

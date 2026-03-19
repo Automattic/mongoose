@@ -661,7 +661,7 @@ Just like `refPath`, `ref` can also be assigned a function.
 ```javascript
 const commentSchema = new Schema({
   body: { type: String, required: true },
-  verifiedBuyer: Boolean
+  verifiedBuyer: Boolean,
   doc: {
     type: Schema.Types.ObjectId,
     required: true,

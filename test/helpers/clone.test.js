@@ -269,7 +269,7 @@ describe('clone', () => {
 
       // Current buggy behavior: clone returns same reference
       assert.notStrictEqual(obj, cloned);
-  });
+    });
   });
 
   it('retains RegExp options gh-1355', function() {

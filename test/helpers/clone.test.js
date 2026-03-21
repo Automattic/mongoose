@@ -257,6 +257,19 @@ describe('clone', () => {
       assert.equal(typeof cloned, 'object');
       assert.equal(cloned.constructor, Object);
     });
+    it('should not return same reference for custom class without overriding valueOf (gh-12574)', function() {
+      class MyClass {
+        constructor(val) {
+          this.val = val;
+        }
+      }
+
+      const obj = new MyClass(42);
+      const cloned = clone(obj);
+
+      // Current buggy behavior: clone returns same reference
+      assert.notStrictEqual(obj, cloned);
+  });
   });
 
   it('retains RegExp options gh-1355', function() {

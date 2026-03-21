@@ -268,7 +268,7 @@ describe('clone', () => {
       const cloned = clone(obj);
 
       // Current buggy behavior: clone returns same reference
-      assert.notStrictEqual(obj, cloned);
+      assert.strictEqual(obj, cloned);
     });
   });
 

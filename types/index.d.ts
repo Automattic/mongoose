@@ -86,7 +86,7 @@ declare module 'mongoose' {
     collection?: string,
     options?: CompileModelOptions
   ): Model<
-    InferSchemaType<TSchema>,
+    ResolveTopLevelModelDocType<TSchema>,
     ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
     ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
     ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
@@ -94,16 +94,9 @@ declare module 'mongoose' {
     // so user should also specify a hydrated doc type if the auto inferred one isn't correct.
     IsItRecordAndNotAny<ObtainSchemaGeneric<TSchema, 'EnforcedDocType'>> extends true
       ? ObtainSchemaGeneric<TSchema, 'THydratedDocumentType'>
-      : HydratedDocument<
-        InferSchemaType<TSchema>,
-        ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
-        ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
-        ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
-        InferSchemaType<TSchema>,
-        ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>
-      >,
+      : ResolveTopLevelModelHydratedDocType<TSchema>,
     TSchema,
-    ObtainSchemaGeneric<TSchema, 'TLeanResultType'>
+    ResolveTopLevelModelLeanDocType<TSchema>
   > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
   export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;

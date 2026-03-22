@@ -26,6 +26,7 @@ import {
   CallbackWithoutResultAndOptionalError,
   InferRawDocTypeFromSchema,
   InferHydratedDocTypeFromSchema,
+  MergeType,
   FlatRecord,
   InferHydratedDocType
 } from 'mongoose';
@@ -2367,4 +2368,44 @@ function gh16045DocumentArray() {
       }
     }
   }
+}
+
+async function gh16101SchemaOptionDiscriminators() {
+  const ownerSchema = new Schema({ fullName: String });
+  const dogSchema = new Schema({ breed: String });
+  const catSchema = new Schema({ indoor: Boolean });
+
+  const animalSchema = new Schema(
+    {
+      name: String,
+      owner: { type: Schema.Types.ObjectId, ref: 'Owner' }
+    },
+    {
+      discriminatorKey: 'kind',
+      discriminators: {
+        Dog: dogSchema,
+        Cat: catSchema
+      }
+    }
+  );
+
+  const Owner = model('OwnerForSchemaOptionDiscriminators', ownerSchema);
+  const Animal = model('AnimalForSchemaOptionDiscriminators', animalSchema);
+
+  const animal = await Animal.findOne()
+    .populate<{ owner: HydratedDocument<InferSchemaType<typeof ownerSchema>> }>('owner')
+    .orFail();
+
+  type PopulatedOwner = {
+    owner: HydratedDocument<InferSchemaType<typeof ownerSchema>>;
+  };
+
+  ExpectAssignable<
+    | HydratedDocument<MergeType<InferSchemaType<typeof animalSchema>, PopulatedOwner>>
+    | HydratedDocument<MergeType<MergeType<InferSchemaType<typeof animalSchema>, InferSchemaType<typeof dogSchema>>, PopulatedOwner>>
+    | HydratedDocument<MergeType<MergeType<InferSchemaType<typeof animalSchema>, InferSchemaType<typeof catSchema>>, PopulatedOwner>>
+  >()(animal);
+
+  ExpectType<string | null | undefined>(animal.owner.fullName);
+  void Owner;
 }

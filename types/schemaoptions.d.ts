@@ -91,6 +91,9 @@ declare module 'mongoose' {
      */
     discriminatorKey?: string;
 
+    /** Top-level discriminators to apply automatically when this schema is compiled into a model. */
+    discriminators?: Record<string, Schema>;
+
     /**
      * Option for nested Schemas.
      *

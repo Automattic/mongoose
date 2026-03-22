@@ -131,6 +131,59 @@ declare module 'mongoose' {
       ? AddDefaultId<RawDocType, V, ResolveSchemaOptions<TSchemaOptions>>
       : {};
 
+  type DefaultModelHydratedDocType<TSchema extends Schema> = HydratedDocument<
+    InferSchemaType<TSchema>,
+    ObtainSchemaGeneric<TSchema, 'TVirtuals'> & ObtainSchemaGeneric<TSchema, 'TInstanceMethods'>,
+    ObtainSchemaGeneric<TSchema, 'TQueryHelpers'>,
+    ObtainSchemaGeneric<TSchema, 'TVirtuals'>,
+    InferSchemaType<TSchema>,
+    ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>
+  >;
+
+  type ResolveModelDiscriminators<TSchema extends Schema, TDiscriminators, BaseType, DiscriminatorType> =
+    IsAny<TDiscriminators> extends true ? BaseType
+    : TDiscriminators extends Record<string, any> ?
+      TDiscriminators[keyof TDiscriminators] extends Schema ?
+        BaseType | DiscriminatorType
+      : BaseType
+    : BaseType;
+
+  type ResolveTopLevelModelDocType<TSchema extends Schema> =
+    ResolveSchemaOptions<ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>> extends { discriminators: infer TDiscriminators } ?
+      ResolveModelDiscriminators<
+        TSchema,
+        TDiscriminators,
+        InferSchemaType<TSchema>,
+        TDiscriminators[keyof TDiscriminators] extends Schema ?
+          MergeType<InferSchemaType<TSchema>, InferSchemaType<TDiscriminators[keyof TDiscriminators]>>
+        : never
+      >
+    : InferSchemaType<TSchema>;
+
+  type ResolveTopLevelModelHydratedDocType<TSchema extends Schema> =
+    ResolveSchemaOptions<ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>> extends { discriminators: infer TDiscriminators } ?
+      ResolveModelDiscriminators<
+        TSchema,
+        TDiscriminators,
+        DefaultModelHydratedDocType<TSchema>,
+        TDiscriminators[keyof TDiscriminators] extends Schema ?
+          MergeType<DefaultModelHydratedDocType<TSchema>, InferHydratedDocTypeFromSchema<TDiscriminators[keyof TDiscriminators]>>
+        : never
+      >
+    : DefaultModelHydratedDocType<TSchema>;
+
+  type ResolveTopLevelModelLeanDocType<TSchema extends Schema> =
+    ResolveSchemaOptions<ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>> extends { discriminators: infer TDiscriminators } ?
+      ResolveModelDiscriminators<
+        TSchema,
+        TDiscriminators,
+        ObtainSchemaGeneric<TSchema, 'TLeanResultType'>,
+        TDiscriminators[keyof TDiscriminators] extends Schema ?
+          MergeType<ObtainSchemaGeneric<TSchema, 'TLeanResultType'>, ObtainSchemaGeneric<TDiscriminators[keyof TDiscriminators], 'TLeanResultType'>>
+        : never
+      >
+    : ObtainSchemaGeneric<TSchema, 'TLeanResultType'>;
+
   type ApplySchemaOptions<T, O = DefaultSchemaOptions> = ResolveTimestamps<T, O>;
 
   type DefaultTimestampProps = {

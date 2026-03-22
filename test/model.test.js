@@ -9168,30 +9168,30 @@ describe('Model', function() {
       assert.throws(() => db.model('Test'), /MissingSchemaError/);
     });
 
-    it('should throw a TypeError if no connection is passed (gh-16098)', async function() {
+    it('should throw a MongooseError if no connection is passed (gh-16098)', async function() {
       const schema = new mongoose.Schema({
         name: String
       });
       const Model = db.model('Test', schema);
       assert.throws(() => {
         Model.useConnection();
-      }, { name: 'TypeError', message: '`useConnection()` requires a Mongoose Connection instance.' });
+      }, { name: 'MongooseError', message: '`useConnection()` requires a Mongoose Connection instance.' });
     });
 
-    it('should throw a TypeError if a non-connection object is passed (gh-16098)', async function() {
+    it('should throw a MongooseError if a non-connection object is passed (gh-16098)', async function() {
       const schema = new mongoose.Schema({ name: String });
       const Model = db.model('Test', schema);
       assert.throws(() => {
         Model.useConnection({});
-      }, { name: 'TypeError', message: '`useConnection()` requires a Mongoose Connection instance.' });
+      }, { name: 'MongooseError', message: '`useConnection()` requires a Mongoose Connection instance.' });
     });
 
-    it('should throw a TypeError if null is passed (gh-16098)', async function() {
+    it('should throw a MongooseError if null is passed (gh-16098)', async function() {
       const schema = new mongoose.Schema({ name: String });
       const Model = db.model('Test', schema);
       assert.throws(() => {
         Model.useConnection(null);
-      }, { name: 'TypeError', message: '`useConnection()` requires a Mongoose Connection instance.' });
+      }, { name: 'MongooseError', message: '`useConnection()` requires a Mongoose Connection instance.' });
     });
   });
 

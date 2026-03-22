@@ -584,6 +584,12 @@ Clock.ensureIndexes(callback);
 The `autoIndex` option is set to `true` by default. You can change this
 default by setting [`mongoose.set('autoIndex', false);`](api/mongoose.html#mongoose_Mongoose-set)
 
+A common pattern is to disable `autoIndex` only in production:
+
+```javascript
+mongoose.set('autoIndex', process.env.NODE_ENV !== 'production');
+```
+
 ## option: autoCreate {#autoCreate}
 
 Before Mongoose builds indexes, it calls `Model.createCollection()` to create the underlying collection in MongoDB by default.

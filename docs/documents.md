@@ -126,8 +126,8 @@ doc3.nested.subdoc.name = 'John Smythe';
 // Do not use the following pattern with Mongoose documents.
 const doc4 = new TestModel();
 (doc4.nested.subdoc ??= {}).name = 'Charlie Smith';
-doc.nested.subdoc; // Empty object
-doc.nested.subdoc.name; // undefined.
+doc4.nested.subdoc; // Empty object
+doc4.nested.subdoc.name; // undefined.
 ```
 
 ## Updating Using Queries {#updating-using-queries}

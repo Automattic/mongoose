@@ -50,5 +50,36 @@ describe('isObject', () => {
     it('"[object Object]"', () => {
       assert.ok(!isObject('[object Object]'));
     });
+
+    it('null', () => {
+      assert.ok(!isObject(null));
+    });
+
+    it('undefined', () => {
+      assert.ok(!isObject(undefined));
+    });
+
+    it('number', () => {
+      assert.ok(!isObject(0));
+      assert.ok(!isObject(123));
+      assert.ok(!isObject(-456));
+    });
+
+    it('boolean', () => {
+      assert.ok(!isObject(true));
+      assert.ok(!isObject(false));
+    });
+
+    it('Date', () => {
+      assert.ok(!isObject(new Date()));
+    });
+
+    it('Map', () => {
+      assert.ok(!isObject(new Map()));
+    });
+
+    it('Set', () => {
+      assert.ok(!isObject(new Set()));
+    });
   });
 });

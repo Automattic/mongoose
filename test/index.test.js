@@ -7,6 +7,7 @@ const start = require('./common');
 const assert = require('assert');
 const random = require('./util').random;
 const stream = require('stream');
+const util = require('util');
 
 const collection = 'blogposts_' + random();
 
@@ -91,7 +92,6 @@ describe('mongoose module:', function() {
   });
 
   it('should collect the args correctly gh-13364', async function() {
-    const util = require('util');
     const mongoose = new Mongoose();
     const conn = await mongoose.connect(start.uri);
     let actual = '';
@@ -246,6 +246,30 @@ describe('mongoose module:', function() {
     const doc = new M();
     assert.equal(doc.toObject().foo, 42);
     assert.strictEqual(doc.toJSON().foo, void 0);
+  });
+
+  it('set() with null (gh-16130)', function() {
+    const mongoose = new Mongoose();
+
+    assert.throws(
+      () => mongoose.set(null),
+      /"null" is not a valid option to set/
+    );
+
+    assert.throws(
+      () => mongoose.set(undefined),
+      /"undefined" is not a valid option to set/
+    );
+
+    assert.throws(
+      () => mongoose.set(null, 'test'),
+      /"null" is not a valid option to set/
+    );
+
+    assert.throws(
+      () => mongoose.set(undefined, 'test'),
+      /"undefined" is not a valid option to set/
+    );
   });
 
   it('strict option (gh-6858)', function() {

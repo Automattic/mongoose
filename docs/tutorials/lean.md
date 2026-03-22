@@ -114,7 +114,7 @@ app.put('/person/:id', function(req, res) {
 ```
 
 Remember that virtuals do **not** end up in `lean()` query results. Use the
-[mongoose-lean-virtuals plugin](http://plugins.mongoosejs.io/plugins/lean-virtuals)
+[mongoose-lean-virtuals plugin](https://plugins.mongoosejs.io/plugins/lean-virtuals)
 to add virtuals to your lean query results.
 
 ## Plugins

@@ -16,7 +16,7 @@ You can also read more about [promises in Mongoose](https://masteringjs.io/tutor
 
 ## Queries are not promises
 
-[Mongoose queries](http://mongoosejs.com/docs/queries.html) are **not** promises. They have a `.then()`
+[Mongoose queries](https://mongoosejs.com/docs/queries.html) are **not** promises. They have a `.then()`
 function for [co](https://www.npmjs.com/package/co) and async/await as
 a convenience. If you need
 a fully-fledged promise, use the `.exec()` function.

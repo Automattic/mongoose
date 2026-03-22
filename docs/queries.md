@@ -210,7 +210,7 @@ await Person.find().sort({ age: -1 }); // returns age starting from 10 as the fi
 await Person.find().sort({ age: 1 }); // returns age starting from 0 as the first entry
 ```
 
-When sorting with mutiple fields, the order of the sort keys determines what key MongoDB server sorts by first.
+When sorting with multiple fields, the order of the sort keys determines what key MongoDB server sorts by first.
 
 ```javascript
 const personSchema = new mongoose.Schema({

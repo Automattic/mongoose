@@ -43,7 +43,7 @@ const person = await Person.findOne({ 'name.last': 'Ghost' }, 'name occupation')
 console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation);
 ```
 
-What `person` is depends on the operation: For `findOne()` it is a [potentially-null single document](api/model.html#model_Model-findOne), `find()` a [list of documents](api/model.html#model_Model-find), `count()` [the number of documents](api/model.html#model_Model-count), `update()` the [number of documents affected](api/model.html#model_Model-update), etc.
+What `person` is depends on the operation: For `findOne()` it is a [potentially-null single document](api/model.html#model_Model-findOne), `find()` a [list of documents](api/model.html#model_Model-find), `countDocuments()` [the number of documents](api/model.html#model_Model-countDocuments), `updateOne()` the [number of documents affected](api/model.html#model_Model-updateOne), etc.
 The [API docs for Models](api/model.html) provide more details.
 
 Now let's look at what happens when no `await` is used:

@@ -420,7 +420,7 @@ person.populated('fans'); // Array of ObjectIds
 ## Populating multiple existing documents {#populate_multiple_documents}
 
 If we have one or many mongoose documents or even plain objects
-(*like [mapReduce](api/model.html#model_Model-mapReduce) output*), we may
+(*for example, results from an [aggregation](api/model.html#model_Model-aggregate) query*), we may
 populate them using the [Model.populate()](api/model.html#model_Model-populate)
 method. This is what `Document#populate()`
 and `Query#populate()` use to populate documents.

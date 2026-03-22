@@ -7,6 +7,13 @@ declare module 'mongoose' {
     currentTime?: () => (NativeDate | number);
   }
 
+  type SchemaOptionsStaticsPropertyType<TStaticMethods, TModelType> = IfEquals<
+    TStaticMethods,
+    {},
+    Record<string, (...args: any[]) => unknown> & ThisType<TModelType>,
+    { [K in keyof TStaticMethods]: OmitThisParameter<TStaticMethods[K]> } & ThisType<TModelType>
+  >;
+
   type TypeKeyBaseType = string;
 
   type DefaultTypeKey = 'type';
@@ -222,12 +229,7 @@ declare module 'mongoose' {
     /**
      * Model Statics methods.
      */
-    statics?: IfEquals<
-      TStaticMethods,
-      {},
-      { [name: string]: (this: TModelType, ...args: any[]) => unknown },
-      AddThisParameter<TStaticMethods, TModelType>
-    >
+    statics?: SchemaOptionsStaticsPropertyType<TStaticMethods, TModelType>
 
     /**
      * Document instance methods.

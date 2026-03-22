@@ -2238,6 +2238,24 @@ function gh16046() {
   IssueTwo.myStaticMethod();
 }
 
+function gh16046VersionKeyFalse() {
+  const mySchema = new Schema(
+    { name: { type: String, required: true } },
+    {
+      versionKey: false,
+      statics: {
+        testMe: function() {
+          ExpectType<string>(this.modelName);
+        }
+      }
+    }
+  );
+
+  const MyModel = model('Test', mySchema);
+
+  MyModel.testMe();
+}
+
 function gh16045() {
   const circleSchema = new Schema({
     kind: { type: String, enum: ['Circle'] },

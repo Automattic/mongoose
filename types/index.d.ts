@@ -1071,7 +1071,7 @@ declare module 'mongoose' {
    * By handling all transforms in one pass, we correctly handle ObjectIds/UUIDs nested inside Maps
    * since we recurse into Map values during the same traversal that converts ObjectIds/UUIDs.
    */
-  type ApplyFlattenTransforms<T, O> =
+  type ApplyFlattenTransforms<T, O> = T extends any ? (
     // Handle ObjectId first (before TreatAsPrimitives since ObjectId is in TreatAsPrimitives)
     T extends mongodb.ObjectId
       ? O extends { flattenObjectIds: true } ? string : T
@@ -1100,7 +1100,8 @@ declare module 'mongoose' {
     // Handle regular objects - recurse into properties
     : T extends Record<string, any>
       ? { [K in keyof T]: ApplyFlattenTransforms<T[K], O> }
-    : T;
+    : T
+  ) : never;
 
   /**
    * Computes the return type of toObject/toJSON based on the provided options.

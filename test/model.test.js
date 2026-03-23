@@ -9197,7 +9197,7 @@ describe('Model', function() {
       );
     });
 
-    it('should throw a MongooseError if mismatched Mongoose version (gh-16098)', async function() {
+    it('should throw a MongooseError if mismatched Mongoose version (gh-16098)', function() {
       const schema = new mongoose.Schema({ name: String });
       const m = new mongoose.Mongoose();
       m.version = 'not a valid version';

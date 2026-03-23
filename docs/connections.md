@@ -399,8 +399,7 @@ if (err.name === 'MongooseServerSelectionError') {
 ## Multi-mongos support {#mongos_connections}
 
 You can also connect to multiple [mongos](https://www.mongodb.com/docs/manual/reference/program/mongos/) instances
-for high availability in a sharded cluster. You do
-[not need to pass any special options to connect to multiple mongos](https://mongodb.github.io/node-mongodb-native/3.0/tutorials/connect/#connect-to-sharded-cluster) in mongoose 5.x.
+for high availability in a sharded cluster.
 
 ```javascript
 // Connect to 2 mongos servers

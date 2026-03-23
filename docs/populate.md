@@ -931,7 +931,7 @@ const libraries = await Library.find().populate('books.$*.author');
 
 ## Populate in Middleware {#populate-middleware}
 
-You can populate in either pre or post [hooks](http://mongoosejs.com/docs/middleware.html). If you want to
+You can populate in either pre or post [hooks](https://mongoosejs.com/docs/middleware.html). If you want to
 always populate a certain field, check out the [mongoose-autopopulate plugin](http://npmjs.com/package/mongoose-autopopulate).
 
 ```javascript

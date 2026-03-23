@@ -9200,13 +9200,13 @@ describe('Model', function() {
     it('should throw a MongooseError if mismatched Mongoose version (gh-16098)', function() {
       const schema = new mongoose.Schema({ name: String });
       const m = new mongoose.Mongoose();
-      m.version = 'not a valid version';
+      m.version = '0.0.7';
       const Model = db.model('Test', schema);
       assert.throws(
         () => Model.useConnection(m.connection),
         {
           name: 'MongooseError',
-          message: 'The connection passed to `useConnection()` has a different version of Mongoose than the model you are using.'
+          message: `The connection passed to \`useConnection()\` has a different version of Mongoose (0.0.7) than the model you are using (${mongoose.version}).`
         }
       );
     });

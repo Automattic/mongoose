@@ -1,6 +1,6 @@
 # Mongoose
 
-Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment. Mongoose supports [Node.js](https://nodejs.org/en/) and [Deno](https://deno.land/) (alpha).
+Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed to work in an asynchronous environment. Mongoose supports [Node.js](https://nodejs.org/en/) and [Deno](https://deno.land/).
 
 [![Build Status](https://github.com/Automattic/mongoose/workflows/Test/badge.svg)](https://github.com/Automattic/mongoose)
 [![NPM version](https://badge.fury.io/js/mongoose.svg)](http://badge.fury.io/js/mongoose)
@@ -66,7 +66,7 @@ yarn add mongoose
 bun add mongoose
 ```
 
-Mongoose 6.8.0 also includes alpha support for [Deno](https://deno.land/).
+Mongoose also supports [Deno](https://deno.land/).
 
 ## Importing
 

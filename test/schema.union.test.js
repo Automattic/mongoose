@@ -162,20 +162,20 @@ describe('Union', function() {
     const SubSchema1 = new Schema({
       price: { type: Number, required: true },
       title: { type: String },
-      isThisSchema1: { type: Boolean },
+      isThisSchema1: { type: Boolean }
     }, { _id: false });
 
     const SubSchema2 = new Schema({
       description: { type: String, required: true },
       title: { type: String },
-      isThisSchema2: { type: Boolean },
+      isThisSchema2: { type: Boolean }
     }, { _id: false });
 
     const TestSchema = new Schema({
       product: {
         type: 'Union',
-        of: [SubSchema1, SubSchema2],
-      },
+        of: [SubSchema1, SubSchema2]
+      }
     });
 
     const TestModel = db.model('Test', TestSchema);
@@ -186,8 +186,8 @@ describe('Union', function() {
         title: 'string',
         arbitraryNeverSave: true,
         isThisSchema1: true,
-        isThisSchema2: true,
-      },
+        isThisSchema2: true
+      }
     });
 
     let err;

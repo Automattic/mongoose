@@ -2,7 +2,6 @@
 
 const start = require('./common');
 const assert = require('assert');
-const generateSchemaFromCollection = require('../lib/helpers/schema/generateSchemaFromCollection');
 const mongoose = require('../');
 
 describe('generateSchemaFromCollection', function() {
@@ -27,7 +26,7 @@ describe('generateSchemaFromCollection', function() {
     ]);
 
     const schemaDef = await db.generateSchemaFromCollection(collectionName);
-    
+
     assert.deepStrictEqual(schemaDef.name, { type: 'String', required: true });
     assert.deepStrictEqual(schemaDef.age, { type: 'Number', required: true });
     assert.deepStrictEqual(schemaDef.active, { type: 'Boolean', required: true });
@@ -51,7 +50,7 @@ describe('generateSchemaFromCollection', function() {
     ]);
 
     const schemaDef = await db.generateSchemaFromCollection(collectionName);
-    
+
     assert.deepStrictEqual(schemaDef.name, { type: 'String', required: true });
     assert.deepStrictEqual(schemaDef.age, { type: 'Number' });
     assert.strictEqual(schemaDef.age.required, undefined);
@@ -67,7 +66,7 @@ describe('generateSchemaFromCollection', function() {
     ]);
 
     const schemaDef = await db.generateSchemaFromCollection(collectionName);
-    
+
     assert.ok(schemaDef.user);
     assert.deepStrictEqual(schemaDef.user.first, { type: 'String', required: true });
     assert.deepStrictEqual(schemaDef.user.last, { type: 'String' });
@@ -90,7 +89,7 @@ describe('generateSchemaFromCollection', function() {
     ]);
 
     const schemaDef = await db.generateSchemaFromCollection(collectionName);
-    
+
     assert.deepStrictEqual(schemaDef.tags, ['String']);
     assert.deepStrictEqual(schemaDef.scores, ['Number']);
     assert.deepStrictEqual(schemaDef.items, [{ id: { type: 'Number', required: true } }]);
@@ -104,16 +103,16 @@ describe('generateSchemaFromCollection', function() {
   });
 
   it('handles Mixed types', async function() {
-     const collectionName = 'test_mixed';
-     const Collection = db.collection(collectionName);
-     await Collection.deleteMany({});
-     await Collection.insertMany([
-       { mixed: 'string' },
-       { mixed: 123 }
-     ]);
+    const collectionName = 'test_mixed';
+    const Collection = db.collection(collectionName);
+    await Collection.deleteMany({});
+    await Collection.insertMany([
+      { mixed: 'string' },
+      { mixed: 123 }
+    ]);
 
-     const schemaDef = await db.generateSchemaFromCollection(collectionName);
-     assert.deepStrictEqual(schemaDef.mixed, { type: 'Mixed', required: true });
+    const schemaDef = await db.generateSchemaFromCollection(collectionName);
+    assert.deepStrictEqual(schemaDef.mixed, { type: 'Mixed', required: true });
   });
 
   it('handles ObjectId and BSON types', async function() {
@@ -126,7 +125,7 @@ describe('generateSchemaFromCollection', function() {
     ]);
 
     const schemaDef = await db.generateSchemaFromCollection(collectionName);
-    
+
     // _id should be ignored in output but others included
     assert.strictEqual(schemaDef._id, undefined);
     assert.deepStrictEqual(schemaDef.ref, { type: 'ObjectId', required: true });

@@ -671,7 +671,7 @@ temperature.celsius instanceof bson.Double; // true
 There are several types of values that will be successfully cast to a Double.
 
 ```javascript
-new Temperature({ celsius: '1.2e12' }).celsius; // 15 as a Double
+new Temperature({ celsius: '1.2e12' }).celsius; // 1200000000000 as a Double
 new Temperature({ celsius: true }).celsius; // 1 as a Double
 new Temperature({ celsius: false }).celsius; // 0 as a Double
 new Temperature({ celsius: { valueOf: () => 83.0033 } }).celsius; // 83 as a Double
@@ -699,7 +699,7 @@ const student = new Student({ id: 1339 });
 typeof student.id; // 'number'
 ```
 
-There are several types of values that will be successfully cast to a Number.
+There are several types of values that will be successfully cast to an Int32.
 
 ```javascript
 new Student({ id: '15' }).id; // 15 as a Int32
@@ -925,7 +925,7 @@ const schema = new mongoose.Schema({
 ## Creating Custom Types {#customtypes}
 
 Mongoose can also be extended with [custom SchemaTypes](customschematypes.html). Search the
-[plugins](http://plugins.mongoosejs.io)
+[plugins](https://plugins.mongoosejs.io)
 site for compatible types like
 [mongoose-long](https://github.com/aheckmann/mongoose-long),
 [mongoose-int32](https://github.com/vkarpov15/mongoose-int32),

@@ -678,11 +678,11 @@ new Temperature({ celsius: { valueOf: () => 83.0033 } }).celsius; // 83 as a Dou
 new Temperature({ celsius: '' }).celsius; // null
 ```
 
-The following inputs will result will all result in a [CastError](validation.html#cast-errors) once validated, meaning that it will not throw on initialization, only when validated:
+The following inputs will all result in a [CastError](validation.html#cast-errors) once validated, meaning that it will not throw on initialization, only when validated:
 
 * strings that do not represent a numeric string, a NaN or a null-ish value
 * objects that don't have a `valueOf()` function
-* an input that represents a value outside the bounds of a IEEE 754-2008 floating point
+* an input that represents a value outside the bounds of an IEEE 754-2008 floating-point number
 
 ### Int32 {#int32}
 
@@ -714,13 +714,13 @@ call it and assign the returned value to the path.
 
 The values `null` and `undefined` are not cast.
 
-The following inputs will result will all result in a [CastError](validation.html#cast-errors) once validated, meaning that it will not throw on initialization, only when validated:
+The following inputs will all result in a [CastError](validation.html#cast-errors) once validated, meaning that it will not throw on initialization, only when validated:
 
 * NaN
 * strings that cast to NaN
 * objects that don't have a `valueOf()` function
 * a decimal that must be rounded to be an integer
-* an input that represents a value outside the bounds of an 32-bit integer
+* an input that represents a value outside the bounds of a 32-bit integer
 
 ### Union {#union}
 

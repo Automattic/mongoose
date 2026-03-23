@@ -63,7 +63,7 @@ console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupa
 
 In the above code, the `query` variable is of type [Query](api/query.html).
 A `Query` enables you to build up a query using chaining syntax, rather than specifying a JSON object.
-The below 2 examples are equivalent.
+The two examples below are equivalent.
 
 ```javascript
 // With a JSON doc
@@ -174,7 +174,7 @@ const docs = await Person.aggregate([{ $match: { 'name.last': 'Ghost' } }]);
 docs[0] instanceof mongoose.Document; // false
 ```
 
-Also, unlike query filters, Mongoose also doesn't
+Also, unlike query filters, Mongoose doesn't
 [cast](tutorials/query_casting.html) aggregation pipelines. That means
 you're responsible for ensuring the values you pass in to an aggregation
 pipeline have the correct type.
@@ -206,7 +206,7 @@ for (let i = 0; i < 10; i++) {
   await Person.create({ age: i });
 }
 
-await Person.find().sort({ age: -1 }); // returns age starting from 10 as the first entry
+await Person.find().sort({ age: -1 }); // returns age starting from 9 as the first entry
 await Person.find().sort({ age: 1 }); // returns age starting from 0 as the first entry
 ```
 

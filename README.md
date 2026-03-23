@@ -13,7 +13,7 @@ Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed 
 
 The official documentation website is [mongoosejs.com](https://mongoosejs.com/).
 
-Mongoose 9.0.0 was released on November 21, 2025. You can find more details on [backwards breaking changes in 9.0.0 on our docs site](https://mongoosejs.com/docs/migrating_to_9.html).
+Mongoose 9.0.0 was released on November 21, 2025. You can find more details on [backward-incompatible changes in 9.0.0 on our docs site](https://mongoosejs.com/docs/migrating_to_9.html).
 
 ## Support
 
@@ -32,7 +32,7 @@ Check out the [plugins search site](https://plugins.mongoosejs.io/) to see hundr
 Pull requests are always welcome! Please base pull requests against the `master`
 branch and follow the [contributing guide](https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md).
 
-If your pull requests makes documentation changes, please do **not**
+If your pull request makes documentation changes, please do **not**
 modify any `.html` files. The `.html` files are compiled code, so please make
 your changes in `docs/*.pug`, `lib/*.js`, or `test/docs/*.js`.
 
@@ -114,7 +114,7 @@ Both `connect` and `createConnection` take a `mongodb://` URI, or the parameters
 await mongoose.connect('mongodb://127.0.0.1/my_database');
 ```
 
-Once connected, the `open` event is fired on the `Connection` instance. If you're using `mongoose.connect`, the `Connection` is `mongoose.connection`. Otherwise, `mongoose.createConnection` return value is a `Connection`.
+Once connected, the `open` event is fired on the `Connection` instance. If you're using `mongoose.connect`, the `Connection` is `mongoose.connection`. Otherwise, the return value of `mongoose.createConnection` is a `Connection`.
 
 **Note:** *If the local connection fails then try using 127.0.0.1 instead of localhost. Sometimes issues may arise when the local hostname has been changed.*
 
@@ -219,7 +219,7 @@ console.log(instance.my.key); // 'hello'
 
 For more details check out [the docs](https://mongoosejs.com/docs/queries.html).
 
-**Important!** If you opened a separate connection using `mongoose.createConnection()` but attempt to access the model through `mongoose.model('ModelName')` it will not work as expected since it is not hooked up to an active db connection. In this case access your model through the connection you created:
+**Important!** If you opened a separate connection using `mongoose.createConnection()` but attempt to access the model through `mongoose.model('ModelName')` it will not work as expected since it is not hooked up to an active db connection. In this case, access your model through the connection you created:
 
 ```js
 const conn = mongoose.createConnection('your connection string');
@@ -338,7 +338,7 @@ new Schema({
 
 ### Driver Access
 
-Mongoose is built on top of the [official MongoDB Node.js driver](https://github.com/mongodb/node-mongodb-native). Each mongoose model keeps a reference to a [native MongoDB driver collection](http://mongodb.github.io/node-mongodb-native/2.1/api/Collection.html). The collection object can be accessed using `YourModel.collection`. However, using the collection object directly bypasses all mongoose features, including hooks, validation, etc. The one
+Mongoose is built on top of the [official MongoDB Node.js driver](https://github.com/mongodb/node-mongodb-native). Each mongoose model keeps a reference to a [native MongoDB driver collection](https://mongodb.github.io/node-mongodb-native/7.0/classes/Collection.html). The collection object can be accessed using `YourModel.collection`. However, using the collection object directly bypasses all mongoose features, including hooks, validation, etc. The one
 notable exception that `YourModel.collection` still buffers
 commands. As such, `YourModel.collection.find()` will **not**
 return a cursor.

@@ -1,5 +1,5 @@
 import { Schema, model, Document, Model, Types } from 'mongoose';
-import { ExpectType } from './util/assertions';
+import { expect } from 'tstyche';
 
 // Basic usage of `loadClass` with TypeScript
 function basicLoadClassPattern() {
@@ -31,17 +31,17 @@ function basicLoadClassPattern() {
   const MyModel = model<MyCombinedDocument, MyCombinedModel>('MyClass', schema as any);
 
   // Static function should work
-  ExpectType<number>(MyModel.myStatic());
+  expect(MyModel.myStatic()).type.toBe<number>();
 
   // Instance method should work
   const doc = new MyModel();
-  ExpectType<number>(doc.myMethod());
+  expect(doc.myMethod()).type.toBe<number>();
 
   // Getter should work
-  ExpectType<number>(doc.myVirtual);
+  expect(doc.myVirtual).type.toBe<number>();
 
   // Schema property should be typed
-  ExpectType<string>(doc.property1);
+  expect(doc.property1).type.toBe<string>();
 }
 
 
@@ -82,21 +82,21 @@ function thisParameterPattern() {
   const MyModel = model<MyCombinedDocument, MyCombinedModel>('MyClass2', schema as any);
 
   // Test static
-  ExpectType<number>(MyModel.myStatic());
+  expect(MyModel.myStatic()).type.toBe<number>();
 
   const doc = new MyModel({ property1: 'test' });
 
   // Instance method returns string
-  ExpectType<string>(doc.myMethod());
+  expect(doc.myMethod()).type.toBe<string>();
 
   // Schema field is typed correctly
-  ExpectType<string>(doc.property1);
+  expect(doc.property1).type.toBe<string>();
 
 
   // Getter works at runtime, but TypeScript can't type `this` in getters.
   // So we accept `any`.
   const virtual = doc.myVirtual;
-  ExpectType<any>(virtual);
+  expect(virtual).type.toBe<any>();
 }
 
 
@@ -137,16 +137,16 @@ function toObjectToJSONTest() {
   const pojo = doc.toObject();
 
   // Schema property is still typed
-  ExpectType<string>(pojo.property1);
+  expect(pojo.property1).type.toBe<string>();
 
   // TS still thinks class method exists (wrong at runtime)
-  ExpectType<() => number>(pojo.myMethod);
+  expect(pojo.myMethod).type.toBe<() => number>();
 
   // Same caveat applies to toJSON()
   const json = doc.toJSON();
 
-  ExpectType<() => number>(json.myMethod);
-  ExpectType<string>(json.property1);
+  expect(json.myMethod).type.toBe<() => number>();
+  expect(json.property1).type.toBe<string>();
 }
 
 

@@ -309,7 +309,7 @@ declare module 'mongoose' {
       IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : DocType,
       ResolveSchemaOptions<TSchemaOptions>
     >,
-    TSchemaDefinition = SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType, THydratedDocumentType>,
+    TSchemaDefinition = IfAny<RawDocType, unknown, SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType, THydratedDocumentType>>,
     LeanResultType = IsItRecordAndNotAny<RawDocType> extends true ? RawDocType : Default__v<Require_id<BufferToBinary<FlattenMaps<DocType>>>>
   >
     extends events.EventEmitter {
@@ -379,7 +379,12 @@ declare module 'mongoose' {
       >,
       TMethods = TSchemaOptions extends { methods: infer M } ? { [K in keyof M]: OmitThisParameter<M[K]> } : {},
       TStatics = TSchemaOptions extends { statics: infer S } ? { [K in keyof S]: OmitThisParameter<S[K]> } : {}
-    >(def: TSchemaDefinition, options: TSchemaOptions): Schema<
+    >(def: TSchemaDefinition, options: TSchemaOptions & {
+      statics?: SchemaOptionsStaticsPropertyType<
+        TStatics,
+        Model<RawDocType>
+      >
+    }): Schema<
       RawDocType,
       Model<RawDocType, any, any, any>,
       TMethods,
@@ -497,6 +502,7 @@ declare module 'mongoose' {
 
     /** Registers a plugin for this schema. */
     plugin<PFunc extends PluginFunction<DocType, TModelType, any, any, any, any>, POptions extends Parameters<PFunc>[1] = Parameters<PFunc>[1]>(fn: PFunc, opts?: POptions): this;
+    plugin<PFunc extends PluginFunction<DocType, Model<DocType, any, any, any, any, any>, any, any, any, any>, POptions extends Parameters<PFunc>[1] = Parameters<PFunc>[1]>(fn: PFunc, opts?: POptions): this;
 
     /** Defines a post hook for the model. */
 

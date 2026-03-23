@@ -1,7 +1,7 @@
 import { QueryFilter, sanitizeFilter } from 'mongoose';
-import { ExpectType } from './util/assertions';
+import { expect } from 'tstyche';
 
 const data = { username: 'val', pwd: { $ne: null } };
 type Data = typeof data;
 
-ExpectType<QueryFilter<Data>>(sanitizeFilter<typeof data>(data));
+expect(sanitizeFilter<typeof data>(data)).type.toBe<QueryFilter<Data>>();

@@ -7,8 +7,10 @@ on:
       - 'docs/**'
       - 'lib'
       - 'test'
-      - 'website.js'
+      - 'scripts/website.js'
       - 'CHANGELOG.md'
+      - 'CONTRIBUTING.md'
+      - 'index.pug'
   push:
     branches:
       - master
@@ -18,8 +20,10 @@ on:
       - 'docs/**'
       - 'lib'
       - 'test'
-      - 'website.js'
+      - 'scripts/website.js'
       - 'CHANGELOG.md'
+      - 'CONTRIBUTING.md'
+      - 'index.pug'
 permissions:
   contents: read
 

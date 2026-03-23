@@ -40,9 +40,7 @@ View all 400+ [contributors](https://github.com/Automattic/mongoose/graphs/contr
 
 ## Installation
 
-First install [Node.js](http://nodejs.org/) and [MongoDB](https://www.mongodb.org/downloads). Then:
-
-Then install the `mongoose` package using your preferred package manager:
+First install [Node.js](https://nodejs.org/) and [MongoDB](https://www.mongodb.org/downloads), then install the `mongoose` package using your preferred package manager:
 
 ### Using npm
 

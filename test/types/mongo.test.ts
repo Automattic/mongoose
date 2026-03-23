@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
-import { ExpectType } from './util/assertions';
 import * as bson from 'bson';
+import { expect } from 'tstyche';
 
 function gh12537() {
   const schema = new mongoose.Schema({ test: String });
@@ -9,7 +9,7 @@ function gh12537() {
   const doc = new model({});
 
   const v = new bson.ObjectId('somehex');
-  ExpectType<string>(v._id.toHexString());
+  expect(v._id.toHexString()).type.toBe<string>();
 
   doc._id = new bson.ObjectId('somehex');
 }

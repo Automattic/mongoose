@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import { ExpectType } from './util/assertions';
+import { expect } from 'tstyche';
 
 Object.values(mongoose.models).forEach(model => {
   model.modelName;
@@ -23,14 +23,14 @@ function gh10746() {
   let testVar: A;
   testVar = 'A string';
   testVar = 'B string';
-  ExpectType<string>(testVar);
+  expect(testVar).type.toBe<string>();
 }
 
 function gh10957() {
   type TestType = { name: string };
   const obj: TestType = { name: 'foo' };
 
-  ExpectType<TestType>(mongoose.trusted(obj));
+  expect(mongoose.trusted(obj)).type.toBe<TestType>();
 }
 
 function connectionStates() {
@@ -64,10 +64,9 @@ function gh15756() {
 function gh15972() {
   mongoose.set('returnDocument', 'before');
   mongoose.set('returnDocument', 'after');
-  // @ts-expect-error  Argument of type '"invalid"' is not assignable to parameter of type '"before" | "after" | undefined'.
-  mongoose.set('returnDocument', 'invalid');
-  // @ts-expect-error  Argument of type 'true' is not assignable to parameter of type '"before" | "after" | undefined'.
-  mongoose.set('returnDocument', true);
+
+  expect(mongoose.set).type.not.toBeCallableWith('returnDocument', 'invalid');
+  expect(mongoose.set).type.not.toBeCallableWith('returnDocument', true);
 }
 
 function gh12100() {
@@ -82,8 +81,7 @@ function setAsObject() {
     updatePipeline: true
   });
 
-  // @ts-expect-error  'invalid' does not exist in type
-  mongoose.set({ invalid: true });
+  expect(mongoose.set).type.not.toBeCallableWith({ invalid: true });
 }
 
 const x: { name: string } = mongoose.omitUndefined({ name: 'foo' });

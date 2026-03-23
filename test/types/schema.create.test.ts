@@ -2017,3 +2017,21 @@ function gh16046() {
   (new IssueTwo()).myMethod();
   IssueTwo.myStaticMethod();
 }
+
+function gh16046VersionKeyFalse() {
+  const mySchema = Schema.create(
+    { name: { type: String, required: true } },
+    {
+      versionKey: false,
+      statics: {
+        testMe: function() {
+          ExpectType<string>(this.modelName);
+        }
+      }
+    }
+  );
+
+  const MyModel = model('TestCreate', mySchema);
+
+  MyModel.testMe();
+}

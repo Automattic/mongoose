@@ -2237,3 +2237,134 @@ function gh16046() {
   (new IssueTwo()).myMethod();
   IssueTwo.myStaticMethod();
 }
+
+function gh16046VersionKeyFalse() {
+  const mySchema = new Schema(
+    { name: { type: String, required: true } },
+    {
+      versionKey: false,
+      statics: {
+        testMe: function() {
+          ExpectType<string>(this.modelName);
+        }
+      }
+    }
+  );
+
+  const MyModel = model('Test', mySchema);
+
+  MyModel.testMe();
+}
+
+function gh16045() {
+  const circleSchema = new Schema({
+    kind: { type: String, enum: ['Circle'] },
+    name: {
+      baseName: String
+    },
+    radius: Number
+  });
+  const squareSchema = new Schema({
+    kind: { type: String, enum: ['Square'] },
+    side: Number
+  });
+
+  const shapeSchema = new Schema({ name: String }, { discriminatorKey: 'kind' });
+  const schema = new Schema({
+    shape: {
+      type: shapeSchema,
+      discriminators: {
+        Circle: circleSchema,
+        Square: squareSchema
+      }
+    }
+  });
+
+  type ShapeDocType = InferSchemaType<typeof schema>['shape'];
+  ExpectType<
+    |(Omit<InferSchemaType<typeof shapeSchema>, keyof InferSchemaType<typeof circleSchema>> & InferSchemaType<typeof circleSchema>)
+      | (Omit<InferSchemaType<typeof shapeSchema>, keyof InferSchemaType<typeof squareSchema>> & InferSchemaType<typeof squareSchema>)
+      | null
+      | undefined
+      >({} as ShapeDocType);
+  ExpectType<
+    | string
+    | { baseName?: string | null | undefined }
+    | null
+    | undefined
+  >({} as NonNullable<ShapeDocType>['name']);
+
+  const Model = model('EmbeddedDiscriminatorPathOption', schema);
+  const circleDoc = new Model({ shape: { kind: 'Circle', radius: 5 } });
+  const squareDoc = new Model({ shape: { kind: 'Square', side: 10 } });
+
+  for (const doc of [circleDoc, squareDoc]) {
+    if (doc.shape?.kind === 'Circle') {
+      ExpectType<number | null | undefined>(doc.shape.radius);
+      ExpectType<{ baseName?: string | null | undefined } | null | undefined>(doc.shape.name);
+      ExpectType<string | null | undefined>(doc.shape.name?.baseName);
+      // @ts-expect-error Property 'side' does not exist on type
+      doc.shape.side;
+    }
+
+    if (doc.shape?.kind === 'Square') {
+      ExpectType<number | null | undefined>(doc.shape.side);
+      ExpectType<string | null | undefined>(doc.shape.name);
+      // @ts-expect-error Property 'radius' does not exist on type
+      doc.shape.radius;
+    }
+  }
+}
+
+function gh16045DocumentArray() {
+  const circleSchema = new Schema({
+    kind: { type: String, enum: ['Circle'] },
+    name: {
+      baseName: String
+    },
+    radius: Number
+  });
+  const squareSchema = new Schema({
+    kind: { type: String, enum: ['Square'] },
+    side: Number
+  });
+
+  const shapeSchema = new Schema({ name: String }, { discriminatorKey: 'kind' });
+  const schema = new Schema({
+    shapes: [{
+      type: shapeSchema,
+      discriminators: {
+        Circle: circleSchema,
+        Square: squareSchema
+      }
+    }]
+  });
+
+  type ShapeElementType = NonNullable<InferSchemaType<typeof schema>['shapes']>[number];
+  ExpectType<
+    |(Omit<InferSchemaType<typeof shapeSchema>, keyof InferSchemaType<typeof circleSchema>> & InferSchemaType<typeof circleSchema>)
+      | (Omit<InferSchemaType<typeof shapeSchema>, keyof InferSchemaType<typeof squareSchema>> & InferSchemaType<typeof squareSchema>)
+      >({} as ShapeElementType);
+
+  const Model = model('EmbeddedDiscriminatorPathOptionDocArray', schema);
+  const circleDoc = new Model({ shapes: [{ kind: 'Circle', radius: 5, name: { baseName: 'a' } }] });
+  const squareDoc = new Model({ shapes: [{ kind: 'Square', side: 10, name: 'b' }] });
+
+  for (const doc of [circleDoc, squareDoc]) {
+    for (const shape of doc.shapes!) {
+      if (shape.kind === 'Circle') {
+        ExpectType<number | null | undefined>(shape.radius);
+        ExpectType<{ baseName?: string | null | undefined } | null | undefined>(shape.name);
+        // @ts-expect-error Property 'side' does not exist on type
+        shape.side;
+      }
+
+      if (shape.kind === 'Square') {
+        ExpectType<number | null | undefined>(shape.side);
+        ExpectType<string | null | undefined>(shape.name);
+        // @ts-expect-error Property 'radius' does not exist on type
+        shape.radius;
+      }
+    }
+  }
+}

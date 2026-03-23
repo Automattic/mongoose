@@ -1,6 +1,6 @@
 # Contributing to Mongoose
 
-If you have a question about Mongoose (not a bug report) please post it to either [StackOverflow](http://stackoverflow.com/questions/tagged/mongoose), or on [Gitter](https://gitter.im/Automattic/mongoose?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+If you have a question about Mongoose (not a bug report) please post it to either [StackOverflow](https://stackoverflow.com/questions/tagged/mongoose), or on [Gitter](https://gitter.im/Automattic/mongoose?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Reporting bugs
 
@@ -13,13 +13,13 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
 
 ## Requesting new features
 
-* Before opening a new issue, look for existing [issues](https://github.com/learnboost/mongoose/issues) to avoid duplication. If the issue does not yet exist, [create one](https://github.com/learnboost/mongoose/issues/new).
+* Before opening a new issue, look for existing [issues](https://github.com/Automattic/mongoose/issues) to avoid duplication. If the issue does not yet exist, [create one](https://github.com/Automattic/mongoose/issues/new).
 * Please describe a use case for it
 * Please include test cases if possible
 
 ## Fixing bugs / Adding features
 
-* Before starting to write code, look for existing [issues](https://github.com/learnboost/mongoose/issues). That way you avoid working on something that might not be of interest or that has been addressed already in a different branch. [You can create a new issue on GitHub](https://github.com/learnboost/mongoose/issues/new).
+* Before starting to write code, look for existing [issues](https://github.com/Automattic/mongoose/issues). That way you avoid working on something that might not be of interest or that has been addressed already in a different branch. [You can create a new issue on GitHub](https://github.com/Automattic/mongoose/issues/new).
   * *The source of this project is written in JavaScript, not CoffeeScript or TypeScript. Please write your bug reports in JavaScript that can run in vanilla Node.js*.
 * Fork the [repo](https://github.com/Automattic/mongoose) *or* for small documentation changes, navigate to the source on github and click the [Edit](https://github.com/blog/844-forking-with-the-edit-button) button.
 * Follow the general coding style of the rest of the project:
@@ -39,7 +39,7 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
 * Open a terminal and navigate to the root of the project
 * execute `npm install` to install the necessary dependencies
 * execute `npm run mongo` to start a MongoDB instance on port 27017. This step is optional, if you have already a database running on port 27017. To spin up a specific mongo version, you can do it by executing `npm run mongo -- {version}`. E.g. you want to spin up a mongo 4.2.2 server, you execute `npm run mongo -- 4.2.2`
-* execute `npm test` to run the tests (we're using [mocha](http://mochajs.org/))
+* execute `npm test` to run the tests (we're using [mocha](https://mochajs.org/))
   * or to execute a single test `npm test -- -g 'some regexp that matches the test description'`
   * any mocha flags can be specified with `-- <mocha flags here>`
   * For example, you can use `npm test -- -R spec` to use the spec reporter, rather than the dot reporter (by default, the test output looks like a bunch of dots)
@@ -56,9 +56,9 @@ If you have a question about Mongoose (not a bug report) please post it to eithe
 
 ## Documentation
 
-To contribute to the [API documentation](http://mongoosejs.com/docs/api/mongoose.html) just make your changes to the inline documentation of the appropriate [source code](https://github.com/Automattic/mongoose/tree/master/lib) in the master branch and submit a [pull request](https://help.github.com/articles/using-pull-requests/). You might also use the github [Edit](https://github.com/blog/844-forking-with-the-edit-button) button.
+To contribute to the [API documentation](https://mongoosejs.com/docs/api/mongoose.html) just make your changes to the inline documentation of the appropriate [source code](https://github.com/Automattic/mongoose/tree/master/lib) in the master branch and submit a [pull request](https://help.github.com/articles/using-pull-requests/). You might also use the github [Edit](https://github.com/blog/844-forking-with-the-edit-button) button.
 
-To contribute to the [guide](http://mongoosejs.com/docs/guide.html) or [quick start](http://mongoosejs.com/docs/index.html) docs, make your changes to the appropriate `.pug` / `.md` files in the [docs](https://github.com/Automattic/mongoose/tree/master/docs) directory of the master branch and submit a pull request. Again, the [Edit](https://github.com/blog/844-forking-with-the-edit-button) button might work for you here.
+To contribute to the [guide](https://mongoosejs.com/docs/guide.html) or [quick start](https://mongoosejs.com/docs/index.html) docs, make your changes to the appropriate `.pug` / `.md` files in the [docs](https://github.com/Automattic/mongoose/tree/master/docs) directory of the master branch and submit a pull request. Again, the [Edit](https://github.com/blog/844-forking-with-the-edit-button) button might work for you here.
 
 If you'd like to preview your documentation changes, first commit your changes to your local master branch, then execute:
 
@@ -75,7 +75,7 @@ There are some guidelines to keep the style for the documentation consistent:
 
 ## Plugins website
 
-The [plugins](http://plugins.mongoosejs.io/) site is also an [open source project](https://github.com/vkarpov15/mongooseplugins) that you can get involved with. Feel free to fork and improve it as well!
+The [plugins](https://plugins.mongoosejs.io/) site is also an [open source project](https://github.com/vkarpov15/mongooseplugins) that you can get involved with. Feel free to fork and improve it as well!
 
 ## Financial contributions
 

@@ -429,7 +429,7 @@ await Test.find().validate();
 
 Pre and post `save()` hooks are **not** executed on `update()`,
 `findOneAndUpdate()`, etc. You can see a more detailed discussion why in
-[this GitHub issue](http://github.com/Automattic/mongoose/issues/964).
+[this GitHub issue](https://github.com/Automattic/mongoose/issues/964).
 Mongoose 4.0 introduced distinct hooks for these functions.
 
 ```javascript

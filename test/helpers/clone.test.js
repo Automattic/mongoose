@@ -208,7 +208,7 @@ describe('clone', () => {
     it('does nothing', () => {
       class BeeSon {
         constructor() { this.myAttr = 'myAttrVal'; }
-        toBSON() {}
+        toBSON() { }
       }
       const base = new BeeSon();
       const cloned = clone(base, { bson: true });
@@ -257,9 +257,23 @@ describe('clone', () => {
       assert.equal(typeof cloned, 'object');
       assert.equal(cloned.constructor, Object);
     });
+
+    it('clones class instances even if they have default valueOf (gh-12574)', () => {
+      class MyClass {
+        constructor(props) {
+          Object.assign(this, props);
+        }
+      }
+      const base = new MyClass({ a: 1, b: 2 });
+      const cloned = clone(base);
+      assert.notStrictEqual(cloned, base);
+      assert.strictEqual(cloned.a, 1);
+      assert.strictEqual(cloned.b, 2);
+      assert.strictEqual(cloned.constructor, Object);
+    });
   });
 
-  it('retains RegExp options gh-1355', function() {
+  it('retains RegExp options gh-1355', function () {
     const a = new RegExp('hello', 'igm');
     assert.ok(a.global);
     assert.ok(a.ignoreCase);
@@ -272,7 +286,7 @@ describe('clone', () => {
     assert.equal(a.multiline, b.multiline);
   });
 
-  it('clones objects created with Object.create(null)', function() {
+  it('clones objects created with Object.create(null)', function () {
     const o = Object.create(null);
     o.a = 0;
     o.b = '0';
@@ -287,7 +301,7 @@ describe('clone', () => {
     assert.equal(Object.keys(out).length, 4);
   });
 
-  it('doesnt minimize empty objects in arrays to null (gh-7322)', function() {
+  it('doesnt minimize empty objects in arrays to null (gh-7322)', function () {
     const o = { arr: [{ a: 42 }, {}, {}] };
 
     const out = clone(o, { minimize: true });
@@ -296,7 +310,7 @@ describe('clone', () => {
     assert.deepEqual(out.arr[2], {});
   });
 
-  it('skips cloning types that have `toBSON()` if `bson` is set (gh-8299)', function() {
+  it('skips cloning types that have `toBSON()` if `bson` is set (gh-8299)', function () {
     const o = {
       toBSON() {
         return 'toBSON';

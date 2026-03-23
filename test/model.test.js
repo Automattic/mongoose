@@ -9179,7 +9179,7 @@ describe('Model', function() {
       );
     });
 
-    it('should throw a MongooseError if a non-connection object is passed (gh-16098)', async function() {
+    it('should throw a MongooseError if a non-connection object is passed (gh-16098)', function() {
       const schema = new mongoose.Schema({ name: String });
       const Model = db.model('Test', schema);
       assert.throws(

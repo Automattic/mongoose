@@ -101,8 +101,8 @@ gameSchema.plugin(loadedAtPlugin);
 The Mongoose team maintains several plugins that add cool new features to
 Mongoose. Here's a couple:
 
-* [mongoose-autopopulate](http://plugins.mongoosejs.io/plugins/autopopulate): Always [`populate()`](populate.html) certain fields in your Mongoose schemas.
-* [mongoose-lean-virtuals](http://plugins.mongoosejs.io/plugins/lean-virtuals): Attach virtuals to the results of Mongoose queries when using [`.lean()`](api/query.html#query_Query-lean).
+* [mongoose-autopopulate](https://plugins.mongoosejs.io/plugins/autopopulate): Always [`populate()`](populate.html) certain fields in your Mongoose schemas.
+* [mongoose-lean-virtuals](https://plugins.mongoosejs.io/plugins/lean-virtuals): Attach virtuals to the results of Mongoose queries when using [`.lean()`](api/query.html#query_Query-lean).
 * [mongoose-cast-aggregation](https://www.npmjs.com/package/mongoose-cast-aggregation)
 
 You can find a full list of officially supported plugins on [Mongoose's plugins search site](https://plugins.mongoosejs.io/).
@@ -113,4 +113,4 @@ Not only can you re-use schema functionality in your own projects, but you
 also reap the benefits of the Mongoose community as well. Any plugin
 published to [npm](https://npmjs.org/) and with
 'mongoose' as an [npm keyword](https://docs.npmjs.com/files/package.json#keywords)
-will show up on our [search results](http://plugins.mongoosejs.io) page.
+will show up on our [search results](https://plugins.mongoosejs.io) page.

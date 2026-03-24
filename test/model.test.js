@@ -9175,7 +9175,20 @@ describe('Model', function() {
       const Model = db.model('Test', schema);
       assert.throws(() => {
         Model.useConnection();
-      }, { message: 'Please provide a connection.' });
+      }, { message: '`Model.useConnection()` requires a valid Mongoose connection instance.' });
+    });
+
+    it('should throw an error if a non-connection object is passed (gh-16098)', async function() {
+      const schema = new mongoose.Schema({ name: String });
+      const Model = db.model('Test2', schema);
+      
+      assert.throws(() => {
+        Model.useConnection({ not: 'a connection' });
+      }, { message: '`Model.useConnection()` requires a valid Mongoose connection instance.' });
+      
+      assert.throws(() => {
+        Model.useConnection('mongodb://localhost:27017/test');
+      }, { message: '`Model.useConnection()` requires a valid Mongoose connection instance.' });
     });
   });
 

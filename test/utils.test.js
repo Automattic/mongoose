@@ -142,7 +142,7 @@ describe('utils', function() {
     assert.ok(!utils.deepEqual(a, b));
 
     b = new Map([['b', 2], ['a', 1]]);
-    assert.ok(!utils.deepEqual(a, b));
+    assert.ok(utils.deepEqual(a, b));
   });
 
   it('deepEquals on MongooseDocumentArray works', function() {

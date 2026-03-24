@@ -323,6 +323,18 @@ describe('utils', function() {
       assert.ok(pojoError.stack);
       assert.deepEqual(pojoError.metadata, { hello: 'world' });
     });
+    it('preserves `cause` when provided (Error chaining, Node.js v16+)', () => {
+      // Arrange
+      const cause = new Error('root cause');
+      const err = new Error('top-level error', { cause });
+
+      // Act
+      const pojoError = utils.errorToPOJO(err);
+
+      // Assert
+      assert.equal(pojoError.message, 'top-level error');
+      assert.strictEqual(pojoError.cause, cause);
+    });
   });
 
   describe('toCollectionName', function() {

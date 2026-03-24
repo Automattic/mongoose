@@ -77,8 +77,10 @@ describe('diagnostics_channel', function() {
       }
 
       const schema = new Schema({ name: String });
+      schema.pre('findOne', function() {
+        throw new Error('pre hook error');
+      });
       const M = db.model('TestDiagnosticsQueryErr', schema);
-      await M.create({ name: 'x' });
 
       const events = [];
       const channels = dc.tracingChannel('mongoose:query:exec');
@@ -99,9 +101,6 @@ describe('diagnostics_channel', function() {
         await assert.rejects(
           async() => {
             const q = M.findOne({ name: 'x' });
-            q.pre(function(next) {
-              next(new Error('pre hook error'));
-            });
             await q.exec();
           },
           /pre hook error/
@@ -161,10 +160,10 @@ describe('diagnostics_channel', function() {
       }
 
       const schema = new Schema({ name: String });
-      const M = db.model('TestDiagnosticsAggErr', schema);
-      M.schema.pre('aggregate', function(next) {
-        next(new Error('aggregate pre hook error'));
+      schema.pre('aggregate', function() {
+        throw new Error('aggregate pre hook error');
       });
+      const M = db.model('TestDiagnosticsAggErr', schema);
 
       const events = [];
       const channels = dc.tracingChannel('mongoose:aggregate:exec');
@@ -262,7 +261,7 @@ describe('diagnostics_channel', function() {
       try {
         await assert.rejects(
           async() => doc.save(),
-          /validation failed/
+          /Path `name` is required/
         );
         assert.strictEqual(events.length, 3, 'start, error, asyncEnd');
         assert.strictEqual(events[1].name, 'error');

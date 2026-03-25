@@ -4341,7 +4341,7 @@ describe('Model', function() {
 
           let lastUse = session.serverSession.lastUse;
 
-          await delay(1);
+          await delay(10);
 
           const docs = await MyModel.find({ _id: doc._id }, null,
             { session: session });
@@ -4352,7 +4352,7 @@ describe('Model', function() {
           assert.ok(session.serverSession.lastUse > lastUse);
           lastUse = session.serverSession.lastUse;
 
-          await delay(1);
+          await delay(10);
 
           docs[0].name = 'test3';
 

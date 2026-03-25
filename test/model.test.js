@@ -9488,11 +9488,11 @@ describe('Model', function() {
       }, { autoIndex: false, autoCreate: false });
       // Use a random collection name so it doesn't conflict with existing indexes
       const TestModel = db.model('DiffIndexesOptionsTest', schema, 'diffindexesoptionstest');
-      
+
       const res = await TestModel.diffIndexes({ indexOptionsToCreate: true });
       assert.ok(Array.isArray(res.toCreate));
       assert.equal(res.toCreate.length, 1);
-      
+
       // assert that the first element is an array (a tuple)
       assert.ok(Array.isArray(res.toCreate[0]), 'Expected toCreate elements to be arrays with [indexKeys, indexOptions]');
       assert.deepEqual(res.toCreate[0][0], { name: 1 });

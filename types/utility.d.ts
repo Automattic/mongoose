@@ -103,7 +103,7 @@ declare module 'mongoose' {
     ? T
     : T extends any ? (Omit<T, keyof U> & U) : never;
 
-  type MergeType<A, B> = A extends any ? (Omit<A, keyof B> & B) : never;
+  type MergeType<A, B> = A extends unknown ? Omit<A, keyof B> & B : never;
 
   /**
    * @summary Converts Unions to one record "object".

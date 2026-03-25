@@ -554,3 +554,58 @@ async function gh15111() {
   );
   expect(parents[0].fullName).type.toBe<string>();
 }
+
+async function gh16101() {
+  interface IOwner {
+    _id: Types.ObjectId;
+    name: string;
+  }
+
+  type OwnerInstance = HydratedDocument<IOwner>;
+
+  interface IBaseAnimal {
+    _id: Types.ObjectId;
+    name: string;
+    owner: PopulatedDoc<Document<Types.ObjectId> & IOwner>;
+  }
+
+  interface IDog extends IBaseAnimal {
+    kind: 'Dog';
+    breed: string;
+  }
+
+  interface ICat extends IBaseAnimal {
+    kind: 'Cat';
+    indoor: boolean;
+  }
+
+  type IAnimal = IDog | ICat;
+  type AnimalInstance = HydratedDocument<IDog> | HydratedDocument<ICat>;
+  type AnimalModelType = Model<IAnimal, {}, {}, {}, AnimalInstance>;
+
+  const ownerSchema = new Schema<IOwner>({ name: String });
+  const animalSchema = new Schema<IAnimal, AnimalModelType>(
+    {
+      name: { type: Schema.Types.String, required: true },
+      owner: { type: Schema.Types.ObjectId, ref: 'Owner-gh16101', required: true }
+    },
+    { discriminatorKey: 'kind' }
+  );
+
+  model<IOwner>('Owner-gh16101', ownerSchema);
+  const Animal = model<IAnimal, AnimalModelType>('Animal-gh16101', animalSchema);
+  Animal.discriminator<IDog>('Dog', new Schema<IDog>({ breed: { type: Schema.Types.String, required: true } }));
+  Animal.discriminator<ICat>('Cat', new Schema<ICat>({ indoor: { type: Schema.Types.Boolean, required: true } }));
+
+  const doc = await Animal.findById('test')
+    .populate<{ owner: OwnerInstance }>('owner')
+    .orFail();
+
+  if (doc.kind === 'Dog') {
+    expect(doc.breed).type.toBe<string>();
+    expect(doc.owner.name).type.toBe<string>();
+  } else {
+    expect(doc.indoor).type.toBe<boolean>();
+    expect(doc.owner.name).type.toBe<string>();
+  }
+}

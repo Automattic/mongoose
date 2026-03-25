@@ -1,3 +1,11 @@
+9.3.3 / 2026-03-25
+==================
+ * fix(schemaType): standardize to use MongooseError instead of plain Error #16172 [VIPAX-JIT](https://github.com/VIPAX-JIT)
+ * types: make MergeType distributive to better support populate on models where the hydrated doc type is a union #16101 #16161
+ * docs: upgrade http:// links to https:// in connections.md #16163 [Puxhkar](https://github.com/Puxhkar)
+ * docs: fix typographical, grammatical errors & documentation clarity improvements #16175 [yogesh968](https://github.com/yogesh968)
+ * docs: clarify multi-mongos support documentation for sharded clusters
+
 9.3.2 / 2026-03-23
 ==================
  * fix(mongoose): throw error when trying to set null or undefined as options #16130 #16140

@@ -165,16 +165,10 @@ describe('Union', function() {
       isThisSchema1: { type: Boolean }
     }, { _id: false });
 
-    const SubSchema2 = new Schema({
-      description: { type: String, required: true },
-      title: { type: String },
-      isThisSchema2: { type: Boolean }
-    }, { _id: false });
-
     const TestSchema = new Schema({
       product: {
         type: 'Union',
-        of: [SubSchema1, SubSchema2]
+        of: [SubSchema1, Number]
       }
     });
 
@@ -202,5 +196,16 @@ describe('Union', function() {
       err.errors['product.price'] || err.errors['product.description'] || err.errors['product'],
       'Expected missing required property error'
     );
+
+    const doc2 = new TestModel({
+      product: {
+        price: 42,
+        title: 'string',
+        arbitraryNeverSave: true,
+        isThisSchema1: true,
+        isThisSchema2: true
+      }
+    });
+    await doc2.validate();
   });
 });

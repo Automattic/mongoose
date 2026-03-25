@@ -9485,9 +9485,9 @@ describe('Model', function() {
     it('returns indexOptionsToCreate in toCreate array if indexOptionsToCreate is true', async function() {
       const schema = new mongoose.Schema({
         name: { type: String, unique: true }
-      });
+      }, { autoIndex: false, autoCreate: false });
       // Use a random collection name so it doesn't conflict with existing indexes
-      const TestModel = db.model('DiffIndexesOptionsTest', schema, 'diffindexesoptionstest_' + Date.now());
+      const TestModel = db.model('DiffIndexesOptionsTest', schema, 'diffindexesoptionstest');
       
       const res = await TestModel.diffIndexes({ indexOptionsToCreate: true });
       assert.ok(Array.isArray(res.toCreate));

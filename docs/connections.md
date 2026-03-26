@@ -16,7 +16,7 @@ You can also specify several more parameters in the `uri`:
 mongoose.connect('mongodb://username:password@host:port/database?options...');
 ```
 
-See the [mongodb connection string spec](http://www.mongodb.com/docs/manual/reference/connection-string/) for more details.
+See the [mongodb connection string spec](https://www.mongodb.com/docs/manual/reference/connection-string/) for more details.
 
 <ul class="toc">
   <li><a href="#buffering">Buffering</a></li>
@@ -149,7 +149,7 @@ exceptions that are explained below.
 
 Below are some of the options that are important for tuning Mongoose.
 
-* `maxPoolSize`       - The maximum number of sockets the MongoDB driver will keep open for this connection. By default, `maxPoolSize` is 100. Keep in mind that MongoDB only allows one operation per socket at a time, so you may want to increase this if you find you have a few slow queries that are blocking faster queries from proceeding. See [Slow Trains in MongoDB and Node.js](http://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs). You may want to decrease `maxPoolSize` if you are running into [connection limits](https://www.mongodb.com/docs/atlas/reference/atlas-limits/#connection-limits-and-cluster-tier).
+* `maxPoolSize`       - The maximum number of sockets the MongoDB driver will keep open for this connection. By default, `maxPoolSize` is 100. Keep in mind that MongoDB only allows one operation per socket at a time, so you may want to increase this if you find you have a few slow queries that are blocking faster queries from proceeding. See [Slow Trains in MongoDB and Node.js](https://thecodebarbarian.com/slow-trains-in-mongodb-and-nodejs). You may want to decrease `maxPoolSize` if you are running into [connection limits](https://www.mongodb.com/docs/atlas/reference/atlas-limits/#connection-limits-and-cluster-tier).
 * `minPoolSize`       - The minimum number of sockets the MongoDB driver will keep open for this connection. The MongoDB driver may close sockets that have been inactive for some time. You may want to increase `minPoolSize` if you expect your app to go through long idle times and want to make sure your sockets stay open to avoid slow trains when activity picks up.
 * `socketTimeoutMS`   - How long the MongoDB driver will wait before killing a socket due to inactivity *after initial connection*. A socket may be inactive because of either no activity or a long-running operation. `socketTimeoutMS` defaults to 0, which means Node.js will not time out the socket due to inactivity. This option is passed to [Node.js `socket#setTimeout()` function](https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback) after the MongoDB driver successfully completes.
 * `family`            - Whether to connect using IPv4 or IPv6. This option passed to [Node.js' `dns.lookup()`](https://nodejs.org/api/dns.html#dns_dns_lookup_hostname_options_callback) function. If you don't specify this option, the MongoDB driver will try IPv6 first and then IPv4 if IPv6 fails. If your `mongoose.connect(uri)` call takes a long time, try `mongoose.connect(uri, { family: 4 })`
@@ -399,8 +399,7 @@ if (err.name === 'MongooseServerSelectionError') {
 ## Multi-mongos support {#mongos_connections}
 
 You can also connect to multiple [mongos](https://www.mongodb.com/docs/manual/reference/program/mongos/) instances
-for high availability in a sharded cluster. You do
-[not need to pass any special options to connect to multiple mongos](http://mongodb.github.io/node-mongodb-native/3.0/tutorials/connect/#connect-to-sharded-cluster) in mongoose 5.x.
+for high availability in a sharded cluster.
 
 ```javascript
 // Connect to 2 mongos servers

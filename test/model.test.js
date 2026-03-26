@@ -4341,7 +4341,7 @@ describe('Model', function() {
 
           let lastUse = session.serverSession.lastUse;
 
-          await delay(1);
+          await delay(10);
 
           const docs = await MyModel.find({ _id: doc._id }, null,
             { session: session });
@@ -4352,7 +4352,7 @@ describe('Model', function() {
           assert.ok(session.serverSession.lastUse > lastUse);
           lastUse = session.serverSession.lastUse;
 
-          await delay(1);
+          await delay(10);
 
           docs[0].name = 'test3';
 
@@ -9482,6 +9482,23 @@ describe('Model', function() {
   });
 
   describe('diffIndexes()', function() {
+    it('returns indexOptionsToCreate in toCreate array if indexOptionsToCreate is true', async function() {
+      const schema = new mongoose.Schema({
+        name: { type: String, unique: true }
+      }, { autoIndex: false, autoCreate: false });
+      // Use a random collection name so it doesn't conflict with existing indexes
+      const TestModel = db.model('DiffIndexesOptionsTest', schema, 'diffindexesoptionstest');
+
+      const res = await TestModel.diffIndexes({ indexOptionsToCreate: true });
+      assert.ok(Array.isArray(res.toCreate));
+      assert.equal(res.toCreate.length, 1);
+
+      // assert that the first element is an array (a tuple)
+      assert.ok(Array.isArray(res.toCreate[0]), 'Expected toCreate elements to be arrays with [indexKeys, indexOptions]');
+      assert.deepEqual(res.toCreate[0][0], { name: 1 });
+      assert.equal(res.toCreate[0][1].unique, true);
+    });
+
     it('avoids trying to drop timeseries collections (gh-14984)', async function() {
       const version = await start.mongodVersion();
       if (version[0] < 5) {

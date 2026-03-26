@@ -98,12 +98,12 @@ declare module 'mongoose' {
   type UnpackedIntersection<T, U> = T extends null
     ? null
     : T extends (infer A)[]
-    ? (Omit<A, keyof U> & U)[]
+    ? (A extends any ? (Omit<A, keyof U> & U) : never)[]
     : keyof U extends never
     ? T
-    : Omit<T, keyof U> & U;
+    : T extends any ? (Omit<T, keyof U> & U) : never;
 
-  type MergeType<A, B> = Omit<A, keyof B> & B;
+  type MergeType<A, B> = A extends unknown ? Omit<A, keyof B> & B : never;
 
   /**
    * @summary Converts Unions to one record "object".

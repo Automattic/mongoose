@@ -208,4 +208,61 @@ describe('Union', function() {
     });
     await doc2.validate();
   });
+
+  it('supports toJSONSchema()', function() {
+    const schema = new Schema({
+      test: {
+        type: 'Union',
+        of: [Number, String]
+      },
+      requiredTest: {
+        type: 'Union',
+        required: true,
+        of: [Boolean, Date]
+      }
+    });
+
+    assert.deepStrictEqual(schema.toJSONSchema(), {
+      type: 'object',
+      required: ['requiredTest', '_id'],
+      properties: {
+        test: {
+          oneOf: [
+            { type: ['number', 'null'] },
+            { type: ['string', 'null'] }
+          ]
+        },
+        requiredTest: {
+          oneOf: [
+            { type: ['boolean', 'null'] },
+            { type: ['string', 'null'] }
+          ]
+        },
+        _id: {
+          type: 'string'
+        }
+      }
+    });
+
+    assert.deepStrictEqual(schema.toJSONSchema({ useBsonType: true }), {
+      required: ['requiredTest', '_id'],
+      properties: {
+        test: {
+          oneOf: [
+            { bsonType: ['number', 'null'] },
+            { bsonType: ['string', 'null'] }
+          ]
+        },
+        requiredTest: {
+          oneOf: [
+            { bsonType: ['bool', 'null'] },
+            { bsonType: ['date', 'null'] }
+          ]
+        },
+        _id: {
+          bsonType: 'objectId'
+        }
+      }
+    });
+  });
 });

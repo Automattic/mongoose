@@ -177,13 +177,25 @@ declare module 'mongoose' {
     HydratedDocPathsType,
     any,
     TOverrides extends Record<string, never> ?
-      Document<unknown, TQueryHelpers, RawDocType, TVirtuals, TSchemaOptions> & Default__v<Require_id<HydratedDocPathsType>, TSchemaOptions> & AddDefaultId<HydratedDocPathsType, {}, TSchemaOptions> :
+      Document<unknown, TQueryHelpers, RawDocType, TVirtuals, TSchemaOptions> &
+      Default__v<Require_id<HydratedDocPathsType>, TSchemaOptions> &
+      IfEquals<
+        TVirtuals,
+        {},
+        AddDefaultId<HydratedDocPathsType, {}, TSchemaOptions>,
+        TVirtuals
+      > :
       IfAny<
         TOverrides,
         Document<unknown, TQueryHelpers, RawDocType, TVirtuals, TSchemaOptions> & Default__v<Require_id<HydratedDocPathsType>, TSchemaOptions>,
         Document<unknown, TQueryHelpers, RawDocType, TVirtuals, TSchemaOptions> & MergeType<
           Default__v<Require_id<HydratedDocPathsType>, TSchemaOptions>,
-          TOverrides
+          IfEquals<
+            TOverrides,
+            {},
+            TOverrides,
+            TOverrides & AddDefaultId<HydratedDocPathsType, TVirtuals, TSchemaOptions>
+          >
         >
       >
   >;

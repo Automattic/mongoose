@@ -234,8 +234,8 @@ describe('Union', function() {
         },
         requiredTest: {
           oneOf: [
-            { type: ['boolean', 'null'] },
-            { type: ['string', 'null'] }
+            { type: 'boolean' },
+            { type: 'string' }
           ]
         },
         _id: {
@@ -255,8 +255,8 @@ describe('Union', function() {
         },
         requiredTest: {
           oneOf: [
-            { bsonType: ['bool', 'null'] },
-            { bsonType: ['date', 'null'] }
+            { bsonType: 'bool' },
+            { bsonType: 'date' }
           ]
         },
         _id: {

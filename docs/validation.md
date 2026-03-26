@@ -12,8 +12,31 @@ Before we get into the specifics of validation syntax, please keep the following
 * When you call [Model#save](api/model.html#model_Model-save), Mongoose also runs subdocument validation. If an error occurs, your [Model#save](api/model.html#model_Model-save) promise rejects
 * Validation is customizable
 
-```acquit
-[require:Validation$]
+```javascript acquit:Validation$
+const schema = new Schema({
+  name: {
+    type: String,
+    required: true
+  }
+});
+const Cat = db.model('Cat', schema);
+
+// This cat has no name :(
+const cat = new Cat();
+
+let error;
+try {
+  await cat.save();
+} catch (err) {
+  error = err;
+}
+
+assert.equal(error.errors['name'].message,
+  'Path `name` is required.');
+
+error = cat.validateSync();
+assert.equal(error.errors['name'].message,
+  'Path `name` is required.');
 ```
 
 * [Built-in Validators](#built-in-validators)
@@ -40,8 +63,48 @@ Mongoose has several built-in validators.
 
 Each of the validator links above provide more information about how to enable them and customize their error messages.
 
-```acquit
-[require:Built-in Validators]
+```javascript acquit:Built-in Validators
+const breakfastSchema = new Schema({
+  eggs: {
+    type: Number,
+    min: [6, 'Too few eggs'],
+    max: 12
+  },
+  bacon: {
+    type: Number,
+    required: [true, 'Why no bacon?']
+  },
+  drink: {
+    type: String,
+    enum: ['Coffee', 'Tea'],
+    required: function() {
+      return this.bacon > 3;
+    }
+  }
+});
+const Breakfast = db.model('Breakfast', breakfastSchema);
+
+const badBreakfast = new Breakfast({
+  eggs: 2,
+  bacon: 0,
+  drink: 'Milk'
+});
+let error = badBreakfast.validateSync();
+assert.equal(error.errors['eggs'].message,
+  'Too few eggs');
+assert.ok(!error.errors['bacon']);
+assert.equal(error.errors['drink'].message,
+  '`Milk` is not a valid enum value for path `drink`.');
+
+badBreakfast.bacon = 5;
+badBreakfast.drink = null;
+
+error = badBreakfast.validateSync();
+assert.equal(error.errors['drink'].message, 'Path `drink` is required.');
+
+badBreakfast.bacon = null;
+error = badBreakfast.validateSync();
+assert.equal(error.errors['bacon'].message, 'Why no bacon?');
 ```
 
 ## Custom Error Messages
@@ -55,8 +118,31 @@ ways to set the validator error message:
 Mongoose also supports rudimentary templating for error messages.
 Mongoose replaces `{VALUE}` with the value being validated.
 
-```acquit
-[require:Custom Error Messages]
+```javascript acquit:Custom Error Messages
+const breakfastSchema = new Schema({
+  eggs: {
+    type: Number,
+    min: [6, 'Must be at least 6, got {VALUE}'],
+    max: 12
+  },
+  drink: {
+    type: String,
+    enum: {
+      values: ['Coffee', 'Tea'],
+      message: '{VALUE} is not supported'
+    }
+  }
+});
+const Breakfast = db.model('Breakfast', breakfastSchema);
+
+const badBreakfast = new Breakfast({
+  eggs: 2,
+  drink: 'Milk'
+});
+const error = badBreakfast.validateSync();
+assert.equal(error.errors['eggs'].message,
+  'Must be at least 6, got 2');
+assert.equal(error.errors['drink'].message, 'Milk is not supported');
 ```
 
 ## The `unique` Option is Not a Validator
@@ -65,8 +151,40 @@ A common gotcha for beginners is that the `unique` option for schemas
 is *not* a validator. It's a convenient helper for building [MongoDB unique indexes](https://www.mongodb.com/docs/manual/core/index-unique/).
 See the [FAQ](faq.html) for more information.
 
-```acquit
-[require:The `unique` Option is Not a Validator]
+```javascript acquit:The `unique` Option is Not a Validator
+const uniqueUsernameSchema = new Schema({
+  username: {
+    type: String,
+    unique: true
+  }
+});
+const U1 = db.model('U1', uniqueUsernameSchema);
+const U2 = db.model('U2', uniqueUsernameSchema);
+
+const dup = [{ username: 'Val' }, { username: 'Val' }];
+// Race condition! This may save successfully, depending on whether
+// MongoDB built the index before writing the 2 docs.
+U1.create(dup).
+  then(() => {
+}).
+catch(err => {
+});
+
+// You need to wait for Mongoose to finish building the `unique`
+// index before writing. You only need to build indexes once for
+// a given collection, so you normally don't need to do this
+// in production. But, if you drop the database between tests,
+// you will need to use `init()` to wait for the index build to finish.
+U2.init().
+then(() => U2.create(dup)).
+catch(error => {
+  // `U2.create()` will error, but will *not* be a mongoose validation error, it will be
+  // a duplicate key error.
+  // See: https://masteringjs.io/tutorials/mongoose/e11000-duplicate-key
+  assert.ok(error);
+  assert.ok(!error.errors);
+  assert.ok(error.message.indexOf('duplicate key error') !== -1);
+});
 ```
 
 ## Custom Validators
@@ -78,8 +196,39 @@ Custom validation is declared by passing a validation function.
 You can find detailed instructions on how to do this in the
 [`SchemaType#validate()` API docs](api/schematype.html#schematype_SchemaType-validate).
 
-```acquit
-[require:Custom Validators]
+```javascript acquit:Custom Validators
+const userSchema = new Schema({
+  phone: {
+    type: String,
+    validate: {
+      validator: function(v) {
+        return /\d{3}-\d{3}-\d{4}/.test(v);
+      },
+      message: props => `${props.value} is not a valid phone number!`
+    },
+    required: [true, 'User phone number required']
+  }
+});
+
+const User = db.model('user', userSchema);
+const user = new User();
+let error;
+
+user.phone = '555.0123';
+error = user.validateSync();
+assert.equal(error.errors['phone'].message,
+  '555.0123 is not a valid phone number!');
+
+user.phone = '';
+error = user.validateSync();
+assert.equal(error.errors['phone'].message,
+  'User phone number required');
+
+user.phone = '201-555-0123';
+// Validation succeeds! Phone number is defined
+// and fits `DDD-DDD-DDDD`
+error = user.validateSync();
+assert.equal(error, null);
 ```
 
 ## Async Custom Validators
@@ -89,8 +238,40 @@ returns a promise (like an `async` function), mongoose will wait for that
 promise to settle. If the returned promise rejects, or fulfills with
 the value `false`, Mongoose will consider that a validation error.
 
-```acquit
-[require:Async Custom Validators]
+```javascript acquit:Async Custom Validators
+const userSchema = new Schema({
+  name: {
+    type: String,
+    // You can also make a validator async by returning a promise.
+    validate: () => Promise.reject(new Error('Oops!'))
+  },
+  email: {
+    type: String,
+    // There are two ways for an promise-based async validator to fail:
+    // 1) If the promise rejects, Mongoose assumes the validator failed with the given error.
+    // 2) If the promise resolves to `false`, Mongoose assumes the validator failed and creates an error with the given `message`.
+    validate: {
+      validator: () => Promise.resolve(false),
+      message: 'Email validation failed'
+    }
+  }
+});
+
+const User = db.model('User', userSchema);
+const user = new User();
+
+user.email = 'test@test.co';
+user.name = 'test';
+
+let error;
+try {
+  await user.validate();
+} catch (err) {
+  error = err;
+}
+assert.ok(error);
+assert.equal(error.errors['name'].message, 'Oops!');
+assert.equal(error.errors['email'].message, 'Email validation failed');
 ```
 
 ## Validation Errors
@@ -103,8 +284,54 @@ A ValidatorError also may have a `reason` property. If an error was
 thrown in the validator, this property will contain the error that was
 thrown.
 
-```acquit
-[require:Validation Errors]
+```javascript acquit:Validation Errors
+const toySchema = new Schema({
+  color: String,
+  name: String
+});
+
+const validator = function(value) {
+  return /red|white|gold/i.test(value);
+};
+toySchema.path('color').validate(validator,
+  'Color `{VALUE}` not valid', 'Invalid color');
+toySchema.path('name').validate(function(v) {
+  if (v !== 'Turbo Man') {
+    throw new Error('Need to get a Turbo Man for Christmas');
+  }
+  return true;
+}, 'Name `{VALUE}` is not valid');
+
+const Toy = db.model('Toy', toySchema);
+
+const toy = new Toy({ color: 'Green', name: 'Power Ranger' });
+
+let error;
+try {
+  await toy.save();
+} catch (err) {
+  error = err;
+}
+
+// `error` is a ValidationError object
+// `error.errors.color` is a ValidatorError object
+assert.equal(error.errors.color.message, 'Color `Green` not valid');
+assert.equal(error.errors.color.kind, 'Invalid color');
+assert.equal(error.errors.color.path, 'color');
+assert.equal(error.errors.color.value, 'Green');
+
+// If your validator throws an exception, mongoose will use the error
+// message. If your validator returns `false`,
+// mongoose will use the 'Name `Power Ranger` is not valid' message.
+assert.equal(error.errors.name.message,
+  'Need to get a Turbo Man for Christmas');
+assert.equal(error.errors.name.value, 'Power Ranger');
+// If your validator threw an error, the `reason` property will contain
+// the original error thrown, including the original stack trace.
+assert.equal(error.errors.name.reason.message,
+  'Need to get a Turbo Man for Christmas');
+
+assert.equal(error.name, 'ValidationError');
 ```
 
 ## Cast Errors
@@ -115,15 +342,38 @@ If casting fails for a given path, the `error.errors` object will contain a `Cas
 Casting runs before validation, and validation does not run if casting fails.
 That means your custom validators may assume `v` is `null`, `undefined`, or an instance of the type specified in your schema.
 
-```acquit
-[require:Cast Errors]
+```javascript acquit:Cast Errors
+const vehicleSchema = new mongoose.Schema({
+  numWheels: { type: Number, max: 18 }
+});
+const Vehicle = db.model('Vehicle', vehicleSchema);
+
+const doc = new Vehicle({ numWheels: 'not a number' });
+const err = doc.validateSync();
+
+err.errors['numWheels'].name; // 'CastError'
+// 'Cast to Number failed for value "not a number" at path "numWheels"'
+err.errors['numWheels'].message;
 ```
 
 By default, Mongoose cast error messages look like `Cast to Number failed for value "pie" at path "numWheels"`.
 You can overwrite Mongoose's default cast error message by the `cast` option on your SchemaType to a string as follows.
 
-```acquit
-[require:Cast Error Message Overwrite]
+```javascript acquit:Cast Error Message Overwrite
+const vehicleSchema = new mongoose.Schema({
+  numWheels: {
+    type: Number,
+    cast: '{VALUE} is not a number'
+  }
+});
+const Vehicle = db.model('Vehicle', vehicleSchema);
+
+const doc = new Vehicle({ numWheels: 'pie' });
+const err = doc.validateSync();
+
+err.errors['numWheels'].name; // 'CastError'
+// "pie" is not a number
+err.errors['numWheels'].message;
 ```
 
 Mongoose's cast error message templating supports the following parameters:
@@ -134,8 +384,21 @@ Mongoose's cast error message templating supports the following parameters:
 
 You can also define a function that Mongoose will call to get the cast error message as follows.
 
-```acquit
-[require:Cast Error Message Function Overwrite]
+```javascript acquit:Cast Error Message Function Overwrite
+const vehicleSchema = new mongoose.Schema({
+  numWheels: {
+    type: Number,
+    cast: [null, (value, path, model, kind) => `"${value}" is not a number`]
+  }
+});
+const Vehicle = db.model('Vehicle', vehicleSchema);
+
+const doc = new Vehicle({ numWheels: 'pie' });
+const err = doc.validateSync();
+
+err.errors['numWheels'].name; // 'CastError'
+// "pie" is not a number
+err.errors['numWheels'].message;
 ```
 
 ## Global SchemaType Validation
@@ -143,8 +406,21 @@ You can also define a function that Mongoose will call to get the cast error mes
 In addition to defining custom validators on individual schema paths, you can also configure a custom validator to run on every instance of a given `SchemaType`.
 For example, the following code demonstrates how to make empty string `''` an invalid value for *all* string paths.
 
-```acquit
-[require:Global SchemaType Validation]
+```javascript acquit:Global SchemaType Validation
+// Add a custom validator to all strings
+mongoose.Schema.Types.String.set('validate', v => v == null || v > 0);
+
+const userSchema = new Schema({
+  name: String,
+  email: String
+});
+const User = db.model('User', userSchema);
+
+const user = new User({ name: '', email: '' });
+
+const err = await user.validate().then(() => null, err => err);
+err.errors['name']; // ValidatorError
+err.errors['email']; // ValidatorError
 ```
 
 ## Required Validators On Nested Objects
@@ -152,8 +428,37 @@ For example, the following code demonstrates how to make empty string `''` an in
 Defining validators on nested objects in mongoose is tricky, because
 nested objects are not fully fledged paths.
 
-```acquit
-[require:Required Validators On Nested Objects]
+```javascript acquit:Required Validators On Nested Objects
+let personSchema = new Schema({
+  name: {
+    first: String,
+    last: String
+  }
+});
+
+assert.throws(function() {
+  // This throws an error, because 'name' isn't a full fledged path
+  personSchema.path('name').required(true);
+}, /Cannot.*'required'/);
+
+// To make a nested object required, use a single nested schema
+const nameSchema = new Schema({
+  first: String,
+  last: String
+});
+
+personSchema = new Schema({
+  name: {
+    type: nameSchema,
+    required: true
+  }
+});
+
+const Person = db.model('Person', personSchema);
+
+const person = new Person();
+const error = person.validateSync();
+assert.ok(error.errors['name']);
 ```
 
 ## Update Validators
@@ -170,8 +475,28 @@ To turn on update validators, set the `runValidators` option for
 Be careful: update validators are off by default because they have several
 caveats.
 
-```acquit
-[require:Update Validators$]
+```javascript acquit:Update Validators$
+const toySchema = new Schema({
+  color: String,
+  name: String
+});
+
+const Toy = db.model('Toys', toySchema);
+
+Toy.schema.path('color').validate(function(value) {
+  return /red|green|blue/i.test(value);
+}, 'Invalid color');
+
+const opts = { runValidators: true };
+
+let error;
+try {
+  await Toy.updateOne({}, { color: 'not a color' }, opts);
+} catch (err) {
+  error = err;
+}
+
+assert.equal(error.errors.color.message, 'Invalid color');
 ```
 
 ## Update Validators and `this`
@@ -182,8 +507,43 @@ to the document being validated when using document validation.
 However, when running update validators, `this` refers to the query object instead of the document.
 Because queries have a neat `.get()` function, you can get the updated value of the property you want.
 
-```acquit
-[require:Update Validators and `this`]
+```javascript acquit:Update Validators and `this`
+const toySchema = new Schema({
+  color: String,
+  name: String
+});
+
+toySchema.path('color').validate(function(value) {
+  // When running in `validate()` or `validateSync()`, the
+  // validator can access the document using `this`.
+  // When running with update validators, `this` is the Query,
+  // **not** the document being updated!
+  // Queries have a `get()` method that lets you get the
+  // updated value.
+  if (this.get('name') && this.get('name').toLowerCase().indexOf('red') !== -1) {
+    return value === 'red';
+  }
+  return true;
+});
+
+const Toy = db.model('ActionFigure', toySchema);
+
+const toy = new Toy({ color: 'green', name: 'Red Power Ranger' });
+// Validation failed: color: Validator failed for path `color` with value `green`
+let error = toy.validateSync();
+assert.ok(error.errors['color']);
+
+const update = { color: 'green', name: 'Red Power Ranger' };
+const opts = { runValidators: true };
+
+error = null;
+try {
+  await Toy.updateOne({}, update, opts);
+} catch (err) {
+  error = err;
+}
+// Validation failed: color: Validator failed for path `color` with value `green`
+assert.ok(error);
 ```
 
 ## Update Validators Only Run On Updated Paths
@@ -196,8 +556,24 @@ succeed.
 When using update validators, `required` validators **only** fail when
 you try to explicitly `$unset` the key.
 
-```acquit
-[require:Update Validators Only Run On Updated Paths]
+```javascript acquit:Update Validators Only Run On Updated Paths
+const kittenSchema = new Schema({
+  name: { type: String, required: true },
+  age: Number
+});
+
+const Kitten = db.model('Kitten', kittenSchema);
+
+const update = { color: 'blue' };
+const opts = { runValidators: true };
+// Operation succeeds despite the fact that 'name' is not specified
+await Kitten.updateOne({}, update, opts);
+
+const unset = { $unset: { name: 1 } };
+// Operation fails because 'name' is required
+const err = await Kitten.updateOne({}, unset, opts).then(() => null, err => err);
+assert.ok(err);
+assert.ok(err.errors['name']);
 ```
 
 ## Update Validators Only Run For Some Operations
@@ -219,8 +595,30 @@ Also, `$push`, `$addToSet`, `$pull`, and `$pullAll` validation does
 **not** run any validation on the array itself, only individual elements
 of the array.
 
-```acquit
-[require:Update Validators Only Run For Some Operations]
+```javascript acquit:Update Validators Only Run For Some Operations
+const testSchema = new Schema({
+  number: { type: Number, max: 0 },
+  arr: [{ message: { type: String, maxlength: 10 } }]
+});
+
+// Update validators won't check this, so you can still `$push` 2 elements
+// onto the array, so long as they don't have a `message` that's too long.
+testSchema.path('arr').validate(function(v) {
+  return v.length < 2;
+});
+
+const Test = db.model('Test', testSchema);
+
+let update = { $inc: { number: 1 } };
+const opts = { runValidators: true };
+
+// There will never be a validation error here
+await Test.updateOne({}, update, opts);
+
+// This will never error either even though the array will have at
+// least 2 elements.
+update = { $push: [{ message: 'hello' }, { message: 'world' }] };
+await Test.updateOne({}, update, opts);
 ```
 
 ## Next Up

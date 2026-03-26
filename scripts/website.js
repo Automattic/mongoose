@@ -8,7 +8,7 @@ const fsextra = require('fs-extra');
 const path = require('path');
 const pug = require('pug');
 const pkg = require('../package.json');
-const transform = require('acquit-require');
+const { findTest } = require('acquit-require');
 const childProcess = require('child_process');
 
 // using "__dirname" and ".." to have a consistent CWD, this script should not be runnable, even when not being in the root of the project
@@ -76,7 +76,8 @@ const testPath = path.resolve(cwd, 'test');
 /** additional test files to scan, relative to `test/` */
 const additionalTestFiles = [
   'geojson.test.js',
-  'schema.alias.test.js'
+  'schema.alias.test.js',
+  'model.middleware.test.js'
 ];
 /** ignored files from `test/docs/` */
 const ignoredTestFiles = [
@@ -337,7 +338,7 @@ const files = Object.keys(docsFilemap.fileMap);
 // api explicitly imported for specific file loading
 const apiReq = require('../docs/source/api');
 
-const wrapMarkdown = (md, baseLayout, versionedPath) => `
+const wrapMarkdown = (md, baseLayout, versionedPath, markdownUrl) => `
 extends ${baseLayout}
 
 append style
@@ -345,9 +346,14 @@ append style
   script(type="text/javascript" src="${versionedPath}/docs/js/native.js")
 
 block content
-  <a class="edit-docs-link" href="#{editLink}" target="_blank">
-    <img src="${versionedPath}/docs/images/pencil.svg" />
-  </a>
+  <div class="doc-links">
+    <a class="edit-docs-link" href="#{editLink}" target="_blank">
+      <img src="${versionedPath}/docs/images/pencil.svg" />
+    </a>
+    <button class="copy-markdown-link" data-md-url="${markdownUrl}" title="Copy page as Markdown" onclick="fetch(this.dataset.mdUrl).then(r=>r.text()).then(t=>{navigator.clipboard.writeText(t);this.classList.add('copied');setTimeout(()=>this.classList.remove('copied'),2000)})">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+    </button>
+  </div>
   :markdown
 ${md.split('\n').map(line => '    ' + line).join('\n')}
 `;
@@ -426,12 +432,11 @@ function mapURLs(block, currentUrl) {
  * @param {Boolean} isReload Indicate this is a reload of the file
  * @returns
  */
-async function pugify(filename, options, isReload = false) {
+async function renderFile(filename, options, isReload = false) {
   /** Path for the output file */
   let newfile = undefined;
   options = options || {};
   options.package = pkg;
-  // const isAPI = options.api && !filename.endsWith('docs/api.pug');
 
   const _editLink = 'https://github.com/Automattic/mongoose/blob/master' +
     filename.replace(cwd, '');
@@ -453,18 +458,26 @@ async function pugify(filename, options, isReload = false) {
   let contents = fs.readFileSync(path.resolve(cwd, inputFile)).toString();
 
   if (options.acquit) {
-    contents = transform(contents, getTests());
-
-    contents = contents.replaceAll(/^```acquit$/gmi, '```javascript');
+    const tests = getTests();
+    contents = contents.replace(/```javascript acquit:([^\n]+)\n[\s\S]*?```/g, (match, pattern) => {
+      const code = findTest(pattern, tests);
+      if (!code) {
+        throw new Error(`No test found for acquit pattern "${pattern}" in ${filename}`);
+      }
+      return '```javascript\n' + code + '\n```';
+    });
   }
   if (options.markdown) {
+    const markdownUrl = versionObj.versionedPath + '/' + path.relative(cwd, filename);
+
     const lines = contents.split('\n');
     lines.splice(2, 0, cpc);
     contents = lines.join('\n');
     contents = wrapMarkdown(
       contents,
       path.relative(path.dirname(filename), path.join(cwd, 'docs/layout')),
-      versionObj.versionedPath
+      versionObj.versionedPath,
+      markdownUrl
     );
     newfile = filename.replace('.md', '.html');
   }
@@ -524,7 +537,7 @@ function startWatch() {
 
     fs.watchFile(watchPath, { interval: 1000 }, (cur, prev) => {
       if (cur.mtime > prev.mtime) {
-        pugify(notifyPath, docsFilemap.fileMap[file], true);
+        renderFile(notifyPath, docsFilemap.fileMap[file], true);
       }
     });
   });
@@ -532,7 +545,7 @@ function startWatch() {
   fs.watchFile(path.join(cwd, 'docs/layout.pug'), { interval: 1000 }, (cur, prev) => {
     if (cur.mtime > prev.mtime) {
       console.log('docs/layout.pug modified, reloading all files');
-      pugifyAllFiles(true, true);
+      renderAllFiles(true, true);
     }
   });
 
@@ -541,7 +554,7 @@ function startWatch() {
       console.log('docs/api_split.pug modified, reloading all api files');
       Promise.all(files.filter(v => v.startsWith('docs/api')).map(async(file) => {
         const filename = path.join(cwd, file);
-        await pugify(filename, docsFilemap.fileMap[file], true);
+        await renderFile(filename, docsFilemap.fileMap[file], true);
       }));
     }
   });
@@ -551,7 +564,7 @@ function startWatch() {
       console.log('docs/api_split.pug modified, reloading all api files');
       Promise.all(files.filter(v => v.startsWith('docs/api')).map(async(file) => {
         const filename = path.join(cwd, file);
-        await pugify(filename, docsFilemap.fileMap[file]);
+        await renderFile(filename, docsFilemap.fileMap[file]);
       }));
     }
   });
@@ -562,10 +575,10 @@ function startWatch() {
  * @param {Boolean} noWatch Set whether to start file watchers for reload
  * @param {Boolean} isReload Indicate this is a reload of all files
  */
-async function pugifyAllFiles(noWatch, isReload = false) {
+async function renderAllFiles(noWatch, isReload = false) {
   await Promise.all(files.map(async(file) => {
     const filename = path.join(cwd, file);
-    await pugify(filename, docsFilemap.fileMap[file], isReload);
+    await renderFile(filename, docsFilemap.fileMap[file], isReload);
   }));
 
   // enable watch after all files have been done once, and not in the loop to use less-code
@@ -595,10 +608,10 @@ async function copyAllRequiredFiles() {
   }));
 }
 
-exports.default = pugify;
-exports.pugify = pugify;
+exports.default = renderFile;
+exports.renderFile = renderFile;
 exports.startWatch = startWatch;
-exports.pugifyAllFiles = pugifyAllFiles;
+exports.renderAllFiles = renderAllFiles;
 exports.copyAllRequiredFiles = copyAllRequiredFiles;
 exports.versionObj = versionObj;
 exports.cwd = cwd;
@@ -608,16 +621,21 @@ if (isMain) {
   (async function main() {
     console.log(`Processing ~${files.length} files`);
 
-    const generateSearch = require('./generateSearch');
     let generateSearchPromise;
-    try {
-      const config = generateSearch.getConfig();
-      generateSearchPromise = generateSearch.generateSearch(config);
-    } catch (err) {
-      console.error('Generating Search failed:', err);
+    if (process.env.GENERATE_SEARCH) {
+      const generateSearch = require('./generateSearch');
+      try {
+        const config = generateSearch.getConfig();
+        generateSearchPromise = generateSearch.generateSearch(config);
+      } catch (err) {
+        console.error('Generating Search failed:', err);
+      }
+    } else {
+      console.log('Skipping generate search');
     }
+
     await deleteAllHtmlFiles();
-    await pugifyAllFiles();
+    await renderAllFiles();
     await copyAllRequiredFiles();
     if (!!process.env.DOCS_DEPLOY && !!versionObj.versionedPath) {
       await moveDocsToTemp();

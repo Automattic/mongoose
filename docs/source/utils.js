@@ -14,7 +14,7 @@ const fs = require('fs');
 function mapSubDoc(subDoc, options, exportsObj) {
   const dirName = `docs/${subDoc}`;
 
-  const files = fs.readdirSync(dirName).filter(file => file.endsWith('.md'));
+  const files = fs.readdirSync(dirName).filter(file => file.endsWith('.md') && !file.endsWith('.raw.md'));
 
   files.forEach((filename) => {
     const content = fs.readFileSync(`${dirName}/${filename}`, 'utf8');

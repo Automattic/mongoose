@@ -31,8 +31,21 @@ or Mongoose's `Connection#transaction()` function to run a transaction. The `ses
 * Aborting the transaction if your operation throws
 * Retrying in the event of a [transient transaction error](https://stackoverflow.com/questions/52153538/what-is-a-transienttransactionerror-in-mongoose-or-mongodb).
 
-```acquit
-[require:transactions.*withTransaction]
+```javascript acquit:transactions.*withTransaction
+let session = null;
+return Customer.createCollection().
+  then(() => Customer.startSession()).
+  // The `withTransaction()` function's first parameter is a function
+  // that returns a promise.
+  then(_session => {
+    session = _session;
+    return session.withTransaction(() => {
+      return Customer.create([{ name: 'Test' }], { session: session });
+    });
+  }).
+  then(() => Customer.countDocuments()).
+  then(count => assert.strictEqual(count, 1)).
+  then(() => session.endSession());
 ```
 
 For more information on the `ClientSession#withTransaction()` function, please see
@@ -88,8 +101,34 @@ keep a reference to the session and use that session for [`save()`](api/document
 
 To get/set the session associated with a given document, use [`doc.$session()`](api/document.html#document_Document-$session).
 
-```acquit
-[require:transactions.*save]
+```javascript acquit:transactions.*save
+const User = db.model('User', new Schema({ name: String }));
+
+let session = null;
+return User.createCollection().
+  then(() => db.startSession()).
+  then(_session => {
+    session = _session;
+    return User.create({ name: 'foo' });
+  }).
+  then(() => {
+    session.startTransaction();
+    return User.findOne({ name: 'foo' }).session(session);
+  }).
+  then(user => {
+    // Getter/setter for the session associated with this document.
+    assert.ok(user.$session());
+    user.name = 'bar';
+    // By default, `save()` uses the associated session
+    return user.save();
+  }).
+  then(() => User.findOne({ name: 'bar' })).
+  // Won't find the doc because `save()` is part of an uncommitted transaction
+  then(doc => assert.ok(!doc)).
+  then(() => session.commitTransaction()).
+  then(() => session.endSession()).
+  then(() => User.findOne({ name: 'bar' })).
+  then(doc => assert.ok(doc));
 ```
 
 ## With the Aggregation Framework {#with-the-aggregation-framework}
@@ -99,8 +138,41 @@ aggregations have a [`session()` helper](api/aggregate.html#aggregate_Aggregate-
 that sets the [`session` option](api/aggregate.html#aggregate_Aggregate-option).
 Below is an example of executing an aggregation within a transaction.
 
-```acquit
-[require:transactions.*aggregate]
+```javascript acquit:transactions.*aggregate
+const Event = db.model('Event', new Schema({ createdAt: Date }), 'Event');
+
+let session = null;
+return Event.createCollection().
+  then(() => db.startSession()).
+  then(_session => {
+    session = _session;
+    session.startTransaction();
+    return Event.insertMany([
+      { createdAt: new Date('2018-06-01') },
+      { createdAt: new Date('2018-06-02') },
+      { createdAt: new Date('2017-06-01') },
+      { createdAt: new Date('2017-05-31') }
+    ], { session: session });
+  }).
+  then(() => Event.aggregate([
+    {
+      $group: {
+        _id: {
+          month: { $month: '$createdAt' },
+          year: { $year: '$createdAt' }
+        },
+        count: { $sum: 1 }
+      }
+    },
+    { $sort: { count: -1, '_id.year': -1, '_id.month': -1 } }
+  ]).session(session)).
+  then(res => assert.deepEqual(res, [
+    { _id: { month: 6, year: 2018 }, count: 2 },
+    { _id: { month: 6, year: 2017 }, count: 1 },
+    { _id: { month: 5, year: 2017 }, count: 1 }
+  ])).
+  then(() => session.commitTransaction()).
+  then(() => session.endSession());
 ```
 
 ## Using AsyncLocalStorage {#asynclocalstorage}
@@ -163,12 +235,51 @@ await mongoose.connection.transaction(async () => {
 Advanced users who want more fine-grained control over when they commit or abort transactions
 can use `session.startTransaction()` to start a transaction:
 
-```acquit
-[require:transactions.*basic example]
+```javascript acquit:transactions.*basic example
+const Customer = db.model('Customer', new Schema({ name: String }));
+
+let session = null;
+return Customer.createCollection().
+  then(() => db.startSession()).
+  then(_session => {
+    session = _session;
+    // Start a transaction
+    session.startTransaction();
+    // This `create()` is part of the transaction because of the `session`
+    // option.
+    return Customer.create([{ name: 'Test' }], { session: session });
+  }).
+  // Transactions execute in isolation, so unless you pass a `session`
+  // to `findOne()` you won't see the document until the transaction
+  // is committed.
+  then(() => Customer.findOne({ name: 'Test' })).
+  then(doc => assert.ok(!doc)).
+  // This `findOne()` will return the doc, because passing the `session`
+  // means this `findOne()` will run as part of the transaction.
+  then(() => Customer.findOne({ name: 'Test' }).session(session)).
+  then(doc => assert.ok(doc)).
+  // Once the transaction is committed, the write operation becomes
+  // visible outside of the transaction.
+  then(() => session.commitTransaction()).
+  then(() => Customer.findOne({ name: 'Test' })).
+  then(doc => assert.ok(doc)).
+  then(() => session.endSession());
 ```
 
 You can also use `session.abortTransaction()` to abort a transaction:
 
-```acquit
-[require:transactions.*abort]
+```javascript acquit:transactions.*abort
+let session = null;
+return Customer.createCollection().
+  then(() => Customer.startSession()).
+  then(_session => {
+    session = _session;
+    session.startTransaction();
+    return Customer.create([{ name: 'Test' }], { session: session });
+  }).
+  then(() => Customer.create([{ name: 'Test2' }], { session: session })).
+  then(() => session.abortTransaction()).
+  then(() => Customer.countDocuments()).
+  then(count => assert.strictEqual(count, 0)).
+  then(() => session.endSession());
 ```

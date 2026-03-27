@@ -21,8 +21,19 @@ want the email's domain. For example, the domain portion of
 Below is one way to implement the `domain` property using a virtual.
 You define virtuals on a schema using the [`Schema#virtual()` function](../api/schema.html#schema_Schema-virtual).
 
-```acquit
-[require:Virtuals.*basic]
+```javascript acquit:Virtuals.*basic
+const userSchema = mongoose.Schema({
+  email: String
+});
+// Create a virtual property `domain` that's computed from `email`.
+userSchema.virtual('domain').get(function() {
+  return this.email.slice(this.email.indexOf('@') + 1);
+});
+const User = mongoose.model('User', userSchema);
+
+const doc = await User.create({ email: 'test@gmail.com' });
+// `domain` is now a property on User documents.
+doc.domain; // 'gmail.com'
 ```
 
 The `Schema#virtual()` function returns a [`VirtualType` object](../api/virtualtype.html). Unlike normal document properties,
@@ -40,8 +51,30 @@ create a virtual property `fullName` that lets you set both of
 these properties at once. The key detail is that, in virtual getters and
 setters, `this` refers to the document the virtual is attached to.
 
-```acquit
-[require:Virtuals.*fullName]
+```javascript acquit:Virtuals.*fullName
+const userSchema = mongoose.Schema({
+  firstName: String,
+  lastName: String
+});
+// Create a virtual property `fullName` with a getter and setter.
+userSchema.virtual('fullName').
+  get(function() { return `${this.firstName} ${this.lastName}`; }).
+  set(function(v) {
+    // `v` is the value being set, so use the value to set
+    // `firstName` and `lastName`.
+    const firstName = v.substring(0, v.indexOf(' '));
+    const lastName = v.substring(v.indexOf(' ') + 1);
+    this.set({ firstName, lastName });
+  });
+const User = mongoose.model('User', userSchema);
+
+const doc = new User();
+// Vanilla JavaScript assignment triggers the setter
+doc.fullName = 'Jean-Luc Picard';
+
+doc.fullName; // 'Jean-Luc Picard'
+doc.firstName; // 'Jean-Luc'
+doc.lastName; // 'Picard'
 ```
 
 ## Virtuals in JSON
@@ -52,8 +85,26 @@ For example, if you pass a document to [Express'  `res.json()` function](http://
 To include virtuals in `res.json()`, you need to set the
 [`toJSON` schema option](../guide.html#toJSON) to `{ virtuals: true }`.
 
-```acquit
-[require:Virtuals.*toJSON]
+```javascript acquit:Virtuals.*toJSON
+const opts = { toJSON: { virtuals: true } };
+const userSchema = mongoose.Schema({
+  _id: Number,
+  email: String
+}, opts);
+// Create a virtual property `domain` that's computed from `email`.
+userSchema.virtual('domain').get(function() {
+  return this.email.slice(this.email.indexOf('@') + 1);
+});
+const User = mongoose.model('User', userSchema);
+
+const doc = new User({ _id: 1, email: 'test@gmail.com' });
+
+doc.toJSON().domain; // 'gmail.com'
+// {"_id":1,"email":"test@gmail.com","domain":"gmail.com","id":"1"}
+JSON.stringify(doc);
+
+// To skip applying virtuals, pass `virtuals: false` to `toJSON()`
+doc.toJSON({ virtuals: false }).domain; // undefined
 ```
 
 ## Virtuals in `console.log()`
@@ -72,8 +123,12 @@ Virtuals are properties on Mongoose documents. If you use the
 rather than full Mongoose documents. That means no virtuals if you use
 [`lean()`](../api/query.html#query_Query-lean).
 
-```acquit
-[require:Virtuals.*lean]
+```javascript acquit:Virtuals.*lean
+const fullDoc = await User.findOne();
+fullDoc.domain; // 'gmail.com'
+
+const leanDoc = await User.findOne().lean();
+leanDoc.domain; // undefined
 ```
 
 If you use `lean()` for performance, but still need virtuals, Mongoose
@@ -86,8 +141,11 @@ that decorates lean documents with virtuals.
 Mongoose virtuals are **not** stored in MongoDB, which means you can't query
 based on Mongoose virtuals.
 
-```acquit
-[require:Virtuals.*in query]
+```javascript acquit:Virtuals.*in query
+// Will **not** find any results, because `domain` is not stored in
+// MongoDB.
+const doc = await User.findOne({ domain: 'gmail.com' }, null, { strictQuery: false });
+doc; // undefined
 ```
 
 If you want to query by a computed property, you should set the property using
@@ -102,22 +160,95 @@ virtual, you need to specify:
 * The `ref` option, which tells Mongoose which model to populate documents from.
 * The `localField` and `foreignField` options. Mongoose will populate documents from the model in `ref` whose `foreignField` matches this document's `localField`.
 
-```acquit
-[require:Virtuals.*populate]
+```javascript acquit:Virtuals.*populate
+const userSchema = mongoose.Schema({ _id: Number, email: String });
+const blogPostSchema = mongoose.Schema({
+  title: String,
+  authorId: Number
+});
+// When you `populate()` the `author` virtual, Mongoose will find the
+// first document in the User model whose `_id` matches this document's
+// `authorId` property.
+blogPostSchema.virtual('author', {
+  ref: 'User',
+  localField: 'authorId',
+  foreignField: '_id',
+  justOne: true
+});
+const User = mongoose.model('User', userSchema);
+const BlogPost = mongoose.model('BlogPost', blogPostSchema);
+
+await BlogPost.create({ title: 'Introduction to Mongoose', authorId: 1 });
+await User.create({ _id: 1, email: 'test@gmail.com' });
+
+const doc = await BlogPost.findOne().populate('author');
+doc.author.email; // 'test@gmail.com'
 ```
 
 ## Virtuals via schema options
 
 Virtuals can also be defined in the schema-options directly without having to use [`.virtual`](../api/schema.html#Schema.prototype.virtual):
 
-```acquit
-[require:Virtuals.*schema-options fullName]
+```javascript acquit:Virtuals.*schema-options fullName
+const userSchema = mongoose.Schema({
+  firstName: String,
+  lastName: String
+}, {
+  virtuals: {
+    // Create a virtual property `fullName` with a getter and setter
+    fullName: {
+      get() { return `${this.firstName} ${this.lastName}`; },
+      set(v) {
+        // `v` is the value being set, so use the value to set
+        // `firstName` and `lastName`.
+        const firstName = v.substring(0, v.indexOf(' '));
+        const lastName = v.substring(v.indexOf(' ') + 1);
+        this.set({ firstName, lastName });
+      }
+    }
+  }
+});
+const User = mongoose.model('User', userSchema);
+
+const doc = new User();
+// Vanilla JavaScript assignment triggers the setter
+doc.fullName = 'Jean-Luc Picard';
+
+doc.fullName; // 'Jean-Luc Picard'
+doc.firstName; // 'Jean-Luc'
+doc.lastName; // 'Picard'
 ```
 
 The same also goes for virtual options, like virtual populate:
 
-```acquit
-[require:Virtuals.*schema-options populate]
+```javascript acquit:Virtuals.*schema-options populate
+const userSchema = mongoose.Schema({ _id: Number, email: String });
+const blogPostSchema = mongoose.Schema({
+  title: String,
+  authorId: Number
+}, {
+  virtuals: {
+    // When you `populate()` the `author` virtual, Mongoose will find the
+    // first document in the User model whose `_id` matches this document's
+    // `authorId` property.
+    author: {
+      options: {
+        ref: 'User',
+        localField: 'authorId',
+        foreignField: '_id',
+        justOne: true
+      }
+    }
+  }
+});
+const User = mongoose.model('User', userSchema);
+const BlogPost = mongoose.model('BlogPost', blogPostSchema);
+
+await BlogPost.create({ title: 'Introduction to Mongoose', authorId: 1 });
+await User.create({ _id: 1, email: 'test@gmail.com' });
+
+const doc = await BlogPost.findOne().populate('author');
+doc.author.email; // 'test@gmail.com'
 ```
 
 ## Further Reading

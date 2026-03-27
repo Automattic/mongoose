@@ -12,7 +12,7 @@ const port = process.env.PORT
 async function main() {
   await Promise.all([
     website.copyAllRequiredFiles(),
-    website.pugifyAllFiles()
+    website.renderAllFiles()
   ]);
   // start watching for file changes and re-compile them, so that they can be served directly
   website.startWatch();

@@ -439,6 +439,7 @@ async function renderFile(filename, options, isReload = false) {
   let newfile = undefined;
   options = options || {};
   options.package = pkg;
+  let markdownSource = null;
 
   const _editLink = 'https://github.com/Automattic/mongoose/blob/master' +
     filename.replace(cwd, '');
@@ -469,8 +470,10 @@ async function renderFile(filename, options, isReload = false) {
       return '```javascript acquit:' + pattern + '\n' + code + '\n```';
     });
     fs.writeFileSync(path.resolve(cwd, inputFile), contents);
+    console.log('%s : rendered %s', (new Date()).toISOString(), path.resolve(cwd, inputFile));
   }
   if (options.markdown) {
+    markdownSource = contents;
     const markdownUrl = versionObj.versionedPath + '/' + path.relative(cwd, filename);
 
     const lines = contents.split('\n');
@@ -526,6 +529,13 @@ async function renderFile(filename, options, isReload = false) {
   }).then(() => {
     console.log('%s : rendered %s', (new Date()).toISOString(), newfile);
   });
+
+  if (versionObj.versionedDeploy && markdownSource != null) {
+    const versionedMarkdownPath = path.resolve(cwd, path.join('.', versionObj.versionedPath), path.relative(cwd, filename));
+    await fs.promises.mkdir(path.dirname(versionedMarkdownPath), { recursive: true });
+    await fs.promises.writeFile(versionedMarkdownPath, markdownSource);
+    console.log('%s : rendered %s', (new Date()).toISOString(), versionedMarkdownPath);
+  }
 }
 
 /** extra function to start watching for file-changes, without having to call this file directly with "watch" */

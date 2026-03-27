@@ -60,7 +60,9 @@ markdown.use({
       </h${depth}>\n`;
     },
     code: function({ text, lang }) {
-      if (!lang || lang === 'acquit') {
+      if (lang) {
+        lang = lang.split(' ')[0];
+      } else if (!lang) {
         lang = 'javascript';
       }
       if (lang === 'no-highlight') {
@@ -464,8 +466,9 @@ async function renderFile(filename, options, isReload = false) {
       if (!code) {
         throw new Error(`No test found for acquit pattern "${pattern}" in ${filename}`);
       }
-      return '```javascript\n' + code + '\n```';
+      return '```javascript acquit:' + pattern + '\n' + code + '\n```';
     });
+    fs.writeFileSync(path.resolve(cwd, inputFile), contents);
   }
   if (options.markdown) {
     const markdownUrl = versionObj.versionedPath + '/' + path.relative(cwd, filename);

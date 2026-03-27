@@ -164,10 +164,9 @@ const U2 = db.model('U2', uniqueUsernameSchema);
 const dup = [{ username: 'Val' }, { username: 'Val' }];
 // Race condition! This may save successfully, depending on whether
 // MongoDB built the index before writing the 2 docs.
-U1.create(dup).
-  then(() => {
-}).
-catch(err => {
+await U1.create(dup).catch(err => {
+  // May have an error here depending on timing
+  err?.message;
 });
 
 // You need to wait for Mongoose to finish building the `unique`
@@ -175,9 +174,8 @@ catch(err => {
 // a given collection, so you normally don't need to do this
 // in production. But, if you drop the database between tests,
 // you will need to use `init()` to wait for the index build to finish.
-U2.init().
-then(() => U2.create(dup)).
-catch(error => {
+await U2.init();
+await U2.create(dup).catch(error => {
   // `U2.create()` will error, but will *not* be a mongoose validation error, it will be
   // a duplicate key error.
   // See: https://masteringjs.io/tutorials/mongoose/e11000-duplicate-key

@@ -79,18 +79,14 @@ examples of querying by dates, date ranges, and sorting by date:
 
 ```javascript acquit:Date Tutorial.*Example 1.3.1
 // Find episodes that aired on this exact date
-return Episode.find({ airedAt: new Date('1987-10-26') }).
-  then(episodes => {
-    episodes[0].title; // "Where No One Has Gone Before"
+const episodes = await Episode.find({ airedAt: new Date('1987-10-26') });
+episodes[0].title; // "Where No One Has Gone Before"
 // Find episodes within a range of dates, sorted by date ascending
-return Episode.
+const sortedEpisodes = await Episode.
   find({ airedAt: { $gte: '1987-10-19', $lte: '1987-10-26' } }).
   sort({ airedAt: 1 });
-  }).
-  then(episodes => {
-episodes[0].title; // "The Last Outpost"
-episodes[1].title; // "Where No One Has Gone Before"
-});
+sortedEpisodes[0].title; // "The Last Outpost"
+sortedEpisodes[1].title; // "Where No One Has Gone Before"
 ```
 
 ## Casting Edge Cases

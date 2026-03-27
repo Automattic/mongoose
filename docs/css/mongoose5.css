@@ -373,12 +373,17 @@ li.version ul.pure-menu-children {
   gap: 4px;
 }
 
-.edit-docs-link:not(.doc-links .edit-docs-link) {
+.edit-docs-link {
   position: absolute;
   top: 0.5em;
   right: 0px;
 }
 
+.doc-links .edit-docs-link {
+  position: static;
+  top: auto;
+  right: auto;
+}
 .edit-docs-link,
 .copy-markdown-link {
   background-color: var(--bg-tertiary);

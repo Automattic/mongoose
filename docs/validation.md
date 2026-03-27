@@ -406,7 +406,7 @@ For example, the following code demonstrates how to make empty string `''` an in
 
 ```javascript acquit:Global SchemaType Validation
 // Add a custom validator to all strings
-mongoose.Schema.Types.String.set('validate', v => v == null || v > 0);
+mongoose.Schema.Types.String.set('validate', v => v == null || v.length > 0);
 
 const userSchema = new Schema({
   name: String,

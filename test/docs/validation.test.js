@@ -424,7 +424,7 @@ describe('validation docs', function() {
 
   it('Global SchemaType Validation', async function() {
     // Add a custom validator to all strings
-    mongoose.Schema.Types.String.set('validate', v => v == null || v > 0);
+    mongoose.Schema.Types.String.set('validate', v => v == null || v.length > 0);
 
     const userSchema = new Schema({
       name: String,

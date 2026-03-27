@@ -66,7 +66,7 @@ assert.ok(post.date.getTime() <= Date.now());
 Mongoose also sets defaults on `update()` and `findOneAndUpdate()` when the `upsert` option is set by adding your schema's defaults to a [MongoDB `$setOnInsert` operator](https://www.mongodb.com/docs/manual/reference/operator/update/setOnInsert/).
 You can disable this behavior by setting the `setDefaultsOnInsert` option to `false`.
 
-```javascript acquit:The `setDefaultsOnInsert` option
+```javascript acquit:The .setDefaultsOnInsert. option
 const schema = new Schema({
   title: String,
   genre: { type: String, default: 'Action' }
@@ -103,7 +103,7 @@ mongoose.set('setDefaultsOnInsert', false);
 Unless it is running on a query with `setDefaultsOnInsert`, a default
 function's `this` refers to the document.
 
-```javascript acquit:Default functions and `this`
+```javascript acquit:Default functions and .this.
 const schema = new Schema({
   title: String,
   released: Boolean,

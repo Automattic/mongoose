@@ -151,7 +151,7 @@ A common gotcha for beginners is that the `unique` option for schemas
 is *not* a validator. It's a convenient helper for building [MongoDB unique indexes](https://www.mongodb.com/docs/manual/core/index-unique/).
 See the [FAQ](faq.html) for more information.
 
-```javascript acquit:The `unique` Option is Not a Validator
+```javascript acquit:The .unique. Option is Not a Validator
 const uniqueUsernameSchema = new Schema({
   username: {
     type: String,
@@ -507,7 +507,7 @@ to the document being validated when using document validation.
 However, when running update validators, `this` refers to the query object instead of the document.
 Because queries have a neat `.get()` function, you can get the updated value of the property you want.
 
-```javascript acquit:Update Validators and `this`
+```javascript acquit:Update Validators and .this.
 const toySchema = new Schema({
   color: String,
   name: String

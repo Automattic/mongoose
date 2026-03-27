@@ -73,7 +73,7 @@ As far as functionality is concerned, these two are equivalent.
 However, we recommend using `.exec()` because that gives you
 better stack traces.
 
-```javascript acquit:Should You Use `exec\(\)` With `await`
+```javascript acquit:Should You Use .exec\(\). With .await.
 const doc = await Band.findOne({ name: 'Guns N\' Roses' }); // works
 
 const badId = 'this is not a valid id';

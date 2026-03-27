@@ -14,7 +14,7 @@ using the `model.discriminator()` function. This function takes
 key (defaults to the model name). It returns a model whose schema
 is the union of the base schema and the discriminator schema.
 
-```javascript acquit:The `model.discriminator\(\)` function
+```javascript acquit:The .model.discriminator\(\). function
 const options = { discriminatorKey: 'kind' };
 
 const eventSchema = new mongoose.Schema({ time: Date }, options);

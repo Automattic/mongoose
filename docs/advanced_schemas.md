@@ -8,7 +8,7 @@ statics, and virtuals from an ES6 class. A class method maps to a schema
 method, a static method maps to a schema static, and getters/setters map
 to virtuals.
 
-```javascript acquit:Creating from ES6 Classes Using `loadClass\(\)`
+```javascript acquit:Creating from ES6 Classes Using.*loadClass
 const schema = new Schema({ firstName: String, lastName: String });
 
 class HumanClass {

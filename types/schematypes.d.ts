@@ -55,6 +55,12 @@ declare module 'mongoose' {
 
   type DefaultType<T> = T extends Schema.Types.Mixed ? any : Partial<ExtractMongooseArray<T>>;
 
+  /**
+   * Valid types for the `ref` property in populate operations.
+   * Can specify a reference as a string (model name), Model instance, or function returning either.
+   */
+  type MongooseRef = string | Model<any> | ((this: any, doc: any) => string | Model<any>);
+
   class SchemaTypeOptions<T, EnforcedDocType = any, THydratedDocumentType = HydratedDocument<EnforcedDocType>> {
     type?: T extends string ? StringSchemaDefinition
     : T extends number ? NumberSchemaDefinition
@@ -113,7 +119,7 @@ declare module 'mongoose' {
     /**
      * The model that `populate()` should use if populating this path.
      */
-    ref?: string | Model<any> | ((this: any, doc: any) => string | Model<any>);
+    ref?: MongooseRef;
 
     /**
      * The path in the document that `populate()` should use to find the model

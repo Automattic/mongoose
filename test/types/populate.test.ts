@@ -609,3 +609,46 @@ async function gh16101() {
     expect(doc.owner.name).type.toBe<string>();
   }
 }
+
+async function mongooseRefDynamicFunction() {
+  // Test case for MongooseRef type with dynamic reference function
+  interface Author {
+    _id: Types.ObjectId;
+    name: string;
+  }
+
+  interface Book {
+    _id: Types.ObjectId;
+    title: string;
+    authorModel: string; // Stores the model name dynamically
+    authorRef: PopulatedDoc<Author>;
+  }
+
+  // Schema with dynamic ref function that returns model name from a field
+  const bookSchema = new Schema<Book>({
+    title: { type: String, required: true },
+    authorModel: { type: String, required: true },
+    authorRef: {
+      type: Schema.Types.ObjectId,
+      // Dynamic ref function - returns string (model name) based on document state
+      ref: function(this: any) {
+        return this.authorModel || 'Author';
+      },
+      required: true
+    }
+  });
+
+  const authorSchema = new Schema<Author>({
+    name: { type: String, required: true }
+  });
+
+  const BookModel = model<Book>('Book', bookSchema);
+  model<Author>('Author', authorSchema);
+
+  // Test populating with dynamic ref
+  const book = await BookModel.findOne().populate<{ authorRef: Author }>('authorRef').orFail();
+  expect(book.authorRef.name).type.toBe<string>();
+
+  // Test that the book model name is correctly used
+  expect(book.authorModel).type.toBe<string>();
+}

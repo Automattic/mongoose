@@ -9177,6 +9177,38 @@ describe('Model', function() {
         Model.useConnection();
       }, { message: 'Please provide a connection.' });
     });
+
+    it('should throw an error if connection lacks collection() method', async function() {
+      const schema = new mongoose.Schema({
+        name: String
+      });
+      const Model = db.model('Test', schema);
+      const invalidConnection = { model: () => {} };
+      assert.throws(() => {
+        Model.useConnection(invalidConnection);
+      }, /connection must be a valid Mongoose Connection instance.*collection\(\) method/);
+    });
+
+    it('should throw an error if connection lacks model() method', async function() {
+      const schema = new mongoose.Schema({
+        name: String
+      });
+      const Model = db.model('Test', schema);
+      const invalidConnection = { collection: () => {} };
+      assert.throws(() => {
+        Model.useConnection(invalidConnection);
+      }, /connection must be a valid Mongoose Connection instance.*model\(\) method/);
+    });
+
+    it('should throw an error if connection is a plain object', async function() {
+      const schema = new mongoose.Schema({
+        name: String
+      });
+      const Model = db.model('Test', schema);
+      assert.throws(() => {
+        Model.useConnection({});
+      }, /connection must be a valid Mongoose Connection instance.*collection\(\) method/);
+    });
   });
 
   it('insertMany should throw an error if there were operations that failed validation, ' +

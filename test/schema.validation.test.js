@@ -633,7 +633,7 @@ describe('schema', function() {
             await m.validate();
             assert.ok(false);
           } catch (err) {
-            assert.equal(err.errors.x.toString(), 'Error code 25');
+            assert.equal(err.errors.x.toString(), 'ValidatorError: Error code 25');
             assert.equal(err.errors.x.properties.message, 'Error code 25');
             assert.equal(err.errors.x.properties.errorCode, 25);
           }
@@ -655,7 +655,7 @@ describe('schema', function() {
 
           const m = new M({ x: 'whatever' });
           const err = await m.validate().then(() => null, err => err);
-          assert.equal(err.errors.x.toString(), 'Custom message');
+          assert.equal(err.errors.x.toString(), 'ValidatorError: Custom message');
         });
       });
     });
@@ -678,7 +678,7 @@ describe('schema', function() {
             await m.validate();
             assert.ok(false);
           } catch (err) {
-            assert.equal(String(err.errors.x), 'x failed validation (3,4,5,6)');
+            assert.equal(String(err.errors.x), 'ValidatorError: x failed validation (3,4,5,6)');
             assert.equal(err.errors.x.properties.message, 'x failed validation (3,4,5,6)');
             assert.equal(err.errors.x.kind, 'customType');
           }
@@ -701,7 +701,7 @@ describe('schema', function() {
             await m.validate();
             assert.ok(false);
           } catch (err) {
-            assert.equal(String(err.errors.x), 'x failed validation (3,4,5,6)');
+            assert.equal(String(err.errors.x), 'ValidatorError: x failed validation (3,4,5,6)');
             assert.equal(err.errors.x.kind, 'customType');
           }
         });

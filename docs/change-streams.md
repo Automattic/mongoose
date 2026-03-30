@@ -60,8 +60,8 @@ Use `resumeAfter` to track where the last change stream left off, and add a time
 let resumeAfter = undefined;
 
 exports.handler = async(event, context) => {
-  // add this so that we can re-use any static/global variables between function calls if Lambda
-  // happens to re-use existing containers for the invocation.
+  // add this so that we can reuse any static/global variables between function calls if Lambda
+  // happens to reuse existing containers for the invocation.
   context.callbackWaitsForEmptyEventLoop = false;
 
   await connectToDatabase();

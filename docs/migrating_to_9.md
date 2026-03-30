@@ -149,9 +149,9 @@ doc.mySubdoc[0].deleteOne();
 await doc.save();
 ```
 
-## Hooks for custom methods and statics no longer support callbacks
+## Hooks for custom methods and statistics no longer support callbacks
 
-Previously, you could use Mongoose middleware with custom methods and statics that took callbacks.
+Previously, you could use Mongoose middleware with custom methods and statistics that took callbacks.
 In Mongoose 9, this is no longer supported.
 If you want to use Mongoose middleware with a custom method or static, that custom method or static must be an async function or return a Promise.
 
@@ -165,7 +165,7 @@ const mySchema = new Schema({
 mySchema.methods.foo = async function(cb) {
   return cb(null, this.name);
 };
-mySchema.statics.bar = async function(cb) {
+mySchema.statistics.bar = async function(cb) {
   return cb(null, 'bar');
 };
 
@@ -186,7 +186,7 @@ mySchema.methods.baz = async function baz(arg) {
 mySchema.pre('baz', async function baz() {
   console.log('baz pre hook');
 });
-mySchema.statics.qux = async function qux(arg) {
+mySchema.statistics.qux = async function qux(arg) {
   return arg;
 };
 mySchema.pre('qux', async function qux() {

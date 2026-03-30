@@ -67,7 +67,7 @@ const res = await q;
 ## MongoDB Node Driver 6 {#mongodb-node-driver-6}
 
 Mongoose 8 uses [v6.x of the MongoDB Node driver](https://github.com/mongodb/node-mongodb-native/releases/tag/v6.0.0).
-There's a few noteable changes in MongoDB Node driver v6 that affect Mongoose:
+There's a few notable changes in MongoDB Node driver v6 that affect Mongoose:
 
 1. The `ObjectId` constructor no longer accepts strings of length 12. In Mongoose 7, `new mongoose.Types.ObjectId('12charstring')` was perfectly valid. In Mongoose 8, `new mongoose.Types.ObjectId('12charstring')` throws an error.
 

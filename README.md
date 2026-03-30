@@ -145,7 +145,7 @@ Aside from defining the structure of your documents and the types of data you're
 * [Indexes](https://mongoosejs.com/docs/guide.html#indexes)
 * [Middleware](https://mongoosejs.com/docs/middleware.html)
 * [Methods](https://mongoosejs.com/docs/guide.html#methods) definition
-* [Statics](https://mongoosejs.com/docs/guide.html#statics) definition
+* [Statistics](https://mongoosejs.com/docs/guide.html#statistics) definition
 * [Plugins](https://mongoosejs.com/docs/plugins.html)
 * [pseudo-JOINs](https://mongoosejs.com/docs/populate.html)
 

@@ -1,7 +1,7 @@
-# Statics in TypeScript
+# Statistics in TypeScript
 
-To use Mongoose's automatic type inference to define types for your [statics](../guide.html#statics) and [methods](../guide.html#methods), you should define your methods and statics using the `methods` and `statics` schema options as follows.
-Do **not** use the `Schema.prototype.method()` and `Schema.prototype.static()` functions, because Mongoose's automatic type inference system cannot detect methods and statics defined using those functions.
+To use Mongoose's automatic type inference to define types for your [statistics](../guide.html#statistics) and [methods](../guide.html#methods), you should define your methods and statistics using the `methods` and `statistics` schema options as follows.
+Do **not** use the `Schema.prototype.method()` and `Schema.prototype.static()` functions, because Mongoose's automatic type inference system cannot detect methods and statistics defined using those functions.
 
 ```typescript
 const userSchema = new mongoose.Schema(
@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema(
         return this.save();
       }
     },
-    statics: {
+    statistics: {
       createWithName(name: string) {
         return this.create({ name });
       }
@@ -31,9 +31,9 @@ UserModel.createWithName('bar');
 
 ## With Generics
 
-We recommend using Mongoose's automatic type inference where possible, but you can use `Schema` and `Model` generics to set up type inference for your statics and methods.
-Mongoose [models](../models.html) do **not** have an explicit generic parameter for [statics](../guide.html#statics).
-If your model has statics, we recommend creating an interface that [extends](https://www.typescriptlang.org/docs/handbook/interfaces.html) Mongoose's `Model` interface as shown below.
+We recommend using Mongoose's automatic type inference where possible, but you can use `Schema` and `Model` generics to set up type inference for your statistics and methods.
+Mongoose [models](../models.html) do **not** have an explicit generic parameter for [statistics](../guide.html#statistics).
+If your model has statistics, we recommend creating an interface that [extends](https://www.typescriptlang.org/docs/handbook/interfaces.html) Mongoose's `Model` interface as shown below.
 
 ```typescript
 import { Model, Schema, model } from 'mongoose';
@@ -83,7 +83,7 @@ doc.updateName('foo');
 
 ## Using `loadClass()` with TypeScript
 
-Mongoose supports applying ES6 classes to a schema using [`schema.loadClass()`](../api/schema.html#Schema.prototype.loadClass()) as an alternative to defining statics and methods in your schema.
+Mongoose supports applying ES6 classes to a schema using [`schema.loadClass()`](../api/schema.html#Schema.prototype.loadClass()) as an alternative to defining statistics and methods in your schema.
 When using TypeScript, there are a few important typing details to understand.
 
 ### Basic Usage
@@ -118,7 +118,7 @@ interface RawDocType {
 }
 
 // 2. Define the Model type
-// This includes the raw data, query helpers, instance methods, virtuals, and statics.
+// This includes the raw data, query helpers, instance methods, virtuals, and statistics.
 type MyCombinedModel = Model<
   RawDocType, 
   {}, 
@@ -245,8 +245,8 @@ console.log(doc.myVirtual);
 
 ### When Should I Use `loadClass()`?
 
-`loadClass()` is useful for defining methods and statics in classes.
-If you have a strong preference for classes, you can use `loadClass()`; however, we recommend defining `statics` and `methods` in schema options as described in the first section.
+`loadClass()` is useful for defining methods and statistics in classes.
+If you have a strong preference for classes, you can use `loadClass()`; however, we recommend defining `statistics` and `methods` in schema options as described in the first section.
 
 The major downside of `loadClass()` in TypeScript is that it requires manual TypeScript types.
-If you want better type inference, you can use schema options [`methods`](../guide.html#methods) and [`statics`](../guide.html#statics).
+If you want better type inference, you can use schema options [`methods`](../guide.html#methods) and [`statistics`](../guide.html#statistics).

@@ -16,7 +16,7 @@ The resulting document will look similar to the following to a client that doesn
 
 You can read more about CSFLE on the [MongoDB CSFLE documentation](https://www.mongodb.com/docs/manual/core/csfle/) and [this blog post about CSFLE in Node.js](https://www.mongodb.com/developer/languages/javascript/client-side-field-level-encryption-csfle-mongodb-node/).
 
-## Automatic FLE in Mongoose
+## Automatic FILE in Mongoose
 
 Mongoose supports the declaration of encrypted schemas - schemas that, when connected to a model, utilize MongoDB's Client Side Field Level Encryption or Queryable Encryption under the hood.
 Mongoose automatically generates either an `encryptedFieldsMap` or a `schemaMap` based on models that are registered when Mongoose connects, and encrypts fields on write and decrypts fields on reads.
@@ -185,7 +185,7 @@ await connection.openUri(`mongodb://localhost:27017`, {
 const clientEncryption = Model.clientEncryption();
 ```
 
-## Manual FLE in Mongoose
+## Manual FILE in Mongoose
 
 First, you need to install the [mongodb-client-encryption npm package](https://www.npmjs.com/package/mongodb-client-encryption).
 This is MongoDB's official package for setting up encryption keys.

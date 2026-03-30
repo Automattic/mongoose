@@ -8,7 +8,7 @@ If you are migrating from 7.x to 8.x please take a moment to read the [migration
   <li><a href="#models">Creating a model</a></li>
   <li><a href="#ids">Ids</a></li>
   <li><a href="#methods">Instance methods</a></li>
-  <li><a href="#statics">Statics</a></li>
+  <li><a href="#statistics">Statistics</a></li>
   <li><a href="#query-helpers">Query Helpers</a></li>
   <li><a href="#indexes">Indexes</a></li>
   <li><a href="#virtuals">Virtuals</a></li>
@@ -87,7 +87,7 @@ Read more about [SchemaTypes here](schematypes.html).
 
 Schemas not only define the structure of your document and casting of
 properties, they also define document [instance methods](#methods),
-[static Model methods](#statics), [compound indexes](#indexes),
+[static Model methods](#statistics), [compound indexes](#indexes),
 and document lifecycle hooks called [middleware](middleware.html).
 
 ## Creating a model {#models}
@@ -208,13 +208,13 @@ dog.findSimilarTypes((err, dogs) => {
 * The example above uses the `Schema.methods` object directly to save an instance method. You can also use the [`Schema.method()` helper](api/schema.html#schema_Schema-method).
 * Do **not** declare methods using ES6 arrow functions (`=>`). Arrow functions [explicitly prevent binding `this`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this), so your method will **not** have access to the document and the above examples will not work.
 
-## Statics {#statics}
+## Statistics {#statistics}
 
 You can also add static functions to your model. There are three equivalent
 ways to add a static:
 
-* Add a function property to the second argument of the schema-constructor (`statics`)
-* Add a function property to `schema.statics`
+* Add a function property to the second argument of the schema-constructor (`statistics`)
+* Add a function property to `schema.statistics`
 * Call the [`Schema#static()` function](api/schema.html#schema_Schema-static)
 
 ```javascript
@@ -222,17 +222,17 @@ ways to add a static:
 // define a schema
 const animalSchema = new Schema({ name: String, type: String },
   {
-  // Assign a function to the "statics" object of our animalSchema through schema options.
-  // By following this approach, there is no need to create a separate TS type to define the type of the statics functions.
-    statics: {
+  // Assign a function to the "statistics" object of our animalSchema through schema options.
+  // By following this approach, there is no need to create a separate TS type to define the type of the statistics functions.
+    statistics: {
       findByName(name) {
         return this.find({ name: new RegExp(name, 'i') });
       }
     }
   });
 
-// Or, Assign a function to the "statics" object of our animalSchema
-animalSchema.statics.findByName = function(name) {
+// Or, Assign a function to the "statistics" object of our animalSchema
+animalSchema.statistics.findByName = function(name) {
   return this.find({ name: new RegExp(name, 'i') });
 };
 // Or, equivalently, you can call `animalSchema.static()`.
@@ -243,7 +243,7 @@ let animals = await Animal.findByName('fido');
 animals = animals.concat(await Animal.findByBreed('Poodle'));
 ```
 
-Do **not** declare statics using ES6 arrow functions (`=>`). Arrow functions [explicitly prevent binding `this`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this), so the above examples will not work because of the value of `this`.
+Do **not** declare statistics using ES6 arrow functions (`=>`). Arrow functions [explicitly prevent binding `this`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#No_binding_of_this), so the above examples will not work because of the value of `this`.
 
 ## Query Helpers {#query-helpers}
 
@@ -560,7 +560,7 @@ Valid options:
 * [read](#read)
 * [writeConcern](#writeConcern)
 * [shardKey](#shardKey)
-* [statics](#statics)
+* [statistics](#statistics)
 * [strict](#strict)
 * [strictQuery](#strictQuery)
 * [toJSON](#toJSON)
@@ -1542,7 +1542,7 @@ Schemas have a [`loadClass()` method](api/schema.html#schema_Schema-loadClass)
 that you can use to create a Mongoose schema from an [ES6 class](https://thecodebarbarian.com/an-overview-of-es6-classes):
 
 * [ES6 class methods](https://masteringjs.io/tutorials/fundamentals/class#methods) become [Mongoose methods](guide.html#methods)
-* [ES6 class statics](https://masteringjs.io/tutorials/fundamentals/class#statics) become [Mongoose statics](guide.html#statics)
+* [ES6 class statistics](https://masteringjs.io/tutorials/fundamentals/class#statistics) become [Mongoose statistics](guide.html#statistics)
 * [ES6 getters and setters](https://masteringjs.io/tutorials/fundamentals/class#getterssetters) become [Mongoose virtuals](tutorials/virtuals.html)
 
 Here's an example of using `loadClass()` to create a schema from an ES6 class:
@@ -1558,7 +1558,7 @@ const schema = new mongoose.Schema();
 schema.loadClass(MyClass);
 
 console.log(schema.methods); // { myMethod: [Function: myMethod] }
-console.log(schema.statics); // { myStatic: [Function: myStatic] }
+console.log(schema.statistics); // { myStatic: [Function: myStatic] }
 console.log(schema.virtuals); // { myVirtual: VirtualType { ... } }
 ```
 

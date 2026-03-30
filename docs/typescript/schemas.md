@@ -221,7 +221,7 @@ const orderSchema = new mongoose.Schema<
   {}, // methods
   {}, // query helpers
   {}, // virtuals
-  {}, // statics
+  {}, // statistics
   mongoose.DefaultSchemaOptions, // schema options
   IOrder, // doctype
   OrderHydratedDocument // THydratedDocumentType

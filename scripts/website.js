@@ -306,7 +306,7 @@ getVersions();
  * @property {Version} currentVersion The current version this branch is built for
  * @property {string} latestVersion The latest version available across the repository
  * @property {Version[]} pastVersions The latest versions of past major versions to include as selectable
- * @property {boolean} versionedDeploy Indicates wheter to build for a version or as latest (no prefix)
+ * @property {boolean} versionedDeploy Indicates whether to build for a version or as latest (no prefix)
  * @property {string} versionedPath The path to use for versioned deploy (empty string when "versionedDeploy" is false)
  */
 const versionObj = (() => {
@@ -404,7 +404,7 @@ function mapURLs(block, currentUrl) {
 
   while ((match = mongooseComRegex.exec(block)) !== null) {
     // console.log("match", match);
-    // cant just use "match.index" byitself, because of the extra "href=\"" condition, which is not factored in in "match.index"
+    // can't just use "match.index" byitself, because of the extra "href=\"" condition, which is not factored in in "match.index"
     const startIndex = match.index + match[0].length - match[1].length;
     out += block.slice(lastIndex, startIndex);
     lastIndex = startIndex + match[1].length;

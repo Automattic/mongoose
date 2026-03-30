@@ -13,7 +13,7 @@ let conn = null;
 const uri = 'YOUR CONNECTION STRING HERE';
 
 exports.handler = async function(event, context) {
-  // Make sure to add this so you can re-use `conn` between function calls.
+  // Make sure to add this so you can reuse `conn` between function calls.
   // See https://www.mongodb.com/blog/post/serverless-development-with-nodejs-aws-lambda-mongodb-atlas
   context.callbackWaitsForEmptyEventLoop = false;
 

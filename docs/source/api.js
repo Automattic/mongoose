@@ -103,10 +103,10 @@ parseAllFiles();
  * @typedef {Object} TagObject
  * @property {String} name The Processed name of the Tag (already includes all processing)
  * @property {String} description The Description of this Tag
- * @property {Boolean} optional Defines wheter the Tag is optional or not (already included in `name`)
- * @property {Boolean} nullable Defines wheter the Tag is nullable (dox does not add "null" by default)
+ * @property {Boolean} optional Defines whether the Tag is optional or not (already included in `name`)
+ * @property {Boolean} nullable Defines whether the Tag is nullable (dox does not add "null" by default)
  * @property {Boolean} nonNullable Unknown (invert of `nullable`?)
- * @property {Boolean} variable Defines wheter the type is spreadable ("...Type")
+ * @property {Boolean} variable Defines whether the type is spreadable ("...Type")
  * @property {String[]} types Collection of all types this Tag has
  * @property {String} type The Type of the Tag
  * @property {String} string The full string of types plus name plus description (unused in mongoose)
@@ -121,18 +121,18 @@ parseAllFiles();
 
 /**
  * @typedef {Object} PropContext
- * @property {boolean} [isStatic] Defines wheter the current property is a static property (not mutually exlusive with "isInstance")
- * @property {boolean} [isInstance] Defines wheter the current property is a instance property (not mutually exlusive with "isStatic")
- * @property {boolean} [isFunction] Defines wheter the current property is meant to be a function
+ * @property {boolean} [isStatic] Defines whether the current property is a static property (not mutually exclusive with "isInstance")
+ * @property {boolean} [isInstance] Defines whether the current property is a instance property (not mutually exclusive with "isStatic")
+ * @property {boolean} [isFunction] Defines whether the current property is meant to be a function
  * @property {string} [constructor] Defines the Constructor (or rather path) the current property is on
- * @property {boolean} [constructorWasUndefined] Defined wheter the "constructor" property was defined by "dox", but was set to "undefined"
+ * @property {boolean} [constructorWasUndefined] Defines whether the "constructor" property was defined by "dox", but was set to "undefined"
  * @property {string} [type] Defines the type the property is meant to be
  * @property {string} [name] Defines the current Properties name
  * @property {TagObject} [return] The full object for a "@return" jsdoc tag
  * @property {string} [string] Defines the full string the property will be listed as
  * @property {string} [anchorId] Defines the Anchor ID to be used for linking
  * @property {string} [description] Defines the Description the property will be listed with
- * @property {string} [deprecated] Defines wheter the current Property is signaled as deprecated
+ * @property {string} [deprecated] Defines whether the current Property is signaled as deprecated
  * @property {SeeObject[]} [see] Defines all "@see" references
  * @property {TagObject[]} [param] Defines all "@param" references
  * @property {SeeObject} [inherits] Defines the string for "@inherits"

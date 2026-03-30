@@ -109,7 +109,7 @@ You can find a full list of officially supported plugins on [Mongoose's plugins 
 
 ## Community
 
-Not only can you re-use schema functionality in your own projects, but you
+Not only can you reuse schema functionality in your own projects, but you
 also reap the benefits of the Mongoose community as well. Any plugin
 published to [npm](https://npmjs.org/) and with
 'mongoose' as an [npm keyword](https://docs.npmjs.com/files/package.json#keywords)

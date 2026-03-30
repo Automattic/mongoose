@@ -240,7 +240,7 @@ describe('transactions', function() {
       return session.endSession();
     });
 
-    it('`populate()` uses the querys session', function() {
+    it('`populate()` uses the queries session', function() {
       return Author.create([{ name: 'Val' }], { session: session }).
         then(authors => Article.create([{ author: authors[0]._id }], { session: session })).
         then(articles => {

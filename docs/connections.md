@@ -166,8 +166,8 @@ By default, `serverSelectionTimeoutMS` is 30000 (30 seconds).
 This means that, for example, if you call `mongoose.connect()` when your standalone MongoDB server is down, your `mongoose.connect()` call will only throw an error after 30 seconds.
 
 ```javascript
-// Throws an error "getaddrinfo ENOTFOUND doesn't.exist" after 30 seconds
-await mongoose.connect('mongodb://doesn't.exist:27017/test');
+// Throws an error "getaddrinfo ENOTFOUND does.not.exist" after 30 seconds
+await mongoose.connect('mongodb://does.not.exist:27017/test');
 ```
 
 Similarly, if your standalone MongoDB server goes down after initial connection, any `find()` or `save()` calls will error out after 30 seconds, unless your MongoDB server is restarted.
@@ -194,7 +194,7 @@ const serverSelectionTimeoutMS = 5000;
 // error. Exits after approximately 15 seconds.
 for (let i = 0; i < 3; ++i) {
   try {
-    await mongoose.connect('mongodb://doesn't.exist:27017/test', {
+    await mongoose.connect('mongodb://does.not.exist:27017/test', {
       serverSelectionTimeoutMS
     });
     break;

@@ -494,7 +494,7 @@ async function gh11602(): Promise<void> {
 
   const ModelType = model<ITest>('foo', schema);
 
-  const updateResult = await ModelType.findOneAndUpdate(query, { $inc: { occurence: 1 } }, {
+  const updateResult = await ModelType.findOneAndUpdate(query, { $inc: { occurrence: 1 } }, {
     upsert: true,
     returnDocument: 'after',
     includeResultMetadata: true

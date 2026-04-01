@@ -145,6 +145,22 @@ describe('utils', function() {
     assert.ok(!utils.deepEqual(a, b));
   });
 
+  it('deepEquals on sets', function() {
+    const a = new Set([1, 2, 3]);
+    let b = new Set([1, 2, 3]);
+
+    assert.ok(utils.deepEqual(a, b));
+
+    b = new Set([1, 2, 4]);
+    assert.ok(!utils.deepEqual(a, b));
+
+    b = new Set([1, 2]);
+    assert.ok(!utils.deepEqual(a, b));
+
+    b = new Set([1, 2, 3, 4]);
+    assert.ok(!utils.deepEqual(a, b));
+  });
+
   it('deepEquals on MongooseDocumentArray works', function() {
     const A = new Schema({ a: String });
     mongoose.deleteModel(/Test/);

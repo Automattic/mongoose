@@ -3114,6 +3114,24 @@ describe('Model', function() {
       assert.strictEqual(delta[0].__v, undefined, 'should not include __v in query when only excluded nested path modified');
     });
 
+    it('should include __v when optimisticConcurrency array contains a parent path and subdocument is modified (gh-16054)', async function() {
+      const userSchema = new Schema({
+        profile: {
+          firstName: String,
+          lastName: String
+        },
+        balance: Number
+      }, { optimisticConcurrency: ['profile.firstName'] });
+
+      const User = db.model('User_oc_include_parent', userSchema);
+      const user = await User.create({ profile: { firstName: 'Alice', lastName: 'Smith' }, balance: 100 });
+
+      user.profile = { firstName: 'Val' };
+      const delta = user.$__delta();
+      assert.ok(delta, 'delta should exist');
+      assert.strictEqual(delta[0].__v, 0, 'should include __v in query when included parent path is modified');
+    });
+
     it('should exclude ad-hoc nested subpaths on non-strict schemas when optimisticConcurrency exclude contains a parent path (gh-16054)', async function() {
       const profileSchema = new Schema({ firstName: String, lastName: String }, { _id: false, strict: false });
       const userSchema = new Schema({

@@ -802,7 +802,7 @@ schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct'
 
 schema.post(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'updateOne', 'deleteOne', 'validate'], { document: true, query: false }, function(res) {
   expect(this).type.toBeAssignableTo<HydratedDocument<IDocument>>();
-  expect(res).type.toBeAssignableTo<Query<any, any> | HydratedDocument<IDocument>>();
+  expect(res).type.toBeAssignableTo<HydratedDocument<IDocument>>();
 });
 
 schema.pre(['estimatedDocumentCount', 'countDocuments', 'deleteMany', 'distinct', 'find', 'findOne', 'findOneAndDelete', 'findOneAndReplace', 'findOneAndUpdate', 'replaceOne', 'updateMany', 'save', 'updateOne', 'deleteOne', 'validate'], { document: true, query: true }, function() {

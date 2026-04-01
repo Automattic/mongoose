@@ -315,6 +315,34 @@ function gh13094() {
   expect(doc.name).type.toBe<string>();
 }
 
+async function gh16178() {
+  interface IData {
+    name: string;
+  }
+
+  interface IDataMethods {
+    info(): Promise<string>;
+  }
+
+  type DataModel = Model<IData, {}, IDataMethods>;
+  type DataDocument = HydratedDocument<IData, IDataMethods>;
+
+  const dataSchema = new Schema<IData, DataModel, IDataMethods>({
+    name: { type: String, required: true }
+  });
+
+  dataSchema.methods.info = async function(): Promise<string> {
+    return `Name: ${this.name}`;
+  };
+
+  const Data = model<IData, DataModel>('Data', dataSchema);
+  const data = await Data.create({ name: 'Test' });
+  const dataDoc = null as any as DataDocument;
+
+  expect(data.id).type.toBe<string>();
+  expect(dataDoc.id).type.toBe<string>();
+}
+
 function gh13738() {
   interface IPerson {
     age: number;

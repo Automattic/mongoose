@@ -158,4 +158,54 @@ describe('Union', function() {
     assert.strictEqual(found.arr[0], numValue);
     assert.strictEqual(new Date(found.arr[1]).valueOf(), dateValue.valueOf());
   });
+  it('does not bypass validation when a Union of Objects is used (gh-15732)', async function() {
+    const SubSchema1 = new Schema({
+      price: { type: Number, required: true },
+      title: { type: String },
+      isThisSchema1: { type: Boolean }
+    }, { _id: false });
+
+    const TestSchema = new Schema({
+      product: {
+        type: 'Union',
+        of: [SubSchema1, Number]
+      }
+    });
+
+    const TestModel = db.model('Test', TestSchema);
+
+    // This should fail validation because neither required 'price' nor 'description' are provided
+    const doc = new TestModel({
+      product: {
+        title: 'string',
+        arbitraryNeverSave: true,
+        isThisSchema1: true,
+        isThisSchema2: true
+      }
+    });
+
+    let err;
+    try {
+      await doc.validate();
+    } catch (e) {
+      err = e;
+    }
+
+    assert.ok(err, 'Expected validation error');
+    assert.ok(
+      err.errors['product.price'] || err.errors['product.description'] || err.errors['product'],
+      'Expected missing required property error'
+    );
+
+    const doc2 = new TestModel({
+      product: {
+        price: 42,
+        title: 'string',
+        arbitraryNeverSave: true,
+        isThisSchema1: true,
+        isThisSchema2: true
+      }
+    });
+    await doc2.validate();
+  });
 });

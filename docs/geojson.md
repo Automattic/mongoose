@@ -117,15 +117,42 @@ a polygon representing the state of Colorado using
 
 <img src="https://i.imgur.com/i32pWnC.png" alt="Colorado GeoJSON Polygon">
 
-```acquit
-[require:geojson.*driver query]
+```javascript acquit:geojson.*driver query
+const City = db.model('City', new Schema({
+  name: String,
+  location: pointSchema
+}));
+
+const colorado = {
+  type: 'Polygon',
+  coordinates: [[
+    [-109, 41],
+    [-102, 41],
+    [-102, 37],
+    [-109, 37],
+    [-109, 41]
+  ]]
+};
+const denver = { type: 'Point', coordinates: [-104.9903, 39.7392] };
+return City.create({ name: 'Denver', location: denver }).
+  then(() => City.findOne({
+    location: {
+      $geoWithin: {
+        $geometry: colorado
+      }
+    }
+  })).
+  then(doc => assert.equal(doc.name, 'Denver'));
 ```
 
 Mongoose also has a [`within()` helper](api/query.html#query_Query-within)
 that's a shorthand for `$geoWithin`.
 
-```acquit
-[require:geojson.*within helper]
+```javascript acquit:geojson.*within helper
+const denver = { type: 'Point', coordinates: [-104.9903, 39.7392] };
+return City.create({ name: 'Denver', location: denver }).
+  then(() => City.findOne().where('location').within(colorado)).
+  then(doc => assert.equal(doc.name, 'Denver'));
 ```
 
 ## Geospatial Indexes {#geospatial-indexes}
@@ -134,8 +161,19 @@ MongoDB supports [2dsphere indexes](https://www.mongodb.com/docs/manual/core/2ds
 for speeding up geospatial queries. Here's how you can define
 a 2dsphere index on a GeoJSON point:
 
-```acquit
-[require:geojson.*index$]
+```javascript acquit:geojson.*index$
+const denver = { type: 'Point', coordinates: [-104.9903, 39.7392] };
+const City = db.model('City', new Schema({
+  name: String,
+  location: {
+    type: pointSchema,
+    index: '2dsphere' // Create a special 2dsphere index on `City.location`
+  }
+}));
+
+return City.create({ name: 'Denver', location: denver }).
+  then(() => City.findOne().where('location').within(colorado)).
+  then(doc => assert.equal(doc.name, 'Denver'));
 ```
 
 You can also define a geospatial index using the [`Schema#index()` function](api/schema.html#schema_Schema-index)

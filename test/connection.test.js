@@ -889,11 +889,14 @@ describe('connections:', function() {
         const FAKE_NOW = 1;
         globalThis.Date = { now: () => FAKE_NOW };
 
+        const realBefore = OriginalDate.now();
         db.client.emit('serverHeartbeatSucceeded');
+        const realAfter = OriginalDate.now();
 
         // If using snapshotted Date, _lastHeartbeatAt should be a real timestamp, not the faked value
         assert.notStrictEqual(db._lastHeartbeatAt, FAKE_NOW);
-        assert.ok(db._lastHeartbeatAt > Date.now());
+        assert.ok(db._lastHeartbeatAt >= realBefore);
+        assert.ok(db._lastHeartbeatAt <= realAfter);
       } finally {
         globalThis.Date = OriginalDate;
         await db.close();

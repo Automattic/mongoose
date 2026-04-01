@@ -880,6 +880,67 @@ describe('connections:', function() {
       assert.ok(db._lastHeartbeatAt >= now);
       assert.ok(db2._lastHeartbeatAt >= now);
     });
+
+    it('heartbeat handler uses snapshotted Date, not affected by faked globalThis.Date (gh-16183)', async function() {
+      const db = await mongoose.createConnection(start.uri).asPromise();
+
+      const OriginalDate = globalThis.Date;
+      try {
+        const FAKE_NOW = 1;
+        globalThis.Date = { now: () => FAKE_NOW };
+
+        db.client.emit('serverHeartbeatSucceeded');
+
+        // If using snapshotted Date, _lastHeartbeatAt should be a real timestamp, not the faked value
+        assert.notStrictEqual(db._lastHeartbeatAt, FAKE_NOW);
+        assert.ok(db._lastHeartbeatAt > Date.now());
+      } finally {
+        globalThis.Date = OriginalDate;
+        await db.close();
+      }
+    });
+
+    it('flushes buffered operations when heartbeat refreshes stale connection (gh-16183)', async function() {
+      const db = await mongoose.createConnection(start.uri).asPromise();
+
+      // Make heartbeat stale so readyState getter returns disconnected
+      db._lastHeartbeatAt = 1;
+      assert.equal(db._readyState, STATES.connected);
+      assert.equal(db.readyState, STATES.disconnected);
+
+      // Simulate a buffered operation
+      let flushed = false;
+      db._queue.push({ fn: () => { flushed = true; } });
+
+      // Heartbeat should update timestamp AND flush queue
+      db.client.emit('serverHeartbeatSucceeded');
+
+      assert.equal(db.readyState, STATES.connected);
+      assert.strictEqual(flushed, true);
+      assert.equal(db._queue.length, 0);
+
+      await db.close();
+    });
+
+    it('flushes buffered operations on child dbs when heartbeat refreshes stale connection (gh-16183)', async function() {
+      const db = await mongoose.createConnection(start.uri).asPromise();
+      const db2 = db.useDb(start.databases[1]);
+
+      // Make both stale
+      db._lastHeartbeatAt = 1;
+      db2._lastHeartbeatAt = 1;
+
+      // Queue operation on child db
+      let childFlushed = false;
+      db2._queue.push({ fn: () => { childFlushed = true; } });
+
+      db.client.emit('serverHeartbeatSucceeded');
+
+      assert.strictEqual(childFlushed, true);
+      assert.equal(db2._queue.length, 0);
+
+      await db.close();
+    });
   });
 
   describe('shouldAuthenticate()', function() {

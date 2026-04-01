@@ -21,6 +21,7 @@ async function gh8768() {
   expect<SkipMiddlewareOptions>().type.toBeAssignableFrom({ pre: false });
   expect<SkipMiddlewareOptions>().type.toBeAssignableFrom({ post: false });
   expect<SkipMiddlewareOptions>().type.toBeAssignableFrom({ pre: false, post: true });
+  expect<SkipMiddlewareOptions>().type.toBeAssignableFrom({ pre: true, post: false });
   expect<SkipMiddlewareOptions['pre']>().type.toBe<boolean | undefined>();
   expect<SkipMiddlewareOptions['post']>().type.toBe<boolean | undefined>();
 

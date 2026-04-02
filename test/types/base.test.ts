@@ -84,6 +84,30 @@ function setAsObject() {
   expect(mongoose.set).type.not.toBeCallableWith({ invalid: true });
 }
 
+function debugOptions() {
+  // Test debug with color and shell
+  mongoose.set({
+    debug: { color: true, shell: false }
+  });
+
+  // Test debug with timestamp
+  mongoose.set({
+    debug: { timestamp: true }
+  });
+
+  // Test debug with all options
+  mongoose.set({
+    debug: { color: true, shell: false, timestamp: true }
+  });
+
+  // Test debug with timestamp set to false
+  mongoose.set({
+    debug: { color: true, timestamp: false }
+  });
+
+  expect(mongoose.set).type.not.toBeCallableWith({ debug: { invalidOption: true } });
+}
+
 const x: { name: string } = mongoose.omitUndefined({ name: 'foo' });
 
 function baseConnectionAndCollection() {

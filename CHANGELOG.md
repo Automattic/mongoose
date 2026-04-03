@@ -1,3 +1,7 @@
+9.4.1 / 2026-04-03
+==================
+ * Revert "fix(setDefaultsOnInsert): run setters on default values during upsert" #16218 #16051
+
 9.4.0 / 2026-04-03
 ==================
  * perf(document+model): avoid parallel save error instantiation, simplify resetting atomics, streamline validation and collection handling

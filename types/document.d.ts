@@ -32,7 +32,7 @@ declare module 'mongoose' {
     _id: T;
 
     /** Assert that a given path or paths is populated. Throws an error if not populated. */
-    $assertPopulated<Paths = {}>(path: string | string[], values?: Partial<Paths>): Omit<this, keyof Paths> & Paths;
+    $assertPopulated<Paths = {}>(path: string | string[], values?: Partial<Paths>): PopulateDocumentResult<this, Paths, PopulatedPathsDocumentType<DocType, Paths>, DocType>;
 
     /** Clear the document's modified paths. */
     $clearModifiedPaths(): this;
@@ -171,6 +171,13 @@ declare module 'mongoose' {
      * Returns the changes that happened to the document
      * in the format that will be sent to MongoDB.
      */
+    $getChanges(): UpdateQuery<this>;
+
+    /**
+     * Returns the changes that happened to the document
+     * in the format that will be sent to MongoDB.
+     * @deprecated Use `$getChanges()` instead.
+     */
     getChanges(): UpdateQuery<this>;
 
     /** Signal that we desire an increment of this documents version. */
@@ -238,8 +245,8 @@ declare module 'mongoose' {
     $parent(): Document | undefined;
 
     /** Populates document references. */
-    populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<MergeType<this, Paths>>;
-    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<any>, match?: AnyObject, options?: PopulateOptions): Promise<MergeType<this, Paths>>;
+    populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<PopulateDocumentResult<this, Paths, PopulatedPathsDocumentType<DocType, Paths>, DocType>>;
+    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<any>, match?: AnyObject, options?: PopulateOptions): Promise<PopulateDocumentResult<this, Paths, PopulatedPathsDocumentType<DocType, Paths>, DocType>>;
 
     /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
     populated(path: string): any;
@@ -262,11 +269,41 @@ declare module 'mongoose' {
     toBSON(): Require_id<DocType>;
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
+    toJSON<PopulatedRawDocType, DepopulatedRawDocType>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, DepopulatedRawDocType>,
+      options: { depopulate: true }
+    ): Default__v<Require_id<DepopulatedRawDocType>, TSchemaOptions>;
+    toJSON<PopulatedRawDocType, DepopulatedRawDocType, O extends ToObjectOptions & { depopulate: true }>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, DepopulatedRawDocType>,
+      options: O
+    ): ToObjectReturnType<DepopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
+    toJSON<PopulatedRawDocType, O extends ToObjectOptions>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, any>,
+      options: O
+    ): ToObjectReturnType<PopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
+    toJSON<PopulatedRawDocType>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, any>
+    ): Default__v<Require_id<PopulatedRawDocType>, TSchemaOptions>;
     toJSON<O extends ToObjectOptions>(options: O): ToObjectReturnType<DocType, TVirtuals, O, TSchemaOptions>;
     toJSON(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;
     toJSON<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
+    toObject<PopulatedRawDocType, DepopulatedRawDocType>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, DepopulatedRawDocType>,
+      options: { depopulate: true }
+    ): Default__v<Require_id<DepopulatedRawDocType>, TSchemaOptions>;
+    toObject<PopulatedRawDocType, DepopulatedRawDocType, O extends ToObjectOptions & { depopulate: true }>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, DepopulatedRawDocType>,
+      options: O
+    ): ToObjectReturnType<DepopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
+    toObject<PopulatedRawDocType, O extends ToObjectOptions>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, any>,
+      options: O
+    ): ToObjectReturnType<PopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
+    toObject<PopulatedRawDocType>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, any>
+    ): Default__v<Require_id<PopulatedRawDocType>, TSchemaOptions>;
     toObject<O extends ToObjectOptions>(options: O): ToObjectReturnType<DocType, TVirtuals, O, TSchemaOptions>;
     toObject(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;
     toObject<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;

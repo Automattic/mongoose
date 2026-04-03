@@ -419,6 +419,136 @@ function gh14441() {
       const docObject = docs[0]!.toObject();
       expect(docObject.child.name).type.toBe<string>();
     });
+
+  interface ArrayParent {
+    children?: Types.ObjectId[];
+    title?: string;
+  }
+  const ArrayParentModel = model<ArrayParent>(
+    'ArrayParent',
+    new Schema({
+      title: String,
+      children: [{ type: Schema.Types.ObjectId, ref: 'Child' }]
+    })
+  );
+
+  type PopulatedChildren = {
+    children: mongoose.Types.DocumentArray<mongoose.HydratedDocFromModel<typeof ChildModel>>;
+  };
+
+  ArrayParentModel.findOne({})
+    .orFail()
+    .then(async doc => {
+      const populatedDoc = await doc.populate<PopulatedChildren>('children');
+
+      // Populating changes the path type from ObjectIds to documents, so the result should
+      // not be assignable back to the model's original hydrated type.
+      // @ts-expect-error Type 'PopulateDocumentResult<Document<unknown, {}, ArrayParent, {}, DefaultSchemaOptions> & ArrayParent...'
+      const hydratedDoc: mongoose.HydratedDocFromModel<typeof ArrayParentModel> = populatedDoc;
+      expect(populatedDoc).type.toBeAssignableTo<Document<any>>();
+      expect(populatedDoc).type.toBeAssignableTo<Document<unknown>>();
+      expect(populatedDoc.children[0]?.name).type.toBeAssignableTo<string | undefined>();
+      const plainObject = populatedDoc.toObject();
+      expect(plainObject.children[0].name).type.toBe<string>();
+      const depopulatedObject = populatedDoc.toObject({ depopulate: true });
+      expect(depopulatedObject.children![0]).type.toBeAssignableTo<Types.ObjectId>();
+
+      const objectWithVirtuals = populatedDoc.toObject({ virtuals: true });
+      expect(objectWithVirtuals.children![0].name).type.toBe<string>();
+
+      const objectWithFlattenObjectIds = populatedDoc.toObject({ flattenObjectIds: true });
+      expect(objectWithFlattenObjectIds.children![0].name).type.toBe<string>();
+
+      const depopulatedAndFlattened = populatedDoc.toObject({ depopulate: true, flattenObjectIds: true });
+      expect(depopulatedAndFlattened.children![0]).type.toBeAssignableTo<string>();
+
+      const jsonObject = populatedDoc.toJSON();
+      expect(jsonObject.children![0].name).type.toBe<string>();
+      const jsonObjectWithVirtuals = populatedDoc.toJSON({ virtuals: true });
+      expect(jsonObjectWithVirtuals.children![0].name).type.toBe<string>();
+      const jsonDepopulated = populatedDoc.toJSON({ depopulate: true });
+      expect(jsonDepopulated.children![0]).type.toBe<Types.ObjectId>();
+
+      // Known limitation: structural wrappers that drop the marker lose the populated toObject() behavior.
+      const strippedMarkerDoc: Omit<typeof populatedDoc, keyof mongoose.PopulatedDocumentMarker<any, any>> =
+        populatedDoc;
+      const strippedMarkerObject = strippedMarkerDoc.toObject();
+      // @ts-expect-error Property 'name' does not exist on type 'ObjectId'
+      strippedMarkerObject.children![0].name;
+
+      // Known limitation: generic helpers that erase the marker only see the base toObject() typing.
+      function toObjectWithBaseTyping<T extends Document<unknown, any, ArrayParent>>(input: T) {
+        return input.toObject();
+      }
+      const genericObject = toObjectWithBaseTyping(populatedDoc);
+      // Generic helper removed the populated behavior so we only get the raw ObjectId back.
+      expect(genericObject.children![0]).type.toBeAssignableTo<Types.ObjectId>();
+    });
+
+  ArrayParentModel.findOne({})
+    .populate<PopulatedChildren>('children')
+    .orFail()
+    .then(populatedDoc => {
+      expect(populatedDoc).type.toBeAssignableTo<Document<any>>();
+      expect(populatedDoc).type.toBeAssignableTo<Document<unknown>>();
+      expect(populatedDoc.children[0]?.name).type.toBeAssignableTo<string | undefined>();
+      const plainObject = populatedDoc.toObject();
+      expect(plainObject.children[0].name).type.toBe<string>();
+      const depopulatedObject = populatedDoc.toObject({ depopulate: true });
+      expect(depopulatedObject.children![0]).type.toBeAssignableTo<Types.ObjectId>();
+    });
+
+  ArrayParentModel.findOne({})
+    .orFail()
+    .then(async doc => {
+      const populatedDoc = await ArrayParentModel.populate<PopulatedChildren>(doc, 'children');
+
+      // @ts-expect-error Type 'PopulateDocumentResult<Document<unknown, {}, ArrayParent, {}, DefaultSchemaOptions> & ArrayParent...'
+      const hydratedDoc: mongoose.HydratedDocFromModel<typeof ArrayParentModel> = populatedDoc;
+      expect(populatedDoc).type.toBeAssignableTo<Document<any>>();
+      expect(populatedDoc).type.toBeAssignableTo<Document<unknown>>();
+      expect(populatedDoc.children[0]?.name).type.toBeAssignableTo<string | undefined>();
+      const plainObject = populatedDoc.toObject();
+      expect(plainObject.children[0].name).type.toBe<string>();
+      const depopulatedObject = populatedDoc.toObject({ depopulate: true });
+      expect(depopulatedObject.children![0]).type.toBeAssignableTo<Types.ObjectId>();
+    });
+
+  interface MultiPopulateParent {
+    firstChild?: Types.ObjectId;
+    secondChild?: Types.ObjectId;
+  }
+
+  const MultiPopulateParentModel = model<MultiPopulateParent>(
+    'MultiPopulateParent',
+    new Schema({
+      firstChild: { type: Schema.Types.ObjectId, ref: 'Child' },
+      secondChild: { type: Schema.Types.ObjectId, ref: 'Child' }
+    })
+  );
+
+  type PopulatedFirstChild = {
+    firstChild: mongoose.HydratedDocFromModel<typeof ChildModel>;
+  };
+
+  type PopulatedSecondChild = {
+    secondChild: mongoose.HydratedDocFromModel<typeof ChildModel>;
+  };
+
+  MultiPopulateParentModel.findOne({})
+    .populate<PopulatedFirstChild>('firstChild')
+    .populate<PopulatedSecondChild>('secondChild')
+    .orFail()
+    .then(populatedDoc => {
+      expect(populatedDoc.firstChild?.name).type.toBeAssignableTo<string | undefined>();
+      expect(populatedDoc.secondChild?.name).type.toBeAssignableTo<string | undefined>();
+      const plainObject = populatedDoc.toObject();
+      expect(plainObject.firstChild!.name).type.toBe<string>();
+      expect(plainObject.secondChild!.name).type.toBe<string>();
+      const depopulatedObject = populatedDoc.toObject({ depopulate: true });
+      expect(depopulatedObject.firstChild!).type.toBeAssignableTo<Types.ObjectId>();
+      expect(depopulatedObject.secondChild!).type.toBeAssignableTo<Types.ObjectId>();
+    });
 }
 
 async function gh14574() {

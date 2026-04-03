@@ -107,6 +107,25 @@ describe('setDefaultsOnInsert', function() {
     assert.equal(update.$setOnInsert['referralConversion'], 'bar');
   });
 
+  it('runs setters on default values (gh-16051)', function() {
+    const schema = new Schema({
+      name: String,
+      slug: {
+        type: String,
+        default: 'Hello World!',
+        set: function(v) {
+          return v.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        }
+      }
+    });
+
+    const opts = { upsert: true, setDefaultsOnInsert: true };
+    let update = { $set: { name: 'test' } };
+    update = setDefaultsOnInsert({}, schema, update, opts);
+
+    assert.equal(update.$setOnInsert['slug'], 'hello-world');
+  });
+
   it('skips default if parent is $set (gh-12279)', function() {
     const SubscriptionsConfigSchema = Schema({
       hasPaidSubscription: { type: Boolean, required: true },

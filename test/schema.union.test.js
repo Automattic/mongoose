@@ -228,14 +228,14 @@ describe('Union', function() {
       required: ['requiredTest', '_id'],
       properties: {
         test: {
-          oneOf: [
+          anyOf: [
             { type: 'null' },
             { type: 'number' },
             { type: 'string' }
           ]
         },
         requiredTest: {
-          oneOf: [
+          anyOf: [
             { type: 'boolean' },
             { type: 'string' }
           ]
@@ -250,14 +250,14 @@ describe('Union', function() {
       required: ['requiredTest', '_id'],
       properties: {
         test: {
-          oneOf: [
+          anyOf: [
             { bsonType: 'null' },
             { bsonType: 'number' },
             { bsonType: 'string' }
           ]
         },
         requiredTest: {
-          oneOf: [
+          anyOf: [
             { bsonType: 'bool' },
             { bsonType: 'date' }
           ]
@@ -275,5 +275,15 @@ describe('Union', function() {
     assert.ok(validate({ _id: 'test', test: 42, requiredTest: true }));
     assert.ok(validate({ _id: 'test', test: 'answer', requiredTest: '2025-06-01T00:00:00.000Z' }));
     assert.ok(!validate({ _id: 'test', test: {}, requiredTest: true }));
+
+    const overlappingSchema = new Schema({
+      test: {
+        type: 'Union',
+        of: ['Int32', Number]
+      }
+    });
+    const overlappingValidate = ajv.compile(overlappingSchema.toJSONSchema());
+
+    assert.ok(overlappingValidate({ _id: 'test', test: 42 }));
   });
 });

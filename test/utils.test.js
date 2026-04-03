@@ -145,6 +145,22 @@ describe('utils', function() {
     assert.ok(!utils.deepEqual(a, b));
   });
 
+  it('deepEquals on sets', function() {
+    const a = new Set([1, 2, 3]);
+    let b = new Set([1, 2, 3]);
+
+    assert.ok(utils.deepEqual(a, b));
+
+    b = new Set([1, 2, 4]);
+    assert.ok(!utils.deepEqual(a, b));
+
+    b = new Set([1, 2]);
+    assert.ok(!utils.deepEqual(a, b));
+
+    b = new Set([1, 2, 3, 4]);
+    assert.ok(!utils.deepEqual(a, b));
+  });
+
   it('deepEquals on MongooseDocumentArray works', function() {
     const A = new Schema({ a: String });
     mongoose.deleteModel(/Test/);
@@ -253,6 +269,36 @@ describe('utils', function() {
       assert.ok(to.getName === To.prototype.getName);
       assert.ok(to.toMethod === To.prototype.toMethod);
       assert.equal(to.fomMethod, From.prototype.fomMethod);
+    });
+
+    it('should skip schema merge when isDiscriminatorSchemaMerge is true (gh-9534)', function() {
+      const to = {
+        key: { $isSingleNested: true, existingProp: 1 }
+      };
+      const from = {
+        key: { $isMongooseDocumentArray: true, newProp: 2 }
+      };
+
+      // When isDiscriminatorSchemaMerge is true, merge SHOULD skip
+      // conflicting single-nested vs document-array paths
+      utils.merge(to, from, { isDiscriminatorSchemaMerge: true });
+
+      assert.strictEqual(to.key.newProp, undefined);
+    });
+
+    it('should not skip schema merge when isDiscriminatorSchemaMerge is false (gh-9534)', function() {
+      const to = {
+        key: { $isSingleNested: true, existingProp: 1 }
+      };
+      const from = {
+        key: { $isMongooseDocumentArray: true, newProp: 2 }
+      };
+
+      // When isDiscriminatorSchemaMerge is false, merge should NOT skip
+      // the key even if from/to have $isMongooseDocumentArray/$isSingleNested
+      utils.merge(to, from, { isDiscriminatorSchemaMerge: false });
+
+      assert.strictEqual(to.key.newProp, 2);
     });
   });
 

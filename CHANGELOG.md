@@ -1,3 +1,35 @@
+9.3.3 / 2026-03-25
+==================
+ * fix(schemaType): standardize to use MongooseError instead of plain Error #16172 [VIPAX-JIT](https://github.com/VIPAX-JIT)
+ * types: make MergeType distributive to better support populate on models where the hydrated doc type is a union #16101 #16161
+ * docs: upgrade http:// links to https:// in connections.md #16163 [Puxhkar](https://github.com/Puxhkar)
+ * docs: fix typographical, grammatical errors & documentation clarity improvements #16175 [yogesh968](https://github.com/yogesh968)
+ * docs: clarify multi-mongos support documentation for sharded clusters
+
+9.3.2 / 2026-03-23
+==================
+ * fix(mongoose): throw error when trying to set null or undefined as options #16130 #16140
+ * fix(cast): include array value in query filter error message #16127 [White-Devil2839](https://github.com/White-Devil2839)
+ * fix(cast): replace assert.ok with descriptive Error in castNumber #16110 [mrsandy1965](https://github.com/mrsandy1965)
+ * fix(connection): standardize throw new Error to MongooseError #16142 [techcodie](https://github.com/techcodie)
+ * fix(query): use MongooseError instead of Error #16132 [ace-tk](https://github.com/ace-tk)
+ * docs: add production environment example for autoIndex #16151 [mrsandy1965](https://github.com/mrsandy1965)
+ * docs: upgrade self-referencing http:// links to https:// #16150 [mrsandy1965](https://github.com/mrsandy1965)
+ * docs: fix incorrect Double cast comment and upgrade insecure plugin link #16148 [mrsandy1965](https://github.com/mrsandy1965)
+ * docs: fix redundant text and http link in installation section #16146 [Puxhkar](https://github.com/Puxhkar)
+ * docs: fix typo 'mutiple' → 'multiple' in queries.md #16147 [mrsandy1965](https://github.com/mrsandy1965)
+ * docs: use HTTPS for external links in docs navigation #16133 [ace-tk](https://github.com/ace-tk)
+ * docs: use HTTPS for external links in CONTRIBUTING and homepage #16134 [ace-tk](https://github.com/ace-tk)
+ * docs(populate): replace removed mapReduce() API link #16135 [ace-tk](https://github.com/ace-tk)
+ * docs(models): replace removed count() and mapReduce() references #16123 [White-Devil2839](https://github.com/White-Devil2839)
+ * docs: fix broken count() and update() links in queries docs [White-Devil2839](https://github.com/White-Devil2839)
+ * docs: fix broken update() link in validation docs #16121 [White-Devil2839](https://github.com/White-Devil2839)
+ * docs: update GitHub link to use https #16120 [White-Devil2839](https://github.com/White-Devil2839)
+ * docs(documents): fix incorrect variable name in nullish coalescing example #16119 [White-Devil2839](https://github.com/White-Devil2839)
+ * docs: fix missing quotes in populate path examples #16118 [White-Devil2839](https://github.com/White-Devil2839)
+ * docs: fix missing comma in populate dynamic ref example #16117 [White-Devil2839](https://github.com/White-Devil2839)
+ * docs: clarify that transaction rollback marks fields as modified to allow re-saving #16112 [ramanverse](https://github.com/ramanverse)
+
 9.3.1 / 2026-03-17
 ==================
  * fix(model): handle passing string projection to `hydrate()` #16082

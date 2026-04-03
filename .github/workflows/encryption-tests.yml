@@ -1,4 +1,4 @@
-name: Encryption Tests 
+name: Encryption Tests
 
 on:
   pull_request:
@@ -45,6 +45,8 @@ jobs:
         run: npm install
       - name: Install mongodb-client-encryption
         run: npm install mongodb-client-encryption
+      - name: Run setup scripts for mongodb-client-encryption
+        run: pushd node_modules/mongodb-client-encryption && npm run install && popd
       - name: Setup Tests
         run: npm run setup-test-encryption
       - name: Run Tests

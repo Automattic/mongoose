@@ -3,6 +3,7 @@
 const start = require('./common');
 const util = require('./util');
 
+const Ajv = require('ajv');
 const assert = require('assert');
 
 const mongoose = start.mongoose;
@@ -207,5 +208,82 @@ describe('Union', function() {
       }
     });
     await doc2.validate();
+  });
+
+  it('supports toJSONSchema()', function() {
+    const schema = new Schema({
+      test: {
+        type: 'Union',
+        of: [Number, String]
+      },
+      requiredTest: {
+        type: 'Union',
+        required: true,
+        of: [Boolean, Date]
+      }
+    });
+
+    assert.deepStrictEqual(schema.toJSONSchema(), {
+      type: 'object',
+      required: ['requiredTest', '_id'],
+      properties: {
+        test: {
+          anyOf: [
+            { type: 'null' },
+            { type: 'number' },
+            { type: 'string' }
+          ]
+        },
+        requiredTest: {
+          anyOf: [
+            { type: 'boolean' },
+            { type: 'string' }
+          ]
+        },
+        _id: {
+          type: 'string'
+        }
+      }
+    });
+
+    assert.deepStrictEqual(schema.toJSONSchema({ useBsonType: true }), {
+      required: ['requiredTest', '_id'],
+      properties: {
+        test: {
+          anyOf: [
+            { bsonType: 'null' },
+            { bsonType: 'number' },
+            { bsonType: 'string' }
+          ]
+        },
+        requiredTest: {
+          anyOf: [
+            { bsonType: 'bool' },
+            { bsonType: 'date' }
+          ]
+        },
+        _id: {
+          bsonType: 'objectId'
+        }
+      }
+    });
+
+    const ajv = new Ajv();
+    const validate = ajv.compile(schema.toJSONSchema());
+
+    assert.ok(validate({ _id: 'test', test: null, requiredTest: true }));
+    assert.ok(validate({ _id: 'test', test: 42, requiredTest: true }));
+    assert.ok(validate({ _id: 'test', test: 'answer', requiredTest: '2025-06-01T00:00:00.000Z' }));
+    assert.ok(!validate({ _id: 'test', test: {}, requiredTest: true }));
+
+    const overlappingSchema = new Schema({
+      test: {
+        type: 'Union',
+        of: ['Int32', Number]
+      }
+    });
+    const overlappingValidate = ajv.compile(overlappingSchema.toJSONSchema());
+
+    assert.ok(overlappingValidate({ _id: 'test', test: 42 }));
   });
 });

@@ -3291,7 +3291,7 @@ describe('Model', function() {
 
   });
 
-  it('path is cast to correct value when retreived from db', async function() {
+  it('path is cast to correct value when retrieved from db', async function() {
     const schema = new Schema({ title: { type: 'string', index: true } });
     const T = db.model('Test', schema);
     await T.collection.insertOne({ title: 234 });
@@ -4341,7 +4341,7 @@ describe('Model', function() {
 
           let lastUse = session.serverSession.lastUse;
 
-          await delay(1);
+          await delay(10);
 
           const docs = await MyModel.find({ _id: doc._id }, null,
             { session: session });
@@ -4352,7 +4352,7 @@ describe('Model', function() {
           assert.ok(session.serverSession.lastUse > lastUse);
           lastUse = session.serverSession.lastUse;
 
-          await delay(1);
+          await delay(10);
 
           docs[0].name = 'test3';
 
@@ -9173,9 +9173,42 @@ describe('Model', function() {
         name: String
       });
       const Model = db.model('Test', schema);
-      assert.throws(() => {
-        Model.useConnection();
-      }, { message: 'Please provide a connection.' });
+      assert.throws(
+        () => Model.useConnection(),
+        { name: 'MongooseError', message: '`useConnection()` requires a Mongoose connection.' }
+      );
+    });
+
+    it('should throw a MongooseError if a non-connection object is passed (gh-16098)', function() {
+      const schema = new mongoose.Schema({ name: String });
+      const Model = db.model('Test', schema);
+      assert.throws(
+        () => Model.useConnection({}),
+        { name: 'MongooseError', message: '`useConnection()` requires a Mongoose connection.' }
+      );
+    });
+
+    it('should throw a MongooseError if null is passed (gh-16098)', function() {
+      const schema = new mongoose.Schema({ name: String });
+      const Model = db.model('Test', schema);
+      assert.throws(
+        () => Model.useConnection(null),
+        { name: 'MongooseError', message: '`useConnection()` requires a Mongoose connection.' }
+      );
+    });
+
+    it('should throw a MongooseError if mismatched Mongoose version (gh-16098)', function() {
+      const schema = new mongoose.Schema({ name: String });
+      const m = new mongoose.Mongoose();
+      m.version = '0.0.7';
+      const Model = db.model('Test', schema);
+      assert.throws(
+        () => Model.useConnection(m.connection),
+        {
+          name: 'MongooseError',
+          message: `The connection passed to \`useConnection()\` has a different version of Mongoose (0.0.7) than the model you are using (${mongoose.version}).`
+        }
+      );
     });
   });
 

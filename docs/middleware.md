@@ -581,16 +581,43 @@ Certain Mongoose hooks are synchronous, which means they do **not** support func
 Currently, only `init` hooks are synchronous, because the [`init()` function](api/document.html#document_Document-init) is synchronous.
 Below is an example of using pre and post init hooks.
 
-```acquit
-[require:post init hooks.*success]
+```javascript acquit:post init hooks.*success
+const schema = new Schema({ title: String, loadedAt: Date });
+
+schema.pre('init', pojo => {
+  assert.equal(pojo.constructor.name, 'Object'); // Plain object before init
+});
+
+const now = new Date();
+schema.post('init', doc => {
+  assert.ok(doc instanceof mongoose.Document); // Mongoose doc after init
+  doc.loadedAt = now;
+});
+
+const Test = db.model('Test', schema);
+
+return Test.create({ title: 'Casino Royale' }).
+  then(doc => Test.findById(doc)).
+  then(doc => assert.equal(doc.loadedAt.valueOf(), now.valueOf()));
 ```
 
 To report an error in an init hook, you must throw a **synchronous** error.
 Unlike all other middleware, init middleware does **not** handle promise
 rejections.
 
-```acquit
-[require:post init hooks.*error]
+```javascript acquit:post init hooks.*with errors
+const schema = new Schema({ title: String });
+
+const swallowedError = new Error('will not show');
+// init hooks do **not** handle async errors or any sort of async behavior
+schema.pre('init', () => Promise.reject(swallowedError));
+schema.post('init', () => { throw Error('will show'); });
+
+const Test = db.model('Test', schema);
+
+return Test.create({ title: 'Casino Royale' }).
+  then(doc => Test.findById(doc)).
+  catch(error => assert.equal(error.message, 'will show'));
 ```
 
 ## Skipping Middleware {#skipping}

@@ -3,6 +3,7 @@
 const start = require('./common');
 const util = require('./util');
 
+const Ajv = require('ajv');
 const assert = require('assert');
 
 const mongoose = start.mongoose;
@@ -157,5 +158,132 @@ describe('Union', function() {
     assert.strictEqual(found.arr.length, 2);
     assert.strictEqual(found.arr[0], numValue);
     assert.strictEqual(new Date(found.arr[1]).valueOf(), dateValue.valueOf());
+  });
+  it('does not bypass validation when a Union of Objects is used (gh-15732)', async function() {
+    const SubSchema1 = new Schema({
+      price: { type: Number, required: true },
+      title: { type: String },
+      isThisSchema1: { type: Boolean }
+    }, { _id: false });
+
+    const TestSchema = new Schema({
+      product: {
+        type: 'Union',
+        of: [SubSchema1, Number]
+      }
+    });
+
+    const TestModel = db.model('Test', TestSchema);
+
+    // This should fail validation because neither required 'price' nor 'description' are provided
+    const doc = new TestModel({
+      product: {
+        title: 'string',
+        arbitraryNeverSave: true,
+        isThisSchema1: true,
+        isThisSchema2: true
+      }
+    });
+
+    let err;
+    try {
+      await doc.validate();
+    } catch (e) {
+      err = e;
+    }
+
+    assert.ok(err, 'Expected validation error');
+    assert.ok(
+      err.errors['product.price'] || err.errors['product.description'] || err.errors['product'],
+      'Expected missing required property error'
+    );
+
+    const doc2 = new TestModel({
+      product: {
+        price: 42,
+        title: 'string',
+        arbitraryNeverSave: true,
+        isThisSchema1: true,
+        isThisSchema2: true
+      }
+    });
+    await doc2.validate();
+  });
+
+  it('supports toJSONSchema()', function() {
+    const schema = new Schema({
+      test: {
+        type: 'Union',
+        of: [Number, String]
+      },
+      requiredTest: {
+        type: 'Union',
+        required: true,
+        of: [Boolean, Date]
+      }
+    });
+
+    assert.deepStrictEqual(schema.toJSONSchema(), {
+      type: 'object',
+      required: ['requiredTest', '_id'],
+      properties: {
+        test: {
+          anyOf: [
+            { type: 'null' },
+            { type: 'number' },
+            { type: 'string' }
+          ]
+        },
+        requiredTest: {
+          anyOf: [
+            { type: 'boolean' },
+            { type: 'string' }
+          ]
+        },
+        _id: {
+          type: 'string'
+        }
+      }
+    });
+
+    assert.deepStrictEqual(schema.toJSONSchema({ useBsonType: true }), {
+      required: ['requiredTest', '_id'],
+      properties: {
+        test: {
+          anyOf: [
+            { bsonType: 'null' },
+            { bsonType: 'number' },
+            { bsonType: 'string' }
+          ]
+        },
+        requiredTest: {
+          anyOf: [
+            { bsonType: 'bool' },
+            { bsonType: 'date' }
+          ]
+        },
+        _id: {
+          bsonType: 'objectId'
+        }
+      }
+    });
+
+    const ajv = new Ajv();
+    const validate = ajv.compile(schema.toJSONSchema());
+
+    assert.ok(validate({ _id: 'test', test: null, requiredTest: true }));
+    assert.ok(validate({ _id: 'test', test: 42, requiredTest: true }));
+    assert.ok(validate({ _id: 'test', test: 'answer', requiredTest: '2025-06-01T00:00:00.000Z' }));
+    assert.ok(!validate({ _id: 'test', test: {}, requiredTest: true }));
+
+    const overlappingSchema = new Schema({
+      test: {
+        type: 'Union',
+        of: ['Int32', Number]
+      }
+    });
+    const overlappingValidate = ajv.compile(overlappingSchema.toJSONSchema());
+
+    assert.ok(overlappingValidate({ _id: 'test', test: 42 }));
   });
 });

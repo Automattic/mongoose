@@ -177,13 +177,25 @@ declare module 'mongoose' {
     HydratedDocPathsType,
     any,
     TOverrides extends Record<string, never> ?
-      Document<unknown, TQueryHelpers, RawDocType, TVirtuals, TSchemaOptions> & Default__v<Require_id<HydratedDocPathsType>, TSchemaOptions> & AddDefaultId<HydratedDocPathsType, {}, TSchemaOptions> :
+      Document<unknown, TQueryHelpers, RawDocType, TVirtuals, TSchemaOptions> &
+      Default__v<Require_id<HydratedDocPathsType>, TSchemaOptions> &
+      IfEquals<
+        TVirtuals,
+        {},
+        AddDefaultId<HydratedDocPathsType, {}, TSchemaOptions>,
+        TVirtuals
+      > :
       IfAny<
         TOverrides,
         Document<unknown, TQueryHelpers, RawDocType, TVirtuals, TSchemaOptions> & Default__v<Require_id<HydratedDocPathsType>, TSchemaOptions>,
         Document<unknown, TQueryHelpers, RawDocType, TVirtuals, TSchemaOptions> & MergeType<
           Default__v<Require_id<HydratedDocPathsType>, TSchemaOptions>,
-          TOverrides
+          IfEquals<
+            TOverrides,
+            {},
+            TOverrides,
+            TOverrides & AddDefaultId<HydratedDocPathsType, TVirtuals, TSchemaOptions>
+          >
         >
       >
   >;
@@ -1095,6 +1107,9 @@ declare module 'mongoose' {
     // Handle DocumentArray - recurse into items
     : T extends Types.DocumentArray<infer ItemType>
       ? Types.DocumentArray<ApplyFlattenTransforms<ItemType, O>>
+    // Handle plain arrays - recurse into items
+    : T extends Array<infer ItemType>
+      ? ApplyFlattenTransforms<ItemType, O>[]
     // Handle Subdocument - recurse into subdoc type
     : T extends Types.Subdocument<unknown, unknown, infer SubdocType>
       ? HydratedSingleSubdocument<ApplyFlattenTransforms<SubdocType, O>>

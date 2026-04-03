@@ -107,27 +107,23 @@ describe('Date Tutorial', function() {
       ]);
     });
 
-    it('date queries', function() {
+    it('date queries', async function() {
       // Find episodes that aired on this exact date
-      return Episode.find({ airedAt: new Date('1987-10-26') }).
-        then(episodes => {
-          episodes[0].title; // "Where No One Has Gone Before"
-          // acquit:ignore:start
-          assert.equal(episodes[0].title, 'Where No One Has Gone Before');
-          // acquit:ignore:end
-          // Find episodes within a range of dates, sorted by date ascending
-          return Episode.
-            find({ airedAt: { $gte: '1987-10-19', $lte: '1987-10-26' } }).
-            sort({ airedAt: 1 });
-        }).
-        then(episodes => {
-          episodes[0].title; // "The Last Outpost"
-          episodes[1].title; // "Where No One Has Gone Before"
-          // acquit:ignore:start
-          assert.equal(episodes[0].title, 'The Last Outpost');
-          assert.equal(episodes[1].title, 'Where No One Has Gone Before');
-          // acquit:ignore:end
-        });
+      const episodes = await Episode.find({ airedAt: new Date('1987-10-26') });
+      episodes[0].title; // "Where No One Has Gone Before"
+      // acquit:ignore:start
+      assert.equal(episodes[0].title, 'Where No One Has Gone Before');
+      // acquit:ignore:end
+      // Find episodes within a range of dates, sorted by date ascending
+      const sortedEpisodes = await Episode.
+        find({ airedAt: { $gte: '1987-10-19', $lte: '1987-10-26' } }).
+        sort({ airedAt: 1 });
+      sortedEpisodes[0].title; // "The Last Outpost"
+      sortedEpisodes[1].title; // "Where No One Has Gone Before"
+      // acquit:ignore:start
+      assert.equal(sortedEpisodes[0].title, 'The Last Outpost');
+      assert.equal(sortedEpisodes[1].title, 'Where No One Has Gone Before');
+      // acquit:ignore:end
     });
   });
 

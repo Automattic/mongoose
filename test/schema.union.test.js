@@ -3,6 +3,7 @@
 const start = require('./common');
 const util = require('./util');
 
+const Ajv = require('ajv');
 const assert = require('assert');
 
 const mongoose = start.mongoose;
@@ -228,8 +229,9 @@ describe('Union', function() {
       properties: {
         test: {
           oneOf: [
-            { type: ['number', 'null'] },
-            { type: ['string', 'null'] }
+            { type: 'null' },
+            { type: 'number' },
+            { type: 'string' }
           ]
         },
         requiredTest: {
@@ -249,8 +251,9 @@ describe('Union', function() {
       properties: {
         test: {
           oneOf: [
-            { bsonType: ['number', 'null'] },
-            { bsonType: ['string', 'null'] }
+            { bsonType: 'null' },
+            { bsonType: 'number' },
+            { bsonType: 'string' }
           ]
         },
         requiredTest: {
@@ -264,5 +267,13 @@ describe('Union', function() {
         }
       }
     });
+
+    const ajv = new Ajv();
+    const validate = ajv.compile(schema.toJSONSchema());
+
+    assert.ok(validate({ _id: 'test', test: null, requiredTest: true }));
+    assert.ok(validate({ _id: 'test', test: 42, requiredTest: true }));
+    assert.ok(validate({ _id: 'test', test: 'answer', requiredTest: '2025-06-01T00:00:00.000Z' }));
+    assert.ok(!validate({ _id: 'test', test: {}, requiredTest: true }));
   });
 });

@@ -1,4 +1,4 @@
-name: Encryption Tests 
+name: Encryption Tests
 
 on:
   pull_request:
@@ -38,13 +38,15 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Setup node
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
         with:
           node-version: 22
       - name: Install Dependencies
         run: npm install
       - name: Install mongodb-client-encryption
         run: npm install mongodb-client-encryption
+      - name: Run setup scripts for mongodb-client-encryption
+        run: pushd node_modules/mongodb-client-encryption && npm run install && popd
       - name: Setup Tests
         run: npm run setup-test-encryption
       - name: Run Tests

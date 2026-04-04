@@ -18,17 +18,34 @@ declare module 'mongoose' {
             ? DateQueryTypeCasting
             : T;
 
-  export type ApplyBasicQueryCasting<T> = QueryTypeCasting<T> | QueryTypeCasting<T[]> | (T extends (infer U)[] ? QueryTypeCasting<U> : T) | null;
+  export type ApplyBasicQueryCasting<T> = QueryTypeCasting<T> | QueryTypeCasting<T>[] | (T extends (infer U)[] ? QueryTypeCasting<U> : T) | null;
+
+  type RemoveIndexSignature<T> = {
+    [K in keyof T as string extends K ? never : number extends K ? never : symbol extends K ? never : K]: T[K];
+  };
+
+  type StrictFilterOperators<TValue> = RemoveIndexSignature<mongodb.FilterOperators<TValue>>;
+
+  type StrictCondition<T> = mongodb.AlternativeType<T> | StrictFilterOperators<mongodb.AlternativeType<T>>;
+
+  type _StrictFilter<TSchema> = {
+    [P in keyof TSchema]?: StrictCondition<ApplyBasicQueryCasting<TSchema[P]>>;
+  } & StrictRootFilterOperators<TSchema>;
+
+  type StrictRootFilterOperators<TSchema> = Omit<mongodb.RootFilterOperators<TSchema>, '$and' | '$or' | '$nor'> & {
+    $and?: _StrictFilter<TSchema>[];
+    $or?: _StrictFilter<TSchema>[];
+    $nor?: _StrictFilter<TSchema>[];
+  };
 
   type _QueryFilter<T> = (
-    { [P in keyof T]?: mongodb.Condition<ApplyBasicQueryCasting<T[P]>>; } &
-    mongodb.RootFilterOperators<{ [P in keyof mongodb.WithId<T>]?: ApplyBasicQueryCasting<mongodb.WithId<T>[P]>; }>
+    { [P in keyof T]?: StrictCondition<ApplyBasicQueryCasting<T[P]>>; } &
+    StrictRootFilterOperators<{ [P in keyof mongodb.WithId<T>]?: ApplyBasicQueryCasting<mongodb.WithId<T>[P]>; }>
   );
   type _QueryFilterLooseId<T> = (
-    { [P in keyof T]?: mongodb.Condition<ApplyBasicQueryCasting<T[P]>>; } &
-    mongodb.RootFilterOperators<
-      { [P in keyof T]?: ApplyBasicQueryCasting<T[P]>; } &
-      { _id?: any; }
+    { [P in keyof T]?: StrictCondition<ApplyBasicQueryCasting<T[P]>>; } &
+    StrictRootFilterOperators<
+      { [P in keyof T]?: ApplyBasicQueryCasting<T[P]>; }
     >
   );
   type QueryFilter<T> = IsItRecordAndNotAny<T> extends true ? _QueryFilter<WithLevel1NestedPaths<T>> : _QueryFilterLooseId<Record<string, any>>;
@@ -201,10 +218,10 @@ declare module 'mongoose' {
       ? ResultType
       : ResultType extends (infer U)[]
         ? U extends Document
-          ? HydratedDocument<MergeType<RawDocType, Paths>, TDocOverrides, TQueryHelpers>[]
+          ? PopulateDocumentResult<U, Paths, MergeType<RawDocType, Paths>, RawDocType>[]
           : (MergeType<U, Paths>)[]
         : ResultType extends Document
-          ? HydratedDocument<MergeType<RawDocType, Paths>, TDocOverrides, TQueryHelpers>
+          ? PopulateDocumentResult<ResultType, Paths, MergeType<RawDocType, Paths>, RawDocType>
           : MergeType<ResultType, Paths>
     : MergeType<ResultType, Paths>;
 

@@ -1,3 +1,31 @@
+9.4.1 / 2026-04-03
+==================
+ * Revert "fix(setDefaultsOnInsert): run setters on default values during upsert" #16218 #16051
+
+9.4.0 / 2026-04-03
+==================
+ * perf(document+model): avoid parallel save error instantiation, simplify resetting atomics, streamline validation and collection handling
+ * feat(document): add $getChanges() alias, deprecate getChanges() #15959 [techcodie](https://github.com/techcodie)
+ * fix(schema): support toJSONSchema on unions #16179
+ * fix(schema): implement validation for Union schemas and subdocuments [techcodie](https://github.com/techcodie)
+ * fix(connection): snapshot Date in heartbeat handler and flush queue on recovery #16183 [andreialecu](https://github.com/andreialecu)
+ * fix(model): use duck-typing with version check to validate the argument to useConnection() is actually a connection #16098
+ * fix(setDefaultsOnInsert): run setters on default values during upsert #16051 [mahmoodhamdi](https://github.com/mahmoodhamdi)
+ * fix(utils): properly compare Set objects in deepEqual [KhanjarSingh](https://github.com/KhanjarSingh)
+ * fix(utils): wrap discriminator merge check in parentheses to fix precedence [Necro-Rohan](https://github.com/Necro-Rohan)
+ * fix(schema): correct template literal in encryptionType error message [Mridul012](https://github.com/Mridul012)
+ * fix(schema): correct error when unsupported query operator with number #16062
+ * fix(types): make MergeType and UnpackedIntersection distributive over union types [techcodie](https://github.com/techcodie)
+ * types: add `id` to HydratedDocument virtuals by default unless explicitly set #16178
+ * types(populate): use marker type to track populated vs depopulated type for perf
+ * types(populate): retain populated paths in toObject() and toJSON() unless depopulate: true set #16085
+ * types(query): make TypeScript error on $and with unrecognized query operator
+ * chore: use TSTyche assertions [mrazauskas](https://github.com/mrazauskas)
+ * docs(connection): remove references to useUnifiedTopology and fix backtick
+ * docs: fix typo 'retreiving' -> 'retrieving' in SchemaType getter JSDoc [yogesh968](https://github.com/yogesh968)
+ * docs: fix typos around 'retrieve' in schemaType and tests [ayushshukla1807](https://github.com/ayushshukla1807)
+ * docs: fix typos in code comments [Goldyvaiiii](https://github.com/Goldyvaiiii)
+
 9.3.3 / 2026-03-25
 ==================
  * fix(schemaType): standardize to use MongooseError instead of plain Error #16172 [VIPAX-JIT](https://github.com/VIPAX-JIT)

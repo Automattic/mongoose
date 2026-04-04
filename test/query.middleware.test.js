@@ -190,7 +190,8 @@ describe('query middleware', function() {
       ++preCount;
     });
 
-    schema.post('countDocuments', function() {
+    schema.post('countDocuments', function(res) {
+      assert.equal(res, 1);
       ++postCount;
     });
 
@@ -213,7 +214,8 @@ describe('query middleware', function() {
       ++preCount;
     });
 
-    schema.post('estimatedDocumentCount', function() {
+    schema.post('estimatedDocumentCount', function(res) {
+      assert.equal(res, 1);
       ++postCount;
     });
 
@@ -236,7 +238,8 @@ describe('query middleware', function() {
       ++preCount;
     });
 
-    schema.post('updateOne', function() {
+    schema.post('updateOne', function(res) {
+      assert.equal(res.modifiedCount, 1);
       ++postCount;
     });
 
@@ -261,7 +264,8 @@ describe('query middleware', function() {
       ++preCount;
     });
 
-    schema.post('updateMany', function() {
+    schema.post('updateMany', function(res) {
+      assert.equal(res.modifiedCount, 2);
       ++postCount;
     });
 
@@ -287,7 +291,8 @@ describe('query middleware', function() {
       ++preCount;
     });
 
-    schema.post('deleteOne', function() {
+    schema.post('deleteOne', function(res) {
+      assert.equal(res.deletedCount, 1);
       ++postCount;
     });
 
@@ -313,7 +318,8 @@ describe('query middleware', function() {
       ++preCount;
     });
 
-    schema.post('deleteMany', function() {
+    schema.post('deleteMany', function(res) {
+      assert.equal(res.deletedCount, 2);
       ++postCount;
     });
 

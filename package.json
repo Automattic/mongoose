@@ -61,7 +61,7 @@
     "pug": "3.0.4",
     "sinon": "21.0.3",
     "tstyche": "^7.0.0-rc.0",
-    "typescript": "5.9.3",
+    "typescript": "6.0.2",
     "typescript-eslint": "^8.31.1",
     "uuid": "11.1.0"
   },

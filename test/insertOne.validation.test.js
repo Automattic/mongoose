@@ -74,16 +74,8 @@ describe('Model.insertOne() input validation', function() {
     assert.ok(threw, 'Expected insertOne() to throw but it did not');
   });
 
-  it('should NOT throw ObjectParameterError when doc is null', async function() {
-    let threw = false;
-    try {
-      await TestModel.insertOne(null);
-    } catch (err) {
-      if (err.name === 'ObjectParameterError') {
-        threw = true;
-      }
-    }
-    assert.ok(!threw, 'insertOne(null) should not throw ObjectParameterError');
+  it('should throw ObjectParameterError when doc is null', async function() {
+    await assert.rejects(() => TestModel.insertOne(null), /ObjectParameterError/);
   });
 
   it('should successfully insert a valid document', async function() {
@@ -100,15 +92,7 @@ describe('Model.insertOne() input validation', function() {
     assert.ok(result._id, 'Expected result to have an _id');
   });
 
-  it('should NOT throw ObjectParameterError when doc is undefined', async function() {
-    let threw = false;
-    try {
-      await TestModel.insertOne(undefined);
-    } catch (err) {
-      if (err.name === 'ObjectParameterError') {
-        threw = true;
-      }
-    }
-    assert.ok(!threw, 'insertOne(undefined) should not throw ObjectParameterError');
+  it('should throw ObjectParameterError when doc is undefined', async function() {
+    await assert.rejects(() => TestModel.insertOne(undefined), /ObjectParameterError/);
   });
 });

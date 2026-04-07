@@ -965,9 +965,9 @@ describe('model: findOneAndUpdate:', function() {
       const User = db.model('User', userSchema);
 
       const foundUser = await User.findOneAndUpdate(
-          { 'address.city': 'New York' },
-          { $setOnInsert: { firstName: 'John' }, $set: { lastName: 'Smith' } },
-          { upsert: true, new: true, setDefaultsOnInsert: true });
+        { 'address.city': 'New York' },
+        { $setOnInsert: { firstName: 'John' }, $set: { lastName: 'Smith' } },
+        { upsert: true, new: true, setDefaultsOnInsert: true });
 
       assert.equal(foundUser.lastName, 'Smith');
       assert.equal(foundUser.firstName, 'John');
@@ -984,9 +984,9 @@ describe('model: findOneAndUpdate:', function() {
       const User = db.model('User', userSchema);
 
       const foundUser = await User.findOneAndUpdate(
-          { firstName: 'John' },
-          { $set: { lastName: 'Smith' } },
-          { upsert: true, new: true, setDefaultsOnInsert: true });
+        { firstName: 'John' },
+        { $set: { lastName: 'Smith' } },
+        { upsert: true, new: true, setDefaultsOnInsert: true });
 
       assert.equal(foundUser.lastName, 'Smith');
       assert.equal(foundUser.firstName, 'John');

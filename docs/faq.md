@@ -248,6 +248,9 @@ mongoose.set('debug', { color: false });
 
 // get mongodb-shell friendly output (ISODate)
 mongoose.set('debug', { shell: true });
+
+// prefix debug output with an ISO timestamp in brackets
+mongoose.set('debug', { timestamp: true });
 ```
 
 For more debugging options (streams, callbacks), see the ['debug' option under `.set()`](api/mongoose.html#mongoose_Mongoose-set).

@@ -1,5 +1,5 @@
 import mongoose, { InferRawDocType, type InferRawDocTypeWithout_id, type ResolveTimestamps, type Schema, type Types, FlattenMaps } from 'mongoose';
-import { ExpectType } from './util/assertions';
+import { expect } from 'tstyche';
 
 function inferPojoType() {
   const schemaDefinition = {
@@ -20,9 +20,13 @@ function inferPojoType() {
     }
   };
 
-  type UserType = InferRawDocTypeWithout_id<typeof schemaDefinition>;
-  ExpectType<{ email: string, password: string, dateOfBirth: Date }>({} as UserType);
+  expect<InferRawDocTypeWithout_id<typeof schemaDefinition>>().type.toBe<{
+    email: string,
+    password: string,
+    dateOfBirth: Date
+  }>();
 }
+
 function gh14839() {
   const schemaDefinition = {
     email: {
@@ -42,8 +46,11 @@ function gh14839() {
     }
   };
 
-  type UserType = InferRawDocType< typeof schemaDefinition>;
-  ExpectType<{ email: string, password: string, dateOfBirth: Date } & { _id: Types.ObjectId }>({} as UserType);
+  expect<InferRawDocType<typeof schemaDefinition>>().type.toBe<{
+    email: string,
+    password: string,
+    dateOfBirth: Date,
+    _id: Types.ObjectId }>();
 }
 
 function optionality() {
@@ -57,8 +64,11 @@ function optionality() {
     }
   };
 
-  type UserType = InferRawDocType<typeof schemaDefinition>;
-  ExpectType<{ name: string; dateOfBirth?: number | null | undefined } & { _id: Types.ObjectId }>({} as UserType);
+  expect<InferRawDocType<typeof schemaDefinition>>().type.toBe<{
+    name: string;
+    dateOfBirth?: number | null | undefined,
+    _id: Types.ObjectId
+  }>();
 }
 
 type SchemaOptionsWithTimestamps<t> = {
@@ -80,12 +90,12 @@ function Timestamps() {
     }
   };
 
-  type UserType = InferRawDocType<typeof schemaDefinition, SchemaOptionsWithTimestamps<true>>;
-  type ExpectedUserType = {
+  expect<InferRawDocType<typeof schemaDefinition, SchemaOptionsWithTimestamps<true>>>().type.toBe<{
     name: string;
     dateOfBirth?: number | null | undefined;
-  } & { createdAt: NativeDate; updatedAt: NativeDate; } & { _id: Types.ObjectId };
-  ExpectType<ExpectedUserType>({} as UserType);
+    createdAt: NativeDate; updatedAt: NativeDate;
+    _id: Types.ObjectId }
+  >();
 
   type Resolved = ResolveTimestamps<
     { foo: true },
@@ -96,12 +106,7 @@ function Timestamps() {
     }
   >;
 
-  ExpectType<Resolved>(
-    {} as {
-      foo: true;
-      bar: NativeDate;
-    }
-  );
+  expect<Resolved>().type.toBe<{ foo: true; bar: NativeDate }>();
 }
 
 function DefinitionTypes() {
@@ -114,15 +119,15 @@ function DefinitionTypes() {
     schemaInstance: Schema.Types.String;
   }>;
 
-  type ExpectedActualType = {
+  expect<Actual>().type.toBe<{
     lowercaseString?: string | null | undefined;
     uppercaseString?: string | null | undefined;
     stringConstructor?: string | null | undefined;
     schemaConstructor?: string | null | undefined;
     stringInstance?: string | null | undefined;
     schemaInstance?: string | null | undefined;
-  } & { _id: Types.ObjectId };
-  ExpectType<ExpectedActualType>({} as Actual);
+    _id: Types.ObjectId
+  }>();
 }
 
 function MoreDefinitionTypes() {
@@ -135,27 +140,24 @@ function MoreDefinitionTypes() {
     objectIdInstance: Schema.Types.ObjectId;
   }>;
 
-  type ExpectedActualType = {
+  expect<Actual>().type.toBe<{
     numberString?: number | null | undefined;
     // these should not fallback to Boolean, which has no methods
     objectIdConstructor?: Types.ObjectId | null | undefined;
     objectIdInstance?: Types.ObjectId | null | undefined;
-  } & { _id: Types.ObjectId };
-  ExpectType<ExpectedActualType>({} as Actual);
+    _id: Types.ObjectId
+  }>();
 }
 
 function HandlesAny() {
-  type ActualShallow = InferRawDocType<any>;
-  ExpectType<{ [x: PropertyKey]: any } & { _id: unknown }>({} as ActualShallow);
-  type ActualNested = InferRawDocType<Record<string, any>>;
-  ExpectType<{ [x: string]: any } & { _id: unknown }>({} as ActualNested);
+  expect<InferRawDocType<any>>().type.toBe<{ [x: PropertyKey]: any; _id: unknown }>();
+  expect<InferRawDocType<Record<string, any>>>().type.toBe<{ [x: string]: any; _id: unknown }>();
 }
 
 function gh15699() {
   const schema = { unTypedArray: [] } as const;
 
-  type TSchema = InferRawDocType<typeof schema>;
-  ExpectType<any[] | null | undefined>({} as unknown as TSchema['unTypedArray']);
+  expect<InferRawDocType<typeof schema>['unTypedArray']>().type.toBe<any[] | null | undefined>();
 }
 
 function gh13772RawType() {
@@ -166,12 +168,10 @@ function gh13772RawType() {
     child: childSchema
   };
 
-  type RawParentDoc = InferRawDocType<typeof parentSchemaDef>;
-
-  ExpectType<{
+  expect<InferRawDocType<typeof parentSchemaDef>>().type.toBe<{
     children:(FlattenMaps<{ name?: string | null | undefined }> & { _id: Types.ObjectId })[];
     child?: (FlattenMaps<{ name?: string | null | undefined }> & { _id: Types.ObjectId }) | null | undefined;
-      } & { _id: Types.ObjectId }>({} as RawParentDoc);
+    _id: Types.ObjectId }>();
 }
 
 function gh13772WithIdFalse() {
@@ -182,12 +182,10 @@ function gh13772WithIdFalse() {
     child: childSchema
   };
 
-  type RawParentDoc = InferRawDocType<typeof parentSchemaDef>;
-
-  ExpectType<{
+  expect<InferRawDocType<typeof parentSchemaDef>>().type.toBe<{
     children: FlattenMaps<{ name?: string | null | undefined }>[];
     child?: FlattenMaps<{ name?: string | null | undefined }> | null | undefined;
-  } & { _id: Types.ObjectId }>({} as RawParentDoc);
+    _id: Types.ObjectId }>();
 }
 
 function gh13772WithSchemaCreate() {
@@ -198,12 +196,10 @@ function gh13772WithSchemaCreate() {
     child: childSchema
   };
 
-  type RawParentDoc = InferRawDocType<typeof parentSchemaDef>;
-
-  ExpectType<{
-    children:({ name?: string | null | undefined } & { _id: Types.ObjectId })[];
-    child?: ({ name?: string | null | undefined } & { _id: Types.ObjectId }) | null | undefined;
-      } & { _id: Types.ObjectId }>({} as RawParentDoc);
+  expect<InferRawDocType<typeof parentSchemaDef>>().type.toBe<{
+    children:({ name?: string | null | undefined; _id: Types.ObjectId })[];
+    child?: ({ name?: string | null | undefined; _id: Types.ObjectId }) | null | undefined;
+    _id: Types.ObjectId }>();
 }
 
 function gh13772WithSchemaCreateIdFalse() {
@@ -214,13 +210,11 @@ function gh13772WithSchemaCreateIdFalse() {
     child: childSchema
   };
 
-  type RawParentDoc = InferRawDocType<typeof parentSchemaDef>;
-
   // Schema.create with _id: false - child subdocs should not have _id
-  ExpectType<{
+  expect<InferRawDocType<typeof parentSchemaDef>>().type.toBe<{
     children: { name?: string | null | undefined }[];
     child?: { name?: string | null | undefined } | null | undefined;
-  } & { _id: Types.ObjectId }>({} as RawParentDoc);
+    _id: Types.ObjectId }>();
 }
 
 function gh13772WithExplicitDocType() {
@@ -232,13 +226,11 @@ function gh13772WithExplicitDocType() {
     child: childSchema
   };
 
-  type RawParentDoc = InferRawDocType<typeof parentSchemaDef>;
-
   // Explicit DocType is used directly as RawDocType
-  ExpectType<{
+  expect<InferRawDocType<typeof parentSchemaDef>>().type.toBe<{
     children: ChildDocType[];
     child?: ChildDocType | null | undefined;
-  } & { _id: Types.ObjectId }>({} as RawParentDoc);
+    _id: Types.ObjectId }>();
 }
 
 function gh13772WithExplicitDocTypeIdFalse() {
@@ -250,13 +242,11 @@ function gh13772WithExplicitDocTypeIdFalse() {
     child: childSchema
   };
 
-  type RawParentDoc = InferRawDocType<typeof parentSchemaDef>;
-
   // Explicit DocType is used directly as RawDocType
-  ExpectType<{
+  expect<InferRawDocType<typeof parentSchemaDef>>().type.toBe<{
     children: ChildDocType[];
     child?: ChildDocType | null | undefined;
-  } & { _id: Types.ObjectId }>({} as RawParentDoc);
+    _id: Types.ObjectId }>();
 }
 
 function gh15988() {
@@ -278,13 +268,11 @@ function gh15988() {
     }
   } as const;
 
-  type Location = InferRawDocType<typeof locationSchemaDef>;
-
   // Nested paths should not have _id added
-  ExpectType<{
+  expect<InferRawDocType<typeof locationSchemaDef>>().type.toBe<{
     name: string;
     coordinates?: { latitude: number; longitude: number } | null | undefined;
-  } & { _id: Types.ObjectId }>({} as Location);
+    _id: Types.ObjectId }>();
 
   // Test subdocument (has type key with object value) - should have _id
   const schemaDef2 = {
@@ -300,13 +288,11 @@ function gh15988() {
     }
   } as const;
 
-  type Doc2 = InferRawDocType<typeof schemaDef2>;
-
   // Subdocuments (defined with type: {...}) should have _id added
-  ExpectType<{
+  expect<InferRawDocType<typeof schemaDef2>>().type.toBe<{
     name: string;
-    data: { role?: string | null | undefined } & { _id: Types.ObjectId };
-  } & { _id: Types.ObjectId }>({} as Doc2);
+    data: { role?: string | null | undefined; _id: Types.ObjectId };
+    _id: Types.ObjectId }>();
 
   // Test subdocument with _id: false - should NOT have _id
   const schemaDef3 = {
@@ -330,13 +316,11 @@ function gh15988() {
     }
   } as const;
 
-  type Doc3 = InferRawDocType<typeof schemaDef3>;
-
   // Subdocuments with _id: false should not have _id added
-  ExpectType<{
+  expect<InferRawDocType<typeof schemaDef3>>().type.toBe<{
     name: string;
     coordinates: { latitude: number; longitude: number };
-  } & { _id: Types.ObjectId }>({} as Doc3);
+    _id: Types.ObjectId }>();
 
   // Test subdocument (has type key with object value) with no options - should have _id
   const schemaDef4 = {
@@ -351,13 +335,11 @@ function gh15988() {
     }
   } as const;
 
-  type Doc4 = InferRawDocType<typeof schemaDef4>;
-
   // Subdocuments (defined with type: {...}) should have _id added, but optional since no `required` or `default`
-  ExpectType<{
+  expect<InferRawDocType<typeof schemaDef4>>().type.toBe<{
     name: string;
-    data?:({ role?: string | null | undefined } & { _id: Types.ObjectId }) | null | undefined;
-      } & { _id: Types.ObjectId }>({} as Doc4);
+    data?:({ role?: string | null | undefined; _id: Types.ObjectId }) | null | undefined;
+    _id: Types.ObjectId }>();
 
   // Test 1: Array of subdocuments - should have _id
   const schemaDef5 = {
@@ -367,12 +349,10 @@ function gh15988() {
     }]
   } as const;
 
-  type Doc5 = InferRawDocType<typeof schemaDef5>;
-
   // Arrays of subdocuments should have _id added to each element
-  ExpectType<{
-    users?: Array<{ name: string; email?: string | null | undefined } & { _id: Types.ObjectId }> | null | undefined;
-  } & { _id: Types.ObjectId }>({} as Doc5);
+  expect<InferRawDocType<typeof schemaDef5>>().type.toBe<{
+    users?: Array<{ name: string; email?: string | null | undefined; _id: Types.ObjectId }> | null | undefined;
+    _id: Types.ObjectId }>();
 
   // Test 2: Array of nested paths (no type key in array element) - should have _id (arrays are always subdocs)
   const schemaDef6 = {
@@ -382,12 +362,10 @@ function gh15988() {
     }]
   } as const;
 
-  type Doc6 = InferRawDocType<typeof schemaDef6>;
-
   // Arrays of objects are subdocuments, so they get _id
-  ExpectType<{
-    locations?: Array<{ latitude?: number | null | undefined; longitude?: number | null | undefined } & { _id: Types.ObjectId }> | null | undefined;
-  } & { _id: Types.ObjectId }>({} as Doc6);
+  expect<InferRawDocType<typeof schemaDef6>>().type.toBe<{
+    locations?: Array<{ latitude?: number | null | undefined; longitude?: number | null | undefined; _id: Types.ObjectId }> | null | undefined;
+    _id: Types.ObjectId }>();
 
   // Test 3: Custom typeKey - nested path should not have _id
   const schemaDef7 = {
@@ -407,13 +385,11 @@ function gh15988() {
     }
   } as const;
 
-  type Doc7 = InferRawDocType<typeof schemaDef7, { typeKey: '$type' }>;
-
   // With custom typeKey, nested paths (no $type key) should still not have _id
-  ExpectType<{
+  expect<InferRawDocType<typeof schemaDef7, { typeKey: '$type' }>>().type.toBe<{
     name: string;
     coordinates?: { latitude: number; longitude: number } | null | undefined;
-  } & { _id: Types.ObjectId }>({} as Doc7);
+    _id: Types.ObjectId }>();
 
   // Test 4: Custom typeKey - subdocument should have _id
   const schemaDef8 = {
@@ -429,13 +405,11 @@ function gh15988() {
     }
   } as const;
 
-  type Doc8 = InferRawDocType<typeof schemaDef8, { typeKey: '$type' }>;
-
   // With custom typeKey, subdocuments (with $type key) should have _id
-  ExpectType<{
+  expect<InferRawDocType<typeof schemaDef8, { typeKey: '$type' }>>().type.toBe<{
     name: string;
-    data: { role?: string | null | undefined } & { _id: Types.ObjectId };
-  } & { _id: Types.ObjectId }>({} as Doc8);
+    data: { role?: string | null | undefined; _id: Types.ObjectId };
+    _id: Types.ObjectId }>();
 }
 
 async function gh16053() {
@@ -460,7 +434,7 @@ async function gh16053() {
   async function queryById(id: string) {
     TestModel.findById(id).lean().then(result => {
       if (result) {
-        ExpectType<FlattenMaps<TestType> & { _id: Types.ObjectId }>(result);
+        expect(result).type.toBe<FlattenMaps<TestType> & { _id: Types.ObjectId, __v: number }>();
         console.log(result._id);
       }
     });

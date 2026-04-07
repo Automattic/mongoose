@@ -8,6 +8,7 @@ import mongoose, {
   InferSchemaType,
   InsertManyResult,
   Model,
+  ModifyResult,
   Query,
   Schema,
   Types,
@@ -20,8 +21,8 @@ import mongoose, {
   UpdateManyModel
 } from 'mongoose';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
-import { ModifyResult, UpdateOneModel as MongoUpdateOneModel, ChangeStreamInsertDocument, ObjectId } from 'mongodb';
-import { ExpectAssignable, ExpectType } from './util/assertions';
+import { UpdateOneModel as MongoUpdateOneModel, ChangeStreamInsertDocument, ObjectId } from 'mongodb';
+import { expect } from 'tstyche';
 
 function rawDocSyntax(): void {
   interface ITest {
@@ -40,7 +41,7 @@ function rawDocSyntax(): void {
 
   const Test = connection.model<ITest, TestModel>('Test', TestSchema);
 
-  ExpectType<Model<ITest, {}, ITestMethods, {}>>(Test);
+  expect(Test).type.toBe<Model<ITest, {}, ITestMethods, {}>>();
 
   const doc = new Test({ foo: '42' });
   console.log(doc.foo);
@@ -81,10 +82,10 @@ async function insertManyTest() {
   });
 
   const res = await Test.insertMany([{ foo: 'bar' }], { rawResult: true });
-  ExpectType<Types.ObjectId>(res.insertedIds[0]);
+  expect(res.insertedIds[0]).type.toBe<Types.ObjectId>();
 
   const res2 = await Test.insertMany([{ foo: 'bar' }], { ordered: false, rawResult: true });
-  ExpectAssignable<Error | Object | ReturnType<(typeof Test)['hydrate']>>()(res2.mongoose.results[0]);
+  expect(res2.mongoose.results[0]).type.toBe<Error | Object | ReturnType<(typeof Test)['hydrate']>>();
 }
 
 function gh13930() {
@@ -139,10 +140,10 @@ async function gh10359() {
 
   async function foo(model: Model<User, {}, {}, {}>) {
     const doc = await model.findOne({ groupId: 'test' }).orFail().lean().exec();
-    ExpectType<string>(doc.firstName);
-    ExpectType<string>(doc.lastName);
-    ExpectType<Types.ObjectId>(doc._id);
-    ExpectType<string>(doc.groupId);
+    expect(doc.firstName).type.toBe<string>();
+    expect(doc.lastName).type.toBe<string>();
+    expect(doc._id).type.toBe<Types.ObjectId>();
+    expect(doc.groupId).type.toBe<string>();
     return doc;
   }
 
@@ -251,8 +252,7 @@ function inheritance() {
 
 Project.createCollection({ expires: '5 seconds' });
 Project.createCollection({ expireAfterSeconds: 5 });
-// @ts-expect-error  Type 'string' is not assignable to type 'number'.
-Project.createCollection({ expireAfterSeconds: '5 seconds' });
+expect(Project.createCollection).type.not.toBeCallableWith({ expireAfterSeconds: '5 seconds' });
 
 function bulkWrite() {
 
@@ -342,11 +342,10 @@ async function overwriteBulkWriteContents() {
 
   const BaseModel = model<BaseModelClassDoc>('test', baseModelClassSchema);
 
-  BaseModel.bulkWrite<{ testy: string }>([
+  expect(BaseModel.bulkWrite<{ testy: string }>).type.not.toBeCallableWith([
     {
       insertOne: {
         document: {
-          // @ts-expect-error  'test' does not exist in type 'OptionalId<{ testy: string; }>'.
           test: 'hello'
         }
       }
@@ -382,22 +381,22 @@ export function autoTypedModel() {
   // Model-functions-test
   // Create should works with arbitrary objects.
     const randomObject = await AutoTypedModel.create({ unExistKey: 'unExistKey', description: 'st' } as Partial<InferSchemaType<typeof AutoTypedSchema>>);
-    ExpectType<AutoTypedSchemaType['schema']['userName']>(randomObject.userName);
+    expect(randomObject.userName).type.toBe<AutoTypedSchemaType['schema']['userName']>();
 
     const testDoc1 = await AutoTypedModel.create({ userName: 'M0_0a' });
-    ExpectType<AutoTypedSchemaType['schema']['userName']>(testDoc1.userName);
-    ExpectType<AutoTypedSchemaType['schema']['description']>(testDoc1.description);
+    expect(testDoc1.userName).type.toBe<AutoTypedSchemaType['schema']['userName']>();
+    expect(testDoc1.description).type.toBe<AutoTypedSchemaType['schema']['description']>();
 
     const testDoc2 = await AutoTypedModel.insertMany([{ userName: 'M0_0a' }]);
-    ExpectType<AutoTypedSchemaType['schema']['userName']>(testDoc2[0].userName);
-    ExpectType<AutoTypedSchemaType['schema']['description'] | undefined>(testDoc2[0]?.description);
+    expect(testDoc2[0].userName).type.toBe<AutoTypedSchemaType['schema']['userName']>();
+    expect(testDoc2[0].description).type.toBe<AutoTypedSchemaType['schema']['description'] | undefined>();
 
     const testDoc3 = await AutoTypedModel.findOne({ userName: 'M0_0a' });
-    ExpectType<AutoTypedSchemaType['schema']['userName'] | undefined>(testDoc3?.userName);
-    ExpectType<AutoTypedSchemaType['schema']['description'] | undefined>(testDoc3?.description);
+    expect(testDoc3?.userName).type.toBe<AutoTypedSchemaType['schema']['userName'] | undefined>();
+    expect(testDoc3?.description).type.toBe<AutoTypedSchemaType['schema']['description'] | undefined>();
 
     // Model-statics-functions-test
-    ExpectType<ReturnType<AutoTypedSchemaType['statics']['staticFn']>>(AutoTypedModel.staticFn());
+    expect(AutoTypedModel.staticFn()).type.toBe<ReturnType<AutoTypedSchemaType['statics']['staticFn']>>();
 
   })();
   return AutoTypedModel;
@@ -415,10 +414,10 @@ function gh11911() {
   const Animal = model<IAnimal>('Animal', animalSchema);
 
   const changes: UpdateQuery<IAnimal> = {};
-  ExpectAssignable<MongoUpdateOneModel>()({
+  expect({
     filter: {},
     update: changes
-  });
+  }).type.toBeAssignableTo<MongoUpdateOneModel>();
 }
 
 
@@ -492,7 +491,7 @@ function gh12100() {
   const TestModel = model('test', schema_with_string_id);
   const obj = new TestModel();
 
-  ExpectType<string | null>(obj._id);
+  expect(obj._id).type.toBe<string | null>();
 })();
 
 (async function gh12094() {
@@ -505,7 +504,7 @@ function gh12100() {
   const User = model('User', userSchema);
 
   const doc = await User.exists({ name: 'Bill' }).orFail();
-  ExpectType<Types.ObjectId>(doc._id);
+  expect(doc._id).type.toBe<Types.ObjectId>();
 })();
 
 
@@ -529,7 +528,7 @@ async function gh12286() {
   if (user == null) {
     return;
   }
-  ExpectType<string>(user.name);
+  expect(user.name).type.toBe<string>();
 }
 
 
@@ -556,7 +555,7 @@ async function gh12347() {
   const User = model<IUser>('User', schema);
 
   const replaceOneResult = await User.replaceOne({}, {});
-  ExpectType<UpdateWriteOpResult>(replaceOneResult);
+  expect(replaceOneResult).type.toBe<UpdateWriteOpResult>();
 }
 
 async function gh12319() {
@@ -583,7 +582,7 @@ async function gh12319() {
     typeof projectSchema
   >;
 
-  ExpectAssignable<ProjectModelHydratedDoc>()(await ProjectModel.findOne().orFail());
+  expect(await ProjectModel.findOne().orFail()).type.toBe<ProjectModelHydratedDoc>();
 }
 
 function findWithId() {
@@ -596,9 +595,9 @@ function findWithId() {
 function gh12573ModelAny() {
   const TestModel = model<any>('Test', new Schema({}));
   const doc = new TestModel();
-  ExpectType<any>(doc);
+  expect(doc).type.toBe<any>();
   const { fieldA } = doc;
-  ExpectType<any>(fieldA);
+  expect(fieldA).type.toBe<any>();
 }
 
 function aggregateOptionsTest() {
@@ -623,9 +622,9 @@ async function gh13151() {
 
   const TestModel = model<ITest>('Test', TestSchema);
   const test = await TestModel.findOne().lean();
-  ExpectType<ITest & { _id: Types.ObjectId } & { __v: number } | null>(test);
+  expect(test).type.toBe<ITest & { _id: Types.ObjectId, __v: number } | null>();
   if (!test) return;
-  ExpectType<ITest & { _id: Types.ObjectId } & { __v: number }>(test);
+  expect(test).type.toBe<ITest & { _id: Types.ObjectId, __v: number }>();
 }
 
 function gh13206() {
@@ -635,7 +634,7 @@ function gh13206() {
   const TestSchema = new Schema({ name: String });
   const TestModel = model<ITest>('Test', TestSchema);
   TestModel.watch<ITest, ChangeStreamInsertDocument<ITest>>([], { fullDocument: 'updateLookup' }).on('change', (change) => {
-    ExpectType<ChangeStreamInsertDocument<ITest>>(change);
+    expect(change).type.toBe<ChangeStreamInsertDocument<ITest>>();
   });
 }
 
@@ -664,31 +663,31 @@ async function gh13705() {
   type ExpectedLeanDoc = (mongoose.FlattenMaps<{ name?: string | null }> & { _id: mongoose.Types.ObjectId } & { __v: number });
 
   const findByIdRes = await TestModel.findById('0'.repeat(24), undefined, { lean: true });
-  ExpectType<ExpectedLeanDoc | null>(findByIdRes);
+  expect(findByIdRes).type.toBe<ExpectedLeanDoc | null>();
 
   const findOneRes = await TestModel.findOne({ _id: '0'.repeat(24) }, undefined, { lean: true });
-  ExpectType<ExpectedLeanDoc | null>(findOneRes);
+  expect(findOneRes).type.toBe<ExpectedLeanDoc | null>();
 
   const findRes = await TestModel.find({ _id: '0'.repeat(24) }, undefined, { lean: true });
-  ExpectType<ExpectedLeanDoc[]>(findRes);
+  expect(findRes).type.toBe<ExpectedLeanDoc[]>();
 
   const findByIdAndDeleteRes = await TestModel.findByIdAndDelete('0'.repeat(24), { lean: true });
-  ExpectType<ExpectedLeanDoc | null>(findByIdAndDeleteRes);
+  expect(findByIdAndDeleteRes).type.toBe<ExpectedLeanDoc | null>();
 
   const findByIdAndUpdateRes = await TestModel.findByIdAndUpdate('0'.repeat(24), {}, { lean: true });
-  ExpectType<ExpectedLeanDoc | null>(findByIdAndUpdateRes);
+  expect(findByIdAndUpdateRes).type.toBe<ExpectedLeanDoc | null>();
 
   const findOneAndDeleteRes = await TestModel.findOneAndDelete({ _id: '0'.repeat(24) }, { lean: true });
-  ExpectType<ExpectedLeanDoc | null>(findOneAndDeleteRes);
+  expect(findOneAndDeleteRes).type.toBe<ExpectedLeanDoc | null>();
 
   const findOneAndReplaceRes = await TestModel.findOneAndReplace({ _id: '0'.repeat(24) }, {}, { lean: true });
-  ExpectType<ExpectedLeanDoc | null>(findOneAndReplaceRes);
+  expect(findOneAndReplaceRes).type.toBe<ExpectedLeanDoc | null>();
 
   const findOneAndUpdateRes = await TestModel.findOneAndUpdate({}, {}, { lean: true });
-  ExpectType<ExpectedLeanDoc | null>(findOneAndUpdateRes);
+  expect(findOneAndUpdateRes).type.toBe<ExpectedLeanDoc | null>();
 
   const findOneAndUpdateResWithMetadata = await TestModel.findOneAndUpdate({}, {}, { lean: true, includeResultMetadata: true });
-  ExpectAssignable<ModifyResult<ExpectedLeanDoc>>()(findOneAndUpdateResWithMetadata);
+  expect(findOneAndUpdateResWithMetadata).type.toBe<ModifyResult<{ name?: string | null | undefined }>>();
 }
 
 async function gh13746() {
@@ -698,29 +697,29 @@ async function gh13746() {
   type OkType = 0 | 1;
 
   const findByIdAndUpdateRes = await TestModel.findByIdAndUpdate('0'.repeat(24), {}, { includeResultMetadata: true });
-  ExpectType<boolean | undefined>(findByIdAndUpdateRes.lastErrorObject?.updatedExisting);
-  ExpectType<ObjectId | undefined>(findByIdAndUpdateRes.lastErrorObject?.upserted);
-  ExpectType<OkType>(findByIdAndUpdateRes.ok);
+  expect(findByIdAndUpdateRes.lastErrorObject?.updatedExisting).type.toBe<boolean | undefined>();
+  expect(findByIdAndUpdateRes.lastErrorObject?.upserted).type.toBe<ObjectId | undefined>();
+  expect(findByIdAndUpdateRes.ok).type.toBe<OkType>();
 
   const findOneAndReplaceRes = await TestModel.findOneAndReplace({ _id: '0'.repeat(24) }, {}, { includeResultMetadata: true });
-  ExpectType<boolean | undefined>(findOneAndReplaceRes.lastErrorObject?.updatedExisting);
-  ExpectType<ObjectId | undefined>(findOneAndReplaceRes.lastErrorObject?.upserted);
-  ExpectType<OkType>(findOneAndReplaceRes.ok);
+  expect(findOneAndReplaceRes.lastErrorObject?.updatedExisting).type.toBe<boolean | undefined>();
+  expect(findOneAndReplaceRes.lastErrorObject?.upserted).type.toBe<ObjectId | undefined>();
+  expect(findOneAndReplaceRes.ok).type.toBe<OkType>();
 
   const findOneAndUpdateRes = await TestModel.findOneAndUpdate({ _id: '0'.repeat(24) }, {}, { includeResultMetadata: true });
-  ExpectType<boolean | undefined>(findOneAndUpdateRes.lastErrorObject?.updatedExisting);
-  ExpectType<ObjectId | undefined>(findOneAndUpdateRes.lastErrorObject?.upserted);
-  ExpectType<OkType>(findOneAndUpdateRes.ok);
+  expect(findOneAndUpdateRes.lastErrorObject?.updatedExisting).type.toBe<boolean | undefined>();
+  expect(findOneAndUpdateRes.lastErrorObject?.upserted).type.toBe<ObjectId | undefined>();
+  expect(findOneAndUpdateRes.ok).type.toBe<OkType>();
 
   const findOneAndDeleteRes = await TestModel.findOneAndDelete({ _id: '0'.repeat(24) }, { includeResultMetadata: true });
-  ExpectType<boolean | undefined>(findOneAndDeleteRes.lastErrorObject?.updatedExisting);
-  ExpectType<ObjectId | undefined>(findOneAndDeleteRes.lastErrorObject?.upserted);
-  ExpectType<OkType>(findOneAndDeleteRes.ok);
+  expect(findOneAndDeleteRes.lastErrorObject?.updatedExisting).type.toBe<boolean | undefined>();
+  expect(findOneAndDeleteRes.lastErrorObject?.upserted).type.toBe<ObjectId | undefined>();
+  expect(findOneAndDeleteRes.ok).type.toBe<OkType>();
 
   const findByIdAndDeleteRes = await TestModel.findByIdAndDelete('0'.repeat(24), { includeResultMetadata: true });
-  ExpectType<boolean | undefined>(findByIdAndDeleteRes.lastErrorObject?.updatedExisting);
-  ExpectType<ObjectId | undefined>(findByIdAndDeleteRes.lastErrorObject?.upserted);
-  ExpectType<OkType>(findByIdAndDeleteRes.ok);
+  expect(findByIdAndDeleteRes.lastErrorObject?.updatedExisting).type.toBe<boolean | undefined>();
+  expect(findByIdAndDeleteRes.lastErrorObject?.upserted).type.toBe<ObjectId | undefined>();
+  expect(findByIdAndDeleteRes.ok).type.toBe<OkType>();
 }
 
 function gh13904() {
@@ -731,13 +730,13 @@ function gh13904() {
   }
   const Test = model<ITest>('Test', schema);
 
-  ExpectAssignable<Promise<InsertManyResult<ITest>>>()(Test.insertMany(
+  expect(Test.insertMany(
     [{ name: 'test' }],
     {
       ordered: false,
       rawResult: true
     }
-  ));
+  )).type.toBeAssignableTo<Promise<InsertManyResult<ITest>>>();
 }
 
 function gh13957() {
@@ -761,7 +760,7 @@ function gh13957() {
   const schema = new Schema({ name: { type: String, required: true } });
   const TestModel = model('Test', schema);
   const repository = new RepositoryBase<ITest>(TestModel);
-  ExpectType<Promise<ITest[]>>(repository.insertMany([{ name: 'test' }]));
+  expect(repository.insertMany([{ name: 'test' }])).type.toBe<Promise<ITest[]>>();
 }
 
 function gh13897() {
@@ -780,11 +779,8 @@ function gh13897() {
 
   const Document = model<IDocument>('Document', documentSchema);
   const doc = new Document({ name: 'foo' });
-  ExpectType<Date>(doc.createdAt);
-  new Document<IDocument>(
-    // @ts-expect-error  Type '{ name: string; }' is missing the following properties from type 'IDocument': createdAt, updatedAt
-    { name: 'foo' }
-  );
+  expect(doc.createdAt).type.toBe<Date>();
+  expect(Document<IDocument>).type.not.toBeConstructableWith({ name: 'foo' });
 }
 
 async function gh14026() {
@@ -795,14 +791,14 @@ async function gh14026() {
   const FooModel = mongoose.model<Foo>('Foo', new mongoose.Schema<Foo>({ bar: [String] }));
 
   const distinctBar = await FooModel.distinct('bar');
-  ExpectType<string[]>(distinctBar);
+  expect(distinctBar).type.toBe<string[]>();
 
   const TestModel = mongoose.model(
     'Test',
     new mongoose.Schema({ bar: [String] })
   );
 
-  ExpectType<string[]>(await TestModel.distinct('bar'));
+  expect(await TestModel.distinct('bar')).type.toBe<string[]>();
 }
 
 async function gh14072() {
@@ -865,7 +861,7 @@ async function gh14114() {
   const Test = mongoose.model('Test', schema);
 
   const doc = await Test.findOneAndDelete({ name: 'foo' });
-  ExpectType<ReturnType<(typeof Test)['hydrate']> | null>(doc);
+  expect(doc).type.toBe<ReturnType<(typeof Test)['hydrate']> | null>();
 }
 
 async function gh13999() {
@@ -932,14 +928,10 @@ async function gh12064() {
 
   const MyRecord = model('MyRecord', MyRecordSchema);
 
-  ExpectType<(string | null)[]>(
-    await MyRecord.distinct('foo.one').exec()
-  );
-  ExpectType<(string | null)[]>(
-    await MyRecord.find().distinct('foo.one').exec()
-  );
-  ExpectType<unknown[]>(await MyRecord.distinct('foo.two').exec());
-  ExpectType<unknown[]>(await MyRecord.distinct('arr.0').exec());
+  expect(await MyRecord.distinct('foo.one').exec()).type.toBe<(string | null)[]>();
+  expect(await MyRecord.find().distinct('foo.one').exec()).type.toBe<(string | null)[]>();
+  expect(await MyRecord.distinct('foo.two').exec()).type.toBe<unknown[]>();
+  expect(await MyRecord.distinct('arr.0').exec()).type.toBe<unknown[]>();
 }
 
 function testWithLevel1NestedPaths() {
@@ -960,7 +952,7 @@ function testWithLevel1NestedPaths() {
     nested2Level: { l2: { l3: boolean } },
     'nested2Level.l2': { l3: boolean }
   };
-  ExpectType<ExpectedTest1Type>({} as Test1);
+  expect<Test1>().type.toBe<ExpectedTest1Type>();
 
   const FooSchema = new Schema({
     one: { type: String }
@@ -979,11 +971,11 @@ function testWithLevel1NestedPaths() {
     foo: { one?: string | null | undefined },
     'foo.one': string | null | undefined
   };
-  ExpectType<ExpectedTest2Type>({} as Test2);
-  ExpectType<string>({} as Test2['_id']);
-  ExpectType<{ one?: string | null | undefined }>({} as Test2['foo']);
-  ExpectType<string | null | undefined>({} as Test2['foo.one']);
-  ExpectType<'_id' | 'foo' | 'foo.one'>({} as keyof Test2);
+  expect<Test2>().type.toBe<ExpectedTest2Type>();
+  expect<Test2['_id']>().type.toBe<string>();
+  expect<Test2['foo']>().type.toBe<{ one?: string | null | undefined }>();
+  expect<Test2['foo.one']>().type.toBe<string | null | undefined>();
+  expect<keyof Test2>().type.toBe<'_id' | 'foo' | 'foo.one'>();
 }
 
 async function gh14802() {
@@ -1003,7 +995,7 @@ async function gh14843() {
   const Model = model('Test', schema);
 
   const doc = await Model.insertOne({ name: 'taco' });
-  ExpectType<ReturnType<(typeof Model)['hydrate']>>(doc);
+  expect(doc).type.toBe<ReturnType<(typeof Model)['hydrate']>>();
 }
 
 async function gh15369() {
@@ -1065,9 +1057,9 @@ async function gh15437() {
 
   // Test hydrating with string projection
   const doc1 = PersonModel.hydrate(data, 'name age');
-  ExpectType<string>(doc1.name);
-  ExpectType<number>(doc1.age);
-  ExpectAssignable<undefined | null | string>()(doc1.address);
+  expect(doc1.name).type.toBe<string>();
+  expect(doc1.age).type.toBe<number>();
+  expect(doc1.address).type.toBe<string>();
 }
 
 async function customModelInstanceWithStatics() {
@@ -1078,7 +1070,7 @@ async function customModelInstanceWithStatics() {
     {
       statics: {
         function() {
-          ExpectType<number>(this.someCustomProp);
+          expect(this.someCustomProp).type.toBe<number>();
         }
       }
     }
@@ -1090,7 +1082,7 @@ async function gh16526() {
   const Tank = model('Tank', schema);
 
   const insertManyResult = await Tank.insertMany([{ name: 'test' }], { lean: true, rawResult: true });
-  ExpectType<number>(insertManyResult.insertedCount);
+  expect(insertManyResult.insertedCount).type.toBe<number>();
 }
 
 async function gh15693() {
@@ -1106,23 +1098,19 @@ async function gh15693() {
 
   const schema = new Schema<IUser, Model<IUser>, UserMethods>({ name: { type: String, required: true } });
   schema.method('printNamePrefixed', function printName(this: IUser, prefix: string) {
-    // @ts-expect-error  Property 'isModified' does not exist on type 'IUser'.
-    this.isModified('name');
-    // @ts-expect-error  Property 'doesNotExist' does not exist on type 'IUser'.
-    this.doesNotExist();
-    ExpectType<string>(this.name);
+    expect(this).type.not.toHaveProperty('isModified');
+    expect(this).type.not.toHaveProperty('doesNotExist');
+    expect(this.name).type.toBe<string>();
     console.log(prefix + this.name);
   });
   schema.method('printName', function printName(this: IUser) {
-    // @ts-expect-error  Property 'isModified' does not exist on type 'IUser'.
-    this.isModified('name');
-    // @ts-expect-error  Property 'doesNotExist' does not exist on type 'IUser'.
-    this.doesNotExist();
-    ExpectType<string>(this.name);
+    expect(this).type.not.toHaveProperty('isModified');
+    expect(this).type.not.toHaveProperty('doesNotExist');
+    expect(this.name).type.toBe<string>();
     console.log(this.name);
   });
   schema.method('getName', function getName() {
-    ExpectType<boolean>(this.isModified('name'));
+    expect(this.isModified('name')).type.toBe<boolean>();
     return this.name;
   });
   const User = model('user', schema);
@@ -1159,10 +1147,10 @@ async function gh15781() {
     }
   ]);
 
-  ExpectType<boolean | undefined>({} as UpdateOneModel['timestamps']);
-  ExpectType<boolean | undefined>({} as UpdateOneModel['overwriteImmutable']);
-  ExpectType<boolean | undefined>({} as UpdateManyModel['timestamps']);
-  ExpectType<boolean | undefined>({} as UpdateManyModel['overwriteImmutable']);
+  expect<UpdateOneModel['timestamps']>().type.toBe<boolean | undefined>();
+  expect<UpdateOneModel['overwriteImmutable']>().type.toBe<boolean | undefined>();
+  expect<UpdateManyModel['timestamps']>().type.toBe<boolean | undefined>();
+  expect<UpdateManyModel['overwriteImmutable']>().type.toBe<boolean | undefined>();
 }
 
 async function gh15910() {
@@ -1248,7 +1236,7 @@ function hydrateWithStrictOption() {
     extraField: 'value'
   }, undefined, { strict: false });
 
-  ExpectType<ReturnType<(typeof TestModel)['hydrate']>>(doc1);
+  expect(doc1).type.toBe<ReturnType<(typeof TestModel)['hydrate']>>();
 
   // Test with strict: true
   const doc2 = TestModel.hydrate({
@@ -1257,7 +1245,7 @@ function hydrateWithStrictOption() {
     age: 25
   }, undefined, { strict: true });
 
-  ExpectType<ReturnType<(typeof TestModel)['hydrate']>>(doc2);
+  expect(doc2).type.toBe<ReturnType<(typeof TestModel)['hydrate']>>();
 
   // Test with strict: 'throw'
   const doc3 = TestModel.hydrate({
@@ -1266,7 +1254,7 @@ function hydrateWithStrictOption() {
     age: 35
   }, undefined, { strict: 'throw' });
 
-  ExpectType<ReturnType<(typeof TestModel)['hydrate']>>(doc3);
+  expect(doc3).type.toBe<ReturnType<(typeof TestModel)['hydrate']>>();
 
   // Test without strict option
   const doc4 = TestModel.hydrate({
@@ -1275,5 +1263,5 @@ function hydrateWithStrictOption() {
     age: 28
   });
 
-  ExpectType<ReturnType<(typeof TestModel)['hydrate']>>(doc4);
+  expect(doc4).type.toBe<ReturnType<(typeof TestModel)['hydrate']>>();
 }

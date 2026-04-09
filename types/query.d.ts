@@ -129,6 +129,11 @@ declare module 'mongoose' {
      */
     new?: boolean;
 
+    /**
+     * If `false`, skip applying default schema values to the returned document(s).
+     * @default true
+     */
+    defaults?: boolean;
     overwriteDiscriminatorKey?: boolean;
     /**
      * Mongoose removes updated immutable properties from `update` by default (excluding $setOnInsert).

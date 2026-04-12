@@ -24,7 +24,7 @@ async function run() {
     prop9: String,
     prop10: String
   });
-  const FooModel = mongoose.model('Foo', FooSchema);
+  const FooModel = mongoose.model('Foo', FooSchema, 'foos');
 
   const client = new MongoClient(uri);
   await client.connect();
@@ -37,6 +37,23 @@ async function run() {
   }
 
   const numIterations = 500;
+  const c = FooModel.collection;
+  for (let i = 0; i < 10000; ++i) {
+    // Warm up
+    await c.insertOne({
+      _id: new mongoose.Types.ObjectId(),
+      prop1: `test ${i}`,
+      prop2: `test ${i}`,
+      prop3: `test ${i}`,
+      prop4: `test ${i}`,
+      prop5: `test ${i}`,
+      prop6: `test ${i}`,
+      prop7: `test ${i}`,
+      prop8: `test ${i}`,
+      prop9: `test ${i}`,
+      prop10: `test ${i}`
+    });
+  }
 
   const mongooseSaveStart = Date.now();
   for (let i = 0; i < numIterations; ++i) {
@@ -62,6 +79,7 @@ async function run() {
   for (let i = 0; i < numIterations; ++i) {
     for (let j = 0; j < 10; ++j) {
       await fooCollection.insertOne({
+        _id: new mongoose.Types.ObjectId(),
         prop1: `test ${i}`,
         prop2: `test ${i}`,
         prop3: `test ${i}`,

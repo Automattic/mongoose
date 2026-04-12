@@ -20,7 +20,7 @@ import mongoose, {
 import mongodb from 'mongodb';
 import { ModifyResult, ObjectId } from 'mongodb';
 import { autoTypedModel } from './models.test';
-import { ExpectAssignable, ExpectType } from './util/assertions';
+import { expect } from 'tstyche';
 
 interface QueryHelpers {
   _byName(this: QueryWithHelpers<any, ITest, QueryHelpers>, name: string): QueryWithHelpers<Array<ITest>, ITest, QueryHelpers>;
@@ -43,8 +43,7 @@ schema.query._byName = function(name: string): QueryWithHelpers<ITest[], ITest, 
 };
 
 schema.query.byName = function(name: string): QueryWithHelpers<ITest[], ITest, QueryHelpers> {
-  // @ts-expect-error  Property 'notAQueryHelper' does not exist on type
-  this.notAQueryHelper();
+  expect(this).type.not.toHaveProperty('notAQueryHelper');
   return this._byName(name);
 };
 
@@ -70,8 +69,7 @@ interface ITest {
   endDate?: Date;
 }
 
-type X = mongoose.WithLevel1NestedPaths<ITest>;
-ExpectType<number | undefined>({} as X['docs.id']);
+expect<mongoose.WithLevel1NestedPaths<ITest>['docs.id']>().type.toBe<number | undefined>();
 
 const Test = model<ITest, Model<ITest, QueryHelpers>>('Test', schema);
 
@@ -157,15 +155,12 @@ const p1: Record<string, number> = Test.find().projection('age docs.id');
 const p2: Record<string, number> | null = Test.find().projection();
 const p3: null = Test.find().projection(null);
 
-
-// @ts-expect-error  No overload matches this call.
-Test.find({ }, { name: 'ss' }); // Only 0 and 1 are allowed
+expect(Test.find).type.not.toBeCallableWith({}, { name: 'ss' }); // Only 0 and 1 are allowed
 Test.find({}, { name: 3 });
 Test.find({}, { name: true, age: false, endDate: true, tags: 1 });
 Test.find({}, { name: true, age: false, endDate: true });
 Test.find({}, { name: false, age: false, tags: false, child: { name: false }, docs: { myId: false, id: true } });
-// @ts-expect-error  No overload matches this call.
-Test.find({}, { tags: { something: 1 } }); // Array of strings or numbers should only be allowed to be a boolean or 1 and 0
+expect(Test.find).type.not.toBeCallableWith({}, { tags: { something: 1 } }); // Array of strings or numbers should only be allowed to be a boolean or 1 and 0
 Test.find({}, { name: true, age: true, endDate: true, tags: 1, child: { name: true }, docs: { myId: true, id: true } }); // This should be allowed
 Test.find({}, { name: 1, age: 1, endDate: 1, tags: 1, child: { name: 1 }, docs: { myId: 1, id: 1 } }); // This should be allowed
 Test.find({}, { _id: 0, name: 1, age: 1, endDate: 1, tags: 1, child: 1, docs: 1 }); // _id is an exception and should be allowed to be excluded
@@ -173,36 +168,27 @@ Test.find({}, { name: 0, age: 0, endDate: 0, tags: 0, child: 0, docs: 0 }); // T
 Test.find({}, { name: 0, age: 0, endDate: 0, tags: 0, child: { name: 0 }, docs: { myId: 0, id: 0 } }); // This should be allowed
 Test.find({}, { name: 1, age: 1, _id: 0 }); // This should be allowed since _id is an exception
 Test.find({}, { someOtherField: 1 }); // This should be allowed since it's not a field in the schema
-// @ts-expect-error  No overload matches this call.
-Test.find({}, { name: { $slice: 1 } }); // $slice should only be allowed on arrays
+expect(Test.find).type.not.toBeCallableWith({}, { name: { $slice: 1 } }); // $slice should only be allowed on arrays
 Test.find({}, { tags: { $slice: 1 } }); // $slice should be allowed on arrays
 Test.find({}, { tags: { $slice: [1, 2] } }); // $slice with the format of [ <number to skip>, <number to return> ] should also be allowed on arrays
-// @ts-expect-error  No overload matches this call.
-Test.find({}, { age: { $elemMatch: {} } }); // $elemMatch should not be allowed on non arrays
+expect(Test.find).type.not.toBeCallableWith({}, { age: { $elemMatch: {} } }); // $elemMatch should not be allowed on non arrays
 Test.find({}, { docs: { $elemMatch: { id: 'aa' } } }); // $elemMatch should be allowed on arrays
-// @ts-expect-error  No overload matches this call.
-Test.find({}, { tags: { $slice: 1, $elemMatch: {} } }); // $elemMatch and $slice should not be allowed together
+expect(Test.find).type.not.toBeCallableWith({}, { tags: { $slice: 1, $elemMatch: {} } }); // $elemMatch and $slice should not be allowed together
 Test.find({}, { age: 1, tags: { $slice: 5 } }); // $slice should be allowed in inclusion projection
 Test.find({}, { age: 0, tags: { $slice: 5 } }); // $slice should be allowed in exclusion projection
 Test.find({}, { age: 1, tags: { $elemMatch: {} } }); // $elemMatch should be allowed in inclusion projection
 Test.find({}, { age: 0, tags: { $elemMatch: {} } }); // $elemMatch should be allowed in exclusion projection
-// @ts-expect-error  No overload matches this call.
-Test.find({}, { 'docs.id': 'taco' }); // Dot notation should be allowed and does not accept any
-// @ts-expect-error  No overload matches this call.
-Test.find({}, { docs: { id: '1' } }); // Dot notation should be able to use a combination with objects
+expect(Test.find).type.not.toBeCallableWith({}, { 'docs.id': 'taco' }); // Dot notation should be allowed and does not accept any
+expect(Test.find).type.not.toBeCallableWith({}, { docs: { id: '1' } }); // Dot notation should be able to use a combination with objects
 Test.find({}, { docs: { id: false } }); // Dot notation should be allowed with valid values - should correctly handle arrays
 Test.find({}, { docs: { id: true } }); // Dot notation should be allowed with valid values - should correctly handle arrays
 Test.find({ docs: { $elemMatch: { id: 1 } } }, { 'docs.$': 1 }); // $ projection should be allowed
 Test.find({}, { child: 1 }); // Dot notation should be able to use a combination with objects
 // Test.find({}, { 'docs.profiles': { name: 1 } }); // 3 levels deep not supported
-// @ts-expect-error  No overload matches this call.
-Test.find({}, { 'docs.profiles': { name: 'aa' } }); // should support a combination of dot notation and objects
-// @ts-expect-error  No overload matches this call.
-Test.find({}, { endDate: { toString: 1 } }); // should not allow projecting inherited methods in nested objects
-// @ts-expect-error  No overload matches this call.
-Test.find({}, { tags: { trim: 1 } }); // should not allow projecting inherited methods in nested objects
-// @ts-expect-error  No overload matches this call.
-Test.find({}, { child: { toJSON: 1 } }); // should not allow projecting inherited methods in nested objects
+expect(Test.find).type.not.toBeCallableWith({}, { 'docs.profiles': { name: 'aa' } }); // should support a combination of dot notation and objects
+expect(Test.find).type.not.toBeCallableWith({}, { endDate: { toString: 1 } }); // should not allow projecting inherited methods in nested objects
+expect(Test.find).type.not.toBeCallableWith({}, { tags: { trim: 1 } }); // should not allow projecting inherited methods in nested objects
+expect(Test.find).type.not.toBeCallableWith({}, { child: { toJSON: 1 } }); // should not allow projecting inherited methods in nested objects
 Test.find({}, { age: 1, _id: 0 });
 Test.find({}, { name: 0, age: 0, _id: 1 });
 
@@ -217,16 +203,11 @@ Test.find().sort(undefined);
 Test.find().sort(null);
 Test.find().sort([['key', 'ascending']]);
 Test.find().sort([['key1', 'ascending'], ['key2', 'descending']]);
-// @ts-expect-error  Argument of type '{ name: 2; }' is not assignable
-Test.find().sort({ name: 2 });
-// @ts-expect-error  Argument of type '{ name: "invalidSortOrder"; }' is not assignable
-Test.find().sort({ name: 'invalidSortOrder' });
-// @ts-expect-error  Type '"invalid"' is not assignable to type 'SortOrder'.
-Test.find().sort([['key', 'invalid']]);
-// @ts-expect-error  Type 'false' is not assignable to type 'SortOrder'.
-Test.find().sort([['key', false]]);
-// @ts-expect-error  Type 'string' is not assignable to type '[string, SortOrder]'.
-Test.find().sort(['invalid']);
+expect(Test.find().sort).type.not.toBeCallableWith({ name: 2 });
+expect(Test.find().sort).type.not.toBeCallableWith({ name: 'invalidSortOrder' });
+expect(Test.find().sort).type.not.toBeCallableWith([['key', 'invalid']]);
+expect(Test.find().sort).type.not.toBeCallableWith([['key', false]]);
+expect(Test.find().sort).type.not.toBeCallableWith(['invalid']);
 
 // Super generic query
 function testGenericQuery(): void {
@@ -242,10 +223,10 @@ function testGenericQuery(): void {
 
 function eachAsync(): void {
   Test.find().cursor().eachAsync((doc) => {
-    ExpectType<HydratedDocument<ITest, {}, QueryHelpers>>(doc);
+    expect(doc).type.toBe<HydratedDocument<ITest, {}, QueryHelpers>>();
   });
   Test.find().cursor().eachAsync((docs) => {
-    ExpectType<HydratedDocument<ITest, {}, QueryHelpers>[]>(docs);
+    expect(docs).type.toBe<HydratedDocument<ITest, {}, QueryHelpers>[]>();
   }, { batchSize: 2 });
 }
 
@@ -315,7 +296,7 @@ async function gh11156(): Promise<void> {
   const User: Model<IUser> = model<IUser>('User', schema);
 
   const doc = await User.findOne<Pick<IUser, 'name'>>({}).orFail();
-  ExpectType<{ name: string }>(doc);
+  expect(doc).type.toBe<{ name: string }>();
 }
 
 async function gh11041(): Promise<void> {
@@ -335,7 +316,7 @@ async function gh11041(): Promise<void> {
   // 3. Create a Model.
   const MyModel = model<User>('User', schema);
 
-  ExpectType<HydratedDocument<User> | null>(await MyModel.findOne({}).populate('someField').exec());
+  expect(await MyModel.findOne({}).populate('someField').exec()).type.toBe<HydratedDocument<User> | null>();
 }
 
 async function gh11306(): Promise<void> {
@@ -355,14 +336,14 @@ async function gh11306(): Promise<void> {
   // 3. Create a Model.
   const MyModel = model<User>('User', schema);
 
-  ExpectType<unknown[]>(await MyModel.distinct('notThereInSchema'));
-  ExpectType<string[]>(await MyModel.distinct('name'));
+  expect(await MyModel.distinct('notThereInSchema')).type.toBe<unknown[]>();
+  expect(await MyModel.distinct('name')).type.toBe<string[]>();
 }
 
 function autoTypedQuery() {
   const AutoTypedModel = autoTypedModel();
   const query = AutoTypedModel.find();
-  ExpectType<typeof query>(AutoTypedModel.find().byUserName(''));
+  expect(AutoTypedModel.find().byUserName('')).type.toBe<typeof query>();
 }
 
 function gh11964() {
@@ -389,11 +370,8 @@ function gh14397() {
 
   const id = 'Test Id';
 
-  let idCondition: Condition<WithId<TestUser>['id']>;
-  let filter: QueryFilter<WithId<TestUser>>;
-
-  ExpectAssignable<typeof idCondition>()(id);
-  ExpectAssignable<typeof filter>()({ id });
+  expect<Condition<WithId<TestUser>['id']>>().type.toBeAssignableFrom(id);
+  expect<QueryFilter<WithId<TestUser>>>().type.toBeAssignableFrom({ id });
 }
 
 function gh12091() {
@@ -459,9 +437,8 @@ async function gh12342_manual() {
   // 2nd param to `model()` is the Model class to return.
   const ProjectModel = model<Project, ProjectModelType>('Project', schema);
 
-  ExpectType<HydratedDocument<Project>[]>(
-    await ProjectModel.findOne().where('stars').gt(1000).byName('mongoose')
-  );
+  expect(await ProjectModel.findOne().where('stars').gt(1000).byName('mongoose')).type.toBe<HydratedDocument<Project>[]>();
+
 }
 
 async function gh12342_auto() {
@@ -483,9 +460,7 @@ async function gh12342_auto() {
 
   const ProjectModel = model('Project', ProjectSchema);
 
-  ExpectAssignable<HydratedDocument<Project>[]>()(
-    await ProjectModel.findOne().where('stars').gt(1000).byName('mongoose')
-  );
+  expect(await ProjectModel.findOne().where('stars').gt(1000).byName('mongoose')).type.toBe<HydratedDocument<Project>[]>();
 }
 
 async function gh11602(): Promise<void> {
@@ -500,17 +475,15 @@ async function gh11602(): Promise<void> {
     includeResultMetadata: true
   });
 
-  // @ts-expect-error  Property 'modifiedCount' does not exist on type
-  updateResult.lastErrorObject?.modifiedCount;
-  ExpectType<boolean | undefined>(updateResult.lastErrorObject?.updatedExisting);
-  ExpectType<ObjectId | undefined>(updateResult.lastErrorObject?.upserted);
+  expect(updateResult.lastErrorObject!).type.not.toHaveProperty('modifiedCount');
+  expect(updateResult.lastErrorObject?.updatedExisting).type.toBe<boolean | undefined>();
+  expect(updateResult.lastErrorObject?.upserted).type.toBe<ObjectId | undefined>();
 
   ModelType.findOneAndUpdate({}, {}, { returnDocument: 'before' });
   ModelType.findOneAndUpdate({}, {}, { returnDocument: 'after' });
   ModelType.findOneAndUpdate({}, {}, { returnDocument: undefined });
   ModelType.findOneAndUpdate({}, {}, {});
-  // @ts-expect-error  No overload matches this call.
-  ModelType.findOneAndUpdate({}, {}, { returnDocument: 'not-before-or-after' }); // returnDocument should be 'before' or 'after'
+  expect(ModelType.findOneAndUpdate).type.not.toBeCallableWith({}, {}, { returnDocument: 'not-before-or-after' }); // returnDocument should be 'before' or 'after'
 }
 
 async function gh13142() {
@@ -549,7 +522,7 @@ async function gh13142() {
     { lean: true }
   );
   if (!blog) return;
-  ExpectType<Pick<Blog, Extract<keyof { content: 1 }, keyof Blog>>>(blog);
+  expect(blog).type.toBe<Pick<Blog, Extract<keyof { content: 1 }, keyof Blog>>>();
 }
 
 async function gh13224() {
@@ -557,25 +530,22 @@ async function gh13224() {
   const UserModel = model('User', userSchema);
 
   const u1 = await UserModel.findOne().select(['name']).orFail();
-  ExpectType<string | undefined | null>(u1.name);
-  ExpectType<number | undefined | null>(u1.age);
-  ExpectAssignable<Function>()(u1.toObject);
+  expect(u1.name).type.toBe<string | undefined | null>();
+  expect(u1.age).type.toBe<number | undefined | null>();
+  expect(u1.toObject).type.toBeAssignableTo<Function>();
 
   const u2 = await UserModel.findOne().select<{ name?: string }>(['name']).orFail();
-  ExpectType<string | undefined>(u2.name);
-  // @ts-expect-error  Property 'age' does not exist on type
-  u2.age;
-  ExpectAssignable<Function>()(u2.toObject);
+  expect(u2.name).type.toBe<string | undefined>();
+  expect(u2).type.not.toHaveProperty('age');
+  expect(u2.toObject).type.toBeAssignableTo<Function>();
 
   const users = await UserModel.find().select<{ name?: string }>(['name']);
   const u3 = users[0];
-  ExpectType<string | undefined>(u3!.name);
-  // @ts-expect-error  Property 'age' does not exist on type
-  u3!.age;
-  ExpectAssignable<Function>()(u3.toObject);
+  expect(u3.name).type.toBe<string | undefined>();
+  expect(u3).type.not.toHaveProperty('age');
+  expect(u3.toObject).type.toBeAssignableTo<Function>();
 
-  // @ts-expect-error  Type '{ notInSchema: string; }' has no properties in common with type '{ name?: any; age?: any; _id?: any; __v?: any; }'.
-  await UserModel.findOne().select<{ notInSchema: string }>(['name']).orFail();
+  expect(UserModel.findOne().select).type.not.toBeInstantiableWith<[{ notInSchema: string }]>();
 }
 
 function gh13630() {
@@ -587,16 +557,13 @@ function gh13630() {
     }
   }
 
-  ExpectAssignable<UpdateQueryKnownOnly<User>>()({ $set: { name: 'John' } });
-  ExpectAssignable<UpdateQueryKnownOnly<User>>()({ $unset: { phone: 'test' } });
-  ExpectAssignable<UpdateQueryKnownOnly<User>>()({ $set: { nested: { test: 'foo' } } });
-  // @ts-expect-error  'namee' does not exist in type 'AnyKeys<User>'.
-  const q1: UpdateQueryKnownOnly<User> = { $set: { namee: 'foo' } };
-  // @ts-expect-error  ''nested.test'' does not exist in type 'AnyKeys<User>'.
-  const q2: UpdateQueryKnownOnly<User> = { $set: { 'nested.test': 'foo' } };
+  expect<UpdateQueryKnownOnly<User>>().type.toBeAssignableFrom({ $set: { name: 'John' } });
+  expect<UpdateQueryKnownOnly<User>>().type.toBeAssignableFrom({ $unset: { phone: 'test' } });
+  expect<UpdateQueryKnownOnly<User>>().type.toBeAssignableFrom({ $set: { nested: { test: 'foo' } } });
+  expect<UpdateQueryKnownOnly<User>>().type.not.toBeAssignableFrom({ $set: { namee: 'foo' } });
+  expect<UpdateQueryKnownOnly<User>>().type.not.toBeAssignableFrom({ $set: { 'nested.test': 'foo' } });
 
-  const x: UpdateQueryKnownOnly<User> = { $set: { name: 'John' } };
-  ExpectAssignable<UpdateQuery<User>>()(x);
+  expect<UpdateQueryKnownOnly<User>>().type.toBeAssignableTo<UpdateQuery<User>>();
 }
 
 async function gh14190() {
@@ -604,23 +571,23 @@ async function gh14190() {
   const UserModel = model('User', userSchema);
 
   const doc = await UserModel.findByIdAndDelete('0'.repeat(24));
-  ExpectType<ReturnType<(typeof UserModel)['hydrate']> | null>(doc);
+  expect(doc).type.toBe<ReturnType<(typeof UserModel)['hydrate']> | null>();
 
   const res = await UserModel.findByIdAndDelete(
     '0'.repeat(24),
     { includeResultMetadata: true }
   );
-  ExpectAssignable<
+  expect(res).type.toBeAssignableTo<
     ModifyResult<ReturnType<(typeof UserModel)['hydrate']>>
-      >()(res);
+  >();
 
   const res2 = await UserModel.find().findByIdAndDelete(
     '0'.repeat(24),
     { includeResultMetadata: true }
   );
-  ExpectAssignable<
+  expect(res2).type.toBeAssignableTo<
     ModifyResult<ReturnType<(typeof UserModel)['hydrate']>>
-      >()(res2);
+  >();
 }
 
 function mongooseQueryOptions() {
@@ -725,10 +692,8 @@ async function gh14545() {
   const myDocs = await M.find({}).exec();
   const myDoc = await M.findOne({}).exec();
 
-  const myProjections = await M.find({}).select<SlimTest>({ prop: 1 }).exec();
-  ExpectType<SlimTestDocument[]>(myProjections);
-  const myProjection = await M.findOne({}).select<SlimTest>({ prop: 1 }).exec();
-  ExpectType<SlimTestDocument | null>(myProjection);
+  expect(await M.find({}).select<SlimTest>({ prop: 1 }).exec()).type.toBe<SlimTestDocument[]>();
+  expect(await M.findOne({}).select<SlimTest>({ prop: 1 }).exec()).type.toBe<SlimTestDocument | null>();
 }
 
 function gh14841() {
@@ -757,10 +722,8 @@ async function gh15526() {
   const u1 = await UserModel.findOne()
     .select<SelectType>(selection)
     .orFail();
-  ExpectType<string | undefined | null>(u1.name);
-
-  // @ts-expect-error  Property 'age' does not exist on type
-  u1.age;
+  expect(u1.name).type.toBe<string | undefined | null>();
+  expect(u1).type.not.toHaveProperty('age');
 }
 
 async function gh14173() {
@@ -820,12 +783,9 @@ async function gh12064() {
   const TestModel = model('Model', schema);
 
   await TestModel.findOne({ 'subdoc.subdocProp': { $gt: 0 }, 'nested.nestedProp': { $in: ['foo', 'bar'] }, 'documentArray.documentArrayProp': { $ne: true } });
-  // @ts-expect-error  No overload matches this call.
-  TestModel.findOne({ 'subdoc.subdocProp': 'taco tuesday' });
-  // @ts-expect-error  No overload matches this call.
-  TestModel.findOne({ 'nested.nestedProp': true });
-  // @ts-expect-error  No overload matches this call.
-  TestModel.findOne({ 'documentArray.documentArrayProp': 'taco' });
+  expect(TestModel.findOne).type.not.toBeCallableWith({ 'subdoc.subdocProp': 'taco tuesday' });
+  expect(TestModel.findOne).type.not.toBeCallableWith({ 'nested.nestedProp': true });
+  expect(TestModel.findOne).type.not.toBeCallableWith({ 'documentArray.documentArrayProp': 'taco' });
 }
 
 function gh15671() {
@@ -871,10 +831,8 @@ async function gh15779() {
 
   v8Filter.name = 'test';
 
-  type AgeType = typeof v8Filter.age;
-  ExpectAssignable<typeof v8Filter.age>()(42);
-  // @ts-expect-error  Type '"taco"' is not assignable to type 'StrictCondition<ApplyBasicQueryCasting<number>> | undefined'.
-  const a1: AgeType = 'taco';
+  expect(v8Filter.age).type.toBeAssignableFrom(42);
+  expect(v8Filter.age).type.not.toBeAssignableFrom('taco');
 
   const TestModel = model('Test', new Schema({ age: Number, name: String }));
   const query = TestModel.find({ age: { $gt: 18 } });
@@ -913,8 +871,6 @@ async function gh15779_2() {
 
 async function gh16062() {
   const Test = model('Test', new Schema({ runtime: Number }));
-  // @ts-expect-error  No overload matches this call.
-  await Test.findOne({ runtime: { $wrong: 100 } });
-  // @ts-expect-error  No overload matches this call.
-  await Test.findOne({ $and: [{ runtime: { $wrong: 100 } }] });
+  expect(Test.findOne).type.not.toBeCallableWith({ runtime: { $wrong: 100 } });
+  expect(Test.findOne).type.not.toBeCallableWith({ $and: [{ runtime: { $wrong: 100 } }] });
 }

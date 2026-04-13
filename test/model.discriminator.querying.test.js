@@ -132,6 +132,26 @@ describe('model', function() {
         assert.equal(docs[2].name, 'Impression event');
       });
 
+      it('skips applying defaults for discriminator docs when defaults option is false', async function() {
+        const eventSchema = new Schema({
+          name: { type: String, default: 'default event name' }
+        });
+        const impressionSchema = new Schema({ element: String });
+        const EventWithDefault = db.model('EventWithDefault', eventSchema);
+        const ImpressionWithDefault = EventWithDefault.discriminator('ImpressionWithDefault', impressionSchema);
+
+        await EventWithDefault.collection.insertOne({ __t: 'ImpressionWithDefault', element: 'banner' });
+
+        const doc = await EventWithDefault.findOne({ __t: 'ImpressionWithDefault' }).setOptions({ defaults: false });
+
+        assert.ok(doc instanceof ImpressionWithDefault);
+        assert.equal(doc.element, 'banner');
+        assert.ok(!doc.name);
+
+        const docWithDefaults = await EventWithDefault.findOne({ __t: 'ImpressionWithDefault' });
+        assert.equal(docWithDefaults.name, 'default event name');
+      });
+
       async function checkHydratesCorrectModels(fields) {
         const baseEvent = new BaseEvent({ name: 'Base event' });
         const impressionEvent = new ImpressionEvent({ name: 'Impression event' });

@@ -2571,6 +2571,17 @@ describe('Query', function() {
       assert.strictEqual(q._update.$set.testing, undefined);
       assert.strictEqual(q._update.$set.newPath, 'newValue');
     });
+
+    it('clones shared update when mutating `_update` directly', function() {
+      const q = new Query({});
+      const update = { $set: { newPath: 'newValue' } };
+
+      q.updateOne({}, update);
+      q._update.$set.otherPath = 'otherValue';
+
+      assert.deepStrictEqual(update, { $set: { newPath: 'newValue' } });
+      assert.strictEqual(q.getUpdate().$set.otherPath, 'otherValue');
+    });
   });
 
   describe('get() (gh-7312)', function() {

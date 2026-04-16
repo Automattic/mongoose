@@ -7,7 +7,7 @@ import {
   HydratedArraySubdocument,
   HydratedSingleSubdocument
 } from 'mongoose';
-import { expectAssignable } from 'tsd';
+import { expect } from 'tstyche';
 
 const childSchema = new Schema({ name: String });
 
@@ -144,8 +144,8 @@ function gh14601() {
   });
 
   const obj = item.toObject();
+  expect(obj).type.toBeAssignableTo<IMain>();
 
   const obj2 = item.f2.toObject();
-
-  expectAssignable<{ _id: Types.ObjectId, field1: string }>(obj2);
+  expect(obj2).type.toBeAssignableTo<ISub>();
 }

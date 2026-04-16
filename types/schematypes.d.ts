@@ -212,6 +212,9 @@ declare module 'mongoose' {
     /** If set, overrides the child schema's `_id` option. Only allowed for subdocuments and subdocument arrays. */
     _id?: boolean;
 
+    /** Embedded discriminators for this path. Only allowed for subdocuments and subdocument arrays. */
+    discriminators?: Record<string, Schema<unknown>>;
+
     /** If set, specifies the type of this map's values. Mongoose will cast this map's values to the given type. */
     of?: Function | SchemaDefinitionProperty<any> | (Function | SchemaDefinitionProperty<any>)[];
 

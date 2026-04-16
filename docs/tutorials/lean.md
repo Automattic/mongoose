@@ -26,16 +26,38 @@ const leanDoc = await MyModel.findOne().lean();
 
 How much smaller are lean documents? Here's a comparison.
 
-```acquit
-[require:Lean Tutorial.*compare sizes]
+```javascript acquit:Lean Tutorial.*compare sizes
+const schema = new mongoose.Schema({ name: String });
+const MyModel = mongoose.model('Test', schema);
+
+await MyModel.create({ name: 'test' });
+
+const normalDoc = await MyModel.findOne();
+// To enable the `lean` option for a query, use the `lean()` function.
+const leanDoc = await MyModel.findOne().lean();
+
+v8Serialize(normalDoc).length; // approximately 180
+v8Serialize(leanDoc).length; // approximately 55, about 3x smaller!
+
+// In case you were wondering, the JSON form of a Mongoose doc is the same
+// as the POJO. This additional memory only affects how much memory your
+// Node.js process uses, not how much data is sent over the network.
+JSON.stringify(normalDoc).length === JSON.stringify(leanDoc).length; // true
 ```
 
 Under the hood, after executing a query, Mongoose converts the query results
 from POJOs to Mongoose documents. If you turn on the `lean` option, Mongoose
 skips this step.
 
-```acquit
-[require:Lean Tutorial.*compare types]
+```javascript acquit:Lean Tutorial.*compare types
+const normalDoc = await MyModel.findOne();
+const leanDoc = await MyModel.findOne().lean();
+
+normalDoc instanceof mongoose.Document; // true
+normalDoc.constructor.name; // 'model'
+
+leanDoc instanceof mongoose.Document; // false
+leanDoc.constructor.name; // 'Object'
 ```
 
 The downside of enabling `lean` is that lean docs don't have:
@@ -49,8 +71,40 @@ The downside of enabling `lean` is that lean docs don't have:
 For example, the following code sample shows that the `Person` model's getters
 and virtuals don't run if you enable `lean`.
 
-```acquit
-[require:Lean Tutorial.*getters and virtuals]
+```javascript acquit:Lean Tutorial.*getters and virtuals
+// Define a `Person` model. Schema has 2 custom getters and a `fullName`
+// virtual. Neither the getters nor the virtuals will run if lean is enabled.
+const personSchema = new mongoose.Schema({
+  firstName: {
+    type: String,
+    get: capitalizeFirstLetter
+  },
+  lastName: {
+    type: String,
+    get: capitalizeFirstLetter
+  }
+});
+personSchema.virtual('fullName').get(function() {
+  return `${this.firstName} ${this.lastName}`;
+});
+function capitalizeFirstLetter(v) {
+  // Convert 'bob' -> 'Bob'
+  return v.charAt(0).toUpperCase() + v.substring(1);
+}
+const Person = mongoose.model('Person', personSchema);
+
+// Create a doc and load it as a lean doc
+await Person.create({ firstName: 'benjamin', lastName: 'sisko' });
+const normalDoc = await Person.findOne();
+const leanDoc = await Person.findOne().lean();
+
+normalDoc.fullName; // 'Benjamin Sisko'
+normalDoc.firstName; // 'Benjamin', because of `capitalizeFirstLetter()`
+normalDoc.lastName; // 'Sisko', because of `capitalizeFirstLetter()`
+
+leanDoc.fullName; // undefined
+leanDoc.firstName; // 'benjamin', custom getter doesn't run
+leanDoc.lastName; // 'sisko', custom getter doesn't run
 ```
 
 ## Lean and Populate
@@ -60,14 +114,72 @@ use both `populate()` and `lean()`, the `lean` option propagates to the
 populated documents as well. In the below example, both the top-level
 'Group' documents and the populated 'Person' documents will be lean.
 
-```acquit
-[require:Lean Tutorial.*conventional populate]
+```javascript acquit:Lean Tutorial.*conventional populate
+// Create models
+const Group = mongoose.model('Group', new mongoose.Schema({
+  name: String,
+  members: [{ type: mongoose.ObjectId, ref: 'Person' }]
+}));
+const Person = mongoose.model('Person', new mongoose.Schema({
+  name: String
+}));
+
+// Initialize data
+const people = await Person.create([
+  { name: 'Benjamin Sisko' },
+  { name: 'Kira Nerys' }
+]);
+await Group.create({
+  name: 'Star Trek: Deep Space Nine Characters',
+  members: people.map(p => p._id)
+});
+
+// Execute a lean query
+const group = await Group.findOne().lean().populate('members');
+group.members[0].name; // 'Benjamin Sisko'
+group.members[1].name; // 'Kira Nerys'
+
+// Both the `group` and the populated `members` are lean.
+group instanceof mongoose.Document; // false
+group.members[0] instanceof mongoose.Document; // false
+group.members[1] instanceof mongoose.Document; // false
 ```
 
 [Virtual populate](../populate.html#populate-virtuals) also works with lean.
 
-```acquit
-[require:Lean Tutorial.*virtual populate]
+```javascript acquit:Lean Tutorial.*virtual populate
+// Create models
+const groupSchema = new mongoose.Schema({ name: String });
+groupSchema.virtual('members', {
+  ref: 'Person',
+  localField: '_id',
+  foreignField: 'groupId'
+});
+const Group = mongoose.model('Group', groupSchema);
+const Person = mongoose.model('Person', new mongoose.Schema({
+  name: String,
+  groupId: mongoose.ObjectId
+}));
+
+// Initialize data
+const g = await Group.create({ name: 'DS9 Characters' });
+await Person.create([
+  { name: 'Benjamin Sisko', groupId: g._id },
+  { name: 'Kira Nerys', groupId: g._id }
+]);
+
+// Execute a lean query
+const group = await Group.findOne().lean().populate({
+  path: 'members',
+  options: { sort: { name: 1 } }
+});
+group.members[0].name; // 'Benjamin Sisko'
+group.members[1].name; // 'Kira Nerys'
+
+// Both the `group` and the populated `members` are lean.
+group instanceof mongoose.Document; // false
+group.members[0] instanceof mongoose.Document; // false
+group.members[1] instanceof mongoose.Document; // false
 ```
 
 ## When to Use Lean
@@ -114,7 +226,7 @@ app.put('/person/:id', function(req, res) {
 ```
 
 Remember that virtuals do **not** end up in `lean()` query results. Use the
-[mongoose-lean-virtuals plugin](http://plugins.mongoosejs.io/plugins/lean-virtuals)
+[mongoose-lean-virtuals plugin](https://plugins.mongoosejs.io/plugins/lean-virtuals)
 to add virtuals to your lean query results.
 
 ## Plugins
@@ -147,6 +259,23 @@ schema.virtual('lowercase', function() {
 By default, the MongoDB Node driver converts longs stored in MongoDB into JavaScript numbers, **not** [BigInts](https://thecodebarbarian.com/an-overview-of-bigint-in-node-js.html).
 Set the `useBigInt64` option on your `lean()` queries to inflate longs into BigInts.
 
-```acquit
-[require:Lean Tutorial.*bigint]
+```javascript acquit:Lean Tutorial.*bigint
+const Person = mongoose.model('Person', new mongoose.Schema({
+  name: String,
+  age: BigInt
+}));
+// Mongoose will convert `age` to a BigInt
+const { age } = await Person.create({ name: 'Benjamin Sisko', age: 37 });
+typeof age; // 'bigint'
+
+// By default, if you store a document with a BigInt property in MongoDB and you
+// load the document with `lean()`, the BigInt property will be a number
+let person = await Person.findOne({ name: 'Benjamin Sisko' }).lean();
+typeof person.age; // 'number'
+
+// Set the `useBigInt64` option to opt in to converting MongoDB longs to BigInts.
+person = await Person.findOne({ name: 'Benjamin Sisko' }).
+  setOptions({ useBigInt64: true }).
+  lean();
+typeof person.age; // 'bigint'
 ```

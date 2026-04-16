@@ -4161,6 +4161,107 @@ describe('Query', function() {
     assert.ok(doc);
     assert.equal(doc.title, 'test-defaults-disabled');
   });
+  describe('defaults option skips applying defaults on query results (gh-7287)', function() {
+    const schema = mongoose.Schema({
+      name: { type: String, default: 'foo' },
+      age: { type: Number },
+      _id: { type: Number }
+    });
+    let Test;
+
+    beforeEach(async function() {
+      Test = db.model('Test', schema);
+      await Test.collection.insertMany([{ age: 21, _id: 1 }, { age: 25, _id: 2 }]);
+    });
+
+    it('find()', async function() {
+      const docs = await Test.find().setOptions({ defaults: false });
+      assert.equal(docs.length, 2);
+      for (const doc of docs) {
+        assert.ok(!doc.name);
+      }
+
+      const docsWithDefaults = await Test.find();
+      for (const doc of docsWithDefaults) {
+        assert.equal(doc.name, 'foo');
+      }
+    });
+
+    it('findOne()', async function() {
+      const doc = await Test.findOne({ _id: 1 }).setOptions({ defaults: false });
+      assert.ok(!doc.name);
+
+      const docWithDefaults = await Test.findOne({ _id: 1 });
+      assert.equal(docWithDefaults.name, 'foo');
+    });
+
+    it('findById()', async function() {
+      const doc = await Test.findById(1).setOptions({ defaults: false });
+      assert.ok(!doc.name);
+
+      const docWithDefaults = await Test.findById(1);
+      assert.equal(docWithDefaults.name, 'foo');
+    });
+
+    it('findOneAndUpdate()', async function() {
+      const doc = await Test.findOneAndUpdate(
+        { _id: 1 },
+        { age: 22 },
+        { defaults: false }
+      );
+      assert.ok(!doc.name);
+
+      const docWithDefaults = await Test.findOneAndUpdate(
+        { _id: 1 },
+        { age: 23 }
+      );
+      assert.equal(docWithDefaults.name, 'foo');
+    });
+
+    it('findByIdAndUpdate()', async function() {
+      const doc = await Test.findByIdAndUpdate(
+        1,
+        { age: 22 },
+        { defaults: false }
+      );
+      assert.ok(!doc.name);
+
+      const docWithDefaults = await Test.findByIdAndUpdate(
+        1,
+        { age: 23 }
+      );
+      assert.equal(docWithDefaults.name, 'foo');
+    });
+
+    it('findOneAndReplace()', async function() {
+      const doc = await Test.findOneAndReplace(
+        { _id: 1 },
+        { age: 30, _id: 1 },
+        { defaults: false }
+      );
+      assert.ok(!doc.name);
+      assert.equal(doc.age, 21);
+
+      const docWithDefaults = await Test.findOneAndReplace(
+        { _id: 2 },
+        { age: 31, _id: 2 }
+      );
+      assert.equal(docWithDefaults.name, 'foo');
+    });
+
+    it('findOneAndDelete()', async function() {
+      const doc = await Test.findOneAndDelete(
+        { _id: 2 },
+        { defaults: false }
+      );
+      assert.ok(!doc.name);
+      assert.equal(doc.age, 25);
+
+      const docWithDefaults = await Test.findOneAndDelete({ _id: 1 });
+      assert.equal(docWithDefaults.name, 'foo');
+    });
+  });
+
   it('throws a readable error when executing Query instance without a model (gh-13570)', async function() {
     const schema = new Schema({ name: String });
     const M = db.model('Test', schema, 'Test');
@@ -4488,6 +4589,18 @@ describe('Query', function() {
     query = Person.find({}).readConcern('majority').populate({ path: 'friends', options: { readConcern: 'local' } });
     await query.exec();
     assert.strictEqual(query._mongooseOptions.populate.friends.options.readConcern, 'local');
+  });
+
+  it('does not error out if strict "throw" and db document has extra fields', async function() {
+    const schema = new Schema({
+      name: String,
+      age: Number
+    }, { strict: 'throw' });
+    const Person = db.model('Person', schema);
+
+    await Person.collection.insertOne({ name: 'test strict throw', extraProperty: 'test' });
+    const doc = await Person.findOne({ name: 'test strict throw' });
+    assert.strictEqual(doc.get('extraProperty'), 'test');
   });
 
   describe('Query with requireFilter', function() {

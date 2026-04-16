@@ -1,22 +1,22 @@
 import { MergeType, WithTimestamps, WithLevel1NestedPaths, PopulatedDoc, Document, Types } from 'mongoose';
-import { expectType, expectAssignable } from 'tsd';
+import { expect } from 'tstyche';
 
 type A = { a: string, c: number };
 type B = { a: number, b: string };
 
-expectType<string>({} as MergeType<B, A>['a']);
-expectType<string>({} as MergeType<B, A>['b']);
-expectType<number>({} as MergeType<B, A>['c']);
+expect<MergeType<B, A>['a']>().type.toBe<string>();
+expect<MergeType<B, A>['b']>().type.toBe<string>();
+expect<MergeType<B, A>['c']>().type.toBe<number>();
 
-expectType<number>({} as MergeType<A, B>['a']);
-expectType<string>({} as MergeType<A, B>['b']);
-expectType<number>({} as MergeType<A, B>['c']);
+expect<MergeType<A, B>['a']>().type.toBe<number>();
+expect<MergeType<A, B>['b']>().type.toBe<string>();
+expect<MergeType<A, B>['c']>().type.toBe<number>();
 
 type C = WithTimestamps<{ a: string; b: string }>;
-expectType<string>({} as C['a']);
-expectType<string>({} as C['b']);
-expectType<Date>({} as C['createdAt']);
-expectType<Date>({} as C['updatedAt']);
+expect<C['a']>().type.toBe<string>();
+expect<C['b']>().type.toBe<string>();
+expect<C['createdAt']>().type.toBe<Date>();
+expect<C['updatedAt']>().type.toBe<Date>();
 
 type D = WithTimestamps<
   { a: string; b: string },
@@ -25,10 +25,10 @@ type D = WithTimestamps<
     updatedAt: 'modified';
   }
 >;
-expectType<string>({} as D['a']);
-expectType<string>({} as D['b']);
-expectType<Date>({} as D['created']);
-expectType<Date>({} as D['modified']);
+expect<D['a']>().type.toBe<string>();
+expect<D['b']>().type.toBe<string>();
+expect<D['created']>().type.toBe<Date>();
+expect<D['modified']>().type.toBe<Date>();
 
 // Test WithLevel1NestedPaths preserves non-Document parts of PopulatedDoc union types
 interface RefSchema {
@@ -43,5 +43,4 @@ type NestedPaths = WithLevel1NestedPaths<SchemaWithPopulatedRef>;
 
 // The refField type should be a union that includes RefSchema and ObjectId
 // This ensures that PopulatedDoc fields can be queried with both the populated document and the raw ID
-expectAssignable<NestedPaths['refField']>({ name: 'test' } as RefSchema);
-expectAssignable<NestedPaths['refField']>(new Types.ObjectId());
+expect<NestedPaths['refField']>().type.toBe<RefSchema | Types.ObjectId>();

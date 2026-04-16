@@ -98,12 +98,12 @@ declare module 'mongoose' {
   type UnpackedIntersection<T, U> = T extends null
     ? null
     : T extends (infer A)[]
-    ? (Omit<A, keyof U> & U)[]
+    ? (A extends any ? (Omit<A, keyof U> & U) : never)[]
     : keyof U extends never
     ? T
-    : Omit<T, keyof U> & U;
+    : T extends any ? (Omit<T, keyof U> & U) : never;
 
-  type MergeType<A, B> = Omit<A, keyof B> & B;
+  type MergeType<A, B> = A extends unknown ? Omit<A, keyof B> & B : never;
 
   /**
    * @summary Converts Unions to one record "object".
@@ -131,7 +131,7 @@ declare module 'mongoose' {
   /**
    * @summary Checks if two types are identical.
    * @param {T} T The first type to be compared with {@link U}.
-   * @param {U} U The seconde type to be compared with {@link T}.
+   * @param {U} U The second type to be compared with {@link T}.
    * @param {Y} Y A type to be returned if {@link T} &  {@link U} are identical.
    * @param {N} N A type to be returned if {@link T} &  {@link U} are not identical.
    */

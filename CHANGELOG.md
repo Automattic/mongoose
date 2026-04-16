@@ -1,10 +1,165 @@
+9.4.1 / 2026-04-03
+==================
+ * Revert "fix(setDefaultsOnInsert): run setters on default values during upsert" #16218 #16051
+
+9.4.0 / 2026-04-03
+==================
+ * perf(document+model): avoid parallel save error instantiation, simplify resetting atomics, streamline validation and collection handling
+ * feat(document): add $getChanges() alias, deprecate getChanges() #15959 [techcodie](https://github.com/techcodie)
+ * fix(schema): support toJSONSchema on unions #16179
+ * fix(schema): implement validation for Union schemas and subdocuments [techcodie](https://github.com/techcodie)
+ * fix(connection): snapshot Date in heartbeat handler and flush queue on recovery #16183 [andreialecu](https://github.com/andreialecu)
+ * fix(model): use duck-typing with version check to validate the argument to useConnection() is actually a connection #16098
+ * fix(setDefaultsOnInsert): run setters on default values during upsert #16051 [mahmoodhamdi](https://github.com/mahmoodhamdi)
+ * fix(utils): properly compare Set objects in deepEqual [KhanjarSingh](https://github.com/KhanjarSingh)
+ * fix(utils): wrap discriminator merge check in parentheses to fix precedence [Necro-Rohan](https://github.com/Necro-Rohan)
+ * fix(schema): correct template literal in encryptionType error message [Mridul012](https://github.com/Mridul012)
+ * fix(schema): correct error when unsupported query operator with number #16062
+ * fix(types): make MergeType and UnpackedIntersection distributive over union types [techcodie](https://github.com/techcodie)
+ * types: add `id` to HydratedDocument virtuals by default unless explicitly set #16178
+ * types(populate): use marker type to track populated vs depopulated type for perf
+ * types(populate): retain populated paths in toObject() and toJSON() unless depopulate: true set #16085
+ * types(query): make TypeScript error on $and with unrecognized query operator
+ * chore: use TSTyche assertions [mrazauskas](https://github.com/mrazauskas)
+ * docs(connection): remove references to useUnifiedTopology and fix backtick
+ * docs: fix typo 'retreiving' -> 'retrieving' in SchemaType getter JSDoc [yogesh968](https://github.com/yogesh968)
+ * docs: fix typos around 'retrieve' in schemaType and tests [ayushshukla1807](https://github.com/ayushshukla1807)
+ * docs: fix typos in code comments [Goldyvaiiii](https://github.com/Goldyvaiiii)
+
+9.3.3 / 2026-03-25
+==================
+ * fix(schemaType): standardize to use MongooseError instead of plain Error #16172 [VIPAX-JIT](https://github.com/VIPAX-JIT)
+ * types: make MergeType distributive to better support populate on models where the hydrated doc type is a union #16101 #16161
+ * docs: upgrade http:// links to https:// in connections.md #16163 [Puxhkar](https://github.com/Puxhkar)
+ * docs: fix typographical, grammatical errors & documentation clarity improvements #16175 [yogesh968](https://github.com/yogesh968)
+ * docs: clarify multi-mongos support documentation for sharded clusters
+
+9.3.2 / 2026-03-23
+==================
+ * fix(mongoose): throw error when trying to set null or undefined as options #16130 #16140
+ * fix(cast): include array value in query filter error message #16127 [White-Devil2839](https://github.com/White-Devil2839)
+ * fix(cast): replace assert.ok with descriptive Error in castNumber #16110 [mrsandy1965](https://github.com/mrsandy1965)
+ * fix(connection): standardize throw new Error to MongooseError #16142 [techcodie](https://github.com/techcodie)
+ * fix(query): use MongooseError instead of Error #16132 [ace-tk](https://github.com/ace-tk)
+ * docs: add production environment example for autoIndex #16151 [mrsandy1965](https://github.com/mrsandy1965)
+ * docs: upgrade self-referencing http:// links to https:// #16150 [mrsandy1965](https://github.com/mrsandy1965)
+ * docs: fix incorrect Double cast comment and upgrade insecure plugin link #16148 [mrsandy1965](https://github.com/mrsandy1965)
+ * docs: fix redundant text and http link in installation section #16146 [Puxhkar](https://github.com/Puxhkar)
+ * docs: fix typo 'mutiple' → 'multiple' in queries.md #16147 [mrsandy1965](https://github.com/mrsandy1965)
+ * docs: use HTTPS for external links in docs navigation #16133 [ace-tk](https://github.com/ace-tk)
+ * docs: use HTTPS for external links in CONTRIBUTING and homepage #16134 [ace-tk](https://github.com/ace-tk)
+ * docs(populate): replace removed mapReduce() API link #16135 [ace-tk](https://github.com/ace-tk)
+ * docs(models): replace removed count() and mapReduce() references #16123 [White-Devil2839](https://github.com/White-Devil2839)
+ * docs: fix broken count() and update() links in queries docs [White-Devil2839](https://github.com/White-Devil2839)
+ * docs: fix broken update() link in validation docs #16121 [White-Devil2839](https://github.com/White-Devil2839)
+ * docs: update GitHub link to use https #16120 [White-Devil2839](https://github.com/White-Devil2839)
+ * docs(documents): fix incorrect variable name in nullish coalescing example #16119 [White-Devil2839](https://github.com/White-Devil2839)
+ * docs: fix missing quotes in populate path examples #16118 [White-Devil2839](https://github.com/White-Devil2839)
+ * docs: fix missing comma in populate dynamic ref example #16117 [White-Devil2839](https://github.com/White-Devil2839)
+ * docs: clarify that transaction rollback marks fields as modified to allow re-saving #16112 [ramanverse](https://github.com/ramanverse)
+
+9.3.1 / 2026-03-17
+==================
+ * fix(model): handle passing string projection to `hydrate()` #16082
+ * fix(model): fix `bulkWrite()` sorting #16079 #16080 [pnkov](https://github.com/pnkov)
+ * fix(QueryCursor): fix wrong `this` context in QueryCursor close callback #16104 [techcodie](https://github.com/techcodie)
+ * types(schema): infer schema options correctly for model context in statics #16046 #16102
+ * types(schema): fix type definition for `HydratedDocType` in `autoTypedVirtuals` #16083
+ * types(plugin): allow passing model with custom TStatics into `Schema.prototype.plugin()` #16090 #16086
+ * chore: use `MongooseError` instead of `Error` in schema, model, and aggregate #15995 [mahmoodhamdi](https://github.com/mahmoodhamdi)
+ * docs(projection): clean up jsdoc for `parseProjection()`
+
+9.3.0 / 2026-03-10
+==================
+ * feat(schema): support `discriminators` option inline for better TypeScript support #16053
+ * feat(aggregate): add `pipelineForUnionWith()` helper to allow reusing pipelines with `$unionWith` in TypeScript #16033
+ * feat(setDefaultsOnInsert): pass query as context to default functions #16041 #16025
+ * fix: resolve deeply nested discriminator paths in arrayFilters #16072 [Yatin81](https://github.com/Yatin81)
+ * fix(changeStream): emit ready on next tick to allow stream to initialize
+ * fix(connection): handle calling watch() on disconnected connection
+ * fix: remove references to mongodb option "promiseLibrary" [hasezoey](https://github.com/hasezoey)
+ * fix(model+query): backwards compatible validateBeforeSave handling and avoid TypeError in removeUnusedArrayFilters on nullish update
+ * perf(model): remove unnecessary overhead when saving new doc
+ * types(InferRawDocType): fall back to using InferRawDocType instead of pulling non-raw inferred doc type if EnforcedDocType not set #16053
+ * types: add type constraints for `Document#$model()` and `Document#model()` [mrazauskas](https://github.com/mrazauskas)
+ * docs: fix broken links and update MongoDB documentation links #16037 [hasezoey](https://github.com/hasezoey)
+ * docs(contributing): update issue tracker links to Automattic org [AkaHarshit](https://github.com/AkaHarshit)
+
+9.2.4 / 2026-03-03
+==================
+ * types(models): allow unknown keys in subdocs while retaining autocomplete suggestions #16048
+ * types(schema): fix issues related to defining timestamps and virtuals with methods and/or statics in schema options #16052 #16046
+ * docs: use lowercase primitive types in JSDoc and fix incorrect `@returns` declarations #16036 #16018
+ * docs(field-level-encryption): improve CSFLE docs with model registration guidance and schema definition example #16065 #16015
+
+9.2.3 / 2026-02-26
+==================
+ * types(model): make bulkSave() correctly take array of THydratedDocumentType #16032
+
+9.2.2 / 2026-02-23
+==================
+ * fix(document): make `pathsToSave` filter all update operators and preserve unsaved state #16027
+ * fix(setDefaultsOnInsert): check child filter paths before applying defaults, fix dot-notation handling, and prevent prototype pollution #16031 #16030
+ * fix(populate): make `refPath` work as a function, including map paths with `$*` #16035 #16028
+ * perf: optimize `pathsToSave` and indexed-path checks for subdocuments
+ * types: remove duplicate definition of `UUIDToJSON` type #16029
+ * docs(field-level-encryption): clarify crypt_shared library usage and move `extraOptions` under `autoEncryption` #16026 #16015
+ * test(types): introduce TSTyche for type testing #16024
+
+9.2.1 / 2026-02-11
+==================
+ * types(query): allow assigning QueryFilter<DocType> to QueryFilter<any> #16020
+ * types: duplicate identifier 'UUIDToJSON' in mongoosejs 9.2.0 #16023
+ * types: preserve subdocument toObject() field types when using virtuals + versionKey options #16021 #15965 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(mongoose): add missing options to mongoose.set() docs #16019
+
+9.2.0 / 2026-02-09
+==================
+ * feat: add option to skip middleware #15883 #8768 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(model): delay "Duplicate schema index" warning until createIndexes runs to include model name in the warning #15979
+ * feat(model): add strict option to Model.hydrate(...) #15940 #15977
+ * feat(document): add flattenUUIDs option to toObject() and toJSON() #15864 #15021 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(schema): treat undefined as not provided for strict, strictQuery and id options #16004 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * types(inferrawdoctype): avoid adding _id to nested paths and handle _id: false in options + schema definition #15989
+ * types: fix toObject() type inference with timestamps + virtuals #15975 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * types(models): remove dead MapReduce and GeoSearch types #15984
+ * test(types): remove tsd in favor of tsc + test utilities #15951 #15696
+
+8.23.0 / 2026-02-09
+===================
+ * feat(document): add flattenUUIDs option to toObject() and toJSON() (backport #15021 to 8.x)
+
+9.1.6 / 2026-02-04
+==================
+ * fix: handle other top-level query operators in sanitizeFilter
+ * fix(types): fix toObject() type inference with timestamps + virtuals #15975 #15965 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(populate): defer subpopulate until after match functions to avoid comparing populated subdocs #15981 mongodb-js/mongoose-autopopulate#112
+ * fix(DocumentArray): correctly clone subdocument when updating document array #15978 #15973
+ * fix(documentArray): fix change tracking for documentArrays in nested maps #15983 #15970 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs: clarify that you need to explicitly create timeseries collection before inserting document #15990 #15986
+
+8.22.1 / 2026-02-04
+==================
+ * fix: handle other top-level query operators in sanitizeFilter
+ * fix(document): when cloning a doc with subdocs, make sure the subdocs parent is the cloned doc #15904 #15901
+ * types(models): support Mongoose query casting in AnyBulkWriteOperation filter property #15910
+ * types: add toBSON() to documents #15927
+
+7.8.9 / 2026-02-04
+==================
+ * fix: handle other top-level query operators in sanitizeFilter
+
+8.22.0 / 2026-01-27
+===================
+ * feat(model): allow passing strict option to hydrate() #15944 #15940
+
 8.21.1 / 2026-01-23
 ===================
-* fix(clone): fix parent doc for map subdocuments and array subdocuments #15958 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
-* fix(document): when cloning a doc with subdocs, make sure the subdocs parent is the cloned doc #15904 #15901
-* fix: respect currentTime schema option in bulkWrite updates #15976 [sderrow](https://github.com/sderrow)
-* types(models): support Mongoose query casting in AnyBulkWriteOperation filter property #15910
-* types: add toBSON() to documents #15927
+ * fix(clone): fix parent doc for map subdocuments and array subdocuments #15958 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): when cloning a doc with subdocs, make sure the subdocs parent is the cloned doc #15904 #15901
+ * fix: respect currentTime schema option in bulkWrite updates #15976 [sderrow](https://github.com/sderrow)
+ * types(models): support Mongoose query casting in AnyBulkWriteOperation filter property #15910
+ * types: add toBSON() to documents #15927
 
 9.1.5 / 2026-01-20
 ==================

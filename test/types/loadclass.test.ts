@@ -1,6 +1,5 @@
 import { Schema, model, Document, Model, Types } from 'mongoose';
-import { expectType, expectError } from 'tsd';
-
+import { expect } from 'tstyche';
 
 // Basic usage of `loadClass` with TypeScript
 function basicLoadClassPattern() {
@@ -32,17 +31,17 @@ function basicLoadClassPattern() {
   const MyModel = model<MyCombinedDocument, MyCombinedModel>('MyClass', schema as any);
 
   // Static function should work
-  expectType<number>(MyModel.myStatic());
+  expect(MyModel.myStatic()).type.toBe<number>();
 
   // Instance method should work
   const doc = new MyModel();
-  expectType<number>(doc.myMethod());
+  expect(doc.myMethod()).type.toBe<number>();
 
   // Getter should work
-  expectType<number>(doc.myVirtual);
+  expect(doc.myVirtual).type.toBe<number>();
 
   // Schema property should be typed
-  expectType<string>(doc.property1);
+  expect(doc.property1).type.toBe<string>();
 }
 
 
@@ -68,8 +67,7 @@ function thisParameterPattern() {
     // TypeScript does NOT allow `this` parameters in getters/setters.
     // So we show an example error here.
     get myVirtual() {
-      expectError(this.property1);
-      // @ts-expect-error: getter does not support `this` typing
+      // @ts-expect-error  Property 'property1' does not exist on type 'MyClass'.
       return this.property1;
     }
   }
@@ -84,21 +82,21 @@ function thisParameterPattern() {
   const MyModel = model<MyCombinedDocument, MyCombinedModel>('MyClass2', schema as any);
 
   // Test static
-  expectType<number>(MyModel.myStatic());
+  expect(MyModel.myStatic()).type.toBe<number>();
 
   const doc = new MyModel({ property1: 'test' });
 
   // Instance method returns string
-  expectType<string>(doc.myMethod());
+  expect(doc.myMethod()).type.toBe<string>();
 
   // Schema field is typed correctly
-  expectType<string>(doc.property1);
+  expect(doc.property1).type.toBe<string>();
 
 
   // Getter works at runtime, but TypeScript can't type `this` in getters.
   // So we accept `any`.
   const virtual = doc.myVirtual;
-  expectType<any>(virtual);
+  expect(virtual).type.toBe<any>();
 }
 
 
@@ -139,16 +137,16 @@ function toObjectToJSONTest() {
   const pojo = doc.toObject();
 
   // Schema property is still typed
-  expectType<string>(pojo.property1);
+  expect(pojo.property1).type.toBe<string>();
 
   // TS still thinks class method exists (wrong at runtime)
-  expectType<() => number>(pojo.myMethod);
+  expect(pojo.myMethod).type.toBe<() => number>();
 
   // Same caveat applies to toJSON()
   const json = doc.toJSON();
 
-  expectType<() => number>(json.myMethod);
-  expectType<string>(json.property1);
+  expect(json.myMethod).type.toBe<() => number>();
+  expect(json.property1).type.toBe<string>();
 }
 
 
@@ -161,10 +159,10 @@ function getterLimitationTest() {
   }
 
   class TestGetter {
-    name: string;
+    name!: string;
 
     // TS errors if you try `this` in getter
-    // @ts-expect-error TS2784: 'this' parameters are not allowed in getters
+    // @ts-expect-error  'get' and 'set' accessors cannot declare 'this' parameters.
     get test(this: TestDoc): string {
       return this.name;
     }
@@ -174,4 +172,3 @@ function getterLimitationTest() {
     _id: Types.ObjectId;
   }
 }
-

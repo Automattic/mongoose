@@ -8,10 +8,12 @@ import {
   DefaultSchemaOptions,
   DefaultTypeKey,
   DoubleSchemaDefinition,
+  IfAny,
   IfEquals,
   InferSchemaType,
   IsItRecordAndNotAny,
   MapSchemaDefinition,
+  MergeType,
   NumberSchemaDefinition,
   ObjectIdSchemaDefinition,
   ObtainDocumentType,
@@ -112,7 +114,22 @@ declare module 'mongoose' {
       }[alias]
     : unknown;
 
-  type ResolveSchemaOptions<T> = MergeType<DefaultSchemaOptions, T>;
+  type TypesAreEqual<A, B> = [A] extends [B] ? [B] extends [A] ? true : false : false;
+
+  type ResolveSchemaOptions<T> =
+    keyof T extends never ? DefaultSchemaOptions :
+    TypesAreEqual<T, DefaultSchemaOptions> extends true ? DefaultSchemaOptions :
+    MergeType<DefaultSchemaOptions, T>;
+
+  /*!
+   * ResolveVirtuals resolves the virtuals option from the schema options.
+   * Adds the default `id` virtual if it is not disabled in schema options or
+   * overwritten in the RawDocType.
+   */
+  type ResolveVirtuals<TSchemaOptions, RawDocType> =
+    ResolveSchemaOptions<TSchemaOptions> extends { virtuals: infer V }
+      ? AddDefaultId<RawDocType, V, ResolveSchemaOptions<TSchemaOptions>>
+      : {};
 
   type ApplySchemaOptions<T, O = DefaultSchemaOptions> = ResolveTimestamps<T, O>;
 
@@ -228,7 +245,8 @@ type ObtainDocumentPathType<PathValueType, TypeKey extends string = DefaultTypeK
     : Omit<PathValueType, TypeKey>
   : {},
   TypeKey,
-  TypeHint<PathValueType>
+  TypeHint<PathValueType>,
+  DiscriminatorEnumType<PathValueType>
 >;
 
 /**
@@ -243,6 +261,22 @@ type PathEnumOrString<T extends SchemaTypeOptions<string>['enum']> =
 
 type UnionToType<T extends readonly any[]> = T[number] extends infer U
   ? ResolvePathType<U>
+  : never;
+
+type ResolveDiscriminatorPathType<TBaseSchema extends Schema, TDiscriminators> =
+  IfAny<TDiscriminators, never,
+  TDiscriminators extends Record<string, any> ?
+    TDiscriminators[keyof TDiscriminators] extends Schema ?
+      MergeType<InferSchemaType<TBaseSchema>, InferSchemaType<TDiscriminators[keyof TDiscriminators]>>
+    : never
+  : never>;
+
+type DiscriminatorEnumType<T> = string extends keyof T ? never
+  : number extends keyof T ? never
+  : T extends { type: infer BaseType; discriminators: infer TDiscriminators } ?
+    IfAny<BaseType, never, BaseType extends Schema ?
+      ResolveDiscriminatorPathType<BaseType, TDiscriminators>
+    : never>
   : never;
 
 type IsSchemaTypeFromBuiltinClass<T> =
@@ -279,9 +313,12 @@ type ResolvePathType<
   PathValueType,
   Options extends SchemaTypeOptions<PathValueType> = {},
   TypeKey extends string = DefaultSchemaOptions['typeKey'],
-  TypeHint = never
+  TypeHint = never,
+  TDiscriminatorEnumType = never
 > = [TypeHint] extends [never]
-  ? PathValueType extends Schema ? InferSchemaType<PathValueType>
+  ? [TDiscriminatorEnumType] extends [never]
+    ? PathValueType extends Schema ?
+      InferSchemaType<PathValueType>
   : PathValueType extends AnyArray<infer Item> ?
     [Item] extends [never]
       ? any[]
@@ -289,7 +326,11 @@ type ResolvePathType<
         // If Item is a schema, infer its type.
         Types.DocumentArray<InferSchemaType<Item>>
       : Item extends Record<TypeKey, any> ?
-        Item[TypeKey] extends Function | String ?
+        Item[TypeKey] extends Schema ?
+          Types.DocumentArray<
+            [DiscriminatorEnumType<Item>] extends [never] ? InferSchemaType<Item[TypeKey]> : DiscriminatorEnumType<Item>
+          >
+        : Item[TypeKey] extends Function | String ?
           // If Item has a type key that's a string or a callable, it must be a scalar,
           // so we can directly obtain its path type.
           ObtainDocumentPathType<Item, TypeKey>[]
@@ -334,4 +375,5 @@ type ResolvePathType<
       }
     >
   : unknown
+  : TDiscriminatorEnumType
   : TypeHint;

@@ -508,8 +508,25 @@ schemas and [subdocuments](subdocs.html), but you can also declare
 nested path aliases inline as long as you use the full nested path
 `nested.myProp` as the alias.
 
-```acquit
-[require:gh-6671]
+```javascript acquit:gh-6671
+const childSchema = new Schema({
+  n: {
+    type: String,
+    alias: 'name'
+  }
+}, { _id: false });
+
+const parentSchema = new Schema({
+  // If in a child schema, alias doesn't need to include the full nested path
+  c: childSchema,
+  name: {
+    f: {
+      type: String,
+      // Alias needs to include the full nested path if declared inline
+      alias: 'name.first'
+    }
+  }
+});
 ```
 
 ## Options {#options}
@@ -583,6 +600,12 @@ Clock.ensureIndexes(callback);
 
 The `autoIndex` option is set to `true` by default. You can change this
 default by setting [`mongoose.set('autoIndex', false);`](api/mongoose.html#mongoose_Mongoose-set)
+
+A common pattern is to disable `autoIndex` only in production:
+
+```javascript
+mongoose.set('autoIndex', process.env.NODE_ENV !== 'production');
+```
 
 ## option: autoCreate {#autoCreate}
 

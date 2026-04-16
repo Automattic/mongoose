@@ -5,6 +5,8 @@ declare module 'mongoose' {
   type AggregateExtract<P> = P extends Aggregate<infer T> ? T : never;
 
   interface AggregateOptions extends Omit<mongodb.AggregateOptions & mongodb.Abortable, 'session'>, SessionOption {
+    /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
+    middleware?: boolean | SkipMiddlewareOptions;
     [key: string]: any;
   }
 
@@ -122,6 +124,9 @@ declare module 'mongoose' {
 
     /** Returns the current pipeline */
     pipeline(): PipelineStage[];
+
+    /** Returns the current pipeline typed for use in `$unionWith` */
+    pipelineForUnionWith(): PipelineStage.UnionWithPipelineStage[];
 
     /** Appends a new $project operator to this aggregate pipeline. */
     project(arg: PipelineStage.Project['$project'] | string): this;

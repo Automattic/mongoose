@@ -132,6 +132,26 @@ describe('model', function() {
         assert.equal(docs[2].name, 'Impression event');
       });
 
+      it('skips applying defaults for discriminator docs when defaults option is false', async function() {
+        const eventSchema = new Schema({
+          name: { type: String, default: 'default event name' }
+        });
+        const impressionSchema = new Schema({ element: String });
+        const EventWithDefault = db.model('EventWithDefault', eventSchema);
+        const ImpressionWithDefault = EventWithDefault.discriminator('ImpressionWithDefault', impressionSchema);
+
+        await EventWithDefault.collection.insertOne({ __t: 'ImpressionWithDefault', element: 'banner' });
+
+        const doc = await EventWithDefault.findOne({ __t: 'ImpressionWithDefault' }).setOptions({ defaults: false });
+
+        assert.ok(doc instanceof ImpressionWithDefault);
+        assert.equal(doc.element, 'banner');
+        assert.ok(!doc.name);
+
+        const docWithDefaults = await EventWithDefault.findOne({ __t: 'ImpressionWithDefault' });
+        assert.equal(docWithDefaults.name, 'default event name');
+      });
+
       async function checkHydratesCorrectModels(fields) {
         const baseEvent = new BaseEvent({ name: 'Base event' });
         const impressionEvent = new ImpressionEvent({ name: 'Impression event' });
@@ -563,6 +583,66 @@ describe('model', function() {
         const expected = conversionEvent.toJSON();
         expected.name = 'Conversion event - updated';
         assert.deepEqual(document.toJSON(), expected);
+      });
+
+      it('handles deeply nested paths with discriminators and arrayFilters (gh-16072)', async function() {
+        const eventSchema = new Schema(
+          { message: String },
+          { discriminatorKey: 'kind', _id: false }
+        );
+
+        const batchSchema = new Schema(
+          { events: [eventSchema] },
+          { timestamps: true }
+        );
+
+        const docArray = batchSchema.path('events');
+
+        docArray.discriminator(
+          'Clicked',
+          new Schema({ element: { type: String, required: true } }, { _id: false })
+        );
+
+        docArray.discriminator(
+          'Purchased',
+          new Schema({
+            products: {
+              type: new Schema({ map: { type: Schema.Types.Map, of: String } }, { _id: false })
+            }
+          })
+        );
+
+        const Batch = db.model('gh16072', batchSchema);
+
+        const purchasedId = new mongoose.Types.ObjectId();
+
+        const doc = await Batch.create({
+          events: [
+            { kind: 'Clicked', element: '#hero', message: 'hello' },
+            {
+              kind: 'Purchased',
+              _id: purchasedId,
+              products: { map: { key: 'value' } },
+              message: 'world'
+            }
+          ]
+        });
+
+        const updatedBatch = await Batch.findByIdAndUpdate(
+          doc._id,
+          { 'events.$[event].products.map.key': 'newValue' },
+          {
+            arrayFilters: [
+              {
+                'event._id': purchasedId,
+                'event.kind': 'Purchased'
+              }
+            ],
+            new: true
+          }
+        ).exec();
+
+        assert.equal(updatedBatch.events[1].products.map.get('key'), 'newValue');
       });
     });
 

@@ -13,6 +13,7 @@ const assert = require('assert');
 const idGetter = require('../lib/helpers/schema/idGetter');
 const sinon = require('sinon');
 const util = require('./util');
+const isBsonType = require('../lib/helpers/isBsonType');
 const utils = require('../lib/utils');
 
 const mongoose = start.mongoose;
@@ -3178,6 +3179,218 @@ describe('document', function() {
       assert.ok(parent.otherId instanceof mongoose.Types.ObjectId);
     });
 
+    describe('function refPath (gh-16028)', function() {
+      describe('top-level doc', function() {
+        it('should treat assigned document as its id when creating', async function() {
+          // Arrange
+          const { User, ActivityLog } = createTestContext();
+          const user = await User.create({ name: 'Hafez' });
+
+          // Act
+          const activityLog = await ActivityLog.create({ targetModel: 'User', targetUser: user });
+
+          // Assert
+          const activityLogFromDb = await ActivityLog.findById(activityLog._id);
+          assert.ok(isBsonType(activityLogFromDb.targetUser, 'ObjectId'));
+          assert.ok(activityLogFromDb.targetUser.equals(user._id));
+        });
+
+        it('should pass `this`, doc, and path to function refPath', async function() {
+          // Arrange
+          const { User, ActivityLog, getRefPathArgs } = createTestContext();
+          const user = await User.create({ name: 'Hafez' });
+
+          // Act
+          const activityLog = await ActivityLog.create({ targetModel: 'User', targetUser: user });
+
+          // Assert
+          const refPathArgs = getRefPathArgs();
+          assert.ok(refPathArgs);
+          assert.strictEqual(refPathArgs.refPathThis, refPathArgs.doc);
+          assert.strictEqual(refPathArgs.doc, activityLog);
+          assert.strictEqual(refPathArgs.path, 'targetUser');
+
+          assert.strictEqual(refPathArgs.refPathThis.targetModel, 'User');
+          assert.strictEqual(refPathArgs.refPathThis, activityLog);
+        });
+
+        it('should treat document assigned after construction as populated', async function() {
+          // Arrange
+          const { User, ActivityLog } = createTestContext();
+          const user = await User.create({ name: 'Hafez' });
+
+          // Act
+          const activityLog = new ActivityLog({ targetModel: 'User' });
+          activityLog.targetUser = user;
+          await activityLog.save();
+
+          // Assert
+          assert.ok(activityLog.populated('targetUser'));
+          assert.strictEqual(activityLog.targetUser.name, 'Hafez');
+          const activityLogFromDb = await ActivityLog.findById(activityLog._id);
+          assert.ok(isBsonType(activityLogFromDb.targetUser, 'ObjectId'));
+          assert.ok(activityLogFromDb.targetUser.equals(user._id));
+        });
+
+        it('should work with string refPath when assigning a document (baseline)', async function() {
+          // Arrange
+          const { User, ActivityLog } = createTestContext({ refPath: 'targetModel' });
+          const user = await User.create({ name: 'Hafez' });
+
+          // Act
+          const activityLog = await ActivityLog.create({ targetModel: 'User', targetUser: user });
+          const activityLogFromDb = await ActivityLog.findById(activityLog._id).populate('targetUser');
+
+          // Assert
+          assert.equal(activityLogFromDb.targetUser.name, 'Hafez');
+        });
+
+        it('should use MongooseError if function refPath returns a non-string during $set', async function() {
+          // Arrange
+          const userSchema = new Schema({ name: String });
+          const User = db.model('User', userSchema);
+
+          const activityLogSchema = new Schema({
+            targetModel: String,
+            targetUser: {
+              type: Schema.Types.ObjectId,
+              refPath: function() {
+                return { path: 'targetModel' };
+              }
+            }
+          });
+          const ActivityLog = db.model('ActivityLog', activityLogSchema);
+
+          const user = await User.create({ name: 'Hafez' });
+
+          // Act
+          const err = await ActivityLog.create({ targetModel: 'User', targetUser: user }).
+            then(() => null, err => err);
+
+          // Assert
+          assert.equal(err.name, 'ValidationError');
+          assert.equal(err.errors.targetUser.reason.name, 'MongooseError');
+          assert.ok(/`refPath` must be a string/.test(err.errors.targetUser.reason.message));
+        });
+
+        function createTestContext({ refPath } = {}) {
+          let refPathArgs = null;
+
+          const userSchema = new Schema({ name: String });
+          const User = db.model('User', userSchema);
+
+          const activityLogSchema = new Schema({
+            targetModel: String,
+            targetUser: {
+              type: Schema.Types.ObjectId,
+              refPath: refPath || function(doc, path) {
+                refPathArgs = { refPathThis: this, doc, path };
+                return 'targetModel';
+              }
+            }
+          });
+          const ActivityLog = db.model('ActivityLog', activityLogSchema);
+
+          return { User, ActivityLog, getRefPathArgs: () => refPathArgs };
+        }
+      });
+
+      describe('subdoc array during $set', function() {
+        it('should pass indexed path', async function() {
+          // Arrange
+          const { User, Inbox, getRefPathCalls } = createTestContext();
+          const user = await User.create({ name: 'Hafez' });
+
+          // Act
+          const inbox = await Inbox.create({
+            notifications: [{ targetModel: 'User', target: user }]
+          });
+
+          // Assert
+          const calls = getRefPathCalls();
+          assert.strictEqual(calls.length, 1);
+          assert.strictEqual(calls[0].thisEqualsDoc, true);
+          assert.strictEqual(calls[0].doc, inbox.notifications[0]);
+          assert.strictEqual(calls[0].path, 'notifications.0.target');
+        });
+
+        it('should pass distinct indexed paths for multiple subdocs', async function() {
+          // Arrange
+          const { User, Inbox, getRefPathCalls } = createTestContext();
+          const user1 = await User.create({ name: 'Hafez' });
+          const user2 = await User.create({ name: 'Val' });
+
+          // Act
+          const inbox = await Inbox.create({
+            notifications: [
+              { targetModel: 'User', target: user1 },
+              { targetModel: 'User', target: user2 }
+            ]
+          });
+
+          // Assert
+          const calls = getRefPathCalls();
+          assert.strictEqual(calls.length, 2);
+          assert.strictEqual(calls[0].thisEqualsDoc, true);
+          assert.strictEqual(calls[0].doc, inbox.notifications[0]);
+          assert.strictEqual(calls[0].path, 'notifications.0.target');
+          assert.strictEqual(calls[1].thisEqualsDoc, true);
+          assert.strictEqual(calls[1].doc, inbox.notifications[1]);
+          assert.strictEqual(calls[1].path, 'notifications.1.target');
+        });
+
+        function createTestContext() {
+          const refPathCalls = [];
+
+          const userSchema = new Schema({ name: String });
+          const User = db.model('User', userSchema);
+
+          const notificationSchema = new Schema({
+            targetModel: String,
+            target: {
+              type: Schema.Types.ObjectId,
+              refPath: function(doc, path) {
+                refPathCalls.push({ thisEqualsDoc: this === doc, doc, path });
+                return path.replace('.target', '.targetModel');
+              }
+            }
+          });
+          const inboxSchema = new Schema({ notifications: [notificationSchema] });
+          const Inbox = db.model('Inbox', inboxSchema);
+
+          return { User, Inbox, getRefPathCalls: () => refPathCalls };
+        }
+      });
+
+      it('should pass path for single nested subdoc during $set', async function() {
+        // Arrange
+        const userSchema = new Schema({ name: String });
+        const User = db.model('User', userSchema);
+
+        let capturedPath = null;
+        const metadataSchema = new Schema({
+          targetModel: String,
+          target: {
+            type: Schema.Types.ObjectId,
+            refPath: function(_doc, path) {
+              capturedPath = path;
+              return path.replace('.target', '.targetModel');
+            }
+          }
+        });
+        const postSchema = new Schema({ title: String, metadata: metadataSchema });
+        const Post = db.model('Post', postSchema);
+
+        const user = await User.create({ name: 'Hafez' });
+
+        // Act
+        new Post({ title: 'Test', metadata: { targetModel: 'User', target: user } });
+
+        // Assert
+        assert.equal(capturedPath, 'metadata.target');
+      });
+    });
+
     it('doesnt skipId for single nested subdocs (gh-4008)', async function() {
       const childSchema = new Schema({
         name: String
@@ -4768,7 +4981,7 @@ describe('document', function() {
       assert.equal(doc.children[0].text, 'test');
     });
 
-    it('pre save hooks on subdocs receive save options (gh-15920)', async function() {
+    it('pre save hooks on subdocs receive save options when calling `doc.save()` (gh-15920)', async function() {
       // Arrange
       let receivedOptions = null;
 
@@ -4791,6 +5004,31 @@ describe('document', function() {
       // Assert
       assert.ok(receivedOptions, 'Subdoc pre save hook should receive options');
       assert.strictEqual(receivedOptions.customOption, 'test123');
+    });
+
+    it('pre save hooks on subdocs receive save options when calling `subdoc.save()` directly (gh-15920)', async function() {
+      // Arrange
+      let receivedOptions = null;
+
+      const addressSchema = new Schema({ city: String });
+      addressSchema.pre('save', function(options) {
+        receivedOptions = options;
+      });
+
+      const userSchema = new Schema({
+        name: String,
+        address: addressSchema
+      });
+
+      const User = db.model('User', userSchema);
+
+      // Act
+      const user = new User({ name: 'John', address: { city: 'New York' } });
+      await user.address.save({ suppressWarning: true, customOption: 'test456' });
+
+      // Assert
+      assert.ok(receivedOptions, 'Subdoc pre save hook should receive options');
+      assert.strictEqual(receivedOptions.customOption, 'test456');
     });
 
     it('post hooks on array child subdocs run after save (gh-5085) (gh-6926)', function() {
@@ -7123,6 +7361,132 @@ describe('document', function() {
       },
       documentArray: [{ _id: '3'.repeat(24) }]
     });
+  });
+
+  describe('`flattenUUIDs` option (gh-15021)', function() {
+    it('converts UUIDs to strings in toObject()', function() {
+      // Arrange
+      const { User, UUID } = createTestContext();
+      const user = new User({
+        _id: new UUID('00000000-0000-0000-0000-000000000000'),
+        uuid: new UUID('11111111-1111-1111-1111-111111111111'),
+        nested: {
+          uuid: new UUID('22222222-2222-2222-2222-222222222222')
+        },
+        subdocument: {
+          _id: new UUID('33333333-3333-3333-3333-333333333333')
+        },
+        documentArray: [{ _id: new UUID('44444444-4444-4444-4444-444444444444') }]
+      });
+
+      // Act
+      const userObj = user.toObject({ flattenUUIDs: true });
+
+      // Assert
+      assert.deepStrictEqual(userObj, {
+        _id: '00000000-0000-0000-0000-000000000000',
+        uuid: '11111111-1111-1111-1111-111111111111',
+        nested: {
+          uuid: '22222222-2222-2222-2222-222222222222'
+        },
+        subdocument: {
+          _id: '33333333-3333-3333-3333-333333333333'
+        },
+        documentArray: [{ _id: '44444444-4444-4444-4444-444444444444' }]
+      });
+    });
+
+    it('converts UUIDs to strings in toJSON()', function() {
+      // Arrange
+      const { User, UUID } = createTestContext();
+      const user = new User({
+        _id: new UUID('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+        uuid: new UUID('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'),
+        nested: { uuid: new UUID('cccccccc-cccc-cccc-cccc-cccccccccccc') },
+        subdocument: { _id: new UUID('dddddddd-dddd-dddd-dddd-dddddddddddd') },
+        documentArray: [{ _id: new UUID('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee') }]
+      });
+
+      // Act
+      const userJSON = user.toJSON({ flattenUUIDs: true });
+
+      // Assert
+      assert.deepStrictEqual(userJSON, {
+        _id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+        uuid: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        nested: {
+          uuid: 'cccccccc-cccc-cccc-cccc-cccccccccccc'
+        },
+        subdocument: {
+          _id: 'dddddddd-dddd-dddd-dddd-dddddddddddd'
+        },
+        documentArray: [{ _id: 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee' }]
+      });
+    });
+
+    for (const flattenUUIDs of [false, undefined]) {
+      it(`does not convert UUIDs when flattenUUIDs is \`${flattenUUIDs}\``, function() {
+        // Arrange
+        const { User, UUID } = createTestContext();
+        const testUUID = new UUID('12345678-1234-1234-1234-123456789012');
+        const user = new User({
+          _id: testUUID,
+          uuid: testUUID,
+          nested: { uuid: testUUID },
+          subdocument: { _id: testUUID },
+          documentArray: [{ _id: testUUID }]
+        });
+
+        // Act
+        const obj = user.toObject({ flattenUUIDs });
+
+        // Assert
+        assert.ok(obj._id instanceof UUID);
+        assert.ok(obj.uuid instanceof UUID);
+        assert.ok(obj.nested.uuid instanceof UUID);
+        assert.ok(obj.subdocument._id instanceof UUID);
+        assert.ok(obj.documentArray[0]._id instanceof UUID);
+      });
+    }
+
+
+    it('converts UUIDs inside Maps when both flattenMaps and flattenUUIDs are true', function() {
+      // Arrange
+      const { User, UUID } = createTestContext();
+      const user = new User({
+        _id: new UUID('00000000-0000-0000-0000-000000000000'),
+        uuidMap: new Map([
+          ['first', { refId: new UUID('11111111-1111-1111-1111-111111111111') }],
+          ['second', { refId: new UUID('22222222-2222-2222-2222-222222222222') }]
+        ])
+      });
+
+      // Act
+      const userObj = user.toObject({ flattenMaps: true, flattenUUIDs: true });
+
+      // Assert
+      assert.deepStrictEqual(userObj.uuidMap, {
+        first: { refId: '11111111-1111-1111-1111-111111111111' },
+        second: { refId: '22222222-2222-2222-2222-222222222222' }
+      });
+    });
+
+    function createTestContext() {
+      const UUID = mongoose.Types.UUID;
+      const userSchema = new Schema({
+        _id: 'UUID',
+        uuid: 'UUID',
+        nested: {
+          uuid: 'UUID'
+        },
+        subdocument: new Schema({ _id: 'UUID' }),
+        documentArray: [new Schema({ _id: 'UUID' })],
+        uuidMap: { type: Map, of: new Schema({ refId: 'UUID' }, { _id: false }) }
+      }, { versionKey: false });
+
+      const User = db.model('User', userSchema);
+      return { User, UUID };
+    }
   });
 
   it('`collection` property with strict: false (gh-7276)', async function() {
@@ -10858,13 +11222,12 @@ describe('document', function() {
       assert.deepEqual(Object.keys(err2.errors), ['age']);
     });
 
-    // skip until gh-10367 is implemented
-    it.skip('support `pathsToSkip` option for `Model.validate()`', async function() {
+    it('support `pathsToSkip` option for `Model.validate()`', async function() {
       const User = getUserModel();
-      const err1 = await User.validate({}, { pathsToSkip: ['age'] });
+      const err1 = await User.validate({}, { pathsToSkip: ['age'] }).then(() => null, err => err);
       assert.deepEqual(Object.keys(err1.errors), ['name']);
 
-      const err2 = await User.validate({}, { pathsToSkip: ['name'] });
+      const err2 = await User.validate({}, { pathsToSkip: ['name'] }).then(() => null, err => err);
       assert.deepEqual(Object.keys(err2.errors), ['age']);
     });
 

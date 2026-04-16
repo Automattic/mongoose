@@ -1,5 +1,5 @@
-import { Document, Model, Schema, model, InferSchemaType, ObtainSchemaGeneric } from 'mongoose';
-import { expectType } from 'tsd';
+import mongoose, { Document, Model, Schema, model, InferSchemaType, ObtainSchemaGeneric, Types } from 'mongoose';
+import { expect } from 'tstyche';
 
 interface IPerson {
   _id: number;
@@ -84,13 +84,21 @@ function gh11543() {
     lastName: { type: String, required: true }
   });
 
-  expectType<PetVirtuals>(personSchema.virtuals);
+  expect(personSchema.virtuals).type.toBe<PetVirtuals>();
 }
 
 async function autoTypedVirtuals() {
   type AutoTypedSchemaType = InferSchemaType<typeof testSchema>;
   type VirtualsType = { domain: string } & { id: string };
   type InferredDocType = AutoTypedSchemaType & ObtainSchemaGeneric<typeof testSchema, 'TVirtuals'>;
+  // Domain is unknown because of circular dep: this is the type of virtuals in the domain getter and setter
+  type ThisVirtualsType = { domain: unknown } & { id: string };
+  type HydratedDocType = mongoose.HydratedDocument<
+    AutoTypedSchemaType,
+    ThisVirtualsType,
+    {},
+    ThisVirtualsType
+  >;
 
   const testSchema = new Schema({
     email: {
@@ -101,25 +109,24 @@ async function autoTypedVirtuals() {
     virtuals: {
       domain: {
         get() {
-          expectType<Document<any, any, { email: string }> & AutoTypedSchemaType>(this);
+          expect(this).type.toBe<HydratedDocType>();
           return this.email.slice(this.email.indexOf('@') + 1);
         },
         set() {
-          expectType<Document<any, any, AutoTypedSchemaType> & AutoTypedSchemaType>(this);
+          expect(this).type.toBe<HydratedDocType>();
         },
         options: {}
       }
     }
   });
 
-
   const TestModel = model('AutoTypedVirtuals', testSchema);
 
   const doc = new TestModel();
-  expectType<string>(doc.domain);
+  expect(doc.domain).type.toBe<string>();
 
-  expectType<AutoTypedSchemaType & VirtualsType>({} as InferredDocType);
+  expect<InferredDocType>().type.toBe<AutoTypedSchemaType & VirtualsType>();
 
   const doc2 = await TestModel.findOne().orFail();
-  expectType<string>(doc2.domain);
+  expect(doc2.domain).type.toBe<string>();
 }

@@ -18,6 +18,7 @@ on the schema level and is useful for writing [plugins](plugins.html).
   <li><a href="#error-handling-middleware">Error Handling Middleware</a></li>
   <li><a href="#aggregate">Aggregation Hooks</a></li>
   <li><a href="#synchronous">Synchronous Hooks</a></li>
+  <li><a href="#skipping">Skipping Middleware</a></li>
 </ul>
 
 ## Types of Middleware
@@ -39,10 +40,10 @@ Query middleware is supported for the following Query functions.
 Query middleware executes when you call `exec()` or `then()` on a Query object, or `await` on a Query object.
 In query middleware functions, `this` refers to the query.
 
-* [count](api/query.html#query_Query-count)
 * [countDocuments](api/query.html#query_Query-countDocuments)
 * [deleteMany](api/query.html#query_Query-deleteMany)
 * [deleteOne](api/query.html#query_Query-deleteOne)
+* [distinct](api/query.html#query_Query-distinct)
 * [estimatedDocumentCount](api/query.html#query_Query-estimatedDocumentCount)
 * [find](api/query.html#query_Query-find)
 * [findOne](api/query.html#query_Query-findOne)
@@ -72,11 +73,11 @@ Here are the possible strings that can be passed to `pre()`
 
 * aggregate
 * bulkWrite
-* count
 * countDocuments
 * createCollection
-* deleteOne
 * deleteMany
+* deleteOne
+* distinct
 * estimatedDocumentCount
 * find
 * findOne
@@ -87,9 +88,8 @@ Here are the possible strings that can be passed to `pre()`
 * insertMany
 * replaceOne
 * save
-* update
-* updateOne
 * updateMany
+* updateOne
 * validate
 
 All middleware types support pre and post hooks.
@@ -429,7 +429,7 @@ await Test.find().validate();
 
 Pre and post `save()` hooks are **not** executed on `update()`,
 `findOneAndUpdate()`, etc. You can see a more detailed discussion why in
-[this GitHub issue](http://github.com/Automattic/mongoose/issues/964).
+[this GitHub issue](https://github.com/Automattic/mongoose/issues/964).
 Mongoose 4.0 introduced distinct hooks for these functions.
 
 ```javascript
@@ -581,17 +581,78 @@ Certain Mongoose hooks are synchronous, which means they do **not** support func
 Currently, only `init` hooks are synchronous, because the [`init()` function](api/document.html#document_Document-init) is synchronous.
 Below is an example of using pre and post init hooks.
 
-```acquit
-[require:post init hooks.*success]
+```javascript acquit:post init hooks.*success
+const schema = new Schema({ title: String, loadedAt: Date });
+
+schema.pre('init', pojo => {
+  assert.equal(pojo.constructor.name, 'Object'); // Plain object before init
+});
+
+const now = new Date();
+schema.post('init', doc => {
+  assert.ok(doc instanceof mongoose.Document); // Mongoose doc after init
+  doc.loadedAt = now;
+});
+
+const Test = db.model('Test', schema);
+
+return Test.create({ title: 'Casino Royale' }).
+  then(doc => Test.findById(doc)).
+  then(doc => assert.equal(doc.loadedAt.valueOf(), now.valueOf()));
 ```
 
 To report an error in an init hook, you must throw a **synchronous** error.
 Unlike all other middleware, init middleware does **not** handle promise
 rejections.
 
-```acquit
-[require:post init hooks.*error]
+```javascript acquit:post init hooks.*with errors
+const schema = new Schema({ title: String });
+
+const swallowedError = new Error('will not show');
+// init hooks do **not** handle async errors or any sort of async behavior
+schema.pre('init', () => Promise.reject(swallowedError));
+schema.post('init', () => { throw Error('will show'); });
+
+const Test = db.model('Test', schema);
+
+return Test.create({ title: 'Casino Royale' }).
+  then(doc => Test.findById(doc)).
+  catch(error => assert.equal(error.message, 'will show'));
 ```
+
+## Skipping Middleware {#skipping}
+
+You can skip user-defined middleware using the `middleware` option. This is useful for performance-critical operations or when you need to bypass hooks temporarily.
+
+### Skip All User Middleware
+
+Pass `middleware: false` to skip all user-defined pre and post hooks:
+
+```javascript
+// Skip all user middleware on save
+await doc.save({ middleware: false });
+
+// Skip all user middleware on queries
+await Model.find({}, null, { middleware: false });
+await Model.updateOne({}, { name: 'test' }, { middleware: false });
+
+// Skip all user middleware on aggregation
+await Model.aggregate([]).option({ middleware: false });
+```
+
+### Skip Only Pre or Post Hooks
+
+You can selectively skip only pre or post hooks:
+
+```javascript
+// Skip only pre hooks, post hooks still run
+await doc.save({ middleware: { pre: false } });
+
+// Skip only post hooks, pre hooks still run
+await Model.find({}, null, { middleware: { post: false } });
+```
+
+**Note:** Built-in Mongoose middleware (timestamps, validation, etc.) always runs regardless of this option. Only user-defined middleware registered via `schema.pre()` and `schema.post()` is skipped.
 
 ## Next Up {#next}
 

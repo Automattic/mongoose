@@ -167,6 +167,13 @@ describe('aggregate: ', function() {
       assert.deepEqual(aggregate._pipeline, [{ $project: { a: 1, b: 1, c: 0 } }, { $project: { b: 1 } }]);
     });
 
+    it('does not split string projections on tabs', function() {
+      const aggregate = new Aggregate();
+
+      aggregate.project('a\tb -c\td');
+      assert.deepEqual(aggregate._pipeline, [{ $project: { 'a\tb': 1, 'c\td': 0 } }]);
+    });
+
     it('("a","b","c")', function() {
       assert.throws(function() {
         const aggregate = new Aggregate();

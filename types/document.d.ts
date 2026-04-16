@@ -4,6 +4,13 @@ declare module 'mongoose' {
   /** A list of paths to skip. If set, Mongoose will validate every modified path that is not in this list. */
   type pathsToSkip = string[] | string;
 
+  interface ValidateOptions {
+    /** List of paths to skip. If set, Mongoose will validate every modified path that is not in this list. */
+    pathsToSkip?: pathsToSkip;
+    /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
+    middleware?: boolean | SkipMiddlewareOptions;
+  }
+
   interface DocumentSetOptions {
     merge?: boolean;
 
@@ -25,7 +32,7 @@ declare module 'mongoose' {
     _id: T;
 
     /** Assert that a given path or paths is populated. Throws an error if not populated. */
-    $assertPopulated<Paths = {}>(path: string | string[], values?: Partial<Paths>): Omit<this, keyof Paths> & Paths;
+    $assertPopulated<Paths = {}>(path: string | string[], values?: Partial<Paths>): PopulateDocumentResult<this, Paths, PopulatedPathsDocumentType<DocType, Paths>, DocType>;
 
     /** Clear the document's modified paths. */
     $clearModifiedPaths(): this;
@@ -82,8 +89,8 @@ declare module 'mongoose' {
     $markValid(path: string): void;
 
     /** Returns the model with the given name on this document's associated connection. */
-    $model<ModelType = Model<unknown>>(name: string): ModelType;
-    $model<ModelType = Model<DocType>>(): ModelType;
+    $model<ModelType extends Model<unknown>>(name: string): ModelType;
+    $model<ModelType extends Model<DocType>>(): ModelType;
 
     /**
      * A string containing the current operation that Mongoose is executing
@@ -164,6 +171,13 @@ declare module 'mongoose' {
      * Returns the changes that happened to the document
      * in the format that will be sent to MongoDB.
      */
+    $getChanges(): UpdateQuery<this>;
+
+    /**
+     * Returns the changes that happened to the document
+     * in the format that will be sent to MongoDB.
+     * @deprecated Use `$getChanges()` instead.
+     */
     getChanges(): UpdateQuery<this>;
 
     /** Signal that we desire an increment of this documents version. */
@@ -211,8 +225,8 @@ declare module 'mongoose' {
     markModified(path: string, scope?: any): void;
 
     /** Returns the model with the given name on this document's associated connection. */
-    model<ModelType = Model<unknown>>(name: string): ModelType;
-    model<ModelType = Model<DocType>>(): ModelType;
+    model<ModelType extends Model<unknown>>(name: string): ModelType;
+    model<ModelType extends Model<DocType>>(): ModelType;
 
     /** Returns the list of paths that have been modified. */
     modifiedPaths(options?: { includeChildren?: boolean }): Array<string>;
@@ -231,8 +245,8 @@ declare module 'mongoose' {
     $parent(): Document | undefined;
 
     /** Populates document references. */
-    populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<MergeType<this, Paths>>;
-    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<any>, match?: AnyObject, options?: PopulateOptions): Promise<MergeType<this, Paths>>;
+    populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<PopulateDocumentResult<this, Paths, PopulatedPathsDocumentType<DocType, Paths>, DocType>>;
+    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<any>, match?: AnyObject, options?: PopulateOptions): Promise<PopulateDocumentResult<this, Paths, PopulatedPathsDocumentType<DocType, Paths>, DocType>>;
 
     /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
     populated(path: string): any;
@@ -255,105 +269,43 @@ declare module 'mongoose' {
     toBSON(): Require_id<DocType>;
 
     /** The return value of this method is used in calls to JSON.stringify(doc). */
-    // Consistently handle combinations of flattenMaps, flattenObjectIds, virtuals, and versionKey
-
-    // All combinations, including with and without TVirtuals when virtuals is true/false,
-    // and proper nesting/order: flattenMaps -> ObjectIdToString -> Omit<..., '__v'> when needed.
-
-    // flattenMaps: false (default) cases
-    toJSON(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: true, virtuals: true, versionKey: false }): ObjectIdToString<Omit<Require_id<DocType & TVirtuals>, '__v'>>;
-    toJSON(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: true, virtuals: true }): ObjectIdToString<Require_id<DocType & TVirtuals>>;
-    toJSON(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: false, virtuals: true, versionKey: false }): Omit<Require_id<DocType & TVirtuals>, '__v'>;
-    toJSON(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: false, virtuals: true }): Require_id<DocType & TVirtuals>;
-    toJSON(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: true, virtuals: false, versionKey: false }): ObjectIdToString<Omit<Require_id<DocType>, '__v'>>;
-    toJSON(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: true, virtuals: false }): ObjectIdToString<Require_id<DocType>>;
-    toJSON(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: false, virtuals: false, versionKey: false }): Omit<Require_id<DocType>, '__v'>;
-    toJSON(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: false, virtuals: false }): Require_id<DocType>;
-
-    // flattenMaps: true cases
-    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: true, versionKey: false }): ObjectIdToString<Omit<FlattenMaps<Require_id<DocType & TVirtuals>>, '__v'>>;
-    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: true }): ObjectIdToString<FlattenMaps<Require_id<DocType & TVirtuals>>>;
-    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: false, virtuals: true, versionKey: false }): Omit<FlattenMaps<Require_id<DocType & TVirtuals>>, '__v'>;
-    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: false, virtuals: true }): FlattenMaps<Require_id<DocType & TVirtuals>>;
-    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: false, versionKey: false }): ObjectIdToString<Omit<FlattenMaps<Require_id<DocType>>, '__v'>>;
-    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: false }): ObjectIdToString<FlattenMaps<Require_id<DocType>>>;
-    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: false, virtuals: false, versionKey: false }): Omit<FlattenMaps<Require_id<DocType>>, '__v'>;
-    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: false, virtuals: false }): FlattenMaps<Require_id<DocType>>;
-
-    // Handle "at least" short cross-combinations
-    // (Some permutations above will catch these, but make some explicit for clarity)
-    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: true }): ObjectIdToString<FlattenMaps<Require_id<DocType & TVirtuals>>>;
-    toJSON(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true }): ObjectIdToString<FlattenMaps<Require_id<DocType>>>;
-    toJSON(options: ToObjectOptions & { flattenObjectIds: true, virtuals: true }): ObjectIdToString<Require_id<DocType & TVirtuals>>;
-    toJSON(options: ToObjectOptions & { flattenObjectIds: true }): ObjectIdToString<Require_id<DocType>>;
-    toJSON(options: ToObjectOptions & { flattenMaps: true, virtuals: true }): FlattenMaps<Require_id<DocType & TVirtuals>>;
-    toJSON(options: ToObjectOptions & { flattenMaps: true }): FlattenMaps<Require_id<DocType>>;
-
-    // Handle versionKey: false (regardless of the others - most specific overloads should come first)
-    toJSON(options: ToObjectOptions & { versionKey: false, flattenMaps: true, flattenObjectIds: true, virtuals: true }): ObjectIdToString<Omit<FlattenMaps<Require_id<DocType & TVirtuals>>, '__v'>>;
-    toJSON(options: ToObjectOptions & { versionKey: false, flattenMaps: false, flattenObjectIds: true, virtuals: true }): ObjectIdToString<Omit<Require_id<DocType & TVirtuals>, '__v'>>;
-    toJSON(options: ToObjectOptions & { versionKey: false, flattenMaps: true, virtuals: true }): Omit<FlattenMaps<Require_id<DocType & TVirtuals>>, '__v'>;
-    toJSON(options: ToObjectOptions & { versionKey: false, flattenObjectIds: true, virtuals: true }): ObjectIdToString<Omit<Require_id<DocType & TVirtuals>, '__v'>>;
-    toJSON(options: ToObjectOptions & { versionKey: false, virtuals: true }): Omit<Require_id<DocType & TVirtuals>, '__v'>;
-    toJSON(options: ToObjectOptions & { versionKey: false, flattenMaps: true, flattenObjectIds: true }): ObjectIdToString<Omit<FlattenMaps<Require_id<DocType>>, '__v'>>;
-    toJSON(options: ToObjectOptions & { versionKey: false, flattenObjectIds: true }): ObjectIdToString<Omit<Require_id<DocType>, '__v'>>;
-    toJSON(options: ToObjectOptions & { versionKey: false, flattenMaps: true }): Omit<FlattenMaps<Require_id<DocType>>, '__v'>;
-    toJSON(options: ToObjectOptions & { versionKey: false }): Omit<Require_id<DocType>, '__v'>;
-
-    // Handle virtuals: true
-    toJSON(options: ToObjectOptions & { virtuals: true }): Require_id<DocType & TVirtuals>;
-
-    // Default - no special options
+    toJSON<PopulatedRawDocType, DepopulatedRawDocType>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, DepopulatedRawDocType>,
+      options: { depopulate: true }
+    ): Default__v<Require_id<DepopulatedRawDocType>, TSchemaOptions>;
+    toJSON<PopulatedRawDocType, DepopulatedRawDocType, O extends ToObjectOptions & { depopulate: true }>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, DepopulatedRawDocType>,
+      options: O
+    ): ToObjectReturnType<DepopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
+    toJSON<PopulatedRawDocType, O extends ToObjectOptions>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, any>,
+      options: O
+    ): ToObjectReturnType<PopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
+    toJSON<PopulatedRawDocType>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, any>
+    ): Default__v<Require_id<PopulatedRawDocType>, TSchemaOptions>;
+    toJSON<O extends ToObjectOptions>(options: O): ToObjectReturnType<DocType, TVirtuals, O, TSchemaOptions>;
     toJSON(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;
-
     toJSON<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
-    // flattenMaps: false (default) cases
-    toObject(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: true, virtuals: true, versionKey: false }): ObjectIdToString<Omit<Require_id<DocType & TVirtuals>, '__v'>>;
-    toObject(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: true, virtuals: true }): ObjectIdToString<Require_id<DocType & TVirtuals>>;
-    toObject(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: false, virtuals: true, versionKey: false }): Omit<Require_id<DocType & TVirtuals>, '__v'>;
-    toObject(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: false, virtuals: true }): Require_id<DocType & TVirtuals>;
-    toObject(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: true, virtuals: false, versionKey: false }): ObjectIdToString<Omit<Require_id<DocType>, '__v'>>;
-    toObject(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: true, virtuals: false }): ObjectIdToString<Require_id<DocType>>;
-    toObject(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: false, virtuals: false, versionKey: false }): Omit<Require_id<DocType>, '__v'>;
-    toObject(options: ToObjectOptions & { flattenMaps: false, flattenObjectIds: false, virtuals: false }): Require_id<DocType>;
-
-    // flattenMaps: true cases
-    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: true, versionKey: false }): ObjectIdToString<Omit<FlattenMaps<Require_id<DocType & TVirtuals>>, '__v'>>;
-    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: true }): ObjectIdToString<FlattenMaps<Require_id<DocType & TVirtuals>>>;
-    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: false, virtuals: true, versionKey: false }): Omit<FlattenMaps<Require_id<DocType & TVirtuals>>, '__v'>;
-    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: false, virtuals: true }): FlattenMaps<Require_id<DocType & TVirtuals>>;
-    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: false, versionKey: false }): ObjectIdToString<Omit<FlattenMaps<Require_id<DocType>>, '__v'>>;
-    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: false }): ObjectIdToString<FlattenMaps<Require_id<DocType>>>;
-    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: false, virtuals: false, versionKey: false }): Omit<FlattenMaps<Require_id<DocType>>, '__v'>;
-    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: false, virtuals: false }): FlattenMaps<Require_id<DocType>>;
-
-    // Handle "at least" short cross-combinations
-    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true, virtuals: true }): ObjectIdToString<FlattenMaps<Require_id<DocType & TVirtuals>>>;
-    toObject(options: ToObjectOptions & { flattenMaps: true, flattenObjectIds: true }): ObjectIdToString<FlattenMaps<Require_id<DocType>>>;
-    toObject(options: ToObjectOptions & { flattenObjectIds: true, virtuals: true }): ObjectIdToString<Require_id<DocType & TVirtuals>>;
-    toObject(options: ToObjectOptions & { flattenObjectIds: true }): ObjectIdToString<Require_id<DocType>>;
-    toObject(options: ToObjectOptions & { flattenMaps: true, virtuals: true }): FlattenMaps<Require_id<DocType & TVirtuals>>;
-    toObject(options: ToObjectOptions & { flattenMaps: true }): FlattenMaps<Require_id<DocType>>;
-
-    // Handle versionKey: false (regardless of the others - most specific overloads should come first)
-    toObject(options: ToObjectOptions & { versionKey: false, flattenMaps: true, flattenObjectIds: true, virtuals: true }): ObjectIdToString<Omit<FlattenMaps<Require_id<DocType & TVirtuals>>, '__v'>>;
-    toObject(options: ToObjectOptions & { versionKey: false, flattenMaps: false, flattenObjectIds: true, virtuals: true }): ObjectIdToString<Omit<Require_id<DocType & TVirtuals>, '__v'>>;
-    toObject(options: ToObjectOptions & { versionKey: false, flattenMaps: true, virtuals: true }): Omit<FlattenMaps<Require_id<DocType & TVirtuals>>, '__v'>;
-    toObject(options: ToObjectOptions & { versionKey: false, flattenObjectIds: true, virtuals: true }): ObjectIdToString<Omit<Require_id<DocType & TVirtuals>, '__v'>>;
-    toObject(options: ToObjectOptions & { versionKey: false, virtuals: true }): Omit<Require_id<DocType & TVirtuals>, '__v'>;
-    toObject(options: ToObjectOptions & { versionKey: false, flattenMaps: true, flattenObjectIds: true }): ObjectIdToString<Omit<FlattenMaps<Require_id<DocType>>, '__v'>>;
-    toObject(options: ToObjectOptions & { versionKey: false, flattenObjectIds: true }): ObjectIdToString<Omit<Require_id<DocType>, '__v'>>;
-    toObject(options: ToObjectOptions & { versionKey: false, flattenMaps: true }): Omit<FlattenMaps<Require_id<DocType>>, '__v'>;
-    toObject(options: ToObjectOptions & { versionKey: false }): Omit<Require_id<DocType>, '__v'>;
-
-    // Handle virtuals: true
-    toObject(options: ToObjectOptions & { virtuals: true }): Require_id<DocType & TVirtuals>;
-
-    // Default - no special options
+    toObject<PopulatedRawDocType, DepopulatedRawDocType>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, DepopulatedRawDocType>,
+      options: { depopulate: true }
+    ): Default__v<Require_id<DepopulatedRawDocType>, TSchemaOptions>;
+    toObject<PopulatedRawDocType, DepopulatedRawDocType, O extends ToObjectOptions & { depopulate: true }>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, DepopulatedRawDocType>,
+      options: O
+    ): ToObjectReturnType<DepopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
+    toObject<PopulatedRawDocType, O extends ToObjectOptions>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, any>,
+      options: O
+    ): ToObjectReturnType<PopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
+    toObject<PopulatedRawDocType>(
+      this: PopulatedDocumentMarker<PopulatedRawDocType, any>
+    ): Default__v<Require_id<PopulatedRawDocType>, TSchemaOptions>;
+    toObject<O extends ToObjectOptions>(options: O): ToObjectReturnType<DocType, TVirtuals, O, TSchemaOptions>;
     toObject(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;
-
     toObject<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
 
     /** Clears the modified state on the specified path. */
@@ -364,13 +316,13 @@ declare module 'mongoose' {
     updateOne(update?: UpdateQuery<this> | UpdateWithAggregationPipeline, options?: QueryOptions | null): Query<any, this>;
 
     /** Executes registered validation rules for this document. */
-    validate<T extends keyof DocType>(pathsToValidate?: T | T[], options?: AnyObject): Promise<void>;
-    validate(pathsToValidate?: pathsToValidate, options?: AnyObject): Promise<void>;
-    validate(options: { pathsToSkip?: pathsToSkip }): Promise<void>;
+    validate<T extends keyof DocType>(pathsToValidate?: T | T[], options?: Omit<ValidateOptions, 'pathsToSkip'> & AnyObject): Promise<void>;
+    validate(pathsToValidate?: pathsToValidate, options?: Omit<ValidateOptions, 'pathsToSkip'> & AnyObject): Promise<void>;
+    validate(options: ValidateOptions): Promise<void>;
 
     /** Executes registered validation rules (skipping asynchronous validators) for this document. */
-    validateSync(options: { pathsToSkip?: pathsToSkip, [k: string]: any }): Error.ValidationError | null;
-    validateSync<T extends keyof DocType>(pathsToValidate?: T | T[], options?: AnyObject): Error.ValidationError | null;
-    validateSync(pathsToValidate?: pathsToValidate, options?: AnyObject): Error.ValidationError | null;
+    validateSync(options: ValidateOptions & { [k: string]: any }): Error.ValidationError | null;
+    validateSync<T extends keyof DocType>(pathsToValidate?: T | T[], options?: Omit<ValidateOptions, 'pathsToSkip'> & AnyObject): Error.ValidationError | null;
+    validateSync(pathsToValidate?: pathsToValidate, options?: Omit<ValidateOptions, 'pathsToSkip'> & AnyObject): Error.ValidationError | null;
   }
 }

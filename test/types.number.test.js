@@ -100,6 +100,18 @@ describe('types.number', function() {
     done();
   });
 
+  it('throws an error when using an unsupported query operator (gh-16062)', function() {
+    const n = new SchemaNumber();
+    let err;
+    try {
+      n.castForQuery('$wrong', 100);
+    } catch (e) {
+      err = e;
+    }
+    assert.ok(err);
+    assert.ok(err.message.includes('Can\'t use $wrong with Number'));
+  });
+
   it('throws a CastError with a bad conditional (gh-6927)', function() {
     const n = new SchemaNumber();
     let err;

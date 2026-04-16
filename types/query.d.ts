@@ -18,13 +18,41 @@ declare module 'mongoose' {
             ? DateQueryTypeCasting
             : T;
 
-  export type ApplyBasicQueryCasting<T> = QueryTypeCasting<T> | QueryTypeCasting<T[]> | (T extends (infer U)[] ? QueryTypeCasting<U> : T) | null;
+  export type ApplyBasicQueryCasting<T> = QueryTypeCasting<T> | QueryTypeCasting<T>[] | (T extends (infer U)[] ? QueryTypeCasting<U> : T) | null;
 
-  type _QueryFilter<T> = ({ [P in keyof T]?: mongodb.Condition<ApplyBasicQueryCasting<T[P]>>; } & mongodb.RootFilterOperators<{ [P in keyof mongodb.WithId<T>]?: ApplyBasicQueryCasting<mongodb.WithId<T>[P]>; }>);
-  type QueryFilter<T> = IsItRecordAndNotAny<T> extends true ? _QueryFilter<WithLevel1NestedPaths<T>> : _QueryFilter<Record<string, any>>;
+  type RemoveIndexSignature<T> = {
+    [K in keyof T as string extends K ? never : number extends K ? never : symbol extends K ? never : K]: T[K];
+  };
+
+  type StrictFilterOperators<TValue> = RemoveIndexSignature<mongodb.FilterOperators<TValue>>;
+
+  type StrictCondition<T> = mongodb.AlternativeType<T> | StrictFilterOperators<mongodb.AlternativeType<T>>;
+
+  type _StrictFilter<TSchema> = {
+    [P in keyof TSchema]?: StrictCondition<ApplyBasicQueryCasting<TSchema[P]>>;
+  } & StrictRootFilterOperators<TSchema>;
+
+  type StrictRootFilterOperators<TSchema> = Omit<mongodb.RootFilterOperators<TSchema>, '$and' | '$or' | '$nor'> & {
+    $and?: _StrictFilter<TSchema>[];
+    $or?: _StrictFilter<TSchema>[];
+    $nor?: _StrictFilter<TSchema>[];
+  };
+
+  type _QueryFilter<T> = (
+    { [P in keyof T]?: StrictCondition<ApplyBasicQueryCasting<T[P]>>; } &
+    StrictRootFilterOperators<{ [P in keyof mongodb.WithId<T>]?: ApplyBasicQueryCasting<mongodb.WithId<T>[P]>; }>
+  );
+  type _QueryFilterLooseId<T> = (
+    { [P in keyof T]?: StrictCondition<ApplyBasicQueryCasting<T[P]>>; } &
+    StrictRootFilterOperators<
+      { [P in keyof T]?: ApplyBasicQueryCasting<T[P]>; }
+    >
+  );
+  type QueryFilter<T> = IsItRecordAndNotAny<T> extends true ? _QueryFilter<WithLevel1NestedPaths<T>> : _QueryFilterLooseId<Record<string, any>>;
 
   type MongooseBaseQueryOptionKeys =
     | 'context'
+    | 'middleware'
     | 'multipleCastError'
     | 'overwriteDiscriminatorKey'
     | 'overwriteImmutable'
@@ -95,9 +123,17 @@ declare module 'mongoose' {
      * By default, `findOneAndUpdate()` returns the document as it was **before**
      * `update` was applied. If you set `new: true`, `findOneAndUpdate()` will
      * instead give you the object after `update` was applied.
+     * Use `returnDocument: 'after'` instead of `new: true`, or `returnDocument: 'before'` instead of `new: false`.
+     *
+     * @deprecated
      */
     new?: boolean;
 
+    /**
+     * If `false`, skip applying default schema values to the returned document(s).
+     * @default true
+     */
+    defaults?: boolean;
     overwriteDiscriminatorKey?: boolean;
     /**
      * Mongoose removes updated immutable properties from `update` by default (excluding $setOnInsert).
@@ -112,10 +148,14 @@ declare module 'mongoose' {
     readPreference?: string | mongodb.ReadPreferenceMode;
     /**
      * An alias for the `new` option. `returnOriginal: false` is equivalent to `new: true`.
+     * Use `returnDocument: 'after'` instead of `returnOriginal: false`, or `returnDocument: 'before'` instead of `returnOriginal: true`.
+     *
+     * @deprecated
      */
     returnOriginal?: boolean;
     /**
-     * Another alias for the `new` option. `returnOriginal` is deprecated so this should be used.
+     * Has two possible values, `'before'` and `'after'`. By default, it will return the document before the update was applied.
+     * @default 'before'
      */
     returnDocument?: 'before' | 'after';
     /**
@@ -166,6 +206,9 @@ declare module 'mongoose' {
     updatePipeline?: boolean;
     writeConcern?: mongodb.WriteConcern;
 
+    /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
+    middleware?: boolean | SkipMiddlewareOptions;
+
     [other: string]: any;
   }
 
@@ -180,10 +223,10 @@ declare module 'mongoose' {
       ? ResultType
       : ResultType extends (infer U)[]
         ? U extends Document
-          ? HydratedDocument<MergeType<RawDocType, Paths>, TDocOverrides, TQueryHelpers>[]
+          ? PopulateDocumentResult<U, Paths, MergeType<RawDocType, Paths>, RawDocType>[]
           : (MergeType<U, Paths>)[]
         : ResultType extends Document
-          ? HydratedDocument<MergeType<RawDocType, Paths>, TDocOverrides, TQueryHelpers>
+          ? PopulateDocumentResult<ResultType, Paths, MergeType<RawDocType, Paths>, RawDocType>
           : MergeType<ResultType, Paths>
     : MergeType<ResultType, Paths>;
 
@@ -191,7 +234,7 @@ declare module 'mongoose' {
     _mongooseOptions: QueryOptions<RawDocType>;
 
     /**
-     * Returns a wrapper around a [mongodb driver cursor](https://mongodb.github.io/node-mongodb-native/4.9/classes/FindCursor.html).
+     * Returns a wrapper around a [mongodb driver cursor](https://mongodb.github.io/node-mongodb-native/7.0/classes/FindCursor.html).
      * A QueryCursor exposes a Streams3 interface, as well as a `.next()` function.
      * This is equivalent to calling `.cursor()` with no arguments.
      */
@@ -275,7 +318,7 @@ declare module 'mongoose' {
     ): QueryWithHelpers<number, DocType, THelpers, RawDocType, 'countDocuments', TDocOverrides>;
 
     /**
-     * Returns a wrapper around a [mongodb driver cursor](https://mongodb.github.io/node-mongodb-native/4.9/classes/FindCursor.html).
+     * Returns a wrapper around a [mongodb driver cursor](https://mongodb.github.io/node-mongodb-native/7.0/classes/FindCursor.html).
      * A QueryCursor exposes a Streams3 interface, as well as a `.next()` function.
      */
     cursor(options?: QueryOptions<RawDocType>): Cursor<Unpacked<ResultType>, QueryOptions<RawDocType>>;

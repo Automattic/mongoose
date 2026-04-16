@@ -6,13 +6,43 @@ One of these new features is the [`SchemaType.cast()` function](../api/schematyp
 For example, by default Mongoose will throw an error if you attempt to cast
 a string that contains a Japanese numeral to a number.
 
-```acquit
-[require:custom casting.*casting error]
+```javascript acquit:custom casting.*casting error
+const schema = new mongoose.Schema({
+  age: Number
+});
+const Model = mongoose.model('Test', schema);
+
+const doc = new Model({ age: '二' });
+const err = doc.validateSync();
+// "Cast to Number failed for value "二" at path "age""
+err.message;
 ```
 
 You can overwrite the default casting function for numbers to allow converting
 the string that contains the Japanese numeral "2" to a number as shown below.
 
-```acquit
-[require:custom casting.*casting override]
+```javascript acquit:custom casting.*casting override
+// Calling `cast()` on a class that inherits from `SchemaType` returns the
+// current casting function.
+const originalCast = mongoose.Number.cast();
+
+// Calling `cast()` with a function sets the current function used to
+// cast a given schema type, in this cast Numbers.
+mongoose.Number.cast(v => {
+  if (v === '二') {
+    return 2;
+  }
+  return originalCast(v);
+});
+
+const schema = new mongoose.Schema({
+  age: Number
+});
+
+const Model = mongoose.model('Test', schema);
+
+const doc = new Model({ age: '二' });
+const err = doc.validateSync();
+err; // null
+doc.age; // 2
 ```

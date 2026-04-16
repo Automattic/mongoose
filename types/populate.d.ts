@@ -8,6 +8,50 @@ declare module 'mongoose' {
     RawId extends RefType = (PopulatedType extends { _id?: RefType; } ? NonNullable<PopulatedType['_id']> : Types.ObjectId) | undefined
   > = PopulatedType | RawId;
 
+  const mongoosePopulatedDocumentMarker: unique symbol;
+
+  type ExtractDocumentObjectType<T> = T extends infer ObjectType & Document ? FlatRecord<ObjectType> : T;
+
+  type PopulatePathToRawDocType<T> =
+    T extends Types.DocumentArray<any, infer ItemType>
+      ? PopulatePathToRawDocType<ItemType>[]
+      : T extends Array<infer ItemType>
+        ? PopulatePathToRawDocType<ItemType>[]
+        : T extends Document
+          ? SubdocsToPOJOs<ExtractDocumentObjectType<T>>
+          : T extends Record<string, any>
+            ? { [K in keyof T]: PopulatePathToRawDocType<T[K]> }
+            : T;
+
+  type PopulatedPathsDocumentType<RawDocType, Paths> = UnpackedIntersection<RawDocType, PopulatePathToRawDocType<Paths>>;
+
+  type PopulatedDocumentMarker<
+    PopulatedRawDocType,
+    DepopulatedRawDocType,
+  > = {
+    [mongoosePopulatedDocumentMarker]?: {
+      populated: PopulatedRawDocType,
+      depopulated: DepopulatedRawDocType
+    }
+  };
+
+  type ResolvePopulatedRawDocType<
+    ThisType,
+    FallbackRawDocType,
+    O = never
+  > = ThisType extends PopulatedDocumentMarker<infer PopulatedRawDocType, infer DepopulatedRawDocType>
+    ? O extends { depopulate: true }
+      ? DepopulatedRawDocType
+      : PopulatedRawDocType
+    : FallbackRawDocType;
+
+  type PopulateDocumentResult<
+    Doc,
+    Paths,
+    PopulatedRawDocType,
+    DepopulatedRawDocType = PopulatedRawDocType
+  > = MergeType<Doc, Paths> & PopulatedDocumentMarker<PopulatedRawDocType, DepopulatedRawDocType>;
+
   interface PopulateOptions {
     /** space delimited path(s) to populate */
     path: string;

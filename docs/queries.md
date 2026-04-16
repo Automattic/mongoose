@@ -43,7 +43,7 @@ const person = await Person.findOne({ 'name.last': 'Ghost' }, 'name occupation')
 console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation);
 ```
 
-What `person` is depends on the operation: For `findOne()` it is a [potentially-null single document](api/model.html#model_Model-findOne), `find()` a [list of documents](api/model.html#model_Model-find), `count()` [the number of documents](api/model.html#model_Model-count), `update()` the [number of documents affected](api/model.html#model_Model-update), etc.
+What `person` is depends on the operation: For `findOne()` it is a [potentially-null single document](api/model.html#model_Model-findOne), `find()` a [list of documents](api/model.html#model_Model-find), `countDocuments()` [the number of documents](api/model.html#model_Model-countDocuments), `updateOne()` the [number of documents affected](api/model.html#model_Model-updateOne), etc.
 The [API docs for Models](api/model.html) provide more details.
 
 Now let's look at what happens when no `await` is used:
@@ -210,7 +210,7 @@ await Person.find().sort({ age: -1 }); // returns age starting from 10 as the fi
 await Person.find().sort({ age: 1 }); // returns age starting from 0 as the first entry
 ```
 
-When sorting with mutiple fields, the order of the sort keys determines what key MongoDB server sorts by first.
+When sorting with multiple fields, the order of the sort keys determines what key MongoDB server sorts by first.
 
 ```javascript
 const personSchema = new mongoose.Schema({

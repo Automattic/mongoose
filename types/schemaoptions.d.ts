@@ -7,6 +7,13 @@ declare module 'mongoose' {
     currentTime?: () => (NativeDate | number);
   }
 
+  type SchemaOptionsStaticsPropertyType<TStaticMethods, TModelType> = IfEquals<
+    TStaticMethods,
+    {},
+    Record<string, (...args: any[]) => unknown> & ThisType<TModelType>,
+    { [K in keyof TStaticMethods]: OmitThisParameter<TStaticMethods[K]> } & ThisType<TModelType>
+  >;
+
   type TypeKeyBaseType = string;
 
   type DefaultTypeKey = 'type';
@@ -222,12 +229,7 @@ declare module 'mongoose' {
     /**
      * Model Statics methods.
      */
-    statics?: IfEquals<
-      TStaticMethods,
-      {},
-      { [name: string]: (this: TModelType, ...args: any[]) => unknown },
-      AddThisParameter<TStaticMethods, TModelType>
-    >
+    statics?: SchemaOptionsStaticsPropertyType<TStaticMethods, TModelType>
 
     /**
      * Document instance methods.
@@ -258,7 +260,7 @@ declare module 'mongoose' {
     /**
      * Virtual paths.
      */
-    virtuals?: SchemaOptionsVirtualsPropertyType<DocType, TVirtuals, TInstanceMethods>,
+    virtuals?: SchemaOptionsVirtualsPropertyType<any, TVirtuals, THydratedDocumentType>,
 
     /**
      * Set to `true` to default to overwriting models with the same name when calling `mongoose.model()`, as opposed to throwing an `OverwriteModelError`.

@@ -1,5 +1,5 @@
 import { Schema, model, Document, Expression, PipelineStage, Types, Model, Aggregate } from 'mongoose';
-import { expectType } from 'tsd';
+import { expect } from 'tstyche';
 
 const schema = new Schema({ name: { type: 'String' } });
 
@@ -25,9 +25,9 @@ async function run() {
   const res2: Array<ITest> = await Test.aggregate<ITest>([{ $match: { name: 'foo' } }]);
   console.log(res2[0].name);
 
-  expectType<number | undefined>(Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).options.maxTimeMS);
-  expectType<boolean | undefined>(Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).options.allowDiskUse);
-  Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).option({ maxTimeMS: 222 });
+  expect(Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).options.maxTimeMS).type.toBe<number | undefined>();
+  expect(Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).options.allowDiskUse).type.toBe<boolean | undefined>();
+  expect(Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).option({ maxTimeMS: 222 })).type.toBe<Aggregate<ITest[]>>();
 
   await Test.aggregate<ITest>([{ $match: { name: 'foo' } }]).cursor().eachAsync(async(res) => {
     console.log(res);
@@ -39,32 +39,32 @@ async function run() {
 
   function eachAsync(): void {
     Test.aggregate().cursor().eachAsync((doc) => {
-      expectType<any>(doc);
+      expect(doc).type.toBe<any>();
     });
     Test.aggregate().cursor().eachAsync((docs) => {
-      expectType<any[]>(docs);
+      expect(docs).type.toBe<any[]>();
     }, { batchSize: 2 });
     Test.aggregate().cursor<ITest>().eachAsync((doc) => {
-      expectType<ITest>(doc);
+      expect(doc).type.toBe<ITest>();
     });
     Test.aggregate().cursor<ITest>().eachAsync((docs) => {
-      expectType<ITest[]>(docs);
+      expect(docs).type.toBe<ITest[]>();
     }, { batchSize: 2 });
   }
 
   // Aggregate.prototype.sort()
-  expectType<ITest[]>(await Test.aggregate<ITest>().sort('-name'));
-  expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 1 }));
-  expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: -1 }));
-  expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 'asc' }));
-  expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 'ascending' }));
-  expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 'desc' }));
-  expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: 'descending' }));
-  expectType<ITest[]>(await Test.aggregate<ITest>().sort({ name: { $meta: 'textScore' } }));
+  expect(await Test.aggregate<ITest>().sort('-name')).type.toBe<ITest[]>();
+  expect(await Test.aggregate<ITest>().sort({ name: 1 })).type.toBe<ITest[]>();
+  expect(await Test.aggregate<ITest>().sort({ name: -1 })).type.toBe<ITest[]>();
+  expect(await Test.aggregate<ITest>().sort({ name: 'asc' })).type.toBe<ITest[]>();
+  expect(await Test.aggregate<ITest>().sort({ name: 'ascending' })).type.toBe<ITest[]>();
+  expect(await Test.aggregate<ITest>().sort({ name: 'desc' })).type.toBe<ITest[]>();
+  expect(await Test.aggregate<ITest>().sort({ name: 'descending' })).type.toBe<ITest[]>();
+  expect(await Test.aggregate<ITest>().sort({ name: { $meta: 'textScore' } })).type.toBe<ITest[]>();
 
   // Aggregate.prototype.model()
-  expectType<Model<any>>(Test.aggregate<ITest>().model());
-  expectType<Aggregate<ITest[]>>(Test.aggregate<ITest>().model(AnotherTest));
+  expect(Test.aggregate<ITest>().model()).type.toBe<Model<any>>();
+  expect(Test.aggregate<ITest>().model(AnotherTest)).type.toBe<Aggregate<ITest[]>>();
 }
 
 function gh12017_1() {
@@ -158,4 +158,26 @@ async function gh15300() {
   const TestModel = model('Document', schema);
 
   await TestModel.aggregate().project('a b -_id');
+}
+
+function gh16033() {
+  const schema = new Schema({ text: String, published: Boolean });
+  const Item = model('ItemGh16033', schema);
+
+  const basePipeline = Item.aggregate().match({ published: true });
+
+  Item.aggregate()
+    .match({ text: 'example' })
+    .unionWith({
+      coll: 'other_items',
+      pipeline: basePipeline.pipelineForUnionWith()
+    });
+
+  Item.aggregate()
+    .match({ text: 'example' })
+    .unionWith({
+      coll: 'other_items',
+      // @ts-expect-error  Type 'PipelineStage[]' is not assignable to type 'UnionWithPipelineStage[]'.
+      pipeline: basePipeline.pipeline()
+    });
 }

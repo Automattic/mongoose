@@ -420,7 +420,7 @@ person.populated('fans'); // Array of ObjectIds
 ## Populating multiple existing documents {#populate_multiple_documents}
 
 If we have one or many mongoose documents or even plain objects
-(*like [mapReduce](api/model.html#model_Model-mapReduce) output*), we may
+(*for example, results from an [aggregation](api/model.html#model_Model-aggregate) query*), we may
 populate them using the [Model.populate()](api/model.html#model_Model-populate)
 method. This is what `Document#populate()`
 and `Query#populate()` use to populate documents.
@@ -590,6 +590,10 @@ Using `refPath` means you only need 2 schema paths and one `populate()` call
 regardless of how many models your `commentSchema` can point to.
 
 You could also assign a function to `refPath`, which means Mongoose selects a refPath depending on a value on the document being populated.
+The function must return the **path** to the field that stores the model name.
+Mongoose passes `(doc, path)` where `path` is root-relative.
+For array elements, `path` includes indexes (for example, `'items.0.entityId'`).
+Mongoose uses the same `path` value during both assignment/casting and `populate()`.
 
 ```javascript
 const commentSchema = new Schema({
@@ -601,8 +605,11 @@ const commentSchema = new Schema({
   entityId: {
     type: Schema.Types.ObjectId,
     required: true,
-    refPath: function () {
-      return this.commentType === 'review' ? this.reviewEntityModel : this.commentEntityModel; // 'this' refers to the document being populated
+    refPath: function() {
+      // `this` refers to the document/subdocument being processed
+      return this.commentType === 'review' ?
+        'reviewEntityModel' :
+        'commentEntityModel';
     }
   },
   commentEntityModel: {
@@ -618,6 +625,35 @@ const commentSchema = new Schema({
 });
 ```
 
+When the populated path is inside an array of subdocuments, a static string
+`refPath` like `'items.targetModel'` does not work because each array element
+needs an indexed path (like `'items.0.targetModel'`).
+
+Use a function `refPath` in this case:
+
+```javascript
+const orderSchema = new Schema({
+  items: [{
+    targetModel: {
+      type: String,
+      enum: ['Product', 'Service'],
+      required: true
+    },
+    target: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      refPath: function(doc, path) {
+        return path.replace(/\.target$/, '.targetModel');
+      }
+    }
+  }]
+});
+```
+
+For example, if Mongoose is processing `items.0.target`, `path` is
+`'items.0.target'`, so the function returns `'items.0.targetModel'`.
+This pattern works consistently for both `populate()` and document assignment.
+
 ## Dynamic References via `ref` {#dynamic-ref}
 
 Just like `refPath`, `ref` can also be assigned a function.
@@ -625,7 +661,7 @@ Just like `refPath`, `ref` can also be assigned a function.
 ```javascript
 const commentSchema = new Schema({
   body: { type: String, required: true },
-  verifiedBuyer: Boolean
+  verifiedBuyer: Boolean,
   doc: {
     type: Schema.Types.ObjectId,
     required: true,
@@ -805,7 +841,7 @@ You can overwrite the `match` option when calling `populate()` as follows.
 ```javascript
 // Overwrite the `match` option specified in `AuthorSchema.virtual()` for this
 // single `populate()` call.
-await Author.findOne().populate({ path: posts, match: {} });
+await Author.findOne().populate({ path: 'posts', match: {} });
 ```
 
 You can also set the `match` option to a function in your `populate()` call.
@@ -813,7 +849,7 @@ If you want to merge your `populate()` match option, rather than overwriting, us
 
 ```javascript
 await Author.findOne().populate({
-  path: posts,
+  path: 'posts',
   // Add `isDeleted: false` to the virtual's default `match`, so the `match`
   // option would be `{ tags: author.favoriteTags, isDeleted: false }`
   match: (author, virtual) => ({
@@ -895,7 +931,7 @@ const libraries = await Library.find().populate('books.$*.author');
 
 ## Populate in Middleware {#populate-middleware}
 
-You can populate in either pre or post [hooks](http://mongoosejs.com/docs/middleware.html). If you want to
+You can populate in either pre or post [hooks](https://mongoosejs.com/docs/middleware.html). If you want to
 always populate a certain field, check out the [mongoose-autopopulate plugin](http://npmjs.com/package/mongoose-autopopulate).
 
 ```javascript

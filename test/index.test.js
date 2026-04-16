@@ -7,6 +7,7 @@ const start = require('./common');
 const assert = require('assert');
 const random = require('./util').random;
 const stream = require('stream');
+const util = require('util');
 
 const collection = 'blogposts_' + random();
 
@@ -91,7 +92,6 @@ describe('mongoose module:', function() {
   });
 
   it('should collect the args correctly gh-13364', async function() {
-    const util = require('util');
     const mongoose = new Mongoose();
     const conn = await mongoose.connect(start.uri);
     let actual = '';
@@ -101,6 +101,30 @@ describe('mongoose module:', function() {
     const user = conn.connection.collection('User');
     await user.findOne({ key: 'value' });
     assert.equal('User.findOne({ key: \'value\' })', actual);
+  });
+
+  it('debug timestamp option prefixes ISO timestamp to console output', async function() {
+    const mongoose = new Mongoose();
+
+    mongoose.set('debug', { timestamp: true, color: false });
+
+    const stub = sinon.stub(console, 'info');
+    try {
+      await mongoose.connect(start.uri);
+      const User = mongoose.model('User', new Schema({ name: String }));
+      await User.findOne();
+
+      assert.ok(stub.calledOnce);
+      const output = stub.firstCall.args[0];
+
+      // Should start with an ISO 8601 timestamp
+      assert.ok(/^\[\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z\]/.test(output), `Expected bracketed ISO timestamp prefix, got: ${output}`);
+      // Should still contain the regular Mongoose log
+      assert.ok(output.includes('Mongoose: '), `Expected "Mongoose: " in output, got: ${output}`);
+    } finally {
+      stub.restore();
+      await mongoose.disconnect();
+    }
   });
 
   it('{g,s}etting options', function() {
@@ -246,6 +270,30 @@ describe('mongoose module:', function() {
     const doc = new M();
     assert.equal(doc.toObject().foo, 42);
     assert.strictEqual(doc.toJSON().foo, void 0);
+  });
+
+  it('set() with null (gh-16130)', function() {
+    const mongoose = new Mongoose();
+
+    assert.throws(
+      () => mongoose.set(null),
+      /"null" is not a valid option to set/
+    );
+
+    assert.throws(
+      () => mongoose.set(undefined),
+      /"undefined" is not a valid option to set/
+    );
+
+    assert.throws(
+      () => mongoose.set(null, 'test'),
+      /"null" is not a valid option to set/
+    );
+
+    assert.throws(
+      () => mongoose.set(undefined, 'test'),
+      /"undefined" is not a valid option to set/
+    );
   });
 
   it('strict option (gh-6858)', function() {

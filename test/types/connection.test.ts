@@ -1,89 +1,87 @@
-import { createConnection, Schema, Collection, Connection, ConnectionSyncIndexesResult, InferSchemaType, Model, connection, HydratedDocument, Query } from 'mongoose';
+import { createConnection, Schema, Collection, Connection, ConnectionStates, ConnectionSyncIndexesResult, InferSchemaType, Model, connection, HydratedDocument, Query } from 'mongoose';
 import * as mongodb from 'mongodb';
-import { expectAssignable, expectError, expectType } from 'tsd';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
+import { expect, pick } from 'tstyche';
 
-expectType<Connection>(createConnection());
-expectType<Connection>(createConnection('mongodb://127.0.0.1:27017/test'));
-expectType<Connection>(createConnection('mongodb://127.0.0.1:27017/test', { appName: 'mongoose' }));
+expect(createConnection()).type.toBe<Connection>();
+expect(createConnection('mongodb://127.0.0.1:27017/test')).type.toBe<Connection>();
+expect(createConnection('mongodb://127.0.0.1:27017/test', { appName: 'mongoose' })).type.toBe<Connection>();
 
 const conn = createConnection();
 
-expectAssignable<Model<{ name: string }, any, any, any>>(conn.model('Test', new Schema<{ name: string }>({ name: { type: String } })));
-expectType<Model<{ name: string }>>(conn.model<{ name: string }>('Test', new Schema({ name: { type: String } })));
+expect(conn.model('Test', new Schema<{ name: string }>({ name: { type: String } }))).type.toBeAssignableTo<Model<{ name: string }, any, any, any>>();
+expect(conn.model<{ name: string }>('Test', new Schema({ name: { type: String } }))).type.toBe<Model<{ name: string }>>();
 
-expectType<Promise<Connection>>(conn.openUri('mongodb://127.0.0.1:27017/test'));
-expectType<Promise<Connection>>(conn.openUri('mongodb://127.0.0.1:27017/test', { bufferCommands: true }));
+expect(conn.openUri('mongodb://127.0.0.1:27017/test')).type.toBe<Promise<Connection>>();
+expect(conn.openUri('mongodb://127.0.0.1:27017/test', { bufferCommands: true })).type.toBe<Promise<Connection>>();
 
 conn.readyState === 0;
 conn.readyState === 99;
 
-expectError(conn.readyState = 0);
+expect(pick(conn, 'readyState')).type.toBe<{ readonly readyState: ConnectionStates }>();
 
-expectType<Promise<Record<string, Error | mongodb.Collection<any>>>>(
-  conn.createCollections()
-);
+expect(conn.createCollections()).type.toBe<Promise<Record<string, Error | mongodb.Collection<any>>>>();
 
-expectType<Connection>(new Connection());
-expectType<Promise<Connection>>(new Connection().asPromise());
+expect(new Connection()).type.toBe<Connection>();
+expect(new Connection().asPromise()).type.toBe<Promise<Connection>>();
 
-expectType<Promise<mongodb.Collection<{ [key: string]: any }>>>(conn.createCollection('some'));
+expect(conn.createCollection('some')).type.toBe<Promise<mongodb.Collection<{ [key: string]: any }>>>();
 
-expectType<Promise<void>>(conn.dropCollection('some'));
+expect(conn.dropCollection('some')).type.toBe<Promise<void>>();
 
-expectError(conn.deleteModel());
-expectType<Connection>(conn.deleteModel('something'));
-expectType<Connection>(conn.deleteModel(/.+/));
+expect(conn.deleteModel).type.not.toBeCallableWith();
+expect(conn.deleteModel('something')).type.toBe<Connection>();
+expect(conn.deleteModel(/.+/)).type.toBe<Connection>();
 
-expectType<Array<string>>(conn.modelNames());
+expect(conn.modelNames()).type.toBe<Array<string>>();
 
-expectType<Promise<void>>(createConnection('mongodb://127.0.0.1:27017/test').close());
-expectType<Promise<void>>(createConnection('mongodb://127.0.0.1:27017/test').close(true));
+expect(createConnection('mongodb://127.0.0.1:27017/test').close()).type.toBe<Promise<void>>();
+expect(createConnection('mongodb://127.0.0.1:27017/test').close(true)).type.toBe<Promise<void>>();
 
-expectType<mongodb.Db | undefined>(conn.db);
+expect(conn.db).type.toBe<mongodb.Db | undefined>();
 
-expectType<mongodb.MongoClient>(conn.getClient());
-expectType<Connection>(conn.setClient(new mongodb.MongoClient('mongodb://127.0.0.1:27017/test')));
+expect(conn.getClient()).type.toBe<mongodb.MongoClient>();
+expect(conn.setClient(new mongodb.MongoClient('mongodb://127.0.0.1:27017/test'))).type.toBe<Connection>();
 
-expectType<Promise<string>>(conn.transaction(async(res) => {
-  expectType<mongodb.ClientSession>(res);
+expect(conn.transaction(async(res) => {
+  expect(res).type.toBe<mongodb.ClientSession>();
   return 'a';
-}));
-expectType<Promise<string>>(conn.transaction(async(res) => {
-  expectType<mongodb.ClientSession>(res);
+})).type.toBe<Promise<string>>();
+expect(conn.transaction(async(res) => {
+  expect(res).type.toBe<mongodb.ClientSession>();
   return 'a';
-}, { readConcern: 'majority' }));
+}, { readConcern: 'majority' })).type.toBe<Promise<string>>();
 
-expectType<Promise<string>>(conn.withSession(async(res) => {
-  expectType<mongodb.ClientSession>(res);
+expect(conn.withSession(async(res) => {
+  expect(res).type.toBe<mongodb.ClientSession>();
   return 'a';
-}));
+})).type.toBe<Promise<string>>();
 
-expectError(conn.user = 'invalid');
-expectError(conn.pass = 'invalid');
-expectError(conn.host = 'invalid');
-expectError(conn.port = 'invalid');
+expect(pick(conn, 'user')).type.toBe<{ readonly user: string }>();
+expect(pick(conn, 'pass')).type.toBe<{ readonly pass: string }>();
+expect(pick(conn, 'host')).type.toBe<{ readonly host: string }>();
+expect(pick(conn, 'port')).type.toBe<{ readonly port: number }>();
 
-expectType<Collection>(conn.collection('test'));
-expectType<mongodb.Collection | undefined>(conn.db?.collection('test'));
+expect(conn.collection('test')).type.toBe<Collection>();
+expect(conn.db?.collection('test')).type.toBe<mongodb.Collection | undefined>();
 
-expectType<Promise<mongodb.ClientSession>>(conn.startSession());
-expectType<Promise<mongodb.ClientSession>>(conn.startSession({ causalConsistency: true }));
+expect(conn.startSession()).type.toBe<Promise<mongodb.ClientSession>>();
+expect(conn.startSession({ causalConsistency: true })).type.toBe<Promise<mongodb.ClientSession>>();
 
-expectType<Promise<ConnectionSyncIndexesResult>>(conn.syncIndexes());
-expectType<Promise<ConnectionSyncIndexesResult>>(conn.syncIndexes({ continueOnError: true }));
+expect(conn.syncIndexes()).type.toBe<Promise<ConnectionSyncIndexesResult>>();
+expect(conn.syncIndexes({ continueOnError: true })).type.toBe<Promise<ConnectionSyncIndexesResult>>();
 
-expectType<Connection>(conn.useDb('test'));
-expectType<Connection>(conn.useDb('test', {}));
-expectType<Connection>(conn.useDb('test', { useCache: true }));
+expect(conn.useDb('test')).type.toBe<Connection>();
+expect(conn.useDb('test', {})).type.toBe<Connection>();
+expect(conn.useDb('test', { useCache: true })).type.toBe<Connection>();
 
-expectType<Promise<string[]>>(
+expect(
   conn.listCollections().then(collections => collections.map(coll => coll.name))
-);
+).type.toBe<Promise<string[]>>();
 
-expectType<Promise<string[]>>(
+expect(
   conn.listDatabases().then(dbs => dbs.databases.map(db => db.name))
-);
+).type.toBe<Promise<string[]>>();
 
 export function autoTypedModelConnection() {
   const AutoTypedSchema = autoTypedSchema();
@@ -93,22 +91,22 @@ export function autoTypedModelConnection() {
   // Model-functions-test
   // Create should works with arbitrary objects.
     const randomObject = await AutoTypedModel.create({ unExistKey: 'unExistKey', description: 'st' } as Partial<InferSchemaType<typeof AutoTypedSchema>>);
-    expectType<AutoTypedSchemaType['schema']['userName']>(randomObject.userName);
+    expect(randomObject.userName).type.toBe<AutoTypedSchemaType['schema']['userName']>();
 
     const testDoc1 = await AutoTypedModel.create({ userName: 'M0_0a' });
-    expectType<AutoTypedSchemaType['schema']['userName']>(testDoc1.userName);
-    expectType<AutoTypedSchemaType['schema']['description']>(testDoc1.description);
+    expect(testDoc1.userName).type.toBe<AutoTypedSchemaType['schema']['userName']>();
+    expect(testDoc1.description).type.toBe<AutoTypedSchemaType['schema']['description']>();
 
     const testDoc2 = await AutoTypedModel.insertMany([{ userName: 'M0_0a' }]);
-    expectType<AutoTypedSchemaType['schema']['userName']>(testDoc2[0].userName);
-    expectType<AutoTypedSchemaType['schema']['description'] | undefined>(testDoc2[0]?.description);
+    expect(testDoc2[0].userName).type.toBe<AutoTypedSchemaType['schema']['userName']>();
+    expect(testDoc2[0]?.description).type.toBe<AutoTypedSchemaType['schema']['description'] | undefined>();
 
     const testDoc3 = await AutoTypedModel.findOne({ userName: 'M0_0a' });
-    expectType<AutoTypedSchemaType['schema']['userName'] | undefined>(testDoc3?.userName);
-    expectType<AutoTypedSchemaType['schema']['description'] | undefined>(testDoc3?.description);
+    expect(testDoc3?.userName).type.toBe<AutoTypedSchemaType['schema']['userName'] | undefined>();
+    expect(testDoc3?.description).type.toBe<AutoTypedSchemaType['schema']['description'] | undefined>();
 
     // Model-statics-functions-test
-    expectType<ReturnType<AutoTypedSchemaType['statics']['staticFn']>>(AutoTypedModel.staticFn());
+    expect(AutoTypedModel.staticFn()).type.toBe<ReturnType<AutoTypedSchemaType['statics']['staticFn']>>();
 
   })();
   return AutoTypedModel;
@@ -155,18 +153,22 @@ function schemaInstanceMethodsAndQueryHelpersOnConnection() {
 
 async function gh15359() {
   const res = await conn.bulkWrite([{ model: 'Test', name: 'insertOne', document: { name: 'test1' } }]);
-  expectType<number>(res.insertedCount);
-  expectError(res.mongoose.validationErrors);
+  expect(res.insertedCount).type.toBe<number>();
+  expect(res).type.not.toHaveProperty('mongoose');
 
   const res2 = await conn.bulkWrite([{ model: 'Test', name: 'insertOne', document: { name: 'test2' } }], { ordered: false });
-  expectType<number>(res2.insertedCount);
-  expectType<Error[] | undefined>(res2.mongoose?.validationErrors);
+  expect(res2.insertedCount).type.toBe<number>();
+  expect(res2.mongoose?.validationErrors).type.toBe<Error[] | undefined>();
 
   const res3 = await conn.bulkWrite([
     { model: 'Test', name: 'updateOne', filter: { name: 'test5' }, update: { $set: { num: 42 } } },
     { model: 'Test', name: 'updateOne', filter: { name: 'test4' }, update: { $set: { num: 'not a number' } } }
   ], { ordered: false });
-  expectType<number>(res3.insertedCount);
-  expectError(res3.validationErrors);
-  expectType<Error[] | undefined>(res3.mongoose?.validationErrors);
+  expect(res3.insertedCount).type.toBe<number>();
+
+
+  expect(pick(res3, 'mongoose')).type.toBe<{
+    mongoose?: { validationErrors: Error[]; results: Array<Error | mongodb.WriteError | null> }
+  }>();
+  expect(res3.mongoose?.validationErrors).type.toBe<Error[] | undefined>();
 }

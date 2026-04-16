@@ -225,7 +225,7 @@ doc.child; // { age: 0 }
 ## Finding a Subdocument
 
 Each subdocument has an `_id` by default. Mongoose document arrays have a
-special [id](api/mongoosedocumentarray.html#mongoosedocumentarray_MongooseDocumentArray-id) method
+special [id](api/documentarray.html#MongooseDocumentArray.prototype.id()) method
 for searching a document array to find a document with a given `_id`.
 
 ```javascript
@@ -250,7 +250,7 @@ await parent.save();
 console.log('Success!');
 ```
 
-You can also create a subdocument without adding it to an array by using the [`create()` method](api/mongoosedocumentarray.html#mongoosedocumentarray_MongooseDocumentArray-create) of Document Arrays.
+You can also create a subdocument without adding it to an array by using the [`create()` method](api/documentarray.html#MongooseDocumentArray.prototype.create()) of Document Arrays.
 
 ```javascript
 const newdoc = parent.children.create({ name: 'Aaron' });

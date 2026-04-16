@@ -11,7 +11,7 @@ Mongoose is a [MongoDB](https://www.mongodb.org/) object modeling tool designed 
 
 ## Documentation
 
-The official documentation website is [mongoosejs.com](http://mongoosejs.com/).
+The official documentation website is [mongoosejs.com](https://mongoosejs.com/).
 
 Mongoose 9.0.0 was released on November 21, 2025. You can find more details on [backwards breaking changes in 9.0.0 on our docs site](https://mongoosejs.com/docs/migrating_to_9.html).
 
@@ -25,7 +25,7 @@ Mongoose 9.0.0 was released on November 21, 2025. You can find more details on [
 
 ## Plugins
 
-Check out the [plugins search site](http://plugins.mongoosejs.io/) to see hundreds of related modules from the community. Next, learn how to write your own plugin from the [docs](http://mongoosejs.com/docs/plugins.html) or [this blog post](http://thecodebarbarian.com/2015/03/06/guide-to-mongoose-plugins).
+Check out the [plugins search site](https://plugins.mongoosejs.io/) to see hundreds of related modules from the community. Next, learn how to write your own plugin from the [docs](https://mongoosejs.com/docs/plugins.html) or [this blog post](http://thecodebarbarian.com/2015/03/06/guide-to-mongoose-plugins).
 
 ## Contributors
 
@@ -40,9 +40,7 @@ View all 400+ [contributors](https://github.com/Automattic/mongoose/graphs/contr
 
 ## Installation
 
-First install [Node.js](http://nodejs.org/) and [MongoDB](https://www.mongodb.org/downloads). Then:
-
-Then install the `mongoose` package using your preferred package manager:
+First install [Node.js](https://nodejs.org/) and [MongoDB](https://www.mongodb.org/downloads), then install the `mongoose` package using your preferred package manager:
 
 ### Using npm
 
@@ -140,16 +138,16 @@ const BlogPost = new Schema({
 
 Aside from defining the structure of your documents and the types of data you're storing, a Schema handles the definition of:
 
-* [Validators](http://mongoosejs.com/docs/validation.html) (async and sync)
-* [Defaults](http://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-default)
-* [Getters](http://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-get)
-* [Setters](http://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-set)
-* [Indexes](http://mongoosejs.com/docs/guide.html#indexes)
-* [Middleware](http://mongoosejs.com/docs/middleware.html)
-* [Methods](http://mongoosejs.com/docs/guide.html#methods) definition
-* [Statics](http://mongoosejs.com/docs/guide.html#statics) definition
-* [Plugins](http://mongoosejs.com/docs/plugins.html)
-* [pseudo-JOINs](http://mongoosejs.com/docs/populate.html)
+* [Validators](https://mongoosejs.com/docs/validation.html) (async and sync)
+* [Defaults](https://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-default)
+* [Getters](https://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-get)
+* [Setters](https://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-set)
+* [Indexes](https://mongoosejs.com/docs/guide.html#indexes)
+* [Middleware](https://mongoosejs.com/docs/middleware.html)
+* [Methods](https://mongoosejs.com/docs/guide.html#methods) definition
+* [Statics](https://mongoosejs.com/docs/guide.html#statics) definition
+* [Plugins](https://mongoosejs.com/docs/plugins.html)
+* [pseudo-JOINs](https://mongoosejs.com/docs/populate.html)
 
 The following example shows some of these features:
 
@@ -219,7 +217,7 @@ const instance = await MyModel.findOne({ /* ... */ });
 console.log(instance.my.key); // 'hello'
 ```
 
-For more details check out [the docs](http://mongoosejs.com/docs/queries.html).
+For more details check out [the docs](https://mongoosejs.com/docs/queries.html).
 
 **Important!** If you opened a separate connection using `mongoose.createConnection()` but attempt to access the model through `mongoose.model('ModelName')` it will not work as expected since it is not hooked up to an active db connection. In this case access your model through the connection you created:
 
@@ -274,7 +272,7 @@ Embedded documents enjoy all the same features as your models. Defaults, validat
 
 ### Middleware
 
-See the [docs](http://mongoosejs.com/docs/middleware.html) page.
+See the [docs](https://mongoosejs.com/docs/middleware.html) page.
 
 #### Intercepting and mutating method arguments
 
@@ -347,7 +345,7 @@ return a cursor.
 
 ## API Docs
 
-[Mongoose API documentation](http://mongoosejs.com/docs/api/mongoose.html), generated using [dox](https://github.com/tj/dox)
+[Mongoose API documentation](https://mongoosejs.com/docs/api/mongoose.html), generated using [dox](https://github.com/tj/dox)
 and [acquit](https://github.com/vkarpov15/acquit).
 
 ## Related Projects

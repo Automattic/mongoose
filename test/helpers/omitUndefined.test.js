@@ -162,8 +162,6 @@ describe('omitUndefined', function() {
     });
   });
 
-  // ─── edge cases ─────────────────────────────────────────────────────────────
-
   describe('edge cases', function() {
     it('handles an empty object', function() {
       const obj = {};

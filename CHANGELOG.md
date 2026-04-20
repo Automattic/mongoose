@@ -1,6 +1,5 @@
 9.5.0 / 2026-04-20
 ==================
- * feat: bump mongodb to 7.2
  * feat(debug): add `timestamp` option to debug output #16216 [rejunp](https://github.com/rejunp)
  * feat(query): add `cloneUpdate` option to explicitly disable update cloning #16230 #16202
  * feat(query): extend `defaults` query option to `find()` #16226 [sderrow](https://github.com/sderrow)

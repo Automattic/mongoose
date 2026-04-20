@@ -55,53 +55,57 @@ async function run() {
     });
   }
 
-  const driverInsertStart = Date.now();
-  for (let i = 0; i < numIterations; ++i) {
-    for (let j = 0; j < 10; ++j) {
-      await fooCollection.insertOne({
-        _id: new mongoose.Types.ObjectId(),
-        prop1: `test ${i}`,
-        prop2: `test ${i}`,
-        prop3: `test ${i}`,
-        prop4: `test ${i}`,
-        prop5: `test ${i}`,
-        prop6: `test ${i}`,
-        prop7: `test ${i}`,
-        prop8: `test ${i}`,
-        prop9: `test ${i}`,
-        prop10: `test ${i}`
-      });
+  for (let i = 0; i < 3; ++i) {
+    const driverInsertStart = Date.now();
+    for (let i = 0; i < numIterations; ++i) {
+      for (let j = 0; j < 10; ++j) {
+        await fooCollection.insertOne({
+          _id: new mongoose.Types.ObjectId(),
+          prop1: `test ${i}`,
+          prop2: `test ${i}`,
+          prop3: `test ${i}`,
+          prop4: `test ${i}`,
+          prop5: `test ${i}`,
+          prop6: `test ${i}`,
+          prop7: `test ${i}`,
+          prop8: `test ${i}`,
+          prop9: `test ${i}`,
+          prop10: `test ${i}`
+        });
+      }
     }
-  }
-  const driverInsertEnd = Date.now();
+    const driverInsertEnd = Date.now();
 
-  const mongooseSaveStart = Date.now();
-  for (let i = 0; i < numIterations; ++i) {
-    for (let j = 0; j < 10; ++j) {
-      const doc = new FooModel({
-        prop1: `test ${i}`,
-        prop2: `test ${i}`,
-        prop3: `test ${i}`,
-        prop4: `test ${i}`,
-        prop5: `test ${i}`,
-        prop6: `test ${i}`,
-        prop7: `test ${i}`,
-        prop8: `test ${i}`,
-        prop9: `test ${i}`,
-        prop10: `test ${i}`
-      });
-      await doc.save();
+    const mongooseSaveStart = Date.now();
+    for (let i = 0; i < numIterations; ++i) {
+      for (let j = 0; j < 10; ++j) {
+        const doc = new FooModel({
+          prop1: `test ${i}`,
+          prop2: `test ${i}`,
+          prop3: `test ${i}`,
+          prop4: `test ${i}`,
+          prop5: `test ${i}`,
+          prop6: `test ${i}`,
+          prop7: `test ${i}`,
+          prop8: `test ${i}`,
+          prop9: `test ${i}`,
+          prop10: `test ${i}`
+        });
+        await doc.save();
+      }
     }
-  }
-  const mongooseSaveEnd = Date.now();
+    const mongooseSaveEnd = Date.now();
 
-  const results = {
-    'Average mongoose save time ms': +((mongooseSaveEnd - mongooseSaveStart) / numIterations).toFixed(2),
-    'Average driver insertOne time ms': +((driverInsertEnd - driverInsertStart) / numIterations).toFixed(2)
-  };
+    const results = {
+      'Average mongoose save time ms': +((mongooseSaveEnd - mongooseSaveStart) / numIterations).toFixed(2),
+      'Average driver insertOne time ms': +((driverInsertEnd - driverInsertStart) / numIterations).toFixed(2)
+    };
+
+    console.log(JSON.stringify(results, null, '  '));
+  }
+
 
   await client.close();
 
-  console.log(JSON.stringify(results, null, '  '));
   process.exit(0);
 }

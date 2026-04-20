@@ -157,6 +157,66 @@ describe('model: findOneAndUpdate:', function() {
     assert.ok(up.comments[1]._id instanceof DocumentObjectId);
   });
 
+  it('preserves own __proto__ keys in update payloads without mutating the caller update (gh-16202)', async function() {
+    const Test = db.model('Test', new Schema({
+      path1: Schema.Types.Mixed
+    }));
+
+    const doc = await Test.create({ path1: {} });
+    const update = { $set: { path1: { ['__proto__']: 'abcd' } } };
+
+    const res = await Test.findOneAndUpdate(
+      { _id: doc._id },
+      update,
+      { returnDocument: 'after', cloneUpdate: false }
+    ).lean();
+
+    assert.equal(Object.prototype.hasOwnProperty.call(update.$set.path1, '__proto__'), true);
+    assert.equal(update.$set.path1.__proto__, 'abcd');
+    assert.equal(Object.prototype.hasOwnProperty.call(res.path1, '__proto__'), true);
+    assert.equal(res.path1.__proto__, 'abcd');
+  });
+
+  it('does not mutate the caller update when chaining set() after findOneAndUpdate()', async function() {
+    const Test = db.model('Test', new Schema({
+      title: String,
+      status: String
+    }));
+
+    const doc = await Test.create({ title: 'before', status: 'before' });
+    const update = { title: 'after' };
+
+    const query = Test.findOneAndUpdate(
+      { _id: doc._id },
+      update,
+      { returnDocument: 'after' }
+    );
+
+    query.set('status', 'changed');
+    const res = await query;
+
+    assert.deepStrictEqual(update, { title: 'after' });
+    assert.equal(res.title, 'after');
+    assert.equal(res.status, 'changed');
+  });
+
+  it('does not mutate the caller update when built-in timestamp middleware runs', async function() {
+    const Test = db.model('Test', new Schema({
+      title: String
+    }, { timestamps: true }));
+
+    const doc = await Test.create({ title: 'before' });
+    const update = { $set: { title: 'after' } };
+
+    await Test.findOneAndUpdate(
+      { _id: doc._id },
+      update,
+      { returnDocument: 'after' }
+    );
+
+    assert.deepStrictEqual(update, { $set: { title: 'after' } });
+  });
+
   describe('will correctly', function() {
     let ItemParentModel, ItemChildModel;
 

@@ -2572,6 +2572,16 @@ describe('Query', function() {
       assert.strictEqual(q._update.$set.newPath, 'newValue');
     });
 
+    it('stores cloneUpdate option when setting update', function() {
+      const q = new Query({});
+      const update = { $set: { newPath: 'newValue' } };
+
+      q.setUpdate(update, false);
+
+      assert.strictEqual(q.mongooseOptions().cloneUpdate, false);
+      assert.strictEqual(q.getUpdate(), update);
+    });
+
     it('clones shared update when mutating `_update` directly', function() {
       const q = new Query({});
       const update = { $set: { newPath: 'newValue' } };

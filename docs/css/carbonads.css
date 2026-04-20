@@ -1,32 +1,72 @@
-/* CPM ads */
+/* Carbon ad — rendered inside .right-sidebar .cpc-ad, below the TOC.
+   The carbonads.com script injects #carbonads into the .cpc-ad container;
+   we style it to flow in the sidebar rather than float at the viewport. */
 
-.carbonad{
-  margin-top:0!important;
-  margin-bottom:-3rem!important
+.cpc-ad {
+  width: 100%;
 }
 
 #carbonads {
-  position:fixed;
-  right: 0px;
-  bottom: 0px;
-  display:block;
-  width:160px;
-  padding:15px 15px 15px 150px;
-  overflow:hidden;
-  font-size:13px;
-  line-height:1.4;
-  text-align:left;
-  background-color: #fafafa;
+  display: block;
+  width: 100%;
+  max-width: 240px;
+  padding: 12px;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: left;
+  background-color: var(--bg-secondary, #fafafa);
+  border: 1px solid var(--border-color, #e5e5e7);
+  border-radius: 8px;
+  box-sizing: border-box;
 }
 
-@media (max-width: 1170px) {
-  #carbonads {
-    display: none !important;
-  }
+#carbonads a {
+  color: var(--text-primary, #333);
+  text-decoration: none;
 }
 
-#carbonads a{color:#333;text-decoration:none}
+#carbonads a:hover {
+  color: var(--link-color, #0971B2);
+}
 
-.carbon-img{float:left;margin-left:-145px}
+.carbon-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
 
-.carbon-poweredby{display:block;color:#777!important}
+.carbon-img {
+  flex-shrink: 0;
+  display: block;
+}
+
+.carbon-img img {
+  display: block;
+  width: 100px;
+  height: auto;
+  border-radius: 4px;
+}
+
+.carbon-text {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  color: var(--text-secondary, #555);
+}
+
+.carbon-poweredby {
+  display: block;
+  margin-top: 6px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted, #888) !important;
+}
+
+/* Legacy .carbonad class (older ad format) — let it flow, ignore the old
+   negative margin hack that fought the old fixed-position sidebar. */
+.carbonad {
+  margin: 0 !important;
+}

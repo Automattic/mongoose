@@ -3386,6 +3386,7 @@ describe('Query', function() {
         versionKey: false,
         writeConcern: {
           w: 'majority',
+          j: true,
           wtimeout: 15000
         }
       }

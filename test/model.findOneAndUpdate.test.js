@@ -168,7 +168,7 @@ describe('model: findOneAndUpdate:', function() {
     const res = await Test.findOneAndUpdate(
       { _id: doc._id },
       update,
-      { returnDocument: 'after' }
+      { returnDocument: 'after', cloneUpdate: false }
     ).lean();
 
     assert.equal(Object.prototype.hasOwnProperty.call(update.$set.path1, '__proto__'), true);

@@ -122,6 +122,7 @@ Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { includeResultMetada
 Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { new: true, upsert: true, includeResultMetadata: true }).then((res: any) => {
   console.log(res.ok);
 });
+Test.findOneAndUpdate({ name: 'test' }, { name: 'test3' }, { cloneUpdate: false });
 
 Test.findOneAndReplace({ name: 'test' }, { _id: new Types.ObjectId(), name: 'test2' }).exec().then((res: ITest | null) => console.log(res));
 
@@ -136,6 +137,7 @@ Test.findOneAndUpdate({ name: 'test' }, update);
 
 Test.findOneAndUpdate({ name: 'test' }, { $currentDate: { endDate: true } });
 Test.findOneAndUpdate({ name: 'test' }, [{ $set: { endDate: true } }]);
+Test.findOneAndUpdate().setUpdate({ $set: { name: 'test' } }, false);
 
 Test.findByIdAndUpdate({ name: 'test' }, { name: 'test2' }, (err: any, doc: any) => console.log(doc));
 
@@ -398,7 +400,8 @@ function gh12142() {
     { _id: new Types.ObjectId() },
     {
       $pull: { comments: new Types.ObjectId() }
-    }
+    },
+    { cloneUpdate: false }
   );
 }
 

@@ -843,6 +843,9 @@ hr {
 /* Table of contents */
 .toc {
   margin-bottom: 32px;
+}
+
+.right-sidebar .toc {
   height: calc(100vh - 310px);
   overflow-y: auto;
 }

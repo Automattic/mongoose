@@ -343,10 +343,6 @@ const apiReq = require('../docs/source/api');
 const wrapMarkdown = (md, baseLayout, versionedPath, markdownUrl) => `
 extends ${baseLayout}
 
-append style
-  link(rel="stylesheet", href="${versionedPath}/docs/css/inlinecpc.css")
-  script(type="text/javascript" src="${versionedPath}/docs/js/native.js")
-
 block content
   <div class="doc-links">
     <a class="edit-docs-link" href="#{editLink}" target="_blank">

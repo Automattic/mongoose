@@ -474,6 +474,7 @@ async function renderFile(filename, options, isReload = false) {
   }
 
   let contents = fs.readFileSync(path.resolve(cwd, inputFile)).toString();
+  const originalContents = contents;
 
   if (options.acquit) {
     const tests = getTests();
@@ -484,8 +485,10 @@ async function renderFile(filename, options, isReload = false) {
       }
       return '```javascript acquit:' + pattern + '\n' + code + '\n```';
     });
-    fs.writeFileSync(path.resolve(cwd, inputFile), contents);
-    console.log('%s : rendered %s', (new Date()).toISOString(), path.resolve(cwd, inputFile));
+    if (contents !== originalContents) {
+      fs.writeFileSync(path.resolve(cwd, inputFile), contents);
+      console.log('%s : rendered %s', (new Date()).toISOString(), path.resolve(cwd, inputFile));
+    }
   }
   if (options.markdown) {
     markdownSource = contents;
@@ -583,16 +586,6 @@ function startWatch() {
       Promise.all(files.filter(v => v.startsWith('docs/api')).map(async(file) => {
         const filename = path.join(cwd, file);
         await renderFile(filename, docsFilemap.fileMap[file], true);
-      }));
-    }
-  });
-
-  fs.watchFile(path.join(cwd, 'docs/api_split.pug'), { interval: 1000 }, (cur, prev) => {
-    if (cur.mtime > prev.mtime) {
-      console.log('docs/api_split.pug modified, reloading all api files');
-      Promise.all(files.filter(v => v.startsWith('docs/api')).map(async(file) => {
-        const filename = path.join(cwd, file);
-        await renderFile(filename, docsFilemap.fileMap[file]);
       }));
     }
   });

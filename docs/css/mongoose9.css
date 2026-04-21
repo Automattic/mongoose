@@ -214,9 +214,9 @@ hr {
    Logo
 ---------------------------------------------------------------- */
 .site-logo {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
+  align-self: stretch;
   color: var(--brand-primary);
   flex-shrink: 0;
   margin-right: 8px;
@@ -226,8 +226,15 @@ hr {
   color: var(--brand-primary-hover);
 }
 
+.site-logo-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .site-logo-mark {
-  display: inline-block;
+  display: block;
+  flex: 0 0 auto;
   width: 34px;
   height: 20px;
   background-color: currentColor;
@@ -242,9 +249,9 @@ hr {
 }
 
 .site-logo-text {
+  display: block;
   font-size: 22px;
   font-weight: 500;
-  line-height: 1;
   letter-spacing: -0.01em;
 }
 

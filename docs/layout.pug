@@ -42,8 +42,9 @@ html(lang='en')
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
 
           a.site-logo(href="/")
-            span.site-logo-mark(role="img" aria-label="Mongoose logo")
-            span.site-logo-text mongoose
+            .site-logo-inner
+              span.site-logo-mark(role="img" aria-label="Mongoose logo")
+              span.site-logo-text mongoose
 
           .site-search
             input#search-input-nav(type="text", placeholder="Search")

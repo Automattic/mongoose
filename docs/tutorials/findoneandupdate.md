@@ -106,7 +106,7 @@ doc.name; // Will Riker
 doc.age; // 29
 ```
 
-<h2 id="includeresultmetadata">The <code>includeResultMetadata</code> Option<h2 id="rawresult"></h2></h2>
+<h2 id="includeresultmetadata">The <code>includeResultMetadata</code> Option<h2 id="rawresult"></h2
 
 Mongoose transforms the result of `findOneAndUpdate()` by default: it
 returns the updated document. That makes it difficult to check whether

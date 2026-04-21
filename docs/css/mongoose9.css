@@ -380,7 +380,8 @@ hr {
 }
 
 .icon-button:hover,
-.icon-link:hover {
+.icon-link:hover,
+.icon-button.active {
   color: var(--text-primary);
   background-color: var(--bg-secondary);
 }
@@ -389,6 +390,10 @@ hr {
 .icon-link svg {
   width: 20px;
   height: 20px;
+}
+
+.mobile-toc-toggle {
+  display: none;
 }
 
 /* Theme toggle — crossfade the two icons already in markup */
@@ -644,6 +649,20 @@ hr {
   margin: 0 0 24px 0;
 }
 
+.article-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.article-header h1 {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
 .article h2 {
   font-size: 24px;
   font-weight: 700;
@@ -774,15 +793,12 @@ hr {
 
 
 /* ----------------------------------------------------------------
-   Doc action links (edit / copy-as-md) — float top-right of article
+   Doc action links (edit / copy-as-md)
 ---------------------------------------------------------------- */
 .doc-links {
-  position: absolute;
-  top: 0;
-  right: 0;
   display: flex;
+  flex: 0 0 auto;
   gap: 6px;
-  z-index: 1;
 }
 
 .edit-docs-link,
@@ -811,6 +827,16 @@ hr {
   width: 16px;
   height: 16px;
   opacity: 0.7;
+}
+
+[data-theme="dark"] .edit-docs-link img {
+  filter: invert(1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .edit-docs-link img {
+    filter: invert(1);
+  }
 }
 
 .copy-markdown-link svg {
@@ -1038,7 +1064,36 @@ hr {
   .site-body {
     grid-template-columns: var(--left-sidebar-width) minmax(0, 1fr);
   }
-  .right-sidebar { display: none; }
+
+  .mobile-toc-toggle {
+    display: inline-flex;
+  }
+
+  .right-sidebar {
+    display: none;
+    position: fixed;
+    top: var(--site-header-height);
+    right: 0;
+    width: min(86vw, 320px);
+    height: calc(100vh - var(--site-header-height));
+    padding: 24px 16px;
+    background-color: var(--bg-primary);
+    box-shadow: var(--shadow-md);
+    z-index: 95;
+  }
+
+  .right-sidebar.active {
+    display: flex;
+  }
+
+  .right-sidebar .toc {
+    height: auto;
+    max-height: none;
+  }
+
+  .right-sidebar-aside {
+    display: none;
+  }
 }
 
 /* Tablet / mobile: drawer sidebar + compact header */
@@ -1091,6 +1146,10 @@ hr {
   }
 
   .article h1 { font-size: 28px; }
+  .article-header {
+    flex-direction: column;
+    gap: 10px;
+  }
   .article h2 { font-size: 22px; }
 }
 

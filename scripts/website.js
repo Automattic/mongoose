@@ -371,6 +371,13 @@ block content
 ${md.split('\n').map(line => '    ' + line).join('\n')}
 `;
 
+function wrapArticleHeader(str) {
+  return str.replace(
+    /(<article class="article" id="content">)(<div class="doc-links">[\s\S]*?<\/div>)(<script>[\s\S]*?<\/script>)(<h1\b[\s\S]*?<\/h1>)/,
+    '$1<div class="article-header">$4$2</div>$3'
+  );
+}
+
 const cpc = `
 <div class="sponsored-ad">
   <a href="https://localizejs.com/?utm_campaign=Mongoose&utm_source=mongoose&utm_medium=banner">
@@ -536,6 +543,7 @@ async function renderFile(filename, options, isReload = false) {
     return;
   }
 
+  str = wrapArticleHeader(str);
   str = mapURLs(str, '/' + path.relative(cwd, docsPath));
 
   await fs.promises.writeFile(newfile, str).catch((err) => {

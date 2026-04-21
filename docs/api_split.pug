@@ -6,10 +6,11 @@ append style
   script(src=`${versions.versionedPath}/docs/js/convert-old-anchorid.js`)
 
 block content
-  <a class="edit-docs-link" href="#{editLink}" target="_blank">
-    <img src="#{versions.versionedPath}/docs/images/pencil.svg" />
-  </a>
-  h1 #{title}
+  .article-header
+    h1 #{title}
+    <a class="edit-docs-link" href="#{editLink}" target="_blank">
+      <img src="#{versions.versionedPath}/docs/images/pencil.svg" />
+    </a>
 
   include includes/native
 

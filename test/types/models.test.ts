@@ -250,6 +250,42 @@ function inheritance() {
   }
 }
 
+async function gh15532() {
+  const userSchema = new Schema({
+    name: { type: String, required: true }
+  });
+
+  const BaseUserModel = model('User', userSchema);
+  class UserModel extends BaseUserModel {
+    updateName(name: string) {
+      this.name = name;
+      return this.save();
+    }
+
+    static findByName(name: string) {
+      return this.findOne({ name });
+    }
+  }
+
+  const foundDoc = await UserModel.findOne({ name: 'test' }).orFail();
+  expect(foundDoc.updateName('foo')).type.toBe<Promise<UserModel>>();
+
+  type ExplicitUserDoc = HydratedDocument<{ name: string }>;
+  const foundExplicitDoc = await UserModel.findOne<ExplicitUserDoc>({ name: 'test' }).orFail();
+  expect(foundExplicitDoc).type.toBe<ExplicitUserDoc>();
+  const foundExplicitDocById = await UserModel.findById<ExplicitUserDoc>('0'.repeat(24)).orFail();
+  expect(foundExplicitDocById).type.toBe<ExplicitUserDoc>();
+
+  const foundDocFromStatic = await UserModel.findByName('test').orFail();
+  expect(foundDocFromStatic.updateName('foo')).type.toBe<Promise<UserModel>>();
+
+  const foundDocsAfterUpdate = await UserModel.updateOne({ name: 'test' }, { name: 'foo' }).find({ name: 'foo' });
+  expect(foundDocsAfterUpdate[0].updateName('bar')).type.toBe<Promise<UserModel>>();
+
+  const foundDocsAfterDistinct = await UserModel.distinct('name').find({ name: 'foo' });
+  expect(foundDocsAfterDistinct[0].updateName('baz')).type.toBe<Promise<UserModel>>();
+}
+
 Project.createCollection({ expires: '5 seconds' });
 Project.createCollection({ expireAfterSeconds: 5 });
 expect(Project.createCollection).type.not.toBeCallableWith({ expireAfterSeconds: '5 seconds' });

@@ -210,6 +210,13 @@ declare module 'mongoose' {
       ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>['lean'] :
     false;
 
+  type ModelConstructor = new (...args: any) => any;
+  type DefaultModelResultDoc = { readonly __mongooseDefaultModelResultDoc?: never };
+  type ModelResultType<TModel extends ModelConstructor> = InstanceType<TModel>;
+  type ModelThis<TModel extends ModelConstructor> = TModel;
+  type ModelResultDoc<TResultDoc, TModel extends ModelConstructor> =
+    [TResultDoc] extends [DefaultModelResultDoc] ? ModelResultType<TModel> : TResultDoc;
+
   /**
    * Models are fancy constructors compiled from `Schema` definitions.
    * An instance of a model is called a document.
@@ -282,12 +289,13 @@ declare module 'mongoose' {
     collection: Collection;
 
     /** Creates a `countDocuments` query: counts the number of documents that match `filter`. */
-    countDocuments(
+    countDocuments<TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter?: QueryFilter<TRawDocType>,
       options?: (mongodb.CountOptions & MongooseBaseQueryOptions<TRawDocType> & mongodb.Abortable) | null
     ): QueryWithHelpers<
       number,
-      THydratedDocumentType,
+      ModelResultType<TModel>,
       TQueryHelpers,
       TRawDocType,
       'countDocuments',
@@ -341,12 +349,13 @@ declare module 'mongoose' {
      * Behaves like `remove()`, but deletes all documents that match `conditions`
      * regardless of the `single` option.
      */
-    deleteMany(
+    deleteMany<TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter?: QueryFilter<TRawDocType>,
       options?: (mongodb.DeleteOptions & MongooseBaseQueryOptions<TRawDocType>) | null
     ): QueryWithHelpers<
       mongodb.DeleteResult,
-      THydratedDocumentType,
+      ModelResultType<TModel>,
       TQueryHelpers,
       TLeanResultType,
       'deleteMany',
@@ -369,12 +378,13 @@ declare module 'mongoose' {
      * Behaves like `remove()`, but deletes at most one document regardless of the
      * `single` option.
      */
-    deleteOne(
+    deleteOne<TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter?: QueryFilter<TRawDocType>,
       options?: (mongodb.DeleteOptions & MongooseBaseQueryOptions<TRawDocType>) | null
     ): QueryWithHelpers<
       mongodb.DeleteResult,
-      THydratedDocumentType,
+      ModelResultType<TModel>,
       TQueryHelpers,
       TLeanResultType,
       'deleteOne',
@@ -431,25 +441,27 @@ declare module 'mongoose' {
      * equivalent to `findOne({ _id: id })`. If you want to query by a document's
      * `_id`, use `findById()` instead of `findOne()`.
      */
-    findById<ResultDoc = THydratedDocumentType>(
+    findById<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       id: any,
       projection: ProjectionType<TRawDocType> | null | undefined,
       options: QueryOptions<TRawDocType> & { lean: true }
     ): QueryWithHelpers<
       TLeanResultType | null,
-      ResultDoc,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOne',
       TInstanceMethods & TVirtuals
     >;
-    findById<ResultDoc = THydratedDocumentType>(
+    findById<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       id?: any,
       projection?: ProjectionType<TRawDocType> | null | undefined,
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? TLeanResultType | null : ResultDoc | null,
-      ResultDoc,
+      HasLeanOption<TSchema> extends true ? TLeanResultType | null : ModelResultDoc<ResultDoc, TModel> | null,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOne',
@@ -457,13 +469,14 @@ declare module 'mongoose' {
     >;
 
     /** Finds one document. */
-    findOne<ResultDoc = THydratedDocumentType>(
+    findOne<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter: QueryFilter<TRawDocType>,
       projection: ProjectionType<TRawDocType> | null | undefined,
       options: QueryOptions<TRawDocType> & { lean: true } & mongodb.Abortable
     ): QueryWithHelpers<
       TLeanResultType | null,
-      ResultDoc,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOne',
@@ -482,12 +495,25 @@ declare module 'mongoose' {
       TInstanceMethods & TVirtuals
     >;
     findOne<ResultDoc = THydratedDocumentType>(
+      filter: QueryFilter<TRawDocType>,
+      projection: ProjectionType<TRawDocType> | null | undefined,
+      options: QueryOptions<TRawDocType> & mongodb.Abortable | null | undefined
+    ): QueryWithHelpers<
+      HasLeanOption<TSchema> extends true ? TLeanResultType | null : ResultDoc | null,
+      ResultDoc,
+      TQueryHelpers,
+      TLeanResultType,
+      'findOne',
+      TInstanceMethods & TVirtuals
+    >;
+    findOne<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter?: QueryFilter<TRawDocType>,
       projection?: ProjectionType<TRawDocType> | null | undefined,
       options?: QueryOptions<TRawDocType> & mongodb.Abortable | null | undefined
     ): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? TLeanResultType | null : ResultDoc | null,
-      ResultDoc,
+      HasLeanOption<TSchema> extends true ? TLeanResultType | null : ModelResultDoc<ResultDoc, TModel> | null,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOne',
@@ -656,7 +682,7 @@ declare module 'mongoose' {
     watch<ResultType extends mongodb.Document = any, ChangeType extends mongodb.ChangeStreamDocument = any>(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions & { hydrate?: boolean }): mongodb.ChangeStream<ResultType, ChangeType>;
 
     /** Adds a `$where` clause to this query */
-    $where(argument: string | Function): QueryWithHelpers<Array<THydratedDocumentType>, THydratedDocumentType, TQueryHelpers, TRawDocType, 'find', TInstanceMethods & TVirtuals>;
+    $where<TModel extends ModelConstructor = ModelConstructor>(this: ModelThis<TModel>, argument: string | Function): QueryWithHelpers<Array<ModelResultType<TModel>>, ModelResultType<TModel>, TQueryHelpers, TRawDocType, 'find', TInstanceMethods & TVirtuals>;
 
     /** Registered discriminators for this model. */
     discriminators: { [name: string]: Model<any> } | undefined;
@@ -665,7 +691,8 @@ declare module 'mongoose' {
     translateAliases(raw: any): any;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
-    distinct<DocKey extends string>(
+    distinct<DocKey extends string, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       field: DocKey,
       filter?: QueryFilter<TRawDocType>,
       options?: QueryOptions<TRawDocType>
@@ -675,7 +702,7 @@ declare module 'mongoose' {
           ? WithoutUndefined<Unpacked<WithLevel1NestedPaths<TRawDocType>[DocKey]>>
           : unknown
       >,
-      THydratedDocumentType,
+      ModelResultType<TModel>,
       TQueryHelpers,
       TLeanResultType,
       'distinct',
@@ -699,9 +726,9 @@ declare module 'mongoose' {
     >;
 
     /** Creates a `estimatedDocumentCount` query: counts the number of documents in the collection. */
-    estimatedDocumentCount(options?: QueryOptions<TRawDocType>): QueryWithHelpers<
+    estimatedDocumentCount<TModel extends ModelConstructor = ModelConstructor>(this: ModelThis<TModel>, options?: QueryOptions<TRawDocType>): QueryWithHelpers<
       number,
-      THydratedDocumentType,
+      ModelResultType<TModel>,
       TQueryHelpers,
       TLeanResultType,
       'estimatedDocumentCount',
@@ -712,11 +739,12 @@ declare module 'mongoose' {
      * Returns a document with its `_id` if at least one document exists in the database that matches
      * the given `filter`, and `null` otherwise.
      */
-    exists(
+    exists<TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter: QueryFilter<TRawDocType>
     ): QueryWithHelpers<
       { _id: InferId<TRawDocType> } | null,
-      THydratedDocumentType,
+      ModelResultType<TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOne',
@@ -734,13 +762,14 @@ declare module 'mongoose' {
     >;
 
     /** Creates a `find` query: gets a list of documents that match `filter`. */
-    find<ResultDoc = THydratedDocumentType>(
+    find<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter: QueryFilter<TRawDocType>,
       projection: ProjectionType<TRawDocType> | null | undefined,
       options: QueryOptions<TRawDocType> & { lean: true } & mongodb.Abortable
     ): QueryWithHelpers<
       GetLeanResultType<TRawDocType, TRawDocType[], 'find'>,
-      ResultDoc,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'find',
@@ -758,13 +787,14 @@ declare module 'mongoose' {
       'find',
       TInstanceMethods & TVirtuals
     >;
-    find<ResultDoc = THydratedDocumentType>(
+    find<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter?: QueryFilter<TRawDocType>,
       projection?: ProjectionType<TRawDocType> | null | undefined,
       options?: QueryOptions<TRawDocType> & mongodb.Abortable
     ): QueryWithHelpers<
-      ResultDoc[],
-      ResultDoc,
+      ModelResultDoc<ResultDoc, TModel>[],
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'find',
@@ -784,45 +814,49 @@ declare module 'mongoose' {
     >;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
-    findByIdAndDelete<ResultDoc = THydratedDocumentType>(
+    findByIdAndDelete<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       id: mongodb.ObjectId | any,
       options: QueryOptions<TRawDocType> & { includeResultMetadata: true, lean: true }
     ): QueryWithHelpers<
       ModifyResult<TLeanResultType>,
-      ResultDoc,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndDelete',
       TInstanceMethods & TVirtuals
     >;
-    findByIdAndDelete<ResultDoc = THydratedDocumentType>(
+    findByIdAndDelete<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       id: mongodb.ObjectId | any,
       options: QueryOptions<TRawDocType> & { lean: true }
     ): QueryWithHelpers<
       TLeanResultType | null,
-      ResultDoc,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndDelete',
       TInstanceMethods & TVirtuals
     >;
-    findByIdAndDelete<ResultDoc = THydratedDocumentType>(
+    findByIdAndDelete<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       id: mongodb.ObjectId | any,
       options: QueryOptions<TRawDocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? ModifyResult<TLeanResultType> : ModifyResult<ResultDoc>,
-      ResultDoc,
+      HasLeanOption<TSchema> extends true ? ModifyResult<TLeanResultType> : ModifyResult<ModelResultDoc<ResultDoc, TModel>>,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndDelete',
       TInstanceMethods & TVirtuals
     >;
-    findByIdAndDelete<ResultDoc = THydratedDocumentType>(
+    findByIdAndDelete<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       id?: mongodb.ObjectId | any,
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? TLeanResultType | null : ResultDoc | null,
-      ResultDoc,
+      HasLeanOption<TSchema> extends true ? TLeanResultType | null : ModelResultDoc<ResultDoc, TModel> | null,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndDelete',
@@ -831,13 +865,14 @@ declare module 'mongoose' {
 
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
-    findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
+    findByIdAndUpdate<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter: QueryFilter<TRawDocType>,
       update: UpdateQuery<TRawDocType>,
       options: QueryOptions<TRawDocType> & { includeResultMetadata: true, lean: true }
     ): QueryWithHelpers<
       ModifyResult<TRawDocType>,
-      ResultDoc,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndUpdate',
@@ -855,49 +890,53 @@ declare module 'mongoose' {
       'findOneAndUpdate',
       TInstanceMethods & TVirtuals
     >;
-    findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
+    findByIdAndUpdate<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       id: mongodb.ObjectId | any,
       update: UpdateQuery<TRawDocType>,
       options: QueryOptions<TRawDocType> & { lean: true }
     ): QueryWithHelpers<
       TLeanResultType | null,
-      ResultDoc,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndUpdate',
       TInstanceMethods & TVirtuals
     >;
-    findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
+    findByIdAndUpdate<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       id: mongodb.ObjectId | any,
       update: UpdateQuery<TRawDocType>,
       options: QueryOptions<TRawDocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? ModifyResult<TLeanResultType> : ModifyResult<ResultDoc>,
-      ResultDoc,
+      HasLeanOption<TSchema> extends true ? ModifyResult<TLeanResultType> : ModifyResult<ModelResultDoc<ResultDoc, TModel>>,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndUpdate',
       TInstanceMethods & TVirtuals
     >;
-    findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
+    findByIdAndUpdate<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       id: mongodb.ObjectId | any,
       update: UpdateQuery<TRawDocType>,
       options: QueryOptions<TRawDocType> & { upsert: true } & ReturnsNewDoc
     ): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? TLeanResultType : ResultDoc,
-      ResultDoc,
+      HasLeanOption<TSchema> extends true ? TLeanResultType : ModelResultDoc<ResultDoc, TModel>,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndUpdate',
       TInstanceMethods & TVirtuals
     >;
-    findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
+    findByIdAndUpdate<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       id?: mongodb.ObjectId | any,
       update?: UpdateQuery<TRawDocType>,
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? TLeanResultType | null : ResultDoc | null,
-      ResultDoc,
+      HasLeanOption<TSchema> extends true ? TLeanResultType | null : ModelResultDoc<ResultDoc, TModel> | null,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndUpdate',
@@ -905,12 +944,13 @@ declare module 'mongoose' {
     >;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
-    findOneAndDelete<ResultDoc = THydratedDocumentType>(
+    findOneAndDelete<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter: QueryFilter<TRawDocType>,
       options: QueryOptions<TRawDocType> & { lean: true }
     ): QueryWithHelpers<
       TLeanResultType | null,
-      ResultDoc,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndDelete',
@@ -927,12 +967,13 @@ declare module 'mongoose' {
       'findOneAndDelete',
       TInstanceMethods & TVirtuals
     >;
-    findOneAndDelete<ResultDoc = THydratedDocumentType>(
+    findOneAndDelete<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter: QueryFilter<TRawDocType>,
       options: QueryOptions<TRawDocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? ModifyResult<TRawDocType> : ModifyResult<ResultDoc>,
-      ResultDoc,
+      HasLeanOption<TSchema> extends true ? ModifyResult<TRawDocType> : ModifyResult<ModelResultDoc<ResultDoc, TModel>>,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndDelete',
@@ -949,12 +990,13 @@ declare module 'mongoose' {
       'findOneAndDelete',
       TInstanceMethods & TVirtuals
     >;
-    findOneAndDelete<ResultDoc = THydratedDocumentType>(
+    findOneAndDelete<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter?: QueryFilter<TRawDocType> | null,
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? TRawDocType | null : ResultDoc | null,
-      ResultDoc,
+      HasLeanOption<TSchema> extends true ? TRawDocType | null : ModelResultDoc<ResultDoc, TModel> | null,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndDelete',
@@ -973,13 +1015,14 @@ declare module 'mongoose' {
     >;
 
     /** Creates a `findOneAndReplace` query: atomically finds the given document and replaces it with `replacement`. */
-    findOneAndReplace<ResultDoc = THydratedDocumentType>(
+    findOneAndReplace<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter: QueryFilter<TRawDocType>,
       replacement: TRawDocType | AnyObject,
       options: QueryOptions<TRawDocType> & { lean: true }
     ): QueryWithHelpers<
       TLeanResultType | null,
-      ResultDoc,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndReplace',
@@ -997,13 +1040,14 @@ declare module 'mongoose' {
       'findOneAndReplace',
       TInstanceMethods & TVirtuals
     >;
-    findOneAndReplace<ResultDoc = THydratedDocumentType>(
+    findOneAndReplace<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter: QueryFilter<TRawDocType>,
       replacement: TRawDocType | AnyObject,
       options: QueryOptions<TRawDocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? ModifyResult<TLeanResultType> : ModifyResult<ResultDoc>,
-      ResultDoc,
+      HasLeanOption<TSchema> extends true ? ModifyResult<TLeanResultType> : ModifyResult<ModelResultDoc<ResultDoc, TModel>>,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndReplace',
@@ -1021,13 +1065,14 @@ declare module 'mongoose' {
       'findOneAndReplace',
       TInstanceMethods & TVirtuals
     >;
-    findOneAndReplace<ResultDoc = THydratedDocumentType>(
+    findOneAndReplace<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter: QueryFilter<TRawDocType>,
       replacement: TRawDocType | AnyObject,
       options: QueryOptions<TRawDocType> & { upsert: true } & ReturnsNewDoc
     ): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? TLeanResultType : ResultDoc,
-      ResultDoc,
+      HasLeanOption<TSchema> extends true ? TLeanResultType : ModelResultDoc<ResultDoc, TModel>,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndReplace',
@@ -1045,13 +1090,14 @@ declare module 'mongoose' {
       'findOneAndReplace',
       TInstanceMethods & TVirtuals
     >;
-    findOneAndReplace<ResultDoc = THydratedDocumentType>(
+    findOneAndReplace<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter?: QueryFilter<TRawDocType>,
       replacement?: TRawDocType | AnyObject,
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? TLeanResultType | null : ResultDoc | null,
-      ResultDoc,
+      HasLeanOption<TSchema> extends true ? TLeanResultType | null : ModelResultDoc<ResultDoc, TModel> | null,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndReplace',
@@ -1071,13 +1117,14 @@ declare module 'mongoose' {
     >;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
-    findOneAndUpdate<ResultDoc = THydratedDocumentType>(
+    findOneAndUpdate<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter: QueryFilter<TRawDocType>,
       update: UpdateQuery<TRawDocType>,
       options: QueryOptions<TRawDocType> & { includeResultMetadata: true, lean: true }
     ): QueryWithHelpers<
       ModifyResult<TRawDocType>,
-      ResultDoc,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndUpdate',
@@ -1095,13 +1142,14 @@ declare module 'mongoose' {
       'findOneAndUpdate',
       TInstanceMethods & TVirtuals
     >;
-    findOneAndUpdate<ResultDoc = THydratedDocumentType>(
+    findOneAndUpdate<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter: QueryFilter<TRawDocType>,
       update: UpdateQuery<TRawDocType>,
       options: QueryOptions<TRawDocType> & { lean: true }
     ): QueryWithHelpers<
       GetLeanResultType<TRawDocType, TRawDocType, 'findOneAndUpdate'> | null,
-      ResultDoc,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndUpdate',
@@ -1119,13 +1167,14 @@ declare module 'mongoose' {
       'findOneAndUpdate',
       TInstanceMethods & TVirtuals
     >;
-    findOneAndUpdate<ResultDoc = THydratedDocumentType>(
+    findOneAndUpdate<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter: QueryFilter<TRawDocType>,
       update: UpdateQuery<TRawDocType>,
       options: QueryOptions<TRawDocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? ModifyResult<TLeanResultType> : ModifyResult<ResultDoc>,
-      ResultDoc,
+      HasLeanOption<TSchema> extends true ? ModifyResult<TLeanResultType> : ModifyResult<ModelResultDoc<ResultDoc, TModel>>,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndUpdate',
@@ -1143,13 +1192,14 @@ declare module 'mongoose' {
       'findOneAndUpdate',
       TInstanceMethods & TVirtuals
     >;
-    findOneAndUpdate<ResultDoc = THydratedDocumentType>(
+    findOneAndUpdate<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter: QueryFilter<TRawDocType>,
       update: UpdateQuery<TRawDocType>,
       options: QueryOptions<TRawDocType> & { upsert: true } & ReturnsNewDoc
     ): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? TLeanResultType : ResultDoc,
-      ResultDoc,
+      HasLeanOption<TSchema> extends true ? TLeanResultType : ModelResultDoc<ResultDoc, TModel>,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndUpdate',
@@ -1167,25 +1217,26 @@ declare module 'mongoose' {
       'findOneAndUpdate',
       TInstanceMethods & TVirtuals
     >;
-    findOneAndUpdate<ResultDoc = THydratedDocumentType>(
+    findOneAndUpdate<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter?: QueryFilter<TRawDocType>,
       update?: UpdateQuery<TRawDocType>,
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? TLeanResultType | null : ResultDoc | null,
-      ResultDoc,
+      HasLeanOption<TSchema> extends true ? TLeanResultType | null : ModelResultDoc<ResultDoc, TModel> | null,
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndUpdate',
       TInstanceMethods & TVirtuals
     >;
-    findOneAndUpdate<ResultDoc = THydratedDocumentType>(
+    findOneAndUpdate(
       filter?: Query<any, any>,
       update?: UpdateQuery<TRawDocType>,
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? TLeanResultType | null : ResultDoc | null,
-      ResultDoc,
+      HasLeanOption<TSchema> extends true ? TLeanResultType | null : THydratedDocumentType | null,
+      THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndUpdate',
@@ -1193,11 +1244,12 @@ declare module 'mongoose' {
     >;
 
     /** Creates a `replaceOne` query: finds the first document that matches `filter` and replaces it with `replacement`. */
-    replaceOne<ResultDoc = THydratedDocumentType>(
+    replaceOne<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter?: QueryFilter<TRawDocType>,
       replacement?: TRawDocType | AnyObject,
       options?: (mongodb.ReplaceOptions & QueryOptions<TRawDocType>) | null
-    ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, TLeanResultType, 'replaceOne', TInstanceMethods & TVirtuals>;
+    ): QueryWithHelpers<UpdateWriteOpResult, ModelResultDoc<ResultDoc, TModel>, TQueryHelpers, TLeanResultType, 'replaceOne', TInstanceMethods & TVirtuals>;
     replaceOne<ResultDoc = THydratedDocumentType>(
       filter?: Query<any, any>,
       replacement?: TRawDocType | AnyObject,
@@ -1211,11 +1263,12 @@ declare module 'mongoose' {
     schema: TSchema;
 
     /** Creates a `updateMany` query: updates all documents that match `filter` with `update`. */
-    updateMany(
+    updateMany<TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter: QueryFilter<TRawDocType>,
       update: UpdateQuery<TRawDocType> | UpdateWithAggregationPipeline,
       options?: (mongodb.UpdateOptions & MongooseUpdateQueryOptions<TRawDocType>) | null
-    ): QueryWithHelpers<UpdateWriteOpResult, THydratedDocumentType, TQueryHelpers, TLeanResultType, 'updateMany', TInstanceMethods & TVirtuals>;
+    ): QueryWithHelpers<UpdateWriteOpResult, ModelResultType<TModel>, TQueryHelpers, TLeanResultType, 'updateMany', TInstanceMethods & TVirtuals>;
     updateMany(
       filter: Query<any, any>,
       update: UpdateQuery<TRawDocType> | UpdateWithAggregationPipeline,
@@ -1223,11 +1276,12 @@ declare module 'mongoose' {
     ): QueryWithHelpers<UpdateWriteOpResult, THydratedDocumentType, TQueryHelpers, TLeanResultType, 'updateMany', TInstanceMethods & TVirtuals>;
 
     /** Creates a `updateOne` query: updates the first document that matches `filter` with `update`. */
-    updateOne(
+    updateOne<TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       filter: QueryFilter<TRawDocType>,
       update: UpdateQuery<TRawDocType> | UpdateWithAggregationPipeline,
       options?: (mongodb.UpdateOptions & MongooseUpdateQueryOptions<TRawDocType>) | null
-    ): QueryWithHelpers<UpdateWriteOpResult, THydratedDocumentType, TQueryHelpers, TLeanResultType, 'updateOne', TInstanceMethods & TVirtuals>;
+    ): QueryWithHelpers<UpdateWriteOpResult, ModelResultType<TModel>, TQueryHelpers, TLeanResultType, 'updateOne', TInstanceMethods & TVirtuals>;
     updateOne(
       filter: Query<any, any>,
       update: UpdateQuery<TRawDocType> | UpdateWithAggregationPipeline,
@@ -1235,21 +1289,22 @@ declare module 'mongoose' {
     ): QueryWithHelpers<UpdateWriteOpResult, THydratedDocumentType, TQueryHelpers, TLeanResultType, 'updateOne', TInstanceMethods & TVirtuals>;
 
     /** Creates a Query, applies the passed conditions, and returns the Query. */
-    where<ResultDoc = THydratedDocumentType>(
+    where<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(
+      this: ModelThis<TModel>,
       path: string,
       val?: any
-    ): QueryWithHelpers<HasLeanOption<TSchema> extends true ? TRawDocType[] : ResultDoc[], ResultDoc, TQueryHelpers, TRawDocType, 'find', TInstanceMethods>;
-    where<ResultDoc = THydratedDocumentType>(obj: object): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? TRawDocType[] : ResultDoc[],
-      ResultDoc,
+    ): QueryWithHelpers<HasLeanOption<TSchema> extends true ? TRawDocType[] : ModelResultDoc<ResultDoc, TModel>[], ModelResultDoc<ResultDoc, TModel>, TQueryHelpers, TRawDocType, 'find', TInstanceMethods>;
+    where<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(this: ModelThis<TModel>, obj: object): QueryWithHelpers<
+      HasLeanOption<TSchema> extends true ? TRawDocType[] : ModelResultDoc<ResultDoc, TModel>[],
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'find',
       TInstanceMethods & TVirtuals
     >;
-    where<ResultDoc = THydratedDocumentType>(): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? TRawDocType[] : ResultDoc[],
-      ResultDoc,
+    where<ResultDoc = DefaultModelResultDoc, TModel extends ModelConstructor = ModelConstructor>(this: ModelThis<TModel>): QueryWithHelpers<
+      HasLeanOption<TSchema> extends true ? TRawDocType[] : ModelResultDoc<ResultDoc, TModel>[],
+      ModelResultDoc<ResultDoc, TModel>,
       TQueryHelpers,
       TLeanResultType,
       'find',

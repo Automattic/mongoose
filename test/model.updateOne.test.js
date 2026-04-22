@@ -3547,6 +3547,31 @@ describe('model: updateOne: ', function() {
     assert.equal(validateNameCalls, 1);
   });
 
+  it('applies allowNull validators with updateOne and runValidators', async function() {
+    const schema = new Schema({
+      name: { type: String, allowNull: false }
+    });
+    const Model = db.model('Test', schema);
+    const doc = await Model.create({ name: 'test' });
+
+    let err = await Model.updateOne(
+      { _id: doc._id },
+      { $set: { name: null } },
+      { runValidators: true }
+    ).then(() => null, err => err);
+
+    assert.ok(err);
+    assert.ok(err.errors['name']);
+    assert.equal(err.errors['name'].kind, 'allowNull');
+
+    err = await Model.updateOne(
+      { _id: doc._id },
+      { $set: { name: undefined } },
+      { runValidators: true }
+    ).then(() => null, err => err);
+    assert.equal(err, null);
+  });
+
   it('casts top level $each (gh-15642)', async function() {
     const schema = new Schema({ tags: [String] });
     const Model = db.model('Test', schema);

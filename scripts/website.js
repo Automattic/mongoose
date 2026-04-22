@@ -340,18 +340,26 @@ const files = Object.keys(docsFilemap.fileMap);
 // api explicitly imported for specific file loading
 const apiReq = require('../docs/source/api');
 
-const wrapMarkdown = (md, baseLayout, versionedPath, markdownUrl) => `
+const wrapMarkdown = (md, baseLayout, versionedPath, markdownUrl) => {
+  const newlineIdx = md.indexOf('\n');
+  const firstLine = newlineIdx === -1 ? md : md.slice(0, newlineIdx);
+  const rest = newlineIdx === -1 ? '' : md.slice(newlineIdx + 1);
+
+  return `
 extends ${baseLayout}
 
 block content
-  <div class="doc-links">
-    <a class="edit-docs-link" href="#{editLink}" target="_blank">
-      <img src="${versionedPath}/docs/images/pencil.svg" />
-    </a>
-    <button class="copy-markdown-link" data-md-url="${markdownUrl}" title="Copy page as Markdown" aria-label="Copy page as Markdown">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-    </button>
-  </div>
+  .article-header
+    :markdown
+      ${firstLine}
+    <div class="doc-links">
+      <a class="edit-docs-link" href="#{editLink}" target="_blank">
+        <img src="${versionedPath}/docs/images/pencil.svg" />
+      </a>
+      <button class="copy-markdown-link" data-md-url="${markdownUrl}" title="Copy page as Markdown" aria-label="Copy page as Markdown">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+      </button>
+    </div>
   script.
     (function() {
       const copyMarkdownButton = document.querySelector('.copy-markdown-link');
@@ -368,15 +376,9 @@ block content
       });
     })();
   :markdown
-${md.split('\n').map(line => '    ' + line).join('\n')}
+${rest.split('\n').map(line => '    ' + line).join('\n')}
 `;
-
-function wrapArticleHeader(str) {
-  return str.replace(
-    /(<article class="article" id="content">)(<div class="doc-links">[\s\S]*?<\/div>)(<script>[\s\S]*?<\/script>)(<h1\b[\s\S]*?<\/h1>)/,
-    '$1<div class="article-header">$4$2</div>$3'
-  );
-}
+};
 
 const cpc = `
 <div class="sponsored-ad">
@@ -543,7 +545,6 @@ async function renderFile(filename, options, isReload = false) {
     return;
   }
 
-  str = wrapArticleHeader(str);
   str = mapURLs(str, '/' + path.relative(cwd, docsPath));
 
   await fs.promises.writeFile(newfile, str).catch((err) => {

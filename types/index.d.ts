@@ -288,9 +288,9 @@ declare module 'mongoose' {
       ? Schema<MergeType<DocType, DisSchemaEDocType>, DiscriminatorModel<DisSchemaM, M>, DisSchemaInstanceMethods | TInstanceMethods, DisSchemaQueryhelpers | TQueryHelpers, DisSchemaVirtuals | TVirtuals, DisSchemaStatics & TStaticMethods>
       : Schema<DocType, M, TInstanceMethods, TQueryHelpers, TVirtuals, TStaticMethods>;
 
-  type QueryResultType<T> = T extends Query<infer ResultType, any> ? ResultType : never;
+  export type QueryResultType<T> = T extends Query<infer ResultType, any> ? ResultType : never;
 
-  type PluginFunction<
+  export type PluginFunction<
     DocType,
     M,
     TInstanceMethods,
@@ -819,7 +819,7 @@ declare module 'mongoose' {
 
   export type ReturnsNewDoc = { new: true } | { returnOriginal: false } | { returnDocument: 'after' };
 
-  type ArrayOperators = { $slice: number | [number, number]; $elemMatch?: never } | { $elemMatch: Record<string, any>; $slice?: never };
+  export type ArrayOperators = { $slice: number | [number, number]; $elemMatch?: never } | { $elemMatch: Record<string, any>; $slice?: never };
   /**
    * This Type Assigns `Element | undefined` recursively to the `T` type.
    * if it is an array it will do this to the element of the array, if it is an object it will do this for the properties of the object.
@@ -836,7 +836,7 @@ declare module 'mongoose' {
         d?: true | ArrayOperators | undefined;
     }
   */
-  type Projector<T, Element> = T extends Array<infer U>
+  export type Projector<T, Element> = T extends Array<infer U>
     ? Projector<U, Element> | ArrayOperators
     : T extends TreatAsPrimitives
       ? Element

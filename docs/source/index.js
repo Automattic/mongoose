@@ -21,6 +21,7 @@ const api = require('./api');
  * @property {Boolean} [guide] Indicate the page is a guide
  * @property {Boolean} [schema]
  * @property {*}  [jobs] Overwrite which jobs should be listed in the page (applied automatically)
+ * @property {{image: String, href: String}} [affiliateAd] Optional affiliate ad rendered under the right-sidebar ToC. Falsy `image` hides the ad.
  */
 
 /**
@@ -67,7 +68,12 @@ docs['docs/migrating_to_6.md'] = { guide: true, title: 'Migrating to Mongoose 6'
 docs['docs/migrating_to_7.md'] = { guide: true, title: 'Migrating to Mongoose 7', markdown: true };
 docs['docs/migrating_to_8.md'] = { guide: true, title: 'Migrating to Mongoose 8', markdown: true };
 docs['docs/migrating_to_9.md'] = { guide: true, title: 'Migrating to Mongoose 9', markdown: true };
-docs['docs/connections.md'] = { guide: true, title: 'Connecting to MongoDB', markdown: true };
+docs['docs/connections.md'] = {
+  guide: true,
+  title: 'Connecting to MongoDB',
+  markdown: true,
+  affiliateAd: { image: '/docs/css/railway-ad-4.jpg', href: 'https://railway.com?referralCode=CD4_kV' }
+};
 docs['docs/lambda.md'] = { guide: true, title: 'Using Mongoose With AWS Lambda', markdown: true };
 docs['docs/geojson.md'] = { guide: true, title: 'Using GeoJSON', acquit: true, markdown: true };
 docs['docs/transactions.md'] = { guide: true, title: 'Transactions', acquit: true, markdown: true };

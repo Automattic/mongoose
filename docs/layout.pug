@@ -212,8 +212,17 @@ html(lang='en')
             ul.toc-list#toc-list
 
           .right-sidebar-aside
-            .cpc-ad
-              <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script>
+            - if (!(affiliateAd && affiliateAd.image))
+              .cpc-ad
+                <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script>
+
+            - if (affiliateAd && affiliateAd.image)
+              .affiliate-ad
+                - if (affiliateAd.href)
+                  a(href=affiliateAd.href, target="_blank", rel="noopener sponsored")
+                    img(src=`${versions.versionedPath}${affiliateAd.image}`, alt="Sponsored")
+                - else
+                  img(src=`${versions.versionedPath}${affiliateAd.image}`, alt="Sponsored")
 
             - if (jobs && jobs.length && !outputUrl.startsWith(`${versions.versionedPath}/docs/jobs.html`))
               .jobs

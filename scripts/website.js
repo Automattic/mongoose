@@ -536,6 +536,7 @@ async function renderFile(filename, options, isReload = false) {
   options.outputUrl = newfile.replace(cwd, '');
   options.jobs = jobs;
   options.versions = versionObj;
+  options.affiliateAd = options.affiliateAd || null;
 
   options.opencollectiveSponsors = opencollectiveSponsors;
 

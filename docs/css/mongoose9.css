@@ -942,6 +942,26 @@ hr {
   margin: 0;
 }
 
+.affiliate-ad {
+  margin: 0;
+  flex-shrink: 0;
+  min-height: 432px;
+}
+
+.affiliate-ad a,
+.affiliate-ad img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+@media (max-height: 767px) {
+  .affiliate-ad {
+    display: none;
+  }
+}
+
 /* Jobs block, inlined into the right sidebar (no longer fixed-position) */
 .jobs {
   font-size: 12px;

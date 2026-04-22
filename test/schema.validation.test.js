@@ -735,6 +735,52 @@ describe('schema', function() {
           const err = await m.validate().then(() => null, err => err);
           assert.equal(err.errors.x.toString(), 'Custom message');
         });
+
+        it('passes full string value to custom validator message functions', async function() {
+          const value = 'long-long-long.short-enough.com';
+          const schema = new Schema({
+            url: {
+              type: String,
+              validate: {
+                validator: function() {
+                  return false;
+                },
+                message: props => `${props.value} is not a valid url`
+              }
+            }
+          });
+
+          const M = mongoose.model('gh-15571', schema);
+          const m = new M({ url: value });
+
+          const err = await m.validate().then(() => null, err => err);
+          assert.equal(err.errors.url.message, `${value} is not a valid url`);
+          assert.equal(err.errors.url.value, value);
+          assert.equal(err.errors.url.properties.value, value);
+        });
+
+        it('passes full string value to custom validator message functions on validateSync()', function() {
+          const value = 'long-long-long.short-enough.com';
+          const schema = new Schema({
+            url: {
+              type: String,
+              validate: {
+                validator: function() {
+                  return false;
+                },
+                message: props => `${props.value} is not a valid url`
+              }
+            }
+          });
+
+          const M = mongoose.model('gh-15571-sync', schema);
+          const m = new M({ url: value });
+
+          const err = m.validateSync();
+          assert.equal(err.errors.url.message, `${value} is not a valid url`);
+          assert.equal(err.errors.url.value, value);
+          assert.equal(err.errors.url.properties.value, value);
+        });
       });
     });
 

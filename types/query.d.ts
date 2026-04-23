@@ -51,6 +51,7 @@ declare module 'mongoose' {
   type QueryFilter<T> = IsItRecordAndNotAny<T> extends true ? _QueryFilter<WithLevel1NestedPaths<T>> : _QueryFilterLooseId<Record<string, any>>;
 
   type MongooseBaseQueryOptionKeys =
+    | 'cloneUpdate'
     | 'context'
     | 'middleware'
     | 'multipleCastError'
@@ -108,6 +109,10 @@ declare module 'mongoose' {
     collation?: mongodb.CollationOptions;
     comment?: any;
     context?: string;
+    /**
+     * If `false`, Mongoose will not clone the update before executing the query.
+     */
+    cloneUpdate?: boolean;
     explain?: mongodb.ExplainVerbosityLike;
     fields?: any | string;
     hint?: mongodb.Hint;
@@ -129,6 +134,11 @@ declare module 'mongoose' {
      */
     new?: boolean;
 
+    /**
+     * If `false`, skip applying default schema values to the returned document(s).
+     * @default true
+     */
+    defaults?: boolean;
     overwriteDiscriminatorKey?: boolean;
     /**
      * Mongoose removes updated immutable properties from `update` by default (excluding $setOnInsert).
@@ -884,7 +894,7 @@ declare module 'mongoose' {
     setQuery(val: QueryFilter<RawDocType> | null): void;
     setQuery(val: Query<any, any> | null): void;
 
-    setUpdate(update: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline): void;
+    setUpdate(update: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline, cloneUpdate?: boolean): void;
 
     /** Specifies an `$size` query condition. When called with one argument, the most recent path passed to `where()` is used. */
     size(path: string, val: number): this;

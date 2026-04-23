@@ -82,7 +82,7 @@ declare module 'mongoose' {
      */
     debug?:
     | boolean
-    | { color?: boolean; shell?: boolean; }
+    | { color?: boolean; shell?: boolean; timestamp?: boolean; }
     | stream.Writable
     | ((collectionName: string, methodName: string, ...methodArgs: any[]) => void);
 

@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "9.4.1",
+  "version": "9.5.0",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -20,7 +20,7 @@
   "type": "commonjs",
   "license": "MIT",
   "dependencies": {
-    "kareem": "3.2.0",
+    "kareem": "3.3.0",
     "mongodb": "~7.1",
     "mpath": "0.9.0",
     "mquery": "6.0.0",
@@ -60,7 +60,7 @@
     "ncp": "^2.0.0",
     "pug": "3.0.4",
     "sinon": "21.0.3",
-    "tstyche": "^7.0.0-rc.0",
+    "tstyche": "^7.0.0",
     "typescript": "5.9.3",
     "typescript-eslint": "^8.31.1",
     "uuid": "11.1.0"

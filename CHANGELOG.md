@@ -1,3 +1,9 @@
+8.23.1 / 2026-04-23
+===================
+ * fix(model): support sort option in Model.bulkWrite() updateOne and replaceOne operations #16091 #16079
+ * fix(setDefaultsOnInsert): check child filter paths before applying defaults (backport #16031 to 8.x) #16219 [marklai1998](https://github.com/marklai1998)
+ * fix(schema): always pass raw string value to error validators, only trim to 30 chars for maxlength validator #16238 #16236 #15550 #15571
+
 8.23.0 / 2026-02-09
 ===================
  * feat(document): add flattenUUIDs option to toObject() and toJSON() (backport #15021 to 8.x)

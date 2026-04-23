@@ -210,6 +210,8 @@ describe('ValidationError', function() {
       const err = await model.validate().then(() => null, err => err);
 
       assert.notEqual(err, null, 'String maxLength validation failed.');
+      assert.equal(err.errors.name.value, 'John Jacob Jingleheimer Schmidt');
+      assert.equal(err.errors.name.properties.value, 'John Jacob Jingleheimer Schmidt');
       assert.ok(
         err.message.endsWith('Path `name` (`John Jacob Jingleheimer Schmid...`, length 31) is longer than the maximum allowed length (10).'),
         err.message

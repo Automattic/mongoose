@@ -1983,6 +1983,45 @@ describe('schema', function() {
         assert.equal(schema.path('name').validators[0].type, 'allowNull');
       });
 
+      it('keeps allowNull options in sync when changed at runtime', function() {
+        const schema = new Schema({ name: String });
+        const schemaType = schema.path('name');
+
+        schemaType.allowNull(false);
+        assert.equal(schemaType.options.allowNull, false);
+        assert.deepStrictEqual(schema.toJSONSchema(), {
+          type: 'object',
+          required: ['_id'],
+          properties: {
+            _id: {
+              type: 'string'
+            },
+            name: {
+              type: 'string'
+            }
+          }
+        });
+
+        const otherSchema = schema.clone();
+        assert.equal(otherSchema.path('name').options.allowNull, false);
+        assert.deepStrictEqual(otherSchema.toJSONSchema(), schema.toJSONSchema());
+
+        schemaType.allowNull(true);
+        assert.ok(!Object.hasOwn(schemaType.options, 'allowNull'));
+        assert.deepStrictEqual(schema.toJSONSchema(), {
+          type: 'object',
+          required: ['_id'],
+          properties: {
+            _id: {
+              type: 'string'
+            },
+            name: {
+              type: ['string', 'null']
+            }
+          }
+        });
+      });
+
       it('correctly copies all child schemas (gh-7537)', function() {
         const l3Schema = new Schema({ name: String });
         const l2Schema = new Schema({ l3: l3Schema });

@@ -11,6 +11,8 @@
 
   if (headings.length < 2) {
     container.classList.add('toc-empty');
+    const tocLink = document.getElementById('tocLink');
+    if (tocLink) tocLink.disabled = true;
     return;
   }
 

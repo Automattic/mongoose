@@ -386,6 +386,18 @@ hr {
   background-color: var(--bg-secondary);
 }
 
+.icon-button:disabled {
+  color: var(--border-color);
+  background-color: transparent;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.icon-button:disabled:hover {
+  background-color: transparent;
+  color: var(--border-color);
+}
+
 .icon-button svg,
 .icon-link svg {
   width: 20px;
@@ -678,6 +690,7 @@ hr {
   font-weight: 600;
   line-height: 1.4;
   margin: 32px 0 12px 0;
+  overflow-x: auto;
 }
 
 .article h4 {
@@ -775,9 +788,13 @@ hr {
   margin-top: 4px;
   width: 18px;
   height: 18px;
-  background-image: url('/docs/images/link_64x64.png');
-  background-size: contain;
-  background-repeat: no-repeat;
+  background-color: var(--text-muted);
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'/><path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/></svg>");
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'/><path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/></svg>");
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
   content: '';
   opacity: 0;
   transition: opacity 0.15s ease;
@@ -1146,10 +1163,6 @@ hr {
   }
 
   .article h1 { font-size: 28px; }
-  .article-header {
-    flex-direction: column;
-    gap: 10px;
-  }
   .article h2 { font-size: 22px; }
 }
 

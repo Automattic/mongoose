@@ -12,9 +12,9 @@ body {
 /* Theme Toggle Button for Homepage */
 #theme-toggle {
   position: fixed;
-  top: 20px;
+  top: auto;
   right: 20px;
-  bottom: auto;
+  bottom: 20px;
   z-index: 1000;
   background-color: var(--bg-primary);
   border: 1px solid var(--border-color);
@@ -298,6 +298,15 @@ h2 a {
   font-size: 12px;
   margin-bottom: 20px;
 }
+@media only screen and (max-width: 768px) {
+  #follow {
+    margin-left: 0;
+    text-align: center;
+  }
+  #follow ul {
+    padding-left: 0;
+  }
+}
 @media only screen and (max-width: 480px) {
   #forkbanner { display: none }
   #header {
@@ -362,6 +371,15 @@ h2 a {
   }
   .addyourown, .addyourown a {
     width: 100%;
+  }
+  #theme-toggle-btn {
+    width: 33px;
+    height: 33px;
+  }
+  #theme-icon-light,
+  #theme-icon-dark {
+    width: 15px;
+    height: 15px;
   }
 }
 

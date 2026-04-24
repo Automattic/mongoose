@@ -41,10 +41,6 @@
   if (tocLink != null && toc != null) {
     tocLink.setAttribute('aria-expanded', 'false');
 
-    if (toc.querySelector('.toc-empty') != null) {
-      tocLink.hidden = true;
-    }
-
     tocLink.onclick = function(e) {
       e.preventDefault();
       closeMenu();

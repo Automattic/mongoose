@@ -1,0 +1,171 @@
+/* CSS Custom Properties for Theming */
+/* Light mode (default) */
+:root, [data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #eee;
+  --bg-tertiary: #fafafa;
+  --text-primary: #000000;
+  --text-secondary: #333333;
+  --text-muted: #777777;
+  --link-color: #0971B2;
+  --link-hover: #065a8f;
+  --border-color: #ddd;
+  --code-bg: #f5f5f5;
+  --code-text: #333;
+  --menu-bg: #eee;
+  --menu-hover: rgba(0, 0, 0, 0.1);
+  --menu-selected: rgba(0, 0, 0, 0.15);
+  --shadow: rgba(0, 0, 0, 0.1);
+  --focus-ring: #0971B2;
+  --focus-ring-width: 3px;
+  --focus-ring-shadow: rgba(9, 113, 178, 0.1);
+  /* Brand colors */
+  --brand-primary: #800;
+  --brand-primary-hover: #990000;
+  --brand-primary-subtle: rgba(136, 0, 0, 0.1);
+  /* Button colors */
+  --btn-bg: #444;
+  --btn-text-shadow: #222;
+  /* Tagline text shadow */
+  --tagline-text-shadow: #f8f8f8;
+}
+
+/* Dark mode - system preference (no-JS fallback) or manual toggle */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #252525;
+    --bg-tertiary: #252525;
+    --text-primary: #f0f0f0;
+    --text-secondary: #d8d8d8;
+    --text-muted: #a0a0a0;
+    --link-color: #7BC3FF;
+    --link-hover: #8AD0FF;
+    --border-color: #444444;
+    --code-bg: #252525;
+    --code-text: #e8e8e8;
+    --menu-bg: #252525;
+    --menu-hover: rgba(255, 255, 255, 0.1);
+    --menu-selected: rgba(255, 255, 255, 0.15);
+    --shadow: rgba(0, 0, 0, 0.3);
+    --focus-ring: #FFB4B4;
+    --focus-ring-shadow: rgba(255, 180, 180, 0.2);
+    /* Brand colors */
+    --brand-primary: #FF5E5E;
+    --brand-primary-hover: #F55;
+    --brand-primary-subtle: rgba(255, 180, 180, 0.1);
+    /* Button colors */
+    --btn-bg: #444;
+    --btn-text-shadow: #222;
+    /* Tagline text shadow */
+    --tagline-text-shadow: #222;
+  }
+}
+
+/* Dark mode - manual toggle (overrides system preference) */
+[data-theme="dark"] {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --bg-tertiary: #252525;
+  --text-primary: #f0f0f0;
+  --text-secondary: #d8d8d8;
+  --text-muted: #a0a0a0;
+  --link-color: #7BC3FF;
+  --link-hover: #8AD0FF;
+  --border-color: #444444;
+  --code-bg: #252525;
+  --code-text: #e8e8e8;
+  --menu-bg: #252525;
+  --menu-hover: rgba(255, 255, 255, 0.1);
+  --menu-selected: rgba(255, 255, 255, 0.15);
+  --shadow: rgba(0, 0, 0, 0.3);
+  --focus-ring: #FFB4B4;
+  --focus-ring-shadow: rgba(255, 180, 180, 0.2);
+  /* Brand colors */
+  --brand-primary: #FF5E5E;
+  --brand-primary-hover: #F55;
+  --brand-primary-subtle: rgba(255, 180, 180, 0.1);
+  /* Button colors */
+  --btn-bg: #444;
+  --btn-text-shadow: #222;
+  /* Tagline text shadow */
+  --tagline-text-shadow: #222;
+}
+
+html {
+  font-family: 'Open Sans';
+  color-scheme: light dark;
+}
+
+a {
+  text-decoration: none;
+}
+
+p {
+  line-height: 1.5em;
+}
+
+/* Anchor icons on hover for markdown-generated headings */
+h1 a::before,
+h2 a::before,
+h3 a::before,
+h4 a::before,
+a.anchor::before {
+  position: absolute;
+  left: 22px;
+  margin-top: 4px;
+  background-color: var(--text-muted);
+  -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'/><path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/></svg>");
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'/><path d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'/></svg>");
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  height: 1em;
+  /* Any width that will be over the size of the icon and overlap the link to keep the hover state will work */
+  width: 2em;
+  content: ' ';
+
+  /* Hide it when not hover */
+  opacity: 0;
+}
+
+h1 a:hover::before,
+h2 a:hover::before,
+h3 a:hover::before,
+h4 a:hover::before,
+a.anchor:hover::before {
+  opacity: 1;
+}
+
+h1 a,
+h2 a,
+h3 a,
+h4 a {
+  color: var(--text-primary);
+}
+
+h1 a:focus-visible,
+h2 a:focus-visible,
+h3 a:focus-visible,
+h4 a:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+@media (max-width: 768px) {
+  .github-fork-ribbon {
+    display: none;
+  }
+
+  h1 a::before,
+  h2 a::before,
+  h3 a::before,
+  h4 a::before,
+  a.anchor::before {
+    display: none;
+  }
+}

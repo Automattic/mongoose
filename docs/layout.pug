@@ -83,124 +83,85 @@ html(lang='en')
                 li
                   a.version-picker-item(role="menuitem" href=pastVersionsHref(pastVersion.path)) v#{pastVersion.listed}
 
+          mixin sidebarItem(rel, label)
+            - const href = `${versions.versionedPath}/docs/${rel}`
+            li.sidebar-item
+              a.sidebar-link(href=href, class=outputUrl === href ? 'active' : '')= label
+              block
+
           nav.sidebar-nav(aria-label="Docs navigation")
             .sidebar-section
               h3.sidebar-section-title Getting Started
               ul.sidebar-list
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/index.html`, class=outputUrl === `${versions.versionedPath}/docs/index.html` ? 'active' : '') Quick Start
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/guides.html`, class=outputUrl === `${versions.versionedPath}/docs/guides.html` ? 'active' : '') All Guides
+                +sidebarItem('index.html', 'Quick Start')
+                +sidebarItem('guides.html', 'All Guides')
 
             .sidebar-section
               h3.sidebar-section-title Guides
               ul.sidebar-list
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/guide.html`, class=outputUrl === `${versions.versionedPath}/docs/guide.html` ? 'active' : '') Schemas
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/schematypes.html`, class=outputUrl === `${versions.versionedPath}/docs/schematypes.html` ? 'active' : '') SchemaTypes
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/connections.html`, class=outputUrl === `${versions.versionedPath}/docs/connections.html` ? 'active' : '') Connections
+                +sidebarItem('guide.html', 'Schemas')
+                +sidebarItem('schematypes.html', 'SchemaTypes')
+                +sidebarItem('connections.html', 'Connections')
                   - if ([`${versions.versionedPath}/docs/connections`, `${versions.versionedPath}/docs/tutorials/ssl`].some(path => outputUrl.startsWith(path)))
                     ul.sidebar-children
-                      li.sidebar-item
-                        a.sidebar-link(href=`${versions.versionedPath}/docs/tutorials/ssl.html`, class=outputUrl === `${versions.versionedPath}/docs/tutorials/ssl.html` ? 'active' : '') TLS/SSL Connections
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/models.html`, class=outputUrl === `${versions.versionedPath}/docs/models.html` ? 'active' : '') Models
+                      +sidebarItem('tutorials/ssl.html', 'TLS/SSL Connections')
+                +sidebarItem('models.html', 'Models')
                   - if ([`${versions.versionedPath}/docs/models`, `${versions.versionedPath}/docs/change-streams`].some(path => outputUrl.startsWith(path)))
                     ul.sidebar-children
-                      li.sidebar-item
-                        a.sidebar-link(href=`${versions.versionedPath}/docs/change-streams.html`, class=outputUrl === `${versions.versionedPath}/docs/change-streams.html` ? 'active' : '') Change Streams
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/documents.html`, class=outputUrl === `${versions.versionedPath}/docs/documents.html` ? 'active' : '') Documents
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/subdocs.html`, class=outputUrl === `${versions.versionedPath}/docs/subdocs.html` ? 'active' : '') Subdocuments
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/queries.html`, class=outputUrl === `${versions.versionedPath}/docs/queries.html` ? 'active' : '') Queries
+                      +sidebarItem('change-streams.html', 'Change Streams')
+                +sidebarItem('documents.html', 'Documents')
+                +sidebarItem('subdocs.html', 'Subdocuments')
+                +sidebarItem('queries.html', 'Queries')
                   - if ([`${versions.versionedPath}/docs/queries`, `${versions.versionedPath}/docs/tutorials/findoneandupdate`, `${versions.versionedPath}/docs/tutorials/lean`, `${versions.versionedPath}/docs/tutorials/query_casting`].some(path => outputUrl.startsWith(path)))
                     ul.sidebar-children
-                      li.sidebar-item
-                        a.sidebar-link(href=`${versions.versionedPath}/docs/tutorials/query_casting.html`, class=outputUrl === `${versions.versionedPath}/docs/tutorials/query_casting.html` ? 'active' : '') Query Casting
-                      li.sidebar-item
-                        a.sidebar-link(href=`${versions.versionedPath}/docs/tutorials/findoneandupdate.html`, class=outputUrl === `${versions.versionedPath}/docs/tutorials/findoneandupdate.html` ? 'active' : '') findOneAndUpdate
-                      li.sidebar-item
-                        a.sidebar-link(href=`${versions.versionedPath}/docs/tutorials/lean.html`, class=outputUrl === `${versions.versionedPath}/docs/tutorials/lean.html` ? 'active' : '') The Lean Option
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/validation.html`, class=outputUrl === `${versions.versionedPath}/docs/validation.html` ? 'active' : '') Validation
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/middleware.html`, class=outputUrl === `${versions.versionedPath}/docs/middleware.html` ? 'active' : '') Middleware
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/populate.html`, class=outputUrl === `${versions.versionedPath}/docs/populate.html` ? 'active' : '') Populate
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/discriminators.html`, class=outputUrl === `${versions.versionedPath}/docs/discriminators.html` ? 'active' : '') Discriminators
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/plugins.html`, class=outputUrl === `${versions.versionedPath}/docs/plugins.html` ? 'active' : '') Plugins
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/timestamps.html`, class=outputUrl === `${versions.versionedPath}/docs/timestamps.html` ? 'active' : '') Timestamps
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/transactions.html`, class=outputUrl === `${versions.versionedPath}/docs/transactions.html` ? 'active' : '') Transactions
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/typescript.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript.html` ? 'active' : '') TypeScript
+                      +sidebarItem('tutorials/query_casting.html', 'Query Casting')
+                      +sidebarItem('tutorials/findoneandupdate.html', 'findOneAndUpdate')
+                      +sidebarItem('tutorials/lean.html', 'The Lean Option')
+                +sidebarItem('validation.html', 'Validation')
+                +sidebarItem('middleware.html', 'Middleware')
+                +sidebarItem('populate.html', 'Populate')
+                +sidebarItem('discriminators.html', 'Discriminators')
+                +sidebarItem('plugins.html', 'Plugins')
+                +sidebarItem('timestamps.html', 'Timestamps')
+                +sidebarItem('transactions.html', 'Transactions')
+                +sidebarItem('typescript.html', 'TypeScript')
                   - if (outputUrl.startsWith(`${versions.versionedPath}/docs/typescript`))
                     ul.sidebar-children
-                      li.sidebar-item
-                        a.sidebar-link(href=`${versions.versionedPath}/docs/typescript/schemas.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/schemas.html` ? 'active' : '') Schemas
-                      li.sidebar-item
-                        a.sidebar-link(href=`${versions.versionedPath}/docs/typescript/statics-and-methods.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/statics-and-methods.html` ? 'active' : '') Statics and Methods
-                      li.sidebar-item
-                        a.sidebar-link(href=`${versions.versionedPath}/docs/typescript/queries.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/queries.html` ? 'active' : '') Queries
-                      li.sidebar-item
-                        a.sidebar-link(href=`${versions.versionedPath}/docs/typescript/query-helpers.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/query-helpers.html` ? 'active' : '') Query Helpers
-                      li.sidebar-item
-                        a.sidebar-link(href=`${versions.versionedPath}/docs/typescript/populate.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/populate.html` ? 'active' : '') Populate
-                      li.sidebar-item
-                        a.sidebar-link(href=`${versions.versionedPath}/docs/typescript/virtuals.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/virtuals.html` ? 'active' : '') Virtuals
-                      li.sidebar-item
-                        a.sidebar-link(href=`${versions.versionedPath}/docs/typescript/subdocuments.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/subdocuments.html` ? 'active' : '') Subdocuments
+                      +sidebarItem('typescript/schemas.html', 'Schemas')
+                      +sidebarItem('typescript/statics-and-methods.html', 'Statics and Methods')
+                      +sidebarItem('typescript/queries.html', 'Queries')
+                      +sidebarItem('typescript/query-helpers.html', 'Query Helpers')
+                      +sidebarItem('typescript/populate.html', 'Populate')
+                      +sidebarItem('typescript/virtuals.html', 'Virtuals')
+                      +sidebarItem('typescript/subdocuments.html', 'Subdocuments')
 
             .sidebar-section
               h3.sidebar-section-title API Reference
               ul.sidebar-list
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/api/mongoose.html`, class=outputUrl === `${versions.versionedPath}/docs/api/mongoose.html` ? 'active' : '') Mongoose
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/api/schema.html`, class=outputUrl === `${versions.versionedPath}/docs/api/schema.html` ? 'active' : '') Schema
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/api/connection.html`, class=outputUrl === `${versions.versionedPath}/docs/api/connection.html` ? 'active' : '') Connection
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/api/document.html`, class=outputUrl === `${versions.versionedPath}/docs/api/document.html` ? 'active' : '') Document
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/api/model.html`, class=outputUrl === `${versions.versionedPath}/docs/api/model.html` ? 'active' : '') Model
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/api/query.html`, class=outputUrl === `${versions.versionedPath}/docs/api/query.html` ? 'active' : '') Query
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/api/aggregate.html`, class=outputUrl === `${versions.versionedPath}/docs/api/aggregate.html` ? 'active' : '') Aggregate
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/api/schematype.html`, class=outputUrl === `${versions.versionedPath}/docs/api/schematype.html` ? 'active' : '') SchemaType
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/api/virtualtype.html`, class=outputUrl === `${versions.versionedPath}/docs/api/virtualtype.html` ? 'active' : '') VirtualType
+                +sidebarItem('api/mongoose.html', 'Mongoose')
+                +sidebarItem('api/schema.html', 'Schema')
+                +sidebarItem('api/connection.html', 'Connection')
+                +sidebarItem('api/document.html', 'Document')
+                +sidebarItem('api/model.html', 'Model')
+                +sidebarItem('api/query.html', 'Query')
+                +sidebarItem('api/aggregate.html', 'Aggregate')
+                +sidebarItem('api/schematype.html', 'SchemaType')
+                +sidebarItem('api/virtualtype.html', 'VirtualType')
 
             .sidebar-section
               h3.sidebar-section-title Reference
               ul.sidebar-list
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/migrating_to_9.html`, class=outputUrl === `${versions.versionedPath}/docs/migrating_to_9.html` ? 'active' : '') Migration Guide
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/compatibility.html`, class=outputUrl === `${versions.versionedPath}/docs/compatibility.html` ? 'active' : '') Version Compatibility
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/version-support.html`, class=outputUrl === `${versions.versionedPath}/docs/version-support.html` ? 'active' : '') Version Support
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/faq.html`, class=outputUrl === `${versions.versionedPath}/docs/faq.html` ? 'active' : '') FAQ
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/further_reading.html`, class=outputUrl === `${versions.versionedPath}/docs/further_reading.html` ? 'active' : '') Further Reading
+                +sidebarItem('migrating_to_9.html', 'Migration Guide')
+                +sidebarItem('compatibility.html', 'Version Compatibility')
+                +sidebarItem('version-support.html', 'Version Support')
+                +sidebarItem('faq.html', 'FAQ')
+                +sidebarItem('further_reading.html', 'Further Reading')
 
             .sidebar-section
               h3.sidebar-section-title Community
               ul.sidebar-list
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/enterprise.html`, class=outputUrl === `${versions.versionedPath}/docs/enterprise.html` ? 'active' : '') For Enterprise
-                li.sidebar-item
-                  a.sidebar-link(href=`${versions.versionedPath}/docs/sponsors.html`, class=outputUrl === `${versions.versionedPath}/docs/sponsors.html` ? 'active' : '') Sponsors
+                +sidebarItem('enterprise.html', 'For Enterprise')
+                +sidebarItem('sponsors.html', 'Sponsors')
 
         main.site-main
           article.article#content

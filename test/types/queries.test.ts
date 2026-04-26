@@ -270,6 +270,36 @@ function gh10857() {
   }
   type MyClassDocument = MyClass & Document;
   const test: QueryFilter<MyClass> = { status: { $in: ['VALUE1', 'VALUE2'] } };
+  expect<QueryFilter<MyClass>>().type.not.toBeAssignableFrom({ status: 'nope' });
+}
+
+function gh16240() {
+  enum Status {
+    ACTIVE = 'active',
+    BANNED = 'banned'
+  }
+
+  interface MyClass {
+    statusUnion: 'active' | 'banned';
+    statusEnum: Status;
+    name: string;
+  }
+
+  expect<QueryFilter<MyClass>>().type.not.toBeAssignableFrom({
+    statusUnion: 'nope'
+  });
+  expect<QueryFilter<MyClass>>().type.not.toBeAssignableFrom({
+    statusEnum: 'nope'
+  });
+  expect<QueryFilter<MyClass>>().type.toBeAssignableFrom({
+    statusUnion: 'active'
+  } as const);
+  expect<QueryFilter<MyClass>>().type.toBeAssignableFrom({
+    statusEnum: Status.ACTIVE
+  });
+  expect<QueryFilter<MyClass>>().type.toBeAssignableFrom({
+    name: /valid/
+  } as const);
 }
 
 function gh10786() {

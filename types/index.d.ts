@@ -819,12 +819,12 @@ declare module 'mongoose' {
 
   export type ReturnsNewDoc = { new: true } | { returnOriginal: false } | { returnDocument: 'after' };
 
-  type ArrayOperators = { $slice: number | [number, number]; $elemMatch?: never } | { $elemMatch: Record<string, any>; $slice?: never };
+  export type ArrayProjectionOperators = { $slice: number | [number, number]; $elemMatch?: never } | { $elemMatch: Record<string, any>; $slice?: never };
   /**
    * This Type Assigns `Element | undefined` recursively to the `T` type.
    * if it is an array it will do this to the element of the array, if it is an object it will do this for the properties of the object.
    * `Element` is the truthy or falsy values that are going to be used as the value of the projection.(1 | true or 0 | false)
-   * For the elements of the array we will use: `Element | `undefined` | `ArrayOperators`
+   * For the elements of the array we will use: `Element | `undefined` | `ArrayProjectionOperators`
    * @example
    * type CalculatedType = Projector<{ a: string, b: number, c: { d: string }, d: string[] }, true>
    * type CalculatedType = {
@@ -833,11 +833,11 @@ declare module 'mongoose' {
         c?: true | {
             d?: true | undefined;
         } | undefined;
-        d?: true | ArrayOperators | undefined;
+        d?: true | ArrayProjectionOperators | undefined;
     }
   */
-  type Projector<T, Element> = T extends Array<infer U>
-    ? Projector<U, Element> | ArrayOperators
+  export type Projector<T, Element> = T extends Array<infer U>
+    ? Projector<U, Element> | ArrayProjectionOperators
     : T extends TreatAsPrimitives
       ? Element
       : T extends Record<string, any>

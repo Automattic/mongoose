@@ -466,7 +466,7 @@ async function gh15077() {
     const newFoo = {
       state: 'on'
       // extra props but irrelevant
-    };
+    } as const;
 
     const createdFoo = await fooModel.create(newFoo);
 

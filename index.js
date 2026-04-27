@@ -54,6 +54,7 @@ module.exports.SchemaTypeOptions = mongoose.SchemaTypeOptions;
 module.exports.mongo = mongoose.mongo;
 module.exports.mquery = mongoose.mquery;
 module.exports.sanitizeFilter = mongoose.sanitizeFilter;
+module.exports.parent = mongoose.parent;
 module.exports.trusted = mongoose.trusted;
 module.exports.skipMiddlewareFunction = mongoose.skipMiddlewareFunction;
 module.exports.overwriteMiddlewareResult = mongoose.overwriteMiddlewareResult;

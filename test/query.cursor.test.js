@@ -438,6 +438,22 @@ describe('QueryCursor', function() {
     assert.ok(!doc.$__);
   });
 
+  it('applies lean virtuals before returning cursor docs', async function() {
+    const schema = new Schema({ email: String });
+    schema.virtual('lower').get(function() {
+      return this.email.toLowerCase();
+    });
+    db.deleteModel(/Test/);
+    const Model = db.model('Test', schema);
+
+    await Model.deleteMany({});
+    await Model.create({ email: 'FOO@BAR' });
+
+    const doc = await Model.find().lean({ virtuals: true }).cursor().next();
+    assert.equal(doc.email, 'FOO@BAR');
+    assert.equal(doc.lower, 'foo@bar');
+  });
+
   it('data before close (gh-4998)', async function() {
     const userSchema = new mongoose.Schema({
       name: String

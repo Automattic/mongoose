@@ -762,6 +762,70 @@ describe('schema', function() {
       assert.equal(err, null);
     });
 
+    it('disallows null with allowNull false without making the path required', async function() {
+      const schema = new Schema({
+        name: { type: String, allowNull: false }
+      });
+      const Test = mongoose.model('allowNullFalse' + random(), schema);
+
+      await new Test({ name: undefined }).validate();
+
+      const err = await new Test({ name: null }).validate().then(() => null, err => err);
+      assert.ok(err);
+      assert.ok(err.errors['name']);
+      assert.equal(err.errors['name'].name, 'ValidatorError');
+      assert.equal(err.errors['name'].kind, 'allowNull');
+      assert.equal(err.errors['name'].message, 'Path `name` does not allow null values.');
+    });
+
+    it('throws if allowNull is specified with required true', function() {
+      assert.throws(function() {
+        new Schema({
+          name: { type: String, required: true, allowNull: false }
+        });
+      }, /Path "name" may not have `allowNull` specified when `required` is true/);
+
+      assert.throws(function() {
+        new Schema({
+          name: { type: String, required: true, allowNull: true }
+        });
+      }, /Path "name" may not have `allowNull` specified when `required` is true/);
+
+      assert.throws(function() {
+        const schema = new Schema({ name: String });
+        schema.path('name').allowNull(false).required(true);
+      }, /Path "name" may not have `allowNull` specified when `required` is true/);
+
+      assert.throws(function() {
+        const schema = new Schema({ name: { type: String, required: true } });
+        schema.path('name').allowNull(false);
+      }, /Path "name" may not have `allowNull` specified when `required` is true/);
+    });
+
+    it('disallows null with allowNull false when required function returns false', async function() {
+      const schema = new Schema({
+        status: String,
+        endDate: {
+          type: Date,
+          required: function() { return this.status === 'completed'; },
+          allowNull: false
+        }
+      });
+      const Test = mongoose.model('allowNullRequiredFunction' + random(), schema);
+
+      await new Test({ status: 'pending', endDate: undefined }).validate();
+
+      const err = await new Test({ status: 'pending', endDate: null }).validate().then(() => null, err => err);
+      assert.ok(err);
+      assert.ok(err.errors['endDate']);
+      assert.equal(err.errors['endDate'].kind, 'allowNull');
+
+      const requiredErr = await new Test({ status: 'completed', endDate: null }).validate().then(() => null, err => err);
+      assert.ok(requiredErr);
+      assert.ok(requiredErr.errors['endDate']);
+      assert.equal(requiredErr.errors['endDate'].kind, 'required');
+    });
+
     it('should allow an array of subdocuments with enums (gh-3521)', async function() {
       const coolSchema = new Schema({
         votes: [{

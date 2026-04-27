@@ -1,3 +1,18 @@
+9.5.0 / 2026-04-20
+==================
+ * feat(debug): add `timestamp` option to debug output #16216 [rejunp](https://github.com/rejunp)
+ * feat(query): add `cloneUpdate` option to explicitly disable update cloning #16230 #16202
+ * feat(query): extend `defaults` query option to `find()` #16226 [sderrow](https://github.com/sderrow)
+ * fix(query): avoid cloning update until absolutely necessary to better support updates with `__proto__` #16230 #16202
+ * fix(query): avoid treating documents with a `$set()` method as objects with a `$set` property when casting updates #16230
+ * fix(queryHelpers): pass default options to discriminators #16227 #16226
+ * fix(document): handle including and excluding nested paths with optimistic concurrency #16177 #16054
+ * fix(model): throw `ObjectParameterError` in `insertOne()` if doc is not an object #16221 [IshitaSingh0822](https://github.com/IshitaSingh0822)
+ * fix(cast): preserve reason in `CastError` message after `setModel()` #16167 [White-Devil2839](https://github.com/White-Devil2839)
+ * perf(model): remove unnecessary clone in `findOneAndUpdate()` #16230
+ * perf: use kareem 3.3.0 mongoosejs/kareem#45 #16229
+ * chore: use TSTyche assertions #16222 [mrazauskas](https://github.com/mrazauskas)
+
 9.4.1 / 2026-04-03
 ==================
  * Revert "fix(setDefaultsOnInsert): run setters on default values during upsert" #16218 #16051

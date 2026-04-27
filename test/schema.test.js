@@ -1956,6 +1956,72 @@ describe('schema', function() {
         assert.equal(schema.path('name').validators.length, 0);
       });
 
+      it('clones allowNull validators', function() {
+        const schema = new Schema({ name: { type: String, allowNull: false } });
+        const otherSchema = schema.clone();
+        const Model = db.model('Test', otherSchema);
+
+        assert.equal(otherSchema.path('name').validators.length, 1);
+        assert.equal(otherSchema.path('name').validators[0].type, 'allowNull');
+
+        const doc = new Model({ name: null });
+        const err = doc.validateSync();
+
+        assert.ok(err);
+        assert.ok(err.errors['name']);
+        assert.equal(err.errors['name'].kind, 'allowNull');
+      });
+
+      it('clones allowNull validators so they can be removed independently', function() {
+        const schema = new Schema({ name: { type: String, allowNull: false } });
+        const otherSchema = schema.clone();
+
+        otherSchema.path('name').allowNull(true);
+
+        assert.equal(otherSchema.path('name').validators.length, 0);
+        assert.equal(schema.path('name').validators.length, 1);
+        assert.equal(schema.path('name').validators[0].type, 'allowNull');
+      });
+
+      it('keeps allowNull options in sync when changed at runtime', function() {
+        const schema = new Schema({ name: String });
+        const schemaType = schema.path('name');
+
+        schemaType.allowNull(false);
+        assert.equal(schemaType.options.allowNull, false);
+        assert.deepStrictEqual(schema.toJSONSchema(), {
+          type: 'object',
+          required: ['_id'],
+          properties: {
+            _id: {
+              type: 'string'
+            },
+            name: {
+              type: 'string'
+            }
+          }
+        });
+
+        const otherSchema = schema.clone();
+        assert.equal(otherSchema.path('name').options.allowNull, false);
+        assert.deepStrictEqual(otherSchema.toJSONSchema(), schema.toJSONSchema());
+
+        schemaType.allowNull(true);
+        assert.ok(!Object.hasOwn(schemaType.options, 'allowNull'));
+        assert.deepStrictEqual(schema.toJSONSchema(), {
+          type: 'object',
+          required: ['_id'],
+          properties: {
+            _id: {
+              type: 'string'
+            },
+            name: {
+              type: ['string', 'null']
+            }
+          }
+        });
+      });
+
       it('correctly copies all child schemas (gh-7537)', function() {
         const l3Schema = new Schema({ name: String });
         const l2Schema = new Schema({ l3: l3Schema });
@@ -3511,6 +3577,44 @@ describe('schema', function() {
       assert.ok(validate({ _id: 'test', name: 'John', age: 30, ageSource: 'document' }));
       assert.ok(!validate({ _id: 'test', name: 'Foobar', age: null, ageSource: 'something else' }));
       assert.ok(!validate({}));
+    });
+
+    it('omits null from optional allowNull false paths', function() {
+      const schema = new Schema({
+        name: { type: String, allowNull: false },
+        age: Number
+      }, { autoCreate: false, autoIndex: false });
+
+      assert.deepStrictEqual(schema.toJSONSchema({ useBsonType: true }), {
+        required: ['_id'],
+        properties: {
+          _id: {
+            bsonType: 'objectId'
+          },
+          name: {
+            bsonType: 'string'
+          },
+          age: {
+            bsonType: ['number', 'null']
+          }
+        }
+      });
+
+      assert.deepStrictEqual(schema.toJSONSchema(), {
+        type: 'object',
+        required: ['_id'],
+        properties: {
+          _id: {
+            type: 'string'
+          },
+          name: {
+            type: 'string'
+          },
+          age: {
+            type: ['number', 'null']
+          }
+        }
+      });
     });
 
     it('handles all primitive data types', async function() {

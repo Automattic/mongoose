@@ -394,6 +394,29 @@ describe('model: updateOne:', function() {
     assert.equal(doc.get('meta.visitors'), 9);
   });
 
+  it('updateOne() preserves existing update state on the query', async function() {
+    const q = BlogPost.find({ _id: post._id });
+    q.set('slug', 'test-slug');
+
+    await q.updateOne({ title: 'newtitle' });
+
+    const doc = await BlogPost.findById(post._id);
+    assert.equal(doc.title, 'newtitle');
+    assert.equal(doc.slug, 'test-slug');
+  });
+
+  it('updateMany() preserves existing update state on the query', async function() {
+    const q = BlogPost.find({});
+    q.set('slug', 'test-slug');
+
+    await q.updateMany({ title: 'newtitle' });
+
+    const docs = await BlogPost.find({});
+    assert.equal(docs.length, 1);
+    assert.equal(docs[0].title, 'newtitle');
+    assert.equal(docs[0].slug, 'test-slug');
+  });
+
   it('passes number of affected docs', async function() {
     await BlogPost.deleteMany({});
     await BlogPost.create({ title: 'one' }, { title: 'two' }, { title: 'three' });
@@ -3522,6 +3545,31 @@ describe('model: updateOne: ', function() {
     // Assert that each validator was only called once
     assert.equal(validateDetailsCalls, 1);
     assert.equal(validateNameCalls, 1);
+  });
+
+  it('applies allowNull validators with updateOne and runValidators', async function() {
+    const schema = new Schema({
+      name: { type: String, allowNull: false }
+    });
+    const Model = db.model('Test', schema);
+    const doc = await Model.create({ name: 'test' });
+
+    let err = await Model.updateOne(
+      { _id: doc._id },
+      { $set: { name: null } },
+      { runValidators: true }
+    ).then(() => null, err => err);
+
+    assert.ok(err);
+    assert.ok(err.errors['name']);
+    assert.equal(err.errors['name'].kind, 'allowNull');
+
+    err = await Model.updateOne(
+      { _id: doc._id },
+      { $set: { name: undefined } },
+      { runValidators: true }
+    ).then(() => null, err => err);
+    assert.equal(err, null);
   });
 
   it('casts top level $each (gh-15642)', async function() {

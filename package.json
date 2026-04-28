@@ -36,9 +36,9 @@
     "@typescript-eslint/eslint-plugin": "^8.19.1",
     "@typescript-eslint/parser": "^8.19.1",
     "acquit": "1.4.0",
-    "acquit-ignore": "0.2.1",
+    "acquit-ignore": "0.2.2",
     "acquit-require": "0.1.1",
-    "ajv": "8.17.1",
+    "ajv": "8.20.0",
     "assert-browserify": "2.0.0",
     "babel-loader": "8.2.5",
     "broken-link-checker": "^0.7.8",
@@ -69,8 +69,8 @@
     "stream-browserify": "3.0.0",
     "tsd": "0.33.0",
     "typescript": "5.9.3",
-    "uuid": "11.1.0",
-    "webpack": "5.102.1"
+    "uuid": "14.0.0",
+    "webpack": "5.106.2"
   },
   "directories": {
     "lib": "./lib/mongoose"

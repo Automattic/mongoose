@@ -1,3 +1,10 @@
+9.6.0 / 2026-04-28
+==================
+ * feat: upgrade mongodb node driver to 7.2 #16245
+ * feat(schematype): support `allowNull` option to disallow null values even if not `required` #16237 #15905
+ * types(query): make QueryFilter respect string unions and enums #16242 #16240
+ * types: export Projector and ArrayProjectionOperators #16243 #16235
+
 9.5.0 / 2026-04-20
 ==================
  * feat(debug): add `timestamp` option to debug output #16216 [rejunp](https://github.com/rejunp)

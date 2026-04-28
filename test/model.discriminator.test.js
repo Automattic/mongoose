@@ -340,6 +340,44 @@ describe('model', function() {
         assert.equal(gender.options.default, 'F');
       });
 
+      it('allows discriminator schema to override required true with required false and allowNull false', function() {
+        const baseSchema = new Schema({
+          name: { type: String, required: true }
+        });
+        const Base = db.model('Test1', baseSchema);
+        const Child = Base.discriminator('Child', new Schema({
+          name: { type: String, required: false, allowNull: false }
+        }));
+
+        assert.equal(Base.schema.path('name').isRequired, true);
+        assert.equal(Child.schema.path('name').isRequired, false);
+        assert.equal(Child.schema.path('name').validators.length, 1);
+        assert.equal(Child.schema.path('name').validators[0].type, 'allowNull');
+
+        assert.ifError(new Child({}).validateSync());
+
+        const err = new Child({ name: null }).validateSync();
+        assert.ok(err);
+        assert.ok(err.errors['name']);
+        assert.equal(err.errors['name'].kind, 'allowNull');
+      });
+
+      it('allows discriminator schema to override allowNull false with allowNull true', function() {
+        const baseSchema = new Schema({
+          name: { type: String, allowNull: false }
+        });
+        const Base = db.model('Test2', baseSchema);
+        const Child = Base.discriminator('Child', new Schema({
+          name: { type: String, allowNull: true }
+        }));
+
+        assert.equal(Base.schema.path('name').validators.length, 1);
+        assert.equal(Base.schema.path('name').validators[0].type, 'allowNull');
+        assert.equal(Child.schema.path('name').validators.length, 0);
+
+        assert.ifError(new Child({ name: null }).validateSync());
+      });
+
       it('inherits methods', function() {
         const employee = new Employee();
         assert.strictEqual(employee.getFullName, PersonSchema.methods.getFullName);

@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "9.5.0",
+  "version": "9.6.0",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -21,7 +21,7 @@
   "license": "MIT",
   "dependencies": {
     "kareem": "3.3.0",
-    "mongodb": "~7.1",
+    "mongodb": "~7.2",
     "mpath": "0.9.0",
     "mquery": "6.0.0",
     "ms": "2.1.3",
@@ -52,7 +52,7 @@
     "markdownlint-cli2": "0.22.0",
     "marked": "17.0.5",
     "mkdirp": "^3.0.1",
-    "mocha": "11.7.5",
+    "mocha": "12.0.0-beta-9.2",
     "moment": "2.30.1",
     "mongodb-client-encryption": "~7.0",
     "mongodb-memory-server": "11.0.1",
@@ -63,7 +63,7 @@
     "tstyche": "^7.0.0",
     "typescript": "5.9.3",
     "typescript-eslint": "^8.31.1",
-    "uuid": "11.1.0"
+    "uuid": "14.0.0"
   },
   "directories": {
     "lib": "./lib/mongoose"

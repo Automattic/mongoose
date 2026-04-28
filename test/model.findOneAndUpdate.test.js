@@ -1110,6 +1110,32 @@ describe('model: findOneAndUpdate:', function() {
       assert.equal(error.errors.topping.message, 'Validator failed for path `topping` with value `bacon`');
     });
 
+    it('applies allowNull validators with runValidators', async function() {
+      const schema = new Schema({
+        name: { type: String, allowNull: false }
+      });
+      const Model = db.model('Test', schema);
+      const doc = await Model.create({ name: 'test' });
+      const updateOptions = { runValidators: true, new: true };
+
+      let err = await Model.findOneAndUpdate(
+        { _id: doc._id },
+        { $set: { name: null } },
+        updateOptions
+      ).then(() => null, err => err);
+
+      assert.ok(err);
+      assert.ok(err.errors['name']);
+      assert.equal(err.errors['name'].kind, 'allowNull');
+
+      err = await Model.findOneAndUpdate(
+        { _id: doc._id },
+        { $set: { name: undefined } },
+        updateOptions
+      ).then(() => null, err => err);
+      assert.equal(err, null);
+    });
+
     it('validators handle $unset and $setOnInsert', async function() {
       const s = new Schema({
         steak: { type: String, required: true },

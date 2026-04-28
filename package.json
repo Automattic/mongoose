@@ -69,7 +69,7 @@
     "stream-browserify": "3.0.0",
     "tsd": "0.33.0",
     "typescript": "5.9.3",
-    "uuid": "14.0.0",
+    "uuid": "11.1.0",
     "webpack": "5.106.2"
   },
   "directories": {

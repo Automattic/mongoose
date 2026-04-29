@@ -1,3 +1,7 @@
+9.6.1 / 2026-04-29
+==================
+ * types(objectid): fix `_id` getter helper on ObjectId #16251 [noseworthy](https://github.com/noseworthy)
+
 9.6.0 / 2026-04-28
 ==================
  * feat: upgrade mongodb node driver to 7.2 #16245

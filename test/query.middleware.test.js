@@ -583,4 +583,98 @@ describe('query middleware', function() {
     const doc = await Test.findById(_id);
     assert.equal(doc.name, 'changed');
   });
+
+  describe('query.post() receives result (gh-15898)', function() {
+    it('post hook receives result for find()', async function() {
+      await initializeData();
+
+      let receivedResult;
+      const q = Author.find({ title: 'Professional AngularJS' });
+      q.post(function(result) {
+        receivedResult = result;
+      });
+
+      const docs = await q.exec();
+      assert.ok(Array.isArray(receivedResult));
+      assert.strictEqual(receivedResult, docs);
+      assert.equal(receivedResult.length, 1);
+      assert.equal(receivedResult[0].author, 'Val');
+    });
+
+    it('post hook receives result for updateOne()', async function() {
+      await initializeData();
+
+      let receivedResult;
+      const q = Author.updateOne({}, { author: 'updated' });
+      q.post(function(result) {
+        receivedResult = result;
+      });
+
+      const res = await q.exec();
+      assert.ok(receivedResult);
+      assert.strictEqual(receivedResult, res);
+      assert.ok(receivedResult.modifiedCount >= 0);
+      assert.ok(receivedResult.matchedCount >= 0);
+    });
+
+    it('post hook receives result for deleteOne()', async function() {
+      const Model = db.model('TestDeleteOneResult', schema);
+      await Model.create([{ title: 'foo' }, { title: 'bar' }]);
+
+      let receivedResult;
+      const q = Model.deleteOne({ title: 'foo' });
+      q.post(function(result) {
+        receivedResult = result;
+      });
+
+      const res = await q.exec();
+      assert.ok(receivedResult);
+      assert.strictEqual(receivedResult, res);
+      assert.equal(receivedResult.deletedCount, 1);
+    });
+
+    it('does NOT break hooks without params', async function() {
+      await initializeData();
+
+      let called = false;
+      const q = Author.find({ title: 'Professional AngularJS' });
+      q.post(function() {
+        called = true;
+      });
+
+      await q.exec();
+      assert.ok(called);
+    });
+
+    it('works with async hook using next()', async function() {
+      await initializeData();
+
+      let receivedResult;
+      const q = Author.findOne({ title: 'Professional AngularJS' });
+      q.post(function(result, next) {
+        receivedResult = result;
+        next();
+      });
+
+      const doc = await q.exec();
+      assert.ok(receivedResult);
+      assert.strictEqual(receivedResult, doc);
+      assert.equal(receivedResult.author, 'Val');
+    });
+
+    it('works with findOne()', async function() {
+      await initializeData();
+
+      let receivedResult;
+      const q = Author.findOne({ title: 'Professional AngularJS' });
+      q.post(function(result) {
+        receivedResult = result;
+      });
+
+      const doc = await q.exec();
+      assert.ok(receivedResult);
+      assert.strictEqual(receivedResult, doc);
+      assert.equal(receivedResult.author, 'Val');
+    });
+  });
 });

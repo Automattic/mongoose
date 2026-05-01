@@ -90,15 +90,19 @@ html(lang='en')
               block
 
           nav.sidebar-nav(aria-label="Docs navigation")
-            .sidebar-section
-              h3.sidebar-section-title Getting Started
-              ul.sidebar-list
+            .sidebar-section.sidebar-section-collapsible#sidebar-section-getting-started
+              h3.sidebar-section-title.sidebar-section-toggle(role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-getting-started")
+                span Getting Started
+                <svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              ul.sidebar-list#sidebar-list-getting-started
                 +sidebarItem('index.html', 'Quick Start')
                 +sidebarItem('guides.html', 'All Guides')
 
-            .sidebar-section
-              h3.sidebar-section-title Guides
-              ul.sidebar-list
+            .sidebar-section.sidebar-section-collapsible#sidebar-section-guides
+              h3.sidebar-section-title.sidebar-section-toggle(role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-guides")
+                span Guides
+                <svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              ul.sidebar-list#sidebar-list-guides
                 +sidebarItem('guide.html', 'Schemas')
                 +sidebarItem('schematypes.html', 'SchemaTypes')
                 +sidebarItem('connections.html', 'Connections')
@@ -135,9 +139,11 @@ html(lang='en')
                       +sidebarItem('typescript/virtuals.html', 'Virtuals')
                       +sidebarItem('typescript/subdocuments.html', 'Subdocuments')
 
-            .sidebar-section
-              h3.sidebar-section-title API Reference
-              ul.sidebar-list
+            .sidebar-section.sidebar-section-collapsible#sidebar-section-api-reference
+              h3.sidebar-section-title.sidebar-section-toggle(role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-api-reference")
+                span API Reference
+                <svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              ul.sidebar-list#sidebar-list-api-reference
                 +sidebarItem('api/mongoose.html', 'Mongoose')
                 +sidebarItem('api/schema.html', 'Schema')
                 +sidebarItem('api/connection.html', 'Connection')
@@ -148,18 +154,22 @@ html(lang='en')
                 +sidebarItem('api/schematype.html', 'SchemaType')
                 +sidebarItem('api/virtualtype.html', 'VirtualType')
 
-            .sidebar-section
-              h3.sidebar-section-title Reference
-              ul.sidebar-list
+            .sidebar-section.sidebar-section-collapsible#sidebar-section-reference
+              h3.sidebar-section-title.sidebar-section-toggle(role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-reference")
+                span Reference
+                <svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              ul.sidebar-list#sidebar-list-reference
                 +sidebarItem('migrating_to_9.html', 'Migration Guide')
                 +sidebarItem('compatibility.html', 'Version Compatibility')
                 +sidebarItem('version-support.html', 'Version Support')
                 +sidebarItem('faq.html', 'FAQ')
                 +sidebarItem('further_reading.html', 'Further Reading')
 
-            .sidebar-section
-              h3.sidebar-section-title Community
-              ul.sidebar-list
+            .sidebar-section.sidebar-section-collapsible#sidebar-section-community
+              h3.sidebar-section-title.sidebar-section-toggle(role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-community")
+                span Community
+                <svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+              ul.sidebar-list#sidebar-list-community
                 +sidebarItem('enterprise.html', 'For Enterprise')
                 +sidebarItem('sponsors.html', 'Sponsors')
 
@@ -195,4 +205,5 @@ html(lang='en')
       script(type="text/javascript" src=`${versions.versionedPath}/docs/js/theme-toggle.js`)
       script(type="text/javascript" src=`${versions.versionedPath}/docs/js/copy-code.js`)
       script(type="text/javascript" src=`${versions.versionedPath}/docs/js/version-picker.js`)
+      script(type="text/javascript" src=`${versions.versionedPath}/docs/js/sidebar-collapse.js`)
       script(type="text/javascript" src=`${versions.versionedPath}/docs/js/toc.js`)

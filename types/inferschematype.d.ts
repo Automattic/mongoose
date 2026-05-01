@@ -47,7 +47,9 @@ declare module 'mongoose' {
           TSchemaOptions['typeKey']
         > extends true ?
           ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']>
-        : ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']> | null;
+        : PathAllowsNull<DocDefinition[K]> extends true ?
+          ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']> | null
+        : ObtainDocumentPathType<DocDefinition[K], TSchemaOptions['typeKey']>;
       };
 
   /**
@@ -221,6 +223,12 @@ type OptionalPaths<T, TypeKey extends string = DefaultTypeKey> = Pick<
   { -readonly [K in keyof T]?: T[K] },
   OptionalPathKeys<T, TypeKey>
 >;
+
+/**
+ * @summary Checks if a document path allows `null` values.
+ * @param {P} P Document path.
+ */
+export type PathAllowsNull<P> = P extends { allowNull: false } ? false : true;
 
 /**
  * @summary Allows users to optionally choose their own type for a schema field for stronger typing.

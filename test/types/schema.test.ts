@@ -2368,3 +2368,42 @@ function gh16045DocumentArray() {
     }
   }
 }
+
+function allowNullFalseInferredTypes() {
+  const schema = new Schema({
+    name: { type: String, allowNull: false },
+    age: Number,
+    status: String,
+    endDate: {
+      type: Date,
+      required: function() { return this.status === 'completed'; },
+      allowNull: false
+    }
+  });
+
+  type InferredDocType = InferSchemaType<typeof schema>;
+  ExpectType<{ name?: string, age?: number | null, status?: string | null, endDate?: Date }>({} as InferredDocType);
+  ExpectType<string | undefined>({} as InferredDocType['name']);
+  ExpectType<Date | undefined>({} as InferredDocType['endDate']);
+  ExpectType<number | null | undefined>({} as InferredDocType['age']);
+  // @ts-expect-error Argument of type 'null' is not assignable to parameter of type 'string | undefined'.
+  ExpectType<InferredDocType['name']>(null);
+  // @ts-expect-error Argument of type 'null' is not assignable to parameter of type 'NativeDate | undefined'.
+  ExpectType<InferredDocType['endDate']>(null);
+
+  const defaultSchema = new Schema({
+    title: String
+  });
+  type DefaultInferredDocType = InferSchemaType<typeof defaultSchema>;
+  ExpectType<string | null | undefined>({} as DefaultInferredDocType['title']);
+
+  const schemaDefinition = {
+    name: { type: String, allowNull: false },
+    title: String
+  } as const;
+  type RawDocType = InferRawDocType<typeof schemaDefinition>;
+  ExpectType<string | undefined>({} as RawDocType['name']);
+  ExpectType<string | null | undefined>({} as RawDocType['title']);
+  // @ts-expect-error Argument of type 'null' is not assignable to parameter of type 'string | undefined'.
+  ExpectType<RawDocType['name']>(null);
+}

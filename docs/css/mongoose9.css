@@ -571,7 +571,7 @@ hr {
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 20px;
 }
 
 .sidebar-section {
@@ -584,7 +584,7 @@ hr {
   font-size: 15px;
   font-weight: 700;
   color: var(--text-primary);
-  margin: 0 0 10px 0;
+  margin: 0 0 6px 0;
   padding: 0 8px;
   letter-spacing: -0.01em;
 }
@@ -635,7 +635,7 @@ hr {
 
 .sidebar-link {
   display: block;
-  padding: 7px 8px;
+  padding: 5px 8px;
   font-size: 14px;
   color: var(--text-secondary);
   border-radius: 4px;

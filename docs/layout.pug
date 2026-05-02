@@ -89,11 +89,14 @@ html(lang='en')
               a.sidebar-link(href=href, class=outputUrl === href ? 'active' : '')= label
               block
 
+          mixin sidebarSectionCarat
+            <svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+
           nav.sidebar-nav(aria-label="Docs navigation")
             .sidebar-section.sidebar-section-collapsible#sidebar-section-getting-started
               h3.sidebar-section-title.sidebar-section-toggle(role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-getting-started")
                 span Getting Started
-                <svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                +sidebarSectionCarat
               ul.sidebar-list#sidebar-list-getting-started
                 +sidebarItem('index.html', 'Quick Start')
                 +sidebarItem('guides.html', 'All Guides')
@@ -101,7 +104,7 @@ html(lang='en')
             .sidebar-section.sidebar-section-collapsible#sidebar-section-guides
               h3.sidebar-section-title.sidebar-section-toggle(role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-guides")
                 span Guides
-                <svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                +sidebarSectionCarat
               ul.sidebar-list#sidebar-list-guides
                 +sidebarItem('guide.html', 'Schemas')
                 +sidebarItem('schematypes.html', 'SchemaTypes')
@@ -142,7 +145,7 @@ html(lang='en')
             .sidebar-section.sidebar-section-collapsible#sidebar-section-api-reference
               h3.sidebar-section-title.sidebar-section-toggle(role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-api-reference")
                 span API Reference
-                <svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                +sidebarSectionCarat
               ul.sidebar-list#sidebar-list-api-reference
                 +sidebarItem('api/mongoose.html', 'Mongoose')
                 +sidebarItem('api/schema.html', 'Schema')
@@ -157,7 +160,7 @@ html(lang='en')
             .sidebar-section.sidebar-section-collapsible#sidebar-section-reference
               h3.sidebar-section-title.sidebar-section-toggle(role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-reference")
                 span Reference
-                <svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                +sidebarSectionCarat
               ul.sidebar-list#sidebar-list-reference
                 +sidebarItem('migrating_to_9.html', 'Migration Guide')
                 +sidebarItem('compatibility.html', 'Version Compatibility')
@@ -168,7 +171,7 @@ html(lang='en')
             .sidebar-section.sidebar-section-collapsible#sidebar-section-community
               h3.sidebar-section-title.sidebar-section-toggle(role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-community")
                 span Community
-                <svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                +sidebarSectionCarat
               ul.sidebar-list#sidebar-list-community
                 +sidebarItem('enterprise.html', 'For Enterprise')
                 +sidebarItem('sponsors.html', 'Sponsors')

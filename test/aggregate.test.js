@@ -815,6 +815,24 @@ describe('aggregate: ', function() {
       assert.deepEqual(pipeline, [{ $match: { sal: { $lt: 16000 } } }]);
     });
 
+    it('pipelineForUnionWith() returns pipeline for valid unionWith subpipeline', function() {
+      const aggregate = new Aggregate();
+
+      const pipeline = aggregate.
+        match({ sal: { $lt: 16000 } }).
+        pipelineForUnionWith();
+
+      assert.deepEqual(pipeline, [{ $match: { sal: { $lt: 16000 } } }]);
+    });
+
+    it('pipelineForUnionWith() throws if pipeline contains $out or $merge', function() {
+      const aggregateWithOut = new Aggregate().append({ $match: { sal: { $lt: 16000 } } }, { $out: 'test' });
+      assert.throws(() => aggregateWithOut.pipelineForUnionWith(), /cannot include `\$out` or `\$merge`/);
+
+      const aggregateWithMerge = new Aggregate().append({ $match: { sal: { $lt: 16000 } } }, { $merge: { into: 'test' } });
+      assert.throws(() => aggregateWithMerge.pipelineForUnionWith(), /cannot include `\$out` or `\$merge`/);
+    });
+
     it('explain()', async function() {
       const aggregate = new Aggregate([], db.model('Employee'));
 

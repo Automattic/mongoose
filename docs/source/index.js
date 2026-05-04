@@ -48,7 +48,12 @@ docs['docs/advanced_schemas.md'] = { title: 'Advanced Schemas', acquit: true, ma
 docs['docs/validation.md'] = { title: 'Validation', acquit: true, markdown: true };
 docs['docs/customschematypes.md'] = { title: 'Custom Schema Types', acquit: true, markdown: true };
 docs['docs/promises.md'] = { title: 'Promises', acquit: true, markdown: true };
-docs['docs/discriminators.md'] = { title: 'Discriminators', acquit: true, markdown: true };
+docs['docs/discriminators.md'] = {
+  title: 'Discriminators',
+  acquit: true,
+  markdown: true,
+  affiliateAd: { image: '/docs/css/railway-ad-6.jpg', href: 'https://railway.com?referralCode=CD4_kV' }
+};
 docs['docs/defaults.md'] = { title: 'Defaults', acquit: true, markdown: true };
 docs['docs/index.md'] = { title: 'Getting Started', markdown: true };
 docs['docs/browser.md'] = { guide: true, title: 'Browser Library', acquit: true, markdown: true };
@@ -59,7 +64,12 @@ docs['docs/middleware.md'] = { guide: true, title: 'Middleware', acquit: true, m
 docs['docs/plugins.md'] = { guide: true, title: 'Plugins', markdown: true };
 docs['docs/subdocs.md'] = { guide: true, docs: true, title: 'SubDocuments', markdown: true };
 docs['docs/documents.md'] = { guide: true, docs: true, title: 'Documents', markdown: true };
-docs['docs/models.md'] = { guide: true, title: 'Models', markdown: true };
+docs['docs/models.md'] = {
+  guide: true,
+  title: 'Models',
+  markdown: true,
+  affiliateAd: { image: '/docs/css/railway-ad-6.jpg', href: 'https://railway.com?referralCode=CD4_kV' }
+};
 docs['docs/queries.md'] = { guide: true, title: 'Queries', markdown: true };
 docs['docs/populate.md'] = { guide: true, title: 'Query Population', markdown: true };
 docs['docs/migration.md'] = { guide: true, title: 'Migration Guide', markdown: true };
@@ -107,6 +117,11 @@ docs['docs/lodash.md'] = { title: 'Using Mongoose with Lodash', markdown: true }
 docs['docs/incompatible_packages.md'] = { title: 'Known Incompatible npm Packages', markdown: true };
 docs['docs/check-version.md'] = { title: 'How to Check Your Mongoose Version', markdown: true };
 docs['docs/version-support.md'] = { title: 'Version Support', markdown: true };
+
+docs['docs/tutorials/ssl.md'] = {
+  ...docs['docs/tutorials/ssl.md'],
+  affiliateAd: { image: '/docs/css/railway-ad-4.jpg', href: 'https://railway.com?referralCode=CD4_kV' }
+};
 
 for (const props of Object.values(docs)) {
   props.jobs = jobs;

@@ -340,22 +340,26 @@ const files = Object.keys(docsFilemap.fileMap);
 // api explicitly imported for specific file loading
 const apiReq = require('../docs/source/api');
 
-const wrapMarkdown = (md, baseLayout, versionedPath, markdownUrl) => `
+const wrapMarkdown = (md, baseLayout, versionedPath, markdownUrl) => {
+  const newlineIdx = md.indexOf('\n');
+  const firstLine = newlineIdx === -1 ? md : md.slice(0, newlineIdx);
+  const rest = newlineIdx === -1 ? '' : md.slice(newlineIdx + 1);
+
+  return `
 extends ${baseLayout}
 
-append style
-  link(rel="stylesheet", href="${versionedPath}/docs/css/inlinecpc.css")
-  script(type="text/javascript" src="${versionedPath}/docs/js/native.js")
-
 block content
-  <div class="doc-links">
-    <a class="edit-docs-link" href="#{editLink}" target="_blank">
-      <img src="${versionedPath}/docs/images/pencil.svg" />
-    </a>
-    <button class="copy-markdown-link" data-md-url="${markdownUrl}" title="Copy page as Markdown" aria-label="Copy page as Markdown">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-    </button>
-  </div>
+  .article-header
+    :markdown
+      ${firstLine}
+    <div class="doc-links">
+      <a class="edit-docs-link" href="#{editLink}" target="_blank">
+        <img src="${versionedPath}/docs/images/pencil.svg" />
+      </a>
+      <button class="copy-markdown-link" data-md-url="${markdownUrl}" title="Copy page as Markdown" aria-label="Copy page as Markdown">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+      </button>
+    </div>
   script.
     (function() {
       const copyMarkdownButton = document.querySelector('.copy-markdown-link');
@@ -372,8 +376,9 @@ block content
       });
     })();
   :markdown
-${md.split('\n').map(line => '    ' + line).join('\n')}
+${rest.split('\n').map(line => '    ' + line).join('\n')}
 `;
+};
 
 const cpc = `
 <div class="sponsored-ad">
@@ -474,6 +479,7 @@ async function renderFile(filename, options, isReload = false) {
   }
 
   let contents = fs.readFileSync(path.resolve(cwd, inputFile)).toString();
+  const originalContents = contents;
 
   if (options.acquit) {
     const tests = getTests();
@@ -484,8 +490,10 @@ async function renderFile(filename, options, isReload = false) {
       }
       return '```javascript acquit:' + pattern + '\n' + code + '\n```';
     });
-    fs.writeFileSync(path.resolve(cwd, inputFile), contents);
-    console.log('%s : rendered %s', (new Date()).toISOString(), path.resolve(cwd, inputFile));
+    if (contents !== originalContents) {
+      fs.writeFileSync(path.resolve(cwd, inputFile), contents);
+      console.log('%s : rendered %s', (new Date()).toISOString(), path.resolve(cwd, inputFile));
+    }
   }
   if (options.markdown) {
     markdownSource = contents;
@@ -583,16 +591,6 @@ function startWatch() {
       Promise.all(files.filter(v => v.startsWith('docs/api')).map(async(file) => {
         const filename = path.join(cwd, file);
         await renderFile(filename, docsFilemap.fileMap[file], true);
-      }));
-    }
-  });
-
-  fs.watchFile(path.join(cwd, 'docs/api_split.pug'), { interval: 1000 }, (cur, prev) => {
-    if (cur.mtime > prev.mtime) {
-      console.log('docs/api_split.pug modified, reloading all api files');
-      Promise.all(files.filter(v => v.startsWith('docs/api')).map(async(file) => {
-        const filename = path.join(cwd, file);
-        await renderFile(filename, docsFilemap.fileMap[file]);
       }));
     }
   });

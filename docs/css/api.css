@@ -1,5 +1,5 @@
 .method-type {
-  color: #1485CC;
+  color: var(--accent);
   margin-left: 0.25em;
   margin-right: 0.25em;
 }
@@ -47,11 +47,12 @@
 
 .api-nav a {
   color: var(--text-muted, #777);
+  font-weight: 500;
   transition: color 0.2s ease;
 }
 
 .api-nav a:hover {
-  color: var(--link-color, #0971B2);
+  color: var(--accent-hover, #990000);
 }
 
 .api-nav a:focus-visible {
@@ -182,9 +183,14 @@ hr.separate-api {
 }
 
 .native-ad a {
-  color: #111;
+  color: var(--accent, #800);
   display: block;
+  font-weight: 500;
   text-decoration: none;
+}
+
+.native-ad a:hover {
+  color: var(--accent-hover, #990000);
 }
 
 .native-ad span {
@@ -255,13 +261,16 @@ hr.separate-api {
     color: var(--text-muted);
   }
   :root:not([data-theme="light"]) .api-nav a:hover {
-    color: var(--link-color);
+    color: var(--accent-hover);
   }
   :root:not([data-theme="light"]) .native-ad {
     background-color: var(--bg-secondary);
   }
   :root:not([data-theme="light"]) .native-ad a {
-    color: var(--text-primary);
+    color: var(--accent);
+  }
+  :root:not([data-theme="light"]) .native-ad a:hover {
+    color: var(--accent-hover);
   }
 }
 
@@ -275,7 +284,7 @@ hr.separate-api {
 }
 
 [data-theme="dark"] .api-nav a:hover {
-  color: var(--link-color);
+  color: var(--accent-hover);
 }
 
 [data-theme="dark"] .native-ad {
@@ -283,5 +292,9 @@ hr.separate-api {
 }
 
 [data-theme="dark"] .native-ad a {
-  color: var(--text-primary);
+  color: var(--accent);
+}
+
+[data-theme="dark"] .native-ad a:hover {
+  color: var(--accent-hover);
 }

@@ -6,12 +6,11 @@ append style
   script(src=`${versions.versionedPath}/docs/js/convert-old-anchorid.js`)
 
 block content
-  <a class="edit-docs-link" href="#{editLink}" target="_blank">
-    <img src="#{versions.versionedPath}/docs/images/pencil.svg" />
-  </a>
-  h1 #{title}
-
-  include includes/native
+  .article-header
+    h1 #{title}
+    <a class="edit-docs-link" href="#{editLink}" target="_blank">
+      <img src="#{versions.versionedPath}/docs/images/pencil.svg" />
+    </a>
 
   div.api-nav
     div.api-nav-content
@@ -43,7 +42,7 @@ block content
       h3(id=prop.anchorId)
         a(href='#' + prop.anchorId)
           | <code>#{prop.string}</code>
-      if prop.deprecated 
+      if prop.deprecated
         <span class="deprecated">~DEPRECATED~</span>
       if prop.param != null
         h5 Parameters:
@@ -76,4 +75,4 @@ block content
           each see in prop.see
             li <span class="method-type"><a href="#{see.url}">#{see.text}</a></span>
       div
-        | !{prop.description}  
+        | !{prop.description}

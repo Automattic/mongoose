@@ -105,6 +105,13 @@ declare module 'mongoose' {
       | [(this: THydratedDocumentType) => boolean, string];
 
     /**
+     * Controls whether this path may be set to `null`. By default, Mongoose allows
+     * `null` for non-required paths. Set `allowNull: false` to allow `undefined`
+     * but disallow `null`.
+     */
+    allowNull?: boolean;
+
+    /**
      * The default value for this path. If a function, Mongoose executes the function
      * and uses the return value as the default.
      */
@@ -354,6 +361,9 @@ declare module 'mongoose' {
      * to the front of this SchemaType's validators array using unshift().
      */
     required(required: boolean, message?: string): this;
+
+    /** Adds or removes a validator that disallows `null` without making this path required. */
+    allowNull(allowNull: boolean): this;
 
     /** If the SchemaType is a subdocument or document array, this is the schema of that subdocument */
     schema?: Schema<any>;

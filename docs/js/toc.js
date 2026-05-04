@@ -11,6 +11,8 @@
 
   if (headings.length < 2) {
     container.classList.add('toc-empty');
+    const tocLink = document.getElementById('tocLink');
+    if (tocLink) tocLink.disabled = true;
     return;
   }
 
@@ -28,7 +30,10 @@
     const a = document.createElement('a');
     a.className = 'toc-link';
     a.href = '#' + h.id;
-    a.textContent = h.textContent.replace(/\s*#\s*$/, '').trim();
+    a.textContent = h.textContent
+      .replace(/\s*#\s*$/, '')
+      .replace(/\.prototype\./g, '#')
+      .trim();
     li.appendChild(a);
     list.appendChild(li);
     links.push({ link: a, heading: h });

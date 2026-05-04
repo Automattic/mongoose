@@ -3,7 +3,8 @@ import {
   PathEnumOrString,
   OptionalPaths,
   RequiredPaths,
-  IsPathRequired
+  IsPathRequired,
+  PathAllowsNull
 } from './inferschematype';
 import { Binary, UUID } from 'mongodb';
 
@@ -24,7 +25,9 @@ declare module 'mongoose' {
     OptionalPaths<SchemaDefinition, TSchemaOptions['typeKey']>)
     ]: IsPathRequired<SchemaDefinition[K], TSchemaOptions['typeKey']> extends true
       ? ObtainRawDocumentPathType<SchemaDefinition[K], TSchemaOptions['typeKey'], TTransformOptions>
-      : ObtainRawDocumentPathType<SchemaDefinition[K], TSchemaOptions['typeKey'], TTransformOptions> | null;
+      : PathAllowsNull<SchemaDefinition[K]> extends true
+        ? ObtainRawDocumentPathType<SchemaDefinition[K], TSchemaOptions['typeKey'], TTransformOptions> | null
+        : ObtainRawDocumentPathType<SchemaDefinition[K], TSchemaOptions['typeKey'], TTransformOptions>;
   }, TSchemaOptions>;
 
   export type InferRawDocType<

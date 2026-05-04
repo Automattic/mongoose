@@ -21,6 +21,7 @@ const api = require('./api');
  * @property {Boolean} [guide] Indicate the page is a guide
  * @property {Boolean} [schema]
  * @property {*}  [jobs] Overwrite which jobs should be listed in the page (applied automatically)
+ * @property {{image: String, href: String}} [affiliateAd] Optional affiliate ad rendered under the right-sidebar ToC. Falsy `image` hides the ad.
  */
 
 /**
@@ -47,7 +48,12 @@ docs['docs/advanced_schemas.md'] = { title: 'Advanced Schemas', acquit: true, ma
 docs['docs/validation.md'] = { title: 'Validation', acquit: true, markdown: true };
 docs['docs/customschematypes.md'] = { title: 'Custom Schema Types', acquit: true, markdown: true };
 docs['docs/promises.md'] = { title: 'Promises', acquit: true, markdown: true };
-docs['docs/discriminators.md'] = { title: 'Discriminators', acquit: true, markdown: true };
+docs['docs/discriminators.md'] = {
+  title: 'Discriminators',
+  acquit: true,
+  markdown: true,
+  affiliateAd: { image: '/docs/css/railway-ad-6.jpg', href: 'https://railway.com?referralCode=CD4_kV' }
+};
 docs['docs/defaults.md'] = { title: 'Defaults', acquit: true, markdown: true };
 docs['docs/index.md'] = { title: 'Getting Started', markdown: true };
 docs['docs/browser.md'] = { guide: true, title: 'Browser Library', acquit: true, markdown: true };
@@ -58,7 +64,12 @@ docs['docs/middleware.md'] = { guide: true, title: 'Middleware', acquit: true, m
 docs['docs/plugins.md'] = { guide: true, title: 'Plugins', markdown: true };
 docs['docs/subdocs.md'] = { guide: true, docs: true, title: 'SubDocuments', markdown: true };
 docs['docs/documents.md'] = { guide: true, docs: true, title: 'Documents', markdown: true };
-docs['docs/models.md'] = { guide: true, title: 'Models', markdown: true };
+docs['docs/models.md'] = {
+  guide: true,
+  title: 'Models',
+  markdown: true,
+  affiliateAd: { image: '/docs/css/railway-ad-6.jpg', href: 'https://railway.com?referralCode=CD4_kV' }
+};
 docs['docs/queries.md'] = { guide: true, title: 'Queries', markdown: true };
 docs['docs/populate.md'] = { guide: true, title: 'Query Population', markdown: true };
 docs['docs/migration.md'] = { guide: true, title: 'Migration Guide', markdown: true };
@@ -67,7 +78,12 @@ docs['docs/migrating_to_6.md'] = { guide: true, title: 'Migrating to Mongoose 6'
 docs['docs/migrating_to_7.md'] = { guide: true, title: 'Migrating to Mongoose 7', markdown: true };
 docs['docs/migrating_to_8.md'] = { guide: true, title: 'Migrating to Mongoose 8', markdown: true };
 docs['docs/migrating_to_9.md'] = { guide: true, title: 'Migrating to Mongoose 9', markdown: true };
-docs['docs/connections.md'] = { guide: true, title: 'Connecting to MongoDB', markdown: true };
+docs['docs/connections.md'] = {
+  guide: true,
+  title: 'Connecting to MongoDB',
+  markdown: true,
+  affiliateAd: { image: '/docs/css/railway-ad-4.jpg', href: 'https://railway.com?referralCode=CD4_kV' }
+};
 docs['docs/lambda.md'] = { guide: true, title: 'Using Mongoose With AWS Lambda', markdown: true };
 docs['docs/geojson.md'] = { guide: true, title: 'Using GeoJSON', acquit: true, markdown: true };
 docs['docs/transactions.md'] = { guide: true, title: 'Transactions', acquit: true, markdown: true };
@@ -101,6 +117,11 @@ docs['docs/lodash.md'] = { title: 'Using Mongoose with Lodash', markdown: true }
 docs['docs/incompatible_packages.md'] = { title: 'Known Incompatible npm Packages', markdown: true };
 docs['docs/check-version.md'] = { title: 'How to Check Your Mongoose Version', markdown: true };
 docs['docs/version-support.md'] = { title: 'Version Support', markdown: true };
+
+docs['docs/tutorials/ssl.md'] = {
+  ...docs['docs/tutorials/ssl.md'],
+  affiliateAd: { image: '/docs/css/railway-ad-4.jpg', href: 'https://railway.com?referralCode=CD4_kV' }
+};
 
 for (const props of Object.values(docs)) {
   props.jobs = jobs;

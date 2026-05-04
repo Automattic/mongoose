@@ -2,9 +2,9 @@ doctype html
 html(lang='en')
   head
     meta(charset="utf-8")
-    meta(name="viewport", content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
     title Mongoose v#{package.version}: #{title}
-    //- Inline script to prevent flash of wrong theme - must run before CSS loads
+    //- Inline script to prevent flash of wrong theme — must run before CSS loads
     script.
       (function() {
         var theme = localStorage.getItem('mongoose-theme');
@@ -15,14 +15,11 @@ html(lang='en')
     include ./includes/favicon
     block style
 
-      link(rel="stylesheet", href="https://unpkg.com/purecss@1.0.1/build/pure-min.css", integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47", crossorigin="anonymous")
-
-      link(rel="stylesheet", href="https://fonts.googleapis.com/css?family=Open+Sans")
-      link(rel="stylesheet", href=`${versions.versionedPath}/docs/css/mongoose5.css?v=${Date.now()}`)
+      link(rel="stylesheet", href="https://fonts.googleapis.com/css?family=Open+Sans:wght@400;500;600;700&display=swap")
+      link(rel="stylesheet", href=`${versions.versionedPath}/docs/css/mongoose9.css?v=${Date.now()}`)
       link(rel="stylesheet", href=`${versions.versionedPath}/docs/css/github.css?v=${Date.now()}`)
       link(rel="stylesheet", href=`${versions.versionedPath}/docs/css/carbonads.css`)
       link(rel="stylesheet", href=`${versions.versionedPath}/docs/css/copy-code.css`)
-
 
       meta(name='msapplication-TileColor', content='#ffffff')
       meta(name='msapplication-TileImage', content=`${versions.versionedPath}/docs/images/favicon/ms-icon-144x144.png`)
@@ -30,165 +27,195 @@ html(lang='en')
 
   body
     block layout
-      #layout
-        #mobile-menu
-          a#menuLink.menu-link(href='#menu')
-            <svg width="100%" height="100%" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg>
-          #mobile-logo-container
-            a(href="/")
-              span#logo(role="img" aria-label="Mongoose logo")
-              span.logo-text mongoose
-        #menu
-          nav.pure-menu
-            #logo-container.pure-menu-heading
-              a(href="/")
-                span#logo(role="img" aria-label="Mongoose logo")
-                span.logo-text mongoose
-            ul.pure-menu-list#navbar
-              li.pure-menu-horizontal.pure-menu-item.pure-menu-has-children.pure-menu-allow-hover.version
-                a(href=`${versions.versionedPath}/docs/index.html`).pure-menu-link Version #{versions.currentVersion.listed}
-                ul.pure-menu-children
-                  - if (versions.currentVersion.listed !== versions.latestVersion.listed)
-                    li.pure-menu-item
-                      a.pure-menu-link(href=`${versions.latestVersion.path}/docs/index.html`) Version #{versions.latestVersion.listed}
-                  each pastVersion in versions.pastVersions
-                    li.pure-menu-item
-                      - if ((pastVersion.listed != versions.currentVersion.listed) || versions.versionedDeploy)
-                        a.pure-menu-link(href=`/docs/${pastVersion.path}/index.html`) Version #{pastVersion.listed}
-                      - else
-                        a.pure-menu-link(href=`/docs/index.html`) Version #{pastVersion.listed}
-              li.pure-menu-item.search
-                input#search-input-nav(type="text", placeholder="Search")
-                button#search-button-nav
-                  img(src=`${versions.versionedPath}/docs/images/search.svg`)
-              li.pure-menu-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/index.html`, class=outputUrl === `${versions.versionedPath}/docs/index.html` ? 'selected' : '') Quick Start
-              li.pure-menu-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/guides.html`, class=outputUrl === `${versions.versionedPath}/docs/guides.html` ? 'selected' : '') Guides
-                ul.pure-menu-list
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/guide.html`, class=outputUrl === `${versions.versionedPath}/docs/guide.html` ? 'selected' : '') Schemas
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/schematypes.html`, class=outputUrl === `${versions.versionedPath}/docs/schematypes.html` ? 'selected' : '') SchemaTypes
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/connections.html`, class=outputUrl === `${versions.versionedPath}/docs/connections.html` ? 'selected' : '') Connections
-                    - if ([`${versions.versionedPath}/docs/connections`, `${versions.versionedPath}/docs/tutorials/ssl`].some(path => outputUrl.startsWith(path)))
-                      ul.pure-menu-list
-                        li.pure-menu-item.sub-item
-                          a.pure-menu-link(href=`${versions.versionedPath}/docs/tutorials/ssl.html`, class=outputUrl === `${versions.versionedPath}/docs/tutorials/ssl.html` ? 'selected' : '') TLS/SSL Connections
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/models.html`, class=outputUrl === `${versions.versionedPath}/docs/models.html` ? 'selected' : '') Models
-                    - if ([`${versions.versionedPath}/docs/models`, `${versions.versionedPath}/docs/change-streams`].some(path => outputUrl.startsWith(path)))
-                      ul.pure-menu-list
-                        li.pure-menu-item.sub-item
-                          a.pure-menu-link(href=`${versions.versionedPath}/docs/change-streams.html`, class=outputUrl === `${versions.versionedPath}/docs/change-streams.html` ? 'selected' : '') Change Streams
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/documents.html`, class=outputUrl === `${versions.versionedPath}/docs/documents.html` ? 'selected' : '') Documents
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/subdocs.html`, class=outputUrl === `${versions.versionedPath}/docs/subdocs.html` ? 'selected' : '') Subdocuments
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/queries.html`, class=outputUrl === `${versions.versionedPath}/docs/queries.html` ? 'selected' : '') Queries
-                    - if ([`${versions.versionedPath}/docs/queries`, `${versions.versionedPath}/docs/tutorials/findoneandupdate`, `${versions.versionedPath}/docs/tutorials/lean`, `${versions.versionedPath}/docs/tutorials/query_casting`].some(path => outputUrl.startsWith(path)))
-                      ul.pure-menu-list
-                        li.pure-menu-item.sub-item
-                          a.pure-menu-link(href=`${versions.versionedPath}/docs/tutorials/query_casting.html`, class=outputUrl === `${versions.versionedPath}/docs/tutorials/query_casting.html` ? 'selected' : '') Query Casting
-                        li.pure-menu-item.sub-item
-                          a.pure-menu-link(href=`${versions.versionedPath}/docs/tutorials/findoneandupdate.html`, class=outputUrl === `${versions.versionedPath}/docs/tutorials/findoneandupdate.html` ? 'selected' : '') findOneAndUpdate
-                        li.pure-menu-item.sub-item
-                          a.pure-menu-link(href=`${versions.versionedPath}/docs/tutorials/lean.html`, class=outputUrl === `${versions.versionedPath}/docs/tutorials/lean.html` ? 'selected' : '') The Lean Option
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/validation.html`, class=outputUrl === `${versions.versionedPath}/docs/validation.html` ? 'selected' : '') Validation
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/middleware.html`, class=outputUrl === `${versions.versionedPath}/docs/middleware.html` ? 'selected' : '') Middleware
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/populate.html`, class=outputUrl === `${versions.versionedPath}/docs/populate.html` ? 'selected' : '') Populate
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/discriminators.html`, class=outputUrl === `${versions.versionedPath}/docs/discriminators.html` ? 'selected' : '') Discriminators
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/plugins.html`, class=outputUrl === `${versions.versionedPath}/docs/plugins.html` ? 'selected' : '') Plugins
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/timestamps.html`, class=outputUrl === `${versions.versionedPath}/docs/timestamps.html` ? 'selected' : '') Timestamps
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/transactions.html`, class=outputUrl === `${versions.versionedPath}/docs/transactions.html` ? 'selected' : '') Transactions
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript.html` ? 'selected' : '') TypeScript
-                    - if (outputUrl.startsWith(`${versions.versionedPath}/docs/typescript`))
-                      ul.pure-menu-list
-                        li.pure-menu-item.sub-item
-                          a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/schemas.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/schemas.html` ? 'selected' : '') Schemas
-                        li.pure-menu-item.sub-item
-                          a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/statics-and-methods.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/statics-and-methods.html` ? 'selected' : '') Statics and Methods
-                        li.pure-menu-item.sub-item
-                          a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/queries.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/queries.html` ? 'selected' : '') Queries
-                        li.pure-menu-item.sub-item
-                          a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/query-helpers.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/query-helpers.html` ? 'selected' : '') Query Helpers
-                        li.pure-menu-item.sub-item
-                          a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/populate.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/populate.html` ? 'selected' : '') Populate
-                        li.pure-menu-item.sub-item
-                          a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/virtuals.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/virtuals.html` ? 'selected' : '') Virtuals
-                        li.pure-menu-item.sub-item
-                          a.pure-menu-link(href=`${versions.versionedPath}/docs/typescript/subdocuments.html`, class=outputUrl === `${versions.versionedPath}/docs/typescript/subdocuments.html` ? 'selected' : '') Subdocuments
-              li.pure-menu-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/api/mongoose.html`, class=outputUrl === `${versions.versionedPath}/docs/api/mongoose.html` ? 'selected' : '') API
-                ul.pure-menu-list
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/api/mongoose.html`, class=outputUrl === `${versions.versionedPath}/docs/api/mongoose.html` ? 'selected' : '') Mongoose
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/api/schema.html`, class=outputUrl === `${versions.versionedPath}/docs/api/schema.html` ? 'selected' : '') Schema
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/api/connection.html`, class=outputUrl === `${versions.versionedPath}/docs/api/connection.html` ? 'selected' : '') Connection
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/api/document.html`, class=outputUrl === `${versions.versionedPath}/docs/api/document.html` ? 'selected' : '') Document
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/api/model.html`, class=outputUrl === `${versions.versionedPath}/docs/api/model.html` ? 'selected' : '') Model
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/api/query.html`, class=outputUrl === `${versions.versionedPath}/docs/api/query.html` ? 'selected' : '') Query
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/api/aggregate.html`, class=outputUrl === `${versions.versionedPath}/docs/api/aggregate.html` ? 'selected' : '') Aggregate
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/api/schematype.html`, class=outputUrl === `${versions.versionedPath}/docs/api/schematype.html` ? 'selected' : '') SchemaType
-                  li.pure-menu-item.sub-item
-                    a.pure-menu-link(href=`${versions.versionedPath}/docs/api/virtualtype.html`, class=outputUrl === `${versions.versionedPath}/docs/api/virtualtype.html` ? 'selected' : '') VirtualType
-              li.pure-menu-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/migrating_to_9.html`, class=outputUrl === `${versions.versionedPath}/docs/migrating_to_9.html` ? 'selected' : '') Migration Guide
-              li.pure-menu-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/compatibility.html`, class=outputUrl === `${versions.versionedPath}/docs/compatibility.html` ? 'selected' : '') Version Compatibility
-              li.pure-menu-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/version-support.html`, class=outputUrl === `${versions.versionedPath}/docs/version-support.html` ? 'selected' : '') Version Support
-              li.pure-menu-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/faq.html`, class=outputUrl === `${versions.versionedPath}/docs/faq.html` ? 'selected' : '') FAQ
-              li.pure-menu-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/further_reading.html`, class=outputUrl === `${versions.versionedPath}/docs/further_reading.html` ? 'selected' : '') Further Reading
-              li.pure-menu-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/enterprise.html`, class=outputUrl === `${versions.versionedPath}/docs/enterprise.html` ? 'selected' : '') For Enterprise
-              li.pure-menu-item
-                a.pure-menu-link(href=`${versions.versionedPath}/docs/sponsors.html`, , class=outputUrl === `${versions.versionedPath}/docs/sponsors.html` ? 'selected' : '') Sponsors
-            div.cpc-ad
-              <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?serve=CKYIL27I&placement=mongoosejscom" id="_carbonads_js"></script>
-            #theme-toggle
-              button#theme-toggle-btn(aria-label="Toggle dark mode" title="Toggle dark/light theme")
-                <svg id="theme-icon-light" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-                <svg id="theme-icon-dark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        .container
-          #content
+      - const docsHome = `${versions.versionedPath}/docs/index.html`
+      - const apiHome = `${versions.versionedPath}/docs/api/mongoose.html`
+      - const migrationHome = `${versions.versionedPath}/docs/migrating_to_9.html`
+      - const faqHome = `${versions.versionedPath}/docs/faq.html`
+      - const isApiPage = outputUrl.startsWith(`${versions.versionedPath}/docs/api/`)
+      - const isMigrationPage = outputUrl === migrationHome
+      - const isFaqPage = outputUrl === faqHome
+      - const isDocsPage = !isApiPage && !isMigrationPage && !isFaqPage
+
+      header.site-header
+        .site-header-inner
+          button.mobile-menu-toggle#menuLink(aria-label="Toggle navigation")
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+
+          a.site-logo(href="/")
+            .site-logo-inner
+              span.site-logo-mark(role="img" aria-label="Mongoose logo")
+              span.site-logo-text mongoose
+
+          .site-search
+            input#search-input-nav(type="text", placeholder="Search", aria-label="Search")
+            button.site-search-button#search-button-nav(aria-label="Search")
+              img(src=`${versions.versionedPath}/docs/images/search.svg`)
+
+          nav.top-navbar(aria-label="Primary")
+            a.top-navbar-link(href=docsHome, class=isDocsPage ? 'active' : '') Docs
+            a.top-navbar-link(href=apiHome, class=isApiPage ? 'active' : '') API
+            a.top-navbar-link(href=migrationHome, class=isMigrationPage ? 'active' : '') Migration
+            a.top-navbar-link(href=faqHome, class=isFaqPage ? 'active' : '') FAQ
+
+          .site-actions
+            button.icon-button#theme-toggle-btn(aria-label="Toggle dark mode" title="Toggle dark/light theme")
+              <svg id="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+              <svg id="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            a.icon-link(href="https://github.com/Automattic/mongoose", target="_blank", rel="noopener", aria-label="GitHub repository")
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.55v-2c-3.2.7-3.87-1.37-3.87-1.37-.52-1.32-1.28-1.67-1.28-1.67-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.52-1.47.11-3.06 0 0 .97-.31 3.18 1.18a11.04 11.04 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.77.12 3.06.74.81 1.18 1.84 1.18 3.1 0 4.44-2.7 5.4-5.27 5.69.41.35.77 1.05.77 2.12v3.14c0 .31.2.66.8.55A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
+            button.icon-button.mobile-toc-toggle#tocLink(aria-label="Toggle table of contents" aria-controls="toc-sidebar" title="Table of contents")
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg>
+
+      #layout.site-body
+        aside.left-sidebar#menu
+          - const pastVersionsHref = (p) => `/docs/${p}/index.html`
+
+          .version-picker#version-picker
+            .version-picker-label Version
+            button.version-picker-button(type="button" aria-haspopup="true" aria-expanded="false")
+              span.version-picker-current v#{versions.currentVersion.listed}
+              <svg class="version-picker-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            ul.version-picker-menu(role="menu")
+              - if (versions.currentVersion.listed !== versions.latestVersion.listed)
+                li
+                  a.version-picker-item(role="menuitem" href=`${versions.latestVersion.path}/docs/index.html`) v#{versions.latestVersion.listed} (latest)
+              each pastVersion in versions.pastVersions
+                li
+                  a.version-picker-item(role="menuitem" href=pastVersionsHref(pastVersion.path)) v#{pastVersion.listed}
+
+          mixin sidebarItem(rel, label)
+            - const href = `${versions.versionedPath}/docs/${rel}`
+            li.sidebar-item
+              a.sidebar-link(href=href, class=outputUrl === href ? 'active' : '')= label
+              block
+
+          mixin sidebarSectionCarat
+            <svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+
+          nav.sidebar-nav(aria-label="Docs navigation")
+            .sidebar-section.sidebar-section-collapsible#sidebar-section-getting-started
+              h3.sidebar-section-title.sidebar-section-toggle(role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-getting-started")
+                span Getting Started
+                +sidebarSectionCarat
+              ul.sidebar-list#sidebar-list-getting-started
+                +sidebarItem('index.html', 'Quick Start')
+                +sidebarItem('guides.html', 'All Guides')
+
+            .sidebar-section.sidebar-section-collapsible#sidebar-section-guides
+              h3.sidebar-section-title.sidebar-section-toggle(role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-guides")
+                span Guides
+                +sidebarSectionCarat
+              ul.sidebar-list#sidebar-list-guides
+                +sidebarItem('guide.html', 'Schemas')
+                +sidebarItem('schematypes.html', 'SchemaTypes')
+                +sidebarItem('connections.html', 'Connections')
+                  - if ([`${versions.versionedPath}/docs/connections`, `${versions.versionedPath}/docs/tutorials/ssl`].some(path => outputUrl.startsWith(path)))
+                    ul.sidebar-children
+                      +sidebarItem('tutorials/ssl.html', 'TLS/SSL Connections')
+                +sidebarItem('models.html', 'Models')
+                  - if ([`${versions.versionedPath}/docs/models`, `${versions.versionedPath}/docs/change-streams`].some(path => outputUrl.startsWith(path)))
+                    ul.sidebar-children
+                      +sidebarItem('change-streams.html', 'Change Streams')
+                +sidebarItem('documents.html', 'Documents')
+                +sidebarItem('subdocs.html', 'Subdocuments')
+                +sidebarItem('queries.html', 'Queries')
+                  - if ([`${versions.versionedPath}/docs/queries`, `${versions.versionedPath}/docs/tutorials/findoneandupdate`, `${versions.versionedPath}/docs/tutorials/lean`, `${versions.versionedPath}/docs/tutorials/query_casting`].some(path => outputUrl.startsWith(path)))
+                    ul.sidebar-children
+                      +sidebarItem('tutorials/query_casting.html', 'Query Casting')
+                      +sidebarItem('tutorials/findoneandupdate.html', 'findOneAndUpdate')
+                      +sidebarItem('tutorials/lean.html', 'The Lean Option')
+                +sidebarItem('validation.html', 'Validation')
+                +sidebarItem('middleware.html', 'Middleware')
+                +sidebarItem('populate.html', 'Populate')
+                +sidebarItem('discriminators.html', 'Discriminators')
+                +sidebarItem('plugins.html', 'Plugins')
+                +sidebarItem('timestamps.html', 'Timestamps')
+                +sidebarItem('transactions.html', 'Transactions')
+                +sidebarItem('typescript.html', 'TypeScript')
+                  - if (outputUrl.startsWith(`${versions.versionedPath}/docs/typescript`))
+                    ul.sidebar-children
+                      +sidebarItem('typescript/schemas.html', 'Schemas')
+                      +sidebarItem('typescript/statics-and-methods.html', 'Statics and Methods')
+                      +sidebarItem('typescript/queries.html', 'Queries')
+                      +sidebarItem('typescript/query-helpers.html', 'Query Helpers')
+                      +sidebarItem('typescript/populate.html', 'Populate')
+                      +sidebarItem('typescript/virtuals.html', 'Virtuals')
+                      +sidebarItem('typescript/subdocuments.html', 'Subdocuments')
+
+            .sidebar-section.sidebar-section-collapsible#sidebar-section-api-reference
+              h3.sidebar-section-title.sidebar-section-toggle(role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-api-reference")
+                span API Reference
+                +sidebarSectionCarat
+              ul.sidebar-list#sidebar-list-api-reference
+                +sidebarItem('api/mongoose.html', 'Mongoose')
+                +sidebarItem('api/schema.html', 'Schema')
+                +sidebarItem('api/connection.html', 'Connection')
+                +sidebarItem('api/document.html', 'Document')
+                +sidebarItem('api/model.html', 'Model')
+                +sidebarItem('api/query.html', 'Query')
+                +sidebarItem('api/aggregate.html', 'Aggregate')
+                +sidebarItem('api/schematype.html', 'SchemaType')
+                +sidebarItem('api/virtualtype.html', 'VirtualType')
+
+            .sidebar-section.sidebar-section-collapsible#sidebar-section-reference
+              h3.sidebar-section-title.sidebar-section-toggle(role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-reference")
+                span Reference
+                +sidebarSectionCarat
+              ul.sidebar-list#sidebar-list-reference
+                +sidebarItem('migrating_to_9.html', 'Migration Guide')
+                +sidebarItem('compatibility.html', 'Version Compatibility')
+                +sidebarItem('version-support.html', 'Version Support')
+                +sidebarItem('faq.html', 'FAQ')
+                +sidebarItem('further_reading.html', 'Further Reading')
+
+            .sidebar-section.sidebar-section-collapsible#sidebar-section-community
+              h3.sidebar-section-title.sidebar-section-toggle(role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-community")
+                span Community
+                +sidebarSectionCarat
+              ul.sidebar-list#sidebar-list-community
+                +sidebarItem('enterprise.html', 'For Enterprise')
+                +sidebarItem('sponsors.html', 'Sponsors')
+
+        main.site-main
+          article.article#content
             block content
 
-        - if (!outputUrl.startsWith(`${versions.versionedPath}/docs/jobs.html`))
-          div#jobs
-            each job in jobs
-              .job-listing
-                a(href=`${versions.versionedPath}/docs/jobs.html#` + job._id)
-                  .company-logo
-                    img(src=job.logo)
-                  .description
-                    .company #{job.company}
-                    .title #{job.title}
-                    .location #{job.location}
-            .button.jobs-view-more
-              a(href=`${versions.versionedPath}/docs/jobs.html`) View more jobs!
+        aside.right-sidebar#toc-sidebar
+          nav.toc#toc(aria-label="On this page")
+            h2.toc-title On This Page
+            ul.toc-list#toc-list
 
-        script(type="text/javascript" src=`${versions.versionedPath}/docs/js/navbar-search.js`)
-        script(type="text/javascript" src=`${versions.versionedPath}/docs/js/mobile-navbar-toggle.js`)
-        script(type="text/javascript" src=`${versions.versionedPath}/docs/js/theme-toggle.js`)
+          .right-sidebar-aside
+            - if (!(affiliateAd && affiliateAd.image))
+              .cpc-ad
+                <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script>
 
-        script(type="text/javascript" src=`${versions.versionedPath}/docs/js/copy-code.js`)
+            - if (affiliateAd && affiliateAd.image)
+              .affiliate-ad
+                - if (affiliateAd.href)
+                  a(href=affiliateAd.href, target="_blank", rel="noopener sponsored")
+                    img(src=`${versions.versionedPath}${affiliateAd.image}`, alt="Sponsored")
+                - else
+                  img(src=`${versions.versionedPath}${affiliateAd.image}`, alt="Sponsored")
+
+            - if (jobs && jobs.length && !outputUrl.startsWith(`${versions.versionedPath}/docs/jobs.html`))
+              .jobs
+                h3.jobs-title Jobs
+                each job in jobs
+                  a.job-listing(href=`${versions.versionedPath}/docs/jobs.html#` + job._id)
+                    .company-logo
+                      img(src=job.logo)
+                    .job-meta
+                      .company #{job.company}
+                      .title #{job.title}
+                      .location #{job.location}
+                .jobs-view-more
+                  a(href=`${versions.versionedPath}/docs/jobs.html`) View more jobs
+
+      script(type="text/javascript" src=`${versions.versionedPath}/docs/js/navbar-search.js`)
+      script(type="text/javascript" src=`${versions.versionedPath}/docs/js/mobile-navbar-toggle.js`)
+      script(type="text/javascript" src=`${versions.versionedPath}/docs/js/theme-toggle.js`)
+      script(type="text/javascript" src=`${versions.versionedPath}/docs/js/copy-code.js`)
+      script(type="text/javascript" src=`${versions.versionedPath}/docs/js/version-picker.js`)
+      script(type="text/javascript" src=`${versions.versionedPath}/docs/js/sidebar-collapse.js`)
+      script(type="text/javascript" src=`${versions.versionedPath}/docs/js/toc.js`)

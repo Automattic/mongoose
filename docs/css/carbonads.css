@@ -22,13 +22,12 @@
 }
 
 #carbonads a {
-  color: var(--accent, #800);
-  font-weight: 500;
+  color: var(--text-primary, #333);
   text-decoration: none;
 }
 
 #carbonads a:hover {
-  color: var(--accent-hover, #990000);
+  color: var(--link-color, #0971B2);
 }
 
 .carbon-wrap {

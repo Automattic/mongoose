@@ -1,3 +1,47 @@
+/*
+ * Mongoose keeps its GitHub-inspired light highlighting and switches dark mode
+ * to a Monokai-inspired palette.
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --hljs-bg: #272822;
+    --hljs-text: #f8f8f2;
+    --hljs-muted: #75715e;
+    --hljs-red: #f92672;
+    --hljs-orange: #fd971f;
+    --hljs-yellow: #e6db74;
+    --hljs-green: #a6e22e;
+    --hljs-blue: #66d9ef;
+    --hljs-purple: #ae81ff;
+    --hljs-border: #3e3d32;
+    --hljs-shadow: rgba(0, 0, 0, 0.35);
+    --hljs-addition-bg: #33421f;
+    --hljs-deletion-bg: #4a1f2d;
+    --hljs-change-bg: #25454d;
+    --code-inline-bg: #34352d;
+    --code-inline-text: #f92672;
+  }
+}
+
+[data-theme="dark"] {
+  --hljs-bg: #272822;
+  --hljs-text: #f8f8f2;
+  --hljs-muted: #75715e;
+  --hljs-red: #f92672;
+  --hljs-orange: #fd971f;
+  --hljs-yellow: #e6db74;
+  --hljs-green: #a6e22e;
+  --hljs-blue: #66d9ef;
+  --hljs-purple: #ae81ff;
+  --hljs-border: #3e3d32;
+  --hljs-shadow: rgba(0, 0, 0, 0.35);
+  --hljs-addition-bg: #33421f;
+  --hljs-deletion-bg: #4a1f2d;
+  --hljs-change-bg: #25454d;
+  --code-inline-bg: #34352d;
+  --code-inline-text: #f92672;
+}
+
 code {
   background-color: var(--code-bg, #eee);
   padding: 2px 6px;
@@ -174,112 +218,236 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 /* Dark mode support for syntax highlighting */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) code {
-    background-color: var(--code-bg);
-    color: var(--link-color);
+    background-color: var(--code-inline-bg);
+    color: var(--code-inline-text);
   }
   :root:not([data-theme="light"]) pre {
-    background-color: var(--code-bg);
-    border-color: var(--border-color);
-    color: var(--code-text);
+    background-color: var(--hljs-bg);
+    border-color: var(--hljs-border);
+    color: var(--hljs-text);
+    box-shadow: 0 1px 3px var(--hljs-shadow);
   }
+  :root:not([data-theme="light"]) pre:hover {
+    box-shadow: 0 2px 6px var(--hljs-shadow);
+  }
+  :root:not([data-theme="light"]) pre code,
   :root:not([data-theme="light"]) .hljs {
-    background: var(--code-bg);
-    color: var(--code-text);
+    background: var(--hljs-bg);
+    color: var(--hljs-text);
   }
 }
 
 [data-theme="dark"] code {
-  background-color: var(--code-bg);
-  color: var(--link-color);
+  background-color: var(--code-inline-bg);
+  color: var(--code-inline-text);
 }
 
 [data-theme="dark"] pre {
-  background-color: var(--code-bg);
-  border-color: var(--border-color);
-  color: var(--code-text);
+  background-color: var(--hljs-bg);
+  border-color: var(--hljs-border);
+  color: var(--hljs-text);
+  box-shadow: 0 1px 3px var(--hljs-shadow);
 }
 
+[data-theme="dark"] pre:hover {
+  box-shadow: 0 2px 6px var(--hljs-shadow);
+}
+
+[data-theme="dark"] pre code,
 [data-theme="dark"] .hljs {
-  background: var(--code-bg);
-  color: var(--code-text);
+  background: var(--hljs-bg);
+  color: var(--hljs-text);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .hljs-comment,
+  :root:not([data-theme="light"]) .hljs-meta,
+  :root:not([data-theme="light"]) .diff .hljs-header,
+  :root:not([data-theme="light"]) .hljs-javadoc {
+    color: var(--hljs-muted);
+  }
+
+  :root:not([data-theme="light"]) .hljs-keyword,
+  :root:not([data-theme="light"]) .hljs-selector-tag,
+  :root:not([data-theme="light"]) .hljs-literal,
+  :root:not([data-theme="light"]) .hljs-name,
+  :root:not([data-theme="light"]) .hljs-attr,
+  :root:not([data-theme="light"]) .hljs-doctag,
+  :root:not([data-theme="light"]) .css .rule .hljs-keyword,
+  :root:not([data-theme="light"]) .hljs-winutils,
+  :root:not([data-theme="light"]) .nginx .hljs-title,
+  :root:not([data-theme="light"]) .hljs-subst,
+  :root:not([data-theme="light"]) .hljs-request,
+  :root:not([data-theme="light"]) .hljs-status {
+    color: var(--hljs-red);
+  }
+
+  :root:not([data-theme="light"]) .hljs-number,
+  :root:not([data-theme="light"]) .hljs-bullet,
+  :root:not([data-theme="light"]) .hljs-quote,
+  :root:not([data-theme="light"]) .hljs-link,
+  :root:not([data-theme="light"]) .hljs-hexcolor,
+  :root:not([data-theme="light"]) .ruby .hljs-constant,
+  :root:not([data-theme="light"]) .hljs-regexp {
+    color: var(--hljs-purple);
+  }
+
+  :root:not([data-theme="light"]) .hljs-string,
+  :root:not([data-theme="light"]) .hljs-selector-id,
+  :root:not([data-theme="light"]) .hljs-selector-attr,
+  :root:not([data-theme="light"]) .hljs-selector-pseudo,
+  :root:not([data-theme="light"]) .hljs-template-variable,
+  :root:not([data-theme="light"]) .hljs-tag .hljs-value,
+  :root:not([data-theme="light"]) .hljs-phpdoc,
+  :root:not([data-theme="light"]) .hljs-dartdoc,
+  :root:not([data-theme="light"]) .tex .hljs-formula,
+  :root:not([data-theme="light"]) .hljs-type,
+  :root:not([data-theme="light"]) .hljs-built_in,
+  :root:not([data-theme="light"]) .hljs-variable {
+    color: var(--hljs-yellow);
+  }
+
+  :root:not([data-theme="light"]) .hljs-title,
+  :root:not([data-theme="light"]) .hljs-code,
+  :root:not([data-theme="light"]) .hljs-section,
+  :root:not([data-theme="light"]) .hljs-selector-class,
+  :root:not([data-theme="light"]) .hljs-id,
+  :root:not([data-theme="light"]) .scss .hljs-preprocessor {
+    color: var(--hljs-green);
+  }
+
+  :root:not([data-theme="light"]) .hljs-class .hljs-title,
+  :root:not([data-theme="light"]) .vhdl .hljs-literal,
+  :root:not([data-theme="light"]) .tex .hljs-command,
+  :root:not([data-theme="light"]) .hljs-symbol,
+  :root:not([data-theme="light"]) .hljs-attribute {
+    color: var(--hljs-blue);
+  }
+
+  :root:not([data-theme="light"]) .hljs-tag,
+  :root:not([data-theme="light"]) .hljs-tag .hljs-title,
+  :root:not([data-theme="light"]) .hljs-rules .hljs-property,
+  :root:not([data-theme="light"]) .django .hljs-tag .hljs-keyword,
+  :root:not([data-theme="light"]) .hljs-prompt {
+    color: var(--hljs-red);
+  }
+
+  :root:not([data-theme="light"]) .lisp .hljs-body {
+    color: var(--hljs-orange);
+  }
+
+  :root:not([data-theme="light"]) .hljs-params,
+  :root:not([data-theme="light"]) .hljs-title.class_,
+  :root:not([data-theme="light"]) .hljs-class .hljs-title {
+    color: var(--hljs-text);
+  }
+
+  :root:not([data-theme="light"]) .hljs-preprocessor,
+  :root:not([data-theme="light"]) .hljs-pragma,
+  :root:not([data-theme="light"]) .hljs-pi,
+  :root:not([data-theme="light"]) .hljs-doctype,
+  :root:not([data-theme="light"]) .hljs-shebang,
+  :root:not([data-theme="light"]) .hljs-cdata,
+  :root:not([data-theme="light"]) .hljs-chunk {
+    color: var(--hljs-muted);
+  }
+
+  :root:not([data-theme="light"]) .hljs-deletion {
+    background: var(--hljs-deletion-bg);
+    color: var(--hljs-red);
+  }
+
+  :root:not([data-theme="light"]) .hljs-addition {
+    background: var(--hljs-addition-bg);
+    color: var(--hljs-green);
+  }
+
+  :root:not([data-theme="light"]) .diff .hljs-change {
+    background: var(--hljs-change-bg);
+    color: var(--hljs-blue);
+  }
 }
 
 [data-theme="dark"] .hljs-comment,
+[data-theme="dark"] .hljs-meta,
 [data-theme="dark"] .diff .hljs-header,
 [data-theme="dark"] .hljs-javadoc {
-  color: #6a9955;
+  color: var(--hljs-muted);
 }
 
 [data-theme="dark"] .hljs-keyword,
+[data-theme="dark"] .hljs-selector-tag,
+[data-theme="dark"] .hljs-literal,
+[data-theme="dark"] .hljs-name,
+[data-theme="dark"] .hljs-attr,
+[data-theme="dark"] .hljs-doctag,
 [data-theme="dark"] .css .rule .hljs-keyword,
 [data-theme="dark"] .hljs-winutils,
 [data-theme="dark"] .nginx .hljs-title,
 [data-theme="dark"] .hljs-subst,
 [data-theme="dark"] .hljs-request,
 [data-theme="dark"] .hljs-status {
-  color: #569cd6;
-  font-weight: bold;
+  color: var(--hljs-red);
 }
 
 [data-theme="dark"] .hljs-number,
+[data-theme="dark"] .hljs-bullet,
+[data-theme="dark"] .hljs-quote,
+[data-theme="dark"] .hljs-link,
 [data-theme="dark"] .hljs-hexcolor,
-[data-theme="dark"] .ruby .hljs-constant {
-  color: #b5cea8;
+[data-theme="dark"] .ruby .hljs-constant,
+[data-theme="dark"] .hljs-regexp {
+  color: var(--hljs-purple);
 }
 
 [data-theme="dark"] .hljs-string,
+[data-theme="dark"] .hljs-selector-id,
+[data-theme="dark"] .hljs-selector-attr,
+[data-theme="dark"] .hljs-selector-pseudo,
+[data-theme="dark"] .hljs-template-variable,
 [data-theme="dark"] .hljs-tag .hljs-value,
 [data-theme="dark"] .hljs-phpdoc,
 [data-theme="dark"] .hljs-dartdoc,
-[data-theme="dark"] .tex .hljs-formula {
-  color: #ce9178;
+[data-theme="dark"] .tex .hljs-formula,
+[data-theme="dark"] .hljs-type,
+[data-theme="dark"] .hljs-built_in,
+[data-theme="dark"] .hljs-variable {
+  color: var(--hljs-yellow);
 }
 
 [data-theme="dark"] .hljs-title,
+[data-theme="dark"] .hljs-code,
+[data-theme="dark"] .hljs-section,
+[data-theme="dark"] .hljs-selector-class,
 [data-theme="dark"] .hljs-id,
 [data-theme="dark"] .scss .hljs-preprocessor {
-  color: #d7ba7d;
-  font-weight: bold;
+  color: var(--hljs-green);
 }
 
 [data-theme="dark"] .hljs-class .hljs-title,
-[data-theme="dark"] .hljs-type,
 [data-theme="dark"] .vhdl .hljs-literal,
-[data-theme="dark"] .tex .hljs-command {
-  color: #4ec9b0;
-  font-weight: bold;
+[data-theme="dark"] .tex .hljs-command,
+[data-theme="dark"] .hljs-symbol,
+[data-theme="dark"] .hljs-attribute {
+  color: var(--hljs-blue);
 }
 
 [data-theme="dark"] .hljs-tag,
 [data-theme="dark"] .hljs-tag .hljs-title,
 [data-theme="dark"] .hljs-rules .hljs-property,
-[data-theme="dark"] .django .hljs-tag .hljs-keyword {
-  color: #569cd6;
-  font-weight: normal;
-}
-
-[data-theme="dark"] .hljs-attribute,
-[data-theme="dark"] .hljs-variable,
-[data-theme="dark"] .lisp .hljs-body {
-  color: #9cdcfe;
-}
-
-[data-theme="dark"] .hljs-regexp {
-  color: #d16969;
-}
-
-[data-theme="dark"] .hljs-symbol,
-[data-theme="dark"] .ruby .hljs-symbol .hljs-string,
-[data-theme="dark"] .lisp .hljs-keyword,
-[data-theme="dark"] .clojure .hljs-keyword,
-[data-theme="dark"] .scheme .hljs-keyword,
-[data-theme="dark"] .tex .hljs-special,
+[data-theme="dark"] .django .hljs-tag .hljs-keyword,
 [data-theme="dark"] .hljs-prompt {
-  color: #c586c0;
+  color: var(--hljs-red);
 }
 
-[data-theme="dark"] .hljs-built_in {
-  color: #4fc1ff;
+[data-theme="dark"] .lisp .hljs-body {
+  color: var(--hljs-orange);
+}
+
+[data-theme="dark"] .hljs-params,
+[data-theme="dark"] .hljs-title.class_,
+[data-theme="dark"] .hljs-class .hljs-title {
+  color: var(--hljs-text);
 }
 
 [data-theme="dark"] .hljs-preprocessor,
@@ -287,28 +455,24 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 [data-theme="dark"] .hljs-pi,
 [data-theme="dark"] .hljs-doctype,
 [data-theme="dark"] .hljs-shebang,
-[data-theme="dark"] .hljs-cdata {
-  color: #808080;
-  font-weight: bold;
+[data-theme="dark"] .hljs-cdata,
+[data-theme="dark"] .hljs-chunk {
+  color: var(--hljs-muted);
 }
 
 [data-theme="dark"] .hljs-deletion {
-  background: #5a1d1d;
-  color: #f48771;
+  background: var(--hljs-deletion-bg);
+  color: var(--hljs-red);
 }
 
 [data-theme="dark"] .hljs-addition {
-  background: #1e3a1e;
-  color: #b5cea8;
+  background: var(--hljs-addition-bg);
+  color: var(--hljs-green);
 }
 
 [data-theme="dark"] .diff .hljs-change {
-  background: #2d4d2d;
-  color: #4ec9b0;
-}
-
-[data-theme="dark"] .hljs-chunk {
-  color: #808080;
+  background: var(--hljs-change-bg);
+  color: var(--hljs-blue);
 }
 
 /* Accessibility: Ensure sufficient contrast for code */

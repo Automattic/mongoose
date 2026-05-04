@@ -15705,6 +15705,31 @@ describe('document', function() {
       { updatePipeline: true }
     );
   });
+
+  it('clears child modified paths when parent mixed path is unset (gh-16252)', async function() {
+    const schema = new Schema({
+      mail: Schema.Types.Mixed
+    }, { versionKey: false });
+    const Test = db.model('Test', schema);
+
+    const created = await Test.create({
+      mail: { 207: { emId: 207, readStatus: 0, getAttach: 0 } }
+    });
+
+    const doc = await Test.findById(created._id).orFail();
+    doc.mail[207].readStatus = 1;
+    doc.markModified('mail.207.readStatus');
+
+    delete doc.mail[207];
+    doc.markModified('mail.207');
+
+    const delta = doc.$__delta()[1];
+    assert.deepStrictEqual(delta, { $unset: { 'mail.207': 1 } });
+
+    await doc.save();
+    const reloaded = await Test.findById(created._id).orFail();
+    assert.strictEqual(reloaded.mail[207], undefined);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

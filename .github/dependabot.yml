@@ -4,6 +4,8 @@ updates:
   directory: "/"
   schedule:
     interval: "monthly"
+  cooldown:
+    default-days: 2
   open-pull-requests-limit: 100
   target-branch: master
 - package-ecosystem: github-actions

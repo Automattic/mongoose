@@ -46,7 +46,7 @@ code {
   background-color: var(--code-bg, #eee);
   padding: 2px 6px;
   font-size: 0.9em;
-  color: var(--link-color, #800);
+  color: var(--accent, #800);
   border-radius: 4px;
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   transition: background-color 0.3s ease, color 0.3s ease;

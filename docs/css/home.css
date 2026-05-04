@@ -7,8 +7,6 @@
   --text-primary: #000000;
   --text-secondary: #333333;
   --text-muted: #777777;
-  --link-color: #0971B2;
-  --link-hover: #065a8f;
   --border-color: #ddd;
   --code-bg: #f5f5f5;
   --code-text: #333;
@@ -23,6 +21,11 @@
   --brand-primary: #800;
   --brand-primary-hover: #990000;
   --brand-primary-subtle: rgba(136, 0, 0, 0.1);
+  --accent: var(--brand-primary);
+  --accent-hover: var(--brand-primary-hover);
+  --accent-subtle: var(--brand-primary-subtle);
+  --link-color: var(--accent);
+  --link-hover: var(--accent-hover);
   /* Button colors */
   --btn-bg: #444;
   --btn-text-shadow: #222;
@@ -39,8 +42,6 @@
     --text-primary: #f0f0f0;
     --text-secondary: #d8d8d8;
     --text-muted: #a0a0a0;
-    --link-color: #7BC3FF;
-    --link-hover: #8AD0FF;
     --border-color: #444444;
     --code-bg: #252525;
     --code-text: #e8e8e8;
@@ -54,6 +55,11 @@
     --brand-primary: #FF5E5E;
     --brand-primary-hover: #F55;
     --brand-primary-subtle: rgba(255, 180, 180, 0.1);
+    --accent: var(--brand-primary);
+    --accent-hover: var(--brand-primary-hover);
+    --accent-subtle: var(--brand-primary-subtle);
+    --link-color: var(--accent);
+    --link-hover: var(--accent-hover);
     /* Button colors */
     --btn-bg: #444;
     --btn-text-shadow: #222;
@@ -70,8 +76,6 @@
   --text-primary: #f0f0f0;
   --text-secondary: #d8d8d8;
   --text-muted: #a0a0a0;
-  --link-color: #7BC3FF;
-  --link-hover: #8AD0FF;
   --border-color: #444444;
   --code-bg: #252525;
   --code-text: #e8e8e8;
@@ -85,6 +89,11 @@
   --brand-primary: #FF5E5E;
   --brand-primary-hover: #F55;
   --brand-primary-subtle: rgba(255, 180, 180, 0.1);
+  --accent: var(--brand-primary);
+  --accent-hover: var(--brand-primary-hover);
+  --accent-subtle: var(--brand-primary-subtle);
+  --link-color: var(--accent);
+  --link-hover: var(--accent-hover);
   /* Button colors */
   --btn-bg: #444;
   --btn-text-shadow: #222;
@@ -98,7 +107,14 @@ html {
 }
 
 a {
+  color: var(--accent);
+  font-weight: 500;
   text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+a:hover {
+  color: var(--accent-hover);
 }
 
 p {
@@ -144,6 +160,14 @@ h1 a,
 h2 a,
 h3 a,
 h4 a {
+  color: var(--text-primary);
+  font-weight: inherit;
+}
+
+h1 a:hover,
+h2 a:hover,
+h3 a:hover,
+h4 a:hover {
   color: var(--text-primary);
 }
 

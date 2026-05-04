@@ -17,8 +17,6 @@
   --text-primary: #1a1a1a;
   --text-secondary: #3c3c43;
   --text-muted: #6e6e7a;
-  --link-color: #0971B2;
-  --link-hover: #065a8f;
   --border-color: #e5e5e7;
   --border-color-soft: #ebebef;
   --code-bg: #f5f5f5;
@@ -37,6 +35,8 @@
   --accent: var(--brand-primary);
   --accent-hover: var(--brand-primary-hover);
   --accent-subtle: var(--brand-primary-subtle);
+  --link-color: var(--accent);
+  --link-hover: var(--accent-hover);
 
   --btn-bg: #444;
   --btn-text-shadow: #222;
@@ -59,8 +59,6 @@
     --text-primary: rgba(255, 255, 245, 0.86);
     --text-secondary: rgba(235, 235, 245, 0.7);
     --text-muted: rgba(235, 235, 245, 0.7);
-    --link-color: #7BC3FF;
-    --link-hover: #9BD9FF;
     --border-color: #2e2e32;
     --border-color-soft: #35353a;
     --code-bg: #25252b;
@@ -74,6 +72,11 @@
     --brand-primary: #FF7878;
     --brand-primary-hover: #FF9898;
     --brand-primary-subtle: rgba(255, 120, 120, 0.12);
+    --accent: var(--brand-primary);
+    --accent-hover: var(--brand-primary-hover);
+    --accent-subtle: var(--brand-primary-subtle);
+    --link-color: var(--accent);
+    --link-hover: var(--accent-hover);
 
     --callout-info-bg: #202127;
     --callout-info-border: #2e2e32;
@@ -95,8 +98,6 @@
   --text-primary: rgba(255, 255, 245, 0.86);
   --text-secondary: rgba(235, 235, 245, 0.7);
   --text-muted: rgba(235, 235, 245, 0.7);
-  --link-color: #7BC3FF;
-  --link-hover: #9BD9FF;
   --border-color: #2e2e32;
   --border-color-soft: #35353a;
   --code-bg: #25252b;
@@ -110,6 +111,11 @@
   --brand-primary: #FF7878;
   --brand-primary-hover: #FF9898;
   --brand-primary-subtle: rgba(255, 120, 120, 0.12);
+  --accent: var(--brand-primary);
+  --accent-hover: var(--brand-primary-hover);
+  --accent-subtle: var(--brand-primary-subtle);
+  --link-color: var(--accent);
+  --link-hover: var(--accent-hover);
 
   --callout-info-bg: #202127;
   --callout-info-border: #2e2e32;
@@ -157,11 +163,12 @@ body {
 }
 
 a {
-  color: var(--link-color);
+  color: var(--accent);
+  font-weight: 500;
   text-decoration: none;
   transition: color 0.15s ease;
 }
-a:hover { color: var(--link-hover); }
+a:hover { color: var(--accent-hover); }
 
 a:focus-visible,
 button:focus-visible,
@@ -217,13 +224,13 @@ hr {
   display: inline-flex;
   align-items: center;
   align-self: stretch;
-  color: var(--brand-primary);
+  color: var(--accent);
   flex-shrink: 0;
   margin-right: 8px;
 }
 
 .site-logo:hover {
-  color: var(--brand-primary-hover);
+  color: var(--accent-hover);
 }
 
 .site-logo-inner {
@@ -739,6 +746,7 @@ hr {
 .article h3 a,
 .article h4 a {
   color: inherit;
+  font-weight: inherit;
 }
 
 .article p {
@@ -1080,7 +1088,12 @@ hr {
 }
 
 .jobs-view-more a {
-  color: var(--text-secondary);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.jobs-view-more a:hover {
+  color: var(--accent-hover);
 }
 
 
@@ -1282,20 +1295,22 @@ hr.separate-api-elements {
 
 .mongoose-btn-outline {
   background-color: transparent;
-  color: var(--brand-primary);
-  border: 1px solid var(--brand-primary);
+  color: var(--accent);
+  border: 1px solid var(--accent);
 }
 
 .mongoose-btn-outline:hover {
-  background-color: var(--brand-primary-subtle);
+  color: var(--accent-hover);
+  background-color: var(--accent-subtle);
 }
 
 .mongoose-btn-solid {
-  background-color: var(--brand-primary);
+  background-color: var(--accent);
   color: #fff;
   border: 1px solid transparent;
 }
 
 .mongoose-btn-solid:hover {
-  background-color: var(--brand-primary-hover);
+  color: #fff;
+  background-color: var(--accent-hover);
 }

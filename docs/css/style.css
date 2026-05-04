@@ -88,7 +88,7 @@ body {
 /* location.hash */
 :target::before {
   content: ">>> ";
-  color: var(--link-color);
+  color: var(--accent);
   font-weight: bold;
   font-size: 20px;
 }
@@ -99,14 +99,15 @@ body {
 }
 
 a {
-  color: var(--link-color);
+  color: var(--accent);
+  font-weight: 500;
   -webkit-transition-property: opacity, -webkit-transform, color, background-color, padding, -webkit-box-shadow;
   -webkit-transition-duration: 0.15s;
   -webkit-transition-timing-function: ease-out;
   transition: opacity 0.15s ease-out, color 0.15s ease-out;
 }
 a:hover {
-  opacity: 0.8;
+  color: var(--accent-hover);
 }
 a:focus-visible {
   outline: 3px solid var(--focus-ring);
@@ -169,12 +170,13 @@ h2 {
 h2 a {
   position: relative;
   bottom: 4px;
+  font-weight: inherit;
 }
 #header .mongoose {
   font-size: 146px;
   font-weight: 100;
   text-indent: -23px;
-  color: var(--brand-primary);
+  color: var(--accent);
 }
 .load #header .mongoose {
   letter-spacing: -14px;
@@ -194,7 +196,7 @@ h2 a {
 }
 .tagline a, .blurb a {
   text-decoration: none;
-  color: var(--brand-primary);
+  color: var(--accent);
 }
 #links {
   margin: 50px 10px 20px;
@@ -219,6 +221,10 @@ h2 a {
   text-decoration: none;
   text-transform: lowercase;
   text-shadow: 1px 1px 7px var(--btn-text-shadow);
+}
+
+#links a:hover {
+  color: white;
 }
 #follow {
   margin-bottom: 36px;

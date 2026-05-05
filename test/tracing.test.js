@@ -3,7 +3,7 @@
 const assert = require('assert');
 const mongoose = require('../index');
 
-const { queryChannel, aggregateChannel, saveChannel, modelChannel } = require('../lib/tracing');
+const { channel } = require('../lib/tracing');
 
 describe('TracingChannel', function() {
   let conn;
@@ -30,7 +30,7 @@ describe('TracingChannel', function() {
     await Test.deleteMany({});
   });
 
-  describe('mongoose:query', function() {
+  describe('query operations', function() {
     it('fires start and asyncEnd for find', async function() {
       const events = [];
       const handlers = {
@@ -41,20 +41,20 @@ describe('TracingChannel', function() {
         error(ctx) { events.push({ event: 'error', error: ctx.error }); }
       };
 
-      queryChannel.subscribe(handlers);
+      channel.subscribe(handlers);
       try {
         await Test.find({ name: 'test' });
 
-        const startEvent = events.find(e => e.event === 'start');
-        assert.ok(startEvent, 'start event should fire');
-        assert.strictEqual(startEvent.operation, 'find');
-        assert.strictEqual(startEvent.collection, collectionName);
-        assert.deepStrictEqual(startEvent.query, { name: 'test' });
-        assert.ok(startEvent.database);
-        assert.ok(startEvent.serverAddress);
+        const start = events.find(e => e.event === 'start');
+        assert.ok(start, 'start event should fire');
+        assert.strictEqual(start.operation, 'find');
+        assert.strictEqual(start.collection, collectionName);
+        assert.ok(start.database);
+        assert.ok(start.serverAddress);
+        assert.deepStrictEqual(start.args.filter, { name: 'test' });
         assert.ok(events.some(e => e.event === 'asyncEnd'), 'asyncEnd should fire');
       } finally {
-        queryChannel.unsubscribe(handlers);
+        channel.unsubscribe(handlers);
       }
     });
 
@@ -68,16 +68,16 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      queryChannel.subscribe(handlers);
+      channel.subscribe(handlers);
       try {
         await Test.findOne({ name: 'test' });
 
-        const startEvent = events.find(e => e.event === 'start');
-        assert.ok(startEvent);
-        assert.strictEqual(startEvent.operation, 'findOne');
-        assert.strictEqual(startEvent.collection, collectionName);
+        const start = events.find(e => e.event === 'start');
+        assert.ok(start);
+        assert.strictEqual(start.operation, 'findOne');
+        assert.strictEqual(start.collection, collectionName);
       } finally {
-        queryChannel.unsubscribe(handlers);
+        channel.unsubscribe(handlers);
       }
     });
 
@@ -93,16 +93,16 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      queryChannel.subscribe(handlers);
+      channel.subscribe(handlers);
       try {
         await Test.updateOne({ name: 'update-test' }, { age: 20 });
 
-        const startEvent = events.find(e => e.event === 'start');
-        assert.ok(startEvent);
-        assert.strictEqual(startEvent.operation, 'updateOne');
-        assert.strictEqual(startEvent.collection, collectionName);
+        const start = events.find(e => e.event === 'start');
+        assert.ok(start);
+        assert.strictEqual(start.operation, 'updateOne');
+        assert.strictEqual(start.collection, collectionName);
       } finally {
-        queryChannel.unsubscribe(handlers);
+        channel.unsubscribe(handlers);
       }
     });
 
@@ -118,15 +118,15 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      queryChannel.subscribe(handlers);
+      channel.subscribe(handlers);
       try {
         await Test.deleteOne({ name: 'delete-test' });
 
-        const startEvent = events.find(e => e.event === 'start');
-        assert.ok(startEvent);
-        assert.strictEqual(startEvent.operation, 'deleteOne');
+        const start = events.find(e => e.event === 'start');
+        assert.ok(start);
+        assert.strictEqual(start.operation, 'deleteOne');
       } finally {
-        queryChannel.unsubscribe(handlers);
+        channel.unsubscribe(handlers);
       }
     });
 
@@ -140,14 +140,14 @@ describe('TracingChannel', function() {
         error(ctx) { events.push({ event: 'error', error: ctx.error }); }
       };
 
-      queryChannel.subscribe(handlers);
+      channel.subscribe(handlers);
       try {
         await Test.find({ $invalidOperator: true }).catch(() => {});
 
         assert.ok(events.some(e => e.event === 'start'), 'start should fire');
         assert.ok(events.some(e => e.event === 'error'), 'error should fire');
       } finally {
-        queryChannel.unsubscribe(handlers);
+        channel.unsubscribe(handlers);
       }
     });
 
@@ -161,19 +161,19 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      queryChannel.subscribe(handlers);
+      channel.subscribe(handlers);
       try {
         await Test.find({});
         const ctx = events[0];
         assert.ok(ctx.database);
         assert.ok(ctx.serverAddress);
       } finally {
-        queryChannel.unsubscribe(handlers);
+        channel.unsubscribe(handlers);
       }
     });
   });
 
-  describe('mongoose:aggregate', function() {
+  describe('aggregate operations', function() {
     it('fires start and asyncEnd for aggregate', async function() {
       await Test.create([{ name: 'agg1', age: 10 }, { name: 'agg2', age: 20 }]);
 
@@ -186,24 +186,25 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      aggregateChannel.subscribe(handlers);
+      channel.subscribe(handlers);
       try {
         await Test.aggregate([{ $match: { age: { $gte: 10 } } }]);
 
-        const startEvent = events.find(e => e.event === 'start');
-        assert.ok(startEvent, 'start event should fire');
-        assert.ok(Array.isArray(startEvent.pipeline));
-        assert.deepStrictEqual(startEvent.pipeline[0], { $match: { age: { $gte: 10 } } });
-        assert.strictEqual(startEvent.collection, collectionName);
-        assert.ok(startEvent.database);
+        const start = events.find(e => e.event === 'start');
+        assert.ok(start, 'start event should fire');
+        assert.strictEqual(start.operation, 'aggregate');
+        assert.strictEqual(start.collection, collectionName);
+        assert.ok(start.database);
+        assert.ok(Array.isArray(start.args.pipeline));
+        assert.deepStrictEqual(start.args.pipeline[0], { $match: { age: { $gte: 10 } } });
         assert.ok(events.some(e => e.event === 'asyncEnd'));
       } finally {
-        aggregateChannel.unsubscribe(handlers);
+        channel.unsubscribe(handlers);
       }
     });
   });
 
-  describe('mongoose:save', function() {
+  describe('save operations', function() {
     it('fires start and asyncEnd for save (insert)', async function() {
       const events = [];
       const handlers = {
@@ -214,19 +215,19 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      saveChannel.subscribe(handlers);
+      channel.subscribe(handlers);
       try {
         const doc = new Test({ name: 'save-test', age: 25 });
         await doc.save();
 
-        const startEvent = events.find(e => e.event === 'start');
-        assert.ok(startEvent, 'start event should fire');
-        assert.strictEqual(startEvent.operation, 'save');
-        assert.strictEqual(startEvent.collection, collectionName);
-        assert.ok(startEvent.database);
+        const start = events.find(e => e.event === 'start');
+        assert.ok(start, 'start event should fire');
+        assert.strictEqual(start.operation, 'save');
+        assert.strictEqual(start.collection, collectionName);
+        assert.ok(start.database);
         assert.ok(events.some(e => e.event === 'asyncEnd'));
       } finally {
-        saveChannel.unsubscribe(handlers);
+        channel.unsubscribe(handlers);
       }
     });
 
@@ -242,18 +243,18 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      saveChannel.subscribe(handlers);
+      channel.subscribe(handlers);
       try {
         doc.age = 20;
         await doc.save();
 
-        const startEvent = events.find(e => e.event === 'start');
-        assert.ok(startEvent);
-        assert.strictEqual(startEvent.operation, 'save');
-        assert.strictEqual(startEvent.collection, collectionName);
+        const start = events.find(e => e.event === 'start');
+        assert.ok(start);
+        assert.strictEqual(start.operation, 'save');
+        assert.strictEqual(start.collection, collectionName);
         assert.ok(events.some(e => e.event === 'asyncEnd'));
       } finally {
-        saveChannel.unsubscribe(handlers);
+        channel.unsubscribe(handlers);
       }
     });
 
@@ -272,7 +273,7 @@ describe('TracingChannel', function() {
         error(ctx) { events.push({ event: 'error', error: ctx.error }); }
       };
 
-      saveChannel.subscribe(handlers);
+      channel.subscribe(handlers);
       try {
         const doc = new StrictModel({});
         await doc.save().catch(() => {});
@@ -280,13 +281,13 @@ describe('TracingChannel', function() {
         assert.ok(events.some(e => e.event === 'start'), 'start should fire');
         assert.ok(events.some(e => e.event === 'error'), 'error should fire');
       } finally {
-        saveChannel.unsubscribe(handlers);
+        channel.unsubscribe(handlers);
         await StrictModel.deleteMany({});
       }
     });
   });
 
-  describe('mongoose:model', function() {
+  describe('model operations', function() {
     it('fires start and asyncEnd for insertMany', async function() {
       const events = [];
       const handlers = {
@@ -297,21 +298,22 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      modelChannel.subscribe(handlers);
+      channel.subscribe(handlers);
       try {
         await Test.insertMany([
           { name: 'insert1', age: 10 },
           { name: 'insert2', age: 20 }
         ]);
 
-        const startEvent = events.find(e => e.event === 'start');
-        assert.ok(startEvent, 'start event should fire');
-        assert.strictEqual(startEvent.operation, 'insertMany');
-        assert.strictEqual(startEvent.collection, collectionName);
-        assert.ok(startEvent.database);
+        const start = events.find(e => e.event === 'start');
+        assert.ok(start, 'start event should fire');
+        assert.strictEqual(start.operation, 'insertMany');
+        assert.strictEqual(start.collection, collectionName);
+        assert.ok(start.database);
+        assert.ok(Array.isArray(start.args.docs));
         assert.ok(events.some(e => e.event === 'asyncEnd'));
       } finally {
-        modelChannel.unsubscribe(handlers);
+        channel.unsubscribe(handlers);
       }
     });
 
@@ -325,20 +327,21 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      modelChannel.subscribe(handlers);
+      channel.subscribe(handlers);
       try {
         await Test.bulkWrite([
           { insertOne: { document: { name: 'bulk1', age: 30 } } }
         ]);
 
-        const startEvent = events.find(e => e.event === 'start');
-        assert.ok(startEvent, 'start event should fire');
-        assert.strictEqual(startEvent.operation, 'bulkWrite');
-        assert.strictEqual(startEvent.collection, collectionName);
-        assert.ok(startEvent.database);
+        const start = events.find(e => e.event === 'start');
+        assert.ok(start, 'start event should fire');
+        assert.strictEqual(start.operation, 'bulkWrite');
+        assert.strictEqual(start.collection, collectionName);
+        assert.ok(start.database);
+        assert.ok(Array.isArray(start.args.ops));
         assert.ok(events.some(e => e.event === 'asyncEnd'));
       } finally {
-        modelChannel.unsubscribe(handlers);
+        channel.unsubscribe(handlers);
       }
     });
   });

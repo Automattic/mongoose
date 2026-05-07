@@ -5,10 +5,6 @@
         border: 1px solid;
         padding: 8px;
     }
-
-    table tr:nth-child(2n) {
-        background: rgba(0,0,0,.03);
-    }
 </style>
 
 Mongoose relies on the [MongoDB Node.js Driver](https://www.mongodb.com/docs/drivers/node/current/) to communicate with MongoDB.

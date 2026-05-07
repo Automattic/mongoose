@@ -218,7 +218,6 @@ ways to add a static:
 * Call the [`Schema#static()` function](api/schema.html#schema_Schema-static)
 
 ```javascript
-
 // define a schema
 const animalSchema = new Schema({ name: String, type: String },
   {
@@ -252,7 +251,6 @@ but for mongoose queries. Query helper methods let you extend mongoose's
 [chainable query builder API](queries.html).
 
 ```javascript
-
 // define a schema
 const animalSchema = new Schema({ name: String, type: String },
   {

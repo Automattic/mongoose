@@ -270,7 +270,7 @@ In Mongoose 9, this option is no longer necessary because Mongoose no longer sto
 
 ## Node.js version support
 
-Mongoose 9 requires Node.js 18 or higher.
+Mongoose 9 requires Node.js 20.19.0 or higher.
 
 ## UUID's are now MongoDB UUID objects
 

@@ -398,7 +398,7 @@ describe('model: updateOne:', function() {
     const q = BlogPost.find({ _id: post._id });
     q.set('slug', 'test-slug');
 
-    await q.updateOne({ title: 'newtitle' });
+    await q.updateOne({}, { title: 'newtitle' });
 
     const doc = await BlogPost.findById(post._id);
     assert.equal(doc.title, 'newtitle');
@@ -409,7 +409,7 @@ describe('model: updateOne:', function() {
     const q = BlogPost.find({});
     q.set('slug', 'test-slug');
 
-    await q.updateMany({ title: 'newtitle' });
+    await q.updateMany({}, { title: 'newtitle' });
 
     const docs = await BlogPost.find({});
     assert.equal(docs.length, 1);
@@ -1285,10 +1285,10 @@ describe('model: updateOne:', function() {
       const Schema = mongoose.Schema({ name: String });
       const Model = db.model('Test', Schema);
 
-      let query = Model.updateOne({ name: 'Val' });
+      let query = Model.updateOne({}, { name: 'Val' });
       assert.equal(query.getUpdate().name, 'Val');
 
-      query = Model.find().updateOne({ name: 'Val' });
+      query = Model.find().updateOne({}, { name: 'Val' });
       assert.equal(query.getUpdate().name, 'Val');
 
       return query.setOptions({ upsert: true }).
@@ -1302,7 +1302,7 @@ describe('model: updateOne:', function() {
       const Schema = mongoose.Schema({ name: String });
 
       Schema.pre('updateOne', function() {
-        this.updateOne({ name: 'Val' });
+        this.updateOne({}, { name: 'Val' });
       });
 
       const Model = db.model('Test', Schema);

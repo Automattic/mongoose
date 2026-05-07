@@ -104,7 +104,7 @@ declare module 'mongoose' {
                   Types.Subdocument<InferHydratedDocType<Item>['_id'], unknown, InferHydratedDocType<Item>> & InferHydratedDocType<Item>
                 >:
               IsSchemaTypeFromBuiltinClass<Item> extends true ?
-                Types.Array<ResolveHydratedPathType<Item, { enum: Options['enum'] }, TypeKey>> :
+                Types.Array<ResolveHydratedPathType<Item, { enum: Exclude<Options['enum'], undefined> }, TypeKey>> :
                 IsItRecordAndNotAny<Item> extends true ?
                   Item extends Record<string, never> ?
                     Types.Array<ObtainHydratedDocumentPathType<Item, TypeKey>> :

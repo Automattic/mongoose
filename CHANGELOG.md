@@ -1,3 +1,9 @@
+9.6.2 / 2026-05-08
+==================
+ * fix(document): correctly handle modified subpaths when parent path is unset after modifying #16271 #16252
+ * types: handle compiling with exactOptionalPropertyTypes #16277 #16273
+ * chore: align Node version docs and types #16270 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
 9.6.1 / 2026-04-29
 ==================
  * types(objectid): fix `_id` getter helper on ObjectId #16251 [noseworthy](https://github.com/noseworthy)

@@ -2845,7 +2845,7 @@ describe('model: updateOne: ', function() {
       });
 
       it(`can not update immutable fields without overwriteImmutable: true and timestamps: ${timestamps}`, async function() {
-      // Arrange
+        // Arrange
         const { User } = createTestContext();
         const users = await User.create([
           { name: 'Bob', ssn: '222-22-2222' },

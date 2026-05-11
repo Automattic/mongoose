@@ -2788,6 +2788,50 @@ describe('model: updateOne: ', function() {
       assert.strictEqual(updatedUser.createdAt.valueOf(), customCreatedAt.valueOf());
     });
 
+    it('updateOne upsert preserves user-provided `$setOnInsert.createdAt` with overwriteImmutable: true', async function() {
+      // Arrange
+      const schema = Schema({ name: String }, { timestamps: true });
+      const Model = db.model('UpsertSetOnInsertOne', schema);
+      const userCreatedAt = new Date('2020-01-01');
+      const filter = { name: 'gh-setoninsert-createdat-one' };
+
+      // Act
+      await Model.bulkWrite([{
+        updateOne: {
+          filter,
+          update: { $setOnInsert: { createdAt: userCreatedAt, name: filter.name } },
+          upsert: true,
+          overwriteImmutable: true
+        }
+      }]);
+
+      // Assert
+      const doc = await Model.findOne(filter);
+      assert.strictEqual(doc.createdAt.valueOf(), userCreatedAt.valueOf());
+    });
+
+    it('updateMany upsert preserves user-provided `$setOnInsert.createdAt` with overwriteImmutable: true', async function() {
+      // Arrange
+      const schema = Schema({ name: String }, { timestamps: true });
+      const Model = db.model('UpsertSetOnInsertMany', schema);
+      const userCreatedAt = new Date('2020-01-01');
+      const filter = { name: 'gh-setoninsert-createdat-many' };
+
+      // Act
+      await Model.bulkWrite([{
+        updateMany: {
+          filter,
+          update: { $setOnInsert: { createdAt: userCreatedAt, name: filter.name } },
+          upsert: true,
+          overwriteImmutable: true
+        }
+      }]);
+
+      // Assert
+      const doc = await Model.findOne(filter);
+      assert.strictEqual(doc.createdAt.valueOf(), userCreatedAt.valueOf());
+    });
+
     for (const timestamps of [true, false, null, undefined]) {
       it(`overwriting immutable createdAt with bulkWrite (gh-15781) when \`timestamps\` is \`${timestamps}\``, async function() {
         // Arrange

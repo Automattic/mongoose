@@ -2837,6 +2837,7 @@ describe('model: updateOne: ', function() {
         const newCreatedAt = new Date('2020-01-01');
 
         // Act
+        // `name` keeps the update non-empty when `timestamps: false`, since `ssn` and `createdAt` are immutable and get stripped.
         await User.bulkWrite([
           {
             updateOne: {

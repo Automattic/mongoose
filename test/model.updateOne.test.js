@@ -2798,6 +2798,14 @@ describe('model: updateOne: ', function() {
         const doc1 = await Model.create({ name: 'gh-15781-1' });
         const doc2 = await Model.create({ name: 'gh-15781-2' });
 
+        // Seed a known past `updatedAt` via the raw collection (bypasses immutable casting)
+        // so we can observe whether the bulkWrite advances `updatedAt`.
+        const initialUpdatedAt = new Date('2020-06-15');
+        await Model.collection.updateMany(
+          { _id: { $in: [doc1._id, doc2._id] } },
+          { $set: { updatedAt: initialUpdatedAt } }
+        );
+
         // Act
         const createdAt = new Date('2011-06-01');
 
@@ -2825,6 +2833,15 @@ describe('model: updateOne: ', function() {
 
         assert.equal(updatesDocs[0].createdAt.valueOf(), createdAt.valueOf());
         assert.equal(updatesDocs[1].createdAt.valueOf(), createdAt.valueOf());
+
+        // Per-op `timestamps` should be honored: `updatedAt` only advances when not `false`.
+        if (timestamps === false) {
+          assert.strictEqual(updatesDocs[0].updatedAt.valueOf(), initialUpdatedAt.valueOf());
+          assert.strictEqual(updatesDocs[1].updatedAt.valueOf(), initialUpdatedAt.valueOf());
+        } else {
+          assert.ok(updatesDocs[0].updatedAt > initialUpdatedAt);
+          assert.ok(updatesDocs[1].updatedAt > initialUpdatedAt);
+        }
       });
 
       it(`can not update immutable fields without overwriteImmutable: true and timestamps: ${timestamps}`, async function() {
@@ -2835,6 +2852,14 @@ describe('model: updateOne: ', function() {
           { name: 'Eve', ssn: '333-33-3333' }
         ]);
         const newCreatedAt = new Date('2020-01-01');
+
+        // Seed a known past `updatedAt` via the raw collection (bypasses immutable casting)
+        // so we can observe whether the bulkWrite advances `updatedAt`.
+        const initialUpdatedAt = new Date('2020-06-15');
+        await User.collection.updateMany(
+          { _id: { $in: users.map(u => u._id) } },
+          { $set: { updatedAt: initialUpdatedAt } }
+        );
 
         // Act
         // `name` keeps the update non-empty when `timestamps: false`, since `ssn` and `createdAt` are immutable and get stripped.
@@ -2868,6 +2893,15 @@ describe('model: updateOne: ', function() {
         assert.strictEqual(updatedUser2.name, 'Updated Eve');
         assert.strictEqual(updatedUser2.ssn, '333-33-3333');
         assert.notStrictEqual(updatedUser2.createdAt.valueOf(), newCreatedAt.valueOf());
+
+        // Per-op `timestamps` should be honored: `updatedAt` only advances when not `false`.
+        if (timestamps === false) {
+          assert.strictEqual(updatedUser1.updatedAt.valueOf(), initialUpdatedAt.valueOf());
+          assert.strictEqual(updatedUser2.updatedAt.valueOf(), initialUpdatedAt.valueOf());
+        } else {
+          assert.ok(updatedUser1.updatedAt > initialUpdatedAt);
+          assert.ok(updatedUser2.updatedAt > initialUpdatedAt);
+        }
       });
     }
 

@@ -1108,6 +1108,25 @@ describe('types.documentarray', function() {
       assert.strictEqual(fetched.addresses[2].city, 'Boston');
     });
 
+    it('registers full array atomics after reverse() follows append-only push()', async function() {
+      // Arrange
+      const { user } = createTestContext();
+      await user.save();
+      user.addresses.push({ street: '4 Main', city: 'Austin' });
+      assert.ok(user.addresses.$atomics().$push, 'sanity: append-only push starts as $push');
+
+      // Act
+      const ret = user.addresses.reverse();
+
+      // Assert
+      assert.strictEqual(ret, user.addresses);
+      assert.ok(user.addresses.$atomics().$set);
+      assert.deepStrictEqual(
+        user.addresses.$atomics().$set.map(address => address.city),
+        ['Austin', 'Denver', 'Chicago', 'Boston']
+      );
+    });
+
     function createTestContext() {
       const addressSchema = new mongoose.Schema({
         street: String,

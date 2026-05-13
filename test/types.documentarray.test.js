@@ -926,6 +926,32 @@ describe('types.documentarray', function() {
       assert.strictEqual(fetched.addresses[1].city, 'Denver');
     });
 
+    it('reindexes subdocs after $shift() so subsequent nested changes save correctly', async function() {
+      // Arrange
+      const { User, user } = createTestContext();
+      await user.save();
+      user.addresses.$shift();
+      await user.save();
+      assert.strictEqual(user.isModified(), false, 'sanity: saved doc starts clean');
+
+      // Act
+      user.addresses[0].city = 'New York';
+
+      // Assert
+      assert.strictEqual(
+        user.addresses[0].$__fullPath('city'),
+        'addresses.0.city',
+        'first remaining subdoc should use its current array index'
+      );
+      assert.ok(user.modifiedPaths().includes('addresses.0.city'));
+      assert.ok(!user.modifiedPaths().includes('addresses.1.city'));
+
+      await user.save();
+      const fetched = await User.findById(user._id).orFail().lean();
+      assert.strictEqual(fetched.addresses[0].city, 'New York');
+      assert.strictEqual(fetched.addresses[1].city, 'Denver');
+    });
+
     function createTestContext() {
       const addressSchema = new mongoose.Schema({
         street: String,

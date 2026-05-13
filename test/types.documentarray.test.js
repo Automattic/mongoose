@@ -1032,6 +1032,28 @@ describe('types.documentarray', function() {
       assert.strictEqual(fetched.addresses[3].city, 'Denver');
     });
 
+    it('does not restamp existing subdocs after append-only push()', function() {
+      // Arrange
+      const { user } = createTestContext();
+      const originalSetIndex = user.addresses[0].$setIndex;
+      let setIndexCalls = 0;
+      user.addresses[0].$setIndex = function(index) {
+        ++setIndexCalls;
+        return originalSetIndex.call(this, index);
+      };
+
+      // Act
+      user.addresses.push({ street: '4 Main', city: 'Austin' });
+
+      // Assert
+      assert.strictEqual(setIndexCalls, 0);
+      assert.strictEqual(
+        user.addresses[3].$__fullPath('city'),
+        'addresses.3.city',
+        'appended subdoc should use its appended array index'
+      );
+    });
+
     it('reindexes subdocs after sort() so subsequent nested changes save correctly', async function() {
       // Arrange
       const { User, user } = createTestContext();
@@ -1129,6 +1151,29 @@ describe('types.documentarray', function() {
           locations[1]._id.toString(),
           locations[0]._id.toString(),
           locations[2]._id.toString()
+        ]
+      );
+    });
+
+    it('updates top-level populated() after reverse() reorders a document array', async function() {
+      // Arrange
+      const { Trip, locations, trip, getPopulatedLocationIds } = await createTestContext();
+      const fromDb = await Trip.findById(trip._id).orFail().populate('stops.location');
+      assert.deepStrictEqual(
+        getPopulatedLocationIds(fromDb),
+        locations.map(location => location._id.toString())
+      );
+
+      // Act
+      fromDb.stops.reverse();
+
+      // Assert
+      assert.deepStrictEqual(
+        getPopulatedLocationIds(fromDb),
+        [
+          locations[2]._id.toString(),
+          locations[1]._id.toString(),
+          locations[0]._id.toString()
         ]
       );
     });

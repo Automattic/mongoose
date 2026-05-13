@@ -847,6 +847,108 @@ describe('types.documentarray', function() {
     assert.strictEqual(fetched.array[1].v, 0);
   });
 
+  describe('document array indexes after removal', function() {
+    it('reindexes subdocs after pull() so subsequent nested changes save correctly', async function() {
+      // Arrange
+      const { User, user } = createTestContext();
+      await user.save();
+      user.addresses.pull(user.addresses[0]._id);
+      await user.save();
+      assert.strictEqual(user.isModified(), false, 'sanity: saved doc starts clean');
+
+      // Act
+      user.addresses[0].city = 'New York';
+
+      // Assert
+      assert.strictEqual(
+        user.addresses[0].$__fullPath('city'),
+        'addresses.0.city',
+        'first remaining subdoc should use its current array index'
+      );
+      assert.ok(user.modifiedPaths().includes('addresses.0.city'));
+      assert.ok(!user.modifiedPaths().includes('addresses.1.city'));
+
+      await user.save();
+      const fetched = await User.findById(user._id).orFail().lean();
+      assert.strictEqual(fetched.addresses[0].city, 'New York');
+      assert.strictEqual(fetched.addresses[1].city, 'Denver');
+    });
+
+    it('reindexes subdocs after splice() so subsequent nested changes save correctly', async function() {
+      // Arrange
+      const { User, user } = createTestContext();
+      await user.save();
+      user.addresses.splice(0, 1);
+      await user.save();
+      assert.strictEqual(user.isModified(), false, 'sanity: saved doc starts clean');
+
+      // Act
+      user.addresses[0].city = 'New York';
+
+      // Assert
+      assert.strictEqual(
+        user.addresses[0].$__fullPath('city'),
+        'addresses.0.city',
+        'first remaining subdoc should use its current array index'
+      );
+      assert.ok(user.modifiedPaths().includes('addresses.0.city'));
+      assert.ok(!user.modifiedPaths().includes('addresses.1.city'));
+
+      await user.save();
+      const fetched = await User.findById(user._id).orFail().lean();
+      assert.strictEqual(fetched.addresses[0].city, 'New York');
+      assert.strictEqual(fetched.addresses[1].city, 'Denver');
+    });
+
+    it('reindexes subdocs after shift() so subsequent nested changes save correctly', async function() {
+      // Arrange
+      const { User, user } = createTestContext();
+      await user.save();
+      user.addresses.shift();
+      await user.save();
+      assert.strictEqual(user.isModified(), false, 'sanity: saved doc starts clean');
+
+      // Act
+      user.addresses[0].city = 'New York';
+
+      // Assert
+      assert.strictEqual(
+        user.addresses[0].$__fullPath('city'),
+        'addresses.0.city',
+        'first remaining subdoc should use its current array index'
+      );
+      assert.ok(user.modifiedPaths().includes('addresses.0.city'));
+      assert.ok(!user.modifiedPaths().includes('addresses.1.city'));
+
+      await user.save();
+      const fetched = await User.findById(user._id).orFail().lean();
+      assert.strictEqual(fetched.addresses[0].city, 'New York');
+      assert.strictEqual(fetched.addresses[1].city, 'Denver');
+    });
+
+    function createTestContext() {
+      const addressSchema = new mongoose.Schema({
+        street: String,
+        city: String
+      });
+      const userSchema = new mongoose.Schema({
+        name: String,
+        addresses: [addressSchema]
+      });
+      const User = db.model('UserDocumentArrayIndex', userSchema);
+      const user = new User({
+        name: 'John',
+        addresses: [
+          { street: '1 Main', city: 'Boston' },
+          { street: '2 Main', city: 'Chicago' },
+          { street: '3 Main', city: 'Denver' }
+        ]
+      });
+
+      return { User, user };
+    }
+  });
+
   it('clones subdoc when same subdoc reference appears multiple times in array (gh-15973)', async function() {
     const childSchema = new mongoose.Schema({
       id: Number,

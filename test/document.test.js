@@ -13034,6 +13034,88 @@ describe('document', function() {
     }
   });
 
+  describe('$clone() does not leak state to the original document', function() {
+    it('cloned document array $parent() returns the cloned root document', function() {
+      // Arrange
+      const { user } = createTestContext();
+
+      // Act
+      const clonedUser = user.$clone();
+
+      // Assert
+      assert.strictEqual(
+        clonedUser.addresses.$parent(),
+        clonedUser,
+        'cloned document array $parent() should return cloned document'
+      );
+      assert.strictEqual(
+        user.addresses.$parent(),
+        user,
+        'original document array $parent() should still return original document'
+      );
+    });
+
+    it('cloning a freshly-constructed document does not mutate the original document\'s modifiedPaths', function() {
+      // Arrange
+      const { user } = createTestContext();
+      const before = user.modifiedPaths().slice().sort();
+
+      // Act
+      user.$clone();
+
+      // Assert
+      const after = user.modifiedPaths().slice().sort();
+      assert.deepStrictEqual(
+        after,
+        before,
+        'cloning should not add paths to the original document\'s modifiedPaths'
+      );
+    });
+
+    it('modifying a subdoc field on the cloned document does not mark the original as modified', async function() {
+      // Arrange
+      const { User, user } = createTestContext();
+      await user.save();
+      const fetched = await User.findById(user._id);
+      assert.strictEqual(fetched.isModified(), false, 'sanity: fetched doc starts clean');
+
+      // Act
+      const clonedFetched = fetched.$clone();
+      clonedFetched.addresses[0].city = 'New York';
+
+      // Assert
+      assert.strictEqual(
+        fetched.isModified(),
+        false,
+        'original fetched document should remain clean after mutating clone'
+      );
+      assert.deepStrictEqual(
+        fetched.modifiedPaths(),
+        [],
+        'original fetched document modifiedPaths should remain empty'
+      );
+      assert.strictEqual(
+        clonedFetched.isModified('addresses.0.city'),
+        true,
+        'cloned document should track the mutation on its own subdoc'
+      );
+    });
+
+    function createTestContext() {
+      const addressSchema = new Schema({ street: String, city: String });
+      const userSchema = new Schema({
+        name: String,
+        addresses: [addressSchema]
+      });
+      const User = db.model('UserCloneIsolation', userSchema);
+      const user = new User({
+        name: 'John',
+        addresses: [{ street: '1 Main', city: 'Boston' }]
+      });
+      return { User, user };
+    }
+  });
+
   it('can create document with document array and top-level key named `schema` (gh-12480)', async function() {
     const AuthorSchema = new Schema({
       fullName: { type: 'String', required: true }

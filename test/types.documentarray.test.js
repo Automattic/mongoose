@@ -1109,6 +1109,64 @@ describe('types.documentarray', function() {
     }
   });
 
+  describe('document array populated paths after reordering', function() {
+    it('updates top-level populated() after sort() reorders a document array', async function() {
+      // Arrange
+      const { Trip, locations, trip, getPopulatedLocationIds } = await createTestContext();
+      const fromDb = await Trip.findById(trip._id).orFail().populate('stops.location');
+      assert.deepStrictEqual(
+        getPopulatedLocationIds(fromDb),
+        locations.map(location => location._id.toString())
+      );
+
+      // Act
+      fromDb.stops.sort((left, right) => left.sequence - right.sequence);
+
+      // Assert
+      assert.deepStrictEqual(
+        getPopulatedLocationIds(fromDb),
+        [
+          locations[1]._id.toString(),
+          locations[0]._id.toString(),
+          locations[2]._id.toString()
+        ]
+      );
+    });
+
+    async function createTestContext() {
+      const locationSchema = new Schema({ name: String });
+      const stopSchema = new Schema({
+        location: { type: Schema.Types.ObjectId, ref: 'Location' },
+        sequence: Number
+      });
+      const tripSchema = new Schema({
+        name: String,
+        stops: [stopSchema]
+      });
+      const Location = db.model('Location', locationSchema);
+      const Trip = db.model('Trip', tripSchema);
+      const locations = await Location.create([
+        { name: 'Boston' },
+        { name: 'Chicago' },
+        { name: 'Denver' }
+      ]);
+      const trip = await Trip.create({
+        name: 'Route planning',
+        stops: [
+          { location: locations[0]._id, sequence: 2 },
+          { location: locations[1]._id, sequence: 1 },
+          { location: locations[2]._id, sequence: 3 }
+        ]
+      });
+
+      return { Trip, locations, trip, getPopulatedLocationIds };
+    }
+
+    function getPopulatedLocationIds(trip) {
+      return trip.populated('stops.location').map(id => id.toString());
+    }
+  });
+
   it('clones subdoc when same subdoc reference appears multiple times in array (gh-15973)', async function() {
     const childSchema = new mongoose.Schema({
       id: Number,

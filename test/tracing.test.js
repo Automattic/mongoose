@@ -205,6 +205,36 @@ describe('TracingChannel', function() {
         channel.unsubscribe(handlers);
       }
     });
+
+    it('fires start and asyncEnd for connection-level aggregate', async function() {
+      await Test.create([{ name: 'conn-agg1', age: 10 }, { name: 'conn-agg2', age: 20 }]);
+
+      const events = [];
+      const handlers = {
+        start(ctx) { events.push({ event: 'start', ...ctx }); },
+        end() {},
+        asyncStart() {},
+        asyncEnd(ctx) { events.push({ event: 'asyncEnd', result: ctx.result }); },
+        error() {}
+      };
+
+      channel.subscribe(handlers);
+      try {
+        await conn.aggregate([{ $documents: [{ x: 1 }] }]);
+
+        const start = events.find(e => e.event === 'start');
+        assert.ok(start, 'start event should fire');
+        assert.strictEqual(start.operation, 'aggregate');
+        assert.ok(start.database);
+        assert.ok(Array.isArray(start.args.pipeline));
+
+        const asyncEnd = events.find(e => e.event === 'asyncEnd');
+        assert.ok(asyncEnd, 'asyncEnd should fire');
+        assert.ok(Array.isArray(asyncEnd.result));
+      } finally {
+        channel.unsubscribe(handlers);
+      }
+    });
   });
 
   describe('save operations', function() {

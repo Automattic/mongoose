@@ -36,8 +36,8 @@ describe('TracingChannel', function() {
       const handlers = {
         start(ctx) { events.push({ event: 'start', ...ctx }); },
         end() { events.push({ event: 'end' }); },
-        asyncStart() { events.push({ event: 'asyncStart' }); },
-        asyncEnd() { events.push({ event: 'asyncEnd' }); },
+        asyncStart(ctx) { events.push({ event: 'asyncStart', result: ctx.result }); },
+        asyncEnd(ctx) { events.push({ event: 'asyncEnd', result: ctx.result }); },
         error(ctx) { events.push({ event: 'error', error: ctx.error }); }
       };
 
@@ -52,7 +52,10 @@ describe('TracingChannel', function() {
         assert.ok(start.database);
         assert.ok(start.serverAddress);
         assert.deepStrictEqual(start.args.filter, { name: 'test' });
-        assert.ok(events.some(e => e.event === 'asyncEnd'), 'asyncEnd should fire');
+
+        const asyncEnd = events.find(e => e.event === 'asyncEnd');
+        assert.ok(asyncEnd, 'asyncEnd should fire');
+        assert.ok(Array.isArray(asyncEnd.result), 'asyncEnd should include the result');
       } finally {
         channel.unsubscribe(handlers);
       }
@@ -211,7 +214,7 @@ describe('TracingChannel', function() {
         start(ctx) { events.push({ event: 'start', ...ctx }); },
         end() {},
         asyncStart() {},
-        asyncEnd() { events.push({ event: 'asyncEnd' }); },
+        asyncEnd(ctx) { events.push({ event: 'asyncEnd', result: ctx.result }); },
         error() {}
       };
 
@@ -225,7 +228,11 @@ describe('TracingChannel', function() {
         assert.strictEqual(start.operation, 'save');
         assert.strictEqual(start.collection, collectionName);
         assert.ok(start.database);
-        assert.ok(events.some(e => e.event === 'asyncEnd'));
+
+        const asyncEnd = events.find(e => e.event === 'asyncEnd');
+        assert.ok(asyncEnd, 'asyncEnd should fire');
+        assert.ok(asyncEnd.result, 'asyncEnd should include the result');
+        assert.strictEqual(asyncEnd.result.name, 'save-test');
       } finally {
         channel.unsubscribe(handlers);
       }

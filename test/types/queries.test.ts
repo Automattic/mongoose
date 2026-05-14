@@ -486,7 +486,6 @@ async function gh11602(): Promise<void> {
 
   ModelType.findOneAndUpdate({}, {}, { returnDocument: 'before' });
   ModelType.findOneAndUpdate({}, {}, { returnDocument: 'after' });
-  ModelType.findOneAndUpdate({}, {}, { returnDocument: undefined });
   ModelType.findOneAndUpdate({}, {}, {});
   expectError(ModelType.findOneAndUpdate({}, {}, {
     returnDocument: 'not-before-or-after'

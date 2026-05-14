@@ -2,6 +2,7 @@
   "compilerOptions": {
     "strict": true,
     "strictNullChecks": true,
+    "exactOptionalPropertyTypes": true,
     "paths": {
       "mongoose" : ["./types/index.d.ts"]
     }

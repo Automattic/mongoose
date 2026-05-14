@@ -36,7 +36,7 @@ function optionality() {
   };
 
   type UserType = InferRawDocType<typeof schemaDefinition>;
-  expectType<{ name: string; dateOfBirth?: number | null | undefined }>({} as UserType);
+  expectType<{ name: string; dateOfBirth?: number | null }>({} as UserType);
 }
 
 type SchemaOptionsWithTimestamps<t> = {
@@ -61,7 +61,7 @@ function Timestamps() {
   type UserType = InferRawDocType<typeof schemaDefinition, SchemaOptionsWithTimestamps<true>>;
   expectType<{
     name: string;
-    dateOfBirth?: number | null | undefined;
+    dateOfBirth?: number | null;
     createdAt: NativeDate;
     updatedAt: NativeDate;
   }>({} as UserType);
@@ -94,12 +94,12 @@ function DefinitionTypes() {
   }>;
 
   expectType<{
-    lowercaseString?: string | null | undefined;
-    uppercaseString?: string | null | undefined;
-    stringConstructor?: string | null | undefined;
-    schemaConstructor?: string | null | undefined;
-    stringInstance?: string | null | undefined;
-    schemaInstance?: string | null | undefined;
+    lowercaseString?: string | null;
+    uppercaseString?: string | null;
+    stringConstructor?: string | null;
+    schemaConstructor?: string | null;
+    stringInstance?: string | null;
+    schemaInstance?: string | null;
   }>({} as Actual);
 }
 
@@ -114,10 +114,10 @@ function MoreDefinitionTypes() {
   }>;
 
   expectType<{
-    numberString?: number | null | undefined;
+    numberString?: number | null;
     // these should not fallback to Boolean, which has no methods
-    objectIdConstructor?: Types.ObjectId | null | undefined;
-    objectIdInstance?: Types.ObjectId | null | undefined;
+    objectIdConstructor?: Types.ObjectId | null;
+    objectIdInstance?: Types.ObjectId | null;
   }>({} as Actual);
 }
 

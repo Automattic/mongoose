@@ -88,7 +88,7 @@ function encrypt() {
   // qe + valid queries
   new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, queries: 'equality' };
   new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, queries: 'range' };
-  new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, queries: undefined };
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid };
 
   // empty object
   expectError<SchemaTypeOptions<string>['encrypt']>({});

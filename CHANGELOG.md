@@ -1,3 +1,9 @@
+8.24.0 / 2026-05-14
+===================
+ * feat(aggregate): add pipelineForUnionWith() helper to allow reusing pipelines with $unionWith in TypeScript #16247 #16041 #16033
+ * fix(connection): handle calling watch() on disconnected connection #16246 #16034
+ * types: handle compiling with exactOptionalPropertyTypes #16286 #16273
+
 8.23.1 / 2026-04-23
 ===================
  * fix(model): support sort option in Model.bulkWrite() updateOne and replaceOne operations #16091 #16079

@@ -309,4 +309,80 @@ describe('clone', () => {
     const out = clone(o, { bson: true });
     assert.deepEqual(out, o);
   });
+
+  describe('__proto__ security', () => {
+    it('cloning an object with own __proto__ does not pollute Object.prototype', () => {
+      const malicious = JSON.parse('{"__proto__":{"polluted":"yes"}}');
+      clone(malicious);
+
+      assert.strictEqual(Object.prototype.polluted, undefined);
+      assert.strictEqual({}.polluted, undefined);
+
+      clone({ ['__proto__']: 'polluted' });
+      assert.strictEqual(Object.prototype.polluted, undefined);
+      assert.strictEqual({}.polluted, undefined);
+    });
+
+    it('cloning nested __proto__ does not pollute Object.prototype', () => {
+      const malicious = JSON.parse('{"nested":{"__proto__":{"polluted":"nested"}}}');
+      clone(malicious);
+
+      assert.strictEqual(Object.prototype.polluted, undefined);
+      assert.strictEqual({}.polluted, undefined);
+    });
+
+    it('__proto__ with constructor.prototype path does not pollute', () => {
+      const malicious = JSON.parse('{"__proto__":{"toString":"hacked"}}');
+      clone(malicious);
+
+      assert.strictEqual(typeof {}.toString, 'function');
+      assert.strictEqual(Object.prototype.toString.call({}), '[object Object]');
+    });
+
+    it('cloned __proto__ is an own property, not a prototype link', () => {
+      const obj = JSON.parse('{"__proto__":{"x":1},"a":2}');
+      const out = clone(obj);
+
+      assert.strictEqual(out.a, 2);
+      // __proto__ should exist as an own property on the cloned object
+      assert.ok(Object.prototype.hasOwnProperty.call(out, '__proto__'));
+      // x from __proto__ value must NOT leak as an inherited property
+      assert.strictEqual(out.x, undefined);
+      // Object.prototype must remain untouched
+      assert.strictEqual(Object.prototype.x, undefined);
+    });
+
+    it('deeply nested __proto__ does not pollute', () => {
+      const malicious = JSON.parse('{"a":{"b":{"__proto__":{"deep":"pollution"}}}}');
+      clone(malicious);
+
+      assert.strictEqual(Object.prototype.deep, undefined);
+      assert.strictEqual({}.deep, undefined);
+    });
+
+    it('__proto__ set to a primitive value does not break clone', () => {
+      const obj = JSON.parse('{"__proto__":"string_value","a":1}');
+      const out = clone(obj);
+
+      assert.strictEqual(out.a, 1);
+      assert.ok(Object.prototype.hasOwnProperty.call(out, '__proto__'));
+    });
+
+    it('__proto__ set to null does not break clone', () => {
+      const obj = JSON.parse('{"__proto__":null,"a":1}');
+      const out = clone(obj);
+
+      assert.strictEqual(out.a, 1);
+      assert.strictEqual(out.__proto__, null);
+    });
+
+    it('multiple __proto__ in array elements do not pollute', () => {
+      const arr = JSON.parse('[{"__proto__":{"arrPolluted":"yes"}},{"__proto__":{"arrPolluted2":"yes"}}]');
+      clone(arr);
+
+      assert.strictEqual(Object.prototype.arrPolluted, undefined);
+      assert.strictEqual(Object.prototype.arrPolluted2, undefined);
+      assert.strictEqual(arr[0].__proto__.arrPolluted, 'yes');
+    });
+  });
 });

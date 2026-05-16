@@ -3,7 +3,7 @@
 const assert = require('assert');
 const mongoose = require('../index');
 
-const { channel } = require('../lib/tracing');
+const { channel, cursorNextChannel } = require('../lib/tracing');
 
 describe('TracingChannel', function() {
   let conn;
@@ -383,6 +383,131 @@ describe('TracingChannel', function() {
     });
   });
 
+  describe('cursor:next operations', function() {
+    it('fires start and asyncEnd for query cursor next()', async function() {
+      await Test.create([
+        { name: 'cursor1', age: 10 },
+        { name: 'cursor2', age: 20 }
+      ]);
+
+      const events = [];
+      const handlers = {
+        start(ctx) { events.push({ event: 'start', ...ctx }); },
+        end() { events.push({ event: 'end' }); },
+        asyncStart(ctx) { events.push({ event: 'asyncStart', result: ctx.result }); },
+        asyncEnd(ctx) { events.push({ event: 'asyncEnd', result: ctx.result }); },
+        error(ctx) { events.push({ event: 'error', error: ctx.error }); }
+      };
+
+      cursorNextChannel.subscribe(handlers);
+      try {
+        const cursor = Test.find({ name: /^cursor/ }).sort({ name: 1 }).cursor();
+        const doc1 = await cursor.next();
+        const doc2 = await cursor.next();
+        const doc3 = await cursor.next();
+
+        assert.strictEqual(doc1.name, 'cursor1');
+        assert.strictEqual(doc2.name, 'cursor2');
+        assert.strictEqual(doc3, null);
+
+        const starts = events.filter(e => e.event === 'start');
+        assert.strictEqual(starts.length, 3, 'should fire start for each next() call');
+        assert.strictEqual(starts[0].operation, 'find');
+        assert.strictEqual(starts[0].collection, collectionName);
+        assert.ok(starts[0].database);
+
+        const asyncEnds = events.filter(e => e.event === 'asyncEnd');
+        assert.strictEqual(asyncEnds.length, 3, 'should fire asyncEnd for each next() call');
+      } finally {
+        cursorNextChannel.unsubscribe(handlers);
+      }
+    });
+
+    it('fires start and asyncEnd for aggregate cursor next()', async function() {
+      await Test.create([
+        { name: 'agg-cursor1', age: 10 },
+        { name: 'agg-cursor2', age: 20 }
+      ]);
+
+      const events = [];
+      const handlers = {
+        start(ctx) { events.push({ event: 'start', ...ctx }); },
+        end() { events.push({ event: 'end' }); },
+        asyncStart() {},
+        asyncEnd(ctx) { events.push({ event: 'asyncEnd', result: ctx.result }); },
+        error() {}
+      };
+
+      cursorNextChannel.subscribe(handlers);
+      try {
+        const cursor = Test.aggregate([
+          { $match: { name: /^agg-cursor/ } },
+          { $sort: { name: 1 } }
+        ]).cursor();
+
+        const doc1 = await cursor.next();
+        const doc2 = await cursor.next();
+        const doc3 = await cursor.next();
+
+        assert.strictEqual(doc1.name, 'agg-cursor1');
+        assert.strictEqual(doc2.name, 'agg-cursor2');
+        assert.strictEqual(doc3, null);
+
+        const starts = events.filter(e => e.event === 'start');
+        assert.strictEqual(starts.length, 3, 'should fire start for each next() call');
+        assert.strictEqual(starts[0].operation, 'aggregate');
+        assert.strictEqual(starts[0].collection, collectionName);
+        assert.ok(starts[0].database);
+        assert.ok(Array.isArray(starts[0].args.pipeline));
+      } finally {
+        cursorNextChannel.unsubscribe(handlers);
+      }
+    });
+
+    it('fires error event on cursor next() failure', async function() {
+      const events = [];
+      const handlers = {
+        start() { events.push({ event: 'start' }); },
+        end() {},
+        asyncStart() {},
+        asyncEnd() {},
+        error(ctx) { events.push({ event: 'error', error: ctx.error }); }
+      };
+
+      cursorNextChannel.subscribe(handlers);
+      try {
+        const cursor = Test.find({ $invalidOperator: true }).cursor();
+        await cursor.next().catch(() => {});
+
+        assert.ok(events.some(e => e.event === 'start'), 'start should fire');
+        assert.ok(events.some(e => e.event === 'error'), 'error should fire');
+      } finally {
+        cursorNextChannel.unsubscribe(handlers);
+      }
+    });
+
+    it('does not fire cursor:next events when using regular find()', async function() {
+      await Test.create({ name: 'no-cursor', age: 5 });
+
+      const events = [];
+      const handlers = {
+        start() { events.push({ event: 'start' }); },
+        end() {},
+        asyncStart() {},
+        asyncEnd() {},
+        error() {}
+      };
+
+      cursorNextChannel.subscribe(handlers);
+      try {
+        await Test.find({ name: 'no-cursor' });
+        assert.strictEqual(events.length, 0, 'cursor:next should not fire for regular find()');
+      } finally {
+        cursorNextChannel.unsubscribe(handlers);
+      }
+    });
+  });
+
   describe('zero-cost when no subscribers', function() {
     it('operations work without any subscribers', async function() {
       const doc = new Test({ name: 'no-sub', age: 5 });
@@ -400,6 +525,17 @@ describe('TracingChannel', function() {
       ]);
 
       await Test.deleteMany({ name: /^no-sub/ });
+    });
+
+    it('cursor next() works without any subscribers', async function() {
+      await Test.create({ name: 'no-sub-cursor', age: 5 });
+
+      const cursor = Test.find({ name: 'no-sub-cursor' }).cursor();
+      const doc = await cursor.next();
+      assert.strictEqual(doc.name, 'no-sub-cursor');
+
+      const done = await cursor.next();
+      assert.strictEqual(done, null);
     });
   });
 });

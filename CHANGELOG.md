@@ -1,3 +1,15 @@
+8.24.0 / 2026-05-14
+===================
+ * feat(aggregate): add pipelineForUnionWith() helper to allow reusing pipelines with $unionWith in TypeScript #16247 #16041 #16033
+ * fix(connection): handle calling watch() on disconnected connection #16246 #16034
+ * types: handle compiling with exactOptionalPropertyTypes #16286 #16273
+
+9.6.2 / 2026-05-08
+==================
+ * fix(document): correctly handle modified subpaths when parent path is unset after modifying #16271 #16252
+ * types: handle compiling with exactOptionalPropertyTypes #16277 #16273
+ * chore: align Node version docs and types #16270 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
 9.6.1 / 2026-04-29
 ==================
  * types(objectid): fix `_id` getter helper on ObjectId #16251 [noseworthy](https://github.com/noseworthy)
@@ -8,6 +20,12 @@
  * feat(schematype): support `allowNull` option to disallow null values even if not `required` #16237 #15905
  * types(query): make QueryFilter respect string unions and enums #16242 #16240
  * types: export Projector and ArrayProjectionOperators #16243 #16235
+
+8.23.1 / 2026-04-23
+===================
+ * fix(model): support sort option in Model.bulkWrite() updateOne and replaceOne operations #16091 #16079
+ * fix(setDefaultsOnInsert): check child filter paths before applying defaults (backport #16031 to 8.x) #16219 [marklai1998](https://github.com/marklai1998)
+ * fix(schema): always pass raw string value to error validators, only trim to 30 chars for maxlength validator #16238 #16236 #15550 #15571
 
 9.5.0 / 2026-04-20
 ==================

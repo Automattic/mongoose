@@ -144,7 +144,7 @@ declare module 'mongoose' {
            : // If the type key isn't callable, then this is an array of objects, in which case
              // we need to call InferRawDocType to correctly infer its type.
              Array<InferRawDocType<Item, DefaultSchemaOptions, TTransformOptions>>
-         : IsSchemaTypeFromBuiltinClass<Item> extends true ? ResolveRawPathType<Item, { enum: Options['enum'] }, TypeKey, TTransformOptions>[]
+         : IsSchemaTypeFromBuiltinClass<Item> extends true ? ResolveRawPathType<Item, { enum: Exclude<Options['enum'], undefined> }, TypeKey, TTransformOptions>[]
          : IsItRecordAndNotAny<Item> extends true ?
            Item extends Record<string, never> ?
              ObtainRawDocumentPathType<Item, TypeKey, TTransformOptions>[]

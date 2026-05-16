@@ -13034,6 +13034,193 @@ describe('document', function() {
     }
   });
 
+  describe('$clone() does not leak state to the original document', function() {
+    it('cloned document array $parent() returns the cloned root document', function() {
+      // Arrange
+      const { user } = createTestContext();
+
+      // Act
+      const clonedUser = user.$clone();
+
+      // Assert
+      assert.strictEqual(
+        clonedUser.addresses.$parent(),
+        clonedUser,
+        'cloned document array $parent() should return cloned document'
+      );
+      assert.strictEqual(
+        user.addresses.$parent(),
+        user,
+        'original document array $parent() should still return original document'
+      );
+    });
+
+    it('cloning a freshly-constructed document does not mutate the original document\'s modifiedPaths', function() {
+      // Arrange
+      const { user } = createTestContext();
+      const before = user.modifiedPaths().slice().sort();
+
+      // Act
+      user.$clone();
+
+      // Assert
+      const after = user.modifiedPaths().slice().sort();
+      assert.deepStrictEqual(
+        after,
+        before,
+        'cloning should not add paths to the original document\'s modifiedPaths'
+      );
+    });
+
+    it('modifying a subdoc field on the cloned document does not mark the original as modified', async function() {
+      // Arrange
+      const { User, user } = createTestContext();
+      await user.save();
+      const fetched = await User.findById(user._id);
+      assert.strictEqual(fetched.isModified(), false, 'sanity: fetched doc starts clean');
+
+      // Act
+      const clonedFetched = fetched.$clone();
+      clonedFetched.addresses[0].city = 'New York';
+
+      // Assert
+      assert.strictEqual(
+        fetched.isModified(),
+        false,
+        'original fetched document should remain clean after mutating clone'
+      );
+      assert.deepStrictEqual(
+        fetched.modifiedPaths(),
+        [],
+        'original fetched document modifiedPaths should remain empty'
+      );
+      assert.strictEqual(
+        clonedFetched.isModified('addresses.0.city'),
+        true,
+        'cloned document should track the mutation on its own subdoc'
+      );
+    });
+
+    it('refreshes cloned document array subdoc indexes after source array changes', async function() {
+      // Arrange
+      const { user } = createTestContext({
+        addresses: [
+          { street: '1 Main', city: 'Boston' },
+          { street: '2 Main', city: 'Chicago' },
+          { street: '3 Main', city: 'Denver' }
+        ]
+      });
+      await user.save();
+      user.addresses.pull(user.addresses[0]._id);
+      await user.save();
+      assert.strictEqual(user.isModified(), false, 'sanity: saved doc starts clean');
+
+      // Act
+      const clonedUser = user.$clone();
+      clonedUser.addresses[0].city = 'New York';
+
+      // Assert
+      assert.strictEqual(
+        clonedUser.addresses[0].$__fullPath('city'),
+        'addresses.0.city',
+        'cloned subdoc should use its cloned array index'
+      );
+      assert.strictEqual(
+        clonedUser.isModified('addresses.0.city'),
+        true,
+        'cloned document should track the first subdoc by its cloned index'
+      );
+      assert.strictEqual(
+        clonedUser.isModified('addresses.1.city'),
+        false,
+        'cloned document should not track the first subdoc by its stale source index'
+      );
+    });
+
+    it('clones document arrays with null entries', function() {
+      // Arrange
+      const { user } = createTestContext({
+        addresses: [
+          null,
+          { street: '1 Main', city: 'Boston' }
+        ]
+      });
+
+      // Act
+      const clonedUser = user.$clone();
+
+      // Assert
+      assert.strictEqual(clonedUser.addresses[0], null);
+      assert.strictEqual(
+        clonedUser.addresses[1].$__fullPath('city'),
+        'addresses.1.city',
+        'non-null cloned subdoc should keep the correct array index'
+      );
+    });
+
+    it('cloning a document with a primitive array does not mutate the original document\'s modifiedPaths', function() {
+      // Arrange
+      const { user } = createTestContext({ tags: ['admin'] });
+      const before = user.modifiedPaths().slice().sort();
+
+      // Act
+      user.$clone();
+
+      // Assert
+      const after = user.modifiedPaths().slice().sort();
+      assert.deepStrictEqual(
+        after,
+        before,
+        'cloning should not add primitive array paths to the original document\'s modifiedPaths'
+      );
+    });
+
+    it('modifying a primitive array on the cloned document does not mark the original as modified', async function() {
+      // Arrange
+      const { User, user } = createTestContext({ tags: ['admin'] });
+      await user.save();
+      const fetched = await User.findById(user._id);
+      assert.strictEqual(fetched.isModified(), false, 'sanity: fetched doc starts clean');
+
+      // Act
+      const clonedFetched = fetched.$clone();
+      clonedFetched.tags[0] = 'member';
+
+      // Assert
+      assert.strictEqual(
+        fetched.isModified(),
+        false,
+        'original fetched document should remain clean after mutating cloned primitive array'
+      );
+      assert.deepStrictEqual(
+        fetched.modifiedPaths(),
+        [],
+        'original fetched document modifiedPaths should remain empty'
+      );
+      assert.strictEqual(
+        clonedFetched.isModified('tags.0'),
+        true,
+        'cloned document should track the primitive array mutation'
+      );
+    });
+
+    function createTestContext({ addresses, tags } = {}) {
+      const addressSchema = new Schema({ street: String, city: String });
+      const userSchema = new Schema({
+        name: String,
+        addresses: [addressSchema],
+        tags: [String]
+      });
+      const User = db.model('UserCloneIsolation', userSchema);
+      const user = new User({
+        name: 'John',
+        addresses: addresses ?? [{ street: '1 Main', city: 'Boston' }],
+        tags: tags ?? []
+      });
+      return { User, user };
+    }
+  });
+
   it('can create document with document array and top-level key named `schema` (gh-12480)', async function() {
     const AuthorSchema = new Schema({
       fullName: { type: 'String', required: true }

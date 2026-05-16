@@ -9,6 +9,7 @@ import {
   IndexOptions,
   InferRawDocType,
   InferSchemaType,
+  FlattenMaps,
   InsertManyOptions,
   JSONSerialized,
   ObtainDocumentType,
@@ -1778,14 +1779,14 @@ async function gh14451() {
 
   type TestJSON = JSONSerialized<InferSchemaType<typeof exampleSchema>>;
   expectType<{
-    myId?: string | undefined | null,
+    myId?: string | null,
     myRequiredId: string,
     myBuf: { type: 'buffer', data: number[] },
     subdoc?: {
       subdocProp?: string | undefined | null
     } | null,
-    docArr: { nums: number[], times: string[] }[],
-    myMap?: Record<string, string> | null | undefined
+    docArr: FlattenMaps<{ nums: number[], times: string[] }>[],
+    myMap?: Record<string, string> | null
   }>({} as TestJSON);
 }
 

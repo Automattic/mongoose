@@ -2,7 +2,6 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "strict": true,
-    "allowSyntheticDefaultImports": true,
     "module": "commonjs",
     "target": "ES2022",
     "noEmit": true,

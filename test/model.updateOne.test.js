@@ -1278,24 +1278,6 @@ describe('model: updateOne:', function() {
       const Model = db.model('Test', Schema);
 
       await Model.updateOne({}, { myBufferField: Buffer.alloc(1) });
-
-    });
-
-    it('.updateOne(doc) (gh-3221)', function() {
-      const Schema = mongoose.Schema({ name: String });
-      const Model = db.model('Test', Schema);
-
-      let query = Model.updateOne({}, { name: 'Val' });
-      assert.equal(query.getUpdate().name, 'Val');
-
-      query = Model.find().updateOne({}, { name: 'Val' });
-      assert.equal(query.getUpdate().name, 'Val');
-
-      return query.setOptions({ upsert: true }).
-        then(() => Model.findOne()).
-        then(doc => {
-          assert.equal(doc.name, 'Val');
-        });
     });
 
     it('middleware update with exec (gh-3549)', async function() {

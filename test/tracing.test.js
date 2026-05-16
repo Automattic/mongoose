@@ -415,9 +415,38 @@ describe('TracingChannel', function() {
         assert.strictEqual(starts[0].operation, 'find');
         assert.strictEqual(starts[0].collection, collectionName);
         assert.ok(starts[0].database);
+        assert.strictEqual(starts[0].tailable, false);
 
         const asyncEnds = events.filter(e => e.event === 'asyncEnd');
         assert.strictEqual(asyncEnds.length, 3, 'should fire asyncEnd for each next() call');
+      } finally {
+        cursorNextChannel.channel.unsubscribe(handlers);
+      }
+    });
+
+    it('includes batchSize in query cursor context', async function() {
+      await Test.create([
+        { name: 'batch1', age: 10 },
+        { name: 'batch2', age: 20 }
+      ]);
+
+      const events = [];
+      const handlers = {
+        start(ctx) { events.push({ event: 'start', ...ctx }); },
+        end() {},
+        asyncStart() {},
+        asyncEnd() {},
+        error() {}
+      };
+
+      cursorNextChannel.channel.subscribe(handlers);
+      try {
+        const cursor = Test.find({ name: /^batch/ }).cursor({ batchSize: 10 });
+        await cursor.next();
+
+        const start = events.find(e => e.event === 'start');
+        assert.strictEqual(start.batchSize, 10);
+        assert.strictEqual(start.tailable, false);
       } finally {
         cursorNextChannel.channel.unsubscribe(handlers);
       }

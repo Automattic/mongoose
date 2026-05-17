@@ -73,6 +73,7 @@ declare module 'mongoose' {
   export function omitUndefined<T extends Record<string, any>>(val: T): T;
 
   export type HydratedDocFromModel<M extends Model<any>> = ReturnType<M['hydrate']>;
+  export type VirtualsForModel<ModelType extends Model<any, any, any, any>> = ModelType extends Model<any, any, any, infer TVirtuals> ? TVirtuals : never;
 
   /* ! ignore */
   export type CompileModelOptions = {
@@ -1156,6 +1157,8 @@ declare module 'mongoose' {
   export function skipMiddlewareFunction(val: any): Kareem.SkipWrappedFunction;
 
   export function overwriteMiddlewareArguments(val: any): Kareem.OverwriteArguments;
+
+  export function parent<ParentType = any>(value: any): ParentType | undefined;
 
   export default mongoose;
 }

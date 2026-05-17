@@ -5102,4 +5102,97 @@ describe('Query', function() {
       });
     });
   });
+
+  describe('lean virtuals', function() {
+    it('applies top-level virtuals before query transforms', async function() {
+      const schema = new Schema({ name: String });
+      schema.virtual('lower').get(function() {
+        return this.name.toLowerCase();
+      });
+      const Model = db.model('Test', schema);
+
+      await Model.create([
+        { name: 'JOHN' },
+        { name: 'JANE' }
+      ]);
+
+      const docs = await Model.find().sort({ name: 1 }).lean({ virtuals: true }).transform((docs) => {
+        return docs.reduce((map, doc) => {
+          map[doc.name] = doc.lower;
+          return map;
+        }, {});
+      });
+
+      assert.deepStrictEqual(docs, { JANE: 'jane', JOHN: 'john' });
+    });
+
+    it('supports lean subdocument virtuals accessing their parent', async function() {
+      const childSchema = new Schema({ firstName: String });
+      childSchema.virtual('fullName').get(function() {
+        const parent = this instanceof mongoose.Document ? this.parent() : mongoose.parent(this);
+        return `${this.firstName} ${parent.lastName}`;
+      });
+
+      const parentSchema = new Schema({
+        lastName: String,
+        child: childSchema,
+        children: [childSchema]
+      });
+      const Model = db.model('Test', parentSchema);
+
+      await Model.create({
+        lastName: 'Skywalker',
+        child: { firstName: 'Luke' },
+        children: [{ firstName: 'Leia' }, null]
+      });
+
+      const doc = await Model.findOne().lean({ virtuals: true });
+
+      assert.strictEqual(doc.child.fullName, 'Luke Skywalker');
+      assert.strictEqual(doc.children[0].fullName, 'Leia Skywalker');
+      assert.strictEqual(doc.children[1], null);
+    });
+
+    it('supports selecting a subset of lean virtuals', async function() {
+      const schema = new Schema({
+        nested: {
+          name: String
+        }
+      });
+      schema.virtual('topLevel').get(function() {
+        return this.nested.name.toUpperCase();
+      });
+      schema.virtual('nested.lower').get(function() {
+        return this.nested.name.toLowerCase();
+      });
+      const Model = db.model('Test', schema);
+
+      await Model.create({ nested: { name: 'Bill' } });
+
+      const doc = await Model.findOne().lean({ virtuals: ['nested.lower'] });
+
+      assert.strictEqual(doc.topLevel, undefined);
+      assert.strictEqual(doc.nested.lower, 'bill');
+    });
+
+    it('matches toObject() for unpopulated virtuals', async function() {
+      const schema = new Schema({
+        friendId: Schema.Types.ObjectId
+      });
+      schema.virtual('friend', {
+        ref: 'Test',
+        localField: 'friendId',
+        foreignField: '_id',
+        justOne: true
+      });
+      const Model = db.model('Test', schema);
+
+      const doc = await Model.create({});
+      const hydrated = await Model.findById(doc._id).orFail();
+      const lean = await Model.findById(doc._id).lean({ virtuals: true }).orFail();
+
+      assert.strictEqual(hydrated.toObject({ virtuals: true }).friend, undefined);
+      assert.strictEqual(lean.friend, undefined);
+    });
+  });
 });

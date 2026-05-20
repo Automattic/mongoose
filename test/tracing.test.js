@@ -2,8 +2,13 @@
 
 const assert = require('assert');
 const mongoose = require('../index');
+const dc = require('node:diagnostics_channel');
 
-const { queryChannel, aggregateChannel, cursorNextChannel } = require('../lib/tracing');
+function subscribe(channelName, handlers) {
+  const ch = dc.tracingChannel(channelName);
+  ch.subscribe(handlers);
+  return () => ch.unsubscribe(handlers);
+}
 
 describe('TracingChannel', function() {
   let conn;
@@ -41,7 +46,7 @@ describe('TracingChannel', function() {
         error(ctx) { events.push({ event: 'error', error: ctx.error }); }
       };
 
-      queryChannel.channel.subscribe(handlers);
+      const unsubscribe = subscribe('mongoose:query', handlers);
       try {
         await Test.find({ name: 'test' });
 
@@ -57,7 +62,7 @@ describe('TracingChannel', function() {
         assert.ok(asyncEnd, 'asyncEnd should fire');
         assert.ok(Array.isArray(asyncEnd.result), 'asyncEnd should include the result');
       } finally {
-        queryChannel.channel.unsubscribe(handlers);
+        unsubscribe();
       }
     });
 
@@ -71,7 +76,7 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      queryChannel.channel.subscribe(handlers);
+      const unsubscribe = subscribe('mongoose:query', handlers);
       try {
         await Test.findOne({ name: 'test' });
 
@@ -80,7 +85,7 @@ describe('TracingChannel', function() {
         assert.strictEqual(start.operation, 'findOne');
         assert.strictEqual(start.collection, collectionName);
       } finally {
-        queryChannel.channel.unsubscribe(handlers);
+        unsubscribe();
       }
     });
 
@@ -96,7 +101,7 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      queryChannel.channel.subscribe(handlers);
+      const unsubscribe = subscribe('mongoose:query', handlers);
       try {
         await Test.updateOne({ name: 'update-test' }, { age: 20 });
 
@@ -105,7 +110,7 @@ describe('TracingChannel', function() {
         assert.strictEqual(start.operation, 'updateOne');
         assert.strictEqual(start.collection, collectionName);
       } finally {
-        queryChannel.channel.unsubscribe(handlers);
+        unsubscribe();
       }
     });
 
@@ -121,7 +126,7 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      queryChannel.channel.subscribe(handlers);
+      const unsubscribe = subscribe('mongoose:query', handlers);
       try {
         await Test.deleteOne({ name: 'delete-test' });
 
@@ -129,7 +134,7 @@ describe('TracingChannel', function() {
         assert.ok(start);
         assert.strictEqual(start.operation, 'deleteOne');
       } finally {
-        queryChannel.channel.unsubscribe(handlers);
+        unsubscribe();
       }
     });
 
@@ -143,14 +148,14 @@ describe('TracingChannel', function() {
         error(ctx) { events.push({ event: 'error', error: ctx.error }); }
       };
 
-      queryChannel.channel.subscribe(handlers);
+      const unsubscribe = subscribe('mongoose:query', handlers);
       try {
         await Test.find({ $invalidOperator: true }).catch(() => {});
 
         assert.ok(events.some(e => e.event === 'start'), 'start should fire');
         assert.ok(events.some(e => e.event === 'error'), 'error should fire');
       } finally {
-        queryChannel.channel.unsubscribe(handlers);
+        unsubscribe();
       }
     });
 
@@ -164,14 +169,14 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      queryChannel.channel.subscribe(handlers);
+      const unsubscribe = subscribe('mongoose:query', handlers);
       try {
         await Test.find({});
         const ctx = events[0];
         assert.ok(ctx.database);
         assert.ok(ctx.serverAddress);
       } finally {
-        queryChannel.channel.unsubscribe(handlers);
+        unsubscribe();
       }
     });
   });
@@ -189,7 +194,7 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      aggregateChannel.channel.subscribe(handlers);
+      const unsubscribe = subscribe('mongoose:aggregate', handlers);
       try {
         await Test.aggregate([{ $match: { age: { $gte: 10 } } }]);
 
@@ -202,7 +207,7 @@ describe('TracingChannel', function() {
         assert.deepStrictEqual(start.args.pipeline[0], { $match: { age: { $gte: 10 } } });
         assert.ok(events.some(e => e.event === 'asyncEnd'));
       } finally {
-        aggregateChannel.channel.unsubscribe(handlers);
+        unsubscribe();
       }
     });
 
@@ -218,7 +223,7 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      aggregateChannel.channel.subscribe(handlers);
+      const unsubscribe = subscribe('mongoose:aggregate', handlers);
       try {
         await conn.aggregate([{ $documents: [{ x: 1 }] }]);
 
@@ -232,7 +237,7 @@ describe('TracingChannel', function() {
         assert.ok(asyncEnd, 'asyncEnd should fire');
         assert.ok(Array.isArray(asyncEnd.result));
       } finally {
-        aggregateChannel.channel.unsubscribe(handlers);
+        unsubscribe();
       }
     });
   });
@@ -248,7 +253,7 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      queryChannel.channel.subscribe(handlers);
+      const unsubscribe = subscribe('mongoose:model:save', handlers);
       try {
         const doc = new Test({ name: 'save-test', age: 25 });
         await doc.save();
@@ -264,7 +269,7 @@ describe('TracingChannel', function() {
         assert.ok(asyncEnd.result, 'asyncEnd should include the result');
         assert.strictEqual(asyncEnd.result.name, 'save-test');
       } finally {
-        queryChannel.channel.unsubscribe(handlers);
+        unsubscribe();
       }
     });
 
@@ -280,7 +285,7 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      queryChannel.channel.subscribe(handlers);
+      const unsubscribe = subscribe('mongoose:model:save', handlers);
       try {
         doc.age = 20;
         await doc.save();
@@ -291,7 +296,7 @@ describe('TracingChannel', function() {
         assert.strictEqual(start.collection, collectionName);
         assert.ok(events.some(e => e.event === 'asyncEnd'));
       } finally {
-        queryChannel.channel.unsubscribe(handlers);
+        unsubscribe();
       }
     });
 
@@ -310,7 +315,7 @@ describe('TracingChannel', function() {
         error(ctx) { events.push({ event: 'error', error: ctx.error }); }
       };
 
-      queryChannel.channel.subscribe(handlers);
+      const unsubscribe = subscribe('mongoose:model:save', handlers);
       try {
         const doc = new StrictModel({});
         await doc.save().catch(() => {});
@@ -318,7 +323,7 @@ describe('TracingChannel', function() {
         assert.ok(events.some(e => e.event === 'start'), 'start should fire');
         assert.ok(events.some(e => e.event === 'error'), 'error should fire');
       } finally {
-        queryChannel.channel.unsubscribe(handlers);
+        unsubscribe();
         await StrictModel.deleteMany({});
       }
     });
@@ -335,7 +340,7 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      queryChannel.channel.subscribe(handlers);
+      const unsubscribe = subscribe('mongoose:model:insertMany', handlers);
       try {
         await Test.insertMany([
           { name: 'insert1', age: 10 },
@@ -350,7 +355,7 @@ describe('TracingChannel', function() {
         assert.ok(Array.isArray(start.args.docs));
         assert.ok(events.some(e => e.event === 'asyncEnd'));
       } finally {
-        queryChannel.channel.unsubscribe(handlers);
+        unsubscribe();
       }
     });
 
@@ -364,7 +369,7 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      queryChannel.channel.subscribe(handlers);
+      const unsubscribe = subscribe('mongoose:model:bulkWrite', handlers);
       try {
         await Test.bulkWrite([
           { insertOne: { document: { name: 'bulk1', age: 30 } } }
@@ -378,7 +383,7 @@ describe('TracingChannel', function() {
         assert.ok(Array.isArray(start.args.ops));
         assert.ok(events.some(e => e.event === 'asyncEnd'));
       } finally {
-        queryChannel.channel.unsubscribe(handlers);
+        unsubscribe();
       }
     });
   });
@@ -399,7 +404,7 @@ describe('TracingChannel', function() {
         error(ctx) { events.push({ event: 'error', error: ctx.error }); }
       };
 
-      cursorNextChannel.channel.subscribe(handlers);
+      const unsubscribe = subscribe('mongoose:cursor:next', handlers);
       try {
         const cursor = Test.find({ name: /^cursor/ }).sort({ name: 1 }).cursor();
         const doc1 = await cursor.next();
@@ -420,7 +425,7 @@ describe('TracingChannel', function() {
         const asyncEnds = events.filter(e => e.event === 'asyncEnd');
         assert.strictEqual(asyncEnds.length, 3, 'should fire asyncEnd for each next() call');
       } finally {
-        cursorNextChannel.channel.unsubscribe(handlers);
+        unsubscribe();
       }
     });
 
@@ -439,7 +444,7 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      cursorNextChannel.channel.subscribe(handlers);
+      const unsubscribe = subscribe('mongoose:cursor:next', handlers);
       try {
         const cursor = Test.find({ name: /^batch/ }).cursor({ batchSize: 10 });
         await cursor.next();
@@ -448,7 +453,7 @@ describe('TracingChannel', function() {
         assert.strictEqual(start.batchSize, 10);
         assert.strictEqual(start.tailable, false);
       } finally {
-        cursorNextChannel.channel.unsubscribe(handlers);
+        unsubscribe();
       }
     });
 
@@ -467,7 +472,7 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      cursorNextChannel.channel.subscribe(handlers);
+      const unsubscribe = subscribe('mongoose:cursor:next', handlers);
       try {
         const cursor = Test.aggregate([
           { $match: { name: /^agg-cursor/ } },
@@ -489,7 +494,7 @@ describe('TracingChannel', function() {
         assert.ok(starts[0].database);
         assert.ok(Array.isArray(starts[0].args.pipeline));
       } finally {
-        cursorNextChannel.channel.unsubscribe(handlers);
+        unsubscribe();
       }
     });
 
@@ -503,7 +508,7 @@ describe('TracingChannel', function() {
         error(ctx) { events.push({ event: 'error', error: ctx.error }); }
       };
 
-      cursorNextChannel.channel.subscribe(handlers);
+      const unsubscribe = subscribe('mongoose:cursor:next', handlers);
       try {
         const cursor = Test.find({ $invalidOperator: true }).cursor();
         await cursor.next().catch(() => {});
@@ -511,7 +516,7 @@ describe('TracingChannel', function() {
         assert.ok(events.some(e => e.event === 'start'), 'start should fire');
         assert.ok(events.some(e => e.event === 'error'), 'error should fire');
       } finally {
-        cursorNextChannel.channel.unsubscribe(handlers);
+        unsubscribe();
       }
     });
 
@@ -527,12 +532,12 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      cursorNextChannel.channel.subscribe(handlers);
+      const unsubscribe = subscribe('mongoose:cursor:next', handlers);
       try {
         await Test.find({ name: 'no-cursor' });
         assert.strictEqual(events.length, 0, 'cursor:next should not fire for regular find()');
       } finally {
-        cursorNextChannel.channel.unsubscribe(handlers);
+        unsubscribe();
       }
     });
   });

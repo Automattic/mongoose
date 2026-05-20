@@ -3,7 +3,7 @@
 const assert = require('assert');
 const mongoose = require('../index');
 
-const { queryChannel, cursorNextChannel } = require('../lib/tracing');
+const { queryChannel, aggregateChannel, cursorNextChannel } = require('../lib/tracing');
 
 describe('TracingChannel', function() {
   let conn;
@@ -189,7 +189,7 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      queryChannel.channel.subscribe(handlers);
+      aggregateChannel.channel.subscribe(handlers);
       try {
         await Test.aggregate([{ $match: { age: { $gte: 10 } } }]);
 
@@ -202,7 +202,7 @@ describe('TracingChannel', function() {
         assert.deepStrictEqual(start.args.pipeline[0], { $match: { age: { $gte: 10 } } });
         assert.ok(events.some(e => e.event === 'asyncEnd'));
       } finally {
-        queryChannel.channel.unsubscribe(handlers);
+        aggregateChannel.channel.unsubscribe(handlers);
       }
     });
 
@@ -218,7 +218,7 @@ describe('TracingChannel', function() {
         error() {}
       };
 
-      queryChannel.channel.subscribe(handlers);
+      aggregateChannel.channel.subscribe(handlers);
       try {
         await conn.aggregate([{ $documents: [{ x: 1 }] }]);
 
@@ -232,7 +232,7 @@ describe('TracingChannel', function() {
         assert.ok(asyncEnd, 'asyncEnd should fire');
         assert.ok(Array.isArray(asyncEnd.result));
       } finally {
-        queryChannel.channel.unsubscribe(handlers);
+        aggregateChannel.channel.unsubscribe(handlers);
       }
     });
   });

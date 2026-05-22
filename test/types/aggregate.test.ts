@@ -181,3 +181,31 @@ function gh16033() {
       pipeline: basePipeline.pipeline()
     });
 }
+
+function gh16288() {
+  // `$percentile` should be a valid accumulator in `$group`, alongside the
+  // already-supported `$median`.
+  const pipeline: PipelineStage[] = [
+    {
+      $group: {
+        _id: null,
+        p95: {
+          $percentile: {
+            input: '$orderTotal',
+            p: [0.95],
+            method: 'approximate'
+          }
+        },
+        median: {
+          $median: {
+            input: '$orderTotal',
+            method: 'approximate'
+          }
+        }
+      }
+    }
+  ];
+
+  const Order = model('OrderGh16288', new Schema({ orderTotal: Number }));
+  Order.aggregate(pipeline);
+}

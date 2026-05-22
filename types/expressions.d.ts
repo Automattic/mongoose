@@ -2313,6 +2313,19 @@ declare module 'mongoose' {
       }
     }
 
+    export interface Percentile {
+      /**
+       * Returns an array of scalar values that correspond to specified percentile values.
+       *
+       * @see https://www.mongodb.com/docs/v7.0/reference/operator/aggregation/percentile/
+       */
+      $percentile: {
+        input: number | Expression,
+        p: Array<number | Expression>,
+        method: 'approximate'
+      }
+    }
+
     export interface StdDevPop {
       /**
        * Calculates the population standard deviation of the input values. Use if the values encompass the entire
@@ -2981,6 +2994,7 @@ declare module 'mongoose' {
     Expression.MergeObjects |
     Expression.Min |
     Expression.MinN |
+    Expression.Percentile |
     Expression.Push |
     Expression.StdDevPop |
     Expression.StdDevSamp |

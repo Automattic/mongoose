@@ -1111,6 +1111,30 @@ describe('aggregate: ', function() {
     assert.ok(cursor instanceof require('stream').Readable);
   });
 
+  it('cursor() buffers aggregate cursor creation until connection opens', async function() {
+    const collectionName = 'aggregate_cursor_buffering';
+    const schema = new Schema({ name: String });
+    const Seed = db.model('Seed', schema, collectionName);
+
+    await Seed.deleteMany({});
+    await Seed.create([{ name: 'Axl' }, { name: 'Slash' }]);
+
+    const conn = mongoose.createConnection();
+    try {
+      const Test = conn.model('Test', schema, collectionName);
+      const cursor = Test.aggregate([{ $sort: { name: 1 } }]).cursor();
+      const docPromise = cursor.next();
+
+      await conn.openUri(start.uri);
+      const doc = await docPromise;
+
+      assert.equal(doc.name, 'Axl');
+      assert.equal(typeof cursor.cursor.next, 'function');
+    } finally {
+      await conn.close();
+    }
+  });
+
   it('cursor() with useMongooseAggCursor (gh-5145)', function() {
     const MyModel = db.model('Test', { name: String });
 

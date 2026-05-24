@@ -25,7 +25,7 @@
 }
 
 /* Show button only when the code block is hovered */
-.code-block-wrapper:hover .copy-btn {
+.code-block-wrapper:hover .copy-btn, .code-block-wrapper:focus-within .copy-btn {
   opacity: 1;
   transform: translateY(0);
 }

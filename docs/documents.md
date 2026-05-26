@@ -315,7 +315,7 @@ const User = mongoose.model('User', userSchema);
 
 const user = new User({ name: '  JOHN SMITH  ' });
 await user.save();
-user.normalizedName; // 'John Smith'
+user.normalizedName; // 'john smith'
 ```
 
 Document middleware is a good fit for logic that is closely tied to the document itself, such as:

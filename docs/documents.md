@@ -1,7 +1,7 @@
 # Documents
 
 Mongoose documents are JavaScript objects backed by MongoDB data.
-They are instances of Mongoose's [Document](http://localhost:8089/docs/api/document.html) class with built-in support for change tracking, casting, validation, middleware, and persistence.
+They are instances of Mongoose's [Document](https://mongoosejs.com/docs/api/document.html) class with built-in support for change tracking, casting, validation, middleware, and persistence.
 
 <ul class="toc">
   <li><a href="#what-is-a-document">What is a Document</a></li>

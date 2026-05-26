@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.innerHTML = copyIcon; // initial icon state
 
     // Handle the copy-to-clipboard action
-    btn.onclick = async () => {
+    btn.onclick = async() => {
       if (btn.dataset.locked) return; // prevents multiple fast clicks
       btn.dataset.locked = '1';
 

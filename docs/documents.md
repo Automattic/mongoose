@@ -196,8 +196,8 @@ doc.isEnabled = 0;
 doc.age; // 42 as a number
 doc.isEnabled; // false
 
-doc.enabled = 1;
-doc.enabled; // true
+doc.isEnabled = 1;
+doc.isEnabled; // true
 ```
 
 If Mongoose cannot convert a value to the expected type, it creates a cast error and stores it on the document.

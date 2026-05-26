@@ -282,7 +282,7 @@ const doc = new User({ name: '' });
 await doc.validate();
 ```
 
-Note that empty arrays do **not* cause a `ValidationError` if the array is `required`.
+Note that empty arrays do **not** cause a `ValidationError` if the array is `required`.
 
 ## Middleware
 

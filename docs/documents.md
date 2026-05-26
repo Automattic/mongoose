@@ -191,10 +191,10 @@ const Person = mongoose.model('Person', schema);
 
 const doc = new Person();
 doc.age = '42';
-doc.enabled = 0;
+doc.isEnabled = 0;
 
 doc.age; // 42 as a number
-doc.enabled; // false
+doc.isEnabled; // false
 
 doc.enabled = 1;
 doc.enabled; // true

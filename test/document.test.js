@@ -15918,7 +15918,7 @@ describe('document', function() {
     assert.strictEqual(reloaded.mail[207], undefined);
   });
 
-  it('saving undefined with allowNull', async function () {
+  it('saving undefined with allowNull', async function() {
     const schema = new Schema({
       _id: String,
       name: { type: String, allowNull: false },

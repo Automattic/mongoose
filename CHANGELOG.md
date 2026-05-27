@@ -1,3 +1,19 @@
+9.6.3 / 2026-05-27
+==================
+ * fix(clone): isolate cloned arrays from source documents #16281 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(update): preserve user-provided `$setOnInsert.createdAt` with `overwriteImmutable: true` #16278 #15781 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(schema): always pass raw string value to error validators, only trim to 30 chars for maxlength validator #16238 #16236 #15550 #15571
+ * types: add `$percentile` to TypeScript aggregation expression types #16290 #16288
+ * docs: update default pool sizes on createConnection() #16295 [torbiak-samdesk](https://github.com/torbiak-samdesk)
+ * docs: improve code block copy button behavior and sidebar scrolling #16294 [DraXx-Van](https://github.com/DraXx-Van)
+ * docs: remove broken link to deleted schema example #16297 [kaseken](https://github.com/kaseken)
+
+8.24.0 / 2026-05-14
+===================
+ * feat(aggregate): add pipelineForUnionWith() helper to allow reusing pipelines with $unionWith in TypeScript #16247 #16041 #16033
+ * fix(connection): handle calling watch() on disconnected connection #16246 #16034
+ * types: handle compiling with exactOptionalPropertyTypes #16286 #16273
+
 9.6.2 / 2026-05-08
 ==================
  * fix(document): correctly handle modified subpaths when parent path is unset after modifying #16271 #16252
@@ -14,6 +30,12 @@
  * feat(schematype): support `allowNull` option to disallow null values even if not `required` #16237 #15905
  * types(query): make QueryFilter respect string unions and enums #16242 #16240
  * types: export Projector and ArrayProjectionOperators #16243 #16235
+
+8.23.1 / 2026-04-23
+===================
+ * fix(model): support sort option in Model.bulkWrite() updateOne and replaceOne operations #16091 #16079
+ * fix(setDefaultsOnInsert): check child filter paths before applying defaults (backport #16031 to 8.x) #16219 [marklai1998](https://github.com/marklai1998)
+ * fix(schema): always pass raw string value to error validators, only trim to 30 chars for maxlength validator #16238 #16236 #15550 #15571
 
 9.5.0 / 2026-04-20
 ==================

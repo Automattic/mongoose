@@ -96,6 +96,10 @@ You can then run the above script using the following.
 deno run --allow-net --allow-read --allow-sys --allow-env mongoose-test.js
 ```
 
+## Mongoose Studio
+
+[Mongoose Studio](https://mongoosestudio.app?utm_source=mongoose&utm_medium=referral&utm_campaign=readme) is a free, fully open-source, browser-based MongoDB GUI built by the Mongoose team for apps that already use Mongoose. Install `@mongoosejs/studio` from npm and run it alongside your app as Express middleware, or deploy it on Vercel or Netlify, to browse and edit documents, query with your existing models and schemas with autocomplete, build dashboards, visualize and edit GeoJSON, and use AI-assisted MongoDB workflows without moving data into a hosted third-party workspace or sharing raw MongoDB connection strings.
+
 ## Mongoose for Enterprise
 
 Available as part of the Tidelift Subscription
@@ -171,8 +175,6 @@ Comment.pre('save', function(next) {
   next();
 });
 ```
-
-Take a look at the example in [`examples/schema/schema.js`](https://github.com/Automattic/mongoose/blob/master/examples/schema/schema.js) for an end-to-end example of a typical setup.
 
 ### Accessing a Model
 

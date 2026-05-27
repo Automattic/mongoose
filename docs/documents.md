@@ -15,7 +15,7 @@ They are instances of Mongoose's [Document](https://mongoosejs.com/docs/api/docu
 
 ## What is a Document?
 
-A Mongoose [document](api/document.html#Document) is an instance of a [Model](api/model.html#Model).
+A Mongoose [document](https://mongoosejs.com/docs/api/document.html#Document) is an instance of a [Model](https://mongoosejs.com/docs/api/model.html#Model).
 When you instantiate a model, you create a new document.
 
 ```javascript

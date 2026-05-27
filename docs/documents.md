@@ -15,7 +15,7 @@ They are instances of Mongoose's [Document](https://mongoosejs.com/docs/api/docu
 
 ## What is a Document?
 
-A Mongoose [document](api/document.html#Document) is an instance of a [Model](api/model.html#Model).
+A Mongoose [document](https://mongoosejs.com/docs/api/document.html#Document) is an instance of a [Model](https://mongoosejs.com/docs/api/model.html#Model).
 When you instantiate a model, you create a new document.
 
 ```javascript
@@ -191,13 +191,13 @@ const Person = mongoose.model('Person', schema);
 
 const doc = new Person();
 doc.age = '42';
-doc.enabled = 0;
+doc.isEnabled = 0;
 
 doc.age; // 42 as a number
-doc.enabled; // false
+doc.isEnabled; // false
 
-doc.enabled = 1;
-doc.enabled; // true
+doc.isEnabled = 1;
+doc.isEnabled; // true
 ```
 
 If Mongoose cannot convert a value to the expected type, it creates a cast error and stores it on the document.
@@ -282,7 +282,7 @@ const doc = new User({ name: '' });
 await doc.validate();
 ```
 
-Note that empty arrays do **not* cause a `ValidationError` if the array is `required`.
+Note that empty arrays do **not** cause a `ValidationError` if the array is `required`.
 
 ## Middleware
 
@@ -315,7 +315,7 @@ const User = mongoose.model('User', userSchema);
 
 const user = new User({ name: '  JOHN SMITH  ' });
 await user.save();
-user.normalizedName; // 'John Smith'
+user.normalizedName; // 'john smith'
 ```
 
 Document middleware is a good fit for logic that is closely tied to the document itself, such as:

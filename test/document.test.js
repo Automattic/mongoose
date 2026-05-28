@@ -15993,6 +15993,25 @@ describe('document', function() {
     const reloaded = await Test.findById(created._id).orFail();
     assert.strictEqual(reloaded.mail[207], undefined);
   });
+
+  it('saving undefined with allowNull', async function() {
+    const schema = new Schema({
+      _id: String,
+      name: { type: String, allowNull: false },
+      subdoc: new Schema({
+        subname: { type: String, allowNull: false }
+      }, { _id: false })
+    }, { versionKey: false });
+    const Test = db.model('Test', schema);
+    const doc = new Test({ _id: 'test1', name: undefined, subdoc: { subname: undefined } });
+    await doc.save();
+    let rawDoc = await Test.collection.findOne({ _id: doc._id });
+    assert.deepStrictEqual(Object.keys(rawDoc), ['_id']);
+
+    await Test.collection.insertOne({ _id: 'test2', name: undefined });
+    rawDoc = await Test.collection.findOne({ _id: 'test2' });
+    assert.deepStrictEqual(rawDoc, { _id: 'test2', name: null });
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

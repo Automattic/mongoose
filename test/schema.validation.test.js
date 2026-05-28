@@ -814,6 +814,7 @@ describe('schema', function() {
       });
       const Test = mongoose.model('allowNullFalse' + random(), schema);
 
+      await new Test({}).validate();
       await new Test({ name: undefined }).validate();
 
       const err = await new Test({ name: null }).validate().then(() => null, err => err);

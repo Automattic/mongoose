@@ -39,5 +39,8 @@ exports.stopRemainingOps = function stopRemainingOps(db) {
   for (const name of Object.keys(db.models)) {
     const model = db.models[name];
     model.collection.buffer = true;
+    if (db.collections[model.collection.name] === model.collection) {
+      delete db.collections[model.collection.name];
+    }
   }
 };

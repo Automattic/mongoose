@@ -11269,25 +11269,21 @@ describe('document', function() {
 
     it('emits a deprecation warning', () => {
       // Arrange
-      sinon.stub(utils, 'warn');
-      const User = db.model('UserWarning', Schema({ name: String }));
+      const { User, getWarningCalls } = createTestContext();
       const user = new User({ name: 'Sam' });
 
       // Act
       user.validateSync();
 
       // Assert
-      const calls = utils.warn.getCalls();
+      const calls = getWarningCalls();
       assert.strictEqual(calls.length, 1);
       assert.ok(calls[0].args[0].includes('`Document.prototype.validateSync()` is deprecated'));
     });
 
     it('does not emit a deprecation warning for internal bulkSave() validation', async() => {
       // Arrange
-      sinon.stub(utils, 'warn');
-      const User = db.model('BulkSaveWarning', Schema({
-        name: { type: String, required: true }
-      }));
+      const { User, getWarningCalls } = createTestContext();
       const user = new User();
 
       // Act
@@ -11296,24 +11292,18 @@ describe('document', function() {
       // Assert
       assert.ok(err);
       assert.strictEqual(err.name, 'ValidationError');
-      assert.strictEqual(utils.warn.getCalls().length, 0);
+      assert.strictEqual(getWarningCalls().length, 0);
     });
 
     it('emits one deprecation warning when validating subdocuments and unions', () => {
       // Arrange
-      sinon.stub(utils, 'warn');
-      const addressSchema = Schema({ city: { type: String, required: true } });
-      const officeSchema = Schema({ city: { type: String, required: true } });
-      const preferenceSchema = Schema({ score: { type: Number, required: true } });
-      const User = db.model('SubdocWarning', Schema({
-        address: addressSchema,
-        offices: [officeSchema],
-        preference: {
-          type: 'Union',
-          of: [preferenceSchema, Number]
-        }
-      }));
-      const user = new User({ address: {}, offices: [{}, {}], preference: {} });
+      const { User, getWarningCalls } = createTestContext();
+      const user = new User({
+        name: 'Sam',
+        address: {},
+        offices: [{}, {}],
+        preference: {}
+      });
 
       // Act
       const err = user.validateSync();
@@ -11324,8 +11314,29 @@ describe('document', function() {
       assert.ok(err.errors['offices.0.city']);
       assert.ok(err.errors['offices.1.city']);
       assert.ok(err.errors['preference.score']);
-      assert.strictEqual(utils.warn.getCalls().length, 1);
+      assert.strictEqual(getWarningCalls().length, 1);
     });
+
+    function createTestContext() {
+      sinon.stub(utils, 'warn');
+      const addressSchema = Schema({ city: { type: String, required: true } });
+      const officeSchema = Schema({ city: { type: String, required: true } });
+      const preferenceSchema = Schema({ score: { type: Number, required: true } });
+      const User = db.model('ValidateSyncWarning', Schema({
+        name: { type: String, required: true },
+        address: addressSchema,
+        offices: [officeSchema],
+        preference: {
+          type: 'Union',
+          of: [preferenceSchema, Number]
+        }
+      }));
+
+      return {
+        User,
+        getWarningCalls: () => utils.warn.getCalls()
+      };
+    }
   });
 
   it('skips recursive merging (gh-9121)', function() {

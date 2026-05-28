@@ -49,6 +49,36 @@ function rawDocSyntax(): void {
   doc.save();
 }
 
+async function standardSchemaModelValidate(): Promise<void> {
+  interface IUser {
+    name: string;
+    age: number;
+  }
+
+  const User = connection.model<IUser>('StandardSchemaUser', new Schema<IUser>({
+    name: { type: String, required: true },
+    age: Number
+  }));
+
+  expect(User['~standard'].version).type.toBe<1>();
+  expect(User['~standard'].vendor).type.toBe<'mongoose'>();
+  expect(User['~standard']).type.toBe<mongoose.StandardSchemaV1.Props<IUser>>();
+
+  const result = await User['~standard'].validate({ name: 'Val', age: '42' });
+  if (!result.issues) {
+    expect(result.value).type.toBe<IUser>();
+    expect(result.value.name).type.toBe<string>();
+    expect(result.value.age).type.toBe<number>();
+  } else {
+    expect(result.issues[0].message).type.toBe<string>();
+    expect(result.issues[0].path).type.toBe<ReadonlyArray<PropertyKey | mongoose.StandardSchemaV1.PathSegment> | undefined>();
+  }
+
+  await User['~standard'].validate({ name: 'Val' }, {
+    libraryOptions: { pathsToSkip: ['age'] }
+  });
+}
+
 function tAndDocSyntax(): void {
   interface ITest {
     id: number;

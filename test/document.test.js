@@ -11261,6 +11261,71 @@ describe('document', function() {
       const User = db.model('User', userSchema);
       return User;
     }
+
+  });
+
+  describe('validateSync()', () => {
+    afterEach(() => sinon.restore());
+
+    it('emits a deprecation warning', () => {
+      // Arrange
+      sinon.stub(utils, 'warn');
+      const User = db.model('UserWarning', Schema({ name: String }));
+      const user = new User({ name: 'Sam' });
+
+      // Act
+      user.validateSync();
+
+      // Assert
+      const calls = utils.warn.getCalls();
+      assert.strictEqual(calls.length, 1);
+      assert.ok(calls[0].args[0].includes('`Document.prototype.validateSync()` is deprecated'));
+    });
+
+    it('does not emit a deprecation warning for internal bulkSave() validation', async() => {
+      // Arrange
+      sinon.stub(utils, 'warn');
+      const User = db.model('BulkSaveWarning', Schema({
+        name: { type: String, required: true }
+      }));
+      const user = new User();
+
+      // Act
+      const err = await User.bulkSave([user]).then(() => null, err => err);
+
+      // Assert
+      assert.ok(err);
+      assert.strictEqual(err.name, 'ValidationError');
+      assert.strictEqual(utils.warn.getCalls().length, 0);
+    });
+
+    it('emits one deprecation warning when validating subdocuments and unions', () => {
+      // Arrange
+      sinon.stub(utils, 'warn');
+      const addressSchema = Schema({ city: { type: String, required: true } });
+      const officeSchema = Schema({ city: { type: String, required: true } });
+      const preferenceSchema = Schema({ score: { type: Number, required: true } });
+      const User = db.model('SubdocWarning', Schema({
+        address: addressSchema,
+        offices: [officeSchema],
+        preference: {
+          type: 'Union',
+          of: [preferenceSchema, Number]
+        }
+      }));
+      const user = new User({ address: {}, offices: [{}, {}], preference: {} });
+
+      // Act
+      const err = user.validateSync();
+
+      // Assert
+      assert.ok(err);
+      assert.ok(err.errors['address.city']);
+      assert.ok(err.errors['offices.0.city']);
+      assert.ok(err.errors['offices.1.city']);
+      assert.ok(err.errors['preference.score']);
+      assert.strictEqual(utils.warn.getCalls().length, 1);
+    });
   });
 
   it('skips recursive merging (gh-9121)', function() {

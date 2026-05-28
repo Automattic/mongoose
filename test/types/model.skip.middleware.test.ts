@@ -101,11 +101,13 @@ async function gh8768() {
   await user.validate({ middleware: { pre: false } });
   await user.validate({ middleware: { post: false } });
 
-  // ValidateOptions - doc.validateSync()
-  user.validateSync({ middleware: false });
-  user.validateSync({ middleware: { pre: false } });
-  user.validateSync({ middleware: { post: false } });
-  user.validateSync({ middleware: false, pathsToSkip: ['name'] });
+  user.validateSync({ pathsToSkip: ['name'] });
+
+  // validateSync() does not run middleware, so it does not support middleware options
+  expect(user.validateSync).type.not.toBeCallableWith({ middleware: false });
+  expect(user.validateSync).type.not.toBeCallableWith({ middleware: { pre: false } });
+  expect(user.validateSync).type.not.toBeCallableWith({ middleware: { post: false } });
+  expect(user.validateSync).type.not.toBeCallableWith({ middleware: false, pathsToSkip: ['name'] });
 
   // MongooseBulkSaveOptions
   await User.bulkSave([user], { middleware: false });

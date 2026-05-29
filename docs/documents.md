@@ -309,7 +309,8 @@ The most common document middleware hooks are for `validate()` and `save()`.
 
 At a high level, saving a document looks like this:
 
-<img src="https://res.cloudinary.com/drfhhq8wu/image/upload/c_fill,w_768/v1779897307/8abd708d-38bc-44a4-a95c-fd71a6947dd0_xeev6g.png" alt="save document lifecycle diagram">
+<img class="theme-aware-image-light" src="/docs/images/save-lifecycle.svg" alt="save document lifecycle diagram">
+<img class="theme-aware-image-dark" src="/docs/images/save-lifecycle-dark.svg" alt="save document lifecycle diagram">
 
 For example, the following shows using a `pre('validate')` hook to set a `normalizedName` property.
 

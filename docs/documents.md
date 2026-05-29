@@ -265,8 +265,8 @@ const Person = mongoose.model('Person', schema);
 
 const doc = new Person({ age: -1 });
 
+// Throws an error "Path `age` (-1) is less than minimum allowed value (0)"
 await doc.validate();
-// Path `age` (-1) is less than minimum allowed value (0)
 ```
 
 ## Required Properties

@@ -39,8 +39,9 @@ For example, documents created from the `User` model in the above example are st
 You can create a new document using `new User()` or `await User.create()`; or load an existing document from MongoDB using queries like `findOne()`.
 
 ```javascript
+// Create a new document in memory
 const doc = new User({ name: 'John Smith' });
-// Persist the document to MongoDB. Calling `new User()` creates a new document in memory:
+// Persist the document to MongoDB:
 // the document is not persisted to MongoDB until you call `save()`.
 await doc.save();
 

@@ -226,7 +226,7 @@ Instead, Mongoose will report an error when you [`validate()`](https://mongoosej
 // Does **not** throw
 doc.age = 'not a number';
 
-// Throws a CastError 'Cast to Number failed for value "not a number"'
+// Throws a ValidationError with a CastError for path `age`
 await doc.validate();
 ```
 

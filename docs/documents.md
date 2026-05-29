@@ -1,7 +1,7 @@
 # Documents
 
-Mongoose documents are JavaScript objects backed by MongoDB data.
-They are instances of Mongoose's [Document](https://mongoosejs.com/docs/api/document.html) class with built-in support for change tracking, casting, validation, middleware, and persistence.
+Mongoose documents are Mongoose Document class instances backed by MongoDB data.
+Mongoose's [Document class](https://mongoosejs.com/docs/api/document.html) has built-in support for change tracking, casting, validation, middleware, and persistence.
 
 <ul class="toc">
   <li><a href="#what-is-a-document">What is a Document</a></li>
@@ -15,16 +15,19 @@ They are instances of Mongoose's [Document](https://mongoosejs.com/docs/api/docu
 
 ## What is a Document?
 
-A Mongoose [document](https://mongoosejs.com/docs/api/document.html#Document) is an instance of a [Model](https://mongoosejs.com/docs/api/model.html#Model).
-When you instantiate a model, you create a new document.
+A Mongoose [document](https://mongoosejs.com/docs/api/document.html#Document) is an instance of a [Model class](https://mongoosejs.com/docs/api/model.html#Model).
+`Model` and `Document` are separate classes in Mongoose: `Model` extends from `Document`.
 
 ```javascript
+// `User` is a Model class
 const User = mongoose.model('User', new Schema({
   name: String
 }));
 
+// `doc` is a document
 const doc = new User({ name: 'John Smith' });
 
+// The class hierarchy is User extends from Model extends from Document
 doc instanceof User; // true
 doc instanceof mongoose.Model; // true
 doc instanceof mongoose.Document; // true
@@ -80,6 +83,7 @@ obj.name; // 'John Smith'
 ```
 
 You can use the [`lean()` method](https://mongoosejs.com/docs/api/query.html#Query.prototype.lean()) to make Mongoose queries return POJOs instead of hydrated documents.
+Lean queries are often faster and use less memory, making them a good choice for read-only operations where you don't need document functionality.
 
 ```javascript
 const doc = await User.findOne().lean();
@@ -87,6 +91,18 @@ const doc = await User.findOne().lean();
 doc instanceof User; // false
 doc.name; // 'John Smith'
 ```
+
+However, keep in mind that `lean()` bypasses many Mongoose document features, including:
+
+* change tracking
+* validation
+* `save()`
+* getters
+* defaults
+* virtuals (including populated virtuals)
+
+If you need some of these features on lean results, Mongoose provides helpers like [`Model.applyDefaults()`](https://mongoosejs.com/docs/api/model.html#Model.applyDefaults()) and [`Model.applyVirtuals()`](https://mongoosejs.com/docs/api/model.html#Model.applyVirtuals()), and there are plugins that can apply [getters](https://www.npmjs.com/package/mongoose-lean-getters), [virtuals](https://www.npmjs.com/package/mongoose-lean-virtuals), and [defaults](https://www.npmjs.com/package/mongoose-lean-defaults) to lean query results.
+When using `lean()`, you are responsible for explicitly enabling any document features that your app needs.
 
 ## Updating Using `save()` {#updating-using-save}
 
@@ -128,17 +144,17 @@ Mongoose documents have a `set()` function that you can use to safely set deeply
 
 ```javascript
 const schema = new Schema({
-  nested: {
-    subdoc: new Schema({
+  subdoc: new Schema({
+    subdocLevel2: new Schema({
       name: String
     })
-  }
+  })
 });
 const TestModel = mongoose.model('Test', schema);
 
 const doc = new TestModel();
-doc.set('nested.subdoc.name', 'John Smith');
-doc.nested.subdoc.name; // 'John Smith'
+doc.set('subdoc.subdocLevel2.name', 'John Smith');
+doc.subdoc.subdocLevel2.name; // 'John Smith'
 ```
 
 Mongoose documents also have a `get()` function that lets you safely read deeply nested properties. `get()` lets you avoid having to explicitly check for nullish values, similar to JavaScript's [optional chaining operator `?.`](https://masteringjs.io/tutorials/fundamentals/optional-chaining-array).
@@ -146,11 +162,11 @@ Mongoose documents also have a `get()` function that lets you safely read deeply
 ```javascript
 const doc2 = new TestModel();
 
-doc2.get('nested.subdoc.name'); // undefined
-doc2.nested?.subdoc?.name; // undefined
+doc2.get('subdoc.subdocLevel2.name'); // undefined
+doc2.subdoc?.subdocLevel2?.name; // undefined
 
-doc2.set('nested.subdoc.name', 'Will Smith');
-doc2.get('nested.subdoc.name'); // 'Will Smith'
+doc2.set('subdoc.subdocLevel2.name', 'Will Smith');
+doc2.get('subdoc.subdocLevel2.name'); // 'Will Smith'
 ```
 
 You can use optional chaining `?.` and nullish coalescing `??` with Mongoose documents.
@@ -159,15 +175,16 @@ However, be careful when using [nullish coalescing assignments `??=`](https://de
 ```javascript
 // The following works fine
 const doc3 = new TestModel();
-doc3.nested.subdoc ??= {};
-doc3.nested.subdoc.name = 'John Smythe';
+doc3.subdoc.subdocLevel2 ??= {};
+doc3.subdoc.subdocLevel2.name = 'John Smythe';
 
-// The following does **NOT** work.
+// The following does **NOT** work because `doc4.subdoc.subdocLevel2 ??= {}`
+// evaluates to a POJO `{}`, **NOT** the Mongoose value `doc4.subdoc.subdocLevel2`.
 // Do not use the following pattern with Mongoose documents.
 const doc4 = new TestModel();
-(doc4.nested.subdoc ??= {}).name = 'Charlie Smith';
-doc4.nested.subdoc; // Empty object
-doc4.nested.subdoc.name; // undefined.
+(doc4.subdoc.subdocLevel2 ??= {}).name = 'Charlie Smith';
+doc4.subdoc.subdocLevel2; // Empty object
+doc4.subdoc.subdocLevel2.name; // undefined.
 ```
 
 ## Casting and Validation

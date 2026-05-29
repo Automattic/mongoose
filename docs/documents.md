@@ -148,8 +148,8 @@ const schema = new Schema({
   subdoc: new Schema({
     subdocLevel2: new Schema({
       name: String
-    })
-  })
+    }, { _id: false })
+  }, { _id: false })
 });
 const TestModel = mongoose.model('Test', schema);
 
@@ -174,18 +174,19 @@ You can use optional chaining `?.` and nullish coalescing `??` with Mongoose doc
 However, be careful when using [nullish coalescing assignments `??=`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_assignment) to create nested paths with Mongoose documents.
 
 ```javascript
-// The following works fine
-const doc3 = new TestModel();
+const doc3 = new TestModel({ subdoc: {} });
 doc3.subdoc.subdocLevel2 ??= {};
 doc3.subdoc.subdocLevel2.name = 'John Smythe';
+console.log(doc3.subdoc);
 
 // The following does **NOT** work because `doc4.subdoc.subdocLevel2 ??= {}`
 // evaluates to a POJO `{}`, **NOT** the Mongoose value `doc4.subdoc.subdocLevel2`.
 // Do not use the following pattern with Mongoose documents.
-const doc4 = new TestModel();
+const doc4 = new TestModel({ subdoc: {} });
 (doc4.subdoc.subdocLevel2 ??= {}).name = 'Charlie Smith';
 doc4.subdoc.subdocLevel2; // Empty object
 doc4.subdoc.subdocLevel2.name; // undefined.
+console.log(doc4.subdoc);
 ```
 
 ## Casting and Validation

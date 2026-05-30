@@ -212,6 +212,26 @@ html(lang='en')
                 .jobs-view-more
                   a(href=`${versions.versionedPath}/docs/jobs.html`) View more jobs
 
+      .assistant-panel#assistant-panel(aria-label="Mongoose docs assistant" aria-hidden="true")
+        .assistant-panel-resize#assistant-panel-resize(role="separator", aria-orientation="vertical", aria-label="Resize assistant")
+        .assistant-panel-header
+          .assistant-panel-title
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l1.7 5.1L19 10l-5.3 1.9L12 17l-1.7-5.1L5 10l5.3-1.9L12 3z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z"/></svg>
+            span Assistant
+          button.assistant-panel-close#assistant-panel-close(type="button", aria-label="Close assistant")
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        .assistant-thread#assistant-thread(aria-live="polite")
+        form.assistant-panel-form#assistant-panel-form
+          textarea.assistant-panel-input#assistant-panel-input(rows="3", placeholder="Ask a question...", aria-label="Ask the assistant")
+          button.assistant-panel-submit#assistant-panel-submit(type="submit", aria-label="Send question")
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+
+      form.assistant-floating-form#assistant-floating-form
+        input.assistant-floating-input#assistant-floating-input(type="text", placeholder="Ask a question...", aria-label="Ask a question about Mongoose")
+        span.assistant-floating-shortcut Ctrl+I
+        button.assistant-floating-submit#assistant-floating-submit(type="submit", aria-label="Ask")
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+
       script(type="text/javascript" src=`${versions.versionedPath}/docs/js/navbar-search.js`)
       script(type="text/javascript" src=`${versions.versionedPath}/docs/js/mobile-navbar-toggle.js`)
       script(type="text/javascript" src=`${versions.versionedPath}/docs/js/theme-toggle.js`)
@@ -219,3 +239,5 @@ html(lang='en')
       script(type="text/javascript" src=`${versions.versionedPath}/docs/js/version-picker.js`)
       script(type="text/javascript" src=`${versions.versionedPath}/docs/js/sidebar-collapse.js`)
       script(type="text/javascript" src=`${versions.versionedPath}/docs/js/toc.js`)
+      script(type="text/javascript" src="https://cdn.jsdelivr.net/npm/marked/marked.min.js")
+      script(type="text/javascript" src=`${versions.versionedPath}/docs/js/ask-ai.js`)

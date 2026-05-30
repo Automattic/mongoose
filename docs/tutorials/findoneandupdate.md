@@ -74,8 +74,6 @@ Use `$unset` if you want to remove a property from the document.
 
 ```javascript acquit:Tutorial.*findOneAndUpdate.*strips undefined from updates
 const filter = { name: 'Jean-Luc Picard' };
-// Equivalent to `{ $set: { age: 59 } }`
-// `name: undefined` is ignored.
 const update = {
   $set: {
     name: undefined,
@@ -86,9 +84,7 @@ const update = {
 const doc = await Character.findOneAndUpdate(filter, update, {
   returnDocument: 'after'
 });
-// Name is **not** updated
 doc.name; // 'Jean-Luc Picard'
-// Age is updated
 doc.age; // 59
 ```
 

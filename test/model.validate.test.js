@@ -109,7 +109,7 @@ describe('model: validate: ', function() {
 
     const skippedResult = await User['~standard'].validate({
       name: 'Val',
-      age: 16
+      age: '16'
     }, {
       libraryOptions: { pathsToSkip: ['age'] }
     });

@@ -66,8 +66,14 @@ In particular, Mongoose documents store internal state for:
 * `save()`
 * getters, setters, and virtuals
 
-That means some JavaScript object operations behave differently with documents.
-For example, using the [spread operator](https://masteringjs.io/tutorials/fundamentals/spread) on a Mongoose document does not create a shallow clone of the underlying object, you'll get an object with an `_doc` property instead.
+That means some JavaScript object operations behave differently with documents, most notably operations that depend on own enumerable properties or assignment semantics.
+
+* Using the `delete` operator will not unset the document property. For example, `delete doc.name` has no effect on the MongoDB document. To remove a property, use `doc.name = undefined` and then `save()` the document.
+* Using the [spread operator](https://masteringjs.io/tutorials/fundamentals/spread) on a Mongoose document does not create a shallow clone of the underlying object, you'll get an object with an `_doc` property instead.
+* Functions like `Object.keys()`, `Object.values()`, and `Object.entries()` inspect the document instance itself rather than the underlying document data. Use `doc.toObject()` first if you want to enumerate document properties. For example, `Object.keys(doc.toObject())`.
+* Using `in` on a document will always return `true` for properties that are in the Mongoose schema. For example, if `userDoc` is an instance of a User model with a `name` property, `'name' in userDoc` will always evaluate to `true`. Use `userDoc.name !== undefined` to check for existence instead. Mongoose does not store properties in MongoDB that are `=== undefined`.
+* Using [nullish coalescing assignments `??=`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_assignment) can be surprising if you are using them to set nested paths. For example, `(doc.nested ??= {}).name = 'John Smith'` will be a no-op because `(doc.nested ??= {})` evaluates to a temporary object, and the subsequent `.name` assignment happens on that object rather than on the document path itself. Use `doc.set('nested.name', 'John Smith')` instead.
+
 If you want a plain-old JavaScript object (POJO) representation of a Mongoose document, use the [`toObject()` method](https://mongoosejs.com/docs/api/document.html#Document.prototype.toObject()).
 
 ```javascript
@@ -170,25 +176,6 @@ doc2.set('subdoc.subdocLevel2.name', 'Will Smith');
 doc2.get('subdoc.subdocLevel2.name'); // 'Will Smith'
 ```
 
-You can use optional chaining `?.` and nullish coalescing `??` with Mongoose documents.
-However, be careful when using [nullish coalescing assignments `??=`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_assignment) to create nested paths with Mongoose documents.
-
-```javascript
-const doc3 = new TestModel({ subdoc: {} });
-doc3.subdoc.subdocLevel2 ??= {};
-doc3.subdoc.subdocLevel2.name = 'John Smythe';
-console.log(doc3.subdoc);
-
-// The following does **NOT** work because `doc4.subdoc.subdocLevel2 ??= {}`
-// evaluates to a POJO `{}`, **NOT** the Mongoose value `doc4.subdoc.subdocLevel2`.
-// Do not use the following pattern with Mongoose documents.
-const doc4 = new TestModel({ subdoc: {} });
-(doc4.subdoc.subdocLevel2 ??= {}).name = 'Charlie Smith';
-doc4.subdoc.subdocLevel2; // Empty object
-doc4.subdoc.subdocLevel2.name; // undefined.
-console.log(doc4.subdoc);
-```
-
 ## Casting and Validation
 
 Before saving a document, Mongoose:
@@ -250,7 +237,7 @@ Validation checks whether the document satisfies schema rules, which includes ch
 * [min](https://mongoosejs.com/docs/api/schemanumber.html#SchemaNumber.prototype.min())
 * [max](https://mongoosejs.com/docs/api/schemanumber.html#SchemaNumber.prototype.max())
 * [enum](https://mongoosejs.com/docs/api/schemastring.html#SchemaString.prototype.enum())
-* custom validators
+* [custom validators](https://mongoosejs.com/docs/validation.html#custom-validators)
 
 If validation fails, Mongoose does **not** save the document.
 

@@ -339,6 +339,7 @@ const docsFilemap = require('../docs/source/index');
 const files = Object.keys(docsFilemap.fileMap);
 // api explicitly imported for specific file loading
 const apiReq = require('../docs/source/api');
+const generateLLMsTXT = require('./generateLLMsTXT');
 
 const wrapMarkdown = (md, baseLayout, versionedPath, markdownUrl) => {
   const newlineIdx = md.indexOf('\n');
@@ -607,6 +608,7 @@ async function renderAllFiles(noWatch, isReload = false) {
     const filename = path.join(cwd, file);
     await renderFile(filename, docsFilemap.fileMap[file], isReload);
   }));
+  await generateLLMsTXT();
 
   // enable watch after all files have been done once, and not in the loop to use less-code
   // only enable watch if main module AND having argument "--watch"
@@ -639,6 +641,7 @@ exports.default = renderFile;
 exports.renderFile = renderFile;
 exports.startWatch = startWatch;
 exports.renderAllFiles = renderAllFiles;
+exports.generateLLMsTXT = generateLLMsTXT;
 exports.copyAllRequiredFiles = copyAllRequiredFiles;
 exports.versionObj = versionObj;
 exports.cwd = cwd;

@@ -1,0 +1,96 @@
+# Mongoose
+
+> Elegant MongoDB object modeling for Node.js.
+
+**Overview**
+
+Mongoose provides schema-based modeling, validation, casting, middleware, query building, and API references for building MongoDB applications with Node.js.
+
+# Home Page
+- Description: Overview of Mongoose documentation, guides, API docs, and community resources.
+- URL: https://mongoosejs.com/
+
+## Getting Started
+
+- [Getting Started](https://mongoosejs.com/docs/index.md)
+- [Schemas](https://mongoosejs.com/docs/guides.md)
+
+## Guides
+
+- [Schemas](https://mongoosejs.com/docs/guide.md)
+- [SchemaTypes](https://mongoosejs.com/docs/schematypes.md)
+- [Connecting to MongoDB](https://mongoosejs.com/docs/connections.md)
+- [Models](https://mongoosejs.com/docs/models.md)
+- [Documents](https://mongoosejs.com/docs/documents.md)
+- [SubDocuments](https://mongoosejs.com/docs/subdocs.md)
+- [Queries](https://mongoosejs.com/docs/queries.md)
+- [Validation](https://mongoosejs.com/docs/validation.md)
+- [Middleware](https://mongoosejs.com/docs/middleware.md)
+- [Query Population](https://mongoosejs.com/docs/populate.md)
+- [Discriminators](https://mongoosejs.com/docs/discriminators.md)
+- [Plugins](https://mongoosejs.com/docs/plugins.md)
+- [Mongoose Timestamps](https://mongoosejs.com/docs/timestamps.md)
+- [Transactions](https://mongoosejs.com/docs/transactions.md)
+- [Using TypeScript with Mongoose](https://mongoosejs.com/docs/typescript.md)
+
+## API Reference
+
+- [Redirect to API](https://mongoosejs.com/docs/api.md)
+
+## Reference
+
+- [Migrating to Mongoose 9](https://mongoosejs.com/docs/migrating_to_9.md)
+- [MongoDB Version Compatibility](https://mongoosejs.com/docs/compatibility.md)
+- [Version Support](https://mongoosejs.com/docs/version-support.md)
+- [FAQ](https://mongoosejs.com/docs/faq.md)
+- [Further Reading](https://mongoosejs.com/docs/further_reading.md)
+
+## Community
+
+- [Mongoose for Enterprise](https://mongoosejs.com/docs/enterprise.md)
+
+## Tutorials
+
+- [ Custom Casting](https://mongoosejs.com/docs/tutorials/custom-casting.md)
+- [ Faster Mongoose Queries With Lean](https://mongoosejs.com/docs/tutorials/lean.md)
+- [ Getters/Setters in Mongoose](https://mongoosejs.com/docs/tutorials/getters-setters.md)
+- [ How to Use `findOneAndUpdate()` in Mongoose](https://mongoosejs.com/docs/tutorials/findoneandupdate.md)
+- [ Mongoose Virtuals](https://mongoosejs.com/docs/tutorials/virtuals.md)
+- [ Query Casting](https://mongoosejs.com/docs/tutorials/query_casting.md)
+- [ TLS/SSL Connections](https://mongoosejs.com/docs/tutorials/ssl.md)
+- [ Working With Dates](https://mongoosejs.com/docs/tutorials/dates.md)
+
+## TypeScript
+
+- [ Handling Subdocuments in TypeScript](https://mongoosejs.com/docs/typescript/subdocuments.md)
+- [ Populate with TypeScript](https://mongoosejs.com/docs/typescript/populate.md)
+- [ Queries in TypeScript](https://mongoosejs.com/docs/typescript/queries.md)
+- [ Query Helpers in TypeScript](https://mongoosejs.com/docs/typescript/query-helpers.md)
+- [ Schemas in TypeScript](https://mongoosejs.com/docs/typescript/schemas.md)
+- [ Statics in TypeScript](https://mongoosejs.com/docs/typescript/statics-and-methods.md)
+- [ Virtuals in TypeScript](https://mongoosejs.com/docs/typescript/virtuals.md)
+
+## Additional Resources
+
+- [Advanced Schemas](https://mongoosejs.com/docs/advanced_schemas.md)
+- [Browser Library](https://mongoosejs.com/docs/browser.md)
+- [Custom Schema Types](https://mongoosejs.com/docs/customschematypes.md)
+- [Defaults](https://mongoosejs.com/docs/defaults.md)
+- [Deprecation Warnings](https://mongoosejs.com/docs/deprecations.md)
+- [Field Level Encryption](https://mongoosejs.com/docs/field-level-encryption.md)
+- [How to Check Your Mongoose Version](https://mongoosejs.com/docs/check-version.md)
+- [Known Incompatible npm Packages](https://mongoosejs.com/docs/incompatible_packages.md)
+- [Migrating to Mongoose 5](https://mongoosejs.com/docs/migrating_to_5.md)
+- [Migrating to Mongoose 6](https://mongoosejs.com/docs/migrating_to_6.md)
+- [Migrating to Mongoose 7](https://mongoosejs.com/docs/migrating_to_7.md)
+- [Migrating to Mongoose 8](https://mongoosejs.com/docs/migrating_to_8.md)
+- [Migration Guide](https://mongoosejs.com/docs/migration.md)
+- [MongoDB Change Streams in NodeJS with Mongoose](https://mongoosejs.com/docs/change-streams.md)
+- [Promises](https://mongoosejs.com/docs/promises.md)
+- [Sharing Schemas Between Mongoose Projects](https://mongoosejs.com/docs/shared-schemas.md)
+- [Testing Mongoose with Jest](https://mongoosejs.com/docs/jest.md)
+- [Using Async/Await with Mongoose](https://mongoosejs.com/docs/async-await.md)
+- [Using GeoJSON](https://mongoosejs.com/docs/geojson.md)
+- [Using Mongoose With AWS Lambda](https://mongoosejs.com/docs/lambda.md)
+- [Using Mongoose with Lodash](https://mongoosejs.com/docs/lodash.md)
+- [Using Mongoose With Next.js](https://mongoosejs.com/docs/nextjs.md)

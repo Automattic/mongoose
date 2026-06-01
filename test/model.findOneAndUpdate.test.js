@@ -1116,9 +1116,9 @@ describe('model: findOneAndUpdate:', function() {
       });
       const Model = db.model('Test', schema);
       const doc = await Model.create({ name: 'test' });
-      const updateOptions = { runValidators: true, new: true };
+      const updateOptions = { runValidators: true, returnDocument: 'after' };
 
-      let err = await Model.findOneAndUpdate(
+      const err = await Model.findOneAndUpdate(
         { _id: doc._id },
         { $set: { name: null } },
         updateOptions
@@ -1128,12 +1128,14 @@ describe('model: findOneAndUpdate:', function() {
       assert.ok(err.errors['name']);
       assert.equal(err.errors['name'].kind, 'allowNull');
 
-      err = await Model.findOneAndUpdate(
+      // Mongoose strips out `name: undefined` from the update, so `name` will not be unset
+      // or set to null.
+      const updatedDoc = await Model.findOneAndUpdate(
         { _id: doc._id },
         { $set: { name: undefined } },
         updateOptions
-      ).then(() => null, err => err);
-      assert.equal(err, null);
+      );
+      assert.strictEqual(updatedDoc.name, 'test');
     });
 
     it('validators handle $unset and $setOnInsert', async function() {

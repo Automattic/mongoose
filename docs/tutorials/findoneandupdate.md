@@ -4,6 +4,7 @@ The [`findOneAndUpdate()` function in Mongoose](../api/query.html#query_Query-fi
 However, there are some cases where you need to use [`findOneAndUpdate()`](https://masteringjs.io/tutorials/mongoose/findoneandupdate). In this tutorial, you'll see how to use `findOneAndUpdate()`, and learn when you need to use it.
 
 * [Getting Started](#getting-started)
+* [Undefined Values in Updates](#undefined-values-in-updates)
 * [Atomic Updates](#atomic-updates)
 * [Upsert](#upsert)
 * [The `includeResultMetadata` Option](#includeresultmetadata)
@@ -63,6 +64,33 @@ Mongoose's `findOneAndUpdate()` is slightly different from [the MongoDB Node.js 
 The `new` and `returnOriginal` options are **deprecated** in favor of `returnDocument`.
 Use `returnDocument: 'after'` instead of `new: true` or `returnOriginal: false`.
 Use `returnDocument: 'before'` instead of `new: false` or `returnOriginal: true`.
+
+## Undefined Values in Updates
+
+Mongoose removes `undefined` values from updates.
+For example, if you set `name` to `undefined` in the following `findOneAndUpdate()` call, Mongoose removes `name` from `$set` before sending the update to MongoDB.
+That means `name` remains unchanged.
+Use `$unset` if you want to remove a property from the document.
+
+```javascript acquit:Tutorial.*findOneAndUpdate.*strips undefined from updates
+const filter = { name: 'Jean-Luc Picard' };
+// Equivalent to `{ $set: { age: 59 } }`
+// `name: undefined` is ignored.
+const update = {
+  $set: {
+    name: undefined,
+    age: 59
+  }
+};
+
+const doc = await Character.findOneAndUpdate(filter, update, {
+  returnDocument: 'after'
+});
+// Name is **not** updated
+doc.name; // 'Jean-Luc Picard'
+// Age is updated
+doc.age; // 59
+```
 
 ## Atomic Updates
 

@@ -10037,3 +10037,85 @@ function pick(obj, keys) {
   }
   return newObj;
 }
+
+describe('circular references in query filters and updates (gh-10378)', function() {
+  let db;
+  let Test;
+
+  before(function() {
+    db = start();
+    Test = db.model('Test', new Schema({ name: String, age: Number }, { strict: false }));
+  });
+
+  after(async function() {
+    await db.close();
+  });
+
+  beforeEach(async function() {
+    await Test.deleteMany({});
+  });
+
+  // A throwable, catchable MongooseError instead of an uncatchable
+  // `RangeError: Maximum call stack size exceeded`. The check runs while the
+  // query/operation is built, which may be synchronous, so wrap each call in a
+  // thunk that `assert.rejects` can run for both sync throws and async rejects.
+  const circularError = { name: 'MongooseError', message: /circular reference/ };
+  const rejects = (fn) => assert.rejects(async() => { await fn(); }, circularError);
+  function circular() {
+    const obj = { name: 'test' };
+    obj.self = obj;
+    return obj;
+  }
+
+  it('throws a catchable error on a circular query filter', async function() {
+    await rejects(() => Test.find(circular()));
+    await rejects(() => Test.findOne(circular()));
+    await rejects(() => Test.countDocuments(circular()));
+    await rejects(() => Test.deleteOne(circular()));
+    await rejects(() => Test.find().where(circular()));
+  });
+
+  it('throws a catchable error on a circular update', async function() {
+    await rejects(() => Test.updateOne({}, { $set: circular() }));
+    await rejects(() => Test.updateOne({}, circular()));
+    await rejects(() => Test.updateMany({}, { $set: circular() }));
+    await rejects(() => Test.findOneAndUpdate({}, circular()));
+    await rejects(() => Test.replaceOne({}, circular()));
+  });
+
+  it('throws a catchable error on a circular filter for update operations', async function() {
+    await rejects(() => Test.updateOne(circular(), { $set: { age: 1 } }));
+    await rejects(() => Test.findOneAndUpdate(circular(), { age: 1 }));
+    await rejects(() => Test.findOneAndDelete(circular()));
+  });
+
+  it('throws a catchable error on a circular bulkWrite operation', async function() {
+    await rejects(() => Test.bulkWrite([{ updateOne: { filter: {}, update: { $set: circular() } } }]));
+    await rejects(() => Test.bulkWrite([{ replaceOne: { filter: {}, replacement: circular() } }]));
+    await rejects(() => Test.bulkWrite([{ updateOne: { filter: circular(), update: { $set: { age: 1 } } } }]));
+  });
+
+  it('throws a catchable error from document update helpers', async function() {
+    const doc = await Test.create({ name: 'test', age: 1 });
+    await rejects(() => doc.updateOne(circular()));
+    await rejects(() => doc.updateOne({ $set: circular() }));
+    await rejects(() => doc.replaceOne(circular()));
+  });
+
+  it('allows shared but acyclic references (not circular)', async function() {
+    const shared = { age: 1 };
+    const sharedArray = [1, 2, 3];
+
+    // Same object referenced from multiple keys is a DAG, not a cycle.
+    await Test.find({ $or: [shared, shared] });
+    await Test.find({ age: { $in: sharedArray }, x: { $nin: sharedArray } });
+    await Test.updateOne({}, { $set: { a: shared, b: shared } });
+
+    // Sanity check that ordinary deeply nested filters/updates still work.
+    await Test.find({ a: { b: { c: { d: 1 } } } });
+    const doc = await Test.create({ name: 'ok', age: 2 });
+    await Test.updateOne({ _id: doc._id }, { $set: { age: 3 } });
+    const updated = await Test.findById(doc._id);
+    assert.equal(updated.age, 3);
+  });
+});

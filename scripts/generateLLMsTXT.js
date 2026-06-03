@@ -39,9 +39,7 @@ const llmsSections = [
   },
   {
     title: 'API Reference',
-    files: [
-      'docs/api.md'
-    ]
+    api: true
   },
   {
     title: 'Reference',
@@ -60,6 +58,8 @@ const llmsSections = [
     ]
   }
 ];
+
+const llmsFileMap = Object.fromEntries(Object.entries(docsFilemap.fileMap).filter(([file]) => file !== 'docs/api.md'));
 
 function appendLLMsSection(lines, title, entries) {
   if (entries.length === 0) {
@@ -90,8 +90,22 @@ async function generateLLMsTXT() {
   const includedFiles = new Set();
   for (const section of llmsSections) {
     const entries = [];
+    if (section.api) {
+      const apiFiles = Array.from(docsFilemap.apiDocs.values()).
+        sort((fileA, fileB) => fileA.title.localeCompare(fileB.title));
+
+      for (const file of apiFiles) {
+        const name = `docs/api/${file.fileName}.md`;
+        includedFiles.add(name);
+        entries.push(`- [${file.title}](${llmsBaseUrl}/${name})`);
+      }
+
+      appendLLMsSection(lines, section.title, entries);
+      continue;
+    }
+
     for (const file of section.files) {
-      const doc = docsFilemap.fileMap[file];
+      const doc = llmsFileMap[file];
       if (!doc?.markdown) {
         continue;
       }
@@ -102,7 +116,7 @@ async function generateLLMsTXT() {
   }
 
   const tutorialFiles = [];
-  for (const entry of Object.entries(docsFilemap.fileMap)) {
+  for (const entry of Object.entries(llmsFileMap)) {
     const [file] = entry;
     if (file.startsWith('docs/tutorials/') && file.endsWith('.md')) {
       tutorialFiles.push(entry);
@@ -118,7 +132,7 @@ async function generateLLMsTXT() {
   appendLLMsSection(lines, 'Tutorials', tutorialEntries);
 
   const typescriptFiles = [];
-  for (const entry of Object.entries(docsFilemap.fileMap)) {
+  for (const entry of Object.entries(llmsFileMap)) {
     const [file] = entry;
     if (file.startsWith('docs/typescript/') && file.endsWith('.md')) {
       typescriptFiles.push(entry);
@@ -134,7 +148,7 @@ async function generateLLMsTXT() {
   appendLLMsSection(lines, 'TypeScript', typescriptEntries);
 
   const additionalFiles = [];
-  for (const entry of Object.entries(docsFilemap.fileMap)) {
+  for (const entry of Object.entries(llmsFileMap)) {
     const [file, doc] = entry;
     if (!includedFiles.has(file) && doc.markdown) {
       additionalFiles.push(entry);

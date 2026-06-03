@@ -479,6 +479,30 @@ async function renderFile(filename, options, isReload = false) {
     inputFile = path.resolve(cwd, 'docs/api_split.pug');
   }
 
+  if (options.apiMarkdown) {
+    newfile = path.resolve(cwd, filename);
+    const str = options.markdownSource;
+    if (typeof str !== 'string') {
+      throw new Error(`No markdown source found for API page "${filename}"`);
+    }
+
+    await fs.promises.mkdir(path.dirname(newfile), { recursive: true });
+    await fs.promises.writeFile(newfile, str).catch((err) => {
+      console.error('could not write', err.stack);
+    }).then(() => {
+      console.log('%s : rendered %s', (new Date()).toISOString(), newfile);
+    });
+
+    if (versionObj.versionedDeploy) {
+      const versionedMarkdownPath = path.resolve(cwd, path.join('.', versionObj.versionedPath), path.relative(cwd, filename));
+      await fs.promises.mkdir(path.dirname(versionedMarkdownPath), { recursive: true });
+      await fs.promises.writeFile(versionedMarkdownPath, str);
+      console.log('%s : rendered %s', (new Date()).toISOString(), versionedMarkdownPath);
+    }
+
+    return;
+  }
+
   let contents = fs.readFileSync(path.resolve(cwd, inputFile)).toString();
   const originalContents = contents;
 

@@ -51,24 +51,24 @@ Mongoose provides schema-based modeling, validation, casting, middleware, query 
 
 ## Tutorials
 
-- [ Custom Casting](https://mongoosejs.com/docs/tutorials/custom-casting.md)
-- [ Faster Mongoose Queries With Lean](https://mongoosejs.com/docs/tutorials/lean.md)
-- [ Getters/Setters in Mongoose](https://mongoosejs.com/docs/tutorials/getters-setters.md)
-- [ How to Use `findOneAndUpdate()` in Mongoose](https://mongoosejs.com/docs/tutorials/findoneandupdate.md)
-- [ Mongoose Virtuals](https://mongoosejs.com/docs/tutorials/virtuals.md)
-- [ Query Casting](https://mongoosejs.com/docs/tutorials/query_casting.md)
-- [ TLS/SSL Connections](https://mongoosejs.com/docs/tutorials/ssl.md)
-- [ Working With Dates](https://mongoosejs.com/docs/tutorials/dates.md)
+- [Custom Casting](https://mongoosejs.com/docs/tutorials/custom-casting.md)
+- [Faster Mongoose Queries With Lean](https://mongoosejs.com/docs/tutorials/lean.md)
+- [Getters/Setters in Mongoose](https://mongoosejs.com/docs/tutorials/getters-setters.md)
+- [How to Use `findOneAndUpdate()` in Mongoose](https://mongoosejs.com/docs/tutorials/findoneandupdate.md)
+- [Mongoose Virtuals](https://mongoosejs.com/docs/tutorials/virtuals.md)
+- [Query Casting](https://mongoosejs.com/docs/tutorials/query_casting.md)
+- [TLS/SSL Connections](https://mongoosejs.com/docs/tutorials/ssl.md)
+- [Working With Dates](https://mongoosejs.com/docs/tutorials/dates.md)
 
 ## TypeScript
 
-- [ Handling Subdocuments in TypeScript](https://mongoosejs.com/docs/typescript/subdocuments.md)
-- [ Populate with TypeScript](https://mongoosejs.com/docs/typescript/populate.md)
-- [ Queries in TypeScript](https://mongoosejs.com/docs/typescript/queries.md)
-- [ Query Helpers in TypeScript](https://mongoosejs.com/docs/typescript/query-helpers.md)
-- [ Schemas in TypeScript](https://mongoosejs.com/docs/typescript/schemas.md)
-- [ Statics in TypeScript](https://mongoosejs.com/docs/typescript/statics-and-methods.md)
-- [ Virtuals in TypeScript](https://mongoosejs.com/docs/typescript/virtuals.md)
+- [Handling Subdocuments in TypeScript](https://mongoosejs.com/docs/typescript/subdocuments.md)
+- [Populate with TypeScript](https://mongoosejs.com/docs/typescript/populate.md)
+- [Queries in TypeScript](https://mongoosejs.com/docs/typescript/queries.md)
+- [Query Helpers in TypeScript](https://mongoosejs.com/docs/typescript/query-helpers.md)
+- [Schemas in TypeScript](https://mongoosejs.com/docs/typescript/schemas.md)
+- [Statics in TypeScript](https://mongoosejs.com/docs/typescript/statics-and-methods.md)
+- [Virtuals in TypeScript](https://mongoosejs.com/docs/typescript/virtuals.md)
 
 ## Additional Resources
 

@@ -82,6 +82,7 @@ async function generateLLMsTXT() {
     'Mongoose provides schema-based modeling, validation, casting, middleware, query building, and API references for building MongoDB applications with Node.js.',
     '',
     '# Home Page',
+    '',
     '- Description: Overview of Mongoose documentation, guides, API docs, and community resources.',
     `- URL: ${llmsBaseUrl}/`,
     ''

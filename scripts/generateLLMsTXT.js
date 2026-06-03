@@ -59,8 +59,18 @@ const llmsSections = [
   }
 ];
 
-const llmsFileMap = Object.fromEntries(Object.entries(docsFilemap.fileMap).filter(([file]) => file !== 'docs/api.md'));
+const llmsFiles = Object.entries(docsFilemap.fileMap).
+  filter(([file]) => file !== 'docs/api.md').
+  sort(([_nameA, fileA], [_nameB, fileB]) => fileA.title.localeCompare(fileB.title));
+const llmsFileMap = Object.fromEntries(llmsFiles);
 
+/**
+ * Append an llms.txt section if there are entries to list.
+ * @param {string[]} lines The full llms.txt output lines
+ * @param {string} title The section title
+ * @param {string[]} entries Markdown list items for this section
+ * @returns {void}
+ */
 function appendLLMsSection(lines, title, entries) {
   if (entries.length === 0) {
     return;
@@ -71,6 +81,10 @@ function appendLLMsSection(lines, title, entries) {
   lines.push('');
 }
 
+/**
+ * Generate docs/llms.txt from the docs file map and parsed API docs.
+ * @returns {Promise<void>}
+ */
 async function generateLLMsTXT() {
   const lines = [
     '# Mongoose',
@@ -106,25 +120,13 @@ async function generateLLMsTXT() {
     }
 
     for (const file of section.files) {
-      const doc = llmsFileMap[file];
-      if (!doc?.markdown) {
-        continue;
-      }
       includedFiles.add(file);
-      entries.push(`- [${doc.title}](${llmsBaseUrl}/${file})`);
+      entries.push(`- [${llmsFileMap[file].title}](${llmsBaseUrl}/${file})`);
     }
     appendLLMsSection(lines, section.title, entries);
   }
 
-  const tutorialFiles = [];
-  for (const entry of Object.entries(llmsFileMap)) {
-    const [file] = entry;
-    if (file.startsWith('docs/tutorials/') && file.endsWith('.md')) {
-      tutorialFiles.push(entry);
-    }
-  }
-  tutorialFiles.sort(([_nameA, fileA], [_nameB, fileB]) => fileA.title.localeCompare(fileB.title));
-
+  const tutorialFiles = llmsFiles.filter(([file]) => file.startsWith('docs/tutorials/') && file.endsWith('.md'));
   const tutorialEntries = [];
   for (const [name, file] of tutorialFiles) {
     includedFiles.add(name);
@@ -132,15 +134,7 @@ async function generateLLMsTXT() {
   }
   appendLLMsSection(lines, 'Tutorials', tutorialEntries);
 
-  const typescriptFiles = [];
-  for (const entry of Object.entries(llmsFileMap)) {
-    const [file] = entry;
-    if (file.startsWith('docs/typescript/') && file.endsWith('.md')) {
-      typescriptFiles.push(entry);
-    }
-  }
-  typescriptFiles.sort(([_nameA, fileA], [_nameB, fileB]) => fileA.title.localeCompare(fileB.title));
-
+  const typescriptFiles = llmsFiles.filter(([file]) => file.startsWith('docs/typescript/') && file.endsWith('.md'));
   const typescriptEntries = [];
   for (const [name, file] of typescriptFiles) {
     includedFiles.add(name);
@@ -148,15 +142,7 @@ async function generateLLMsTXT() {
   }
   appendLLMsSection(lines, 'TypeScript', typescriptEntries);
 
-  const additionalFiles = [];
-  for (const entry of Object.entries(llmsFileMap)) {
-    const [file, doc] = entry;
-    if (!includedFiles.has(file) && doc.markdown) {
-      additionalFiles.push(entry);
-    }
-  }
-  additionalFiles.sort(([_nameA, fileA], [_nameB, fileB]) => fileA.title.localeCompare(fileB.title));
-
+  const additionalFiles = llmsFiles.filter(([file, doc]) => !includedFiles.has(file) && doc.markdown);
   const additionalEntries = [];
   for (const [name, file] of additionalFiles) {
     additionalEntries.push(`- [${file.title}](${llmsBaseUrl}/${name})`);

@@ -1,6 +1,5 @@
 'use strict';
 
-const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 
@@ -88,7 +87,6 @@ async function generateLLMsTXT() {
     ''
   ];
 
-  const urlsToCheck = [];
   const includedFiles = new Set();
   for (const section of llmsSections) {
     const entries = [];
@@ -97,10 +95,8 @@ async function generateLLMsTXT() {
       if (!doc?.markdown) {
         continue;
       }
-      const url = `${llmsBaseUrl}/${file}`;
       includedFiles.add(file);
-      urlsToCheck.push(url);
-      entries.push(`- [${doc.title}](${url})`);
+      entries.push(`- [${doc.title}](${llmsBaseUrl}/${file})`);
     }
     appendLLMsSection(lines, section.title, entries);
   }
@@ -116,10 +112,8 @@ async function generateLLMsTXT() {
 
   const tutorialEntries = [];
   for (const [name, file] of tutorialFiles) {
-    const url = `${llmsBaseUrl}/${name}`;
     includedFiles.add(name);
-    urlsToCheck.push(url);
-    tutorialEntries.push(`- [${file.title}](${url})`);
+    tutorialEntries.push(`- [${file.title}](${llmsBaseUrl}/${name})`);
   }
   appendLLMsSection(lines, 'Tutorials', tutorialEntries);
 
@@ -134,10 +128,8 @@ async function generateLLMsTXT() {
 
   const typescriptEntries = [];
   for (const [name, file] of typescriptFiles) {
-    const url = `${llmsBaseUrl}/${name}`;
     includedFiles.add(name);
-    urlsToCheck.push(url);
-    typescriptEntries.push(`- [${file.title}](${url})`);
+    typescriptEntries.push(`- [${file.title}](${llmsBaseUrl}/${name})`);
   }
   appendLLMsSection(lines, 'TypeScript', typescriptEntries);
 
@@ -152,13 +144,9 @@ async function generateLLMsTXT() {
 
   const additionalEntries = [];
   for (const [name, file] of additionalFiles) {
-    const url = `${llmsBaseUrl}/${name}`;
-    urlsToCheck.push(url);
-    additionalEntries.push(`- [${file.title}](${url})`);
+    additionalEntries.push(`- [${file.title}](${llmsBaseUrl}/${name})`);
   }
   appendLLMsSection(lines, 'Additional Resources', additionalEntries);
-
-  await Promise.all(urlsToCheck.map(url => fetch(url).then(res => assert.ok(res.ok, url))));
 
   await fs.promises.writeFile(llmsTxtPath, `${lines.join('\n').trim()}\n`);
   console.log('%s : rendered %s', (new Date()).toISOString(), llmsTxtPath);

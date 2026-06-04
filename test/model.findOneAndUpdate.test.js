@@ -14,7 +14,6 @@ const utils = require('../lib/utils');
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 const DocumentObjectId = mongoose.Types.ObjectId;
-const { isDeepStrictEqual } = require('util');
 const isEqualWith = require('lodash.isequalwith');
 const util = require('./util');
 const uuid = require('uuid');
@@ -783,14 +782,14 @@ describe('model: findOneAndUpdate:', function() {
     assert.deepEqual(doc.contacts[0].account, a2._id);
     assert.ok(utils.deepEqual(doc.contacts[0].account, a2._id));
     assert.ok(isEqualWith(doc.contacts[0].account, a2._id, compareBuffers));
-    assert.ok(isDeepStrictEqual(doc.contacts[0].account, a2._id));
+    assert.deepStrictEqual(doc.contacts[0].account, a2._id);
 
     const doc2 = await User.findOne({ name: 'parent' });
 
     assert.deepEqual(doc2.contacts[0].account, a2._id);
     assert.ok(utils.deepEqual(doc2.contacts[0].account, a2._id));
     assert.ok(isEqualWith(doc2.contacts[0].account, a2._id, compareBuffers));
-    assert.ok(isDeepStrictEqual(doc2.contacts[0].account, a2._id));
+    assert.deepStrictEqual(doc2.contacts[0].account, a2._id);
 
     function compareBuffers(a, b) {
       if (Buffer.isBuffer(a) && Buffer.isBuffer(b)) {

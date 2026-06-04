@@ -61,7 +61,7 @@ const llmsSections = [
 
 const llmsFiles = Object.entries(docsFilemap.fileMap).
   filter(([file]) => file !== 'docs/api.md').
-  sort(([_nameA, fileA], [_nameB, fileB]) => fileA.title.localeCompare(fileB.title));
+  sort(([, fileA], [, fileB]) => fileA.title.localeCompare(fileB.title));
 const llmsFileMap = Object.fromEntries(llmsFiles);
 
 /**

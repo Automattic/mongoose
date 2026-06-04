@@ -780,14 +780,12 @@ describe('model: findOneAndUpdate:', function() {
     );
 
     assert.deepEqual(doc.contacts[0].account, a2._id);
-    assert.ok(utils.deepEqual(doc.contacts[0].account, a2._id));
     assert.ok(isEqualWith(doc.contacts[0].account, a2._id, compareBuffers));
     assert.deepStrictEqual(doc.contacts[0].account, a2._id);
 
     const doc2 = await User.findOne({ name: 'parent' });
 
     assert.deepEqual(doc2.contacts[0].account, a2._id);
-    assert.ok(utils.deepEqual(doc2.contacts[0].account, a2._id));
     assert.ok(isEqualWith(doc2.contacts[0].account, a2._id, compareBuffers));
     assert.deepStrictEqual(doc2.contacts[0].account, a2._id);
 

@@ -226,26 +226,57 @@ function convertTypesToString(types, typesDescription) {
   return result;
 }
 
-function apiLinkToMarkdown(url) {
-  if (!url) {
-    return url;
+/**
+ * Convert API doc HTML links in a string to their equivalent Markdown file paths.
+ * @param {String} [str] The string containing API documentation links to convert
+ * @returns {String|undefined}
+ */
+function apiLinksToMarkdown(str) {
+  if (!str) {
+    return str;
   }
-  return url.replace(/(^|\/)docs\/api\/([^/#]+)\.html/g, '$1docs/api/$2.md').
+  return str.
+    replace(/https:\/\/mongoosejs\.com\/docs\/api\/\S+\.html/g, url => url.replace(/\.html$/, '.md')).
     replace(/^([^/#]+)\.html(#.*)?$/, '$1.md$2');
 }
 
+/**
+ * Clean a dox description for Markdown output.
+ * @param {String} [description] The raw dox description
+ * @returns {String}
+ */
 function normalizeMarkdownDescription(description) {
-  return (description || '').
+  return apiLinksToMarkdown((description || '').
     replace(/<br \/>/ig, '\n').
-    replace(/https:\/\/mongoosejs\.com\/docs\/api\/([^)\s#]+)\.html/g, 'https://mongoosejs.com/docs/api/$1.md').
-    replace(/&gt;/ig, '>').
+    replace(/&gt;/ig, '>')).
     trim();
 }
 
+/**
+ * Clean a dox description for HTML output.
+ * @param {String} [description] The raw dox description
+ * @returns {String}
+ */
+function normalizeHtmlDescription(description) {
+  return (description || '').
+    replace(/<br \/>/ig, ' ').
+    replace(/&gt;/ig, '>');
+}
+
+/**
+ * Format an API type string for Markdown output.
+ * @param {String} [types] The API type string to format
+ * @returns {String}
+ */
 function formatApiType(types) {
   return types ? `\\<${types}\\> ` : '';
 }
 
+/**
+ * Build the Markdown source for a parsed API page.
+ * @param {DocsObj} data The parsed API page data
+ * @returns {String}
+ */
 function buildMarkdown(data) {
   const lines = [
     `# ${data.title}`,
@@ -289,7 +320,7 @@ function buildMarkdown(data) {
     if (prop.inherits != null) {
       lines.push('### Inherits');
       lines.push('');
-      lines.push(`- [${prop.inherits.text}](${apiLinkToMarkdown(prop.inherits.url)})`);
+      lines.push(`- [${prop.inherits.text}](${apiLinksToMarkdown(prop.inherits.url)})`);
       lines.push('');
     }
 
@@ -297,7 +328,7 @@ function buildMarkdown(data) {
       lines.push('### See');
       lines.push('');
       for (const see of prop.see) {
-        lines.push(`- [${see.text}](${apiLinkToMarkdown(see.url)})`);
+        lines.push(`- [${see.text}](${apiLinksToMarkdown(see.url)})`);
       }
       lines.push('');
     }
@@ -525,7 +556,7 @@ function processFile(props) {
     ctx.anchorId = ctx.string;
 
     ctx.descriptionMarkdown = normalizeMarkdownDescription(prop.description.full);
-    ctx.description = md.parse(ctx.descriptionMarkdown);
+    ctx.description = md.parse(normalizeHtmlDescription(prop.description.full));
 
     data.props.push(ctx);
   }

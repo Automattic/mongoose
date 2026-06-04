@@ -208,6 +208,27 @@ async function createWithRawDocTypeNo_id() {
   expect(doc2._id).type.toBe<Types.ObjectId>();
 }
 
+async function createWithPopulatedDoc() {
+  interface User {
+    dummy: string;
+  }
+
+  interface Other {
+    to: mongoose.PopulatedDoc<User>;
+  }
+
+  const userSchema = new mongoose.Schema({ dummy: String });
+  const userModel = mongoose.model<User>('TestCreateWithPopulatedDocUser', userSchema);
+
+  const otherSchema = new mongoose.Schema({ to: { type: mongoose.Types.ObjectId, ref: 'TestCreateWithPopulatedDocUser' } });
+  const otherModel = mongoose.model<Other>('TestCreateWithPopulatedDocOther', otherSchema);
+
+  const user = await userModel.create({ dummy: 'hello' });
+  const other = await otherModel.create({ to: user._id.toString() });
+
+  expect(other.to).type.toBe<mongoose.PopulatedDoc<User>>();
+}
+
 createWithAggregateErrors();
 
 async function gh15902() {

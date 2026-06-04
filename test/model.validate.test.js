@@ -61,6 +61,82 @@ describe('model: validate: ', function() {
     assert.strictEqual(obj.age, 42);
   });
 
+  it('Model["~standard"].validate() validates using standard schema result format', async function() {
+    const User = mongoose.model('User', new Schema({
+      name: {
+        type: String,
+        required: true,
+        minlength: 2
+      },
+      age: {
+        type: Number,
+        min: 18
+      },
+      friends: [{ type: String, minlength: 3 }]
+    }));
+
+    assert.equal(User['~standard'].version, 1);
+    assert.equal(User['~standard'].vendor, 'mongoose');
+
+    const validResult = await User['~standard'].validate({
+      name: 'Val',
+      age: '42',
+      friends: ['John']
+    });
+
+    assert.deepStrictEqual(validResult, {
+      value: {
+        name: 'Val',
+        // Important: Mongoose still casts values internally so users need to use the result
+        // of `validate()`.
+        age: 42,
+        friends: ['John']
+      }
+    });
+
+    const invalidResult = await User['~standard'].validate({
+      name: 'V',
+      age: 16,
+      friends: ['Al']
+    });
+
+    assert.deepStrictEqual(invalidResult.issues.map(issue => issue.path), [
+      ['name'],
+      ['age'],
+      ['friends', 0]
+    ]);
+    assert.ok(invalidResult.issues.every(issue => typeof issue.message === 'string'));
+
+    const skippedResult = await User['~standard'].validate({
+      name: 'Val',
+      age: '16'
+    }, {
+      libraryOptions: { pathsToSkip: ['age'] }
+    });
+
+    assert.deepStrictEqual(skippedResult, {
+      value: {
+        name: 'Val',
+        age: 16
+      }
+    });
+  });
+
+  it('Model["~standard"].validate() respects discriminators', async function() {
+    const AnimalSchema = new Schema({ name: String }, { discriminatorKey: 'kind' });
+    const Animal = mongoose.model('Animal', AnimalSchema);
+    Animal.discriminator('dog', new Schema({
+      barks: { type: Boolean, required: true }
+    }));
+
+    const result = await Animal['~standard'].validate({
+      kind: 'dog',
+      name: 'Daisy'
+    });
+
+    assert.deepStrictEqual(result.issues.map(issue => issue.path), [['barks']]);
+  });
+
   it('Model.validate(...) validates paths in arrays (gh-8821)', async function() {
     const userSchema = new Schema({
       friends: [{ type: String, required: true, minlength: 3 }]

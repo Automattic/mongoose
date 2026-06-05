@@ -108,6 +108,41 @@ declare module 'mongoose' {
    */
   type pathsToValidate = PathsToValidate;
 
+  export namespace StandardSchemaV1 {
+    export interface Props<Output = unknown> {
+      readonly version: 1;
+      readonly vendor: 'mongoose';
+      readonly validate: (
+        value: unknown,
+        options?: Options | undefined
+      ) => Result<Output> | Promise<Result<Output>>;
+    }
+
+    export interface Options {
+      readonly libraryOptions?: Record<string, unknown> | undefined;
+    }
+
+    export type Result<Output> = SuccessResult<Output> | FailureResult;
+
+    export interface SuccessResult<Output> {
+      readonly value: Output;
+      readonly issues?: undefined;
+    }
+
+    export interface FailureResult {
+      readonly issues: ReadonlyArray<Issue>;
+    }
+
+    export interface Issue {
+      readonly message: string;
+      readonly path?: ReadonlyArray<PropertyKey | PathSegment> | undefined;
+    }
+
+    export interface PathSegment {
+      readonly key: PropertyKey;
+    }
+  }
+
   interface SaveOptions extends
     SessionOption {
     checkKeys?: boolean;
@@ -192,15 +227,15 @@ declare module 'mongoose' {
   type CreateObjectWithExtraKeys<T> = T & Record<string, unknown>;
   type ApplyBasicCreateCasting<T> = {
     [K in keyof T]: NonNullable<T[K]> extends Map<infer KeyType extends string, infer ValueType>
-      ? (Record<KeyType, ValueType> | Array<[KeyType, ValueType]> | T[K])
+      ? (Record<KeyType, ValueType> | Array<[KeyType, ValueType]> | T[K] | QueryTypeCasting<Extract<T[K], TreatAsPrimitives>>)
       : NonNullable<T[K]> extends Types.DocumentArray<infer RawSubdocType>
-         ? RawSubdocType[] | T[K]
+         ? RawSubdocType[] | T[K] | QueryTypeCasting<Extract<T[K], TreatAsPrimitives>>
          : NonNullable<T[K]> extends Document<any, any, infer RawSubdocType>
-           ? CreateObjectWithExtraKeys<ApplyBasicCreateCasting<RawSubdocType>> | T[K]
+           ? CreateObjectWithExtraKeys<ApplyBasicCreateCasting<RawSubdocType>> | T[K] | QueryTypeCasting<Extract<T[K], TreatAsPrimitives>>
            : NonNullable<T[K]> extends TreatAsPrimitives
               ? QueryTypeCasting<T[K]>
               : NonNullable<T[K]> extends object
-                ? CreateObjectWithExtraKeys<ApplyBasicCreateCasting<T[K]>> | T[K]
+                ? CreateObjectWithExtraKeys<ApplyBasicCreateCasting<T[K]>> | T[K] | QueryTypeCasting<Extract<T[K], TreatAsPrimitives>>
                 : QueryTypeCasting<T[K]>;
   };
 
@@ -233,6 +268,9 @@ declare module 'mongoose' {
 
     /** Base Mongoose instance the model uses. */
     base: Mongoose;
+
+    /** Standard Schema adapter for validating input with this model's schema. */
+    readonly '~standard': StandardSchemaV1.Props<TRawDocType>;
 
     /**
      * If this is a discriminator model, `baseModelName` is the name of

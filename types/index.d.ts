@@ -24,6 +24,7 @@
 /// <reference path="./inferrawdoctype.d.ts" />
 /// <reference path="./inferschematype.d.ts" />
 /// <reference path="./virtuals.d.ts" />
+/// <reference path="./tracing.d.ts" />
 /// <reference path="./augmentations.d.ts" />
 
 declare class NativeDate extends globalThis.Date { }

@@ -690,6 +690,9 @@ declare module 'mongoose' {
     validate(obj: any, pathsOrOptions: PathsToValidate): Promise<void>;
     validate(obj: any, pathsOrOptions: { pathsToSkip?: pathsToSkip }): Promise<void>;
 
+    /** Validates query filter values against this model's schema. */
+    validateFilter(conditions: any, context?: any): Promise<any>;
+
     /** Watches the underlying collection for changes using [MongoDB change streams](https://www.mongodb.com/docs/manual/changeStreams/). */
     watch<ResultType extends mongodb.Document = any, ChangeType extends mongodb.ChangeStreamDocument = any>(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions & { hydrate?: boolean }): mongodb.ChangeStream<ResultType, ChangeType>;
 

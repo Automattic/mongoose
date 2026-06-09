@@ -7,7 +7,8 @@ const cwd = path.resolve(__dirname, '..');
 const docsFilemap = require('../docs/source/index');
 
 const llmsBaseUrl = 'https://mongoosejs.com';
-const llmsTxtPath = path.join(cwd, 'docs', 'llms.txt');
+// Publish alongside top level so mongoosejs.com/llms.txt not mongoosejs.com/docs/llms.txt
+const llmsTxtPath = path.join(cwd, 'llms.txt');
 
 const llmsSections = [
   {

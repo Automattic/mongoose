@@ -491,14 +491,14 @@ async function renderFile(filename, options, isReload = false) {
       await fs.promises.mkdir(path.dirname(versionedMarkdownPath), { recursive: true });
       await fs.promises.writeFile(versionedMarkdownPath, str);
       console.log('%s : rendered %s', (new Date()).toISOString(), versionedMarkdownPath);
-    } else {
-      await fs.promises.mkdir(path.dirname(newfile), { recursive: true });
-      await fs.promises.writeFile(newfile, str).catch((err) => {
-        console.error('could not write', err.stack);
-      }).then(() => {
-        console.log('%s : rendered %s', (new Date()).toISOString(), newfile);
-      });
     }
+
+    await fs.promises.mkdir(path.dirname(newfile), { recursive: true });
+    await fs.promises.writeFile(newfile, str).catch((err) => {
+      console.error('could not write', err.stack);
+    }).then(() => {
+      console.log('%s : rendered %s', (new Date()).toISOString(), newfile);
+    });
 
     return;
   }
@@ -573,17 +573,17 @@ async function renderFile(filename, options, isReload = false) {
 
   str = mapURLs(str, '/' + path.relative(cwd, docsPath));
 
+  await fs.promises.writeFile(newfile, str).catch((err) => {
+    console.error('could not write', err.stack);
+  }).then(() => {
+    console.log('%s : rendered %s', (new Date()).toISOString(), newfile);
+  });
+
   if (versionObj.versionedDeploy && markdownSource != null) {
     const versionedMarkdownPath = path.resolve(cwd, path.join('.', versionObj.versionedPath), path.relative(cwd, filename));
     await fs.promises.mkdir(path.dirname(versionedMarkdownPath), { recursive: true });
     await fs.promises.writeFile(versionedMarkdownPath, markdownSource);
     console.log('%s : rendered %s', (new Date()).toISOString(), versionedMarkdownPath);
-  } else {
-    await fs.promises.writeFile(newfile, str).catch((err) => {
-      console.error('could not write', err.stack);
-    }).then(() => {
-      console.log('%s : rendered %s', (new Date()).toISOString(), newfile);
-    });
   }
 }
 

@@ -632,7 +632,9 @@ async function renderAllFiles(noWatch, isReload = false) {
     const filename = path.join(cwd, file);
     await renderFile(filename, docsFilemap.fileMap[file], isReload);
   }));
-  await generateLLMsTXT();
+  if (!versionObj.versionedDeploy) {
+    await generateLLMsTXT();
+  }
 
   // enable watch after all files have been done once, and not in the loop to use less-code
   // only enable watch if main module AND having argument "--watch"

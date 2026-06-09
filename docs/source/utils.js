@@ -20,7 +20,9 @@ function mapSubDoc(subDoc, options, exportsObj) {
     const content = fs.readFileSync(`${dirName}/${filename}`, 'utf8');
     exportsObj[`${dirName}/${filename}`] = {
       ...options,
-      title: `${options.title} ${content.split('\n')[0].replace(/^#+/, '').trim()}`
+      title: options.title
+        ? `${options.title} ${content.split('\n')[0].replace(/^#+/, '').trim()}`
+        : content.split('\n')[0].replace(/^#+/, '').trim()
     };
   });
 }

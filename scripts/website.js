@@ -339,6 +339,7 @@ const docsFilemap = require('../docs/source/index');
 const files = Object.keys(docsFilemap.fileMap);
 // api explicitly imported for specific file loading
 const apiReq = require('../docs/source/api');
+const generateLLMsTXT = require('./generateLLMsTXT');
 
 const wrapMarkdown = (md, baseLayout, versionedPath, markdownUrl) => {
   const newlineIdx = md.indexOf('\n');
@@ -478,6 +479,30 @@ async function renderFile(filename, options, isReload = false) {
     inputFile = path.resolve(cwd, 'docs/api_split.pug');
   }
 
+  if (options.apiMarkdown) {
+    newfile = path.resolve(cwd, filename);
+    const str = options.markdownSource;
+    if (typeof str !== 'string') {
+      throw new Error(`No markdown source found for API page "${filename}"`);
+    }
+
+    if (versionObj.versionedDeploy) {
+      const versionedMarkdownPath = path.resolve(cwd, path.join('.', versionObj.versionedPath), path.relative(cwd, filename));
+      await fs.promises.mkdir(path.dirname(versionedMarkdownPath), { recursive: true });
+      await fs.promises.writeFile(versionedMarkdownPath, str);
+      console.log('%s : rendered %s', (new Date()).toISOString(), versionedMarkdownPath);
+    }
+
+    await fs.promises.mkdir(path.dirname(newfile), { recursive: true });
+    await fs.promises.writeFile(newfile, str).catch((err) => {
+      console.error('could not write', err.stack);
+    }).then(() => {
+      console.log('%s : rendered %s', (new Date()).toISOString(), newfile);
+    });
+
+    return;
+  }
+
   let contents = fs.readFileSync(path.resolve(cwd, inputFile)).toString();
   const originalContents = contents;
 
@@ -607,6 +632,9 @@ async function renderAllFiles(noWatch, isReload = false) {
     const filename = path.join(cwd, file);
     await renderFile(filename, docsFilemap.fileMap[file], isReload);
   }));
+  if (!versionObj.versionedDeploy) {
+    await generateLLMsTXT();
+  }
 
   // enable watch after all files have been done once, and not in the loop to use less-code
   // only enable watch if main module AND having argument "--watch"
@@ -639,6 +667,7 @@ exports.default = renderFile;
 exports.renderFile = renderFile;
 exports.startWatch = startWatch;
 exports.renderAllFiles = renderAllFiles;
+exports.generateLLMsTXT = generateLLMsTXT;
 exports.copyAllRequiredFiles = copyAllRequiredFiles;
 exports.versionObj = versionObj;
 exports.cwd = cwd;

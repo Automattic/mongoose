@@ -1,3 +1,17 @@
+9.7.0 / 2026-06-09
+==================
+ * feat: add Node.js TracingChannel support for APM instrumentation #16275 #16105 [logaretm](https://github.com/logaretm)
+ * feat(model): add standard schema adapter for models #16308 #16280
+ * fix(cursor): avoid waiting on buffering to run aggregation middleware #16289 #16284
+ * fix(document): throw error if overwriting array selected with `$slice` #16313 #2432
+ * fix(schema): remove `validateSync()` union fallback #16310 #16291 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * types: cast primitive types within unions when applying create casting #16320 #16316
+ * docs: add `llms.txt` #16312 #15687
+ * docs: rewrite documents docs #16298
+ * docs(model): clarify some details on `model.validate()` casting #16308 #16280
+ * docs(findOneAndUpdate): clarify update handling of undefined #16299
+ * docs(model): fix link to be absolute #16321 [hasezoey](https://github.com/hasezoey)
+
 9.6.3 / 2026-05-27
 ==================
  * fix(clone): isolate cloned arrays from source documents #16281 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

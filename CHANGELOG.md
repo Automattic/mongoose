@@ -1,3 +1,13 @@
+9.6.3 / 2026-05-27
+==================
+ * fix(clone): isolate cloned arrays from source documents #16281 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(update): preserve user-provided `$setOnInsert.createdAt` with `overwriteImmutable: true` #16278 #15781 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(schema): always pass raw string value to error validators, only trim to 30 chars for maxlength validator #16238 #16236 #15550 #15571
+ * types: add `$percentile` to TypeScript aggregation expression types #16290 #16288
+ * docs: update default pool sizes on createConnection() #16295 [torbiak-samdesk](https://github.com/torbiak-samdesk)
+ * docs: improve code block copy button behavior and sidebar scrolling #16294 [DraXx-Van](https://github.com/DraXx-Van)
+ * docs: remove broken link to deleted schema example #16297 [kaseken](https://github.com/kaseken)
+
 8.24.0 / 2026-05-14
 ===================
  * feat(aggregate): add pipelineForUnionWith() helper to allow reusing pipelines with $unionWith in TypeScript #16247 #16041 #16033

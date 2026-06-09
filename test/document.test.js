@@ -11261,6 +11261,82 @@ describe('document', function() {
       const User = db.model('User', userSchema);
       return User;
     }
+
+  });
+
+  describe('validateSync()', () => {
+    afterEach(() => sinon.restore());
+
+    it('emits a deprecation warning', () => {
+      // Arrange
+      const { User, getWarningCalls } = createTestContext();
+      const user = new User({ name: 'Sam' });
+
+      // Act
+      user.validateSync();
+
+      // Assert
+      const calls = getWarningCalls();
+      assert.strictEqual(calls.length, 1);
+      assert.ok(calls[0].args[0].includes('`Document.prototype.validateSync()` is deprecated'));
+    });
+
+    it('does not emit a deprecation warning for internal bulkSave() validation', async() => {
+      // Arrange
+      const { User, getWarningCalls } = createTestContext();
+      const user = new User();
+
+      // Act
+      const err = await User.bulkSave([user]).then(() => null, err => err);
+
+      // Assert
+      assert.ok(err);
+      assert.strictEqual(err.name, 'ValidationError');
+      assert.strictEqual(getWarningCalls().length, 0);
+    });
+
+    it('emits one deprecation warning when validating subdocuments and unions', () => {
+      // Arrange
+      const { User, getWarningCalls } = createTestContext();
+      const user = new User({
+        name: 'Sam',
+        address: {},
+        offices: [{}, {}],
+        preference: {}
+      });
+
+      // Act
+      const err = user.validateSync();
+
+      // Assert
+      assert.ok(err);
+      assert.ok(err.errors['address.city']);
+      assert.ok(err.errors['offices.0.city']);
+      assert.ok(err.errors['offices.1.city']);
+      assert.ok(err.errors['preference.score']);
+      assert.strictEqual(getWarningCalls().length, 1);
+    });
+
+    function createTestContext() {
+      sinon.stub(utils, 'warn');
+      const addressSchema = Schema({ city: { type: String, required: true } });
+      const officeSchema = Schema({ city: { type: String, required: true } });
+      const preferenceSchema = Schema({ score: { type: Number, required: true } });
+      const User = db.model('ValidateSyncWarning', Schema({
+        name: { type: String, required: true },
+        address: addressSchema,
+        offices: [officeSchema],
+        preference: {
+          type: 'Union',
+          of: [preferenceSchema, Number]
+        }
+      }));
+
+      return {
+        User,
+        getWarningCalls: () => utils.warn.getCalls()
+      };
+    }
   });
 
   it('skips recursive merging (gh-9121)', function() {
@@ -15916,6 +15992,25 @@ describe('document', function() {
     await doc.save();
     const reloaded = await Test.findById(created._id).orFail();
     assert.strictEqual(reloaded.mail[207], undefined);
+  });
+
+  it('saving undefined with allowNull', async function() {
+    const schema = new Schema({
+      _id: String,
+      name: { type: String, allowNull: false },
+      subdoc: new Schema({
+        subname: { type: String, allowNull: false }
+      }, { _id: false })
+    }, { versionKey: false });
+    const Test = db.model('Test', schema);
+    const doc = new Test({ _id: 'test1', name: undefined, subdoc: { subname: undefined } });
+    await doc.save();
+    let rawDoc = await Test.collection.findOne({ _id: doc._id });
+    assert.deepStrictEqual(Object.keys(rawDoc), ['_id']);
+
+    await Test.collection.insertOne({ _id: 'test2', name: undefined });
+    rawDoc = await Test.collection.findOne({ _id: 'test2' });
+    assert.deepStrictEqual(rawDoc, { _id: 'test2', name: null });
   });
 });
 

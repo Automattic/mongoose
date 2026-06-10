@@ -59,4 +59,56 @@ describe('checkForGiantPopulateFilters', function() {
     assert.deepStrictEqual(res[1][1]._id.$in, [4]);
     assert.deepStrictEqual(res[1][1].status.$in, ['a', 'b', 'c', 'd']);
   });
+
+  it('splits large $in filters inside multi-foreignField $or queries', function() {
+    // createPopulateQueryFilter produces this shape when a populate resolves
+    // to more than one foreign field (e.g. a virtual with a `foreignField`
+    // function returning different fields per document).
+    const param = [
+      { foreignField: new Set(['fieldA', 'fieldB']) },
+      {
+        $or: [
+          { fieldA: { $in: [1, 2, 3, 4, 5] } },
+          { fieldB: { $in: [1, 2, 3, 4, 5] } }
+        ]
+      },
+      null,
+      {}
+    ];
+
+    const res = checkForGiantPopulateFilters([param]);
+
+    // The oversized `$in` arrays live inside `$or`, so they should still be split.
+    assert.strictEqual(res.length, 2);
+    // Every `$or` branch is sliced in lockstep so the union matches the original.
+    assert.deepStrictEqual(res[0][1].$or, [
+      { fieldA: { $in: [1, 2, 3] } },
+      { fieldB: { $in: [1, 2, 3] } }
+    ]);
+    assert.deepStrictEqual(res[1][1].$or, [
+      { fieldA: { $in: [4, 5] } },
+      { fieldB: { $in: [4, 5] } }
+    ]);
+  });
+
+  it('splits large $in filters nested under $elemMatch on a foreign field parent path', function() {
+    const param = [
+      { foreignField: new Set(['items.userId']) },
+      { items: { $elemMatch: { userId: { $in: [1, 2, 3, 4, 5, 6, 7] }, active: true } } },
+      null,
+      {}
+    ];
+
+    const res = checkForGiantPopulateFilters([param]);
+
+    assert.strictEqual(res.length, 3);
+    assert.deepStrictEqual(res.map(p => p[1].items.$elemMatch.userId.$in), [
+      [1, 2, 3],
+      [4, 5, 6],
+      [7]
+    ]);
+    assert.ok(res.every(p => p[1].items.$elemMatch.active));
+    assert.deepStrictEqual(param[1].items.$elemMatch.userId.$in, [1, 2, 3, 4, 5, 6, 7]);
+  });
+
 });

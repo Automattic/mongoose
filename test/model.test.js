@@ -4460,7 +4460,7 @@ describe('Model', function() {
 
           let lastUse = session.serverSession.lastUse;
 
-          await delay(1);
+          await delay(50);
 
           doc = await MyModel.findOne({ _id: doc._id }, null, { session });
 

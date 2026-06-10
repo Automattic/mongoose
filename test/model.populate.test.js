@@ -151,6 +151,56 @@ describe('model: populate:', function() {
     }
   });
 
+  it('splits large virtual populate $in filters into multiple queries', async function() {
+    const virtualBlogPostSchema = new Schema({ title: String });
+    virtualBlogPostSchema.virtual('virtualFans', {
+      ref: 'VirtualPopulateFan',
+      localField: '_id',
+      foreignField: 'postId'
+    });
+    const fanSchema = new Schema({
+      name: String,
+      postId: ObjectId
+    });
+
+    const BlogPost = db.model('VirtualPopulateBlogPost', virtualBlogPostSchema);
+    const Fan = db.model('VirtualPopulateFan', fanSchema);
+    const originalMaxFilterLength = checkForGiantPopulateFilters.maxFilterLength;
+    const findSpy = sinon.spy(Fan.collection, 'find');
+
+    checkForGiantPopulateFilters.maxFilterLength = 1;
+
+    try {
+      const posts = await BlogPost.create([
+        { title: 'Woot' },
+        { title: 'Woot 2' }
+      ]);
+      await Fan.create([
+        { name: 'Fan 0', postId: posts[0]._id },
+        { name: 'Fan 1', postId: posts[0]._id },
+        { name: 'Fan 2', postId: posts[1]._id },
+        { name: 'Fan 3', postId: posts[1]._id }
+      ]);
+
+      const docs = await BlogPost.find({ _id: { $in: posts.map(post => post._id) } }).
+        sort({ title: 1 }).
+        populate('virtualFans');
+
+      assert.strictEqual(docs.length, 2);
+      assert.deepStrictEqual(docs[0].virtualFans.map(fan => fan.name).sort(), ['Fan 0', 'Fan 1']);
+      assert.deepStrictEqual(docs[1].virtualFans.map(fan => fan.name).sort(), ['Fan 2', 'Fan 3']);
+
+      const querySizes = findSpy.getCalls().
+        map(call => call.args[0]).
+        filter(filter => Array.isArray(filter?.postId?.$in)).
+        map(filter => filter.postId.$in.length);
+      assert.deepStrictEqual(querySizes, [1, 1]);
+    } finally {
+      checkForGiantPopulateFilters.maxFilterLength = originalMaxFilterLength;
+      findSpy.restore();
+    }
+  });
+
   it('deep population (gh-3103)', async function() {
     const BlogPost = db.model('BlogPost', blogPostSchema);
     const User = db.model('User', userSchema);

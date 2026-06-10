@@ -228,22 +228,18 @@ h2 a {
 }
 #follow {
   margin-bottom: 36px;
-  margin-left: 109px;
 }
 #follow ul {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
   height: 26px;
+  padding: 0;
 }
 #follow li {
-  display: inline-block;
+  display: flex;
   font-size: 12px;
-  margin-right: 12px;
-}
-#follow #version {
-  margin: 0 29px 0 10px;
-}
-#follow #version span {
-  position: relative;
-  top: -4px;
 }
 /* GitHub buttons iframe - use filter to invert colors in dark mode */
 .github-btn {
@@ -352,12 +348,8 @@ h2 a {
     font-size: 15px;
   }
   #follow, #docs { margin-left: 0; }
-  #follow ul { padding-left: 15px }
+  #follow ul { gap: 12px }
   #follow li { margin-right: 0px }
-  #follow #version {
-    margin-left: 5px;
-    margin-right: 15px;
-  }
   .module {
     padding-left: 5px;
     border-width: 3px;

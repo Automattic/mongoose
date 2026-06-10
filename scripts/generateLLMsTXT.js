@@ -83,7 +83,7 @@ function appendLLMsSection(lines, title, entries) {
 }
 
 /**
- * Generate docs/llms.txt from the docs file map and parsed API docs.
+ * Generate llms.txt from the docs file map and parsed API docs.
  * @returns {Promise<void>}
  */
 async function generateLLMsTXT() {

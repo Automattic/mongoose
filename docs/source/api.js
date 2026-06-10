@@ -455,7 +455,7 @@ function processFile(props) {
   }
 
   data.file = props.file;
-  data.editLink = 'https://github.com/Automattic/mongoose/blob/master/' +
+  data.editLink = 'https://github.com/Automattic/mongoose/edit/master/' +
       props.file;
 
   out.set(data.file, data);

@@ -461,7 +461,7 @@ async function renderFile(filename, options, isReload = false) {
   options.package = pkg;
   let markdownSource = null;
 
-  const _editLink = 'https://github.com/Automattic/mongoose/blob/master' +
+  const _editLink = 'https://github.com/Automattic/mongoose/edit/master' +
     filename.replace(cwd, '');
   options.editLink = options.editLink || _editLink;
 

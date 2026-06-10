@@ -7,7 +7,9 @@
 const start = require('./common');
 
 const assert = require('assert');
+const checkForGiantPopulateFilters = require('../lib/helpers/populate/checkForGiantPopulateFilters');
 const { randomUUID } = require('crypto');
+const sinon = require('sinon');
 const utils = require('../lib/utils');
 const util = require('./util');
 const MongooseError = require('../lib/error/mongooseError');
@@ -103,6 +105,50 @@ describe('model: populate:', function() {
 
     // Does not throw
     await post.populate('comments');
+  });
+
+  it('splits large populate $in filters into multiple queries', async function() {
+    const BlogPost = db.model('BlogPost', blogPostSchema);
+    const User = db.model('User', userSchema);
+    const originalMaxFilterLength = checkForGiantPopulateFilters.maxFilterLength;
+    const findSpy = sinon.spy(User.collection, 'find');
+
+    checkForGiantPopulateFilters.maxFilterLength = 5;
+
+    try {
+      const users = await User.create(Array.from({ length: 14 }, (_, i) => ({ name: `User ${i}` })));
+      const firstPostUsers = users.slice(0, 7);
+      const secondPostUsers = users.slice(7);
+      const posts = await BlogPost.create([
+        {
+          title: 'Woot',
+          fans: firstPostUsers.map(user => user._id)
+        },
+        {
+          title: 'Woot 2',
+          fans: secondPostUsers.map(user => user._id)
+        }
+      ]);
+
+      const docs = await BlogPost.find({ _id: { $in: posts.map(post => post._id) } }).
+        sort({ title: 1 }).
+        populate('fans');
+
+      assert.strictEqual(docs.length, 2);
+      assert.strictEqual(docs[0].fans.length, 7);
+      assert.strictEqual(docs[1].fans.length, 7);
+      assert.deepStrictEqual(docs[0].fans.map(user => user.name), firstPostUsers.map(user => user.name));
+      assert.deepStrictEqual(docs[1].fans.map(user => user.name), secondPostUsers.map(user => user.name));
+
+      const querySizes = findSpy.getCalls().
+        map(call => call.args[0]).
+        filter(filter => Array.isArray(filter?._id?.$in)).
+        map(filter => filter._id.$in.length);
+      assert.deepStrictEqual(querySizes.sort((a, b) => a - b), [4, 5, 5]);
+    } finally {
+      checkForGiantPopulateFilters.maxFilterLength = originalMaxFilterLength;
+      findSpy.restore();
+    }
   });
 
   it('deep population (gh-3103)', async function() {

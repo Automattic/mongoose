@@ -101,15 +101,17 @@ describe('document.populate', function() {
   let db, B, User;
   let user1, user2, post, _id;
 
-  before(function() {
+  before(function createConnection() {
     db = start();
   });
 
-  beforeEach(() => db.deleteModel(/.*/));
+  beforeEach(function deleteModels() {
+    db.deleteModel(/.*/);
+  });
   afterEach(() => require('./util').clearTestData(db));
   afterEach(() => require('./util').stopRemainingOps(db));
 
-  beforeEach(async function() {
+  beforeEach(async function setupData() {
     B = db.model('BlogPost', BlogPostSchema);
     User = db.model('User', UserSchema);
 
@@ -841,7 +843,7 @@ describe('document.populate', function() {
   describe('#populated() with virtuals (gh-7440)', function() {
     let Team;
 
-    beforeEach(function() {
+    beforeEach(function setupVirtualPopulateModels() {
       const teamSchema = mongoose.Schema({
         name: String,
         captain: String
@@ -895,7 +897,7 @@ describe('document.populate', function() {
     let Team;
     let Player;
 
-    beforeEach(function() {
+    beforeEach(function setupEmbeddedGetterPopulateModels() {
       const playerSchema = mongoose.Schema({
         _id: String
       });

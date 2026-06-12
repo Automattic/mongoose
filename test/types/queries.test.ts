@@ -17,8 +17,7 @@ import mongoose, {
   ProjectionType,
   QueryFilter
 } from 'mongoose';
-import mongodb from 'mongodb';
-import { ModifyResult, ObjectId } from 'mongodb';
+import { Condition, ModifyResult, ObjectId } from 'mongodb';
 import { autoTypedModel } from './models.test';
 import { expect } from 'tstyche';
 
@@ -381,7 +380,7 @@ function autoTypedQuery() {
 function gh11964() {
   class Repository<T extends { id: string }> {
     find(id: string) {
-      const idCondition: mongodb.Condition<T['id']> = id as mongodb.Condition<T['id']>;
+      const idCondition: Condition<T['id']> = id as Condition<T['id']>;
 
       // `as` is necessary because `T` can be `{ id: never }`,
       // so we need to explicitly coerce
@@ -391,8 +390,6 @@ function gh11964() {
 }
 
 function gh14397() {
-  type Condition<T> = mongodb.Condition<T>; // redefined here because it's not exported by mongoose
-
   type WithId<T extends object> = T & { id: string };
 
   type TestUser = {

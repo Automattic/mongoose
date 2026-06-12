@@ -4108,6 +4108,27 @@ describe('Model', function() {
             doc._id.toHexString());
         });
 
+        it('using next() and hasNext() before connecting (gh-16034)', async function() {
+          const disconnected = start({
+            noErrorListener: true
+          });
+          const MyModel = disconnected.model('Test16034', new Schema({ name: String }));
+
+          const changeStream = MyModel.watch();
+          const changes = Promise.all([changeStream.next(), changeStream.hasNext()]);
+
+          await disconnected.asPromise();
+          const doc = await MyModel.create({ name: 'Ned Stark' });
+
+          const [changeData] = await changes;
+          assert.equal(changeData.operationType, 'insert');
+          assert.equal(changeData.fullDocument._id.toHexString(),
+            doc._id.toHexString());
+
+          await changeStream.close();
+          await disconnected.close();
+        });
+
         it('fullDocument (gh-11936)', async function() {
           const MyModel = db.model('Test', new Schema({ name: String }));
 
@@ -4334,7 +4355,7 @@ describe('Model', function() {
 
           let lastUse = session.serverSession.lastUse;
 
-          await delay(1);
+          await delay(10);
 
           doc = await MyModel.findOne({ _id: doc._id }, null, { session });
           assert.strictEqual(doc.$__.session, session);
@@ -4344,7 +4365,7 @@ describe('Model', function() {
           assert.ok(session.serverSession.lastUse > lastUse);
           lastUse = session.serverSession.lastUse;
 
-          await delay(1);
+          await delay(10);
 
           doc = await MyModel.findOneAndUpdate({}, { name: 'test2' },
             { session: session });
@@ -4355,7 +4376,7 @@ describe('Model', function() {
           assert.ok(session.serverSession.lastUse > lastUse);
           lastUse = session.serverSession.lastUse;
 
-          await delay(1);
+          await delay(10);
 
           doc.name = 'test3';
 
@@ -4373,7 +4394,7 @@ describe('Model', function() {
 
           const lastUse = session.serverSession.lastUse;
 
-          await delay(1);
+          await delay(10);
 
           doc = await MyModel.findOne({ _id: doc._id }, null, { session });
           assert.strictEqual(doc.$__.session, session);
@@ -4439,14 +4460,14 @@ describe('Model', function() {
 
           let lastUse = session.serverSession.lastUse;
 
-          await delay(1);
+          await delay(10);
 
           doc = await MyModel.findOne({ _id: doc._id }, null, { session });
 
           assert.ok(session.serverSession.lastUse > lastUse);
           lastUse = session.serverSession.lastUse;
 
-          await delay(1);
+          await delay(10);
 
           doc.name = 'test3';
 

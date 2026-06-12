@@ -11,6 +11,7 @@ Makefile
 CNAME
 index.html
 index.pug
+llms.txt
 bin/
 tools/31*
 *.key

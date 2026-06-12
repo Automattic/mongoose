@@ -850,8 +850,7 @@ describe('types.documentarray', function() {
   describe('document array indexes after removal', function() {
     it('reindexes subdocs after pull() so subsequent nested changes save correctly', async function() {
       // Arrange
-      const { User, user } = createTestContext();
-      await user.save();
+      const { User, user } = await createTestContext();
       user.addresses.pull(user.addresses[0]._id);
       await user.save();
       assert.strictEqual(user.isModified(), false, 'sanity: saved doc starts clean');
@@ -876,8 +875,7 @@ describe('types.documentarray', function() {
 
     it('reindexes subdocs after splice() so subsequent nested changes save correctly', async function() {
       // Arrange
-      const { User, user } = createTestContext();
-      await user.save();
+      const { User, user } = await createTestContext();
       user.addresses.splice(0, 1);
       await user.save();
       assert.strictEqual(user.isModified(), false, 'sanity: saved doc starts clean');
@@ -902,8 +900,7 @@ describe('types.documentarray', function() {
 
     it('reindexes subdocs after shift() so subsequent nested changes save correctly', async function() {
       // Arrange
-      const { User, user } = createTestContext();
-      await user.save();
+      const { User, user } = await createTestContext();
       user.addresses.shift();
       await user.save();
       assert.strictEqual(user.isModified(), false, 'sanity: saved doc starts clean');
@@ -928,8 +925,7 @@ describe('types.documentarray', function() {
 
     it('reindexes subdocs after $shift() so subsequent nested changes save correctly', async function() {
       // Arrange
-      const { User, user } = createTestContext();
-      await user.save();
+      const { User, user } = await createTestContext();
       user.addresses.$shift();
       await user.save();
       assert.strictEqual(user.isModified(), false, 'sanity: saved doc starts clean');
@@ -952,7 +948,7 @@ describe('types.documentarray', function() {
       assert.strictEqual(fetched.addresses[1].city, 'Denver');
     });
 
-    function createTestContext() {
+    async function createTestContext() {
       const addressSchema = new mongoose.Schema({
         street: String,
         city: String
@@ -970,6 +966,7 @@ describe('types.documentarray', function() {
           { street: '3 Main', city: 'Denver' }
         ]
       });
+      await user.save();
 
       return { User, user };
     }
@@ -978,8 +975,7 @@ describe('types.documentarray', function() {
   describe('document array indexes after reordering', function() {
     it('reindexes subdocs after unshift() so subsequent nested changes save correctly', async function() {
       // Arrange
-      const { User, user } = createTestContext();
-      await user.save();
+      const { User, user } = await createTestContext();
       user.addresses.unshift({ street: '0 Main', city: 'Amsterdam' });
       await user.save();
       assert.strictEqual(user.isModified(), false, 'sanity: saved doc starts clean');
@@ -1006,8 +1002,7 @@ describe('types.documentarray', function() {
 
     it('reindexes subdocs after positioned push() so subsequent nested changes save correctly', async function() {
       // Arrange
-      const { User, user } = createTestContext();
-      await user.save();
+      const { User, user } = await createTestContext();
       user.addresses.push({ $each: [{ street: '0 Main', city: 'Amsterdam' }], $position: 0 });
       await user.save();
       assert.strictEqual(user.isModified(), false, 'sanity: saved doc starts clean');
@@ -1032,9 +1027,9 @@ describe('types.documentarray', function() {
       assert.strictEqual(fetched.addresses[3].city, 'Denver');
     });
 
-    it('does not restamp existing subdocs after append-only push()', function() {
+    it('does not restamp existing subdocs after append-only push()', async function() {
       // Arrange
-      const { user } = createTestContext();
+      const { user } = await createTestContext();
       const originalSetIndex = user.addresses[0].$setIndex;
       let setIndexCalls = 0;
       user.addresses[0].$setIndex = function(index) {
@@ -1056,8 +1051,7 @@ describe('types.documentarray', function() {
 
     it('reindexes subdocs after sort() so subsequent nested changes save correctly', async function() {
       // Arrange
-      const { User, user } = createTestContext();
-      await user.save();
+      const { User, user } = await createTestContext();
       user.addresses.sort((a, b) => b.city.localeCompare(a.city));
       await user.save();
       assert.strictEqual(user.isModified(), false, 'sanity: saved doc starts clean');
@@ -1083,8 +1077,7 @@ describe('types.documentarray', function() {
 
     it('keeps subdoc indexes correct after reverse() so subsequent nested changes save correctly', async function() {
       // Arrange
-      const { User, user } = createTestContext();
-      await user.save();
+      const { User, user } = await createTestContext();
       user.addresses.reverse();
       await user.save();
       assert.strictEqual(user.isModified(), false, 'sanity: saved doc starts clean');
@@ -1110,8 +1103,7 @@ describe('types.documentarray', function() {
 
     it('registers full array atomics after reverse() follows append-only push()', async function() {
       // Arrange
-      const { user } = createTestContext();
-      await user.save();
+      const { user } = await createTestContext();
       user.addresses.push({ street: '4 Main', city: 'Austin' });
       assert.ok(user.addresses.$atomics().$push, 'sanity: append-only push starts as $push');
 
@@ -1127,7 +1119,7 @@ describe('types.documentarray', function() {
       );
     });
 
-    function createTestContext() {
+    async function createTestContext() {
       const addressSchema = new mongoose.Schema({
         street: String,
         city: String
@@ -1145,6 +1137,7 @@ describe('types.documentarray', function() {
           { street: '3 Main', city: 'Denver' }
         ]
       });
+      await user.save();
 
       return { User, user };
     }

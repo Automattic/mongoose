@@ -1175,7 +1175,7 @@ describe('types.documentarray', function() {
     }
   });
 
-  describe('document array populated paths after reordering', function() {
+  describe('document array populated paths', function() {
     it('updates top-level populated() after sort() reorders a document array', async function() {
       // Arrange
       const { Trip, locations, trip, getPopulatedLocationIds } = await createTestContext();
@@ -1219,6 +1219,44 @@ describe('types.documentarray', function() {
           locations[1]._id.toString(),
           locations[0]._id.toString()
         ]
+      );
+    });
+
+    it('updates top-level populated() after pop() removes the last subdoc', async function() {
+      // Arrange
+      const { Trip, locations, trip, getPopulatedLocationIds } = await createTestContext();
+      const fromDb = await Trip.findById(trip._id).orFail().populate('stops.location');
+      assert.deepStrictEqual(
+        getPopulatedLocationIds(fromDb),
+        locations.map(location => location._id.toString())
+      );
+
+      // Act
+      fromDb.stops.pop();
+
+      // Assert
+      assert.deepStrictEqual(
+        getPopulatedLocationIds(fromDb),
+        [locations[0]._id.toString(), locations[1]._id.toString()]
+      );
+    });
+
+    it('updates top-level populated() after $pop() removes the last subdoc', async function() {
+      // Arrange
+      const { Trip, locations, trip, getPopulatedLocationIds } = await createTestContext();
+      const fromDb = await Trip.findById(trip._id).orFail().populate('stops.location');
+      assert.deepStrictEqual(
+        getPopulatedLocationIds(fromDb),
+        locations.map(location => location._id.toString())
+      );
+
+      // Act
+      fromDb.stops.$pop();
+
+      // Assert
+      assert.deepStrictEqual(
+        getPopulatedLocationIds(fromDb),
+        [locations[0]._id.toString(), locations[1]._id.toString()]
       );
     });
 

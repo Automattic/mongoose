@@ -2,6 +2,8 @@
 
 (function() {
   const endpoint = 'https://mothership.mongoosestudio.app/.netlify/functions/mongodbKnowledge';
+  const markedScript = 'https://cdn.jsdelivr.net/npm/marked@18.0.5/lib/marked.umd.min.js';
+  const xssScript = 'https://cdn.jsdelivr.net/npm/xss@1.0.15/dist/xss.min.js';
   const floatingForm = document.getElementById('assistant-floating-form');
   const floatingInput = document.getElementById('assistant-floating-input');
   const floatingSubmit = document.getElementById('assistant-floating-submit');
@@ -14,6 +16,7 @@
   const resizeHandle = document.getElementById('assistant-panel-resize');
 
   let hasAskedQuestion = false;
+  let markdownDependenciesPromise = null;
   let resizeStartX = 0;
   let resizeStartWidth = 0;
 
@@ -70,6 +73,7 @@
     setLoading(true);
 
     try {
+      const markdownDependencies = loadMarkdownDependencies();
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -85,6 +89,7 @@
         throw new Error(`MongoDB Knowledge API request failed with ${response.status}`);
       }
 
+      await markdownDependencies;
       reply.body.textContent = '';
 
       await readEventStream(response.body, event => {
@@ -131,9 +136,12 @@
 
   function appendUserMessage(text) {
     const message = document.createElement('div');
+    const body = document.createElement('div');
+
     message.className = 'assistant-message assistant-message-user';
-    message.innerHTML = `<div class="assistant-message-body"></div>`;
-    message.firstChild.textContent = text;
+    body.className = 'assistant-message-body';
+    body.textContent = text;
+    message.appendChild(body);
     thread.appendChild(message);
     scrollThreadToBottom();
   }
@@ -193,7 +201,7 @@
 
   function renderMarkdown(element, markdown) {
     element.classList.remove('assistant-status');
-    element.innerHTML = window.marked?.parse ? window.marked.parse(markdown) : markdown;
+    element.innerHTML = window.marked?.parse ? window.filterXSS(window.marked.parse(markdown)) : markdown;
   }
 
   function renderSources(message, sources) {
@@ -212,9 +220,12 @@
     for (const source of sources) {
       const item = document.createElement('li');
       if (source.url) {
-        item.innerHTML = `<a target="_blank" rel="noopener"></a>`;
-        item.firstChild.href = source.url;
-        item.firstChild.textContent = source.title || source.url;
+        const link = document.createElement('a');
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.href = source.url;
+        link.textContent = source.title || source.url;
+        item.appendChild(link);
       } else {
         item.textContent = source.filename || source.file_id;
       }
@@ -248,5 +259,37 @@
 
   function scrollThreadToBottom() {
     thread.scrollTop = thread.scrollHeight;
+  }
+
+  function loadMarkdownDependencies() {
+    if (markdownDependenciesPromise == null) {
+      markdownDependenciesPromise = Promise.all([
+        loadScript(markedScript, () => window.marked?.parse),
+        loadScript(xssScript, () => window.filterXSS)
+      ]);
+    }
+
+    return markdownDependenciesPromise;
+  }
+
+  function loadScript(src, isLoaded) {
+    if (isLoaded()) {
+      return Promise.resolve();
+    }
+
+    return new Promise((resolve, reject) => {
+      const existingScript = document.querySelector(`script[src="${src}"]`);
+      const script = existingScript || document.createElement('script');
+
+      script.addEventListener('load', () => isLoaded() ? resolve() : reject(new Error(`Failed to load ${src}`)), { once: true });
+      script.addEventListener('error', () => reject(new Error(`Failed to load ${src}`)), { once: true });
+
+      if (existingScript == null) {
+        script.type = 'text/javascript';
+        script.src = src;
+        script.async = true;
+        document.head.appendChild(script);
+      }
+    });
   }
 })();

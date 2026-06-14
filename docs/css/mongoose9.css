@@ -185,6 +185,28 @@ p {
 
 img { max-width: 100%; height: auto; }
 
+.theme-aware-image-dark {
+  display: none;
+}
+
+[data-theme="dark"] .theme-aware-image-light {
+  display: none;
+}
+
+[data-theme="dark"] .theme-aware-image-dark {
+  display: inline;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-aware-image-light {
+    display: none;
+  }
+
+  :root:not([data-theme="light"]) .theme-aware-image-dark {
+    display: inline;
+  }
+}
+
 hr {
   border: none;
   border-top: 1px solid var(--border-color);

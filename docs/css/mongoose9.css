@@ -1148,28 +1148,37 @@ hr {
   bottom: 18px;
   z-index: 90;
   display: flex;
-  align-items: center;
-  gap: 10px;
+  align-items: stretch;
+  gap: 8px;
   width: min(var(--content-max-width), calc(100vw - var(--left-sidebar-width) - var(--right-sidebar-width) - 80px));
   min-height: 58px;
-  padding: 8px 10px 8px 16px;
+  padding: 0 8px 0 0;
   color: var(--text-primary);
   background: var(--bg-raised);
   border: 1px solid var(--border-color);
   border-radius: 14px;
   box-shadow: var(--shadow-md);
   transform: translateX(-50%);
+  overflow: hidden;
 }
 
 .assistant-floating-input {
   flex: 1;
   min-width: 0;
-  height: 38px;
+  min-height: 56px;
+  padding: 17px 72px 13px 16px;
   color: var(--text-primary);
   background: transparent;
   border: 0;
   font: inherit;
   font-size: 14px;
+  line-height: 1.4;
+  resize: none;
+}
+
+.assistant-floating-form:focus-within {
+  outline: 1px solid var(--accent);
+  outline-offset: 0px;
 }
 
 .assistant-floating-input:focus {
@@ -1181,9 +1190,18 @@ hr {
 }
 
 .assistant-floating-shortcut {
+  position: absolute;
+  right: 56px;
+  top: 50%;
+  transform: translateY(-50%);
   color: var(--text-muted);
   font-size: 12px;
   white-space: nowrap;
+  pointer-events: none;
+}
+
+.assistant-floating-input:focus + .assistant-floating-shortcut {
+  display: none;
 }
 
 .assistant-floating-submit,
@@ -1199,6 +1217,7 @@ hr {
 .assistant-floating-submit,
 .assistant-panel-submit {
   flex: 0 0 auto;
+  align-self: center;
   width: 32px;
   height: 32px;
   color: #fff;

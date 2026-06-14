@@ -31,6 +31,12 @@
 
   floatingInput.addEventListener('focus', openExistingConversation);
   floatingInput.addEventListener('click', openExistingConversation);
+  floatingInput.addEventListener('keydown', event => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      submitQuestion(floatingInput.value);
+    }
+  });
 
   panelForm.addEventListener('submit', event => {
     event.preventDefault();

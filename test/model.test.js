@@ -4355,7 +4355,7 @@ describe('Model', function() {
 
           let lastUse = session.serverSession.lastUse;
 
-          await delay(1);
+          await delay(10);
 
           doc = await MyModel.findOne({ _id: doc._id }, null, { session });
           assert.strictEqual(doc.$__.session, session);
@@ -4365,7 +4365,7 @@ describe('Model', function() {
           assert.ok(session.serverSession.lastUse > lastUse);
           lastUse = session.serverSession.lastUse;
 
-          await delay(1);
+          await delay(10);
 
           doc = await MyModel.findOneAndUpdate({}, { name: 'test2' },
             { session: session });
@@ -4376,7 +4376,7 @@ describe('Model', function() {
           assert.ok(session.serverSession.lastUse > lastUse);
           lastUse = session.serverSession.lastUse;
 
-          await delay(1);
+          await delay(10);
 
           doc.name = 'test3';
 
@@ -4394,7 +4394,7 @@ describe('Model', function() {
 
           const lastUse = session.serverSession.lastUse;
 
-          await delay(1);
+          await delay(10);
 
           doc = await MyModel.findOne({ _id: doc._id }, null, { session });
           assert.strictEqual(doc.$__.session, session);
@@ -4460,14 +4460,14 @@ describe('Model', function() {
 
           let lastUse = session.serverSession.lastUse;
 
-          await delay(1);
+          await delay(10);
 
           doc = await MyModel.findOne({ _id: doc._id }, null, { session });
 
           assert.ok(session.serverSession.lastUse > lastUse);
           lastUse = session.serverSession.lastUse;
 
-          await delay(1);
+          await delay(10);
 
           doc.name = 'test3';
 

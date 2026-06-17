@@ -1,3 +1,11 @@
+9.7.1 / 2026-06-17
+==================
+ * perf(document+model): improve save performance by avoiding unnecessary promise allocations and reducing path/default/dirty-state overhead #16331
+ * fix(schema): include ObjectId regex pattern in `toJSONSchema()` output #16335 #16334 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(populate): split populate into separate queries per document if the resulting `$in` filter has more than 50k elements to reduce risk of BSON size errors #16333 #5890
+ * docs: add assistant sidebar with MongoDB Knowledge integration #16311 #16283
+ * docs: update docs copy buttons, edit links, homepage alignment, and `llms.txt` generation #16326 #16327 #16329
+
 9.7.0 / 2026-06-09
 ==================
  * feat: add Node.js TracingChannel support for APM instrumentation #16275 #16105 [logaretm](https://github.com/logaretm)

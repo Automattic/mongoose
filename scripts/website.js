@@ -14,6 +14,17 @@ const childProcess = require('child_process');
 // using "__dirname" and ".." to have a consistent CWD, this script should not be runnable, even when not being in the root of the project
 // also a consistent root path so that it is easy to change later when the script should be moved
 const cwd = path.resolve(__dirname, '..');
+const docsVendorPath = path.join(cwd, 'docs/vendor');
+const vendorFiles = [
+  {
+    src: path.join(path.dirname(require.resolve('marked/package.json')), 'lib/marked.umd.js'),
+    dest: path.join(docsVendorPath, 'marked.umd.js')
+  },
+  {
+    src: path.join(path.dirname(require.resolve('xss/package.json')), 'dist/xss.min.js'),
+    dest: path.join(docsVendorPath, 'xss.min.js')
+  }
+];
 
 // support custom heading ids
 // see https://www.markdownguide.org/extended-syntax/#heading-ids
@@ -462,7 +473,7 @@ async function renderFile(filename, options, isReload = false) {
   options.package = pkg;
   let markdownSource = null;
 
-  const _editLink = 'https://github.com/Automattic/mongoose/blob/master' +
+  const _editLink = 'https://github.com/Automattic/mongoose/edit/master' +
     filename.replace(cwd, '');
   options.editLink = options.editLink || _editLink;
 
@@ -628,6 +639,7 @@ function startWatch() {
  * @param {Boolean} isReload Indicate this is a reload of all files
  */
 async function renderAllFiles(noWatch, isReload = false) {
+  await copyVendorFiles();
   await Promise.all(files.map(async(file) => {
     const filename = path.join(cwd, file);
     await renderFile(filename, docsFilemap.fileMap[file], isReload);
@@ -647,8 +659,14 @@ async function renderAllFiles(noWatch, isReload = false) {
 const pathsToCopy = [
   'docs/js',
   'docs/css',
-  'docs/images'
+  'docs/images',
+  'docs/vendor'
 ];
+
+async function copyVendorFiles() {
+  await fs.promises.mkdir(docsVendorPath, { recursive: true });
+  await Promise.all(vendorFiles.map(file => fs.promises.copyFile(file.src, file.dest)));
+}
 
 /** Copy all static files when versionedDeploy is used */
 async function copyAllRequiredFiles() {
@@ -669,6 +687,7 @@ exports.startWatch = startWatch;
 exports.renderAllFiles = renderAllFiles;
 exports.generateLLMsTXT = generateLLMsTXT;
 exports.copyAllRequiredFiles = copyAllRequiredFiles;
+exports.copyVendorFiles = copyVendorFiles;
 exports.versionObj = versionObj;
 exports.cwd = cwd;
 

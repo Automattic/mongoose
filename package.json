@@ -1,7 +1,7 @@
 {
   "name": "mongoose",
   "description": "Mongoose MongoDB ODM",
-  "version": "9.7.0",
+  "version": "9.7.1",
   "author": "Guillermo Rauch <guillermo@learnboost.com>",
   "keywords": [
     "mongodb",
@@ -63,7 +63,8 @@
     "tstyche": "^7.0.0",
     "typescript": "5.9.3",
     "typescript-eslint": "^8.31.1",
-    "uuid": "14.0.0"
+    "uuid": "14.0.0",
+    "xss": "1.0.15"
   },
   "directories": {
     "lib": "./lib/mongoose"

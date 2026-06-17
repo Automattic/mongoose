@@ -1,7 +1,7 @@
 'use strict';
 
 (function() {
-  const endpoint = 'https://mothership.mongoosestudio.app/.netlify/functions/mongodbKnowledge';
+  const endpoint = 'https://knowledge.mongodb.com/api/v1/responses';
   const vendorBase = document.currentScript.src.replace('/js/ask-ai.js', '/vendor/');
   const markedScript = vendorBase + 'marked.umd.js';
   const highlightScript = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js';

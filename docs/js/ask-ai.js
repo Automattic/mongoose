@@ -2,8 +2,10 @@
 
 (function() {
   const endpoint = 'https://mothership.mongoosestudio.app/.netlify/functions/mongodbKnowledge';
-  const markedScript = 'https://cdn.jsdelivr.net/npm/marked@18.0.5/lib/marked.umd.min.js';
-  const xssScript = 'https://cdn.jsdelivr.net/npm/xss@1.0.15/dist/xss.min.js';
+  const vendorBase = document.currentScript.src.replace('/js/ask-ai.js', '/vendor/');
+  const markedScript = vendorBase + 'marked.umd.js';
+  const highlightScript = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js';
+  const xssScript = vendorBase + 'xss.min.js';
   const floatingForm = document.getElementById('assistant-floating-form');
   const floatingInput = document.getElementById('assistant-floating-input');
   const floatingSubmit = document.getElementById('assistant-floating-submit');
@@ -207,7 +209,17 @@
 
   function renderMarkdown(element, markdown) {
     element.classList.remove('assistant-status');
-    element.innerHTML = window.marked?.parse ? window.filterXSS(window.marked.parse(markdown)) : markdown;
+    element.innerHTML = sanitizeMarkdownHtml(window.marked.parse(markdown));
+    element.querySelectorAll('pre code').forEach(code => window.hljs.highlightElement(code));
+  }
+
+  function sanitizeMarkdownHtml(html) {
+    const whiteList = window.filterXSS.getDefaultWhiteList();
+    // xss strips out class="lang-javascript" from the marked output by default,
+    // so we need to allow it through to preserve syntax highlighting
+    whiteList.code = Array.from(new Set([...(whiteList.code || []), 'class', 'lang']));
+
+    return window.filterXSS(html, { whiteList });
   }
 
   function renderSources(message, sources) {
@@ -225,7 +237,7 @@
 
     for (const source of sources) {
       const item = document.createElement('li');
-      if (source.url) {
+      if (source.url?.match(/^https?:\/\//i)) {
         const link = document.createElement('a');
         link.target = '_blank';
         link.rel = 'noopener';
@@ -271,6 +283,7 @@
     if (markdownDependenciesPromise == null) {
       markdownDependenciesPromise = Promise.all([
         loadScript(markedScript, () => window.marked?.parse),
+        loadScript(highlightScript, () => window.hljs?.highlightElement),
         loadScript(xssScript, () => window.filterXSS)
       ]);
     }

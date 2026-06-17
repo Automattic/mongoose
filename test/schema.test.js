@@ -1539,6 +1539,58 @@ describe('schema', function() {
     });
   });
 
+  describe('path()', function() {
+    it('does not return inherited properties as schema paths', function() {
+      const schema = new Schema({ name: String });
+
+      assert.strictEqual(schema.path('__proto__'), undefined);
+      assert.strictEqual(schema.path('constructor'), undefined);
+      assert.strictEqual(schema.path('prototype'), undefined);
+      assert.strictEqual(schema.path('toString'), undefined);
+    });
+
+    it('throws when setting paths under special properties', function() {
+      const schema = new Schema({}, { supressReservedKeysWarning: true });
+
+      assert.throws(
+        () => schema.path('__proto__', String),
+        /Cannot set special property `__proto__` on a schema/
+      );
+      assert.throws(
+        () => schema.path('__proto__.nested', String),
+        /Cannot set special property `__proto__` on a schema/
+      );
+      assert.throws(
+        () => schema.path('nested.__proto__', String),
+        /Cannot set special property `__proto__` on a schema/
+      );
+      assert.throws(
+        () => schema.path('constructor', String),
+        /Cannot set special property `constructor` on a schema/
+      );
+      assert.throws(
+        () => schema.path('constructor.nested', String),
+        /Cannot set special property `constructor` on a schema/
+      );
+      assert.throws(
+        () => schema.path('nested.constructor', String),
+        /Cannot set special property `constructor` on a schema/
+      );
+      assert.throws(
+        () => schema.path('prototype', String),
+        /Cannot set special property `prototype` on a schema/
+      );
+      assert.throws(
+        () => schema.path('prototype.nested', String),
+        /Cannot set special property `prototype` on a schema/
+      );
+      assert.throws(
+        () => schema.path('nested.prototype', String),
+        /Cannot set special property `prototype` on a schema/
+      );
+    });
+  });
+
   describe('pathType()', function() {
     let schema;
 
@@ -1578,6 +1630,10 @@ describe('schema', function() {
     });
     describe('when called on undefined path', function() {
       it('returns adHocOrUndefined', function(done) {
+        assert.equal(schema.pathType('__proto__'), 'adhocOrUndefined');
+        assert.equal(schema.pathType('constructor'), 'adhocOrUndefined');
+        assert.equal(schema.pathType('prototype'), 'adhocOrUndefined');
+        assert.equal(schema.pathType('toString'), 'adhocOrUndefined');
         assert.equal(schema.pathType('mixed.what'), 'adhocOrUndefined');
         assert.equal(schema.pathType('mixed.4'), 'adhocOrUndefined');
         assert.equal(schema.pathType('mixed.4.thing'), 'adhocOrUndefined');

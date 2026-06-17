@@ -210,7 +210,10 @@
   function renderMarkdown(element, markdown) {
     element.classList.remove('assistant-status');
     element.innerHTML = sanitizeMarkdownHtml(window.marked.parse(markdown));
-    element.querySelectorAll('pre code').forEach(code => window.hljs.highlightElement(code));
+    element.querySelectorAll('pre code').forEach(code => {
+      window.hljs.highlightElement(code);
+      window.addCopyButton(code);
+    });
   }
 
   function sanitizeMarkdownHtml(html) {

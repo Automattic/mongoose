@@ -504,9 +504,7 @@ h2 a {
 /* Sponsors */
 
 .sponsors .sponsor {
-    max-height: 50px;
     width: auto;
-    border: 0;
 }
 
 .sponsors > div {

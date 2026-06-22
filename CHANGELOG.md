@@ -1,3 +1,11 @@
+8.24.1 / 2026-06-22
+===================
+ * fix(documentarray): reindex subdocs after array reordering and removal so subsequent nested changes save using the correct path #16282 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): avoid accessing special properties in `Document.prototype.get()`
+ * fix(schema): avoid returning inherited properties from schema path lookups, including paths underneath maps of subdocuments
+ * fix(clone): isolate cloned arrays from source documents #16281 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * types: enable exactOptionalPropertyTypes in TypeScript tests #16287
+
 8.24.0 / 2026-05-14
 ===================
  * feat(aggregate): add pipelineForUnionWith() helper to allow reusing pipelines with $unionWith in TypeScript #16247 #16041 #16033

@@ -503,15 +503,25 @@ h2 a {
 
 /* Sponsors */
 
-.sponsors .sponsor {
-    width: auto;
+.sponsors {
+    max-width: 100%;
 }
 
+.sponsors .sponsor {
+    box-sizing: border-box;
+    display: block;
+    max-width: 100%;
+}
+
+.sponsors,
 .sponsors > div {
     display: flex;
     flex-wrap: wrap;
+    min-width: 0;
 }
 
 .sponsors a {
+    display: inline-flex;
     margin: 2px;
+    max-width: 100%;
 }

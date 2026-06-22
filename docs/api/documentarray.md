@@ -51,7 +51,7 @@ Pulls items from the array atomically.
 
 - `[...args]` \<object\>
 
-Wraps [`Array#push`](https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/push) with proper change tracking.
+Wraps [`Array#push`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push) with proper change tracking.
 
 ## `MongooseDocumentArray.prototype.toObject()`
 

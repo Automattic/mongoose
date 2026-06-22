@@ -1,3 +1,10 @@
+9.7.2 / 2026-06-22
+==================
+ * fix(documentarray): reindex subdocs after array reordering and removal so subsequent nested changes save using the correct path #16282 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): avoid accessing special properties in `Document.prototype.get()`
+ * fix(schema): only return own properties in schematype lookups and disallow setting schema paths under special properties
+ * docs: update homepage sponsor layout
+
 9.7.1 / 2026-06-17
 ==================
  * perf(document+model): improve save performance by avoiding unnecessary promise allocations and reducing path/default/dirty-state overhead #16331

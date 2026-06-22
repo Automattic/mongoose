@@ -48,6 +48,28 @@ function rawDocSyntax(): void {
   doc.save();
 }
 
+async function modelValidateReturnsCastedObject(): Promise<void> {
+  interface IUser {
+    name: string;
+    age: number;
+  }
+
+  const User = connection.model<IUser>('ModelValidateReturn', new Schema<IUser>({
+    name: { type: String, required: true },
+    age: Number
+  }));
+
+  // `Model.validate()` resolves to the casted-and-validated copy of the input,
+  // not `void`. See gh-16338.
+  const validated = await User.validate({ name: 'Val', age: 42 });
+  expectType<IUser>(validated);
+  expectType<string>(validated.name);
+  expectType<number>(validated.age);
+
+  expectType<IUser>(await User.validate({ name: 'Val', age: 42 }, ['name']));
+  expectType<IUser>(await User.validate({ name: 'Val', age: 42 }, { pathsToSkip: ['age'] }));
+}
+
 function tAndDocSyntax(): void {
   interface ITest {
     id: number;

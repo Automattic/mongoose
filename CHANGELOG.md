@@ -1,3 +1,9 @@
+7.8.10 / 2026-06-22
+===================
+ * fix(document): add additional defensive checks for special properties in Document.prototype.get()
+ * fix(schema): avoid returning inherited properties from schema path lookups
+ * docs(schema): add instanceof/typeof checks to default getter examples for populated docs and nullish values #16272 #16250
+
 7.8.9 / 2026-02-04
 ==================
  * fix: handle other top-level query operators in sanitizeFilter

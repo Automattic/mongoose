@@ -684,11 +684,11 @@ declare module 'mongoose' {
      */
     useConnection(connection: Connection): this;
 
-    /** Casts and validates the given object against this model's schema, passing the given `context` to custom validators. */
-    validate(): Promise<void>;
-    validate(obj: any): Promise<void>;
-    validate(obj: any, pathsOrOptions: PathsToValidate): Promise<void>;
-    validate(obj: any, pathsOrOptions: { pathsToSkip?: pathsToSkip }): Promise<void>;
+    /** Casts and validates the given object against this model's schema, returning the casted-and-validated copy of `obj`, passing the given `context` to custom validators. */
+    validate(): Promise<TRawDocType>;
+    validate(obj: any): Promise<TRawDocType>;
+    validate(obj: any, pathsOrOptions: PathsToValidate): Promise<TRawDocType>;
+    validate(obj: any, pathsOrOptions: { pathsToSkip?: pathsToSkip }): Promise<TRawDocType>;
 
     /** Watches the underlying collection for changes using [MongoDB change streams](https://www.mongodb.com/docs/manual/changeStreams/). */
     watch<ResultType extends mongodb.Document = any, ChangeType extends mongodb.ChangeStreamDocument = any>(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions & { hydrate?: boolean }): mongodb.ChangeStream<ResultType, ChangeType>;

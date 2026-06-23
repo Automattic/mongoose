@@ -79,6 +79,28 @@ async function standardSchemaModelValidate(): Promise<void> {
   });
 }
 
+async function modelValidateReturnsCastedObject(): Promise<void> {
+  interface IUser {
+    name: string;
+    age: number;
+  }
+
+  const User = connection.model<IUser>('ModelValidateReturn', new Schema<IUser>({
+    name: { type: String, required: true },
+    age: Number
+  }));
+
+  // `Model.validate()` resolves to the casted-and-validated copy of the input,
+  // not `void`. See gh-16338.
+  const validated = await User.validate({ name: 'Val', age: 42 });
+  expect(validated).type.toBe<IUser>();
+  expect(validated.name).type.toBe<string>();
+  expect(validated.age).type.toBe<number>();
+
+  expect(await User.validate({ name: 'Val', age: 42 }, ['name'])).type.toBe<IUser>();
+  expect(await User.validate({ name: 'Val', age: 42 }, { pathsToSkip: ['age'] })).type.toBe<IUser>();
+}
+
 function tAndDocSyntax(): void {
   interface ITest {
     id: number;

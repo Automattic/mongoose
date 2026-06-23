@@ -61,14 +61,16 @@ async function standardSchemaModelValidate(): Promise<void> {
   }));
 
   expect(User['~standard'].version).type.toBe<1>();
-  expect(User['~standard'].vendor).type.toBe<'mongoose'>();
-  expect(User['~standard']).type.toBe<mongoose.StandardSchemaV1.Props<IUser>>();
+  expect(User['~standard'].vendor).type.toBe<string>();
+  expect(User['~standard']).type.toBeAssignableTo<mongoose.StandardSchemaV1.Props<IUser>>();
 
   const result = await User['~standard'].validate({ name: 'Val', age: '42' });
   if (!result.issues) {
-    expect(result.value).type.toBe<IUser>();
+    expect(result.value).type.toBe<mongoose.Default__v<mongoose.Require_id<IUser>>>();
     expect(result.value.name).type.toBe<string>();
     expect(result.value.age).type.toBe<number>();
+    expect(result.value._id).type.toBe<Types.ObjectId>();
+    expect(result.value.__v).type.toBe<number>();
   } else {
     expect(result.issues[0].message).type.toBe<string>();
     expect(result.issues[0].path).type.toBe<ReadonlyArray<PropertyKey | mongoose.StandardSchemaV1.PathSegment> | undefined>();

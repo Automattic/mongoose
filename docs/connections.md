@@ -10,6 +10,25 @@ This is the minimum needed to connect the `myapp` database running locally on th
 For local MongoDB databases, we recommend using `127.0.0.1` instead of `localhost`.
 That is because Node.js 18 and up prefer IPv6 addresses, which means, on many machines, Node.js will resolve `localhost` to the IPv6 address `::1` and Mongoose will be unable to connect, unless the mongodb instance is running with ipv6 enabled.
 
+#### SRV DNS Resolution Failure on Windows (`querySrv ECONNREFUSED`)
+
+If you are connecting to MongoDB Atlas using `mongodb+srv://` and see a
+`querySrv ECONNREFUSED` error, Node.js may be failing to resolve MongoDB's
+SRV records even when your OS DNS works correctly. This is a known issue on
+Windows (confirmed regression in Node.js v24.13.0, see
+[nodejs/node#61453](https://github.com/nodejs/node/pull/61453)) and can also
+affect systems where the ISP intercepts DNS at the network level.
+
+The fix is to explicitly set DNS servers in Node.js at the top of your entry
+file, before any other imports:
+
+```js
+const dns = require('dns');
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+```
+
+This bypasses the OS/ISP DNS resolver entirely at the Node.js level.
+
 You can also specify several more parameters in the `uri`:
 
 ```javascript

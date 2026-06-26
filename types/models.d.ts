@@ -1,5 +1,6 @@
 declare module 'mongoose' {
   import mongodb = require('mongodb');
+  import { StandardSchemaV1 as StandardSchemaV1Spec, StandardTypedV1 as StandardTypedV1Spec } from '@standard-schema/spec';
 
   export interface DiscriminatorOptions {
     value?: string | number | ObjectId;
@@ -108,40 +109,8 @@ declare module 'mongoose' {
    */
   type pathsToValidate = PathsToValidate;
 
-  export namespace StandardSchemaV1 {
-    export interface Props<Output = unknown> {
-      readonly version: 1;
-      readonly vendor: 'mongoose';
-      readonly validate: (
-        value: unknown,
-        options?: Options | undefined
-      ) => Result<Output> | Promise<Result<Output>>;
-    }
-
-    export interface Options {
-      readonly libraryOptions?: Record<string, unknown> | undefined;
-    }
-
-    export type Result<Output> = SuccessResult<Output> | FailureResult;
-
-    export interface SuccessResult<Output> {
-      readonly value: Output;
-      readonly issues?: undefined;
-    }
-
-    export interface FailureResult {
-      readonly issues: ReadonlyArray<Issue>;
-    }
-
-    export interface Issue {
-      readonly message: string;
-      readonly path?: ReadonlyArray<PropertyKey | PathSegment> | undefined;
-    }
-
-    export interface PathSegment {
-      readonly key: PropertyKey;
-    }
-  }
+  export import StandardTypedV1 = StandardTypedV1Spec;
+  export import StandardSchemaV1 = StandardSchemaV1Spec;
 
   interface SaveOptions extends
     SessionOption {
@@ -270,7 +239,7 @@ declare module 'mongoose' {
     base: Mongoose;
 
     /** Standard Schema adapter for validating input with this model's schema. */
-    readonly '~standard': StandardSchemaV1.Props<TRawDocType>;
+    readonly '~standard': StandardSchemaV1.Props<Default__v<Require_id<TRawDocType>, ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>>>;
 
     /**
      * If this is a discriminator model, `baseModelName` is the name of
@@ -684,11 +653,11 @@ declare module 'mongoose' {
      */
     useConnection(connection: Connection): this;
 
-    /** Casts and validates the given object against this model's schema, passing the given `context` to custom validators. */
-    validate(): Promise<void>;
-    validate(obj: any): Promise<void>;
-    validate(obj: any, pathsOrOptions: PathsToValidate): Promise<void>;
-    validate(obj: any, pathsOrOptions: { pathsToSkip?: pathsToSkip }): Promise<void>;
+    /** Casts and validates the given object against this model's schema, returning the casted-and-validated copy of `obj`, passing the given `context` to custom validators. */
+    validate(): Promise<TRawDocType>;
+    validate(obj: any): Promise<TRawDocType>;
+    validate(obj: any, pathsOrOptions: PathsToValidate): Promise<TRawDocType>;
+    validate(obj: any, pathsOrOptions: { pathsToSkip?: pathsToSkip }): Promise<TRawDocType>;
 
     /** Watches the underlying collection for changes using [MongoDB change streams](https://www.mongodb.com/docs/manual/changeStreams/). */
     watch<ResultType extends mongodb.Document = any, ChangeType extends mongodb.ChangeStreamDocument = any>(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions & { hydrate?: boolean }): mongodb.ChangeStream<ResultType, ChangeType>;

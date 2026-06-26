@@ -1,3 +1,8 @@
+9.7.3 / 2026-06-26
+==================
+ * types(model): correct Model.validate() return type to Promise<TRawDocType> #16340 #16338
+ * types: use @standard-schema/spec for StandardSchema types rather than inlining #16341 #16339
+
 9.7.2 / 2026-06-22
 ==================
  * fix(documentarray): reindex subdocs after array reordering and removal so subsequent nested changes save using the correct path #16282 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

@@ -119,6 +119,7 @@ async function gh16046(): Promise<void> {
     methods: {
       t(locale?: string) {
         const translation = (!!locale && this.translations.get(locale)) || {};
+        expect(this._v).type.toBe<number | null | undefined>();
 
         return {
           name: translation.name ?? this.name,

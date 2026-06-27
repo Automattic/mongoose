@@ -57,6 +57,25 @@ await Test.findOne(); // Will throw "Operation timed out" error because `db` isn
 You must ensure that you have whitelisted your ip on [mongodb](https://www.mongodb.com/docs/atlas/security/ip-access-list/) to allow Mongoose to connect.
 You can allow access from all ips with `0.0.0.0/0`.
 
+<hr id="querysrv-econnrefused" />
+
+<a class="anchor" href="#querysrv-econnrefused">**Q**</a>. I get a `querySrv ECONNREFUSED` error when connecting to MongoDB Atlas using `mongodb+srv://`. What gives?
+
+**A**. Node.js may be failing to resolve MongoDB's SRV records even when your OS DNS works correctly.
+This is a known issue on Windows (confirmed regression in Node.js v24.13.0, see [nodejs/node#61453](https://github.com/nodejs/node/pull/61453)) and can also affect systems where the ISP intercepts DNS at the network level.
+
+The fix is to explicitly set DNS servers in Node.js at the very top of your entry file, before any other imports:
+
+```javascript
+const dns = require('dns');
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
+// Now connect to MongoDB
+mongoose.connect('mongodb+srv://...');
+```
+
+This bypasses the OS/ISP DNS resolver entirely at the Node.js level.
+
 <hr id="not-a-function" />
 
 <a class="anchor" href="#not-a-function">**Q**</a>. x.$__y is not a function. What gives?

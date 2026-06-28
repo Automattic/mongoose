@@ -12,8 +12,6 @@ declare module 'mongoose' {
   }
 
   interface ValidateSyncOptions extends Omit<ValidateOptions, 'middleware'> {
-    /** `validateSync()` does not run middleware. Use `validate()` if you need middleware. */
-    middleware?: never;
     [k: string]: any;
   }
 

@@ -1,7 +1,7 @@
 'use strict';
 
 const mongoose = require('../');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 
 run().catch(err => {
   console.error(err);

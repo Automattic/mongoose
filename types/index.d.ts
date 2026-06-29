@@ -1152,7 +1152,7 @@ declare module 'mongoose' {
   /* for ts-mongoose */
   export class mquery { }
 
-  export function overwriteMiddlewareResult(val: any): Kareem.OverwriteMiddlewareResult;
+  export function overwriteMiddlewareResult(val: any): Kareem.OverwriteResult;
 
   export function skipMiddlewareFunction(val: any): Kareem.SkipWrappedFunction;
 

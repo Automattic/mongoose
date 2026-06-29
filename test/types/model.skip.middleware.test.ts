@@ -37,9 +37,15 @@ async function gh8768() {
   expect<MongooseBulkSaveOptions['middleware']>().type.toBe<boolean | SkipMiddlewareOptions | undefined>();
   expect<AggregateOptions['middleware']>().type.toBe<boolean | SkipMiddlewareOptions | undefined>();
   expect<AggregateCursorOptions>().type.toBeAssignableFrom({ batchSize: 100 });
+  expect<AggregateCursorOptions>().type.toBeAssignableFrom({ comment: 'test cursor' });
+  expect<AggregateCursorOptions>().type.toBeAssignableFrom({ maxTimeMS: 1000 });
+  expect<AggregateCursorOptions>().type.toBeAssignableFrom({ signal: new AbortController().signal });
   expect<AggregateCursorOptions>().type.toBeAssignableFrom({ useMongooseAggCursor: true });
   expect<AggregateCursorOptions>().type.toBeAssignableFrom({ middleware: false });
   expect<AggregateCursorOptions>().type.toBeAssignableFrom({ middleware: { pre: false } });
+  expect<AggregateCursorOptions['maxTimeMS']>().type.toBe<number | undefined>();
+  expect<AggregateCursorOptions['signal']>().type.toBe<AbortSignal | undefined>();
+  expect<AggregateCursorOptions>().type.not.toBeAssignableFrom({ maxTimeMS: '1000' });
   expect<AggregateCursorOptions>().type.not.toBeAssignableFrom({ middleware: { post: false } });
 
   // QueryOptions - Query operations

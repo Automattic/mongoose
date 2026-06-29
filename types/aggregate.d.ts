@@ -16,8 +16,7 @@ declare module 'mongoose' {
     post?: never;
   }
 
-  interface AggregateCursorOptions {
-    batchSize?: number;
+  interface AggregateCursorOptions extends Omit<mongodb.AggregationCursorOptions & mongodb.Abortable, 'session'>, SessionOption {
     middleware?: boolean | AggregateCursorMiddlewareOptions;
     transform?: (doc: any) => any;
     useMongooseAggCursor?: boolean;

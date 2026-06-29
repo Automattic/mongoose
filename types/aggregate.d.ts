@@ -10,6 +10,20 @@ declare module 'mongoose' {
     [key: string]: any;
   }
 
+  interface AggregateCursorMiddlewareOptions {
+    /** If `false`, skip pre aggregate middleware. Aggregate cursors do not run post aggregate middleware. */
+    pre?: boolean;
+    post?: never;
+  }
+
+  interface AggregateCursorOptions {
+    batchSize?: number;
+    middleware?: boolean | AggregateCursorMiddlewareOptions;
+    transform?: (doc: any) => any;
+    useMongooseAggCursor?: boolean;
+    [key: string]: unknown;
+  }
+
   class Aggregate<ResultType> implements SessionOperation {
     /**
      * Returns an asyncIterator for use with [`for/await/of` loops](https://thecodebarbarian.com/getting-started-with-async-iterators-in-node-js)
@@ -62,7 +76,7 @@ declare module 'mongoose' {
     /**
      * Sets the cursor option for the aggregation query
      */
-    cursor<DocType = any>(options?: Record<string, unknown>): Cursor<DocType>;
+    cursor<DocType = any>(options?: AggregateCursorOptions): Cursor<DocType>;
 
 
     /** Executes the aggregate pipeline on the currently bound Model. */

@@ -635,19 +635,10 @@ await doc.save({ middleware: false });
 // Skip all user middleware on queries
 await Model.find({}, null, { middleware: false });
 await Model.updateOne({}, { name: 'test' }, { middleware: false });
-await Model.find().cursor({ middleware: false }).eachAsync(doc => {
-  // process doc
-});
 
 // Skip all user middleware on aggregation
 await Model.aggregate([]).option({ middleware: false });
-await Model.aggregate([]).cursor({ middleware: false }).eachAsync(doc => {
-  // process doc
-});
 ```
-
-Aggregation cursors run `pre('aggregate')` hooks when creating the cursor, but do not run `post('aggregate')` hooks.
-For aggregation cursors, `middleware: false` skips `pre('aggregate')` hooks.
 
 ### Skip Only Pre or Post Hooks
 
@@ -660,23 +651,6 @@ await doc.save({ middleware: { pre: false } });
 // Skip only post hooks, pre hooks still run
 await Model.find({}, null, { middleware: { post: false } });
 ```
-
-For custom statics and methods, reserve the last argument for Mongoose options and default it to `{}`.
-Mongoose reads `middleware` from that trailing options object:
-
-```javascript
-schema.statics.queueEmail = async function(to, emailOptions, options = {}) {
-  await emailQueue.add({ to, priority: emailOptions.priority });
-};
-schema.pre('queueEmail', function() {
-  // user-defined middleware, for example rate limiting or audit logging
-});
-
-await User.queueEmail('test@example.com', { priority: 'high' }, { middleware: false });
-```
-
-Because custom statics and methods can have arbitrary signatures, Mongoose treats a `middleware` property on the trailing plain object argument as the middleware option.
-Pass application-specific options before the trailing Mongoose options argument.
 
 **Note:** Built-in Mongoose middleware (timestamps, validation, etc.) always runs regardless of this option. Only user-defined middleware registered via `schema.pre()` and `schema.post()` is skipped.
 

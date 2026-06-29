@@ -21,7 +21,7 @@
   "license": "MIT",
   "dependencies": {
     "@standard-schema/spec": "^1.1.0",
-    "kareem": "git+https://github.com/AbdelrahmanHafez/kareem.git#f0ec8dcc94f616e7468a839fb122ebb6a14d5c6a",
+    "kareem": "3.3.0",
     "mongodb": "~7.2",
     "mpath": "0.9.0",
     "mquery": "6.0.0",

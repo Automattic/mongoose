@@ -7,9 +7,7 @@ import {
   InsertManyOptions,
   MongooseBulkWriteOptions,
   MongooseBulkSaveOptions,
-  AggregateOptions,
-  AggregateCursorOptions,
-  AggregateCursorMiddlewareOptions
+  AggregateOptions
 } from 'mongoose';
 import { expect } from 'tstyche';
 
@@ -26,8 +24,6 @@ async function gh8768() {
   expect<SkipMiddlewareOptions>().type.toBeAssignableFrom({ pre: true, post: false });
   expect<SkipMiddlewareOptions['pre']>().type.toBe<boolean | undefined>();
   expect<SkipMiddlewareOptions['post']>().type.toBe<boolean | undefined>();
-  expect<AggregateCursorMiddlewareOptions>().type.toBeAssignableFrom({ pre: false });
-  expect<AggregateCursorMiddlewareOptions>().type.not.toBeAssignableFrom({ post: false });
 
   // Verify middleware option types are strictly boolean | SkipMiddlewareOptions | undefined
   expect<QueryOptions['middleware']>().type.toBe<boolean | SkipMiddlewareOptions | undefined>();
@@ -36,17 +32,6 @@ async function gh8768() {
   expect<MongooseBulkWriteOptions['middleware']>().type.toBe<boolean | SkipMiddlewareOptions | undefined>();
   expect<MongooseBulkSaveOptions['middleware']>().type.toBe<boolean | SkipMiddlewareOptions | undefined>();
   expect<AggregateOptions['middleware']>().type.toBe<boolean | SkipMiddlewareOptions | undefined>();
-  expect<AggregateCursorOptions>().type.toBeAssignableFrom({ batchSize: 100 });
-  expect<AggregateCursorOptions>().type.toBeAssignableFrom({ comment: 'test cursor' });
-  expect<AggregateCursorOptions>().type.toBeAssignableFrom({ maxTimeMS: 1000 });
-  expect<AggregateCursorOptions>().type.toBeAssignableFrom({ signal: new AbortController().signal });
-  expect<AggregateCursorOptions>().type.toBeAssignableFrom({ useMongooseAggCursor: true });
-  expect<AggregateCursorOptions>().type.toBeAssignableFrom({ middleware: false });
-  expect<AggregateCursorOptions>().type.toBeAssignableFrom({ middleware: { pre: false } });
-  expect<AggregateCursorOptions['maxTimeMS']>().type.toBe<number | undefined>();
-  expect<AggregateCursorOptions['signal']>().type.toBe<AbortSignal | undefined>();
-  expect<AggregateCursorOptions>().type.not.toBeAssignableFrom({ maxTimeMS: '1000' });
-  expect<AggregateCursorOptions>().type.not.toBeAssignableFrom({ middleware: { post: false } });
 
   // QueryOptions - Query operations
   User.find({}, null, { middleware: false });
@@ -139,22 +124,10 @@ async function gh8768() {
   User.find().setOptions({ middleware: { pre: false } });
   User.find().setOptions({ middleware: { post: false } });
 
-  // Query.prototype.cursor() accepts middleware options
-  User.find().cursor({ middleware: false });
-  User.find().cursor({ middleware: { pre: false } });
-  User.find().cursor({ middleware: { post: false } });
-
   // Aggregate.prototype.option() chain method
   User.aggregate().option({ middleware: false });
   User.aggregate().option({ middleware: { pre: false } });
   User.aggregate().option({ middleware: { post: false } });
-
-  // Aggregate.prototype.cursor() accepts pre aggregate middleware options
-  User.aggregate().option({ middleware: false }).cursor();
-  User.aggregate().option({ middleware: { pre: false } }).cursor();
-  User.aggregate().cursor({ middleware: false });
-  User.aggregate().cursor({ middleware: { pre: false } });
-  expect(User.aggregate().cursor).type.not.toBeCallableWith({ middleware: { post: false } });
 
   // Document instance operations - user.updateOne(), user.deleteOne()
   await user.updateOne({}, { middleware: false });

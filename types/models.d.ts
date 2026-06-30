@@ -463,9 +463,29 @@ declare module 'mongoose' {
       TInstanceMethods & TVirtuals
     >;
 
+    /**
+     * Finds one document using named parameters (gh-10367), e.g.
+     * `findOne({ $filter, $projection, $options })`. `$filter` is required;
+     * for an options-only call pass `$filter: null`. Listed first so an object
+     * with a `$filter` key resolves to this overload before the positional ones.
+     */
+    findOne<ResultDoc = THydratedDocumentType>(
+      namedParameters: {
+        $filter: QueryFilter<TRawDocType> | null;
+        $projection?: ProjectionType<TRawDocType> | null;
+        $options?: (QueryOptions<TRawDocType> & mongodb.Abortable) | null;
+      }
+    ): QueryWithHelpers<
+      HasLeanOption<TSchema> extends true ? TLeanResultType | null : ResultDoc | null,
+      ResultDoc,
+      TQueryHelpers,
+      TLeanResultType,
+      'findOne',
+      TInstanceMethods & TVirtuals
+    >;
     /** Finds one document. */
     findOne<ResultDoc = THydratedDocumentType>(
-      filter: QueryFilter<TRawDocType>,
+      filter: QueryFilter<TRawDocType> & { $filter?: never; $projection?: never; $options?: never },
       projection: ProjectionType<TRawDocType> | null | undefined,
       options: QueryOptions<TRawDocType> & { lean: true } & mongodb.Abortable
     ): QueryWithHelpers<
@@ -489,7 +509,7 @@ declare module 'mongoose' {
       TInstanceMethods & TVirtuals
     >;
     findOne<ResultDoc = THydratedDocumentType>(
-      filter?: QueryFilter<TRawDocType>,
+      filter?: QueryFilter<TRawDocType> & { $filter?: never; $projection?: never; $options?: never },
       projection?: ProjectionType<TRawDocType> | null | undefined,
       options?: QueryOptions<TRawDocType> & mongodb.Abortable | null | undefined
     ): QueryWithHelpers<

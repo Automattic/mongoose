@@ -103,6 +103,38 @@ async function modelValidateReturnsCastedObject(): Promise<void> {
   expect(await User.validate({ name: 'Val', age: 42 }, { pathsToSkip: ['age'] })).type.toBe<IUser>();
 }
 
+async function gh16046(): Promise<void> {
+  const watchSchema = new Schema({
+    _id: { type: Schema.Types.ObjectId },
+    name: { type: String, required: true, trim: true },
+    code: { type: String, required: true, trim: true, index: true },
+    spec: { type: String, required: true, trim: true },
+    translations: { type: Map, of: new Schema({ name: String, spec: String }), required: true },
+    createdAt: { type: Date },
+    updatedAt: { type: Date },
+    _v: { type: Number, required: false, default: 0 }
+  }, {
+    timestamps: true,
+    versionKey: '_v',
+    methods: {
+      t(locale?: string) {
+        const translation = (!!locale && this.translations.get(locale)) || {};
+        expect(this._v).type.toBe<number | null | undefined>();
+
+        return {
+          name: translation.name ?? this.name,
+          spec: translation.spec ?? this.spec
+        };
+      }
+    }
+  });
+
+  const Watch = model('gh16046', watchSchema);
+  const watch = await Watch.findOne({ code: 'test' });
+
+  expect(watch?.t('en')).type.toBe<{ name: string; spec: string } | undefined>();
+}
+
 function tAndDocSyntax(): void {
   interface ITest {
     id: number;

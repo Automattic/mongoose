@@ -14,6 +14,8 @@ const util = require('./util');
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 const DocumentObjectId = mongoose.Types.ObjectId;
+const ValidatorError = mongoose.Error.ValidatorError;
+const ValidationError = mongoose.Error.ValidationError;
 
 /**
  * Test.
@@ -1011,6 +1013,375 @@ describe('Query', function() {
     });
   });
 
+  describe('validateFilter option', function() {
+    let validateSchema;
+    let ValidateModel;
+
+    before(function() {
+      validateSchema = new Schema({
+        status: { type: String, enum: ['open', 'closed'] },
+        priority: { type: Number, enum: [1, 2, 3] },
+        name: String,
+        age: { type: Number, min: 0 },
+        address: {
+          city: { type: String, enum: ['NYC', 'LA'] }
+        },
+        tags: {
+          type: String,
+          validate: {
+            async validator(v) {
+              return v === 'allowed';
+            },
+            message: 'invalid tag'
+          }
+        }
+      });
+    });
+
+    beforeEach(function() {
+      ValidateModel = db.model('ValidateTest', validateSchema);
+    });
+
+    it('throws on invalid enum value when validateFilter is enabled', async function() {
+      const q = ValidateModel.find({ status: 'invalid' }).validateFilter(true);
+
+      await q._castConditions();
+
+      const err = q.error();
+      assert.ok(err instanceof ValidationError);
+      assert.ok(err.errors.status instanceof ValidatorError);
+      assert.equal(err.errors.status.kind, 'enum');
+      assert.equal(err.errors.status.value, 'invalid');
+    });
+
+    it('does not throw on invalid enum value when validateFilter is disabled', async function() {
+      const q = ValidateModel.find({ status: 'invalid' });
+
+      await q._castConditions();
+
+      assert.ifError(q.error());
+    });
+
+    it('allows valid enum values when validateFilter is enabled', async function() {
+      const q = ValidateModel.find({ status: 'open' }).validateFilter(true);
+
+      await q._castConditions();
+
+      assert.ifError(q.error());
+    });
+
+    it('allows null when validateFilter is enabled', async function() {
+      const q = ValidateModel.find({ status: null }).validateFilter(true);
+
+      await q._castConditions();
+
+      assert.ifError(q.error());
+    });
+
+    it('skips RegExp values', async function() {
+      const q = ValidateModel.find({ status: /open/ }).validateFilter(true);
+
+      await q._castConditions();
+
+      assert.ifError(q.error());
+    });
+
+    it('validates $in values', async function() {
+      const q = ValidateModel.find({ status: { $in: ['open', 'closed'] } }).validateFilter(true);
+
+      await q._castConditions();
+
+      assert.ifError(q.error());
+    });
+
+    it('throws for invalid value in $in', async function() {
+      const q = ValidateModel.find({ status: { $in: ['open', 'invalid'] } }).validateFilter(true);
+
+      await q._castConditions();
+
+      const err = q.error();
+      assert.ok(err instanceof ValidationError);
+      assert.ok(err.errors.status instanceof ValidatorError);
+      assert.equal(err.errors.status.value, 'invalid');
+    });
+
+    it('validates number enums', async function() {
+      const q = ValidateModel.find({ priority: 4 }).validateFilter(true);
+
+      await q._castConditions();
+
+      const err = q.error();
+      assert.ok(err instanceof ValidationError);
+      assert.ok(err.errors.priority instanceof ValidatorError);
+      assert.equal(err.errors.priority.value, 4);
+    });
+
+    it('skips paths without enum', async function() {
+      const q = ValidateModel.find({ name: 'anything' }).validateFilter(true);
+
+      await q._castConditions();
+
+      assert.ifError(q.error());
+    });
+
+    it('works with setOptions', async function() {
+      const q = ValidateModel.find({ status: 'invalid' }).setOptions({ validateFilter: true });
+
+      await q._castConditions();
+
+      assert.ok(q.error() instanceof ValidationError);
+    });
+
+    it('works when passing validateFilter in find options object', async function() {
+      const q = ValidateModel.find({ status: 'invalid' }, null, { validateFilter: true });
+
+      assert.equal(q.options.validateFilter, true);
+
+      await q._castConditions();
+
+      const err = q.error();
+      assert.ok(err instanceof ValidationError);
+      assert.ok(err.errors.status instanceof ValidatorError);
+    });
+
+    it('allows valid enum values when validateFilter is passed in find options object', async function() {
+      const q = ValidateModel.find({ status: 'open' }, null, { validateFilter: true });
+
+      assert.equal(q.options.validateFilter, true);
+
+      await q._castConditions();
+
+      assert.ifError(q.error());
+    });
+
+    it('works with find via _castConditions', async function() {
+      const q = ValidateModel.find({ status: 'invalid' }).validateFilter(true);
+      await q._castConditions();
+
+      const err = q.error();
+      assert.ok(err instanceof ValidationError);
+      assert.ok(err.errors.status instanceof ValidatorError);
+    });
+
+    it('executes find with valid enum value when validateFilter is enabled', async function() {
+      await ValidateModel.create({ status: 'open' });
+
+      const docs = await ValidateModel.find({ status: 'open' }).validateFilter(true);
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0].status, 'open');
+    });
+
+    it('throws on find with invalid enum value when validateFilter is enabled', async function() {
+      await ValidateModel.create({ status: 'open' });
+
+      const err = await ValidateModel.find({ status: 'invalid' }).validateFilter(true).then(() => null, e => e);
+      assert.ok(err instanceof ValidationError);
+      assert.ok(err.errors.status instanceof ValidatorError);
+    });
+
+    it('throws on find with invalid enum value when validateFilter is in options object', async function() {
+      await ValidateModel.create({ status: 'open' });
+
+      const err = await ValidateModel.find({ status: 'invalid' }, null, { validateFilter: true }).then(() => null, e => e);
+      assert.ok(err instanceof ValidationError);
+      assert.ok(err.errors.status instanceof ValidatorError);
+    });
+
+    it('executes find with valid enum value when validateFilter is in options object', async function() {
+      await ValidateModel.create({ status: 'open' });
+
+      const docs = await ValidateModel.find({ status: 'open' }, null, { validateFilter: true });
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0].status, 'open');
+    });
+
+    it('works with Model.validateFilter()', async function() {
+      await ValidateModel.validateFilter({ status: 'open' });
+
+      const err = await ValidateModel.validateFilter({ status: 'invalid' }).then(() => null, e => e);
+      assert.ok(err instanceof ValidationError);
+      assert.ok(err.errors.status instanceof ValidatorError);
+    });
+
+    it('does not throw on find with invalid enum value when validateFilter is disabled', async function() {
+      await ValidateModel.create({ status: 'open' });
+
+      const docs = await ValidateModel.find({ status: 'invalid' });
+      assert.equal(docs.length, 0);
+    });
+
+    it('validates values in $or', async function() {
+      const q = ValidateModel.find({ $or: [{ status: 'invalid' }, { status: 'open' }] }).validateFilter(true);
+
+      await q._castConditions();
+
+      assert.ok(q.error() instanceof ValidationError);
+      assert.ok(q.error().errors.status instanceof ValidatorError);
+    });
+
+    it('allows valid values in $and', async function() {
+      const q = ValidateModel.find({ $and: [{ status: 'open' }, { priority: 1 }] }).validateFilter(true);
+
+      await q._castConditions();
+
+      assert.ifError(q.error());
+    });
+
+    it('validates values in $nor', async function() {
+      const q = ValidateModel.find({ $nor: [{ status: 'invalid' }] }).validateFilter(true);
+
+      await q._castConditions();
+
+      assert.ok(q.error() instanceof ValidationError);
+      assert.ok(q.error().errors.status instanceof ValidatorError);
+    });
+
+    it('throws for invalid value in $nin', async function() {
+      const q = ValidateModel.find({ status: { $nin: ['open', 'invalid'] } }).validateFilter(true);
+
+      await q._castConditions();
+
+      assert.ok(q.error() instanceof ValidationError);
+      assert.ok(q.error().errors.status instanceof ValidatorError);
+      assert.equal(q.error().errors.status.value, 'invalid');
+    });
+
+    it('throws for invalid value in $eq', async function() {
+      const q = ValidateModel.find({ status: { $eq: 'invalid' } }).validateFilter(true);
+
+      await q._castConditions();
+
+      assert.ok(q.error() instanceof ValidationError);
+      assert.ok(q.error().errors.status instanceof ValidatorError);
+    });
+
+    it('throws for invalid value in $ne', async function() {
+      const q = ValidateModel.find({ status: { $ne: 'invalid' } }).validateFilter(true);
+
+      await q._castConditions();
+
+      assert.ok(q.error() instanceof ValidationError);
+      assert.ok(q.error().errors.status instanceof ValidatorError);
+    });
+
+    it('validates values in $not', async function() {
+      const q = ValidateModel.find({ status: { $not: { $eq: 'invalid' } } }).validateFilter(true);
+
+      await q._castConditions();
+
+      assert.ok(q.error() instanceof ValidationError);
+      assert.ok(q.error().errors.status instanceof ValidatorError);
+    });
+
+    it('does not validate values in unsupported operators like $gt', async function() {
+      const q = ValidateModel.find({ status: { $gt: 'invalid' } }).validateFilter(true);
+
+      await q._castConditions();
+
+      assert.ifError(q.error());
+    });
+
+    it('validates non-enum validators like min', async function() {
+      const q = ValidateModel.find({ age: -1 }).validateFilter(true);
+
+      await q._castConditions();
+
+      const err = q.error();
+      assert.ok(err instanceof ValidationError);
+      assert.ok(err.errors.age instanceof ValidatorError);
+      assert.equal(err.errors.age.kind, 'min');
+    });
+
+    it('validates nested dot notation paths', async function() {
+      const q = ValidateModel.find({ 'address.city': 'invalid' }).validateFilter(true);
+
+      await q._castConditions();
+
+      const err = q.error();
+      assert.ok(err instanceof ValidationError);
+      assert.ok(err.errors['address.city'] instanceof ValidatorError);
+    });
+
+    it('validates nested subdocument paths', async function() {
+      const q = ValidateModel.find({ address: { city: 'invalid' } }).validateFilter(true);
+
+      await q._castConditions();
+
+      const err = q.error();
+      assert.ok(err instanceof ValidationError);
+      assert.ok(err.errors['address.city'] instanceof ValidatorError);
+    });
+
+    it('allows valid nested subdocument paths', async function() {
+      const q = ValidateModel.find({ address: { city: 'NYC' } }).validateFilter(true);
+
+      await q._castConditions();
+
+      assert.ifError(q.error());
+    });
+
+    it('validates with async custom validators', async function() {
+      const q = ValidateModel.find({ tags: 'nope' }).validateFilter(true);
+
+      await q._castConditions();
+
+      const err = q.error();
+      assert.ok(err instanceof ValidationError);
+      assert.ok(err.errors.tags instanceof ValidatorError);
+    });
+
+    it('returns CastError before ValidationError when casting fails', async function() {
+      const q = ValidateModel.find({ priority: 'not a number' }).validateFilter(true);
+
+      await q._castConditions();
+
+      const err = q.error();
+      assert.ok(err);
+      assert.equal(err.name, 'CastError');
+      assert.notEqual(err.name, 'ValidationError');
+    });
+
+    it('throws on findOne with invalid filter when validateFilter is enabled', async function() {
+      const err = await ValidateModel.findOne({ status: 'invalid' }).validateFilter(true).then(() => null, e => e);
+      assert.ok(err instanceof ValidationError);
+      assert.ok(err.errors.status instanceof ValidatorError);
+    });
+
+    it('throws on deleteMany with invalid filter when validateFilter is enabled', async function() {
+      await ValidateModel.create({ status: 'open' });
+
+      const err = await ValidateModel.deleteMany({ status: 'invalid' }).validateFilter(true).then(() => null, e => e);
+      assert.ok(err instanceof ValidationError);
+      assert.ok(err.errors.status instanceof ValidatorError);
+    });
+
+    it('throws on countDocuments with invalid filter when validateFilter is enabled', async function() {
+      const err = await ValidateModel.countDocuments({ status: 'invalid' }).validateFilter(true).then(() => null, e => e);
+      assert.ok(err instanceof ValidationError);
+      assert.ok(err.errors.status instanceof ValidatorError);
+    });
+
+    it('throws on updateOne with invalid filter when validateFilter is enabled', async function() {
+      await ValidateModel.create({ status: 'open' });
+
+      const err = await ValidateModel.updateOne(
+        { status: 'invalid' },
+        { name: 'test' }
+      ).validateFilter(true).then(() => null, e => e);
+      assert.ok(err instanceof ValidationError);
+      assert.ok(err.errors.status instanceof ValidatorError);
+    });
+
+    it('throws on cursor with invalid filter when validateFilter is enabled', async function() {
+      await ValidateModel.create({ status: 'open' });
+
+      const err = await ValidateModel.find({ status: 'invalid' }).validateFilter(true).cursor().next().
+        then(() => null, e => e);
+      assert.ok(err instanceof ValidationError);
+      assert.ok(err.errors.status instanceof ValidatorError);
+    });
+  });
+
   describe('distinct', function() {
     it('op', function() {
       const q = new Query({});
@@ -1178,6 +1549,40 @@ describe('Query', function() {
   // Advanced Query options
 
   describe('options', function() {
+    describe('validateFilter', function() {
+      it('works', function() {
+        let query = new Query({});
+        query.validateFilter();
+        assert.equal(query.options.validateFilter, true);
+
+        query = new Query({});
+        query.validateFilter(true);
+        assert.equal(query.options.validateFilter, true);
+
+        query = new Query({});
+        query.validateFilter(false);
+        assert.equal(query.options.validateFilter, false);
+      });
+
+      it('is false by default', function() {
+        const query = new Query({});
+        assert.ok(!query.options.validateFilter);
+      });
+
+      it('works with setOptions', function() {
+        const query = new Query({});
+        query.setOptions({ validateFilter: true });
+        assert.equal(query.options.validateFilter, true);
+      });
+
+      it('works when passed as find options object', function() {
+        const Model = db.model('ValidateFilterOptionsTest', new Schema({
+          status: { type: String, enum: ['open', 'closed'] }
+        }));
+        const query = Model.find({}, null, { validateFilter: true });
+        assert.equal(query.options.validateFilter, true);
+      });
+    });
     describe('tailable', function() {
       it('works', function() {
         let query = new Query({});

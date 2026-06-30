@@ -163,6 +163,9 @@ declare module 'mongoose' {
 
   type OmitThisParameterIfFunction<T> = T extends (...args: any[]) => any ? OmitThisParameter<T> : T;
 
+  // Strip explicit `this` parameter from methods in schema type options. The `this` parameter
+  // is just for type-checking the function body. Keeping the explicit 'this' typing can cause
+  // compiler errors on the method calls, so remove it for the hydrated document definition.
   type HydratedDocumentOverrides<T> = {
     [K in keyof T]: OmitThisParameterIfFunction<T[K]>;
   };

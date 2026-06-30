@@ -744,7 +744,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       assert.strictEqual(getPostCount('find'), 0);
     });
 
-    it('skips pre/post find hooks when iterating with next()', async function() {
+    it('skips pre/post find hooks when iterating with next() when middleware: false', async function() {
       // Arrange
       const { User, getPreCount, getPostCount } = createTestContext();
       await User.create({ name: 'John' });

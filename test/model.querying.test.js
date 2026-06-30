@@ -365,6 +365,25 @@ describe('model: querying:', function() {
       assert.equal(created.id, found.id);
 
     });
+    it('supports named parameters via namedParamsSymbol', async function() {
+  const { namedParamsSymbol } = require('../lib/helpers/symbols');
+  const title = 'Named Params Test ' + random();
+  await BlogPostB.create({ title: title, author: 'TestAuthor' });
+
+  // old positional style still works
+  const docPositional = await BlogPostB.findOne({ title: title });
+  assert.equal(docPositional.get('title'), title);
+
+  // new named parameters style
+  const docNamed = await BlogPostB.findOne({
+    [namedParamsSymbol]: true,
+    filter: { title: title },
+    projection: 'title author',
+    options: { lean: true }
+  });
+  assert.equal(docNamed.title, title);
+  assert.equal(docNamed.author, 'TestAuthor');
+});
   });
 
   describe('findById', function() {

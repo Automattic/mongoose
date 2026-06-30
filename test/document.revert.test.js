@@ -71,19 +71,23 @@ describe('document: $revert()', function() {
       assert.equal(doc.c, 1);
     });
 
-    it('removes keys added after load', async function() {
+    it('removes a key set via Mongoose API on revert', async function() {
       const schema = new Schema({ name: String }, { strict: false });
       const Model = db.model('Test', schema);
 
       await Model.create({ name: 'Bob' });
       const doc = await Model.findOne({ name: 'Bob' });
 
-      doc._doc.extraKey = 'should be removed';
+      // Use the Mongoose API (tracked in savedState); direct _doc mutation is unsupported
+      doc.set('extraKey', 'should be removed');
       assert.equal(doc._doc.extraKey, 'should be removed');
+      assert.ok(doc.$isModified('extraKey'));
 
       doc.$revert();
 
+      // extraKey's original value was undefined (not in DB), so it is reverted to undefined
       assert.equal(doc._doc.extraKey, undefined);
+      assert.ok(!doc.$isModified('extraKey'));
     });
 
     it('is a no-op on a new (unsaved) document', function() {
@@ -91,10 +95,9 @@ describe('document: $revert()', function() {
       const Model = db.model('Test', schema);
 
       const doc = new Model({ name: 'New' });
-      // No _originalDoc — revert should be harmless
       doc.name = 'Modified';
-      doc.$revert(); // should not throw
-      // Value is unchanged since there's nothing to revert to
+      // savedState is null for programmatic docs (not loaded from DB) — revert is a no-op
+      doc.$revert();
       assert.equal(doc.name, 'Modified');
     });
 

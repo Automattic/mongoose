@@ -287,6 +287,32 @@ describe('Double', function() {
         );
       });
     });
+
+    describe('when a non-numeric object is provided to a Double field', () => {
+      it('throws a CastError instead of silently storing NaN (gh)', async() => {
+        const doc = new Test({
+          myDouble: { malicious: 'object' }
+        });
+
+        assert.deepStrictEqual(doc.myDouble, undefined);
+        const err = await doc.validate().catch(e => e);
+        assert.ok(err);
+        assert.ok(err.errors['myDouble']);
+        assert.equal(err.errors['myDouble'].name, 'CastError');
+      });
+
+      it('throws a CastError for an object whose valueOf() is non-numeric (gh)', async() => {
+        const doc = new Test({
+          myDouble: { valueOf: () => ({}) }
+        });
+
+        assert.deepStrictEqual(doc.myDouble, undefined);
+        const err = await doc.validate().catch(e => e);
+        assert.ok(err);
+        assert.ok(err.errors['myDouble']);
+        assert.equal(err.errors['myDouble'].name, 'CastError');
+      });
+    });
   });
 
   describe('custom casters', () => {

@@ -22,7 +22,7 @@
   "dependencies": {
     "@standard-schema/spec": "^1.1.0",
     "kareem": "3.3.0",
-    "mongodb": "~7.2",
+    "mongodb": "~7.4",
     "mpath": "0.9.0",
     "mquery": "6.0.0",
     "ms": "2.1.3",

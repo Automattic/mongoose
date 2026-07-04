@@ -7,7 +7,7 @@
  * `strictRead` controls what happens when a document hydrated from MongoDB
  * contains fields not defined in the schema:
  *   - false (default): fields are stored in _doc (existing behavior)
- *   - true / 'filter': unknown fields are silently stripped during init
+ *   - true: unknown fields are silently stripped during init
  *   - 'throw': a StrictModeError is thrown during init
  */
 
@@ -87,22 +87,7 @@ describe('document: strictRead option:', function() {
     });
   });
 
-  describe("strictRead: 'filter'", function() {
-    it("'filter' behaves identically to true — strips unknown fields", async function() {
-      const writeSchema = new Schema({ title: String }, { strict: false });
-      const WriteModel = db.model('StrictReadFilterWrite', writeSchema);
-      await WriteModel.create({ title: 'hello', unknownField: 42 });
-
-      const readSchema = new Schema({ title: String }, { strictRead: 'filter' });
-      const ReadModel = db.model('StrictReadFilterRead', readSchema, WriteModel.collection.name);
-      const doc = await ReadModel.findOne({ title: 'hello' });
-
-      assert.equal(doc.title, 'hello');
-      assert.equal(doc._doc.unknownField, undefined, 'unknownField should be filtered out');
-    });
-  });
-
-  describe("strictRead: 'throw'", function() {
+  describe('strictRead: \'throw\'', function() {
     it('throws a StrictModeError when an unknown field is encountered on init', async function() {
       const writeSchema = new Schema({ name: String }, { strict: false });
       const WriteModel = db.model('StrictReadThrowWrite', writeSchema);
@@ -144,6 +129,38 @@ describe('document: strictRead option:', function() {
 
       assert.equal(doc.meta.known, 'yes');
       assert.equal(doc._doc.topLevel, undefined, 'top-level extra field should be stripped');
+    });
+  });
+
+  describe('strictRead with subdocuments and document arrays', function() {
+    it('strips unknown fields inside subdocuments with strictRead: true', async function() {
+      const childWriteSchema = new Schema({ heading: String }, { strict: false, _id: false });
+      const writeSchema = new Schema({ child: childWriteSchema }, { strict: false });
+      const WriteModel = db.model('StrictReadSubdocWrite', writeSchema);
+      await WriteModel.create({ child: { heading: 'intro', extra: 'nestedExtra' } });
+
+      const childReadSchema = new Schema({ heading: String }, { strictRead: true, _id: false });
+      const readSchema = new Schema({ child: childReadSchema }, { strictRead: true });
+      const ReadModel = db.model('StrictReadSubdocRead', readSchema, WriteModel.collection.name);
+      const doc = await ReadModel.findOne({});
+
+      assert.equal(doc.child.heading, 'intro');
+      assert.equal(doc.child._doc.extra, undefined, 'nested unknown field should be stripped from subdoc');
+    });
+
+    it('strips unknown fields inside document arrays with strictRead: true', async function() {
+      const itemWriteSchema = new Schema({ name: String }, { strict: false, _id: false });
+      const writeSchema = new Schema({ items: [itemWriteSchema] }, { strict: false });
+      const WriteModel = db.model('StrictReadDocArrayWrite', writeSchema);
+      await WriteModel.create({ items: [{ name: 'item1', extra: 'arrayExtra' }] });
+
+      const itemReadSchema = new Schema({ name: String }, { strictRead: true, _id: false });
+      const readSchema = new Schema({ items: [itemReadSchema] }, { strictRead: true });
+      const ReadModel = db.model('StrictReadDocArrayRead', readSchema, WriteModel.collection.name);
+      const doc = await ReadModel.findOne({});
+
+      assert.equal(doc.items[0].name, 'item1');
+      assert.equal(doc.items[0]._doc.extra, undefined, 'unknown field in array element should be stripped');
     });
   });
 });

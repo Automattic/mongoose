@@ -216,17 +216,36 @@ async function createWithPopulatedDoc() {
   interface Other {
     to: mongoose.PopulatedDoc<User>;
   }
+  interface OtherWithNested {
+    nested: {
+      to: mongoose.PopulatedDoc<User>;
+    };
+  }
+  interface OtherNestedCreateInput {
+    nested: {
+      to: string;
+    };
+  }
 
   const userSchema = new mongoose.Schema({ dummy: String });
   const userModel = mongoose.model<User>('TestCreateWithPopulatedDocUser', userSchema);
 
   const otherSchema = new mongoose.Schema({ to: { type: mongoose.Types.ObjectId, ref: 'TestCreateWithPopulatedDocUser' } });
   const otherModel = mongoose.model<Other>('TestCreateWithPopulatedDocOther', otherSchema);
+  const otherWithNestedSchema = new mongoose.Schema({
+    nested: {
+      to: { type: mongoose.Types.ObjectId, ref: 'TestCreateWithPopulatedDocUser' }
+    }
+  });
+  const otherWithNestedModel = mongoose.model<OtherWithNested>('TestCreateWithNestedPopulatedDocOther', otherWithNestedSchema);
 
   const user = await userModel.create({ dummy: 'hello' });
   const other = await otherModel.create({ to: user._id.toString() });
+  const nestedInput: OtherNestedCreateInput = { nested: { to: user._id.toString() } };
+  const otherWithNested = await otherWithNestedModel.create(nestedInput);
 
   expect(other.to).type.toBe<mongoose.PopulatedDoc<User>>();
+  expect(otherWithNested.nested.to).type.toBe<mongoose.PopulatedDoc<User>>();
 }
 
 createWithAggregateErrors();

@@ -193,7 +193,7 @@ declare module 'mongoose' {
    * - vanilla arrays of POJOs for document arrays
    * - POJOs and array of arrays for maps
    */
-  type CreateObjectWithExtraKeys<T> = T & Record<string, unknown>;
+  type CreateObjectWithExtraKeys<T> = T | (T & Record<string, unknown>);
   type ApplyBasicCreateCasting<T> = {
     [K in keyof T]: NonNullable<T[K]> extends Map<infer KeyType extends string, infer ValueType>
       ? (Record<KeyType, ValueType> | Array<[KeyType, ValueType]> | T[K] | QueryTypeCasting<Extract<T[K], TreatAsPrimitives>>)

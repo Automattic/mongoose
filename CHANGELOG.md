@@ -1,3 +1,7 @@
+7.8.11 / 2026-07-06
+===================
+ * fix(utils): allow merging single nested paths and document array paths outside of discriminator schema merges #16351 #9534
+
 7.8.10 / 2026-06-22
 ===================
  * fix(document): add additional defensive checks for special properties in Document.prototype.get()

@@ -1,3 +1,9 @@
+9.7.4 / 2026-07-06
+==================
+ * types(create): fix handling of nested objects typed as interfaces #16363 #16362
+ * types: correct `this` parameter handling for methods with `versionKey` #16344 #16046
+ * docs: add FAQ entry for `querySrv ECONNREFUSED` errors on Windows with `mongodb+srv://` connections #16342 [ajay naik](https://github.com/Ajay-Naik)
+
 9.7.3 / 2026-06-26
 ==================
  * types(model): correct Model.validate() return type to Promise<TRawDocType> #16340 #16338

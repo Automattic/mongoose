@@ -130,6 +130,19 @@ describe('document: strictRead option:', function() {
       assert.equal(doc.meta.known, 'yes');
       assert.equal(doc._doc.topLevel, undefined, 'top-level extra field should be stripped');
     });
+
+    it('strips unknown nested objects entirely with strictRead: true', async function() {
+      const writeSchema = new Schema({ meta: { known: String } }, { strict: false });
+      const WriteModel = db.model('StrictReadNestedObjWrite', writeSchema);
+      await WriteModel.create({ meta: { known: 'yes' }, extraObj: { a: 'x' } });
+
+      const readSchema = new Schema({ meta: { known: String } }, { strictRead: true });
+      const ReadModel = db.model('StrictReadNestedObjRead', readSchema, WriteModel.collection.name);
+      const doc = await ReadModel.findOne({});
+
+      assert.equal(doc.meta.known, 'yes');
+      assert.equal(doc._doc.extraObj, undefined, 'unknown object should be stripped, not left as an empty object');
+    });
   });
 
   describe('strictRead with subdocuments and document arrays', function() {

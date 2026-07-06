@@ -222,9 +222,10 @@ async function createWithPopulatedDoc() {
     };
   }
   interface OtherNestedCreateInput {
-    nested: {
-      to: string;
-    };
+    nested: Nested;
+  }
+  interface Nested {
+    to: string;
   }
 
   const userSchema = new mongoose.Schema({ dummy: String });

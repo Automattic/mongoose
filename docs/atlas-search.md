@@ -47,7 +47,16 @@ await Article.init();
 
 ### Custom Field Mappings
 
-For more control over which fields are indexed and how, use custom field mappings:
+For more control over which fields are indexed and how, use custom field mappings.
+
+Atlas Search uses [Apache Lucene](https://lucene.apache.org/) analyzers for text processing.
+Analyzers determine how text is tokenized, filtered, and indexed. Common analyzers include:
+
+* `lucene.standard` - General-purpose text analysis (tokenizes on whitespace and punctuation)
+* `lucene.english` - English language analysis with stemming
+* `lucene.keyword` - Treats entire field value as a single token (exact matching)
+
+For a complete list of analyzers and their configurations, see the [MongoDB Atlas Search Analyzers documentation](https://www.mongodb.com/docs/atlas/atlas-search/analyzers/).
 
 ```javascript
 articleSchema.searchIndex({
@@ -58,15 +67,15 @@ articleSchema.searchIndex({
       fields: {
         title: {
           type: 'string',
-          analyzer: 'lucene.standard'
+          analyzer: 'lucene.standard'  // Tokenize on whitespace/punctuation
         },
         content: {
           type: 'string',
-          analyzer: 'lucene.english'  // Use English language analyzer
+          analyzer: 'lucene.english'  // English language analysis with stemming
         },
         author: {
           type: 'string',
-          analyzer: 'lucene.keyword'  // Exact match only
+          analyzer: 'lucene.keyword'  // Exact match only (no tokenization)
         },
         tags: {
           type: 'string',
@@ -84,7 +93,7 @@ articleSchema.searchIndex({
 ### Vector Search Index
 
 For semantic search using vector embeddings, create a vector search index.
-See the dedicated [Atlas Vector Search](atlas-vector-search.html) guide for detailed information.
+See the [Vector Search](atlas-vector-search.html) guide for detailed information.
 
 ```javascript
 const movieSchema = new mongoose.Schema({
@@ -162,6 +171,7 @@ Once your search index is created, you can use the `$search` aggregation stage t
 ### Basic Text Search
 
 ```javascript
+// Basic search in a single field
 const results = await Article.aggregate([
   {
     $search: {
@@ -176,14 +186,9 @@ const results = await Article.aggregate([
     $limit: 10
   }
 ]);
-```
 
-### Multi-field Search
-
-Search across multiple fields:
-
-```javascript
-const results = await Article.aggregate([
+// Multi-field search: search across title, content, and tags
+const multiFieldResults = await Article.aggregate([
   {
     $search: {
       index: 'article_search',
@@ -194,14 +199,9 @@ const results = await Article.aggregate([
     }
   }
 ]);
-```
 
-### Fuzzy Matching
-
-Enable fuzzy matching to find results even with typos:
-
-```javascript
-const results = await Article.aggregate([
+// Fuzzy matching: find results even with typos
+const fuzzyResults = await Article.aggregate([
   {
     $search: {
       index: 'article_search',
@@ -219,7 +219,7 @@ const results = await Article.aggregate([
 
 ### Compound Queries
 
-Combine multiple search criteria:
+Combine multiple search criteria with `must`, `should`, and `filter` clauses:
 
 ```javascript
 const results = await Article.aggregate([
@@ -260,7 +260,7 @@ const results = await Article.aggregate([
 
 ### Including Search Scores
 
-Include the relevance score in your results:
+Include the relevance score in your results using the `$meta` operator:
 
 ```javascript
 const results = await Article.aggregate([
@@ -277,7 +277,9 @@ const results = await Article.aggregate([
     $project: {
       title: 1,
       content: 1,
-      score: { $meta: 'searchScore' }  // Include the search score
+      // The $meta: 'searchScore' operator returns the relevance score
+      // calculated by Atlas Search based on how well the document matches the query
+      score: { $meta: 'searchScore' }
     }
   },
   {
@@ -291,7 +293,7 @@ const results = await Article.aggregate([
 ## Vector Search {#vector-search}
 
 For semantic search using vector embeddings, use the `$vectorSearch` stage.
-See the complete [Atlas Vector Search](atlas-vector-search.html) guide for detailed examples and best practices.
+See the complete [Vector Search](atlas-vector-search.html) guide for detailed examples.
 
 ```javascript
 const queryEmbedding = await generateEmbedding('romantic comedy');
@@ -310,7 +312,7 @@ const results = await Movie.aggregate([
     $project: {
       title: 1,
       plot: 1,
-      score: { $meta: 'vectorSearchScore' }
+      score: { $meta: 'vectorSearchScore' }  // Vector search uses vectorSearchScore
     }
   }
 ]);
@@ -401,68 +403,12 @@ const results = await Article.aggregate([
 ]);
 ```
 
-### Sequential Search with Re-ranking
-
-First perform vector search, then re-rank with text relevance:
-
-```javascript
-const results = await Article.aggregate([
-  // 1. Vector search to find semantically similar documents
-  {
-    $vectorSearch: {
-      index: 'vector_index',
-      path: 'content_embedding',
-      queryVector: queryEmbedding,
-      numCandidates: 100,
-      limit: 50
-    }
-  },
-  {
-    $addFields: {
-      vectorScore: { $meta: 'vectorSearchScore' }
-    }
-  },
-  // 2. Re-rank using text search
-  {
-    $search: {
-      index: 'article_search',
-      text: {
-        query: 'machine learning',
-        path: 'content'
-      }
-    }
-  },
-  {
-    $addFields: {
-      textScore: { $meta: 'searchScore' }
-    }
-  },
-  // 3. Combine scores with weighting
-  {
-    $addFields: {
-      finalScore: {
-        $add: [
-          { $multiply: ['$vectorScore', 0.7] },  // 70% weight to semantic
-          { $multiply: ['$textScore', 0.3] }     // 30% weight to keywords
-        ]
-      }
-    }
-  },
-  {
-    $sort: { finalScore: -1 }
-  },
-  {
-    $limit: 10
-  }
-]);
-```
-
 ## Best Practices
 
 ### Index Management
 
 * **Use `autoSearchIndex: true` in development**: Automatically sync indexes with your schema
-* **Disable in production**: Set `autoSearchIndex: false` and manage indexes manually via Atlas UI or MongoDB CLI to avoid unintended changes
+* **Manage indexes manually in production**: Create and update indexes through Atlas UI, MongoDB CLI, or deployment scripts to avoid unintended changes during application deployments
 * **Monitor index status**: Always check `listSearchIndexes()` after creation to ensure indexes are ready (`queryable: true`)
 
 ### Schema Design
@@ -490,31 +436,21 @@ const createProductionIndexes = async () => {
 * **Project only needed fields**: Use `$project` to return only necessary data
 * **Index the right fields**: Don't use `dynamic: true` in production; explicitly index only the fields you search
 
-### Error Handling
+### Managing Indexes Outside Mongoose
 
-```javascript
-try {
-  const results = await Article.aggregate([
-    {
-      $search: {
-        index: 'article_search',  // Must exist
-        text: { query: searchQuery, path: 'content' }
-      }
-    }
-  ]);
-} catch (err) {
-  if (err.message.includes('index not found')) {
-    console.error('Search index does not exist. Create it first.');
-  } else {
-    throw err;
-  }
-}
-```
+For production deployments, you may want to manage indexes through:
+
+* **Atlas UI**: Create and manage indexes through the MongoDB Atlas web interface
+* **MongoDB CLI**: Use `mongosh` or MongoDB CLI tools for scripting index operations
+* **Atlas Admin API**: Programmatically manage indexes via the Atlas API
+
+Disable `autoSearchIndex` in production to prevent automatic index changes during deployments.
 
 ## See Also
 
-* [Atlas Vector Search](atlas-vector-search.html) for semantic search with embeddings
+* [Vector Search](atlas-vector-search.html) for semantic search with embeddings
 * [MongoDB Atlas Search Documentation](https://www.mongodb.com/docs/atlas/atlas-search/)
+* [Atlas Search Analyzers](https://www.mongodb.com/docs/atlas/atlas-search/analyzers/)
 * [Model Search Index Methods](api/model.html#model_Model-createSearchIndex)
 * [Schema searchIndex() Method](api/schema.html#schema_Schema-searchIndex)
 * [Aggregation](https://mongoosejs.com/docs/api/aggregate.html) for building complex pipelines

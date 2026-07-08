@@ -516,8 +516,16 @@ declare module 'mongoose' {
     /**
      * Shortcut for creating a new Document from existing raw data, pre-saved in the DB.
      * The document returned has no paths marked as modified initially.
+     * With `strict: false`, fields not in the schema are kept on the document; pass
+     * `ExtraFields` to describe their types, e.g.
+     * `Model.hydrate<{ totalOrders: number }>(obj, null, { strict: false })`.
      */
-    hydrate(obj: any, projection?: ProjectionType<TRawDocType>, options?: HydrateOptions): THydratedDocumentType;
+    hydrate<ExtraFields = unknown>(
+      obj: any,
+      projection: ProjectionType<TRawDocType> | null | undefined,
+      options: HydrateOptions & { strict: false }
+    ): THydratedDocumentType & ExtraFields;
+    hydrate(obj: any, projection?: ProjectionType<TRawDocType> | null | undefined, options?: HydrateOptions): THydratedDocumentType;
 
     /**
      * This function is responsible for building [indexes](https://www.mongodb.com/docs/manual/indexes/),

@@ -61,6 +61,14 @@ declare module 'mongoose' {
     match?: any;
     /** optional model to use for population */
     model?: string | Model<any>;
+    /** by default, Mongoose removes null and undefined values from populated arrays. Use this option to make `populate()` retain `null` and `undefined` array entries. */
+    retainNullValues?: boolean;
+    /** if true, Mongoose will call any getters defined on the `localField`. By default, Mongoose gets the raw value of `localField`. */
+    getters?: boolean;
+    /** if true, Mongoose will clone populated docs before assigning them, so docs that are populated onto multiple parents don't share 1 copy. */
+    clone?: boolean;
+    /** By default, Mongoose throws a cast error if `localField` and `foreignField` schemas don't line up. If you enable this option, Mongoose will instead filter out any `localField` properties that cannot be casted to `foreignField`'s schema type. */
+    skipInvalidIds?: boolean;
     /** optional query options like sort, limit, etc */
     options?: QueryOptions;
     /** correct limit on populated array */

@@ -116,6 +116,8 @@ declare module 'mongoose' {
     SessionOption {
     checkKeys?: boolean;
     j?: boolean;
+    /** An array of paths that tell mongoose to only validate and save the paths in `pathsToSave`. */
+    pathsToSave?: string[];
     safe?: boolean | WriteConcern;
     timestamps?: boolean | QueryTimestampsConfig;
     validateBeforeSave?: boolean;

@@ -152,7 +152,7 @@ await Article.updateSearchIndex('article_search', {
 ### Deleting Indexes
 
 ```javascript
-await Article.deleteSearchIndex('old_index');
+await Article.dropSearchIndex('old_index');
 ```
 
 ## Text Search Queries {#text-search}

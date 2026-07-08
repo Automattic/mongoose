@@ -176,4 +176,26 @@ describe('document: strictRead option:', function() {
       assert.equal(doc.items[0]._doc.extra, undefined, 'unknown field in array element should be stripped');
     });
   });
+
+  describe('global strictRead setting', function() {
+    it('respects mongoose.set("strictRead")', async function() {
+      const originalStrictRead = mongoose.get('strictRead');
+      try {
+        mongoose.set('strictRead', true);
+
+        const writeSchema = new Schema({ name: String }, { strict: false });
+        const WriteModel = db.model('GlobalStrictReadWrite', writeSchema);
+        await WriteModel.create({ name: 'test', extraField: 'should be stripped' });
+
+        const readSchema = new Schema({ name: String });
+        const ReadModel = db.model('GlobalStrictReadRead', readSchema, WriteModel.collection.name);
+        const doc = await ReadModel.findOne({ name: 'test' });
+
+        assert.equal(doc.name, 'test');
+        assert.equal(doc._doc.extraField, undefined, 'extraField should be stripped via global strictRead settings');
+      } finally {
+        mongoose.set('strictRead', originalStrictRead);
+      }
+    });
+  });
 });

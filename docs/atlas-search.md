@@ -441,6 +441,7 @@ const createProductionIndexes = async () => {
 For production deployments, you may want to manage indexes through:
 
 * **Atlas UI**: Create and manage indexes through the MongoDB Atlas web interface
+* **MongoDB Compass**: Visual tool for managing indexes with a user-friendly interface
 * **MongoDB CLI**: Use `mongosh` or MongoDB CLI tools for scripting index operations
 * **Atlas Admin API**: Programmatically manage indexes via the Atlas API
 

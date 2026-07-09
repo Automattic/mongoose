@@ -93,7 +93,7 @@ articleSchema.searchIndex({
 ### Vector Search Index
 
 For semantic search using vector embeddings, create a vector search index.
-See the [Vector Search](atlas-vector-search.html) guide for detailed information.
+See the dedicated [Vector Search](atlas-vector-search.html) guide for detailed information.
 
 ```javascript
 const movieSchema = new mongoose.Schema({
@@ -171,48 +171,20 @@ Once your search index is created, you can use the `$search` aggregation stage t
 ### Basic Text Search
 
 ```javascript
-// Basic search in a single field
 const results = await Article.aggregate([
   {
     $search: {
       index: 'article_search',
       text: {
         query: 'mongodb database',
-        path: 'content'  // Search in the content field
+        path: 'content',  // Single field search
+        // path: ['title', 'content', 'tags'],  // Multi-field search: search across multiple fields
+        // fuzzy: { maxEdits: 2 }  // Fuzzy matching: tolerate typos (up to 2 character differences)
       }
     }
   },
   {
     $limit: 10
-  }
-]);
-
-// Multi-field search: search across title, content, and tags
-const multiFieldResults = await Article.aggregate([
-  {
-    $search: {
-      index: 'article_search',
-      text: {
-        query: 'mongoose tutorial',
-        path: ['title', 'content', 'tags']  // Search in multiple fields
-      }
-    }
-  }
-]);
-
-// Fuzzy matching: find results even with typos
-const fuzzyResults = await Article.aggregate([
-  {
-    $search: {
-      index: 'article_search',
-      text: {
-        query: 'datbase',  // Typo: "database"
-        path: 'content',
-        fuzzy: {
-          maxEdits: 2  // Allow up to 2 character differences
-        }
-      }
-    }
   }
 ]);
 ```
@@ -296,6 +268,9 @@ For semantic search using vector embeddings, use the `$vectorSearch` stage.
 See the complete [Vector Search](atlas-vector-search.html) guide for detailed examples.
 
 ```javascript
+// Note: generateEmbedding() is pseudocode - use your embedding provider's SDK
+// Recommended: Voyage AI (client.embed()), OpenAI (client.embeddings.create()), 
+// or Atlas Automated Embeddings
 const queryEmbedding = await generateEmbedding('romantic comedy');
 
 const results = await Movie.aggregate([
@@ -321,87 +296,7 @@ const results = await Movie.aggregate([
 ## Hybrid Search {#hybrid-search}
 
 Combine text search and vector search to leverage both keyword relevance and semantic similarity.
-
-### Using $unionWith
-
-Perform separate searches and combine results:
-
-```javascript
-const queryEmbedding = await generateEmbedding('machine learning tutorial');
-
-const results = await Article.aggregate([
-  // Text search branch
-  {
-    $search: {
-      index: 'article_search',
-      text: {
-        query: 'machine learning tutorial',
-        path: ['title', 'content']
-      }
-    }
-  },
-  {
-    $limit: 20
-  },
-  {
-    $addFields: {
-      textScore: { $meta: 'searchScore' },
-      searchType: 'text'
-    }
-  },
-  // Combine with vector search
-  {
-    $unionWith: {
-      coll: 'articles',
-      pipeline: [
-        {
-          $vectorSearch: {
-            index: 'vector_index',
-            path: 'content_embedding',
-            queryVector: queryEmbedding,
-            numCandidates: 100,
-            limit: 20
-          }
-        },
-        {
-          $addFields: {
-            vectorScore: { $meta: 'vectorSearchScore' },
-            searchType: 'vector'
-          }
-        }
-      ]
-    }
-  },
-  // Combine scores
-  {
-    $addFields: {
-      combinedScore: {
-        $add: [
-          { $ifNull: ['$textScore', 0] },
-          { $multiply: [{ $ifNull: ['$vectorScore', 0] }, 10] }  // Weight vector results more
-        ]
-      }
-    }
-  },
-  // Deduplicate by _id, keeping highest score
-  {
-    $group: {
-      _id: '$_id',
-      doc: { $first: '$$ROOT' },
-      maxScore: { $max: '$combinedScore' }
-    }
-  },
-  {
-    $replaceRoot: { newRoot: '$doc' }
-  },
-  {
-    $sort: { combinedScore: -1 }
-  },
-  {
-    $limit: 10
-  }
-]);
-```
+For production use, consider using [Atlas Search reranking](https://www.mongodb.com/docs/atlas/atlas-vector-search/rerank-results/) which provides optimized hybrid search capabilities.
 
 ## Best Practices
 

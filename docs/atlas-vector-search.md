@@ -223,10 +223,11 @@ Mongoose doesn't generate embeddings for you - you need to generate them before 
 **MongoDB Atlas can automatically generate embeddings for your documents** using [Atlas Vector Search Automated Embeddings](https://www.mongodb.com/docs/vector-search/crud-embeddings/automated-embedding/overview/).
 
 This is the recommended approach as it:
-- Eliminates the need to manage embedding generation in your application code
-- Ensures consistent embedding generation across your documents
-- Supports various embedding providers including OpenAI and Hugging Face
-- Available in Atlas M10+ clusters and higher tiers
+
+* Eliminates the need to manage embedding generation in your application code
+* Ensures consistent embedding generation across your documents
+* Supports various embedding providers including OpenAI and Hugging Face
+* Available in Atlas M10+ clusters and higher tiers
 
 To use automated embeddings, configure them in your Atlas Search index definition through the Atlas UI or API. Mongoose will then work with the embeddings that Atlas generates automatically. See the [Atlas documentation](https://www.mongodb.com/docs/vector-search/crud-embeddings/automated-embedding/overview/) for setup instructions.
 
@@ -260,9 +261,10 @@ async function saveMovieWithEmbedding(movieData) {
 ```
 
 **Important considerations for application-generated embeddings**:
-- The embedding dimensions must match your index configuration (`numDimensions`)
-- You must use the same embedding model for both indexing and querying
-- Embeddings must be normalized if using `dotProduct` similarity
+
+* The embedding dimensions must match your index configuration (`numDimensions`)
+* You must use the same embedding model for both indexing and querying
+* Embeddings must be normalized if using `dotProduct` similarity
 
 ### Monitoring Index Status
 

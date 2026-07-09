@@ -1,6 +1,6 @@
 # Atlas Vector Search
 
-[Atlas Vector Search](https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-overview/) enables you to perform semantic searches on vector embeddings stored in MongoDB Atlas.
+[Atlas Vector Search](https://www.mongodb.com/docs/vector-search/) enables you to perform semantic searches on vector embeddings stored in MongoDB Atlas.
 Vector search allows you to find similar documents based on their meaning rather than exact keyword matches, which is essential for building modern AI applications like semantic search, recommendation systems, and RAG (Retrieval-Augmented Generation) applications.
 
 Mongoose provides full support for creating vector search indexes and running vector search queries through the MongoDB aggregation pipeline.
@@ -220,7 +220,7 @@ Mongoose doesn't generate embeddings for you - you need to generate them before 
 
 ### Using Atlas Automated Embeddings (Recommended)
 
-**MongoDB Atlas can automatically generate embeddings for your documents** using [Atlas Vector Search Automated Embeddings](https://www.mongodb.com/docs/atlas/atlas-vector-search/ai-integrations/automated-embeddings/).
+**MongoDB Atlas can automatically generate embeddings for your documents** using [Atlas Vector Search Automated Embeddings](https://www.mongodb.com/docs/vector-search/crud-embeddings/automated-embedding/overview/).
 
 This is the recommended approach as it:
 - Eliminates the need to manage embedding generation in your application code
@@ -228,7 +228,7 @@ This is the recommended approach as it:
 - Supports various embedding providers including OpenAI and Hugging Face
 - Available in Atlas M10+ clusters and higher tiers
 
-To use automated embeddings, configure them in your Atlas Search index definition through the Atlas UI or API. Mongoose will then work with the embeddings that Atlas generates automatically. See the [Atlas documentation](https://www.mongodb.com/docs/atlas/atlas-vector-search/ai-integrations/automated-embeddings/) for setup instructions.
+To use automated embeddings, configure them in your Atlas Search index definition through the Atlas UI or API. Mongoose will then work with the embeddings that Atlas generates automatically. See the [Atlas documentation](https://www.mongodb.com/docs/vector-search/crud-embeddings/automated-embedding/overview/) for setup instructions.
 
 ### Using Third-Party Embedding Models
 
@@ -281,9 +281,9 @@ if (vectorIndex?.queryable) {
 
 ## See Also
 
-* [MongoDB Atlas Vector Search Documentation](https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-overview/)
+* [MongoDB Atlas Vector Search Documentation](https://www.mongodb.com/docs/vector-search/)
 * [MongoDB Vector Search $vectorSearch Stage](https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-stage/)
-* [Atlas Automated Embeddings](https://www.mongodb.com/docs/atlas/atlas-vector-search/ai-integrations/automated-embeddings/)
+* [Atlas Automated Embeddings](https://www.mongodb.com/docs/vector-search/crud-embeddings/automated-embedding/overview/)
 * [Atlas Search](atlas-search.html) for text search and hybrid search
 * [Model Search Index Methods](api/model.html#model_Model-createSearchIndex)
 * [Schema searchIndex() Method](api/schema.html#schema_Schema-searchIndex)

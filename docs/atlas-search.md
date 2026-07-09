@@ -1,6 +1,6 @@
 # Atlas Search
 
-[Atlas Search](https://www.mongodb.com/docs/atlas/atlas-search/) enables fine-grained text indexing and querying of data on your Atlas cluster.
+[Atlas Search](https://www.mongodb.com/docs/search/) enables fine-grained text indexing and querying of data on your Atlas cluster.
 You can use Atlas Search to build fast, relevance-based search capabilities on top of your MongoDB data.
 
 Mongoose provides full support for managing Atlas Search indexes through your schema definitions, and querying with the `$search` aggregation stage.
@@ -56,7 +56,7 @@ Analyzers determine how text is tokenized, filtered, and indexed. Common analyze
 * `lucene.english` - English language analysis with stemming
 * `lucene.keyword` - Treats entire field value as a single token (exact matching)
 
-For a complete list of analyzers and their configurations, see the [MongoDB Atlas Search Analyzers documentation](https://www.mongodb.com/docs/atlas/atlas-search/analyzers/).
+For a complete list of analyzers and their configurations, see the [MongoDB Atlas Search Analyzers documentation](https://www.mongodb.com/docs/search/index/analyzers/overview/).
 
 ```javascript
 articleSchema.searchIndex({
@@ -441,7 +441,7 @@ const createProductionIndexes = async () => {
 For production deployments, you may want to manage indexes through:
 
 * **Atlas UI**: Create and manage indexes through the MongoDB Atlas web interface
-* **MongoDB Compass**: Visual tool for managing indexes with a user-friendly interface
+* **MongoDB Compass**: Visual tool for managing indexes with a user-friendly interface (MongoDB 7.0+)
 * **MongoDB CLI**: Use `mongosh` or MongoDB CLI tools for scripting index operations
 * **Atlas Admin API**: Programmatically manage indexes via the Atlas API
 
@@ -450,8 +450,8 @@ Disable `autoSearchIndex` in production to prevent automatic index changes durin
 ## See Also
 
 * [Vector Search](atlas-vector-search.html) for semantic search with embeddings
-* [MongoDB Atlas Search Documentation](https://www.mongodb.com/docs/atlas/atlas-search/)
-* [Atlas Search Analyzers](https://www.mongodb.com/docs/atlas/atlas-search/analyzers/)
+* [MongoDB Atlas Search Documentation](https://www.mongodb.com/docs/search/)
+* [Atlas Search Analyzers](https://www.mongodb.com/docs/search/index/analyzers/overview/)
 * [Model Search Index Methods](api/model.html#model_Model-createSearchIndex)
 * [Schema searchIndex() Method](api/schema.html#schema_Schema-searchIndex)
 * [Aggregation](https://mongoosejs.com/docs/api/aggregate.html) for building complex pipelines

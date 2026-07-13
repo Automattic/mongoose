@@ -7839,6 +7839,35 @@ describe('Model', function() {
       assert.equal(reloaded.__v, 1);
     });
 
+    it('does not lose updates after increment() on a new document (gh-15800)', async function() {
+      // Arrange
+      const userSchema = new Schema({
+        name: String,
+        items: [{ name: String }]
+      });
+
+      const User = db.model('User', userSchema);
+      const user = new User({ name: 'Test User', items: [{ name: 'item1' }] });
+      user.increment();
+
+      // Act
+      await User.bulkSave([user]);
+
+      // Assert - like save(), inserting must not bump the in-memory version
+      // ahead of the database
+      let userFromDb = await User.findById(user._id);
+      assert.equal(user.__v, userFromDb.__v);
+
+      // Act - a VERSION_WHERE update must still match the inserted document
+      user.items[0].name = 'updated-item';
+      await User.bulkSave([user]);
+
+      // Assert
+      userFromDb = await User.findById(user._id);
+      assert.equal(userFromDb.items[0].name, 'updated-item');
+      assert.equal(user.__v, userFromDb.__v);
+    });
+
     it('saves new documents with ordered: false (gh-15495)', async function() {
       const userSchema = new Schema({
         name: { type: String }

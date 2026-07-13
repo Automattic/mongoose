@@ -7856,16 +7856,19 @@ describe('Model', function() {
       // Assert - like save(), inserting must not bump the in-memory version
       // ahead of the database
       let userFromDb = await User.findById(user._id);
-      assert.equal(user.__v, userFromDb.__v);
+      assert.strictEqual(user.__v, 0);
+      assert.strictEqual(userFromDb.__v, 0);
 
-      // Act - a VERSION_WHERE update must still match the inserted document
+      // Act - a VERSION_WHERE update must still match the inserted document,
+      // and the pending increment() applies here
       user.items[0].name = 'updated-item';
       await User.bulkSave([user]);
 
       // Assert
       userFromDb = await User.findById(user._id);
       assert.equal(userFromDb.items[0].name, 'updated-item');
-      assert.equal(user.__v, userFromDb.__v);
+      assert.strictEqual(user.__v, 1);
+      assert.strictEqual(userFromDb.__v, 1);
     });
 
     it('persists the version key when inserting new documents (gh-15800)', async function() {

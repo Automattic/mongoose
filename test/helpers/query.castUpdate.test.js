@@ -38,4 +38,16 @@ describe('castUpdate', function() {
     const res = castUpdate(schema, { $set: toBeUpdated });
     assert.deepEqual(res, { $set: toBeUpdated });
   });
+
+  it('casts a schema path whose name is also an update modifier', function() {
+    // Arrange
+    const accountSchema = new Schema({ $each: Number });
+    const update = { $set: { $each: '42' } };
+
+    // Act
+    const castedUpdate = castUpdate(accountSchema, update);
+
+    // Assert
+    assert.deepEqual(castedUpdate, { $set: { $each: 42 } });
+  });
 });

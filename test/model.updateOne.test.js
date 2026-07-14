@@ -3520,15 +3520,59 @@ describe('model: updateOne: ', function() {
     assert.equal(err, null);
   });
 
-  it('casts top level $each (gh-15642)', async function() {
-    const schema = new Schema({ tags: [String] });
-    const Model = db.model('Test', schema);
+  describe('pathless update modifiers (gh-15642)', function() {
+    it('rejects a pathless modifier with an array value', async function() {
+      // Arrange
+      const { User } = createTestContext();
 
-    await Model.create({ tags: [] });
-    await assert.rejects(
-      Model.updateOne({}, { $addToSet: { $each: ['test'] } }),
-      /Modifiers such as "\$each", "\$or", "\$and", "\$in" must appear under a valid field path/
-    );
+      // Act
+      const promise = User.updateOne({}, { $addToSet: { $each: ['admin'] } });
+
+      // Assert
+      await assert.rejects(promise, /must appear under a valid field path/);
+    });
+
+    it('rejects a pathless modifier with an object value', async function() {
+      // Arrange
+      const { User } = createTestContext();
+
+      // Act
+      const promise = User.updateOne({}, { $push: { $each: { name: 'admin' } } });
+
+      // Assert
+      await assert.rejects(promise, /must appear under a valid field path/);
+    });
+
+    it('rejects a pathless modifier that is not in the original allowlist', async function() {
+      // Arrange
+      const { User } = createTestContext();
+
+      // Act
+      const promise = User.updateOne({}, { $pull: { $nin: ['admin'] } });
+
+      // Assert
+      await assert.rejects(promise, /must appear under a valid field path/);
+    });
+
+    it('allows a modifier nested under a field path', async function() {
+      // Arrange
+      const { User } = createTestContext();
+      const user = await User.create({ roles: ['admin', 'member'] });
+
+      // Act
+      await User.updateOne({ _id: user._id }, { $pull: { roles: { $nin: ['admin'] } } });
+
+      // Assert
+      const updatedUser = await User.findById(user._id);
+      assert.deepEqual(updatedUser.roles, ['admin']);
+    });
+
+    function createTestContext() {
+      const userSchema = new Schema({ roles: [String] });
+      const User = db.model('User', userSchema);
+
+      return { User };
+    }
   });
 });
 

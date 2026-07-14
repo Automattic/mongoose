@@ -3526,10 +3526,13 @@ describe('model: updateOne: ', function() {
       const { User } = createTestContext();
 
       // Act
-      const promise = User.updateOne({}, { $addToSet: { $each: ['admin'] } });
+      const error = await User.updateOne({}, { $addToSet: { $each: ['admin'] } })
+        .then(() => null, error => error);
 
       // Assert
-      await assert.rejects(promise, /must appear under a valid field path/);
+      assert.equal(error?.name, 'MongooseError');
+      assert.match(error.message,
+        /Did you mean something like \{ \$addToSet: \{ fieldName: \{ \$each: \[\.\.\.\] \} \} \}\?/);
     });
 
     it('rejects a pathless modifier with an object value', async function() {

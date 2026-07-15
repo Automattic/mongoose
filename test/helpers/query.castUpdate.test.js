@@ -50,4 +50,68 @@ describe('castUpdate', function() {
     // Assert
     assert.deepEqual(castedUpdate, { $set: { $each: 42 } });
   });
+
+  it('casts a nested schema path whose root name is also an update modifier', function() {
+    // Arrange
+    const accountSchema = new Schema({ $each: { count: Number } });
+    const update = { $set: { $each: { count: '42' } } };
+
+    // Act
+    const castedUpdate = castUpdate(accountSchema, update);
+
+    // Assert
+    assert.deepEqual(castedUpdate, { $set: { $each: { count: 42 } } });
+  });
+
+  it('preserves scalar update operators on a nested modifier-named path', function() {
+    // Arrange
+    const accountSchema = new Schema({ $each: { count: Number } });
+    const updates = [
+      { $unset: { $each: 1 } },
+      { $set: { $each: null } },
+      { $rename: { $each: 'archived' } }
+    ];
+
+    // Act
+    const castedUpdates = updates.map(update => castUpdate(accountSchema, structuredClone(update)));
+
+    // Assert
+    assert.deepEqual(castedUpdates, updates);
+  });
+
+  it('casts a modifier-named schema path nested under another path', function() {
+    // Arrange
+    const accountSchema = new Schema({ preferences: { $each: Number } });
+    const update = { $set: { preferences: { $each: '42' } } };
+
+    // Act
+    const castedUpdate = castUpdate(accountSchema, update);
+
+    // Assert
+    assert.deepEqual(castedUpdate, { $set: { preferences: { $each: 42 } } });
+  });
+
+  it('casts an array schema path whose name is also an update modifier', function() {
+    // Arrange
+    const accountSchema = new Schema({ $each: [Number] });
+    const update = { $push: { $each: '42' } };
+
+    // Act
+    const castedUpdate = castUpdate(accountSchema, update);
+
+    // Assert
+    assert.deepEqual(castedUpdate, { $push: { $each: 42 } });
+  });
+
+  it('preserves a mixed schema path whose name is also an update modifier', function() {
+    // Arrange
+    const accountSchema = new Schema({ $in: Schema.Types.Mixed });
+    const update = { $set: { $in: { count: '42' } } };
+
+    // Act
+    const castedUpdate = castUpdate(accountSchema, update);
+
+    // Assert
+    assert.deepEqual(castedUpdate, { $set: { $in: { count: '42' } } });
+  });
 });

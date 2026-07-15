@@ -3570,11 +3570,66 @@ describe('model: updateOne: ', function() {
       assert.deepEqual(updatedUser.roles, ['admin']);
     });
 
+    it('allows an insert-style upsert for a nested modifier-named dollar path', async function() {
+      // Arrange
+      const { Account } = createDollarPathTestContext();
+      const _id = new mongoose.Types.ObjectId();
+
+      // Act
+      await Account.updateOne({ _id }, { $each: { count: '42' } }, { upsert: true });
+
+      // Assert
+      const account = await Account.findById(_id);
+      assert.equal(account.$each.count, 42);
+    });
+
+    it('updates a nested modifier-named dollar path using object syntax', async function() {
+      // Arrange
+      const { Account } = createDollarPathTestContext();
+      const account = await Account.create({ preferences: { $each: 1 } });
+
+      // Act
+      await Account.updateOne(
+        { _id: account._id },
+        { $set: { preferences: { $each: '42' } } }
+      );
+
+      // Assert
+      const updatedAccount = await Account.findById(account._id);
+      assert.equal(updatedAccount.preferences.$each, 42);
+    });
+
+    it('updates a nested modifier-named dollar path using dotted syntax', async function() {
+      // Arrange
+      const { Account } = createDollarPathTestContext();
+      const account = await Account.create({ preferences: { $each: 1 } });
+
+      // Act
+      await Account.updateOne(
+        { _id: account._id },
+        { $set: { 'preferences.$each': '42' } }
+      );
+
+      // Assert
+      const updatedAccount = await Account.findById(account._id);
+      assert.equal(updatedAccount.preferences.$each, 42);
+    });
+
     function createTestContext() {
       const userSchema = new Schema({ roles: [String] });
       const User = db.model('User', userSchema);
 
       return { User };
+    }
+
+    function createDollarPathTestContext() {
+      const accountSchema = new Schema({
+        $each: { count: Number },
+        preferences: { $each: Number }
+      });
+      const Account = db.model('Account', accountSchema);
+
+      return { Account };
     }
   });
 });

@@ -895,6 +895,9 @@ parent. Returns the original document if there is no parent.
 - `[options.getters=false]` \<boolean\> if true, Mongoose will call any getters defined on the `localField`. By default, Mongoose gets the raw value of `localField`. For example, you would need to set this option to `true` if you wanted to [add a `lowercase` getter to your `localField`](https://mongoosejs.com/docs/schematypes.html#schematype-options).
 - `[options.clone=false]` \<boolean\> When you do `BlogPost.find().populate('author')`, blog posts with the same author will share 1 copy of an `author` doc. Enable this option to make Mongoose clone populated docs before assigning them.
 - `[options.match=null]` \<object|Function\> Add an additional filter to the populate query. Can be a filter object containing [MongoDB query syntax](https://www.mongodb.com/docs/manual/tutorial/query-documents/), or a function that returns a filter object.
+- `[options.skipInvalidIds=false]` \<boolean\> By default, Mongoose throws a cast error if `localField` and `foreignField` schemas don't line up. If you enable this option, Mongoose will instead filter out any `localField` properties that cannot be casted to `foreignField`'s schema type.
+- `[options.perDocumentLimit=null]` \<number\> For legacy reasons, `limit` with `populate()` may give incorrect results when populating multiple parent documents because it executes a single query for all parents. If you set `perDocumentLimit`, Mongoose will execute a separate query per parent document to ensure correct per-document `limit`.
+- `[options.strictPopulate=true]` \<boolean\> Set to false to allow populating paths that aren't defined in the given model's schema.
 - `[options.transform=null]` \<Function\> Function that Mongoose will call on every populated document that allows you to transform the populated document.
 - `[options.options=null]` \<object\> Additional options like `limit` and `lean`.
 - `[options.forceRepopulate=true]` \<boolean\> Set to `false` to prevent Mongoose from repopulating paths that are already populated
@@ -993,6 +996,10 @@ Sends a replaceOne command with this document `_id` as the query selector.
 - `[options.wtimeout]` \<number\> sets a [timeout for the write concern](https://www.mongodb.com/docs/manual/reference/write-concern/#wtimeout). Overrides the [schema-level `writeConcern` option](https://mongoosejs.com/docs/guide.html#writeConcern).
 - `[options.checkKeys=true]` \<boolean\> the MongoDB driver prevents you from saving keys that start with '$' or contain '.' by default. Set this option to `false` to skip that check. See [restrictions on field names](https://www.mongodb.com/docs/manual/reference/limits/#Restrictions-on-Field-Names)
 - `[options.timestamps=true]` \<boolean\> if `false` and [timestamps](https://mongoosejs.com/docs/guide.html#timestamps) are enabled, skip timestamps for this `save()`.
+- `[options.pathsToSave]` \<Array\> An array of paths that tell mongoose to only validate and save the paths in `pathsToSave`.
+- `[options.middleware=true]` \<boolean|object\> set to `false` to skip all user-defined middleware
+- `[options.middleware.pre=true]` \<boolean\> set to `false` to skip only pre hooks
+- `[options.middleware.post=true]` \<boolean\> set to `false` to skip only post hooks
 
 ### Returns
 

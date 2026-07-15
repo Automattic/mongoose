@@ -766,6 +766,9 @@ Appends new custom $sample operator to this aggregate pipeline.
 
     aggregate.sample(3); // Add a pipeline that picks 3 random documents
 
+    // `$match` before `$sample` samples from the filtered subset
+    aggregate.match({ difficulty: 'easy' }).sample(3);
+
 ## `Aggregate.prototype.search()`
 
 ### Parameters

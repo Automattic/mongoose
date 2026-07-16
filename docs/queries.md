@@ -194,7 +194,7 @@ const aggRes = await Person.aggregate([{ $match: { _id: idString } }]);
 
 ## Sorting {#sorting}
 
-[Sorting](/docs/api.html#query_Query-sort) is how you can ensure your query results come back in the desired order.
+[Sorting](api.html#query_Query-sort) is how you can ensure your query results come back in the desired order.
 
 ```javascript
 const personSchema = new mongoose.Schema({

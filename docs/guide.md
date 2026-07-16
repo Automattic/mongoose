@@ -1,7 +1,7 @@
 # Schemas
 
 If you haven't yet done so, please take a minute to read the [quickstart](index.html) to get an idea of how Mongoose works.
-If you are migrating from 7.x to 8.x please take a moment to read the [migration guide](migrating_to_8.html).
+If you are migrating from 8.x to 9.x please take a moment to read the [migration guide](migrating_to_9.html).
 
 <ul class="toc">
   <li><a href="#definition">Defining your schema</a></li>

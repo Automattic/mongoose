@@ -161,6 +161,21 @@ describe('document: strictRead option:', function() {
       assert.equal(doc.child._doc.extra, undefined, 'nested unknown field should be stripped from subdoc');
     });
 
+    it('allows unknown fields inside subdocuments with strictRead: false and parent strictRead: true', async function() {
+      const childWriteSchema = new Schema({ heading: String }, { strict: false, _id: false });
+      const writeSchema = new Schema({ child: childWriteSchema }, { strict: false });
+      const WriteModel = db.model('StrictReadSubdocWrite', writeSchema);
+      await WriteModel.create({ child: { heading: 'intro', extra: 'nestedExtra' } });
+
+      const childReadSchema = new Schema({ heading: String }, { strictRead: false, _id: false });
+      const readSchema = new Schema({ child: childReadSchema }, { strictRead: true });
+      const ReadModel = db.model('StrictReadSubdocRead', readSchema, WriteModel.collection.name);
+      const doc = await ReadModel.findOne({});
+
+      assert.equal(doc.child.heading, 'intro');
+      assert.equal(doc.child.toObject().extra, 'nestedExtra');
+    });
+
     it('strips unknown fields inside document arrays with strictRead: true', async function() {
       const itemWriteSchema = new Schema({ name: String }, { strict: false, _id: false });
       const writeSchema = new Schema({ items: [itemWriteSchema] }, { strict: false });

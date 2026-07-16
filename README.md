@@ -32,7 +32,7 @@ Check out the [plugins search site](https://plugins.mongoosejs.io/) to see hundr
 Pull requests are always welcome! Please base pull requests against the `master`
 branch and follow the [contributing guide](https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md).
 
-If your pull requests make documentation changes, please do **not**
+If your pull request makes documentation changes, please do **not**
 modify any `.html` files. The `.html` files are compiled code, so please make
 your changes in `docs/*.pug`, `lib/*.js`, or `test/docs/*.js`.
 

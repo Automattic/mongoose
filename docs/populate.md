@@ -100,7 +100,7 @@ const story = await Story.
 console.log('The author is %s', story.author.name);
 ```
 
-Populated paths are no longer set to their original `_id` , their value
+Populated paths are no longer set to their original `_id`, their value
 is replaced with the mongoose document returned from the database by
 performing a separate query before returning the results.
 

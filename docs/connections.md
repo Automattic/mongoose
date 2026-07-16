@@ -304,7 +304,7 @@ conn.on('close', () => console.log('close'));
 ## A note about keepAlive {#keepAlive}
 
 Before Mongoose 5.2.0, you needed to enable the `keepAlive` option to initiate [TCP keepalive](https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html) to prevent `"connection closed"` errors.
-However, `keepAlive` has been `true` by default since Mongoose 5.2.0, and the `keepAlive` is deprecated as of Mongoose 7.2.0.
+However, `keepAlive` has been `true` by default since Mongoose 5.2.0, and `keepAlive` is deprecated as of Mongoose 7.2.0.
 Please remove `keepAlive` and `keepAliveInitialDelay` options from your Mongoose connections.
 
 ## Replica Set Connections {#replicaset_connections}
@@ -492,7 +492,7 @@ Your business logic can then `require()` or `import` the connection it needs.
 ## Connection Pools {#connection_pools}
 
 Each `connection`, whether created with `mongoose.connect` or
-`mongoose.createConnection` are all backed by an internal configurable
+`mongoose.createConnection`, is backed by an internal configurable
 connection pool defaulting to a maximum size of 100. Adjust the pool size
 using your connection options:
 
@@ -558,7 +558,7 @@ app.listen(3000);
 
 The following is an example of pattern (2).
 Pattern (2) is more flexible and better for use cases with > 10k tenants and > 1 requests/second.
-Because each tenant has a separate connection pool, one tenants' slow operations will have minimal impact on other tenants.
+Because each tenant has a separate connection pool, one tenant's slow operations will have minimal impact on other tenants.
 However, this pattern is harder to implement and manage in production.
 In particular, [MongoDB does have a limit on the number of open connections](https://www.mongodb.com/blog/post/tuning-mongodb--linux-to-allow-for-tens-of-thousands-connections), and [MongoDB Atlas has separate limits on the number of open connections](https://www.mongodb.com/docs/atlas/reference/atlas-limits), so you need to make sure the total number of sockets in your connection pools doesn't go over MongoDB's limits.
 

@@ -1351,3 +1351,46 @@ function hydrateWithStrictOption() {
 
   expect(doc4).type.toBe<ReturnType<(typeof TestModel)['hydrate']>>();
 }
+
+function gh15940() {
+  interface IUser {
+    name: string;
+    age: number;
+  }
+
+  const schema = new mongoose.Schema<IUser>({
+    name: String,
+    age: Number
+  });
+
+  const User = mongoose.model<IUser>('User', schema);
+
+  const rawUser = {
+    _id: new mongoose.Types.ObjectId(),
+    name: 'John',
+    age: 30,
+    totalOrders: 42
+  };
+
+  // With `strict: false`, callers can describe the extra fields kept on the document
+  const user = User.hydrate<{ totalOrders: number }>(rawUser, null, { strict: false });
+
+  expect(user.name).type.toBe<string>();
+  expect(user.age).type.toBe<number>();
+  expect(user.totalOrders).type.toBe<number>();
+  expect(user.isModified()).type.toBe<boolean>();
+
+  // Without the extra fields type argument, the return type is unchanged
+  const plainUser = User.hydrate(rawUser, null, { strict: false });
+  expect(plainUser).type.toBe<ReturnType<(typeof User)['hydrate']>>();
+
+  // `null` and `undefined` projections are accepted with and without options
+  expect(User.hydrate).type.toBeCallableWith(rawUser, null);
+  expect(User.hydrate).type.toBeCallableWith(rawUser, undefined);
+  expect(User.hydrate<{ totalOrders: number }>).type.toBeCallableWith(rawUser, undefined, { strict: false });
+
+  // Extra fields type argument requires `strict: false`
+  expect(User.hydrate<{ totalOrders: number }>).type.toBeCallableWith(rawUser, null, { strict: false });
+  expect(User.hydrate<{ totalOrders: number }>).type.not.toBeCallableWith(rawUser, null, { strict: true });
+  expect(User.hydrate<{ totalOrders: number }>).type.not.toBeCallableWith(rawUser);
+}

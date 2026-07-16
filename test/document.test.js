@@ -2466,6 +2466,43 @@ describe('document', function() {
       assert.equal(called, 1);
     });
 
+    it('does not rebuild the modified paths set once per required path when validating (gh-16379)', function() {
+      const symbols = require('../lib/helpers/symbols');
+
+      const N = 40;
+      const def = {};
+      for (let i = 0; i < N; ++i) {
+        def['f' + i] = { type: String, required: true };
+      }
+      const Test = db.model('Test', new Schema(def));
+
+      const obj = { _id: new mongoose.Types.ObjectId() };
+      for (let i = 0; i < N; ++i) {
+        obj['f' + i] = 'v' + i;
+      }
+      // Projected document: every required path except `f0` is deselected, so
+      // validation falls through to `$isModified()` for each required path.
+      const doc = Test.hydrate(obj, { f0: 1 });
+      // A modification is required for `$isModified()` to actually build the
+      // modified-paths set (otherwise it short-circuits on an empty modify state).
+      doc.f0 = 'changed';
+
+      const spy = sinon.spy(Document.prototype, symbols.documentModifiedPaths);
+      try {
+        const err = doc.validateSync();
+        assert.ifError(err);
+        // Before gh-16379 this was called once per deselected required path
+        // (O(required)), each call an O(modified) rebuild -> O(required x modified).
+        // The set should now be computed at most once.
+        assert.ok(
+          spy.callCount <= 1,
+          `expected modifiedPaths to be rebuilt at most once, got ${spy.callCount}`
+        );
+      } finally {
+        spy.restore();
+      }
+    });
+
     it('does not filter validation on unmodified paths when validateModifiedOnly not set (gh-7421)', async function() {
       const testSchema = new Schema({ title: { type: String, required: true }, other: String });
 

@@ -168,30 +168,29 @@ await Article.dropSearchIndex('old_index');
 
 Once your search index is created, you can use the `$search` aggregation stage to perform text searches.
 
-### Basic Text Search
+### Text Search Examples
 
 ```javascript
+// Example query showcasing different text search options:
 const results = await Article.aggregate([
   {
     $search: {
       index: 'article_search',
       text: {
         query: 'mongodb database',
-        path: 'content',  // Single field search
-        // path: ['title', 'content', 'tags'],  // Multi-field search: search across multiple fields
-        // fuzzy: { maxEdits: 2 }  // Fuzzy matching: tolerate typos (up to 2 character differences)
+        path: 'content'  // Single field search
+        // path: ['title', 'content', 'tags']  // Multi-field: search across multiple fields
+        // fuzzy: { maxEdits: 2 }  // Fuzzy: tolerate typos (up to 2 char differences)
       }
     }
   },
-  {
-    $limit: 10
-  }
+  { $limit: 10 }
 ]);
 ```
 
 ### Compound Queries
 
-Combine multiple search criteria with `must`, `should`, and `filter` clauses:
+Combine multiple search criteria with `must`, `should`, and `filter` clauses. Include relevance scores using the `$meta` operator:
 
 ```javascript
 const results = await Article.aggregate([
@@ -224,24 +223,6 @@ const results = await Article.aggregate([
             }
           }
         ]
-      }
-    }
-  }
-]);
-```
-
-### Including Search Scores
-
-Include the relevance score in your results using the `$meta` operator:
-
-```javascript
-const results = await Article.aggregate([
-  {
-    $search: {
-      index: 'article_search',
-      text: {
-        query: 'mongodb',
-        path: 'content'
       }
     }
   },
@@ -296,6 +277,65 @@ const results = await Movie.aggregate([
 ## Hybrid Search {#hybrid-search}
 
 Combine text search and vector search to leverage both keyword relevance and semantic similarity.
+
+### Sequential Search with Re-ranking
+
+First perform vector search, then re-rank with text relevance:
+
+```javascript
+const queryEmbedding = await generateEmbedding('machine learning tutorial');
+
+const results = await Article.aggregate([
+  // 1. Vector search to find semantically similar documents
+  {
+    $vectorSearch: {
+      index: 'vector_index',
+      path: 'content_embedding',
+      queryVector: queryEmbedding,
+      numCandidates: 100,
+      limit: 50
+    }
+  },
+  {
+    $addFields: {
+      vectorScore: { $meta: 'vectorSearchScore' }
+    }
+  },
+  // 2. Re-rank using text search
+  {
+    $search: {
+      index: 'article_search',
+      text: {
+        query: 'machine learning',
+        path: 'content'
+      }
+    }
+  },
+  {
+    $addFields: {
+      textScore: { $meta: 'searchScore' }
+    }
+  },
+  // 3. Combine scores with weighting
+  {
+    $addFields: {
+      finalScore: {
+        $add: [
+          { $multiply: ['$vectorScore', 0.7] },  // 70% weight to semantic
+          { $multiply: ['$textScore', 0.3] }     // 30% weight to keywords
+        ]
+      }
+    }
+  },
+  {
+    $sort: { finalScore: -1 }
+  },
+  {
+    $limit: 10
+  }
+]);
+```
+
 For production use, consider using [Atlas Search reranking](https://www.mongodb.com/docs/atlas/atlas-vector-search/rerank-results/) which provides optimized hybrid search capabilities.
 
 ## Best Practices

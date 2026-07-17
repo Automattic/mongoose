@@ -16,8 +16,6 @@ Mongoose provides full support for managing Atlas Search indexes through your sc
 You can define Atlas Search indexes in your Mongoose schema using the `schema.searchIndex()` method.
 Mongoose can automatically create these indexes when your model initializes if you enable the `autoSearchIndex` option.
 
-### Basic Text Search Index
-
 ```javascript
 const articleSchema = new mongoose.Schema({
   title: String,
@@ -167,8 +165,6 @@ await Article.dropSearchIndex('old_index');
 ## Text Search Queries {#text-search}
 
 Once your search index is created, you can use the `$search` aggregation stage to perform text searches.
-
-### Text Search Examples
 
 ```javascript
 // Example query showcasing different text search options:
@@ -336,7 +332,7 @@ const results = await Article.aggregate([
 ]);
 ```
 
-For production use, consider using [Atlas Search reranking](https://www.mongodb.com/docs/atlas/atlas-vector-search/rerank-results/) which provides optimized hybrid search capabilities.
+For production use, see the [Atlas Hybrid Search documentation](https://www.mongodb.com/docs/atlas/atlas-search/tutorial/hybrid-search/) for optimized patterns and best practices.
 
 ## Best Practices
 

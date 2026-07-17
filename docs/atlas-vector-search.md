@@ -107,9 +107,7 @@ await Movie.createSearchIndex({
 
 ## Querying with $vectorSearch {#querying}
 
-Once your vector search index is created, you can perform vector similarity searches using the `$vectorSearch` aggregation stage.
-
-### Basic Vector Search Query
+Once your vector search index is created, and your embeddings are generated (see [Generating Embeddings](#embeddings)), you can perform vector similarity searches using the `$vectorSearch` aggregation stage.
 
 ```javascript
 // Your query embedding (example function - see "Generating Embeddings" section below)
@@ -182,34 +180,62 @@ Mongoose doesn't generate embeddings for you - you need to generate them before 
 
 ### Using Atlas Automated Embeddings (Recommended)
 
-**MongoDB Atlas can automatically generate embeddings for your documents** using [Atlas Vector Search Automated Embeddings](https://www.mongodb.com/docs/vector-search/crud-embeddings/automated-embedding/overview/).
+**MongoDB Atlas can automatically generate embeddings for your documents** using [Atlas Vector Search Automated Embeddings](https://www.mongodb.com/docs/vector-search/crud-embeddings/automated-embedding/overview/). Available in MongoDB Atlas and self-managed deployments (requires MongoDB 8.2+).
 
-This is the recommended approach as it:
+With Automated Embeddings, you define an `autoEmbed` index on a text field — no embedding field in your schema required. Atlas generates and manages the embeddings internally.
 
-* Eliminates the need to manage embedding generation in your application code
-* Ensures consistent embedding generation across your documents
-* Supports various embedding providers including OpenAI and Hugging Face
-* Available in MongoDB Atlas and self-managed deployments
+```javascript
+// Schema needs only the source text field — no embedding array needed
+const movieSchema = new mongoose.Schema({
+  title: String,
+  fullplot: String
+});
 
-To use automated embeddings, configure them through the [MongoDB Atlas UI](https://www.mongodb.com/products/platform/ai-search-and-retrieval) (easiest if using Atlas) or via the API for self-managed deployments. Mongoose will then work with the embeddings that MongoDB generates automatically. See the [Atlas documentation](https://www.mongodb.com/docs/vector-search/crud-embeddings/automated-embedding/overview/) for setup instructions.
+// Define an autoEmbed index — Atlas handles embedding generation via Voyage AI
+movieSchema.searchIndex({
+  name: 'auto_embed_index',
+  type: 'vectorSearch',
+  definition: {
+    fields: [{
+      type: 'autoEmbed',   // Atlas generates embeddings automatically
+      modality: 'text',
+      path: 'fullplot',    // Text field to embed
+      model: 'voyage-4'    // Voyage AI model used at index- and query-time
+    }]
+  }
+});
+
+const Movie = mongoose.model('Movie', movieSchema);
+await Movie.createSearchIndexes();
+
+// Just save the document as usual — Atlas generates the embedding automatically
+await Movie.create({ title: 'Amélie', fullplot: 'A shy waitress plays matchmaker for others.' });
+```
 
 ### Using Third-Party Embedding Models
 
 If you need to generate embeddings in your application (for example, when using embedding models not supported by Atlas Automated Embeddings), you can use any embedding provider. Popular options include:
 
-* **[Voyage AI](https://www.voyageai.com/)** - High-quality embeddings optimized for retrieval, with models like `voyage-2` and `voyage-code-2`
+* **[Voyage AI](https://www.mongodb.com/products/platform/ai-search-and-retrieval)** - High-quality embeddings optimized for retrieval, with models like `voyage-2` and `voyage-code-2`
 * **[OpenAI Embeddings](https://platform.openai.com/docs/guides/embeddings)** - Models like `text-embedding-ada-002` (1536 dimensions) and `text-embedding-3-small`
-* **[Hugging Face Sentence Transformers](https://huggingface.co/sentence-transformers)** - Open-source models with various dimension sizes
+* **[Anthropic Embeddings](https://platform.claude.com/docs/en/build-with-claude/embeddings)** - Multiple models, including Voyage AI family.
 
 Example workflow for application-generated embeddings:
 
 ```javascript
+import OpenAI from "openai";
+const client = new OpenAI();
+
 // Example: Generate embeddings before saving
 async function saveMovieWithEmbedding(movieData) {
   // Generate embedding using your chosen provider's SDK
-  // For example: OpenAI's client.embeddings.create(), Voyage AI's client.embed(), etc.
-  const embedding = await generateEmbedding(movieData.plot);
-  
+  // For example: OpenAI's client.embeddings.create()
+  const response = await client.embeddings.create({
+    model: "text-embedding-3-small",
+    input: "movieData.plot",
+  });
+
+  const embedding = await response.data[0].embedding;
   const movie = new Movie({
     title: movieData.title,
     plot: movieData.plot,

@@ -1182,7 +1182,7 @@ describe('schema', function() {
         }),
         /conflicts with a real path/
       );
-      assert.strictEqual(entrySchema.virtualpath(''), null);
+      assert.deepStrictEqual(Object.keys(entrySchema.virtuals), []);
     });
 
     describe('id', function() {

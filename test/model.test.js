@@ -8619,6 +8619,108 @@ describe('Model', function() {
     );
   });
 
+  it('supports parent-level dotted virtuals on document arrays for `hydrate()` (gh-15627)', function() {
+    const itemSchema = new Schema({ name: String });
+    const orderSchema = new Schema({ items: [itemSchema] });
+    orderSchema.virtual('items.detail');
+
+    const Order = db.model('Order', orderSchema);
+
+    const raw = { items: [{ name: 'Keyboard', detail: 'mechanical' }, { name: 'Mouse', detail: 'wireless' }] };
+
+    const withoutVirtuals = Order.hydrate(raw);
+    assert.equal(withoutVirtuals.items[0].name, 'Keyboard');
+    assert.strictEqual(withoutVirtuals.items[0].detail, undefined);
+
+    const doc = Order.hydrate(raw, undefined, { virtuals: true });
+    assert.equal(doc.items.length, 2);
+    assert.equal(doc.items[0].name, 'Keyboard');
+    assert.equal(doc.items[0].detail, 'mechanical');
+    assert.equal(doc.items[1].name, 'Mouse');
+    assert.equal(doc.items[1].detail, 'wireless');
+    assert.strictEqual(doc.items[0].toObject({ virtuals: true }).detail, 'mechanical');
+  });
+
+  it('supports parent-level dotted virtuals on single nested subdocuments for `hydrate()` (gh-15627)', function() {
+    const addressSchema = new Schema({ city: String });
+    const customerSchema = new Schema({ address: addressSchema });
+    customerSchema.virtual('address.detail');
+
+    const Customer = db.model('Customer', customerSchema);
+
+    const raw = { address: { city: 'Cairo', detail: 'near the river' } };
+
+    const withoutVirtuals = Customer.hydrate(raw);
+    assert.equal(withoutVirtuals.address.city, 'Cairo');
+    assert.strictEqual(withoutVirtuals.address.detail, undefined);
+
+    const doc = Customer.hydrate(raw, undefined, { virtuals: true });
+    assert.equal(doc.address.city, 'Cairo');
+    assert.equal(doc.address.detail, 'near the river');
+    assert.strictEqual(doc.address.toObject({ virtuals: true }).detail, 'near the river');
+  });
+
+  it('supports parent-level dotted virtuals on maps of subdocuments for `hydrate()` (gh-15627)', function() {
+    const entrySchema = new Schema({ value: String }, { _id: false });
+    const reportSchema = new Schema({
+      entries: {
+        type: Map,
+        of: entrySchema
+      }
+    });
+    reportSchema.virtual('entries.$*.detail');
+
+    const Report = db.model('Report', reportSchema);
+
+    const raw = {
+      entries: {
+        first: { value: 'ab', detail: 'first detail' },
+        second: { value: 'cd', detail: 'second detail' }
+      }
+    };
+
+    const withoutVirtuals = Report.hydrate(raw);
+    assert.equal(withoutVirtuals.entries.get('first').value, 'ab');
+    assert.strictEqual(withoutVirtuals.entries.get('first').detail, undefined);
+
+    const doc = Report.hydrate(raw, undefined, { virtuals: true });
+    assert.equal(doc.entries.get('first').value, 'ab');
+    assert.equal(doc.entries.get('first').detail, 'first detail');
+    assert.equal(doc.entries.get('second').value, 'cd');
+    assert.equal(doc.entries.get('second').detail, 'second detail');
+    assert.strictEqual(doc.entries.get('first').toObject({ virtuals: true }).detail, 'first detail');
+  });
+
+  it('keeps child schema paths and virtuals intact with parent-level dotted virtuals for `hydrate()` (gh-15627)', function() {
+    const itemSchema = new Schema({ name: String });
+    itemSchema.virtual('nameUpper').get(function() {
+      return this.name.toUpperCase();
+    });
+
+    const orderSchema = new Schema({ items: [itemSchema] });
+    // Same name as an existing child virtual: must not clobber the child getter
+    orderSchema.virtual('items.nameUpper');
+    orderSchema.virtual('items.detail');
+
+    // Same name as a real child path: still rejected
+    assert.throws(
+      () => orderSchema.virtual('items.name'),
+      /conflicts with a real path/
+    );
+
+    const Order = db.model('Order', orderSchema);
+
+    const doc = Order.hydrate(
+      { items: [{ name: 'Keyboard', detail: 'mechanical' }] },
+      undefined,
+      { virtuals: true }
+    );
+
+    assert.equal(doc.items[0].name, 'Keyboard');
+    assert.equal(doc.items[0].nameUpper, 'KEYBOARD');
+    assert.equal(doc.items[0].detail, 'mechanical');
+  });
+
   it('sets index collation based on schema collation (gh-7621)', async function() {
     let testSchema = new Schema(
       { name: { type: String, index: true } }

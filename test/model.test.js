@@ -8691,6 +8691,28 @@ describe('Model', function() {
     assert.strictEqual(doc.entries.get('first').toObject({ virtuals: true }).detail, 'first detail');
   });
 
+  it('supports parent-level dotted virtuals under nested objects for `hydrate()` (gh-15627)', function() {
+    const itemSchema = new Schema({ name: String });
+    const orderSchema = new Schema({
+      meta: {
+        items: [itemSchema]
+      }
+    });
+    orderSchema.virtual('meta.items.detail');
+
+    const Order = db.model('Order', orderSchema);
+
+    const raw = { meta: { items: [{ name: 'Keyboard', detail: 'mechanical' }] } };
+
+    const withoutVirtuals = Order.hydrate(raw);
+    assert.equal(withoutVirtuals.meta.items[0].name, 'Keyboard');
+    assert.strictEqual(withoutVirtuals.meta.items[0].detail, undefined);
+
+    const doc = Order.hydrate(raw, undefined, { virtuals: true });
+    assert.equal(doc.meta.items[0].name, 'Keyboard');
+    assert.equal(doc.meta.items[0].detail, 'mechanical');
+  });
+
   it('keeps child schema paths and virtuals intact with parent-level dotted virtuals for `hydrate()` (gh-15627)', function() {
     const itemSchema = new Schema({ name: String });
     itemSchema.virtual('nameUpper').get(function() {

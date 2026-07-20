@@ -57,6 +57,25 @@ await Test.findOne(); // Will throw "Operation timed out" error because `db` isn
 You must ensure that you have whitelisted your ip on [mongodb](https://www.mongodb.com/docs/atlas/security/ip-access-list/) to allow Mongoose to connect.
 You can allow access from all ips with `0.0.0.0/0`.
 
+<hr id="querysrv-econnrefused" />
+
+<a class="anchor" href="#querysrv-econnrefused">**Q**</a>. I get a `querySrv ECONNREFUSED` error when connecting to MongoDB Atlas using `mongodb+srv://`. What gives?
+
+**A**. Node.js may be failing to resolve MongoDB's SRV records even when your OS DNS works correctly.
+This is a known issue on Windows (confirmed regression in Node.js v24.13.0, see [nodejs/node#61453](https://github.com/nodejs/node/pull/61453)) and can also affect systems where the ISP intercepts DNS at the network level.
+
+The fix is to explicitly set DNS servers in Node.js at the very top of your entry file, before any other imports:
+
+```javascript
+const dns = require('dns');
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
+// Now connect to MongoDB
+mongoose.connect('mongodb+srv://...');
+```
+
+This bypasses the OS/ISP DNS resolver entirely at the Node.js level.
+
 <hr id="not-a-function" />
 
 <a class="anchor" href="#not-a-function">**Q**</a>. x.$__y is not a function. What gives?
@@ -140,7 +159,7 @@ is undefined on the underlying [POJO](guide.html#minimize).
 <a class="anchor" href="#arrow-functions">**Q**</a>. I'm using an arrow function for a [virtual](guide.html#virtuals), [middleware](middleware.html), [getter](api/schematype.html#schematype_SchemaType-get)/[setter](api/schematype.html#schematype_SchemaType-set), or [method](guide.html#methods) and the value of `this` is wrong.
 
 **A**. Arrow functions [handle the `this` keyword differently than conventional functions](https://masteringjs.io/tutorials/fundamentals/arrow#why-not-arrow-functions).
-Mongoose getters/setters depend on `this` to give you access to the document that you're writing to, but this functionality does not work with arrow functions. Do **not** use arrow functions for mongoose getters/setters unless do not intend to access the document in the getter/setter.
+Mongoose getters/setters depend on `this` to give you access to the document that you're writing to, but this functionality does not work with arrow functions. Do **not** use arrow functions for mongoose getters/setters unless you do not intend to access the document in the getter/setter.
 
 ```javascript
 // Do **NOT** use arrow functions as shown below unless you're certain

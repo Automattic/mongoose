@@ -16042,6 +16042,36 @@ describe('document', function() {
     rawDoc = await Test.collection.findOne({ _id: 'test2' });
     assert.deepStrictEqual(rawDoc, { _id: 'test2', name: null });
   });
+
+  it('revalidates hydrated paths when a dependent field changes (gh-16370)', async function() {
+    const userSchema = new mongoose.Schema({
+      name: String,
+      requiresEmail: Boolean,
+      email: {
+        type: String,
+        validate: {
+          validator: function(v) {
+            return !this.requiresEmail || (typeof v === 'string' && v.includes('@'));
+          },
+          message: 'invalid email'
+        }
+      }
+    });
+    const User = db.model('User', userSchema);
+
+    // Valid at creation time: requiresEmail is false, so the junk email passes
+    const { _id } = await User.create({ name: 'John', requiresEmail: false, email: 'not-an-email' });
+
+    const user = await User.findById(_id);
+
+    // Save #1: touch an unrelated field. Passes on both master and this branch.
+    user.name = 'Johnny';
+    await user.save();
+
+    // Save #2: flip requiresEmail, which makes the hydrated `email` invalid.
+    user.requiresEmail = true;
+    await assert.rejects(() => user.save(), /invalid email/);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

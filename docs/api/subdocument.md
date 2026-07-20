@@ -14,7 +14,9 @@ Returns this sub-documents parent document.
 ## `Subdocument.prototype.$toObject()`
 
 Override `$toObject()` to handle minimizing the whole path. Should not minimize if schematype-level minimize
-is set to false re: gh-11247, gh-14058, gh-14151
+is set to false re: gh-11247, gh-14058, gh-14151. Should not minimize document array elements: an array
+element cannot be removed without shifting the array, so minimizing it to `undefined` makes the BSON
+serializer store `null` re: gh-7322.
 
 ## `Subdocument.prototype.deleteOne()`
 

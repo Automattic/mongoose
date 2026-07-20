@@ -81,6 +81,7 @@ Schema constructor.
 - [shardKey](https://mongoosejs.com/docs/guide.html#shardKey): object - defaults to `null`
 - [strict](https://mongoosejs.com/docs/guide.html#strict): bool - defaults to true
 - [strictQuery](https://mongoosejs.com/docs/guide.html#strictQuery): bool - defaults to false
+- [strictRead](https://mongoosejs.com/docs/guide.html#strictRead): bool or 'throw' - defaults to false. If set to `true`, fields not in the schema will be stripped when hydrating documents from MongoDB. If set to `'throw'`, an error will be thrown when a field not in the schema is encountered during document hydration.
 - [toJSON](https://mongoosejs.com/docs/guide.html#toJSON) - object - no default
 - [toObject](https://mongoosejs.com/docs/guide.html#toObject) - object - no default
 - [typeKey](https://mongoosejs.com/docs/guide.html#typeKey) - string - defaults to 'type'

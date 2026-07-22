@@ -1,3 +1,24 @@
+9.8.0 / 2026-07-20
+==================
+ * feat(schema): add `strictRead` option to filter or throw on unknown fields during document hydration #16345 #4279 [GourabSingha](https://github.com/gourabsingha1)
+ * feat: upgrade MongoDB Node.js driver to 7.5 #16391
+ * fix(subdocument): don't minimize empty document array elements to null #16393 #15336 #7322 [WaleedAshraf](https://github.com/WaleedAshraf)
+ * fix(model): correctly handle version keys when `bulkSave()` inserts new documents #16386 #15800 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(cast): correctly cast object-shaped geo query values #16380 #16376 [rajkumar0932](https://github.com/rajkumar0932)
+ * fix(schema): avoid mutating shared setters when casting array query values #16372 #16364 [yakubka](https://github.com/yakubka)
+ * fix(document): correctly handle excluded parent paths with optimistic concurrency #16367 #16054 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * types(model): add `pathsToSave` to `SaveOptions` #16375 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * types(model): support extra fields in `hydrate()` with `strict: false` #16374 #15940 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(populate): document missing options and `perDocumentLimit` for `populate()` #16371 [Wnayar](https://github.com/Wnayar)
+ * docs: expand `sample()` example to show sampling from a filtered subset #16369 [Wnayar](https://github.com/Wnayar)
+ * docs: fix typos, grammar, and documentation links #16389 [LakshyaTyagi15](https://github.com/LakshyaTyagi15)
+
+9.7.4 / 2026-07-06
+==================
+ * types(create): fix handling of nested objects typed as interfaces #16363 #16362
+ * types: correct `this` parameter handling for methods with `versionKey` #16344 #16046
+ * docs: add FAQ entry for `querySrv ECONNREFUSED` errors on Windows with `mongodb+srv://` connections #16342 [ajay naik](https://github.com/Ajay-Naik)
+
 9.7.3 / 2026-06-26
 ==================
  * types(model): correct Model.validate() return type to Promise<TRawDocType> #16340 #16338

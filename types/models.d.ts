@@ -116,6 +116,8 @@ declare module 'mongoose' {
     SessionOption {
     checkKeys?: boolean;
     j?: boolean;
+    /** An array of paths that tell mongoose to only validate and save the paths in `pathsToSave`. */
+    pathsToSave?: string[];
     safe?: boolean | WriteConcern;
     timestamps?: boolean | QueryTimestampsConfig;
     validateBeforeSave?: boolean;
@@ -193,7 +195,7 @@ declare module 'mongoose' {
    * - vanilla arrays of POJOs for document arrays
    * - POJOs and array of arrays for maps
    */
-  type CreateObjectWithExtraKeys<T> = T & Record<string, unknown>;
+  type CreateObjectWithExtraKeys<T> = T | (T & Record<string, unknown>);
   type ApplyBasicCreateCasting<T> = {
     [K in keyof T]: NonNullable<T[K]> extends Map<infer KeyType extends string, infer ValueType>
       ? (Record<KeyType, ValueType> | Array<[KeyType, ValueType]> | T[K] | QueryTypeCasting<Extract<T[K], TreatAsPrimitives>>)
@@ -516,8 +518,16 @@ declare module 'mongoose' {
     /**
      * Shortcut for creating a new Document from existing raw data, pre-saved in the DB.
      * The document returned has no paths marked as modified initially.
+     * With `strict: false`, fields not in the schema are kept on the document; pass
+     * `ExtraFields` to describe their types, e.g.
+     * `Model.hydrate<{ totalOrders: number }>(obj, null, { strict: false })`.
      */
-    hydrate(obj: any, projection?: ProjectionType<TRawDocType>, options?: HydrateOptions): THydratedDocumentType;
+    hydrate<ExtraFields = unknown>(
+      obj: any,
+      projection: ProjectionType<TRawDocType> | null | undefined,
+      options: HydrateOptions & { strict: false }
+    ): THydratedDocumentType & ExtraFields;
+    hydrate(obj: any, projection?: ProjectionType<TRawDocType> | null | undefined, options?: HydrateOptions): THydratedDocumentType;
 
     /**
      * This function is responsible for building [indexes](https://www.mongodb.com/docs/manual/indexes/),

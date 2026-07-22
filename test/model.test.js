@@ -3132,6 +3132,24 @@ describe('Model', function() {
       assert.strictEqual(delta[0].__v, 0, 'should include __v in query when included parent path is modified');
     });
 
+    it('should include __v when optimisticConcurrency exclude contains a nested path and parent assignment changes a non-excluded subpath (gh-16054)', async function() {
+      const userSchema = new Schema({
+        profile: {
+          firstName: String,
+          lastName: String
+        },
+        balance: Number
+      }, { optimisticConcurrency: { exclude: ['profile.firstName'] } });
+
+      const User = db.model('User_oc_exclude_nested', userSchema);
+      const user = await User.create({ profile: { firstName: 'Alice', lastName: 'Smith' }, balance: 100 });
+
+      user.profile = { firstName: 'Alice', lastName: 'Johnson' };
+      const delta = user.$__delta();
+      assert.ok(delta, 'delta should exist');
+      assert.strictEqual(delta[0].__v, 0, 'should include __v in query when non-excluded nested path is modified via parent assignment');
+    });
+
     it('should exclude ad-hoc nested subpaths on non-strict schemas when optimisticConcurrency exclude contains a parent path (gh-16054)', async function() {
       const profileSchema = new Schema({ firstName: String, lastName: String }, { _id: false, strict: false });
       const userSchema = new Schema({
@@ -7819,6 +7837,56 @@ describe('Model', function() {
 
       reloaded = await User.findById(user._id);
       assert.equal(reloaded.__v, 1);
+    });
+
+    it('does not lose updates after increment() on a new document (gh-15800)', async function() {
+      // Arrange
+      const userSchema = new Schema({
+        name: String,
+        items: [{ name: String }]
+      });
+
+      const User = db.model('User', userSchema);
+      const user = new User({ name: 'Test User', items: [{ name: 'item1' }] });
+      user.increment();
+
+      // Act
+      await User.bulkSave([user]);
+
+      // Assert - like save(), inserting must not bump the in-memory version
+      // ahead of the database
+      let userFromDb = await User.findById(user._id);
+      assert.strictEqual(user.__v, 0);
+      assert.strictEqual(userFromDb.__v, 0);
+
+      // Act - a VERSION_WHERE update must still match the inserted document,
+      // and the pending increment() applies here
+      user.items[0].name = 'updated-item';
+      await User.bulkSave([user]);
+
+      // Assert
+      userFromDb = await User.findById(user._id);
+      assert.equal(userFromDb.items[0].name, 'updated-item');
+      assert.strictEqual(user.__v, 1);
+      assert.strictEqual(userFromDb.__v, 1);
+    });
+
+    it('persists the version key when inserting new documents (gh-15800)', async function() {
+      // Arrange
+      const userSchema = new Schema({
+        name: String
+      });
+
+      const User = db.model('User', userSchema);
+      const user = new User({ name: 'Test User' });
+
+      // Act
+      await User.bulkSave([user]);
+
+      // Assert - like save(), the insert must write the version key
+      const userFromDb = await User.findById(user._id).lean();
+      assert.equal(user.__v, 0);
+      assert.equal(userFromDb.__v, 0);
     });
 
     it('saves new documents with ordered: false (gh-15495)', async function() {

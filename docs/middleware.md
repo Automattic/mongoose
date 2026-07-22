@@ -565,7 +565,7 @@ of each [aggregation pipeline](https://www.mongodb.com/docs/manual/core/aggregat
 
 ```javascript
 customerSchema.pre('aggregate', function() {
-  // Add a $match state to the beginning of each pipeline.
+  // Add a $match stage to the beginning of each pipeline.
   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
 });
 ```

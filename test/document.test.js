@@ -2487,7 +2487,9 @@ describe('document', function() {
       // modified-paths set (otherwise it short-circuits on an empty modify state).
       doc.f0 = 'changed';
 
-      const spy = sinon.spy(Document.prototype, symbols.documentModifiedPaths);
+      const originalDocumentModifiedPaths = Document.prototype[symbols.documentModifiedPaths];
+      const spy = sinon.spy(Document.prototype, 'modifiedPaths');
+      Document.prototype[symbols.documentModifiedPaths] = Document.prototype.modifiedPaths;
       try {
         const err = doc.validateSync();
         assert.ifError(err);
@@ -2499,6 +2501,7 @@ describe('document', function() {
           `expected modifiedPaths to be rebuilt at most once, got ${spy.callCount}`
         );
       } finally {
+        Document.prototype[symbols.documentModifiedPaths] = originalDocumentModifiedPaths;
         spy.restore();
       }
     });

@@ -913,7 +913,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
     describe('statics', function() {
       it('skips pre/post hooks on a custom static when middleware: false', async function() {
         // Arrange
-        const { User, getStaticPreCount, getStaticPostCount } = createStaticsContext();
+        const { User, getStaticPreCount, getStaticPostCount } = createStaticsContext({ supportsMiddlewareOption: true });
         await User.create({ name: 'John' });
 
         // Act
@@ -926,9 +926,24 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         assert.strictEqual(getStaticPostCount(), 0);
       });
 
-      it('runs custom static hooks normally without middleware option', async function() {
+      it('ignores the middleware option when the static does not set supportsMiddlewareOption', async function() {
         // Arrange
         const { User, getStaticPreCount, getStaticPostCount } = createStaticsContext();
+        await User.create({ name: 'John' });
+
+        // Act
+        const user = await User.findByName('John', { middleware: false });
+
+        // Assert
+        assert.ok(user);
+        assert.strictEqual(user.name, 'John');
+        assert.strictEqual(getStaticPreCount(), 1);
+        assert.strictEqual(getStaticPostCount(), 1);
+      });
+
+      it('runs custom static hooks normally without middleware option', async function() {
+        // Arrange
+        const { User, getStaticPreCount, getStaticPostCount } = createStaticsContext({ supportsMiddlewareOption: true });
         await User.create({ name: 'John' });
 
         // Act
@@ -941,9 +956,23 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         assert.strictEqual(getStaticPostCount(), 1);
       });
 
+      it('runs static hooks for falsy middleware option values other than false', async function() {
+        // Arrange
+        const { User, getStaticPreCount, getStaticPostCount } = createStaticsContext({ supportsMiddlewareOption: true });
+        await User.create({ name: 'John' });
+
+        // Act
+        const user = await User.findByName('John', { middleware: 0 });
+
+        // Assert
+        assert.ok(user);
+        assert.strictEqual(getStaticPreCount(), 1);
+        assert.strictEqual(getStaticPostCount(), 1);
+      });
+
       it('skips only pre hooks when middleware: { pre: false }', async function() {
         // Arrange
-        const { User, getStaticPreCount, getStaticPostCount } = createStaticsContext();
+        const { User, getStaticPreCount, getStaticPostCount } = createStaticsContext({ supportsMiddlewareOption: true });
         await User.create({ name: 'John' });
 
         // Act
@@ -958,7 +987,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
 
       it('skips only post hooks when middleware: { post: false }', async function() {
         // Arrange
-        const { User, getStaticPreCount, getStaticPostCount } = createStaticsContext();
+        const { User, getStaticPreCount, getStaticPostCount } = createStaticsContext({ supportsMiddlewareOption: true });
         await User.create({ name: 'John' });
 
         // Act
@@ -971,7 +1000,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         assert.strictEqual(getStaticPostCount(), 0);
       });
 
-      function createStaticsContext() {
+      function createStaticsContext({ supportsMiddlewareOption = false } = {}) {
         let preCount = 0;
         let postCount = 0;
         const userSchema = new Schema({ name: String });
@@ -979,6 +1008,9 @@ describe('middleware option to skip hooks (gh-8768)', function() {
           assert.ok(options);
           return this.findOne({ name });
         };
+        if (supportsMiddlewareOption) {
+          userSchema.statics.findByName.supportsMiddlewareOption = true;
+        }
         userSchema.pre('findByName', function() { preCount++; });
         userSchema.post('findByName', function() { postCount++; });
         const User = db.model('User', userSchema);
@@ -989,7 +1021,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
     describe('methods', function() {
       it('skips pre/post hooks on a custom method when middleware: false', async function() {
         // Arrange
-        const { User, getMethodPreCount, getMethodPostCount } = createMethodsContext();
+        const { User, getMethodPreCount, getMethodPostCount } = createMethodsContext({ supportsMiddlewareOption: true });
         const user = await User.create({ name: 'John' });
 
         // Act
@@ -1002,9 +1034,24 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         assert.strictEqual(getMethodPostCount(), 0);
       });
 
-      it('runs custom method hooks normally without middleware option', async function() {
+      it('ignores the middleware option when the method does not set supportsMiddlewareOption', async function() {
         // Arrange
         const { User, getMethodPreCount, getMethodPostCount } = createMethodsContext();
+        const user = await User.create({ name: 'John' });
+
+        // Act
+        const result = await user.activate({ middleware: false });
+
+        // Assert
+        assert.strictEqual(result, user);
+        assert.strictEqual(user.active, true);
+        assert.strictEqual(getMethodPreCount(), 1);
+        assert.strictEqual(getMethodPostCount(), 1);
+      });
+
+      it('runs custom method hooks normally without middleware option', async function() {
+        // Arrange
+        const { User, getMethodPreCount, getMethodPostCount } = createMethodsContext({ supportsMiddlewareOption: true });
         const user = await User.create({ name: 'John' });
 
         // Act
@@ -1019,7 +1066,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
 
       it('skips only pre hooks when middleware: { pre: false }', async function() {
         // Arrange
-        const { User, getMethodPreCount, getMethodPostCount } = createMethodsContext();
+        const { User, getMethodPreCount, getMethodPostCount } = createMethodsContext({ supportsMiddlewareOption: true });
         const user = await User.create({ name: 'John' });
 
         // Act
@@ -1034,7 +1081,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
 
       it('skips only post hooks when middleware: { post: false }', async function() {
         // Arrange
-        const { User, getMethodPreCount, getMethodPostCount } = createMethodsContext();
+        const { User, getMethodPreCount, getMethodPostCount } = createMethodsContext({ supportsMiddlewareOption: true });
         const user = await User.create({ name: 'John' });
 
         // Act
@@ -1047,7 +1094,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         assert.strictEqual(getMethodPostCount(), 0);
       });
 
-      function createMethodsContext() {
+      function createMethodsContext({ supportsMiddlewareOption = false } = {}) {
         let preCount = 0;
         let postCount = 0;
         const userSchema = new Schema({ name: String, active: Boolean });
@@ -1056,6 +1103,9 @@ describe('middleware option to skip hooks (gh-8768)', function() {
           this.active = true;
           return this;
         };
+        if (supportsMiddlewareOption) {
+          userSchema.methods.activate.supportsMiddlewareOption = true;
+        }
         userSchema.pre('activate', function() { preCount++; });
         userSchema.post('activate', function() { postCount++; });
         const User = db.model('User', userSchema);

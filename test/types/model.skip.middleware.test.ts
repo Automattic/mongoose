@@ -163,4 +163,17 @@ async function gh8768() {
   await user.deleteOne({ middleware: false });
   await user.deleteOne({ middleware: { pre: false } });
   await user.deleteOne({ middleware: { post: false } });
+
+  // Custom statics and methods opt in to the middleware option by setting
+  // `supportsMiddlewareOption` on the function itself
+  const emailSchema = new Schema({ to: String });
+  emailSchema.statics.queueEmail = function(to: string, options = {}) {
+    return Promise.resolve(to);
+  };
+  emailSchema.statics.queueEmail.supportsMiddlewareOption = true;
+  expect<(typeof emailSchema.statics)[string]['supportsMiddlewareOption']>().type.toBe<boolean | undefined>();
+  emailSchema.methods.markSent = function(options = {}) {
+    return this;
+  };
+  emailSchema.methods.markSent.supportsMiddlewareOption = true;
 }

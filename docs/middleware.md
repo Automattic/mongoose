@@ -661,13 +661,14 @@ await doc.save({ middleware: { pre: false } });
 await Model.find({}, null, { middleware: { post: false } });
 ```
 
-For custom statics and methods, reserve the last argument for Mongoose options and default it to `{}`.
-Mongoose reads `middleware` from that trailing options object:
+Custom statics and methods support the `middleware` option as well, but require an explicit opt-in: set `supportsMiddlewareOption = true` on the function and reserve the last argument for Mongoose options.
+When a static or method opts in, Mongoose reads `middleware` from the trailing plain object argument:
 
 ```javascript
 schema.statics.queueEmail = async function(to, emailOptions, options = {}) {
   await emailQueue.add({ to, priority: emailOptions.priority });
 };
+schema.statics.queueEmail.supportsMiddlewareOption = true;
 schema.pre('queueEmail', function() {
   // user-defined middleware, for example rate limiting or audit logging
 });
@@ -675,7 +676,8 @@ schema.pre('queueEmail', function() {
 await User.queueEmail('test@example.com', { priority: 'high' }, { middleware: false });
 ```
 
-Because custom statics and methods can have arbitrary signatures, Mongoose treats a `middleware` property on the trailing plain object argument as the middleware option.
+Because custom statics and methods can have arbitrary signatures, Mongoose only reads the `middleware` option from functions that set `supportsMiddlewareOption`.
+This avoids conflicts with statics and methods whose last argument has an unrelated `middleware` property.
 Pass application-specific options before the trailing Mongoose options argument.
 
 **Note:** Built-in Mongoose middleware (timestamps, validation, etc.) always runs regardless of this option. Only user-defined middleware registered via `schema.pre()` and `schema.post()` is skipped.

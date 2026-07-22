@@ -342,6 +342,21 @@ describe('document', function() {
     assert.ok(!doc.isSelected('numbers'));
   });
 
+  it('isSelected() with both a path and a deeper path underneath it explicitly projected', function() {
+    // when neither `path` itself nor an ancestor/descendant relationship is
+    // unambiguous (here, "nested.deep" is both a descendant of "nested" and
+    // an ancestor of "nested.deep.x", which are both explicitly projected),
+    // the key that was inserted first into the projection object wins - this
+    // pins down that internal ordering so it can't silently change
+    let doc = new TestDocument(undefined, { nested: 0, 'nested.deep.x': 0 });
+    doc.init({ nested: { age: 5, deep: { x: 'a string' } } });
+    assert.ok(!doc.isSelected('nested.deep'));
+
+    doc = new TestDocument(undefined, { 'nested.deep.x': 0, nested: 0 });
+    doc.init({ nested: { age: 5, deep: { x: 'a string' } } });
+    assert.ok(doc.isSelected('nested.deep'));
+  });
+
   it('isDirectSelected (gh-5063)', function() {
     const selection = {
       test: 1,

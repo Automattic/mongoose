@@ -2,7 +2,7 @@
 ==================
  * feat(schema): add `strictRead` option to filter or throw on unknown fields during document hydration #16345 #4279 [GourabSingha](https://github.com/gourabsingha1)
  * feat: upgrade MongoDB Node.js driver to 7.5 #16391
- * fix(subdocument): don't minimize empty document array elements to null #16393 #15336 #7322 [https://github.com/WaleedAshraf](WaleedAshraf)
+ * fix(subdocument): don't minimize empty document array elements to null #16393 #15336 #7322 [WaleedAshraf](https://github.com/WaleedAshraf)
  * fix(model): correctly handle version keys when `bulkSave()` inserts new documents #16386 #15800 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
  * fix(cast): correctly cast object-shaped geo query values #16380 #16376 [rajkumar0932](https://github.com/rajkumar0932)
  * fix(schema): avoid mutating shared setters when casting array query values #16372 #16364 [yakubka](https://github.com/yakubka)

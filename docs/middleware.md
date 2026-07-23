@@ -668,16 +668,19 @@ When a static or method opts in, Mongoose reads `middleware` from the last argum
 
 ```javascript
 schema.statics.queueEmail = async function(to, emailOptions, options = {}) {
-  await emailQueue.add({ to, priority: emailOptions.priority, retries: options.maxRetries });
+  if (options.dryRun) {
+    return;
+  }
+  await emailQueue.add({ to, priority: emailOptions.priority, retries: emailOptions.maxRetries });
 };
 schema.statics.queueEmail.supportsMiddlewareOption = true;
 schema.pre('queueEmail', function() {
   // user-defined middleware, for example rate limiting or audit logging
 });
 
-await User.queueEmail('test@example.com', { priority: 'high' }, {
+await User.queueEmail('test@example.com', { priority: 'high', maxRetries: 3 }, {
   middleware: false, // skip Mongoose middleware for this call
-  maxRetries: 3 // consumed by `queueEmail()` itself, ignored by Mongoose
+  dryRun: true // consumed by `queueEmail()` itself, ignored by Mongoose
 });
 ```
 

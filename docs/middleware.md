@@ -664,7 +664,7 @@ await Model.find({}, null, { middleware: { post: false } });
 ### Skip Middleware for Custom Statics and Methods {#skip-custom-statics-and-methods}
 
 Custom statics and methods support the `middleware` option as well, but require an explicit opt-in: set `supportsMiddlewareOption = true` on the function.
-When a static or method opts in, Mongoose reads `middleware` from the trailing plain object argument and ignores every other property, so the same object can carry options meant for the static or method itself:
+When a static or method opts in, Mongoose reads `middleware` from the last argument if it is a plain object, and ignores every other property, so the same object can carry options meant for the static or method itself:
 
 ```javascript
 schema.statics.queueEmail = async function(to, emailOptions, options = {}) {
@@ -683,7 +683,7 @@ await User.queueEmail('test@example.com', { priority: 'high' }, {
 
 Because custom statics and methods can have arbitrary signatures, Mongoose only reads the `middleware` option from functions that set `supportsMiddlewareOption`.
 This avoids conflicts with statics and methods whose last argument has an unrelated `middleware` property.
-**Tip:** reserve the last parameter for an options object as in the example above, so that a data argument with its own `middleware` property never ends up in the trailing position.
+**Tip:** reserve the last parameter for an options object as in the example above, so that a data argument with its own `middleware` property is never the last argument.
 
 **Note:** Built-in Mongoose middleware (timestamps, validation, etc.) always runs regardless of this option. Only user-defined middleware registered via `schema.pre()` and `schema.post()` is skipped.
 

@@ -1146,6 +1146,45 @@ describe('schema', function() {
 
     });
 
+    it('does not throw when declaring a dotted populate virtual under a map of primitives (gh-15627)', function() {
+      const schema = new Schema({
+        tags: {
+          type: Map,
+          of: String
+        }
+      });
+
+      schema.virtual('tags.$*.owner', {
+        ref: 'User',
+        localField: 'tags.$*.ownerId',
+        foreignField: '_id',
+        justOne: true
+      });
+
+      assert.ok(schema.virtualpath('tags.$*.owner') instanceof VirtualType);
+    });
+
+    it('rejects dotted populate virtuals under a map without `$*` because map keys are real paths (gh-15627)', function() {
+      const entrySchema = new Schema({ ownerId: 'ObjectId' }, { _id: false });
+      const schema = new Schema({
+        entries: {
+          type: Map,
+          of: entrySchema
+        }
+      });
+
+      assert.throws(
+        () => schema.virtual('entries.owner', {
+          ref: 'User',
+          localField: 'entries.ownerId',
+          foreignField: '_id',
+          justOne: true
+        }),
+        /conflicts with a real path/
+      );
+      assert.deepStrictEqual(Object.keys(entrySchema.virtuals), []);
+    });
+
     describe('id', function() {
       it('default creation of id can be overridden (gh-298)', function() {
         assert.doesNotThrow(function() {

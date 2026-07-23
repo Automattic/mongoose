@@ -8191,6 +8191,38 @@ describe('model: populate:', function() {
       assert.equal(asObject.child.bars[0].name, 'bar');
     });
 
+    it('accessing populate virtual prop under a nested object (gh-13189) (gh-8198)', async function() {
+      const FooSchema = new Schema({
+        name: String,
+        nested: {
+          children: [{
+            barId: { type: Schema.Types.ObjectId, ref: 'Test' },
+            quantity: Number
+          }]
+        }
+      });
+      FooSchema.virtual('nested.children.bar', {
+        ref: 'Test',
+        localField: 'nested.children.barId',
+        foreignField: '_id',
+        justOne: true
+      });
+      const BarSchema = Schema({ name: String });
+      const Foo = db.model('Test1', FooSchema);
+      const Bar = db.model('Test', BarSchema);
+
+      const bar = await Bar.create({ name: 'bar' });
+      const foo = await Foo.create({
+        name: 'foo',
+        nested: { children: [{ barId: bar._id, quantity: 1 }] }
+      });
+      const foo2 = await Foo.findById(foo._id).populate('nested.children.bar');
+      assert.equal(foo2.nested.children[0].bar.name, 'bar');
+
+      const asObject = foo2.toObject({ virtuals: true });
+      assert.equal(asObject.nested.children[0].bar.name, 'bar');
+    });
+
     describe('gh-8247', function() {
       let Author;
       let Page;

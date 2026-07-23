@@ -661,6 +661,8 @@ await doc.save({ middleware: { pre: false } });
 await Model.find({}, null, { middleware: { post: false } });
 ```
 
+### Skip Middleware for Custom Statics and Methods {#skip-custom-statics-and-methods}
+
 Custom statics and methods support the `middleware` option as well, but require an explicit opt-in: set `supportsMiddlewareOption = true` on the function and reserve the last argument for Mongoose options.
 When a static or method opts in, Mongoose reads `middleware` from the trailing plain object argument:
 

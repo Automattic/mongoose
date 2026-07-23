@@ -1064,6 +1064,20 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         assert.strictEqual(getMethodPostCount(), 1);
       });
 
+      it('runs method hooks for falsy middleware option values other than false', async function() {
+        // Arrange
+        const { User, getMethodPreCount, getMethodPostCount } = createMethodsContext({ supportsMiddlewareOption: true });
+        const user = await User.create({ name: 'John' });
+
+        // Act
+        const result = await user.activate({ middleware: 0 });
+
+        // Assert
+        assert.strictEqual(result, user);
+        assert.strictEqual(getMethodPreCount(), 1);
+        assert.strictEqual(getMethodPostCount(), 1);
+      });
+
       it('skips only pre hooks when middleware: { pre: false }', async function() {
         // Arrange
         const { User, getMethodPreCount, getMethodPostCount } = createMethodsContext({ supportsMiddlewareOption: true });

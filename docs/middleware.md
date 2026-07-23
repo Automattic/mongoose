@@ -663,24 +663,27 @@ await Model.find({}, null, { middleware: { post: false } });
 
 ### Skip Middleware for Custom Statics and Methods {#skip-custom-statics-and-methods}
 
-Custom statics and methods support the `middleware` option as well, but require an explicit opt-in: set `supportsMiddlewareOption = true` on the function and reserve the last argument for Mongoose options.
-When a static or method opts in, Mongoose reads `middleware` from the trailing plain object argument:
+Custom statics and methods support the `middleware` option as well, but require an explicit opt-in: set `supportsMiddlewareOption = true` on the function.
+When a static or method opts in, Mongoose reads `middleware` from the trailing plain object argument and ignores every other property, so the same object can carry options meant for the static or method itself:
 
 ```javascript
 schema.statics.queueEmail = async function(to, emailOptions, options = {}) {
-  await emailQueue.add({ to, priority: emailOptions.priority });
+  await emailQueue.add({ to, priority: emailOptions.priority, retries: options.maxRetries });
 };
 schema.statics.queueEmail.supportsMiddlewareOption = true;
 schema.pre('queueEmail', function() {
   // user-defined middleware, for example rate limiting or audit logging
 });
 
-await User.queueEmail('test@example.com', { priority: 'high' }, { middleware: false });
+await User.queueEmail('test@example.com', { priority: 'high' }, {
+  middleware: false, // skip Mongoose middleware for this call
+  maxRetries: 3 // consumed by `queueEmail()` itself, ignored by Mongoose
+});
 ```
 
 Because custom statics and methods can have arbitrary signatures, Mongoose only reads the `middleware` option from functions that set `supportsMiddlewareOption`.
 This avoids conflicts with statics and methods whose last argument has an unrelated `middleware` property.
-Pass application-specific options before the trailing Mongoose options argument.
+**Tip:** reserve the last parameter for an options object as in the example above, so that a data argument with its own `middleware` property never ends up in the trailing position.
 
 **Note:** Built-in Mongoose middleware (timestamps, validation, etc.) always runs regardless of this option. Only user-defined middleware registered via `schema.pre()` and `schema.post()` is skipped.
 

@@ -97,3 +97,21 @@ Here's two reasons why:
 
 1. You still need to add an extra check to check if `child instanceof ObjectId`. Otherwise, the TypeScript compiler will fail with `Property name does not exist on type ObjectId`. So using `PopulatedDoc<>` means you need an extra check everywhere you use `doc.child`.
 2. In the `Parent` interface, `child` is a hydrated document, which makes it difficult for Mongoose to infer the type of `child` when you use `lean()` or `toObject()`.
+
+If you do use `PopulatedDoc`, you can move that runtime check into a [type predicate](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates) helper. TypeScript will then narrow the populated type after the helper returns true:
+
+```ts
+import { Types } from 'mongoose';
+
+function isPopulated<T>(doc: T | Types.ObjectId | null | undefined): doc is T {
+  return doc != null && !(doc instanceof Types.ObjectId);
+}
+
+ParentModel.findOne({}).populate('child').orFail().then((doc: Parent) => {
+  if (!isPopulated(doc.child)) {
+    throw new Error('should be populated');
+  }
+  // Works: doc.child is narrowed to the populated document type
+  doc.child.name.trim();
+});
+```

@@ -670,7 +670,7 @@ declare module 'mongoose' {
 
     /** Object of currently defined statics on this schema. */
     statics: { [F in keyof TStaticMethods]: TStaticMethods[F] } &
-    { [name: string]: ((this: TModelType, ...args: any[]) => unknown) & { supportsMiddlewareOption?: boolean } };
+    { [name: string]: ((this: TModelType, ...args: any[]) => unknown) & SupportsMiddlewareOption };
 
     toJSONSchema(options?: { useBsonType?: boolean }): Record<string, any>;
 

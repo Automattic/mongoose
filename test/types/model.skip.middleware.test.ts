@@ -9,7 +9,8 @@ import {
   MongooseBulkSaveOptions,
   AggregateOptions,
   AggregateCursorOptions,
-  AggregateCursorMiddlewareOptions
+  AggregateCursorMiddlewareOptions,
+  SupportsMiddlewareOption
 } from 'mongoose';
 import { expect } from 'tstyche';
 
@@ -166,6 +167,10 @@ async function gh8768() {
 
   // Custom statics and methods opt in to the middleware option by setting
   // `supportsMiddlewareOption` on the function itself
+  expect<SupportsMiddlewareOption>().type.toBeAssignableFrom({});
+  expect<SupportsMiddlewareOption>().type.toBeAssignableFrom({ supportsMiddlewareOption: true });
+  expect<SupportsMiddlewareOption['supportsMiddlewareOption']>().type.toBe<boolean | undefined>();
+
   const emailSchema = new Schema({ to: String });
   emailSchema.statics.queueEmail = function(to: string, options = {}) {
     return Promise.resolve(to);

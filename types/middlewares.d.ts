@@ -41,6 +41,15 @@ declare module 'mongoose' {
     post?: boolean;
   }
 
+  interface SupportsMiddlewareOption {
+    /**
+     * Set to `true` to let callers skip this custom static's or method's middleware
+     * by passing `{ middleware: false }` as the last argument.
+     * See [skipping middleware for custom statics and methods](https://mongoosejs.com/docs/middleware.html#skip-custom-statics-and-methods).
+     */
+    supportsMiddlewareOption?: boolean;
+  }
+
   type PreMiddlewareFunction<ThisType = any> = (
     this: ThisType,
     opts?: Record<string, any>

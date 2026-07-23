@@ -131,6 +131,10 @@ html(lang='en')
                 +sidebarItem('plugins.html', 'Plugins')
                 +sidebarItem('timestamps.html', 'Timestamps')
                 +sidebarItem('transactions.html', 'Transactions')
+                +sidebarItem('atlas-search.html', 'Atlas Search')
+                  - if ([`${versions.versionedPath}/docs/atlas-search`, `${versions.versionedPath}/docs/atlas-vector-search`].some(path => outputUrl.startsWith(path)))
+                    ul.sidebar-children
+                      +sidebarItem('atlas-vector-search.html', 'Vector Search')
                 +sidebarItem('typescript.html', 'TypeScript')
                   - if (outputUrl.startsWith(`${versions.versionedPath}/docs/typescript`))
                     ul.sidebar-children

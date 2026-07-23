@@ -686,7 +686,7 @@ await User.queueEmail('test@example.com', { priority: 'high', maxRetries: 3 }, {
 
 Because custom statics and methods can have arbitrary signatures, Mongoose only reads the `middleware` option from functions that set `supportsMiddlewareOption`.
 This avoids conflicts with statics and methods whose last argument has an unrelated `middleware` property.
-**Tip:** reserve the last parameter for an options object as in the example above, so that a data argument with its own `middleware` property is never the last argument.
+**Tip:** reserve the last parameter for an options object and default it to an empty object (`options = {}`) as in the example above. That way there is always an options object, and a data argument with its own `middleware` property is never the last argument.
 
 **Note:** Built-in Mongoose middleware (timestamps, validation, etc.) always runs regardless of this option. Only user-defined middleware registered via `schema.pre()` and `schema.post()` is skipped.
 

@@ -875,6 +875,34 @@ describe('versioning', function() {
       });
     });
 
+    describe('optimisticConcurrency (gh-16383)', function() {
+      it('supports Map wildcards', async function() {
+        const schema = new Schema({
+          settings: { type: Map, of: String },
+          balance: Number
+        }, { optimisticConcurrency: ['settings.$*'] });
+        const User = db.model('Test16383Map', schema);
+        
+        const user = await User.create({ settings: { theme: 'dark' }, balance: 100 });
+        user.settings.set('theme', 'light');
+        user.$__delta();
+        assert.strictEqual(user.$__.version, VERSION_ALL);
+      });
+
+      it('supports Array of subdocuments', async function() {
+        const schema = new Schema({
+          comments: [{ text: String }],
+          title: String
+        }, { optimisticConcurrency: ['comments.text'] });
+        const Post = db.model('Test16383Array', schema);
+
+        const post = await Post.create({ title: 'Hello', comments: [{ text: 'First' }] });
+        post.comments[0].text = 'Edited';
+        post.$__delta();
+        assert.strictEqual(post.$__.version, VERSION_ALL);
+      });
+    });
+
     async function createTestContext({ optimisticConcurrency }) {
       const schema = new Schema({
         name: String,

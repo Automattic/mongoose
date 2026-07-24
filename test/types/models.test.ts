@@ -81,6 +81,13 @@ async function standardSchemaModelValidate(): Promise<void> {
   });
 }
 
+async function gh16402() {
+  const schema = new Schema({ myid: { type: Schema.Types.ObjectId, required: true } }, { _id: false, versionKey: false });
+  const Book = model('Book', schema);
+  type Out = mongoose.StandardSchemaV1.InferOutput<typeof Book>;
+  expect({} as Out).type.toBe<{ myid: Types.ObjectId }>();
+}
+
 async function modelValidateReturnsCastedObject(): Promise<void> {
   interface IUser {
     name: string;

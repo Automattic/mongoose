@@ -86,6 +86,11 @@ async function gh16402() {
   const Book = model('Book', schema);
   type Out = mongoose.StandardSchemaV1.InferOutput<typeof Book>;
   expect({} as Out).type.toBe<{ myid: Types.ObjectId }>();
+
+  const schemaWithVersionKey = new Schema({ myid: { type: Schema.Types.ObjectId, required: true } }, { _id: false });
+  const BookWithVersionKey = model('Book', schemaWithVersionKey);
+  type OutWithVersionKey = mongoose.StandardSchemaV1.InferOutput<typeof BookWithVersionKey>;
+  expect({} as OutWithVersionKey).type.toBe<{ myid: Types.ObjectId } & { __v: number }>();
 }
 
 async function modelValidateReturnsCastedObject(): Promise<void> {

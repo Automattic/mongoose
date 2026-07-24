@@ -3520,15 +3520,117 @@ describe('model: updateOne: ', function() {
     assert.equal(err, null);
   });
 
-  it('casts top level $each (gh-15642)', async function() {
-    const schema = new Schema({ tags: [String] });
-    const Model = db.model('Test', schema);
+  describe('pathless update modifiers (gh-15642)', function() {
+    it('rejects a pathless modifier with an array value', async function() {
+      // Arrange
+      const { User } = createTestContext();
 
-    await Model.create({ tags: [] });
-    await assert.rejects(
-      Model.updateOne({}, { $addToSet: { $each: ['test'] } }),
-      /Modifiers such as "\$each", "\$or", "\$and", "\$in" must appear under a valid field path/
-    );
+      // Act
+      const error = await User.updateOne({}, { $addToSet: { $each: ['admin'] } })
+        .then(() => null, error => error);
+
+      // Assert
+      assert.equal(error?.name, 'MongooseError');
+      assert.match(error.message,
+        /Did you mean something like \{ \$addToSet: \{ fieldName: \{ \$each: \[\.\.\.\] \} \} \}\?/);
+    });
+
+    it('rejects a pathless modifier with an object value', async function() {
+      // Arrange
+      const { User } = createTestContext();
+
+      // Act
+      const promise = User.updateOne({}, { $push: { $each: { name: 'admin' } } });
+
+      // Assert
+      await assert.rejects(promise, /must appear under a valid field path/);
+    });
+
+    it('rejects a pathless modifier that is not in the original allowlist', async function() {
+      // Arrange
+      const { User } = createTestContext();
+
+      // Act
+      const promise = User.updateOne({}, { $pull: { $nin: ['admin'] } });
+
+      // Assert
+      await assert.rejects(promise, /must appear under a valid field path/);
+    });
+
+    it('allows a modifier nested under a field path', async function() {
+      // Arrange
+      const { User } = createTestContext();
+      const user = await User.create({ roles: ['admin', 'member'] });
+
+      // Act
+      await User.updateOne({ _id: user._id }, { $pull: { roles: { $nin: ['admin'] } } });
+
+      // Assert
+      const updatedUser = await User.findById(user._id);
+      assert.deepEqual(updatedUser.roles, ['admin']);
+    });
+
+    it('allows an insert-style upsert for a nested modifier-named dollar path', async function() {
+      // Arrange
+      const { Account } = createDollarPathTestContext();
+      const _id = new mongoose.Types.ObjectId();
+
+      // Act
+      await Account.updateOne({ _id }, { $each: { count: '42' } }, { upsert: true });
+
+      // Assert
+      const account = await Account.findById(_id);
+      assert.equal(account.$each.count, 42);
+    });
+
+    it('updates a nested modifier-named dollar path using object syntax', async function() {
+      // Arrange
+      const { Account } = createDollarPathTestContext();
+      const account = await Account.create({ preferences: { $each: 1 } });
+
+      // Act
+      await Account.updateOne(
+        { _id: account._id },
+        { $set: { preferences: { $each: '42' } } }
+      );
+
+      // Assert
+      const updatedAccount = await Account.findById(account._id);
+      assert.equal(updatedAccount.preferences.$each, 42);
+    });
+
+    it('updates a nested modifier-named dollar path using dotted syntax', async function() {
+      // Arrange
+      const { Account } = createDollarPathTestContext();
+      const account = await Account.create({ preferences: { $each: 1 } });
+
+      // Act
+      await Account.updateOne(
+        { _id: account._id },
+        { $set: { 'preferences.$each': '42' } }
+      );
+
+      // Assert
+      const updatedAccount = await Account.findById(account._id);
+      assert.equal(updatedAccount.preferences.$each, 42);
+    });
+
+    function createTestContext() {
+      const userSchema = new Schema({ roles: [String] });
+      const User = db.model('User', userSchema);
+
+      return { User };
+    }
+
+    function createDollarPathTestContext() {
+      const accountSchema = new Schema({
+        $each: { count: Number },
+        preferences: { $each: Number }
+      });
+      const Account = db.model('Account', accountSchema);
+
+      return { Account };
+    }
   });
 });
 

@@ -241,7 +241,12 @@ declare module 'mongoose' {
     base: Mongoose;
 
     /** Standard Schema adapter for validating input with this model's schema. */
-    readonly '~standard': StandardSchemaV1.Props<Default__v<Require_id<TRawDocType>, ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>>>;
+    readonly '~standard': StandardSchemaV1.Props<
+      Default__v<
+        Default_id<TRawDocType, ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>>,
+        ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>
+      >
+    >;
 
     /**
      * If this is a discriminator model, `baseModelName` is the name of

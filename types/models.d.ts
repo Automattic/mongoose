@@ -1225,7 +1225,11 @@ declare module 'mongoose' {
     recompileSchema(): void;
 
     /** Schema the model uses. */
-    schema: TSchema;
+    schema: IfAny<
+      TSchema,
+      Schema<TRawDocType, Model<TRawDocType, TQueryHelpers, TInstanceMethods, TVirtuals>, TInstanceMethods, TQueryHelpers, TVirtuals>,
+      TSchema
+    >;
 
     /** Creates a `updateMany` query: updates all documents that match `filter` with `update`. */
     updateMany(

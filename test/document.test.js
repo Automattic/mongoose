@@ -15294,6 +15294,75 @@ describe('document', function() {
     delete mongoose.Schema.Types.CustomType;
   });
 
+  it('reflects transform set via SchemaType.set() after the document was already serialized (gh-16378)', async function() {
+    class SchemaCustomType extends mongoose.SchemaType {
+      constructor(key, options) {
+        super(key, options, 'CustomType2');
+      }
+
+      cast(value) {
+        if (value === null) return null;
+        return new CustomType(value);
+      }
+    }
+    SchemaCustomType.schemaName = 'CustomType2';
+
+    class CustomType {
+      constructor(value) {
+        this.value = value;
+      }
+    }
+
+    mongoose.Schema.Types.CustomType2 = SchemaCustomType;
+
+    const Model = db.model(
+      'Test',
+      new mongoose.Schema({
+        value: { type: mongoose.Schema.Types.CustomType2 }
+      })
+    );
+
+    const _id = new mongoose.Types.ObjectId('0'.repeat(24));
+    const doc = new Model({ _id });
+    doc.value = 1;
+
+    // Warm the transform-paths cache with no transform registered yet.
+    assert.deepStrictEqual(doc.toJSON(), { _id, value: new CustomType(1) });
+
+    mongoose.Schema.Types.CustomType2.set('transform', v => v == null ? v : v.value);
+
+    assert.deepStrictEqual(doc.toJSON(), { _id, value: 1 });
+    assert.deepStrictEqual(doc.toObject(), { _id, value: 1 });
+
+    delete mongoose.Schema.Types.CustomType2;
+  });
+
+  it('picks up transform paths added via schema.add() after serialization (gh-16378)', async function() {
+    const schema = new Schema({ name: String });
+    const Model = db.model('Test', schema);
+
+    const doc = new Model({ name: 'bob' });
+    // Warm the cache while the schema has zero transform paths.
+    assert.deepStrictEqual(doc.toObject(), { _id: doc._id, name: 'bob' });
+
+    schema.add({ extra: { type: String, transform: v => v.toUpperCase() } });
+    doc.set('extra', 'x');
+
+    assert.strictEqual(doc.toObject().extra, 'X');
+  });
+
+  it('reflects transform set via SchemaType#transform() after serialization (gh-16378)', async function() {
+    const schema = new Schema({ name: String });
+    const Model = db.model('Test', schema);
+
+    const doc = new Model({ name: 'bob' });
+    assert.strictEqual(doc.toObject().name, 'bob');
+
+    schema.path('name').transform(v => v + '!');
+
+    assert.strictEqual(doc.toObject().name, 'bob!');
+  });
+
   it('supports schemaFieldsOnly option for toObject() (gh-15258)', async function() {
     const schema = new Schema({ key: String }, { discriminatorKey: 'key' });
     const subschema1 = new Schema({ field1: String });

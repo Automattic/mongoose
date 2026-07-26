@@ -131,8 +131,8 @@ describe('document: $revert()', function() {
 
       doc.$revert(['name']);
 
-      assert.equal(doc.name, 'Carol');   // reverted
-      assert.equal(doc.age, 99);         // NOT reverted
+      assert.equal(doc.name, 'Carol'); // reverted
+      assert.equal(doc.age, 99); // NOT reverted
       assert.ok(!doc.$isModified('name'));
       assert.ok(doc.$isModified('age'));
     });
@@ -149,8 +149,8 @@ describe('document: $revert()', function() {
 
       doc.$revert('x');
 
-      assert.equal(doc.x, 'orig-x');  // reverted
-      assert.equal(doc.y, 'new-y');   // unchanged
+      assert.equal(doc.x, 'orig-x'); // reverted
+      assert.equal(doc.y, 'new-y'); // unchanged
     });
 
     it('reverts multiple specified paths', async function() {
@@ -168,7 +168,7 @@ describe('document: $revert()', function() {
 
       assert.equal(doc.a, 'a0');
       assert.equal(doc.b, 'b0');
-      assert.equal(doc.c, 'c1');  // not reverted
+      assert.equal(doc.c, 'c1'); // not reverted
     });
   });
 

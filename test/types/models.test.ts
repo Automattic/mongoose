@@ -1218,6 +1218,20 @@ async function gh15693() {
   User.schema.methods.printNamePrefixed.call(leanInst, '');
 }
 
+async function gh15693b() {
+  interface Cat {
+    name: string;
+  }
+
+  const catSchema = new Schema<Cat>({ name: { type: String, required: true } });
+  // Hand-written `Model<Cat>` annotation omits the `TSchema` generic, so `schema`
+  // must fall back to `Schema<Cat>` rather than collapsing to `any`.
+  const m: Model<Cat> = model<Cat>('Cat', catSchema);
+
+  expect(m.schema).type.not.toBe<any>();
+  expect(m.schema).type.toBeAssignableTo<Schema<Cat>>();
+}
+
 async function gh15781() {
   const userSchema = new Schema({
     createdAt: { type: Date, immutable: true },

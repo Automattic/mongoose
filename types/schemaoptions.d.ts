@@ -158,6 +158,11 @@ declare module 'mongoose' {
      * [strictQuery](https://mongoosejs.com/docs/guide.html#strictQuery) mode for schemas.
      */
     strictQuery?: boolean | 'throw';
+    /**
+     * May be `false`, `true`, or `'throw'`. Sets the default
+     * [strictRead](https://mongoosejs.com/docs/guide.html#strictRead) mode for schemas.
+     */
+    strictRead?: boolean | 'throw';
     /** Exactly the same as the toObject option but only applies when the document's toJSON method is called. */
     toJSON?: ToObjectOptions<DocType, THydratedDocumentType>;
     /**

@@ -205,7 +205,7 @@ describe('document.populate', function() {
     param.select = '-email';
     param.options = { sort: 'name' };
     param.path = '_creator';
-    post.populate(param);
+    await post.populate(param);
     param.path = 'fans';
 
     await p.populate(param);

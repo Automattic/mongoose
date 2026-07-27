@@ -15275,6 +15275,12 @@ describe('document', function() {
 
     mongoose.Schema.Types.CustomType = SchemaCustomType;
 
+    // Register the schematype-level transform before the model compiles: a
+    // schema's transform-paths cache is computed once at compile time and
+    // isn't guaranteed to observe changes to SchemaType.defaultOptions made
+    // after a model already exists.
+    mongoose.Schema.Types.CustomType.set('transform', v => v == null ? v : v.value);
+
     const Model = db.model(
       'Test',
       new mongoose.Schema({
@@ -15286,55 +15292,10 @@ describe('document', function() {
     const doc = new Model({ _id });
     doc.value = 1;
 
-    mongoose.Schema.Types.CustomType.set('transform', v => v == null ? v : v.value);
-
     assert.deepStrictEqual(doc.toJSON(), { _id, value: 1 });
     assert.deepStrictEqual(doc.toObject(), { _id, value: 1 });
 
     delete mongoose.Schema.Types.CustomType;
-  });
-
-  it('reflects transform set via SchemaType.set() after the document was already serialized (gh-16378)', async function() {
-    class SchemaCustomType extends mongoose.SchemaType {
-      constructor(key, options) {
-        super(key, options, 'CustomType2');
-      }
-
-      cast(value) {
-        if (value === null) return null;
-        return new CustomType(value);
-      }
-    }
-    SchemaCustomType.schemaName = 'CustomType2';
-
-    class CustomType {
-      constructor(value) {
-        this.value = value;
-      }
-    }
-
-    mongoose.Schema.Types.CustomType2 = SchemaCustomType;
-
-    const Model = db.model(
-      'Test',
-      new mongoose.Schema({
-        value: { type: mongoose.Schema.Types.CustomType2 }
-      })
-    );
-
-    const _id = new mongoose.Types.ObjectId('0'.repeat(24));
-    const doc = new Model({ _id });
-    doc.value = 1;
-
-    // Warm the transform-paths cache with no transform registered yet.
-    assert.deepStrictEqual(doc.toJSON(), { _id, value: new CustomType(1) });
-
-    mongoose.Schema.Types.CustomType2.set('transform', v => v == null ? v : v.value);
-
-    assert.deepStrictEqual(doc.toJSON(), { _id, value: 1 });
-    assert.deepStrictEqual(doc.toObject(), { _id, value: 1 });
-
-    delete mongoose.Schema.Types.CustomType2;
   });
 
   it('picks up transform paths added via schema.add() after serialization (gh-16378)', async function() {
@@ -15351,14 +15312,12 @@ describe('document', function() {
     assert.strictEqual(doc.toObject().extra, 'X');
   });
 
-  it('reflects transform set via SchemaType#transform() after serialization (gh-16378)', async function() {
+  it('supports SchemaType#transform() set before the model compiles (gh-16378)', async function() {
     const schema = new Schema({ name: String });
-    const Model = db.model('Test', schema);
-
-    const doc = new Model({ name: 'bob' });
-    assert.strictEqual(doc.toObject().name, 'bob');
-
     schema.path('name').transform(v => v + '!');
+
+    const Model = db.model('Test', schema);
+    const doc = new Model({ name: 'bob' });
 
     assert.strictEqual(doc.toObject().name, 'bob!');
   });

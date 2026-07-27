@@ -9,6 +9,7 @@ import {
   IndexOptions,
   InferRawDocType,
   InferSchemaType,
+  FlattenMaps,
   InsertManyOptions,
   JSONSerialized,
   ObtainDocumentType,
@@ -163,7 +164,7 @@ async function gh9857() {
   type UserModel = Model<UserDocument>;
 
   const u: UserSchemaDefinition = {
-    // @ts-expect-error  Type '{ type: StringConstructor; }' is not assignable to type 'SchemaDefinitionProperty<number, any, any> | undefined'.
+    // @ts-expect-error  Type '{ type: StringConstructor; }' is not assignable to type 'SchemaDefinitionProperty<number, any, any>'.
     name: { type: String },
     active: { type: Boolean },
     points: Number
@@ -1947,7 +1948,7 @@ function gh15479() {
   const doc = new TestModel();
 
   getTestField(doc.toJSON<ReturnType<typeof transform> & { testField: string }>());
-  // @ts-expect-error  Property 'testField' is missing in type '{ name?: string | null | undefined; } & { _id: ObjectId; } & { __v: number; }'
+  // @ts-expect-error  Property 'testField' is missing in type '{ name?: string | null; } & { _id: ObjectId; } & { __v: number; }'
   getTestField(doc.toJSON<ReturnType<typeof transform>>());
 
   function getTestField(obj: { testField: string }) {

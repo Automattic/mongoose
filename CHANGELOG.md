@@ -1,3 +1,13 @@
+9.8.1 / 2026-07-27
+==================
+ * perf(document): avoid rebuilding modified paths during required path validation #16379 [xianjianlf2](https://github.com/xianjianlf2)
+ * perf(document): avoid clearing the required paths cache on every document instantiation #16404 #16377
+ * fix(query): reject update modifiers without paths #16387 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * perf: cache `toString()` results in `array.unique` to avoid redundant allocations #16390 [vivek180905](https://github.com/vivek180905)
+ * types: respect the `_id` option when inferring StandardSchema types #16402
+ * types(model): keep `Model.schema` typed when `TSchema` is omitted [samuelmbabhazi](https://github.com/samuelmbabhazi)
+ * docs(guide): clarify `strictQuery` handling of filter paths not in the schema #16397 [MuhammadFarhantahir](https://github.com/MuhammadFarhantahir)
+
 9.8.0 / 2026-07-20
 ==================
  * feat(schema): add `strictRead` option to filter or throw on unknown fields during document hydration #16345 #4279 [GourabSingha](https://github.com/gourabsingha1)

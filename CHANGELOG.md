@@ -1,3 +1,9 @@
+8.24.2 / 2026-07-27
+===================
+ * fix(subdocument): don't minimize empty document array elements to null #16393 [WaleedAshraf](https://github.com/WaleedAshraf)
+ * types: correct Model.validate() return type to Promise<TRawDocType> #16340
+ #16340 [chatman-media](https://github.com/chatman-media)
+
 8.24.1 / 2026-06-22
 ===================
  * fix(documentarray): reindex subdocs after array reordering and removal so subsequent nested changes save using the correct path #16282 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

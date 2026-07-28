@@ -1947,6 +1947,26 @@ describe('Query', function() {
       const doc = await Test.findOne().select('-subd').orFail();
       assert.strictEqual(doc.subd.clean, undefined);
       assert.strictEqual(doc.subd.raw, undefined);
+
+      // `false` is a valid exclusion value alongside `0` and shouldn't
+      // collide with the schema-level exclusion either
+      const boolQuery = Test.find().select({ subd: false });
+      boolQuery._applyPaths();
+      assert.deepEqual(boolQuery._fields, { subd: false });
+
+      const Deep = db.model('Test1', new Schema({
+        a: { b: { c: { type: String, select: false }, d: String } },
+        arr: [{ raw: { type: String, select: false }, clean: String }]
+      }));
+      for (const [sel, expected] of [
+        ['-a', { a: 0, 'arr.raw': 0 }],
+        ['-a.b', { 'a.b': 0, 'arr.raw': 0 }],
+        ['-arr', { arr: 0, 'a.b.c': 0 }]
+      ]) {
+        const deepQuery = Deep.find().select(sel);
+        deepQuery._applyPaths();
+        assert.deepEqual(deepQuery._fields, expected);
+      }
     });
 
     it('errors in post init (gh-5592)', async function() {

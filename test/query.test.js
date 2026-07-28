@@ -1928,6 +1928,27 @@ describe('Query', function() {
       assert.ok(!doc.child2.field);
     });
 
+    it('excluding a subdocument path does not conflict with a nested select: false path (gh-12798)', async function() {
+      const schema = new Schema({
+        name: String,
+        subd: {
+          raw: { type: String, select: false },
+          clean: String
+        }
+      });
+      const Test = db.model('Test', schema);
+
+      await Test.create({ name: 'test', subd: { raw: 'raw', clean: 'clean' } });
+
+      const query = Test.find().select('-subd');
+      query._applyPaths();
+      assert.deepEqual(query._fields, { subd: 0 });
+
+      const doc = await Test.findOne().select('-subd').orFail();
+      assert.strictEqual(doc.subd.clean, undefined);
+      assert.strictEqual(doc.subd.raw, undefined);
+    });
+
     it('errors in post init (gh-5592)', async function() {
       const TestSchema = new Schema();
 

@@ -1954,6 +1954,11 @@ describe('Query', function() {
       boolQuery._applyPaths();
       assert.deepEqual(boolQuery._fields, { subd: false });
 
+      // Any other falsy defining value is equally a valid exclusion
+      const emptyStringQuery = Test.find().select({ subd: '' });
+      emptyStringQuery._applyPaths();
+      assert.deepEqual(emptyStringQuery._fields, { subd: '' });
+
       const Deep = db.model('Test1', new Schema({
         a: { b: { c: { type: String, select: false }, d: String } },
         arr: [{ raw: { type: String, select: false }, clean: String }]

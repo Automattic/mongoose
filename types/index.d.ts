@@ -150,6 +150,8 @@ declare module 'mongoose' {
     ? IfAny<U, T & { _id: Types.ObjectId }, T & Required<{ _id: U }>>
     : T & { _id: Types.ObjectId };
 
+  export type Default_id<T, TSchemaOptions = {}> = TSchemaOptions extends { _id: false } ? T : Require_id<T>;
+
   export type Default__v<T, TSchemaOptions = {}> = TSchemaOptions extends { versionKey: false }
     ? T
     : TSchemaOptions extends { versionKey: infer VK }

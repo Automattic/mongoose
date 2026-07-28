@@ -1,3 +1,34 @@
+8.24.2 / 2026-07-27
+===================
+ * fix(subdocument): don't minimize empty document array elements to null #16393 [WaleedAshraf](https://github.com/WaleedAshraf)
+ * types: correct Model.validate() return type to Promise<TRawDocType> #16340
+ #16340 [chatman-media](https://github.com/chatman-media)
+
+9.8.1 / 2026-07-27
+==================
+ * perf(document): avoid rebuilding modified paths during required path validation #16379 [xianjianlf2](https://github.com/xianjianlf2)
+ * perf(document): avoid clearing the required paths cache on every document instantiation #16404 #16377
+ * fix(query): reject update modifiers without paths #16387 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * perf: cache `toString()` results in `array.unique` to avoid redundant allocations #16390 [vivek180905](https://github.com/vivek180905)
+ * types: respect the `_id` option when inferring StandardSchema types #16402
+ * types(model): keep `Model.schema` typed when `TSchema` is omitted [samuelmbabhazi](https://github.com/samuelmbabhazi)
+ * docs(guide): clarify `strictQuery` handling of filter paths not in the schema #16397 [MuhammadFarhantahir](https://github.com/MuhammadFarhantahir)
+
+9.8.0 / 2026-07-20
+==================
+ * feat(schema): add `strictRead` option to filter or throw on unknown fields during document hydration #16345 #4279 [GourabSingha](https://github.com/gourabsingha1)
+ * feat: upgrade MongoDB Node.js driver to 7.5 #16391
+ * fix(subdocument): don't minimize empty document array elements to null #16393 #15336 #7322 [WaleedAshraf](https://github.com/WaleedAshraf)
+ * fix(model): correctly handle version keys when `bulkSave()` inserts new documents #16386 #15800 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(cast): correctly cast object-shaped geo query values #16380 #16376 [rajkumar0932](https://github.com/rajkumar0932)
+ * fix(schema): avoid mutating shared setters when casting array query values #16372 #16364 [yakubka](https://github.com/yakubka)
+ * fix(document): correctly handle excluded parent paths with optimistic concurrency #16367 #16054 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * types(model): add `pathsToSave` to `SaveOptions` #16375 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * types(model): support extra fields in `hydrate()` with `strict: false` #16374 #15940 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(populate): document missing options and `perDocumentLimit` for `populate()` #16371 [Wnayar](https://github.com/Wnayar)
+ * docs: expand `sample()` example to show sampling from a filtered subset #16369 [Wnayar](https://github.com/Wnayar)
+ * docs: fix typos, grammar, and documentation links #16389 [LakshyaTyagi15](https://github.com/LakshyaTyagi15)
+
 9.7.4 / 2026-07-06
 ==================
  * types(create): fix handling of nested objects typed as interfaces #16363 #16362
@@ -8,6 +39,14 @@
 ==================
  * types(model): correct Model.validate() return type to Promise<TRawDocType> #16340 #16338
  * types: use @standard-schema/spec for StandardSchema types rather than inlining #16341 #16339
+
+8.24.1 / 2026-06-22
+===================
+ * fix(documentarray): reindex subdocs after array reordering and removal so subsequent nested changes save using the correct path #16282 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): avoid accessing special properties in `Document.prototype.get()`
+ * fix(schema): avoid returning inherited properties from schema path lookups, including paths underneath maps of subdocuments
+ * fix(clone): isolate cloned arrays from source documents #16281 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * types: enable exactOptionalPropertyTypes in TypeScript tests #16287
 
 9.7.2 / 2026-06-22
 ==================

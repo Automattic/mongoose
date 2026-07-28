@@ -81,6 +81,18 @@ async function standardSchemaModelValidate(): Promise<void> {
   });
 }
 
+async function gh16402() {
+  const schema = new Schema({ myid: { type: Schema.Types.ObjectId, required: true } }, { _id: false, versionKey: false });
+  const Book = model('Book', schema);
+  type Out = mongoose.StandardSchemaV1.InferOutput<typeof Book>;
+  expect({} as Out).type.toBe<{ myid: Types.ObjectId }>();
+
+  const schemaWithVersionKey = new Schema({ myid: { type: Schema.Types.ObjectId, required: true } }, { _id: false });
+  const BookWithVersionKey = model('Book', schemaWithVersionKey);
+  type OutWithVersionKey = mongoose.StandardSchemaV1.InferOutput<typeof BookWithVersionKey>;
+  expect({} as OutWithVersionKey).type.toBe<{ myid: Types.ObjectId } & { __v: number }>();
+}
+
 async function modelValidateReturnsCastedObject(): Promise<void> {
   interface IUser {
     name: string;
@@ -1204,6 +1216,20 @@ async function gh15693() {
   const leanInst = await User.findOne({}).lean().orFail();
   User.schema.methods.printName.apply(leanInst);
   User.schema.methods.printNamePrefixed.call(leanInst, '');
+}
+
+async function gh15693b() {
+  interface Cat {
+    name: string;
+  }
+
+  const catSchema = new Schema<Cat>({ name: { type: String, required: true } });
+  // Hand-written `Model<Cat>` annotation omits the `TSchema` generic, so `schema`
+  // must fall back to `Schema<Cat>` rather than collapsing to `any`.
+  const m: Model<Cat> = model<Cat>('Cat', catSchema);
+
+  expect(m.schema).type.not.toBe<any>();
+  expect(m.schema).type.toBeAssignableTo<Schema<Cat>>();
 }
 
 async function gh15781() {

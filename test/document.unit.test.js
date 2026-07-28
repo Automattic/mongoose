@@ -42,6 +42,7 @@ describe('toObject()', function() {
         virtuals: { virtual: { applyGetters: () => 'test' } }
       };
       this.$__schema._defaultToObjectOptions = () => this.$__schema.options.toObject;
+      this.$__schema.pathsWithTransforms = () => [];
       this._doc = { empty: {} };
       this.$__ = {};
     };

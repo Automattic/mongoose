@@ -15274,6 +15274,7 @@ describe('document', function() {
     }
 
     mongoose.Schema.Types.CustomType = SchemaCustomType;
+    mongoose.Schema.Types.CustomType.set('transform', v => v == null ? v : v.value);
 
     const Model = db.model(
       'Test',
@@ -15285,8 +15286,6 @@ describe('document', function() {
     const _id = new mongoose.Types.ObjectId('0'.repeat(24));
     const doc = new Model({ _id });
     doc.value = 1;
-
-    mongoose.Schema.Types.CustomType.set('transform', v => v == null ? v : v.value);
 
     assert.deepStrictEqual(doc.toJSON(), { _id, value: 1 });
     assert.deepStrictEqual(doc.toObject(), { _id, value: 1 });

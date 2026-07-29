@@ -63,10 +63,15 @@ declare module 'mongoose' {
       : '__t'
     : '__t';
 
+  type DiscriminatorHydratedBaseType<TBaseSchema extends Schema> =
+    InferHydratedDocTypeFromSchema<TBaseSchema> extends Record<DiscriminatorHydratedKey<TBaseSchema>, any> ?
+      InferHydratedDocTypeFromSchema<TBaseSchema>
+    : MergeType<InferHydratedDocTypeFromSchema<TBaseSchema>, { [K in DiscriminatorHydratedKey<TBaseSchema>]?: null }>;
+
   type ResolveDiscriminatorHydratedPathType<TBaseSchema extends Schema, TDiscriminators> =
     IsAny<TDiscriminators> extends true ? never
     : TDiscriminators extends Record<string, any> ?
-      MergeType<InferHydratedDocTypeFromSchema<TBaseSchema>, { [K in DiscriminatorHydratedKey<TBaseSchema>]?: null }> |
+      DiscriminatorHydratedBaseType<TBaseSchema> |
       {
         [K in keyof TDiscriminators]: TDiscriminators[K] extends Schema ?
           MergeType<InferHydratedDocTypeFromSchema<TBaseSchema>, InferHydratedDocTypeFromSchema<TDiscriminators[K]>> &

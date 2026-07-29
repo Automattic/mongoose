@@ -289,6 +289,22 @@ function gh16045() {
   expect<Extract<ShapeType, { kind: 'Square' }>['side']>().type.toBe<number | null | undefined>();
 }
 
+function gh16045RequiredDiscriminatorKey() {
+  const baseSchema = new mongoose.Schema({
+    kind: { type: String, required: true },
+    name: String
+  }, { discriminatorKey: 'kind' });
+  const schemaDefinition = {
+    shape: {
+      type: baseSchema,
+      discriminators: {}
+    }
+  } as const;
+
+  type ShapeType = NonNullable<InferRawDocType<typeof schemaDefinition>['shape']>;
+  expect<ShapeType['kind']>().type.toBe<string>();
+}
+
 function gh15988() {
   // Test nested path (no type key) - should NOT have _id
   const locationSchemaDef = {

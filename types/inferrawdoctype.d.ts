@@ -52,10 +52,15 @@ declare module 'mongoose' {
       : '__t'
     : '__t';
 
+  type DiscriminatorRawBaseType<TBaseSchema extends Schema> =
+    InferRawDocTypeFromSchema<TBaseSchema> extends Record<DiscriminatorRawKey<TBaseSchema>, any> ?
+      InferRawDocTypeFromSchema<TBaseSchema>
+    : MergeType<InferRawDocTypeFromSchema<TBaseSchema>, { [K in DiscriminatorRawKey<TBaseSchema>]?: null }>;
+
   type ResolveDiscriminatorRawPathType<TBaseSchema extends Schema, TDiscriminators> =
     IsAny<TDiscriminators> extends true ? never
     : TDiscriminators extends Record<string, any> ?
-      MergeType<InferRawDocTypeFromSchema<TBaseSchema>, { [K in DiscriminatorRawKey<TBaseSchema>]?: null }> |
+      DiscriminatorRawBaseType<TBaseSchema> |
       {
         [K in keyof TDiscriminators]: TDiscriminators[K] extends Schema ?
           MergeType<InferRawDocTypeFromSchema<TBaseSchema>, InferRawDocTypeFromSchema<TDiscriminators[K]>> &

@@ -55,6 +55,7 @@ declare module 'mongoose' {
   type ResolveDiscriminatorRawPathType<TBaseSchema extends Schema, TDiscriminators> =
     IsAny<TDiscriminators> extends true ? never
     : TDiscriminators extends Record<string, any> ?
+      MergeType<InferRawDocTypeFromSchema<TBaseSchema>, { [K in DiscriminatorRawKey<TBaseSchema>]?: null }> |
       {
         [K in keyof TDiscriminators]: TDiscriminators[K] extends Schema ?
           MergeType<InferRawDocTypeFromSchema<TBaseSchema>, InferRawDocTypeFromSchema<TDiscriminators[K]>> &

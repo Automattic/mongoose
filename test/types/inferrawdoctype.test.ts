@@ -275,14 +275,16 @@ function gh16045() {
 
   type ShapeType = NonNullable<InferRawDocType<typeof schemaDefinition>['shape']>;
   type BaseType = InferRawDocTypeFromSchema<typeof shapeSchema>;
+  type BaseWithNullDiscriminator = Omit<BaseType, 'kind'> & { kind?: null };
   type CircleType = InferRawDocTypeFromSchema<typeof circleSchema> & { kind: 'Circle' };
   type SquareType = InferRawDocTypeFromSchema<typeof squareSchema> & { kind: 'Square' };
 
   expect<ShapeType>().type.toBe<
+    BaseWithNullDiscriminator |
     (Omit<BaseType, keyof CircleType> & CircleType) |
     (Omit<BaseType, keyof SquareType> & SquareType)
   >();
-  expect<ShapeType['kind']>().type.toBe<'Circle' | 'Square'>();
+  expect<ShapeType['kind']>().type.toBe<'Circle' | 'Square' | null | undefined>();
   expect<Extract<ShapeType, { kind: 'Circle' }>['radius']>().type.toBe<number | null | undefined>();
   expect<Extract<ShapeType, { kind: 'Square' }>['side']>().type.toBe<number | null | undefined>();
 }

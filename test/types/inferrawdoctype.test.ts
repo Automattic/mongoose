@@ -1,4 +1,4 @@
-import mongoose, { InferRawDocType, InferRawDocTypeFromSchema, type InferRawDocTypeWithout_id, type ResolveTimestamps, type Schema, type Types, FlattenMaps } from 'mongoose';
+import mongoose, { InferRawDocType, InferRawDocTypeFromSchema, ObtainSchemaGeneric, ResolveSchemaOptions, type InferRawDocTypeWithout_id, type ResolveTimestamps, type Schema, type Types, FlattenMaps } from 'mongoose';
 import { expect } from 'tstyche';
 
 function inferPojoType() {
@@ -261,6 +261,8 @@ function gh16045() {
   });
 
   const shapeSchema = new mongoose.Schema({ name: String }, { discriminatorKey: 'kind' });
+  type ShapeOptions = ResolveSchemaOptions<ObtainSchemaGeneric<typeof shapeSchema, 'TSchemaOptions'>>;
+  expect<ShapeOptions['discriminatorKey']>().type.toBe<'kind'>();
   const schemaDefinition = {
     shape: {
       type: shapeSchema,
@@ -273,16 +275,16 @@ function gh16045() {
 
   type ShapeType = NonNullable<InferRawDocType<typeof schemaDefinition>['shape']>;
   type BaseType = InferRawDocTypeFromSchema<typeof shapeSchema>;
-  type CircleType = InferRawDocTypeFromSchema<typeof circleSchema>;
-  type SquareType = InferRawDocTypeFromSchema<typeof squareSchema>;
-  type DiscriminatorType = CircleType | SquareType;
+  type CircleType = InferRawDocTypeFromSchema<typeof circleSchema> & { kind: 'Circle' };
+  type SquareType = InferRawDocTypeFromSchema<typeof squareSchema> & { kind: 'Square' };
 
   expect<ShapeType>().type.toBe<
-    Omit<BaseType, keyof DiscriminatorType> & DiscriminatorType
+    (Omit<BaseType, keyof CircleType> & CircleType) |
+    (Omit<BaseType, keyof SquareType> & SquareType)
   >();
-  expect<ShapeType['kind']>().type.toBe<'Circle' | 'Square' | null | undefined>();
-  expect<Extract<ShapeType, { kind?: 'Circle' | null | undefined }>['radius']>().type.toBe<number | null | undefined>();
-  expect<Extract<ShapeType, { kind?: 'Square' | null | undefined }>['side']>().type.toBe<number | null | undefined>();
+  expect<ShapeType['kind']>().type.toBe<'Circle' | 'Square'>();
+  expect<Extract<ShapeType, { kind: 'Circle' }>['radius']>().type.toBe<number | null | undefined>();
+  expect<Extract<ShapeType, { kind: 'Square' }>['side']>().type.toBe<number | null | undefined>();
 }
 
 function gh15988() {

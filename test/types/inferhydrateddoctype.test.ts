@@ -28,14 +28,14 @@ function gh16045() {
 
   type ShapeType = NonNullable<InferHydratedDocType<typeof schemaDefinition>['shape']>;
   type BaseType = InferHydratedDocTypeFromSchema<typeof shapeSchema>;
-  type CircleType = InferHydratedDocTypeFromSchema<typeof circleSchema>;
-  type SquareType = InferHydratedDocTypeFromSchema<typeof squareSchema>;
-  type DiscriminatorType = CircleType | SquareType;
+  type CircleType = InferHydratedDocTypeFromSchema<typeof circleSchema> & { kind: 'Circle' };
+  type SquareType = InferHydratedDocTypeFromSchema<typeof squareSchema> & { kind: 'Square' };
 
   expect<ShapeType>().type.toBe<
-    Omit<BaseType, keyof DiscriminatorType> & DiscriminatorType
+    (Omit<BaseType, keyof CircleType> & CircleType) |
+    (Omit<BaseType, keyof SquareType> & SquareType)
   >();
-  expect<ShapeType['kind']>().type.toBe<'Circle' | 'Square' | null | undefined>();
-  expect<Extract<ShapeType, { kind?: 'Circle' | null | undefined }>['radius']>().type.toBe<number | null | undefined>();
-  expect<Extract<ShapeType, { kind?: 'Square' | null | undefined }>['side']>().type.toBe<number | null | undefined>();
+  expect<ShapeType['kind']>().type.toBe<'Circle' | 'Square'>();
+  expect<Extract<ShapeType, { kind: 'Circle' }>['radius']>().type.toBe<number | null | undefined>();
+  expect<Extract<ShapeType, { kind: 'Square' }>['side']>().type.toBe<number | null | undefined>();
 }

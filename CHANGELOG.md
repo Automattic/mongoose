@@ -1,6 +1,7 @@
 9.9.0 / 2026-07-30
 ==================
  * perf(document): improve toObject perf with faster string checks and avoiding unnecessary isSelected on paths with no getters #16407 #16373 #16385
+ * perf(model): improve insertMany() performance and general change tracking performance #16370
  * perf(timestamps): avoid adding $setOnInsert for createdAt unless upsert set #16411
  * perf: improve toObject() performance #16408 #16405 #16378 #14394 [BIGSUS24](https://github.com/BIGSUS24)
  * types: add discriminator key to each member of embedded discriminator enum- #16412 #16045

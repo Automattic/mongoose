@@ -279,10 +279,12 @@ function gh16045() {
   type CircleType = InferRawDocTypeFromSchema<typeof circleSchema> & { kind: 'Circle' };
   type SquareType = InferRawDocTypeFromSchema<typeof squareSchema> & { kind: 'Square' };
 
+  type CircleTypeUnionMember = Omit<BaseType, keyof CircleType> & CircleType;
+  type SquareTypeUnionMember = Omit<BaseType, keyof SquareType> & SquareType;
   expect<ShapeType>().type.toBe<
     BaseWithNullDiscriminator |
-    (Omit<BaseType, keyof CircleType> & CircleType) |
-    (Omit<BaseType, keyof SquareType> & SquareType)
+    CircleTypeUnionMember |
+    SquareTypeUnionMember
   >();
   expect<ShapeType['kind']>().type.toBe<'Circle' | 'Square' | null | undefined>();
   expect<Extract<ShapeType, { kind: 'Circle' }>['radius']>().type.toBe<number | null | undefined>();

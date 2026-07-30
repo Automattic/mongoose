@@ -1,3 +1,17 @@
+9.9.0 / 2026-07-30
+==================
+ * perf(document): improve toObject perf with faster string checks and avoiding unnecessary isSelected on paths with no getters #16407 #16373 #16385
+ * perf(model): improve insertMany() performance and general change tracking performance #16370
+ * perf(timestamps): avoid adding $setOnInsert for createdAt unless upsert set #16411
+ * perf: improve toObject() performance #16408 #16405 #16378 #14394 [BIGSUS24](https://github.com/BIGSUS24)
+ * types: add discriminator key to each member of embedded discriminator enum- #16412 #16045
+
+8.24.2 / 2026-07-27
+===================
+ * fix(subdocument): don't minimize empty document array elements to null #16393 [WaleedAshraf](https://github.com/WaleedAshraf)
+ * types: correct Model.validate() return type to Promise<TRawDocType> #16340
+ #16340 [chatman-media](https://github.com/chatman-media)
+
 9.8.1 / 2026-07-27
 ==================
  * perf(document): avoid rebuilding modified paths during required path validation #16379 [xianjianlf2](https://github.com/xianjianlf2)
@@ -33,6 +47,14 @@
 ==================
  * types(model): correct Model.validate() return type to Promise<TRawDocType> #16340 #16338
  * types: use @standard-schema/spec for StandardSchema types rather than inlining #16341 #16339
+
+8.24.1 / 2026-06-22
+===================
+ * fix(documentarray): reindex subdocs after array reordering and removal so subsequent nested changes save using the correct path #16282 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): avoid accessing special properties in `Document.prototype.get()`
+ * fix(schema): avoid returning inherited properties from schema path lookups, including paths underneath maps of subdocuments
+ * fix(clone): isolate cloned arrays from source documents #16281 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * types: enable exactOptionalPropertyTypes in TypeScript tests #16287
 
 9.7.2 / 2026-06-22
 ==================

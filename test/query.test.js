@@ -1983,6 +1983,7 @@ describe('Query', function() {
 
       const Model = db.model('Test', schema);
 
+      await Model.deleteMany({});
       await Model.create({ n: 42 });
 
       let res = await Model.find().explain('queryPlanner');

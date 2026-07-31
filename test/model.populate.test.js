@@ -11,6 +11,7 @@ const { randomUUID } = require('crypto');
 const utils = require('../lib/utils');
 const util = require('./util');
 const MongooseError = require('../lib/error/mongooseError');
+const splitPopulateQuery = require('../lib/helpers/populate/splitPopulateQuery');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -8809,6 +8810,221 @@ describe('model: populate:', function() {
       assert.equal(docs[1]._id.toString(), p2._id.toString());
       assert.deepEqual(docs[0].children.map(c => c._id), [1]);
       assert.deepEqual(docs[1].children.map(c => c._id), [4]);
+    });
+
+    describe('splitting populate queries whose `$in` filter would have too many elements (gh-5890)', function() {
+      let maxInFilterLength;
+
+      beforeEach(function() {
+        maxInFilterLength = splitPopulateQuery.maxInFilterLength;
+        splitPopulateQuery.maxInFilterLength = 3;
+      });
+
+      afterEach(function() {
+        splitPopulateQuery.maxInFilterLength = maxInFilterLength;
+      });
+
+      it('executes a separate query per document (gh-5890)', async function() {
+        const childSchema = new Schema({ name: String });
+        const inFilterLengths = [];
+        childSchema.pre('find', function() {
+          inFilterLengths.push(this.getFilter()._id.$in.length);
+        });
+        const Child = db.model('Child', childSchema);
+        const Parent = db.model('Parent', new Schema({
+          children: [{ type: ObjectId, ref: 'Child' }]
+        }));
+
+        const children = await Child.create(['A', 'B', 'C', 'D'].map(name => ({ name })));
+        await Parent.create([
+          { children: [children[0]._id, children[1]._id] },
+          { children: [children[2]._id, children[3]._id] }
+        ]);
+
+        const docs = await Parent.find().sort({ _id: 1 }).populate('children');
+
+        assert.deepStrictEqual(inFilterLengths, [2, 2]);
+        assert.deepStrictEqual(docs[0].children.map(child => child.name), ['A', 'B']);
+        assert.deepStrictEqual(docs[1].children.map(child => child.name), ['C', 'D']);
+      });
+
+      it('splits nested populate queries that go over the limit (gh-5890)', async function() {
+        const viewSchema = new Schema({ name: String });
+        const inFilterLengths = [];
+        viewSchema.pre('find', function() {
+          inFilterLengths.push(this.getFilter()._id.$in.length);
+        });
+        const View = db.model('View', viewSchema);
+        const TvShow = db.model('TvShow', new Schema({
+          title: String,
+          views: [{ type: ObjectId, ref: 'View' }]
+        }));
+        const Example = db.model('Example', new Schema({
+          tvShows: [{ type: ObjectId, ref: 'TvShow' }]
+        }));
+
+        const views = await View.create(['v1', 'v2', 'v3', 'v4'].map(name => ({ name })));
+        const tvShows = await TvShow.create([
+          { title: 'show 1', views: [views[0]._id, views[1]._id] },
+          { title: 'show 2', views: [views[2]._id, views[3]._id] }
+        ]);
+        await Example.create({ tvShows: [tvShows[0]._id, tvShows[1]._id] });
+
+        const doc = await Example.findOne().populate({
+          path: 'tvShows',
+          populate: { path: 'views' }
+        });
+
+        // The top-level `tvShows` populate is under the limit, but the nested `views`
+        // populate has 4 total ids across 2 tvShows, so it executes one query per tvShow
+        assert.deepStrictEqual(inFilterLengths, [2, 2]);
+        assert.deepStrictEqual(doc.tvShows[0].views.map(view => view.name), ['v1', 'v2']);
+        assert.deepStrictEqual(doc.tvShows[1].views.map(view => view.name), ['v3', 'v4']);
+      });
+
+      it('applies sort, skip, and limit per document (gh-5890)', async function() {
+        const childSchema = new Schema({ order: Number });
+        const inFilterLengths = [];
+        childSchema.pre('find', function() {
+          inFilterLengths.push(this.getFilter()._id.$in.length);
+        });
+        const Child = db.model('Child', childSchema);
+        const Parent = db.model('Parent', new Schema({
+          children: [{ type: ObjectId, ref: 'Child' }]
+        }));
+
+        const children = await Child.create([1, 2, 3, 4, 5, 6].map(order => ({ order })));
+        await Parent.create([
+          { children: children.slice(0, 3).map(child => child._id) },
+          { children: children.slice(3).map(child => child._id) }
+        ]);
+
+        const docs = await Parent.find().sort({ _id: 1 }).populate({
+          path: 'children',
+          options: { sort: { order: -1 }, skip: 1, limit: 2 }
+        });
+
+        assert.deepStrictEqual(inFilterLengths, [3, 3]);
+        // Because each document executes its own query, `sort`, `skip`, and `limit` apply
+        // to each document's populated array separately, like `perDocumentLimit`
+        assert.deepStrictEqual(docs[0].children.map(child => child.order), [2, 1]);
+        assert.deepStrictEqual(docs[1].children.map(child => child.order), [5, 4]);
+      });
+
+      it('counts each foreign field\'s copy of the ids when there are multiple foreign fields (gh-5890)', async function() {
+        const childSchema = new Schema({ name: String, f1: Number, f2: Number });
+        const filters = [];
+        childSchema.pre('find', function() {
+          filters.push(this.getFilter());
+        });
+        const Child = db.model('Child', childSchema);
+
+        const parentSchema = new Schema({ whichField: String, childIds: [Number] });
+        parentSchema.virtual('children', {
+          ref: 'Child',
+          localField: 'childIds',
+          foreignField: function() {
+            return this.whichField;
+          }
+        });
+        const Parent = db.model('Parent', parentSchema);
+
+        await Child.create([{ name: 'A', f1: 1 }, { name: 'B', f2: 11 }]);
+        await Parent.create([
+          { whichField: 'f1', childIds: [1] },
+          { whichField: 'f2', childIds: [11] }
+        ]);
+
+        const docs = await Parent.find().sort({ _id: 1 }).populate('children');
+
+        // Only 2 unique ids, but the filter repeats them under `$or` for each of the 2
+        // foreign fields, which puts the query over the limit of 3
+        assert.equal(filters.length, 2);
+        for (const filter of filters) {
+          assert.deepStrictEqual(filter.$or.map(cond => Object.keys(cond)[0]).sort(), ['f1', 'f2']);
+        }
+        assert.deepStrictEqual(
+          filters.map(filter => filter.$or.find(cond => cond.f1).f1.$in[0]).sort(),
+          [1, 11]
+        );
+        assert.deepStrictEqual(docs[0].children.map(child => child.name), ['A']);
+        assert.deepStrictEqual(docs[1].children.map(child => child.name), ['B']);
+      });
+
+      it('gives each split query its own `$in` when `match` uses `$elemMatch` (gh-5890)', async function() {
+        const groupSchema = new Schema({
+          name: String,
+          members: [{ userId: Number, active: Boolean }]
+        });
+        const filters = [];
+        groupSchema.pre('find', function() {
+          filters.push(this.getFilter());
+        });
+        const Group = db.model('Group', groupSchema);
+
+        const match = { members: { $elemMatch: { active: true } } };
+        const userSchema = new Schema({ userId: Number });
+        userSchema.virtual('groups', {
+          ref: 'Group',
+          localField: 'userId',
+          foreignField: 'members.userId',
+          match
+        });
+        const User = db.model('User', userSchema);
+
+        await Group.create([1, 2, 3, 4].map(userId => ({
+          name: `group ${userId}`,
+          members: [{ userId, active: userId !== 4 }]
+        })));
+        await User.create([1, 2, 3, 4].map(userId => ({ userId })));
+
+        const users = await User.find().sort({ userId: 1 }).populate('groups');
+
+        assert.equal(filters.length, 4);
+        for (const filter of filters) {
+          assert.strictEqual(filter.members.$elemMatch.active, true);
+        }
+        // Each split query's `$in` ends up inside `$elemMatch`, so each query needs its
+        // own copy of the `$elemMatch` rather than a reference to the `match` option's
+        assert.deepStrictEqual(
+          filters.map(filter => filter.members.$elemMatch.userId.$in[0]).sort(),
+          [1, 2, 3, 4]
+        );
+        assert.deepStrictEqual(users[0].groups.map(group => group.name), ['group 1']);
+        assert.deepStrictEqual(users[1].groups.map(group => group.name), ['group 2']);
+        assert.deepStrictEqual(users[2].groups.map(group => group.name), ['group 3']);
+        assert.deepStrictEqual(users[3].groups.map(group => group.name), []);
+        // The user's `match` object should not be modified
+        assert.deepStrictEqual(match, { members: { $elemMatch: { active: true } } });
+      });
+
+      it('skips executing a query for documents with no ids, but still initializes the path (gh-5890)', async function() {
+        const childSchema = new Schema({ name: String });
+        const inFilterLengths = [];
+        childSchema.pre('find', function() {
+          inFilterLengths.push(this.getFilter()._id.$in.length);
+        });
+        const Child = db.model('Child', childSchema);
+        const Parent = db.model('Parent', new Schema({
+          children: [{ type: ObjectId, ref: 'Child' }]
+        }));
+
+        const children = await Child.create(['A', 'B', 'C', 'D'].map(name => ({ name })));
+        await Parent.create([
+          { children: [children[0]._id, children[1]._id] },
+          { children: [] },
+          { children: [children[2]._id, children[3]._id] }
+        ]);
+
+        const docs = await Parent.find().sort({ _id: 1 }).populate('children');
+
+        // No query for the middle parent, whose `children` array is empty
+        assert.deepStrictEqual(inFilterLengths, [2, 2]);
+        assert.deepStrictEqual(docs[0].children.map(child => child.name), ['A', 'B']);
+        assert.deepStrictEqual(docs[1].children.map(child => child.name), []);
+        assert.ok(docs[1].populated('children'));
+        assert.deepStrictEqual(docs[2].children.map(child => child.name), ['C', 'D']);
+      });
     });
 
     it('works when embedded discriminator array has populated path but not refPath (gh-8527)', async function() {

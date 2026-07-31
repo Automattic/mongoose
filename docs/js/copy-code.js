@@ -16,8 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </svg>
   `;
 
-  // Inject a copy button into each <pre><code> block used in docs
-  document.querySelectorAll('pre code').forEach(block => {
+  window.addCopyButton = function addCopyButton(block) {
     const pre = block.parentElement;
 
     const wrapper = document.createElement('div');
@@ -52,5 +51,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     wrapper.appendChild(btn); // attach button to code block
+  };
+
+  // Inject a copy button into each <pre><code> block used in docs
+  document.querySelectorAll('pre code').forEach(block => {
+    window.addCopyButton(block);
   });
 });

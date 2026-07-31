@@ -104,6 +104,26 @@ describe('cast: ', function() {
     });
   });
 
+  describe('geo queries', function() {
+    it('casts object-shaped geo values with scalar leaves (gh-16376)', function() {
+      const schema = new Schema({ name: String });
+
+      const res = cast(schema, {
+        loc: { $geoIntersects: { foo: '5' } }
+      }, { strictQuery: false });
+      assert.strictEqual(res.loc.$geoIntersects.foo, 5);
+    });
+
+    it('still casts array-shaped geo values (gh-16376)', function() {
+      const schema = new Schema({ name: String });
+
+      const res = cast(schema, {
+        loc: { $geoIntersects: { coordinates: ['1', '2'] } }
+      }, { strictQuery: false });
+      assert.deepStrictEqual(res.loc.$geoIntersects.coordinates, [1, 2]);
+    });
+  });
+
   describe('bitwise query operators: ', function() {
     it('with a number', function() {
       const schema = new Schema({ x: Buffer });

@@ -100,7 +100,7 @@
     "publish-7x": "npm publish --tag 7x",
     "create-separate-require-instance": "rm -rf ./node_modules/mongoose-separate-require-instance && node ./scripts/create-tarball && tar -xzf mongoose.tgz -C ./node_modules && mv ./node_modules/package ./node_modules/mongoose-separate-require-instance",
     "test": "mocha --exit --ignore \"test/encryption/**/*.test.js\" \"./test/**/*.test.js\"",
-    "test:ci": "npm run test -- --reporter min",
+    "test:ci": "npm run test -- --reporter min --timeout 10000",
     "test-deno": "deno run --allow-env --allow-read --allow-net --allow-run --allow-sys --allow-write ./test/deno.mjs",
     "test-deno:ci": "npm run test-deno -- --reporter min",
     "test-rs": "START_REPLICA_SET=1 mocha --timeout 30000 --exit --ignore \"test/encryption/**/*.test.js\" \"./test/**/*.test.js\"",

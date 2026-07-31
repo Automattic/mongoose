@@ -1,3 +1,9 @@
+9.9.1 / 2026-07-31
+==================
+ * fix(query): avoid path collision when excluding subdocuments with nested `select: false` paths #12798 [BIGSUS24](https://github.com/BIGSUS24)
+ * types(model): apply schema-level lean to find() #16413
+ * types(model): support overriding schema-level `lean` with `lean: false` #16413
+
 9.9.0 / 2026-07-30
 ==================
  * perf(document): improve toObject perf with faster string checks and avoiding unnecessary isSelected on paths with no getters #16407 #16373 #16385

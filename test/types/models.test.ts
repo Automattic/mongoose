@@ -18,7 +18,8 @@ import mongoose, {
   connection,
   model,
   UpdateOneModel,
-  UpdateManyModel
+  UpdateManyModel,
+  InferHydratedDocTypeFromSchema
 } from 'mongoose';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
 import { UpdateOneModel as MongoUpdateOneModel, ChangeStreamInsertDocument, ObjectId } from 'mongodb';
@@ -792,15 +793,30 @@ async function gh16413() {
   const schema = new Schema({ name: String }, { lean: true });
   const TestModel = model('gh16413', schema);
 
+  type ExpectedHydratedDoc = ReturnType<(typeof TestModel)['hydrate']>;
   type ExpectedLeanDoc = mongoose.FlattenMaps<{ name?: string | null }> & { _id: Types.ObjectId; __v: number };
 
-  const docs = await TestModel.find();
-  expect(docs).type.toBe<ExpectedLeanDoc[]>();
+  async function testFind() {
+    const docs = await TestModel.find();
+    expect(docs).type.toBe<ExpectedLeanDoc[]>();
+
+    const hydratedDocs = await TestModel.find({}, null, { lean: false });
+    hydratedDocs[0].save();
+    expect(hydratedDocs).type.toBe<ExpectedHydratedDoc[]>();
+  }
+
+  async function testFindOne() {
+    const doc = await TestModel.findOne().orFail();
+    expect(doc).type.toBe<ExpectedLeanDoc>();
+    const hydratedDoc = await TestModel.findOne({}, null, { lean: false }).orFail();
+    hydratedDoc.save();
+    expect(hydratedDoc).type.toBe<ExpectedHydratedDoc>();
+  }
 
   const hydratedSchema = new Schema({ name: String }, { lean: false });
   const HydratedTestModel = model('gh16413Hydrated', hydratedSchema);
-  const hydratedDocs = await HydratedTestModel.find();
-  hydratedDocs[0].save();
+  const hydratedDocs2 = await HydratedTestModel.find();
+  hydratedDocs2[0].save();
 }
 
 async function gh13746() {

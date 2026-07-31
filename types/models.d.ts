@@ -496,6 +496,18 @@ declare module 'mongoose' {
       TInstanceMethods & TVirtuals
     >;
     findOne<ResultDoc = THydratedDocumentType>(
+      filter: QueryFilter<TRawDocType>,
+      projection: ProjectionType<TRawDocType> | null | undefined,
+      options: QueryOptions<TRawDocType> & { lean: false } & mongodb.Abortable
+    ): QueryWithHelpers<
+      ResultDoc | null,
+      ResultDoc,
+      TQueryHelpers,
+      TLeanResultType,
+      'findOne',
+      TInstanceMethods & TVirtuals
+    >;
+    findOne<ResultDoc = THydratedDocumentType>(
       filter?: QueryFilter<TRawDocType>,
       projection?: ProjectionType<TRawDocType> | null | undefined,
       options?: QueryOptions<TRawDocType> & mongodb.Abortable | null | undefined
@@ -775,6 +787,18 @@ declare module 'mongoose' {
     ): QueryWithHelpers<
       GetLeanResultType<TRawDocType, TRawDocType[], 'find'>,
       THydratedDocumentType,
+      TQueryHelpers,
+      TLeanResultType,
+      'find',
+      TInstanceMethods & TVirtuals
+    >;
+    find<ResultDoc = THydratedDocumentType>(
+      filter: QueryFilter<TRawDocType>,
+      projection: ProjectionType<TRawDocType> | null | undefined,
+      options: QueryOptions<TRawDocType> & { lean: false } & mongodb.Abortable
+    ): QueryWithHelpers<
+      ResultDoc[],
+      ResultDoc,
       TQueryHelpers,
       TLeanResultType,
       'find',

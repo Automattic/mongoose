@@ -458,6 +458,18 @@ declare module 'mongoose' {
       TInstanceMethods & TVirtuals
     >;
     findById<ResultDoc = THydratedDocumentType>(
+      id: any,
+      projection: ProjectionType<TRawDocType> | null | undefined,
+      options: QueryOptions<TRawDocType> & { lean: false }
+    ): QueryWithHelpers<
+      ResultDoc | null,
+      ResultDoc,
+      TQueryHelpers,
+      TLeanResultType,
+      'findOne',
+      TInstanceMethods & TVirtuals
+    >;
+    findById<ResultDoc = THydratedDocumentType>(
       id?: any,
       projection?: ProjectionType<TRawDocType> | null | undefined,
       options?: QueryOptions<TRawDocType> | null
@@ -854,6 +866,17 @@ declare module 'mongoose' {
     >;
     findByIdAndDelete<ResultDoc = THydratedDocumentType>(
       id: mongodb.ObjectId | any,
+      options: QueryOptions<TRawDocType> & { lean: false }
+    ): QueryWithHelpers<
+      ResultDoc | null,
+      ResultDoc,
+      TQueryHelpers,
+      TLeanResultType,
+      'findOneAndDelete',
+      TInstanceMethods & TVirtuals
+    >;
+    findByIdAndDelete<ResultDoc = THydratedDocumentType>(
+      id: mongodb.ObjectId | any,
       options: QueryOptions<TRawDocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<
       HasLeanOption<TSchema> extends true ? ModifyResult<TLeanResultType> : ModifyResult<ResultDoc>,
@@ -907,6 +930,18 @@ declare module 'mongoose' {
       options: QueryOptions<TRawDocType> & { lean: true }
     ): QueryWithHelpers<
       TLeanResultType | null,
+      ResultDoc,
+      TQueryHelpers,
+      TLeanResultType,
+      'findOneAndUpdate',
+      TInstanceMethods & TVirtuals
+    >;
+    findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
+      id: mongodb.ObjectId | any,
+      update: UpdateQuery<TRawDocType>,
+      options: QueryOptions<TRawDocType> & { lean: false }
+    ): QueryWithHelpers<
+      ResultDoc | null,
       ResultDoc,
       TQueryHelpers,
       TLeanResultType,
@@ -975,6 +1010,28 @@ declare module 'mongoose' {
     >;
     findOneAndDelete<ResultDoc = THydratedDocumentType>(
       filter: QueryFilter<TRawDocType>,
+      options: QueryOptions<TRawDocType> & { lean: false }
+    ): QueryWithHelpers<
+      ResultDoc | null,
+      ResultDoc,
+      TQueryHelpers,
+      TLeanResultType,
+      'findOneAndDelete',
+      TInstanceMethods & TVirtuals
+    >;
+    findOneAndDelete(
+      filter: Query<any, any>,
+      options: QueryOptions<TRawDocType> & { lean: false }
+    ): QueryWithHelpers<
+      THydratedDocumentType | null,
+      THydratedDocumentType,
+      TQueryHelpers,
+      TLeanResultType,
+      'findOneAndDelete',
+      TInstanceMethods & TVirtuals
+    >;
+    findOneAndDelete<ResultDoc = THydratedDocumentType>(
+      filter: QueryFilter<TRawDocType>,
       options: QueryOptions<TRawDocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<
       HasLeanOption<TSchema> extends true ? ModifyResult<TRawDocType> : ModifyResult<ResultDoc>,
@@ -999,7 +1056,7 @@ declare module 'mongoose' {
       filter?: QueryFilter<TRawDocType> | null,
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? TRawDocType | null : ResultDoc | null,
+      HasLeanOption<TSchema> extends true ? TLeanResultType | null : ResultDoc | null,
       ResultDoc,
       TQueryHelpers,
       TLeanResultType,
@@ -1010,7 +1067,7 @@ declare module 'mongoose' {
       filter?: Query<any, any> | null,
       options?: QueryOptions<TRawDocType> | null
     ): QueryWithHelpers<
-      HasLeanOption<TSchema> extends true ? TRawDocType | null : THydratedDocumentType | null,
+      HasLeanOption<TSchema> extends true ? TLeanResultType | null : THydratedDocumentType | null,
       THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
@@ -1037,6 +1094,30 @@ declare module 'mongoose' {
       options: QueryOptions<TRawDocType> & { lean: true }
     ): QueryWithHelpers<
       TLeanResultType | null,
+      THydratedDocumentType,
+      TQueryHelpers,
+      TLeanResultType,
+      'findOneAndReplace',
+      TInstanceMethods & TVirtuals
+    >;
+    findOneAndReplace<ResultDoc = THydratedDocumentType>(
+      filter: QueryFilter<TRawDocType>,
+      replacement: TRawDocType | AnyObject,
+      options: QueryOptions<TRawDocType> & { lean: false }
+    ): QueryWithHelpers<
+      ResultDoc | null,
+      ResultDoc,
+      TQueryHelpers,
+      TLeanResultType,
+      'findOneAndReplace',
+      TInstanceMethods & TVirtuals
+    >;
+    findOneAndReplace(
+      filter: Query<any, any>,
+      replacement: TRawDocType | AnyObject,
+      options: QueryOptions<TRawDocType> & { lean: false }
+    ): QueryWithHelpers<
+      THydratedDocumentType | null,
       THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
@@ -1159,6 +1240,30 @@ declare module 'mongoose' {
       options: QueryOptions<TRawDocType> & { lean: true }
     ): QueryWithHelpers<
       GetLeanResultType<TRawDocType, TRawDocType, 'findOneAndUpdate'> | null,
+      THydratedDocumentType,
+      TQueryHelpers,
+      TLeanResultType,
+      'findOneAndUpdate',
+      TInstanceMethods & TVirtuals
+    >;
+    findOneAndUpdate<ResultDoc = THydratedDocumentType>(
+      filter: QueryFilter<TRawDocType>,
+      update: UpdateQuery<TRawDocType>,
+      options: QueryOptions<TRawDocType> & { lean: false }
+    ): QueryWithHelpers<
+      ResultDoc | null,
+      ResultDoc,
+      TQueryHelpers,
+      TLeanResultType,
+      'findOneAndUpdate',
+      TInstanceMethods & TVirtuals
+    >;
+    findOneAndUpdate(
+      filter: Query<any, any>,
+      update: UpdateQuery<TRawDocType>,
+      options: QueryOptions<TRawDocType> & { lean: false }
+    ): QueryWithHelpers<
+      THydratedDocumentType | null,
       THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,

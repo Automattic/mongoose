@@ -813,10 +813,71 @@ async function gh16413() {
     expect(hydratedDoc).type.toBe<ExpectedHydratedDoc>();
   }
 
+  async function testFindById() {
+    const leanDoc = await TestModel.findById('0'.repeat(24)).orFail();
+    expect(leanDoc).type.toBe<ExpectedLeanDoc>();
+    const doc = await TestModel.findById('0'.repeat(24), undefined, { lean: false }).orFail();
+    doc.save();
+    expect(doc).type.toBe<ExpectedHydratedDoc>();
+  }
+
+  async function testFindOneAndUpdate() {
+    const leanDoc = await TestModel.findOneAndUpdate({}, {}).orFail();
+    expect(leanDoc).type.toBe<ExpectedLeanDoc>();
+    const doc = await TestModel.findOneAndUpdate({}, {}, { lean: false }).orFail();
+    doc.save();
+    expect(doc).type.toBe<ExpectedHydratedDoc>();
+  }
+
+  async function testFindByIdAndUpdate() {
+    const leanDoc = await TestModel.findByIdAndUpdate('0'.repeat(24), {}).orFail();
+    expect(leanDoc).type.toBe<ExpectedLeanDoc>();
+    const doc = await TestModel.findByIdAndUpdate('0'.repeat(24), {}, { lean: false }).orFail();
+    doc.save();
+    expect(doc).type.toBe<ExpectedHydratedDoc>();
+  }
+
+  async function testFindOneAndReplace() {
+    const leanDoc = await TestModel.findOneAndReplace({}, {}).orFail();
+    expect(leanDoc).type.toBe<ExpectedLeanDoc>();
+    const doc = await TestModel.findOneAndReplace({}, {}, { lean: false }).orFail();
+    doc.save();
+    expect(doc).type.toBe<ExpectedHydratedDoc>();
+  }
+
+  async function testFindOneAndDelete() {
+    const leanDoc = await TestModel.findOneAndDelete({}).orFail();
+    expect(leanDoc).type.toBe<ExpectedLeanDoc>();
+    const doc = await TestModel.findOneAndDelete({}, { lean: false }).orFail();
+    doc.save();
+    expect(doc).type.toBe<ExpectedHydratedDoc>();
+  }
+
+  async function testFindByIdAndDelete() {
+    const leanDoc = await TestModel.findByIdAndDelete('0'.repeat(24)).orFail();
+    expect(leanDoc).type.toBe<ExpectedLeanDoc>();
+    const doc = await TestModel.findByIdAndDelete('0'.repeat(24), { lean: false }).orFail();
+    doc.save();
+    expect(doc).type.toBe<ExpectedHydratedDoc>();
+  }
+
   const hydratedSchema = new Schema({ name: String }, { lean: false });
   const HydratedTestModel = model('gh16413Hydrated', hydratedSchema);
   const hydratedDocs2 = await HydratedTestModel.find();
   hydratedDocs2[0].save();
+
+  const leanDoc = await HydratedTestModel.findById('0'.repeat(24), undefined, { lean: true }).orFail();
+  expect(leanDoc).type.toBe<ExpectedLeanDoc>();
+  const leanUpdatedDoc = await HydratedTestModel.findOneAndUpdate({}, {}, { lean: true }).orFail();
+  expect(leanUpdatedDoc).type.toBe<ExpectedLeanDoc>();
+  const leanUpdatedByIdDoc = await HydratedTestModel.findByIdAndUpdate('0'.repeat(24), {}, { lean: true }).orFail();
+  expect(leanUpdatedByIdDoc).type.toBe<ExpectedLeanDoc>();
+  const leanReplacedDoc = await HydratedTestModel.findOneAndReplace({}, {}, { lean: true }).orFail();
+  expect(leanReplacedDoc).type.toBe<ExpectedLeanDoc>();
+  const leanDeletedDoc = await HydratedTestModel.findOneAndDelete({}, { lean: true }).orFail();
+  expect(leanDeletedDoc).type.toBe<ExpectedLeanDoc>();
+  const leanDeletedByIdDoc = await HydratedTestModel.findByIdAndDelete('0'.repeat(24), { lean: true }).orFail();
+  expect(leanDeletedByIdDoc).type.toBe<ExpectedLeanDoc>();
 }
 
 async function gh13746() {

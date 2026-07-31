@@ -788,6 +788,21 @@ async function gh13705() {
   expect(findOneAndUpdateResWithMetadata).type.toBe<ModifyResult<{ name?: string | null | undefined }>>();
 }
 
+async function gh16413() {
+  const schema = new Schema({ name: String }, { lean: true });
+  const TestModel = model('gh16413', schema);
+
+  type ExpectedLeanDoc = mongoose.FlattenMaps<{ name?: string | null }> & { _id: Types.ObjectId; __v: number };
+
+  const docs = await TestModel.find();
+  expect(docs).type.toBe<ExpectedLeanDoc[]>();
+
+  const hydratedSchema = new Schema({ name: String }, { lean: false });
+  const HydratedTestModel = model('gh16413Hydrated', hydratedSchema);
+  const hydratedDocs = await HydratedTestModel.find();
+  hydratedDocs[0].save();
+}
+
 async function gh13746() {
   const schema = new Schema({ name: String });
   const TestModel = model('Test', schema);

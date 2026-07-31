@@ -785,7 +785,7 @@ declare module 'mongoose' {
       projection?: ProjectionType<TRawDocType> | null | undefined,
       options?: QueryOptions<TRawDocType> & mongodb.Abortable
     ): QueryWithHelpers<
-      ResultDoc[],
+      HasLeanOption<TSchema> extends true ? TLeanResultType[] : ResultDoc[],
       ResultDoc,
       TQueryHelpers,
       TLeanResultType,
@@ -797,7 +797,7 @@ declare module 'mongoose' {
       projection?: ProjectionType<TRawDocType> | null | undefined,
       options?: QueryOptions<TRawDocType> & mongodb.Abortable
     ): QueryWithHelpers<
-      THydratedDocumentType[],
+      HasLeanOption<TSchema> extends true ? TLeanResultType[] : THydratedDocumentType[],
       THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,

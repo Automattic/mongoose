@@ -149,20 +149,6 @@ describe('Double', function() {
       assert.deepStrictEqual(doc.myDouble2, new BSON.Double(-Infinity));
     });
 
-    it('casts from NaN string', function() {
-      const schema = new Schema({
-        myDouble: {
-          type: Schema.Types.Double
-        }
-      });
-      const Test = mongoose.model('Test', schema);
-
-      const doc = new Test({
-        myDouble: 'NaN'
-      });
-      assert.deepStrictEqual(doc.myDouble, new BSON.Double('NaN'));
-    });
-
     it('casts from number', function() {
       const schema = new Schema({
         myDouble: Schema.Types.Double
@@ -286,6 +272,22 @@ describe('Double', function() {
           /^Cast to Double failed for value "helloworld" \(type string\) at path "myDouble"/
         );
       });
+    });
+
+    it('throws error on NaN string', async function() {
+      const doc = new Test({
+        myDouble: 'NaN'
+      });
+      assert.deepStrictEqual(doc.myDouble, undefined);
+      await assert.rejects(() => doc.validate(), /Cast to Double failed/);
+    });
+
+    it('throws error on NaN value', async function() {
+      const doc = new Test({
+        myDouble: NaN
+      });
+      assert.deepStrictEqual(doc.myDouble, undefined);
+      await assert.rejects(() => doc.validate(), /Cast to Double failed/);
     });
   });
 

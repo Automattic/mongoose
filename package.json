@@ -60,7 +60,7 @@
     "mongodb-runner": "^6.0.0",
     "ncp": "^2.0.0",
     "pug": "3.0.4",
-    "sinon": "22.0.0",
+    "sinon": "22.1.0",
     "tstyche": "^7.0.0",
     "typescript": "5.9.3",
     "typescript-eslint": "^8.31.1",

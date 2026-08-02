@@ -289,9 +289,9 @@ declare module 'mongoose' {
     ): ToObjectReturnType<PopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
     toJSON<PopulatedRawDocType>(
       this: PopulatedDocumentMarker<PopulatedRawDocType, any>
-    ): Default__v<Require_id<PopulatedRawDocType>, TSchemaOptions>;
+    ): DefaultToObjectReturnType<PopulatedRawDocType, TVirtuals, TSchemaOptions, 'toJSON'>;
     toJSON<O extends ToObjectOptions>(options: O): ToObjectReturnType<DocType, TVirtuals, O, TSchemaOptions>;
-    toJSON(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;
+    toJSON(options?: ToObjectOptions): DefaultToObjectReturnType<DocType, TVirtuals, TSchemaOptions, 'toJSON'>;
     toJSON<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
@@ -309,9 +309,9 @@ declare module 'mongoose' {
     ): ToObjectReturnType<PopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
     toObject<PopulatedRawDocType>(
       this: PopulatedDocumentMarker<PopulatedRawDocType, any>
-    ): Default__v<Require_id<PopulatedRawDocType>, TSchemaOptions>;
+    ): DefaultToObjectReturnType<PopulatedRawDocType, TVirtuals, TSchemaOptions, 'toObject'>;
     toObject<O extends ToObjectOptions>(options: O): ToObjectReturnType<DocType, TVirtuals, O, TSchemaOptions>;
-    toObject(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;
+    toObject(options?: ToObjectOptions): DefaultToObjectReturnType<DocType, TVirtuals, TSchemaOptions, 'toObject'>;
     toObject<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
 
     /** Clears the modified state on the specified path. */

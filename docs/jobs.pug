@@ -117,18 +117,23 @@ block content
             span.company &nbsp;#{job.company}
             span.location &nbsp;&bull; #{job.location} 
           div.job-description
-            div !{job.description}
+            div #{job.description}
 
-            a(href=job.url)
+            a.apply-link(href='#' data-url=(job.url && /^https?:\/\//.test(job.url) ? job.url : ''))
               div.apply Apply
 
-  script window.jobs = !{JSON.stringify(jobs)};
+  script(type="application/json" id="jobs-data") #{JSON.stringify(jobs)}
   script.
     (function() {
-      if (window.location.hash != null && window.location.hash.length > 1) {
+      window.jobs = JSON.parse(document.getElementById('jobs-data').textContent);
+      document.querySelectorAll('.apply-link').forEach(function(link) {
+        var url = link.getAttribute('data-url');
+        if (url) { link.setAttribute('href', url); }
+      });
+      if (window.location.hash && window.location.hash.length > 1) {
         const jobId = window.location.hash.replace(/^#/, '');
         const job = window.jobs.find(job => job._id === jobId);
-        if (job != null) {
+        if (job) {
           document.querySelector('#job-' + job._id).classList.add('active');
           document.querySelector('#checkbox-' + job._id).checked = true;
         }

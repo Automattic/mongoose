@@ -83,6 +83,7 @@ jobs:
     env:
       MONGOMS_VERSION: 6.0.15
       MONGOMS_PREFER_GLOBAL_PATH: 1
+      MONGOMS_DOWNLOAD_DIR: /home/runner/.cache/mongodb-binaries
       FORCE_COLOR: true
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -99,7 +100,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
         with:
-          deno-version: v2.1.x
+          deno-version: v2.6.x
       - run: deno --version
       - run: npm install
       - name: Run Deno tests

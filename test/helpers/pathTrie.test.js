@@ -49,6 +49,25 @@ describe('pathTrie', function() {
       assert.strictEqual(trie.matchesPathOrAncestor('profile.firstName'), false);
       assert.strictEqual(trie.matchesPathOrAncestor(['profile', 'firstName']), true);
     });
+
+    it('ignores numeric segments like array indexes (gh-16383)', function() {
+      const trie = new PathTrie(['comments.text']);
+      assert.strictEqual(trie.matchesPathOrAncestor(['comments', '0', 'text']), true);
+      assert.strictEqual(trie.matchesPathOrAncestor(['comments', '12', 'text']), true);
+      assert.strictEqual(trie.matchesPathOrAncestor(['comments', '0', 'author']), false);
+      assert.strictEqual(trie.matchesPathOrAncestor(['comments', '0']), false);
+    });
+
+    it('still matches explicit numeric entries', function() {
+      const trie = new PathTrie(['comments.0.text']);
+      assert.strictEqual(trie.matchesPathOrAncestor(['comments', '0', 'text']), true);
+      assert.strictEqual(trie.matchesPathOrAncestor(['comments', '1', 'text']), false);
+    });
+
+    it('matches wildcards against numeric segments', function() {
+      const trie = new PathTrie(['comments.$*']);
+      assert.strictEqual(trie.matchesPathOrAncestor(['comments', '0']), true);
+    });
   });
 
   describe('overlapsPath', function() {
@@ -80,6 +99,14 @@ describe('pathTrie', function() {
       const trie = new PathTrie(['profile.firstName']);
       assert.strictEqual(trie.overlapsPath('profile.firstName'), false);
       assert.strictEqual(trie.overlapsPath(['profile', 'firstName']), true);
+    });
+
+    it('ignores numeric segments like array indexes (gh-16383)', function() {
+      const trie = new PathTrie(['comments.text']);
+      assert.strictEqual(trie.overlapsPath(['comments', '0', 'text']), true);
+      assert.strictEqual(trie.overlapsPath(['comments', '0']), true);
+      assert.strictEqual(trie.overlapsPath(['comments', '0', 'text', 'foo']), true);
+      assert.strictEqual(trie.overlapsPath(['comments', '0', 'author']), false);
     });
   });
 

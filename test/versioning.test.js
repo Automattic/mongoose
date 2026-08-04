@@ -828,6 +828,40 @@ describe('versioning', function() {
         assert.strictEqual(user.$__.version, VERSION_ALL);
       });
 
+      it('sets VERSION_ALL when modifying array element path matching a subdocument path (gh-16383)', async function() {
+        // Arrange
+        const postSchema = new Schema({
+          comments: [{ text: String, author: String }],
+          title: String
+        }, { optimisticConcurrency: ['comments.text'] });
+        const Post = db.model('Test', postSchema);
+        const post = await Post.create({ title: 'Hello', comments: [{ text: 'First' }] });
+
+        // Act
+        post.comments[0].text = 'Edited';
+        post.$__delta();
+
+        // Assert
+        assert.strictEqual(post.$__.version, VERSION_ALL);
+      });
+
+      it('does not set version when modifying non-specified subdocument path (gh-16383)', async function() {
+        // Arrange
+        const postSchema = new Schema({
+          comments: [{ text: String, author: String }],
+          title: String
+        }, { optimisticConcurrency: ['comments.text'] });
+        const Post = db.model('Test', postSchema);
+        const post = await Post.create({ title: 'Hello', comments: [{ text: 'First', author: 'A' }] });
+
+        // Act
+        post.comments[0].author = 'B';
+        post.$__delta();
+
+        // Assert
+        assert.strictEqual(post.$__.version, undefined);
+      });
+
       it('does not set version when modifying non-specified field with wildcard path (gh-16383)', async function() {
         // Arrange
         const userSchema = new Schema({

@@ -1,4 +1,4 @@
-import * as BSON from 'bson';
+import { BSON } from 'mongodb';
 
 declare module 'mongoose' {
   /** The Mongoose Date [SchemaType](/docs/schematypes.html). */

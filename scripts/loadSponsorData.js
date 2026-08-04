@@ -31,24 +31,6 @@ async function run() {
     logo: String
   }), 'Subscriber');
 
-  const Job = mongoose.model('Job', mongoose.Schema({
-    logo: String,
-    company: String,
-    title: String,
-    location: {
-      type: String,
-      required: true
-    },
-    description: {
-      type: String,
-      required: true
-    },
-    url: {
-      type: String,
-      required: true
-    }
-  }), 'Job');
-
   const OpenCollectiveSponsor = mongoose.model('OpenCollectiveSponsor', mongoose.Schema({
     openCollectiveId: {
       type: Number
@@ -75,9 +57,6 @@ async function run() {
     sort({ createdAt: 1 }).
     select({ companyName: 1, description: 1, url: 1, logo: 1 });
   fs.writeFileSync(`${docsDir}/data/sponsors.json`, JSON.stringify(subscribers, null, '  '));
-
-  const jobs = await Job.find().select({ logo: 1, company: 1, title: 1, location: 1, description: 1, url: 1 });
-  fs.writeFileSync(`${docsDir}/data/jobs.json`, JSON.stringify(jobs, null, '  '));
 
   const opencollectiveSponsors = await fetch('https://opencollective.com/mongoose/members.json')
     .then(res => res.json())

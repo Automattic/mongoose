@@ -810,6 +810,40 @@ describe('versioning', function() {
         // Assert
         assert.strictEqual(user.$__.version, undefined);
       });
+
+      it('sets VERSION_ALL when modifying a map key matching a wildcard path (gh-16383)', async function() {
+        // Arrange
+        const userSchema = new Schema({
+          settings: { type: Map, of: String },
+          balance: Number
+        }, { optimisticConcurrency: ['settings.$*'] });
+        const User = db.model('Test', userSchema);
+        const user = await User.create({ settings: { theme: 'dark' }, balance: 100 });
+
+        // Act
+        user.settings.set('theme', 'light');
+        user.$__delta();
+
+        // Assert
+        assert.strictEqual(user.$__.version, VERSION_ALL);
+      });
+
+      it('does not set version when modifying non-specified field with wildcard path (gh-16383)', async function() {
+        // Arrange
+        const userSchema = new Schema({
+          settings: { type: Map, of: String },
+          balance: Number
+        }, { optimisticConcurrency: ['settings.$*'] });
+        const User = db.model('Test', userSchema);
+        const user = await User.create({ settings: { theme: 'dark' }, balance: 100 });
+
+        // Act
+        user.balance = 200;
+        user.$__delta();
+
+        // Assert
+        assert.strictEqual(user.$__.version, undefined);
+      });
     });
 
     describe('optimisticConcurrency: { exclude: [] }', function() {
@@ -872,6 +906,23 @@ describe('versioning', function() {
 
         // Assert
         assert.strictEqual(user.$__.version, VERSION_ALL);
+      });
+
+      it('does not set version when modifying only a map key excluded by wildcard path (gh-16383)', async function() {
+        // Arrange
+        const userSchema = new Schema({
+          settings: { type: Map, of: String },
+          balance: Number
+        }, { optimisticConcurrency: { exclude: ['settings.$*'] } });
+        const User = db.model('Test', userSchema);
+        const user = await User.create({ settings: { theme: 'dark' }, balance: 100 });
+
+        // Act
+        user.settings.set('theme', 'light');
+        user.$__delta();
+
+        // Assert
+        assert.strictEqual(user.$__.version, undefined);
       });
     });
 

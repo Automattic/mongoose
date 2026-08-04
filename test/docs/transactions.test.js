@@ -488,6 +488,39 @@ describe('transactions', function() {
     assert.equal(docs[0].name, 'test');
   });
 
+  it('transaction() resets $isDeleted between retries', async function() {
+    db.deleteModel(/Test/);
+    const Test = db.model('Test', Schema({ name: String }));
+
+    await Test.createCollection();
+    await Test.deleteMany({});
+
+    const doc = await Test.create({ name: 'test' });
+    const isDeletedBefore = [];
+    let retryCount = 0;
+
+    await db.transaction(async(session) => {
+      isDeletedBefore.push(doc.$isDeleted());
+      await doc.deleteOne({ session });
+      if (++retryCount < 2) {
+        throw new mongoose.mongo.MongoServerError({
+          errorLabels: ['TransientTransactionError']
+        });
+      }
+    });
+
+    assert.deepStrictEqual(
+      {
+        isDeletedBefore,
+        stillExists: await Test.exists({ _id: doc._id }) != null
+      },
+      {
+        isDeletedBefore: [false, false],
+        stillExists: false
+      }
+    );
+  });
+
   it('handles resetting array state with $set atomic (gh-13698)', async function() {
     db.deleteModel(/Test/);
     const subItemSchema = new mongoose.Schema(

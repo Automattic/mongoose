@@ -220,65 +220,53 @@ See the complete [Vector Search](https://mongoosejs.com/docs/atlas-vector-search
 
 Combine text search and vector search to leverage both keyword relevance and semantic similarity.
 
-### Sequential Search with Re-ranking
-
-First perform vector search, then re-rank with text relevance:
+Use `$rankFusion` to run `$vectorSearch` and `$search` as separate subpipelines and merge their results using [Reciprocal Rank Fusion (RRF)](https://www.mongodb.com/docs/vector-search/hybrid-search/hybrid-search/). Note that `$search` must be the first stage in its subpipeline, which is why it cannot be used directly after `$vectorSearch` in the same pipeline.
 
 ```javascript
 const queryEmbedding = await generateEmbedding('machine learning tutorial');
 
 const results = await Article.aggregate([
-  // 1. Vector search to find semantically similar documents
   {
-    $vectorSearch: {
-      index: 'vector_index',
-      path: 'content_embedding',
-      queryVector: queryEmbedding,
-      numCandidates: 100,
-      limit: 50
-    }
-  },
-  {
-    $addFields: {
-      vectorScore: { $meta: 'vectorSearchScore' }
-    }
-  },
-  // 2. Re-rank using text search
-  {
-    $search: {
-      index: 'article_search',
-      text: {
-        query: 'machine learning',
-        path: 'content'
+    $rankFusion: {
+      input: {
+        pipelines: {
+          // Semantic search subpipeline
+          vector: [
+            {
+              $vectorSearch: {
+                index: 'article_vector_index',
+                path: 'embedding',
+                queryVector: queryEmbedding,
+                numCandidates: 100,
+                limit: 50
+              }
+            }
+          ],
+          // Keyword search subpipeline
+          text: [
+            {
+              $search: {
+                index: 'article_search',
+                text: { query: 'machine learning', path: 'content' }
+              }
+            },
+            { $limit: 50 }
+          ]
+        }
+      },
+      combination: {
+        weights: {
+          vector: 0.7,  // 70% weight to semantic relevance
+          text: 0.3     // 30% weight to keyword relevance
+        }
       }
     }
   },
-  {
-    $addFields: {
-      textScore: { $meta: 'searchScore' }
-    }
-  },
-  // 3. Combine scores with weighting
-  {
-    $addFields: {
-      finalScore: {
-        $add: [
-          { $multiply: ['$vectorScore', 0.7] },  // 70% weight to semantic
-          { $multiply: ['$textScore', 0.3] }     // 30% weight to keywords
-        ]
-      }
-    }
-  },
-  {
-    $sort: { finalScore: -1 }
-  },
-  {
-    $limit: 10
-  }
+  { $limit: 10 }
 ]);
 ```
 
-For production use, see the [Atlas Hybrid Search documentation](https://www.mongodb.com/docs/atlas/atlas-search/tutorial/hybrid-search/) for optimized patterns and best practices.
+For more details, see the [Atlas Hybrid Search documentation](https://www.mongodb.com/docs/vector-search/hybrid-search/hybrid-search/).
 
 ## Best Practices
 

@@ -41,6 +41,7 @@ the `Story` model.
   <li><a href="#populating-multiple-paths">Populating Multiple Paths</a></li>
   <li><a href="#query-conditions">Query conditions and other options</a></li>
   <li><a href="#limit-vs-perDocumentLimit"><code>limit</code> vs. <code>perDocumentLimit</code></a></li>
+  <li><a href="#populate-skip-sort">Always pair <code>skip</code> with <code>sort</code></a></li>
   <li><a href="#refs-to-children">Refs to children</a></li>
   <li><a href="#populate_an_existing_mongoose_document">Populating an existing document</a></li>
   <li><a href="#populate_multiple_documents">Populating multiple existing documents</a></li>
@@ -100,7 +101,7 @@ const story = await Story.
 console.log('The author is %s', story.author.name);
 ```
 
-Populated paths are no longer set to their original `_id` , their value
+Populated paths are no longer set to their original `_id`, their value
 is replaced with the mongoose document returned from the database by
 performing a separate query before returning the results.
 
@@ -342,6 +343,30 @@ stories[0].fans.length; // 2
 stories[1].name; // 'Live and Let Die'
 stories[1].fans.length; // 2
 ```
+
+## Always pair `skip` with `sort` {#populate-skip-sort}
+
+MongoDB [does not guarantee the order of query results unless you specify a sort](https://www.mongodb.com/docs/manual/reference/method/cursor.sort/#result-ordering).
+`skip` is defined in terms of that order, so paginating a populated path with
+`skip` and no `sort` may return the same document twice, or skip one entirely,
+even though Mongoose sends the query correctly.
+
+```javascript
+// Not reliable: the server is free to return the fans in any order, so
+// there is no guarantee that page 2 continues where page 1 stopped.
+await Story.findById(id).populate({
+  path: 'fans',
+  options: { skip: 10, limit: 10 }
+});
+
+// Reliable: `sort` gives `skip` a well-defined order to count from.
+await Story.findById(id).populate({
+  path: 'fans',
+  options: { sort: { _id: 1 }, skip: 10, limit: 10 }
+});
+```
+
+This applies to `skip` on ordinary queries too, not just `populate()`.
 
 ## Refs to children {#refs-to-children}
 

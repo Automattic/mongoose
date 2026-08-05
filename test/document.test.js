@@ -15274,6 +15274,7 @@ describe('document', function() {
     }
 
     mongoose.Schema.Types.CustomType = SchemaCustomType;
+    mongoose.Schema.Types.CustomType.set('transform', v => v == null ? v : v.value);
 
     const Model = db.model(
       'Test',
@@ -15285,8 +15286,6 @@ describe('document', function() {
     const _id = new mongoose.Types.ObjectId('0'.repeat(24));
     const doc = new Model({ _id });
     doc.value = 1;
-
-    mongoose.Schema.Types.CustomType.set('transform', v => v == null ? v : v.value);
 
     assert.deepStrictEqual(doc.toJSON(), { _id, value: 1 });
     assert.deepStrictEqual(doc.toObject(), { _id, value: 1 });
@@ -16041,6 +16040,36 @@ describe('document', function() {
     await Test.collection.insertOne({ _id: 'test2', name: undefined });
     rawDoc = await Test.collection.findOne({ _id: 'test2' });
     assert.deepStrictEqual(rawDoc, { _id: 'test2', name: null });
+  });
+
+  it('revalidates hydrated paths when a dependent field changes (gh-16370)', async function() {
+    const userSchema = new mongoose.Schema({
+      name: String,
+      requiresEmail: Boolean,
+      email: {
+        type: String,
+        validate: {
+          validator: function(v) {
+            return !this.requiresEmail || (typeof v === 'string' && v.includes('@'));
+          },
+          message: 'invalid email'
+        }
+      }
+    });
+    const User = db.model('User', userSchema);
+
+    // Valid at creation time: requiresEmail is false, so the junk email passes
+    const { _id } = await User.create({ name: 'John', requiresEmail: false, email: 'not-an-email' });
+
+    const user = await User.findById(_id);
+
+    // Save #1: touch an unrelated field. Passes on both master and this branch.
+    user.name = 'Johnny';
+    await user.save();
+
+    // Save #2: flip requiresEmail, which makes the hydrated `email` invalid.
+    user.requiresEmail = true;
+    await assert.rejects(() => user.save(), /invalid email/);
   });
 });
 

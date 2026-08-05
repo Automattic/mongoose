@@ -1928,6 +1928,52 @@ describe('Query', function() {
       assert.ok(!doc.child2.field);
     });
 
+    it('excluding a subdocument path does not conflict with a nested select: false path (gh-12798)', async function() {
+      const schema = new Schema({
+        name: String,
+        subd: {
+          raw: { type: String, select: false },
+          clean: String
+        }
+      });
+      const Test = db.model('Test', schema);
+
+      await Test.create({ name: 'test', subd: { raw: 'raw', clean: 'clean' } });
+
+      const query = Test.find().select('-subd');
+      query._applyPaths();
+      assert.deepEqual(query._fields, { subd: 0 });
+
+      const doc = await Test.findOne().select('-subd').orFail();
+      assert.strictEqual(doc.subd.clean, undefined);
+      assert.strictEqual(doc.subd.raw, undefined);
+
+      // `false` is a valid exclusion value alongside `0` and shouldn't
+      // collide with the schema-level exclusion either
+      const boolQuery = Test.find().select({ subd: false });
+      boolQuery._applyPaths();
+      assert.deepEqual(boolQuery._fields, { subd: false });
+
+      // Any other falsy defining value is equally a valid exclusion
+      const emptyStringQuery = Test.find().select({ subd: '' });
+      emptyStringQuery._applyPaths();
+      assert.deepEqual(emptyStringQuery._fields, { subd: '' });
+
+      const Deep = db.model('Test1', new Schema({
+        a: { b: { c: { type: String, select: false }, d: String } },
+        arr: [{ raw: { type: String, select: false }, clean: String }]
+      }));
+      for (const [sel, expected] of [
+        ['-a', { a: 0, 'arr.raw': 0 }],
+        ['-a.b', { 'a.b': 0, 'arr.raw': 0 }],
+        ['-arr', { arr: 0, 'a.b.c': 0 }]
+      ]) {
+        const deepQuery = Deep.find().select(sel);
+        deepQuery._applyPaths();
+        assert.deepEqual(deepQuery._fields, expected);
+      }
+    });
+
     it('errors in post init (gh-5592)', async function() {
       const TestSchema = new Schema();
 
@@ -1983,6 +2029,7 @@ describe('Query', function() {
 
       const Model = db.model('Test', schema);
 
+      await Model.deleteMany({});
       await Model.create({ n: 42 });
 
       let res = await Model.find().explain('queryPlanner');

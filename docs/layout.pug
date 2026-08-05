@@ -202,20 +202,6 @@ html(lang='en')
                 - else
                   img(src=`${versions.versionedPath}${affiliateAd.image}`, alt="Sponsored")
 
-            - if (jobs && jobs.length && !outputUrl.startsWith(`${versions.versionedPath}/docs/jobs.html`))
-              .jobs
-                h3.jobs-title Jobs
-                each job in jobs
-                  a.job-listing(href=`${versions.versionedPath}/docs/jobs.html#` + job._id)
-                    .company-logo
-                      img(src=job.logo)
-                    .job-meta
-                      .company #{job.company}
-                      .title #{job.title}
-                      .location #{job.location}
-                .jobs-view-more
-                  a(href=`${versions.versionedPath}/docs/jobs.html`) View more jobs
-
       .assistant-panel#assistant-panel(aria-label="Mongoose docs assistant" aria-hidden="true")
         .assistant-panel-resize#assistant-panel-resize(role="separator", aria-orientation="vertical", aria-label="Resize assistant")
         .assistant-panel-header

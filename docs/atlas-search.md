@@ -5,16 +5,16 @@ You can use Atlas Search to build fast, relevance-based search capabilities on t
 
 Mongoose provides full support for managing Atlas Search indexes through your schema definitions, and querying with the `$search` aggregation stage.
 
-* [Creating a Search Index](#creating-index)
-* [Managing Search Indexes](#managing-indexes)
-* [Text Search Queries](#text-search)
+* [Creating a Search Index](#creating-a-search-index)
+* [Managing Search Indexes](#managing-search-indexes)
+* [Text Search Queries](#text-search-queries)
 * [Vector Search](#vector-search)
 * [Hybrid Search](#hybrid-search)
 
-## Creating a Search Index {#creating-index}
+## Creating a Search Index
 
 You can define Atlas Search indexes in your Mongoose schema using the `schema.searchIndex()` method.
-Mongoose can automatically create these indexes when your model initializes if you enable the `autoSearchIndex` option.
+Mongoose can automatically create these indexes when your model initializes if you enable the `autoSearchIndex` option, otherwise you can call `Model.createSearchIndexes()` to create the indexes.
 
 ```javascript
 const articleSchema = new mongoose.Schema({
@@ -38,9 +38,6 @@ articleSchema.searchIndex({
 });
 
 const Article = mongoose.model('Article', articleSchema);
-
-// Index will be created when model initializes
-await Article.init();
 ```
 
 ### Custom Field Mappings
@@ -88,32 +85,7 @@ articleSchema.searchIndex({
 });
 ```
 
-### Vector Search Index
-
-For semantic search using vector embeddings, create a vector search index.
-See the dedicated [Vector Search](atlas-vector-search.html) guide for detailed information.
-
-```javascript
-const movieSchema = new mongoose.Schema({
-  title: String,
-  plot_embedding: [Number]
-});
-
-movieSchema.searchIndex({
-  name: 'vector_index',
-  type: 'vectorSearch',
-  definition: {
-    fields: [{
-      type: 'vector',
-      path: 'plot_embedding',
-      numDimensions: 1536,
-      similarity: 'cosine'
-    }]
-  }
-});
-```
-
-## Managing Search Indexes {#managing-indexes}
+## Managing Search Indexes
 
 Mongoose provides several methods for managing Atlas Search indexes:
 
@@ -162,7 +134,7 @@ await Article.updateSearchIndex('article_search', {
 await Article.dropSearchIndex('old_index');
 ```
 
-## Text Search Queries {#text-search}
+## Text Search Queries
 
 Once your search index is created, you can use the `$search` aggregation stage to perform text searches.
 
@@ -186,9 +158,11 @@ const results = await Article.aggregate([
 
 ### Compound Queries
 
-Combine multiple search criteria with `must`, `should`, and `filter` clauses. Include relevance scores using the `$meta` operator:
+Combine multiple search criteria with `must`, `should`, and `filter` clauses. Include relevance scores using the `$meta` operator. Atlas Search [scores](https://www.mongodb.com/docs/search/query/score/overview/) are relative to your dataset, so remember to adjust the `$match` threshold based on the scores you observe in your data.
 
 ```javascript
+// Find articles about 'mongodb' published since 2023, ranked by relevance,
+// with a score boost for articles whose title includes 'tutorial'
 const results = await Article.aggregate([
   {
     $search: {
@@ -198,7 +172,7 @@ const results = await Article.aggregate([
           {
             text: {
               query: 'mongodb',
-              path: 'content'
+              path: 'content'  // Article must mention 'mongodb' in content
             }
           }
         ],
@@ -207,7 +181,7 @@ const results = await Article.aggregate([
             text: {
               query: 'tutorial',
               path: 'title',
-              score: { boost: { value: 2 } }  // Boost title matches
+              score: { boost: { value: 2 } }  // Double the score for articles with 'tutorial' in the title
             }
           }
         ],
@@ -215,7 +189,7 @@ const results = await Article.aggregate([
           {
             range: {
               path: 'publishedAt',
-              gte: new Date('2023-01-01')
+              gte: new Date('2023-01-01')  // Only include articles published in 2023 or later
             }
           }
         ]
@@ -226,51 +200,23 @@ const results = await Article.aggregate([
     $project: {
       title: 1,
       content: 1,
-      // The $meta: 'searchScore' operator returns the relevance score
-      // calculated by Atlas Search based on how well the document matches the query
-      score: { $meta: 'searchScore' }
+      score: { $meta: 'searchScore' }  // Include the relevance score in the results
     }
   },
   {
     $match: {
-      score: { $gte: 5 }  // Only return high-quality matches
+      score: { $gte: 5 }  // Adjust this threshold based on your data
     }
   }
 ]);
 ```
 
-## Vector Search {#vector-search}
+## Vector Search
 
 For semantic search using vector embeddings, use the `$vectorSearch` stage.
-See the complete [Vector Search](atlas-vector-search.html) guide for detailed examples.
+See the complete [Vector Search](https://mongoosejs.com/docs/atlas-vector-search.html) guide for detailed examples.
 
-```javascript
-// Note: generateEmbedding() is pseudocode - use your embedding provider's SDK
-// Recommended: Voyage AI (client.embed()), OpenAI (client.embeddings.create()), 
-// or Atlas Automated Embeddings
-const queryEmbedding = await generateEmbedding('romantic comedy');
-
-const results = await Movie.aggregate([
-  {
-    $vectorSearch: {
-      index: 'vector_index',
-      path: 'plot_embedding',
-      queryVector: queryEmbedding,
-      numCandidates: 100,
-      limit: 10
-    }
-  },
-  {
-    $project: {
-      title: 1,
-      plot: 1,
-      score: { $meta: 'vectorSearchScore' }  // Vector search uses vectorSearchScore
-    }
-  }
-]);
-```
-
-## Hybrid Search {#hybrid-search}
+## Hybrid Search
 
 Combine text search and vector search to leverage both keyword relevance and semantic similarity.
 
@@ -339,7 +285,7 @@ For production use, see the [Atlas Hybrid Search documentation](https://www.mong
 ### Index Management
 
 * **Use `autoSearchIndex: true` in development**: Automatically sync indexes with your schema
-* **Manage indexes manually in production**: Create and update indexes through Atlas UI, MongoDB CLI, or deployment scripts to avoid unintended changes during application deployments
+* **Manage indexes manually in production**: Manage indexes through `Model.createSearchIndexes()`, Atlas UI, MongoDB CLI, or deployment scripts to avoid unintended changes during application deployments
 * **Monitor index status**: Always check `listSearchIndexes()` after creation to ensure indexes are ready (`queryable: true`)
 
 ### Schema Design
@@ -380,9 +326,9 @@ Disable `autoSearchIndex` in production to prevent automatic index changes durin
 
 ## See Also
 
-* [Vector Search](atlas-vector-search.html) for semantic search with embeddings
+* [Vector Search](https://mongoosejs.com/docs/atlas-vector-search.html) for semantic search with embeddings
 * [MongoDB Atlas Search Documentation](https://www.mongodb.com/docs/search/)
 * [Atlas Search Analyzers](https://www.mongodb.com/docs/search/index/analyzers/overview/)
-* [Model Search Index Methods](api/model.html#model_Model-createSearchIndex)
-* [Schema searchIndex() Method](api/schema.html#schema_Schema-searchIndex)
+* [Model Search Index Methods](https://mongoosejs.com/docs/api/model.html#model_Model-createSearchIndex)
+* [Schema searchIndex() Method](https://mongoosejs.com/docs/api/schema.html#schema_Schema-searchIndex)
 * [Aggregation](https://mongoosejs.com/docs/api/aggregate.html) for building complex pipelines

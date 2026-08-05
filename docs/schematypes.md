@@ -501,6 +501,44 @@ const ToyBoxSchema = new Schema({
 });
 ```
 
+Note that `default` applies to whichever level you declare it on. In the example
+above, `default` sits next to `type: [ToySchema]`, so it is the default for the
+*array*. If you instead put `default` inside the square brackets, it becomes the
+default for each *element* of the array, and the array keeps its implicit `[]`
+default.
+
+```javascript
+const ArrayDefault = new Schema({
+  toys: { type: [String], default: undefined }
+});
+const ElementDefault = new Schema({
+  // `default: undefined` here applies to each string element, not to `toys`
+  toys: [{ type: String, default: undefined }]
+});
+
+mongoose.model('ArrayDefault', ArrayDefault);
+mongoose.model('ElementDefault', ElementDefault);
+
+new (mongoose.model('ArrayDefault'))().toys; // undefined
+new (mongoose.model('ElementDefault'))().toys; // []
+```
+
+This distinction matters most when you are declaring an array of ObjectIds with
+a `ref`. Both of the following populate correctly, but only the first sets a
+default for the array itself:
+
+```javascript
+// `default` and `ref` are options on the `students` array
+const ClassroomSchema = new Schema({
+  students: { type: [Schema.Types.ObjectId], ref: 'Person', default: [] }
+});
+
+// `default` and `ref` are options on each element of `students`
+const ClassroomSchema2 = new Schema({
+  students: [{ type: Schema.Types.ObjectId, ref: 'Person', default: [] }]
+});
+```
+
 Note: specifying an empty array is equivalent to `Mixed`. The following all create arrays of
 `Mixed`:
 

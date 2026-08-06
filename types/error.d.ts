@@ -97,6 +97,15 @@ declare module 'mongoose' {
       constructor(instance?: MongooseError);
     }
 
+    export class FilterValidationError extends MongooseError {
+      name: 'FilterValidationError';
+
+      errors: { [path: string]: ValidatorError | CastError };
+      addError: (path: string, error: ValidatorError | CastError) => void;
+
+      constructor();
+    }
+
     export class ValidatorError extends MongooseError {
       name: 'ValidatorError';
       properties: {

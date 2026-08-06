@@ -113,6 +113,13 @@ declare module 'mongoose' {
      * If `false`, Mongoose will not clone the update before executing the query.
      */
     cloneUpdate?: boolean;
+    /**
+     * Query-level option. If `true`, validate query filter values using
+     * [`Model.validateFilter()`](https://mongoosejs.com/docs/api/model.html#Model.validateFilter()).
+     * Disabled by default.
+     * @default false
+     */
+    validateFilter?: boolean;
     explain?: mongodb.ExplainVerbosityLike;
     fields?: any | string;
     hint?: mongodb.Hint;
@@ -912,6 +919,9 @@ declare module 'mongoose' {
       arg?: string | Record<string, SortOrder | { $meta: any }> | [string, SortOrder][] | undefined | null,
       options?: { override?: boolean }
     ): this;
+
+    /** Enables validation for query filters using `Model.validateFilter()`. */
+    validateFilter(bool?: boolean): this;
 
     /** Sets the tailable option (for use with capped collections). */
     tailable(bool?: boolean, opts?: {

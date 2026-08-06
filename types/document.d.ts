@@ -112,6 +112,29 @@ declare module 'mongoose' {
     $restoreModifiedPathsSnapshot(snapshot: ModifiedPathsSnapshot): this;
 
     /**
+     * Reverts unsaved changes to this document, restoring it to the state it was in when it
+     * was last loaded from the database or last saved successfully.
+     *
+     * If `paths` is specified, only those paths are reverted; otherwise the entire document is reverted.
+     * Has no effect on documents that were constructed programmatically (i.e. `new Model()`).
+     *
+     * #### Example:
+     *
+     *     const doc = await MyModel.findOne();
+     *     doc.name = 'changed';
+     *     doc.$revert();
+     *     doc.name; // original value from DB
+     *
+     *     // Revert only specific paths:
+     *     doc.name = 'changed';
+     *     doc.age = 99;
+     *     doc.$revert(['name']);
+     *     doc.name; // reverted to original
+     *     doc.age;  // 99 — not reverted
+     */
+    $revert(paths?: string | string[]): this;
+
+    /**
      * Getter/setter around the session associated with this document. Used to
      * automatically set `session` if you `save()` a doc that you got from a
      * query with an associated session.

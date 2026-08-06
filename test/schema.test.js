@@ -4161,6 +4161,12 @@ describe('schema', function() {
       const doc = await Test.create({ tags: ['funny'], scores: [1, 2] });
       assert.deepStrictEqual(doc.toObject().tags, ['funny']);
 
+      // Neither path is required, so `null` is a valid element: it's in `items.enum`
+      // and `'null'` is in `items.bsonType`.
+      const withNulls = await Test.create({ tags: [null], scores: [null] });
+      assert.deepStrictEqual(withNulls.toObject().tags, [null]);
+      assert.deepStrictEqual(withNulls.toObject().scores, [null]);
+
       await assert.rejects(
         Test.create([{ tags: ['funny', 'something else'] }], { validateBeforeSave: false }),
         /MongoServerError: Document failed validation/
@@ -4170,6 +4176,7 @@ describe('schema', function() {
       const validate = ajv.compile(schema.toJSONSchema());
 
       assert.ok(validate({ _id: '0'.repeat(24), tags: ['funny', 'sad'], scores: [1] }));
+      assert.ok(validate({ _id: '0'.repeat(24), tags: [null], scores: [null] }));
       assert.ok(!validate({ _id: '0'.repeat(24), tags: ['funny', 'something else'] }));
       assert.ok(!validate({ _id: '0'.repeat(24), scores: [3] }));
     });

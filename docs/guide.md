@@ -957,7 +957,9 @@ MyModel.find({ notInSchema: 1 });
 ```
 
 The `strict` option does apply to updates.
-The `strictQuery` option is **just** for query filters.
+<!-- markdownlint-disable MD051 -->
+The `strictQuery` option is for query filters and for [`arrayFilters`](#strictQuery-arrayFilters).
+<!-- markdownlint-enable MD051 -->
 
 ```javascript
 // Mongoose will strip out `notInSchema` from the update if `strict` is
@@ -993,6 +995,37 @@ await MyModel.find({ notInSchema: 1 });
 // Matches _all_ documents with `strictQuery: true`: Mongoose strips out
 // `notInSchema: 1`, leaving an empty filter `{}`.
 await MyModel.find({ notInSchema: 1 }).setOptions({ strictQuery: true });
+```
+
+### strictQuery and arrayFilters {#strictQuery-arrayFilters}
+
+Mongoose also checks `arrayFilters` paths against your schema.
+Array filters are strict by default, even though `strictQuery` is `false` by default.
+Mongoose never silently strips an array filter, because dropping one would change which array elements the update modifies, so an array filter path that isn't in the schema throws instead.
+
+```javascript
+const itemSchema = new Schema({ name: String }, { _id: false });
+const MyModel = mongoose.model('Test', new Schema({ items: [itemSchema] }));
+
+// Throws 'Could not find path "items.0._id" in schema', because `itemSchema` is
+// declared with `_id: false`, so `items._id` is not in the schema.
+await MyModel.updateOne(
+  {},
+  { $set: { 'items.$[item].name': 'test' } },
+  { arrayFilters: [{ 'item._id': 42 }] }
+);
+```
+
+Set `strictQuery: false` to leave the path as-is and send it to the server uncast.
+That is useful when your stored documents contain properties that your schema doesn't declare.
+Mongoose throws for array filters with both `strictQuery: true` and `strictQuery: 'throw'`.
+
+```javascript
+await MyModel.updateOne(
+  {},
+  { $set: { 'items.$[item].name': 'test' } },
+  { arrayFilters: [{ 'item._id': 42 }], strictQuery: false }
+);
 ```
 
 In general, we do **not** recommend passing user-defined objects as query filters:

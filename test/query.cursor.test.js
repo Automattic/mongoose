@@ -868,6 +868,38 @@ describe('QueryCursor', function() {
     assert.equal(typeof cursorMiddleSelect[0].c, 'undefined');
     assert.equal(typeof cursorMiddleSelect[1].c, 'undefined');
   });
+
+  it('applies sanitizeFilter (gh-15720)', async function() {
+    const cursor = Model.find({ name: { $ne: null } }).
+      setOptions({ sanitizeFilter: true }).
+      cursor();
+
+    // Operator injection gets wrapped in `$eq`, so casting the object against
+    // the `name` string path fails rather than matching every document.
+    const err = await cursor.next().then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.name, 'CastError');
+  });
+
+  it('sanitizeFilter allows trusted operators (gh-15720)', async function() {
+    const cursor = Model.find({ name: mongoose.trusted({ $ne: null }) }).
+      setOptions({ sanitizeFilter: true }).
+      sort({ name: 1 }).
+      cursor();
+
+    const doc = await cursor.next();
+    assert.equal(doc.name, 'Axl');
+  });
+
+  it('sanitizeFilter rejects $where (gh-15720)', async function() {
+    const cursor = Model.find({ $where: 'this.name === "Axl"' }).
+      setOptions({ sanitizeFilter: true }).
+      cursor();
+
+    const err = await cursor.next().then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.message, '$where is not allowed with sanitizeFilter');
+  });
 });
 
 async function delay(ms) {

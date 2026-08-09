@@ -4121,6 +4121,104 @@ describe('schema', function() {
       assert.ok(!validate({ _id: 'not-an-objectid' }));
       assert.ok(!validate({ _id: '0'.repeat(24), author: 'not-an-objectid' }));
     });
+
+    it('puts enums on array elements rather than on the array (gh-16443)', async function() {
+      const schema = new Schema({
+        tags: { type: [String], enum: ['funny', 'sad'] },
+        scores: [{ type: Number, enum: [1, 2] }]
+      }, { autoCreate: false, autoIndex: false });
+
+      assert.deepStrictEqual(schema.toJSONSchema({ useBsonType: true }), {
+        required: ['_id'],
+        properties: {
+          tags: {
+            bsonType: ['array', 'null'],
+            items: {
+              bsonType: ['string', 'null'],
+              enum: ['funny', 'sad', null]
+            }
+          },
+          scores: {
+            bsonType: ['array', 'null'],
+            items: {
+              bsonType: ['number', 'null'],
+              enum: [1, 2, null]
+            }
+          },
+          _id: {
+            bsonType: 'objectId'
+          }
+        }
+      });
+
+      await db.createCollection(collectionName, {
+        validator: {
+          $jsonSchema: schema.toJSONSchema({ useBsonType: true })
+        }
+      });
+      const Test = db.model('Test', schema, collectionName);
+
+      const doc = await Test.create({ tags: ['funny'], scores: [1, 2] });
+      assert.deepStrictEqual(doc.toObject().tags, ['funny']);
+
+      // Neither path is required, so `null` is a valid element: it's in `items.enum`
+      // and `'null'` is in `items.bsonType`.
+      const withNulls = await Test.create({ tags: [null], scores: [null] });
+      assert.deepStrictEqual(withNulls.toObject().tags, [null]);
+      assert.deepStrictEqual(withNulls.toObject().scores, [null]);
+
+      await assert.rejects(
+        Test.create([{ tags: ['funny', 'something else'] }], { validateBeforeSave: false }),
+        /MongoServerError: Document failed validation/
+      );
+
+      const ajv = new Ajv();
+      const validate = ajv.compile(schema.toJSONSchema());
+
+      assert.ok(validate({ _id: '0'.repeat(24), tags: ['funny', 'sad'], scores: [1] }));
+      assert.ok(validate({ _id: '0'.repeat(24), tags: [null], scores: [null] }));
+      assert.ok(!validate({ _id: '0'.repeat(24), tags: ['funny', 'something else'] }));
+      assert.ok(!validate({ _id: '0'.repeat(24), scores: [3] }));
+    });
+
+    it('supports enums declared as an object or set with enum() (gh-16443)', function() {
+      const schema = new Schema({
+        status: { type: String, enum: { values: ['on', 'off'], message: '{VALUE} is not supported' } },
+        level: { type: Number, required: true, enum: { values: [1, 2], message: 'invalid' } },
+        color: String
+      }, { autoCreate: false, autoIndex: false });
+      schema.path('color').enum('red', 'green');
+
+      assert.deepStrictEqual(schema.toJSONSchema(), {
+        type: 'object',
+        required: ['level', '_id'],
+        properties: {
+          status: {
+            type: ['string', 'null'],
+            enum: ['on', 'off', null]
+          },
+          level: {
+            type: 'number',
+            enum: [1, 2]
+          },
+          color: {
+            type: ['string', 'null'],
+            enum: ['red', 'green', null]
+          },
+          _id: {
+            type: 'string',
+            pattern: '^[A-Fa-f0-9]{24}$'
+          }
+        }
+      });
+
+      const ajv = new Ajv();
+      const validate = ajv.compile(schema.toJSONSchema());
+
+      assert.ok(validate({ _id: '0'.repeat(24), level: 1, status: null, color: 'red' }));
+      assert.ok(!validate({ _id: '0'.repeat(24), level: 1, status: 'maybe' }));
+      assert.ok(!validate({ _id: '0'.repeat(24), level: 3 }));
+    });
   });
 
   it('path() clears existing child schemas (gh-15253)', async function() {

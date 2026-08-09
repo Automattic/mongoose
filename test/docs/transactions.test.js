@@ -488,6 +488,39 @@ describe('transactions', function() {
     assert.equal(docs[0].name, 'test');
   });
 
+  it('transaction() resets $isDeleted between retries', async function() {
+    db.deleteModel(/Test/);
+    const Test = db.model('Test', Schema({ name: String }));
+
+    await Test.createCollection();
+    await Test.deleteMany({});
+
+    const doc = await Test.create({ name: 'test' });
+    const isDeletedBefore = [];
+    let retryCount = 0;
+
+    await db.transaction(async(session) => {
+      isDeletedBefore.push(doc.$isDeleted());
+      await doc.deleteOne({ session });
+      if (++retryCount < 2) {
+        throw new mongoose.mongo.MongoServerError({
+          errorLabels: ['TransientTransactionError']
+        });
+      }
+    });
+
+    assert.deepStrictEqual(
+      {
+        isDeletedBefore,
+        stillExists: await Test.exists({ _id: doc._id }) != null
+      },
+      {
+        isDeletedBefore: [false, false],
+        stillExists: false
+      }
+    );
+  });
+
   it('handles resetting array state with $set atomic (gh-13698)', async function() {
     db.deleteModel(/Test/);
     const subItemSchema = new mongoose.Schema(
@@ -545,6 +578,56 @@ describe('transactions', function() {
     assert.equal(items[1].name, 'test2');
     assert.equal(items[1].subItems.length, 1);
     assert.equal(items[1].subItems[0].name, 'x2');
+  });
+  
+    it('transaction() resets $isNew between retries with bulkSave() (gh-16432)', async function() {
+    db.deleteModel(/Test/);
+    const Test = db.model('Test', Schema({ name: String }));
+
+    await Test.createCollection();
+    await Test.deleteMany({});
+
+    const doc = new Test({ name: 'test' });
+    assert.ok(doc.$isNew);
+    let retryCount = 0;
+    await db.transaction(async(session) => {
+      assert.ok(doc.$isNew);
+      await Test.bulkSave([doc], { session });
+      if (++retryCount < 3) {
+        throw new mongoose.mongo.MongoServerError({
+          errorLabels: ['TransientTransactionError']
+        });
+      }
+    });
+
+    const docs = await Test.find();
+    assert.equal(docs.length, 1);
+    assert.equal(docs[0].name, 'test');
+  });
+
+  it('transaction() restores modified paths between retries with bulkSave() (gh-16432)', async function() {
+    db.deleteModel(/Test/);
+    const Test = db.model('Test', Schema({ name: String }));
+
+    await Test.createCollection();
+    await Test.deleteMany({});
+
+    const { _id } = await Test.create({ name: 'initial' });
+
+    const doc = await Test.findById(_id).orFail();
+    let retryCount = 0;
+    await db.transaction(async(session) => {
+      doc.name = 'updated';
+      await Test.bulkSave([doc], { session });
+      if (++retryCount < 3) {
+        throw new mongoose.mongo.MongoServerError({
+          errorLabels: ['TransientTransactionError']
+        });
+      }
+    });
+
+    const fromDb = await Test.findById(_id).orFail();
+    assert.equal(fromDb.name, 'updated');
   });
 
   it('transaction() retains modified status for documents created outside of the transaction then modified inside the transaction (gh-13973)', async function() {

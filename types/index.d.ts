@@ -1123,6 +1123,31 @@ declare module 'mongoose' {
     : T;
 
   /**
+   * Extracts the `toObject` or `toJSON` options declared in the schema options.
+   * The runtime applies these as defaults when the corresponding method is
+   * called without arguments.
+   */
+  export type SchemaDeclaredToObjectOptions<TSchemaOptions, Key extends 'toObject' | 'toJSON'> =
+    Key extends keyof TSchemaOptions
+      ? NonNullable<TSchemaOptions[Key]> extends infer O extends ToObjectOptions
+        ? O
+        : {}
+      : {};
+
+  /**
+   * Computes the return type of toObject/toJSON when called without arguments,
+   * applying the options declared in the schema like the runtime does. When the
+   * schema declares no options for the method, the plain document shape is
+   * returned without running it through the option transforms.
+   */
+  export type DefaultToObjectReturnType<DocType, TVirtuals, TSchemaOptions, Key extends 'toObject' | 'toJSON'> =
+    SchemaDeclaredToObjectOptions<TSchemaOptions, Key> extends infer O extends ToObjectOptions
+      ? keyof O extends never
+        ? Default__v<Require_id<DocType>, TSchemaOptions>
+        : ToObjectReturnType<DocType, TVirtuals, O, TSchemaOptions>
+      : Default__v<Require_id<DocType>, TSchemaOptions>;
+
+  /**
    * Computes the return type of toObject/toJSON based on the provided options.
    * Uses a single-pass transform for flatten operations to correctly handle all combinations.
    */

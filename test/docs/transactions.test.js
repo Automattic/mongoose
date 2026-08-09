@@ -579,8 +579,8 @@ describe('transactions', function() {
     assert.equal(items[1].subItems.length, 1);
     assert.equal(items[1].subItems[0].name, 'x2');
   });
-  
-    it('transaction() resets $isNew between retries with bulkSave() (gh-16432)', async function() {
+
+  it('transaction() resets $isNew between retries with bulkSave() (gh-16432)', async function() {
     db.deleteModel(/Test/);
     const Test = db.model('Test', Schema({ name: String }));
 

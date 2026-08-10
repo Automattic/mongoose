@@ -1,3 +1,7 @@
+6.13.11 / 2026-08-10
+====================
+ * fix(query): apply sanitizeFilter in countDocuments and cursor
+
 6.13.10 / 2026-06-22
 ====================
  * fix(document): add additional defensive checks for special properties in Document.prototype.get()

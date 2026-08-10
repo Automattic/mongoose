@@ -24,6 +24,7 @@ describe('model: countDocuments:', function() {
 
   it('counts documents matching the filter', async function() {
     const Test = db.model('Test', new Schema({ username: String, pwd: String }));
+    await Test.deleteMany({});
     await Test.create([
       { username: 'val', pwd: 'my secret' },
       { username: 'not val', pwd: 'other secret' }

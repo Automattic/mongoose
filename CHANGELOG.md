@@ -1,3 +1,7 @@
+8.24.3 / 2026-08-10
+===================
+ * fix(query): apply sanitizeFilter on countDocuments and cursor()
+
 9.9.2 / 2026-08-10
 ==================
  * fix(query): apply sanitizeFilter on countDocuments and cursor()

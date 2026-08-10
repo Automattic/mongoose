@@ -1,3 +1,7 @@
+7.8.12 / 2026-08-10
+===================
+ * fix(query): apply sanitizeFilter in countDocuments and cursor
+
 7.8.11 / 2026-07-06
 ===================
  * fix(utils): allow merging single nested paths and document array paths outside of discriminator schema merges #16351 #9534

@@ -1,3 +1,17 @@
+9.9.2 / 2026-08-10
+==================
+ * fix(query): apply sanitizeFilter on countDocuments and cursor()
+ * fix(document): support map wildcards in optimistic concurrency paths option #16436 #16383
+ * fix(model): set document session in bulkSave() so transaction retries restore document state #16438 #16432 [yogesh968](https://github.com/yogesh968)
+ * fix(connection): restore delete state across transaction retries #16435 #16433 [snowyukitty](https://github.com/snowyukitty)
+ * fix(schema): put enum on array elements and support the object enum form in toJSONSchema #16444 #16443 [Jaybhade](https://github.com/Jaybhade)
+ * perf(document): inline the type checks in $__hasOnlyPrimitiveValues() #14394 [yogesh968](https://github.com/yogesh968)
+ * types(document): respect schema toObject and toJSON options #16431 #15594 [samuelmbabhazi](https://github.com/samuelmbabhazi)
+ * types: import BSON from mongodb instead of bson #16434
+ #16434 [orgads](https://github.com/orgads)
+ * docs(populate): document that skip needs sort to paginate reliably #16442 #7579
+ * docs: remove unused jobs.pug #16437 #16430
+
 9.9.1 / 2026-07-31
 ==================
  * fix(query): avoid path collision when excluding subdocuments with nested `select: false` paths #12798 [BIGSUS24](https://github.com/BIGSUS24)

@@ -1,3 +1,7 @@
+8.24.3 / 2026-08-10
+===================
+ * fix(query): apply sanitizeFilter on countDocuments and cursor()
+
 8.24.2 / 2026-07-27
 ===================
  * fix(subdocument): don't minimize empty document array elements to null #16393 [WaleedAshraf](https://github.com/WaleedAshraf)

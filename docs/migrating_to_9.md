@@ -96,7 +96,7 @@ await Model.updateOne({}, [{ $set: { newProp: 'test2' } }], { updatePipeline: fa
 
 As of Mongoose 9.2.0 ([#16008](https://github.com/Automattic/mongoose/pull/16008)), the `new` and `returnOriginal` options for `findOneAndUpdate()` and `findOneAndReplace()` are deprecated in favor of `returnDocument`. Passing either option still works, but now prints a runtime deprecation warning:
 
-```
+```txt
 [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
 ```
 

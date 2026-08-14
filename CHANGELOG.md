@@ -281,6 +281,7 @@
 9.2.0 / 2026-02-09
 ==================
  * feat: add option to skip middleware #15883 #8768 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(base): add `returnDocument` global option, deprecate `returnOriginal` and `new` #16008
  * feat(model): delay "Duplicate schema index" warning until createIndexes runs to include model name in the warning #15979
  * feat(model): add strict option to Model.hydrate(...) #15940 #15977
  * feat(document): add flattenUUIDs option to toObject() and toJSON() #15864 #15021 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

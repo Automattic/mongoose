@@ -13,8 +13,9 @@ Mongoose provides full support for managing Atlas Search indexes through your sc
 
 ## Creating a Search Index
 
-You can define Atlas Search indexes in your Mongoose schema using the `schema.searchIndex()` method.
-Mongoose can automatically create these indexes when your model initializes if you enable the `autoSearchIndex` option, otherwise you can call `Model.createSearchIndexes()` to create the indexes.
+You can define Atlas Search indexes in your Mongoose schema using `schema.searchIndex()` and `Model.createSearchIndexes()` to create the indexes. 
+
+Mongoose can optionally create the search indexes for you when your model initializes if you enable the [autoSearchIndex](https://mongoosejs.com/docs/guide.html#autoSearchIndex) option.
 
 ```javascript
 const articleSchema = new mongoose.Schema({
@@ -23,8 +24,6 @@ const articleSchema = new mongoose.Schema({
   author: String,
   tags: [String],
   publishedAt: Date
-}, {
-  autoSearchIndex: true  // Automatically create search indexes
 });
 
 // Define a basic text search index
@@ -32,13 +31,21 @@ articleSchema.searchIndex({
   name: 'article_search',
   definition: {
     mappings: {
-      dynamic: true  // Automatically index all fields
+      dynamic: false
+      fields: {
+        title: { type: 'string' },
+        content: { type: 'string' }
+      }
     }
   }
 });
 
 const Article = mongoose.model('Article', articleSchema);
+
+await Article.createSearchIndexes();  // Create the index
 ```
+
+Optionally, you can set `dynamic: true` to index all supported fields. However, this is not recommended in production as it can lead to performance issues and unnecessary storage usage.
 
 ### Custom Field Mappings
 
@@ -272,7 +279,7 @@ For more details, see the [Atlas Hybrid Search documentation](https://www.mongod
 
 ### Index Management
 
-* **Use `autoSearchIndex: true` in development**: Automatically sync indexes with your schema
+* **Use [`autoSearchIndex: true`](https://mongoosejs.com/docs/guide.html#autoSearchIndex)` in development**: Automatically create indexes with your schema
 * **Manage indexes manually in production**: Manage indexes through `Model.createSearchIndexes()`, Atlas UI, MongoDB CLI, or deployment scripts to avoid unintended changes during application deployments
 * **Monitor index status**: Always check `listSearchIndexes()` after creation to ensure indexes are ready (`queryable: true`)
 
@@ -297,9 +304,9 @@ const createProductionIndexes = async () => {
 ### Query Optimization
 
 * **Use `$limit` early**: Reduce the number of documents passed to subsequent pipeline stages
-* **Filter before searching**: Use `$match` before `$search` when possible to reduce search scope
+* **`$search` must be the first stage**: Place `$search` as the first stage in your pipeline — using `$match` before `$search` throws an error. To filter documents during search, use the `filter` clause inside a `compound` operator instead
 * **Project only needed fields**: Use `$project` to return only necessary data
-* **Index the right fields**: Don't use `dynamic: true` in production; explicitly index only the fields you search
+* **Index the right fields**: Avoid `dynamic: true` in production. Dynamic mappings index every field. Use static mappings to index only the fields you search
 
 ### Managing Indexes Outside Mongoose
 
@@ -310,7 +317,7 @@ For production deployments, you may want to manage indexes through:
 * **MongoDB CLI**: Use `mongosh` or MongoDB CLI tools for scripting index operations
 * **Atlas Admin API**: Programmatically manage indexes via the Atlas API
 
-Disable `autoSearchIndex` in production to prevent automatic index changes during deployments.
+Disable [`autoSearchIndex`](https://mongoosejs.com/docs/guide.html#autoSearchIndex)` in production to prevent automatic index changes during deployments.
 
 ## See Also
 

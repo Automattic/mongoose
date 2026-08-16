@@ -18,38 +18,38 @@ You can define Atlas Search indexes in your Mongoose schema using `schema.search
 Mongoose can optionally create the search indexes for you when your model initializes if you enable the [autoSearchIndex](https://mongoosejs.com/docs/guide.html#autoSearchIndex) option.
 
 ```javascript
-const articleSchema = new mongoose.Schema({
+const movieSchema = new mongoose.Schema({
   title: String,
-  content: String,
-  author: String,
-  tags: [String],
-  publishedAt: Date
+  fullplot: String,
+  genres: [String],
+  cast: [String],
+  year: Number
 });
 
 // Define a basic text search index
-articleSchema.searchIndex({
-  name: 'article_search',
+movieSchema.searchIndex({
+  name: 'movie_search',
   definition: {
     mappings: {
-      dynamic: false
+      dynamic: false,
       fields: {
         title: { type: 'string' },
-        content: { type: 'string' }
+        fullplot: { type: 'string' }
       }
     }
   }
 });
 
-const Article = mongoose.model('Article', articleSchema);
+const Movie = mongoose.model('Movie', movieSchema);
 
-await Article.createSearchIndexes();  // Create the index
+await Movie.createSearchIndexes();  // Create the index
 ```
 
-Optionally, you can set `dynamic: true` to index all supported fields. However, this is not recommended in production as it can lead to performance issues and unnecessary storage usage.
+Optionally, you can set `dynamic: true` to index all supported fields. However, this is not recommended in production as it can lead to unnecessary storage usage.
 
-### Custom Field Mappings
+### Selecting Text Analyzers
 
-For more control over which fields are indexed and how, use custom field mappings.
+For more control over how fields are indexed, use custom the `analyzer` option.
 
 Atlas Search uses [Apache Lucene](https://lucene.apache.org/) analyzers for text processing.
 Analyzers determine how text is tokenized, filtered, and indexed. Common analyzers include:
@@ -61,30 +61,30 @@ Analyzers determine how text is tokenized, filtered, and indexed. Common analyze
 For a complete list of analyzers and their configurations, see the [MongoDB Atlas Search Analyzers documentation](https://www.mongodb.com/docs/search/index/analyzers/overview/).
 
 ```javascript
-articleSchema.searchIndex({
-  name: 'article_search',
+movieSchema.searchIndex({
+  name: 'movie_search',
   definition: {
     mappings: {
-      dynamic: false,  // Don't auto-index fields
+      dynamic: false,
       fields: {
         title: {
           type: 'string',
           analyzer: 'lucene.standard'  // Tokenize on whitespace/punctuation
         },
-        content: {
+        fullplot: {
           type: 'string',
           analyzer: 'lucene.english'  // English language analysis with stemming
         },
-        author: {
+        genres: {
           type: 'string',
           analyzer: 'lucene.keyword'  // Exact match only (no tokenization)
         },
-        tags: {
+        cast: {
           type: 'string',
           analyzer: 'lucene.standard'
         },
-        publishedAt: {
-          type: 'date'
+        year: {
+          type: 'number'
         }
       }
     }
@@ -100,10 +100,10 @@ Mongoose provides several methods for managing Atlas Search indexes:
 
 ```javascript
 // Create all indexes defined in the schema
-await Article.createSearchIndexes();
+await Movie.createSearchIndexes();
 
 // Create a single index programmatically
-await Article.createSearchIndex({
+await Movie.createSearchIndex({
   name: 'my_index',
   definition: {
     mappings: { dynamic: true }
@@ -114,7 +114,7 @@ await Article.createSearchIndex({
 ### Listing Indexes
 
 ```javascript
-const indexes = await Article.listSearchIndexes();
+const indexes = await Movie.listSearchIndexes();
 
 for (const index of indexes) {
   console.log(`${index.name}: ${index.status}`);
@@ -124,12 +124,12 @@ for (const index of indexes) {
 ### Updating Indexes
 
 ```javascript
-await Article.updateSearchIndex('article_search', {
+await Movie.updateSearchIndex('movie_search', {
   mappings: {
     dynamic: false,
     fields: {
       title: { type: 'string' },
-      content: { type: 'string' }
+      fullplot: { type: 'string' }
     }
   }
 });
@@ -138,7 +138,7 @@ await Article.updateSearchIndex('article_search', {
 ### Deleting Indexes
 
 ```javascript
-await Article.dropSearchIndex('old_index');
+await Movie.dropSearchIndex('old_index');
 ```
 
 ## Text Search Queries
@@ -147,14 +147,14 @@ Once your search index is created, you can use the `$search` aggregation stage t
 
 ```javascript
 // Example query showcasing different text search options:
-const results = await Article.aggregate([
+const results = await Movie.aggregate([
   {
     $search: {
-      index: 'article_search',
+      index: 'movie_search',
       text: {
-        query: 'mongodb database',
-        path: 'content'  // Single field search
-        // path: ['title', 'content', 'tags']  // Multi-field: search across multiple fields
+        query: 'eternal sunshine',
+        path: 'title'  // Single field search
+        // path: ['title', 'fullplot', 'genres']  // Multi-field: search across multiple fields
         // fuzzy: { maxEdits: 2 }  // Fuzzy: tolerate typos (up to 2 char differences)
       }
     }
@@ -168,35 +168,36 @@ const results = await Article.aggregate([
 Combine multiple search criteria with `must`, `should`, and `filter` clauses. Include relevance scores using the `$meta` operator. Atlas Search [scores](https://www.mongodb.com/docs/search/query/score/overview/) are relative to your dataset, so remember to adjust the `$match` threshold based on the scores you observe in your data.
 
 ```javascript
-// Find articles about 'mongodb' published since 2023, ranked by relevance,
-// with a score boost for articles whose title includes 'tutorial'
-const results = await Article.aggregate([
+// Find Action movies starring Tom Cruise released since 2000, ranked by relevance,
+// with a score boost for movies whose title includes 'mission'
+const results = await Movie.aggregate([
   {
     $search: {
-      index: 'article_search',
+      index: 'movie_search',
       compound: {
         must: [
           {
             text: {
-              query: 'mongodb',
-              path: 'content'  // Article must mention 'mongodb' in content
+              query: 'Action',
+              path: 'genres'  // Movie must be in the 'Action' genre
             }
           }
         ],
         should: [
           {
             text: {
-              query: 'tutorial',
-              path: 'title',
-              score: { boost: { value: 2 } }  // Double the score for articles with 'tutorial' in the title
+              query: 'tom cruise cameron diaz',
+              path: 'cast',
+              score: { boost: { value: 2 } },  // Double the score for movies starring Tom Cruise and Cameron Diaz
+              matchCriteria: 'all'  // Only boost score if all terms match
             }
           }
         ],
         filter: [
           {
             range: {
-              path: 'publishedAt',
-              gte: new Date('2023-01-01')  // Only include articles published in 2023 or later
+              path: 'year',
+              gte: 2000  // Only include movies released in 2000 or later
             }
           }
         ]
@@ -206,13 +207,14 @@ const results = await Article.aggregate([
   {
     $project: {
       title: 1,
-      content: 1,
+      cast:1,
+      fullplot: 1,
       score: { $meta: 'searchScore' }  // Include the relevance score in the results
     }
   },
   {
     $match: {
-      score: { $gte: 5 }  // Adjust this threshold based on your data
+      score: { $gte: .5 }  // Start low and adjust this threshold based on your data
     }
   }
 ]);
@@ -229,10 +231,13 @@ Combine text search and vector search to leverage both keyword relevance and sem
 
 Use `$rankFusion` to run `$vectorSearch` and `$search` as separate subpipelines and merge their results using [Reciprocal Rank Fusion (RRF)](https://www.mongodb.com/docs/vector-search/hybrid-search/hybrid-search/). Note that `$search` must be the first stage in its subpipeline, which is why it cannot be used directly after `$vectorSearch` in the same pipeline.
 
-```javascript
-const queryEmbedding = await generateEmbedding('machine learning tutorial');
+_This example uses the `generateEmbedding()` function from the [Vector Search](https://mongoosejs.com/docs/atlas-vector-search.html#using-third-party-embedding-models) guide._
 
-const results = await Article.aggregate([
+```javascript
+// See the Vector Search guide for details on generating embeddings
+const queryEmbedding = await generateEmbedding('charming animals with adventurous tone');
+
+const results = await Movie.aggregate([
   {
     $rankFusion: {
       input: {
@@ -241,8 +246,8 @@ const results = await Article.aggregate([
           vector: [
             {
               $vectorSearch: {
-                index: 'article_vector_index',
-                path: 'embedding',
+                index: 'vector_index',  // Name of your vector search index
+                path: 'plot_embedding_voyage_3_large',  // Name of the field containing the embeddings
                 queryVector: queryEmbedding,
                 numCandidates: 100,
                 limit: 50
@@ -253,8 +258,8 @@ const results = await Article.aggregate([
           text: [
             {
               $search: {
-                index: 'article_search',
-                text: { query: 'machine learning', path: 'content' }
+                index: 'movie_search',
+                text: { query: 'adventure animals', path: 'fullplot' }
               }
             },
             { $limit: 50 }
@@ -279,7 +284,7 @@ For more details, see the [Atlas Hybrid Search documentation](https://www.mongod
 
 ### Index Management
 
-* **Use [`autoSearchIndex: true`](https://mongoosejs.com/docs/guide.html#autoSearchIndex)` in development**: Automatically create indexes with your schema
+* **Use [`autoSearchIndex: true`](https://mongoosejs.com/docs/guide.html#autoSearchIndex) in development**: Automatically create indexes with your schema
 * **Manage indexes manually in production**: Manage indexes through `Model.createSearchIndexes()`, Atlas UI, MongoDB CLI, or deployment scripts to avoid unintended changes during application deployments
 * **Monitor index status**: Always check `listSearchIndexes()` after creation to ensure indexes are ready (`queryable: true`)
 
@@ -287,16 +292,16 @@ For more details, see the [Atlas Hybrid Search documentation](https://www.mongod
 
 ```javascript
 // Good: Define indexes in schema for version control
-articleSchema.searchIndex({
-  name: 'article_search',
+movieSchema.searchIndex({
+  name: 'movie_search',
   definition: { mappings: { dynamic: false, fields: { /* ... */ } } }
 });
 
 // Also good: Separate index management for production
 const createProductionIndexes = async () => {
-  const indexes = await Article.listSearchIndexes();
-  if (!indexes.find(idx => idx.name === 'article_search')) {
-    await Article.createSearchIndex({ /* definition */ });
+  const indexes = await Movie.listSearchIndexes();
+  if (!indexes.find(idx => idx.name === 'movie_search')) {
+    await Movie.createSearchIndex({ /* definition */ });
   }
 };
 ```
@@ -307,6 +312,7 @@ const createProductionIndexes = async () => {
 * **`$search` must be the first stage**: Place `$search` as the first stage in your pipeline — using `$match` before `$search` throws an error. To filter documents during search, use the `filter` clause inside a `compound` operator instead
 * **Project only needed fields**: Use `$project` to return only necessary data
 * **Index the right fields**: Avoid `dynamic: true` in production. Dynamic mappings index every field. Use static mappings to index only the fields you search
+* You can leverage the MongoDB [Agent Skills](https://github.com/mongodb/agent-skills) package to help you optimize your queries.
 
 ### Managing Indexes Outside Mongoose
 
@@ -317,7 +323,7 @@ For production deployments, you may want to manage indexes through:
 * **MongoDB CLI**: Use `mongosh` or MongoDB CLI tools for scripting index operations
 * **Atlas Admin API**: Programmatically manage indexes via the Atlas API
 
-Disable [`autoSearchIndex`](https://mongoosejs.com/docs/guide.html#autoSearchIndex)` in production to prevent automatic index changes during deployments.
+Disable [`autoSearchIndex`](https://mongoosejs.com/docs/guide.html#autoSearchIndex) in production to prevent automatic index changes during deployments.
 
 ## See Also
 

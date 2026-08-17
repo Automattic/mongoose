@@ -7182,6 +7182,21 @@ describe('document', function() {
     assert.deepEqual(doc.values, [null, 'Unknown']);
   });
 
+  it('applies setters to array element defaults', function() {
+    const schema = new Schema({
+      values: [{
+        type: String,
+        default: 'unknown',
+        set: value => value.toUpperCase()
+      }]
+    });
+    const Model = db.model('Test', schema);
+
+    const doc = new Model({ values: [undefined] });
+
+    assert.deepEqual(doc.values, ['UNKNOWN']);
+  });
+
   it('throws when a nullish array element default has the wrong type', async function() {
     const schema = new Schema({
       values: [{ type: Schema.Types.ObjectId, default: () => [] }]

@@ -106,6 +106,21 @@ describe('model: populate:', function() {
     await post.populate('comments');
   });
 
+  it('populates an array of ObjectIds with ref set on the array options', async function() {
+    const User = db.model('User', new Schema({ name: String }));
+    const Group = db.model('Group', new Schema({
+      members: { type: [Schema.Types.ObjectId], ref: 'User' }
+    }));
+
+    const user = await User.create({ name: 'User 1' });
+    const group = await Group.create({ members: [user._id] });
+
+    await group.populate('members');
+
+    assert.equal(group.members.length, 1);
+    assert.equal(group.members[0].name, 'User 1');
+  });
+
   it('deep population (gh-3103)', async function() {
     const BlogPost = db.model('BlogPost', blogPostSchema);
     const User = db.model('User', userSchema);

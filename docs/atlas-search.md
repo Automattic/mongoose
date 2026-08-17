@@ -299,10 +299,7 @@ movieSchema.searchIndex({
 
 // Also good: Separate index management for production
 const createProductionIndexes = async () => {
-  const indexes = await Movie.listSearchIndexes();
-  if (!indexes.find(idx => idx.name === 'movie_search')) {
-    await Movie.createSearchIndex({ /* definition */ });
-  }
+  await Article.createSearchIndex({ /* definition */ });
 };
 ```
 

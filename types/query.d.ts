@@ -94,6 +94,8 @@ declare module 'mongoose' {
   interface LeanOptions {
     // Set to false to strip out the version key
     versionKey?: boolean;
+    // Apply virtuals to the lean result.
+    virtuals?: boolean | string[];
     // Transform the result document in place. `doc` is the raw document being transformed.
     // Typed as `Record<string, unknown>` because TypeScript gets confused when handling Document.prototype.deleteOne()
     // and other document methods that try to infer the raw doc type from the Document class.
@@ -222,6 +224,21 @@ declare module 'mongoose' {
   type GetLeanResultType<RawDocType, ResultType, QueryOp> = QueryOp extends QueryOpThatReturnsDocument
     ? (ResultType extends any[] ? Default__v<Require_id<RawDocType>>[] : Default__v<Require_id<RawDocType>>)
     : ResultType;
+
+  type FunctionKeys<T> = {
+    [K in keyof T]: T[K] extends (...args: any[]) => any ? K : never;
+  }[keyof T];
+
+  type ExtractVirtualsForLean<TDocOverrides> = Omit<TDocOverrides, FunctionKeys<TDocOverrides>>;
+
+  type ApplyLeanVirtuals<ResultType, TDocOverrides, TLeanOptions> =
+    TLeanOptions extends { virtuals: true | string[] }
+      ? ResultType extends null
+        ? ResultType
+        : ResultType extends (infer ItemType)[]
+          ? MergeType<ItemType, ExtractVirtualsForLean<TDocOverrides>>[]
+          : MergeType<ResultType, ExtractVirtualsForLean<TDocOverrides>>
+      : ResultType;
 
   type MergePopulatePaths<RawDocType, ResultType, QueryOp, Paths, TQueryHelpers, TDocOverrides = Record<string, never>> = QueryOp extends QueryOpThatReturnsDocument
     ? ResultType extends null
@@ -611,6 +628,18 @@ declare module 'mongoose' {
       ResultType extends null
         ? GetLeanResultType<RawDocType, ResultType, QueryOp> | null
         : GetLeanResultType<RawDocType, ResultType, QueryOp>,
+      DocType,
+      THelpers,
+      RawDocType,
+      QueryOp,
+      TDocOverrides
+      >;
+    lean(
+      val: LeanOptions & { virtuals: true | string[] }
+    ): QueryWithHelpers<
+      ResultType extends null
+        ? ApplyLeanVirtuals<GetLeanResultType<RawDocType, ResultType, QueryOp>, TDocOverrides, { virtuals: true | string[] }> | null
+        : ApplyLeanVirtuals<GetLeanResultType<RawDocType, ResultType, QueryOp>, TDocOverrides, { virtuals: true | string[] }>,
       DocType,
       THelpers,
       RawDocType,

@@ -1,4 +1,4 @@
-import mongoose, { Schema, model, Types, InferSchemaType, FlattenMaps, HydratedDocument, Model, Document, PopulatedDoc } from 'mongoose';
+import mongoose, { Schema, model, Types, InferSchemaType, FlattenMaps, HydratedDocument, Model, Document, PopulatedDoc, VirtualsForModel } from 'mongoose';
 import { expect } from 'tstyche';
 
 function gh10345() {
@@ -31,6 +31,138 @@ function gh10345() {
     const doc2 = await UserModel.findOne().orFail().lean();
     expect(doc2).type.not.toHaveProperty('id');
   })();
+}
+
+async function leanVirtualsCoreTypes() {
+  interface TestDoc {
+    name: string;
+    child: {
+      firstName: string;
+    };
+  }
+
+  interface TestVirtuals {
+    nameUpper: string;
+    childFullName: string;
+  }
+
+  type TestModelType = Model<TestDoc, {}, {}, TestVirtuals>;
+
+  const testSchema = new Schema<TestDoc, TestModelType, {}, {}, TestVirtuals>(
+    {
+      name: { type: String, required: true },
+      child: {
+        firstName: { type: String, required: true }
+      }
+    },
+    {
+      id: false,
+      virtuals: {
+        nameUpper: {
+          get() {
+            return this.name.toUpperCase();
+          }
+        },
+        childFullName: {
+          get() {
+            return `${this.child.firstName} ${mongoose.parent<{ name: string }>(this)?.name ?? ''}`;
+          }
+        }
+      }
+    }
+  );
+
+  const TestModel = model('LeanVirtualsCoreTypeTest', testSchema);
+  const virtuals = null as unknown as VirtualsForModel<typeof TestModel>;
+
+  expect<VirtualsForModel<typeof TestModel>>().type.toBeAssignableTo<TestVirtuals>();
+  expect(virtuals.id).type.toBe<string>();
+
+  const doc = await TestModel.findOne().lean<TestDoc & VirtualsForModel<typeof TestModel>>({ virtuals: true }).orFail();
+  expect(doc.nameUpper).type.toBe<string>();
+
+  const leanSubdocParent = mongoose.parent<{ name: string }>({ child: true });
+  expect(leanSubdocParent).type.toBe<{ name: string } | undefined>();
+}
+
+async function leanVirtualsInferredFromModel() {
+  interface TestDoc {
+    name: string;
+  }
+
+  interface TestVirtuals {
+    nameUpper: string;
+  }
+
+  type TestModelType = Model<TestDoc, {}, {}, TestVirtuals>;
+
+  const testSchema = new Schema<TestDoc, TestModelType, {}, {}, TestVirtuals>(
+    {
+      name: { type: String, required: true }
+    },
+    {
+      virtuals: {
+        nameUpper: {
+          get() {
+            return this.name.toUpperCase();
+          }
+        }
+      }
+    }
+  );
+
+  const TestModel = model('LeanVirtualsInferredFromModel', testSchema);
+
+  const doc = await TestModel.findOne().lean({ virtuals: true }).orFail();
+  expect(doc.name).type.toBe<string>();
+  expect(doc.nameUpper).type.toBe<string>();
+}
+
+async function leanVirtualsWithAutoInferredSchema() {
+  const testSchema = new Schema(
+    {
+      name: { type: String, required: true }
+    },
+    {
+      virtuals: {
+        nameUpper: {
+          get() {
+            return this.name.toUpperCase();
+          }
+        }
+      }
+    }
+  );
+
+  const TestModel = model('LeanVirtualsWithAutoInferredSchema', testSchema);
+
+  const leanDoc = await TestModel.findOne().lean({ virtuals: true }).orFail();
+  expect(leanDoc.name).type.toBe<string>();
+  expect(leanDoc.nameUpper).type.toBe<string>();
+}
+
+async function leanFalseAfterLeanVirtuals() {
+  const testSchema = new Schema(
+    {
+      name: { type: String, required: true }
+    },
+    {
+      virtuals: {
+        nameUpper: {
+          get() {
+            return this.name.toUpperCase();
+          }
+        }
+      }
+    }
+  );
+
+  const TestModel = model('LeanFalseAfterLeanVirtuals', testSchema);
+
+  const doc = await TestModel.findOne().lean({ virtuals: true }).lean(false).orFail();
+  expect(doc.name).type.toBe<string>();
+  expect(doc.nameUpper).type.toBe<string>();
+  expect(doc.save).type.toBeCallableWith();
 }
 
 async function gh11761() {

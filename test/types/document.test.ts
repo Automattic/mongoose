@@ -745,6 +745,82 @@ async function gh15578() {
   }
 }
 
+async function gh15594() {
+  function withSchemaLevelOptions() {
+    const ASchema = new Schema({
+      testProperty: Number,
+      testId: Schema.Types.ObjectId
+    }, {
+      toObject: { flattenObjectIds: true, versionKey: false },
+      toJSON: { flattenObjectIds: true, versionKey: false }
+    });
+
+    const AModel = model('YourModel', ASchema);
+
+    const a = new AModel({ testProperty: 8, testId: new Types.ObjectId() });
+
+    const obj = a.toObject();
+    const json = a.toJSON();
+    expect(obj._id).type.toBe<string>();
+    expect(json._id).type.toBe<string>();
+    expect(obj).type.not.toHaveProperty('__v');
+    expect(json).type.not.toHaveProperty('__v');
+
+    // Options passed at the call site keep taking the per-call overloads
+    expect(a.toObject({ flattenObjectIds: false })._id).type.toBe<Types.ObjectId>();
+    expect(a.toObject({ flattenObjectIds: true })._id).type.toBe<string>();
+    expect(a.toJSON({ flattenObjectIds: false })._id).type.toBe<Types.ObjectId>();
+  }
+
+  function withoutSchemaLevelOptions() {
+    const ASchema = new Schema({
+      testProperty: Number
+    });
+
+    const AModel = model('YourModel', ASchema);
+
+    const a = new AModel({ testProperty: 8 });
+
+    expect(a.toObject()._id).type.toBe<Types.ObjectId>();
+    expect(a.toJSON()._id).type.toBe<Types.ObjectId>();
+    expect(a.toObject().__v).type.toBe<number>();
+    expect(a.toJSON().__v).type.toBe<number>();
+  }
+
+  function withOnlyToJSONDeclared() {
+    const ASchema = new Schema({
+      testProperty: Number
+    }, {
+      toJSON: { flattenObjectIds: true, versionKey: false }
+    });
+
+    const AModel = model('YourModel', ASchema);
+
+    const a = new AModel({ testProperty: 8 });
+
+    expect(a.toObject()._id).type.toBe<Types.ObjectId>();
+    expect(a.toObject().__v).type.toBe<number>();
+    expect(a.toJSON()._id).type.toBe<string>();
+    expect(a.toJSON()).type.not.toHaveProperty('__v');
+  }
+
+  function withCustomVersionKeyAndSchemaToObject() {
+    const ASchema = new Schema({
+      testProperty: Number
+    }, {
+      versionKey: 'taco' as const,
+      toObject: { versionKey: false }
+    });
+
+    const AModel = model('YourModel', ASchema);
+
+    const a = new AModel({ testProperty: 8 });
+
+    expect(a.toObject()).type.not.toHaveProperty('taco');
+    expect(a.toJSON().taco).type.toBe<number>();
+  }
+}
+
 function testFlattenUUIDs() {
   interface RawDocType {
     _id: Types.UUID;

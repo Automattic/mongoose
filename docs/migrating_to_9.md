@@ -92,6 +92,27 @@ await Model.updateOne({}, [{ $set: { newProp: 'test2' } }]);
 await Model.updateOne({}, [{ $set: { newProp: 'test2' } }], { updatePipeline: false }); // throws
 ```
 
+## `new` and `returnOriginal` options deprecated
+
+As of Mongoose 9.2.0 ([#16008](https://github.com/Automattic/mongoose/pull/16008)), the `new` and `returnOriginal` options for `findOneAndUpdate()` and `findOneAndReplace()` are deprecated in favor of `returnDocument`. Passing either option still works, but now prints a runtime deprecation warning:
+
+```txt
+[MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+```
+
+Update your queries as follows:
+
+* Use `returnDocument: 'after'` instead of `new: true` or `returnOriginal: false`
+* Use `returnDocument: 'before'` instead of `new: false` or `returnOriginal: true`
+
+```javascript
+// Before
+const doc = await Model.findOneAndUpdate(filter, update, { new: true });
+
+// After
+const doc = await Model.findOneAndUpdate(filter, update, { returnDocument: 'after' });
+```
+
 ## Removed background option for indexes
 
 [MongoDB no longer supports the `background` option for indexes as of MongoDB 4.2](https://www.mongodb.com/docs/manual/core/index-creation/#index-operations). Mongoose 9 will no longer set the background option by default and Mongoose 9 no longer supports setting the `background` option on `Schema.prototype.index()`.

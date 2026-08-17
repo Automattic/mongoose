@@ -287,6 +287,20 @@ describe('Double', function() {
         );
       });
     });
+
+    describe('when an array is provided to a Double field', () => {
+      it('throws a CastError upon validation, even for a single-element or empty array', async() => {
+        for (const value of [[5], [], [5, 6]]) {
+          const doc = new Test({ myDouble: value });
+
+          assert.deepStrictEqual(doc.myDouble, undefined);
+          const err = await doc.validate().catch(e => e);
+          assert.ok(err);
+          assert.ok(err.errors['myDouble']);
+          assert.equal(err.errors['myDouble'].name, 'CastError');
+        }
+      });
+    });
   });
 
   describe('custom casters', () => {

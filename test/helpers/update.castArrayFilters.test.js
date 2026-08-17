@@ -421,34 +421,34 @@ describe('castArrayFilters', function() {
   });
 
   it('respects `strictQuery` passed as a query option (gh-16447)', function() {
-      const itemSchema = new Schema({ name: String }, { _id: false });
-      const schema = new Schema({ items: [itemSchema] });
+    const itemSchema = new Schema({ name: String }, { _id: false });
+    const schema = new Schema({ items: [itemSchema] });
 
-      const update = { $set: { 'items.$[item].name': 'test' } };
+    const update = { $set: { 'items.$[item].name': 'test' } };
 
-      // `items._id` is not in the schema because `itemSchema` sets `_id: false`,
-      // so the array filter throws by default.
-      const q = new Query();
-      q.schema = schema;
-      q.updateOne({}, update, { arrayFilters: [{ 'item._id': 42 }] });
-      assert.throws(function() {
-        castArrayFilters(q);
-      }, /Could not find path "items\.0\._id" in schema/);
+    // `items._id` is not in the schema because `itemSchema` sets `_id: false`,
+    // so the array filter throws by default.
+    const q = new Query();
+    q.schema = schema;
+    q.updateOne({}, update, { arrayFilters: [{ 'item._id': 42 }] });
+    assert.throws(function() {
+      castArrayFilters(q);
+    }, /Could not find path "items\.0\._id" in schema/);
 
-      // `strictQuery: false` as a query option leaves the path as-is, the same way
-      // `strict: false` does.
-      const q2 = new Query();
-      q2.schema = schema;
-      q2.updateOne({}, update, { arrayFilters: [{ 'item._id': 42 }], strictQuery: false });
-      castArrayFilters(q2);
-      assert.strictEqual(q2.options.arrayFilters[0]['item._id'], 42);
+    // `strictQuery: false` as a query option leaves the path as-is, the same way
+    // `strict: false` does.
+    const q2 = new Query();
+    q2.schema = schema;
+    q2.updateOne({}, update, { arrayFilters: [{ 'item._id': 42 }], strictQuery: false });
+    castArrayFilters(q2);
+    assert.strictEqual(q2.options.arrayFilters[0]['item._id'], 42);
 
-      // Same via `setOptions()`.
-      const q3 = new Query();
-      q3.schema = schema;
-      q3.updateOne({}, update, { arrayFilters: [{ 'item._id': 42 }] });
-      q3.setOptions({ strictQuery: false });
-      castArrayFilters(q3);
-      assert.strictEqual(q3.options.arrayFilters[0]['item._id'], 42);
-    });
+    // Same via `setOptions()`.
+    const q3 = new Query();
+    q3.schema = schema;
+    q3.updateOne({}, update, { arrayFilters: [{ 'item._id': 42 }] });
+    q3.setOptions({ strictQuery: false });
+    castArrayFilters(q3);
+    assert.strictEqual(q3.options.arrayFilters[0]['item._id'], 42);
+  });
 });

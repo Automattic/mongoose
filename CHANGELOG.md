@@ -1,3 +1,10 @@
+9.9.3 / 2026-08-17
+==================
+ * perf(document): cache projection metadata and avoid scanning all projected paths for flat projections #16439 #16407 #16373 [yogesh968](https://github.com/yogesh968)
+ * fix(cast): reject arrays when casting to Int32 or Double #16446 [rajanpanth](https://github.com/rajanpanth)
+ * docs: document new/returnOriginal deprecation from 9.2.0 #16449 #16008 #15972 [alimughal95](https://github.com/alimughal95)
+ * docs(schematypes): clarify that array default applies to the level it is declared on #16441 #9232
+
 8.24.3 / 2026-08-10
 ===================
  * fix(query): apply sanitizeFilter on countDocuments and cursor()

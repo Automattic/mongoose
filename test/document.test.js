@@ -7171,6 +7171,28 @@ describe('document', function() {
     assert.ok(doc.roles[1]._id);
   });
 
+  it('applies defaults to nullish array elements', function() {
+    const schema = new Schema({
+      values: [{ type: String, default: 'Unknown' }]
+    });
+    const Model = db.model('Test', schema);
+
+    const doc = new Model({ values: [null, undefined] });
+
+    assert.deepEqual(doc.values, [null, 'Unknown']);
+  });
+
+  it('throws when a nullish array element default has the wrong type', async function() {
+    const schema = new Schema({
+      values: [{ type: Schema.Types.ObjectId, default: () => [] }]
+    });
+    const Model = db.model('Test', schema);
+
+    const doc = new Model({ values: [undefined] });
+
+    await assert.rejects(doc.save(), /Cast to \[ObjectId\] failed/);
+  });
+
   it('updateOne() hooks (gh-7133) (gh-7423)', async function() {
     const schema = new mongoose.Schema({ name: String });
 

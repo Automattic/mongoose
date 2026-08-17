@@ -1,4 +1,4 @@
-import * as BSON from 'bson';
+import { BSON } from 'mongodb';
 
 declare module 'mongoose' {
   /** The Mongoose Date [SchemaType](/docs/schematypes.html). */
@@ -115,7 +115,7 @@ declare module 'mongoose' {
      * The default value for this path. If a function, Mongoose executes the function
      * and uses the return value as the default.
      */
-    default?: DefaultType<T> | ((this: THydratedDocumentType, doc: THydratedDocumentType) => DefaultType<T> | null | undefined) | null;
+    default?: DefaultType<T> | ((this: THydratedDocumentType, doc: THydratedDocumentType) => DefaultType<T> | null | undefined) | null | undefined;
 
     /**
      * The model that `populate()` should use if populating this path.

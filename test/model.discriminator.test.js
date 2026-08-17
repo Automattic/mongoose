@@ -2465,13 +2465,13 @@ describe('model', function() {
       notes: [{ message: String }]
     };
 
-    const orderSchema = new Schema(orderSchemaDefinition);
+    const orderSchema = new Schema(orderSchemaDefinition, { autoIndex: false });
     orderSchema.index({ customerId: 1, createdAt: -1 });
     orderSchema.index({ orderNumber: 1, customerId: 1 });
     orderSchema.index({ 'billingAddress.city': 1, customerId: 1 });
 
     const Order = db.model('Order', orderSchema);
-    const wholesaleOrderSchema = new Schema(orderSchemaDefinition);
+    const wholesaleOrderSchema = new Schema(orderSchemaDefinition, { autoIndex: false });
 
     // Act
     const WholesaleOrder = Order.discriminator('WholesaleOrder', wholesaleOrderSchema, { clone: false });
@@ -2509,12 +2509,12 @@ describe('model', function() {
       shippingAddress: addressSchema
     };
 
-    const orderSchema = new Schema(orderSchemaDefinition);
+    const orderSchema = new Schema(orderSchemaDefinition, { autoIndex: false });
     orderSchema.index({ customerId: 1 });
 
     const Order = db.model('Order', orderSchema);
 
-    const wholesaleOrderSchema = new Schema({ ...orderSchemaDefinition, vendorCode: String });
+    const wholesaleOrderSchema = new Schema({ ...orderSchemaDefinition, vendorCode: String }, { autoIndex: false });
     wholesaleOrderSchema.index({ vendorCode: 1 });
 
     // Act

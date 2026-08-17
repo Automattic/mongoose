@@ -18,7 +18,8 @@ import mongoose, {
   connection,
   model,
   UpdateOneModel,
-  UpdateManyModel
+  UpdateManyModel,
+  InferHydratedDocTypeFromSchema
 } from 'mongoose';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
 import { UpdateOneModel as MongoUpdateOneModel, ChangeStreamInsertDocument, ObjectId } from 'mongodb';
@@ -47,6 +48,104 @@ function rawDocSyntax(): void {
   console.log(doc.foo);
   console.log(doc.bar());
   doc.save();
+}
+
+async function standardSchemaModelValidate(): Promise<void> {
+  interface IUser {
+    name: string;
+    age: number;
+  }
+
+  const User = connection.model<IUser>('StandardSchemaUser', new Schema<IUser>({
+    name: { type: String, required: true },
+    age: Number
+  }));
+
+  expect(User['~standard'].version).type.toBe<1>();
+  expect(User['~standard'].vendor).type.toBe<string>();
+  expect(User['~standard']).type.toBeAssignableTo<mongoose.StandardSchemaV1.Props<IUser>>();
+
+  const result = await User['~standard'].validate({ name: 'Val', age: '42' });
+  if (!result.issues) {
+    expect(result.value).type.toBe<mongoose.Default__v<mongoose.Require_id<IUser>>>();
+    expect(result.value.name).type.toBe<string>();
+    expect(result.value.age).type.toBe<number>();
+    expect(result.value._id).type.toBe<Types.ObjectId>();
+    expect(result.value.__v).type.toBe<number>();
+  } else {
+    expect(result.issues[0].message).type.toBe<string>();
+    expect(result.issues[0].path).type.toBe<ReadonlyArray<PropertyKey | mongoose.StandardSchemaV1.PathSegment> | undefined>();
+  }
+
+  await User['~standard'].validate({ name: 'Val' }, {
+    libraryOptions: { pathsToSkip: ['age'] }
+  });
+}
+
+async function gh16402() {
+  const schema = new Schema({ myid: { type: Schema.Types.ObjectId, required: true } }, { _id: false, versionKey: false });
+  const Book = model('Book', schema);
+  type Out = mongoose.StandardSchemaV1.InferOutput<typeof Book>;
+  expect({} as Out).type.toBe<{ myid: Types.ObjectId }>();
+
+  const schemaWithVersionKey = new Schema({ myid: { type: Schema.Types.ObjectId, required: true } }, { _id: false });
+  const BookWithVersionKey = model('Book', schemaWithVersionKey);
+  type OutWithVersionKey = mongoose.StandardSchemaV1.InferOutput<typeof BookWithVersionKey>;
+  expect({} as OutWithVersionKey).type.toBe<{ myid: Types.ObjectId } & { __v: number }>();
+}
+
+async function modelValidateReturnsCastedObject(): Promise<void> {
+  interface IUser {
+    name: string;
+    age: number;
+  }
+
+  const User = connection.model<IUser>('ModelValidateReturn', new Schema<IUser>({
+    name: { type: String, required: true },
+    age: Number
+  }));
+
+  // `Model.validate()` resolves to the casted-and-validated copy of the input,
+  // not `void`. See gh-16338.
+  const validated = await User.validate({ name: 'Val', age: 42 });
+  expect(validated).type.toBe<IUser>();
+  expect(validated.name).type.toBe<string>();
+  expect(validated.age).type.toBe<number>();
+
+  expect(await User.validate({ name: 'Val', age: 42 }, ['name'])).type.toBe<IUser>();
+  expect(await User.validate({ name: 'Val', age: 42 }, { pathsToSkip: ['age'] })).type.toBe<IUser>();
+}
+
+async function gh16046(): Promise<void> {
+  const watchSchema = new Schema({
+    _id: { type: Schema.Types.ObjectId },
+    name: { type: String, required: true, trim: true },
+    code: { type: String, required: true, trim: true, index: true },
+    spec: { type: String, required: true, trim: true },
+    translations: { type: Map, of: new Schema({ name: String, spec: String }), required: true },
+    createdAt: { type: Date },
+    updatedAt: { type: Date },
+    _v: { type: Number, required: false, default: 0 }
+  }, {
+    timestamps: true,
+    versionKey: '_v',
+    methods: {
+      t(locale?: string) {
+        const translation = (!!locale && this.translations.get(locale)) || {};
+        expect(this._v).type.toBe<number | null | undefined>();
+
+        return {
+          name: translation.name ?? this.name,
+          spec: translation.spec ?? this.spec
+        };
+      }
+    }
+  });
+
+  const Watch = model('gh16046', watchSchema);
+  const watch = await Watch.findOne({ code: 'test' });
+
+  expect(watch?.t('en')).type.toBe<{ name: string; spec: string } | undefined>();
 }
 
 function tAndDocSyntax(): void {
@@ -690,6 +789,97 @@ async function gh13705() {
   expect(findOneAndUpdateResWithMetadata).type.toBe<ModifyResult<{ name?: string | null | undefined }>>();
 }
 
+async function gh16413() {
+  const schema = new Schema({ name: String }, { lean: true });
+  const TestModel = model('gh16413', schema);
+
+  type ExpectedHydratedDoc = ReturnType<(typeof TestModel)['hydrate']>;
+  type ExpectedLeanDoc = mongoose.FlattenMaps<{ name?: string | null }> & { _id: Types.ObjectId; __v: number };
+
+  async function testFind() {
+    const docs = await TestModel.find();
+    expect(docs).type.toBe<ExpectedLeanDoc[]>();
+
+    const hydratedDocs = await TestModel.find({}, null, { lean: false });
+    hydratedDocs[0].save();
+    expect(hydratedDocs).type.toBe<ExpectedHydratedDoc[]>();
+  }
+
+  async function testFindOne() {
+    const doc = await TestModel.findOne().orFail();
+    expect(doc).type.toBe<ExpectedLeanDoc>();
+    const hydratedDoc = await TestModel.findOne({}, null, { lean: false }).orFail();
+    hydratedDoc.save();
+    expect(hydratedDoc).type.toBe<ExpectedHydratedDoc>();
+  }
+
+  async function testFindById() {
+    const leanDoc = await TestModel.findById('0'.repeat(24)).orFail();
+    expect(leanDoc).type.toBe<ExpectedLeanDoc>();
+    const doc = await TestModel.findById('0'.repeat(24), undefined, { lean: false }).orFail();
+    doc.save();
+    expect(doc).type.toBe<ExpectedHydratedDoc>();
+  }
+
+  async function testFindOneAndUpdate() {
+    const leanDoc = await TestModel.findOneAndUpdate({}, {}).orFail();
+    expect(leanDoc).type.toBe<ExpectedLeanDoc>();
+    const doc = await TestModel.findOneAndUpdate({}, {}, { lean: false }).orFail();
+    doc.save();
+    expect(doc).type.toBe<ExpectedHydratedDoc>();
+  }
+
+  async function testFindByIdAndUpdate() {
+    const leanDoc = await TestModel.findByIdAndUpdate('0'.repeat(24), {}).orFail();
+    expect(leanDoc).type.toBe<ExpectedLeanDoc>();
+    const doc = await TestModel.findByIdAndUpdate('0'.repeat(24), {}, { lean: false }).orFail();
+    doc.save();
+    expect(doc).type.toBe<ExpectedHydratedDoc>();
+  }
+
+  async function testFindOneAndReplace() {
+    const leanDoc = await TestModel.findOneAndReplace({}, {}).orFail();
+    expect(leanDoc).type.toBe<ExpectedLeanDoc>();
+    const doc = await TestModel.findOneAndReplace({}, {}, { lean: false }).orFail();
+    doc.save();
+    expect(doc).type.toBe<ExpectedHydratedDoc>();
+  }
+
+  async function testFindOneAndDelete() {
+    const leanDoc = await TestModel.findOneAndDelete({}).orFail();
+    expect(leanDoc).type.toBe<ExpectedLeanDoc>();
+    const doc = await TestModel.findOneAndDelete({}, { lean: false }).orFail();
+    doc.save();
+    expect(doc).type.toBe<ExpectedHydratedDoc>();
+  }
+
+  async function testFindByIdAndDelete() {
+    const leanDoc = await TestModel.findByIdAndDelete('0'.repeat(24)).orFail();
+    expect(leanDoc).type.toBe<ExpectedLeanDoc>();
+    const doc = await TestModel.findByIdAndDelete('0'.repeat(24), { lean: false }).orFail();
+    doc.save();
+    expect(doc).type.toBe<ExpectedHydratedDoc>();
+  }
+
+  const hydratedSchema = new Schema({ name: String }, { lean: false });
+  const HydratedTestModel = model('gh16413Hydrated', hydratedSchema);
+  const hydratedDocs2 = await HydratedTestModel.find();
+  hydratedDocs2[0].save();
+
+  const leanDoc = await HydratedTestModel.findById('0'.repeat(24), undefined, { lean: true }).orFail();
+  expect(leanDoc).type.toBe<ExpectedLeanDoc>();
+  const leanUpdatedDoc = await HydratedTestModel.findOneAndUpdate({}, {}, { lean: true }).orFail();
+  expect(leanUpdatedDoc).type.toBe<ExpectedLeanDoc>();
+  const leanUpdatedByIdDoc = await HydratedTestModel.findByIdAndUpdate('0'.repeat(24), {}, { lean: true }).orFail();
+  expect(leanUpdatedByIdDoc).type.toBe<ExpectedLeanDoc>();
+  const leanReplacedDoc = await HydratedTestModel.findOneAndReplace({}, {}, { lean: true }).orFail();
+  expect(leanReplacedDoc).type.toBe<ExpectedLeanDoc>();
+  const leanDeletedDoc = await HydratedTestModel.findOneAndDelete({}, { lean: true }).orFail();
+  expect(leanDeletedDoc).type.toBe<ExpectedLeanDoc>();
+  const leanDeletedByIdDoc = await HydratedTestModel.findByIdAndDelete('0'.repeat(24), { lean: true }).orFail();
+  expect(leanDeletedByIdDoc).type.toBe<ExpectedLeanDoc>();
+}
+
 async function gh13746() {
   const schema = new Schema({ name: String });
   const TestModel = model('Test', schema);
@@ -1120,6 +1310,20 @@ async function gh15693() {
   User.schema.methods.printNamePrefixed.call(leanInst, '');
 }
 
+async function gh15693b() {
+  interface Cat {
+    name: string;
+  }
+
+  const catSchema = new Schema<Cat>({ name: { type: String, required: true } });
+  // Hand-written `Model<Cat>` annotation omits the `TSchema` generic, so `schema`
+  // must fall back to `Schema<Cat>` rather than collapsing to `any`.
+  const m: Model<Cat> = model<Cat>('Cat', catSchema);
+
+  expect(m.schema).type.not.toBe<any>();
+  expect(m.schema).type.toBeAssignableTo<Schema<Cat>>();
+}
+
 async function gh15781() {
   const userSchema = new Schema({
     createdAt: { type: Date, immutable: true },
@@ -1264,4 +1468,47 @@ function hydrateWithStrictOption() {
   });
 
   expect(doc4).type.toBe<ReturnType<(typeof TestModel)['hydrate']>>();
+}
+
+function gh15940() {
+  interface IUser {
+    name: string;
+    age: number;
+  }
+
+  const schema = new mongoose.Schema<IUser>({
+    name: String,
+    age: Number
+  });
+
+  const User = mongoose.model<IUser>('User', schema);
+
+  const rawUser = {
+    _id: new mongoose.Types.ObjectId(),
+    name: 'John',
+    age: 30,
+    totalOrders: 42
+  };
+
+  // With `strict: false`, callers can describe the extra fields kept on the document
+  const user = User.hydrate<{ totalOrders: number }>(rawUser, null, { strict: false });
+
+  expect(user.name).type.toBe<string>();
+  expect(user.age).type.toBe<number>();
+  expect(user.totalOrders).type.toBe<number>();
+  expect(user.isModified()).type.toBe<boolean>();
+
+  // Without the extra fields type argument, the return type is unchanged
+  const plainUser = User.hydrate(rawUser, null, { strict: false });
+  expect(plainUser).type.toBe<ReturnType<(typeof User)['hydrate']>>();
+
+  // `null` and `undefined` projections are accepted with and without options
+  expect(User.hydrate).type.toBeCallableWith(rawUser, null);
+  expect(User.hydrate).type.toBeCallableWith(rawUser, undefined);
+  expect(User.hydrate<{ totalOrders: number }>).type.toBeCallableWith(rawUser, undefined, { strict: false });
+
+  // Extra fields type argument requires `strict: false`
+  expect(User.hydrate<{ totalOrders: number }>).type.toBeCallableWith(rawUser, null, { strict: false });
+  expect(User.hydrate<{ totalOrders: number }>).type.not.toBeCallableWith(rawUser, null, { strict: true });
+  expect(User.hydrate<{ totalOrders: number }>).type.not.toBeCallableWith(rawUser);
 }

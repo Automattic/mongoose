@@ -398,7 +398,7 @@ describe('model: updateOne:', function() {
     const q = BlogPost.find({ _id: post._id });
     q.set('slug', 'test-slug');
 
-    await q.updateOne({ title: 'newtitle' });
+    await q.updateOne({}, { title: 'newtitle' });
 
     const doc = await BlogPost.findById(post._id);
     assert.equal(doc.title, 'newtitle');
@@ -409,7 +409,7 @@ describe('model: updateOne:', function() {
     const q = BlogPost.find({});
     q.set('slug', 'test-slug');
 
-    await q.updateMany({ title: 'newtitle' });
+    await q.updateMany({}, { title: 'newtitle' });
 
     const docs = await BlogPost.find({});
     assert.equal(docs.length, 1);
@@ -1278,31 +1278,13 @@ describe('model: updateOne:', function() {
       const Model = db.model('Test', Schema);
 
       await Model.updateOne({}, { myBufferField: Buffer.alloc(1) });
-
-    });
-
-    it('.updateOne(doc) (gh-3221)', function() {
-      const Schema = mongoose.Schema({ name: String });
-      const Model = db.model('Test', Schema);
-
-      let query = Model.updateOne({ name: 'Val' });
-      assert.equal(query.getUpdate().name, 'Val');
-
-      query = Model.find().updateOne({ name: 'Val' });
-      assert.equal(query.getUpdate().name, 'Val');
-
-      return query.setOptions({ upsert: true }).
-        then(() => Model.findOne()).
-        then(doc => {
-          assert.equal(doc.name, 'Val');
-        });
     });
 
     it('middleware update with exec (gh-3549)', async function() {
       const Schema = mongoose.Schema({ name: String });
 
       Schema.pre('updateOne', function() {
-        this.updateOne({ name: 'Val' });
+        this.updateOne({}, { name: 'Val' });
       });
 
       const Model = db.model('Test', Schema);
@@ -2788,137 +2770,48 @@ describe('model: updateOne: ', function() {
       assert.strictEqual(updatedUser.createdAt.valueOf(), customCreatedAt.valueOf());
     });
 
-    for (const timestamps of [true, false, null, undefined]) {
-      it(`overwriting immutable createdAt with bulkWrite (gh-15781) when \`timestamps\` is \`${timestamps}\``, async function() {
-        // Arrange
-        const schema = Schema({ name: String }, { timestamps: true });
-
-        const Model = db.model('Test', schema);
-
-        const doc1 = await Model.create({ name: 'gh-15781-1' });
-        const doc2 = await Model.create({ name: 'gh-15781-2' });
-
-        // Act
-        const createdAt = new Date('2011-06-01');
-
-        await Model.bulkWrite([
-          {
-            updateOne: {
-              filter: { _id: doc1._id },
-              update: { createdAt },
-              overwriteImmutable: true,
-              timestamps
-            }
-          },
-          {
-            updateMany: {
-              filter: { _id: doc2._id },
-              update: { createdAt },
-              overwriteImmutable: true,
-              timestamps
-            }
-          }
-        ]);
-
-        // Assert
-        const updatesDocs = await Model.find({ _id: { $in: [doc1._id, doc2._id] } });
-
-        assert.equal(updatesDocs[0].createdAt.valueOf(), createdAt.valueOf());
-        assert.equal(updatesDocs[1].createdAt.valueOf(), createdAt.valueOf());
-      });
-
-      it(`can not update immutable fields without overwriteImmutable: true and timestamps: ${timestamps}`, async function() {
+    it('updateOne upsert preserves user-provided `$setOnInsert.createdAt` with overwriteImmutable: true', async function() {
       // Arrange
-        const { User } = createTestContext();
-        const users = await User.create([
-          { name: 'Bob', ssn: '222-22-2222' },
-          { name: 'Eve', ssn: '333-33-3333' }
-        ]);
-        const newCreatedAt = new Date('2020-01-01');
-
-        // Act
-        await User.bulkWrite([
-          {
-            updateOne: {
-              filter: { _id: users[0]._id },
-              update: { ssn: '888-88-8888', createdAt: newCreatedAt }
-            },
-            timestamps
-          },
-          {
-            updateMany: {
-              filter: { _id: users[1]._id },
-              update: { ssn: '777-77-7777', createdAt: newCreatedAt }
-            },
-            timestamps
-          }
-        ]);
-
-
-        // Assert
-        const [updatedUser1, updatedUser2] = await Promise.all([
-          User.findById(users[0]._id),
-          User.findById(users[1]._id)
-        ]);
-        assert.strictEqual(updatedUser1.ssn, '222-22-2222');
-        assert.notStrictEqual(updatedUser1.createdAt.valueOf(), newCreatedAt.valueOf());
-
-        assert.strictEqual(updatedUser2.ssn, '333-33-3333');
-        assert.notStrictEqual(updatedUser2.createdAt.valueOf(), newCreatedAt.valueOf());
-      });
-    }
-
-    function createTestContext() {
-      const userSchema = new Schema({
-        name: String,
-        ssn: { type: String, immutable: true }
-      }, { timestamps: true });
-      const User = db.model('User', userSchema);
-      return { User };
-    }
-  });
-
-  describe('bulkWrite overwriteImmutable option (gh-15781)', function() {
-    it('updateOne can update immutable field with overwriteImmutable: true', async function() {
-      // Arrange
-      const { User } = createTestContext();
-      const user = await User.create({ name: 'John', ssn: '123-45-6789' });
-      const customCreatedAt = new Date('2020-01-01');
+      const schema = Schema({ name: String }, { timestamps: true });
+      const Model = db.model('UpsertSetOnInsertOne', schema);
+      const userCreatedAt = new Date('2020-01-01');
+      const filter = { name: 'gh-setoninsert-createdat-one' };
 
       // Act
-      await User.bulkWrite([{
+      await Model.bulkWrite([{
         updateOne: {
-          filter: { _id: user._id },
-          update: { createdAt: customCreatedAt, ssn: '999-99-9999' },
+          filter,
+          update: { $setOnInsert: { createdAt: userCreatedAt, name: filter.name } },
+          upsert: true,
           overwriteImmutable: true
         }
       }]);
 
       // Assert
-      const updatedUser = await User.findById(user._id);
-      assert.strictEqual(updatedUser.ssn, '999-99-9999');
-      assert.strictEqual(updatedUser.createdAt.valueOf(), customCreatedAt.valueOf());
+      const doc = await Model.findOne(filter);
+      assert.strictEqual(doc.createdAt.valueOf(), userCreatedAt.valueOf());
     });
 
-    it('updateMany can update immutable field with overwriteImmutable: true', async function() {
+    it('updateMany upsert preserves user-provided `$setOnInsert.createdAt` with overwriteImmutable: true', async function() {
       // Arrange
-      const { User } = createTestContext();
-      const user = await User.create({ name: 'Alice', ssn: '111-11-1111' });
-      const customCreatedAt = new Date('2020-01-01');
+      const schema = Schema({ name: String }, { timestamps: true });
+      const Model = db.model('UpsertSetOnInsertMany', schema);
+      const userCreatedAt = new Date('2020-01-01');
+      const filter = { name: 'gh-setoninsert-createdat-many' };
 
       // Act
-      await User.bulkWrite([{
+      await Model.bulkWrite([{
         updateMany: {
-          filter: { _id: user._id },
-          update: { createdAt: customCreatedAt, ssn: '000-00-0000' },
+          filter,
+          update: { $setOnInsert: { createdAt: userCreatedAt, name: filter.name } },
+          upsert: true,
           overwriteImmutable: true
         }
       }]);
 
       // Assert
-      const updatedUser = await User.findById(user._id);
-      assert.strictEqual(updatedUser.ssn, '000-00-0000');
-      assert.strictEqual(updatedUser.createdAt.valueOf(), customCreatedAt.valueOf());
+      const doc = await Model.findOne(filter);
+      assert.strictEqual(doc.createdAt.valueOf(), userCreatedAt.valueOf());
     });
 
     for (const timestamps of [true, false, null, undefined]) {
@@ -2930,6 +2823,14 @@ describe('model: updateOne: ', function() {
 
         const doc1 = await Model.create({ name: 'gh-15781-1' });
         const doc2 = await Model.create({ name: 'gh-15781-2' });
+
+        // Seed a known past `updatedAt` via the raw collection (bypasses immutable casting)
+        // so we can observe whether the bulkWrite advances `updatedAt`.
+        const initialUpdatedAt = new Date('2020-06-15');
+        await Model.collection.updateMany(
+          { _id: { $in: [doc1._id, doc2._id] } },
+          { $set: { updatedAt: initialUpdatedAt } }
+        );
 
         // Act
         const createdAt = new Date('2011-06-01');
@@ -2958,10 +2859,19 @@ describe('model: updateOne: ', function() {
 
         assert.equal(updatesDocs[0].createdAt.valueOf(), createdAt.valueOf());
         assert.equal(updatesDocs[1].createdAt.valueOf(), createdAt.valueOf());
+
+        // Per-op `timestamps` should be honored: `updatedAt` only advances when not `false`.
+        if (timestamps === false) {
+          assert.strictEqual(updatesDocs[0].updatedAt.valueOf(), initialUpdatedAt.valueOf());
+          assert.strictEqual(updatesDocs[1].updatedAt.valueOf(), initialUpdatedAt.valueOf());
+        } else {
+          assert.ok(updatesDocs[0].updatedAt > initialUpdatedAt);
+          assert.ok(updatesDocs[1].updatedAt > initialUpdatedAt);
+        }
       });
 
       it(`can not update immutable fields without overwriteImmutable: true and timestamps: ${timestamps}`, async function() {
-      // Arrange
+        // Arrange
         const { User } = createTestContext();
         const users = await User.create([
           { name: 'Bob', ssn: '222-22-2222' },
@@ -2969,21 +2879,30 @@ describe('model: updateOne: ', function() {
         ]);
         const newCreatedAt = new Date('2020-01-01');
 
+        // Seed a known past `updatedAt` via the raw collection (bypasses immutable casting)
+        // so we can observe whether the bulkWrite advances `updatedAt`.
+        const initialUpdatedAt = new Date('2020-06-15');
+        await User.collection.updateMany(
+          { _id: { $in: users.map(u => u._id) } },
+          { $set: { updatedAt: initialUpdatedAt } }
+        );
+
         // Act
+        // `name` keeps the update non-empty when `timestamps: false`, since `ssn` and `createdAt` are immutable and get stripped.
         await User.bulkWrite([
           {
             updateOne: {
               filter: { _id: users[0]._id },
-              update: { ssn: '888-88-8888', createdAt: newCreatedAt }
-            },
-            timestamps
+              update: { name: 'Updated Bob', ssn: '888-88-8888', createdAt: newCreatedAt },
+              timestamps
+            }
           },
           {
             updateMany: {
               filter: { _id: users[1]._id },
-              update: { ssn: '777-77-7777', createdAt: newCreatedAt }
-            },
-            timestamps
+              update: { name: 'Updated Eve', ssn: '777-77-7777', createdAt: newCreatedAt },
+              timestamps
+            }
           }
         ]);
 
@@ -2993,11 +2912,22 @@ describe('model: updateOne: ', function() {
           User.findById(users[0]._id),
           User.findById(users[1]._id)
         ]);
+        assert.strictEqual(updatedUser1.name, 'Updated Bob');
         assert.strictEqual(updatedUser1.ssn, '222-22-2222');
         assert.notStrictEqual(updatedUser1.createdAt.valueOf(), newCreatedAt.valueOf());
 
+        assert.strictEqual(updatedUser2.name, 'Updated Eve');
         assert.strictEqual(updatedUser2.ssn, '333-33-3333');
         assert.notStrictEqual(updatedUser2.createdAt.valueOf(), newCreatedAt.valueOf());
+
+        // Per-op `timestamps` should be honored: `updatedAt` only advances when not `false`.
+        if (timestamps === false) {
+          assert.strictEqual(updatedUser1.updatedAt.valueOf(), initialUpdatedAt.valueOf());
+          assert.strictEqual(updatedUser2.updatedAt.valueOf(), initialUpdatedAt.valueOf());
+        } else {
+          assert.ok(updatedUser1.updatedAt > initialUpdatedAt);
+          assert.ok(updatedUser2.updatedAt > initialUpdatedAt);
+        }
       });
     }
 
@@ -3572,15 +3502,117 @@ describe('model: updateOne: ', function() {
     assert.equal(err, null);
   });
 
-  it('casts top level $each (gh-15642)', async function() {
-    const schema = new Schema({ tags: [String] });
-    const Model = db.model('Test', schema);
+  describe('pathless update modifiers (gh-15642)', function() {
+    it('rejects a pathless modifier with an array value', async function() {
+      // Arrange
+      const { User } = createTestContext();
 
-    await Model.create({ tags: [] });
-    await assert.rejects(
-      Model.updateOne({}, { $addToSet: { $each: ['test'] } }),
-      /Modifiers such as "\$each", "\$or", "\$and", "\$in" must appear under a valid field path/
-    );
+      // Act
+      const error = await User.updateOne({}, { $addToSet: { $each: ['admin'] } })
+        .then(() => null, error => error);
+
+      // Assert
+      assert.equal(error?.name, 'MongooseError');
+      assert.match(error.message,
+        /Did you mean something like \{ \$addToSet: \{ fieldName: \{ \$each: \[\.\.\.\] \} \} \}\?/);
+    });
+
+    it('rejects a pathless modifier with an object value', async function() {
+      // Arrange
+      const { User } = createTestContext();
+
+      // Act
+      const promise = User.updateOne({}, { $push: { $each: { name: 'admin' } } });
+
+      // Assert
+      await assert.rejects(promise, /must appear under a valid field path/);
+    });
+
+    it('rejects a pathless modifier that is not in the original allowlist', async function() {
+      // Arrange
+      const { User } = createTestContext();
+
+      // Act
+      const promise = User.updateOne({}, { $pull: { $nin: ['admin'] } });
+
+      // Assert
+      await assert.rejects(promise, /must appear under a valid field path/);
+    });
+
+    it('allows a modifier nested under a field path', async function() {
+      // Arrange
+      const { User } = createTestContext();
+      const user = await User.create({ roles: ['admin', 'member'] });
+
+      // Act
+      await User.updateOne({ _id: user._id }, { $pull: { roles: { $nin: ['admin'] } } });
+
+      // Assert
+      const updatedUser = await User.findById(user._id);
+      assert.deepEqual(updatedUser.roles, ['admin']);
+    });
+
+    it('allows an insert-style upsert for a nested modifier-named dollar path', async function() {
+      // Arrange
+      const { Account } = createDollarPathTestContext();
+      const _id = new mongoose.Types.ObjectId();
+
+      // Act
+      await Account.updateOne({ _id }, { $each: { count: '42' } }, { upsert: true });
+
+      // Assert
+      const account = await Account.findById(_id);
+      assert.equal(account.$each.count, 42);
+    });
+
+    it('updates a nested modifier-named dollar path using object syntax', async function() {
+      // Arrange
+      const { Account } = createDollarPathTestContext();
+      const account = await Account.create({ preferences: { $each: 1 } });
+
+      // Act
+      await Account.updateOne(
+        { _id: account._id },
+        { $set: { preferences: { $each: '42' } } }
+      );
+
+      // Assert
+      const updatedAccount = await Account.findById(account._id);
+      assert.equal(updatedAccount.preferences.$each, 42);
+    });
+
+    it('updates a nested modifier-named dollar path using dotted syntax', async function() {
+      // Arrange
+      const { Account } = createDollarPathTestContext();
+      const account = await Account.create({ preferences: { $each: 1 } });
+
+      // Act
+      await Account.updateOne(
+        { _id: account._id },
+        { $set: { 'preferences.$each': '42' } }
+      );
+
+      // Assert
+      const updatedAccount = await Account.findById(account._id);
+      assert.equal(updatedAccount.preferences.$each, 42);
+    });
+
+    function createTestContext() {
+      const userSchema = new Schema({ roles: [String] });
+      const User = db.model('User', userSchema);
+
+      return { User };
+    }
+
+    function createDollarPathTestContext() {
+      const accountSchema = new Schema({
+        $each: { count: Number },
+        preferences: { $each: Number }
+      });
+      const Account = db.model('Account', accountSchema);
+
+      return { Account };
+    }
   });
 });
 

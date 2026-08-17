@@ -110,7 +110,9 @@ describe('schema select option', function() {
         name: { type: String, select: false },
         docs: [new Schema({ name: { type: String, select: false }, bool: Boolean })]
       });
+    });
 
+    beforeEach(function() {
       S = db.model('Test1', selected);
       E = db.model('Test2', excluded);
     });

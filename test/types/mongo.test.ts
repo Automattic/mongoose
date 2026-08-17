@@ -1,5 +1,5 @@
 import * as mongoose from 'mongoose';
-import * as bson from 'bson';
+import * as mongodb from 'mongodb';
 import { expect } from 'tstyche';
 
 function gh12537() {
@@ -8,10 +8,10 @@ function gh12537() {
 
   const doc = new model({});
 
-  const v = new bson.ObjectId('somehex');
+  const v = new mongodb.ObjectId('somehex');
   expect(v._id.toHexString()).type.toBe<string>();
 
-  doc._id = new bson.ObjectId('somehex');
+  doc._id = new mongodb.ObjectId('somehex');
 }
 
 gh12537();

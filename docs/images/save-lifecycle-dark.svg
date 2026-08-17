@@ -1,0 +1,124 @@
+<svg id="save-lifecycle" xmlns="http://www.w3.org/2000/svg" width="1120" height="740" viewBox="0 0 1120 740" role="img" aria-labelledby="save-lifecycle-title save-lifecycle-desc">
+  <title id="save-lifecycle-title">save() Lifecycle</title>
+  <desc id="save-lifecycle-desc">Flowchart showing pre-validate middleware, validate, post-validate middleware, pre-save middleware, write to MongoDB, and post-save middleware.</desc>
+  <defs>
+    <marker id="save-lifecycle-arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="10" markerHeight="10" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" class="arrow-head"/>
+    </marker>
+    <style>
+      .diagram-title {
+        fill: #f3f7fb;
+        font: 700 32px Arial, Helvetica, sans-serif;
+      }
+      .card {
+        stroke-width: 3;
+      }
+      .purple {
+        fill: #26183d;
+        stroke: #b692f6;
+      }
+      .green {
+        fill: #132b1b;
+        stroke: #7ee787;
+      }
+      .orange {
+        fill: #321f0a;
+        stroke: #f0b65f;
+      }
+      .blue {
+        fill: #10233e;
+        stroke: #79c0ff;
+      }
+      .blue-line {
+        fill: none;
+        stroke: #79c0ff;
+        stroke-width: 3;
+      }
+      .purple-text,
+      .green-text,
+      .orange-text,
+      .blue-text {
+        fill: #f3f7fb;
+      }
+      .heading {
+        font: 700 20px Arial, Helvetica, sans-serif;
+      }
+      .body {
+        font: 15px Arial, Helvetica, sans-serif;
+      }
+      .emphasis {
+        font: italic 15px Arial, Helvetica, sans-serif;
+      }
+      .code {
+        font: 15px Consolas, Monaco, "Liberation Mono", monospace;
+      }
+      .arrow {
+        fill: none;
+        stroke: #a6b3c3;
+        stroke-width: 3;
+        marker-end: url(#save-lifecycle-arrow);
+      }
+      .arrow-head {
+        fill: #a6b3c3;
+      }
+    </style>
+  </defs>
+
+  <text x="560" y="46" text-anchor="middle" class="diagram-title">save() Lifecycle</text>
+
+  <g transform="translate(40 90)">
+    <rect width="500" height="160" rx="10" class="card purple"/>
+    <text x="24" y="36" class="purple-text heading">🛡️ 1. Pre-Validate Middleware</text>
+    <text x="24" y="70" class="purple-text body">Runs <tspan class="code">pre('validate')</tspan> middleware.</text>
+    <text x="24" y="100" class="purple-text body">Use this to prepare or modify the document</text>
+    <text x="24" y="126" class="purple-text body">before validation.</text>
+  </g>
+  <path d="M 548 170 L 572 170" class="arrow"/>
+
+  <g transform="translate(580 90)">
+    <rect width="500" height="160" rx="10" class="card green"/>
+    <text x="24" y="36" class="green-text heading">🔍 2. Validate</text>
+    <text x="24" y="70" class="green-text body">Mongoose casts values and runs built-in</text>
+    <text x="24" y="96" class="green-text body">validators and custom validators.</text>
+    <text x="24" y="126" class="green-text emphasis">If validation fails, <tspan class="code">save()</tspan> is aborted.</text>
+    <text x="24" y="150" class="green-text emphasis">No changes are written.</text>
+  </g>
+  <path d="M 830 258 L 830 278 L 290 278 L 290 297" class="arrow"/>
+
+  <g transform="translate(40 305)">
+    <rect width="500" height="160" rx="10" class="card purple"/>
+    <text x="24" y="36" class="purple-text heading">✅ 3. Post-Validate Middleware</text>
+    <text x="24" y="70" class="purple-text body">Runs <tspan class="code">post('validate')</tspan> middleware.</text>
+    <text x="24" y="100" class="purple-text body">Runs whether validation succeeds or fails.</text>
+    <text x="24" y="130" class="purple-text body">Use this for logging, metrics, etc.</text>
+  </g>
+  <path d="M 548 385 L 572 385" class="arrow"/>
+
+  <g transform="translate(580 305)">
+    <rect width="500" height="160" rx="10" class="card orange"/>
+    <text x="24" y="36" class="orange-text heading">⚙️ 4. Pre-Save Middleware</text>
+    <text x="24" y="70" class="orange-text body">Runs <tspan class="code">pre('save')</tspan> middleware.</text>
+    <text x="24" y="100" class="orange-text body">Use this right before persistence, for</text>
+    <text x="24" y="126" class="orange-text body">hashing passwords or setting timestamps.</text>
+  </g>
+  <path d="M 830 473 L 830 493 L 290 493 L 290 512" class="arrow"/>
+
+  <g transform="translate(40 520)">
+    <path d="M 0 18 C 0 7 112 0 250 0 C 388 0 500 7 500 18 L 500 150 C 500 161 388 168 250 168 C 112 168 0 161 0 150 Z" class="card blue"/>
+    <path d="M 0 18 C 0 29 112 36 250 36 C 388 36 500 29 500 18" class="blue-line"/>
+    <text x="24" y="66" class="blue-text heading">🗄️ 5. Write to MongoDB</text>
+    <text x="24" y="100" class="blue-text body">Mongoose generates the write operation:</text>
+    <text x="48" y="128" class="blue-text body">• New document: <tspan class="code">insertOne()</tspan></text>
+    <text x="48" y="154" class="blue-text body">• Existing document: <tspan class="code">updateOne()</tspan> with modified paths</text>
+  </g>
+  <path d="M 548 604 L 572 604" class="arrow"/>
+
+  <g transform="translate(580 520)">
+    <rect width="500" height="168" rx="10" class="card purple"/>
+    <text x="24" y="38" class="purple-text heading">📥 6. Post-Save Middleware</text>
+    <text x="24" y="72" class="purple-text body">Runs <tspan class="code">post('save')</tspan> middleware after</text>
+    <text x="24" y="98" class="purple-text body">the write attempt.</text>
+    <text x="24" y="130" class="purple-text body">The document is now up to date with</text>
+    <text x="24" y="156" class="purple-text body">what's in MongoDB.</text>
+  </g>
+</svg>

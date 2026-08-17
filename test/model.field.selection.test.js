@@ -12,6 +12,7 @@ const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 const DocumentObjectId = mongoose.Types.ObjectId;
+const DivergentArrayError = mongoose.Error.DivergentArrayError;
 
 describe('model field selection', function() {
   let Comments;
@@ -264,6 +265,98 @@ describe('model field selection', function() {
       post.tags[0].count = 1;
       const err = await post.save().then(() => null, err => err);
       assert.ok(err);
+    });
+  });
+
+  describe('with $slice projection', function() {
+    it('throws divergent array error when saving with $set atomic', async function() {
+      const postSchema = new Schema({
+        numbers: [Number]
+      });
+
+      const B = db.model('Test', postSchema);
+
+      const doc = await B.create({ numbers: [1, 2, 3] });
+      const found = await B.findById(doc._id).select({ numbers: { $slice: -1 } });
+      assert.deepEqual(found.numbers, [3]);
+
+      found.numbers.unshift(0);
+
+      const err = await found.save().then(() => null, err => err);
+      assert.ok(err instanceof DivergentArrayError, 'non-divergent error: ' + err);
+      assert.ok(/\snumbers/.test(err.message));
+    });
+
+    it('allows saving pure $push atomics', async function() {
+      const postSchema = new Schema({
+        numbers: [Number]
+      });
+
+      const B = db.model('Test', postSchema);
+
+      const doc = await B.create({ numbers: [1, 2, 3] });
+      const found = await B.findById(doc._id).select({ numbers: { $slice: -1 } });
+      assert.deepEqual(found.numbers, [3]);
+
+      found.numbers.push(4);
+      await found.save();
+
+      const updated = await B.findById(doc._id).lean();
+      assert.deepEqual(updated.numbers, [1, 2, 3, 4]);
+    });
+
+    it('allows saving pure pull atomics', async function() {
+      const postSchema = new Schema({
+        numbers: [Number]
+      });
+
+      const B = db.model('Test', postSchema);
+
+      const doc = await B.create({ numbers: [1, 2, 3] });
+      const found = await B.findById(doc._id).select({ numbers: { $slice: -2 } });
+      assert.deepEqual(found.numbers, [2, 3]);
+
+      found.numbers.pull(2);
+      await found.save();
+
+      const updated = await B.findById(doc._id).lean();
+      assert.deepEqual(updated.numbers, [1, 3]);
+    });
+
+    it('allows saving pure $pop atomics', async function() {
+      const postSchema = new Schema({
+        numbers: [Number]
+      });
+
+      const B = db.model('Test', postSchema);
+
+      const doc = await B.create({ numbers: [1, 2, 3] });
+      const found = await B.findById(doc._id).select({ numbers: { $slice: -1 } });
+      assert.deepEqual(found.numbers, [3]);
+
+      found.numbers.$pop();
+      await found.save();
+
+      const updated = await B.findById(doc._id).lean();
+      assert.deepEqual(updated.numbers, [1, 2]);
+    });
+
+    it('allows saving pure $addToSet atomics', async function() {
+      const postSchema = new Schema({
+        numbers: [Number]
+      });
+
+      const B = db.model('Test', postSchema);
+
+      const doc = await B.create({ numbers: [1, 2, 3] });
+      const found = await B.findById(doc._id).select({ numbers: { $slice: -1 } });
+      assert.deepEqual(found.numbers, [3]);
+
+      found.numbers.addToSet(4);
+      await found.save();
+
+      const updated = await B.findById(doc._id).lean();
+      assert.deepEqual(updated.numbers, [1, 2, 3, 4]);
     });
   });
 

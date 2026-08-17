@@ -1,36 +1,18 @@
 extends layout
 
 append style
-  style.
-    .title {
-      font-size: 1.5em;
-    }
-
-    ul {
-      list-style-type: none;
-      padding: 0px;
-    }
-
-    .url a {
-      font-size: 0.75em;
-      color: #777;
-      margin-top: 0.5em;
-    }
-
-    p {
-      margin-top: 0.5em;
-    }
+  link(rel="stylesheet", href=`${versions.versionedPath}/docs/css/search.css?v=${Date.now()}`)
 
 block content
-  div
+  .search-page
     h1 Search
+    p.search-page-intro Search across Mongoose guides, API docs, and migration notes.
 
-    include includes/native
+    form.search-page-form#search-form(role="search")
+      label.sr-only(for="search-input") Search docs
+      input#search-input(type="search", placeholder="Search docs", autocomplete="off")
+      button.search-page-button#search-button(type="submit") Search
 
-    div.search
-      input#search-input(type="text", placeholder="Search")
-      button#search-button
-        img(src=`${versions.versionedPath}/docs/images/search.svg`)
-    div#results
+    div.search-results#results(aria-live="polite")
 
     script(type="text/javascript" src=`${versions.versionedPath}/docs/js/search.js`)

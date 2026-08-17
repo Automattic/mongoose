@@ -17,8 +17,7 @@ import mongoose, {
   ProjectionType,
   QueryFilter
 } from 'mongoose';
-import mongodb from 'mongodb';
-import { ModifyResult, ObjectId } from 'mongodb';
+import { Condition, ModifyResult, ObjectId } from 'mongodb';
 import { autoTypedModel } from './models.test';
 import { expect } from 'tstyche';
 
@@ -270,6 +269,36 @@ function gh10857() {
   }
   type MyClassDocument = MyClass & Document;
   const test: QueryFilter<MyClass> = { status: { $in: ['VALUE1', 'VALUE2'] } };
+  expect<QueryFilter<MyClass>>().type.not.toBeAssignableFrom({ status: 'nope' });
+}
+
+function gh16240() {
+  enum Status {
+    ACTIVE = 'active',
+    BANNED = 'banned'
+  }
+
+  interface MyClass {
+    statusUnion: 'active' | 'banned';
+    statusEnum: Status;
+    name: string;
+  }
+
+  expect<QueryFilter<MyClass>>().type.not.toBeAssignableFrom({
+    statusUnion: 'nope'
+  });
+  expect<QueryFilter<MyClass>>().type.not.toBeAssignableFrom({
+    statusEnum: 'nope'
+  });
+  expect<QueryFilter<MyClass>>().type.toBeAssignableFrom({
+    statusUnion: 'active'
+  } as const);
+  expect<QueryFilter<MyClass>>().type.toBeAssignableFrom({
+    statusEnum: Status.ACTIVE
+  });
+  expect<QueryFilter<MyClass>>().type.toBeAssignableFrom({
+    name: /valid/
+  } as const);
 }
 
 function gh10786() {
@@ -351,7 +380,7 @@ function autoTypedQuery() {
 function gh11964() {
   class Repository<T extends { id: string }> {
     find(id: string) {
-      const idCondition: mongodb.Condition<T['id']> = id as mongodb.Condition<T['id']>;
+      const idCondition: Condition<T['id']> = id as Condition<T['id']>;
 
       // `as` is necessary because `T` can be `{ id: never }`,
       // so we need to explicitly coerce
@@ -361,8 +390,6 @@ function gh11964() {
 }
 
 function gh14397() {
-  type Condition<T> = mongodb.Condition<T>; // redefined here because it's not exported by mongoose
-
   type WithId<T extends object> = T & { id: string };
 
   type TestUser = {
@@ -484,7 +511,6 @@ async function gh11602(): Promise<void> {
 
   ModelType.findOneAndUpdate({}, {}, { returnDocument: 'before' });
   ModelType.findOneAndUpdate({}, {}, { returnDocument: 'after' });
-  ModelType.findOneAndUpdate({}, {}, { returnDocument: undefined });
   ModelType.findOneAndUpdate({}, {}, {});
   expect(ModelType.findOneAndUpdate).type.not.toBeCallableWith({}, {}, { returnDocument: 'not-before-or-after' }); // returnDocument should be 'before' or 'after'
 }

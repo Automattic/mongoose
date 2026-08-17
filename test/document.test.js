@@ -11120,6 +11120,36 @@ describe('document', function() {
 
         assert.equal(user.get, 12);
       });
+
+      it('does not access special properties with noDottedPath', () => {
+        const userSchema = new Schema({ name: String });
+        const User = db.model('DocGetNoDottedSpecialProperties', userSchema);
+        const user = new User({ name: 'test' });
+
+        assert.equal(user.get('__proto__', null, { noDottedPath: true }), void 0);
+        assert.equal(user.get('constructor', null, { noDottedPath: true }), void 0);
+        assert.equal(user.get('prototype', null, { noDottedPath: true }), void 0);
+      });
+
+      it('does not access special properties when applying virtuals to nested paths', () => {
+        const userSchema = new Schema({ name: String });
+        const User = db.model('DocGetNestedSpecialProperties', userSchema);
+        const user = new User({ name: 'test' });
+
+        assert.equal(user.get('__proto__', null, { virtuals: true }), void 0);
+        assert.equal(user.get('constructor', null, { virtuals: true }), void 0);
+        assert.equal(user.get('prototype', null, { virtuals: true }), void 0);
+      });
+
+      it('does not traverse through special properties', () => {
+        const userSchema = new Schema({ name: String });
+        const User = db.model('DocGetSpecialPropertyPaths', userSchema);
+        const user = new User({ name: 'test' });
+
+        assert.equal(user.get('__proto__.constructor'), void 0);
+        assert.equal(user.get('constructor.prototype'), void 0);
+        assert.equal(user.get('name.__proto__'), void 0);
+      });
     });
   });
 
@@ -11260,6 +11290,82 @@ describe('document', function() {
 
       const User = db.model('User', userSchema);
       return User;
+    }
+
+  });
+
+  describe('validateSync()', () => {
+    afterEach(() => sinon.restore());
+
+    it('emits a deprecation warning', () => {
+      // Arrange
+      const { User, getWarningCalls } = createTestContext();
+      const user = new User({ name: 'Sam' });
+
+      // Act
+      user.validateSync();
+
+      // Assert
+      const calls = getWarningCalls();
+      assert.strictEqual(calls.length, 1);
+      assert.ok(calls[0].args[0].includes('`Document.prototype.validateSync()` is deprecated'));
+    });
+
+    it('does not emit a deprecation warning for internal bulkSave() validation', async() => {
+      // Arrange
+      const { User, getWarningCalls } = createTestContext();
+      const user = new User();
+
+      // Act
+      const err = await User.bulkSave([user]).then(() => null, err => err);
+
+      // Assert
+      assert.ok(err);
+      assert.strictEqual(err.name, 'ValidationError');
+      assert.strictEqual(getWarningCalls().length, 0);
+    });
+
+    it('emits one deprecation warning when validating subdocuments and unions', () => {
+      // Arrange
+      const { User, getWarningCalls } = createTestContext();
+      const user = new User({
+        name: 'Sam',
+        address: {},
+        offices: [{}, {}],
+        preference: {}
+      });
+
+      // Act
+      const err = user.validateSync();
+
+      // Assert
+      assert.ok(err);
+      assert.ok(err.errors['address.city']);
+      assert.ok(err.errors['offices.0.city']);
+      assert.ok(err.errors['offices.1.city']);
+      assert.ok(err.errors['preference.score']);
+      assert.strictEqual(getWarningCalls().length, 1);
+    });
+
+    function createTestContext() {
+      sinon.stub(utils, 'warn');
+      const addressSchema = Schema({ city: { type: String, required: true } });
+      const officeSchema = Schema({ city: { type: String, required: true } });
+      const preferenceSchema = Schema({ score: { type: Number, required: true } });
+      const User = db.model('ValidateSyncWarning', Schema({
+        name: { type: String, required: true },
+        address: addressSchema,
+        offices: [officeSchema],
+        preference: {
+          type: 'Union',
+          of: [preferenceSchema, Number]
+        }
+      }));
+
+      return {
+        User,
+        getWarningCalls: () => utils.warn.getCalls()
+      };
     }
   });
 
@@ -13029,6 +13135,193 @@ describe('document', function() {
         images: new Map([['avatar', { url: 'https://example.com/avatar.jpg' }]]),
         addresses: [{ city: 'Denver', contacts: [{ email: 'john@test.com' }] }, { city: 'Miami', contacts: [] }],
         phones: [{ number: '555-1234' }]
+      });
+      return { User, user };
+    }
+  });
+
+  describe('$clone() does not leak state to the original document', function() {
+    it('cloned document array $parent() returns the cloned root document', function() {
+      // Arrange
+      const { user } = createTestContext();
+
+      // Act
+      const clonedUser = user.$clone();
+
+      // Assert
+      assert.strictEqual(
+        clonedUser.addresses.$parent(),
+        clonedUser,
+        'cloned document array $parent() should return cloned document'
+      );
+      assert.strictEqual(
+        user.addresses.$parent(),
+        user,
+        'original document array $parent() should still return original document'
+      );
+    });
+
+    it('cloning a freshly-constructed document does not mutate the original document\'s modifiedPaths', function() {
+      // Arrange
+      const { user } = createTestContext();
+      const before = user.modifiedPaths().slice().sort();
+
+      // Act
+      user.$clone();
+
+      // Assert
+      const after = user.modifiedPaths().slice().sort();
+      assert.deepStrictEqual(
+        after,
+        before,
+        'cloning should not add paths to the original document\'s modifiedPaths'
+      );
+    });
+
+    it('modifying a subdoc field on the cloned document does not mark the original as modified', async function() {
+      // Arrange
+      const { User, user } = createTestContext();
+      await user.save();
+      const fetched = await User.findById(user._id);
+      assert.strictEqual(fetched.isModified(), false, 'sanity: fetched doc starts clean');
+
+      // Act
+      const clonedFetched = fetched.$clone();
+      clonedFetched.addresses[0].city = 'New York';
+
+      // Assert
+      assert.strictEqual(
+        fetched.isModified(),
+        false,
+        'original fetched document should remain clean after mutating clone'
+      );
+      assert.deepStrictEqual(
+        fetched.modifiedPaths(),
+        [],
+        'original fetched document modifiedPaths should remain empty'
+      );
+      assert.strictEqual(
+        clonedFetched.isModified('addresses.0.city'),
+        true,
+        'cloned document should track the mutation on its own subdoc'
+      );
+    });
+
+    it('refreshes cloned document array subdoc indexes after source array changes', async function() {
+      // Arrange
+      const { user } = createTestContext({
+        addresses: [
+          { street: '1 Main', city: 'Boston' },
+          { street: '2 Main', city: 'Chicago' },
+          { street: '3 Main', city: 'Denver' }
+        ]
+      });
+      await user.save();
+      user.addresses.pull(user.addresses[0]._id);
+      await user.save();
+      assert.strictEqual(user.isModified(), false, 'sanity: saved doc starts clean');
+
+      // Act
+      const clonedUser = user.$clone();
+      clonedUser.addresses[0].city = 'New York';
+
+      // Assert
+      assert.strictEqual(
+        clonedUser.addresses[0].$__fullPath('city'),
+        'addresses.0.city',
+        'cloned subdoc should use its cloned array index'
+      );
+      assert.strictEqual(
+        clonedUser.isModified('addresses.0.city'),
+        true,
+        'cloned document should track the first subdoc by its cloned index'
+      );
+      assert.strictEqual(
+        clonedUser.isModified('addresses.1.city'),
+        false,
+        'cloned document should not track the first subdoc by its stale source index'
+      );
+    });
+
+    it('clones document arrays with null entries', function() {
+      // Arrange
+      const { user } = createTestContext({
+        addresses: [
+          null,
+          { street: '1 Main', city: 'Boston' }
+        ]
+      });
+
+      // Act
+      const clonedUser = user.$clone();
+
+      // Assert
+      assert.strictEqual(clonedUser.addresses[0], null);
+      assert.strictEqual(
+        clonedUser.addresses[1].$__fullPath('city'),
+        'addresses.1.city',
+        'non-null cloned subdoc should keep the correct array index'
+      );
+    });
+
+    it('cloning a document with a primitive array does not mutate the original document\'s modifiedPaths', function() {
+      // Arrange
+      const { user } = createTestContext({ tags: ['admin'] });
+      const before = user.modifiedPaths().slice().sort();
+
+      // Act
+      user.$clone();
+
+      // Assert
+      const after = user.modifiedPaths().slice().sort();
+      assert.deepStrictEqual(
+        after,
+        before,
+        'cloning should not add primitive array paths to the original document\'s modifiedPaths'
+      );
+    });
+
+    it('modifying a primitive array on the cloned document does not mark the original as modified', async function() {
+      // Arrange
+      const { User, user } = createTestContext({ tags: ['admin'] });
+      await user.save();
+      const fetched = await User.findById(user._id);
+      assert.strictEqual(fetched.isModified(), false, 'sanity: fetched doc starts clean');
+
+      // Act
+      const clonedFetched = fetched.$clone();
+      clonedFetched.tags[0] = 'member';
+
+      // Assert
+      assert.strictEqual(
+        fetched.isModified(),
+        false,
+        'original fetched document should remain clean after mutating cloned primitive array'
+      );
+      assert.deepStrictEqual(
+        fetched.modifiedPaths(),
+        [],
+        'original fetched document modifiedPaths should remain empty'
+      );
+      assert.strictEqual(
+        clonedFetched.isModified('tags.0'),
+        true,
+        'cloned document should track the primitive array mutation'
+      );
+    });
+
+    function createTestContext({ addresses, tags } = {}) {
+      const addressSchema = new Schema({ street: String, city: String });
+      const userSchema = new Schema({
+        name: String,
+        addresses: [addressSchema],
+        tags: [String]
+      });
+      const User = db.model('UserCloneIsolation', userSchema);
+      const user = new User({
+        name: 'John',
+        addresses: addresses ?? [{ street: '1 Main', city: 'Boston' }],
+        tags: tags ?? []
       });
       return { User, user };
     }
@@ -14981,6 +15274,7 @@ describe('document', function() {
     }
 
     mongoose.Schema.Types.CustomType = SchemaCustomType;
+    mongoose.Schema.Types.CustomType.set('transform', v => v == null ? v : v.value);
 
     const Model = db.model(
       'Test',
@@ -14992,8 +15286,6 @@ describe('document', function() {
     const _id = new mongoose.Types.ObjectId('0'.repeat(24));
     const doc = new Model({ _id });
     doc.value = 1;
-
-    mongoose.Schema.Types.CustomType.set('transform', v => v == null ? v : v.value);
 
     assert.deepStrictEqual(doc.toJSON(), { _id, value: 1 });
     assert.deepStrictEqual(doc.toObject(), { _id, value: 1 });
@@ -15704,6 +15996,80 @@ describe('document', function() {
       ],
       { updatePipeline: true }
     );
+  });
+
+  it('clears child modified paths when parent mixed path is unset (gh-16252)', async function() {
+    const schema = new Schema({
+      mail: Schema.Types.Mixed
+    }, { versionKey: false });
+    const Test = db.model('Test', schema);
+
+    const created = await Test.create({
+      mail: { 207: { emId: 207, readStatus: 0, getAttach: 0 } }
+    });
+
+    const doc = await Test.findById(created._id).orFail();
+    doc.mail[207].readStatus = 1;
+    doc.markModified('mail.207.readStatus');
+
+    delete doc.mail[207];
+    doc.markModified('mail.207');
+
+    const delta = doc.$__delta()[1];
+    assert.deepStrictEqual(delta, { $unset: { 'mail.207': 1 } });
+
+    await doc.save();
+    const reloaded = await Test.findById(created._id).orFail();
+    assert.strictEqual(reloaded.mail[207], undefined);
+  });
+
+  it('saving undefined with allowNull', async function() {
+    const schema = new Schema({
+      _id: String,
+      name: { type: String, allowNull: false },
+      subdoc: new Schema({
+        subname: { type: String, allowNull: false }
+      }, { _id: false })
+    }, { versionKey: false });
+    const Test = db.model('Test', schema);
+    const doc = new Test({ _id: 'test1', name: undefined, subdoc: { subname: undefined } });
+    await doc.save();
+    let rawDoc = await Test.collection.findOne({ _id: doc._id });
+    assert.deepStrictEqual(Object.keys(rawDoc), ['_id']);
+
+    await Test.collection.insertOne({ _id: 'test2', name: undefined });
+    rawDoc = await Test.collection.findOne({ _id: 'test2' });
+    assert.deepStrictEqual(rawDoc, { _id: 'test2', name: null });
+  });
+
+  it('revalidates hydrated paths when a dependent field changes (gh-16370)', async function() {
+    const userSchema = new mongoose.Schema({
+      name: String,
+      requiresEmail: Boolean,
+      email: {
+        type: String,
+        validate: {
+          validator: function(v) {
+            return !this.requiresEmail || (typeof v === 'string' && v.includes('@'));
+          },
+          message: 'invalid email'
+        }
+      }
+    });
+    const User = db.model('User', userSchema);
+
+    // Valid at creation time: requiresEmail is false, so the junk email passes
+    const { _id } = await User.create({ name: 'John', requiresEmail: false, email: 'not-an-email' });
+
+    const user = await User.findById(_id);
+
+    // Save #1: touch an unrelated field. Passes on both master and this branch.
+    user.name = 'Johnny';
+    await user.save();
+
+    // Save #2: flip requiresEmail, which makes the hydrated `email` invalid.
+    user.requiresEmail = true;
+    await assert.rejects(() => user.save(), /invalid email/);
   });
 });
 

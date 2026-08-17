@@ -81,6 +81,26 @@ describe('Tutorial: findOneAndUpdate()', function() {
     // acquit:ignore:end
   });
 
+  it('strips undefined from updates', async function() {
+    const filter = { name: 'Jean-Luc Picard' };
+    const update = {
+      $set: {
+        name: undefined,
+        age: 59
+      }
+    };
+
+    const doc = await Character.findOneAndUpdate(filter, update, {
+      returnDocument: 'after'
+    });
+    doc.name; // 'Jean-Luc Picard'
+    doc.age; // 59
+    // acquit:ignore:start
+    assert.equal(doc.name, 'Jean-Luc Picard');
+    assert.equal(doc.age, 59);
+    // acquit:ignore:end
+  });
+
   it('save race condition', async function() {
     const filter = { name: 'Jean-Luc Picard' };
     const update = { age: 59 };

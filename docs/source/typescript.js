@@ -2,6 +2,6 @@
 const { mapSubDoc } = require('./utils');
 
 mapSubDoc('typescript', {
-  title: 'Mongoose:',
+  title: '',
   markdown: true
 }, module.exports);

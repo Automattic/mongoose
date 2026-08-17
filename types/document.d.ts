@@ -11,6 +11,12 @@ declare module 'mongoose' {
     middleware?: boolean | SkipMiddlewareOptions;
   }
 
+  interface ValidateSyncOptions extends Omit<ValidateOptions, 'middleware'> {
+    /** `validateSync()` does not run middleware. Use `validate()` if you need middleware. */
+    middleware?: never;
+    [k: string]: any;
+  }
+
   interface DocumentSetOptions {
     merge?: boolean;
 
@@ -283,9 +289,9 @@ declare module 'mongoose' {
     ): ToObjectReturnType<PopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
     toJSON<PopulatedRawDocType>(
       this: PopulatedDocumentMarker<PopulatedRawDocType, any>
-    ): Default__v<Require_id<PopulatedRawDocType>, TSchemaOptions>;
+    ): DefaultToObjectReturnType<PopulatedRawDocType, TVirtuals, TSchemaOptions, 'toJSON'>;
     toJSON<O extends ToObjectOptions>(options: O): ToObjectReturnType<DocType, TVirtuals, O, TSchemaOptions>;
-    toJSON(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;
+    toJSON(options?: ToObjectOptions): DefaultToObjectReturnType<DocType, TVirtuals, TSchemaOptions, 'toJSON'>;
     toJSON<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
@@ -303,9 +309,9 @@ declare module 'mongoose' {
     ): ToObjectReturnType<PopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
     toObject<PopulatedRawDocType>(
       this: PopulatedDocumentMarker<PopulatedRawDocType, any>
-    ): Default__v<Require_id<PopulatedRawDocType>, TSchemaOptions>;
+    ): DefaultToObjectReturnType<PopulatedRawDocType, TVirtuals, TSchemaOptions, 'toObject'>;
     toObject<O extends ToObjectOptions>(options: O): ToObjectReturnType<DocType, TVirtuals, O, TSchemaOptions>;
-    toObject(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;
+    toObject(options?: ToObjectOptions): DefaultToObjectReturnType<DocType, TVirtuals, TSchemaOptions, 'toObject'>;
     toObject<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
 
     /** Clears the modified state on the specified path. */
@@ -320,9 +326,20 @@ declare module 'mongoose' {
     validate(pathsToValidate?: pathsToValidate, options?: Omit<ValidateOptions, 'pathsToSkip'> & AnyObject): Promise<void>;
     validate(options: ValidateOptions): Promise<void>;
 
-    /** Executes registered validation rules (skipping asynchronous validators) for this document. */
-    validateSync(options: ValidateOptions & { [k: string]: any }): Error.ValidationError | null;
-    validateSync<T extends keyof DocType>(pathsToValidate?: T | T[], options?: Omit<ValidateOptions, 'pathsToSkip'> & AnyObject): Error.ValidationError | null;
-    validateSync(pathsToValidate?: pathsToValidate, options?: Omit<ValidateOptions, 'pathsToSkip'> & AnyObject): Error.ValidationError | null;
+    /**
+     * Executes registered validation rules (skipping asynchronous validators) for this document.
+     * @deprecated Use `validate()` instead. `validateSync()` does not run middleware and will be removed in Mongoose 10.
+     */
+    validateSync(options: ValidateSyncOptions): Error.ValidationError | null;
+    /**
+     * Executes registered validation rules (skipping asynchronous validators) for this document.
+     * @deprecated Use `validate()` instead. `validateSync()` does not run middleware and will be removed in Mongoose 10.
+     */
+    validateSync<T extends keyof DocType>(pathsToValidate?: T | T[], options?: Omit<ValidateSyncOptions, 'pathsToSkip'>): Error.ValidationError | null;
+    /**
+     * Executes registered validation rules (skipping asynchronous validators) for this document.
+     * @deprecated Use `validate()` instead. `validateSync()` does not run middleware and will be removed in Mongoose 10.
+     */
+    validateSync(pathsToValidate?: pathsToValidate, options?: Omit<ValidateSyncOptions, 'pathsToSkip'>): Error.ValidationError | null;
   }
 }

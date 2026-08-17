@@ -45,12 +45,28 @@ declare module 'mongoose' {
   type RawDocTypeHint<T> = IsAny<T> extends true ? never
     : T extends { __rawDocTypeHint: infer U } ? U: never;
 
+  type DiscriminatorRawKey<TBaseSchema extends Schema> =
+    ObtainSchemaGeneric<TBaseSchema, 'TSchemaOptions'> extends infer TSchemaOptions ?
+      'discriminatorKey' extends keyof TSchemaOptions ?
+        TSchemaOptions['discriminatorKey'] extends string ? TSchemaOptions['discriminatorKey'] : '__t'
+      : '__t'
+    : '__t';
+
+  type DiscriminatorRawBaseType<TBaseSchema extends Schema> =
+    InferRawDocTypeFromSchema<TBaseSchema> extends Record<DiscriminatorRawKey<TBaseSchema>, any> ?
+      InferRawDocTypeFromSchema<TBaseSchema>
+    : MergeType<InferRawDocTypeFromSchema<TBaseSchema>, { [K in DiscriminatorRawKey<TBaseSchema>]?: null }>;
+
   type ResolveDiscriminatorRawPathType<TBaseSchema extends Schema, TDiscriminators> =
     IsAny<TDiscriminators> extends true ? never
     : TDiscriminators extends Record<string, any> ?
-      TDiscriminators[keyof TDiscriminators] extends Schema ?
-        MergeType<InferRawDocTypeFromSchema<TBaseSchema>, InferRawDocTypeFromSchema<TDiscriminators[keyof TDiscriminators]>>
-      : never
+      DiscriminatorRawBaseType<TBaseSchema> |
+      {
+        [K in keyof TDiscriminators]: TDiscriminators[K] extends Schema ?
+          MergeType<InferRawDocTypeFromSchema<TBaseSchema>, InferRawDocTypeFromSchema<TDiscriminators[K]>> &
+          { [KDiscriminatorKey in DiscriminatorRawKey<TBaseSchema>]: K }
+        : never
+      }[keyof TDiscriminators]
     : never;
 
   type RawDiscriminatorEnumType<T> = string extends keyof T ? never
@@ -144,7 +160,7 @@ declare module 'mongoose' {
            : // If the type key isn't callable, then this is an array of objects, in which case
              // we need to call InferRawDocType to correctly infer its type.
              Array<InferRawDocType<Item, DefaultSchemaOptions, TTransformOptions>>
-         : IsSchemaTypeFromBuiltinClass<Item> extends true ? ResolveRawPathType<Item, { enum: Options['enum'] }, TypeKey, TTransformOptions>[]
+         : IsSchemaTypeFromBuiltinClass<Item> extends true ? ResolveRawPathType<Item, { enum: Exclude<Options['enum'], undefined> }, TypeKey, TTransformOptions>[]
          : IsItRecordAndNotAny<Item> extends true ?
            Item extends Record<string, never> ?
              ObtainRawDocumentPathType<Item, TypeKey, TTransformOptions>[]

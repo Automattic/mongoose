@@ -1,3 +1,153 @@
+8.24.3 / 2026-08-10
+===================
+ * fix(query): apply sanitizeFilter on countDocuments and cursor()
+
+9.9.2 / 2026-08-10
+==================
+ * fix(query): apply sanitizeFilter on countDocuments and cursor()
+ * fix(document): support map wildcards in optimistic concurrency paths option #16436 #16383
+ * fix(model): set document session in bulkSave() so transaction retries restore document state #16438 #16432 [yogesh968](https://github.com/yogesh968)
+ * fix(connection): restore delete state across transaction retries #16435 #16433 [snowyukitty](https://github.com/snowyukitty)
+ * fix(schema): put enum on array elements and support the object enum form in toJSONSchema #16444 #16443 [Jaybhade](https://github.com/Jaybhade)
+ * perf(document): inline the type checks in $__hasOnlyPrimitiveValues() #14394 [yogesh968](https://github.com/yogesh968)
+ * types(document): respect schema toObject and toJSON options #16431 #15594 [samuelmbabhazi](https://github.com/samuelmbabhazi)
+ * types: import BSON from mongodb instead of bson #16434
+ #16434 [orgads](https://github.com/orgads)
+ * docs(populate): document that skip needs sort to paginate reliably #16442 #7579
+ * docs: remove unused jobs.pug #16437 #16430
+
+9.9.1 / 2026-07-31
+==================
+ * fix(query): avoid path collision when excluding subdocuments with nested `select: false` paths #12798 [BIGSUS24](https://github.com/BIGSUS24)
+ * types(model): apply schema-level lean to find() #16413
+ * types(model): support overriding schema-level `lean` with `lean: false` #16413
+
+9.9.0 / 2026-07-30
+==================
+ * perf(document): improve toObject perf with faster string checks and avoiding unnecessary isSelected on paths with no getters #16407 #16373 #16385
+ * perf(model): improve insertMany() performance and general change tracking performance #16370
+ * perf(timestamps): avoid adding $setOnInsert for createdAt unless upsert set #16411
+ * perf: improve toObject() performance #16408 #16405 #16378 #14394 [BIGSUS24](https://github.com/BIGSUS24)
+ * types: add discriminator key to each member of embedded discriminator enum- #16412 #16045
+
+8.24.2 / 2026-07-27
+===================
+ * fix(subdocument): don't minimize empty document array elements to null #16393 [WaleedAshraf](https://github.com/WaleedAshraf)
+ * types: correct Model.validate() return type to Promise<TRawDocType> #16340
+ #16340 [chatman-media](https://github.com/chatman-media)
+
+9.8.1 / 2026-07-27
+==================
+ * perf(document): avoid rebuilding modified paths during required path validation #16379 [xianjianlf2](https://github.com/xianjianlf2)
+ * perf(document): avoid clearing the required paths cache on every document instantiation #16404 #16377
+ * fix(query): reject update modifiers without paths #16387 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * perf: cache `toString()` results in `array.unique` to avoid redundant allocations #16390 [vivek180905](https://github.com/vivek180905)
+ * types: respect the `_id` option when inferring StandardSchema types #16402
+ * types(model): keep `Model.schema` typed when `TSchema` is omitted [samuelmbabhazi](https://github.com/samuelmbabhazi)
+ * docs(guide): clarify `strictQuery` handling of filter paths not in the schema #16397 [MuhammadFarhantahir](https://github.com/MuhammadFarhantahir)
+
+9.8.0 / 2026-07-20
+==================
+ * feat(schema): add `strictRead` option to filter or throw on unknown fields during document hydration #16345 #4279 [GourabSingha](https://github.com/gourabsingha1)
+ * feat: upgrade MongoDB Node.js driver to 7.5 #16391
+ * fix(subdocument): don't minimize empty document array elements to null #16393 #15336 #7322 [WaleedAshraf](https://github.com/WaleedAshraf)
+ * fix(model): correctly handle version keys when `bulkSave()` inserts new documents #16386 #15800 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(cast): correctly cast object-shaped geo query values #16380 #16376 [rajkumar0932](https://github.com/rajkumar0932)
+ * fix(schema): avoid mutating shared setters when casting array query values #16372 #16364 [yakubka](https://github.com/yakubka)
+ * fix(document): correctly handle excluded parent paths with optimistic concurrency #16367 #16054 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * types(model): add `pathsToSave` to `SaveOptions` #16375 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * types(model): support extra fields in `hydrate()` with `strict: false` #16374 #15940 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * docs(populate): document missing options and `perDocumentLimit` for `populate()` #16371 [Wnayar](https://github.com/Wnayar)
+ * docs: expand `sample()` example to show sampling from a filtered subset #16369 [Wnayar](https://github.com/Wnayar)
+ * docs: fix typos, grammar, and documentation links #16389 [LakshyaTyagi15](https://github.com/LakshyaTyagi15)
+
+9.7.4 / 2026-07-06
+==================
+ * types(create): fix handling of nested objects typed as interfaces #16363 #16362
+ * types: correct `this` parameter handling for methods with `versionKey` #16344 #16046
+ * docs: add FAQ entry for `querySrv ECONNREFUSED` errors on Windows with `mongodb+srv://` connections #16342 [ajay naik](https://github.com/Ajay-Naik)
+
+9.7.3 / 2026-06-26
+==================
+ * types(model): correct Model.validate() return type to Promise<TRawDocType> #16340 #16338
+ * types: use @standard-schema/spec for StandardSchema types rather than inlining #16341 #16339
+
+8.24.1 / 2026-06-22
+===================
+ * fix(documentarray): reindex subdocs after array reordering and removal so subsequent nested changes save using the correct path #16282 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): avoid accessing special properties in `Document.prototype.get()`
+ * fix(schema): avoid returning inherited properties from schema path lookups, including paths underneath maps of subdocuments
+ * fix(clone): isolate cloned arrays from source documents #16281 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * types: enable exactOptionalPropertyTypes in TypeScript tests #16287
+
+9.7.2 / 2026-06-22
+==================
+ * fix(documentarray): reindex subdocs after array reordering and removal so subsequent nested changes save using the correct path #16282 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(document): avoid accessing special properties in `Document.prototype.get()`
+ * fix(schema): only return own properties in schematype lookups and disallow setting schema paths under special properties
+ * docs: update homepage sponsor layout
+
+9.7.1 / 2026-06-17
+==================
+ * perf(document+model): improve save performance by avoiding unnecessary promise allocations and reducing path/default/dirty-state overhead #16331
+ * fix(schema): include ObjectId regex pattern in `toJSONSchema()` output #16335 #16334 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(populate): split populate into separate queries per document if the resulting `$in` filter has more than 50k elements to reduce risk of BSON size errors #16333 #5890
+ * docs: add assistant sidebar with MongoDB Knowledge integration #16311 #16283
+ * docs: update docs copy buttons, edit links, homepage alignment, and `llms.txt` generation #16326 #16327 #16329
+
+9.7.0 / 2026-06-09
+==================
+ * feat: add Node.js TracingChannel support for APM instrumentation #16275 #16105 [logaretm](https://github.com/logaretm)
+ * feat(model): add standard schema adapter for models #16308 #16280
+ * fix(cursor): avoid waiting on buffering to run aggregation middleware #16289 #16284
+ * fix(document): throw error if overwriting array selected with `$slice` #16313 #2432
+ * fix(schema): remove `validateSync()` union fallback #16310 #16291 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * types: cast primitive types within unions when applying create casting #16320 #16316
+ * docs: add `llms.txt` #16312 #15687
+ * docs: rewrite documents docs #16298
+ * docs(model): clarify some details on `model.validate()` casting #16308 #16280
+ * docs(findOneAndUpdate): clarify update handling of undefined #16299
+ * docs(model): fix link to be absolute #16321 [hasezoey](https://github.com/hasezoey)
+
+9.6.3 / 2026-05-27
+==================
+ * fix(clone): isolate cloned arrays from source documents #16281 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(update): preserve user-provided `$setOnInsert.createdAt` with `overwriteImmutable: true` #16278 #15781 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(schema): always pass raw string value to error validators, only trim to 30 chars for maxlength validator #16238 #16236 #15550 #15571
+ * types: add `$percentile` to TypeScript aggregation expression types #16290 #16288
+ * docs: update default pool sizes on createConnection() #16295 [torbiak-samdesk](https://github.com/torbiak-samdesk)
+ * docs: improve code block copy button behavior and sidebar scrolling #16294 [DraXx-Van](https://github.com/DraXx-Van)
+ * docs: remove broken link to deleted schema example #16297 [kaseken](https://github.com/kaseken)
+
+8.24.0 / 2026-05-14
+===================
+ * feat(aggregate): add pipelineForUnionWith() helper to allow reusing pipelines with $unionWith in TypeScript #16247 #16041 #16033
+ * fix(connection): handle calling watch() on disconnected connection #16246 #16034
+ * types: handle compiling with exactOptionalPropertyTypes #16286 #16273
+
+9.6.2 / 2026-05-08
+==================
+ * fix(document): correctly handle modified subpaths when parent path is unset after modifying #16271 #16252
+ * types: handle compiling with exactOptionalPropertyTypes #16277 #16273
+ * chore: align Node version docs and types #16270 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+
+9.6.1 / 2026-04-29
+==================
+ * types(objectid): fix `_id` getter helper on ObjectId #16251 [noseworthy](https://github.com/noseworthy)
+
+9.6.0 / 2026-04-28
+==================
+ * feat: upgrade mongodb node driver to 7.2 #16245
+ * feat(schematype): support `allowNull` option to disallow null values even if not `required` #16237 #15905
+ * types(query): make QueryFilter respect string unions and enums #16242 #16240
+ * types: export Projector and ArrayProjectionOperators #16243 #16235
+
+8.23.1 / 2026-04-23
+===================
+ * fix(model): support sort option in Model.bulkWrite() updateOne and replaceOne operations #16091 #16079
+ * fix(setDefaultsOnInsert): check child filter paths before applying defaults (backport #16031 to 8.x) #16219 [marklai1998](https://github.com/marklai1998)
+ * fix(schema): always pass raw string value to error validators, only trim to 30 chars for maxlength validator #16238 #16236 #15550 #15571
+
 9.5.0 / 2026-04-20
 ==================
  * feat(debug): add `timestamp` option to debug output #16216 [rejunp](https://github.com/rejunp)
@@ -131,6 +281,7 @@
 9.2.0 / 2026-02-09
 ==================
  * feat: add option to skip middleware #15883 #8768 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * feat(base): add `returnDocument` global option, deprecate `returnOriginal` and `new` #16008
  * feat(model): delay "Duplicate schema index" warning until createIndexes runs to include model name in the warning #15979
  * feat(model): add strict option to Model.hydrate(...) #15940 #15977
  * feat(document): add flattenUUIDs option to toObject() and toJSON() #15864 #15021 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

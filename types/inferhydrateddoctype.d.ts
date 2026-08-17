@@ -56,12 +56,28 @@ declare module 'mongoose' {
   type HydratedDocTypeHint<T> = T extends { __hydratedDocTypeHint: infer U } ? U
     : never;
 
+  type DiscriminatorHydratedKey<TBaseSchema extends Schema> =
+    ObtainSchemaGeneric<TBaseSchema, 'TSchemaOptions'> extends infer TSchemaOptions ?
+      'discriminatorKey' extends keyof TSchemaOptions ?
+        TSchemaOptions['discriminatorKey'] extends string ? TSchemaOptions['discriminatorKey'] : '__t'
+      : '__t'
+    : '__t';
+
+  type DiscriminatorHydratedBaseType<TBaseSchema extends Schema> =
+    InferHydratedDocTypeFromSchema<TBaseSchema> extends Record<DiscriminatorHydratedKey<TBaseSchema>, any> ?
+      InferHydratedDocTypeFromSchema<TBaseSchema>
+    : MergeType<InferHydratedDocTypeFromSchema<TBaseSchema>, { [K in DiscriminatorHydratedKey<TBaseSchema>]?: null }>;
+
   type ResolveDiscriminatorHydratedPathType<TBaseSchema extends Schema, TDiscriminators> =
     IsAny<TDiscriminators> extends true ? never
     : TDiscriminators extends Record<string, any> ?
-      TDiscriminators[keyof TDiscriminators] extends Schema ?
-        MergeType<InferHydratedDocTypeFromSchema<TBaseSchema>, InferHydratedDocTypeFromSchema<TDiscriminators[keyof TDiscriminators]>>
-      : never
+      DiscriminatorHydratedBaseType<TBaseSchema> |
+      {
+        [K in keyof TDiscriminators]: TDiscriminators[K] extends Schema ?
+          MergeType<InferHydratedDocTypeFromSchema<TBaseSchema>, InferHydratedDocTypeFromSchema<TDiscriminators[K]>> &
+          { [KDiscriminatorKey in DiscriminatorHydratedKey<TBaseSchema>]: K }
+        : never
+      }[keyof TDiscriminators]
     : never;
 
   type HydratedDiscriminatorEnumType<T> = string extends keyof T ? never
@@ -104,7 +120,7 @@ declare module 'mongoose' {
                   Types.Subdocument<InferHydratedDocType<Item>['_id'], unknown, InferHydratedDocType<Item>> & InferHydratedDocType<Item>
                 >:
               IsSchemaTypeFromBuiltinClass<Item> extends true ?
-                Types.Array<ResolveHydratedPathType<Item, { enum: Options['enum'] }, TypeKey>> :
+                Types.Array<ResolveHydratedPathType<Item, { enum: Exclude<Options['enum'], undefined> }, TypeKey>> :
                 IsItRecordAndNotAny<Item> extends true ?
                   Item extends Record<string, never> ?
                     Types.Array<ObtainHydratedDocumentPathType<Item, TypeKey>> :

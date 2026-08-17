@@ -167,6 +167,13 @@ describe('aggregate: ', function() {
       assert.deepEqual(aggregate._pipeline, [{ $project: { a: 1, b: 1, c: 0 } }, { $project: { b: 1 } }]);
     });
 
+    it('does not split string projections on tabs', function() {
+      const aggregate = new Aggregate();
+
+      aggregate.project('a\tb -c\td');
+      assert.deepEqual(aggregate._pipeline, [{ $project: { 'a\tb': 1, 'c\td': 0 } }]);
+    });
+
     it('("a","b","c")', function() {
       assert.throws(function() {
         const aggregate = new Aggregate();
@@ -618,7 +625,7 @@ describe('aggregate: ', function() {
 
   describe('exec', function() {
     beforeEach(async function() {
-      this.timeout(4000); // double the default of 2 seconds
+      this.timeout(15000);
       await setupData(db);
     });
 
@@ -1109,6 +1116,30 @@ describe('aggregate: ', function() {
       aggregate([{ $match: { name: 'test' } }]).
       cursor();
     assert.ok(cursor instanceof require('stream').Readable);
+  });
+
+  it('cursor() buffers aggregate cursor creation until connection opens', async function() {
+    const collectionName = 'aggregate_cursor_buffering';
+    const schema = new Schema({ name: String });
+    const Seed = db.model('Seed', schema, collectionName);
+
+    await Seed.deleteMany({});
+    await Seed.create([{ name: 'Axl' }, { name: 'Slash' }]);
+
+    const conn = mongoose.createConnection();
+    try {
+      const Test = conn.model('Test', schema, collectionName);
+      const cursor = Test.aggregate([{ $sort: { name: 1 } }]).cursor();
+      const docPromise = cursor.next();
+
+      await conn.openUri(start.uri);
+      const doc = await docPromise;
+
+      assert.equal(doc.name, 'Axl');
+      assert.equal(typeof cursor.cursor.next, 'function');
+    } finally {
+      await conn.close();
+    }
   });
 
   it('cursor() with useMongooseAggCursor (gh-5145)', function() {

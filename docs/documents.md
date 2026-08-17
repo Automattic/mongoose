@@ -1,86 +1,149 @@
 # Documents
 
-Mongoose [documents](api/document.html) represent a one-to-one mapping
-to documents as stored in MongoDB. Each document is an instance of its
-[Model](models.html).
+Mongoose documents are Mongoose Document class instances backed by MongoDB data.
+Mongoose's [Document class](https://mongoosejs.com/docs/api/document.html) has built-in support for change tracking, casting, validation, middleware, and persistence.
 
 <ul class="toc">
-  <li><a href="#documents-vs-models">Documents vs Models</a></li>
-  <li><a href="#retrieving">Retrieving</a></li>
+  <li><a href="#what-is-a-document">What is a Document</a></li>
+  <li><a href="#hydrated-documents-vs-lean-documents">Hydrated Documents vs Lean Documents</a></li>
   <li><a href="#updating-using-save">Updating Using <code>save()</code></a></li>
   <li><a href="#setting-nested-properties">Setting Nested Properties</a></li>
-  <li><a href="#updating-using-queries">Updating Using Queries</a></li>
-  <li><a href="#validating">Validating</a></li>
-  <li><a href="#overwriting">Overwriting</a></li>
+  <li><a href="#casting-and-validation">Casting and Validation</a></li>
+  <li><a href="#required-properties">Required Properties</a></li>
+  <li><a href="#middleware">Middleware</a></li>
 </ul>
 
-## Documents vs Models {#documents-vs-models}
+## What is a Document?
 
-[Document](api/document.html#Document) and [Model](api/model.html#Model) are distinct
-classes in Mongoose. The Model class is a subclass of the Document class.
-When you use the [Model constructor](api/model.html#Model), you create a
-new document.
+A Mongoose [document](https://mongoosejs.com/docs/api/document.html#Document) is an instance of a [Model class](https://mongoosejs.com/docs/api/model.html#Model).
+`Model` and `Document` are separate classes in Mongoose: `Model` extends from `Document`.
 
 ```javascript
-const MyModel = mongoose.model('Test', new Schema({ name: String }));
-const doc = new MyModel();
+// `User` is a Model class
+const User = mongoose.model('User', new Schema({
+  name: String
+}));
 
-doc instanceof MyModel; // true
+// `doc` is a document
+const doc = new User({ name: 'John Smith' });
+
+// The class hierarchy is User extends from Model extends from Document
+doc instanceof User; // true
 doc instanceof mongoose.Model; // true
 doc instanceof mongoose.Document; // true
 ```
 
-In Mongoose, a "document" generally means an instance of a model.
-You should not have to create an instance of the Document class without
-going through a model.
+Mongoose documents represent individual documents stored in a MongoDB collection.
+For example, documents created from the `User` model in the above example are stored in the `users` collection by default.
 
-## Retrieving {#retrieving}
-
-When you load documents from MongoDB using model functions like [`findOne()`](api/model.html#model_Model-findOne),
-you get a Mongoose document back.
+You can create a new document using `new User()` or `await User.create()`; or load an existing document from MongoDB using queries like `findOne()`.
 
 ```javascript
-const doc = await MyModel.findOne();
+// Create a new document in memory
+const doc = new User({ name: 'John Smith' });
+// Persist the document to MongoDB:
+// the document is not persisted to MongoDB until you call `save()`.
+await doc.save();
 
-doc instanceof MyModel; // true
-doc instanceof mongoose.Model; // true
-doc instanceof mongoose.Document; // true
+// Load an existing document
+const existingDoc = await User.findOne({ name: 'John Smith' });
+
+existingDoc instanceof User; // true
+existingDoc instanceof mongoose.Model; // true
+existingDoc instanceof mongoose.Document; // true
 ```
+
+## Hydrated Documents vs Lean Documents
+
+When you create a new document or load a document using a query, Mongoose returns a **hydrated document**.
+Mongoose documents are not [plain-old JavaScript objects](https://masteringjs.io/tutorials/fundamentals/pojo): they are an instance of Mongoose's `Document` class.
+In particular, Mongoose documents store internal state for:
+
+* change tracking
+* validation
+* middleware
+* document methods
+* `save()`
+* getters, setters, and virtuals
+
+That means some JavaScript object operations behave differently with documents, most notably operations that depend on own enumerable properties or assignment semantics.
+
+* Using the `delete` operator will not unset the document property. For example, `delete doc.name` has no effect on the MongoDB document. To remove a property, use `doc.name = undefined` and then `save()` the document.
+* Using the [spread operator](https://masteringjs.io/tutorials/fundamentals/spread) on a Mongoose document does not create a shallow clone of the underlying object, you'll get an object with an `_doc` property instead.
+* Functions like `Object.keys()`, `Object.values()`, and `Object.entries()` inspect the document instance itself rather than the underlying document data. Use `doc.toObject()` first if you want to enumerate document properties. For example, `Object.keys(doc.toObject())`.
+* Using `in` on a document will always return `true` for properties that are in the Mongoose schema. For example, if `userDoc` is an instance of a User model with a `name` property, `'name' in userDoc` will always evaluate to `true`. Use `userDoc.name !== undefined` to check for existence instead. Mongoose does not store properties in MongoDB that are `=== undefined`.
+* Using [nullish coalescing assignments `??=`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_assignment) can be surprising if you are using them to set nested paths. For example, `(doc.nested ??= {}).name = 'John Smith'` will be a no-op because `(doc.nested ??= {})` evaluates to a temporary object, and the subsequent `.name` assignment happens on that object rather than on the document path itself. Use `doc.set('nested.name', 'John Smith')` instead.
+
+If you want a plain-old JavaScript object (POJO) representation of a Mongoose document, use the [`toObject()` method](https://mongoosejs.com/docs/api/document.html#Document.prototype.toObject()).
+
+```javascript
+const doc = await User.findOne();
+
+// NOT RECOMMENDED
+const copy = { ...doc };
+copy.name; // undefined
+copy; // { _doc: { name: 'John Smith' }, ... }
+
+// To get a plain object clone of a document, use `toObject()`
+const obj = doc.toObject();
+obj.name; // 'John Smith'
+```
+
+You can use the [`lean()` method](https://mongoosejs.com/docs/api/query.html#Query.prototype.lean()) to make Mongoose queries return POJOs instead of hydrated documents.
+Lean queries are often faster and use less memory, making them a good choice for read-only operations where you don't need document functionality.
+
+```javascript
+const doc = await User.findOne().lean();
+
+doc instanceof User; // false
+doc.name; // 'John Smith'
+```
+
+However, keep in mind that `lean()` bypasses many Mongoose document features, including:
+
+* change tracking
+* validation
+* `save()`
+* getters
+* defaults
+* virtuals (including populated virtuals)
+
+If you need some of these features on lean results, Mongoose provides helpers like [`Model.applyDefaults()`](https://mongoosejs.com/docs/api/model.html#Model.applyDefaults()) and [`Model.applyVirtuals()`](https://mongoosejs.com/docs/api/model.html#Model.applyVirtuals()), and there are plugins that can apply [getters](https://www.npmjs.com/package/mongoose-lean-getters), [virtuals](https://www.npmjs.com/package/mongoose-lean-virtuals), and [defaults](https://www.npmjs.com/package/mongoose-lean-defaults) to lean query results.
+When using `lean()`, you are responsible for explicitly enabling any document features that your app needs.
 
 ## Updating Using `save()` {#updating-using-save}
 
-Mongoose documents track changes. You can modify a document using vanilla
-JavaScript assignments and Mongoose will convert it into [MongoDB update operators](https://www.mongodb.com/docs/manual/reference/operator/update/).
+Mongoose documents have a `save()` method that persists the current document state to MongoDB.
+For new documents, `save()` inserts the document.
 
 ```javascript
-doc.name = 'foo';
-
-// Mongoose sends an `updateOne({ _id: doc._id }, { $set: { name: 'foo' } })`
-// to MongoDB.
+const doc = new User({ name: 'John Smith' });
+// Inserts a new document
 await doc.save();
 ```
 
-The `save()` method returns a promise. If `save()` succeeds, the promise
-resolves to the document that was saved.
+For existing documents, `save()` sends an `updateOne()` that updates just the modified paths.
 
 ```javascript
-doc.save().then(savedDoc => {
-  savedDoc === doc; // true
-});
+const doc = await User.findOne();
+
+doc.name = 'Something else';
+// Sends an updateOne with `{ $set: { name: 'Something else' } }` to MongoDB
+await doc.save();
 ```
 
-If the document with the corresponding `_id` is not found, Mongoose will
-report a `DocumentNotFoundError`:
+Mongoose documents track changes.
+When you assign to a document property, Mongoose marks that path as modified.
+The [`isModified()` method](https://mongoosejs.com/docs/api/document.html#Document.prototype.isModified()) lets you check whether a given path is modified, and the [`$getChanges()` method](https://mongoosejs.com/docs/api/document.html#Document.prototype.$getChanges()) returns the changes that will be sent to MongoDB when you call `save()`.
 
 ```javascript
-const doc = await MyModel.findOne();
+doc.name = 'Something else';
 
-// Delete the document so Mongoose won't be able to save changes
-await MyModel.deleteOne({ _id: doc._id });
-
-doc.name = 'foo';
-await doc.save(); // Throws DocumentNotFoundError
+doc.isModified('name'); // true
+doc.$getChanges(); // { $set: { name: 'Something else' } }
 ```
+
+In particular, this means `save()` only updates modified paths: it does **not** overwrite the entire document.
 
 ## Setting Nested Properties
 
@@ -88,17 +151,17 @@ Mongoose documents have a `set()` function that you can use to safely set deeply
 
 ```javascript
 const schema = new Schema({
-  nested: {
-    subdoc: new Schema({
+  subdoc: new Schema({
+    subdocLevel2: new Schema({
       name: String
-    })
-  }
+    }, { _id: false })
+  }, { _id: false })
 });
 const TestModel = mongoose.model('Test', schema);
 
 const doc = new TestModel();
-doc.set('nested.subdoc.name', 'John Smith');
-doc.nested.subdoc.name; // 'John Smith'
+doc.set('subdoc.subdocLevel2.name', 'John Smith');
+doc.subdoc.subdocLevel2.name; // 'John Smith'
 ```
 
 Mongoose documents also have a `get()` function that lets you safely read deeply nested properties. `get()` lets you avoid having to explicitly check for nullish values, similar to JavaScript's [optional chaining operator `?.`](https://masteringjs.io/tutorials/fundamentals/optional-chaining-array).
@@ -106,105 +169,190 @@ Mongoose documents also have a `get()` function that lets you safely read deeply
 ```javascript
 const doc2 = new TestModel();
 
-doc2.get('nested.subdoc.name'); // undefined
-doc2.nested?.subdoc?.name; // undefined
+doc2.get('subdoc.subdocLevel2.name'); // undefined
+doc2.subdoc?.subdocLevel2?.name; // undefined
 
-doc2.set('nested.subdoc.name', 'Will Smith');
-doc2.get('nested.subdoc.name'); // 'Will Smith'
+doc2.set('subdoc.subdocLevel2.name', 'Will Smith');
+doc2.get('subdoc.subdocLevel2.name'); // 'Will Smith'
 ```
 
-You can use optional chaining `?.` and nullish coalescing `??` with Mongoose documents.
-However, be careful when using [nullish coalescing assignments `??=`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Nullish_coalescing_assignment) to create nested paths with Mongoose documents.
+## Casting and Validation
+
+Before saving a document, Mongoose:
+
+* casts values to match the schema
+* validates the resulting values
+
+Casting and validation are related, but they are different concepts and happen at different times.
+
+**Casting** means converting values to the schema's configured type.
+Mongoose handles certain type conversions automatically, like converting the string `'42'` to a number for number paths or converting the number `0` to `false` for boolean paths.
 
 ```javascript
-// The following works fine
-const doc3 = new TestModel();
-doc3.nested.subdoc ??= {};
-doc3.nested.subdoc.name = 'John Smythe';
-
-// The following does **NOT** work.
-// Do not use the following pattern with Mongoose documents.
-const doc4 = new TestModel();
-(doc4.nested.subdoc ??= {}).name = 'Charlie Smith';
-doc4.nested.subdoc; // Empty object
-doc4.nested.subdoc.name; // undefined.
-```
-
-## Updating Using Queries {#updating-using-queries}
-
-The [`save()`](api/model.html#model_Model-save) function is generally the right
-way to update a document with Mongoose. With `save()`, you get full
-[validation](validation.html) and [middleware](middleware.html).
-
-For cases when `save()` isn't flexible enough, Mongoose lets you create
-your own [MongoDB updates](https://www.mongodb.com/docs/manual/reference/operator/update/)
-with casting, [middleware](middleware.html#notes), and [limited validation](validation.html#update-validators).
-
-```javascript
-// Update all documents in the `mymodels` collection
-await MyModel.updateMany({}, { $set: { name: 'foo' } });
-```
-
-*Note that `update()`, `updateMany()`, `findOneAndUpdate()`, etc. do **not**
-execute `save()` middleware. If you need save middleware and full validation,
-first query for the document and then `save()` it.*
-
-## Validating {#validating}
-
-Documents are casted and validated before they are saved. Mongoose first casts
-values to the specified type and then validates them. Internally, Mongoose
-calls the document's [`validate()` method](api/document.html#document_Document-validate)
-before saving.
-
-```javascript
-const schema = new Schema({ name: String, age: { type: Number, min: 0 } });
+const schema = new Schema({
+  age: Number,
+  isEnabled: Boolean
+});
 const Person = mongoose.model('Person', schema);
 
-const p = new Person({ name: 'foo', age: 'bar' });
-// Cast to Number failed for value "bar" at path "age"
-await p.validate();
+const doc = new Person();
+doc.age = '42';
+doc.isEnabled = 0;
 
-const p2 = new Person({ name: 'foo', age: -1 });
-// Path `age` (-1) is less than minimum allowed value (0).
-await p2.validate();
+doc.age; // 42 as a number
+doc.isEnabled; // false
+
+doc.isEnabled = 1;
+doc.isEnabled; // true
 ```
 
-Mongoose also supports limited validation on updates using the [`runValidators` option](validation.html#update-validators).
-Mongoose casts parameters to query functions like `findOne()`, `updateOne()`
-by default. However, Mongoose does *not* run validation on query function
-parameters by default. You need to set `runValidators: true` for Mongoose
-to validate.
+If Mongoose cannot convert a value to the expected type, it creates a cast error and stores it on the document.
+Most importantly, assigning an invalid value does **not** throw immediately.
+Instead, Mongoose will report an error when you [`validate()`](https://mongoosejs.com/docs/api/document.html#Document.prototype.validate()) the document (or call `save()`, which calls `validate()`).
 
 ```javascript
-// Cast to number failed for value "bar" at path "age"
-await Person.updateOne({}, { age: 'bar' });
+// Does **not** throw
+doc.age = 'not a number';
 
-// Path `age` (-1) is less than minimum allowed value (0).
-await Person.updateOne({}, { age: -1 }, { runValidators: true });
+// Throws a ValidationError with a CastError for path `age`
+await doc.validate();
 ```
 
-Read the [validation](validation.html) guide for more details.
-
-## Overwriting {#overwriting}
-
-There are 2 different ways to overwrite a document (replacing all keys in the
-document). One way is to use the
-[`Document#overwrite()` function](api/document.html#document_Document-overwrite)
-followed by `save()`.
+This behavior allows Mongoose to collect multiple validation and casting errors together.
+Also, if you set a value multiple times, the last value wins, so if you overwrite an invalid value then validation will succeed.
 
 ```javascript
-const doc = await Person.findOne({ _id });
+doc.age = 'not a number';
+doc.age = 42;
 
-// Sets `name` and unsets all other properties
-doc.overwrite({ name: 'Jean-Luc Picard' });
+// Validation succeeds
+await doc.validate();
+```
+
+**Validation** is a separate step that runs when you call the document's `validate()` method.
+The `save()` method calls `validate()` internally, so `save()` also triggers validation.
+Validation checks whether the document satisfies schema rules, which includes checking for cast errors, but also:
+
+* [required](https://mongoosejs.com/docs/api/schematype.html#SchemaType.prototype.required())
+* [min](https://mongoosejs.com/docs/api/schemanumber.html#SchemaNumber.prototype.min())
+* [max](https://mongoosejs.com/docs/api/schemanumber.html#SchemaNumber.prototype.max())
+* [enum](https://mongoosejs.com/docs/api/schemastring.html#SchemaString.prototype.enum())
+* [custom validators](https://mongoosejs.com/docs/validation.html#custom-validators)
+
+If validation fails, Mongoose does **not** save the document.
+
+```javascript
+const schema = new Schema({
+  age: {
+    type: Number,
+    min: 0
+  }
+});
+
+const Person = mongoose.model('Person', schema);
+
+const doc = new Person({ age: -1 });
+
+// Throws an error "Path `age` (-1) is less than minimum allowed value (0)"
+await doc.validate();
+```
+
+## Required Properties
+
+The most commonly used validator in Mongoose is `required`.
+If a required path is missing when you validate or save a document, Mongoose throws a validation error.
+
+```javascript
+const schema = new Schema({
+  name: {
+    type: String,
+    required: true
+  }
+});
+
+const User = mongoose.model('User', schema);
+
+const doc = new User();
+
+// Throws an error "Path `name` is required"
+await doc.validate();
+```
+
+For most schema types, any value that is not `null` or `undefined` will pass the required validator.
+The exceptions are strings and buffers: empty string and empty buffer cause a `ValidationError` if `required` is set.
+
+```javascript
+const doc = new User({ name: '' });
+
+// Throws an error "Path `name` is required"
+await doc.validate();
+```
+
+Note that empty arrays do **not** cause a `ValidationError` if the array is `required`.
+
+## Middleware
+
+Document [middleware](https://mongoosejs.com/docs/middleware.html) lets you run code during key parts of a document's lifecycle.
+The most common document middleware hooks are for `validate()` and `save()`.
+
+At a high level, saving a document looks like this:
+
+<img class="theme-aware-image-light" src="/docs/images/save-lifecycle.svg" alt="save document lifecycle diagram">
+<img class="theme-aware-image-dark" src="/docs/images/save-lifecycle-dark.svg" alt="save document lifecycle diagram">
+
+For example, the following shows using a `pre('validate')` hook to set a `normalizedName` property.
+
+```javascript
+const userSchema = new Schema({
+  name: String,
+  normalizedName: String
+});
+
+userSchema.pre('validate', function() {
+  if (this.name != null) {
+    this.normalizedName = this.name.trim().toLowerCase();
+  }
+});
+
+userSchema.pre('save', function() {
+  console.log('Saving user:', this.name);
+});
+
+const User = mongoose.model('User', userSchema);
+
+const user = new User({ name: '  JOHN SMITH  ' });
+await user.save();
+user.normalizedName; // 'john smith'
+```
+
+Document middleware is a good fit for logic that is closely tied to the document itself, such as:
+
+* normalizing values before validation
+* deriving one path from another
+* enforcing document-level invariants
+* logging or auditing document saves
+* updating timestamps or metadata
+
+However, use middleware sparingly.
+Middleware is usually not a good place for complex application logic.
+In particular, we recommend avoiding code in middleware that:
+
+* makes network calls to unrelated services
+* depends heavily on request-specific context
+* performs expensive work that should be explicit
+
+Also note that document middleware only runs for document operations.
+Query updates like `updateOne()` and `findOneAndUpdate()` do **not** run `save()` middleware.
+
+```javascript
+const doc = await User.findOne();
+
+doc.name = 'Jane Doe';
+// runs validate and save middleware
 await doc.save();
-```
 
-The other way is to use [`Model.replaceOne()`](api/model.html#model_Model-replaceOne).
-
-```javascript
-// Sets `name` and unsets all other properties
-await Person.replaceOne({ _id }, { name: 'Jean-Luc Picard' });
+// does not run save middleware
+await doc.updateOne({ name: 'John Doe' });
 ```
 
 ## Next Up

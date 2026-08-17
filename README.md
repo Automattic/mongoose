@@ -32,7 +32,7 @@ Check out the [plugins search site](https://plugins.mongoosejs.io/) to see hundr
 Pull requests are always welcome! Please base pull requests against the `master`
 branch and follow the [contributing guide](https://github.com/Automattic/mongoose/blob/master/CONTRIBUTING.md).
 
-If your pull requests makes documentation changes, please do **not**
+If your pull request makes documentation changes, please do **not**
 modify any `.html` files. The `.html` files are compiled code, so please make
 your changes in `docs/*.pug`, `lib/*.js`, or `test/docs/*.js`.
 
@@ -95,6 +95,10 @@ You can then run the above script using the following.
 ```sh
 deno run --allow-net --allow-read --allow-sys --allow-env mongoose-test.js
 ```
+
+## Mongoose Studio
+
+[Mongoose Studio](https://mongoosestudio.app?utm_source=mongoose&utm_medium=referral&utm_campaign=readme) is a free, fully open-source, browser-based MongoDB GUI built by the Mongoose team for apps that already use Mongoose. Install `@mongoosejs/studio` from npm and run it alongside your app as Express middleware, or deploy it on Vercel or Netlify, to browse and edit documents, query with your existing models and schemas with autocomplete, build dashboards, visualize and edit GeoJSON, and use AI-assisted MongoDB workflows without moving data into a hosted third-party workspace or sharing raw MongoDB connection strings.
 
 ## Mongoose for Enterprise
 
@@ -171,8 +175,6 @@ Comment.pre('save', function(next) {
   next();
 });
 ```
-
-Take a look at the example in [`examples/schema/schema.js`](https://github.com/Automattic/mongoose/blob/master/examples/schema/schema.js) for an end-to-end example of a typical setup.
 
 ### Accessing a Model
 
@@ -339,7 +341,7 @@ new Schema({
 ### Driver Access
 
 Mongoose is built on top of the [official MongoDB Node.js driver](https://github.com/mongodb/node-mongodb-native). Each mongoose model keeps a reference to a [native MongoDB driver collection](http://mongodb.github.io/node-mongodb-native/2.1/api/Collection.html). The collection object can be accessed using `YourModel.collection`. However, using the collection object directly bypasses all mongoose features, including hooks, validation, etc. The one
-notable exception that `YourModel.collection` still buffers
+notable exception is that `YourModel.collection` still buffers
 commands. As such, `YourModel.collection.find()` will **not**
 return a cursor.
 

@@ -1,13 +1,13 @@
 declare module 'mongoose' {
   import mongodb = require('mongodb');
 
-  type StringQueryTypeCasting = string | RegExp;
+  type StringQueryTypeCasting<T> = string extends T ? string | RegExp : T | RegExp;
   type ObjectIdQueryTypeCasting = Types.ObjectId | string;
   type DateQueryTypeCasting = string | number | NativeDate;
   type UUIDQueryTypeCasting = Types.UUID | string;
   type BufferQueryCasting = Buffer | mongodb.Binary | number[] | string | { $binary: string | mongodb.Binary };
   type QueryTypeCasting<T> = T extends string
-    ? StringQueryTypeCasting
+    ? StringQueryTypeCasting<T>
     : T extends Types.ObjectId
       ? ObjectIdQueryTypeCasting
       : T extends Types.UUID

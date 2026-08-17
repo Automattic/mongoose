@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "exactOptionalPropertyTypes": true,
+    "skipLibCheck": false,
+    "lib": ["ES2022", "ESNext.Disposable"]
+  },
+  "include": ["**/*"]
+}

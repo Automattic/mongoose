@@ -14,8 +14,6 @@ const utils = require('../lib/utils');
 const Schema = mongoose.Schema;
 const ObjectId = Schema.Types.ObjectId;
 const DocumentObjectId = mongoose.Types.ObjectId;
-const isEqual = require('lodash.isequal');
-const { isDeepStrictEqual } = require('util');
 const isEqualWith = require('lodash.isequalwith');
 const util = require('./util');
 const uuid = require('uuid');
@@ -782,21 +780,14 @@ describe('model: findOneAndUpdate:', function() {
     );
 
     assert.deepEqual(doc.contacts[0].account, a2._id);
-    assert.ok(utils.deepEqual(doc.contacts[0].account, a2._id));
     assert.ok(isEqualWith(doc.contacts[0].account, a2._id, compareBuffers));
-    // Re: commends on https://github.com/mongodb/js-bson/commit/aa0b54597a0af28cce3530d2144af708e4b66bf0
-    // Deep equality checks no longer work as expected with node 0.10.
-    // Please file an issue if this is a problem for you
-    assert.ok(isEqual(doc.contacts[0].account, a2._id));
-    assert.ok(isDeepStrictEqual(doc.contacts[0].account, a2._id));
+    assert.deepStrictEqual(doc.contacts[0].account, a2._id);
 
     const doc2 = await User.findOne({ name: 'parent' });
 
     assert.deepEqual(doc2.contacts[0].account, a2._id);
-    assert.ok(utils.deepEqual(doc2.contacts[0].account, a2._id));
     assert.ok(isEqualWith(doc2.contacts[0].account, a2._id, compareBuffers));
-    assert.ok(isEqual(doc2.contacts[0].account, a2._id));
-    assert.ok(isDeepStrictEqual(doc2.contacts[0].account, a2._id));
+    assert.deepStrictEqual(doc2.contacts[0].account, a2._id);
 
     function compareBuffers(a, b) {
       if (Buffer.isBuffer(a) && Buffer.isBuffer(b)) {
@@ -1116,9 +1107,9 @@ describe('model: findOneAndUpdate:', function() {
       });
       const Model = db.model('Test', schema);
       const doc = await Model.create({ name: 'test' });
-      const updateOptions = { runValidators: true, new: true };
+      const updateOptions = { runValidators: true, returnDocument: 'after' };
 
-      let err = await Model.findOneAndUpdate(
+      const err = await Model.findOneAndUpdate(
         { _id: doc._id },
         { $set: { name: null } },
         updateOptions
@@ -1128,12 +1119,14 @@ describe('model: findOneAndUpdate:', function() {
       assert.ok(err.errors['name']);
       assert.equal(err.errors['name'].kind, 'allowNull');
 
-      err = await Model.findOneAndUpdate(
+      // Mongoose strips out `name: undefined` from the update, so `name` will not be unset
+      // or set to null.
+      const updatedDoc = await Model.findOneAndUpdate(
         { _id: doc._id },
         { $set: { name: undefined } },
         updateOptions
-      ).then(() => null, err => err);
-      assert.equal(err, null);
+      );
+      assert.strictEqual(updatedDoc.name, 'test');
     });
 
     it('validators handle $unset and $setOnInsert', async function() {

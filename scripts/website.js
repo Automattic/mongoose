@@ -14,6 +14,17 @@ const childProcess = require('child_process');
 // using "__dirname" and ".." to have a consistent CWD, this script should not be runnable, even when not being in the root of the project
 // also a consistent root path so that it is easy to change later when the script should be moved
 const cwd = path.resolve(__dirname, '..');
+const docsVendorPath = path.join(cwd, 'docs/vendor');
+const vendorFiles = [
+  {
+    src: path.join(path.dirname(require.resolve('marked/package.json')), 'lib/marked.umd.js'),
+    dest: path.join(docsVendorPath, 'marked.umd.js')
+  },
+  {
+    src: path.join(path.dirname(require.resolve('xss/package.json')), 'dist/xss.min.js'),
+    dest: path.join(docsVendorPath, 'xss.min.js')
+  }
+];
 
 // support custom heading ids
 // see https://www.markdownguide.org/extended-syntax/#heading-ids
@@ -22,11 +33,6 @@ const cwd = path.resolve(__dirname, '..');
 const CustomIdRegex = /{#([a-zA-Z0-9_-]+)}(?: *)$/;
 
 const isMain = require.main === module;
-
-let jobs = [];
-try {
-  jobs = require('../docs/data/jobs.json');
-} catch {}
 
 let opencollectiveSponsors = [];
 try {
@@ -339,23 +345,28 @@ const docsFilemap = require('../docs/source/index');
 const files = Object.keys(docsFilemap.fileMap);
 // api explicitly imported for specific file loading
 const apiReq = require('../docs/source/api');
+const generateLLMsTXT = require('./generateLLMsTXT');
 
-const wrapMarkdown = (md, baseLayout, versionedPath, markdownUrl) => `
+const wrapMarkdown = (md, baseLayout, versionedPath, markdownUrl) => {
+  const newlineIdx = md.indexOf('\n');
+  const firstLine = newlineIdx === -1 ? md : md.slice(0, newlineIdx);
+  const rest = newlineIdx === -1 ? '' : md.slice(newlineIdx + 1);
+
+  return `
 extends ${baseLayout}
 
-append style
-  link(rel="stylesheet", href="${versionedPath}/docs/css/inlinecpc.css")
-  script(type="text/javascript" src="${versionedPath}/docs/js/native.js")
-
 block content
-  <div class="doc-links">
-    <a class="edit-docs-link" href="#{editLink}" target="_blank">
-      <img src="${versionedPath}/docs/images/pencil.svg" />
-    </a>
-    <button class="copy-markdown-link" data-md-url="${markdownUrl}" title="Copy page as Markdown" aria-label="Copy page as Markdown">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-    </button>
-  </div>
+  .article-header
+    :markdown
+      ${firstLine}
+    <div class="doc-links">
+      <a class="edit-docs-link" href="#{editLink}" target="_blank">
+        <img src="${versionedPath}/docs/images/pencil.svg" />
+      </a>
+      <button class="copy-markdown-link" data-md-url="${markdownUrl}" title="Copy page as Markdown" aria-label="Copy page as Markdown">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+      </button>
+    </div>
   script.
     (function() {
       const copyMarkdownButton = document.querySelector('.copy-markdown-link');
@@ -372,8 +383,9 @@ block content
       });
     })();
   :markdown
-${md.split('\n').map(line => '    ' + line).join('\n')}
+${rest.split('\n').map(line => '    ' + line).join('\n')}
 `;
+};
 
 const cpc = `
 <div class="sponsored-ad">
@@ -456,7 +468,7 @@ async function renderFile(filename, options, isReload = false) {
   options.package = pkg;
   let markdownSource = null;
 
-  const _editLink = 'https://github.com/Automattic/mongoose/blob/master' +
+  const _editLink = 'https://github.com/Automattic/mongoose/edit/master' +
     filename.replace(cwd, '');
   options.editLink = options.editLink || _editLink;
 
@@ -473,7 +485,32 @@ async function renderFile(filename, options, isReload = false) {
     inputFile = path.resolve(cwd, 'docs/api_split.pug');
   }
 
+  if (options.apiMarkdown) {
+    newfile = path.resolve(cwd, filename);
+    const str = options.markdownSource;
+    if (typeof str !== 'string') {
+      throw new Error(`No markdown source found for API page "${filename}"`);
+    }
+
+    if (versionObj.versionedDeploy) {
+      const versionedMarkdownPath = path.resolve(cwd, path.join('.', versionObj.versionedPath), path.relative(cwd, filename));
+      await fs.promises.mkdir(path.dirname(versionedMarkdownPath), { recursive: true });
+      await fs.promises.writeFile(versionedMarkdownPath, str);
+      console.log('%s : rendered %s', (new Date()).toISOString(), versionedMarkdownPath);
+    }
+
+    await fs.promises.mkdir(path.dirname(newfile), { recursive: true });
+    await fs.promises.writeFile(newfile, str).catch((err) => {
+      console.error('could not write', err.stack);
+    }).then(() => {
+      console.log('%s : rendered %s', (new Date()).toISOString(), newfile);
+    });
+
+    return;
+  }
+
   let contents = fs.readFileSync(path.resolve(cwd, inputFile)).toString();
+  const originalContents = contents;
 
   if (options.acquit) {
     const tests = getTests();
@@ -484,8 +521,10 @@ async function renderFile(filename, options, isReload = false) {
       }
       return '```javascript acquit:' + pattern + '\n' + code + '\n```';
     });
-    fs.writeFileSync(path.resolve(cwd, inputFile), contents);
-    console.log('%s : rendered %s', (new Date()).toISOString(), path.resolve(cwd, inputFile));
+    if (contents !== originalContents) {
+      fs.writeFileSync(path.resolve(cwd, inputFile), contents);
+      console.log('%s : rendered %s', (new Date()).toISOString(), path.resolve(cwd, inputFile));
+    }
   }
   if (options.markdown) {
     markdownSource = contents;
@@ -526,8 +565,8 @@ async function renderFile(filename, options, isReload = false) {
   }
 
   options.outputUrl = newfile.replace(cwd, '');
-  options.jobs = jobs;
   options.versions = versionObj;
+  options.affiliateAd = options.affiliateAd || null;
 
   options.opencollectiveSponsors = opencollectiveSponsors;
 
@@ -586,16 +625,6 @@ function startWatch() {
       }));
     }
   });
-
-  fs.watchFile(path.join(cwd, 'docs/api_split.pug'), { interval: 1000 }, (cur, prev) => {
-    if (cur.mtime > prev.mtime) {
-      console.log('docs/api_split.pug modified, reloading all api files');
-      Promise.all(files.filter(v => v.startsWith('docs/api')).map(async(file) => {
-        const filename = path.join(cwd, file);
-        await renderFile(filename, docsFilemap.fileMap[file]);
-      }));
-    }
-  });
 }
 
 /**
@@ -604,10 +633,14 @@ function startWatch() {
  * @param {Boolean} isReload Indicate this is a reload of all files
  */
 async function renderAllFiles(noWatch, isReload = false) {
+  await copyVendorFiles();
   await Promise.all(files.map(async(file) => {
     const filename = path.join(cwd, file);
     await renderFile(filename, docsFilemap.fileMap[file], isReload);
   }));
+  if (!versionObj.versionedDeploy) {
+    await generateLLMsTXT();
+  }
 
   // enable watch after all files have been done once, and not in the loop to use less-code
   // only enable watch if main module AND having argument "--watch"
@@ -620,8 +653,14 @@ async function renderAllFiles(noWatch, isReload = false) {
 const pathsToCopy = [
   'docs/js',
   'docs/css',
-  'docs/images'
+  'docs/images',
+  'docs/vendor'
 ];
+
+async function copyVendorFiles() {
+  await fs.promises.mkdir(docsVendorPath, { recursive: true });
+  await Promise.all(vendorFiles.map(file => fs.promises.copyFile(file.src, file.dest)));
+}
 
 /** Copy all static files when versionedDeploy is used */
 async function copyAllRequiredFiles() {
@@ -640,7 +679,9 @@ exports.default = renderFile;
 exports.renderFile = renderFile;
 exports.startWatch = startWatch;
 exports.renderAllFiles = renderAllFiles;
+exports.generateLLMsTXT = generateLLMsTXT;
 exports.copyAllRequiredFiles = copyAllRequiredFiles;
+exports.copyVendorFiles = copyVendorFiles;
 exports.versionObj = versionObj;
 exports.cwd = cwd;
 

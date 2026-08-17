@@ -15,7 +15,10 @@ export default defineConfig([
     '!**/.*',
     '**/node_modules',
     '**/.git',
-    '**/data'
+    '**/data',
+    '**/docs/3.*/**',
+    '**/docs/5.*/**',
+    '**/docs/vendor/*'
   ]),
   js.configs.recommended,
   // general options

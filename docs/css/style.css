@@ -12,9 +12,9 @@ body {
 /* Theme Toggle Button for Homepage */
 #theme-toggle {
   position: fixed;
-  top: 20px;
+  top: auto;
   right: 20px;
-  bottom: auto;
+  bottom: 20px;
   z-index: 1000;
   background-color: var(--bg-primary);
   border: 1px solid var(--border-color);
@@ -88,7 +88,7 @@ body {
 /* location.hash */
 :target::before {
   content: ">>> ";
-  color: var(--link-color);
+  color: var(--accent);
   font-weight: bold;
   font-size: 20px;
 }
@@ -99,14 +99,15 @@ body {
 }
 
 a {
-  color: var(--link-color);
+  color: var(--accent);
+  font-weight: 500;
   -webkit-transition-property: opacity, -webkit-transform, color, background-color, padding, -webkit-box-shadow;
   -webkit-transition-duration: 0.15s;
   -webkit-transition-timing-function: ease-out;
   transition: opacity 0.15s ease-out, color 0.15s ease-out;
 }
 a:hover {
-  opacity: 0.8;
+  color: var(--accent-hover);
 }
 a:focus-visible {
   outline: 3px solid var(--focus-ring);
@@ -169,12 +170,13 @@ h2 {
 h2 a {
   position: relative;
   bottom: 4px;
+  font-weight: inherit;
 }
 #header .mongoose {
   font-size: 146px;
   font-weight: 100;
   text-indent: -23px;
-  color: var(--brand-primary);
+  color: var(--accent);
 }
 .load #header .mongoose {
   letter-spacing: -14px;
@@ -194,7 +196,7 @@ h2 a {
 }
 .tagline a, .blurb a {
   text-decoration: none;
-  color: var(--brand-primary);
+  color: var(--accent);
 }
 #links {
   margin: 50px 10px 20px;
@@ -220,24 +222,24 @@ h2 a {
   text-transform: lowercase;
   text-shadow: 1px 1px 7px var(--btn-text-shadow);
 }
+
+#links a:hover {
+  color: white;
+}
 #follow {
   margin-bottom: 36px;
-  margin-left: 109px;
 }
 #follow ul {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
   height: 26px;
+  padding: 0;
 }
 #follow li {
-  display: inline-block;
+  display: flex;
   font-size: 12px;
-  margin-right: 12px;
-}
-#follow #version {
-  margin: 0 29px 0 10px;
-}
-#follow #version span {
-  position: relative;
-  top: -4px;
 }
 /* GitHub buttons iframe - use filter to invert colors in dark mode */
 .github-btn {
@@ -298,6 +300,15 @@ h2 a {
   font-size: 12px;
   margin-bottom: 20px;
 }
+@media only screen and (max-width: 768px) {
+  #follow {
+    margin-left: 0;
+    text-align: center;
+  }
+  #follow ul {
+    padding-left: 0;
+  }
+}
 @media only screen and (max-width: 480px) {
   #forkbanner { display: none }
   #header {
@@ -337,12 +348,8 @@ h2 a {
     font-size: 15px;
   }
   #follow, #docs { margin-left: 0; }
-  #follow ul { padding-left: 15px }
+  #follow ul { gap: 12px }
   #follow li { margin-right: 0px }
-  #follow #version {
-    margin-left: 5px;
-    margin-right: 15px;
-  }
   .module {
     padding-left: 5px;
     border-width: 3px;
@@ -362,6 +369,15 @@ h2 a {
   }
   .addyourown, .addyourown a {
     width: 100%;
+  }
+  #theme-toggle-btn {
+    width: 33px;
+    height: 33px;
+  }
+  #theme-icon-light,
+  #theme-icon-dark {
+    width: 15px;
+    height: 15px;
   }
 }
 
@@ -403,4 +419,109 @@ h2 a {
   margin-right: 5px;
   position: relative;
   top: 5px;
+}
+
+/* Carbon Ads - Homepage */
+
+.carbon-home {
+    height: 100px;
+    margin: 3em 0;
+}
+
+.carbon-home #carbonads * {
+  margin: initial;
+  padding: initial;
+}
+
+.carbon-home #carbonads {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial,
+    sans-serif;
+    margin: 0 auto;
+}
+
+.carbon-home #carbonads {
+  display: flex;
+  max-width: 400px;
+  background-color: hsl(0, 0%, 98%);
+  box-shadow: 0 1px 4px 1px hsla(0, 0%, 0%, 0.1);
+  z-index: 100;
+}
+
+.carbon-home #carbonads a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.carbon-home #carbonads a:hover {
+  color: inherit;
+}
+
+.carbon-home #carbonads span {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+
+.carbon-home #carbonads .carbon-wrap {
+  display: flex;
+}
+
+.carbon-home #carbonads .carbon-img {
+  display: block;
+  margin: 0;
+  line-height: 1;
+}
+
+.carbon-home #carbonads .carbon-img img {
+  display: block;
+}
+
+.carbon-home #carbonads .carbon-text {
+  font-size: 13px;
+  padding: 10px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.carbon-home #carbonads .carbon-poweredby {
+  display: block;
+  padding: 6px 8px;
+  background: #f1f1f2;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  font-size: 8px;
+  line-height: 1;
+  border-top-left-radius: 3px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+/* Sponsors */
+
+.sponsors {
+    max-width: 100%;
+}
+
+.sponsors .sponsor {
+    box-sizing: border-box;
+    display: block;
+    max-width: 100%;
+}
+
+.sponsors,
+.sponsors > div {
+    display: flex;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.sponsors a {
+    display: inline-flex;
+    margin: 2px;
+    max-width: 100%;
 }

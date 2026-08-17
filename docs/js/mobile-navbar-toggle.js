@@ -5,43 +5,69 @@
   const layout = document.getElementById('layout'),
       menu = document.getElementById('menu'),
       menuLink = document.getElementById('menuLink'),
+      toc = document.getElementById('toc-sidebar'),
+      tocLink = document.getElementById('tocLink'),
       content = document.getElementById('content');
 
-  function toggleClass(element, className) {
-    const classes = element.className.split(/\s+/),
-        length = classes.length;
+  const active = 'active';
 
-    for (let i = 0; i < length; i++) {
-      if (classes[i] === className) {
-        classes.splice(i, 1);
-        break;
-      }
-    }
-    // The className is not found
-    if (length === classes.length) {
-      classes.push(className);
-    }
-
-    element.className = classes.join(' ');
+  function closeMenu() {
+    layout.classList.remove(active);
+    menu.classList.remove(active);
+    menuLink.classList.remove(active);
   }
 
-  function toggleAll(e) {
-    const active = 'active';
+  function closeToc() {
+    if (toc == null || tocLink == null) {
+      return;
+    }
+    toc.classList.remove(active);
+    tocLink.classList.remove(active);
+    tocLink.setAttribute('aria-expanded', 'false');
+  }
 
+  function toggleMenu(e) {
     e.preventDefault();
-    toggleClass(layout, active);
-    toggleClass(menu, active);
-    toggleClass(menuLink, active);
+    closeToc();
+    layout.classList.toggle(active);
+    menu.classList.toggle(active);
+    menuLink.classList.toggle(active);
   }
 
   menuLink.onclick = function(e) {
-    toggleAll(e);
+    toggleMenu(e);
   };
 
-  content.onclick = function(e) {
-    if (menu.className.indexOf('active') !== -1) {
-      toggleAll(e);
+  if (tocLink != null && toc != null) {
+    tocLink.setAttribute('aria-expanded', 'false');
+
+    tocLink.onclick = function(e) {
+      e.preventDefault();
+      closeMenu();
+      const isActive = toc.classList.toggle(active);
+      tocLink.classList.toggle(active, isActive);
+      tocLink.setAttribute('aria-expanded', String(isActive));
+    };
+
+    toc.addEventListener('click', function(e) {
+      if (e.target.closest('.toc-link') != null) {
+        closeToc();
+      }
+    });
+  }
+
+  content.onclick = function() {
+    if (menu.classList.contains(active)) {
+      closeMenu();
     }
+    closeToc();
   };
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeMenu();
+      closeToc();
+    }
+  });
 
 }(this, this.document));

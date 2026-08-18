@@ -7171,7 +7171,7 @@ describe('document', function() {
     assert.ok(doc.roles[1]._id);
   });
 
-  it('applies defaults to nullish array elements', function() {
+  it('applies defaults to undefined array elements', function() {
     const schema = new Schema({
       values: [{ type: String, default: 'Unknown' }]
     });

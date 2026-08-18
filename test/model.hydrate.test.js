@@ -214,6 +214,35 @@ describe('model', function() {
       assert.ok(c.users[0] instanceof User);
     });
 
+    it('hydrates populated refs in embedded docs', async function() {
+      const userSchema = new Schema({
+        name: String
+      });
+      const childSchema = new Schema({
+        user: { ref: 'HydrateEmbeddedUser', type: Schema.Types.ObjectId }
+      });
+      const parentSchema = new Schema({
+        child: childSchema
+      });
+
+      db.deleteModel(/HydrateEmbeddedUser/);
+      db.deleteModel(/HydrateEmbeddedParent/);
+      const User = db.model('HydrateEmbeddedUser', userSchema);
+      const Parent = db.model('HydrateEmbeddedParent', parentSchema);
+
+      const user = { _id: new mongoose.Types.ObjectId(), name: 'Val' };
+      const parent = {
+        _id: new mongoose.Types.ObjectId(),
+        child: { user }
+      };
+
+      const doc = Parent.hydrate(parent, null, { hydratedPopulatedDocs: true });
+
+      assert.ok(doc.child.populated('user'));
+      assert.ok(doc.child.user instanceof User);
+      assert.equal(doc.child.user.name, 'Val');
+    });
+
     it('marks deeply nested docs as hydrated underneath virtuals (gh-15110)', async function() {
       const ArticleSchema = new Schema({ title: String });
 

@@ -12158,6 +12158,27 @@ describe('document', function() {
     assert.deepEqual(failure.modifiedPaths(), []);
   });
 
+  it('avoids setting modified on defaults in nested arrays of subdocuments', async function() {
+    const textSchema = new Schema({
+      text: { type: String }
+    }, { _id: false });
+
+    const messageSchema = new Schema({
+      body: { type: textSchema, default: { text: 'hello' } },
+      date: { type: Date, default: Date.now }
+    }, { _id: false });
+
+    const Message = db.model('Test', new Schema({
+      messages: [[messageSchema]]
+    }));
+    Message.schema.path('messages').embeddedSchemaType.default(() => [{}]);
+
+    const entry = await Message.create({ messages: [undefined] });
+    const failure = await Message.findById(entry._id);
+
+    assert.deepEqual(failure.modifiedPaths(), []);
+  });
+
   it('works when passing dot notation to mixed property (gh-1946)', async function() {
     const schema = Schema({
       name: String,

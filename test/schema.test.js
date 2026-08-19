@@ -3621,6 +3621,58 @@ describe('schema', function() {
       });
     });
 
+    it('does not repeat null in enum when the enum already lists null', async function() {
+      const schema = new Schema({
+        status: { type: String, enum: ['active', 'inactive', null] },
+        rating: { type: Number, enum: [1, 2, null] },
+        tags: { type: [String], enum: ['a', null] }
+      }, { autoCreate: false, autoIndex: false });
+
+      assert.deepStrictEqual(schema.toJSONSchema({ useBsonType: true }), {
+        required: ['_id'],
+        properties: {
+          _id: {
+            bsonType: 'objectId'
+          },
+          status: {
+            bsonType: ['string', 'null'],
+            enum: ['active', 'inactive', null]
+          },
+          rating: {
+            bsonType: ['number', 'null'],
+            enum: [1, 2, null]
+          },
+          tags: {
+            bsonType: ['array', 'null'],
+            items: {
+              bsonType: ['string', 'null'],
+              enum: ['a', null]
+            }
+          }
+        }
+      });
+
+      // MongoDB rejects a `$jsonSchema` whose `enum` repeats a value, so the
+      // collection cannot be created at all when `null` is listed twice.
+      await db.createCollection(collectionName, {
+        validator: {
+          $jsonSchema: schema.toJSONSchema({ useBsonType: true })
+        }
+      });
+      const Test = db.model('Test', schema, collectionName);
+
+      const doc = await Test.create({ status: 'active', rating: 1, tags: ['a'] });
+      assert.equal(doc.status, 'active');
+      assert.equal(doc.rating, 1);
+
+      const ajv = new Ajv();
+      const validate = ajv.compile(schema.toJSONSchema());
+
+      assert.ok(validate({ _id: '0'.repeat(24), status: 'active', rating: 1, tags: ['a'] }));
+      assert.ok(validate({ _id: '0'.repeat(24), status: null, rating: null, tags: null }));
+      assert.ok(!validate({ _id: '0'.repeat(24), status: 'archived' }));
+    });
+
     it('handles all primitive data types', async function() {
       const schema = new Schema({
         num: Number,

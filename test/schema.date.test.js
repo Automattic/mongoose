@@ -44,6 +44,18 @@ describe('SchemaDate', function() {
     assert.equal(doc.x.valueOf(), mockDate);
   });
 
+  it('throws a CastError when an array is provided to a Date field', async function() {
+    for (const value of [['2024-01-15'], ['January 1, 2024'], [5], [], [2024, 0, 15]]) {
+      const doc = new M({ x: value });
+
+      assert.strictEqual(doc.x, undefined);
+      const err = await doc.validate().catch(e => e);
+      assert.ok(err);
+      assert.ok(err.errors['x']);
+      assert.equal(err.errors['x'].name, 'CastError');
+    }
+  });
+
   it('casts string representation of unix timestamps (gh-6443)', function() {
     const timestamp = Date.now();
     const stringTimestamp = timestamp.toString();

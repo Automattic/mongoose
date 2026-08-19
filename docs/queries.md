@@ -1,9 +1,7 @@
 # Queries
 
-Mongoose [models](models.html) provide several static helper functions
-for [CRUD operations](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete).
-Each of these functions return a
-[mongoose `Query` object](api/query.html#Query).
+Mongoose [models](models.html) provide several static helper functions for [CRUD operations](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete).
+Each of these functions returns a [mongoose `Query` object](api/query.html#Query).
 
 * [`Model.deleteMany()`](api.html#model_Model-deleteMany)
 * [`Model.deleteOne()`](api.html#model_Model-deleteOne)

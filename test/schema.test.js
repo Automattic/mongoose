@@ -2731,6 +2731,22 @@ describe('schema', function() {
     assert.equal(casted[0].$path(), 'ids.0');
   });
 
+  it('preserves the array path index when applying nested array defaults', function() {
+    const schema = new Schema({
+      ids: [[String]],
+      otherIds: [[String]]
+    });
+    schema.path('ids').embeddedSchemaType.default(() => ['default']);
+
+    const casted = schema.path('ids').cast([undefined]);
+    assert.deepEqual(Array.from(casted[0]), ['default']);
+    assert.equal(casted[0].$path(), 'ids.0');
+
+    const casted2 = schema.path('otherIds').cast([['default']]);
+    assert.deepEqual(Array.from(casted2[0]), ['default']);
+    assert.equal(casted2[0].$path(), 'otherIds.0');
+  });
+
   describe('cast option (gh-8407)', function() {
     it('disable casting using `false`', function() {
       const schema = Schema({

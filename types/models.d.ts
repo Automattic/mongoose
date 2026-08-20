@@ -792,6 +792,22 @@ declare module 'mongoose' {
       'find',
       TInstanceMethods & TVirtuals
     >;
+
+    findAndCount(
+      filter: Query<any, any> | QueryFilter<TRawDocType>,
+      projection: ProjectionType<TRawDocType> | null | undefined,
+      options: QueryOptions<TRawDocType> & { lean: true } & mongodb.Abortable
+    ): Promise<[GetLeanResultType<TRawDocType, TRawDocType[], 'find'>, number]>;
+    findAndCount<ResultDoc = THydratedDocumentType>(
+      filter: Query<any, any> | QueryFilter<TRawDocType>,
+      projection: ProjectionType<TRawDocType> | null | undefined,
+      options: QueryOptions<TRawDocType> & { lean: false } & mongodb.Abortable
+    ): Promise<[ResultDoc[], number]>;
+    findAndCount(
+      filter?: Query<any, any> | QueryFilter<TRawDocType>,
+      projection?: ProjectionType<TRawDocType> | null | undefined,
+      options?: QueryOptions<TRawDocType> & mongodb.Abortable
+    ): Promise<[HasLeanOption<TSchema> extends true ? TLeanResultType[] : THydratedDocumentType[], number]>;
     find(
       filter: Query<any, any>,
       projection: ProjectionType<TRawDocType> | null | undefined,

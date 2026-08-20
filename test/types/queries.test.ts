@@ -72,7 +72,7 @@ expect<mongoose.WithLevel1NestedPaths<ITest>['docs.id']>().type.toBe<number | un
 
 const Test = model<ITest, Model<ITest, QueryHelpers>>('Test', schema);
 
-const schemaWithQueryHelper = new Schema<{ name: string }>({ name: String }).queryHelper('byName', function(name: string) {
+const schemaWithQueryHelper = new Schema({ name: String }).queryHelper('byName', function(name: string) {
   return this.where({ name });
 });
 const ModelWithQueryHelper = model('ModelWithQueryHelper', schemaWithQueryHelper);

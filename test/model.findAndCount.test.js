@@ -40,13 +40,18 @@ describe('model: findAndCount:', function() {
 
   it('supports string and array projections', async function() {
     const Test = db.model('Test', new Schema({ name: String, value: Number }));
+    await Test.deleteMany({});
     await Test.create([
       { name: 'a', value: 1 },
       { name: 'b', value: 2 }
     ]);
 
     for (const projection of ['name -_id', ['name', '-_id']]) {
-      const [docs, total] = await Test.findAndCount({}, projection);
+      const [docs, total] = await Test.findAndCount(
+        {},
+        projection,
+        { sort: { name: 1 }, limit: 10 }
+      );
       assert.deepEqual(docs.map(doc => doc.toObject()), [
         { name: 'a' },
         { name: 'b' }
@@ -65,7 +70,7 @@ describe('model: findAndCount:', function() {
     const Test = db.model('Test', schema);
     await Test.create({ name: 'a' });
 
-    await Test.findAndCount({});
+    await Test.findAndCount({}, null, { sort: { name: 1 }, limit: 10 });
     assert.deepEqual(calls.sort(), ['count:post', 'count:pre', 'find:post', 'find:pre']);
   });
 
@@ -75,7 +80,7 @@ describe('model: findAndCount:', function() {
     const child = await Child.create({ name: 'child' });
     await Test.create({ child });
 
-    const [docs, total] = await Test.findAndCount({}, null, { lean: true, populate: 'child' });
+    const [docs, total] = await Test.findAndCount({}, null, { sort: { _id: 1 }, limit: 10, lean: true, populate: 'child' });
     assert.equal(docs[0] instanceof mongoose.Document, false);
     assert.equal(docs[0].child.name, 'child');
     assert.equal(total, 1);

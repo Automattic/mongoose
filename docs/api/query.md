@@ -1615,13 +1615,22 @@ The model this query is associated with.
 Getter/setter around the current mongoose-specific options for this query
 Below are the current Mongoose-specific options.
 
-- `populate`: an array representing what paths will be populated. Should have one entry for each call to [`Query.prototype.populate()`](https://mongoosejs.com/docs/api/query.md#Query.prototype.populate())
+- `cloneUpdate`: if `false`, Mongoose will not clone updates before executing the query
+- `defaults`: if `false`, Mongoose will not apply defaults to the returned document(s)
 - `lean`: if truthy, Mongoose will not [hydrate](https://mongoosejs.com/docs/api/model.md#Model.hydrate()) any documents that are returned from this query. See [`Query.prototype.lean()`](https://mongoosejs.com/docs/api/query.md#Query.prototype.lean()) for more information.
+- `nearSphere`: use `$nearSphere` instead of `near()`. See the [`Query.prototype.nearSphere()` docs](https://mongoosejs.com/docs/api/query.md#Query.prototype.nearSphere())
+- `overwriteDiscriminatorKey`: allow setting the discriminator key in the update
+- `overwriteImmutable`: allow overwriting properties that are set to `immutable` in the schema
+- `populate`: an array representing what paths will be populated. Should have one entry for each call to [`Query.prototype.populate()`](https://mongoosejs.com/docs/api/query.md#Query.prototype.populate())
+- `sanitizeFilter`: if truthy, Mongoose will sanitize query filters before executing the query
+- `sanitizeProjection`: if truthy, Mongoose will sanitize projections before executing the query
+- `schemaLevelProjections`: if `false`, Mongoose will not apply schema-level `select: false` or `select: true` for this query
+- `setDefaultsOnInsert`: if `true`, Mongoose will apply defaults to upserted documents
 - `strict`: controls how Mongoose handles keys that aren't in the schema for updates. This option is `true` by default, which means Mongoose will silently strip any paths in the update that aren't in the schema. See the [`strict` mode docs](https://mongoosejs.com/docs/guide.html#strict) for more information.
 - `strictQuery`: controls how Mongoose handles keys that aren't in the schema for the query `filter`. This option is `false` by default, which means Mongoose will allow `Model.find({ foo: 'bar' })` even if `foo` is not in the schema. See the [`strictQuery` docs](https://mongoosejs.com/docs/guide.html#strictQuery) for more information.
-- `nearSphere`: use `$nearSphere` instead of `near()`. See the [`Query.prototype.nearSphere()` docs](https://mongoosejs.com/docs/api/query.md#Query.prototype.nearSphere())
-- `schemaLevelProjections`: if `false`, Mongoose will not apply schema-level `select: false` or `select: true` for this query
-- `cloneUpdate`: if `false`, Mongoose will not clone updates before executing the query
+- `timestamps`: if `false`, Mongoose will not apply timestamps to the update
+- `translateAliases`: if `true`, Mongoose will translate schema aliases in the query
+- `updatePipeline`: if `true`, Mongoose will treat the update as an update pipeline
 
 Mongoose maintains a separate object for internal options because
 Mongoose sends `Query.prototype.options` to the MongoDB server, and the

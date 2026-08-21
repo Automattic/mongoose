@@ -493,6 +493,24 @@ declare module 'mongoose' {
     method<Context = THydratedDocumentType>(name: string, fn: (this: Context, ...args: any[]) => any, opts?: any): this;
     method(obj: Partial<TInstanceMethods>): this;
 
+    /** Adds a query helper to this schema. */
+    queryHelper<Name extends string, Fn extends (this: QueryWithHelpers<any, DocType, TQueryHelpers, RawDocType>, ...args: any[]) => any>(
+      name: Name,
+      fn: Fn
+    ): Schema<
+      RawDocType,
+      TModelType,
+      TInstanceMethods,
+      TQueryHelpers & { [K in Name]: Fn },
+      TVirtuals,
+      TStaticMethods,
+      TSchemaOptions,
+      DocType,
+      THydratedDocumentType,
+      TSchemaDefinition,
+      LeanResultType
+    >;
+
     /** Object of currently defined methods on this schema. */
     methods: AddThisParameter<TInstanceMethods, THydratedDocumentType> & AnyObject;
 

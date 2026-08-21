@@ -1766,6 +1766,23 @@ describe('schema', function() {
 
     });
 
+    it('removes a map that lives under a nested path', function() {
+      const schema = new Schema({
+        n: { m: { type: Map, of: Number } },
+        other: String
+      }, { autoCreate: false, autoIndex: false });
+
+      // Used to throw, because the map values subpath has no branch of its own
+      // in the tree and its parent had already been deleted in the same pass
+      assert.doesNotThrow(() => schema.remove('n'));
+
+      assert.strictEqual(schema.path('n.m'), undefined);
+      assert.strictEqual(schema.path('n.m.$*'), undefined);
+      assert.equal(schema.pathType('n.m'), 'adhocOrUndefined');
+      assert.equal(schema.pathType('n.m.key'), 'adhocOrUndefined');
+      assert.ok(schema.path('other'));
+    });
+
     it('removes an array of paths', function() {
       this.schema.remove(['e', 'f', 'g']);
       assert.strictEqual(this.schema.path('e'), undefined);

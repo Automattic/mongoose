@@ -708,7 +708,9 @@ describe('QueryCursor', function() {
 
   it('post hooks (gh-9435)', async function() {
     const schema = new mongoose.Schema({ name: String });
+    const postHookDocs = [];
     schema.post('find', function(docs) {
+      postHookDocs.push(docs.map(doc => doc.name));
       docs.forEach(doc => { doc.name = doc.name.toUpperCase(); });
     });
     const Movie = db.model('Movie', schema);
@@ -723,6 +725,8 @@ describe('QueryCursor', function() {
     const arr = [];
     await Movie.find().sort({ name: -1 }).cursor().
       eachAsync(doc => arr.push(doc.name));
+
+    assert.deepEqual(postHookDocs, [['Kickboxer'], ['Ip Man'], ['Enter the Dragon']]);
     assert.deepEqual(arr, ['KICKBOXER', 'IP MAN', 'ENTER THE DRAGON']);
   });
 

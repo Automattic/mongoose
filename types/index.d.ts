@@ -690,7 +690,7 @@ declare module 'mongoose' {
 
     /** Object of currently defined statics on this schema. */
     statics: { [F in keyof TStaticMethods]: TStaticMethods[F] } &
-    { [name: string]: (this: TModelType, ...args: any[]) => unknown };
+    { [name: string]: ((this: TModelType, ...args: any[]) => unknown) & SupportsMiddlewareOption };
 
     toJSONSchema(options?: { useBsonType?: boolean }): Record<string, any>;
 
@@ -1199,7 +1199,7 @@ declare module 'mongoose' {
   /* for ts-mongoose */
   export class mquery { }
 
-  export function overwriteMiddlewareResult(val: any): Kareem.OverwriteMiddlewareResult;
+  export function overwriteMiddlewareResult(val: any): Kareem.OverwriteResult;
 
   export function skipMiddlewareFunction(val: any): Kareem.SkipWrappedFunction;
 

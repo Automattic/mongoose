@@ -1,3 +1,7 @@
+8.24.4 / 2026-08-21
+===================
+ * fix(discriminator): prevent indexes and callQueue duplication with shared nested schemas #16467 #16466 #15966 (8.x backport) [AbinMadathil-Celigo](https://github.com/AbinMadathil-Celigo)
+
 8.24.3 / 2026-08-10
 ===================
  * fix(query): apply sanitizeFilter on countDocuments and cursor()

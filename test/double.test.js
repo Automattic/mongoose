@@ -289,11 +289,15 @@ describe('Double', function() {
     });
 
     describe('when an array is provided to a Double field', () => {
-      it('throws a CastError upon validation, even for a single-element or empty array', async() => {
-        for (const value of [[5], [], [5, 6]]) {
-          const doc = new Test({ myDouble: value });
+      it('casts a single-element array and rejects empty or multi-element arrays', async() => {
+        const single = new Test({ myDouble: ['5'] });
+        assert.strictEqual(single.myDouble.valueOf(), 5);
+        assert.ifError(single.validateSync());
 
+        for (const value of [[], [5, 6]]) {
+          const doc = new Test({ myDouble: value });
           assert.deepStrictEqual(doc.myDouble, undefined);
+
           const err = await doc.validate().catch(e => e);
           assert.ok(err);
           assert.ok(err.errors['myDouble']);

@@ -2339,7 +2339,7 @@ describe('model: findOneAndUpdate:', function() {
       {},
       {
         $set: {
-          'accessories.0.additionals.0.k': ['test']
+          'accessories.0.additionals.0.k': { foo: 'bar' }
         }
       }
     ).then(() => null, err => err);

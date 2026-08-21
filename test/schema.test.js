@@ -1766,6 +1766,23 @@ describe('schema', function() {
 
     });
 
+    it('removes a map that lives under a nested path', function() {
+      const schema = new Schema({
+        n: { m: { type: Map, of: Number } },
+        other: String
+      }, { autoCreate: false, autoIndex: false });
+
+      // Used to throw, because the map values subpath has no branch of its own
+      // in the tree and its parent had already been deleted in the same pass
+      assert.doesNotThrow(() => schema.remove('n'));
+
+      assert.strictEqual(schema.path('n.m'), undefined);
+      assert.strictEqual(schema.path('n.m.$*'), undefined);
+      assert.equal(schema.pathType('n.m'), 'adhocOrUndefined');
+      assert.equal(schema.pathType('n.m.key'), 'adhocOrUndefined');
+      assert.ok(schema.path('other'));
+    });
+
     it('removes an array of paths', function() {
       this.schema.remove(['e', 'f', 'g']);
       assert.strictEqual(this.schema.path('e'), undefined);
@@ -1832,6 +1849,33 @@ describe('schema', function() {
     });
 
     describe('clone()', function() {
+      it('works with an array of document arrays (gh-16462)', function() {
+        const schema = new Schema({ a: [[{ x: Number }]] });
+
+        const clone = schema.clone();
+        assert.deepStrictEqual(Object.keys(clone.paths).sort(), ['_id', 'a']);
+        assert.deepStrictEqual(Object.keys(clone.subpaths).sort(), ['a.$', 'a.$.$']);
+        assert.equal(clone.subpaths['a.$.$'].instance, 'DocumentArrayElement');
+        assert.ok(clone.subpaths['a.$.$'].$parentSchemaType);
+      });
+
+      it('carries the document array element over to the copy (gh-16462)', function() {
+        const schema = new Schema({ a: [[{ x: { type: Number, default: 3 } }]] });
+
+        const clone = schema.clone();
+        const original = schema.subpaths['a.$.$'];
+        const copy = clone.subpaths['a.$.$'];
+        assert.notStrictEqual(copy, original);
+        assert.strictEqual(copy.schema, original.schema);
+        assert.strictEqual(copy.Constructor, original.Constructor);
+        assert.ok(copy.$parentSchemaType);
+
+        const M = mongoose.model('gh16462', clone);
+        const doc = new M({ a: [[{}, { x: 7 }]] });
+        assert.equal(doc.a[0][0].x, 3);
+        assert.equal(doc.a[0][1].x, 7);
+      });
+
       it('copies methods, statics, and query helpers (gh-5752)', function() {
         const schema = new Schema({});
 
@@ -2436,6 +2480,19 @@ describe('schema', function() {
   });
 
   describe('omit() (gh-12931)', function() {
+    it('removes the values subpath of a map', function() {
+      const schema = new Schema({
+        m: { type: Map, of: Number },
+        other: String
+      }, { autoCreate: false, autoIndex: false });
+
+      const newSchema = schema.omit(['m']);
+
+      assert.ok(!newSchema.path('m'));
+      assert.ok(!newSchema.path('m.$*'));
+      assert.equal(newSchema.pathType('m.k'), 'adhocOrUndefined');
+    });
+
     it('works with nested paths', function() {
       const schema = Schema({
         name: {
@@ -3619,6 +3676,58 @@ describe('schema', function() {
           }
         }
       });
+    });
+
+    it('does not repeat null in enum when the enum already lists null', async function() {
+      const schema = new Schema({
+        status: { type: String, enum: ['active', 'inactive', null] },
+        rating: { type: Number, enum: [1, 2, null] },
+        tags: { type: [String], enum: ['a', null] }
+      }, { autoCreate: false, autoIndex: false });
+
+      assert.deepStrictEqual(schema.toJSONSchema({ useBsonType: true }), {
+        required: ['_id'],
+        properties: {
+          _id: {
+            bsonType: 'objectId'
+          },
+          status: {
+            bsonType: ['string', 'null'],
+            enum: ['active', 'inactive', null]
+          },
+          rating: {
+            bsonType: ['number', 'null'],
+            enum: [1, 2, null]
+          },
+          tags: {
+            bsonType: ['array', 'null'],
+            items: {
+              bsonType: ['string', 'null'],
+              enum: ['a', null]
+            }
+          }
+        }
+      });
+
+      // MongoDB rejects a `$jsonSchema` whose `enum` repeats a value, so the
+      // collection cannot be created at all when `null` is listed twice.
+      await db.createCollection(collectionName, {
+        validator: {
+          $jsonSchema: schema.toJSONSchema({ useBsonType: true })
+        }
+      });
+      const Test = db.model('Test', schema, collectionName);
+
+      const doc = await Test.create({ status: 'active', rating: 1, tags: ['a'] });
+      assert.equal(doc.status, 'active');
+      assert.equal(doc.rating, 1);
+
+      const ajv = new Ajv();
+      const validate = ajv.compile(schema.toJSONSchema());
+
+      assert.ok(validate({ _id: '0'.repeat(24), status: 'active', rating: 1, tags: ['a'] }));
+      assert.ok(validate({ _id: '0'.repeat(24), status: null, rating: null, tags: null }));
+      assert.ok(!validate({ _id: '0'.repeat(24), status: 'archived' }));
     });
 
     it('handles all primitive data types', async function() {

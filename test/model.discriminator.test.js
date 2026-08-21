@@ -2509,20 +2509,12 @@ describe('model', function() {
       shippingAddress: addressSchema
     };
 
-<<<<<<< HEAD
     const orderSchema = new Schema(orderSchemaDefinition, { autoIndex: false });
-=======
-    const orderSchema = new Schema(orderSchemaDefinition);
->>>>>>> 8.x
     orderSchema.index({ customerId: 1 });
 
     const Order = db.model('Order', orderSchema);
 
-<<<<<<< HEAD
     const wholesaleOrderSchema = new Schema({ ...orderSchemaDefinition, vendorCode: String }, { autoIndex: false });
-=======
-    const wholesaleOrderSchema = new Schema({ ...orderSchemaDefinition, vendorCode: String });
->>>>>>> 8.x
     wholesaleOrderSchema.index({ vendorCode: 1 });
 
     // Act
@@ -2531,20 +2523,11 @@ describe('model', function() {
     const wholesaleDiff = await WholesaleOrder.diffIndexes();
 
     // Assert
-<<<<<<< HEAD
     assert.deepStrictEqual(orderSchema._indexes, [
       [{ customerId: 1 }, {}]
     ]);
     assert.deepStrictEqual(wholesaleOrderSchema._indexes, [
       [{ vendorCode: 1 }, { partialFilterExpression: { __t: 'WholesaleOrder' } }]
-=======
-    // Note: on 8.x, getIndexes() adds `background: true` to stored index options
-    assert.deepStrictEqual(orderSchema._indexes, [
-      [{ customerId: 1 }, { background: true }]
-    ]);
-    assert.deepStrictEqual(wholesaleOrderSchema._indexes, [
-      [{ vendorCode: 1 }, { background: true, partialFilterExpression: { __t: 'WholesaleOrder' } }]
->>>>>>> 8.x
     ]);
 
     assert.deepStrictEqual(orderDiff, {
@@ -2553,10 +2536,7 @@ describe('model', function() {
         { customerId: 1 }
       ]
     });
-<<<<<<< HEAD
 
-=======
->>>>>>> 8.x
     assert.deepStrictEqual(wholesaleDiff, {
       toDrop: [],
       toCreate: [
@@ -2590,8 +2570,4 @@ describe('model', function() {
     );
     assert.strictEqual(testMethodCalls.length, 1);
   });
-<<<<<<< HEAD
-
-=======
->>>>>>> 8.x
 });

@@ -38,6 +38,23 @@ describe('model: findAndCount:', function() {
     assert.equal(total, 3);
   });
 
+  it('supports string and array projections', async function() {
+    const Test = db.model('Test', new Schema({ name: String, value: Number }));
+    await Test.create([
+      { name: 'a', value: 1 },
+      { name: 'b', value: 2 }
+    ]);
+
+    for (const projection of ['name -_id', ['name', '-_id']]) {
+      const [docs, total] = await Test.findAndCount({}, projection);
+      assert.deepEqual(docs.map(doc => doc.toObject()), [
+        { name: 'a' },
+        { name: 'b' }
+      ]);
+      assert.equal(total, 2);
+    }
+  });
+
   it('runs find and countDocuments middleware', async function() {
     const calls = [];
     const schema = new Schema({ name: String });

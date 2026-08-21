@@ -85,6 +85,15 @@ Test.find().byName('test').byName('test2').orFail().exec().then(console.log);
 Test.countDocuments({ name: /Test/ }).exec().then((res: number) => console.log(res));
 Test.findOne({ 'docs.id': 42 }).exec().then(console.log);
 
+Test.findAndCount({ name: /Test/ }, null, { sort: { name: 1 }, limit: 10 }).then(([docs, count]) => {
+  expect(docs[0].name).type.toBe<string | undefined>();
+  expect<typeof count>().type.toBe<number>();
+});
+Test.findAndCount({ name: /Test/ }, null, { sort: { name: 1 }, limit: 10, lean: true }).then(([docs, count]) => {
+  expect(docs[0].name).type.toBe<string | undefined>();
+  expect<typeof count>().type.toBe<number>();
+});
+
 // ObjectId casting
 Test.find({ parent: new Types.ObjectId('0'.repeat(24)) });
 Test.find({ parent: '0'.repeat(24) });

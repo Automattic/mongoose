@@ -696,6 +696,7 @@ describe('timestamps', function() {
       let group = await Group.create({ cats: [{ name: 'Garfield' }] });
       group.cats.push({ name: 'Keanu' });
       await group.save();
+      await new Promise(resolve => setTimeout(resolve, 5));
       group = await Group.findById(group._id);
       assert.ok(group.cats[1].createdAt);
       assert.ok(group.cats[1].createdAt.getTime() > now);

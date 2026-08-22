@@ -493,6 +493,24 @@ declare module 'mongoose' {
     method<Context = THydratedDocumentType>(name: string, fn: (this: Context, ...args: any[]) => any, opts?: any): this;
     method(obj: Partial<TInstanceMethods>): this;
 
+    /** Adds a query helper to this schema. */
+    queryHelper<Name extends string, Fn extends (this: QueryWithHelpers<any, DocType, TQueryHelpers, RawDocType>, ...args: any[]) => any>(
+      name: Name,
+      fn: Fn
+    ): Schema<
+      RawDocType,
+      TModelType,
+      TInstanceMethods,
+      TQueryHelpers & { [K in Name]: Fn },
+      TVirtuals,
+      TStaticMethods,
+      TSchemaOptions,
+      DocType,
+      THydratedDocumentType,
+      TSchemaDefinition,
+      LeanResultType
+    >;
+
     /** Object of currently defined methods on this schema. */
     methods: AddThisParameter<TInstanceMethods, THydratedDocumentType> & AnyObject;
 
@@ -672,7 +690,7 @@ declare module 'mongoose' {
 
     /** Object of currently defined statics on this schema. */
     statics: { [F in keyof TStaticMethods]: TStaticMethods[F] } &
-    { [name: string]: (this: TModelType, ...args: any[]) => unknown };
+    { [name: string]: ((this: TModelType, ...args: any[]) => unknown) & SupportsMiddlewareOption };
 
     toJSONSchema(options?: { useBsonType?: boolean }): Record<string, any>;
 
@@ -1181,7 +1199,7 @@ declare module 'mongoose' {
   /* for ts-mongoose */
   export class mquery { }
 
-  export function overwriteMiddlewareResult(val: any): Kareem.OverwriteMiddlewareResult;
+  export function overwriteMiddlewareResult(val: any): Kareem.OverwriteResult;
 
   export function skipMiddlewareFunction(val: any): Kareem.SkipWrappedFunction;
 

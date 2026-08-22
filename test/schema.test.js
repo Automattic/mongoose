@@ -1890,6 +1890,18 @@ describe('schema', function() {
 
       });
 
+      it('adds query helpers with queryHelper()', function() {
+        const schema = new Schema({ name: String });
+        const helper = function(name) {
+          return this.where({ name });
+        };
+
+        assert.strictEqual(schema.queryHelper('byName', helper), schema);
+        assert.strictEqual(schema.query.byName, helper);
+        assert.throws(() => schema.queryHelper(42, helper), /First param to `schema.queryHelper\(\)` must be a string/);
+        assert.throws(() => schema.queryHelper('byName', 'not a function'), /Second param to `schema.queryHelper\(\)` must be a function/);
+      });
+
       it('copies validators declared with validate() (gh-5607)', function() {
         const schema = new Schema({
           num: Number
@@ -2773,6 +2785,22 @@ describe('schema', function() {
 
     const casted = schema.path('ids').cast([[]]);
     assert.equal(casted[0].$path(), 'ids.0');
+  });
+
+  it('preserves the array path index when applying nested array defaults', function() {
+    const schema = new Schema({
+      ids: [[String]],
+      otherIds: [[String]]
+    });
+    schema.path('ids').embeddedSchemaType.default(() => ['default']);
+
+    const casted = schema.path('ids').cast([undefined]);
+    assert.deepEqual(Array.from(casted[0]), ['default']);
+    assert.equal(casted[0].$path(), 'ids.0');
+
+    const casted2 = schema.path('otherIds').cast([['default']]);
+    assert.deepEqual(Array.from(casted2[0]), ['default']);
+    assert.equal(casted2[0].$path(), 'otherIds.0');
   });
 
   describe('cast option (gh-8407)', function() {

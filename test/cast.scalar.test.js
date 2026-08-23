@@ -23,14 +23,14 @@ describe('scalar casting from arrays', function() {
   const casterCases = [
     { name: 'BigInt', cast: castBigInt, value: '42', emptyStringIsNull: true },
     { name: 'Boolean', cast: castBoolean, value: 'true' },
-    { name: 'Date', cast: castDate, value: '2020-01-01', emptyStringIsNull: true },
+    { name: 'Date', cast: castDate, value: '2020-01-01', emptyStringIsNull: true, nestedArrayTarget: 'a date' },
     { name: 'Decimal128', cast: castDecimal128, value: '1.23' },
-    { name: 'Double', cast: castDouble, value: '1.23', emptyStringIsNull: true },
-    { name: 'Int32', cast: castInt32, value: '42', emptyStringIsNull: true },
+    { name: 'Double', cast: castDouble, value: '1.23', emptyStringIsNull: true, nestedArrayTarget: 'a Double' },
+    { name: 'Int32', cast: castInt32, value: '42', emptyStringIsNull: true, nestedArrayTarget: 'an Int32' },
     { name: 'Number', cast: castNumber, value: '42', emptyStringIsNull: true },
-    { name: 'ObjectId', cast: castObjectId, value: objectId },
+    { name: 'ObjectId', cast: castObjectId, value: objectId, nestedArrayTarget: 'an ObjectId' },
     { name: 'String', cast: castString, value: 42 },
-    { name: 'UUID', cast: castUUID, value: uuid }
+    { name: 'UUID', cast: castUUID, value: uuid, nestedArrayTarget: 'a UUID' }
   ];
 
   for (const casterCase of casterCases) {
@@ -76,7 +76,14 @@ describe('scalar casting from arrays', function() {
         const value = [[casterCase.value]];
 
         // Act & Assert
-        assert.throws(() => casterCase.cast(value));
+        if (casterCase.nestedArrayTarget == null) {
+          assert.throws(() => casterCase.cast(value));
+        } else {
+          assert.throws(
+            () => casterCase.cast(value),
+            { message: `Nested arrays cannot be cast to ${casterCase.nestedArrayTarget}` }
+          );
+        }
       });
     });
   }

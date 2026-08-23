@@ -8217,6 +8217,27 @@ describe('Model', function() {
       assert.deepEqual(user2.getChanges(), { $set: { age: 27, name: 'Sam' } });
 
     });
+    it('updates successful document state with multiple unordered write errors', async() => {
+      const userSchema = new Schema({
+        name: { type: String, unique: true }
+      });
+
+      const User = db.model('User', userSchema);
+      await User.init();
+      await User.create([{ name: 'duplicate-1' }, { name: 'duplicate-2' }]);
+
+      const users = [
+        new User({ name: 'duplicate-1' }),
+        new User({ name: 'success-1' }),
+        new User({ name: 'duplicate-2' }),
+        new User({ name: 'success-2' })
+      ];
+      const err = await User.bulkSave(users, { ordered: false }).then(() => null, err => err);
+
+      assert.equal(err.name, 'MongoBulkWriteError');
+      assert.equal(err.writeErrors.length, 2);
+      assert.deepEqual(users.map(user => user.isNew), [true, false, true, false]);
+    });
     it('triggers pre/post-save hooks', async() => {
 
       const userSchema = new Schema({

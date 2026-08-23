@@ -127,7 +127,8 @@ describe('scalar casting from arrays', function() {
       viewCount: { type: BigInt, required: true }
     });
     const RequiredScalarValues = mongoose.model('RequiredScalarValues', requiredScalarValuesSchema);
-    const requiredPaths = Object.keys(requiredScalarValuesSchema.paths).filter(path => path !== '_id');
+    const requiredPaths = Object.keys(requiredScalarValuesSchema.paths).
+      filter(path => path !== '_id' && path !== '__v');
 
     return { casterCases, RequiredScalarValues, requiredPaths };
   }

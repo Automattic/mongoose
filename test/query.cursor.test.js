@@ -479,7 +479,8 @@ describe('QueryCursor', function() {
 
   it('preserves options object identity after opening the cursor', async function() {
     // Arrange
-    const { User } = createTestContext();
+    const userSchema = new Schema({ name: String });
+    const User = db.model('User', userSchema);
     const cursor = User.find().cursor({ batchSize: 1 });
     const options = cursor.options;
 
@@ -1004,12 +1005,6 @@ describe('QueryCursor', function() {
     assert.ok(err);
     assert.equal(err.message, '$where is not allowed with sanitizeFilter');
   });
-
-  function createTestContext() {
-    const userSchema = new Schema({ name: String });
-    const User = db.model('User', userSchema);
-    return { User };
-  }
 });
 
 async function delay(ms) {

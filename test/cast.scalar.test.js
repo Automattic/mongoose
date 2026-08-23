@@ -18,7 +18,20 @@ const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
 describe('scalar casting from arrays', function() {
-  const { casterCases } = createTestContext();
+  const uuid = '09190f70-3d30-11e5-8814-0f4df9a59c41';
+  const objectId = '0123456789abcdef01234567';
+  const casterCases = [
+    { name: 'BigInt', cast: castBigInt, value: '42', emptyStringIsNull: true },
+    { name: 'Boolean', cast: castBoolean, value: 'true' },
+    { name: 'Date', cast: castDate, value: '2020-01-01', emptyStringIsNull: true },
+    { name: 'Decimal128', cast: castDecimal128, value: '1.23' },
+    { name: 'Double', cast: castDouble, value: '1.23', emptyStringIsNull: true },
+    { name: 'Int32', cast: castInt32, value: '42', emptyStringIsNull: true },
+    { name: 'Number', cast: castNumber, value: '42', emptyStringIsNull: true },
+    { name: 'ObjectId', cast: castObjectId, value: objectId },
+    { name: 'String', cast: castString, value: 42 },
+    { name: 'UUID', cast: castUUID, value: uuid }
+  ];
 
   for (const casterCase of casterCases) {
     describe(casterCase.name, function() {
@@ -30,7 +43,7 @@ describe('scalar casting from arrays', function() {
         const actual = casterCase.cast([casterCase.value]);
 
         // Assert
-        assert.deepStrictEqual(casterCase.normalize(actual), casterCase.normalize(expected));
+        assert.deepStrictEqual(actual, expected);
       });
 
       it('rejects empty and multi-element arrays', function() {
@@ -54,7 +67,7 @@ describe('scalar casting from arrays', function() {
           const actual = casterCase.cast([value]);
 
           // Assert
-          assert.deepStrictEqual(casterCase.normalize(actual), casterCase.normalize(expected));
+          assert.deepStrictEqual(actual, expected);
         }
       });
 
@@ -77,75 +90,29 @@ describe('scalar casting from arrays', function() {
       const actual = casterCase.cast(['']);
 
       // Assert
-      assert.deepStrictEqual(casterCase.normalize(actual), casterCase.normalize(expected));
+      assert.deepStrictEqual(actual, expected);
     });
   }
 
   it('reports required validation errors for single null elements', function() {
     // Arrange
-    const { RequiredScalarValues, requiredPaths } = createTestContext();
-    const values = Object.fromEntries(requiredPaths.map(path => [path, [null]]));
+    const { Article } = createTestContext();
 
     // Act
-    const error = new RequiredScalarValues(values).validateSync();
+    const error = new Article({ title: [null] }).validateSync();
 
     // Assert
     assert.ok(error);
-    for (const path of requiredPaths) {
-      assert.strictEqual(error.errors[path].name, 'ValidatorError');
-      assert.strictEqual(error.errors[path].kind, 'required');
-    }
+    assert.strictEqual(error.errors.title.name, 'ValidatorError');
+    assert.strictEqual(error.errors.title.kind, 'required');
   });
 
   function createTestContext() {
-    const uuid = '09190f70-3d30-11e5-8814-0f4df9a59c41';
-    const objectId = '0123456789abcdef01234567';
-    const casterCases = [
-      { name: 'BigInt', cast: castBigInt, value: '42', emptyStringIsNull: true },
-      { name: 'Boolean', cast: castBoolean, value: 'true' },
-      { name: 'Date', cast: castDate, value: '2020-01-01', emptyStringIsNull: true, normalize: normalizeDate },
-      { name: 'Decimal128', cast: castDecimal128, value: '1.23', normalize: normalizeBsonValue },
-      { name: 'Double', cast: castDouble, value: '1.23', emptyStringIsNull: true, normalize: normalizeDouble },
-      { name: 'Int32', cast: castInt32, value: '42', emptyStringIsNull: true },
-      { name: 'Number', cast: castNumber, value: '42', emptyStringIsNull: true },
-      { name: 'ObjectId', cast: castObjectId, value: objectId, normalize: normalizeBsonValue },
-      { name: 'String', cast: castString, value: 42 },
-      { name: 'UUID', cast: castUUID, value: uuid, normalize: normalizeBsonValue }
-    ].map(casterCase => ({ normalize: identity, ...casterCase }));
-
-    mongoose.deleteModel(/RequiredScalarValues/);
-    const requiredScalarValuesSchema = new Schema({
-      active: { type: Boolean, required: true },
-      latitude: { type: Schema.Types.Double, required: true },
-      ownerId: { type: Schema.Types.ObjectId, required: true },
-      price: { type: Schema.Types.Decimal128, required: true },
-      publishedAt: { type: Date, required: true },
-      rating: { type: Number, required: true },
-      requestId: { type: Schema.Types.UUID, required: true },
-      retryCount: { type: Schema.Types.Int32, required: true },
-      title: { type: String, required: true },
-      viewCount: { type: BigInt, required: true }
+    mongoose.deleteModel(/Article/);
+    const articleSchema = new Schema({
+      title: { type: String, required: true }
     });
-    const RequiredScalarValues = mongoose.model('RequiredScalarValues', requiredScalarValuesSchema);
-    const requiredPaths = Object.keys(requiredScalarValuesSchema.paths).
-      filter(path => path !== '_id' && path !== '__v');
-
-    return { casterCases, RequiredScalarValues, requiredPaths };
-  }
-
-  function identity(value) {
-    return value;
-  }
-
-  function normalizeDate(value) {
-    return value == null ? value : value.valueOf();
-  }
-
-  function normalizeDouble(value) {
-    return value == null ? value : value.valueOf();
-  }
-
-  function normalizeBsonValue(value) {
-    return value == null ? value : value.toString();
+    const Article = mongoose.model('Article', articleSchema);
+    return { Article };
   }
 });

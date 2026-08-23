@@ -82,7 +82,7 @@ describe('scalar casting from arrays', function() {
   }
 
   for (const casterCase of casterCases.filter(casterCase => casterCase.emptyStringIsNull)) {
-    it(`${casterCase.name} casts a single empty string like an empty string`, function() {
+    it(`${casterCase.name} casts a single empty string to null`, function() {
       // Arrange
       const expected = casterCase.cast('');
 
@@ -90,13 +90,18 @@ describe('scalar casting from arrays', function() {
       const actual = casterCase.cast(['']);
 
       // Assert
-      assert.deepStrictEqual(actual, expected);
+      assert.strictEqual(expected, null);
+      assert.strictEqual(actual, null);
+      assert.strictEqual(actual, expected);
     });
   }
 
   it('reports required validation errors for single null elements', function() {
     // Arrange
-    const { Article } = createTestContext();
+    mongoose.deleteModel(/Article/);
+    const Article = mongoose.model('Article', new Schema({
+      title: { type: String, required: true }
+    }));
 
     // Act
     const error = new Article({ title: [null] }).validateSync();
@@ -106,13 +111,4 @@ describe('scalar casting from arrays', function() {
     assert.strictEqual(error.errors.title.name, 'ValidatorError');
     assert.strictEqual(error.errors.title.kind, 'required');
   });
-
-  function createTestContext() {
-    mongoose.deleteModel(/Article/);
-    const articleSchema = new Schema({
-      title: { type: String, required: true }
-    });
-    const Article = mongoose.model('Article', articleSchema);
-    return { Article };
-  }
 });

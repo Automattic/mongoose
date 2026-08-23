@@ -43,6 +43,7 @@ export default defineConfig([
       'no-constant-condition': 'off',
       'no-multi-spaces': 'error',
       'func-call-spacing': 'error',
+      'no-unused-vars': ['error', { ignoreRestSiblings: true }],
       'no-trailing-spaces': 'error',
       'no-undef': 'error',
       'no-unneeded-ternary': 'error',

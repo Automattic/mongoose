@@ -451,4 +451,30 @@ describe('castArrayFilters', function() {
     castArrayFilters(q3);
     assert.strictEqual(q3.options.arrayFilters[0]['item._id'], 42);
   });
+
+  it('casts nested array filters correctly when accessing _id (gh-16445)', function() {
+    const schema = new Schema({
+      itemGroups: [{
+        items: [{
+          itemId: String,
+          qty: Number,
+          price: Number
+        }]
+      }]
+    });
+    const q = new Query();
+    q.schema = schema;
+
+    q.updateOne({}, { $set: { 'itemGroups.$[order].items.$[item].qty': 20 } }, {
+      arrayFilters: [
+        { 'order._id': 'c94ad7fe-2ffa-4555-bab4-6f6b3eccc511' },
+        { 'item._id': 'd03331ef-f18a-4c6d-b927-6b16f204cf42' }
+      ]
+    });
+    castArrayFilters(q);
+
+    // If it throws "Could not find path ... in schema", it failed.
+    // If it succeeds, it should cast the string to an ObjectId.
+    assert.ok(q.options.arrayFilters[1]['item._id'] instanceof Types.ObjectId || Types.ObjectId.isValid(q.options.arrayFilters[1]['item._id']));
+  });
 });

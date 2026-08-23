@@ -477,6 +477,20 @@ describe('QueryCursor', function() {
     assert.equal(cursor.options.readPreference, read);
   });
 
+  it('preserves options object identity after opening the cursor', async function() {
+    // Arrange
+    const { User } = createTestContext();
+    const cursor = User.find().cursor({ batchSize: 1 });
+    const options = cursor.options;
+
+    // Act
+    await once(cursor, 'cursor');
+    await cursor.close();
+
+    // Assert
+    assert.strictEqual(cursor.options, options);
+  });
+
   it('eachAsync() with parallel > numDocs (gh-8422)', async function() {
     const schema = new mongoose.Schema({ name: String });
     const Movie = db.model('Movie', schema);
@@ -990,6 +1004,12 @@ describe('QueryCursor', function() {
     assert.ok(err);
     assert.equal(err.message, '$where is not allowed with sanitizeFilter');
   });
+
+  function createTestContext() {
+    const userSchema = new Schema({ name: String });
+    const User = db.model('User', userSchema);
+    return { User };
+  }
 });
 
 async function delay(ms) {

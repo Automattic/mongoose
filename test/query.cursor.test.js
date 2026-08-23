@@ -492,6 +492,26 @@ describe('QueryCursor', function() {
     assert.strictEqual(cursor.options, options);
   });
 
+  it('strips middleware added to options before opening the cursor', async function() {
+    // Arrange
+    let continuePreHook;
+    const preHookPromise = new Promise(resolve => { continuePreHook = resolve; });
+    const userSchema = new Schema({ name: String });
+    userSchema.pre('find', () => preHookPromise);
+    const User = db.model('User', userSchema);
+    const cursor = User.find().cursor();
+    const cursorOpened = once(cursor, 'cursor');
+    cursor.options.middleware = false;
+
+    // Act
+    continuePreHook();
+    await cursorOpened;
+    await cursor.close();
+
+    // Assert
+    assert.ok(!Object.hasOwn(cursor.options, 'middleware'));
+  });
+
   it('eachAsync() with parallel > numDocs (gh-8422)', async function() {
     const schema = new mongoose.Schema({ name: String });
     const Movie = db.model('Movie', schema);

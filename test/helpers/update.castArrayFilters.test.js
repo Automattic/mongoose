@@ -467,14 +467,14 @@ describe('castArrayFilters', function() {
 
     q.updateOne({}, { $set: { 'itemGroups.$[order].items.$[item].qty': 20 } }, {
       arrayFilters: [
-        { 'order._id': 'c94ad7fe-2ffa-4555-bab4-6f6b3eccc511' },
-        { 'item._id': 'd03331ef-f18a-4c6d-b927-6b16f204cf42' }
+        { 'order._id': '64f1b8a5e8c1b2c3d4e5f6a7' },
+        { 'item._id': '64f1b8a5e8c1b2c3d4e5f6a8' }
       ]
     });
     castArrayFilters(q);
 
     // If it throws "Could not find path ... in schema", it failed.
     // If it succeeds, it should cast the string to an ObjectId.
-    assert.ok(q.options.arrayFilters[1]['item._id'] instanceof Types.ObjectId || Types.ObjectId.isValid(q.options.arrayFilters[1]['item._id']));
+    assert.ok(q.options.arrayFilters[1]['item._id'] instanceof Types.ObjectId);
   });
 });

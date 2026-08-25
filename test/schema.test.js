@@ -3562,6 +3562,10 @@ describe('schema', function() {
         message.includes('for model "gh15056"'),
         'Warning should include model name'
       );
+      assert.ok(
+        message.includes('IndexOptionsConflict'),
+        'Warning should say the duplicate index is not created'
+      );
     } finally {
       sinon.restore();
     }

@@ -15756,7 +15756,7 @@ describe('document', function() {
     await human.save();
 
     h.name.first = 'Larry';
-    human.set(h, null, null, { merge: true });
+    human.set(h, null, { merge: true });
 
     assert.deepStrictEqual(
       human.modifiedPaths({ includeChildren: true }).sort(),

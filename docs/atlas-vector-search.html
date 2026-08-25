@@ -1,0 +1,345 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Atlas Vector Search - Mongoose v9.9.4</title><script>(function() {
+  var theme = localStorage.getItem('mongoose-theme');
+  if (theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+  }
+})();</script><link rel="apple-touch-icon" sizes="57x57" href="/docs/images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="/docs/images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="/docs/images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="/docs/images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="/docs/images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="/docs/images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="/docs/images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="/docs/images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="/docs/images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="/docs/images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="/docs/images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="/docs/images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="/docs/images/favicon/favicon-16x16.png"><link rel="manifest" href="/docs/images/favicon/manifest.json"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:wght@400;500;600;700&amp;display=swap"><link rel="stylesheet" href="/docs/css/mongoose9.css?v=1787677038662"><link rel="stylesheet" href="/docs/css/github.css?v=1787677038662"><link rel="stylesheet" href="/docs/css/carbonads.css"><link rel="stylesheet" href="/docs/css/copy-code.css"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="/docs/images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"></head><body><header class="site-header"><div class="site-header-inner"><button class="mobile-menu-toggle" id="menuLink" aria-label="Toggle navigation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><a class="site-logo" href="/"><div class="site-logo-inner"><span class="site-logo-mark" role="img" aria-label="Mongoose logo"></span><span class="site-logo-text">mongoose</span></div></a><div class="site-search"><input id="search-input-nav" type="text" placeholder="Search" aria-label="Search"><button class="site-search-button" id="search-button-nav" aria-label="Search"><img src="/docs/images/search.svg"></button></div><nav class="top-navbar" aria-label="Primary"><a class="top-navbar-link active" href="/docs/index.html">Docs</a><a class="top-navbar-link" href="/docs/api/mongoose.html">API</a><a class="top-navbar-link" href="/docs/migrating_to_9.html">Migration</a><a class="top-navbar-link" href="/docs/faq.html">FAQ</a></nav><div class="site-actions"><button class="icon-button" id="theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle dark/light theme"><svg id="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+<svg id="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button><a class="icon-link" href="https://github.com/Automattic/mongoose" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.55v-2c-3.2.7-3.87-1.37-3.87-1.37-.52-1.32-1.28-1.67-1.28-1.67-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.52-1.47.11-3.06 0 0 .97-.31 3.18 1.18a11.04 11.04 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.77.12 3.06.74.81 1.18 1.84 1.18 3.1 0 4.44-2.7 5.4-5.27 5.69.41.35.77 1.05.77 2.12v3.14c0 .31.2.66.8.55A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg></a><button class="icon-button mobile-toc-toggle" id="tocLink" aria-label="Toggle table of contents" aria-controls="toc-sidebar" title="Table of contents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg></button></div></div></header><div class="site-body" id="layout"><aside class="left-sidebar" id="menu"><div class="version-picker" id="version-picker"><div class="version-picker-label">Version</div><button class="version-picker-button" type="button" aria-haspopup="true" aria-expanded="false"><span class="version-picker-current">v9.9.4</span><svg class="version-picker-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button><ul class="version-picker-menu" role="menu"><li><a class="version-picker-item" role="menuitem" href="/docs/8.x/index.html">v8.24.4</a></li><li><a class="version-picker-item" role="menuitem" href="/docs/7.x/index.html">v7.8.12</a></li><li><a class="version-picker-item" role="menuitem" href="/docs/6.x/index.html">v6.13.11</a></li></ul></div><nav class="sidebar-nav" aria-label="Docs navigation"><div class="sidebar-section sidebar-section-collapsible" id="sidebar-section-getting-started"><h3 class="sidebar-section-title sidebar-section-toggle" role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-getting-started"><span>Getting Started</span><svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></h3><ul class="sidebar-list" id="sidebar-list-getting-started"><li class="sidebar-item"><a class="sidebar-link" href="/docs/index.html">Quick Start</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/guides.html">All Guides</a></li></ul></div><div class="sidebar-section sidebar-section-collapsible" id="sidebar-section-guides"><h3 class="sidebar-section-title sidebar-section-toggle" role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-guides"><span>Guides</span><svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></h3><ul class="sidebar-list" id="sidebar-list-guides"><li class="sidebar-item"><a class="sidebar-link" href="/docs/guide.html">Schemas</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/connections.html">Connections</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/models.html">Models</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/documents.html">Documents</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/queries.html">Queries</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/validation.html">Validation</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/middleware.html">Middleware</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/populate.html">Populate</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/discriminators.html">Discriminators</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/plugins.html">Plugins</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/timestamps.html">Timestamps</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/transactions.html">Transactions</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/atlas-search.html">Atlas Search</a><ul class="sidebar-children"><li class="sidebar-item"><a class="sidebar-link active" href="/docs/atlas-vector-search.html">Vector Search</a></li></ul></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/typescript.html">TypeScript</a></li></ul></div><div class="sidebar-section sidebar-section-collapsible" id="sidebar-section-api-reference"><h3 class="sidebar-section-title sidebar-section-toggle" role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-api-reference"><span>API Reference</span><svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></h3><ul class="sidebar-list" id="sidebar-list-api-reference"><li class="sidebar-item"><a class="sidebar-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/api/schema.html">Schema</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/api/connection.html">Connection</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/api/document.html">Document</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/api/model.html">Model</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/api/query.html">Query</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/api/virtualtype.html">VirtualType</a></li></ul></div><div class="sidebar-section sidebar-section-collapsible" id="sidebar-section-reference"><h3 class="sidebar-section-title sidebar-section-toggle" role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-reference"><span>Reference</span><svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></h3><ul class="sidebar-list" id="sidebar-list-reference"><li class="sidebar-item"><a class="sidebar-link" href="/docs/migrating_to_9.html">Migration Guide</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/version-support.html">Version Support</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/faq.html">FAQ</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/further_reading.html">Further Reading</a></li></ul></div><div class="sidebar-section sidebar-section-collapsible" id="sidebar-section-community"><h3 class="sidebar-section-title sidebar-section-toggle" role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-community"><span>Community</span><svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></h3><ul class="sidebar-list" id="sidebar-list-community"><li class="sidebar-item"><a class="sidebar-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/sponsors.html">Sponsors</a></li></ul></div></nav></aside><main class="site-main"><article class="article" id="content"><div class="article-header"><h1 id="atlas-vector-search">
+        <a href="#atlas-vector-search">
+          Atlas Vector Search
+        </a>
+      </h1>
+<div class="doc-links">
+<a class="edit-docs-link" href="https://github.com/Automattic/mongoose/edit/master/docs/atlas-vector-search.md" target="_blank">
+<img src="/docs/images/pencil.svg" />
+</a>
+<button class="copy-markdown-link" data-md-url="/docs/atlas-vector-search.md" title="Copy page as Markdown" aria-label="Copy page as Markdown">
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+</button>
+</div></div><script>(function() {
+  const copyMarkdownButton = document.querySelector('.copy-markdown-link');
+  if (copyMarkdownButton == null) {
+    return;
+  }
+
+  copyMarkdownButton.addEventListener('click', async function() {
+    const response = await fetch(copyMarkdownButton.dataset.mdUrl);
+    const markdown = await response.text();
+    await navigator.clipboard.writeText(markdown);
+    copyMarkdownButton.classList.add('copied');
+    setTimeout(() => copyMarkdownButton.classList.remove('copied'), 2000);
+  });
+})();</script><div class="sponsored-ad">
+  <a href="https://localizejs.com/?utm_campaign=Mongoose&utm_source=mongoose&utm_medium=banner">
+    <img src="https://res.cloudinary.com/drfhhq8wu/image/upload/v1770464125/localize2_acgiup.webp">
+  </a>
+</div><p><a href="https://www.mongodb.com/docs/vector-search/">Atlas Vector Search</a> enables you to perform semantic searches on vector embeddings stored in MongoDB Atlas.
+Vector search allows you to find similar documents based on their meaning rather than exact keyword matches, which is essential for building modern AI applications like semantic search, recommendation systems, and RAG (Retrieval-Augmented Generation) applications.</p>
+<p>Mongoose provides full support for creating vector search indexes and running vector search queries through the MongoDB aggregation pipeline.</p>
+<ul>
+<li><a href="#creating-a-vector-search-index">Creating a Vector Search Index</a></li>
+<li><a href="#generating-embeddings">Generating Embeddings</a></li>
+<li><a href="#querying-with-vectorsearch">Querying with $vectorSearch</a></li>
+</ul>
+<hr>
+<p>The examples in this guide are based on MongoDB&#39;s <a href="https://www.mongodb.com/docs/manual/sample-data/sample-mflix/">mflix</a> sample dataset.</p>
+<h2 id="creating-a-vector-search-index">
+        <a href="#creating-a-vector-search-index">
+          Creating a Vector Search Index
+        </a>
+      </h2>
+<p>To use vector search, you first need to create a vector search index on your collection.
+You can do this by calling <code>schema.searchIndex()</code> with <code>type: &#39;vectorSearch&#39;</code> and defining the vector fields you want to index.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> movieSchema = <span class="hljs-keyword">new</span> mongoose.<span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">title</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">plot</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">year</span>: <span class="hljs-title class_">Number</span>,
+  <span class="hljs-attr">genres</span>: [<span class="hljs-title class_">String</span>],
+  <span class="hljs-comment">// Field to store the embeddings for the plot. It can be whatever you choose.</span>
+  <span class="hljs-attr">plot_embedding_voyage_3_large</span>: {
+    <span class="hljs-attr">type</span>: <span class="hljs-title class_">Buffer</span>,  <span class="hljs-comment">// embeddings are stored as binData (BSON binary vector, float32)</span>
+    <span class="hljs-attr">validate</span>: {
+      <span class="hljs-comment">// A 2048-dim float32 binary vector is 8194 bytes: a 2-byte vector header + 2048 x 4 bytes</span>
+      <span class="hljs-attr">validator</span>: <span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> v == <span class="hljs-literal">null</span> || v.<span class="hljs-property">length</span> === <span class="hljs-number">8194</span>,
+      <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;plot_embedding must be nullish or a 2048-dimension float32 binary vector&#x27;</span>
+    }
+  }
+});
+
+<span class="hljs-comment">// Define a vector search index</span>
+movieSchema.<span class="hljs-title function_">searchIndex</span>({
+  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;vector_index&#x27;</span>,
+  <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;vectorSearch&#x27;</span>,
+  <span class="hljs-attr">definition</span>: {
+    <span class="hljs-attr">fields</span>: [{
+      <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;vector&#x27;</span>,
+      <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;plot_embedding_voyage_3_large&#x27;</span>,  <span class="hljs-comment">// Where the embeddings are stored</span>
+      <span class="hljs-attr">numDimensions</span>: <span class="hljs-number">2048</span>,  <span class="hljs-comment">// Must match your embedding model&#x27;s dimensions</span>
+      <span class="hljs-attr">similarity</span>: <span class="hljs-string">&#x27;cosine&#x27;</span>  <span class="hljs-comment">// Similarity function to use</span>
+    }]
+  }
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Movie</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Movie&#x27;</span>, movieSchema);
+
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Movie</span>.<span class="hljs-title function_">createSearchIndexes</span>();  <span class="hljs-comment">// Create the index</span></code></pre><h3 id="using-bindata-vs-float-array">
+        <a href="#using-bindata-vs-float-array">
+          Using BinData vs Float Array
+        </a>
+      </h3>
+<p>Embedding vectors are arrays of numbers representing a piece of text in a numeric form that can be compared and searched against other vectors. Vectors in MongoDB can be stored as a plain array of numbers (most embedding providers return this format), but MongoDB offers an optional, more compact and efficient storage format: <a href="https://www.mongodb.com/docs/manual/reference/bson-types/#binary-data">Binary Vector</a>.</p>
+<p>This guide uses the Binary Vector format but you can also use a plain array of numbers instead if your application requires it.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> movieSchema = <span class="hljs-keyword">new</span> mongoose.<span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">title</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">plot</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">year</span>: <span class="hljs-title class_">Number</span>,
+  <span class="hljs-attr">genres</span>: [<span class="hljs-title class_">String</span>],
+  <span class="hljs-attr">plot_embedding</span>: {
+    <span class="hljs-attr">type</span>: [<span class="hljs-title class_">Number</span>], <span class="hljs-comment">// Array instead of Buffer</span>
+    <span class="hljs-attr">validate</span>: {
+      <span class="hljs-attr">validator</span>: <span class="hljs-function"><span class="hljs-params">v</span> =&gt;</span> v == <span class="hljs-literal">null</span> || v.<span class="hljs-property">length</span> === <span class="hljs-number">2048</span>, <span class="hljs-comment">// This would be the size when not a Buffer</span>
+      <span class="hljs-attr">message</span>: <span class="hljs-string">&#x27;plot_embedding must be nullish or a 2048-length float32 array&#x27;</span>
+    }
+  }
+});</code></pre><h3 id="index-definition-fields">
+        <a href="#index-definition-fields">
+          Index Definition Fields
+        </a>
+      </h3>
+<p>The vector search index definition requires the following fields:</p>
+<ul>
+<li><code>type</code>: Must be <code>&#39;vector&#39;</code> for vector fields</li>
+<li><code>path</code>: The field path containing the vector embeddings</li>
+<li><code>numDimensions</code>: Number of dimensions in your vector embeddings. This must match the output dimensions of your embedding model</li>
+<li><code>similarity</code>: The similarity function to use. Options are <code>&#39;cosine&#39;</code>, <code>&#39;euclidean&#39;</code>, or <code>&#39;dotProduct&#39;</code>. See <a href="https://www.mongodb.com/docs/vector-search/index/vector-search-type/">MongoDB&#39;s similarity metrics documentation</a> for guidance on choosing the right metric.</li>
+</ul>
+<h3 id="monitoring-index-status">
+        <a href="#monitoring-index-status">
+          Monitoring Index Status
+        </a>
+      </h3>
+<p>After creating a vector search index, it takes time to build. Check the index status using <code>Model.listSearchIndexes()</code>:</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> indexes = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Movie</span>.<span class="hljs-title function_">listSearchIndexes</span>();
+<span class="hljs-keyword">const</span> vectorIndex = indexes.<span class="hljs-title function_">find</span>(<span class="hljs-function"><span class="hljs-params">idx</span> =&gt;</span> idx.<span class="hljs-property">name</span> === <span class="hljs-string">&#x27;vector_index&#x27;</span>);
+
+<span class="hljs-keyword">if</span> (vectorIndex?.<span class="hljs-property">queryable</span>) {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Vector search index is ready!&#x27;</span>);
+} <span class="hljs-keyword">else</span> {
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Index is still building...&#x27;</span>);
+}</code></pre><h2 id="generating-embeddings">
+        <a href="#generating-embeddings">
+          Generating Embeddings
+        </a>
+      </h2>
+<p>Vector embeddings are numerical representations of your data generated by embedding models.
+Mongoose doesn&#39;t generate embeddings for you - you need to generate them before saving documents or performing queries.</p>
+<h3 id="using-atlas-automated-embeddings-recommended">
+        <a href="#using-atlas-automated-embeddings-recommended">
+          Using Atlas Automated Embeddings (Recommended)
+        </a>
+      </h3>
+<p><strong>MongoDB Atlas can automatically generate embeddings for your documents</strong> using <a href="https://www.mongodb.com/docs/vector-search/crud-embeddings/automated-embedding/overview/">Atlas Vector Search Automated Embeddings</a>. Available in MongoDB Atlas, and on self-managed deployments running MongoDB 8.2+.</p>
+<p>With Automated Embeddings, you define an <code>autoEmbed</code> index on a text field — no embedding field in your schema required. Atlas generates and manages the embeddings internally.</p>
+<pre><code lang="javascript"><span class="hljs-comment">// Schema needs only the source text field — no embedding array needed</span>
+<span class="hljs-keyword">const</span> movieSchema = <span class="hljs-keyword">new</span> mongoose.<span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">title</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">plot</span>: <span class="hljs-title class_">String</span>
+});
+
+<span class="hljs-comment">// Define an autoEmbed index — Atlas handles embedding generation via Voyage AI</span>
+movieSchema.<span class="hljs-title function_">searchIndex</span>({
+  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;auto_embed_index&#x27;</span>,
+  <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;vectorSearch&#x27;</span>,
+  <span class="hljs-attr">definition</span>: {
+    <span class="hljs-attr">fields</span>: [{
+      <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;autoEmbed&#x27;</span>,      <span class="hljs-comment">// Atlas generates embeddings automatically</span>
+      <span class="hljs-attr">modality</span>: <span class="hljs-string">&#x27;text&#x27;</span>,
+      <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;plot&#x27;</span>,           <span class="hljs-comment">// Text field to embed</span>
+      <span class="hljs-attr">model</span>: <span class="hljs-string">&#x27;voyage-4&#x27;</span>       <span class="hljs-comment">// Voyage AI model used at index- and query-time</span>
+    }]
+  }
+});
+
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Movie</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Movie&#x27;</span>, movieSchema);
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Movie</span>.<span class="hljs-title function_">createSearchIndexes</span>();
+
+<span class="hljs-comment">// Just save the document as usual — Atlas generates the embedding automatically</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Movie</span>.<span class="hljs-title function_">create</span>({ 
+  <span class="hljs-attr">title</span>: <span class="hljs-string">&#x27;Project Hail Mary&#x27;</span>, 
+  <span class="hljs-attr">plot</span>: <span class="hljs-string">&#x27;An amnesiac teacher and a musical, rock-spider-like alien team up on a spaceship to save their solar systems from a sun-eating organism.&#x27;</span>,
+  <span class="hljs-attr">year</span>: <span class="hljs-number">2026</span>,
+  <span class="hljs-attr">genres</span>: [<span class="hljs-string">&#x27;Adventure&#x27;</span>, <span class="hljs-string">&#x27;Family&#x27;</span>, <span class="hljs-string">&#x27;Sci-Fi&#x27;</span>]
+});
+
+<span class="hljs-comment">// Query using plain text — Atlas generates the query embedding automatically</span>
+<span class="hljs-keyword">const</span> results = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Movie</span>.<span class="hljs-title function_">aggregate</span>([
+  {
+    <span class="hljs-attr">$vectorSearch</span>: {
+      <span class="hljs-attr">index</span>: <span class="hljs-string">&#x27;auto_embed_index&#x27;</span>,
+      <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;plot&#x27;</span>,
+      <span class="hljs-attr">query</span>: <span class="hljs-string">&#x27;scientist and friend save dying sun&#x27;</span>,  <span class="hljs-comment">// plain text, no embedding needed</span>
+      <span class="hljs-attr">numCandidates</span>: <span class="hljs-number">100</span>,
+      <span class="hljs-attr">limit</span>: <span class="hljs-number">10</span>
+    }
+  },
+  {
+    <span class="hljs-comment">// Rest of your aggregation pipeline...</span>
+  }
+]);</code></pre><h3 id="using-third-party-embedding-models">
+        <a href="#using-third-party-embedding-models">
+          Using Third-Party Embedding Models
+        </a>
+      </h3>
+<p>If you need to generate embeddings in your application (for example, when using embedding models not supported by Atlas Automated Embeddings), you can use any embedding provider. Popular options include:</p>
+<ul>
+<li><strong><a href="https://www.mongodb.com/products/platform/ai-search-and-retrieval">Voyage AI</a></strong> - High-quality embeddings optimized for retrieval, with models like <code>voyage-4-large</code>, <code>voyage-4-little</code>, and <code>voyage-4-code</code></li>
+<li><strong><a href="https://platform.openai.com/docs/guides/embeddings">OpenAI Embeddings</a></strong> - Models like <code>text-embedding-ada-002</code> and <code>text-embedding-3-small</code></li>
+<li><strong><a href="https://platform.claude.com/docs/en/build-with-claude/embeddings">Anthropic Embeddings</a></strong> - Multiple models, including Voyage AI family.</li>
+</ul>
+<p>Example workflow for application-generated embeddings:</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> { <span class="hljs-title class_">Binary</span> } = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;mongodb&#x27;</span>);  <span class="hljs-comment">// Bundled with Mongoose</span>
+
+<span class="hljs-comment">// In the sample_mflix dataset, there are two separate movies collections: embedded_movies</span>
+<span class="hljs-comment">// has built-in embeddings that were generated with Voyage AI and movies does not.</span>
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Movie</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Movie&#x27;</span>, movieSchema, <span class="hljs-string">&#x27;embedded_movies&#x27;</span>);
+
+<span class="hljs-comment">// Use this function to generate embeddings with a third-party provider</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">generateEmbedding</span>(<span class="hljs-params">text</span>) {
+  <span class="hljs-keyword">const</span> voyageAPIKey = process.<span class="hljs-property">env</span>.<span class="hljs-property">VOYAGE_API_KEY</span>;
+  <span class="hljs-keyword">const</span> response = <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetch</span>(<span class="hljs-string">&#x27;https://ai.mongodb.com/v1/embeddings&#x27;</span>, {
+    <span class="hljs-attr">method</span>: <span class="hljs-string">&#x27;POST&#x27;</span>,
+    <span class="hljs-attr">headers</span>: {
+      <span class="hljs-title class_">Authorization</span>: <span class="hljs-string">`Bearer <span class="hljs-subst">${voyageAPIKey}</span>`</span>,
+      <span class="hljs-string">&#x27;Content-Type&#x27;</span>: <span class="hljs-string">&#x27;application/json&#x27;</span>
+    },
+    <span class="hljs-attr">body</span>: <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>({
+      <span class="hljs-attr">input</span>: text,
+      <span class="hljs-attr">model</span>: <span class="hljs-string">&#x27;voyage-3-large&#x27;</span>,
+      <span class="hljs-attr">output_dimension</span>: <span class="hljs-number">2048</span>
+    })
+  });
+
+  <span class="hljs-keyword">if</span> (!response.<span class="hljs-property">ok</span>) {
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">`Embeddings request failed: <span class="hljs-subst">${response.status}</span> <span class="hljs-subst">${<span class="hljs-keyword">await</span> response.text()}</span>`</span>);
+  }
+
+  <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> response.<span class="hljs-title function_">json</span>();
+  <span class="hljs-keyword">return</span> result.<span class="hljs-property">data</span>[<span class="hljs-number">0</span>].<span class="hljs-property">embedding</span>;
+}
+
+<span class="hljs-comment">// Generate embeddings before saving</span>
+<span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">saveMovieWithEmbedding</span>(<span class="hljs-params">movieData</span>) {
+  <span class="hljs-keyword">const</span> embeddings = <span class="hljs-keyword">await</span> <span class="hljs-title function_">generateEmbedding</span>(movieData.<span class="hljs-property">plot</span>);
+
+  <span class="hljs-comment">// Convert the float array to a binData for efficient storage</span>
+  <span class="hljs-keyword">const</span> embeddingVector = <span class="hljs-title class_">Binary</span>.<span class="hljs-title function_">fromFloat32Array</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Float32Array</span>(embeddings));
+
+  <span class="hljs-keyword">const</span> movie = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Movie</span>({
+    <span class="hljs-attr">title</span>: movieData.<span class="hljs-property">title</span>,
+    <span class="hljs-attr">plot</span>: movieData.<span class="hljs-property">plot</span>,
+    <span class="hljs-attr">plot_embedding_voyage_3_large</span>: embeddingVector
+  });
+
+  <span class="hljs-keyword">await</span> movie.<span class="hljs-title function_">save</span>();
+  <span class="hljs-keyword">return</span> movie;
+}</code></pre><p><strong>Important considerations for application-generated embeddings</strong>:</p>
+<ul>
+<li>The embedding dimensions must match your index configuration (<code>numDimensions</code>)</li>
+<li>You must use the same embedding model for both indexing and querying</li>
+<li>Embeddings must be normalized if using <code>dotProduct</code> similarity</li>
+</ul>
+<h2 id="querying-with-vectorsearch">
+        <a href="#querying-with-vectorsearch">
+          Querying with $vectorSearch
+        </a>
+      </h2>
+<p>Once your vector search index is created, and your embeddings are generated, you can perform vector similarity searches using the <code>$vectorSearch</code> aggregation stage.</p>
+<pre><code lang="javascript"><span class="hljs-comment">// Your query embedding (if not using Automated Embeddings)</span>
+<span class="hljs-keyword">const</span> queryEmbedding = <span class="hljs-keyword">await</span> <span class="hljs-title function_">generateEmbedding</span>(<span class="hljs-string">&#x27;space adventure about friendship&#x27;</span>);
+
+<span class="hljs-comment">// Perform vector search</span>
+<span class="hljs-keyword">const</span> results = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Movie</span>.<span class="hljs-title function_">aggregate</span>([
+  {
+    <span class="hljs-attr">$vectorSearch</span>: {
+      <span class="hljs-attr">index</span>: <span class="hljs-string">&#x27;vector_index&#x27;</span>,     <span class="hljs-comment">// Name of your vector search index</span>
+      <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;plot_embedding_voyage_3_large&#x27;</span>,     <span class="hljs-comment">// Field containing the vectors</span>
+      <span class="hljs-attr">queryVector</span>: queryEmbedding, <span class="hljs-comment">// Your query as an array of numbers (not binData when searching)</span>
+      <span class="hljs-attr">numCandidates</span>: <span class="hljs-number">100</span>,         <span class="hljs-comment">// Number of candidates to consider (should be &gt;= limit)</span>
+      <span class="hljs-attr">limit</span>: <span class="hljs-number">10</span>                   <span class="hljs-comment">// Number of results to return</span>
+    }
+  },
+  {
+    <span class="hljs-attr">$project</span>: {
+      <span class="hljs-attr">title</span>: <span class="hljs-number">1</span>,
+      <span class="hljs-attr">plot</span>: <span class="hljs-number">1</span>,
+      <span class="hljs-attr">score</span>: { <span class="hljs-attr">$meta</span>: <span class="hljs-string">&#x27;vectorSearchScore&#x27;</span> }  <span class="hljs-comment">// Include similarity score</span>
+    }
+  }
+]);</code></pre><h3 id="vectorsearch-options">
+        <a href="#vectorsearch-options">
+          $vectorSearch Options
+        </a>
+      </h3>
+<p>The <code>$vectorSearch</code> stage accepts the following options:</p>
+<ul>
+<li><code>index</code> (required): Name of the vector search index to use</li>
+<li><code>path</code> (required): Field path containing the vector embeddings</li>
+<li><code>queryVector</code> (required): Array of numbers representing your query embedding</li>
+<li><code>limit</code> (required): Maximum number of documents to return</li>
+<li><code>numCandidates</code> (optional): Number of candidate documents to examine. Must be &gt;= <code>limit</code>. Recommended: set to at least 10-20x your <code>limit</code> for better accuracy</li>
+<li><code>filter</code> (optional): MQL filter expression to pre-filter documents before vector search</li>
+<li><code>exact</code> (optional): Boolean. If <code>true</code>, performs exact nearest neighbor search. If <code>false</code> or omitted, performs approximate search</li>
+</ul>
+<p>For detailed information on these parameters and performance tuning, see the <a href="https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-stage/">MongoDB Vector Search documentation</a>.</p>
+<h3 id="using-pre-filters">
+        <a href="#using-pre-filters">
+          Using Pre-filters
+        </a>
+      </h3>
+<p>You can use the <code>filter</code> option to restrict your search to a subset of documents.
+Any field you filter on must be declared as a <code>filter</code> field in your index definition:</p>
+<pre><code lang="javascript">movieSchema.<span class="hljs-title function_">searchIndex</span>({
+  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;vector_index&#x27;</span>,
+  <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;vectorSearch&#x27;</span>,
+  <span class="hljs-attr">definition</span>: {
+    <span class="hljs-attr">fields</span>: [
+      {
+        <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;vector&#x27;</span>,
+        <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;plot_embedding_voyage_3_large&#x27;</span>,
+        <span class="hljs-attr">numDimensions</span>: <span class="hljs-number">2048</span>,
+        <span class="hljs-attr">similarity</span>: <span class="hljs-string">&#x27;cosine&#x27;</span>
+      },
+      { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;filter&#x27;</span>, <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;year&#x27;</span> },    <span class="hljs-comment">// Enable filtering on year</span>
+      { <span class="hljs-attr">type</span>: <span class="hljs-string">&#x27;filter&#x27;</span>, <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;genres&#x27;</span> }   <span class="hljs-comment">// Enable filtering on genres</span>
+    ]
+  }
+});</code></pre><p>Once the filter fields are indexed, you can pre-filter your search:</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> results = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Movie</span>.<span class="hljs-title function_">aggregate</span>([
+  {
+    <span class="hljs-attr">$vectorSearch</span>: {
+      <span class="hljs-attr">index</span>: <span class="hljs-string">&#x27;vector_index&#x27;</span>,
+      <span class="hljs-attr">path</span>: <span class="hljs-string">&#x27;plot_embedding_voyage_3_large&#x27;</span>,
+      <span class="hljs-attr">queryVector</span>: queryEmbedding,
+      <span class="hljs-attr">numCandidates</span>: <span class="hljs-number">100</span>,
+      <span class="hljs-attr">limit</span>: <span class="hljs-number">10</span>,
+      <span class="hljs-attr">filter</span>: {
+        <span class="hljs-attr">year</span>: { <span class="hljs-attr">$gte</span>: <span class="hljs-number">2010</span> },     <span class="hljs-comment">// Only movies from 2010 or later</span>
+        <span class="hljs-attr">genres</span>: <span class="hljs-string">&#x27;Family&#x27;</span>          <span class="hljs-comment">// Only family movies</span>
+      }
+    }
+  }
+]);</code></pre><p>The <code>filter</code> field accepts standard MongoDB query operators. For best performance, ensure the fields used in your filter are indexed. See <a href="https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-stage/#pre-filter-with-the-filter-option">MongoDB&#39;s pre-filtering documentation</a> for more details.</p>
+<h2 id="see-also">
+        <a href="#see-also">
+          See Also
+        </a>
+      </h2>
+<ul>
+<li><a href="https://www.mongodb.com/docs/vector-search/">MongoDB Atlas Vector Search Documentation</a></li>
+<li><a href="https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-stage/">MongoDB Vector Search $vectorSearch Stage</a></li>
+<li><a href="https://www.mongodb.com/docs/vector-search/crud-embeddings/automated-embedding/overview/">Atlas Automated Embeddings</a></li>
+<li><a href="/docs/atlas-search.html">Atlas Search</a> for text search and hybrid search</li>
+<li><a href="/docs/api/model.html#model_Model-createSearchIndex">Model Search Index Methods</a></li>
+<li><a href="/docs/api/schema.html#schema_Schema-searchIndex">Schema searchIndex() Method</a></li>
+</ul>
+</article></main><aside class="right-sidebar" id="toc-sidebar"><nav class="toc" id="toc" aria-label="On this page"><h2 class="toc-title">On This Page</h2><ul class="toc-list" id="toc-list"></ul></nav><div class="right-sidebar-aside"><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></div></aside></div><div class="assistant-panel" id="assistant-panel" aria-label="Mongoose docs assistant" aria-hidden="true"><div class="assistant-panel-resize" id="assistant-panel-resize" role="separator" aria-orientation="vertical" aria-label="Resize assistant"></div><div class="assistant-panel-header"><div class="assistant-panel-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l1.7 5.1L19 10l-5.3 1.9L12 17l-1.7-5.1L5 10l5.3-1.9L12 3z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z"/></svg><span>Assistant</span></div><button class="assistant-panel-close" id="assistant-panel-close" type="button" aria-label="Close assistant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div><div class="assistant-thread" id="assistant-thread" aria-live="polite"></div><form class="assistant-panel-form" id="assistant-panel-form"><textarea class="assistant-panel-input" id="assistant-panel-input" rows="3" placeholder="Ask a question..." aria-label="Ask the assistant"></textarea><button class="assistant-panel-submit" id="assistant-panel-submit" type="submit" aria-label="Send question"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg></button></form></div><form class="assistant-floating-form" id="assistant-floating-form"><textarea class="assistant-floating-input" id="assistant-floating-input" rows="1" placeholder="Ask a question..." aria-label="Ask a question about Mongoose"></textarea><span class="assistant-floating-shortcut">Ctrl+I</span><button class="assistant-floating-submit" id="assistant-floating-submit" type="submit" aria-label="Ask"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg></button></form><script type="text/javascript" src="/docs/js/navbar-search.js"></script><script type="text/javascript" src="/docs/js/mobile-navbar-toggle.js"></script><script type="text/javascript" src="/docs/js/theme-toggle.js"></script><script type="text/javascript" src="/docs/js/copy-code.js"></script><script type="text/javascript" src="/docs/js/version-picker.js"></script><script type="text/javascript" src="/docs/js/sidebar-collapse.js"></script><script type="text/javascript" src="/docs/js/toc.js"></script><script type="text/javascript" src="/docs/js/ask-ai.js"></script></body></html>

@@ -109,6 +109,8 @@ Mongoose provides schema-based modeling, validation, casting, middleware, query 
 ## Additional Resources
 
 - [Advanced Schemas](https://mongoosejs.com/docs/advanced_schemas.md)
+- [Atlas Search](https://mongoosejs.com/docs/atlas-search.md)
+- [Atlas Vector Search](https://mongoosejs.com/docs/atlas-vector-search.md)
 - [Browser Library](https://mongoosejs.com/docs/browser.md)
 - [Custom Schema Types](https://mongoosejs.com/docs/customschematypes.md)
 - [Defaults](https://mongoosejs.com/docs/defaults.md)

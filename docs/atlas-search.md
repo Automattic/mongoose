@@ -34,7 +34,9 @@ movieSchema.searchIndex({
       dynamic: false,
       fields: {
         title: { type: 'string' },
-        fullplot: { type: 'string' }
+        fullplot: { type: 'string' },
+        cast: { type: 'string' },
+        year: { type: 'number' }
       }
     }
   }
@@ -129,7 +131,9 @@ await Movie.updateSearchIndex('movie_search', {
     dynamic: false,
     fields: {
       title: { type: 'string' },
-      fullplot: { type: 'string' }
+      fullplot: { type: 'string' },
+      cast: { type: 'string' },
+      year: { type: 'number' }
     }
   }
 });
@@ -168,8 +172,10 @@ const results = await Movie.aggregate([
 Combine multiple search criteria with `must`, `should`, and `filter` clauses. Include relevance scores using the `$meta` operator. Atlas Search [scores](https://www.mongodb.com/docs/search/query/score/overview/) are relative to your dataset, so remember to adjust the `$match` threshold based on the scores you observe in your data.
 
 ```javascript
-// Find Action movies starring Tom Cruise released since 2000, ranked by relevance,
-// with a score boost for movies whose title includes 'mission'
+// Find movies whose title includes 'mission' released since 2000, ranked by relevance,
+// with a score boost for movies whose cast includes Tom Cruise.
+// Top 3 results should be `Mission: Impossible II`, `Mission: Impossible - Ghost Protocol`,
+// and `Mission: Impossible III`.
 const results = await Movie.aggregate([
   {
     $search: {
@@ -178,17 +184,17 @@ const results = await Movie.aggregate([
         must: [
           {
             text: {
-              query: 'Action',
-              path: 'genres'  // Movie must be in the 'Action' genre
+              query: 'mission',
+              path: 'title'
             }
           }
         ],
         should: [
           {
             text: {
-              query: 'tom cruise cameron diaz',
+              query: 'tom cruise',
               path: 'cast',
-              score: { boost: { value: 2 } },  // Double the score for movies starring Tom Cruise and Cameron Diaz
+              score: { boost: { value: 5 } },  // Double the score for movies starring Tom Cruise
               matchCriteria: 'all'  // Only boost score if all terms match
             }
           }

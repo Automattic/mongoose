@@ -1,3 +1,17 @@
+9.9.4 / 2026-08-25
+==================
+ * fix(query): set strictQuery and strict on _mongooseOptions consistently #16451 #16447
+ * fix(hydration): use the doc model for looking up a ref #16453 [rawmind](https://github.com/rawmind)
+ * fix(schema): drop the map values subpath when removing a map path #16457 [rawmind](https://github.com/rawmind)
+ * fix(schema): remove a map that lives under a nested path #16461 #16457 [luantaraschi](https://github.com/luantaraschi)
+ * fix(schema): do not repeat null in a toJSONSchema enum that already lists null #16456 [luantaraschi](https://github.com/luantaraschi)
+ * fix(schema): clone a document array element with its own constructor signature #16463 #16462 [luantaraschi](https://github.com/luantaraschi)
+ * fix(schema): keep the map value schematype a single object when cloning #16473 [luantaraschi](https://github.com/luantaraschi)
+ * fix(schema): clarify duplicate index warning to note index is not created #16476 [vjymisal0](https://github.com/vjymisal0)
+ * perf(model): index bulkSave write errors by document id #16474 [yoominho91](https://github.com/yoominho91)
+ * docs: add Atlas Vector Search and Atlas Search documentation #16395
+ * docs: fix dead MongoDB driver Collection link #16458 [rajanpanth](https://github.com/rajanpanth)
+
 8.24.4 / 2026-08-21
 ===================
  * fix(discriminator): prevent indexes and callQueue duplication with shared nested schemas #16467 #16466 #15966 (8.x backport) [AbinMadathil-Celigo](https://github.com/AbinMadathil-Celigo)

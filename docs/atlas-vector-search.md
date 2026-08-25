@@ -174,6 +174,10 @@ Example workflow for application-generated embeddings:
 ```javascript
 const { Binary } = require('mongodb');  // Bundled with Mongoose
 
+// In the sample_mflix dataset, there are two separate movies collections: embedded_movies
+// has built-in embeddings that were generated with Voyage AI and movies does not.
+const Movie = mongoose.model('Movie', movieSchema, 'embedded_movies');
+
 // Use this function to generate embeddings with a third-party provider
 async function generateEmbedding(text) {
   const voyageAPIKey = process.env.VOYAGE_API_KEY;

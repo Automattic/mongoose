@@ -18,7 +18,6 @@ The examples in this guide are based on MongoDB's [mflix](https://www.mongodb.co
 To use vector search, you first need to create a vector search index on your collection.
 You can do this by calling `schema.searchIndex()` with `type: 'vectorSearch'` and defining the vector fields you want to index.
 
-
 ```javascript
 const movieSchema = new mongoose.Schema({
   title: String,

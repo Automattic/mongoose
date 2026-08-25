@@ -13,7 +13,7 @@ Mongoose provides full support for managing Atlas Search indexes through your sc
 
 ## Creating a Search Index
 
-You can define Atlas Search indexes in your Mongoose schema using `schema.searchIndex()` and `Model.createSearchIndexes()` to create the indexes. 
+You can define Atlas Search indexes in your Mongoose schema using `schema.searchIndex()` and `Model.createSearchIndexes()` to create the indexes.
 
 Mongoose can optionally create the search indexes for you when your model initializes if you enable the [autoSearchIndex](https://mongoosejs.com/docs/guide.html#autoSearchIndex) option.
 
@@ -237,7 +237,7 @@ Combine text search and vector search to leverage both keyword relevance and sem
 
 Use `$rankFusion` to run `$vectorSearch` and `$search` as separate subpipelines and merge their results using [Reciprocal Rank Fusion (RRF)](https://www.mongodb.com/docs/vector-search/hybrid-search/hybrid-search/). Note that `$search` must be the first stage in its subpipeline, which is why it cannot be used directly after `$vectorSearch` in the same pipeline.
 
-_This example uses the `generateEmbedding()` function from the [Vector Search](https://mongoosejs.com/docs/atlas-vector-search.html#using-third-party-embedding-models) guide._
+*This example uses the `generateEmbedding()` function from the [Vector Search](https://mongoosejs.com/docs/atlas-vector-search.html#using-third-party-embedding-models) guide.*
 
 ```javascript
 // See the Vector Search guide for details on generating embeddings

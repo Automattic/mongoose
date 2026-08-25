@@ -1,3 +1,7 @@
+8.24.4 / 2026-08-21
+===================
+ * fix(discriminator): prevent indexes and callQueue duplication with shared nested schemas #16467 #16466 #15966 (8.x backport) [AbinMadathil-Celigo](https://github.com/AbinMadathil-Celigo)
+
 9.9.3 / 2026-08-17
 ==================
  * perf(document): cache projection metadata and avoid scanning all projected paths for flat projections #16439 #16407 #16373 [yogesh968](https://github.com/yogesh968)

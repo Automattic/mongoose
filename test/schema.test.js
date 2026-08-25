@@ -3562,6 +3562,10 @@ describe('schema', function() {
         message.includes('for model "gh15056"'),
         'Warning should include model name'
       );
+      assert.ok(
+        message.includes('MongoDB will not create the duplicate index and options on the duplicate definition'),
+        'Warning should mention duplicate index is not created and options not applied (gh-16476)'
+      );
     } finally {
       sinon.restore();
     }

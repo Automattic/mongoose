@@ -1876,6 +1876,42 @@ describe('schema', function() {
         assert.equal(doc.a[0][1].x, 7);
       });
 
+      it('keeps the map value schematype a single object in the copy', function() {
+        const schema = new Schema({ m: { type: Map, of: Number } });
+        const clone = schema.clone();
+
+        assert.strictEqual(clone.paths['m.$*'], clone.paths['m'].$__schemaType);
+        assert.strictEqual(clone.paths['m.$*'], clone.path('m').getEmbeddedSchemaType());
+        assert.deepStrictEqual(clone.mapPaths, [clone.paths['m.$*']]);
+      });
+
+      it('does not hand back the source schema map value schematype', function() {
+        const schema = new Schema({ m: { type: Map, of: Number } });
+        const clone = schema.clone();
+
+        assert.notStrictEqual(clone.paths['m.$*'], schema.paths['m.$*']);
+        assert.notStrictEqual(clone.path('m.someKey'), schema.path('m.someKey'));
+        assert.strictEqual(schema.mapPaths.includes(clone.mapPaths[0]), false);
+      });
+
+      it('applies a setter added to a map value on the copy', function() {
+        const schema = new Schema({ m: { type: Map, of: Number } }).clone();
+        schema.path('m.$*').set(v => v * 2);
+
+        const M = mongoose.model('gh-clone-map-setter', schema);
+        assert.equal(new M({ m: { k: 3 } }).get('m').get('k'), 6);
+      });
+
+      it('applies a validator added to a map value on the copy', function() {
+        const schema = new Schema({ m: { type: Map, of: Number } }).clone();
+        schema.path('m.$*').validate(v => v < 10, 'too big');
+
+        const M = mongoose.model('gh-clone-map-validator', schema);
+        const err = new M({ m: { k: 50 } }).validateSync();
+        assert.ok(err);
+        assert.deepStrictEqual(Object.keys(err.errors), ['m.k']);
+      });
+
       it('copies methods, statics, and query helpers (gh-5752)', function() {
         const schema = new Schema({});
 
@@ -3553,6 +3589,10 @@ describe('schema', function() {
       assert.ok(
         message.includes('for model "gh15056"'),
         'Warning should include model name'
+      );
+      assert.ok(
+        message.includes('MongoDB will not create the duplicate index and options on the duplicate definition'),
+        'Warning should mention duplicate index is not created and options not applied (gh-16476)'
       );
     } finally {
       sinon.restore();

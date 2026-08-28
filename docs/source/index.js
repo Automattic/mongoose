@@ -75,6 +75,7 @@ docs['docs/migrating_to_6.md'] = { guide: true, title: 'Migrating to Mongoose 6'
 docs['docs/migrating_to_7.md'] = { guide: true, title: 'Migrating to Mongoose 7', markdown: true };
 docs['docs/migrating_to_8.md'] = { guide: true, title: 'Migrating to Mongoose 8', markdown: true };
 docs['docs/migrating_to_9.md'] = { guide: true, title: 'Migrating to Mongoose 9', markdown: true };
+docs['docs/migrating_to_10.md'] = { guide: true, title: 'Migrating to Mongoose 10', markdown: true };
 docs['docs/connections.md'] = {
   guide: true,
   title: 'Connecting to MongoDB',

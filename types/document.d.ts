@@ -119,7 +119,6 @@ declare module 'mongoose' {
     $session(session?: ClientSession | null): ClientSession | null;
 
     /** Alias for `set()`, used internally to avoid conflicts */
-    $set(path: string | Record<string, any>, val: any, type: any, options?: DocumentSetOptions): this;
     $set(path: string | Record<string, any>, val: any, options?: DocumentSetOptions): this;
     $set(value: string | Record<string, any>): this;
 
@@ -171,7 +170,7 @@ declare module 'mongoose' {
 
     /** Returns the value of a path. */
     get<T extends keyof DocType>(path: T, type?: any, options?: any): DocType[T];
-    get(path: string, type?: any, options?: any): any;
+    get(path: string, options?: any): any;
 
     /**
      * Returns the changes that happened to the document
@@ -267,8 +266,7 @@ declare module 'mongoose' {
     schema: Schema;
 
     /** Sets the value of a path, or many paths. */
-    set<T extends keyof DocType>(path: T, val: DocType[T], type: any, options?: DocumentSetOptions): this;
-    set(path: string | Record<string, any>, val: any, type: any, options?: DocumentSetOptions): this;
+    set<T extends keyof DocType>(path: T, val: DocType[T], options?: DocumentSetOptions): this;
     set(path: string | Record<string, any>, val: any, options?: DocumentSetOptions): this;
     set(value: string | Record<string, any>): this;
 

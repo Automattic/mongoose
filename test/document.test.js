@@ -6339,7 +6339,7 @@ describe('document', function() {
 
       MainSchema.pre('save', function() {
         if (this.isModified()) {
-          this.set('a.c', 100, Number);
+          this.set('a.c', 100);
         }
       });
 

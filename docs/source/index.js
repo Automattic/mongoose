@@ -106,6 +106,8 @@ docs['docs/sponsors.pug'] = {
 };
 docs['docs/async-await.md'] = { title: 'Using Async/Await with Mongoose', markdown: true };
 docs['docs/change-streams.md'] = { title: 'MongoDB Change Streams in NodeJS with Mongoose', markdown: true };
+docs['docs/atlas-search.md'] = { guide: true, title: 'Atlas Search', markdown: true };
+docs['docs/atlas-vector-search.md'] = { guide: true, title: 'Atlas Vector Search', markdown: true };
 docs['docs/lodash.md'] = { title: 'Using Mongoose with Lodash', markdown: true };
 docs['docs/incompatible_packages.md'] = { title: 'Known Incompatible npm Packages', markdown: true };
 docs['docs/check-version.md'] = { title: 'How to Check Your Mongoose Version', markdown: true };

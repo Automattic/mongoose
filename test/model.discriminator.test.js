@@ -2570,5 +2570,4 @@ describe('model', function() {
     );
     assert.strictEqual(testMethodCalls.length, 1);
   });
-
 });

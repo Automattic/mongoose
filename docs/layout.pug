@@ -29,7 +29,7 @@ html(lang='en')
     block layout
       - const docsHome = `${versions.versionedPath}/docs/index.html`
       - const apiHome = `${versions.versionedPath}/docs/api/mongoose.html`
-      - const migrationHome = `${versions.versionedPath}/docs/migrating_to_9.html`
+      - const migrationHome = `${versions.versionedPath}/docs/migrating_to_10.html`
       - const faqHome = `${versions.versionedPath}/docs/faq.html`
       - const isApiPage = outputUrl.startsWith(`${versions.versionedPath}/docs/api/`)
       - const isMigrationPage = outputUrl === migrationHome
@@ -166,7 +166,7 @@ html(lang='en')
                 span Reference
                 +sidebarSectionCarat
               ul.sidebar-list#sidebar-list-reference
-                +sidebarItem('migrating_to_9.html', 'Migration Guide')
+                +sidebarItem('migrating_to_10.html', 'Migration Guide')
                 +sidebarItem('compatibility.html', 'Version Compatibility')
                 +sidebarItem('version-support.html', 'Version Support')
                 +sidebarItem('faq.html', 'FAQ')

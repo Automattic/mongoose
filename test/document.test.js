@@ -6951,7 +6951,14 @@ describe('document', function() {
     assert.ok(err);
     assert.ok(err.errors['innerField']);
 
-    err = await doc2.inner[0].validate().then(() => assert.ok(false), err => err);
+    const doc3 = new Model();
+    doc3.field = new mongoose.Types.ObjectId();
+    doc3.inner.push({
+      innerField: new mongoose.Types.ObjectId()
+    });
+    doc3.inner[0].innerField = '';
+
+    err = await doc3.inner[0].validate().then(() => assert.ok(false), err => err);
     assert.ok(err);
     assert.ok(err.errors['innerField']);
   });

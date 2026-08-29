@@ -19,9 +19,9 @@ const schema = new mongoose.Schema({}, { strict: false });
 const Test = mongoose.model('Test', schema);
 const doc = new Test();
 
-// Worked in Mongoose 9, but no longer casts in Mongoose 10
+// Worked in Mongoose 9, but throws an error in Mongoose 10
 doc.set('count', '42', Number);
-doc.get('count', Number); // string '42' in Mongoose 10
+doc.get('count', Number);
 ```
 
 Cast values explicitly instead of relying on adhoc type casting.

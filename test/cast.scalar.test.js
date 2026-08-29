@@ -21,15 +21,15 @@ describe('scalar casting from arrays', function() {
   const uuid = '09190f70-3d30-11e5-8814-0f4df9a59c41';
   const objectId = '0123456789abcdef01234567';
   const casterCases = [
-    { name: 'BigInt', cast: castBigInt, value: '42', emptyStringIsNull: true },
+    { name: 'BigInt', cast: castBigInt, value: '42' },
     { name: 'Boolean', cast: castBoolean, value: 'true' },
-    { name: 'Date', cast: castDate, value: '2020-01-01', emptyStringIsNull: true, nestedArrayTarget: 'a date' },
+    { name: 'Date', cast: castDate, value: '2020-01-01', nestedArrayTarget: 'a date' },
     { name: 'Decimal128', cast: castDecimal128, value: '1.23' },
-    { name: 'Double', cast: castDouble, value: '1.23', emptyStringIsNull: true, nestedArrayTarget: 'a Double' },
-    { name: 'Int32', cast: castInt32, value: '42', emptyStringIsNull: true, nestedArrayTarget: 'an Int32' },
-    { name: 'Number', cast: castNumber, value: '42', emptyStringIsNull: true },
+    { name: 'Double', cast: castDouble, value: '1.23', nestedArrayTarget: 'a Double' },
+    { name: 'Int32', cast: castInt32, value: '42', nestedArrayTarget: 'an Int32' },
+    { name: 'Number', cast: castNumber, value: '42' },
     { name: 'ObjectId', cast: castObjectId, value: objectId, nestedArrayTarget: 'an ObjectId' },
-    { name: 'String', cast: castString, value: 42 },
+    { name: 'String', cast: castString, value: 42, preservesEmptyString: true },
     { name: 'UUID', cast: castUUID, value: uuid, nestedArrayTarget: 'a UUID' }
   ];
 
@@ -88,7 +88,7 @@ describe('scalar casting from arrays', function() {
     });
   }
 
-  for (const casterCase of casterCases.filter(casterCase => casterCase.emptyStringIsNull)) {
+  for (const casterCase of casterCases.filter(casterCase => !casterCase.preservesEmptyString)) {
     it(`${casterCase.name} casts a single empty string to null`, function() {
       // Arrange
       const expected = casterCase.cast('');
@@ -102,6 +102,19 @@ describe('scalar casting from arrays', function() {
       assert.strictEqual(actual, expected);
     });
   }
+
+  it('preserves a single empty string for String', function() {
+    // Arrange
+    const expected = castString('');
+
+    // Act
+    const actual = castString(['']);
+
+    // Assert
+    assert.strictEqual(expected, '');
+    assert.strictEqual(actual, '');
+    assert.strictEqual(actual, expected);
+  });
 
   it('reports required validation errors for single null elements', function() {
     // Arrange

@@ -8601,6 +8601,27 @@ describe('document', function() {
     assert.deepEqual(called[1], { a: 'one', b: 'two', c: 'three' });
   });
 
+  it('runs array validators on arrays under nested paths', async function() {
+    const Model = db.model('Test', Schema({
+      nest: {
+        arr: {
+          type: [new Schema({ name: String })],
+          validate: v => v.length <= 1
+        }
+      }
+    }));
+
+    const doc = new Model({ nest: { arr: [{ name: 'a' }, { name: 'b' }] } });
+
+    let err = doc.validateSync();
+    assert.ok(err);
+    assert.ok(err.errors['nest.arr']);
+
+    err = await doc.validate().then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(err.errors['nest.arr']);
+  });
+
   it('handles populate() with custom type that does not cast to doc (gh-8062)', async function() {
     class Gh8062 extends mongoose.SchemaType {
       cast(val) {

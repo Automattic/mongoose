@@ -472,7 +472,7 @@ describe('types.documentarray', function() {
       t.docs.push(null);
       t.docs.push({ name: 'test2' });
 
-      let err = t.validateSync();
+      const err = t.validateSync();
       assert.equal(calls.length, 2);
       assert.ok(err);
       assert.ok(err.errors['docs.0']);

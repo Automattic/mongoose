@@ -454,7 +454,7 @@ describe('types.documentarray', function() {
 
     });
 
-    it('in arr', function() {
+    it('in arr', async function() {
       const calls = [];
       const schema = new Schema({
         docs: [{
@@ -468,15 +468,22 @@ describe('types.documentarray', function() {
 
       mongoose.deleteModel(/Test/);
       const T = mongoose.model('Test', schema);
-      const t = new T({});
+      let t = new T({});
       t.docs.push(null);
       t.docs.push({ name: 'test2' });
 
-      const err = t.validateSync();
+      let err = t.validateSync();
       assert.equal(calls.length, 2);
       assert.ok(err);
       assert.ok(err.errors['docs.0']);
 
+      t = new T({});
+      t.docs.push(null);
+      t.docs.push({ name: 'test2' });
+      await t.validate().then(() => null, err => err);
+      assert.equal(calls.length, 4);
+      assert.ok(err);
+      assert.ok(err.errors['docs.0']);
     });
   });
 

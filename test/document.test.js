@@ -8536,7 +8536,7 @@ describe('document', function() {
     await doc.save();
   });
 
-  it('only calls validator once on mixed validator (gh-8067)', function() {
+  it('only calls validator once on mixed validator (gh-8067)', async function() {
     let called = 0;
     function validator() {
       ++called;
@@ -8567,9 +8567,12 @@ describe('document', function() {
 
     obj.validateSync();
     assert.equal(called, 1);
+
+    await obj.validate();
+    assert.equal(called, 2);
   });
 
-  it('only calls validator once on nested mixed validator (gh-8117)', function() {
+  it('only calls validator once on nested mixed validator (gh-8117)', async function() {
     const called = [];
     const Model = db.model('Test', Schema({
       name: { type: String },
@@ -8588,10 +8591,14 @@ describe('document', function() {
 
     const doc = new Model({ name: 'bob' });
     doc.level1 = { level2: { a: 'one', b: 'two', c: 'three' } };
-    return doc.validate().then(() => {
-      assert.equal(called.length, 1);
-      assert.deepEqual(called[0], { a: 'one', b: 'two', c: 'three' });
-    });
+
+    await doc.validate();
+    assert.equal(called.length, 1);
+    assert.deepEqual(called[0], { a: 'one', b: 'two', c: 'three' });
+
+    doc.validateSync();
+    assert.equal(called.length, 2);
+    assert.deepEqual(called[1], { a: 'one', b: 'two', c: 'three' });
   });
 
   it('handles populate() with custom type that does not cast to doc (gh-8062)', async function() {

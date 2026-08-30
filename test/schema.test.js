@@ -1847,7 +1847,6 @@ describe('schema', function() {
       assert.equal(casted.toString(), '6.2E+23');
 
     });
-https://patch-diff.githubusercontent.com/raw/Automattic/mongoose/pull/16471.diff
     describe('clone()', function() {
       it('works with an array of document arrays (gh-16462)', function() {
         const schema = new Schema({ a: [[{ x: Number }]] });

@@ -1848,7 +1848,7 @@ describe('schema', function() {
 
     });
 
-    describe('clone()', function () {
+    describe('clone()', function() {
       it('works with an array of document arrays (gh-16462)', function() {
         const schema = new Schema({ a: [[{ x: Number }]] });
 

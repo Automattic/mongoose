@@ -6339,7 +6339,7 @@ describe('document', function() {
 
       MainSchema.pre('save', function() {
         if (this.isModified()) {
-          this.set('a.c', 100, Number);
+          this.set('a.c', 100);
         }
       });
 
@@ -15763,7 +15763,7 @@ describe('document', function() {
     await human.save();
 
     h.name.first = 'Larry';
-    human.set(h, null, null, { merge: true });
+    human.set(h, null, { merge: true });
 
     assert.deepStrictEqual(
       human.modifiedPaths({ includeChildren: true }).sort(),

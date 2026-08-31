@@ -94,4 +94,18 @@ declare module 'mongoose' {
   };
 
   type SearchIndexDescription = mongodb.SearchIndexDescription;
+
+  interface SearchIndexInfo {
+    id: string;
+    name: string;
+    type?: string;
+    status: string;
+    queryable: boolean;
+    latestVersion?: number;
+    latestDefinitionVersion?: AnyObject;
+    latestDefinition: AnyObject;
+    statusDetail?: AnyObject[];
+    synonymMappingStatus?: string;
+    synonymMappingStatusDetail?: AnyObject[];
+  }
 }

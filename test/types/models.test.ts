@@ -1,5 +1,6 @@
 import mongoose, {
   AggregateOptions,
+  AnyObject,
   CallbackError,
   DeleteResult,
   Document,
@@ -1511,4 +1512,16 @@ function gh15940() {
   expect(User.hydrate<{ totalOrders: number }>).type.toBeCallableWith(rawUser, null, { strict: false });
   expect(User.hydrate<{ totalOrders: number }>).type.not.toBeCallableWith(rawUser, null, { strict: true });
   expect(User.hydrate<{ totalOrders: number }>).type.not.toBeCallableWith(rawUser);
+}
+
+async function gh16485() {
+  const schema = new Schema({ name: { type: String, unique: true } });
+  const Customer = model('Customer', schema);
+
+  const [index] = await Customer.listSearchIndexes();
+  expect(index.id).type.toBe<string>();
+  expect(index.name).type.toBe<string>();
+  expect(index.status).type.toBe<string>();
+  expect(index.queryable).type.toBe<boolean>();
+  expect(index.latestDefinition).type.toBe<AnyObject>();
 }

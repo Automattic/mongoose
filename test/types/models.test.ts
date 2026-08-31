@@ -12,6 +12,8 @@ import mongoose, {
   Query,
   Schema,
   SearchIndexInfo,
+  SearchIndexStatus,
+  SearchIndexStatusDetail,
   Types,
   UpdateQuery,
   UpdateWriteOpResult,
@@ -1519,6 +1521,10 @@ async function gh16485() {
   const Customer = model('Customer', schema);
 
   const indexes = await Customer.listSearchIndexes();
-  expect(indexes).type.toBe<Array<SearchIndexInfo>>();
-  expect(indexes[0].status).type.toBe<string>();
+  expect(indexes[0]).type.toBe<SearchIndexInfo>();
+  expect(indexes[0].id).type.toBe<string>();
+  expect(indexes[0].queryable).type.toBe<boolean>();
+  expect(indexes[0].status).type.toBe<SearchIndexStatus>();
+  expect(indexes[0].type).type.toBe<'search' | 'vectorSearch' | undefined>();
+  expect(indexes[0].statusDetail).type.toBe<SearchIndexStatusDetail[] | undefined>();
 }

@@ -95,17 +95,32 @@ declare module 'mongoose' {
 
   type SearchIndexDescription = mongodb.SearchIndexDescription;
 
+  /**
+   * A single entry of the [`$listSearchIndexes`](https://www.mongodb.com/docs/manual/reference/operator/aggregation/listSearchIndexes/)
+   * output, as returned by `Model.prototype.listSearchIndexes()`.
+   */
   interface SearchIndexInfo {
+    /** The index's unique identifier, a hex string rather than an ObjectId. */
     id: string;
+    /** The name of the index. */
     name: string;
+    /** The type of the index, `search` or `vectorSearch`. Only returned for Atlas deployments. */
     type?: string;
+    /** The build state of the index, for example `BUILDING`, `READY` or `FAILED`. */
     status: string;
+    /** Whether the index is ready to serve queries. */
     queryable: boolean;
+    /** The version number of the most recent definition. */
     latestVersion?: number;
-    latestDefinitionVersion?: AnyObject;
+    /** When the most recent definition was created, and its version number. */
+    latestDefinitionVersion?: { version: number, createdAt: Date };
+    /** The most recent definition of the index. */
     latestDefinition: AnyObject;
+    /** The status of the index on each individual search node. */
     statusDetail?: AnyObject[];
+    /** The status of the index's synonym mappings, only returned when the index defines any. */
     synonymMappingStatus?: string;
+    /** The status of the index's synonym mappings on each individual search node. */
     synonymMappingStatusDetail?: AnyObject[];
   }
 }

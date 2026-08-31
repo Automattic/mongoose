@@ -1,6 +1,5 @@
 import mongoose, {
   AggregateOptions,
-  AnyObject,
   CallbackError,
   DeleteResult,
   Document,
@@ -12,6 +11,7 @@ import mongoose, {
   ModifyResult,
   Query,
   Schema,
+  SearchIndexInfo,
   Types,
   UpdateQuery,
   UpdateWriteOpResult,
@@ -1515,13 +1515,10 @@ function gh15940() {
 }
 
 async function gh16485() {
-  const schema = new Schema({ name: { type: String, unique: true } });
+  const schema = new Schema({ name: String });
   const Customer = model('Customer', schema);
 
-  const [index] = await Customer.listSearchIndexes();
-  expect(index.id).type.toBe<string>();
-  expect(index.name).type.toBe<string>();
-  expect(index.status).type.toBe<string>();
-  expect(index.queryable).type.toBe<boolean>();
-  expect(index.latestDefinition).type.toBe<AnyObject>();
+  const indexes = await Customer.listSearchIndexes();
+  expect(indexes).type.toBe<Array<SearchIndexInfo>>();
+  expect(indexes[0].status).type.toBe<string>();
 }

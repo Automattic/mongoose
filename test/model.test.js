@@ -2627,6 +2627,65 @@ describe('Model', function() {
       assert.equal(nestedCheck.location[0].zip, 34512);
       assert.equal(nestedCheck.name, 'Quiz');
     });
+    it('should validate nested paths under a parent path in `pathsToSave` (gh-9583)', async function() {
+      const userSchema = new Schema({
+        profile: {
+          firstName: { type: String, minlength: 2 },
+          lastName: String
+        },
+        balance: Number
+      });
+      const User = db.model('User', userSchema);
+      const user = await User.create({ profile: { firstName: 'Alice', lastName: 'Smith' }, balance: 100 });
+
+      user.profile.firstName = 'A';
+      const err = await user.save({ pathsToSave: ['profile'] }).then(() => null, err => err);
+
+      assert.ok(err);
+      assert.equal(err.name, 'ValidationError');
+      assert.ok(err.errors['profile.firstName']);
+
+      const fromDb = await User.findById(user._id).orFail();
+      assert.equal(fromDb.profile.firstName, 'Alice');
+    });
+    it('should save valid nested paths under a parent path in `pathsToSave` (gh-9583)', async function() {
+      const userSchema = new Schema({
+        profile: {
+          firstName: { type: String, minlength: 2 },
+          lastName: String
+        },
+        balance: Number
+      });
+      const User = db.model('User', userSchema);
+      const user = await User.create({ profile: { firstName: 'Alice', lastName: 'Smith' }, balance: 100 });
+
+      user.profile.firstName = 'Alicia';
+      user.balance = 200;
+      await user.save({ pathsToSave: ['profile'] });
+
+      const fromDb = await User.findById(user._id).orFail();
+      assert.equal(fromDb.profile.firstName, 'Alicia');
+      assert.equal(fromDb.balance, 100);
+    });
+    it('should run required validators on nested paths under a parent path in `pathsToSave` (gh-9583)', async function() {
+      const userSchema = new Schema({
+        profile: {
+          firstName: String,
+          lastName: { type: String, required: true }
+        }
+      });
+      const User = db.model('User', userSchema);
+      const _id = new mongoose.Types.ObjectId();
+      await User.collection.insertOne({ _id, profile: { firstName: 'Alice' } });
+
+      const user = await User.findById(_id).orFail();
+      user.profile.firstName = 'Alicia';
+      const err = await user.save({ pathsToSave: ['profile'] }).then(() => null, err => err);
+
+      assert.ok(err);
+      assert.equal(err.name, 'ValidationError');
+      assert.ok(err.errors['profile.lastName']);
+    });
   });
 
   describe('pathsToSave should filter all update operators', function() {

@@ -46,7 +46,7 @@
     "fs-extra": "~11.4.0",
     "glob": "^13.0.6",
     "globals": "^17.4.0",
-    "highlight.js": "11.11.1",
+    "highlight.js": "11.12.0",
     "linkinator": "8.x",
     "lodash.isequal": "4.5.0",
     "lodash.isequalwith": "4.4.0",

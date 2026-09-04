@@ -1847,6 +1847,7 @@ describe('schema', function() {
       assert.equal(casted.toString(), '6.2E+23');
 
     });
+
     describe('clone()', function() {
       it('works with an array of document arrays (gh-16462)', function() {
         const schema = new Schema({ a: [[{ x: Number }]] });

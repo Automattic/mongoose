@@ -8602,11 +8602,26 @@ describe('document', function() {
   });
 
   it('runs array validators on arrays under nested paths', async function() {
+    let arrayValidatorCalledCount = 0;
+    let arrayElementPathValidatorCalledCount = 0;
     const Model = db.model('Test', Schema({
       nest: {
         arr: {
-          type: [new Schema({ name: String })],
-          validate: v => v.length <= 1
+          type: [
+            new Schema({
+              name: {
+                type: String,
+                validate() {
+                  ++arrayElementPathValidatorCalledCount;
+                  return true;
+                }
+              }
+            })
+          ],
+          validate: v => {
+            arrayValidatorCalledCount++;
+            return v.length <= 1;
+          }
         }
       }
     }));
@@ -8616,10 +8631,46 @@ describe('document', function() {
     let err = doc.validateSync();
     assert.ok(err);
     assert.ok(err.errors['nest.arr']);
+    assert.equal(arrayValidatorCalledCount, 1);
+    assert.equal(arrayElementPathValidatorCalledCount, 2);
 
     err = await doc.validate().then(() => null, err => err);
     assert.ok(err);
     assert.ok(err.errors['nest.arr']);
+    assert.equal(arrayValidatorCalledCount, 2);
+    assert.equal(arrayElementPathValidatorCalledCount, 4);
+  });
+
+  it('does not double validate document arrays with passing array validators under nested paths', async function() {
+    let arrayValidatorCalledCount = 0;
+    let arrayElementPathValidatorCalledCount = 0;
+    const Model = db.model('Test', Schema({
+      nest: {
+        arr: {
+          type: [
+            new Schema({
+              name: {
+                type: String,
+                validate() {
+                  ++arrayElementPathValidatorCalledCount;
+                  return true;
+                }
+              }
+            })
+          ],
+          validate: () => {
+            ++arrayValidatorCalledCount;
+            return true;
+          }
+        }
+      }
+    }));
+
+    const doc = new Model({ nest: { arr: [{ name: 'a' }] } });
+    await doc.validate();
+
+    assert.equal(arrayValidatorCalledCount, 1);
+    assert.equal(arrayElementPathValidatorCalledCount, 1);
   });
 
   it('handles populate() with custom type that does not cast to doc (gh-8062)', async function() {

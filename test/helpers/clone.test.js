@@ -259,6 +259,49 @@ describe('clone', () => {
     });
   });
 
+  describe('custom class instances (gh-12574)', () => {
+    it('clones a plain class instance instead of returning it by reference', () => {
+      class Point {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+        }
+      }
+      const base = new Point(1, 2);
+      const cloned = clone(base);
+      assert.notStrictEqual(cloned, base);
+      assert.deepStrictEqual(cloned, base);
+      assert.ok(cloned instanceof Point);
+      cloned.x = 42;
+      assert.equal(base.x, 1);
+    });
+
+    it('does not recurse into class internals (shares nested references)', () => {
+      class Node {
+        constructor(value) {
+          this.value = value;
+        }
+      }
+      const base = new Node('root');
+      base.self = base;
+      const cloned = clone(base);
+      assert.notStrictEqual(cloned, base);
+      assert.equal(cloned.value, 'root');
+      // Shallow: own properties are copied by reference, so no infinite loop.
+      assert.strictEqual(cloned.self, base);
+    });
+
+    it('does not corrupt exotic built-ins with internal slots (Buffer, Map)', () => {
+      const buf = Buffer.from([1, 2, 3]);
+      const clonedBuf = clone(buf);
+      assert.deepStrictEqual([...clonedBuf], [1, 2, 3]);
+
+      const map = new Map([['a', 1]]);
+      const clonedMap = clone(map);
+      assert.equal(clonedMap.get('a'), 1);
+    });
+  });
+
   it('retains RegExp options gh-1355', function() {
     const a = new RegExp('hello', 'igm');
     assert.ok(a.global);

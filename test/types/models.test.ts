@@ -11,6 +11,9 @@ import mongoose, {
   ModifyResult,
   Query,
   Schema,
+  SearchIndexInfo,
+  SearchIndexStatus,
+  SearchIndexStatusDetail,
   Types,
   UpdateQuery,
   UpdateWriteOpResult,
@@ -1511,4 +1514,17 @@ function gh15940() {
   expect(User.hydrate<{ totalOrders: number }>).type.toBeCallableWith(rawUser, null, { strict: false });
   expect(User.hydrate<{ totalOrders: number }>).type.not.toBeCallableWith(rawUser, null, { strict: true });
   expect(User.hydrate<{ totalOrders: number }>).type.not.toBeCallableWith(rawUser);
+}
+
+async function gh16485() {
+  const schema = new Schema({ name: String });
+  const Customer = model('Customer', schema);
+
+  const indexes = await Customer.listSearchIndexes();
+  expect(indexes[0]).type.toBe<SearchIndexInfo>();
+  expect(indexes[0].id).type.toBe<string>();
+  expect(indexes[0].queryable).type.toBe<boolean>();
+  expect(indexes[0].status).type.toBe<SearchIndexStatus>();
+  expect(indexes[0].type).type.toBe<'search' | 'vectorSearch' | undefined>();
+  expect(indexes[0].statusDetail).type.toBe<SearchIndexStatusDetail[] | undefined>();
 }

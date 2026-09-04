@@ -1847,7 +1847,6 @@ describe('schema', function() {
       assert.equal(casted.toString(), '6.2E+23');
 
     });
-
     describe('clone()', function() {
       it('works with an array of document arrays (gh-16462)', function() {
         const schema = new Schema({ a: [[{ x: Number }]] });
@@ -2678,6 +2677,62 @@ describe('schema', function() {
         assert.equal(err.message, '"nay" is invalid at path vote');
       }
       assert.ok(threw);
+    });
+
+    it('replaces {MODEL} with model name on document validation', function() {
+      const schema = Schema({
+        age: {
+          type: Number,
+          cast: '{VALUE} is not a valid number for model {MODEL}'
+        }
+      });
+      const Test = db.model('gh8300', schema);
+
+      const doc = new Test({ age: 'twenty' });
+      const err = doc.validateSync();
+      assert.ok(err);
+      assert.equal(err.errors['age'].name, 'CastError');
+      assert.equal(
+        err.errors['age'].message,
+        '"twenty" is not a valid number for model gh8300'
+      );
+    });
+
+    it('replaces {MODEL} with model name on single nested subdocument validation', function() {
+      const schema = Schema({
+        nested: {
+          age: {
+            type: Number,
+            cast: '{VALUE} is not a valid number for model {MODEL}'
+          }
+        }
+      });
+      const Test = db.model('gh8300_nested', schema);
+
+      const doc = new Test({ nested: { age: 'twenty' } });
+      const err = doc.validateSync();
+      assert.ok(err);
+      assert.equal(err.errors['nested.age'].name, 'CastError');
+      assert.equal(
+        err.errors['nested.age'].message,
+        '"twenty" is not a valid number for model gh8300_nested'
+      );
+    });
+
+    it('passes model to function cast error format on document validation', function() {
+      const schema = Schema({
+        age: {
+          type: Number,
+          cast: [null, (value, path, model) => `${value} is not a number for model ${model ? model.modelName : 'unknown'}`]
+        }
+      });
+      const Test = db.model('gh8300_fn', schema);
+
+      const doc = new Test({ age: 'twenty' });
+      const err = doc.validateSync();
+      assert.ok(err);
+      assert.equal(err.errors['age'].name, 'CastError');
+      assert.equal(err.errors['age'].message, 'twenty is not a number for model gh8300_fn');
     });
   });
 

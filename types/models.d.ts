@@ -658,7 +658,7 @@ declare module 'mongoose' {
      * List all [Atlas search indexes](https://www.mongodb.com/docs/atlas/atlas-search/create-index/) on this model's collection.
      * This function only works when connected to MongoDB Atlas.
      */
-    listSearchIndexes(options?: mongodb.ListSearchIndexesOptions): Promise<Array<{ name: string }>>;
+    listSearchIndexes(options?: mongodb.ListSearchIndexesOptions): Promise<Array<SearchIndexInfo>>;
 
     /** The name of the model */
     modelName: string;

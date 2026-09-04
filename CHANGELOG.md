@@ -1,3 +1,10 @@
+9.9.5 / 2026-09-04
+==================
+ * fix(query): pass schema through when casting a nested $expr comparison #16496 [rajanpanth](https://github.com/rajanpanth)
+ * fix(projection): build the dotted path correctly in isPathSelectedInclusive #16495 [rajanpanth](https://github.com/rajanpanth)
+ * fix(document): replace {MODEL} in custom cast error messages from document validation #16480 #8300 [AbinMadathil-Celigo](https://github.com/AbinMadathil-Celigo)
+ * types(model): add missing properties to listSearchIndexes() return type #16486 [lazerg](https://github.com/lazerg)
+
 9.9.4 / 2026-08-25
 ==================
  * fix(query): set strictQuery and strict on _mongooseOptions consistently #16451 #16447

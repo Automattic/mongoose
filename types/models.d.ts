@@ -841,6 +841,23 @@ declare module 'mongoose' {
       TInstanceMethods & TVirtuals
     >;
 
+    /** Finds documents and counts the number of documents matching `filter`. */
+    findAndCount<ResultDoc = THydratedDocumentType>(
+      filter: QueryFilter<TRawDocType>,
+      projection: ProjectionType<TRawDocType> | null | undefined,
+      options: QueryOptions<TRawDocType> & { sort: any; limit: number; lean: true } & mongodb.Abortable
+    ): Promise<[GetLeanResultType<TRawDocType, TRawDocType[], 'find'>, number]>;
+    findAndCount<ResultDoc = THydratedDocumentType>(
+      filter: QueryFilter<TRawDocType>,
+      projection: ProjectionType<TRawDocType> | null | undefined,
+      options: QueryOptions<TRawDocType> & { sort: any; limit: number; lean: false } & mongodb.Abortable
+    ): Promise<[ResultDoc[], number]>;
+    findAndCount<ResultDoc = THydratedDocumentType>(
+      filter: QueryFilter<TRawDocType>,
+      projection: ProjectionType<TRawDocType> | null | undefined,
+      options: QueryOptions<TRawDocType> & { sort: any; limit: number } & mongodb.Abortable
+    ): Promise<[HasLeanOption<TSchema> extends true ? TLeanResultType[] : ResultDoc[], number]>;
+
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
     findByIdAndDelete<ResultDoc = THydratedDocumentType>(
       id: mongodb.ObjectId | any,

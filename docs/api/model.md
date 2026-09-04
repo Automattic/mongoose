@@ -1331,7 +1331,7 @@ This function only works when connected to MongoDB Atlas.
     const Customer = mongoose.model('Customer', schema);
 
     await Customer.createSearchIndex({ name: 'test', definition: { mappings: { dynamic: true } } });
-    const res = await Customer.listSearchIndexes(); // Includes `[{ name: 'test' }]`
+    const res = await Customer.listSearchIndexes(); // Includes `[{ id: '...', name: 'test', status: 'READY', queryable: true, latestDefinition: { ... } }]`
 
 ## `Model.namespace()`
 

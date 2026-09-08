@@ -334,10 +334,6 @@ declare module 'mongoose' {
       criteria?: QueryFilter<RawDocType>,
       options?: QueryOptions<RawDocType>
     ): QueryWithHelpers<number, DocType, THelpers, RawDocType, 'countDocuments', TDocOverrides>;
-    countDocuments(
-      criteria?: Query<any, any>,
-      options?: QueryOptions<RawDocType>
-    ): QueryWithHelpers<number, DocType, THelpers, RawDocType, 'countDocuments', TDocOverrides>;
 
     /**
      * Returns a wrapper around a [mongodb driver cursor](https://mongodb.github.io/node-mongodb-native/7.0/classes/FindCursor.html).
@@ -354,19 +350,7 @@ declare module 'mongoose' {
       filter?: QueryFilter<RawDocType>,
       options?: QueryOptions<RawDocType>
     ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteMany', TDocOverrides>;
-    deleteMany(
-      filter?: Query<any, any>,
-      options?: QueryOptions<RawDocType>
-    ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteMany', TDocOverrides>;
     deleteMany(filter: QueryFilter<RawDocType>): QueryWithHelpers<
-      any,
-      DocType,
-      THelpers,
-      RawDocType,
-      'deleteMany',
-      TDocOverrides
-    >;
-    deleteMany(filter: Query<any, any>): QueryWithHelpers<
       any,
       DocType,
       THelpers,
@@ -385,19 +369,7 @@ declare module 'mongoose' {
       filter?: QueryFilter<RawDocType>,
       options?: QueryOptions<RawDocType>
     ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteOne', TDocOverrides>;
-    deleteOne(
-      filter?: Query<any, any>,
-      options?: QueryOptions<RawDocType>
-    ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteOne', TDocOverrides>;
     deleteOne(filter: QueryFilter<RawDocType>): QueryWithHelpers<
-      any,
-      DocType,
-      THelpers,
-      RawDocType,
-      'deleteOne',
-      TDocOverrides
-    >;
-    deleteOne(filter: Query<any, any>): QueryWithHelpers<
       any,
       DocType,
       THelpers,
@@ -411,22 +383,6 @@ declare module 'mongoose' {
     distinct<DocKey extends string, ResultType = unknown>(
       field: DocKey,
       filter?: QueryFilter<RawDocType>,
-      options?: QueryOptions<RawDocType>
-    ): QueryWithHelpers<
-      Array<
-        DocKey extends keyof WithLevel1NestedPaths<DocType>
-          ? WithoutUndefined<Unpacked<WithLevel1NestedPaths<DocType>[DocKey]>>
-          : ResultType
-      >,
-      DocType,
-      THelpers,
-      RawDocType,
-      'distinct',
-      TDocOverrides
-    >;
-    distinct<DocKey extends string, ResultType = unknown>(
-      field: DocKey,
-      filter?: Query<any, any>,
       options?: QueryOptions<RawDocType>
     ): QueryWithHelpers<
       Array<
@@ -483,11 +439,6 @@ declare module 'mongoose' {
       projection?: ProjectionType<RawDocType> | null,
       options?: QueryOptions<RawDocType> | null
     ): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find', TDocOverrides>;
-    find(
-      filter?: Query<any, any>,
-      projection?: ProjectionType<RawDocType> | null,
-      options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find', TDocOverrides>;
 
     /** Declares the query a findOne operation. When executed, returns the first found document. */
     findOne(
@@ -495,19 +446,10 @@ declare module 'mongoose' {
       projection?: ProjectionType<RawDocType> | null,
       options?: QueryOptions<RawDocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TDocOverrides>;
-    findOne(
-      filter?: Query<any, any>,
-      projection?: ProjectionType<RawDocType> | null,
-      options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TDocOverrides>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
     findOneAndDelete(
       filter?: QueryFilter<RawDocType>,
-      options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndDelete'>;
-    findOneAndDelete(
-      filter?: Query<any, any>,
       options?: QueryOptions<RawDocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndDelete'>;
 
@@ -518,27 +460,12 @@ declare module 'mongoose' {
       options: QueryOptions<RawDocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<ModifyResult<DocType>, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
     findOneAndUpdate(
-      filter: Query<any, any>,
-      update: UpdateQuery<RawDocType>,
-      options: QueryOptions<RawDocType> & { includeResultMetadata: true }
-    ): QueryWithHelpers<ModifyResult<DocType>, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
-    findOneAndUpdate(
       filter: QueryFilter<RawDocType>,
       update: UpdateQuery<RawDocType>,
       options: QueryOptions<RawDocType> & { upsert: true } & ReturnsNewDoc
     ): QueryWithHelpers<DocType, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
     findOneAndUpdate(
-      filter: Query<any, any>,
-      update: UpdateQuery<RawDocType>,
-      options: QueryOptions<RawDocType> & { upsert: true } & ReturnsNewDoc
-    ): QueryWithHelpers<DocType, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
-    findOneAndUpdate(
       filter?: QueryFilter<RawDocType>,
-      update?: UpdateQuery<RawDocType>,
-      options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
-    findOneAndUpdate(
-      filter?: Query<any, any>,
       update?: UpdateQuery<RawDocType>,
       options?: QueryOptions<RawDocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
@@ -848,11 +775,6 @@ declare module 'mongoose' {
       replacement?: DocType | AnyObject,
       options?: QueryOptions<RawDocType> | null
     ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'replaceOne', TDocOverrides>;
-    replaceOne(
-      filter?: Query<any, any>,
-      replacement?: DocType | AnyObject,
-      options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'replaceOne', TDocOverrides>;
 
     /**
      * Sets this query's `sanitizeProjection` option. With `sanitizeProjection()`, you can pass potentially untrusted user data to `.select()`.
@@ -966,11 +888,6 @@ declare module 'mongoose' {
       update: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline,
       options?: QueryOptions<RawDocType> | null
     ): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType, 'updateMany', TDocOverrides>;
-    updateMany(
-      filter: Query<any, any>,
-      update: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline,
-      options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType, 'updateMany', TDocOverrides>;
 
     /**
      * Declare and/or execute this query as an updateOne() operation. Same as
@@ -978,11 +895,6 @@ declare module 'mongoose' {
      */
     updateOne(
       filter: QueryFilter<RawDocType>,
-      update: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline,
-      options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType, 'updateOne', TDocOverrides>;
-    updateOne(
-      filter: Query<any, any>,
       update: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline,
       options?: QueryOptions<RawDocType> | null
     ): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType, 'updateOne', TDocOverrides>;

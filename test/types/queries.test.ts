@@ -863,11 +863,6 @@ async function gh15779() {
   expect(v8Filter.age).type.toBeAssignableFrom(42);
   expect(v8Filter.age).type.not.toBeAssignableFrom('taco');
 
-  const TestModel = model('Test', new Schema({ age: Number, name: String }));
-  const query = TestModel.find({ age: { $gt: 18 } });
-  TestModel.find(query); // Should compile without errors
-  TestModel.findOne(query);
-  TestModel.deleteMany(query);
 }
 
 async function gh15786() {

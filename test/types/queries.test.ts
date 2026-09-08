@@ -72,12 +72,27 @@ expect<mongoose.WithLevel1NestedPaths<ITest>['docs.id']>().type.toBe<number | un
 
 const Test = model<ITest, Model<ITest, QueryHelpers>>('Test', schema);
 
+const schemaWithQueryHelper = new Schema({ name: String }).queryHelper('byName', function(name: string) {
+  return this.where({ name });
+});
+const ModelWithQueryHelper = model('ModelWithQueryHelper', schemaWithQueryHelper);
+ModelWithQueryHelper.find().byName('test').exec();
+
 Test.find({}, {}, { populate: { path: 'child', model: ChildModel, match: true } }).exec().then((res: Array<ITest>) => console.log(res));
 
 Test.find().byName('test').byName('test2').orFail().exec().then(console.log);
 
 Test.countDocuments({ name: /Test/ }).exec().then((res: number) => console.log(res));
 Test.findOne({ 'docs.id': 42 }).exec().then(console.log);
+
+Test.findAndCount({ name: /Test/ }, null, { sort: { name: 1 }, limit: 10 }).then(([docs, count]) => {
+  expect(docs[0].name).type.toBe<string | undefined>();
+  expect<typeof count>().type.toBe<number>();
+});
+Test.findAndCount({ name: /Test/ }, null, { sort: { name: 1 }, limit: 10, lean: true }).then(([docs, count]) => {
+  expect(docs[0].name).type.toBe<string | undefined>();
+  expect<typeof count>().type.toBe<number>();
+});
 
 // ObjectId casting
 Test.find({ parent: new Types.ObjectId('0'.repeat(24)) });

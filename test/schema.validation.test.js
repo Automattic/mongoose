@@ -1228,7 +1228,7 @@ describe('schema', function() {
         assert.ok(false);
       } catch (error) {
         assert.ok(error);
-        const errorMessage = 'ValidationError: description: Cast to String failed for value "test" (type string) at path "description"';
+        const errorMessage = 'ValidationError: description: Cast to String failed for value "test" (type string) at path "description" for model "gh2832"';
         assert.equal(errorMessage, error.toString());
         assert.ok(error.errors.description);
         assert.equal(error.errors.description.reason.toString(), 'Error: oops');

@@ -74,6 +74,73 @@ const Test = model<ITest, Model<ITest, QueryHelpers>>('Test', schema);
 
 Test.find({}, {}, { populate: { path: 'child', model: ChildModel, match: true } }).exec().then((res: Array<ITest>) => console.log(res));
 
+Test.find({}, { name: 1 }).then(docs => {
+  expect(docs[0]).type.toHaveProperty('name');
+  expect(docs[0]).type.not.toHaveProperty('age');
+  expect(docs[0]).type.toHaveProperty('_id');
+});
+Test.findOne({}, { name: 1 }).then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.find({}, undefined, { projection: { name: 1 } }).then(docs => {
+  expect(docs[0]).type.toHaveProperty('name');
+  expect(docs[0]).type.not.toHaveProperty('age');
+  expect(docs[0]).type.toHaveProperty('_id');
+});
+Test.findOne({}, undefined, { projection: { name: 1 } }).then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.findOne({}, { name: 1, _id: 0 }).then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.not.toHaveProperty('_id');
+});
+Test.findOne({}, { _id: 0 }).then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.toHaveProperty('age');
+  expect(doc!).type.not.toHaveProperty('_id');
+});
+Test.findOne({}, { _id: 1 }).then(doc => {
+  expect(doc!).type.not.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.findOneAndUpdate({}, {}, { projection: { name: 1 } }).then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.findOneAndDelete({}, { projection: { name: 1 } }).then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+
+Test.find({}, { 'docs.$': 1 }).then(docs => {
+  expect(docs[0]).type.not.toHaveProperty('name');
+  expect(docs[0]).type.toHaveProperty('docs');
+  expect(docs[0]).type.toHaveProperty('_id');
+});
+Test.findOne({}, { docs: { $elemMatch: { id: 1 } } }).then(doc => {
+  expect(doc!).type.not.toHaveProperty('name');
+  expect(doc!).type.toHaveProperty('docs');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.findOneAndUpdate({}, {}, { projection: { tags: { $slice: 1 } } }).then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.toHaveProperty('docs');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.findOneAndDelete({}, { projection: { name: { $meta: 'textScore' } } }).then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.toHaveProperty('docs');
+  expect(doc!).type.toHaveProperty('_id');
+});
+
 Test.find().byName('test').byName('test2').orFail().exec().then(console.log);
 
 Test.countDocuments({ name: /Test/ }).exec().then((res: number) => console.log(res));
@@ -179,6 +246,10 @@ Test.find({}, { age: 1, tags: { $slice: 5 } }); // $slice should be allowed in i
 Test.find({}, { age: 0, tags: { $slice: 5 } }); // $slice should be allowed in exclusion projection
 Test.find({}, { age: 1, tags: { $elemMatch: {} } }); // $elemMatch should be allowed in inclusion projection
 Test.find({}, { age: 0, tags: { $elemMatch: {} } }); // $elemMatch should be allowed in exclusion projection
+Test.find({}, { 'docs.$': 1 }); // Positional $ projection should be allowed
+Test.find({}, { docs: { $elemMatch: { id: 1 } } }); // $elemMatch projection should be allowed
+Test.find({}, { tags: { $slice: [0, 1] } }); // $slice projection should be allowed
+Test.find({}, { name: { $meta: 'textScore' } }); // $meta projection should be allowed
 expect(Test.find).type.not.toBeCallableWith({}, { 'docs.id': 'taco' }); // Dot notation should be allowed and does not accept any
 expect(Test.find).type.not.toBeCallableWith({}, { docs: { id: '1' } }); // Dot notation should be able to use a combination with objects
 Test.find({}, { docs: { id: false } }); // Dot notation should be allowed with valid values - should correctly handle arrays

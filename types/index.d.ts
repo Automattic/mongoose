@@ -825,6 +825,7 @@ declare module 'mongoose' {
   export type ReturnsNewDoc = { new: true } | { returnOriginal: false } | { returnDocument: 'after' };
 
   export type ArrayProjectionOperators = { $slice: number | [number, number]; $elemMatch?: never } | { $elemMatch: Record<string, any>; $slice?: never };
+  export type ProjectionOperators = { $meta: string };
   /**
    * This Type Assigns `Element | undefined` recursively to the `T` type.
    * if it is an array it will do this to the element of the array, if it is an object it will do this for the properties of the object.
@@ -842,14 +843,14 @@ declare module 'mongoose' {
     }
   */
   export type Projector<T, Element> = T extends Array<infer U>
-    ? Projector<U, Element> | ArrayProjectionOperators
+    ? Projector<U, Element> | ArrayProjectionOperators | ProjectionOperators
     : T extends TreatAsPrimitives
-      ? Element
+      ? Element | ProjectionOperators
       : T extends Record<string, any>
         ? {
-          [K in keyof T]?: T[K] extends Record<string, any> ? Projector<T[K], Element> | Element : Element;
+          [K in keyof T]?: T[K] extends Record<string, any> ? Projector<T[K], Element> | Element | ProjectionOperators : Element | ProjectionOperators;
         }
-        : Element;
+        : Element | ProjectionOperators;
   type _IDType = { _id?: boolean | number };
   export type InclusionProjection<T> = IsItRecordAndNotAny<T> extends true
     ? Omit<Projector<WithLevel1NestedPaths<T>, boolean | number>, '_id'> & _IDType

@@ -379,6 +379,7 @@ Mongoose's cast error message templating supports the following parameters:
 * `{PATH}`: the path that failed to cast
 * `{VALUE}`: a string representation of the value that failed to cast
 * `{KIND}`: the type that Mongoose attempted to cast to, like `'String'` or `'Number'`
+* `{MODEL}`: the name of the model that the value was being cast for, if the error is associated with a model
 
 You can also define a function that Mongoose will call to get the cast error message as follows.
 

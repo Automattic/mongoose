@@ -94,7 +94,10 @@ describe('types.buffer', function() {
     assert.equal(err2.name, 'ValidationError');
     assert.equal(err2.errors.required.name, 'CastError');
     assert.equal(err2.errors.required.kind, 'Buffer');
-    assert.equal(err2.errors.required.message, 'Cast to Buffer failed for value "{ x: [ 20 ] }" (type Object) at path "required"');
+    assert.equal(
+      err2.errors.required.message,
+      'Cast to Buffer failed for value "{ x: [ 20 ] }" (type Object) at path "required" for model "Test"'
+    );
     assert.deepEqual(err2.errors.required.value, { x: [20] });
     t.required = Buffer.from('hello');
 

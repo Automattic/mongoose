@@ -255,7 +255,7 @@ describe('Int32', function() {
       assert.strictEqual(doc.myInt, 0);
     });
 
-    it('casts empty string to null', function() {
+    it('throws a cast error for empty string', function() {
       const schema = new Schema({
         myInt: Schema.Types.Int32
       });
@@ -264,7 +264,8 @@ describe('Int32', function() {
       const doc = new Test({
         myInt: ''
       });
-      assert.strictEqual(doc.myInt, null);
+      assert.ok(doc.myInt === undefined);
+      assert.ok(doc.validateSync().errors.myInt);
     });
 
     it('supports valueOf() function ', function() {

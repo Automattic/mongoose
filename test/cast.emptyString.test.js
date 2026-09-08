@@ -28,18 +28,14 @@ describe('casting empty strings', function() {
   ];
 
   for (const casterCase of casterCases) {
-    it(`${casterCase.name} casts a single empty string like an empty string`, function() {
-      // Arrange
-      const expected = casterCase.preservesEmptyString ? '' : null;
-
-      // Act
-      const direct = casterCase.cast('');
-      const unboxed = casterCase.cast(['']);
-
-      // Assert
-      assert.strictEqual(direct, expected);
-      assert.strictEqual(unboxed, expected);
-      assert.strictEqual(unboxed, direct);
+    it(`${casterCase.name} ${casterCase.preservesEmptyString ? 'preserves' : 'throws for'} a single empty string`, function() {
+      if (casterCase.preservesEmptyString) {
+        assert.strictEqual(casterCase.cast(''), '');
+        assert.strictEqual(casterCase.cast(['']), '');
+      } else {
+        assert.throws(() => casterCase.cast(''));
+        assert.throws(() => casterCase.cast(['']));
+      }
     });
   }
 });

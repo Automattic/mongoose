@@ -235,7 +235,7 @@ describe('Double', function() {
       assert.deepStrictEqual(doc.myDouble, new BSON.Double(0));
     });
 
-    it('casts empty string to null', function() {
+    it('throws a cast error for empty string', function() {
       const schema = new Schema({
         myDouble: Schema.Types.Double
       });
@@ -244,7 +244,8 @@ describe('Double', function() {
       const doc = new Test({
         myDouble: ''
       });
-      assert.deepStrictEqual(doc.myDouble, null);
+      assert.strictEqual(doc.myDouble, undefined);
+      assert.ok(doc.validateSync().errors.myDouble);
     });
 
     it('supports valueOf() function ', function() {

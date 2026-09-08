@@ -685,8 +685,37 @@ declare module 'mongoose' {
 
     /** Adds static "class" methods to Models compiled from this schema. */
     static<K extends keyof TStaticMethods>(name: K, fn: TStaticMethods[K]): this;
-    static(obj: Partial<TStaticMethods> & { [name: string]: (this: TModelType, ...args: any[]) => any }): this;
-    static(name: string, fn: (this: TModelType, ...args: any[]) => any): this;
+    static<Fns extends Partial<TStaticMethods> & { [name: string]: (this: TModelType, ...args: any[]) => any }>(
+      obj: Fns
+    ): Schema<
+      RawDocType,
+      TModelType,
+      TInstanceMethods,
+      TQueryHelpers,
+      TVirtuals,
+      TStaticMethods & Fns,
+      TSchemaOptions,
+      DocType,
+      THydratedDocumentType,
+      TSchemaDefinition,
+      LeanResultType
+    >;
+    static<Name extends string, Fn extends (this: TModelType, ...args: any[]) => any>(
+      name: Name,
+      fn: Fn
+    ): Schema<
+      RawDocType,
+      TModelType,
+      TInstanceMethods,
+      TQueryHelpers,
+      TVirtuals,
+      TStaticMethods & { [K in Name]: Fn },
+      TSchemaOptions,
+      DocType,
+      THydratedDocumentType,
+      TSchemaDefinition,
+      LeanResultType
+    >;
 
     /** Object of currently defined statics on this schema. */
     statics: { [F in keyof TStaticMethods]: TStaticMethods[F] } &

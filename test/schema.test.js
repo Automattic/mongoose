@@ -2734,6 +2734,34 @@ describe('schema', function() {
       assert.equal(err.errors['age'].name, 'CastError');
       assert.equal(err.errors['age'].message, 'twenty is not a number for model gh8300_fn');
     });
+
+    it('replaces {MODEL} with model name in castObject() errors', function() {
+      const schema = Schema({
+        age: {
+          type: Number,
+          cast: '{VALUE} is not a valid number for model {MODEL}'
+        },
+        nested: {
+          age: {
+            type: Number,
+            cast: '{VALUE} is not a valid number for model {MODEL}'
+          }
+        }
+      });
+      const Test = db.model('gh8300_castObject', schema);
+
+      assert.throws(
+        () => Test.castObject({ age: 'twenty' }),
+        err => err.errors['age'].message ===
+          '"twenty" is not a valid number for model gh8300_castObject'
+      );
+
+      assert.throws(
+        () => Test.castObject({ nested: { age: 'twenty' } }),
+        err => err.errors['nested.age'].message ===
+          '"twenty" is not a valid number for model gh8300_castObject'
+      );
+    });
   });
 
   it('copies `.add()`-ed paths when calling `.add()` with a schema argument (gh-8429)', function() {

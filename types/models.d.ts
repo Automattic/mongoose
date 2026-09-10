@@ -1163,6 +1163,30 @@ declare module 'mongoose' {
     >;
 
     /** Creates a `findOneAndReplace` query: atomically finds the given document and replaces it with `replacement`. */
+    findOneAndReplace<const Projection extends ProjectionType<TRawDocType>>(
+      filter: QueryFilter<TRawDocType>,
+      replacement: TRawDocType | AnyObject,
+      options: QueryOptions<TRawDocType> & { projection: Projection; lean?: false; includeResultMetadata?: false }
+    ): QueryWithHelpers<
+      ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals> | null,
+      ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>,
+      TQueryHelpers,
+      TLeanResultType,
+      'findOneAndReplace',
+      TInstanceMethods & TVirtuals
+    >;
+    findOneAndReplace<const Projection extends ProjectionType<TRawDocType>>(
+      filter: QueryFilter<TRawDocType>,
+      replacement: TRawDocType | AnyObject,
+      options: QueryOptions<TRawDocType> & { projection: Projection; lean?: false; includeResultMetadata: true }
+    ): QueryWithHelpers<
+      ModifyResult<ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>>,
+      ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>,
+      TQueryHelpers,
+      TLeanResultType,
+      'findOneAndReplace',
+      TInstanceMethods & TVirtuals
+    >;
     findOneAndReplace<ResultDoc = THydratedDocumentType>(
       filter: QueryFilter<TRawDocType>,
       replacement: TRawDocType | AnyObject,

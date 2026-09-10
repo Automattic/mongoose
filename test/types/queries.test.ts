@@ -146,6 +146,16 @@ Test.findOneAndDelete({}, { projection: { name: 1 } }).then(doc => {
   expect(doc!).type.not.toHaveProperty('age');
   expect(doc!).type.toHaveProperty('_id');
 });
+Test.findOneAndReplace({}, {}, { projection: { name: 1 } }).then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.findOneAndReplace({}, {}, { projection: { age: 0, _id: 1 }, includeResultMetadata: true }).then(res => {
+  expect(res.value!).type.toHaveProperty('name');
+  expect(res.value!).type.not.toHaveProperty('age');
+  expect(res.value!).type.toHaveProperty('_id');
+});
 
 Test.find({}, { 'docs.$': 1 }).then(docs => {
   expect(docs[0]).type.not.toHaveProperty('name');

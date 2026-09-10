@@ -59,6 +59,7 @@ interface ISubdoc {
 }
 
 interface ITest {
+  _id: Types.ObjectId;
   name?: string;
   age?: number;
   parent?: Types.ObjectId;

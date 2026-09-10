@@ -450,7 +450,7 @@ declare module 'mongoose' {
       projection: Projection,
       options: QueryOptions<TRawDocType> & { lean: true }
     ): QueryWithHelpers<
-      ProjectedLeanDocument<TRawDocType, Projection> | null,
+      ApplyProjection<TRawDocType, Projection> | null,
       THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
@@ -524,7 +524,7 @@ declare module 'mongoose' {
       projection: Projection,
       options: QueryOptions<TRawDocType> & { lean: true } & mongodb.Abortable
     ): QueryWithHelpers<
-      ProjectedLeanDocument<TRawDocType, Projection> | null,
+      ApplyProjection<TRawDocType, Projection> | null,
       THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
@@ -536,7 +536,7 @@ declare module 'mongoose' {
       projection: undefined | null,
       options: QueryOptions<TRawDocType> & { projection: Projection; lean: true } & mongodb.Abortable
     ): QueryWithHelpers<
-      ProjectedLeanDocument<TRawDocType, Projection> | null,
+      ApplyProjection<TRawDocType, Projection> | null,
       THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
@@ -869,7 +869,7 @@ declare module 'mongoose' {
       projection: Projection,
       options: QueryOptions<TRawDocType> & { lean: true } & mongodb.Abortable
     ): QueryWithHelpers<
-      ProjectedLeanDocument<TRawDocType, Projection>[],
+      ApplyProjection<TRawDocType, Projection>[],
       THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
@@ -881,7 +881,7 @@ declare module 'mongoose' {
       projection: undefined | null,
       options: QueryOptions<TRawDocType> & { projection: Projection; lean: true } & mongodb.Abortable
     ): QueryWithHelpers<
-      ProjectedLeanDocument<TRawDocType, Projection>[],
+      ApplyProjection<TRawDocType, Projection>[],
       THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
@@ -954,7 +954,7 @@ declare module 'mongoose' {
       filter: QueryFilter<TRawDocType>,
       projection: Projection,
       options: QueryOptions<TRawDocType> & { sort: any; limit: number; lean: true } & mongodb.Abortable
-    ): Promise<[ProjectedLeanDocument<TRawDocType, Projection>[], number]>;
+    ): Promise<[ApplyProjection<TRawDocType, Projection>[], number]>;
     findAndCount<ResultDoc = THydratedDocumentType>(
       filter: QueryFilter<TRawDocType>,
       projection: ProjectionType<TRawDocType> | null | undefined,
@@ -976,7 +976,7 @@ declare module 'mongoose' {
       id: mongodb.ObjectId | any,
       options: QueryOptions<TRawDocType> & { projection: Projection; lean: true; includeResultMetadata?: false }
     ): QueryWithHelpers<
-      ProjectedLeanDocument<TRawDocType, Projection> | null,
+      ApplyProjection<TRawDocType, Projection> | null,
       THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
@@ -987,7 +987,7 @@ declare module 'mongoose' {
       id: mongodb.ObjectId | any,
       options: QueryOptions<TRawDocType> & { projection: Projection; lean: true; includeResultMetadata: true }
     ): QueryWithHelpers<
-      ModifyResult<ProjectedLeanDocument<TRawDocType, Projection>>,
+      ModifyResult<ApplyProjection<TRawDocType, Projection>>,
       THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
@@ -1057,7 +1057,7 @@ declare module 'mongoose' {
       update: UpdateQuery<TRawDocType>,
       options: QueryOptions<TRawDocType> & { projection: Projection; lean: true; includeResultMetadata?: false }
     ): QueryWithHelpers<
-      ProjectedLeanDocument<TRawDocType, Projection> | null,
+      ApplyProjection<TRawDocType, Projection> | null,
       THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
@@ -1069,7 +1069,7 @@ declare module 'mongoose' {
       update: UpdateQuery<TRawDocType>,
       options: QueryOptions<TRawDocType> & { projection: Projection; lean: true; includeResultMetadata: true }
     ): QueryWithHelpers<
-      ModifyResult<ProjectedLeanDocument<TRawDocType, Projection>>,
+      ModifyResult<ApplyProjection<TRawDocType, Projection>>,
       THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
@@ -1188,7 +1188,7 @@ declare module 'mongoose' {
       filter: QueryFilter<TRawDocType>,
       options: QueryOptions<TRawDocType> & { projection: Projection; lean: true; includeResultMetadata?: false }
     ): QueryWithHelpers<
-      ProjectedLeanDocument<TRawDocType, Projection> | null,
+      ApplyProjection<TRawDocType, Projection> | null,
       THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
@@ -1199,7 +1199,7 @@ declare module 'mongoose' {
       filter: QueryFilter<TRawDocType>,
       options: QueryOptions<TRawDocType> & { projection: Projection; lean: true; includeResultMetadata: true }
     ): QueryWithHelpers<
-      ModifyResult<ProjectedLeanDocument<TRawDocType, Projection>>,
+      ModifyResult<ApplyProjection<TRawDocType, Projection>>,
       THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
@@ -1325,7 +1325,7 @@ declare module 'mongoose' {
       replacement: TRawDocType | AnyObject,
       options: QueryOptions<TRawDocType> & { projection: Projection; lean: true; includeResultMetadata?: false }
     ): QueryWithHelpers<
-      ProjectedLeanDocument<TRawDocType, Projection> | null,
+      ApplyProjection<TRawDocType, Projection> | null,
       THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
@@ -1337,7 +1337,7 @@ declare module 'mongoose' {
       replacement: TRawDocType | AnyObject,
       options: QueryOptions<TRawDocType> & { projection: Projection; lean: true; includeResultMetadata: true }
     ): QueryWithHelpers<
-      ModifyResult<ProjectedLeanDocument<TRawDocType, Projection>>,
+      ModifyResult<ApplyProjection<TRawDocType, Projection>>,
       THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
@@ -1495,7 +1495,7 @@ declare module 'mongoose' {
       update: UpdateQuery<TRawDocType>,
       options: QueryOptions<TRawDocType> & { projection: Projection; lean: true; includeResultMetadata?: false }
     ): QueryWithHelpers<
-      ProjectedLeanDocument<TRawDocType, Projection> | null,
+      ApplyProjection<TRawDocType, Projection> | null,
       THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
@@ -1507,7 +1507,7 @@ declare module 'mongoose' {
       update: UpdateQuery<TRawDocType>,
       options: QueryOptions<TRawDocType> & { projection: Projection; lean: true; includeResultMetadata: true }
     ): QueryWithHelpers<
-      ModifyResult<ProjectedLeanDocument<TRawDocType, Projection>>,
+      ModifyResult<ApplyProjection<TRawDocType, Projection>>,
       THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,

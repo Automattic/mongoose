@@ -240,6 +240,25 @@ declare module 'mongoose' {
           : MergeType<ResultType, ExtractVirtualsForLean<TDocOverrides>>
       : ResultType;
 
+  type QueryLeanResult<RawDocType, ResultType, QueryOp, DocType, TDocOverrides, LeanResultType, LeanOption> =
+    [LeanResultType] extends [never]
+      ? LeanOption extends false
+        ? ResultType extends AnyArray<any>
+          ? DocType[]
+          : ResultType extends null
+            ? DocType | null
+            : DocType
+        : LeanOption extends LeanOptions & { virtuals: true | string[] }
+          ? ResultType extends null
+            ? ApplyLeanVirtuals<GetLeanResultType<RawDocType, ResultType, QueryOp>, TDocOverrides, LeanOption> | null
+            : ApplyLeanVirtuals<GetLeanResultType<RawDocType, ResultType, QueryOp>, TDocOverrides, LeanOption>
+          : ResultType extends null
+            ? GetLeanResultType<RawDocType, ResultType, QueryOp> | null
+            : GetLeanResultType<RawDocType, ResultType, QueryOp>
+      : ResultType extends null
+        ? LeanResultType | null
+        : LeanResultType;
+
   type MergePopulatePaths<RawDocType, ResultType, QueryOp, Paths, TQueryHelpers, TDocOverrides = Record<string, never>> = QueryOp extends QueryOpThatReturnsDocument
     ? ResultType extends null
       ? ResultType
@@ -350,15 +369,6 @@ declare module 'mongoose' {
       filter?: QueryFilter<RawDocType>,
       options?: QueryOptions<RawDocType>
     ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteMany', TDocOverrides>;
-    deleteMany(filter: QueryFilter<RawDocType>): QueryWithHelpers<
-      any,
-      DocType,
-      THelpers,
-      RawDocType,
-      'deleteMany',
-      TDocOverrides
-    >;
-    deleteMany(): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteMany', TDocOverrides>;
 
     /**
      * Declare and/or execute this query as a `deleteOne()` operation. Works like
@@ -369,15 +379,6 @@ declare module 'mongoose' {
       filter?: QueryFilter<RawDocType>,
       options?: QueryOptions<RawDocType>
     ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteOne', TDocOverrides>;
-    deleteOne(filter: QueryFilter<RawDocType>): QueryWithHelpers<
-      any,
-      DocType,
-      THelpers,
-      RawDocType,
-      'deleteOne',
-      TDocOverrides
-    >;
-    deleteOne(): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteOne', TDocOverrides>;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
     distinct<DocKey extends string, ResultType = unknown>(
@@ -454,21 +455,13 @@ declare module 'mongoose' {
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndDelete'>;
 
     /** Creates a `findOneAndUpdate` query: atomically find the first document that matches `filter` and apply `update`. */
-    findOneAndUpdate(
-      filter: QueryFilter<RawDocType>,
-      update: UpdateQuery<RawDocType>,
-      options: QueryOptions<RawDocType> & { includeResultMetadata: true }
-    ): QueryWithHelpers<ModifyResult<DocType>, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
-    findOneAndUpdate(
-      filter: QueryFilter<RawDocType>,
-      update: UpdateQuery<RawDocType>,
-      options: QueryOptions<RawDocType> & { upsert: true } & ReturnsNewDoc
-    ): QueryWithHelpers<DocType, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
-    findOneAndUpdate(
+    findOneAndUpdate<
+      const Options extends QueryOptions<RawDocType> | null = QueryOptions<RawDocType>
+    >(
       filter?: QueryFilter<RawDocType>,
       update?: UpdateQuery<RawDocType>,
-      options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
+      options?: Options
+    ): QueryWithHelpers<QueryOpResult<Options, DocType>, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
 
     /** Declares the query a findById operation. When executed, returns the document with the given `_id`. */
     findById(
@@ -478,31 +471,21 @@ declare module 'mongoose' {
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TDocOverrides>;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */
-    findByIdAndDelete(
-      id: mongodb.ObjectId | any,
-      options: QueryOptions<RawDocType> & { includeResultMetadata: true }
-    ): QueryWithHelpers<ModifyResult<DocType>, DocType, THelpers, RawDocType, 'findOneAndDelete', TDocOverrides>;
-    findByIdAndDelete(
+    findByIdAndDelete<
+      const Options extends QueryOptions<RawDocType> | null = QueryOptions<RawDocType>
+    >(
       id?: mongodb.ObjectId | any,
-      options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndDelete', TDocOverrides>;
+      options?: Options
+    ): QueryWithHelpers<QueryOpResult<Options, DocType>, DocType, THelpers, RawDocType, 'findOneAndDelete', TDocOverrides>;
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
-    findByIdAndUpdate(
-      id: mongodb.ObjectId | any,
-      update: UpdateQuery<RawDocType>,
-      options: QueryOptions<RawDocType> & { includeResultMetadata: true }
-    ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
-    findByIdAndUpdate(
-      id: mongodb.ObjectId | any,
-      update: UpdateQuery<RawDocType>,
-      options: QueryOptions<RawDocType> & { upsert: true } & ReturnsNewDoc
-    ): QueryWithHelpers<DocType, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
-    findByIdAndUpdate(
+    findByIdAndUpdate<
+      const Options extends QueryOptions<RawDocType> | null = QueryOptions<RawDocType>
+    >(
       id?: mongodb.ObjectId | any,
       update?: UpdateQuery<RawDocType>,
-      options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
+      options?: Options
+    ): QueryWithHelpers<QueryOpResult<Options, DocType, any>, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides>;
 
     /** Specifies a `$geometry` condition */
     geometry(object: { type: string, coordinates: any[] }): this;
@@ -561,38 +544,13 @@ declare module 'mongoose' {
       QueryOp,
       TDocOverrides
       >;
-    lean(
-      val: LeanOptions & { virtuals: true | string[] }
+    lean<
+      LeanResultType = never,
+      const LeanOption extends boolean | LeanOptions = boolean | LeanOptions
+    >(
+      val: LeanOption
     ): QueryWithHelpers<
-      ResultType extends null
-        ? ApplyLeanVirtuals<GetLeanResultType<RawDocType, ResultType, QueryOp>, TDocOverrides, { virtuals: true | string[] }> | null
-        : ApplyLeanVirtuals<GetLeanResultType<RawDocType, ResultType, QueryOp>, TDocOverrides, { virtuals: true | string[] }>,
-      DocType,
-      THelpers,
-      RawDocType,
-      QueryOp,
-      TDocOverrides
-      >;
-    lean(
-      val: true | LeanOptions
-    ): QueryWithHelpers<
-      ResultType extends null
-        ? GetLeanResultType<RawDocType, ResultType, QueryOp> | null
-        : GetLeanResultType<RawDocType, ResultType, QueryOp>,
-      DocType,
-      THelpers,
-      RawDocType,
-      QueryOp,
-      TDocOverrides
-      >;
-    lean(
-      val: false
-    ): QueryWithHelpers<
-      ResultType extends AnyArray<any>
-        ? DocType[]
-        : ResultType extends null
-          ? DocType | null
-          : DocType,
+      QueryLeanResult<RawDocType, ResultType, QueryOp, DocType, TDocOverrides, LeanResultType, LeanOption>,
       DocType,
       THelpers,
       RawDocType,
@@ -609,19 +567,6 @@ declare module 'mongoose' {
       QueryOp,
       TDocOverrides
       >;
-    lean<LeanResultType = RawDocType>(
-      val: boolean | LeanOptions
-    ): QueryWithHelpers<
-      ResultType extends null
-        ? LeanResultType | null
-        : LeanResultType,
-      DocType,
-      THelpers,
-      RawDocType,
-      QueryOp,
-      TDocOverrides
-      >;
-
     /** Specifies the maximum number of documents the query will return. */
     limit(val: number): this;
 

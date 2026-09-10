@@ -815,6 +815,29 @@ async function gh14190() {
   expect(res2).type.toBeAssignableTo<
     ModifyResult<ReturnType<(typeof UserModel)['hydrate']>>
   >();
+
+  const res3 = await UserModel.find().findOneAndUpdate(
+    { name: 'test' },
+    { name: 'updated' },
+    { includeResultMetadata: true }
+  );
+  expect(res3).type.toBeAssignableTo<
+    ModifyResult<ReturnType<(typeof UserModel)['hydrate']>>
+  >();
+
+  const upserted = await UserModel.find().findOneAndUpdate(
+    { name: 'test' },
+    { name: 'updated' },
+    { upsert: true, new: true }
+  );
+  expect(upserted).type.toBe<ReturnType<(typeof UserModel)['hydrate']>>();
+
+  const upsertedById = await UserModel.find().findByIdAndUpdate(
+    '0'.repeat(24),
+    { name: 'updated' },
+    { upsert: true, returnDocument: 'after' }
+  );
+  expect(upsertedById).type.toBe<ReturnType<(typeof UserModel)['hydrate']>>();
 }
 
 function mongooseQueryOptions() {

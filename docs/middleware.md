@@ -635,10 +635,19 @@ await doc.save({ middleware: false });
 // Skip all user middleware on queries
 await Model.find({}, null, { middleware: false });
 await Model.updateOne({}, { name: 'test' }, { middleware: false });
+await Model.find().cursor({ middleware: false }).eachAsync(doc => {
+  // process doc
+});
 
 // Skip all user middleware on aggregation
 await Model.aggregate([]).option({ middleware: false });
+await Model.aggregate([]).cursor({ middleware: false }).eachAsync(doc => {
+  // process doc
+});
 ```
+
+Aggregation cursors run `pre('aggregate')` hooks when creating the cursor, but do not run `post('aggregate')` hooks.
+For aggregation cursors, `middleware: false` skips `pre('aggregate')` hooks.
 
 ### Skip Only Pre or Post Hooks
 
@@ -651,6 +660,33 @@ await doc.save({ middleware: { pre: false } });
 // Skip only post hooks, pre hooks still run
 await Model.find({}, null, { middleware: { post: false } });
 ```
+
+### Skip Middleware for Custom Statics and Methods {#skip-custom-statics-and-methods}
+
+Custom statics and methods support the `middleware` option as well, but require an explicit opt-in: set `supportsMiddlewareOption = true` on the function.
+When a static or method opts in, Mongoose reads `middleware` from the last argument if it is a plain object, and ignores every other property, so the same object can carry options meant for the static or method itself:
+
+```javascript
+schema.statics.queueEmail = async function(to, emailOptions, options = {}) {
+  if (options.dryRun) {
+    return;
+  }
+  await emailQueue.add({ to, priority: emailOptions.priority, retries: emailOptions.maxRetries });
+};
+schema.statics.queueEmail.supportsMiddlewareOption = true;
+schema.pre('queueEmail', function() {
+  // user-defined middleware, for example rate limiting or audit logging
+});
+
+await User.queueEmail('test@example.com', { priority: 'high', maxRetries: 3 }, {
+  middleware: false, // skip Mongoose middleware for this call
+  dryRun: true // consumed by `queueEmail()` itself, ignored by Mongoose
+});
+```
+
+Because custom statics and methods can have arbitrary signatures, Mongoose only reads the `middleware` option from functions that set `supportsMiddlewareOption`.
+This avoids conflicts with statics and methods whose last argument has an unrelated `middleware` property.
+**Tip:** reserve the last parameter for an options object and default it to an empty object (`options = {}`) as in the example above. That way there is always an options object, and a data argument with its own `middleware` property is never the last argument.
 
 **Note:** Built-in Mongoose middleware (timestamps, validation, etc.) always runs regardless of this option. Only user-defined middleware registered via `schema.pre()` and `schema.post()` is skipped.
 

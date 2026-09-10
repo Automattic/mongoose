@@ -735,8 +735,8 @@ async function gh13142() {
       options: Options
     ): Promise<
         Options['lean'] extends true
-          ? Pick<Blog, Extract<keyof Projection, keyof Blog>> | null
-          : HydratedDocument<Pick<Blog, Extract<keyof Projection, keyof Blog>>> | null
+          ? mongoose.ApplyProjection<Blog, Projection> | null
+          : HydratedDocument<mongoose.ApplyProjection<Blog, Projection>> | null
     > {
       return this.blogModel.findOne(filter, projection, options);
     }

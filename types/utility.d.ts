@@ -39,6 +39,16 @@ declare module 'mongoose' {
         : HydratedDocument<ApplyProjection<RawDocType, Projection>, TInstanceMethods, TQueryHelpers, TVirtuals>
       : HydratedDocument<ApplyProjection<RawDocType, Projection>, TInstanceMethods, TQueryHelpers, TVirtuals>;
 
+  type ProjectedQueryResult<RawDocType, Projection, Options extends { lean?: any }, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = {}> =
+    Options['lean'] extends true
+      ? ApplyProjection<RawDocType, Projection>
+      : ProjectedHydratedDocument<RawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>;
+
+  type ProjectedQueryResultWithMetadata<RawDocType, Projection, Options extends { lean?: any; includeResultMetadata?: any }, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = {}> =
+    Options['includeResultMetadata'] extends true
+      ? ModifyResult<ProjectedQueryResult<RawDocType, Projection, Options, TInstanceMethods, TQueryHelpers, TVirtuals>>
+      : ProjectedQueryResult<RawDocType, Projection, Options, TInstanceMethods, TQueryHelpers, TVirtuals> | null;
+
   type IfAny<IFTYPE, THENTYPE, ELSETYPE = IFTYPE> = 0 extends 1 & IFTYPE
     ? THENTYPE
     : ELSETYPE;

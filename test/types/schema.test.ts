@@ -2411,3 +2411,27 @@ function allowNullFalseInferredTypes() {
   // @ts-expect-error Argument of type 'null' is not assignable to parameter of type 'string | undefined'.
   ExpectType<RawDocType['name']>(null);
 }
+
+function staticReturnsSchemaWithStaticAdded() {
+  const schemaWithStatic = new Schema({ name: String }).static('findByName', function(name: string) {
+    return this.find({ name });
+  });
+  const ModelWithStatic = model('ModelWithStatic', schemaWithStatic);
+  ModelWithStatic.findByName('test');
+  // @ts-expect-error Argument of type 'number' is not assignable to parameter of type 'string'.
+  ModelWithStatic.findByName(42);
+
+  const schemaWithStaticsObj = new Schema({ name: String }).static({
+    findByName(name: string) {
+      return this.find({ name });
+    },
+    countByName(name: string) {
+      return this.countDocuments({ name });
+    }
+  });
+  const ModelWithStaticsObj = model('ModelWithStaticsObj', schemaWithStaticsObj);
+  ModelWithStaticsObj.findByName('test');
+  ModelWithStaticsObj.countByName('test');
+  // @ts-expect-error Argument of type 'number' is not assignable to parameter of type 'string'.
+  ModelWithStaticsObj.countByName(42);
+}

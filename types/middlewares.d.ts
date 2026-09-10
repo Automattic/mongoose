@@ -41,6 +41,15 @@ declare module 'mongoose' {
     post?: boolean;
   }
 
+  interface SupportsMiddlewareOption {
+    /**
+     * Set to `true` to let callers skip this custom static's or method's middleware
+     * by passing `{ middleware: false }` as the last argument.
+     * See [skipping middleware for custom statics and methods](https://mongoosejs.com/docs/middleware.html#skip-custom-statics-and-methods).
+     */
+    supportsMiddlewareOption?: boolean;
+  }
+
   type PreMiddlewareFunction<ThisType = any> = (
     this: ThisType,
     opts?: Record<string, any>
@@ -60,7 +69,7 @@ declare module 'mongoose' {
     this: ThisType,
     opts: SaveOptions
   ) => void | Promise<void> | Kareem.SkipWrappedFunction;
-  type PostMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, res: ResType, next: CallbackWithoutResultAndOptionalError) => void | Promise<void> | Kareem.OverwriteMiddlewareResult;
+  type PostMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, res: ResType, next: CallbackWithoutResultAndOptionalError) => void | Promise<void> | Kareem.OverwriteResult;
   type ErrorHandlingMiddlewareFunction<ThisType = any, ResType = any> = (this: ThisType, err: NativeError, res: ResType, next: CallbackWithoutResultAndOptionalError) => void;
-  type ErrorHandlingMiddlewareWithOption<ThisType = any, ResType = any> = (this: ThisType, err: NativeError, res: ResType | null, next: CallbackWithoutResultAndOptionalError) => void | Promise<void> | Kareem.OverwriteMiddlewareResult;
+  type ErrorHandlingMiddlewareWithOption<ThisType = any, ResType = any> = (this: ThisType, err: NativeError, res: ResType | null, next: CallbackWithoutResultAndOptionalError) => void | Promise<void> | Kareem.OverwriteResult;
 }

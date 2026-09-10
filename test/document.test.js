@@ -7171,6 +7171,43 @@ describe('document', function() {
     assert.ok(doc.roles[1]._id);
   });
 
+  it('applies defaults to undefined array elements', function() {
+    const schema = new Schema({
+      values: [{ type: String, default: 'Unknown' }]
+    });
+    const Model = db.model('Test', schema);
+
+    const doc = new Model({ values: [null, undefined] });
+
+    assert.deepEqual(doc.values, [null, 'Unknown']);
+  });
+
+  it('applies setters to array element defaults', function() {
+    const schema = new Schema({
+      values: [{
+        type: String,
+        default: 'unknown',
+        set: value => value.toUpperCase()
+      }]
+    });
+    const Model = db.model('Test', schema);
+
+    const doc = new Model({ values: [undefined] });
+
+    assert.deepEqual(doc.values, ['UNKNOWN']);
+  });
+
+  it('throws when a nullish array element default has the wrong type', async function() {
+    const schema = new Schema({
+      values: [{ type: Schema.Types.ObjectId, default: () => [] }]
+    });
+    const Model = db.model('Test', schema);
+
+    const doc = new Model({ values: [undefined] });
+
+    await assert.rejects(doc.save(), /Cast to \[ObjectId\] failed/);
+  });
+
   it('updateOne() hooks (gh-7133) (gh-7423)', async function() {
     const schema = new mongoose.Schema({ name: String });
 
@@ -12117,6 +12154,27 @@ describe('document', function() {
     const entry = await Message.create({});
 
     const failure = await Message.findById({ _id: entry._id });
+
+    assert.deepEqual(failure.modifiedPaths(), []);
+  });
+
+  it('avoids setting modified on defaults in nested arrays of subdocuments', async function() {
+    const textSchema = new Schema({
+      text: { type: String }
+    }, { _id: false });
+
+    const messageSchema = new Schema({
+      body: { type: textSchema, default: { text: 'hello' } },
+      date: { type: Date, default: Date.now }
+    }, { _id: false });
+
+    const Message = db.model('Test', new Schema({
+      messages: [[messageSchema]]
+    }));
+    Message.schema.path('messages').embeddedSchemaType.default(() => [{}]);
+
+    const entry = await Message.create({ messages: [undefined] });
+    const failure = await Message.findById(entry._id);
 
     assert.deepEqual(failure.modifiedPaths(), []);
   });

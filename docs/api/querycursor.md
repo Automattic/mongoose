@@ -28,7 +28,8 @@ in addition to several other mechanisms for loading documents from MongoDB
 one at a time.
 
 QueryCursors execute the model's pre `find` hooks before loading any documents
-from MongoDB, and the model's post `find` hooks after loading each document.
+from MongoDB, and the model's post `find` hooks once per document,
+with an array containing that document.
 
 Unless you're an advanced user, do **not** instantiate this class directly.
 Use [`Query#cursor()`](https://mongoosejs.com/docs/api/query.md#Query.prototype.cursor()) instead.

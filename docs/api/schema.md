@@ -26,6 +26,7 @@
 - [`Schema.prototype.plugin()`](#Schema.prototype.plugin())
 - [`Schema.prototype.post()`](#Schema.prototype.post())
 - [`Schema.prototype.pre()`](#Schema.prototype.pre())
+- [`Schema.prototype.queryHelper()`](#Schema.prototype.queryHelper())
 - [`Schema.prototype.queue()`](#Schema.prototype.queue())
 - [`Schema.prototype.remove()`](#Schema.prototype.remove())
 - [`Schema.prototype.removeIndex()`](#Schema.prototype.removeIndex())
@@ -459,6 +460,10 @@ userSchema.loadClass(UserClass);
 - `name` \<string|object\> The Method Name for a single function, or an Object of "string-function" pairs.
 - `[fn]` \<Function\> The Function in a single-function definition.
 
+### See
+
+- [Skip Middleware](https://mongoosejs.com/docs/middleware.html#skip-custom-statics-and-methods)
+
 Adds an instance method to documents constructed from Models compiled from this schema.
 
 #### Example:
@@ -487,6 +492,17 @@ If a hash of name/fn pairs is passed as the only argument, each name/fn pair wil
     fizz.scratch();
 
 NOTE: `Schema.method()` adds instance methods to the `Schema.methods` object. You can also add instance methods directly to the `Schema.methods` object as seen in the [guide](https://mongoosejs.com/docs/guide.html#methods)
+
+If the method has hooks registered via `schema.pre('meow')` or `schema.post('meow')`, you can allow callers
+to skip them for a single call by setting `supportsMiddlewareOption = true` on the function:
+
+    schema.method('meow', function(options = {}) {
+      console.log('meeeeeoooooooooooow');
+    });
+    schema.methods.meow.supportsMiddlewareOption = true;
+
+    // Skips `pre('meow')` and `post('meow')` hooks
+    await fizz.meow({ middleware: false });
 
 ## `Schema.prototype.obj`
 
@@ -714,6 +730,27 @@ Defines a pre hook for the model.
       // Runs when you call `doc.deleteOne()`
     });
 
+## `Schema.prototype.queryHelper()`
+
+### Parameters
+
+- `name` \<string\> The query helper name.
+- `fn` \<Function\> The query helper function.
+
+### Returns
+
+- \<Schema\> this
+
+Adds a query helper to this schema. Equivalent to `schema.query[name] = fn`.
+
+#### Example:
+
+    schema.queryHelper('byName', function(name) {
+      return this.where({ name });
+    });
+    const Test = mongoose.model('Test', schema);
+    await Test.find().byName('John'); // Equivalent to `Test.find({ name: 'John' })`
+
 ## `Schema.prototype.queue()`
 
 ### Parameters
@@ -866,6 +903,7 @@ Sets a schema option.
 ### See
 
 - [Statics](https://mongoosejs.com/docs/guide.html#statics)
+- [Skip Middleware](https://mongoosejs.com/docs/middleware.html#skip-custom-statics-and-methods)
 
 Adds static "class" methods to Models compiled from this schema.
 
@@ -892,6 +930,17 @@ If a hash of name/fn pairs is passed as the only argument, each name/fn pair wil
     await Drink.findByCost(3);
 
 If a hash of name/fn pairs is passed as the only argument, each name/fn pair will be added as statics.
+
+If the static has hooks registered via `schema.pre('findByName')` or `schema.post('findByName')`, you can allow
+callers to skip them for a single call by setting `supportsMiddlewareOption = true` on the function:
+
+    schema.static('findByName', function(name, options = {}) {
+      return this.find({ name: name });
+    });
+    schema.statics.findByName.supportsMiddlewareOption = true;
+
+    // Skips `pre('findByName')` and `post('findByName')` hooks
+    await Drink.findByName('LaCroix', { middleware: false });
 
 ## `Schema.prototype.toJSONSchema()`
 

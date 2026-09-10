@@ -29,6 +29,7 @@
 - [`Model.events`](#Model.events)
 - [`Model.exists()`](#Model.exists())
 - [`Model.find()`](#Model.find())
+- [`Model.findAndCount()`](#Model.findAndCount())
 - [`Model.findById()`](#Model.findById())
 - [`Model.findByIdAndDelete()`](#Model.findByIdAndDelete())
 - [`Model.findByIdAndUpdate()`](#Model.findByIdAndUpdate())
@@ -841,6 +842,33 @@ more information on how Mongoose casts `filter`.
 
     // passing options
     await MyModel.find({ name: /john/i }, null, { skip: 10 }).exec();
+
+## `Model.findAndCount()`
+
+### Parameters
+
+- `filter` \<object|ObjectId\>
+- `[projection]` \<object|string|Array[string]\> optional fields to return
+- `[options]` \<object\> optional query options
+
+### Returns
+
+- \<Promise<Array>\> a promise that resolves to `[documents, total]`
+
+Finds documents and counts the number of documents matching the filter.
+
+This function fires both `find` and `countDocuments` middleware.
+
+#### Example:
+
+    const [adventures, total] = await Adventure.findAndCount(
+      { type: 'jungle' },
+      null,
+      { sort: { name: 1 }, skip: 10, limit: 10 }
+    );
+
+    adventures; // Array of at most 10 documents matching type 'jungle'
+    total; // Number of documents matching type 'jungle'
 
 ## `Model.findById()`
 

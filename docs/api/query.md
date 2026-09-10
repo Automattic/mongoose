@@ -478,6 +478,10 @@ and the suggested replacement:
 ### Parameters
 
 - `[options]` \<object\>
+- `[options.transform]` \<Function\> optional function which accepts a mongoose document. The return value of the function will be emitted on `data` and returned by `.next()`.
+- `[options.middleware=true]` \<boolean|object\> set to `false` to skip all user-defined middleware
+- `[options.middleware.pre=true]` \<boolean\> set to `false` to skip only pre hooks
+- `[options.middleware.post=true]` \<boolean\> set to `false` to skip only post hooks
 
 ### Returns
 
@@ -490,7 +494,8 @@ and the suggested replacement:
 Returns a wrapper around a [mongodb driver cursor](https://mongodb.github.io/node-mongodb-native/7.0/classes/FindCursor.html).
 A QueryCursor exposes a Streams3 interface, as well as a `.next()` function.
 
-The `.cursor()` function triggers pre find hooks, but **not** post find hooks.
+The `.cursor()` function triggers pre find hooks before opening the cursor
+and post find hooks once per document, with an array containing that document.
 
 #### Example:
 
@@ -519,6 +524,7 @@ The `.cursor()` function triggers pre find hooks, but **not** post find hooks.
 #### Valid options
 
   - `transform`: optional function which accepts a mongoose document. The return value of the function will be emitted on `data` and returned by `.next()`.
+  - [`middleware`](https://mongoosejs.com/docs/middleware.html#skipping): set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post find hooks
 
 ## `Query.prototype.deleteMany()`
 

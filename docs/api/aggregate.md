@@ -210,6 +210,8 @@ Appends a new $count operator to this aggregate pipeline.
 
 - `options` \<object\>
 - `[options.batchSize]` \<number\> set the cursor batch size
+- `[options.middleware=true]` \<boolean|object\> set to `false` to skip user-defined pre aggregate middleware
+- `[options.middleware.pre=true]` \<boolean\> set to `false` to skip pre aggregate middleware
 - `[options.useMongooseAggCursor]` \<boolean\> use experimental mongoose-specific aggregation cursor (for `eachAsync()` and other query cursor semantics)
 
 ### Returns
@@ -223,6 +225,8 @@ Appends a new $count operator to this aggregate pipeline.
 Sets the `cursor` option and executes this aggregation, returning an aggregation cursor.
 Cursors are useful if you want to process the results of the aggregation one-at-a-time
 because the aggregation result is too big to fit into memory.
+Creating an aggregation cursor runs pre aggregate hooks, but not post aggregate hooks.
+To skip pre aggregate hooks, pass `middleware: false` to `.cursor()`.
 
 #### Example:
 

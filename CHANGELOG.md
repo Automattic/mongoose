@@ -1,3 +1,13 @@
+9.10.0 / 2026-09-10
+===================
+ * feat: upgrade mongodb driver -> 7.6.0
+ * feat(model): add Model.findAndCount() wrapper for limit+skip based pagination with countDocuments #16460 #16454
+ * feat(schema): add Schema.prototype.queryHelper() to make it easier to define query helpers in TypeScript #16464 #16410
+ * feat: support middleware skip option for cursors and custom hooks #16350 #15883 #8768 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix: apply defaults to undefined array elements #16542 #9232
+ * types: support for type narrowing when using projection in find and findOne #16500 #15545
+ * types: make Schema.prototype.static() return type with new static #16464
+
 9.9.5 / 2026-09-04
 ==================
  * fix(query): pass schema through when casting a nested $expr comparison #16496 [rajanpanth](https://github.com/rajanpanth)

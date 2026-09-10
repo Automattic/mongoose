@@ -28,3 +28,18 @@ Cast values explicitly instead of relying on adhoc type casting.
 
 The function signature for `Document#set()` and its alias `Document#$set()` is now `function set(path, val, options?)` - the 3rd argument is now `options`.
 The `type` argument has been removed.
+
+## Removed support for passing a query to model query methods
+
+Mongoose 10 no longer supports passing a query instance as the filter to model query methods like `find()` and `findOne()`.
+
+If you need to copy a query into another query, use `Query.prototype.merge()`:
+
+```javascript
+const query = User.find({ status: 'active' }).select('name');
+const queryToRun = User.find().merge(query);
+
+await queryToRun.exec();
+```
+
+`Query.prototype.merge()` copies the query's conditions, field selection, and options to the query it is called on.

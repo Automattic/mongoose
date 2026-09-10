@@ -1,6 +1,5 @@
 import mongoose, {
   AggregateOptions,
-  CallbackError,
   DeleteResult,
   Document,
   HydratedDocument,
@@ -319,9 +318,6 @@ function find() {
   // just filter
   Project.find({});
   Project.find({ name: 'Hello' });
-
-  // just callback; this is no longer supported on .find()
-  Project.find((error: CallbackError, result: IProject[]) => console.log(error, result));
 
   // filter + projection
   Project.find({}, undefined);

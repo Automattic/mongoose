@@ -39,6 +39,37 @@ declare module 'mongoose' {
         : HydratedDocument<ApplyProjection<RawDocType, Projection>, TInstanceMethods, TQueryHelpers, TVirtuals>
       : HydratedDocument<ApplyProjection<RawDocType, Projection>, TInstanceMethods, TQueryHelpers, TVirtuals>;
 
+  type ProjectedQueryResult<RawDocType, Projection, Options extends { lean?: any }, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = {}> =
+    Options['lean'] extends true
+      ? ApplyProjection<RawDocType, Projection>
+      : ProjectedHydratedDocument<RawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>;
+
+  type ProjectedQueryResultWithMetadata<RawDocType, Projection, Options extends { lean?: any; includeResultMetadata?: any }, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = {}> =
+    Options['includeResultMetadata'] extends true
+      ? ModifyResult<ProjectedQueryResult<RawDocType, Projection, Options, TInstanceMethods, TQueryHelpers, TVirtuals>>
+      : ProjectedQueryResult<RawDocType, Projection, Options, TInstanceMethods, TQueryHelpers, TVirtuals> | null;
+
+  type QueryResult<Options, HydratedResult, LeanResult, DefaultResult = HydratedResult> =
+    Options extends { lean: true }
+      ? LeanResult
+      : Options extends { lean: false }
+        ? HydratedResult
+        : DefaultResult;
+
+  type QueryResultWithMetadata<Options, HydratedResult, LeanResult, DefaultResult = HydratedResult, MetadataLeanResult = LeanResult> =
+    Options extends { includeResultMetadata: true }
+      ? ModifyResult<QueryResult<Options, HydratedResult, MetadataLeanResult, DefaultResult>>
+      : Options extends { upsert: true } & ReturnsNewDoc
+        ? QueryResult<Options, HydratedResult, LeanResult, DefaultResult>
+        : QueryResult<Options, HydratedResult, LeanResult, DefaultResult> | null;
+
+  type QueryOpResult<Options, Result, MetadataResult = ModifyResult<Result>> =
+    Options extends { includeResultMetadata: true }
+      ? MetadataResult
+      : Options extends { upsert: true } & ReturnsNewDoc
+        ? Result
+        : Result | null;
+
   type IfAny<IFTYPE, THENTYPE, ELSETYPE = IFTYPE> = 0 extends 1 & IFTYPE
     ? THENTYPE
     : ELSETYPE;

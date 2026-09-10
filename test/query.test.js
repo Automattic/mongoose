@@ -3000,6 +3000,25 @@ describe('Query', function() {
 
       assert.equal(res.owner.name, 'Val');
     });
+
+    it('does not merge queries passed as a filter to find() and findOne()', async function() {
+      const Test = db.model('Test', new Schema({ name: String }));
+
+      const q = Test.find({ name: 'foo' });
+
+      await assert.rejects(
+        Test.find(q).exec(),
+        /Parameter "filter" to find\(\) must be an object/
+      );
+      await assert.rejects(
+        Test.findOne(q).exec(),
+        /Parameter "filter" to findOne\(\) must be an object/
+      );
+
+      // `merge()` still supports queries
+      const res = await Test.find().merge(q);
+      assert.deepStrictEqual(res, []);
+    });
   });
 
   describe('Query#validate() (gh-7984)', function() {

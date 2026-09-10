@@ -39,6 +39,9 @@ declare module 'mongoose' {
         : HydratedDocument<ApplyProjection<RawDocType, Projection>, TInstanceMethods, TQueryHelpers, TVirtuals>
       : HydratedDocument<ApplyProjection<RawDocType, Projection>, TInstanceMethods, TQueryHelpers, TVirtuals>;
 
+  export type ProjectedLeanDocument<RawDocType, Projection> =
+    ApplyProjection<Default__v<Require_id<RawDocType>>, Projection>;
+
   type IfAny<IFTYPE, THENTYPE, ELSETYPE = IFTYPE> = 0 extends 1 & IFTYPE
     ? THENTYPE
     : ELSETYPE;

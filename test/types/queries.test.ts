@@ -100,6 +100,36 @@ Test.findOne({}, undefined, { projection: { name: 1 } }).then(doc => {
   expect(doc!).type.not.toHaveProperty('age');
   expect(doc!).type.toHaveProperty('_id');
 });
+Test.find({}, { name: 1 }, { lean: true }).then(docs => {
+  expect(docs[0]).type.toHaveProperty('name');
+  expect(docs[0]).type.not.toHaveProperty('age');
+  expect(docs[0]).type.toHaveProperty('_id');
+});
+Test.find({}, undefined, { projection: { age: 0, _id: 1 }, lean: true }).then(docs => {
+  expect(docs[0]).type.toHaveProperty('name');
+  expect(docs[0]).type.not.toHaveProperty('age');
+  expect(docs[0]).type.toHaveProperty('_id');
+});
+Test.findOne({}, { name: 1 }, { lean: true }).then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.findOne({}, undefined, { projection: { age: 0, _id: 1 }, lean: true }).then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.findById(new Types.ObjectId(), { name: 1 }, { lean: true }).then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.findAndCount({}, { name: 1 }, { sort: { name: 1 }, limit: 1, lean: true }).then(([docs]) => {
+  expect(docs[0]).type.toHaveProperty('name');
+  expect(docs[0]).type.not.toHaveProperty('age');
+  expect(docs[0]).type.toHaveProperty('_id');
+});
 Test.findOne({}, { name: 1, _id: 0 }).then(doc => {
   expect(doc!).type.toHaveProperty('name');
   expect(doc!).type.not.toHaveProperty('age');
@@ -152,6 +182,56 @@ Test.findOneAndReplace({}, {}, { projection: { name: 1 } }).then(doc => {
   expect(doc!).type.toHaveProperty('_id');
 });
 Test.findOneAndReplace({}, {}, { projection: { age: 0, _id: 1 }, includeResultMetadata: true }).then(res => {
+  expect(res.value!).type.toHaveProperty('name');
+  expect(res.value!).type.not.toHaveProperty('age');
+  expect(res.value!).type.toHaveProperty('_id');
+});
+Test.findOneAndUpdate({}, {}, { projection: { age: 0, _id: 1 }, lean: true }).then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.findOneAndDelete({}, { projection: { age: 0, _id: 1 }, lean: true }).then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.findOneAndReplace({}, {}, { projection: { age: 0, _id: 1 }, lean: true }).then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.findOneAndUpdate({}, {}, { projection: { name: 1 }, lean: true, includeResultMetadata: true }).then(res => {
+  expect(res.value!).type.toHaveProperty('name');
+  expect(res.value!).type.not.toHaveProperty('age');
+  expect(res.value!).type.toHaveProperty('_id');
+});
+Test.findOneAndDelete({}, { projection: { name: 1 }, lean: true, includeResultMetadata: true }).then(res => {
+  expect(res.value!).type.toHaveProperty('name');
+  expect(res.value!).type.not.toHaveProperty('age');
+  expect(res.value!).type.toHaveProperty('_id');
+});
+Test.findOneAndReplace({}, {}, { projection: { name: 1 }, lean: true, includeResultMetadata: true }).then(res => {
+  expect(res.value!).type.toHaveProperty('name');
+  expect(res.value!).type.not.toHaveProperty('age');
+  expect(res.value!).type.toHaveProperty('_id');
+});
+Test.findByIdAndUpdate(new Types.ObjectId(), {}, { projection: { name: 1 }, lean: true }).then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.findByIdAndUpdate(new Types.ObjectId(), {}, { projection: { name: 1 }, lean: true, includeResultMetadata: true }).then(res => {
+  expect(res.value!).type.toHaveProperty('name');
+  expect(res.value!).type.not.toHaveProperty('age');
+  expect(res.value!).type.toHaveProperty('_id');
+});
+Test.findByIdAndDelete(new Types.ObjectId(), { projection: { name: 1 }, lean: true }).then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.findByIdAndDelete(new Types.ObjectId(), { projection: { name: 1 }, lean: true, includeResultMetadata: true }).then(res => {
   expect(res.value!).type.toHaveProperty('name');
   expect(res.value!).type.not.toHaveProperty('age');
   expect(res.value!).type.toHaveProperty('_id');

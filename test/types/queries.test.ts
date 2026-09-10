@@ -115,6 +115,27 @@ Test.findOne({}, { _id: 1 }).then(doc => {
   expect(doc!).type.not.toHaveProperty('age');
   expect(doc!).type.toHaveProperty('_id');
 });
+Test.findOne({}, { age: 0, _id: 1 }).then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.findOne({}, { _id: true, age: false }).then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.findOne({}, { _id: true }).then(doc => {
+  expect(doc!).type.not.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+
+type ProjectionDoc = { _id: string; name: string; age: number };
+expect<mongoose.ApplyProjection<ProjectionDoc, { _id: 1; age: 0 }>>().type.toBe<{ _id: string; name: string }>();
+expect<mongoose.ApplyProjection<ProjectionDoc, { _id: 0; age: 0 }>>().type.toBe<{ name: string }>();
+expect<mongoose.ApplyProjection<ProjectionDoc, { _id: false }>>().type.toBe<{ name: string; age: number }>();
+
 Test.findOneAndUpdate({}, {}, { projection: { name: 1 } }).then(doc => {
   expect(doc!).type.toHaveProperty('name');
   expect(doc!).type.not.toHaveProperty('age');

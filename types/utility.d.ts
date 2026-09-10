@@ -1,13 +1,20 @@
 declare module 'mongoose' {
-  type IsNonDefiningProjectionValue<Value> = Value extends { $slice: any } | { $meta: any } ? true : false;
+  type IsNonDefiningProjection<Value, Key, Projection> = Value extends { $slice: any } | { $meta: any }
+    ? true
+    : Key extends '_id'
+      ? Value extends 0 | false
+        ? false
+        // Including `_id` only defines inclusion when it is the sole projected field.
+        : Exclude<keyof Projection, '_id'> extends never ? false : true
+      : false;
   type ProjectionPath<Key> = Key extends `${infer Parent}.$` ? Parent : Key;
   type DefiningProjectionKeys<Projection> = {
     [Key in keyof Projection]-?: Key extends string
-      ? IsNonDefiningProjectionValue<Projection[Key]> extends true ? never : ProjectionPath<Key>
+      ? IsNonDefiningProjection<Projection[Key], Key, Projection> extends true ? never : ProjectionPath<Key>
       : never
   }[keyof Projection];
   type DefiningProjectionValues<Projection> = {
-    [Key in keyof Projection]-?: IsNonDefiningProjectionValue<Projection[Key]> extends true ? never : Projection[Key]
+    [Key in keyof Projection]-?: IsNonDefiningProjection<Projection[Key], Key, Projection> extends true ? never : Projection[Key]
   }[keyof Projection];
 
   export type ApplyProjection<T, Projection> = Projection extends string

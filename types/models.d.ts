@@ -501,7 +501,7 @@ declare module 'mongoose' {
       options?: QueryOptions<TRawDocType> & { lean?: false } & mongodb.Abortable
     ): QueryWithHelpers<
       ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals> | null,
-      ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>,
+      THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
       'findOne',
@@ -513,7 +513,7 @@ declare module 'mongoose' {
       options: QueryOptions<TRawDocType> & { projection: Projection; lean?: false } & mongodb.Abortable
     ): QueryWithHelpers<
       ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals> | null,
-      ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>,
+      THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
       'findOne',
@@ -846,7 +846,7 @@ declare module 'mongoose' {
       options?: QueryOptions<TRawDocType> & { lean?: false } & mongodb.Abortable
     ): QueryWithHelpers<
       ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>[],
-      ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>,
+      THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
       'find',
@@ -858,7 +858,7 @@ declare module 'mongoose' {
       options: QueryOptions<TRawDocType> & { projection: Projection; lean?: false } & mongodb.Abortable
     ): QueryWithHelpers<
       ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>[],
-      ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>,
+      THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
       'find',
@@ -1167,7 +1167,7 @@ declare module 'mongoose' {
       options: QueryOptions<TRawDocType> & { projection: Projection; lean?: false; includeResultMetadata?: false }
     ): QueryWithHelpers<
       ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals> | null,
-      ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>,
+      THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndDelete',
@@ -1178,7 +1178,7 @@ declare module 'mongoose' {
       options: QueryOptions<TRawDocType> & { projection: Projection; lean?: false; includeResultMetadata: true }
     ): QueryWithHelpers<
       ModifyResult<ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>>,
-      ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>,
+      THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndDelete',
@@ -1302,7 +1302,7 @@ declare module 'mongoose' {
       options: QueryOptions<TRawDocType> & { projection: Projection; lean?: false; includeResultMetadata?: false }
     ): QueryWithHelpers<
       ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals> | null,
-      ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>,
+      THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndReplace',
@@ -1314,7 +1314,7 @@ declare module 'mongoose' {
       options: QueryOptions<TRawDocType> & { projection: Projection; lean?: false; includeResultMetadata: true }
     ): QueryWithHelpers<
       ModifyResult<ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>>,
-      ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>,
+      THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndReplace',
@@ -1472,7 +1472,7 @@ declare module 'mongoose' {
       options: QueryOptions<TRawDocType> & { projection: Projection; lean?: false; includeResultMetadata?: false }
     ): QueryWithHelpers<
       ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals> | null,
-      ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>,
+      THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndUpdate',
@@ -1484,7 +1484,7 @@ declare module 'mongoose' {
       options: QueryOptions<TRawDocType> & { projection: Projection; lean?: false; includeResultMetadata: true }
     ): QueryWithHelpers<
       ModifyResult<ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>>,
-      ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>,
+      THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
       'findOneAndUpdate',

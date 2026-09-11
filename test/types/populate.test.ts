@@ -739,3 +739,13 @@ async function gh16101() {
     expect(doc.owner.name).type.toBe<string>();
   }
 }
+
+function gh16503() {
+  const m: Model<{ a: string }, {}, {}, { id: string }> = mongoose.model(
+    'Test',
+    new mongoose.Schema({ a: { type: String, required: true } })
+  );
+
+  const a: Model<any, any, any, any> = m;
+  const p: mongoose.PopulateOptions = { path: 'x', model: m };
+}

@@ -39,6 +39,17 @@ describe('cast: ', function() {
       assert.deepEqual(cast(schema, { x: strings }), { x: { $in: strings } });
     });
 
+    it('preserves implicit $in for a single-element array', function() {
+      // Arrange
+      const schema = new Schema({ name: String });
+
+      // Act
+      const result = cast(schema, { name: [42] });
+
+      // Assert
+      assert.deepStrictEqual(result, { name: { $in: ['42'] } });
+    });
+
     it('casts array with Strings when necessary', function() {
       const schema = new Schema({ x: String });
       const strings = [123, 456];
@@ -79,6 +90,21 @@ describe('cast: ', function() {
       assert.throws(function() {
         cast(schema, { x: numbers });
       }, /Cast to Number failed for value "asfds"/);
+    });
+
+    it('preserves Buffer and Array values with sanitizeFilter', function() {
+      // Arrange
+      const schema = new Schema({ payload: Buffer, tags: [String] });
+
+      // Act
+      const result = cast(schema, {
+        payload: [1, 2],
+        tags: ['mongodb']
+      }, { sanitizeFilter: true });
+
+      // Assert
+      assert.deepStrictEqual(Array.from(result.payload.value()), [1, 2]);
+      assert.deepStrictEqual(result.tags, ['mongodb']);
     });
   });
 

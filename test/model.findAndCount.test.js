@@ -86,3 +86,68 @@ describe('model: findAndCount:', function() {
     assert.equal(total, 1);
   });
 });
+
+describe('query: findAndCount:', function() {
+  let db;
+
+  before(function() {
+    db = start();
+  });
+
+  after(async function() {
+    await db.close();
+  });
+
+  beforeEach(() => db.deleteModel(/.*/));
+  afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
+
+  it('returns find results and the unpaginated count', async function() {
+    const Test = db.model('Test', new Schema({ name: String, value: Number }));
+    await Test.create([
+      { name: 'a', value: 1 },
+      { name: 'b', value: 2 },
+      { name: 'c', value: 3 }
+    ]);
+
+    const result = Test.find().sort({ value: -1 }).skip(1).limit(1).findAndCount();
+    assert.ok(result instanceof Promise);
+
+    const [docs, total] = await result;
+    assert.deepEqual(docs.map(doc => doc.name), ['b']);
+    assert.equal(total, 3);
+  });
+
+  it('works with incrementally built queries', async function() {
+    const Test = db.model('Test', new Schema({ name: String, status: String }));
+    await Test.create([
+      { name: 'a', status: 'active' },
+      { name: 'b', status: 'active' },
+      { name: 'c', status: 'inactive' },
+      { name: 'd', status: 'active' }
+    ]);
+
+    const query = Test.find({ status: 'active' });
+    query.sort({ name: 1 });
+
+    const [docs, total] = await query.skip(1).limit(1).findAndCount();
+    assert.deepEqual(docs.map(doc => doc.name), ['b']);
+    assert.equal(total, 3);
+  });
+
+  it('throws if sort is not set', async function() {
+    const Test = db.model('Test', new Schema({ name: String }));
+
+    const err = await Test.find().limit(10).findAndCount().then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(err.message.includes('requires sort'));
+  });
+
+  it('throws if limit is not set', async function() {
+    const Test = db.model('Test', new Schema({ name: String }));
+
+    const err = await Test.find().sort({ name: 1 }).findAndCount().then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(err.message.includes('requires limit'));
+  });
+});

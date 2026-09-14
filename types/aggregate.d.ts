@@ -125,7 +125,7 @@ declare module 'mongoose' {
      * Binds this aggregate to a model.
      * @param model the model to which the aggregate is to be bound
      */
-    model(model: Model<any>): this;
+    model(model: Model<any, any, any, any>): this;
 
     /**
      * Returns the current model bound to this aggregate object

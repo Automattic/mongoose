@@ -60,7 +60,7 @@ declare module 'mongoose' {
     /** query conditions to match */
     match?: any;
     /** optional model to use for population */
-    model?: string | Model<any>;
+    model?: string | Model<any, any, any, any>;
     /** by default, Mongoose removes null and undefined values from populated arrays. Use this option to make `populate()` retain `null` and `undefined` array entries. */
     retainNullValues?: boolean;
     /** if true, Mongoose will call any getters defined on the `localField`. By default, Mongoose gets the raw value of `localField`. */

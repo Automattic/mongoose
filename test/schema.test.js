@@ -2746,7 +2746,13 @@ describe('schema', function() {
             type: Number,
             cast: '{VALUE} is not a valid number for model {MODEL}'
           }
-        }
+        },
+        subdoc: Schema({
+          age: {
+            type: Number,
+            cast: '{VALUE} is not a valid number for model {MODEL}'
+          }
+        })
       });
       const Test = db.model('gh8300_castObject', schema);
 
@@ -2759,6 +2765,12 @@ describe('schema', function() {
       assert.throws(
         () => Test.castObject({ nested: { age: 'twenty' } }),
         err => err.errors['nested.age'].message ===
+          '"twenty" is not a valid number for model gh8300_castObject'
+      );
+
+      assert.throws(
+        () => Test.castObject({ subdoc: { age: 'twenty' } }),
+        err => err.errors['subdoc.age'].message ===
           '"twenty" is not a valid number for model gh8300_castObject'
       );
     });

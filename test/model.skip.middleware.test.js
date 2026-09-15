@@ -151,6 +151,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
   });
 
   describe('validation middleware in write operations', function() {
+    // Age must be 0 or greater.
     const operations = {
       save: (User, ages, options) => new User({ age: ages[0] }).save(options),
       'insertMany with plain objects': (User, ages, options) => User.insertMany(ages.map(age => ({ age })), options),
@@ -245,6 +246,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
   });
 
   describe('subdocument validation middleware', function() {
+    // Age must be 0 or greater.
     const operations = {
       validate: (User, data, options) => new User(data).validate(options),
       save: (User, data, options) => new User(data).save(options),

@@ -244,6 +244,128 @@ describe('middleware option to skip hooks (gh-8768)', function() {
     }
   });
 
+  describe('subdocument validation middleware', function() {
+    const operations = {
+      validate: (User, data, options) => new User(data).validate(options),
+      save: (User, data, options) => new User(data).save(options),
+      'insertMany with plain objects': (User, data, options) => User.insertMany([data], options),
+      'insertMany with documents': (User, data, options) => User.insertMany([new User(data)], options)
+    };
+    const selections = [
+      { name: 'middleware: false', options: { middleware: false }, pre: 0, post: 0 },
+      { name: 'no middleware option', options: undefined, pre: 6, post: 6 },
+      { name: 'middleware: { pre: false }', options: { middleware: { pre: false } }, pre: 0, post: 6 },
+      { name: 'middleware: { post: false }', options: { middleware: { post: false } }, pre: 6, post: 0 }
+    ];
+
+    for (const [operation, runOperation] of Object.entries(operations)) {
+      describe(operation, function() {
+        for (const selection of selections) {
+          it(`respects ${selection.name} at each nesting level`, async function() {
+            // Arrange
+            const { User, data, calls } = createTestContext();
+
+            // Act
+            await runOperation(User, data, selection.options);
+
+            // Assert
+            assert.deepStrictEqual(calls, { pre: selection.pre, post: selection.post, errors: 0, validators: 4 });
+            assert.strictEqual(await User.collection.countDocuments(), operation === 'validate' ? 0 : 1);
+          });
+        }
+
+        it('rejects invalid subdocuments without hooks or writes when middleware: false', async function() {
+          // Arrange
+          const { User, data, calls } = createTestContext();
+          data.single.single.age = -1;
+          data.children[0].children[0].age = -2;
+
+          // Act
+          const error = await runOperation(User, data, { middleware: false }).then(() => null, err => err);
+
+          // Assert
+          assert.ok(error instanceof mongoose.Error.ValidationError);
+          assert.ok(error.errors['single.single.age']);
+          assert.ok(error.errors['children.0.children.0.age']);
+          assert.strictEqual(await User.collection.countDocuments(), 0);
+          assert.deepStrictEqual(calls, { pre: 0, post: 0, errors: 0, validators: 4 });
+        });
+
+        for (const phase of ['pre', 'post']) {
+          it(`respects middleware: { ${phase}: false } for validation errors`, async function() {
+            // Arrange
+            const { User, data, calls } = createTestContext();
+            data.single.single.age = -1;
+
+            // Act
+            const error = await runOperation(User, data, { middleware: { [phase]: false } }).then(() => null, err => err);
+
+            // Assert
+            assert.ok(error instanceof mongoose.Error.ValidationError);
+            assert.ok(error.errors['single.single.age']);
+            assert.strictEqual(await User.collection.countDocuments(), 0);
+            assert.strictEqual(calls.validators, 4);
+            assert.strictEqual(calls.pre, phase === 'pre' ? 0 : 6);
+            assert.strictEqual(calls.post, phase === 'post' ? 0 : 4);
+            assert.strictEqual(calls.errors, phase === 'post' ? 0 : 2);
+          });
+        }
+      });
+    }
+
+    for (const operation of ['validate', 'save']) {
+      it(`skips hooks during ${operation} after editing existing subdocuments`, async function() {
+        // Arrange
+        const { User, data, calls } = createTestContext();
+        const stored = new User(data).toObject();
+        await User.collection.insertOne(stored);
+        const user = User.hydrate(stored);
+        user.single.single.age = 25;
+        user.children[0].children[0].age = 35;
+
+        // Act
+        await user[operation]({ middleware: false });
+
+        // Assert
+        assert.strictEqual(calls.pre, 0);
+        assert.strictEqual(calls.post, 0);
+        assert.strictEqual(calls.errors, 0);
+        assert.ok(calls.validators > 0);
+        const persisted = await User.collection.findOne({ _id: user._id });
+        assert.strictEqual(persisted.single.single.age, operation === 'save' ? 25 : 20);
+        assert.strictEqual(persisted.children[0].children[0].age, operation === 'save' ? 35 : 30);
+      });
+    }
+
+    function createTestContext() {
+      const calls = { pre: 0, post: 0, errors: 0, validators: 0 };
+      const childSchema = new Schema({
+        age: {
+          type: Number,
+          validate(value) {
+            calls.validators++;
+            return value >= 0;
+          }
+        }
+      });
+      const parentSchema = new Schema({ single: childSchema, children: [childSchema] });
+      for (const schema of [parentSchema, childSchema]) {
+        schema.pre('validate', function() { calls.pre++; });
+        schema.post('validate', function() { calls.post++; });
+        schema.post('validate', function(error, doc, next) {
+          calls.errors++;
+          next(error);
+        });
+      }
+      const User = db.model('User', new Schema({ single: parentSchema, children: [parentSchema] }));
+      const data = {
+        single: { single: { age: 20 }, children: [{ age: 30 }] },
+        children: [{ single: { age: 20 }, children: [{ age: 30 }] }]
+      };
+      return { User, data, calls };
+    }
+  });
+
   describe('aggregate().explain()', function() {
     it('skips pre/post hooks when middleware: false', async function() {
       // Arrange

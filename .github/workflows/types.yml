@@ -4,12 +4,14 @@ on:
     paths:
       - '.github/workflows/types.yml'
       - 'package.json'
+      - 'scripts/test-types-matrix.js'
       - 'types/**'
       - 'test/types/**'
   push:
     paths:
       - '.github/workflows/types.yml'
       - 'package.json'
+      - 'scripts/test-types-matrix.js'
       - 'types/**'
       - 'test/types/**'
 permissions:
@@ -32,6 +34,9 @@ jobs:
       - name: Lint TS-Files
         run: npm run lint-ts
 
+      - name: Lint matrix runner
+        run: npx eslint scripts/test-types-matrix.js
+
   test-ts-types:
     needs:
       - lint
@@ -49,3 +54,44 @@ jobs:
 
       - name: Typings
         run: npm run test:types
+
+  test-ts-matrix:
+    needs:
+      - lint
+    runs-on: ubuntu-latest
+    name: TypeScript ${{ matrix.typescript }}, exactOptionalPropertyTypes=${{ matrix.exactOptionalPropertyTypes }}, skipLibCheck=${{ matrix.skipLibCheck }}, strict=${{ matrix.strict }}
+    strategy:
+      fail-fast: false
+      matrix:
+        typescript:
+          - '5.9.3'
+          - '7.0.2'
+        exactOptionalPropertyTypes:
+          - true
+          - false
+        skipLibCheck:
+          - true
+          - false
+        strict:
+          - true
+          - false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+
+      - run: npm install
+
+      - name: Install TypeScript ${{ matrix.typescript }}
+        run: npm install --no-save --no-package-lock typescript@${{ matrix.typescript }}
+
+      - name: Typings
+        run: >-
+          node scripts/test-types-matrix.js
+          --typescript=${{ matrix.typescript }}
+          --exactOptionalPropertyTypes=${{ matrix.exactOptionalPropertyTypes }}
+          --skipLibCheck=${{ matrix.skipLibCheck }}
+          --strict=${{ matrix.strict }}

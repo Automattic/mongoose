@@ -253,9 +253,9 @@ describe('middleware option to skip hooks (gh-8768)', function() {
     };
     const selections = [
       { name: 'middleware: false', options: { middleware: false }, pre: 0, post: 0 },
-      { name: 'no middleware option', options: undefined, pre: 6, post: 6 },
-      { name: 'middleware: { pre: false }', options: { middleware: { pre: false } }, pre: 0, post: 6 },
-      { name: 'middleware: { post: false }', options: { middleware: { post: false } }, pre: 6, post: 0 }
+      { name: 'no middleware option', options: undefined, pre: 9, post: 9 },
+      { name: 'middleware: { pre: false }', options: { middleware: { pre: false } }, pre: 0, post: 9 },
+      { name: 'middleware: { post: false }', options: { middleware: { post: false } }, pre: 9, post: 0 }
     ];
 
     for (const [operation, runOperation] of Object.entries(operations)) {
@@ -269,7 +269,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
             await runOperation(User, data, selection.options);
 
             // Assert
-            assert.deepStrictEqual(calls, { pre: selection.pre, post: selection.post, errors: 0, validators: 4 });
+            assert.deepStrictEqual(calls, { pre: selection.pre, post: selection.post, errors: 0, validators: 6 });
             assert.strictEqual(await User.collection.countDocuments(), operation === 'validate' ? 0 : 1);
           });
         }
@@ -279,6 +279,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
           const { User, data, calls } = createTestContext();
           data.single.single.age = -1;
           data.children[0].children[0].age = -2;
+          data.union.single.age = -3;
 
           // Act
           const error = await runOperation(User, data, { middleware: false }).then(() => null, err => err);
@@ -287,8 +288,9 @@ describe('middleware option to skip hooks (gh-8768)', function() {
           assert.ok(error instanceof mongoose.Error.ValidationError);
           assert.ok(error.errors['single.single.age']);
           assert.ok(error.errors['children.0.children.0.age']);
+          assert.ok(error.errors['union.single.age']);
           assert.strictEqual(await User.collection.countDocuments(), 0);
-          assert.deepStrictEqual(calls, { pre: 0, post: 0, errors: 0, validators: 4 });
+          assert.deepStrictEqual(calls, { pre: 0, post: 0, errors: 0, validators: 6 });
         });
 
         for (const phase of ['pre', 'post']) {
@@ -304,9 +306,9 @@ describe('middleware option to skip hooks (gh-8768)', function() {
             assert.ok(error instanceof mongoose.Error.ValidationError);
             assert.ok(error.errors['single.single.age']);
             assert.strictEqual(await User.collection.countDocuments(), 0);
-            assert.strictEqual(calls.validators, 4);
-            assert.strictEqual(calls.pre, phase === 'pre' ? 0 : 6);
-            assert.strictEqual(calls.post, phase === 'post' ? 0 : 4);
+            assert.strictEqual(calls.validators, 6);
+            assert.strictEqual(calls.pre, phase === 'pre' ? 0 : 9);
+            assert.strictEqual(calls.post, phase === 'post' ? 0 : 7);
             assert.strictEqual(calls.errors, phase === 'post' ? 0 : 2);
           });
         }
@@ -322,6 +324,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         const user = User.hydrate(stored);
         user.single.single.age = 25;
         user.children[0].children[0].age = 35;
+        user.union.children[0].age = 45;
 
         // Act
         await user[operation]({ middleware: false });
@@ -334,6 +337,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         const persisted = await User.collection.findOne({ _id: user._id });
         assert.strictEqual(persisted.single.single.age, operation === 'save' ? 25 : 20);
         assert.strictEqual(persisted.children[0].children[0].age, operation === 'save' ? 35 : 30);
+        assert.strictEqual(persisted.union.children[0].age, operation === 'save' ? 45 : 30);
       });
     }
 
@@ -357,10 +361,15 @@ describe('middleware option to skip hooks (gh-8768)', function() {
           next(error);
         });
       }
-      const User = db.model('User', new Schema({ single: parentSchema, children: [parentSchema] }));
+      const User = db.model('User', new Schema({
+        single: parentSchema,
+        children: [parentSchema],
+        union: { type: 'Union', of: [parentSchema, String] }
+      }));
       const data = {
         single: { single: { age: 20 }, children: [{ age: 30 }] },
-        children: [{ single: { age: 20 }, children: [{ age: 30 }] }]
+        children: [{ single: { age: 20 }, children: [{ age: 30 }] }],
+        union: { single: { age: 20 }, children: [{ age: 30 }] }
       };
       return { User, data, calls };
     }

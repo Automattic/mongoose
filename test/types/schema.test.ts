@@ -357,10 +357,8 @@ function gh11435(): void {
 
 // timeSeries
 new Schema({}, { expires: '5 seconds' });
-new Schema({}, {
-  // @ts-expect-error  Type 'string' is not assignable to type 'number'.
-  expireAfterSeconds: '5 seconds'
-});
+// @ts-expect-error  Type 'string' is not assignable to type 'number'.
+new Schema({}, { expireAfterSeconds: '5 seconds' });
 new Schema({}, { expireAfterSeconds: 5 });
 
 function gh10900(): void {
@@ -2171,14 +2169,10 @@ function gh15915() {
   new Schema({ name: String, balance: Number }, { optimisticConcurrency: { exclude: ['name', 'balance'] } });
 
   // invalid types
-  new Schema({ name: String }, {
-    // @ts-expect-error  Type 'string' is not assignable to type 'boolean | string[] | { exclude: string[]; } | undefined'.
-    optimisticConcurrency: 'invalid'
-  });
-  new Schema({ name: String }, { optimisticConcurrency: {
-    // @ts-expect-error  'invalid' does not exist in type 'string[] | { exclude: string[]; }'.
-    invalid: ['name'] }
-  });
+  // @ts-expect-error  Type 'string' is not assignable to type 'boolean | string[] | { exclude: string[]; } | undefined'.
+  new Schema({ name: String }, { optimisticConcurrency: 'invalid' });
+  // @ts-expect-error  'invalid' does not exist in type 'string[] | { exclude: string[]; }'.
+  new Schema({ name: String }, { optimisticConcurrency: { invalid: ['name'] } });
 }
 
 function gh16046() {

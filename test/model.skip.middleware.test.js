@@ -150,6 +150,100 @@ describe('middleware option to skip hooks (gh-8768)', function() {
     });
   });
 
+  describe('validation middleware in write operations', function() {
+    const operations = {
+      save: (User, ages, options) => new User({ age: ages[0] }).save(options),
+      'insertMany with plain objects': (User, ages, options) => User.insertMany(ages.map(age => ({ age })), options),
+      'insertMany with documents': (User, ages, options) => User.insertMany(ages.map(age => new User({ age })), options)
+    };
+
+    for (const [operation, runOperation] of Object.entries(operations)) {
+      describe(operation, function() {
+        const documentCount = operation === 'save' ? 1 : 2;
+
+        it('skips validation hooks with middleware: false', async function() {
+          // Arrange
+          const { User, calls } = createTestContext();
+
+          // Act
+          await runOperation(User, [20, 30], { middleware: false });
+
+          // Assert
+          assert.deepStrictEqual(calls, { pre: 0, post: 0, validators: documentCount });
+          assert.strictEqual(await User.collection.countDocuments(), documentCount);
+        });
+
+        it('runs validation hooks without a middleware option', async function() {
+          // Arrange
+          const { User, calls } = createTestContext();
+
+          // Act
+          await runOperation(User, [20, 30]);
+
+          // Assert
+          assert.deepStrictEqual(calls, { pre: documentCount, post: documentCount, validators: documentCount });
+          assert.strictEqual(await User.collection.countDocuments(), documentCount);
+        });
+
+        it('skips only pre-validation hooks with middleware: { pre: false }', async function() {
+          // Arrange
+          const { User, calls } = createTestContext();
+
+          // Act
+          await runOperation(User, [20, 30], { middleware: { pre: false } });
+
+          // Assert
+          assert.deepStrictEqual(calls, { pre: 0, post: documentCount, validators: documentCount });
+          assert.strictEqual(await User.collection.countDocuments(), documentCount);
+        });
+
+        it('skips only post-validation hooks with middleware: { post: false }', async function() {
+          // Arrange
+          const { User, calls } = createTestContext();
+
+          // Act
+          await runOperation(User, [20, 30], { middleware: { post: false } });
+
+          // Assert
+          assert.deepStrictEqual(calls, { pre: documentCount, post: 0, validators: documentCount });
+          assert.strictEqual(await User.collection.countDocuments(), documentCount);
+        });
+
+        it('rejects invalid documents without writing when middleware: false', async function() {
+          // Arrange
+          const { User, calls } = createTestContext();
+
+          // Act
+          const error = await runOperation(User, [-1, -2], { middleware: false }).then(() => null, err => err);
+
+          // Assert
+          assert.ok(error instanceof mongoose.Error.ValidationError);
+          assert.ok(error.errors.age);
+          assert.strictEqual(await User.collection.countDocuments(), 0);
+          assert.deepStrictEqual(calls, { pre: 0, post: 0, validators: documentCount });
+        });
+      });
+    }
+
+    function createTestContext() {
+      const calls = { pre: 0, post: 0, validators: 0 };
+      const userSchema = new Schema({
+        age: {
+          type: Number,
+          required: true,
+          validate(value) {
+            calls.validators++;
+            return value >= 0;
+          }
+        }
+      });
+      userSchema.pre('validate', function() { calls.pre++; });
+      userSchema.post('validate', function() { calls.post++; });
+      const User = db.model('User', userSchema);
+      return { User, calls };
+    }
+  });
+
   describe('aggregate().explain()', function() {
     it('skips pre/post hooks when middleware: false', async function() {
       // Arrange

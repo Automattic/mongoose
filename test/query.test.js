@@ -3166,7 +3166,7 @@ describe('Query', function() {
     }
 
     for (const lean of [true, false]) {
-      it(`keeps the clone independent when the original changes lean ${lean}`, async function() {
+      it(`keeps the clone independent when the original changes lean to ${!lean}`, async function() {
         // Arrange
         const { User } = await createTestContext();
         const original = User.findOne({ name: 'Alice' }).lean(lean);

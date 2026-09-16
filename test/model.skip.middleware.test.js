@@ -150,6 +150,157 @@ describe('middleware option to skip hooks (gh-8768)', function() {
     });
   });
 
+  describe('query instance middleware', function() {
+    const selections = [
+      { name: 'no middleware option', options: {}, pre: 1, post: 1 },
+      { name: 'middleware: false', options: { middleware: false }, pre: 0, post: 0 },
+      { name: 'middleware: { pre: false }', options: { middleware: { pre: false } }, pre: 0, post: 1 },
+      { name: 'middleware: { post: false }', options: { middleware: { post: false } }, pre: 1, post: 0 }
+    ];
+
+    for (const selection of selections) {
+      for (const execution of ['exec', 'then']) {
+        it(`respects ${selection.name} with ${execution}()`, async function() {
+          // Arrange
+          const { User, calls, addInstanceHooks } = await createTestContext();
+          const query = addInstanceHooks(User.find({ name: 'John' }).setOptions(selection.options));
+
+          // Act
+          const users = await (execution === 'exec' ? query.exec() : query.then(users => users));
+
+          // Assert
+          assert.deepStrictEqual(users.map(user => user.name), ['John']);
+          assert.deepStrictEqual(calls.instance, { pre: selection.pre, post: selection.post });
+          assert.deepStrictEqual(calls.query, { pre: selection.pre, post: selection.post });
+
+          const ordinary = addInstanceHooks(User.find({ name: 'Jane' }));
+          const laterUsers = await ordinary;
+          assert.deepStrictEqual(laterUsers.map(user => user.name), ['Jane']);
+          assert.deepStrictEqual(calls.instance, { pre: selection.pre + 1, post: selection.post + 1 });
+          assert.deepStrictEqual(calls.query, { pre: selection.pre + 1, post: selection.post + 1 });
+        });
+      }
+
+      for (const operation of ['updateOne', 'deleteOne']) {
+        it(`preserves document ${operation} internals with ${selection.name}`, async function() {
+          // Arrange
+          const { User, user, calls, addInstanceHooks } = await createTestContext();
+          const query = operation === 'updateOne' ?
+            user.updateOne({ name: 'John updated' }, selection.options) :
+            user.deleteOne(selection.options);
+          addInstanceHooks(query);
+
+          // Act
+          const result = await query;
+
+          // Assert
+          assert.strictEqual(operation === 'updateOne' ? result.modifiedCount : result.deletedCount, 1);
+          assert.deepStrictEqual(query.getFilter(), { _id: user._id, tenantId: 'north' });
+          assert.deepStrictEqual(calls.instance, { pre: selection.pre, post: selection.post });
+          assert.deepStrictEqual(calls.query, { pre: selection.pre, post: selection.post });
+          assert.deepStrictEqual(calls.document, { pre: selection.pre, post: selection.post });
+          assert.deepStrictEqual(calls.internalDocument, { pre: 1, post: 1 });
+          assert.deepStrictEqual(calls.subdocument, operation === 'deleteOne' ?
+            { pre: selection.pre, post: selection.post } : { pre: 0, post: 0 });
+          assert.deepStrictEqual(calls.internalSubdocument, operation === 'deleteOne' ?
+            { pre: 1, post: 1 } : { pre: 0, post: 0 });
+          const stored = await User.collection.findOne({ _id: user._id });
+          if (operation === 'updateOne') {
+            assert.strictEqual(stored.name, 'John updated');
+          } else {
+            assert.strictEqual(stored, null);
+            assert.strictEqual(user.$isDeleted(), true);
+          }
+          assert.strictEqual(await User.collection.countDocuments({ name: 'Jane' }), 1);
+        });
+      }
+    }
+
+    for (const operation of ['updateOne', 'deleteOne']) {
+      it(`preserves the document session during ${operation} with middleware: false`, async function() {
+        // Arrange
+        const { user } = await createTestContext();
+        const session = await db.startSession();
+        user.$session(session);
+        const query = operation === 'updateOne' ?
+          user.updateOne({ name: 'John updated' }, { middleware: false }) :
+          user.deleteOne({ middleware: false });
+
+        try {
+          // Act
+          const result = await query;
+
+          // Assert
+          assert.strictEqual(operation === 'updateOne' ? result.modifiedCount : result.deletedCount, 1);
+          assert.strictEqual(query.getOptions().session, session);
+        } finally {
+          await session.endSession();
+        }
+      });
+    }
+
+    it('preserves the already-deleted guard with middleware: false', async function() {
+      // Arrange
+      const { User, user } = await createTestContext();
+      user.$isDeleted(true);
+
+      // Act
+      await user.deleteOne({ middleware: false });
+
+      // Assert
+      assert.strictEqual(await User.collection.countDocuments({ _id: user._id }), 1);
+    });
+
+    async function createTestContext() {
+      const calls = {
+        instance: { pre: 0, post: 0 },
+        query: { pre: 0, post: 0 },
+        document: { pre: 0, post: 0 },
+        subdocument: { pre: 0, post: 0 },
+        internalDocument: { pre: 0, post: 0 },
+        internalSubdocument: { pre: 0, post: 0 }
+      };
+      const addressSchema = new Schema({ city: String });
+      const userSchema = new Schema({
+        name: String,
+        tenantId: String,
+        address: addressSchema
+      }, { shardKey: { tenantId: 1 } });
+      for (const operation of ['find', 'updateOne', 'deleteOne']) {
+        userSchema.pre(operation, { query: true, document: false }, function() { calls.query.pre++; });
+        userSchema.post(operation, { query: true, document: false }, function() { calls.query.post++; });
+      }
+      for (const operation of ['updateOne', 'deleteOne']) {
+        userSchema.pre(operation, { document: true, query: false }, function() { calls.document.pre++; });
+        userSchema.post(operation, { document: true, query: false }, function() { calls.document.post++; });
+        addInternalHooks(userSchema, operation, calls.internalDocument);
+      }
+      addressSchema.pre('deleteOne', { document: true, query: false }, function() { calls.subdocument.pre++; });
+      addressSchema.post('deleteOne', { document: true, query: false }, function() { calls.subdocument.post++; });
+      addInternalHooks(addressSchema, 'deleteOne', calls.internalSubdocument);
+      const User = db.model('User', userSchema);
+      const data = new User({ name: 'John', tenantId: 'north', address: { city: 'Amsterdam' } }).toObject();
+      await User.collection.insertMany([data, { name: 'Jane', tenantId: 'south' }]);
+      const user = User.hydrate(data);
+      return { User, user, calls, addInstanceHooks };
+
+      function addInstanceHooks(query) {
+        query.pre(function() { calls.instance.pre++; });
+        query.post(function() { calls.instance.post++; });
+        return query;
+      }
+
+      function addInternalHooks(schema, operation, counts) {
+        function pre() { counts.pre++; }
+        function post() { counts.post++; }
+        pre[builtInMiddleware] = true;
+        post[builtInMiddleware] = true;
+        schema.pre(operation, { document: true, query: false }, pre);
+        schema.post(operation, { document: true, query: false }, post);
+      }
+    }
+  });
+
   describe('validation middleware in write operations', function() {
     // Age must be 0 or greater.
     const operations = {

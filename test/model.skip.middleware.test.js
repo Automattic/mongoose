@@ -301,6 +301,296 @@ describe('middleware option to skip hooks (gh-8768)', function() {
     }
   });
 
+  describe('bulk validation and middleware', function() {
+    // Age must be 0 or greater, including asynchronous validation.
+    const selections = [
+      { name: 'default middleware', options: {}, pre: 1, post: 1 },
+      { name: 'middleware: false', options: { middleware: false }, pre: 0, post: 0 },
+      { name: 'pre: false', options: { middleware: { pre: false } }, pre: 0, post: 1 },
+      { name: 'post: false', options: { middleware: { post: false } }, pre: 1, post: 0 }
+    ];
+
+    for (const operation of ['bulkSave', 'insertOne', 'replaceOne']) {
+      for (const selection of selections) {
+        it(`${operation} respects ${selection.name} during validation and save hooks`, async function() {
+          // Arrange
+          const { User, calls, data } = createTestContext();
+          const doc = new User(data);
+
+          // Act
+          await runOperation(User, operation, doc, selection.options);
+
+          // Assert
+          assertSelectedHooks(calls, selection, operation);
+          const stored = await User.collection.findOne({ name: 'Alice' });
+          assert.strictEqual(stored.age, 20);
+          assert.strictEqual(stored.profile.age, 20);
+          assert.strictEqual(stored.children[0].age, 20);
+          assert.ok(stored.createdAt instanceof Date);
+          if (operation === 'bulkSave') {
+            assert.strictEqual(doc.isNew, false);
+            assert.strictEqual(doc.isModified(), false);
+          }
+
+          resetCalls(calls);
+          const normalDoc = await User.findById(stored._id);
+          normalDoc.age = 21;
+          await User.bulkSave([normalDoc]);
+          assertSelectedHooks(calls, { pre: 1, post: 1 }, 'bulkSave');
+        });
+
+        it(`${operation} rejects an async validator with ${selection.name} before writing`, async function() {
+          // Arrange
+          const { User, data } = createTestContext();
+          const doc = new User({ ...data, age: -1 });
+          if (operation === 'replaceOne') {
+            await User.collection.insertOne(data);
+          }
+
+          // Act
+          const error = await runOperation(User, operation, doc, selection.options).then(() => null, err => err);
+
+          // Assert
+          assert.ok(error instanceof mongoose.Error.ValidationError);
+          assert.strictEqual(error.errors.age.kind, 'user defined');
+          const stored = await User.collection.findOne({ name: 'Alice' });
+          assert.strictEqual(stored?.age, operation === 'replaceOne' ? 20 : undefined);
+        });
+      }
+    }
+
+    it('bulkSave validates every document before sending any writes', async function() {
+      // Arrange
+      const { User, data } = createTestContext();
+      const docs = [new User(data), new User({ ...data, name: 'Bob', age: -1 })];
+
+      // Act
+      const error = await User.bulkSave(docs, { middleware: false }).then(() => null, err => err);
+
+      // Assert
+      assert.ok(error instanceof mongoose.Error.ValidationError);
+      assert.strictEqual(await User.countDocuments(), 0);
+      assert.ok(docs.every(doc => doc.isNew));
+    });
+
+    it('bulkSave awaits validation before user save hooks', async function() {
+      // Arrange
+      const { User, data, events } = createTestContext();
+
+      // Act
+      await User.bulkSave([new User(data)]);
+
+      // Assert
+      assert.ok(events.indexOf('parent:validated') !== -1);
+      assert.ok(events.indexOf('parent:validated') < events.indexOf('parent:save'));
+      assert.ok(events.indexOf('child:validated') < events.indexOf('child:save'));
+    });
+
+    for (const options of [{ validateBeforeSave: false }, { skipValidation: true }]) {
+      it(`bulkSave preserves ${Object.keys(options)[0]} when validation is disabled`, async function() {
+        // Arrange
+        const { User, data, calls } = createTestContext();
+        const doc = new User({ ...data, name: undefined, age: -1 });
+
+        // Act
+        await User.bulkSave([doc], options);
+
+        // Assert
+        assert.strictEqual((await User.collection.findOne({ _id: doc._id })).age, -1);
+        assert.strictEqual(calls.validatePre, 0);
+        assert.strictEqual(calls.validatePost, 0);
+        assert.strictEqual(calls.savePre, 1);
+        assert.strictEqual(calls.childSavePre, 2);
+      });
+    }
+
+    it('bulkSave respects schema validation defaults and an explicit override', async function() {
+      // Arrange
+      const { User, data } = createTestContext({ validateBeforeSave: false });
+      const skipped = new User({ ...data, name: undefined, age: -1 });
+      const checked = new User({ ...data, name: 'Bob', age: -1 });
+
+      // Act
+      await User.bulkSave([skipped]);
+      const error = await User.bulkSave([checked], { validateBeforeSave: true }).then(() => null, err => err);
+
+      // Assert
+      assert.ok(error instanceof mongoose.Error.ValidationError);
+      assert.strictEqual(await User.countDocuments(), 1);
+      assert.strictEqual((await User.collection.findOne({ _id: skipped._id })).age, -1);
+    });
+
+    it('bulkSave forwards validateModifiedOnly without changing the schema default', async function() {
+      // Arrange
+      const { User, data } = createTestContext();
+      const { insertedId } = await User.collection.insertOne({ ...data, name: undefined });
+      const doc = await User.findById(insertedId);
+      doc.age = 21;
+
+      // Act
+      await User.bulkSave([doc], { validateModifiedOnly: true, middleware: false });
+      doc.age = 22;
+      const error = await User.bulkSave([doc], { middleware: false }).then(() => null, err => err);
+
+      // Assert
+      assert.ok(error instanceof mongoose.Error.ValidationError);
+      assert.strictEqual(error.errors.name.kind, 'required');
+      assert.strictEqual((await User.collection.findOne({ _id: insertedId })).age, 21);
+    });
+
+    for (const failure of ['validation', 'duplicate key']) {
+      for (const retry of ['bulkSave', 'save']) {
+        it(`does not retain suppression after ${failure} failure before ${retry}`, async function() {
+          // Arrange
+          const { User, data, calls } = createTestContext();
+          const doc = new User({ ...data, age: failure === 'validation' ? -1 : 20 });
+          if (failure === 'duplicate key') {
+            await User.collection.insertOne({ ...data, _id: doc._id });
+          }
+
+          // Act
+          const error = await User.bulkSave([doc], { middleware: false }).then(() => null, err => err);
+
+          // Assert
+          assert.ok(error);
+          assert.strictEqual(error.name, failure === 'validation' ? 'ValidationError' : 'MongoBulkWriteError');
+          assert.strictEqual(calls.savePre, 0);
+          assert.strictEqual(calls.childSavePre, 0);
+          if (failure === 'duplicate key') {
+            await User.collection.deleteOne({ _id: doc._id });
+          }
+          doc.age = 20;
+          resetCalls(calls);
+          await (retry === 'bulkSave' ? User.bulkSave([doc]) : doc.save());
+          assert.strictEqual(calls.validatePre, 1);
+          assert.strictEqual(calls.validatePost, 1);
+          assert.strictEqual(calls.savePre, 1);
+          assert.strictEqual(calls.savePost, 1);
+          assert.strictEqual(calls.childSavePre, 2);
+          assert.strictEqual(calls.childSavePost, 2);
+        });
+      }
+    }
+
+    for (const operation of ['bulkSave', 'insertOne', 'replaceOne']) {
+      it(`${operation} preserves sessions and disabled timestamps under suppression`, async function() {
+        // Arrange
+        const { User, data } = createTestContext();
+        const session = await db.startSession();
+        const doc = new User(data);
+        const write = sinon.spy(User.collection, 'bulkWrite');
+        try {
+          // Act
+          await runOperation(User, operation, doc, { middleware: false, timestamps: false, session });
+
+          // Assert
+          const stored = await User.collection.findOne({ name: 'Alice' });
+          assert.strictEqual(stored.age, 20);
+          assert.strictEqual(stored.createdAt, undefined);
+          assert.strictEqual(write.firstCall.args[1].session, session);
+          if (operation === 'bulkSave') {
+            assert.strictEqual(doc.$session(), session);
+          }
+        } finally {
+          write.restore();
+          await session.endSession();
+        }
+      });
+    }
+
+    for (const operation of ['insertOne', 'replaceOne']) {
+      for (const perOperation of [false, true]) {
+        it(`${operation} preserves skipValidation at ${perOperation ? 'operation' : 'bulk'} level`, async function() {
+          // Arrange
+          const { User, data, calls } = createTestContext();
+          const write = operation === 'insertOne' ?
+            { document: { ...data, age: -1 } } :
+            { filter: { name: 'Alice' }, replacement: { ...data, age: -1 }, upsert: true };
+          if (perOperation) {
+            write.skipValidation = true;
+          }
+
+          // Act
+          await User.bulkWrite([{ [operation]: write }], { middleware: false, skipValidation: !perOperation });
+
+          // Assert
+          assert.strictEqual((await User.collection.findOne({ name: 'Alice' })).age, -1);
+          assert.strictEqual(calls.validatePre, 0);
+          assert.strictEqual(calls.validatePost, 0);
+        });
+      }
+    }
+
+    function runOperation(User, operation, doc, options) {
+      if (operation === 'bulkSave') {
+        return User.bulkSave([doc], options);
+      }
+      const write = operation === 'insertOne' ?
+        { document: doc } :
+        { filter: { name: 'Alice' }, replacement: doc, upsert: true };
+      return User.bulkWrite([{ [operation]: write }], options);
+    }
+
+    function assertSelectedHooks(calls, selection, operation) {
+      assert.deepStrictEqual(calls, {
+        validatePre: selection.pre,
+        validatePost: selection.post,
+        childValidatePre: 2 * selection.pre,
+        childValidatePost: 2 * selection.post,
+        savePre: operation === 'bulkSave' ? selection.pre : 0,
+        savePost: operation === 'bulkSave' ? selection.post : 0,
+        childSavePre: operation === 'bulkSave' ? 2 * selection.pre : 0,
+        childSavePost: operation === 'bulkSave' ? 2 * selection.post : 0,
+        bulkPre: selection.pre,
+        bulkPost: selection.post
+      });
+    }
+
+    function resetCalls(calls) {
+      for (const key of Object.keys(calls)) {
+        calls[key] = 0;
+      }
+    }
+
+    function createTestContext({ validateBeforeSave = true } = {}) {
+      const calls = {
+        validatePre: 0, validatePost: 0, childValidatePre: 0, childValidatePost: 0,
+        savePre: 0, savePost: 0, childSavePre: 0, childSavePost: 0, bulkPre: 0, bulkPost: 0
+      };
+      const events = [];
+      const childSchema = new Schema({ age: { type: Number, validate: validator('child') } });
+      const schema = new Schema({
+        name: { type: String, required: true },
+        age: { type: Number, validate: validator('parent') },
+        profile: childSchema,
+        children: [childSchema]
+      }, { timestamps: true, validateBeforeSave });
+      for (const [target, prefix, label] of [[schema, '', 'parent'], [childSchema, 'child', 'child']]) {
+        for (const hook of ['validate', 'save']) {
+          const key = prefix + (prefix ? hook[0].toUpperCase() + hook.slice(1) : hook);
+          target.pre(hook, function() {
+            calls[key + 'Pre']++;
+            events.push(label + ':' + hook);
+          });
+          target.post(hook, function() { calls[key + 'Post']++; });
+        }
+      }
+      schema.pre('bulkWrite', function() { calls.bulkPre++; });
+      schema.post('bulkWrite', function() { calls.bulkPost++; });
+      const User = db.model('User', schema);
+      const data = { name: 'Alice', age: 20, profile: { age: 20 }, children: [{ age: 20 }] };
+      return { User, calls, data, events };
+
+      function validator(label) {
+        return async function(age) {
+          await new Promise(resolve => setImmediate(resolve));
+          events.push(label + ':validated');
+          return age >= 0;
+        };
+      }
+    }
+  });
+
   describe('validation middleware in write operations', function() {
     // Age must be 0 or greater.
     const operations = {

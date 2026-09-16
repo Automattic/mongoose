@@ -150,6 +150,194 @@ describe('middleware option to skip hooks (gh-8768)', function() {
     });
   });
 
+  describe('createModel middleware selection', function() {
+    const selections = [
+      { name: 'ordinary hooks', options: {}, enabled: true },
+      { name: 'middleware: false', options: { middleware: false }, enabled: false },
+      { name: 'pre hooks disabled', options: { middleware: { pre: false } }, enabled: false },
+      { name: 'post hooks disabled', options: { middleware: { post: false } }, enabled: true }
+    ];
+    const operations = {
+      find: { run: (User, options) => User.find({}, null, options), dispatches: 2 },
+      findOne: { run: async(User, options) => [await User.findOne({}, null, options)], dispatches: 2 },
+      cursor: { run: async(User, options) => [await User.find({}, null, options).cursor().next()], dispatches: 2 },
+      findOneAndUpdate: {
+        run: async(User, options) => [await User.findOneAndUpdate({}, { name: 'Alice' }, options)], dispatches: 2
+      },
+      hydrate: { run: (User, options, data) => [User.hydrate(data, null, options)], dispatches: 2 },
+      create: { run: (User, options, data) => User.create([data], options), dispatches: 1 },
+      'ordered create': {
+        run: (User, options, data) => User.create([data], { ...options, ordered: true }), dispatches: 1
+      },
+      'aggregateErrors create': {
+        run: (User, options, data) => User.create([data], { ...options, aggregateErrors: true }), dispatches: 1
+      },
+      insertMany: { run: (User, options, data) => User.insertMany([data], options), dispatches: 1 },
+      insertOne: { run: async(User, options, data) => [await User.insertOne(data, options)], dispatches: 1 },
+      'bulkWrite insertOne': {
+        run: async(User, options, data) => {
+          await User.bulkWrite([{ insertOne: { document: data } }], options);
+          return [await User.findOne({ _id: data._id }).lean()];
+        },
+        dispatches: 1,
+        lean: true
+      },
+      'bulkWrite replaceOne': {
+        run: async(User, options, data) => {
+          await User.bulkWrite([{ replaceOne: { filter: {}, replacement: data } }], options);
+          return [await User.findOne({ _id: data._id }).lean()];
+        },
+        dispatches: 1,
+        lean: true
+      }
+    };
+
+    for (const [operation, { run, dispatches, lean }] of Object.entries(operations)) {
+      for (const selection of selections) {
+        it(`${operation} respects ${selection.name} during construction`, async function() {
+          // Arrange
+          const { User, calls, internalCalls, data } = createTestContext();
+          await User.collection.insertOne(operation === 'bulkWrite replaceOne' ? data : { name: 'Alice' });
+
+          // Act
+          const docs = await run(User, selection.options, data);
+
+          // Assert
+          assert.strictEqual(calls.length, selection.enabled ? dispatches : 0);
+          assert.strictEqual(internalCalls.length, dispatches);
+          assert.strictEqual(docs.length, 1);
+          assert.strictEqual(docs[0].name, 'Alice');
+          assert.strictEqual(docs[0].role, 'reader');
+          if (!lean) {
+            assert.ok(docs[0] instanceof User);
+            assert.strictEqual(docs[0].isNew, false);
+            assert.strictEqual(docs[0].isModified(), false);
+          }
+          if (selection.enabled) {
+            assert.deepStrictEqual(calls, internalCalls);
+          }
+          // A later operation must not inherit suppression.
+          calls.length = 0;
+          await User.findOne();
+          assert.strictEqual(calls.length, 2);
+        });
+      }
+    }
+
+    for (const operation of ['find', 'hydrate', 'create', 'insertMany', 'insertOne']) {
+      for (const selection of selections) {
+        it(`${operation} preserves discriminators with ${selection.name}`, async function() {
+          // Arrange
+          const { User, Member, calls, childCalls, data } = createTestContext({ discriminator: true });
+          await User.collection.insertOne(data);
+          const expected = operation === 'insertMany' ? 2 : operations[operation].dispatches;
+          if (['create', 'insertMany', 'insertOne'].includes(operation)) {
+            data._id = new mongoose.Types.ObjectId();
+          }
+
+          // Act
+          const docs = await operations[operation].run(User, selection.options, data);
+
+          // Assert
+          assert.ok(docs[0] instanceof Member);
+          assert.strictEqual(docs[0].name, 'Alice');
+          assert.strictEqual(docs[0].membership, 'gold');
+          assert.strictEqual(calls.length, selection.enabled ? expected : 0);
+          assert.strictEqual(childCalls.length, selection.enabled ? 1 : 0);
+        });
+      }
+    }
+
+    it('preserves synchronous hook context and constructor options', function() {
+      // Arrange
+      const { User, calls, data } = createTestContext();
+
+      // Act
+      const user = new User(data, null, { middleware: { post: false }, defaults: false });
+
+      // Assert
+      assert.deepStrictEqual(calls, [data]);
+      assert.strictEqual(user.name, 'Alice');
+      assert.strictEqual(user.role, undefined);
+      assert.strictEqual(user.isNew, true);
+    });
+
+    it('preserves hydration options when construction hooks are suppressed', function() {
+      // Arrange
+      const { User, calls, data } = createTestContext();
+
+      // Act
+      const user = User.hydrate({ ...data, nickname: 'Al' }, { name: 1, nickname: 1 }, {
+        middleware: false, defaults: false, strict: false
+      });
+
+      // Assert
+      assert.deepStrictEqual(calls, []);
+      assert.strictEqual(user.name, 'Alice');
+      assert.strictEqual(user.get('nickname'), 'Al');
+      assert.strictEqual(user.role, undefined);
+      assert.strictEqual(user.isSelected('role'), false);
+    });
+
+    it('cannot suppress construction that happened before save received options', async function() {
+      // Arrange
+      const { User, calls, data } = createTestContext();
+      const user = new User(data);
+      assert.deepStrictEqual(calls, [data]);
+
+      // Act
+      await user.save({ middleware: false });
+
+      // Assert
+      assert.deepStrictEqual(calls, [data]);
+      assert.strictEqual(await User.countDocuments({ _id: user._id }), 1);
+    });
+
+    it('keeps construction errors enabled after a suppressed insert', async function() {
+      // Arrange
+      const error = new Error('construction failed');
+      const { User, calls, data } = createTestContext({ error });
+
+      // Act
+      const [user] = await User.insertMany([data], { middleware: false });
+
+      // Assert
+      assert.strictEqual(user.name, 'Alice');
+      assert.deepStrictEqual(calls, []);
+      assert.throws(() => new User({ name: 'Bob' }), err => err === error);
+      assert.strictEqual(calls.length, 1);
+    });
+
+    function createTestContext({ discriminator = false, error } = {}) {
+      const calls = [];
+      const internalCalls = [];
+      const childCalls = [];
+      const schema = new Schema({ name: String, role: { type: String, default: 'reader' } });
+      schema.pre('createModel', function() {
+        calls.push(this);
+        if (error) {
+          throw error;
+        }
+      });
+      function internalPre() {
+        internalCalls.push(this);
+      }
+      internalPre[builtInMiddleware] = true;
+      schema.pre('createModel', internalPre);
+      const User = db.model('User', schema);
+      let Member;
+      const data = { _id: new mongoose.Types.ObjectId(), name: 'Alice' };
+      if (discriminator) {
+        const memberSchema = new Schema({ membership: String });
+        memberSchema.pre('createModel', function() { childCalls.push(this); });
+        Member = User.discriminator('Member', memberSchema);
+        data.__t = 'Member';
+        data.membership = 'gold';
+      }
+      return { User, Member, calls, internalCalls, childCalls, data };
+    }
+  });
+
   describe('query instance middleware', function() {
     const selections = [
       { name: 'no middleware option', options: {}, pre: 1, post: 1 },

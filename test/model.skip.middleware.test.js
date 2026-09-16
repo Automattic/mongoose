@@ -887,6 +887,113 @@ describe('middleware option to skip hooks (gh-8768)', function() {
     });
   });
 
+  describe('aggregate explain options after middleware', function() {
+    const selections = [
+      { name: 'default middleware', options: {}, pre: 1, post: 1 },
+      { name: 'middleware: false', options: { middleware: false }, pre: 0, post: 0 },
+      { name: 'pre: false', options: { middleware: { pre: false } }, pre: 0, post: 1 },
+      { name: 'post: false', options: { middleware: { post: false } }, pre: 1, post: 0 }
+    ];
+
+    for (const method of ['explain', 'exec']) {
+      for (const selection of selections) {
+        it(`${method} sends updated options with ${selection.name}`, async function() {
+          // Arrange
+          const { User, calls } = createTestContext();
+          await User.collection.insertOne({ name: 'Alice' });
+          const aggregate = User.aggregate([{ $match: { name: 'Alice' } }]).option({
+            comment: 'original',
+            ...selection.options
+          });
+          const driverCall = sinon.spy(User.collection, 'aggregate');
+          try {
+            // Act
+            const result = await aggregate[method]();
+
+            // Assert
+            assert.strictEqual(driverCall.callCount, 1);
+            const driverOptions = driverCall.firstCall.args[1];
+            assert.strictEqual(driverOptions.comment, selection.pre ? 'set-by-pre-hook' : 'original');
+            assert.strictEqual(driverOptions.allowDiskUse, selection.pre ? true : undefined);
+            assert.strictEqual(Object.hasOwn(driverOptions, 'middleware'), false);
+            assert.notStrictEqual(driverOptions, aggregate.options);
+            assert.deepStrictEqual(aggregate.options.middleware, selection.options.middleware);
+            assert.strictEqual(Object.hasOwn(aggregate.options, 'middleware'), Object.hasOwn(selection.options, 'middleware'));
+            assert.strictEqual(calls.pre, selection.pre);
+            assert.strictEqual(calls.post, selection.post);
+            if (selection.post) {
+              assert.strictEqual(calls.result, result);
+            }
+            if (method === 'exec') {
+              assert.deepStrictEqual(result.map(doc => doc.name), ['Alice']);
+            } else {
+              assert.ok(result.queryPlanner || result.stages);
+            }
+          } finally {
+            driverCall.restore();
+          }
+        });
+      }
+    }
+
+    for (const failure of ['pre hook', 'driver']) {
+      for (const skipPost of [false, true]) {
+        it(`preserves ${failure} errors with post hooks ${skipPost ? 'disabled' : 'enabled'}`, async function() {
+          // Arrange
+          const { User, calls, preError } = createTestContext({ failPre: failure === 'pre hook' });
+          const pipeline = failure === 'driver' ? [{ $invalidStage: {} }] : [{ $match: {} }];
+          const aggregate = User.aggregate(pipeline).option({ middleware: { post: !skipPost } });
+          const driverCall = sinon.spy(User.collection, 'aggregate');
+          try {
+            // Act
+            const error = await aggregate.explain().then(() => null, err => err);
+
+            // Assert
+            assert.ok(error);
+            assert.strictEqual(calls.pre, 1);
+            assert.strictEqual(calls.post, 0);
+            assert.strictEqual(calls.errors, skipPost ? 0 : 1);
+            assert.strictEqual(driverCall.callCount, failure === 'pre hook' ? 0 : 1);
+            if (failure === 'pre hook') {
+              assert.strictEqual(error, preError);
+            } else {
+              assert.strictEqual(error.code, 40324);
+              assert.strictEqual(Object.hasOwn(driverCall.firstCall.args[1], 'middleware'), false);
+            }
+            assert.deepStrictEqual(aggregate.options.middleware, { post: !skipPost });
+          } finally {
+            driverCall.restore();
+          }
+        });
+      }
+    }
+
+    function createTestContext({ failPre = false } = {}) {
+      const calls = { pre: 0, post: 0, errors: 0, result: null };
+      const preError = new Error('pre-aggregate failed');
+      const schema = new Schema({ name: String });
+      schema.pre('aggregate', async function() {
+        calls.pre++;
+        await new Promise(resolve => setImmediate(resolve));
+        this.options.comment = 'set-by-pre-hook';
+        this.options.allowDiskUse = true;
+        if (failPre) {
+          throw preError;
+        }
+      });
+      schema.post('aggregate', function(result) {
+        calls.post++;
+        calls.result = result;
+      });
+      schema.post('aggregate', function(error, result, next) {
+        calls.errors++;
+        next(error);
+      });
+      const User = db.model('User', schema);
+      return { User, calls, preError };
+    }
+  });
+
   describe('init hooks via query options', function() {
     it('skips pre/post init hooks when middleware: false', async function() {
       // Arrange

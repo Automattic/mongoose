@@ -164,6 +164,18 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       findOneAndUpdate: {
         run: async(User, options) => [await User.findOneAndUpdate({}, { name: 'Alice' }, options)], dispatches: 2
       },
+      findOneAndReplace: {
+        run: async(User, options, data) => [await User.findOneAndReplace({}, data, { ...options, returnDocument: 'after' })],
+        dispatches: 3
+      },
+      replaceOne: {
+        run: async(User, options, data) => {
+          await User.replaceOne({}, data, options);
+          return [await User.findOne({ _id: data._id }).lean()];
+        },
+        dispatches: 1,
+        lean: true
+      },
       hydrate: { run: (User, options, data) => [User.hydrate(data, null, options)], dispatches: 2 },
       create: { run: (User, options, data) => User.create([data], options), dispatches: 1 },
       'ordered create': {
@@ -197,7 +209,8 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         it(`${operation} respects ${selection.name} during construction`, async function() {
           // Arrange
           const { User, calls, internalCalls, data } = createTestContext();
-          await User.collection.insertOne(operation === 'bulkWrite replaceOne' ? data : { name: 'Alice' });
+          const isReplacement = ['bulkWrite replaceOne', 'replaceOne', 'findOneAndReplace'].includes(operation);
+          await User.collection.insertOne(isReplacement ? data : { name: 'Alice' });
 
           // Act
           const docs = await run(User, selection.options, data);
@@ -224,13 +237,14 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       }
     }
 
-    for (const operation of ['find', 'hydrate', 'create', 'insertMany', 'insertOne']) {
+    for (const operation of ['find', 'hydrate', 'create', 'insertMany', 'insertOne', 'replaceOne', 'findOneAndReplace']) {
       for (const selection of selections) {
         it(`${operation} preserves discriminators with ${selection.name}`, async function() {
           // Arrange
           const { User, Member, calls, childCalls, data } = createTestContext({ discriminator: true });
           await User.collection.insertOne(data);
-          const expected = operation === 'insertMany' ? 2 : operations[operation].dispatches;
+          const extraDispatch = ['insertMany', 'replaceOne', 'findOneAndReplace'].includes(operation) ? 1 : 0;
+          const expected = operations[operation].dispatches + extraDispatch;
           if (['create', 'insertMany', 'insertOne'].includes(operation)) {
             data._id = new mongoose.Types.ObjectId();
           }
@@ -239,11 +253,14 @@ describe('middleware option to skip hooks (gh-8768)', function() {
           const docs = await operations[operation].run(User, selection.options, data);
 
           // Assert
-          assert.ok(docs[0] instanceof Member);
+          if (!operations[operation].lean) {
+            assert.ok(docs[0] instanceof Member);
+          }
+          assert.strictEqual(docs[0].__t, 'Member');
           assert.strictEqual(docs[0].name, 'Alice');
           assert.strictEqual(docs[0].membership, 'gold');
           assert.strictEqual(calls.length, selection.enabled ? expected : 0);
-          assert.strictEqual(childCalls.length, selection.enabled ? 1 : 0);
+          assert.strictEqual(childCalls.length, selection.enabled ? (operation === 'findOneAndReplace' ? 2 : 1) : 0);
         });
       }
     }

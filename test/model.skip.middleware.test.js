@@ -373,6 +373,25 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       assert.ok(docs.every(doc => doc.isNew));
     });
 
+    it('bulkSave uses current children and middleware selection on repeated saves', async function() {
+      // Arrange
+      const { User, data, calls } = createTestContext();
+      const doc = new User(data);
+      await User.bulkSave([doc], { middleware: false });
+      doc.children.push({ age: 21 });
+      resetCalls(calls);
+
+      // Act
+      await User.bulkSave([doc], { validateBeforeSave: false });
+
+      // Assert
+      assert.strictEqual(calls.savePre, 1);
+      assert.strictEqual(calls.savePost, 1);
+      assert.strictEqual(calls.childSavePre, 3);
+      assert.strictEqual(calls.childSavePost, 3);
+      assert.strictEqual((await User.collection.findOne({ _id: doc._id })).children.length, 2);
+    });
+
     it('bulkSave awaits validation before user save hooks', async function() {
       // Arrange
       const { User, data, events } = createTestContext();

@@ -640,6 +640,134 @@ describe('middleware option to skip hooks (gh-8768)', function() {
     });
   });
 
+  describe('find result hydration', function() {
+    const selections = [
+      { name: 'default middleware', options: {}, pre: 1, post: 1 },
+      { name: 'middleware: false', options: { middleware: false }, pre: 0, post: 0 },
+      { name: 'pre: false', options: { middleware: { pre: false } }, pre: 0, post: 1 },
+      { name: 'post: false', options: { middleware: { post: false } }, pre: 1, post: 0 }
+    ];
+
+    for (const mode of ['find', 'populated find', 'deferred populated find', 'findOne', 'cursor']) {
+      for (const selection of selections) {
+        it(`${mode} respects ${selection.name} and preserves built-in initialization`, async function() {
+          // Arrange
+          const { User, Team, calls } = await createTestContext();
+
+          // Act
+          const docs = await readDocuments(User, mode, selection.options);
+
+          // Assert
+          assert.deepStrictEqual(docs.map(doc => doc.name), mode === 'findOne' ? ['Alice'] : ['Alice', 'Bob', 'Cara']);
+          for (const doc of docs) {
+            assert.ok(doc instanceof User);
+            assert.strictEqual(doc.tier, 'basic');
+            assert.strictEqual(doc.isNew, false);
+            assert.strictEqual(doc.isModified(), false);
+            assert.deepStrictEqual(doc.$__.shardval, { tenantId: 'north' });
+            if (mode === 'populated find') {
+              assert.ok(doc.team instanceof Team);
+              assert.strictEqual(doc.team.name, 'Core');
+            } else {
+              assert.ok(doc.team instanceof mongoose.Types.ObjectId);
+            }
+          }
+          assert.deepStrictEqual(calls, { pre: docs.length * selection.pre, post: docs.length * selection.post });
+
+          const normalDocs = await User.find().sort('name');
+          assert.deepStrictEqual(normalDocs.map(doc => doc.name), ['Alice', 'Bob', 'Cara']);
+          assert.deepStrictEqual(calls, { pre: docs.length * selection.pre + 3, post: docs.length * selection.post + 3 });
+        });
+      }
+    }
+
+    for (const defaults of [false, null, undefined]) {
+      it(`preserves defaults: ${defaults} and the session when init hooks are skipped`, async function() {
+        // Arrange
+        const { User, calls } = await createTestContext();
+        const session = await db.startSession();
+        try {
+          // Act
+          const docs = await User.find().setOptions({ middleware: false, defaults, session });
+
+          // Assert
+          assert.strictEqual(docs.length, 3);
+          for (const doc of docs) {
+            assert.strictEqual(doc.tier, defaults === false ? undefined : 'basic');
+            assert.strictEqual(doc.$session(), session);
+          }
+          assert.deepStrictEqual(calls, { pre: 0, post: 0 });
+        } finally {
+          await session.endSession();
+        }
+      });
+    }
+
+    for (const populate of [false, true]) {
+      it(`preserves lean results with populate: ${populate}`, async function() {
+        // Arrange
+        const { User, calls } = await createTestContext();
+        const query = User.find().sort('name').lean().setOptions({ middleware: false });
+        if (populate) {
+          query.populate('team');
+        }
+
+        // Act
+        const docs = await query;
+
+        // Assert
+        assert.deepStrictEqual(docs.map(doc => doc.name), ['Alice', 'Bob', 'Cara']);
+        for (const doc of docs) {
+          assert.strictEqual(Object.getPrototypeOf(doc), Object.prototype);
+          assert.strictEqual(doc.tier, undefined);
+          if (populate) {
+            assert.strictEqual(Object.getPrototypeOf(doc.team), Object.prototype);
+            assert.strictEqual(doc.team.name, 'Core');
+          }
+        }
+        assert.deepStrictEqual(calls, { pre: 0, post: 0 });
+      });
+    }
+
+    async function readDocuments(User, mode, options) {
+      const query = mode === 'findOne' ? User.findOne({ name: 'Alice' }) : User.find().sort('name');
+      query.setOptions(options);
+      if (mode === 'populated find' || mode === 'deferred populated find') {
+        query.populate('team');
+      }
+      if (mode === 'deferred populated find') {
+        query.setOptions({ _deferPopulate: true });
+      }
+      if (mode === 'cursor') {
+        const docs = [];
+        for await (const doc of query.cursor()) {
+          docs.push(doc);
+        }
+        return docs;
+      }
+      const result = await query;
+      return mode === 'findOne' ? [result] : result;
+    }
+
+    async function createTestContext() {
+      const calls = { pre: 0, post: 0 };
+      const Team = db.model('Team', new Schema({ name: String }));
+      const schema = new Schema({
+        name: String,
+        tenantId: String,
+        tier: { type: String, default: 'basic' },
+        team: { type: Schema.Types.ObjectId, ref: 'Team' }
+      }, { shardKey: { tenantId: 1 } });
+      schema.pre('init', function() { calls.pre++; });
+      schema.post('init', function() { calls.post++; });
+      const User = db.model('User', schema);
+      const team = new mongoose.Types.ObjectId();
+      await Team.collection.insertOne({ _id: team, name: 'Core' });
+      await User.collection.insertMany(['Alice', 'Bob', 'Cara'].map(name => ({ name, tenantId: 'north', team })));
+      return { User, Team, calls };
+    }
+  });
+
   describe('Subdocument operations', function() {
     describe('save hooks', function() {
       describe('subdocument.save()', function() {

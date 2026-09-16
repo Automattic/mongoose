@@ -597,6 +597,8 @@ declare module 'mongoose' {
     post(method: 'bulkWrite' | 'createCollection' | 'insertMany' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<TModelType>): this;
 
     /** Defines a pre hook for the model. */
+    // Construction hooks receive uncast input before a document exists.
+    pre<T = unknown>(method: 'createModel', fn: (this: T) => void): this;
     // this = never since it never happens
     pre<T = never>(method: 'save', options: SchemaPreOptions & { document: false, query: boolean }, fn: PreSaveMiddlewareFunction<T>): this;
     pre<T = never>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: SchemaPreOptions & { document: false, query: false }, fn: PreMiddlewareFunction<T>): this;

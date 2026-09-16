@@ -949,6 +949,116 @@ describe('middleware option to skip hooks (gh-8768)', function() {
     });
   });
 
+  describe('populated virtual hydration', function() {
+    const selections = [
+      { name: 'default middleware', options: {}, pre: 1, post: 1 },
+      { name: 'middleware: false', options: { middleware: false }, pre: 0, post: 0 },
+      { name: 'pre: false', options: { middleware: { pre: false } }, pre: 0, post: 1 },
+      { name: 'post: false', options: { middleware: { post: false } }, pre: 1, post: 0 }
+    ];
+
+    for (const virtualName of ['author', 'authors']) {
+      for (const selection of selections) {
+        it(`preserves ${virtualName} with ${selection.name}`, function() {
+          // Arrange
+          const { Post, Author, calls, createRaw } = createTestContext();
+          const raw = createRaw(virtualName);
+
+          // Act
+          const doc = Post.hydrate(raw, null, { hydratedPopulatedDocs: true, ...selection.options });
+
+          // Assert
+          const author = virtualName === 'author' ? doc.author : doc.authors?.[0];
+          assert.ok(author instanceof Author);
+          assert.strictEqual(author.name, 'Ann');
+          assert.ok(author._id.equals(doc.authorId));
+          assert.strictEqual(author.isNew, false);
+          assert.strictEqual(doc.isNew, false);
+          assert.strictEqual(doc.isModified(), false);
+          assert.strictEqual(doc.$$populatedVirtuals[virtualName], doc[virtualName]);
+          assert.strictEqual(Object.hasOwn(doc._doc, virtualName), false);
+          assert.strictEqual(Object.hasOwn(raw, virtualName), false);
+          if (virtualName === 'authors') {
+            assert.strictEqual(doc.authors.length, 1);
+            assert.deepStrictEqual(doc.populated('authors'), [doc.authorId]);
+          } else {
+            // Ordinary hydration does not mark the single virtual as populated.
+            assert.strictEqual(doc.populated('author'), undefined);
+          }
+          assert.deepStrictEqual(calls, { pre: selection.pre, post: selection.post });
+
+          const normalDoc = Post.hydrate(createRaw(virtualName), null, { hydratedPopulatedDocs: true });
+          assert.ok((virtualName === 'author' ? normalDoc.author : normalDoc.authors[0]) instanceof Author);
+          assert.deepStrictEqual(calls, { pre: selection.pre + 1, post: selection.post + 1 });
+        });
+      }
+    }
+
+    for (const selection of selections) {
+      it(`preserves raw virtual values without related hydration with ${selection.name}`, function() {
+        // Arrange
+        const { Post, calls, createRaw } = createTestContext();
+        const raw = createRaw('author');
+        raw.authors = [{ ...raw.author }];
+
+        // Act
+        const doc = Post.hydrate(raw, null, selection.options);
+
+        // Assert
+        assert.strictEqual(doc.author?.name, 'Ann');
+        assert.strictEqual(doc.authors?.[0].name, 'Ann');
+        assert.strictEqual(Object.getPrototypeOf(doc.author), Object.prototype);
+        assert.strictEqual(Object.getPrototypeOf(doc.authors[0]), Object.prototype);
+        assert.strictEqual(doc.populated('author'), undefined);
+        assert.strictEqual(doc.populated('authors'), undefined);
+        assert.strictEqual(Object.hasOwn(doc._doc, 'author'), false);
+        assert.strictEqual(Object.hasOwn(doc._doc, 'authors'), false);
+        assert.deepStrictEqual(calls, { pre: selection.pre, post: selection.post });
+      });
+
+      it(`preserves population after findOne with ${selection.name}`, async function() {
+        // Arrange
+        const { Post, Author, calls, createRaw } = createTestContext();
+        const raw = createRaw('author');
+        await Author.collection.insertOne(raw.author);
+        delete raw.author;
+        await Post.collection.insertOne(raw);
+
+        // Act
+        const doc = await Post.findOne({ _id: raw._id }, null, selection.options).populate(['author', 'authors']);
+
+        // Assert
+        assert.ok(doc.author instanceof Author);
+        assert.ok(doc.authors[0] instanceof Author);
+        assert.strictEqual(doc.author.name, 'Ann');
+        assert.strictEqual(doc.authors[0].name, 'Ann');
+        assert.deepStrictEqual(calls, { pre: selection.pre, post: selection.post });
+      });
+    }
+
+    function createTestContext() {
+      const calls = { pre: 0, post: 0 };
+      const Author = db.model('Author', new Schema({ name: String }));
+      const schema = new Schema({ title: String, authorId: Schema.Types.ObjectId });
+      schema.virtual('author', { ref: 'Author', localField: 'authorId', foreignField: '_id', justOne: true });
+      schema.virtual('authors', { ref: 'Author', localField: 'authorId', foreignField: '_id' });
+      schema.pre('init', function() { calls.pre++; });
+      schema.post('init', function() { calls.post++; });
+      const Post = db.model('Post', schema);
+      return { Post, Author, calls, createRaw };
+
+      function createRaw(virtualName) {
+        const author = { _id: new mongoose.Types.ObjectId(), name: 'Ann' };
+        return {
+          _id: new mongoose.Types.ObjectId(),
+          title: 'Hydration',
+          authorId: author._id,
+          [virtualName]: virtualName === 'author' ? author : [author]
+        };
+      }
+    }
+  });
+
   describe('find result hydration', function() {
     const selections = [
       { name: 'default middleware', options: {}, pre: 1, post: 1 },

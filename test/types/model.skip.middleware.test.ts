@@ -228,8 +228,31 @@ function hydrationMiddlewareOptions() {
   expect(User.hydrate).type.not.toBeCallableWith({ name: 'Alice' }, null, { middleware: { post: 'false' } });
 }
 
+function constructionMiddlewareTypes() {
+  // Arrange
+  const { schema } = createConstructionTestContext();
+
+  // Act
+  const result = schema.pre('createModel', function() {
+    // Construction receives uncast input, or undefined during query hydration.
+    expect(this).type.toBe<unknown>();
+  });
+  schema.pre<{ name?: string } | undefined>('createModel', function() {
+    expect(this).type.toBe<{ name?: string } | undefined>();
+  });
+
+  // Assert
+  expect<typeof result>().type.toBe<typeof schema>();
+  expect(schema.pre).type.not.toBeCallableWith('createModel', (doc: { name: string }) => {});
+  expect(schema.post).type.not.toBeCallableWith('createModel', function() {});
+}
+
 function createTestContext() {
   const User = model('MiddlewareOptionUser', new Schema({ name: String }));
   const user = new User({ name: 'Alice' });
   return { User, user };
+}
+
+function createConstructionTestContext() {
+  return { schema: new Schema({ name: String }) };
 }

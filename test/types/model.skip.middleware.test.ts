@@ -7,6 +7,8 @@ import {
   InsertManyOptions,
   MongooseBulkWriteOptions,
   MongooseBulkSaveOptions,
+  MongooseBulkWriteResult,
+  HydrateOptions,
   AggregateOptions,
   AggregateCursorOptions,
   AggregateCursorMiddlewareOptions,
@@ -181,4 +183,53 @@ async function gh8768() {
     return this;
   };
   emailSchema.methods.markSent.supportsMiddlewareOption = true;
+}
+
+async function bulkSaveValidationOptions() {
+  // Arrange
+  const { User, user } = createTestContext();
+  const options: MongooseBulkSaveOptions = {
+    validateModifiedOnly: true,
+    skipValidation: false,
+    middleware: { pre: false }
+  };
+
+  // Act
+  const result = await User.bulkSave([user], options);
+  await User.bulkSave([user], { validateModifiedOnly: false, middleware: false });
+  await User.bulkSave([user], { skipValidation: true, middleware: { post: false } });
+  await User.bulkSave([user], { validateModifiedOnly: true, validateBeforeSave: true, timestamps: false, ordered: false });
+
+  // Assert
+  expect<typeof result>().type.toBe<MongooseBulkWriteResult>();
+  expect<MongooseBulkSaveOptions['validateModifiedOnly']>().type.toBe<boolean | undefined>();
+  expect<MongooseBulkSaveOptions['skipValidation']>().type.toBe<boolean | undefined>();
+  expect(User.bulkSave).type.not.toBeCallableWith([user], { validateModifiedOnly: 'true' });
+  expect(User.bulkSave).type.not.toBeCallableWith([user], { skipValidation: 'false' });
+}
+
+function hydrationMiddlewareOptions() {
+  // Arrange
+  const { User, user } = createTestContext();
+  const options: HydrateOptions = { hydratedPopulatedDocs: true, middleware: false };
+
+  // Act
+  const hydrated = User.hydrate({ name: 'Alice' }, null, options);
+  User.hydrate({ name: 'Alice' }, null, { middleware: true });
+  User.hydrate({ name: 'Alice' }, null, { middleware: { pre: false } });
+  User.hydrate({ name: 'Alice' }, null, { middleware: { post: false } });
+  User.hydrate({ name: 'Alice', extra: 'value' }, null, { strict: false, middleware: false });
+
+  // Assert
+  expect<typeof hydrated>().type.toBe<typeof user>();
+  expect<HydrateOptions['middleware']>().type.toBe<boolean | SkipMiddlewareOptions | undefined>();
+  expect(User.hydrate).type.not.toBeCallableWith({ name: 'Alice' }, null, { middleware: 'false' });
+  expect(User.hydrate).type.not.toBeCallableWith({ name: 'Alice' }, null, { middleware: { pre: 'false' } });
+  expect(User.hydrate).type.not.toBeCallableWith({ name: 'Alice' }, null, { middleware: { post: 'false' } });
+}
+
+function createTestContext() {
+  const User = model('MiddlewareOptionUser', new Schema({ name: String }));
+  const user = new User({ name: 'Alice' });
+  return { User, user };
 }

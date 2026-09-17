@@ -36,8 +36,10 @@ declare module 'mongoose' {
     skipValidation?: boolean;
     throwOnValidationError?: boolean;
     strict?: boolean | 'throw';
+
     /** When false, do not add timestamps to documents. Can be overridden at the operation level. */
     timestamps?: boolean;
+
     /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
     middleware?: boolean | SkipMiddlewareOptions;
   }
@@ -46,6 +48,7 @@ declare module 'mongoose' {
     timestamps?: boolean;
     session?: ClientSession;
     validateBeforeSave?: boolean;
+
     /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
     middleware?: boolean | SkipMiddlewareOptions;
   }
@@ -77,6 +80,7 @@ declare module 'mongoose' {
     ordered?: boolean;
     lean?: boolean;
     throwOnValidationError?: boolean;
+
     /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
     middleware?: boolean | SkipMiddlewareOptions;
     timestamps?: boolean | QueryTimestampsConfig;
@@ -92,6 +96,7 @@ declare module 'mongoose' {
 
   interface ModifyResult<T> {
     value: Default__v<Require_id<T>> | null;
+
     /** see https://www.mongodb.com/docs/manual/reference/command/findAndModify/#lasterrorobject */
     lastErrorObject?: {
       updatedExisting?: boolean;
@@ -116,6 +121,7 @@ declare module 'mongoose' {
     SessionOption {
     checkKeys?: boolean;
     j?: boolean;
+
     /** An array of paths that tell mongoose to only validate and save the paths in `pathsToSave`. */
     pathsToSave?: string[];
     safe?: boolean | WriteConcern;
@@ -124,6 +130,7 @@ declare module 'mongoose' {
     validateModifiedOnly?: boolean;
     w?: number | string;
     wtimeout?: number;
+
     /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
     middleware?: boolean | SkipMiddlewareOptions;
   }
@@ -138,6 +145,7 @@ declare module 'mongoose' {
   interface MongooseBulkWritePerOperationOptions {
     /** Skip validation for this operation. */
     skipValidation?: boolean;
+
     /** When false, do not add timestamps. When true, overrides the `timestamps` option set in the `bulkWrite` options. */
     timestamps?: boolean;
   }
@@ -145,6 +153,7 @@ declare module 'mongoose' {
   interface MongooseBulkUpdatePerOperationOptions extends MongooseBulkWritePerOperationOptions {
     /** When true, allows updating fields that are marked as `immutable` in the schema. */
     overwriteImmutable?: boolean;
+
     /** When false, do not set default values on insert. */
     setDefaultsOnInsert?: boolean;
   }
@@ -216,98 +225,14 @@ declare module 'mongoose' {
       ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>['lean'] :
     false;
 
-  /**
-   * Models are fancy constructors compiled from `Schema` definitions.
-   * An instance of a model is called a document.
-   * Models are responsible for creating and reading documents from the underlying MongoDB database
-   */
-  export interface Model<
+  interface ModelDocumentMethods<
     TRawDocType,
-    TQueryHelpers = {},
-    TInstanceMethods = {},
-    TVirtuals = {},
-    THydratedDocumentType = HydratedDocument<TRawDocType, TVirtuals & TInstanceMethods, TQueryHelpers, TVirtuals>,
-    TSchema = any,
-    TLeanResultType = TRawDocType> extends
-    NodeJS.EventEmitter,
-    IndexManager,
-    SessionStarter {
-    new <DocType = Partial<TRawDocType>>(doc?: DocType, fields?: any | null, options?: AnyObject): THydratedDocumentType;
-
-    aggregate<R = any>(pipeline?: PipelineStage[], options?: AggregateOptions): Aggregate<Array<R>>;
-    aggregate<R = any>(pipeline: PipelineStage[]): Aggregate<Array<R>>;
-
-    /** Base Mongoose instance the model uses. */
-    base: Mongoose;
-
-    /** Standard Schema adapter for validating input with this model's schema. */
-    readonly '~standard': StandardSchemaV1.Props<
-      Default__v<
-        Default_id<TRawDocType, ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>>,
-        ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>
-      >
-    >;
-
-    /**
-     * If this is a discriminator model, `baseModelName` is the name of
-     * the base model.
-     */
-    baseModelName: string | undefined;
-
-    /* Cast the given POJO to the model's schema */
-    castObject(obj: AnyObject, options?: { ignoreCastErrors?: boolean }): TRawDocType;
-
-    /* Apply defaults to the given document or POJO. */
-    applyDefaults(obj: AnyObject): AnyObject;
-    applyDefaults(obj: TRawDocType): TRawDocType;
-
-    /* Apply virtuals to the given POJO. */
-    applyVirtuals(obj: AnyObject, virtalsToApply?: string[]): AnyObject;
-
-    /**
-     * Apply this model's timestamps to a given POJO, including subdocument timestamps
-     */
-    applyTimestamps(obj: AnyObject, options?: { isUpdate?: boolean, currentTime?: () => Date }): AnyObject;
-
-    /**
-     * Sends multiple `insertOne`, `updateOne`, `updateMany`, `replaceOne`,
-     * `deleteOne`, and/or `deleteMany` operations to the MongoDB server in one
-     * command. This is faster than sending multiple independent operations (e.g.
-     * if you use `create()`) because with `bulkWrite()` there is only one network
-     * round trip to the MongoDB server.
-     */
-    bulkWrite<DocContents = TRawDocType>(
-      writes: Array<AnyBulkWriteOperation<DocContents extends mongodb.Document ? DocContents : any>>,
-      options: mongodb.BulkWriteOptions & MongooseBulkWriteOptions & { ordered: false }
-    ): Promise<mongodb.BulkWriteResult & { mongoose?: { validationErrors: Error[] } }>;
-    bulkWrite<DocContents = TRawDocType>(
-      writes: Array<AnyBulkWriteOperation<DocContents extends mongodb.Document ? DocContents : any>>,
-      options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions
-    ): Promise<mongodb.BulkWriteResult>;
-
-    /**
-     * Sends multiple `save()` calls in a single `bulkWrite()`. This is faster than
-     * sending multiple `save()` calls because with `bulkSave()` there is only one
-     * network round trip to the MongoDB server.
-     */
-    bulkSave(documents: Array<THydratedDocumentType>, options?: MongooseBulkSaveOptions): Promise<MongooseBulkWriteResult>;
-
-    /** Collection the model uses. */
-    collection: Collection;
-
-    /** Creates a `countDocuments` query: counts the number of documents that match `filter`. */
-    countDocuments(
-      filter?: QueryFilter<TRawDocType>,
-      options?: (mongodb.CountOptions & MongooseBaseQueryOptions<TRawDocType> & mongodb.Abortable) | null
-    ): QueryWithHelpers<
-      number,
-      THydratedDocumentType,
-      TQueryHelpers,
-      TRawDocType,
-      'countDocuments',
-      TInstanceMethods & TVirtuals
-    >;
-
+    TQueryHelpers,
+    TInstanceMethods,
+    TVirtuals,
+    THydratedDocumentType,
+    TSchema
+  > {
     /** Creates a new document or documents */
     create(): Promise<null>;
     create(doc: Partial<TRawDocType>): Promise<THydratedDocumentType>;
@@ -316,62 +241,6 @@ declare module 'mongoose' {
     create(docs: Array<DeepPartial<ApplyBasicCreateCasting<Require_id<TRawDocType>>>>, options?: CreateOptions): Promise<THydratedDocumentType[]>;
     create(doc: DeepPartial<ApplyBasicCreateCasting<Require_id<TRawDocType>>>): Promise<THydratedDocumentType>;
     create(...docs: Array<DeepPartial<ApplyBasicCreateCasting<Require_id<TRawDocType>>>>): Promise<THydratedDocumentType[]>;
-
-    /**
-     * Create the collection for this model. By default, if no indexes are specified,
-     * mongoose will not create the collection for the model until any documents are
-     * created. Use this method to create the collection explicitly.
-     */
-    createCollection<T extends mongodb.Document>(options?: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'> & { middleware?: boolean | SkipMiddlewareOptions }): Promise<mongodb.Collection<T>>;
-
-    /**
-     * Create an [Atlas search index](https://www.mongodb.com/docs/atlas/atlas-search/create-index/).
-     * This function only works when connected to MongoDB Atlas.
-     */
-    createSearchIndex(description: SearchIndexDescription): Promise<string>;
-
-    /**
-     * Creates all [Atlas search indexes](https://www.mongodb.com/docs/atlas/atlas-search/create-index/) defined in this model's schema.
-     * This function only works when connected to MongoDB Atlas.
-     */
-    createSearchIndexes(): Promise<string[]>;
-
-    /** Connection the model uses. */
-    db: Connection;
-
-    /**
-     * Deletes all of the documents that match `conditions` from the collection.
-     * Behaves like `remove()`, but deletes all documents that match `conditions`
-     * regardless of the `single` option.
-     */
-    deleteMany(
-      filter?: QueryFilter<TRawDocType>,
-      options?: (mongodb.DeleteOptions & MongooseBaseQueryOptions<TRawDocType>) | null
-    ): QueryWithHelpers<
-      mongodb.DeleteResult,
-      THydratedDocumentType,
-      TQueryHelpers,
-      TLeanResultType,
-      'deleteMany',
-      TInstanceMethods & TVirtuals
-    >;
-
-    /**
-     * Deletes the first document that matches `conditions` from the collection.
-     * Behaves like `remove()`, but deletes at most one document regardless of the
-     * `single` option.
-     */
-    deleteOne(
-      filter?: QueryFilter<TRawDocType>,
-      options?: (mongodb.DeleteOptions & MongooseBaseQueryOptions<TRawDocType>) | null
-    ): QueryWithHelpers<
-      mongodb.DeleteResult,
-      THydratedDocumentType,
-      TQueryHelpers,
-      TLeanResultType,
-      'deleteOne',
-      TInstanceMethods & TVirtuals
-    >;
 
     /** Adds a discriminator type. */
     discriminator<TDiscriminatorSchema extends Schema<any, any>>(
@@ -396,17 +265,172 @@ declare module 'mongoose' {
     ): U;
 
     /**
-     * Delete an existing [Atlas search index](https://www.mongodb.com/docs/atlas/atlas-search/create-index/) by name.
-     * This function only works when connected to MongoDB Atlas.
+     * Shortcut for creating a new Document from existing raw data, pre-saved in the DB.
+     * The document returned has no paths marked as modified initially.
+     * With `strict: false`, fields not in the schema are kept on the document; pass
+     * `ExtraFields` to describe their types, e.g.
+     * `Model.hydrate<{ totalOrders: number }>(obj, null, { strict: false })`.
      */
-    dropSearchIndex(name: string): Promise<void>;
+    hydrate<ExtraFields = unknown>(
+      obj: any,
+      projection: ProjectionType<TRawDocType> | null | undefined,
+      options: HydrateOptions & { strict: false }
+    ): THydratedDocumentType & ExtraFields;
+    hydrate(obj: any, projection?: ProjectionType<TRawDocType> | null | undefined, options?: HydrateOptions): THydratedDocumentType;
+
+    /** Inserts one or more new documents as a single `insertMany` call to the MongoDB server. */
+    insertMany(
+      docs: Array<TRawDocType>
+    ): Promise<Array<THydratedDocumentType>>;
+    insertMany(
+      doc: Array<TRawDocType>,
+      options: InsertManyOptions & { ordered: false; rawResult: true; }
+    ): Promise<mongodb.InsertManyResult<Require_id<TRawDocType>> & {
+      mongoose: {
+        validationErrors: (CastError | Error.ValidatorError)[];
+        results: Array<
+          Error |
+          Object |
+          THydratedDocumentType
+        >
+      }
+    }>;
+    insertMany(
+      docs: Array<TRawDocType>,
+      options: InsertManyOptions & { lean: true, rawResult: true; }
+    ): Promise<mongodb.InsertManyResult<Require_id<TRawDocType>>>;
+    insertMany<DocContents = TRawDocType>(
+      doc: DocContents | TRawDocType,
+      options: InsertManyOptions & { ordered: false; rawResult: true; }
+    ): Promise<mongodb.InsertManyResult<Require_id<DocContents>> & {
+      mongoose: {
+        validationErrors: (CastError | Error.ValidatorError)[];
+        results: Array<
+          Error |
+          Object |
+          MergeType<THydratedDocumentType, DocContents>
+        >
+      }
+    }>;
+    insertMany(
+      docs: Array<TRawDocType>,
+      options: InsertManyOptions & { lean: true; }
+    ): Promise<Array<Require_id<TRawDocType>>>;
+    insertMany(
+      docs: Array<TRawDocType>,
+      options: InsertManyOptions & { rawResult: true; }
+    ): Promise<mongodb.InsertManyResult<Require_id<THydratedDocumentType>>>;
+    insertMany<DocContents = TRawDocType>(
+      docs: Array<DocContents | TRawDocType>,
+      options: InsertManyOptions & { lean: true; }
+    ): Promise<Array<Require_id<DocContents>>>;
+    insertMany<DocContents = TRawDocType>(
+      docs: Array<DocContents | TRawDocType>,
+      options: InsertManyOptions & { rawResult: true; }
+    ): Promise<mongodb.InsertManyResult<Require_id<DocContents>>>;
+    insertMany<DocContents = TRawDocType>(
+      doc: DocContents,
+      options: InsertManyOptions & { lean: true; }
+    ): Promise<Array<Require_id<DocContents>>>;
+    insertMany<DocContents = TRawDocType>(
+      doc: DocContents,
+      options: InsertManyOptions & { rawResult: true; }
+    ): Promise<mongodb.InsertManyResult<Require_id<DocContents>>>;
+    insertMany(
+      doc: Array<TRawDocType>,
+      options: InsertManyOptions
+    ): Promise<Array<THydratedDocumentType>>;
+    insertMany<DocContents = TRawDocType>(
+      docs: Array<DocContents | TRawDocType>
+    ): Promise<Array<MergeType<THydratedDocumentType, Omit<DocContents, '_id'>>>>;
+    insertMany<DocContents = TRawDocType>(
+      doc: DocContents,
+      options: InsertManyOptions
+    ): Promise<Array<MergeType<THydratedDocumentType, Omit<DocContents, '_id'>>>>;
+    insertMany<DocContents = TRawDocType>(
+      docs: Array<DocContents | TRawDocType>,
+      options: InsertManyOptions
+    ): Promise<Array<MergeType<THydratedDocumentType, Omit<DocContents, '_id'>>>>;
+    insertMany<DocContents = TRawDocType>(
+      doc: DocContents
+    ): Promise<
+      Array<MergeType<THydratedDocumentType, Omit<DocContents, '_id'>>>
+    >;
 
     /**
-     * Event emitter that reports any errors that occurred. Useful for global error
-     * handling.
+     * Shortcut for saving one document to the database.
+     * `MyModel.insertOne(obj, options)` is almost equivalent to `new MyModel(obj).save(options)`.
+     * The difference is that `insertOne()` checks if `obj` is already a document, and checks for discriminators.
      */
-    events: NodeJS.EventEmitter;
+    insertOne(doc: Partial<ApplyBasicCreateCasting<TRawDocType>>, options?: SaveOptions): Promise<THydratedDocumentType>;
 
+    /**
+     * List all [Atlas search indexes](https://www.mongodb.com/docs/atlas/atlas-search/create-index/) on this model's collection.
+     * This function only works when connected to MongoDB Atlas.
+     */
+    listSearchIndexes(options?: mongodb.ListSearchIndexesOptions): Promise<Array<SearchIndexInfo>>;
+
+    /** Populates document references. */
+    populate(
+      docs: Array<any>,
+      options: PopulateOptions | Array<PopulateOptions> | string
+    ): Promise<Array<THydratedDocumentType>>;
+    populate(
+      doc: any, options: PopulateOptions | Array<PopulateOptions> | string
+    ): Promise<THydratedDocumentType>;
+    populate<Paths>(
+      docs: Array<any>,
+      options: PopulateOptions | Array<PopulateOptions> | string
+    ): Promise<Array<PopulateDocumentResult<THydratedDocumentType, Paths, PopulatedPathsDocumentType<TRawDocType, Paths>, TRawDocType>>>;
+    populate<Paths>(
+      doc: any, options: PopulateOptions | Array<PopulateOptions> | string
+    ): Promise<PopulateDocumentResult<THydratedDocumentType, Paths, PopulatedPathsDocumentType<TRawDocType, Paths>, TRawDocType>>;
+    aggregate<R = any>(pipeline?: PipelineStage[], options?: AggregateOptions): Aggregate<Array<R>>;
+    aggregate<R = any>(pipeline: PipelineStage[]): Aggregate<Array<R>>;
+
+    /* Apply defaults to the given document or POJO. */
+    applyDefaults(obj: AnyObject): AnyObject;
+    applyDefaults(obj: TRawDocType): TRawDocType;
+
+    /**
+     * Sends multiple `insertOne`, `updateOne`, `updateMany`, `replaceOne`,
+     * `deleteOne`, and/or `deleteMany` operations to the MongoDB server in one
+     * command. This is faster than sending multiple independent operations (e.g.
+     * if you use `create()`) because with `bulkWrite()` there is only one network
+     * round trip to the MongoDB server.
+     */
+    bulkWrite<DocContents = TRawDocType>(
+      writes: Array<AnyBulkWriteOperation<DocContents extends mongodb.Document ? DocContents : any>>,
+      options: mongodb.BulkWriteOptions & MongooseBulkWriteOptions & { ordered: false }
+    ): Promise<mongodb.BulkWriteResult & { mongoose?: { validationErrors: Error[] } }>;
+    bulkWrite<DocContents = TRawDocType>(
+      writes: Array<AnyBulkWriteOperation<DocContents extends mongodb.Document ? DocContents : any>>,
+      options?: mongodb.BulkWriteOptions & MongooseBulkWriteOptions
+    ): Promise<mongodb.BulkWriteResult>;
+
+    /**
+     * Sends multiple `save()` calls in a single `bulkWrite()`. This is faster than
+     * sending multiple `save()` calls because with `bulkSave()` there is only one
+     * network round trip to the MongoDB server.
+     */
+    bulkSave(documents: Array<THydratedDocumentType>, options?: MongooseBulkSaveOptions): Promise<MongooseBulkWriteResult>;
+
+    /** Casts and validates the given object against this model's schema, returning the casted-and-validated copy of `obj`, passing the given `context` to custom validators. */
+    validate(): Promise<TRawDocType>;
+    validate(obj: any): Promise<TRawDocType>;
+    validate(obj: any, pathsOrOptions: PathsToValidate): Promise<TRawDocType>;
+    validate(obj: any, pathsOrOptions: { pathsToSkip?: pathsToSkip }): Promise<TRawDocType>;
+  }
+
+  interface ModelQueryMethods<
+    TRawDocType,
+    TQueryHelpers,
+    TInstanceMethods,
+    TVirtuals,
+    THydratedDocumentType,
+    TSchema,
+    TLeanResultType
+  > {
     /**
      * Finds a single document by its _id field. `findById(id)` is almost*
      * equivalent to `findOne({ _id: id })`. If you want to query by a document's
@@ -541,215 +565,6 @@ declare module 'mongoose' {
     ): QueryWithHelpers<
       HasLeanOption<TSchema> extends true ? TLeanResultType | null : ResultDoc | null,
       ResultDoc,
-      TQueryHelpers,
-      TLeanResultType,
-      'findOne',
-      TInstanceMethods & TVirtuals
-    >;
-
-    /**
-     * Shortcut for creating a new Document from existing raw data, pre-saved in the DB.
-     * The document returned has no paths marked as modified initially.
-     * With `strict: false`, fields not in the schema are kept on the document; pass
-     * `ExtraFields` to describe their types, e.g.
-     * `Model.hydrate<{ totalOrders: number }>(obj, null, { strict: false })`.
-     */
-    hydrate<ExtraFields = unknown>(
-      obj: any,
-      projection: ProjectionType<TRawDocType> | null | undefined,
-      options: HydrateOptions & { strict: false }
-    ): THydratedDocumentType & ExtraFields;
-    hydrate(obj: any, projection?: ProjectionType<TRawDocType> | null | undefined, options?: HydrateOptions): THydratedDocumentType;
-
-    /**
-     * This function is responsible for building [indexes](https://www.mongodb.com/docs/manual/indexes/),
-     * unless [`autoIndex`](http://mongoosejs.com/docs/guide.html#autoIndex) is turned off.
-     * Mongoose calls this function automatically when a model is created using
-     * [`mongoose.model()`](/docs/api/mongoose.html#mongoose_Mongoose-model) or
-     * [`connection.model()`](/docs/api/connection.html#connection_Connection-model), so you
-     * don't need to call it.
-     */
-    init(): Promise<THydratedDocumentType>;
-
-    /** Inserts one or more new documents as a single `insertMany` call to the MongoDB server. */
-    insertMany(
-      docs: Array<TRawDocType>
-    ): Promise<Array<THydratedDocumentType>>;
-    insertMany(
-      doc: Array<TRawDocType>,
-      options: InsertManyOptions & { ordered: false; rawResult: true; }
-    ): Promise<mongodb.InsertManyResult<Require_id<TRawDocType>> & {
-      mongoose: {
-        validationErrors: (CastError | Error.ValidatorError)[];
-        results: Array<
-          Error |
-          Object |
-          THydratedDocumentType
-        >
-      }
-    }>;
-    insertMany(
-      docs: Array<TRawDocType>,
-      options: InsertManyOptions & { lean: true, rawResult: true; }
-    ): Promise<mongodb.InsertManyResult<Require_id<TRawDocType>>>;
-    insertMany<DocContents = TRawDocType>(
-      doc: DocContents | TRawDocType,
-      options: InsertManyOptions & { ordered: false; rawResult: true; }
-    ): Promise<mongodb.InsertManyResult<Require_id<DocContents>> & {
-      mongoose: {
-        validationErrors: (CastError | Error.ValidatorError)[];
-        results: Array<
-          Error |
-          Object |
-          MergeType<THydratedDocumentType, DocContents>
-        >
-      }
-    }>;
-    insertMany(
-      docs: Array<TRawDocType>,
-      options: InsertManyOptions & { lean: true; }
-    ): Promise<Array<Require_id<TRawDocType>>>;
-    insertMany(
-      docs: Array<TRawDocType>,
-      options: InsertManyOptions & { rawResult: true; }
-    ): Promise<mongodb.InsertManyResult<Require_id<THydratedDocumentType>>>;
-    insertMany<DocContents = TRawDocType>(
-      docs: Array<DocContents | TRawDocType>,
-      options: InsertManyOptions & { lean: true; }
-    ): Promise<Array<Require_id<DocContents>>>;
-    insertMany<DocContents = TRawDocType>(
-      docs: Array<DocContents | TRawDocType>,
-      options: InsertManyOptions & { rawResult: true; }
-    ): Promise<mongodb.InsertManyResult<Require_id<DocContents>>>;
-    insertMany<DocContents = TRawDocType>(
-      doc: DocContents,
-      options: InsertManyOptions & { lean: true; }
-    ): Promise<Array<Require_id<DocContents>>>;
-    insertMany<DocContents = TRawDocType>(
-      doc: DocContents,
-      options: InsertManyOptions & { rawResult: true; }
-    ): Promise<mongodb.InsertManyResult<Require_id<DocContents>>>;
-    insertMany(
-      doc: Array<TRawDocType>,
-      options: InsertManyOptions
-    ): Promise<Array<THydratedDocumentType>>;
-    insertMany<DocContents = TRawDocType>(
-      docs: Array<DocContents | TRawDocType>
-    ): Promise<Array<MergeType<THydratedDocumentType, Omit<DocContents, '_id'>>>>;
-    insertMany<DocContents = TRawDocType>(
-      doc: DocContents,
-      options: InsertManyOptions
-    ): Promise<Array<MergeType<THydratedDocumentType, Omit<DocContents, '_id'>>>>;
-    insertMany<DocContents = TRawDocType>(
-      docs: Array<DocContents | TRawDocType>,
-      options: InsertManyOptions
-    ): Promise<Array<MergeType<THydratedDocumentType, Omit<DocContents, '_id'>>>>;
-    insertMany<DocContents = TRawDocType>(
-      doc: DocContents
-    ): Promise<
-      Array<MergeType<THydratedDocumentType, Omit<DocContents, '_id'>>>
-    >;
-
-    /**
-     * Shortcut for saving one document to the database.
-     * `MyModel.insertOne(obj, options)` is almost equivalent to `new MyModel(obj).save(options)`.
-     * The difference is that `insertOne()` checks if `obj` is already a document, and checks for discriminators.
-     */
-    insertOne(doc: Partial<ApplyBasicCreateCasting<TRawDocType>>, options?: SaveOptions): Promise<THydratedDocumentType>;
-
-    /**
-     * List all [Atlas search indexes](https://www.mongodb.com/docs/atlas/atlas-search/create-index/) on this model's collection.
-     * This function only works when connected to MongoDB Atlas.
-     */
-    listSearchIndexes(options?: mongodb.ListSearchIndexesOptions): Promise<Array<SearchIndexInfo>>;
-
-    /** The name of the model */
-    modelName: string;
-
-    /** Populates document references. */
-    populate(
-      docs: Array<any>,
-      options: PopulateOptions | Array<PopulateOptions> | string
-    ): Promise<Array<THydratedDocumentType>>;
-    populate(
-      doc: any, options: PopulateOptions | Array<PopulateOptions> | string
-    ): Promise<THydratedDocumentType>;
-    populate<Paths>(
-      docs: Array<any>,
-      options: PopulateOptions | Array<PopulateOptions> | string
-    ): Promise<Array<PopulateDocumentResult<THydratedDocumentType, Paths, PopulatedPathsDocumentType<TRawDocType, Paths>, TRawDocType>>>;
-    populate<Paths>(
-      doc: any, options: PopulateOptions | Array<PopulateOptions> | string
-    ): Promise<PopulateDocumentResult<THydratedDocumentType, Paths, PopulatedPathsDocumentType<TRawDocType, Paths>, TRawDocType>>;
-
-    /**
-     * Update an existing [Atlas search index](https://www.mongodb.com/docs/atlas/atlas-search/create-index/).
-     * This function only works when connected to MongoDB Atlas.
-     */
-    updateSearchIndex(name: string, definition: AnyObject): Promise<void>;
-
-    /**
-     * Changes the Connection instance this model uses to make requests to MongoDB.
-     * This function is most useful for changing the Connection that a Model defined using `mongoose.model()` uses
-     * after initialization.
-     */
-    useConnection(connection: Connection): this;
-
-    /** Casts and validates the given object against this model's schema, returning the casted-and-validated copy of `obj`, passing the given `context` to custom validators. */
-    validate(): Promise<TRawDocType>;
-    validate(obj: any): Promise<TRawDocType>;
-    validate(obj: any, pathsOrOptions: PathsToValidate): Promise<TRawDocType>;
-    validate(obj: any, pathsOrOptions: { pathsToSkip?: pathsToSkip }): Promise<TRawDocType>;
-
-    /** Watches the underlying collection for changes using [MongoDB change streams](https://www.mongodb.com/docs/manual/changeStreams/). */
-    watch<ResultType extends mongodb.Document = any, ChangeType extends mongodb.ChangeStreamDocument = any>(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions & { hydrate?: boolean }): mongodb.ChangeStream<ResultType, ChangeType>;
-
-    /** Adds a `$where` clause to this query */
-    $where(argument: string | Function): QueryWithHelpers<Array<THydratedDocumentType>, THydratedDocumentType, TQueryHelpers, TRawDocType, 'find', TInstanceMethods & TVirtuals>;
-
-    /** Registered discriminators for this model. */
-    discriminators: { [name: string]: Model<any> } | undefined;
-
-    /** Translate any aliases fields/conditions so the final query or document object is pure */
-    translateAliases(raw: any): any;
-
-    /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
-    distinct<DocKey extends string>(
-      field: DocKey,
-      filter?: QueryFilter<TRawDocType>,
-      options?: QueryOptions<TRawDocType>
-    ): QueryWithHelpers<
-      Array<
-        DocKey extends keyof WithLevel1NestedPaths<TRawDocType>
-          ? WithoutUndefined<Unpacked<WithLevel1NestedPaths<TRawDocType>[DocKey]>>
-          : unknown
-      >,
-      THydratedDocumentType,
-      TQueryHelpers,
-      TLeanResultType,
-      'distinct',
-      TInstanceMethods & TVirtuals
-    >;
-
-    /** Creates a `estimatedDocumentCount` query: counts the number of documents in the collection. */
-    estimatedDocumentCount(options?: QueryOptions<TRawDocType>): QueryWithHelpers<
-      number,
-      THydratedDocumentType,
-      TQueryHelpers,
-      TLeanResultType,
-      'estimatedDocumentCount',
-      TInstanceMethods & TVirtuals
-    >;
-
-    /**
-     * Returns a document with its `_id` if at least one document exists in the database that matches
-     * the given `filter`, and `null` otherwise.
-     */
-    exists(
-      filter: QueryFilter<TRawDocType>
-    ): QueryWithHelpers<
-      { _id: InferId<TRawDocType> } | null,
-      THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
       'findOne',
@@ -942,7 +757,6 @@ declare module 'mongoose' {
       'findOneAndDelete',
       TInstanceMethods & TVirtuals
     >;
-
 
     /** Creates a `findOneAndUpdate` query, filtering by the given `_id`. */
     findByIdAndUpdate<const Projection extends ProjectionType<TRawDocType>>(
@@ -1364,22 +1178,102 @@ declare module 'mongoose' {
       TInstanceMethods & TVirtuals
     >;
 
+    /** Creates a `countDocuments` query: counts the number of documents that match `filter`. */
+    countDocuments(
+      filter?: QueryFilter<TRawDocType>,
+      options?: (mongodb.CountOptions & MongooseBaseQueryOptions<TRawDocType> & mongodb.Abortable) | null
+    ): QueryWithHelpers<
+      number,
+      THydratedDocumentType,
+      TQueryHelpers,
+      TRawDocType,
+      'countDocuments',
+      TInstanceMethods & TVirtuals
+    >;
+
+    /**
+     * Deletes all of the documents that match `conditions` from the collection.
+     * Behaves like `remove()`, but deletes all documents that match `conditions`
+     * regardless of the `single` option.
+     */
+    deleteMany(
+      filter?: QueryFilter<TRawDocType>,
+      options?: (mongodb.DeleteOptions & MongooseBaseQueryOptions<TRawDocType>) | null
+    ): QueryWithHelpers<
+      mongodb.DeleteResult,
+      THydratedDocumentType,
+      TQueryHelpers,
+      TLeanResultType,
+      'deleteMany',
+      TInstanceMethods & TVirtuals
+    >;
+
+    /**
+     * Deletes the first document that matches `conditions` from the collection.
+     * Behaves like `remove()`, but deletes at most one document regardless of the
+     * `single` option.
+     */
+    deleteOne(
+      filter?: QueryFilter<TRawDocType>,
+      options?: (mongodb.DeleteOptions & MongooseBaseQueryOptions<TRawDocType>) | null
+    ): QueryWithHelpers<
+      mongodb.DeleteResult,
+      THydratedDocumentType,
+      TQueryHelpers,
+      TLeanResultType,
+      'deleteOne',
+      TInstanceMethods & TVirtuals
+    >;
+
+    /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
+    distinct<DocKey extends string>(
+      field: DocKey,
+      filter?: QueryFilter<TRawDocType>,
+      options?: QueryOptions<TRawDocType>
+    ): QueryWithHelpers<
+      Array<
+        DocKey extends keyof WithLevel1NestedPaths<TRawDocType>
+          ? WithoutUndefined<Unpacked<WithLevel1NestedPaths<TRawDocType>[DocKey]>>
+          : unknown
+      >,
+      THydratedDocumentType,
+      TQueryHelpers,
+      TLeanResultType,
+      'distinct',
+      TInstanceMethods & TVirtuals
+    >;
+
+    /** Creates a `estimatedDocumentCount` query: counts the number of documents in the collection. */
+    estimatedDocumentCount(options?: QueryOptions<TRawDocType>): QueryWithHelpers<
+      number,
+      THydratedDocumentType,
+      TQueryHelpers,
+      TLeanResultType,
+      'estimatedDocumentCount',
+      TInstanceMethods & TVirtuals
+    >;
+
+    /**
+     * Returns a document with its `_id` if at least one document exists in the database that matches
+     * the given `filter`, and `null` otherwise.
+     */
+    exists(
+      filter: QueryFilter<TRawDocType>
+    ): QueryWithHelpers<
+      { _id: InferId<TRawDocType> } | null,
+      THydratedDocumentType,
+      TQueryHelpers,
+      TLeanResultType,
+      'findOne',
+      TInstanceMethods & TVirtuals
+    >;
+
     /** Creates a `replaceOne` query: finds the first document that matches `filter` and replaces it with `replacement`. */
     replaceOne<ResultDoc = THydratedDocumentType>(
       filter?: QueryFilter<TRawDocType>,
       replacement?: TRawDocType | AnyObject,
       options?: (mongodb.ReplaceOptions & QueryOptions<TRawDocType>) | null
     ): QueryWithHelpers<UpdateWriteOpResult, ResultDoc, TQueryHelpers, TLeanResultType, 'replaceOne', TInstanceMethods & TVirtuals>;
-
-    /** Apply changes made to this model's schema after this model was compiled. */
-    recompileSchema(): void;
-
-    /** Schema the model uses. */
-    schema: IfAny<
-      TSchema,
-      Schema<TRawDocType, Model<TRawDocType, TQueryHelpers, TInstanceMethods, TVirtuals>, TInstanceMethods, TQueryHelpers, TVirtuals>,
-      TSchema
-    >;
 
     /** Creates a `updateMany` query: updates all documents that match `filter` with `update`. */
     updateMany(
@@ -1415,6 +1309,143 @@ declare module 'mongoose' {
       TLeanResultType,
       'find',
       TInstanceMethods & TVirtuals
+    >;
+  }
+
+  /**
+   * Models are fancy constructors compiled from `Schema` definitions.
+   * An instance of a model is called a document.
+   * Models are responsible for creating and reading documents from the underlying MongoDB database
+   */
+  export interface Model<
+    TRawDocType,
+    TQueryHelpers = {},
+    TInstanceMethods = {},
+    TVirtuals = {},
+    THydratedDocumentType = HydratedDocument<TRawDocType, TVirtuals & TInstanceMethods, TQueryHelpers, TVirtuals>,
+    TSchema = any,
+    TLeanResultType = TRawDocType> extends
+    NodeJS.EventEmitter,
+    ModelDocumentMethods<TRawDocType, TQueryHelpers, TInstanceMethods, TVirtuals, THydratedDocumentType, TSchema>,
+    ModelQueryMethods<TRawDocType, TQueryHelpers, TInstanceMethods, TVirtuals, THydratedDocumentType, TSchema, TLeanResultType>,
+    IndexManager,
+    SessionStarter {
+    new <DocType = Partial<TRawDocType>>(doc?: DocType, fields?: any | null, options?: AnyObject): THydratedDocumentType;
+
+    /** Base Mongoose instance the model uses. */
+    base: Mongoose;
+
+    /** Standard Schema adapter for validating input with this model's schema. */
+    readonly '~standard': StandardSchemaV1.Props<
+      Default__v<
+        Default_id<TRawDocType, ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>>,
+        ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>
+      >
+    >;
+
+    /**
+     * If this is a discriminator model, `baseModelName` is the name of
+     * the base model.
+     */
+    baseModelName: string | undefined;
+
+    /* Cast the given POJO to the model's schema */
+    castObject(obj: AnyObject, options?: { ignoreCastErrors?: boolean }): TRawDocType;
+
+
+    /* Apply virtuals to the given POJO. */
+    applyVirtuals(obj: AnyObject, virtalsToApply?: string[]): AnyObject;
+
+    /**
+     * Apply this model's timestamps to a given POJO, including subdocument timestamps
+     */
+    applyTimestamps(obj: AnyObject, options?: { isUpdate?: boolean, currentTime?: () => Date }): AnyObject;
+
+
+    /** Collection the model uses. */
+    collection: Collection;
+
+    /**
+     * Create the collection for this model. By default, if no indexes are specified,
+     * mongoose will not create the collection for the model until any documents are
+     * created. Use this method to create the collection explicitly.
+     */
+    createCollection<T extends mongodb.Document>(options?: mongodb.CreateCollectionOptions & Pick<SchemaOptions, 'expires'> & { middleware?: boolean | SkipMiddlewareOptions }): Promise<mongodb.Collection<T>>;
+
+    /**
+     * Create an [Atlas search index](https://www.mongodb.com/docs/atlas/atlas-search/create-index/).
+     * This function only works when connected to MongoDB Atlas.
+     */
+    createSearchIndex(description: SearchIndexDescription): Promise<string>;
+
+    /**
+     * Creates all [Atlas search indexes](https://www.mongodb.com/docs/atlas/atlas-search/create-index/) defined in this model's schema.
+     * This function only works when connected to MongoDB Atlas.
+     */
+    createSearchIndexes(): Promise<string[]>;
+
+    /** Connection the model uses. */
+    db: Connection;
+
+    /**
+     * Delete an existing [Atlas search index](https://www.mongodb.com/docs/atlas/atlas-search/create-index/) by name.
+     * This function only works when connected to MongoDB Atlas.
+     */
+    dropSearchIndex(name: string): Promise<void>;
+
+    /**
+     * Event emitter that reports any errors that occurred. Useful for global error
+     * handling.
+     */
+    events: NodeJS.EventEmitter;
+
+    /**
+     * This function is responsible for building [indexes](https://www.mongodb.com/docs/manual/indexes/),
+     * unless [`autoIndex`](http://mongoosejs.com/docs/guide.html#autoIndex) is turned off.
+     * Mongoose calls this function automatically when a model is created using
+     * [`mongoose.model()`](/docs/api/mongoose.html#mongoose_Mongoose-model) or
+     * [`connection.model()`](/docs/api/connection.html#connection_Connection-model), so you
+     * don't need to call it.
+     */
+    init(): Promise<THydratedDocumentType>;
+
+    /** The name of the model */
+    modelName: string;
+
+    /**
+     * Update an existing [Atlas search index](https://www.mongodb.com/docs/atlas/atlas-search/create-index/).
+     * This function only works when connected to MongoDB Atlas.
+     */
+    updateSearchIndex(name: string, definition: AnyObject): Promise<void>;
+
+    /**
+     * Changes the Connection instance this model uses to make requests to MongoDB.
+     * This function is most useful for changing the Connection that a Model defined using `mongoose.model()` uses
+     * after initialization.
+     */
+    useConnection(connection: Connection): this;
+
+
+    /** Watches the underlying collection for changes using [MongoDB change streams](https://www.mongodb.com/docs/manual/changeStreams/). */
+    watch<ResultType extends mongodb.Document = any, ChangeType extends mongodb.ChangeStreamDocument = any>(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions & { hydrate?: boolean }): mongodb.ChangeStream<ResultType, ChangeType>;
+
+    /** Adds a `$where` clause to this query */
+    $where(argument: string | Function): QueryWithHelpers<Array<THydratedDocumentType>, THydratedDocumentType, TQueryHelpers, TRawDocType, 'find', TInstanceMethods & TVirtuals>;
+
+    /** Registered discriminators for this model. */
+    discriminators: { [name: string]: Model<any> } | undefined;
+
+    /** Translate any aliases fields/conditions so the final query or document object is pure */
+    translateAliases(raw: any): any;
+
+    /** Apply changes made to this model's schema after this model was compiled. */
+    recompileSchema(): void;
+
+    /** Schema the model uses. */
+    schema: IfAny<
+      TSchema,
+      Schema<TRawDocType, Model<TRawDocType, TQueryHelpers, TInstanceMethods, TVirtuals>, TInstanceMethods, TQueryHelpers, TVirtuals>,
+      TSchema
     >;
 
     /**

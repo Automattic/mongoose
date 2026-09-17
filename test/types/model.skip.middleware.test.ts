@@ -1,5 +1,8 @@
 import {
   Schema,
+  Model,
+  HydratedDocument,
+  SchemaOptions,
   model,
   SkipMiddlewareOptions,
   QueryOptions,
@@ -255,4 +258,165 @@ function createTestContext() {
 
 function createConstructionTestContext() {
   return { schema: new Schema({ name: String }) };
+}
+
+function explicitCustomFunctionMiddlewareOptions() {
+  // Arrange
+  const { schema } = createTypedFunctionContext();
+
+  // Act
+  schema.methods.runTask = async function(value, attempts) {
+    expect(this).type.toBe<HydratedDocument<TaskData, TaskMethods>>();
+    expect(value).type.toBe<string>();
+    expect(attempts).type.toBe<number | undefined>();
+    return this.name + value;
+  };
+  schema.statics.findTask = async function(value) {
+    expect(value).type.toBe<string>();
+    return value;
+  };
+  schema.methods.runTask.supportsMiddlewareOption = true;
+  schema.statics.findTask.supportsMiddlewareOption = true;
+  schema.methods.runTask.supportsMiddlewareOption = false;
+  schema.statics.findTask.supportsMiddlewareOption = undefined;
+
+  // Assert
+  expect<typeof schema.methods.runTask.supportsMiddlewareOption>().type.toBe<boolean | undefined>();
+  expect<typeof schema.statics.findTask.supportsMiddlewareOption>().type.toBe<boolean | undefined>();
+  expect<Parameters<typeof schema.methods.runTask>>().type.toBe<[value: string, attempts?: number]>();
+  expect<ReturnType<typeof schema.methods.runTask>>().type.toBe<Promise<string>>();
+  expect<ThisParameterType<typeof schema.methods.runTask>>().type.toBe<HydratedDocument<TaskData, TaskMethods>>();
+  expect<Parameters<typeof schema.statics.findTask>>().type.toBe<[value: string]>();
+  expect<ReturnType<typeof schema.statics.findTask>>().type.toBe<Promise<string>>();
+  expect<ThisParameterType<typeof schema.statics.findTask>>().type.toBe<unknown>();
+  expect(schema.statics.findTask).type.not.toBeCallableWith(123);
+  // @ts-expect-error is not assignable to type
+  schema.methods.runTask.supportsMiddlewareOption = 'true';
+  // @ts-expect-error is not assignable to type
+  schema.statics.findTask.supportsMiddlewareOption = 1;
+  // @ts-expect-error is not assignable to type
+  schema.methods.runTask = async(value: number) => String(value);
+  // @ts-expect-error is not assignable to type
+  schema.statics.findTask = (value: string) => value;
+}
+
+function callerDeclaredCustomFunctionProperties() {
+  // Arrange
+  const { schema } = createDeclaredFunctionContext();
+
+  // Act
+  schema.methods.runTask = Object.assign(async(value: string) => value, { tag: 'task' as const });
+  schema.statics.findTask = Object.assign(async(value: string) => value, { tag: 'task' as const });
+  schema.methods.runTask.supportsMiddlewareOption = true;
+  schema.statics.findTask.supportsMiddlewareOption = true;
+
+  // Assert
+  expect<typeof schema.methods.runTask.supportsMiddlewareOption>().type.toBe<true | undefined>();
+  expect<typeof schema.statics.findTask.supportsMiddlewareOption>().type.toBe<true | undefined>();
+  expect<typeof schema.methods.runTask.tag>().type.toBe<'task'>();
+  expect<typeof schema.statics.findTask.tag>().type.toBe<'task'>();
+  expect<ThisParameterType<typeof schema.methods.runTask>>().type.toBe<HydratedDocument<TaskData, DeclaredTaskMethods>>();
+  expect<Parameters<typeof schema.methods.runTask>>().type.toBe<[value: string]>();
+  expect<ReturnType<typeof schema.methods.runTask>>().type.toBe<Promise<string>>();
+  // @ts-expect-error is not assignable to type
+  schema.methods.runTask.supportsMiddlewareOption = false;
+  // @ts-expect-error is not assignable to type
+  schema.methods.runTask.tag = 'other';
+}
+
+function explicitCustomFunctionReceivers() {
+  // Arrange
+  const { schema } = createReceiverFunctionContext();
+
+  // Act
+  schema.methods.runTask = async function(value) {
+    expect(this).type.toBe<TaskReceiver>();
+    return this.prefix + value;
+  };
+  schema.statics.findTask = async function(value) {
+    expect(this).type.toBe<TaskReceiver>();
+    return this.prefix + value;
+  };
+  schema.methods.runTask.supportsMiddlewareOption = true;
+  schema.statics.findTask.supportsMiddlewareOption = true;
+
+  // Assert
+  expect<ThisParameterType<typeof schema.methods.runTask>>().type.toBe<TaskReceiver>();
+  expect<ThisParameterType<typeof schema.statics.findTask>>().type.toBe<TaskReceiver>();
+  expect<Parameters<typeof schema.methods.runTask>>().type.toBe<[value: string]>();
+  expect<ReturnType<typeof schema.statics.findTask>>().type.toBe<Promise<string>>();
+  // @ts-expect-error is not assignable to
+  schema.methods.runTask.call({ prefix: 123 }, 'Alice');
+  // @ts-expect-error is not assignable to
+  schema.statics.findTask.call({}, 'Alice');
+}
+
+function receiverTransformationPreservesProperties() {
+  // Arrange
+  const { options } = createMethodOptionsContext();
+
+  // Act
+  const method = options.methods!.runTask;
+
+  // Assert
+  expect<typeof method.tag>().type.toBe<'task'>();
+  expect<typeof method.supportsMiddlewareOption>().type.toBe<true | undefined>();
+  expect<Parameters<typeof method>>().type.toBe<[value: string]>();
+  expect<ReturnType<typeof method>>().type.toBe<Promise<string>>();
+  expect<ThisParameterType<typeof method>>().type.toBe<HydratedDocument<TaskData, DeclaredTaskMethods>>();
+}
+
+interface TaskData {
+  name: string;
+}
+interface TaskMethods {
+  runTask(value: string, attempts?: number): Promise<string>;
+}
+interface TaskStatics {
+  findTask(value: string): Promise<string>;
+}
+interface DeclaredTaskFunction {
+  (value: string): Promise<string>;
+  supportsMiddlewareOption?: true;
+  tag: 'task';
+}
+interface DeclaredTaskMethods {
+  runTask: DeclaredTaskFunction;
+}
+interface DeclaredTaskStatics {
+  findTask: DeclaredTaskFunction;
+}
+interface TaskReceiver {
+  prefix: string;
+}
+interface ReceiverTaskMethods {
+  runTask(this: TaskReceiver, value: string): Promise<string>;
+}
+interface ReceiverTaskStatics {
+  findTask(this: TaskReceiver, value: string): Promise<string>;
+}
+
+function createTypedFunctionContext() {
+  type TaskModel = Model<TaskData, {}, TaskMethods> & TaskStatics;
+  const schema = new Schema<TaskData, TaskModel, TaskMethods, {}, {}, TaskStatics>({ name: String });
+  return { schema };
+}
+
+function createDeclaredFunctionContext() {
+  type TaskModel = Model<TaskData, {}, DeclaredTaskMethods> & DeclaredTaskStatics;
+  const schema = new Schema<TaskData, TaskModel, DeclaredTaskMethods, {}, {}, DeclaredTaskStatics>({ name: String });
+  return { schema };
+}
+
+function createReceiverFunctionContext() {
+  type TaskModel = Model<TaskData, {}, ReceiverTaskMethods> & ReceiverTaskStatics;
+  const schema = new Schema<TaskData, TaskModel, ReceiverTaskMethods, {}, {}, ReceiverTaskStatics>({ name: String });
+  return { schema };
+}
+
+function createMethodOptionsContext() {
+  const options: SchemaOptions<TaskData, DeclaredTaskMethods, {}, {}, {}, HydratedDocument<TaskData, DeclaredTaskMethods>> = {
+    methods: { runTask: Object.assign(async(value: string) => value, { tag: 'task' as const }) }
+  };
+  return { options };
 }

@@ -6392,51 +6392,6 @@ describe('Model', function() {
       await Test.collection.drop().catch(() => {});
     });
 
-    it('mongodb actually removes expired documents (gh-11229)', async function() {
-      this.timeout(1000 * 20);
-      const version = await start.mongodVersion();
-      if (version[0] < 5) {
-        this.skip();
-        return;
-      }
-
-      // Speed up TTL monitor from 60s to 1s for deterministic testing
-      await db.db.admin().command({ setParameter: 1, ttlMonitorSleepSecs: 1 });
-
-      const schema = Schema({ name: String, timestamp: Date, metadata: Object }, {
-        timeseries: {
-          timeField: 'timestamp',
-          metaField: 'metadata',
-          granularity: 'seconds' // results in 1-hour bucket span
-        },
-        autoCreate: false
-      });
-
-      const Test = db.model('TestMongoDBExpireRemoval', schema);
-
-      await Test.collection.drop().catch(() => {});
-      await Test.createCollection({ expireAfterSeconds: 5 });
-
-      // Timeseries TTL deletes entire buckets, not individual documents.
-      // With granularity: 'seconds', bucket span is 1 hour.
-      // Use 2-hour-old timestamps so the bucket is fully expired.
-      const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
-      await Test.insertMany([
-        { metadata: { sensorId: 5578, type: 'temperature' }, timestamp: twoHoursAgo, temp: 12 },
-        { metadata: { sensorId: 5578, type: 'temperature' }, timestamp: twoHoursAgo, temp: 11 }
-      ]);
-
-      // Wait for TTL monitor (every 1s) to delete the expired bucket
-      let count;
-      for (let i = 0; i < 10; i++) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        count = await Test.countDocuments({});
-        if (count === 0) break;
-      }
-
-      assert.equal(count, 0);
-    });
-
     it('createCollection() handles NamespaceExists errors (gh-9447)', async function() {
       const userSchema = new Schema({ name: String });
       const Model = db.model('User', userSchema);

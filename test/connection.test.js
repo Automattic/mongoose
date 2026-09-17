@@ -836,6 +836,29 @@ describe('connections:', function() {
       return db.close();
     });
 
+    it('supports connection-level maxTimeMS on a useDb() connection', async function() {
+      const db = await mongoose.createConnection(start.uri).asPromise();
+
+      try {
+        const db2 = db.useDb(start.databases[1]);
+        db2.set('maxTimeMS', 1000);
+
+        const schema = new Schema({ name: String });
+        const ParentModel = db.model('Parent', schema);
+        const ChildModel = db2.model('Child', schema);
+
+        const childQuery = ChildModel.findOne();
+        await childQuery;
+        assert.strictEqual(childQuery.getOptions().maxTimeMS, 1000);
+
+        const parentQuery = ParentModel.findOne();
+        await parentQuery;
+        assert.strictEqual(parentQuery.getOptions().maxTimeMS, undefined);
+      } finally {
+        await db.close();
+      }
+    });
+
     it('supports removing db (gh-11821)', async function() {
       const db = await mongoose.createConnection(start.uri).asPromise();
 

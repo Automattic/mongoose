@@ -1,3 +1,7 @@
+9.10.1 / 2026-09-14
+===================
+ * types: relax populate Model generics to allow typed virtuals to be passed to populate in TypeScript 7 with skipLibCheck #16503
+
 9.10.0 / 2026-09-10
 ===================
  * feat: upgrade mongodb driver -> 7.6.0

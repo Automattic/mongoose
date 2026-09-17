@@ -512,7 +512,7 @@ declare module 'mongoose' {
     >;
 
     /** Object of currently defined methods on this schema. */
-    methods: AddThisParameter<TInstanceMethods, THydratedDocumentType> & AnyObject;
+    methods: AddThisParameter<AddMiddlewareOption<TInstanceMethods>, THydratedDocumentType> & AnyObject;
 
     /** The original object passed to the schema constructor */
     obj: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType>;
@@ -720,7 +720,7 @@ declare module 'mongoose' {
     >;
 
     /** Object of currently defined statics on this schema. */
-    statics: { [F in keyof TStaticMethods]: TStaticMethods[F] } &
+    statics: AddMiddlewareOption<TStaticMethods> &
     { [name: string]: ((this: TModelType, ...args: any[]) => unknown) & SupportsMiddlewareOption };
 
     toJSONSchema(options?: { useBsonType?: boolean }): Record<string, any>;

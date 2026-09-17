@@ -196,7 +196,7 @@ declare module 'mongoose' {
   type AddThisParameter<T, D> = {
     [K in keyof T]: T[K] extends (...args: infer A) => infer R
       ? IsUnknown<ThisParameter<T[K], unknown>> extends true
-        ? (this: D, ...args: A) => R
+        ? ((this: D, ...args: A) => R) & Pick<T[K], keyof T[K]>
         : T[K]
       : T[K];
   };

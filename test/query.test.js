@@ -3014,6 +3014,26 @@ describe('Query', function() {
         Test.findOne(q).exec(),
         /Parameter "filter" to findOne\(\) must be an object/
       );
+      await assert.rejects(
+        Test.countDocuments(q).exec(),
+        /Parameter "filter" to countDocuments\(\) must be an object/
+      );
+      await assert.rejects(
+        Test.findOneAndDelete(q).exec(),
+        /Parameter "filter" to findOneAndDelete\(\) must be an object/
+      );
+      await assert.rejects(
+        Test.updateOne(q, { name: 'bar' }).exec(),
+        /Parameter "filter" to updateOne\(\) must be an object/
+      );
+      await assert.rejects(
+        Test.updateMany(q, { name: 'bar' }).exec(),
+        /Parameter "filter" to updateMany\(\) must be an object/
+      );
+      await assert.rejects(
+        Test.replaceOne(q, { name: 'bar' }).exec(),
+        /Parameter "filter" to replaceOne\(\) must be an object/
+      );
 
       // `merge()` still supports queries
       const res = await Test.find().merge(q);

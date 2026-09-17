@@ -2016,6 +2016,242 @@ describe('middleware option to skip hooks (gh-8768)', function() {
     });
   });
 
+  describe('shared query cursor middleware selection', function() {
+    const selections = [
+      { name: 'enabled then disabled', first: true, second: false },
+      { name: 'disabled then enabled', first: false, second: true },
+      { name: 'pre disabled then post disabled', first: { pre: false }, second: { post: false } },
+      { name: 'post disabled then pre disabled', first: { post: false }, second: { pre: false } }
+    ];
+
+    for (const selection of selections) {
+      for (const lean of [false, true]) {
+        it(`keeps ${selection.name} during overlapping ${lean ? 'lean' : 'hydrated'} opening`, async function() {
+          // Arrange
+          const ctx = await createTestContext({ holdOpening: true, lean });
+          try {
+            // Act
+            const first = ctx.open({ middleware: selection.first });
+            await ctx.entered;
+            assert.strictEqual(ctx.calls.findPre, preEnabled(selection.first) ? 1 : 0);
+            const second = ctx.open({ middleware: selection.second });
+            await second.getDriverCursor();
+            ctx.release();
+            await first.getDriverCursor();
+
+            // Assert
+            assert.strictEqual(ctx.calls.findPre, Number(preEnabled(selection.first)) + Number(preEnabled(selection.second)));
+            await ctx.assertDocument(first, 'Alice', selection.first);
+            await ctx.assertDocument(second, 'Alice', selection.second);
+            await ctx.assertDocument(first, 'Bob', selection.first);
+            await ctx.assertDocument(second, 'Bob', selection.second);
+            await ctx.assertExhausted(first, second);
+            ctx.assertDriverOptions();
+          } finally {
+            await ctx.cleanup();
+          }
+        });
+      }
+
+      it(`keeps ${selection.name} during interleaved hydration`, async function() {
+        // Arrange
+        const ctx = await createTestContext();
+        try {
+          const first = ctx.open({ middleware: selection.first });
+          await ctx.assertDocument(first, 'Alice', selection.first);
+
+          // Act
+          const second = ctx.open({ middleware: selection.second });
+          await ctx.assertDocument(second, 'Alice', selection.second);
+
+          // Assert
+          await ctx.assertDocument(first, 'Bob', selection.first);
+          await ctx.assertDocument(second, 'Bob', selection.second);
+          await ctx.assertExhausted(first, second);
+          ctx.assertDriverOptions();
+        } finally {
+          await ctx.cleanup();
+        }
+      });
+    }
+
+    for (const phase of ['pre', 'post']) {
+      it(`captures ${phase} selection before the shared option object changes`, async function() {
+        // Arrange
+        const ctx = await createTestContext({ holdOpening: true });
+        const selection = { [phase]: false };
+        try {
+          const first = ctx.open({ middleware: { ...selection } });
+          await ctx.entered;
+
+          // Act
+          ctx.query.options.middleware[phase] = true;
+          const second = ctx.open();
+          await second.getDriverCursor();
+          ctx.release();
+
+          // Assert
+          await ctx.assertDocument(first, 'Alice', selection);
+          await ctx.assertDocument(second, 'Alice', true);
+          await ctx.assertDocument(first, 'Bob', selection);
+          await ctx.assertDocument(second, 'Bob', true);
+          await ctx.assertExhausted(first, second);
+        } finally {
+          await ctx.cleanup();
+        }
+      });
+    }
+
+    it('keeps separate queries independent', async function() {
+      // Arrange
+      const ctx = await createTestContext({ holdOpening: true });
+      try {
+        const first = ctx.open({ middleware: true });
+        await ctx.entered;
+
+        // Act
+        const second = ctx.open({ middleware: false }, ctx.query.clone());
+        await second.getDriverCursor();
+        ctx.release();
+
+        // Assert
+        await ctx.assertDocument(first, 'Alice', true);
+        await ctx.assertDocument(second, 'Alice', false);
+        await ctx.assertDocument(first, 'Bob', true);
+        await ctx.assertDocument(second, 'Bob', false);
+        await ctx.assertExhausted(first, second);
+      } finally {
+        await ctx.cleanup();
+      }
+    });
+
+    it('preserves middleware selection on the query for later cursors', async function() {
+      // Arrange
+      const ctx = await createTestContext();
+      try {
+        // Act
+        const first = ctx.open({ middleware: false });
+        await ctx.assertDocument(first, 'Alice', false);
+        await ctx.assertDocument(first, 'Bob', false);
+        await ctx.assertExhausted(first);
+        const second = ctx.open();
+
+        // Assert
+        assert.strictEqual(ctx.query.options.middleware, false);
+        await ctx.assertDocument(second, 'Alice', false);
+        await ctx.assertDocument(second, 'Bob', false);
+        await ctx.assertExhausted(second);
+      } finally {
+        await ctx.cleanup();
+      }
+    });
+
+    function preEnabled(selection) {
+      return selection !== false && selection?.pre !== false;
+    }
+
+    async function createTestContext({ holdOpening = false, lean = false } = {}) {
+      const calls = { findPre: 0, findPost: 0, createPre: 0, initPre: 0, initPost: 0 };
+      const internalCalls = { ...calls };
+      const schema = new Schema({ name: String, role: { type: String, default: 'reader' } });
+      for (const [hook, phase, key] of [
+        ['find', 'pre', 'findPre'], ['find', 'post', 'findPost'],
+        ['createModel', 'pre', 'createPre'], ['init', 'pre', 'initPre'], ['init', 'post', 'initPost']
+      ]) {
+        schema[phase](hook, function() { ++calls[key]; });
+        const internal = function() { ++internalCalls[key]; };
+        internal[builtInMiddleware] = true;
+        schema[phase](hook, internal);
+      }
+      let release;
+      let signalEntered;
+      const gate = new Promise(resolve => { release = resolve; });
+      const entered = new Promise(resolve => { signalEntered = resolve; });
+      let opening = 0;
+      const preFind = async function() {
+        if (++opening === 1 && holdOpening) {
+          signalEntered();
+          await gate;
+        }
+        this.setOptions({ comment: 'from-pre-find' });
+      };
+      // Keep the opening barrier active even when user pre hooks are suppressed.
+      preFind[builtInMiddleware] = true;
+      schema.pre('find', preFind);
+      const User = db.model('User', schema);
+      await User.collection.insertMany([{ name: 'Alice' }, { name: 'Bob' }]);
+      const session = await db.startSession();
+      const query = User.find().sort({ name: 1 }).batchSize(1).session(session).lean(lean);
+      const findSpy = sinon.spy(User.collection, 'find');
+      const cursors = [];
+      return {
+        calls, query, entered, release,
+        open(options, source = query) {
+          const cursor = source.cursor(options);
+          cursors.push(cursor);
+          return cursor;
+        },
+        async assertDocument(cursor, name, selection) {
+          await cursor.getDriverCursor();
+          const before = { ...calls };
+          const internalBefore = { ...internalCalls };
+          const doc = await cursor.next();
+          assert.ok(doc);
+          assert.strictEqual(doc.name, name);
+          const pre = preEnabled(selection);
+          const post = selection !== false && selection?.post !== false;
+          const expected = {
+            findPre: 0, findPost: Number(post), createPre: !lean && pre ? 2 : 0,
+            initPre: !lean && pre ? 1 : 0, initPost: !lean && post ? 1 : 0
+          };
+          const internalExpected = { findPre: 0, findPost: 1, createPre: lean ? 0 : 2, initPre: lean ? 0 : 1, initPost: lean ? 0 : 1 };
+          for (const key of Object.keys(calls)) {
+            assert.strictEqual(calls[key] - before[key], expected[key], `${name}: ${key}`);
+            assert.strictEqual(internalCalls[key] - internalBefore[key], internalExpected[key], `${name}: internal ${key}`);
+          }
+          if (lean) {
+            assert.ok(!(doc instanceof User));
+          } else {
+            assert.ok(doc instanceof User);
+            assert.strictEqual(doc.role, 'reader');
+            assert.strictEqual(doc.isNew, false);
+            assert.strictEqual(doc.isModified(), false);
+            assert.strictEqual(doc.$session(), session);
+          }
+        },
+        async assertExhausted(...cursors) {
+          const before = { ...calls };
+          const internalBefore = { ...internalCalls };
+          for (const cursor of cursors) {
+            assert.strictEqual(await cursor.next(), null);
+          }
+          assert.deepStrictEqual(calls, before);
+          assert.deepStrictEqual(internalCalls, internalBefore);
+        },
+        assertDriverOptions() {
+          assert.strictEqual(findSpy.callCount, cursors.length);
+          for (const call of findSpy.getCalls()) {
+            assert.strictEqual(Object.hasOwn(call.args[1], 'middleware'), false);
+            assert.strictEqual(call.args[1].comment, 'from-pre-find');
+            assert.strictEqual(call.args[1].session, session);
+          }
+        },
+        async cleanup() {
+          release();
+          try {
+            await Promise.all(cursors.map(async cursor => {
+              await cursor.getDriverCursor();
+              await cursor.close();
+            }));
+          } finally {
+            findSpy.restore();
+            await session.endSession();
+          }
+        }
+      };
+    }
+  });
+
   describe('aggregate cursor', function() {
     // Aggregate cursors only execute pre aggregate hooks. Post aggregate hooks are
     // result-level hooks for aggregate.exec()/explain(), not cursor iteration.

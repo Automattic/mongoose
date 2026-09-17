@@ -6235,14 +6235,19 @@ describe('Model', function() {
         expireAfterSeconds: 86400
       });
 
-      const Test = db.model('Test', schema, 'Test');
+      const Test = db.model('Test', schema, 'Test_gh10611');
       await Test.init();
 
-      await Test.collection.drop().catch(() => {});
+      await Test.collection.drop().catch(() => { });
+
+      let collections = await Test.db.db.listCollections().toArray();
+      let coll = collections.find(coll => coll.name === 'Test_gh10611');
+      assert.ok(!coll);
+
       await Test.createCollection();
 
-      const collections = await Test.db.db.listCollections().toArray();
-      const coll = collections.find(coll => coll.name === 'Test');
+      collections = await Test.db.db.listCollections().toArray();
+      coll = collections.find(coll => coll.name === 'Test_gh10611');
       assert.ok(coll);
       assert.equal(coll.type, 'timeseries');
       assert.equal(coll.options.timeseries.timeField, 'timestamp');

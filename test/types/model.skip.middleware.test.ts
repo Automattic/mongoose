@@ -278,11 +278,11 @@ function explicitCustomFunctionMiddlewareOptions() {
   schema.methods.runTask.supportsMiddlewareOption = true;
   schema.statics.findTask.supportsMiddlewareOption = true;
   schema.methods.runTask.supportsMiddlewareOption = false;
-  schema.statics.findTask.supportsMiddlewareOption = undefined;
+  delete schema.statics.findTask.supportsMiddlewareOption;
 
   // Assert
-  expect<typeof schema.methods.runTask.supportsMiddlewareOption>().type.toBe<boolean | undefined>();
-  expect<typeof schema.statics.findTask.supportsMiddlewareOption>().type.toBe<boolean | undefined>();
+  expect<(typeof schema.methods.runTask)['supportsMiddlewareOption']>().type.toBe<boolean | undefined>();
+  expect<(typeof schema.statics.findTask)['supportsMiddlewareOption']>().type.toBe<boolean | undefined>();
   expect<Parameters<typeof schema.methods.runTask>>().type.toBe<[value: string, attempts?: number]>();
   expect<ReturnType<typeof schema.methods.runTask>>().type.toBe<Promise<string>>();
   expect<ThisParameterType<typeof schema.methods.runTask>>().type.toBe<HydratedDocument<TaskData, TaskMethods>>();
@@ -311,8 +311,8 @@ function callerDeclaredCustomFunctionProperties() {
   schema.statics.findTask.supportsMiddlewareOption = true;
 
   // Assert
-  expect<typeof schema.methods.runTask.supportsMiddlewareOption>().type.toBe<true | undefined>();
-  expect<typeof schema.statics.findTask.supportsMiddlewareOption>().type.toBe<true | undefined>();
+  expect<(typeof schema.methods.runTask)['supportsMiddlewareOption']>().type.toBe<true | undefined>();
+  expect<(typeof schema.statics.findTask)['supportsMiddlewareOption']>().type.toBe<true | undefined>();
   expect<typeof schema.methods.runTask.tag>().type.toBe<'task'>();
   expect<typeof schema.statics.findTask.tag>().type.toBe<'task'>();
   expect<ThisParameterType<typeof schema.methods.runTask>>().type.toBe<HydratedDocument<TaskData, DeclaredTaskMethods>>();

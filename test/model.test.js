@@ -6238,7 +6238,7 @@ describe('Model', function() {
       const Test = db.model('Test', schema, 'Test_gh10611');
       await Test.init();
 
-      await Test.collection.drop().catch(() => { });
+      await Test.collection.drop();
 
       let collections = await Test.db.db.listCollections().toArray();
       let coll = collections.find(coll => coll.name === 'Test_gh10611');

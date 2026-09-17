@@ -786,6 +786,13 @@ async function gh13705() {
 
   const findOneAndUpdateResWithMetadata = await TestModel.findOneAndUpdate({}, {}, { lean: true, includeResultMetadata: true });
   expect(findOneAndUpdateResWithMetadata).type.toBe<ModifyResult<{ name?: string | null | undefined }>>();
+
+  const findOneAndUpdateResWithMetadataAndOverride = await TestModel.findOneAndUpdate<{ answer: 42 }>(
+    {},
+    {},
+    { includeResultMetadata: true }
+  );
+  expect(findOneAndUpdateResWithMetadataAndOverride).type.toBe<ModifyResult<{ answer: 42 }>>();
 }
 
 async function gh16413() {

@@ -8710,6 +8710,66 @@ describe('document', function() {
     assert.equal(arrayElementPathValidatorCalledCount, 1);
   });
 
+  it('validates elements of document arrays with array validators when the nested path is set directly', async function() {
+    let arrayValidatorCalledCount = 0;
+    let arrayElementPathValidatorCalledCount = 0;
+    const Model = db.model('Test', Schema({
+      nest: {
+        arr: {
+          type: [
+            new Schema({
+              name: {
+                type: String,
+                validate() {
+                  ++arrayElementPathValidatorCalledCount;
+                  return true;
+                }
+              }
+            })
+          ],
+          validate: () => {
+            ++arrayValidatorCalledCount;
+            return true;
+          }
+        }
+      },
+      other: String
+    }));
+
+    // Setting `nest` directly means `nest.arr` is in `activePaths`, unlike
+    // the case where `nest` is set in the constructor. The array's elements
+    // still need to be validated exactly once.
+    const doc = new Model({ other: 'test' });
+    doc.nest = { arr: [{ name: 'a' }, { name: 'b' }] };
+
+    await doc.validate();
+    assert.equal(arrayValidatorCalledCount, 1);
+    assert.equal(arrayElementPathValidatorCalledCount, 2);
+
+    doc.validateSync();
+    assert.equal(arrayValidatorCalledCount, 2);
+    assert.equal(arrayElementPathValidatorCalledCount, 4);
+  });
+
+  it('reports array validator errors on empty document arrays', async function() {
+    const Model = db.model('Test', Schema({
+      arr: {
+        type: [new Schema({ name: String })],
+        validate: v => v.length > 0
+      }
+    }));
+
+    const doc = new Model({ arr: [] });
+
+    const syncErr = doc.validateSync();
+    assert.ok(syncErr);
+    assert.ok(syncErr.errors['arr']);
+
+    const err = await doc.validate().then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(err.errors['arr']);
+  });
+
   it('handles populate() with custom type that does not cast to doc (gh-8062)', async function() {
     class Gh8062 extends mongoose.SchemaType {
       cast(val) {

@@ -46,6 +46,10 @@ declare module 'mongoose' {
     timestamps?: boolean;
     session?: ClientSession;
     validateBeforeSave?: boolean;
+    /** If true, validate only modified paths. */
+    validateModifiedOnly?: boolean;
+    /** If true, skip validation for all documents. */
+    skipValidation?: boolean;
     /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
     middleware?: boolean | SkipMiddlewareOptions;
   }
@@ -65,6 +69,8 @@ declare module 'mongoose' {
     hydratedPopulatedDocs?: boolean;
     virtuals?: boolean;
     strict?: boolean | 'throw';
+    /** Set to false to skip user init hooks, or select which phase to skip. */
+    middleware?: boolean | SkipMiddlewareOptions;
   }
 
   interface InsertManyOptions extends

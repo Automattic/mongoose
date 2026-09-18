@@ -1182,6 +1182,90 @@ describe('types.documentarray', function() {
     }
   });
 
+  describe('document array indexes after addToSet', function() {
+    it('reindexes subdocs after addToSet() skips a duplicate so subsequent nested changes save correctly', async function() {
+      // Arrange
+      const { User, user } = await createTestContext();
+      const added = user.addresses.addToSet(
+        { _id: user.addresses[0]._id, street: '1 Main', city: 'Boston' },
+        { street: '4 Main', city: 'Amsterdam' },
+        { street: '5 Main', city: 'Rotterdam' }
+      );
+      assert.deepStrictEqual(
+        added.map(address => address.city),
+        ['Amsterdam', 'Rotterdam'],
+        'sanity: the duplicate is skipped and only the new subdocs are added'
+      );
+      assert.deepStrictEqual(
+        user.addresses.map(address => address.city),
+        ['Boston', 'Chicago', 'Denver', 'Amsterdam', 'Rotterdam']
+      );
+      await user.save();
+      assert.strictEqual(user.isModified(), false, 'sanity: saved doc starts clean');
+
+      // Act
+      user.addresses[3].city = 'New York';
+
+      // Assert
+      assert.deepStrictEqual(
+        user.addresses.map(address => address.__index),
+        [0, 1, 2, 3, 4]
+      );
+      assert.strictEqual(
+        user.addresses[3].$__fullPath('city'),
+        'addresses.3.city',
+        'subdoc added after a skipped duplicate should use its current array index'
+      );
+      assert.deepStrictEqual(user.modifiedPaths(), ['addresses', 'addresses.3', 'addresses.3.city']);
+      assert.deepStrictEqual(user.$getChanges(), { $set: { 'addresses.3.city': 'New York' } });
+
+      await user.save();
+      const fetched = await User.findById(user._id).orFail().lean();
+      assert.deepStrictEqual(
+        fetched.addresses.map(address => address.city),
+        ['Boston', 'Chicago', 'Denver', 'New York', 'Rotterdam']
+      );
+    });
+
+    it('reports validation errors on addToSet() subdocs at their current array index', async function() {
+      // Arrange
+      const { user } = await createTestContext();
+      user.addresses.addToSet(
+        { _id: user.addresses[0]._id, street: '1 Main', city: 'Boston' },
+        { city: 'Amsterdam' }
+      );
+
+      // Act
+      const err = user.validateSync();
+
+      // Assert
+      assert.deepStrictEqual(Object.keys(err.errors), ['addresses.3.street']);
+    });
+
+    async function createTestContext() {
+      const addressSchema = new mongoose.Schema({
+        street: { type: String, required: true },
+        city: String
+      });
+      const userSchema = new mongoose.Schema({
+        name: String,
+        addresses: [addressSchema]
+      });
+      const User = db.model('UserDocumentArrayAddToSetIndex', userSchema);
+      const user = new User({
+        name: 'John',
+        addresses: [
+          { street: '1 Main', city: 'Boston' },
+          { street: '2 Main', city: 'Chicago' },
+          { street: '3 Main', city: 'Denver' }
+        ]
+      });
+      await user.save();
+
+      return { User, user };
+    }
+  });
+
   describe('document array populated paths', function() {
     it('updates top-level populated() after sort() reorders a document array', async function() {
       // Arrange
@@ -1350,6 +1434,90 @@ describe('types.documentarray', function() {
     const fetched = await Test.findById('test').orFail().lean();
     assert.strictEqual(fetched.array[0].v, 0);
     assert.strictEqual(fetched.array[1].v, 999);
+  });
+
+  describe('document array indexes after addToSet', function() {
+    it('reindexes subdocs after addToSet() skips a duplicate so subsequent nested changes save correctly', async function() {
+      // Arrange
+      const { User, user } = await createTestContext();
+      const added = user.addresses.addToSet(
+        { _id: user.addresses[0]._id, street: '1 Main', city: 'Boston' },
+        { street: '4 Main', city: 'Amsterdam' },
+        { street: '5 Main', city: 'Rotterdam' }
+      );
+      assert.deepStrictEqual(
+        added.map(address => address.city),
+        ['Amsterdam', 'Rotterdam'],
+        'sanity: the duplicate is skipped and only the new subdocs are added'
+      );
+      assert.deepStrictEqual(
+        user.addresses.map(address => address.city),
+        ['Boston', 'Chicago', 'Denver', 'Amsterdam', 'Rotterdam']
+      );
+      await user.save();
+      assert.strictEqual(user.isModified(), false, 'sanity: saved doc starts clean');
+
+      // Act
+      user.addresses[3].city = 'New York';
+
+      // Assert
+      assert.deepStrictEqual(
+        user.addresses.map(address => address.__index),
+        [0, 1, 2, 3, 4]
+      );
+      assert.strictEqual(
+        user.addresses[3].$__fullPath('city'),
+        'addresses.3.city',
+        'subdoc added after a skipped duplicate should use its current array index'
+      );
+      assert.deepStrictEqual(user.modifiedPaths(), ['addresses', 'addresses.3', 'addresses.3.city']);
+      assert.deepStrictEqual(user.getChanges(), { $set: { 'addresses.3.city': 'New York' } });
+
+      await user.save();
+      const fetched = await User.findById(user._id).orFail().lean();
+      assert.deepStrictEqual(
+        fetched.addresses.map(address => address.city),
+        ['Boston', 'Chicago', 'Denver', 'New York', 'Rotterdam']
+      );
+    });
+
+    it('reports validation errors on addToSet() subdocs at their current array index', async function() {
+      // Arrange
+      const { user } = await createTestContext();
+      user.addresses.addToSet(
+        { _id: user.addresses[0]._id, street: '1 Main', city: 'Boston' },
+        { city: 'Amsterdam' }
+      );
+
+      // Act
+      const err = user.validateSync();
+
+      // Assert
+      assert.deepStrictEqual(Object.keys(err.errors), ['addresses.3.street']);
+    });
+
+    async function createTestContext() {
+      const addressSchema = new mongoose.Schema({
+        street: { type: String, required: true },
+        city: String
+      });
+      const userSchema = new mongoose.Schema({
+        name: String,
+        addresses: [addressSchema]
+      });
+      const User = db.model('UserDocumentArrayAddToSetIndex', userSchema);
+      const user = new User({
+        name: 'John',
+        addresses: [
+          { street: '1 Main', city: 'Boston' },
+          { street: '2 Main', city: 'Chicago' },
+          { street: '3 Main', city: 'Denver' }
+        ]
+      });
+      await user.save();
+
+      return { User, user };
+    }
   });
 
   describe('document array indexes after removal', function() {

@@ -96,7 +96,7 @@ declare module 'mongoose' {
 
     /** Returns the model with the given name on this document's associated connection. */
     $model<ModelType extends Model<unknown>>(name: string): ModelType;
-    $model<ModelType extends Model<DocType>>(): ModelType;
+    $model<ModelType extends Model<DocType, any, any, any>>(): ModelType;
 
     /**
      * A string containing the current operation that Mongoose is executing
@@ -232,7 +232,7 @@ declare module 'mongoose' {
 
     /** Returns the model with the given name on this document's associated connection. */
     model<ModelType extends Model<unknown>>(name: string): ModelType;
-    model<ModelType extends Model<DocType>>(): ModelType;
+    model<ModelType extends Model<DocType, any, any, any>>(): ModelType;
 
     /** Returns the list of paths that have been modified. */
     modifiedPaths(options?: { includeChildren?: boolean }): Array<string>;
@@ -252,7 +252,7 @@ declare module 'mongoose' {
 
     /** Populates document references. */
     populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<PopulateDocumentResult<this, Paths, PopulatedPathsDocumentType<DocType, Paths>, DocType>>;
-    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<any>, match?: AnyObject, options?: PopulateOptions): Promise<PopulateDocumentResult<this, Paths, PopulatedPathsDocumentType<DocType, Paths>, DocType>>;
+    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<any, any, any, any>, match?: AnyObject, options?: PopulateOptions): Promise<PopulateDocumentResult<this, Paths, PopulatedPathsDocumentType<DocType, Paths>, DocType>>;
 
     /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
     populated(path: string): any;

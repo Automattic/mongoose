@@ -480,10 +480,58 @@ describe('types.documentarray', function() {
       t = new T({});
       t.docs.push(null);
       t.docs.push({ name: 'test2' });
-      await t.validate().then(() => null, err => err);
+      const asyncErr = await t.validate().then(() => null, err => err);
       assert.equal(calls.length, 4);
-      assert.ok(err);
-      assert.ok(err.errors['docs.0']);
+      assert.ok(asyncErr);
+      assert.ok(asyncErr.errors['docs.0']);
+    });
+  });
+
+  describe('avoids double validating document array elements', function() {
+    it('when an element is modified before the array itself (gh-16522)', async function() {
+      const calls = [];
+      const schema = new Schema({
+        arr: [new Schema({ n: { type: String, validate(v) { calls.push(v); return true; } } })]
+      });
+      mongoose.deleteModel(/Test/);
+      const T = mongoose.model('Test', schema);
+
+      const raw = new T({ arr: [{ n: 'a' }, { n: 'b' }] }).toObject();
+      raw._id = raw._id || new mongoose.Types.ObjectId();
+      const doc = T.hydrate(raw);
+
+      // `arr.0` lands in `activePaths` before `arr` does, so the element path
+      // and the array path both end up describing the same work.
+      doc.arr[0] = { n: 'z' };
+      doc.arr.push({ n: 'c' });
+
+      calls.length = 0;
+      await doc.validate();
+      assert.deepStrictEqual(calls, ['z', 'b', 'c']);
+
+      calls.length = 0;
+      doc.validateSync();
+      assert.deepStrictEqual(calls, ['z', 'b', 'c']);
+    });
+
+    it('validates each element once with validateAllPaths (gh-16522)', async function() {
+      const calls = [];
+      const schema = new Schema({
+        arr: [new Schema({ n: { type: String, validate(v) { calls.push(v); return true; } } })]
+      });
+      mongoose.deleteModel(/Test/);
+      const T = mongoose.model('Test', schema);
+
+      // `validateAllPaths` lists the array and every element, but validating a
+      // document array already validates each element, so listing both would
+      // run every subdocument's validators twice.
+      calls.length = 0;
+      new T({ arr: [{ n: 'p' }, { n: 'q' }] }).validateSync(undefined, { validateAllPaths: true });
+      assert.deepStrictEqual(calls, ['p', 'q']);
+
+      calls.length = 0;
+      await new T({ arr: [{ n: 'p' }, { n: 'q' }] }).validate({ validateAllPaths: true });
+      assert.deepStrictEqual(calls, ['p', 'q']);
     });
   });
 

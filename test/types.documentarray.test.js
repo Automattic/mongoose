@@ -480,10 +480,10 @@ describe('types.documentarray', function() {
       t = new T({});
       t.docs.push(null);
       t.docs.push({ name: 'test2' });
-      await t.validate().then(() => null, err => err);
+      const err2 = await t.validate().then(() => null, err => err);
       assert.equal(calls.length, 4);
-      assert.ok(err);
-      assert.ok(err.errors['docs.0']);
+      assert.ok(err2);
+      assert.ok(err2.errors['docs.0']);
     });
   });
 

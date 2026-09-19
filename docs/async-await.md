@@ -42,7 +42,7 @@ async function awaitUpdate() {
 }
 ```
 
-Note that the specific fulfillment values of different Mongoose methods vary, and may be affected by configuration. Please refer to the [API documentation](api/mongoose.html.html) for information about specific methods.
+Note that the specific fulfillment values of different Mongoose methods vary, and may be affected by configuration. Please refer to the [API documentation](api/mongoose.html) for information about specific methods.
 
 ## Async Functions
 

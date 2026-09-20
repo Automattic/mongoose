@@ -14759,6 +14759,28 @@ describe('document', function() {
     assert.ok(syncErr?.errors['people.0'], syncErr);
   });
 
+  it('validateAllPaths validates maps in document array elements', async function() {
+    const Company = db.model('ArrayMapRepro', new Schema({
+      groups: [{
+        people: {
+          type: Map,
+          of: new Schema({
+            age: { type: Number, min: 18 }
+          })
+        }
+      }]
+    }));
+
+    const doc = new Company({
+      groups: [{ people: { one: { age: 15 } } }]
+    });
+    const err = await doc.validate({ validateAllPaths: true }).then(() => null, err => err);
+    assert.ok(err?.errors['groups.0.people.one.age'], err);
+
+    const syncErr = doc.validateSync({ validateAllPaths: true });
+    assert.ok(syncErr?.errors['groups.0.people.one.age'], syncErr);
+  });
+
   it('minimize unsets property rather than setting to null (gh-14445)', async function() {
     const SubSchema = new mongoose.Schema({
       name: { type: String }

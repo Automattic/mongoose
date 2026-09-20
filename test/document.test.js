@@ -16340,6 +16340,29 @@ describe('document', function() {
     const err = doc.validateSync(['profile']);
     assert.ok(err.message.includes('Path `profile.age`'), err.message);
   });
+
+  it('validates the correct document array when reusing a child schema', async function() {
+    const childSchema = new Schema({ age: Number });
+    const User = db.model('SchemaReuseRepro', new Schema({
+      home: {
+        type: [childSchema],
+        validate: values => values.length > 0
+      },
+      work: {
+        type: [childSchema],
+        validate: () => true
+      }
+    }));
+
+    const doc = new User({ home: [], work: [{ age: 30 }] });
+    await doc.save({ validateBeforeSave: false });
+
+    doc.work[0].age = 31;
+    await doc.save();
+
+    const saved = await User.findById(doc._id).orFail();
+    assert.equal(saved.work[0].age, 31);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

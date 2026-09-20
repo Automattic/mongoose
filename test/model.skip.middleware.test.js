@@ -864,7 +864,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
     });
 
     for (const options of [{ validateBeforeSave: false }, { skipValidation: true }]) {
-      it(`bulkSave preserves ${Object.keys(options)[0]} when validation is disabled`, async function() {
+      it(`bulkSave skips validation with ${Object.keys(options)[0]}`, async function() {
         // Arrange
         const { User, data, calls } = createTestContext();
         const doc = new User({ ...data, name: undefined, age: -1 });

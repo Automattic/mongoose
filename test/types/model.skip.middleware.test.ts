@@ -430,7 +430,7 @@ async function staticValidationAndWatchMiddleware() {
   await User.validate({ name: 'Ann' }, { middleware: true, pathsToSkip: ['name'] });
   await User.validate({ name: 'Ann' }, { middleware: { pre: false } });
   await User.validate({ name: 'Ann' }, { middleware: { post: false }, pathsToSkip: 'name' });
-  const stream = User.watch<{ name: string }>([], { hydrate: true, fullDocument: 'updateLookup', middleware: false });
+  const stream = User.watch<{ name: string }, import('mongodb').ChangeStreamDocument<{ name: string }>>([], { hydrate: true, fullDocument: 'updateLookup', middleware: false });
   User.watch([], { middleware: true });
   User.watch([], { hydrate: false, middleware: { pre: false } });
   User.watch([], { middleware: { post: false } });
@@ -444,7 +444,7 @@ async function staticValidationAndWatchMiddleware() {
   // Assert
   expect(validated).type.toBe<{ name: string }>();
   expect(hydrated).type.toBe<HydratedDocument<{ name: string }>>();
-  expect(stream).type.toBe<import('mongodb').ChangeStream<{ name: string }, import('mongodb').ChangeStreamDocument>>();
+  expect(stream).type.toBe<import('mongodb').ChangeStream<{ name: string }, import('mongodb').ChangeStreamDocument<{ name: string }>>>();
   expect(User.watch).type.not.toBeCallableWith([], { middleware: 'false' });
   expect(User.watch).type.not.toBeCallableWith([], { middleware: { pre: 0 } });
   expect(User.watch).type.not.toBeCallableWith([], { middleware: { post: 'false' } });

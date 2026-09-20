@@ -61,7 +61,7 @@ describe('Union', function() {
     assert.strictEqual(doc1.test, undefined);
     await assert.rejects(
       doc1.save(),
-      'ValidationError: test: Cast to Boolean failed for value "taco tuesday" (type string) at path "test" because of "CastError"'
+      'ValidationError: test: Cast to Boolean failed for value "taco tuesday" (type string) at path "test"'
     );
   });
 

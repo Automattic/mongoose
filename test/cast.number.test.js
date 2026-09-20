@@ -36,7 +36,7 @@ describe('castNumber()', function() {
     assert.strictEqual(err.constructor.name, 'Error',
       `expected plain Error but got ${err.constructor.name}`);
     assert.ok(
-      err.message.includes('Cast to Number failed'),
+      err.message.includes('not a valid number'),
       `unexpected error message: "${err.message}"`
     );
   });

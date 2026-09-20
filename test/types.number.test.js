@@ -15,9 +15,9 @@ const SchemaNumber = mongoose.Schema.Types.Number;
  */
 
 describe('types.number', function() {
-  it('an empty string casts to null', function(done) {
+  it('an empty string throws a cast error', function(done) {
     const n = new SchemaNumber();
-    assert.strictEqual(n.cast(''), null);
+    assert.throws(() => n.cast(''));
     done();
   });
 
@@ -65,7 +65,7 @@ describe('types.number', function() {
 
   it('does not throw number cast error', function(done) {
     const n = new SchemaNumber();
-    const items = [1, '2', '0', null, '', new String('47'), new Number(5), Number(47), Number('09'), 0x12];
+    const items = [1, '2', '0', null, new String('47'), new Number(5), Number(47), Number('09'), 0x12];
     let err;
     try {
       for (const item of items) {

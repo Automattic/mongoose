@@ -537,25 +537,62 @@ describe('middleware option to skip hooks (gh-8768)', function() {
           }
         });
 
-        it(`${operation} preserves option removal by a document hook`, async function() {
-          // Arrange
-          const { User, user } = await createTestContext({ changeOptions: options => { delete options.maxTimeMS; } });
-          const options = { comment: 'original', maxTimeMS: 1000 };
-          const write = sinon.spy(User.collection, operation);
-          try {
+        for (const removedOption of ['maxTimeMS', 'hint', 'sort']) {
+          it(`${operation} preserves ${removedOption} removal by a document hook`, async function() {
+            // Arrange
+            const { User, user } = await createTestContext({ changeOptions: options => { delete options[removedOption]; } });
+            const value = removedOption === 'maxTimeMS' ? 1000 : { _id: 1 };
+            const options = { comment: 'original', [removedOption]: value };
+            const write = sinon.spy(User.collection, operation);
+            try {
+              const query = operation === 'updateOne' ? user.updateOne({ name: 'John updated' }, options) : user.deleteOne(options);
+
+              // Act
+              const result = await query.setOptions({ comment: 'later' });
+
+              // Assert
+              assert.strictEqual(operation === 'updateOne' ? result.modifiedCount : result.deletedCount, 1);
+              const driverOptions = write.firstCall.args[operation === 'updateOne' ? 2 : 1];
+              assert.strictEqual(driverOptions[removedOption], undefined);
+              assert.strictEqual(driverOptions.comment, 'later');
+            } finally {
+              write.restore();
+            }
+          });
+        }
+
+        for (const format of ['object', 'array', 'map']) {
+          it(`${operation} preserves document-hook changes inside ${format} sort options`, async function() {
+            // Arrange
+            const { User, user } = await createTestContext({ changeOptions: options => {
+              if (format === 'map') {
+                options.sort.set('name', 'descending');
+              } else if (format === 'array') {
+                options.sort[0][1] = 'descending';
+              } else {
+                options.sort.name = 'descending';
+              }
+            } });
+            const sort = format === 'map' ? new Map([['name', 'ascending']]) :
+              format === 'array' ? [['name', 'ascending']] : { name: 'ascending' };
+            const options = { sort };
             const query = operation === 'updateOne' ? user.updateOne({ name: 'John updated' }, options) : user.deleteOne(options);
+            query.setOptions({ sort: { tenantId: 1 } });
+            query.pre(function() {
+              assert.deepStrictEqual(this.getOptions().sort, { name: -1, tenantId: 1 });
+              // Older MongoDB versions do not support sort on single-document writes.
+              delete this.options.sort;
+            });
 
             // Act
-            await query.setOptions({ comment: 'later' });
+            const result = await query;
 
             // Assert
-            const driverOptions = write.firstCall.args[operation === 'updateOne' ? 2 : 1];
-            assert.strictEqual(driverOptions.maxTimeMS, undefined);
-            assert.strictEqual(driverOptions.comment, 'later');
-          } finally {
-            write.restore();
-          }
-        });
+            assert.strictEqual(operation === 'updateOne' ? result.modifiedCount : result.deletedCount, 1);
+            const stored = await User.collection.findOne({ _id: user._id });
+            assert.strictEqual(stored?.name ?? null, operation === 'updateOne' ? 'John updated' : null);
+          });
+        }
 
         for (const [original, later] of [['first', 'second'], ['second', 'first']]) {
           it(`${operation} keeps later comment ${later} and untouched options`, async function() {

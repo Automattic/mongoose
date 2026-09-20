@@ -3090,7 +3090,7 @@ describe('internal middleware forwarding', function() {
   });
 
   describe('defaults inside hydrated children', function() {
-    for (const container of ['default array', 'stored array', 'single nested']) {
+    for (const container of ['default array', 'stored array', 'single nested', 'default single nested']) {
       for (const selection of selections) {
         it(`${container} forwards ${selection.name} to default grandchildren`, function() {
           const { User, calls, raw } = createTestContext({ container });
@@ -3100,7 +3100,7 @@ describe('internal middleware forwarding', function() {
 
           const doc = User.hydrate(raw, null, selection.options);
 
-          const child = container === 'single nested' ? doc.child : doc.children[0];
+          const child = container.includes('single nested') ? doc.child : doc.children[0];
           assert.strictEqual(child.toys[0].name, 'ball');
           assert.strictEqual(child.toys[0].ownerDocument(), doc);
           assert.deepStrictEqual(doc.modifiedPaths(), ordinary.modifiedPaths());
@@ -3120,7 +3120,9 @@ describe('internal middleware forwarding', function() {
       toy.pre('init', function() { calls.pre++; });
       toy.post('init', function() { calls.post++; });
       const child = new Schema({ toys: { type: [toy], default: [{ name: 'ball' }] } });
-      const schema = new Schema(container === 'single nested' ? { child } : {
+      const schema = new Schema(container.includes('single nested') ? {
+        child: { type: child, default: container === 'default single nested' ? {} : undefined }
+      } : {
         children: { type: [child], default: container === 'default array' ? [{}] : undefined }
       });
       const raw = container === 'single nested' ? { child: {} } : container === 'stored array' ? { children: [{}] } : {};

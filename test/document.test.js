@@ -16268,6 +16268,25 @@ describe('document', function() {
     user.requiresEmail = true;
     await assert.rejects(() => user.save(), /invalid email/);
   });
+
+  it('validates modified document array elements in map subdocuments', async function() {
+    const teamSchema = new Schema({
+      people: [{ age: { type: Number, min: 18 } }]
+    });
+    const Company = db.model('MapChildRepro', new Schema({
+      teams: { type: Map, of: teamSchema }
+    }));
+
+    const doc = await Company.create({
+      teams: { support: { people: [{ age: 30 }] } }
+    });
+
+    doc.teams.get('support').people[0].age = 15;
+    await assert.rejects(
+      () => doc.save(),
+      /Path `teams\.support\.people\.0\.age` \(15\) is less than minimum allowed value \(18\)/
+    );
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

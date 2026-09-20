@@ -621,6 +621,45 @@ describe('middleware option to skip hooks (gh-8768)', function() {
           });
         }
 
+        for (const sessionChange of ['remove', 'null', 'replace']) {
+          it(`${operation} preserves session precedence when a document hook uses ${sessionChange}`, async function() {
+            // Arrange
+            const session = await db.startSession();
+            const replacementSession = sessionChange === 'replace' ? await db.startSession() : null;
+            const { User, user, calls } = await createTestContext({
+              changeOptions(options) {
+                if (sessionChange === 'remove') {
+                  delete options.session;
+                } else {
+                  options.session = replacementSession;
+                }
+              }
+            });
+            user.$session(session);
+            const write = sinon.spy(User.collection, operation);
+            try {
+              const options = { session };
+              const query = operation === 'updateOne' ? user.updateOne({ name: 'John updated' }, options) : user.deleteOne(options);
+
+              // Act
+              const result = await query;
+
+              // Assert
+              assert.strictEqual(operation === 'updateOne' ? result.modifiedCount : result.deletedCount, 1);
+              assert.strictEqual(calls.document.pre, 1);
+              assert.strictEqual(user.$session(), session);
+              const driverOptions = write.firstCall.args[operation === 'updateOne' ? 2 : 1];
+              assert.strictEqual(driverOptions.session, sessionChange === 'remove' ? session : replacementSession);
+            } finally {
+              write.restore();
+              await session.endSession();
+              if (replacementSession != null) {
+                await replacementSession.endSession();
+              }
+            }
+          });
+        }
+
         for (const useLaterSession of [false, true]) {
           it(`${operation} honors a later ${useLaterSession ? 'session' : 'null session'}`, async function() {
             // Arrange

@@ -2958,8 +2958,8 @@ describe('internal middleware forwarding', function() {
       replaceOne: { parent: true, run: (User, id, age, options) => User.replaceOne({ _id: id }, { child: { age } }, options) },
       findOneAndReplace: { parent: true, run: (User, id, age, options) => User.findOneAndReplace({ _id: id }, { child: { age } }, options) },
       'array element': { array: true, run: (User, id, age, options) => User.updateOne({ _id: id }, { $set: { 'children.0': { age } } }, options) },
-      '$push': { array: true, run: (User, id, age, options) => User.updateOne({ _id: id }, { $push: { children: { $each: [{ age }] } } }, options) },
-      '$addToSet': { array: true, run: (User, id, age, options) => User.updateOne({ _id: id }, { $addToSet: { children: { age } } }, options) },
+      $push: { array: true, run: (User, id, age, options) => User.updateOne({ _id: id }, { $push: { children: { $each: [{ age }] } } }, options) },
+      $addToSet: { array: true, run: (User, id, age, options) => User.updateOne({ _id: id }, { $addToSet: { children: { age } } }, options) },
       'Model.validate': { static: true, run: (User, id, age, options) => User.validate({ child: { age } }, options) }
     };
 
@@ -3086,6 +3086,45 @@ describe('internal middleware forwarding', function() {
       const defaults = [{ name: 'default child' }];
       const schema = new Schema({ name: String, [path]: { type: [child], default: useFunction ? () => defaults : defaults } });
       return { User: db.model('User', schema), calls };
+    }
+  });
+
+  describe('defaults inside hydrated children', function() {
+    for (const container of ['default array', 'stored array', 'single nested']) {
+      for (const selection of selections) {
+        it(`${container} forwards ${selection.name} to default grandchildren`, function() {
+          const { User, calls, raw } = createTestContext({ container });
+          const ordinary = User.hydrate(raw);
+          const ordinaryCalls = { ...calls };
+          calls.pre = calls.post = 0;
+
+          const doc = User.hydrate(raw, null, selection.options);
+
+          const child = container === 'single nested' ? doc.child : doc.children[0];
+          assert.strictEqual(child.toys[0].name, 'ball');
+          assert.strictEqual(child.toys[0].ownerDocument(), doc);
+          assert.deepStrictEqual(doc.modifiedPaths(), ordinary.modifiedPaths());
+          assert.ok(ordinaryCalls.pre > 0);
+          assert.ok(ordinaryCalls.post > 0);
+          assert.deepStrictEqual(calls, {
+            pre: ordinaryCalls.pre * selection.pre,
+            post: ordinaryCalls.post * selection.post
+          });
+        });
+      }
+    }
+
+    function createTestContext({ container }) {
+      const calls = { pre: 0, post: 0 };
+      const toy = new Schema({ name: String });
+      toy.pre('init', function() { calls.pre++; });
+      toy.post('init', function() { calls.post++; });
+      const child = new Schema({ toys: { type: [toy], default: [{ name: 'ball' }] } });
+      const schema = new Schema(container === 'single nested' ? { child } : {
+        children: { type: [child], default: container === 'default array' ? [{}] : undefined }
+      });
+      const raw = container === 'single nested' ? { child: {} } : container === 'stored array' ? { children: [{}] } : {};
+      return { User: db.model('User', schema), calls, raw };
     }
   });
 

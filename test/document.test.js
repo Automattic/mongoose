@@ -14745,6 +14745,20 @@ describe('document', function() {
     );
   });
 
+  it('validateAllPaths validates required document array elements', async function() {
+    const personSchema = new Schema({ age: Number });
+    const Team = db.model('RequiredElementRepro', new Schema({
+      people: [{ type: personSchema, required: true }]
+    }));
+
+    const doc = new Team({ people: [null] });
+    const err = await doc.validate({ validateAllPaths: true }).then(() => null, err => err);
+    assert.ok(err?.errors['people.0'], err);
+
+    const syncErr = doc.validateSync({ validateAllPaths: true });
+    assert.ok(syncErr?.errors['people.0'], syncErr);
+  });
+
   it('minimize unsets property rather than setting to null (gh-14445)', async function() {
     const SubSchema = new mongoose.Schema({
       name: { type: String }

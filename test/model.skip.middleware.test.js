@@ -8,6 +8,7 @@ const { builtInMiddleware } = require('../lib/schema/symbols');
 const start = require('./common');
 
 const assert = require('assert');
+const sinon = require('sinon');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -109,7 +110,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
 
     describe('bulkSave()', function() {
       it('skips pre/post hooks when middleware: false', async function() {
-      // Arrange
+        // Arrange
         const { User, getPreCount, getPostCount } = createTestContext();
         const user = new User({ name: 'test' });
 
@@ -122,7 +123,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       });
 
       it('skips only pre hooks when middleware: { pre: false }', async function() {
-      // Arrange
+        // Arrange
         const { User, getPreCount, getPostCount } = createTestContext();
         const user = new User({ name: 'test' });
 
@@ -135,7 +136,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       });
 
       it('skips only post hooks when middleware: { post: false }', async function() {
-      // Arrange
+        // Arrange
         const { User, getPreCount, getPostCount } = createTestContext();
         const user = new User({ name: 'test' });
 
@@ -208,9 +209,9 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       // Act
       await User.findOne({}, null, { middleware: false });
 
-      // Assert - find hooks should be skipped, but so should init hooks
-      assert.strictEqual(getPreCount('find'), 0);
-      assert.strictEqual(getPostCount('find'), 0);
+      // Assert
+      assert.strictEqual(getPreCount('findOne'), 0);
+      assert.strictEqual(getPostCount('findOne'), 0);
       assert.strictEqual(getPreCount('init'), 0);
       assert.strictEqual(getPostCount('init'), 0);
     });
@@ -224,6 +225,8 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       await User.findOne({});
 
       // Assert
+      assert.strictEqual(getPreCount('findOne'), 1);
+      assert.strictEqual(getPostCount('findOne'), 1);
       assert.strictEqual(getPreCount('init'), 1);
       assert.strictEqual(getPostCount('init'), 1);
     });
@@ -237,6 +240,8 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       await User.findOne({}, null, { middleware: { pre: false } });
 
       // Assert
+      assert.strictEqual(getPreCount('findOne'), 0);
+      assert.strictEqual(getPostCount('findOne'), 1);
       assert.strictEqual(getPreCount('init'), 0);
       assert.strictEqual(getPostCount('init'), 1);
     });
@@ -250,6 +255,8 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       await User.findOne({}, null, { middleware: { post: false } });
 
       // Assert
+      assert.strictEqual(getPreCount('findOne'), 1);
+      assert.strictEqual(getPostCount('findOne'), 0);
       assert.strictEqual(getPreCount('init'), 1);
       assert.strictEqual(getPostCount('init'), 0);
     });
@@ -645,6 +652,479 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         builtInHooks,
         'All internal plugin hooks should have builtInMiddleware symbol'
       );
+    });
+  });
+
+  describe('middleware option parsing', function() {
+    it('runs hooks for falsy middleware option values other than false', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createTestContext();
+      await User.create({ name: 'John' });
+
+      // Act
+      await User.find({}, null, { middleware: 0 }).exec();
+      await User.find({}, null, { middleware: { pre: 0, post: '' } }).exec();
+
+      // Assert
+      assert.strictEqual(getPreCount('find'), 2);
+      assert.strictEqual(getPostCount('find'), 2);
+    });
+  });
+
+  describe('query cursor', function() {
+    it('skips pre/post find hooks when middleware: false', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createTestContext();
+      await User.create({ name: 'John' });
+      let numDocs = 0;
+
+      // Act
+      await User.find().cursor({ middleware: false }).eachAsync(doc => {
+        ++numDocs;
+        assert.strictEqual(doc.name, 'John');
+      });
+
+      // Assert
+      assert.strictEqual(numDocs, 1);
+      assert.strictEqual(getPreCount('find'), 0);
+      assert.strictEqual(getPostCount('find'), 0);
+    });
+
+    it('runs find hooks normally without middleware option', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createTestContext();
+      await User.create({ name: 'John' });
+      let numDocs = 0;
+
+      // Act
+      await User.find().cursor().eachAsync(doc => {
+        ++numDocs;
+        assert.strictEqual(doc.name, 'John');
+      });
+
+      // Assert
+      assert.strictEqual(numDocs, 1);
+      assert.strictEqual(getPreCount('find'), 1);
+      assert.strictEqual(getPostCount('find'), 1);
+    });
+
+    it('skips only pre find hooks when middleware: { pre: false }', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createTestContext();
+      await User.create({ name: 'John' });
+      let numDocs = 0;
+
+      // Act
+      await User.find().cursor({ middleware: { pre: false } }).eachAsync(doc => {
+        ++numDocs;
+        assert.strictEqual(doc.name, 'John');
+      });
+
+      // Assert
+      assert.strictEqual(numDocs, 1);
+      assert.strictEqual(getPreCount('find'), 0);
+      assert.strictEqual(getPostCount('find'), 1);
+    });
+
+    it('skips only post find hooks when middleware: { post: false }', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createTestContext();
+      await User.create({ name: 'John' });
+      let numDocs = 0;
+
+      // Act
+      await User.find().cursor({ middleware: { post: false } }).eachAsync(doc => {
+        ++numDocs;
+        assert.strictEqual(doc.name, 'John');
+      });
+
+      // Assert
+      assert.strictEqual(numDocs, 1);
+      assert.strictEqual(getPreCount('find'), 1);
+      assert.strictEqual(getPostCount('find'), 0);
+    });
+
+    it('skips pre/post find hooks when iterating with next() when middleware: false', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createTestContext();
+      await User.create({ name: 'John' });
+
+      // Act
+      const cursor = User.find().cursor({ middleware: false });
+      const doc = await cursor.next();
+
+      // Assert
+      assert.ok(doc);
+      assert.strictEqual(doc.name, 'John');
+      assert.strictEqual(getPreCount('find'), 0);
+      assert.strictEqual(getPostCount('find'), 0);
+    });
+
+    it('does not leak the middleware option into collection.find', async function() {
+      // Arrange
+      const { User } = createTestContext();
+      await User.create({ name: 'John' });
+      const findSpy = sinon.spy(User.collection, 'find');
+
+      // Act
+      try {
+        await User.find().cursor({ middleware: false }).eachAsync(() => {});
+      } finally {
+        findSpy.restore();
+      }
+
+      // Assert
+      assert.ok(findSpy.called);
+      assert.strictEqual(findSpy.firstCall.args[1].middleware, undefined);
+    });
+  });
+
+  describe('aggregate cursor', function() {
+    // Aggregate cursors only execute pre aggregate hooks. Post aggregate hooks are
+    // result-level hooks for aggregate.exec()/explain(), not cursor iteration.
+    it('skips pre aggregate hooks when middleware: false', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createTestContext();
+      await User.create({ name: 'John' });
+      let numDocs = 0;
+
+      // Act
+      await User.aggregate([{ $match: {} }]).option({ middleware: false }).cursor().eachAsync(doc => {
+        ++numDocs;
+        assert.strictEqual(doc.name, 'John');
+      });
+
+      // Assert
+      assert.strictEqual(numDocs, 1);
+      assert.strictEqual(getPreCount('aggregate'), 0);
+      assert.strictEqual(getPostCount('aggregate'), 0);
+    });
+
+    it('skips pre aggregate hooks when cursor options have middleware: false', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createTestContext();
+      await User.create({ name: 'John' });
+      let numDocs = 0;
+
+      // Act
+      await User.aggregate([{ $match: {} }]).cursor({ middleware: false }).eachAsync(doc => {
+        ++numDocs;
+        assert.strictEqual(doc.name, 'John');
+      });
+
+      // Assert
+      assert.strictEqual(numDocs, 1);
+      assert.strictEqual(getPreCount('aggregate'), 0);
+      assert.strictEqual(getPostCount('aggregate'), 0);
+    });
+
+    it('runs pre aggregate hooks without running post aggregate hooks', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createTestContext();
+      await User.create({ name: 'John' });
+      let numDocs = 0;
+
+      // Act
+      await User.aggregate([{ $match: {} }]).cursor().eachAsync(doc => {
+        ++numDocs;
+        assert.strictEqual(doc.name, 'John');
+      });
+
+      // Assert
+      assert.strictEqual(numDocs, 1);
+      assert.strictEqual(getPreCount('aggregate'), 1);
+      assert.strictEqual(getPostCount('aggregate'), 0);
+    });
+
+    it('skips pre aggregate hooks when middleware: { pre: false }', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createTestContext();
+      await User.create({ name: 'John' });
+      let numDocs = 0;
+
+      // Act
+      await User.aggregate([{ $match: {} }]).cursor({ middleware: { pre: false } }).eachAsync(doc => {
+        ++numDocs;
+        assert.strictEqual(doc.name, 'John');
+      });
+
+      // Assert
+      assert.strictEqual(numDocs, 1);
+      assert.strictEqual(getPreCount('aggregate'), 0);
+      assert.strictEqual(getPostCount('aggregate'), 0);
+    });
+
+    it('runs pre aggregate hooks when middleware: { post: false }', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createTestContext();
+      await User.create({ name: 'John' });
+      let numDocs = 0;
+
+      // Act
+      await User.aggregate([{ $match: {} }]).option({ middleware: { post: false } }).cursor().eachAsync(doc => {
+        ++numDocs;
+        assert.strictEqual(doc.name, 'John');
+      });
+
+      // Assert
+      assert.strictEqual(numDocs, 1);
+      assert.strictEqual(getPreCount('aggregate'), 1);
+      assert.strictEqual(getPostCount('aggregate'), 0);
+    });
+
+    it('does not leak the middleware option into collection.aggregate', async function() {
+      // Arrange
+      const { User } = createTestContext();
+      await User.create({ name: 'John' });
+      const aggregateSpy = sinon.spy(User.collection, 'aggregate');
+
+      // Act
+      try {
+        await User.aggregate([{ $match: {} }]).option({ middleware: false }).cursor().eachAsync(() => {});
+        await User.aggregate([{ $match: {} }]).cursor({ middleware: false }).eachAsync(() => {});
+      } finally {
+        aggregateSpy.restore();
+      }
+
+      // Assert
+      assert.strictEqual(aggregateSpy.callCount, 2);
+      assert.strictEqual(aggregateSpy.firstCall.args[1].middleware, undefined);
+      assert.strictEqual(aggregateSpy.secondCall.args[1].middleware, undefined);
+      assert.strictEqual(aggregateSpy.secondCall.args[1].cursor.middleware, undefined);
+    });
+
+    it('preserves the middleware option on the aggregate after running a cursor', async function() {
+      // Arrange
+      const { User, getPreCount, getPostCount } = createTestContext();
+      await User.create({ name: 'John' });
+      const aggregate = User.aggregate([{ $match: {} }]).option({ middleware: false });
+
+      // Act
+      await aggregate.cursor().eachAsync(() => {});
+
+      // Assert: option survived (sanitized clone sent to driver, agg.options not mutated)
+      assert.strictEqual(getPreCount('aggregate'), 0);
+      assert.strictEqual(getPostCount('aggregate'), 0);
+      assert.strictEqual(aggregate.options.middleware, false);
+    });
+  });
+
+  describe('custom statics and methods', function() {
+    describe('statics', function() {
+      it('skips pre/post hooks on a custom static when middleware: false', async function() {
+        // Arrange
+        const { User, getStaticPreCount, getStaticPostCount } = createStaticsContext({ supportsMiddlewareOption: true });
+        await User.create({ name: 'John' });
+
+        // Act
+        const user = await User.findByName('John', { middleware: false });
+
+        // Assert
+        assert.ok(user);
+        assert.strictEqual(user.name, 'John');
+        assert.strictEqual(getStaticPreCount(), 0);
+        assert.strictEqual(getStaticPostCount(), 0);
+      });
+
+      it('ignores the middleware option when the static does not set supportsMiddlewareOption', async function() {
+        // Arrange
+        const { User, getStaticPreCount, getStaticPostCount } = createStaticsContext();
+        await User.create({ name: 'John' });
+
+        // Act
+        const user = await User.findByName('John', { middleware: false });
+
+        // Assert
+        assert.ok(user);
+        assert.strictEqual(user.name, 'John');
+        assert.strictEqual(getStaticPreCount(), 1);
+        assert.strictEqual(getStaticPostCount(), 1);
+      });
+
+      it('runs custom static hooks normally without middleware option', async function() {
+        // Arrange
+        const { User, getStaticPreCount, getStaticPostCount } = createStaticsContext({ supportsMiddlewareOption: true });
+        await User.create({ name: 'John' });
+
+        // Act
+        const user = await User.findByName('John');
+
+        // Assert
+        assert.ok(user);
+        assert.strictEqual(user.name, 'John');
+        assert.strictEqual(getStaticPreCount(), 1);
+        assert.strictEqual(getStaticPostCount(), 1);
+      });
+
+      it('runs static hooks for falsy middleware option values other than false', async function() {
+        // Arrange
+        const { User, getStaticPreCount, getStaticPostCount } = createStaticsContext({ supportsMiddlewareOption: true });
+        await User.create({ name: 'John' });
+
+        // Act
+        const user = await User.findByName('John', { middleware: 0 });
+
+        // Assert
+        assert.ok(user);
+        assert.strictEqual(getStaticPreCount(), 1);
+        assert.strictEqual(getStaticPostCount(), 1);
+      });
+
+      it('skips only pre hooks when middleware: { pre: false }', async function() {
+        // Arrange
+        const { User, getStaticPreCount, getStaticPostCount } = createStaticsContext({ supportsMiddlewareOption: true });
+        await User.create({ name: 'John' });
+
+        // Act
+        const user = await User.findByName('John', { middleware: { pre: false } });
+
+        // Assert
+        assert.ok(user);
+        assert.strictEqual(user.name, 'John');
+        assert.strictEqual(getStaticPreCount(), 0);
+        assert.strictEqual(getStaticPostCount(), 1);
+      });
+
+      it('skips only post hooks when middleware: { post: false }', async function() {
+        // Arrange
+        const { User, getStaticPreCount, getStaticPostCount } = createStaticsContext({ supportsMiddlewareOption: true });
+        await User.create({ name: 'John' });
+
+        // Act
+        const user = await User.findByName('John', { middleware: { post: false } });
+
+        // Assert
+        assert.ok(user);
+        assert.strictEqual(user.name, 'John');
+        assert.strictEqual(getStaticPreCount(), 1);
+        assert.strictEqual(getStaticPostCount(), 0);
+      });
+
+      function createStaticsContext({ supportsMiddlewareOption = false } = {}) {
+        let preCount = 0;
+        let postCount = 0;
+        const userSchema = new Schema({ name: String });
+        userSchema.statics.findByName = function(name, options = {}) {
+          assert.ok(options);
+          return this.findOne({ name });
+        };
+        if (supportsMiddlewareOption) {
+          userSchema.statics.findByName.supportsMiddlewareOption = true;
+        }
+        userSchema.pre('findByName', function() { preCount++; });
+        userSchema.post('findByName', function() { postCount++; });
+        const User = db.model('User', userSchema);
+        return { User, getStaticPreCount: () => preCount, getStaticPostCount: () => postCount };
+      }
+    });
+
+    describe('methods', function() {
+      it('skips pre/post hooks on a custom method when middleware: false', async function() {
+        // Arrange
+        const { User, getMethodPreCount, getMethodPostCount } = createMethodsContext({ supportsMiddlewareOption: true });
+        const user = await User.create({ name: 'John' });
+
+        // Act
+        const result = await user.activate({ middleware: false });
+
+        // Assert
+        assert.strictEqual(result, user);
+        assert.strictEqual(user.active, true);
+        assert.strictEqual(getMethodPreCount(), 0);
+        assert.strictEqual(getMethodPostCount(), 0);
+      });
+
+      it('ignores the middleware option when the method does not set supportsMiddlewareOption', async function() {
+        // Arrange
+        const { User, getMethodPreCount, getMethodPostCount } = createMethodsContext();
+        const user = await User.create({ name: 'John' });
+
+        // Act
+        const result = await user.activate({ middleware: false });
+
+        // Assert
+        assert.strictEqual(result, user);
+        assert.strictEqual(user.active, true);
+        assert.strictEqual(getMethodPreCount(), 1);
+        assert.strictEqual(getMethodPostCount(), 1);
+      });
+
+      it('runs custom method hooks normally without middleware option', async function() {
+        // Arrange
+        const { User, getMethodPreCount, getMethodPostCount } = createMethodsContext({ supportsMiddlewareOption: true });
+        const user = await User.create({ name: 'John' });
+
+        // Act
+        const result = await user.activate();
+
+        // Assert
+        assert.strictEqual(result, user);
+        assert.strictEqual(user.active, true);
+        assert.strictEqual(getMethodPreCount(), 1);
+        assert.strictEqual(getMethodPostCount(), 1);
+      });
+
+      it('runs method hooks for falsy middleware option values other than false', async function() {
+        // Arrange
+        const { User, getMethodPreCount, getMethodPostCount } = createMethodsContext({ supportsMiddlewareOption: true });
+        const user = await User.create({ name: 'John' });
+
+        // Act
+        const result = await user.activate({ middleware: 0 });
+
+        // Assert
+        assert.strictEqual(result, user);
+        assert.strictEqual(getMethodPreCount(), 1);
+        assert.strictEqual(getMethodPostCount(), 1);
+      });
+
+      it('skips only pre hooks when middleware: { pre: false }', async function() {
+        // Arrange
+        const { User, getMethodPreCount, getMethodPostCount } = createMethodsContext({ supportsMiddlewareOption: true });
+        const user = await User.create({ name: 'John' });
+
+        // Act
+        const result = await user.activate({ middleware: { pre: false } });
+
+        // Assert
+        assert.strictEqual(result, user);
+        assert.strictEqual(user.active, true);
+        assert.strictEqual(getMethodPreCount(), 0);
+        assert.strictEqual(getMethodPostCount(), 1);
+      });
+
+      it('skips only post hooks when middleware: { post: false }', async function() {
+        // Arrange
+        const { User, getMethodPreCount, getMethodPostCount } = createMethodsContext({ supportsMiddlewareOption: true });
+        const user = await User.create({ name: 'John' });
+
+        // Act
+        const result = await user.activate({ middleware: { post: false } });
+
+        // Assert
+        assert.strictEqual(result, user);
+        assert.strictEqual(user.active, true);
+        assert.strictEqual(getMethodPreCount(), 1);
+        assert.strictEqual(getMethodPostCount(), 0);
+      });
+
+      function createMethodsContext({ supportsMiddlewareOption = false } = {}) {
+        let preCount = 0;
+        let postCount = 0;
+        const userSchema = new Schema({ name: String, active: Boolean });
+        userSchema.methods.activate = function(options = {}) {
+          assert.ok(options);
+          this.active = true;
+          return this;
+        };
+        if (supportsMiddlewareOption) {
+          userSchema.methods.activate.supportsMiddlewareOption = true;
+        }
+        userSchema.pre('activate', function() { preCount++; });
+        userSchema.post('activate', function() { postCount++; });
+        const User = db.model('User', userSchema);
+        return { User, getMethodPreCount: () => preCount, getMethodPostCount: () => postCount };
+      }
     });
   });
 

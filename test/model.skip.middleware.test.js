@@ -537,6 +537,26 @@ describe('middleware option to skip hooks (gh-8768)', function() {
           }
         });
 
+        it(`${operation} preserves option removal by a document hook`, async function() {
+          // Arrange
+          const { User, user } = await createTestContext({ changeOptions: options => { delete options.maxTimeMS; } });
+          const options = { comment: 'original', maxTimeMS: 1000 };
+          const write = sinon.spy(User.collection, operation);
+          try {
+            const query = operation === 'updateOne' ? user.updateOne({ name: 'John updated' }, options) : user.deleteOne(options);
+
+            // Act
+            await query.setOptions({ comment: 'later' });
+
+            // Assert
+            const driverOptions = write.firstCall.args[operation === 'updateOne' ? 2 : 1];
+            assert.strictEqual(driverOptions.maxTimeMS, undefined);
+            assert.strictEqual(driverOptions.comment, 'later');
+          } finally {
+            write.restore();
+          }
+        });
+
         for (const [original, later] of [['first', 'second'], ['second', 'first']]) {
           it(`${operation} keeps later comment ${later} and untouched options`, async function() {
             // Arrange

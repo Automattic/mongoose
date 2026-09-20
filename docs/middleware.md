@@ -640,8 +640,8 @@ await Model.find().cursor({ middleware: false }).eachAsync(doc => {
 });
 
 // Skip all user middleware on aggregation
-await Model.aggregate([]).option({ middleware: false });
-await Model.aggregate([]).cursor({ middleware: false }).eachAsync(doc => {
+await Model.aggregate([{ $match: {} }]).option({ middleware: false });
+await Model.aggregate([{ $match: {} }]).cursor({ middleware: false }).eachAsync(doc => {
   // process doc
 });
 ```

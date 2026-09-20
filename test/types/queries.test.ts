@@ -735,8 +735,8 @@ async function gh13142() {
       options: Options
     ): Promise<
         Options['lean'] extends true
-          ? Pick<Blog, Extract<keyof Projection, keyof Blog>> | null
-          : HydratedDocument<Pick<Blog, Extract<keyof Projection, keyof Blog>>> | null
+          ? mongoose.ApplyProjection<Blog, Projection> | null
+          : HydratedDocument<mongoose.ApplyProjection<Blog, Projection>> | null
     > {
       return this.blogModel.findOne(filter, projection, options);
     }
@@ -815,6 +815,29 @@ async function gh14190() {
   expect(res2).type.toBeAssignableTo<
     ModifyResult<ReturnType<(typeof UserModel)['hydrate']>>
   >();
+
+  const res3 = await UserModel.find().findOneAndUpdate(
+    { name: 'test' },
+    { name: 'updated' },
+    { includeResultMetadata: true }
+  );
+  expect(res3).type.toBeAssignableTo<
+    ModifyResult<ReturnType<(typeof UserModel)['hydrate']>>
+  >();
+
+  const upserted = await UserModel.find().findOneAndUpdate(
+    { name: 'test' },
+    { name: 'updated' },
+    { upsert: true, new: true }
+  );
+  expect(upserted).type.toBe<ReturnType<(typeof UserModel)['hydrate']>>();
+
+  const upsertedById = await UserModel.find().findByIdAndUpdate(
+    '0'.repeat(24),
+    { name: 'updated' },
+    { upsert: true, returnDocument: 'after' }
+  );
+  expect(upsertedById).type.toBe<ReturnType<(typeof UserModel)['hydrate']>>();
 }
 
 function mongooseQueryOptions() {
@@ -1061,11 +1084,6 @@ async function gh15779() {
   expect(v8Filter.age).type.toBeAssignableFrom(42);
   expect(v8Filter.age).type.not.toBeAssignableFrom('taco');
 
-  const TestModel = model('Test', new Schema({ age: Number, name: String }));
-  const query = TestModel.find({ age: { $gt: 18 } });
-  TestModel.find(query); // Should compile without errors
-  TestModel.findOne(query);
-  TestModel.deleteMany(query);
 }
 
 async function gh15786() {

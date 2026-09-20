@@ -16287,6 +16287,23 @@ describe('document', function() {
       /Path `teams\.support\.people\.0\.age` \(15\) is less than minimum allowed value \(18\)/
     );
   });
+
+  it('validates nested children when validating a nested parent path', async function() {
+    const User = db.model('NestedParentRepro', new Schema({
+      profile: {
+        age: { type: Number, min: 18 }
+      }
+    }));
+
+    const doc = new User({ profile: { age: 15 } });
+    await assert.rejects(
+      () => doc.validate(['profile']),
+      /Path `profile\.age` \(15\) is less than minimum allowed value \(18\)/
+    );
+
+    const err = doc.validateSync(['profile']);
+    assert.ok(err.message.includes('Path `profile.age`'), err.message);
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

@@ -3,9 +3,14 @@
 const assert = require('assert');
 const start = require('./common');
 const util = require('./util');
+const sinon = require('sinon');
+const utils = require('../lib/utils');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
+const ValidatorError = mongoose.SchemaType.ValidatorError;
+const ValidationError = mongoose.Document.ValidationError;
+const MongooseError = mongoose.Error;
 
 describe('document validation', function() {
   let db;
@@ -360,5 +365,524 @@ describe('document validation', function() {
 
     const saved = await User.findById(doc._id).orFail();
     assert.equal(saved.work[0].age, 31);
+  });
+
+  describe('#validate', function() {
+    it('works (gh-891)', async function() {
+      let called = false;
+
+      const validate = [function() {
+        called = true;
+        return true;
+      }, 'BAM'];
+
+      const schema = new Schema({
+        prop: { type: String, required: true, validate: validate },
+        nick: { type: String, required: true }
+      });
+
+      const M = db.model('Test', schema);
+      const m = new M({ prop: 'gh891', nick: 'validation test' });
+
+      assert.ifError(m.validateSync());
+      assert.equal(called, true);
+      called = false;
+
+      await m.validate();
+      assert.equal(called, true);
+      called = false;
+
+      await m.save();
+      assert.equal(called, true);
+      called = false;
+
+      // `prop` is not selected, so its validators should not run
+      const m2 = await M.findById(m, 'nick');
+      m2.nick = 'gh-891';
+
+      assert.ifError(m2.validateSync());
+      assert.equal(called, false);
+
+      await m2.validate();
+      assert.equal(called, false);
+
+      await m2.save();
+      assert.equal(called, false);
+    });
+
+    it('can return a promise', async function() {
+      const validate = [function() {
+        return true;
+      }, 'BAM'];
+
+      const schema = new Schema({
+        prop: { type: String, required: true, validate: validate },
+        nick: { type: String, required: true }
+      });
+
+      const M = db.model('Test', schema);
+      const m = new M({ prop: 'gh891', nick: 'validation test' });
+      const mBad = new M({ prop: 'other' });
+
+      assert.ifError(m.validateSync());
+      await m.validate().then(res => res);
+
+      assert.ok(mBad.validateSync());
+      const err = await mBad.validate().then(() => null, err => err);
+      assert.ok(err);
+    });
+
+    it('doesnt have stale cast errors (gh-2766)', async function() {
+      const testSchema = new Schema({ name: String });
+      const M = db.model('Test', testSchema);
+
+      const m = new M({ _id: 'this is not a valid _id' });
+      assert.ok(!m.$isValid('_id'));
+      assert.ok(m.validateSync().errors['_id'].name, 'CastError');
+
+      m._id = '000000000000000000000001';
+      assert.ok(m.$isValid('_id'));
+      assert.ifError(m.validateSync());
+      await m.validate();
+    });
+
+    it('cast errors persist across validate() calls (gh-2766)', async function() {
+      const testSchema = new Schema({ name: String });
+      const M = db.model('Test', testSchema);
+
+      const m = new M({ _id: 'this is not a valid _id' });
+      assert.ok(!m.$isValid('_id'));
+
+      const error = await m.validate().then(() => null, err => err);
+      assert.ok(error);
+      assert.equal(error.errors['_id'].name, 'CastError');
+
+      const error2 = await m.validate().then(() => null, err => err);
+      assert.ok(error2);
+      assert.equal(error2.errors['_id'].name, 'CastError');
+
+      const err1 = m.validateSync();
+      const err2 = m.validateSync();
+      assert.equal(err1.errors['_id'].name, 'CastError');
+      assert.equal(err2.errors['_id'].name, 'CastError');
+    });
+
+    it('returns a promise when there are no validators', async function() {
+      const schema = new Schema({ _id: String });
+
+      const M = db.model('Test', schema);
+      const m = new M();
+
+      assert.ifError(m.validateSync());
+
+      const promise = m.validate();
+      assert.equal(typeof promise.then, 'function');
+      await promise;
+    });
+
+    describe('works on arrays', function() {
+      it('with required', async function() {
+        const schema = new Schema({
+          name: String,
+          arr: { type: [], required: true }
+        });
+        const M = db.model('Test', schema);
+        const m = new M({ name: 'gh1109-1', arr: null });
+
+        assert.ok(/Path `arr` is required/.test(m.validateSync()));
+        await assert.rejects(() => m.validate(), /Path `arr` is required/);
+        await assert.rejects(() => m.save(), /Path `arr` is required/);
+
+        m.arr = null;
+        assert.ok(/Path `arr` is required/.test(m.validateSync()));
+        await assert.rejects(() => m.validate(), /Path `arr` is required/);
+        await assert.rejects(() => m.save(), /Path `arr` is required/);
+
+        m.arr = [];
+        m.arr.push('works');
+        assert.ifError(m.validateSync());
+        await m.validate();
+        await m.save();
+      });
+
+      it('with custom validator', async function() {
+        let called = false;
+
+        function validator(val) {
+          called = true;
+          return val && val.length > 1;
+        }
+
+        const validate = [validator, 'BAM'];
+
+        const schema = new Schema({
+          arr: { type: [], validate: validate }
+        });
+
+        const M = db.model('Test', schema);
+        const m = new M({ name: 'gh1109-2', arr: [1] });
+        assert.equal(called, false);
+
+        assert.equal(String(m.validateSync()), 'ValidationError: arr: BAM');
+        assert.equal(called, true);
+        called = false;
+
+        const err = await m.validate().then(() => null, err => err);
+        assert.equal(String(err), 'ValidationError: arr: BAM');
+        assert.equal(called, true);
+        called = false;
+
+        await assert.rejects(() => m.save(), /ValidationError: arr: BAM/);
+        assert.equal(called, true);
+
+        m.arr.push(2);
+
+        called = false;
+        assert.ifError(m.validateSync());
+        assert.equal(called, true);
+
+        called = false;
+        await m.validate();
+        assert.equal(called, true);
+
+        called = false;
+        await m.save();
+        assert.equal(called, true);
+      });
+
+      it('with both required + custom validator', async function() {
+        function validator(val) {
+          return val && val.length > 1;
+        }
+
+        const validate = [validator, 'BAM'];
+
+        const schema = new Schema({
+          arr: { type: [], required: true, validate: validate }
+        });
+
+        const M = db.model('Test', schema);
+        const m = new M({ name: 'gh1109-3', arr: null });
+
+        assert.equal(m.validateSync().errors.arr.message, 'Path `arr` is required.');
+
+        let err = await m.validate().then(() => null, err => err);
+        assert.equal(err.errors.arr.message, 'Path `arr` is required.');
+
+        err = await m.save().then(() => null, err => err);
+        assert.equal(err.errors.arr.message, 'Path `arr` is required.');
+
+        m.arr = [{ nice: true }];
+
+        assert.equal(String(m.validateSync()), 'ValidationError: arr: BAM');
+
+        err = await m.validate().then(() => null, err => err);
+        assert.equal(String(err), 'ValidationError: arr: BAM');
+
+        await assert.rejects(() => m.save(), /ValidationError: arr: BAM/);
+
+        m.arr.push(95);
+        assert.ifError(m.validateSync());
+        await m.validate();
+        await m.save();
+      });
+    });
+
+    it('validator should run only once gh-1743', async function() {
+      let count = 0;
+
+      const Control = new Schema({
+        test: {
+          type: String,
+          validate: function() {
+            count++;
+            return true;
+          }
+        }
+      });
+      const PostSchema = new Schema({
+        controls: [Control]
+      });
+
+      const Post = db.model('BlogPost', PostSchema);
+
+      const post = new Post({
+        controls: [{
+          test: 'xx'
+        }]
+      });
+
+      assert.ifError(post.validateSync());
+      assert.equal(count, 1);
+
+      count = 0;
+      await post.validate();
+      assert.equal(count, 1);
+
+      count = 0;
+      await post.save();
+      assert.equal(count, 1);
+    });
+
+    it('validator should run only once per sub-doc gh-1743', async function() {
+      let count = 0;
+
+      const Control = new Schema({
+        test: {
+          type: String,
+          validate: function() {
+            count++;
+            return true;
+          }
+        }
+      });
+      const PostSchema = new Schema({
+        controls: [Control]
+      });
+
+      const Post = db.model('BlogPost', PostSchema);
+
+      const post = new Post({
+        controls: [
+          { test: 'xx' },
+          { test: 'yy' }
+        ]
+      });
+
+      assert.ifError(post.validateSync());
+      assert.equal(count, post.controls.length);
+
+      count = 0;
+      await post.validate();
+      assert.equal(count, post.controls.length);
+
+      count = 0;
+      await post.save();
+      assert.equal(count, post.controls.length);
+    });
+  });
+
+  it('#invalidate', async function() {
+    const InvalidateSchema = new Schema({ prop: { type: String } },
+      { strict: false });
+
+    const Post = db.model('Test', InvalidateSchema);
+    const post = new Post();
+    post.set({ baz: 'val' });
+
+    const invalidate = () => post.invalidate('baz',
+      'validation failed for path {PATH}', 'val', 'custom error');
+    const assertInvalidateError = err => {
+      assert.ok(err instanceof MongooseError);
+      assert.ok(err instanceof ValidationError);
+      assert.ok(err.errors.baz instanceof ValidatorError);
+      assert.equal(err.errors.baz.message, 'validation failed for path baz');
+      assert.equal(err.errors.baz.path, 'baz');
+      assert.equal(err.errors.baz.value, 'val');
+      assert.equal(err.errors.baz.kind, 'custom error');
+    };
+
+    // `invalidate()` returns the error it recorded, and each validation run
+    // consumes it, so re-invalidate before checking the next entry point.
+    assertInvalidateError(invalidate());
+
+    assertInvalidateError(post.validateSync());
+
+    invalidate();
+    assertInvalidateError(await post.validate().then(() => null, err => err));
+
+    invalidate();
+    assertInvalidateError(await post.save().then(() => null, err => err));
+
+    await post.save();
+  });
+
+  it('support `pathsToValidate` option for `validate()` and `validateSync()` (gh-7587)', async function() {
+    const schema = Schema({
+      name: {
+        type: String,
+        required: true
+      },
+      age: {
+        type: Number,
+        required: true
+      },
+      rank: String
+    });
+    const Model = db.model('Test', schema);
+
+    const doc = new Model({});
+
+    assert.deepEqual(Object.keys(doc.validateSync(['name', 'rank']).errors), ['name']);
+    assert.deepEqual(Object.keys(doc.validateSync(['age', 'rank']).errors), ['age']);
+
+    let err = await doc.validate(['name', 'rank']).catch(err => err);
+    assert.deepEqual(Object.keys(err.errors), ['name']);
+
+    err = await doc.validate(['age', 'rank']).catch(err => err);
+    assert.deepEqual(Object.keys(err.errors), ['age']);
+  });
+
+  it('handles validating single nested paths when specified in `pathsToValidate` (gh-8626)', async function() {
+    const nestedSchema = Schema({
+      name: { type: String, validate: v => v.length > 2 },
+      age: { type: Number, validate: v => v < 200 }
+    });
+    const schema = Schema({ nested: nestedSchema });
+
+    const Model = db.model('Test', schema);
+
+    const doc = new Model({ nested: { name: 'a', age: 9001 } });
+
+    const syncError = doc.validateSync(['nested.name']);
+    assert.ok(syncError.errors['nested.name']);
+    assert.ok(!syncError.errors['nested.age']);
+
+    const error = await doc.validate(['nested.name']).then(() => null, err => err);
+    assert.ok(error.errors['nested.name']);
+    assert.ok(!error.errors['nested.age']);
+  });
+
+  describe('validation `pathsToSkip` (gh-10230)', () => {
+    it('support `pathsToSkip` option for `Document#validate()` and `Document#validateSync()`', async function() {
+      const User = getUserModel();
+      const user = new User();
+
+      assert.deepEqual(Object.keys(user.validateSync({ pathsToSkip: ['age'] }).errors), ['name']);
+      assert.deepEqual(Object.keys(user.validateSync({ pathsToSkip: ['name'] }).errors), ['age']);
+
+      const err1 = await user.validate({ pathsToSkip: ['age'] }).then(() => null, err => err);
+      assert.deepEqual(Object.keys(err1.errors), ['name']);
+
+      const err2 = await user.validate({ pathsToSkip: ['name'] }).then(() => null, err => err);
+      assert.deepEqual(Object.keys(err2.errors), ['age']);
+    });
+
+    it('support `pathsToSkip` option for `Model.validate()`', async function() {
+      const User = getUserModel();
+      const err1 = await User.validate({}, { pathsToSkip: ['age'] }).then(() => null, err => err);
+      assert.deepEqual(Object.keys(err1.errors), ['name']);
+
+      const err2 = await User.validate({}, { pathsToSkip: ['name'] }).then(() => null, err => err);
+      assert.deepEqual(Object.keys(err2.errors), ['age']);
+    });
+
+    it('`pathsToSkip` accepts space separated paths', async() => {
+      const userSchema = Schema({
+        name: { type: String, required: true },
+        age: { type: Number, required: true },
+        country: { type: String, required: true },
+        rank: { type: String, required: true }
+      });
+
+      const User = db.model('User', userSchema);
+
+      const user = new User({ name: 'Sam', age: 26 });
+
+      const err1 = user.validateSync({ pathsToSkip: 'country rank' });
+      assert.ok(err1 == null);
+
+      const err2 = await user.validate({ pathsToSkip: 'country rank' }).then(() => null, err => err);
+      assert.ok(err2 == null);
+    });
+
+    function getUserModel() {
+      const userSchema = Schema({
+        name: { type: String, required: true },
+        age: { type: Number, required: true },
+        rank: String
+      });
+
+      const User = db.model('User', userSchema);
+      return User;
+    }
+  });
+
+  describe('validateSync()', () => {
+    afterEach(() => sinon.restore());
+
+    it('emits a deprecation warning', async function() {
+      // Arrange
+      const { User, getWarningCalls } = createTestContext();
+      const user = new User({ name: 'Sam' });
+
+      // Act
+      user.validateSync();
+
+      // Assert
+      const calls = getWarningCalls();
+      assert.strictEqual(calls.length, 1);
+      assert.ok(calls[0].args[0].includes('`Document.prototype.validateSync()` is deprecated'));
+
+      // `validate()` is the non-deprecated equivalent, so it must stay silent
+      await user.validate();
+      assert.strictEqual(getWarningCalls().length, 1);
+    });
+
+    it('does not emit a deprecation warning for internal bulkSave() validation', async() => {
+      // Arrange
+      const { User, getWarningCalls } = createTestContext();
+      const user = new User();
+
+      // Act
+      const err = await User.bulkSave([user]).then(() => null, err => err);
+
+      // Assert
+      assert.ok(err);
+      assert.strictEqual(err.name, 'ValidationError');
+      assert.strictEqual(getWarningCalls().length, 0);
+    });
+
+    it('emits one deprecation warning when validating subdocuments and unions', async function() {
+      // Arrange
+      const { User, getWarningCalls } = createTestContext();
+      const user = new User({
+        name: 'Sam',
+        address: {},
+        offices: [{}, {}],
+        preference: {}
+      });
+
+      // Act
+      const err = user.validateSync();
+
+      // Assert
+      assert.ok(err);
+      assert.ok(err.errors['address.city']);
+      assert.ok(err.errors['offices.0.city']);
+      assert.ok(err.errors['offices.1.city']);
+      assert.ok(err.errors['preference.score']);
+      assert.strictEqual(getWarningCalls().length, 1);
+
+      // `validate()` reports the same errors without adding another warning
+      const asyncError = await user.validate().then(() => null, err => err);
+      assert.ok(asyncError);
+      assert.ok(asyncError.errors['address.city']);
+      assert.ok(asyncError.errors['offices.0.city']);
+      assert.ok(asyncError.errors['offices.1.city']);
+      assert.ok(asyncError.errors['preference.score']);
+      assert.strictEqual(getWarningCalls().length, 1);
+    });
+
+    function createTestContext() {
+      sinon.stub(utils, 'warn');
+      const addressSchema = Schema({ city: { type: String, required: true } });
+      const officeSchema = Schema({ city: { type: String, required: true } });
+      const preferenceSchema = Schema({ score: { type: Number, required: true } });
+      const User = db.model('ValidateSyncWarning', Schema({
+        name: { type: String, required: true },
+        address: addressSchema,
+        offices: [officeSchema],
+        preference: {
+          type: 'Union',
+          of: [preferenceSchema, Number]
+        }
+      }));
+
+      return {
+        User,
+        getWarningCalls: () => utils.warn.getCalls()
+      };
+    }
   });
 });

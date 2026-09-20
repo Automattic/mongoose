@@ -420,3 +420,44 @@ function createMethodOptionsContext() {
   };
   return { options };
 }
+
+async function staticValidationAndWatchMiddleware() {
+  // Arrange
+  const { User } = createTestContext();
+
+  // Act
+  const validated = await User.validate({ name: 'Ann' }, { middleware: false });
+  await User.validate({ name: 'Ann' }, { middleware: true, pathsToSkip: ['name'] });
+  await User.validate({ name: 'Ann' }, { middleware: { pre: false } });
+  await User.validate({ name: 'Ann' }, { middleware: { post: false }, pathsToSkip: 'name' });
+  const stream = User.watch<{ name: string }>([], { hydrate: true, fullDocument: 'updateLookup', middleware: false });
+  User.watch([], { middleware: true });
+  User.watch([], { hydrate: false, middleware: { pre: false } });
+  User.watch([], { middleware: { post: false } });
+  User.watch([], { middleware: {} });
+  User.watch([], { middleware: { pre: true, post: false }, batchSize: 10 });
+  const hydrated = User.hydrate({ name: 'Ann' }, undefined, { middleware: false });
+  User.hydrate({ name: 'Ann' }, null, { middleware: true });
+  User.hydrate({ name: 'Ann' }, null, { middleware: { pre: false }, hydratedPopulatedDocs: true });
+  User.hydrate({ name: 'Ann' }, null, { middleware: { post: false }, setters: true });
+
+  // Assert
+  expect(validated).type.toBe<{ name: string }>();
+  expect(hydrated).type.toBe<HydratedDocument<{ name: string }>>();
+  expect(stream).type.toBe<import('mongodb').ChangeStream<{ name: string }, import('mongodb').ChangeStreamDocument>>();
+  expect(User.watch).type.not.toBeCallableWith([], { middleware: 'false' });
+  expect(User.watch).type.not.toBeCallableWith([], { middleware: { pre: 0 } });
+  expect(User.watch).type.not.toBeCallableWith([], { middleware: { post: 'false' } });
+  expect(User.watch).type.not.toBeCallableWith([], { hydrate: 'true', middleware: false });
+  expect(User.hydrate).type.not.toBeCallableWith({}, undefined, { middleware: 'false' });
+  expect(User.hydrate).type.not.toBeCallableWith({}, undefined, { middleware: { pre: 0 } });
+  expect(User.hydrate).type.not.toBeCallableWith({}, undefined, { middleware: { post: 'false' } });
+  expect(User.validate).type.not.toBeCallableWith({}, { middleware: 'false' });
+  expect(User.validate).type.not.toBeCallableWith({}, { middleware: { pre: 0 } });
+  expect(User.validate).type.not.toBeCallableWith({}, { middleware: { post: 'false' } });
+
+  function createTestContext() {
+    const schema = new Schema<{ name: string }>({ name: { type: String, required: true } });
+    return { User: model('MiddlewareOptionsUser', schema) };
+  }
+}

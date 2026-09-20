@@ -8,6 +8,7 @@ const { builtInMiddleware } = require('../lib/schema/symbols');
 const start = require('./common');
 
 const assert = require('assert');
+const { EventEmitter } = require('events');
 const sinon = require('sinon');
 
 const mongoose = start.mongoose;
@@ -1525,7 +1526,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       for (const selection of selections) {
         it(`preserves ${virtualName} with ${selection.name}`, function() {
           // Arrange
-          const { Post, Author, calls, createRaw } = createTestContext();
+          const { Post, Author, calls, relatedCalls, createRaw } = createTestContext();
           const raw = createRaw(virtualName);
 
           // Act
@@ -1550,10 +1551,12 @@ describe('middleware option to skip hooks (gh-8768)', function() {
             assert.strictEqual(doc.populated('author'), undefined);
           }
           assert.deepStrictEqual(calls, { pre: selection.pre, post: selection.post });
+          assert.deepStrictEqual(relatedCalls, { pre: selection.pre, post: selection.post });
 
           const normalDoc = Post.hydrate(createRaw(virtualName), null, { hydratedPopulatedDocs: true });
           assert.ok((virtualName === 'author' ? normalDoc.author : normalDoc.authors[0]) instanceof Author);
           assert.deepStrictEqual(calls, { pre: selection.pre + 1, post: selection.post + 1 });
+          assert.deepStrictEqual(relatedCalls, { pre: selection.pre + 1, post: selection.post + 1 });
         });
       }
     }
@@ -1602,14 +1605,18 @@ describe('middleware option to skip hooks (gh-8768)', function() {
 
     function createTestContext() {
       const calls = { pre: 0, post: 0 };
-      const Author = db.model('Author', new Schema({ name: String }));
+      const relatedCalls = { pre: 0, post: 0 };
+      const authorSchema = new Schema({ name: String });
+      authorSchema.pre('init', function() { relatedCalls.pre++; });
+      authorSchema.post('init', function() { relatedCalls.post++; });
+      const Author = db.model('Author', authorSchema);
       const schema = new Schema({ title: String, authorId: Schema.Types.ObjectId });
       schema.virtual('author', { ref: 'Author', localField: 'authorId', foreignField: '_id', justOne: true });
       schema.virtual('authors', { ref: 'Author', localField: 'authorId', foreignField: '_id' });
       schema.pre('init', function() { calls.pre++; });
       schema.post('init', function() { calls.post++; });
       const Post = db.model('Post', schema);
-      return { Post, Author, calls, createRaw };
+      return { Post, Author, calls, relatedCalls, createRaw };
 
       function createRaw(virtualName) {
         const author = { _id: new mongoose.Types.ObjectId(), name: 'Ann' };
@@ -2926,4 +2933,266 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       getChildHookRan: (hook) => (counts.subdoc[hook]?.pre > 0) || (counts.subdoc[hook]?.post > 0)
     };
   }
+});
+
+const selections = [
+  { name: 'ordinary', options: {}, pre: 1, post: 1 },
+  { name: 'disabled', options: { middleware: false }, pre: 0, post: 0 },
+  { name: 'pre disabled', options: { middleware: { pre: false } }, pre: 0, post: 1 },
+  { name: 'post disabled', options: { middleware: { post: false } }, pre: 1, post: 0 }
+];
+
+describe('internal middleware forwarding', function() {
+  let db;
+  before(function() { db = start(); });
+  after(async function() { await db.close(); });
+  beforeEach(() => db.deleteModel(/.*/));
+  afterEach(() => require('./util').clearTestData(db));
+  afterEach(() => require('./util').stopRemainingOps(db));
+
+  describe('query and static validation', function() {
+    // Age must be nonnegative. These operations use 20 as valid data and -1 as invalid data.
+    const operations = {
+      updateOne: { run: (User, id, age, options) => User.updateOne({ _id: id }, { $set: { child: { age } } }, options) },
+      findOneAndUpdate: { run: (User, id, age, options) => User.findOneAndUpdate({ _id: id }, { $set: { child: { age } } }, options) },
+      replaceOne: { parent: true, run: (User, id, age, options) => User.replaceOne({ _id: id }, { child: { age } }, options) },
+      findOneAndReplace: { parent: true, run: (User, id, age, options) => User.findOneAndReplace({ _id: id }, { child: { age } }, options) },
+      'array element': { array: true, run: (User, id, age, options) => User.updateOne({ _id: id }, { $set: { 'children.0': { age } } }, options) },
+      '$push': { array: true, run: (User, id, age, options) => User.updateOne({ _id: id }, { $push: { children: { $each: [{ age }] } } }, options) },
+      '$addToSet': { array: true, run: (User, id, age, options) => User.updateOne({ _id: id }, { $addToSet: { children: { age } } }, options) },
+      'Model.validate': { static: true, run: (User, id, age, options) => User.validate({ child: { age } }, options) }
+    };
+
+    for (const [name, operation] of Object.entries(operations)) {
+      for (const selection of selections) {
+        it(`${name} forwards ${selection.name} selection and retains validators`, async function() {
+          // Arrange
+          const { User, id, calls, resetCalls } = await createTestContext();
+          const options = { runValidators: true, ...selection.options };
+
+          // Act
+          const result = await operation.run(User, id, '20', options);
+
+          // Assert
+          assert.deepStrictEqual(calls, {
+            parentPre: operation.parent ? selection.pre : 0,
+            parentPost: operation.parent ? selection.post : 0,
+            childPre: selection.pre,
+            childPost: selection.post,
+            validators: 1
+          });
+          if (operation.static) {
+            assert.strictEqual(result.child.age, 20);
+          } else {
+            const stored = await User.collection.findOne({ _id: id });
+            assert.strictEqual(operation.array ? stored.children.at(-1).age : stored.child.age, 20);
+          }
+          const before = await User.collection.findOne({ _id: id });
+          resetCalls();
+          await assert.rejects(operation.run(User, id, -1, options), mongoose.Error.ValidationError);
+          assert.strictEqual(calls.validators, 1);
+          assert.strictEqual(calls.childPre, selection.pre);
+          assert.deepStrictEqual(await User.collection.findOne({ _id: id }), before);
+          resetCalls();
+          await operation.run(User, id, 21, { runValidators: true });
+          assert.strictEqual(calls.childPre, 1);
+          assert.strictEqual(calls.childPost, 1);
+        });
+      }
+
+      if (!operation.static) {
+        it(`${name} does not enable validators with middleware alone`, async function() {
+          const { User, id, calls } = await createTestContext();
+          await operation.run(User, id, -1, { middleware: false });
+          assert.strictEqual(calls.validators, 0);
+          assert.strictEqual(calls.childPre, 0);
+          const stored = await User.collection.findOne({ _id: id });
+          assert.strictEqual(operation.array ? stored.children.at(-1).age : stored.child.age, -1);
+        });
+      }
+    }
+
+    it('retains static selected paths and validator context', async function() {
+      const { User, calls } = await createTestContext();
+      const data = { child: { age: '-1' } };
+      const result = await User.validate(data, { pathsToSkip: ['child'], middleware: false });
+      assert.strictEqual(result.child.age, -1);
+      assert.strictEqual(calls.validators, 0);
+      await assert.rejects(User.validate({ child: { age: 'invalid' } }, { middleware: false }), mongoose.Error.ValidationError);
+      assert.strictEqual(data.child.age, '-1');
+    });
+
+    async function createTestContext() {
+      const calls = { parentPre: 0, parentPost: 0, childPre: 0, childPost: 0, validators: 0 };
+      const child = new Schema({ age: { type: Number, validate: function(age) {
+        calls.validators++;
+        assert.strictEqual(this.age, age);
+        return age >= 0;
+      } } });
+      child.pre('validate', function() { calls.childPre++; });
+      child.post('validate', function() { calls.childPost++; });
+      const schema = new Schema({ child, children: [child] });
+      schema.pre('validate', function() { calls.parentPre++; });
+      schema.post('validate', function() { calls.parentPost++; });
+      const User = db.model('User', schema);
+      const id = new mongoose.Types.ObjectId();
+      await User.collection.insertOne({ _id: id, child: { age: 10 }, children: [{ age: 10 }] });
+      return { User, id, calls, resetCalls };
+
+      function resetCalls() {
+        for (const key of Object.keys(calls)) {
+          calls[key] = 0;
+        }
+      }
+    }
+  });
+
+  describe('default child hydration', function() {
+    for (const path of ['children', 'profile.children']) {
+      for (const useFunction of [false, true]) {
+        for (const selection of selections) {
+          it(`forwards ${selection.name} to ${useFunction ? 'function' : 'literal'} ${path} defaults`, function() {
+            // Arrange
+            const { User, calls } = createTestContext({ path, useFunction });
+            const ordinary = User.hydrate({ name: 'Control' });
+            calls.pre = calls.post = 0;
+
+            // Act
+            const doc = User.hydrate({ name: 'Ann' }, null, selection.options);
+
+            // Assert
+            const child = doc.get(path)[0];
+            assert.strictEqual(child.name, 'default child');
+            assert.ok(child instanceof mongoose.Document);
+            assert.strictEqual(child.ownerDocument(), doc);
+            assert.strictEqual(child.$isDefault('name'), ordinary.get(path)[0].$isDefault('name'));
+            assert.deepStrictEqual(child.$__.activePaths, ordinary.get(path)[0].$__.activePaths);
+            assert.strictEqual(doc.$isDefault(path), true);
+            assert.strictEqual(doc.isModified(), ordinary.isModified());
+            assert.deepStrictEqual(doc.modifiedPaths(), ordinary.modifiedPaths());
+            assert.deepStrictEqual(calls, { pre: selection.pre, post: selection.post });
+            User.hydrate({ name: 'Bob' });
+            assert.deepStrictEqual(calls, { pre: selection.pre + 1, post: selection.post + 1 });
+          });
+        }
+      }
+    }
+
+    function createTestContext({ path, useFunction }) {
+      const calls = { pre: 0, post: 0 };
+      const child = new Schema({ name: String });
+      child.pre('init', function() { calls.pre++; });
+      child.post('init', function() { calls.post++; });
+      const defaults = [{ name: 'default child' }];
+      const schema = new Schema({ name: String, [path]: { type: [child], default: useFunction ? () => defaults : defaults } });
+      return { User: db.model('User', schema), calls };
+    }
+  });
+
+  describe('hydrated change streams', function() {
+    for (const mode of ['early event', 'late event', 'callback', 'promise']) {
+      for (const selection of selections) {
+        it(`${mode} forwards ${selection.name} to actual hydration`, async function() {
+          const context = await createTestContext({ selection });
+          try {
+            const event = await context.read(mode);
+            assert.ok(event.fullDocument instanceof context.User);
+            assert.strictEqual(event.fullDocument.name, 'Ann');
+            assert.strictEqual(event.fullDocument.isNew, false);
+            assert.strictEqual(event.fullDocument.isModified(), false);
+            assert.deepStrictEqual(context.calls, { pre: selection.pre, post: selection.post });
+            context.User.hydrate({ name: 'Bob' });
+            assert.deepStrictEqual(context.calls, { pre: selection.pre + 1, post: selection.post + 1 });
+          } finally {
+            await context.close();
+          }
+        });
+      }
+    }
+
+    for (const hydrate of [undefined, false, true]) {
+      it(`omits middleware from driver options with hydrate ${hydrate}`, async function() {
+        const context = await createTestContext({ selection: selections[1], hydrate, omitHydrate: hydrate === undefined });
+        try {
+          await context.stream.$driverChangeStreamPromise;
+          const options = context.watch.firstCall.args[1];
+          assert.strictEqual(Object.hasOwn(options, 'middleware'), false);
+          assert.strictEqual(Object.hasOwn(options, 'hydrate'), false);
+          assert.strictEqual(options.fullDocument, 'updateLookup');
+          assert.strictEqual(options.session, context.session);
+          assert.strictEqual(options.batchSize, 5);
+          assert.strictEqual(context.stream.options.middleware, false);
+        } finally {
+          await context.close();
+        }
+      });
+    }
+
+    for (const mode of ['early event', 'late event', 'callback', 'promise']) {
+      for (const hydrate of [false, true]) {
+        it(`${mode} retains events ${hydrate ? 'without fullDocument' : 'without hydration'}`, async function() {
+          const context = await createTestContext({ selection: selections[1], hydrate, omitDocument: hydrate });
+          try {
+            const event = await context.read(mode);
+            assert.strictEqual(event.operationType, 'insert');
+            assert.strictEqual(event.fullDocument instanceof context.User, false);
+            assert.strictEqual(event.fullDocument?.name, hydrate ? undefined : 'Ann');
+            assert.deepStrictEqual(context.calls, { pre: 0, post: 0 });
+          } finally {
+            await context.close();
+          }
+        });
+      }
+    }
+
+    async function createTestContext({ selection, hydrate = true, omitDocument = false, omitHydrate = false }) {
+      const calls = { pre: 0, post: 0 };
+      const schema = new Schema({ name: String });
+      schema.pre('init', function() { calls.pre++; });
+      schema.post('init', function() { calls.post++; });
+      const User = db.model('User', schema);
+      await db.asPromise();
+      const session = await db.startSession();
+      const driver = new EventEmitter();
+      driver.next = function(callback) {
+        const event = createEvent();
+        if (callback) {
+          callback(null, event);
+          return;
+        }
+        return Promise.resolve(event);
+      };
+      driver.close = async function() { driver.removeAllListeners(); };
+      const watch = sinon.stub(User.collection, 'watch').returns(driver);
+      const stream = User.watch([], { ...selection.options, ...(omitHydrate ? {} : { hydrate }), fullDocument: 'updateLookup', session, batchSize: 5 });
+      return { User, calls, stream, watch, session, read, close };
+
+      async function read(mode) {
+        if (mode === 'callback') {
+          await stream.$driverChangeStreamPromise;
+          return new Promise((resolve, reject) => stream.next((err, value) => err ? reject(err) : resolve(value)));
+        }
+        if (mode === 'promise') {
+          return stream.next();
+        }
+        if (mode === 'late event') {
+          await stream.$driverChangeStreamPromise;
+        }
+        const result = new Promise(resolve => stream.once('change', resolve));
+        await stream.$driverChangeStreamPromise;
+        driver.emit('change', createEvent());
+        return result;
+      }
+
+      function createEvent() {
+        return { operationType: 'insert', ...(omitDocument ? {} : { fullDocument: { name: 'Ann' } }) };
+      }
+
+      async function close() {
+        await stream.close();
+        watch.restore();
+        await session.endSession();
+      }
+    }
+  });
 });

@@ -568,13 +568,13 @@ describe('middleware option to skip hooks (gh-8768)', function() {
               if (format === 'map') {
                 options.sort.set('name', 'descending');
               } else if (format === 'array') {
-                options.sort[0][1] = 'descending';
+                options.sort[0][0][1] = 'descending';
               } else {
                 options.sort.name = 'descending';
               }
             } });
             const sort = format === 'map' ? new Map([['name', 'ascending']]) :
-              format === 'array' ? [['name', 'ascending']] : { name: 'ascending' };
+              format === 'array' ? [[['name', 'ascending']]] : { name: 'ascending' };
             const options = { sort };
             const query = operation === 'updateOne' ? user.updateOne({ name: 'John updated' }, options) : user.deleteOne(options);
             query.setOptions({ sort: { tenantId: 1 } });

@@ -762,10 +762,10 @@ declare module 'mongoose' {
     validate(): Promise<TRawDocType>;
     validate(obj: any): Promise<TRawDocType>;
     validate(obj: any, pathsOrOptions: PathsToValidate): Promise<TRawDocType>;
-    validate(obj: any, pathsOrOptions: { pathsToSkip?: pathsToSkip }): Promise<TRawDocType>;
+    validate(obj: any, pathsOrOptions: { pathsToSkip?: pathsToSkip; middleware?: boolean | SkipMiddlewareOptions }): Promise<TRawDocType>;
 
     /** Watches the underlying collection for changes using [MongoDB change streams](https://www.mongodb.com/docs/manual/changeStreams/). */
-    watch<ResultType extends mongodb.Document = any, ChangeType extends mongodb.ChangeStreamDocument = any>(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions & { hydrate?: boolean }): mongodb.ChangeStream<ResultType, ChangeType>;
+    watch<ResultType extends mongodb.Document = any, ChangeType extends mongodb.ChangeStreamDocument = any>(pipeline?: Array<Record<string, unknown>>, options?: mongodb.ChangeStreamOptions & { hydrate?: boolean; middleware?: boolean | SkipMiddlewareOptions }): mongodb.ChangeStream<ResultType, ChangeType>;
 
     /** Adds a `$where` clause to this query */
     $where(argument: string | Function): QueryWithHelpers<Array<THydratedDocumentType>, THydratedDocumentType, TQueryHelpers, TRawDocType, 'find', TInstanceMethods & TVirtuals>;

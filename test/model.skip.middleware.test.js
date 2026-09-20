@@ -512,6 +512,31 @@ describe('middleware option to skip hooks (gh-8768)', function() {
           });
         }
 
+        it(`${operation} applies document-hook option changes without replaying unchanged options`, async function() {
+          // Arrange
+          const { User, user } = await createTestContext({ changeOptions: options => {
+            options.maxTimeMS = 2000;
+            options.hint = { _id: 1 };
+          } });
+          const options = { comment: 'original', maxTimeMS: 1000 };
+          const write = sinon.spy(User.collection, operation);
+          try {
+            const query = operation === 'updateOne' ? user.updateOne({ name: 'John updated' }, options) : user.deleteOne(options);
+
+            // Act
+            const result = await query.setOptions({ comment: 'later' });
+
+            // Assert
+            assert.strictEqual(operation === 'updateOne' ? result.modifiedCount : result.deletedCount, 1);
+            const driverOptions = write.firstCall.args[operation === 'updateOne' ? 2 : 1];
+            assert.strictEqual(driverOptions.comment, 'later');
+            assert.strictEqual(driverOptions.maxTimeMS, 2000);
+            assert.deepStrictEqual(driverOptions.hint, { _id: 1 });
+          } finally {
+            write.restore();
+          }
+        });
+
         for (const [original, later] of [['first', 'second'], ['second', 'first']]) {
           it(`${operation} keeps later comment ${later} and untouched options`, async function() {
             // Arrange
@@ -615,7 +640,7 @@ describe('middleware option to skip hooks (gh-8768)', function() {
       });
     });
 
-    async function createTestContext() {
+    async function createTestContext({ changeOptions } = {}) {
       const hookArgs = [];
       const calls = {
         instance: { pre: 0, post: 0 },
@@ -636,7 +661,12 @@ describe('middleware option to skip hooks (gh-8768)', function() {
         userSchema.post(operation, { query: true, document: false }, function() { calls.query.post++; });
       }
       for (const operation of ['updateOne', 'deleteOne']) {
-        userSchema.pre(operation, { document: true, query: false }, function() { calls.document.pre++; });
+        userSchema.pre(operation, { document: true, query: false }, function(...args) {
+          calls.document.pre++;
+          if (changeOptions) {
+            changeOptions(args[operation === 'updateOne' ? 2 : 1]);
+          }
+        });
         userSchema.post(operation, { document: true, query: false }, function() { calls.document.post++; });
         addInternalHooks(userSchema, operation, calls.internalDocument);
       }

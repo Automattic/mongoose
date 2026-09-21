@@ -453,7 +453,7 @@ declare module 'mongoose' {
       ApplyProjection<TRawDocType, Projection> | null,
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'findOne',
       TInstanceMethods & TVirtuals
     >;
@@ -503,7 +503,7 @@ declare module 'mongoose' {
       ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals> | null,
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'findOne',
       TInstanceMethods & TVirtuals
     >;
@@ -515,7 +515,7 @@ declare module 'mongoose' {
       ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals> | null,
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'findOne',
       TInstanceMethods & TVirtuals
     >;
@@ -527,7 +527,7 @@ declare module 'mongoose' {
       ApplyProjection<TRawDocType, Projection> | null,
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'findOne',
       TInstanceMethods & TVirtuals
     >;
@@ -539,7 +539,7 @@ declare module 'mongoose' {
       ApplyProjection<TRawDocType, Projection> | null,
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'findOne',
       TInstanceMethods & TVirtuals
     >;
@@ -848,7 +848,7 @@ declare module 'mongoose' {
       ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>[],
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'find',
       TInstanceMethods & TVirtuals
     >;
@@ -860,7 +860,7 @@ declare module 'mongoose' {
       ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>[],
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'find',
       TInstanceMethods & TVirtuals
     >;
@@ -872,7 +872,7 @@ declare module 'mongoose' {
       ApplyProjection<TRawDocType, Projection>[],
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'find',
       TInstanceMethods & TVirtuals
     >;
@@ -884,7 +884,7 @@ declare module 'mongoose' {
       ApplyProjection<TRawDocType, Projection>[],
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'find',
       TInstanceMethods & TVirtuals
     >;
@@ -979,7 +979,7 @@ declare module 'mongoose' {
       ApplyProjection<TRawDocType, Projection> | null,
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'findOneAndDelete',
       TInstanceMethods & TVirtuals
     >;
@@ -990,7 +990,7 @@ declare module 'mongoose' {
       ModifyResult<ApplyProjection<TRawDocType, Projection>>,
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'findOneAndDelete',
       TInstanceMethods & TVirtuals
     >;
@@ -1060,7 +1060,7 @@ declare module 'mongoose' {
       ApplyProjection<TRawDocType, Projection> | null,
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'findOneAndUpdate',
       TInstanceMethods & TVirtuals
     >;
@@ -1072,7 +1072,7 @@ declare module 'mongoose' {
       ModifyResult<ApplyProjection<TRawDocType, Projection>>,
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'findOneAndUpdate',
       TInstanceMethods & TVirtuals
     >;
@@ -1169,7 +1169,7 @@ declare module 'mongoose' {
       ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals> | null,
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'findOneAndDelete',
       TInstanceMethods & TVirtuals
     >;
@@ -1180,7 +1180,7 @@ declare module 'mongoose' {
       ModifyResult<ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>>,
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'findOneAndDelete',
       TInstanceMethods & TVirtuals
     >;
@@ -1191,7 +1191,7 @@ declare module 'mongoose' {
       ApplyProjection<TRawDocType, Projection> | null,
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'findOneAndDelete',
       TInstanceMethods & TVirtuals
     >;
@@ -1202,7 +1202,7 @@ declare module 'mongoose' {
       ModifyResult<ApplyProjection<TRawDocType, Projection>>,
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'findOneAndDelete',
       TInstanceMethods & TVirtuals
     >;
@@ -1304,7 +1304,7 @@ declare module 'mongoose' {
       ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals> | null,
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'findOneAndReplace',
       TInstanceMethods & TVirtuals
     >;
@@ -1316,7 +1316,7 @@ declare module 'mongoose' {
       ModifyResult<ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>>,
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'findOneAndReplace',
       TInstanceMethods & TVirtuals
     >;
@@ -1328,7 +1328,7 @@ declare module 'mongoose' {
       ApplyProjection<TRawDocType, Projection> | null,
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'findOneAndReplace',
       TInstanceMethods & TVirtuals
     >;
@@ -1340,7 +1340,7 @@ declare module 'mongoose' {
       ModifyResult<ApplyProjection<TRawDocType, Projection>>,
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'findOneAndReplace',
       TInstanceMethods & TVirtuals
     >;
@@ -1474,7 +1474,7 @@ declare module 'mongoose' {
       ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals> | null,
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'findOneAndUpdate',
       TInstanceMethods & TVirtuals
     >;
@@ -1486,7 +1486,7 @@ declare module 'mongoose' {
       ModifyResult<ProjectedHydratedDocument<TRawDocType, Projection, TInstanceMethods, TQueryHelpers, TVirtuals>>,
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'findOneAndUpdate',
       TInstanceMethods & TVirtuals
     >;
@@ -1498,7 +1498,7 @@ declare module 'mongoose' {
       ApplyProjection<TRawDocType, Projection> | null,
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'findOneAndUpdate',
       TInstanceMethods & TVirtuals
     >;
@@ -1510,7 +1510,7 @@ declare module 'mongoose' {
       ModifyResult<ApplyProjection<TRawDocType, Projection>>,
       THydratedDocumentType,
       TQueryHelpers,
-      TLeanResultType,
+      ApplyProjection<TLeanResultType, Projection>,
       'findOneAndUpdate',
       TInstanceMethods & TVirtuals
     >;

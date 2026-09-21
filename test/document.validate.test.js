@@ -368,6 +368,176 @@ describe('document validation', function() {
       assert.equal(saved.work[0].age, 31);
     });
 
+    describe('element-level validators', function() {
+      it('runs element validators on non-null elements', async function() {
+        const childSchema = new Schema({ name: String });
+        const Model = db.model('Test', new Schema({
+          arr: [{ type: childSchema, validate: v => v == null || v.name !== 'bad' }]
+        }));
+        const doc = new Model({ arr: [{ name: 'good' }, { name: 'bad' }] });
+
+        const syncError = doc.validateSync();
+        assert.ok(syncError?.errors['arr.1'], syncError);
+        assert.ok(!syncError.errors['arr.0'], syncError);
+
+        const error = await doc.validate().then(() => null, error => error);
+        assert.ok(error?.errors['arr.1'], error);
+        assert.ok(!error.errors['arr.0'], error);
+
+        const allPathsSyncError = doc.validateSync({ validateAllPaths: true });
+        assert.ok(allPathsSyncError?.errors['arr.1'], allPathsSyncError);
+
+        const allPathsError = await doc.validate({ validateAllPaths: true }).then(() => null, error => error);
+        assert.ok(allPathsError?.errors['arr.1'], allPathsError);
+
+        await assert.rejects(() => doc.save(), /ValidationError/);
+      });
+
+      it('runs element validators when modifying an element of a saved document', async function() {
+        const childSchema = new Schema({ name: String });
+        const Model = db.model('Test', new Schema({
+          arr: [{ type: childSchema, validate: v => v == null || v.name !== 'bad' }]
+        }));
+        const doc = await Model.create({ arr: [{ name: 'good' }] });
+        doc.arr[0].name = 'bad';
+
+        const syncError = doc.validateSync();
+        assert.ok(syncError?.errors['arr.0'], syncError);
+
+        const error = await doc.validate().then(() => null, error => error);
+        assert.ok(error?.errors['arr.0'], error);
+
+        const allPathsSyncError = doc.validateSync({ validateAllPaths: true });
+        assert.ok(allPathsSyncError?.errors['arr.0'], allPathsSyncError);
+
+        const allPathsError = await doc.validate({ validateAllPaths: true }).then(() => null, error => error);
+        assert.ok(allPathsError?.errors['arr.0'], allPathsError);
+
+        await assert.rejects(() => doc.save(), /ValidationError/);
+      });
+
+      it('calls element and subdocument validators exactly once per element', async function() {
+        let elementValidatorCalls = 0;
+        let childValidatorCalls = 0;
+        const childSchema = new Schema({
+          name: {
+            type: String,
+            validate: () => {
+              ++childValidatorCalls;
+              return true;
+            }
+          }
+        });
+        const Model = db.model('Test', new Schema({
+          arr: [{
+            type: childSchema,
+            validate: () => {
+              ++elementValidatorCalls;
+              return true;
+            }
+          }]
+        }));
+        const doc = new Model({ arr: [{ name: 'a' }, { name: 'b' }] });
+
+        assert.ifError(doc.validateSync());
+        assert.equal(elementValidatorCalls, 2);
+        assert.equal(childValidatorCalls, 2);
+
+        elementValidatorCalls = 0;
+        childValidatorCalls = 0;
+        await doc.validate();
+        assert.equal(elementValidatorCalls, 2);
+        assert.equal(childValidatorCalls, 2);
+
+        elementValidatorCalls = 0;
+        childValidatorCalls = 0;
+        assert.ifError(doc.validateSync({ validateAllPaths: true }));
+        assert.equal(elementValidatorCalls, 2);
+        assert.equal(childValidatorCalls, 2);
+
+        elementValidatorCalls = 0;
+        childValidatorCalls = 0;
+        await doc.validate({ validateAllPaths: true });
+        assert.equal(elementValidatorCalls, 2);
+        assert.equal(childValidatorCalls, 2);
+
+        elementValidatorCalls = 0;
+        childValidatorCalls = 0;
+        await doc.save();
+        assert.equal(elementValidatorCalls, 2);
+        assert.equal(childValidatorCalls, 2);
+      });
+
+      it('calls subdocument validators exactly once per element with `required` elements', async function() {
+        let childValidatorCalls = 0;
+        const childSchema = new Schema({
+          name: {
+            type: String,
+            validate: () => {
+              ++childValidatorCalls;
+              return true;
+            }
+          }
+        });
+        const Model = db.model('Test', new Schema({
+          arr: [{ type: childSchema, required: true }]
+        }));
+        const doc = new Model({ arr: [{ name: 'a' }, { name: 'b' }] });
+
+        assert.ifError(doc.validateSync());
+        assert.equal(childValidatorCalls, 2);
+
+        childValidatorCalls = 0;
+        await doc.validate();
+        assert.equal(childValidatorCalls, 2);
+
+        childValidatorCalls = 0;
+        assert.ifError(doc.validateSync({ validateAllPaths: true }));
+        assert.equal(childValidatorCalls, 2);
+
+        childValidatorCalls = 0;
+        await doc.validate({ validateAllPaths: true });
+        assert.equal(childValidatorCalls, 2);
+
+        childValidatorCalls = 0;
+        await doc.save();
+        assert.equal(childValidatorCalls, 2);
+      });
+
+      it('runs element validators on document arrays underneath nested paths and subdocs', async function() {
+        const childSchema = new Schema({ name: String });
+        const elementDefinition = [{
+          type: childSchema,
+          validate: v => v == null || v.name !== 'bad'
+        }];
+        const Model = db.model('Test', new Schema({
+          nested: { arr: elementDefinition },
+          single: new Schema({ arr: elementDefinition })
+        }));
+        const doc = new Model({
+          nested: { arr: [{ name: 'bad' }] },
+          single: { arr: [{ name: 'bad' }] }
+        });
+
+        const syncError = doc.validateSync();
+        assert.ok(syncError?.errors['nested.arr.0'], syncError);
+        assert.ok(syncError?.errors['single.arr.0'], syncError);
+
+        const error = await doc.validate().then(() => null, error => error);
+        assert.ok(error?.errors['nested.arr.0'], error);
+        assert.ok(error?.errors['single.arr.0'], error);
+
+        const allPathsSyncError = doc.validateSync({ validateAllPaths: true });
+        assert.ok(allPathsSyncError?.errors['nested.arr.0'], allPathsSyncError);
+        assert.ok(allPathsSyncError?.errors['single.arr.0'], allPathsSyncError);
+
+        const allPathsError = await doc.validate({ validateAllPaths: true }).then(() => null, error => error);
+        assert.ok(allPathsError?.errors['nested.arr.0'], allPathsError);
+        assert.ok(allPathsError?.errors['single.arr.0'], allPathsError);
+      });
+    });
+
+
     describe('basic document array', function() {
       it('reports validator errors on element subpaths', async function() {
         const elementSchema = new Schema({

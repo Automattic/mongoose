@@ -151,6 +151,16 @@ Test.findOne({}, { age: 0 }).lean().then(doc => {
   expect(doc!).type.not.toHaveProperty('age');
   expect(doc!).type.toHaveProperty('_id');
 });
+Test.findOneAndUpdate({}, {}, { projection: { name: 1 } }).lean().then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.findOneAndDelete({}, { projection: { name: 1 } }).lean().then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
 Test.findOne({}, { name: 1, _id: 0 }).then(doc => {
   expect(doc!).type.toHaveProperty('name');
   expect(doc!).type.not.toHaveProperty('age');

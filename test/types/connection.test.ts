@@ -172,3 +172,22 @@ async function gh15359() {
   }>();
   expect(res3.mongoose?.validationErrors).type.toBe<Error[] | undefined>();
 }
+
+
+async function connectionBulkWriteMiddleware() {
+  const operations = [{ model: 'User', name: 'insertOne' as const, document: { name: 'Ann' } }];
+  for (const middleware of [true, false, { pre: false }, { post: false }, { pre: true, post: false }]) {
+    const ordinary = await conn.bulkWrite(operations, { middleware, bypassDocumentValidation: true, verboseResults: true });
+    expect(ordinary).type.toBe<mongodb.ClientBulkWriteResult>();
+    const ordered = await conn.bulkWrite(operations, { middleware, ordered: true, bypassDocumentValidation: true });
+    expect(ordered).type.toBe<mongodb.ClientBulkWriteResult>();
+    const unordered = await conn.bulkWrite(operations, { middleware, ordered: false, verboseResults: true });
+    expect(unordered.insertedCount).type.toBe<number>();
+    expect(unordered.mongoose?.validationErrors).type.toBe<Error[] | undefined>();
+    expect(unordered.mongoose?.results).type.toBe<Array<Error | mongodb.WriteError | null> | undefined>();
+  }
+  expect(conn.bulkWrite).type.not.toBeCallableWith(operations, { middleware: 'false' });
+  expect(conn.bulkWrite).type.not.toBeCallableWith(operations, { middleware: { pre: 'false' } });
+  expect(conn.bulkWrite).type.not.toBeCallableWith(operations, { ordered: false, middleware: { post: 0 } });
+  expect(conn.bulkWrite).type.not.toBeCallableWith(operations, { middleware: false, verboseResults: 'true' });
+}

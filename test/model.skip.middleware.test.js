@@ -3275,4 +3275,132 @@ describe('internal middleware forwarding', function() {
       }
     }
   });
+  describe('hydration through ordinary refs and nested arrays', function() {
+    for (const populated of [false, true]) {
+      for (const selection of [
+        { name: 'ordinary', options: {}, pre: 1, post: 1 },
+        { name: 'false', options: { middleware: false }, pre: 0, post: 0 },
+        { name: 'pre false', options: { middleware: { pre: false } }, pre: 0, post: 1 },
+        { name: 'post false', options: { middleware: { post: false } }, pre: 1, post: 0 }
+      ]) {
+        it(`preserves ${selection.name} with populated refs ${populated}`, function() {
+          // Arrange
+          const { Article, Author, raw, calls } = createTestContext({ populated });
+
+          // Act
+          const article = Article.hydrate(raw, null, { hydratedPopulatedDocs: populated, ...selection.options });
+
+          // Assert
+          assert.deepStrictEqual(calls.article, { pre: selection.pre, post: selection.post });
+          assert.deepStrictEqual(calls.author, { pre: populated ? selection.pre * 2 : 0, post: populated ? selection.post * 2 : 0 });
+          assert.deepStrictEqual(calls.child, { pre: selection.pre, post: selection.post });
+          assert.strictEqual(article.title, 'Middleware');
+          assert.strictEqual(article.isNew, false);
+          assert.strictEqual(article.isModified(), false);
+          assert.strictEqual(article.groups[0][0].name, 'Ann');
+          assert.strictEqual(article.groups[0][0].ownerDocument(), article);
+          assert.strictEqual(article.groups[0][0].isNew, false);
+          if (populated) {
+            assert.ok(article.author instanceof Author);
+            assert.ok(article.authors[0] instanceof Author);
+            assert.strictEqual(article.author.name, 'Sam');
+            assert.strictEqual(article.authors[0].name, 'Lee');
+            assert.deepStrictEqual(article.populated('author'), raw.author._id);
+            assert.deepStrictEqual(article.populated('authors'), [raw.authors[0]._id]);
+            assert.strictEqual(article.author.isNew, false);
+            assert.strictEqual(article.author.isModified(), false);
+          }
+        });
+      }
+    }
+
+    function createTestContext({ populated }) {
+      const calls = { article: { pre: 0, post: 0 }, author: { pre: 0, post: 0 }, child: { pre: 0, post: 0 } };
+      const authorSchema = new Schema({ name: String });
+      const childSchema = new Schema({ name: String });
+      const articleSchema = new Schema({
+        title: String,
+        author: { type: Schema.Types.ObjectId, ref: 'Author' },
+        authors: [{ type: Schema.Types.ObjectId, ref: 'Author' }],
+        groups: [[childSchema]]
+      });
+      for (const [name, schema] of [['article', articleSchema], ['author', authorSchema], ['child', childSchema]]) {
+        schema.pre('init', function() { ++calls[name].pre; });
+        schema.post('init', function() { ++calls[name].post; });
+      }
+      const Author = db.model('Author', authorSchema);
+      const Article = db.model('Article', articleSchema);
+      const raw = { _id: new mongoose.Types.ObjectId(), title: 'Middleware', groups: [[{ name: 'Ann' }]] };
+      if (populated) {
+        raw.author = { _id: new mongoose.Types.ObjectId(), name: 'Sam' };
+        raw.authors = [{ _id: new mongoose.Types.ObjectId(), name: 'Lee' }];
+      }
+      return { Article, Author, raw, calls };
+    }
+  });
+
+  describe('upsert default child middleware', function() {
+    const operations = ['updateOne', 'updateMany', 'findOneAndUpdate', 'bulk updateOne', 'bulk updateMany'];
+    for (const operation of operations) {
+      for (const selection of [
+        { name: 'ordinary', options: {}, pre: 1, post: 1 },
+        { name: 'false', options: { middleware: false }, pre: 0, post: 0 },
+        { name: 'pre false', options: { middleware: { pre: false } }, pre: 0, post: 1 },
+        { name: 'post false', options: { middleware: { post: false } }, pre: 1, post: 0 }
+      ]) {
+        it(`${operation} respects ${selection.name} for omitted default children`, async function() {
+          // Arrange
+          const { User, calls, run } = createTestContext({ operation });
+
+          // Act
+          await run(selection.options);
+
+          // Assert
+          assert.deepStrictEqual(calls, { pre: selection.pre, post: selection.post });
+          const stored = await User.collection.findOne({ key: 'new' });
+          assert.strictEqual(stored.children[0].name, 'Ann');
+          assert.strictEqual(stored.label, operation.startsWith('bulk') ? 'bulk' : 'new');
+          assert.strictEqual(await User.collection.countDocuments({ key: 'new' }), 1);
+        });
+      }
+
+      it(`${operation} keeps setDefaultsOnInsert false effective`, async function() {
+        // Arrange
+        const { User, calls, run } = createTestContext({ operation });
+
+        // Act
+        await run({ middleware: false, setDefaultsOnInsert: false });
+
+        // Assert
+        assert.deepStrictEqual(calls, { pre: 0, post: 0 });
+        const stored = await User.collection.findOne({ key: 'new' });
+        assert.ok(stored);
+        assert.strictEqual(stored.children, undefined);
+        assert.strictEqual(stored.label, undefined);
+      });
+    }
+
+    function createTestContext({ operation }) {
+      const calls = { pre: 0, post: 0 };
+      const childSchema = new Schema({ name: String });
+      childSchema.pre('init', function() { ++calls.pre; });
+      childSchema.post('init', function() { ++calls.post; });
+      const User = db.model('User', new Schema({
+        key: String,
+        label: { type: String, default: function() { return this instanceof mongoose.Query ? this.getFilter().key : 'bulk'; } },
+        children: { type: [childSchema], default: [{ name: 'Ann' }] }
+      }));
+      return { User, calls, run };
+
+      function run(options) {
+        const filter = { key: 'new' };
+        const update = { $set: { key: 'new' } };
+        if (operation.startsWith('bulk')) {
+          return User.bulkWrite([{ [operation.slice(5)]: { filter, update, upsert: true, setDefaultsOnInsert: options.setDefaultsOnInsert } }], options);
+        }
+        return User[operation](filter, update, { upsert: true, returnDocument: 'after', lean: true, ...options });
+      }
+    }
+  });
+
 });

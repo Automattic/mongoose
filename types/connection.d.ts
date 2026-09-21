@@ -83,11 +83,11 @@ declare module 'mongoose' {
 
     bulkWrite<TSchemaMap extends Record<string, AnyObject>>(
       ops: Array<ConnectionBulkWriteModel<TSchemaMap>>,
-      options: mongodb.ClientBulkWriteOptions & { ordered: false }
+      options: mongodb.ClientBulkWriteOptions & { ordered: false; middleware?: boolean | SkipMiddlewareOptions }
     ): Promise<mongodb.ClientBulkWriteResult & { mongoose?: { validationErrors: Error[], results: Array<Error | mongodb.WriteError | null> } }>;
     bulkWrite<TSchemaMap extends Record<string, AnyObject>>(
       ops: Array<ConnectionBulkWriteModel<TSchemaMap>>,
-      options?: mongodb.ClientBulkWriteOptions
+      options?: mongodb.ClientBulkWriteOptions & { middleware?: boolean | SkipMiddlewareOptions }
     ): Promise<mongodb.ClientBulkWriteResult>;
 
     /** Closes the connection */

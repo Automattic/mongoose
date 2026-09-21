@@ -535,6 +535,125 @@ describe('document validation', function() {
         assert.ok(allPathsError?.errors['nested.arr.0'], allPathsError);
         assert.ok(allPathsError?.errors['single.arr.0'], allPathsError);
       });
+
+      it('runs element validators on an unmodified document loaded from the database', async function() {
+        const childSchema = new Schema({ name: String });
+        const Model = db.model('Test', new Schema({
+          arr: [{ type: childSchema, validate: v => v == null || v.name !== 'bad' }]
+        }));
+        // Insert through the driver so the offending element never passes
+        // through validation on the way in.
+        await Model.collection.insertOne({ arr: [{ name: 'bad' }] });
+        const doc = await Model.findOne().orFail();
+        assert.ok(!doc.$isNew);
+        assert.ok(!doc.$isModified('arr'));
+
+        const syncError = doc.validateSync();
+        assert.ok(syncError?.errors['arr.0'], syncError);
+
+        const error = await doc.validate().then(() => null, error => error);
+        assert.ok(error?.errors['arr.0'], error);
+
+        const allPathsSyncError = doc.validateSync({ validateAllPaths: true });
+        assert.ok(allPathsSyncError?.errors['arr.0'], allPathsSyncError);
+
+        const allPathsError = await doc.validate({ validateAllPaths: true }).then(() => null, error => error);
+        assert.ok(allPathsError?.errors['arr.0'], allPathsError);
+
+        await assert.rejects(() => doc.save(), /ValidationError/);
+      });
+
+      it('runs `required` element validators on an unmodified document loaded from the database', async function() {
+        const childSchema = new Schema({ name: String });
+        const Model = db.model('Test', new Schema({
+          arr: [{ type: childSchema, required: true }]
+        }));
+        await Model.collection.insertOne({ arr: [null] });
+        const doc = await Model.findOne().orFail();
+        assert.ok(!doc.$isModified('arr'));
+
+        const syncError = doc.validateSync();
+        assert.ok(syncError?.errors['arr.0'], syncError);
+
+        const error = await doc.validate().then(() => null, error => error);
+        assert.ok(error?.errors['arr.0'], error);
+
+        const allPathsSyncError = doc.validateSync({ validateAllPaths: true });
+        assert.ok(allPathsSyncError?.errors['arr.0'], allPathsSyncError);
+
+        const allPathsError = await doc.validate({ validateAllPaths: true }).then(() => null, error => error);
+        assert.ok(allPathsError?.errors['arr.0'], allPathsError);
+      });
+
+      it('runs element validators when only a sibling path is modified', async function() {
+        const childSchema = new Schema({ name: String });
+        const Model = db.model('Test', new Schema({
+          other: String,
+          arr: [{ type: childSchema, validate: v => v == null || v.name !== 'bad' }]
+        }));
+        await Model.collection.insertOne({ other: 'a', arr: [{ name: 'bad' }] });
+        const doc = await Model.findOne().orFail();
+        doc.other = 'b';
+
+        const syncError = doc.validateSync();
+        assert.ok(syncError?.errors['arr.0'], syncError);
+
+        const error = await doc.validate().then(() => null, error => error);
+        assert.ok(error?.errors['arr.0'], error);
+
+        const allPathsSyncError = doc.validateSync({ validateAllPaths: true });
+        assert.ok(allPathsSyncError?.errors['arr.0'], allPathsSyncError);
+
+        const allPathsError = await doc.validate({ validateAllPaths: true }).then(() => null, error => error);
+        assert.ok(allPathsError?.errors['arr.0'], allPathsError);
+      });
+
+      it('calls element validators exactly once on a document loaded from the database', async function() {
+        let elementValidatorCalls = 0;
+        let childValidatorCalls = 0;
+        const childSchema = new Schema({
+          name: {
+            type: String,
+            validate: () => {
+              ++childValidatorCalls;
+              return true;
+            }
+          }
+        });
+        const Model = db.model('Test', new Schema({
+          arr: [{
+            type: childSchema,
+            validate: () => {
+              ++elementValidatorCalls;
+              return true;
+            }
+          }]
+        }));
+        await Model.collection.insertOne({ arr: [{ name: 'a' }, { name: 'b' }] });
+        const doc = await Model.findOne().orFail();
+
+        assert.ifError(doc.validateSync());
+        assert.equal(elementValidatorCalls, 2);
+        assert.equal(childValidatorCalls, 2);
+
+        elementValidatorCalls = 0;
+        childValidatorCalls = 0;
+        await doc.validate();
+        assert.equal(elementValidatorCalls, 2);
+        assert.equal(childValidatorCalls, 2);
+
+        elementValidatorCalls = 0;
+        childValidatorCalls = 0;
+        assert.ifError(doc.validateSync({ validateAllPaths: true }));
+        assert.equal(elementValidatorCalls, 2);
+        assert.equal(childValidatorCalls, 2);
+
+        elementValidatorCalls = 0;
+        childValidatorCalls = 0;
+        await doc.validate({ validateAllPaths: true });
+        assert.equal(elementValidatorCalls, 2);
+        assert.equal(childValidatorCalls, 2);
+      });
     });
 
 

@@ -1783,6 +1783,30 @@ describe('schema', function() {
       assert.ok(schema.path('other'));
     });
 
+    it('removes the subpaths of a document array and of a subdocument (gh-16520)', function() {
+      const schema = new Schema({
+        child: new Schema({ name: String, nested: { x: Number } }, { _id: false }),
+        arr: [{ v: Number }],
+        tags: [String],
+        other: String
+      }, { autoCreate: false, autoIndex: false });
+      // Positional lookups register the element paths lazily
+      assert.ok(schema.path('arr.0.v'));
+      assert.ok(schema.path('tags.$'));
+
+      schema.remove(['child', 'arr', 'tags']);
+
+      assert.deepStrictEqual(Object.keys(schema.singleNestedPaths), []);
+      assert.deepStrictEqual(Object.keys(schema.subpaths), []);
+      assert.strictEqual(schema.path('child.name'), undefined);
+      assert.strictEqual(schema.path('arr.0.v'), undefined);
+      assert.strictEqual(schema.path('tags.$'), undefined);
+      assert.equal(schema.pathType('child.name'), 'adhocOrUndefined');
+      assert.equal(schema.pathType('child.nested.x'), 'adhocOrUndefined');
+      assert.equal(schema.pathType('arr.0.v'), 'adhocOrUndefined');
+      assert.ok(schema.path('other'));
+    });
+
     it('removes an array of paths', function() {
       this.schema.remove(['e', 'f', 'g']);
       assert.strictEqual(this.schema.path('e'), undefined);
@@ -2540,6 +2564,23 @@ describe('schema', function() {
       assert.equal(newSchema.pathType('m.k'), 'adhocOrUndefined');
     });
 
+    it('removes the paths of an omitted subdocument (gh-16520)', function() {
+      const schema = new Schema({
+        child: new Schema({ name: String, nested: { x: Number } }, { _id: false }),
+        other: String
+      }, { autoCreate: false, autoIndex: false });
+
+      const newSchema = schema.omit(['child']);
+
+      assert.ok(!newSchema.path('child'));
+      assert.ok(!newSchema.path('child.name'));
+      assert.deepStrictEqual(Object.keys(newSchema.singleNestedPaths), []);
+      assert.equal(newSchema.pathType('child.name'), 'adhocOrUndefined');
+      // The original schema is untouched
+      assert.ok(schema.path('child.name'));
+      assert.equal(schema.pathType('child.nested.x'), 'real');
+    });
+
     it('works with nested paths', function() {
       const schema = Schema({
         name: {
@@ -2745,6 +2786,46 @@ describe('schema', function() {
       assert.ok(err);
       assert.equal(err.errors['age'].name, 'CastError');
       assert.equal(err.errors['age'].message, 'twenty is not a number for model gh8300_fn');
+    });
+
+    it('replaces {MODEL} with model name in castObject() errors', function() {
+      const schema = Schema({
+        age: {
+          type: Number,
+          cast: '{VALUE} is not a valid number for model {MODEL}'
+        },
+        nested: {
+          age: {
+            type: Number,
+            cast: '{VALUE} is not a valid number for model {MODEL}'
+          }
+        },
+        subdoc: Schema({
+          age: {
+            type: Number,
+            cast: '{VALUE} is not a valid number for model {MODEL}'
+          }
+        })
+      });
+      const Test = db.model('gh8300_castObject', schema);
+
+      assert.throws(
+        () => Test.castObject({ age: 'twenty' }),
+        err => err.errors['age'].message ===
+          '"twenty" is not a valid number for model gh8300_castObject'
+      );
+
+      assert.throws(
+        () => Test.castObject({ nested: { age: 'twenty' } }),
+        err => err.errors['nested.age'].message ===
+          '"twenty" is not a valid number for model gh8300_castObject'
+      );
+
+      assert.throws(
+        () => Test.castObject({ subdoc: { age: 'twenty' } }),
+        err => err.errors['subdoc.age'].message ===
+          '"twenty" is not a valid number for model gh8300_castObject'
+      );
     });
   });
 

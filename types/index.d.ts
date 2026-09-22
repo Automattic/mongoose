@@ -104,7 +104,7 @@ declare module 'mongoose' {
         ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>
       >,
     TSchema,
-    ObtainSchemaGeneric<TSchema, 'TLeanResultType'>
+    Default__v<Require_id<ObtainSchemaGeneric<TSchema, 'TLeanResultType'>>>
   > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
   export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;

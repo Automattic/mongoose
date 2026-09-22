@@ -131,12 +131,47 @@ Test.findAndCount({}, { name: 1 }, { sort: { name: 1 }, limit: 1, lean: true }).
   expect(docs[0]).type.not.toHaveProperty('age');
   expect(docs[0]).type.toHaveProperty('_id');
 });
+Test.find({}, { name: 1 }).lean().then(docs => {
+  expect(docs[0]).type.toHaveProperty('name');
+  expect(docs[0]).type.not.toHaveProperty('age');
+  expect(docs[0]).type.toHaveProperty('_id');
+});
+Test.findOne({}, { name: 1 }).lean().then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.findOne({}, undefined, { projection: { name: 1 } }).lean().then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.findOne({}, { age: 0 }).lean().then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.findOneAndUpdate({}, {}, { projection: { name: 1 } }).lean().then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
+Test.findOneAndDelete({}, { projection: { name: 1 } }).lean().then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.not.toHaveProperty('age');
+  expect(doc!).type.toHaveProperty('_id');
+});
 Test.findOne({}, { name: 1, _id: 0 }).then(doc => {
   expect(doc!).type.toHaveProperty('name');
   expect(doc!).type.not.toHaveProperty('age');
   expect(doc!).type.not.toHaveProperty('_id');
 });
 Test.findOne({}, { _id: 0 }).then(doc => {
+  expect(doc!).type.toHaveProperty('name');
+  expect(doc!).type.toHaveProperty('age');
+  expect(doc!).type.not.toHaveProperty('_id');
+});
+Test.findOne({}, { _id: 0 }).lean().then(doc => {
   expect(doc!).type.toHaveProperty('name');
   expect(doc!).type.toHaveProperty('age');
   expect(doc!).type.not.toHaveProperty('_id');

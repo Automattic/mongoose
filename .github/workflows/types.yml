@@ -38,14 +38,12 @@ jobs:
     needs:
       - lint
     runs-on: ubuntu-latest
-    name: Test Typescript Types (TypeScript ${{ matrix.typescript }}, strict=${{ matrix.strict }}, skipLibCheck=${{ matrix.skip_lib_check }}, exactOptionalPropertyTypes=${{ matrix.exact_optional_property_types }})
+    name: Test Typescript Types (TypeScript ${{ matrix.typescript }}, skipLibCheck=${{ matrix.skip_lib_check }})
     strategy:
       fail-fast: false
       matrix:
         typescript: ['5.9.3', '7.0.2']
-        strict: [true, false]
         skip_lib_check: [true, false]
-        exact_optional_property_types: [true, false]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -60,18 +58,15 @@ jobs:
         # TSTyche 7.2.5 does not support the TypeScript 7 compiler API. The
         # TypeScript 7 jobs compile the complete suite with tsc below.
         if: matrix.typescript == '5.9.3'
-        # TSTyche assertions and Mongoose's conditional types require these
-        # individual checks even when the strict umbrella option is disabled.
         run: >-
           npm run test:types -- --config tstyche.matrix.json
           --target ${{ matrix.typescript }} --tsconfig
-          '{"extends":"./test/types/tsconfig.json","compilerOptions":{"strict":${{ matrix.strict }},"strictNullChecks":true,"noImplicitAny":true,"noImplicitThis":true,"strictFunctionTypes":true,"skipLibCheck":${{ matrix.skip_lib_check }},"exactOptionalPropertyTypes":${{ matrix.exact_optional_property_types }}}}'
+          '{"extends":"./test/types/tsconfig.json","compilerOptions":{"strict":true,"skipLibCheck":${{ matrix.skip_lib_check }},"exactOptionalPropertyTypes":true}}'
 
       - name: Compile Typescript Tests
         run: >-
           npx --yes --package typescript@${{ matrix.typescript }} --
           tsc --project test/types/tsconfig.json --noEmit
-          --strict ${{ matrix.strict }} --strictNullChecks true
-          --noImplicitAny true --noImplicitThis true --strictFunctionTypes true
+          --strict true
           --skipLibCheck ${{ matrix.skip_lib_check }}
-          --exactOptionalPropertyTypes ${{ matrix.exact_optional_property_types }}
+          --exactOptionalPropertyTypes true

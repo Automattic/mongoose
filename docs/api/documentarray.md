@@ -1,11 +1,21 @@
 # DocumentArray
 
+- [`MongooseDocumentArray.prototype.addToSet()`](#MongooseDocumentArray.prototype.addToSet())
 - [`MongooseDocumentArray.prototype.create()`](#MongooseDocumentArray.prototype.create())
 - [`MongooseDocumentArray.prototype.id()`](#MongooseDocumentArray.prototype.id())
 - [`MongooseDocumentArray.prototype.inspect()`](#MongooseDocumentArray.prototype.inspect())
 - [`MongooseDocumentArray.prototype.pull()`](#MongooseDocumentArray.prototype.pull())
 - [`MongooseDocumentArray.prototype.push()`](#MongooseDocumentArray.prototype.push())
 - [`MongooseDocumentArray.prototype.toObject()`](#MongooseDocumentArray.prototype.toObject())
+
+## `MongooseDocumentArray.prototype.addToSet()`
+
+### Parameters
+
+- `[...args]` \<object\>
+
+Wraps [`MongooseArray#addToSet`](https://mongoosejs.com/docs/api/array.md#MongooseArray.prototype.addToSet())
+with proper change tracking.
 
 ## `MongooseDocumentArray.prototype.create()`
 

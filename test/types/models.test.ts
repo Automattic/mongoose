@@ -579,6 +579,22 @@ function schemaInstanceMethodsAndQueryHelpers() {
   const TestModel = model<User, UserModel, UserQueryHelpers>('User', userSchema);
 }
 
+function syncIndexesMiddlewareOptions() {
+  const User = model('SyncIndexUser', new Schema({ name: { type: String, index: true } }));
+
+  for (const middleware of [true, false, { pre: false }, { post: false }, { pre: false, post: false }]) {
+    expect(User.syncIndexes({ middleware, continueOnError: true, hideIndexes: false, sparse: true })).type.toBe<Promise<string[]>>();
+    expect(connection.syncIndexes({ middleware, continueOnError: true })).type.toBe<Promise<mongoose.ConnectionSyncIndexesResult>>();
+    expect(mongoose.syncIndexes({ middleware, sparse: true })).type.toBe<Promise<mongoose.ConnectionSyncIndexesResult>>();
+  }
+
+  expect(User.syncIndexes).type.not.toBeCallableWith({ middleware: 'false' });
+  expect(User.syncIndexes).type.not.toBeCallableWith({ middleware: { pre: 'false' } });
+  expect(User.syncIndexes).type.not.toBeCallableWith({ middleware: { post: 0 } });
+  expect(User.syncIndexes).type.not.toBeCallableWith({ middleware: false, hideIndexes: 'true' });
+  expect(User.syncIndexes).type.not.toBeCallableWith({ middleware: false, continueOnError: 'true' });
+}
+
 function gh12100() {
   const schema = new Schema();
 

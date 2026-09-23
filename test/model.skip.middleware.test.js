@@ -3150,6 +3150,132 @@ describe('internal middleware forwarding', function() {
     }
   });
 
+  describe('syncIndexes collection middleware', function() {
+    const indexSelections = [
+      ...selections,
+      { name: 'enabled', options: { middleware: true }, pre: 1, post: 1 },
+      { name: 'both phases disabled', options: { middleware: { pre: false, post: false } }, pre: 0, post: 0 }
+    ];
+
+    for (const selection of indexSelections) {
+      it(`forwards ${selection.name} selection and preserves index synchronization`, async function() {
+        // Arrange
+        const { User, calls, hookOptions } = await createTestContext();
+        const options = { autoCreate: true, hideIndexes: false, ...selection.options };
+        const originalOptions = { ...options };
+
+        // Act
+        const dropped = await User.syncIndexes(options);
+
+        // Assert
+        assert.deepStrictEqual(dropped, []);
+        assert.strictEqual((await db.db.listCollections({ name: User.collection.name }).toArray()).length, 1);
+        assert.deepStrictEqual((await User.listIndexes()).map(index => index.name).sort(), ['_id_', 'name_1']);
+        assert.deepStrictEqual(options, originalOptions);
+        for (const options of hookOptions) {
+          assert.ok(options == null || Object.keys(options).length === 0);
+        }
+        const selectedCalls = { ...calls };
+        await User.collection.insertOne({ name: 'Ann', age: 20 });
+        await User.collection.createIndex({ age: 1 });
+        assert.deepStrictEqual(await User.syncIndexes({ autoCreate: true }), ['age_1']);
+        assert.deepStrictEqual((await User.listIndexes()).map(index => index.name).sort(), ['_id_', 'name_1']);
+        assert.strictEqual((await User.collection.findOne({ name: 'Ann' })).age, 20);
+        assert.deepStrictEqual(calls, { pre: selectedCalls.pre + 1, post: selectedCalls.post + 1 });
+        assert.deepStrictEqual(selectedCalls, { pre: selection.pre, post: selection.post });
+      });
+    }
+
+    it('uses schema autoCreate with collection middleware selection', async function() {
+      // Arrange
+      const { User, calls } = await createTestContext();
+      User.schema.options.autoCreate = true;
+
+      // Act
+      const dropped = await User.syncIndexes({ middleware: false });
+
+      // Assert
+      assert.deepStrictEqual(dropped, []);
+      assert.ok((await User.listIndexes()).some(index => index.name === 'name_1'));
+      assert.deepStrictEqual(calls, { pre: 0, post: 0 });
+    });
+
+    for (const options of [{}, { autoCreate: false, middleware: true }]) {
+      it(`respects disabled autoCreate with ${JSON.stringify(options)}`, async function() {
+        // Arrange
+        const { User, calls } = await createTestContext();
+        await User.collection.insertOne({ name: 'Ann' });
+
+        // Act
+        const dropped = await User.syncIndexes(options);
+
+        // Assert
+        assert.deepStrictEqual(dropped, []);
+        assert.ok((await User.listIndexes()).some(index => index.name === 'name_1'));
+        assert.deepStrictEqual(calls, { pre: 0, post: 0 });
+      });
+    }
+
+    it('preserves omitted collection options when middleware is undefined', async function() {
+      // Arrange
+      const { User, calls, hookOptions } = await createTestContext();
+
+      // Act
+      await User.syncIndexes({ autoCreate: true, middleware: undefined });
+
+      // Assert
+      assert.deepStrictEqual(hookOptions, [undefined]);
+      assert.deepStrictEqual(calls, { pre: 1, post: 1 });
+    });
+
+    it('propagates collection hook errors before building indexes', async function() {
+      // Arrange
+      const error = new Error('Cannot create the user collection');
+      const { User, calls } = await createTestContext({ error });
+
+      // Act
+      const result = await User.syncIndexes({ autoCreate: true, middleware: { post: false } }).catch(err => err);
+
+      // Assert
+      assert.strictEqual(result, error);
+      assert.deepStrictEqual(calls, { pre: 1, post: 0 });
+      assert.deepStrictEqual(await db.db.listCollections({ name: User.collection.name }).toArray(), []);
+    });
+
+    it('forwards collection selection through connection syncIndexes', async function() {
+      // Arrange
+      const { User, calls } = await createTestContext();
+
+      // Act
+      const result = await db.syncIndexes({ autoCreate: true, continueOnError: true, middleware: { pre: false } });
+
+      // Assert
+      assert.deepStrictEqual(result, { User: [] });
+      assert.ok((await User.listIndexes()).some(index => index.name === 'name_1'));
+      assert.deepStrictEqual(calls, { pre: 0, post: 1 });
+    });
+
+    async function createTestContext({ error } = {}) {
+      const calls = { pre: 0, post: 0 };
+      const hookOptions = [];
+      const schema = new Schema({ name: { type: String, index: true }, age: Number }, {
+        autoCreate: false,
+        autoIndex: false
+      });
+      schema.pre('createCollection', function(options) {
+        ++calls.pre;
+        hookOptions.push(options);
+        if (error) {
+          throw error;
+        }
+      });
+      schema.post('createCollection', function() { ++calls.post; });
+      const User = db.model('User', schema);
+      await User.init();
+      return { User, calls, hookOptions };
+    }
+  });
+
   describe('connection collection middleware', function() {
     for (const selection of selections) {
       it(`forwards ${selection.name} selection to every model without affecting later calls`, async function() {

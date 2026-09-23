@@ -2989,6 +2989,144 @@ describe('internal middleware forwarding', function() {
   afterEach(() => require('./util').clearTestData(db));
   afterEach(() => require('./util').stopRemainingOps(db));
 
+  describe('connection collection middleware', function() {
+    for (const selection of selections) {
+      it(`forwards ${selection.name} selection to every model without affecting later calls`, async function() {
+        // Arrange
+        const { models, calls } = createTestContext();
+
+        // Act
+        const result = await db.createCollections({ ...selection.options, continueOnError: true });
+
+        // Assert
+        const collections = await db.db.listCollections().toArray();
+        for (const model of models) {
+          assert.strictEqual(result[model.modelName], model.collection);
+          assert.ok(collections.some(collection => collection.name === model.collection.name));
+          assert.deepStrictEqual(calls[model.modelName], { pre: selection.pre, post: selection.post });
+        }
+        await db.createCollections();
+        for (const model of models) {
+          assert.deepStrictEqual(calls[model.modelName], { pre: selection.pre + 1, post: selection.post + 1 });
+        }
+      });
+    }
+
+    for (const continueOnError of [false, true]) {
+      it(`preserves collection errors with continueOnError ${continueOnError}`, async function() {
+        // Arrange
+        const error = new Error('Cannot create the user collection');
+        const { models, calls } = createTestContext({ error });
+
+        // Act
+        const result = await db.createCollections({ continueOnError, middleware: { post: false } }).catch(err => err);
+
+        // Assert
+        if (continueOnError) {
+          assert.strictEqual(result.User, error);
+          assert.strictEqual(result.Team, models[1].collection);
+          assert.deepStrictEqual(calls.Team, { pre: 1, post: 0 });
+        } else {
+          assert.strictEqual(result.name, 'CreateCollectionsError');
+          assert.strictEqual(result.errors.User, error);
+          assert.deepStrictEqual(calls.Team, { pre: 0, post: 0 });
+        }
+        assert.deepStrictEqual(calls.User, { pre: 1, post: 0 });
+      });
+    }
+
+    function createTestContext({ error } = {}) {
+      const calls = {};
+      const models = ['User', 'Team'].map(name => {
+        calls[name] = { pre: 0, post: 0 };
+        const schema = new Schema({ name: String }, { autoCreate: false, autoIndex: false });
+        schema.pre('createCollection', function(options) {
+          ++calls[name].pre;
+          assert.ok(!Object.hasOwn(options, 'continueOnError'));
+          if (name === 'User' && error) {
+            throw error;
+          }
+        });
+        schema.post('createCollection', function() { ++calls[name].post; });
+        return db.model(name, schema);
+      });
+      return { models, calls };
+    }
+  });
+
+  describe('delegated save middleware', function() {
+    for (const selection of selections) {
+      it(`retains built-in save processing with ${selection.name} selection`, async function() {
+        // Arrange
+        const { user, calls, advanceTime, firstTime, secondTime } = createTestContext();
+
+        // Act
+        const result = await user.save(selection.options);
+
+        // Assert
+        assert.strictEqual(result, user);
+        assert.deepStrictEqual(calls, {
+          parentPre: selection.pre, parentPost: selection.post,
+          childPre: selection.pre, childPost: selection.post
+        });
+        assert.strictEqual(user.isNew, false);
+        assert.strictEqual(user.children[0].isNew, false);
+        const stored = await user.constructor.collection.findOne({ _id: user._id });
+        assert.deepStrictEqual(stored.createdAt, firstTime);
+        assert.deepStrictEqual(stored.updatedAt, firstTime);
+        assert.deepStrictEqual(stored.children[0].createdAt, firstTime);
+        assert.deepStrictEqual(stored.children[0].updatedAt, firstTime);
+
+        advanceTime();
+        user.children[0].name = 'Beth';
+        await user.save();
+        const updated = await user.constructor.collection.findOne({ _id: user._id });
+        assert.strictEqual(updated.children[0].name, 'Beth');
+        assert.deepStrictEqual(updated.createdAt, firstTime);
+        assert.deepStrictEqual(updated.updatedAt, secondTime);
+        assert.deepStrictEqual(updated.children[0].updatedAt, secondTime);
+        assert.deepStrictEqual(calls, {
+          parentPre: selection.pre + 1, parentPost: selection.post + 1,
+          childPre: selection.pre + 1, childPost: selection.post + 1
+        });
+      });
+    }
+
+    it('retains validation through a delegated save with hooks disabled', async function() {
+      const { user } = createTestContext();
+      user.children[0].name = undefined;
+      await assert.rejects(user.save({ middleware: false }), mongoose.Error.ValidationError);
+      assert.strictEqual(await user.constructor.countDocuments(), 0);
+    });
+
+    it('excludes internal query hooks from custom document methods', async function() {
+      const { user } = createTestContext();
+      assert.strictEqual(await user.findOneAndUpdate(), 'Ann');
+      assert.strictEqual(user.createdAt, undefined);
+    });
+
+    function createTestContext() {
+      const calls = { parentPre: 0, parentPost: 0, childPre: 0, childPost: 0 };
+      const firstTime = new Date('2020-01-01T00:00:00Z');
+      const secondTime = new Date('2020-01-02T00:00:00Z');
+      let now = firstTime;
+      const timestamps = { currentTime: () => now };
+      const child = new Schema({ name: { type: String, required: true } }, { timestamps });
+      const schema = new Schema({ name: String, children: [child] }, { timestamps, suppressReservedKeysWarning: true });
+      child.pre('save', function() { ++calls.childPre; });
+      child.post('save', function() { ++calls.childPost; });
+      schema.pre('save', function() { ++calls.parentPre; });
+      schema.post('save', function() { ++calls.parentPost; });
+      schema.methods.save = function(options) { return this.$save(options); };
+      schema.methods.findOneAndUpdate = async function() { return this.name; };
+      const User = db.model('User', schema);
+      return {
+        user: new User({ name: 'Ann', children: [{ name: 'Alice' }] }),
+        calls, firstTime, secondTime, advanceTime: () => { now = secondTime; }
+      };
+    }
+  });
+
   describe('query and static validation', function() {
     // Age must be nonnegative. These operations use 20 as valid data and -1 as invalid data.
     const operations = {

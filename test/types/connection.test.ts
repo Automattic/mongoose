@@ -191,3 +191,15 @@ async function connectionBulkWriteMiddleware() {
   expect(conn.bulkWrite).type.not.toBeCallableWith(operations, { ordered: false, middleware: { post: 0 } });
   expect(conn.bulkWrite).type.not.toBeCallableWith(operations, { middleware: false, verboseResults: 'true' });
 }
+
+async function connectionCreateCollectionsMiddleware() {
+  for (const middleware of [true, false, { pre: false }, { post: false }]) {
+    const result = await conn.createCollections({ middleware, continueOnError: true });
+    expect(result).type.toBe<Record<string, Error | mongodb.Collection<any>>>();
+  }
+  await conn.createCollections({ continueOnError: false });
+  expect(conn.createCollections).type.not.toBeCallableWith({ middleware: 'false' });
+  expect(conn.createCollections).type.not.toBeCallableWith({ middleware: { pre: 'false' } });
+  expect(conn.createCollections).type.not.toBeCallableWith({ middleware: { post: 0 } });
+  expect(conn.createCollections).type.not.toBeCallableWith({ continueOnError: 'true' });
+}

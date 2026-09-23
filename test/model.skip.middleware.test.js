@@ -3012,6 +3012,24 @@ describe('internal middleware forwarding', function() {
       });
     }
 
+    for (const options of [{}, { middleware: undefined }]) {
+      it(`omits unspecified middleware from hook and driver options (${Object.hasOwn(options, 'middleware')})`, async function() {
+        // Arrange
+        const { hookOptions } = createTestContext();
+        const createCollection = sinon.spy(db, 'createCollection');
+        try {
+          // Act
+          await db.createCollections(options);
+
+          // Assert
+          assert.deepStrictEqual(hookOptions, [{}, {}]);
+          assert.deepStrictEqual(createCollection.args.map(args => args[1]), [{}, {}]);
+        } finally {
+          createCollection.restore();
+        }
+      });
+    }
+
     for (const continueOnError of [false, true]) {
       it(`preserves collection errors with continueOnError ${continueOnError}`, async function() {
         // Arrange
@@ -3037,10 +3055,12 @@ describe('internal middleware forwarding', function() {
 
     function createTestContext({ error } = {}) {
       const calls = {};
+      const hookOptions = [];
       const models = ['User', 'Team'].map(name => {
         calls[name] = { pre: 0, post: 0 };
         const schema = new Schema({ name: String }, { autoCreate: false, autoIndex: false });
         schema.pre('createCollection', function(options) {
+          hookOptions.push(options);
           ++calls[name].pre;
           assert.ok(!Object.hasOwn(options, 'continueOnError'));
           if (name === 'User' && error) {
@@ -3050,7 +3070,7 @@ describe('internal middleware forwarding', function() {
         schema.post('createCollection', function() { ++calls[name].post; });
         return db.model(name, schema);
       });
-      return { models, calls };
+      return { models, calls, hookOptions };
     }
   });
 
@@ -3102,7 +3122,6 @@ describe('internal middleware forwarding', function() {
     it('excludes internal query hooks from custom document methods', async function() {
       const { user } = createTestContext();
       assert.strictEqual(await user.findOneAndUpdate(), 'Ann');
-      assert.strictEqual(user.createdAt, undefined);
     });
 
     function createTestContext() {

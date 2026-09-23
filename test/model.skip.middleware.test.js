@@ -2989,6 +2989,167 @@ describe('internal middleware forwarding', function() {
   afterEach(() => require('./util').clearTestData(db));
   afterEach(() => require('./util').stopRemainingOps(db));
 
+  describe('overlapping saves from post hooks', function() {
+    const cases = [
+      { mode: 'detached', selection: selections[1] },
+      { mode: 'awaited', selection: selections[1] },
+      { mode: 'sequential', selection: selections[1] },
+      { mode: 'detached', selection: selections[0] },
+      { mode: 'detached', selection: selections[2] },
+      { mode: 'detached', selection: selections[3] }
+    ];
+
+    for (const { mode, selection } of cases) {
+      it(`retains each save's child selection with a ${mode} ${selection.name} second save`, async function() {
+        // Arrange
+        const { User, user, calls, validationStarted, release, startSecondSave, getSecondSave } = createTestContext({ mode, selection });
+        let firstSave;
+        try {
+          // Act
+          firstSave = user.save();
+          if (mode === 'awaited') {
+            await validationStarted;
+          } else {
+            await firstSave;
+            if (mode === 'sequential') {
+              startSecondSave();
+            }
+            await validationStarted;
+          }
+
+          // Assert the first write and its hooks before the second write can finish.
+          assert.deepStrictEqual({ ...calls }, {
+            parentPre: 1, parentPost: 1, childPre: 1, childPost: mode === 'awaited' ? 0 : 1
+          });
+          assert.strictEqual((await User.collection.findOne({ _id: user._id })).name, 'first');
+          release();
+          await Promise.all([firstSave, getSecondSave()]);
+          assert.deepStrictEqual(calls, {
+            parentPre: 1 + selection.pre, parentPost: 1 + selection.post,
+            childPre: 1 + selection.pre, childPost: 1 + selection.post
+          });
+          assert.strictEqual((await User.collection.findOne({ _id: user._id })).name, 'second');
+        } finally {
+          release();
+          await Promise.allSettled([firstSave, getSecondSave()]);
+        }
+      });
+    }
+
+    function createTestContext({ mode, selection }) {
+      const calls = { parentPre: 0, parentPost: 0, childPre: 0, childPost: 0 };
+      let secondStarted = false;
+      let secondSave;
+      let release;
+      let signalValidation;
+      const barrier = new Promise(resolve => { release = resolve; });
+      const validationStarted = new Promise(resolve => { signalValidation = resolve; });
+      const child = new Schema({ name: String });
+      child.pre('save', function() { ++calls.childPre; });
+      child.post('save', function(doc) {
+        assert.strictEqual(doc, this);
+        assert.strictEqual(arguments.length, 2);
+        ++calls.childPost;
+      });
+      const schema = new Schema({
+        name: {
+          type: String,
+          validate: async function() {
+            if (secondStarted) {
+              signalValidation();
+              await barrier;
+            }
+            return true;
+          }
+        },
+        child
+      });
+      schema.pre('save', function() { ++calls.parentPre; });
+      schema.post('save', function(doc) {
+        assert.strictEqual(doc, this);
+        assert.strictEqual(arguments.length, 2);
+        ++calls.parentPost;
+        if (!secondStarted && mode !== 'sequential') {
+          startSecondSave();
+          if (mode === 'awaited') {
+            return secondSave;
+          }
+        }
+      });
+      const User = db.model('User', schema);
+      const user = new User({ name: 'first', child: { name: 'Ada' } });
+      return { User, user, calls, validationStarted, release, startSecondSave, getSecondSave: () => secondSave };
+
+      function startSecondSave() {
+        secondStarted = true;
+        user.name = 'second';
+        secondSave = user.save(selection.options);
+        secondSave.catch(() => {});
+        return secondSave;
+      }
+    }
+  });
+
+  describe('population clone middleware', function() {
+    for (const entry of ['query', 'model']) {
+      for (const clone of [false, true]) {
+        for (const selection of selections) {
+          it(`${entry} population retains ${selection.name} selection with clone ${clone}`, async function() {
+            // Arrange
+            const { Author, authorId, calls, populate } = await createTestContext({ entry });
+
+            // Act
+            const articles = await populate({ clone, options: selection.options });
+
+            // Assert
+            const hydrations = clone ? 3 : 1;
+            assert.deepStrictEqual(calls, { pre: hydrations * selection.pre, post: hydrations * selection.post });
+            for (const article of articles) {
+              assert.ok(article.author instanceof Author);
+              assert.strictEqual(article.author.name, 'Ann');
+              assert.strictEqual(article.author.role, 'editor');
+              assert.strictEqual(article.author.isNew, false);
+              assert.deepStrictEqual(article.populated('author'), authorId);
+            }
+            assert.strictEqual(articles[0].author === articles[1].author, !clone);
+            calls.pre = calls.post = 0;
+            await populate({ clone });
+            assert.deepStrictEqual(calls, { pre: hydrations, post: hydrations });
+          });
+        }
+      }
+
+      it(`${entry} population preserves lean clones`, async function() {
+        const { Author, calls, populate } = await createTestContext({ entry });
+        const articles = await populate({ clone: true, options: { lean: true, middleware: false } });
+        assert.deepStrictEqual(calls, { pre: 0, post: 0 });
+        assert.ok(!(articles[0].author instanceof Author));
+        assert.notStrictEqual(articles[0].author, articles[1].author);
+        assert.strictEqual(articles[0].author.name, 'Ann');
+        assert.deepStrictEqual(articles[0].author, articles[1].author);
+      });
+    }
+
+    async function createTestContext({ entry }) {
+      const calls = { pre: 0, post: 0 };
+      const authorSchema = new Schema({ name: String, role: String });
+      authorSchema.pre('init', function() { ++calls.pre; });
+      authorSchema.post('init', function() { ++calls.post; });
+      const Author = db.model('Author', authorSchema);
+      const Article = db.model('Article', new Schema({ title: String, author: { type: Schema.Types.ObjectId, ref: 'Author' } }));
+      const authorId = new mongoose.Types.ObjectId();
+      await Author.collection.insertOne({ _id: authorId, name: 'Ann', role: 'editor' });
+      await Article.collection.insertMany([{ title: 'First', author: authorId }, { title: 'Second', author: authorId }]);
+      return { Author, authorId, calls, populate };
+
+      async function populate(options) {
+        const query = Article.find().sort({ title: 1 });
+        return entry === 'query' ? query.populate({ path: 'author', ...options }) :
+          Article.populate(await query, { path: 'author', ...options });
+      }
+    }
+  });
+
   describe('connection collection middleware', function() {
     for (const selection of selections) {
       it(`forwards ${selection.name} selection to every model without affecting later calls`, async function() {

@@ -60,6 +60,7 @@ declare module 'mongoose' {
   type IndexDefinition = Record<string, IndexDirection>;
 
   interface SyncIndexesOptions extends mongodb.CreateIndexesOptions {
+    middleware?: boolean | SkipMiddlewareOptions;
     continueOnError?: boolean;
     hideIndexes?: boolean;
   }

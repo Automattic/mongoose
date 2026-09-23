@@ -583,11 +583,12 @@ function syncIndexesMiddlewareOptions() {
   const User = model('SyncIndexUser', new Schema({ name: { type: String, index: true } }));
 
   for (const middleware of [true, false, { pre: false }, { post: false }, { pre: false, post: false }]) {
-    expect(User.syncIndexes({ middleware, continueOnError: true, hideIndexes: false, sparse: true })).type.toBe<Promise<string[]>>();
-    expect(connection.syncIndexes({ middleware, continueOnError: true })).type.toBe<Promise<mongoose.ConnectionSyncIndexesResult>>();
-    expect(mongoose.syncIndexes({ middleware, sparse: true })).type.toBe<Promise<mongoose.ConnectionSyncIndexesResult>>();
+    expect(User.syncIndexes({ autoCreate: true, middleware, continueOnError: true, hideIndexes: false, sparse: true })).type.toBe<Promise<string[]>>();
+    expect(connection.syncIndexes({ autoCreate: false, middleware, continueOnError: true })).type.toBe<Promise<mongoose.ConnectionSyncIndexesResult>>();
+    expect(mongoose.syncIndexes({ autoCreate: true, middleware, sparse: true })).type.toBe<Promise<mongoose.ConnectionSyncIndexesResult>>();
   }
 
+  expect(User.syncIndexes).type.not.toBeCallableWith({ autoCreate: 'true', middleware: false });
   expect(User.syncIndexes).type.not.toBeCallableWith({ middleware: 'false' });
   expect(User.syncIndexes).type.not.toBeCallableWith({ middleware: { pre: 'false' } });
   expect(User.syncIndexes).type.not.toBeCallableWith({ middleware: { post: 0 } });

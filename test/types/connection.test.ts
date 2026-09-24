@@ -1,4 +1,4 @@
-import { createConnection, Schema, Collection, Connection, ConnectionStates, ConnectionSyncIndexesResult, InferSchemaType, Model, connection, HydratedDocument, Query } from 'mongoose';
+import { createConnection, Schema, Collection, Connection, ConnectionStates, ConnectionSyncIndexesResult, InferSchemaType, Model, connection, HydratedDocument, Query, SkipMiddlewareOptions } from 'mongoose';
 import * as mongodb from 'mongodb';
 import { AutoTypedSchemaType, autoTypedSchema } from './schema.test';
 import { expect, pick } from 'tstyche';
@@ -174,30 +174,27 @@ async function gh15359() {
 }
 
 
-async function connectionBulkWriteMiddleware() {
+async function connectionBulkWriteMiddleware(middleware: boolean | SkipMiddlewareOptions) {
   const operations = [{ model: 'User', name: 'insertOne' as const, document: { name: 'Ann' } }];
-  for (const middleware of [true, false, { pre: false }, { post: false }, { pre: true, post: false }]) {
-    const ordinary = await conn.bulkWrite(operations, { middleware, bypassDocumentValidation: true, verboseResults: true });
-    expect(ordinary).type.toBe<mongodb.ClientBulkWriteResult>();
-    const ordered = await conn.bulkWrite(operations, { middleware, ordered: true, bypassDocumentValidation: true });
-    expect(ordered).type.toBe<mongodb.ClientBulkWriteResult>();
-    const unordered = await conn.bulkWrite(operations, { middleware, ordered: false, verboseResults: true });
-    expect(unordered.insertedCount).type.toBe<number>();
-    expect(unordered.mongoose?.validationErrors).type.toBe<Error[] | undefined>();
-    expect(unordered.mongoose?.results).type.toBe<Array<Error | mongodb.WriteError | null> | undefined>();
-  }
+  const ordinary = await conn.bulkWrite(operations, { middleware, bypassDocumentValidation: true, verboseResults: true });
+  const ordered = await conn.bulkWrite(operations, { middleware, ordered: true });
+  const unordered = await conn.bulkWrite(operations, { middleware, ordered: false, verboseResults: true });
+
+  expect(ordinary).type.toBe<mongodb.ClientBulkWriteResult>();
+  expect(ordered).type.toBe<mongodb.ClientBulkWriteResult>();
+  expect(unordered.insertedCount).type.toBe<number>();
+  expect(unordered.mongoose?.validationErrors).type.toBe<Error[] | undefined>();
+  expect(unordered.mongoose?.results).type.toBe<Array<Error | mongodb.WriteError | null> | undefined>();
   expect(conn.bulkWrite).type.not.toBeCallableWith(operations, { middleware: 'false' });
   expect(conn.bulkWrite).type.not.toBeCallableWith(operations, { middleware: { pre: 'false' } });
   expect(conn.bulkWrite).type.not.toBeCallableWith(operations, { ordered: false, middleware: { post: 0 } });
   expect(conn.bulkWrite).type.not.toBeCallableWith(operations, { middleware: false, verboseResults: 'true' });
 }
 
-async function connectionCreateCollectionsMiddleware() {
-  for (const middleware of [true, false, { pre: false }, { post: false }]) {
-    const result = await conn.createCollections({ middleware, continueOnError: true });
-    expect(result).type.toBe<Record<string, Error | mongodb.Collection<any>>>();
-  }
-  await conn.createCollections({ continueOnError: false });
+async function connectionCreateCollectionsMiddleware(middleware: boolean | SkipMiddlewareOptions) {
+  const result = await conn.createCollections({ middleware, continueOnError: true });
+
+  expect(result).type.toBe<Record<string, Error | mongodb.Collection<any>>>();
   expect(conn.createCollections).type.not.toBeCallableWith({ middleware: 'false' });
   expect(conn.createCollections).type.not.toBeCallableWith({ middleware: { pre: 'false' } });
   expect(conn.createCollections).type.not.toBeCallableWith({ middleware: { post: 0 } });

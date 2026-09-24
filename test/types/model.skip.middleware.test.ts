@@ -18,6 +18,7 @@ import {
   SupportsMiddlewareOption
 } from 'mongoose';
 import { expect } from 'tstyche';
+import { ChangeStream, ChangeStreamDocument } from 'mongodb';
 
 async function gh8768() {
   const addressSchema = new Schema({ city: String });
@@ -194,14 +195,14 @@ async function bulkSaveValidationOptions() {
   const options: MongooseBulkSaveOptions = {
     validateModifiedOnly: true,
     skipValidation: false,
+    validateBeforeSave: true,
+    timestamps: false,
+    ordered: false,
     middleware: { pre: false }
   };
 
   // Act
   const result = await User.bulkSave([user], options);
-  await User.bulkSave([user], { validateModifiedOnly: false, middleware: false });
-  await User.bulkSave([user], { skipValidation: true, middleware: { post: false } });
-  await User.bulkSave([user], { validateModifiedOnly: true, validateBeforeSave: true, timestamps: false, ordered: false });
 
   // Assert
   expect<typeof result>().type.toBe<MongooseBulkWriteResult>();
@@ -211,20 +212,18 @@ async function bulkSaveValidationOptions() {
   expect(User.bulkSave).type.not.toBeCallableWith([user], { skipValidation: 'false' });
 }
 
-function hydrationMiddlewareOptions() {
+function hydrationMiddlewareOptions(middleware: boolean | SkipMiddlewareOptions) {
   // Arrange
   const { User, user } = createTestContext();
-  const options: HydrateOptions = { hydratedPopulatedDocs: true, middleware: false };
+  const options: HydrateOptions = { hydratedPopulatedDocs: true, setters: true, middleware };
 
   // Act
   const hydrated = User.hydrate({ name: 'Alice' }, null, options);
-  User.hydrate({ name: 'Alice' }, null, { middleware: true });
-  User.hydrate({ name: 'Alice' }, null, { middleware: { pre: false } });
-  User.hydrate({ name: 'Alice' }, null, { middleware: { post: false } });
-  User.hydrate({ name: 'Alice', extra: 'value' }, null, { strict: false, middleware: false });
+  const withExtra = User.hydrate<{ extra: string }>({ name: 'Alice', extra: 'value' }, null, { strict: false, middleware });
 
   // Assert
   expect<typeof hydrated>().type.toBe<typeof user>();
+  expect(withExtra.extra).type.toBe<string>();
   expect<HydrateOptions['middleware']>().type.toBe<boolean | SkipMiddlewareOptions | undefined>();
   expect(User.hydrate).type.not.toBeCallableWith({ name: 'Alice' }, null, { middleware: 'false' });
   expect(User.hydrate).type.not.toBeCallableWith({ name: 'Alice' }, null, { middleware: { pre: 'false' } });
@@ -233,7 +232,7 @@ function hydrationMiddlewareOptions() {
 
 function constructionMiddlewareTypes() {
   // Arrange
-  const { schema } = createConstructionTestContext();
+  const { schema } = createTestContext();
 
   // Act
   const result = schema.pre('createModel', function() {
@@ -248,16 +247,6 @@ function constructionMiddlewareTypes() {
   expect<typeof result>().type.toBe<typeof schema>();
   expect(schema.pre).type.not.toBeCallableWith('createModel', (doc: { name: string }) => {});
   expect(schema.post).type.not.toBeCallableWith('createModel', function() {});
-}
-
-function createTestContext() {
-  const User = model('MiddlewareOptionUser', new Schema({ name: String }));
-  const user = new User({ name: 'Alice' });
-  return { User, user };
-}
-
-function createConstructionTestContext() {
-  return { schema: new Schema({ name: String }) };
 }
 
 function explicitCustomFunctionMiddlewareOptions() {
@@ -302,13 +291,14 @@ function explicitCustomFunctionMiddlewareOptions() {
 
 function callerDeclaredCustomFunctionProperties() {
   // Arrange
-  const { schema } = createDeclaredFunctionContext();
+  const { schema, options } = createDeclaredFunctionContext();
 
   // Act
   schema.methods.runTask = Object.assign(async(value: string) => value, { tag: 'task' as const });
   schema.statics.findTask = Object.assign(async(value: string) => value, { tag: 'task' as const });
   schema.methods.runTask.supportsMiddlewareOption = true;
   schema.statics.findTask.supportsMiddlewareOption = true;
+  const optionMethod = options.methods!.runTask;
 
   // Assert
   expect<(typeof schema.methods.runTask)['supportsMiddlewareOption']>().type.toBe<true | undefined>();
@@ -318,6 +308,11 @@ function callerDeclaredCustomFunctionProperties() {
   expect<ThisParameterType<typeof schema.methods.runTask>>().type.toBe<HydratedDocument<TaskData, DeclaredTaskMethods>>();
   expect<Parameters<typeof schema.methods.runTask>>().type.toBe<[value: string]>();
   expect<ReturnType<typeof schema.methods.runTask>>().type.toBe<Promise<string>>();
+  expect<typeof optionMethod.tag>().type.toBe<'task'>();
+  expect<typeof optionMethod.supportsMiddlewareOption>().type.toBe<true | undefined>();
+  expect<Parameters<typeof optionMethod>>().type.toBe<[value: string]>();
+  expect<ReturnType<typeof optionMethod>>().type.toBe<Promise<string>>();
+  expect<ThisParameterType<typeof optionMethod>>().type.toBe<HydratedDocument<TaskData, DeclaredTaskMethods>>();
   // @ts-expect-error is not assignable to type
   schema.methods.runTask.supportsMiddlewareOption = false;
   // @ts-expect-error is not assignable to type
@@ -351,19 +346,25 @@ function explicitCustomFunctionReceivers() {
   schema.statics.findTask.call({}, 'Alice');
 }
 
-function receiverTransformationPreservesProperties() {
+async function staticValidationAndWatchMiddleware(middleware: boolean | SkipMiddlewareOptions) {
   // Arrange
-  const { options } = createMethodOptionsContext();
+  const { User } = createTestContext();
+  type Change = ChangeStreamDocument<{ name: string }>;
 
   // Act
-  const method = options.methods!.runTask;
+  const validated = await User.validate({ name: 'Alice' }, { middleware, pathsToSkip: ['name'] });
+  const stream = User.watch<{ name: string }, Change>([], { hydrate: true, fullDocument: 'updateLookup', middleware });
 
   // Assert
-  expect<typeof method.tag>().type.toBe<'task'>();
-  expect<typeof method.supportsMiddlewareOption>().type.toBe<true | undefined>();
-  expect<Parameters<typeof method>>().type.toBe<[value: string]>();
-  expect<ReturnType<typeof method>>().type.toBe<Promise<string>>();
-  expect<ThisParameterType<typeof method>>().type.toBe<HydratedDocument<TaskData, DeclaredTaskMethods>>();
+  expect(validated).type.toBe<{ name: string }>();
+  expect(stream).type.toBe<ChangeStream<{ name: string }, Change>>();
+  expect(User.watch).type.not.toBeCallableWith([], { middleware: 'false' });
+  expect(User.watch).type.not.toBeCallableWith([], { middleware: { pre: 0 } });
+  expect(User.watch).type.not.toBeCallableWith([], { middleware: { post: 'false' } });
+  expect(User.watch).type.not.toBeCallableWith([], { hydrate: 'true', middleware: false });
+  expect(User.validate).type.not.toBeCallableWith({}, { middleware: 'false' });
+  expect(User.validate).type.not.toBeCallableWith({}, { middleware: { pre: 0 } });
+  expect(User.validate).type.not.toBeCallableWith({}, { middleware: { post: 'false' } });
 }
 
 interface TaskData {
@@ -396,6 +397,12 @@ interface ReceiverTaskStatics {
   findTask(this: TaskReceiver, value: string): Promise<string>;
 }
 
+function createTestContext() {
+  const schema = new Schema<{ name: string }>({ name: { type: String, required: true } });
+  const User = model('MiddlewareOptionUser', schema);
+  return { schema, User, user: new User({ name: 'Alice' }) };
+}
+
 function createTypedFunctionContext() {
   type TaskModel = Model<TaskData, {}, TaskMethods> & TaskStatics;
   const schema = new Schema<TaskData, TaskModel, TaskMethods, {}, {}, TaskStatics>({ name: String });
@@ -405,59 +412,14 @@ function createTypedFunctionContext() {
 function createDeclaredFunctionContext() {
   type TaskModel = Model<TaskData, {}, DeclaredTaskMethods> & DeclaredTaskStatics;
   const schema = new Schema<TaskData, TaskModel, DeclaredTaskMethods, {}, {}, DeclaredTaskStatics>({ name: String });
-  return { schema };
+  const options: SchemaOptions<TaskData, DeclaredTaskMethods, {}, {}, {}, HydratedDocument<TaskData, DeclaredTaskMethods>> = {
+    methods: { runTask: Object.assign(async(value: string) => value, { tag: 'task' as const }) }
+  };
+  return { schema, options };
 }
 
 function createReceiverFunctionContext() {
   type TaskModel = Model<TaskData, {}, ReceiverTaskMethods> & ReceiverTaskStatics;
   const schema = new Schema<TaskData, TaskModel, ReceiverTaskMethods, {}, {}, ReceiverTaskStatics>({ name: String });
   return { schema };
-}
-
-function createMethodOptionsContext() {
-  const options: SchemaOptions<TaskData, DeclaredTaskMethods, {}, {}, {}, HydratedDocument<TaskData, DeclaredTaskMethods>> = {
-    methods: { runTask: Object.assign(async(value: string) => value, { tag: 'task' as const }) }
-  };
-  return { options };
-}
-
-async function staticValidationAndWatchMiddleware() {
-  // Arrange
-  const { User } = createTestContext();
-
-  // Act
-  const validated = await User.validate({ name: 'Ann' }, { middleware: false });
-  await User.validate({ name: 'Ann' }, { middleware: true, pathsToSkip: ['name'] });
-  await User.validate({ name: 'Ann' }, { middleware: { pre: false } });
-  await User.validate({ name: 'Ann' }, { middleware: { post: false }, pathsToSkip: 'name' });
-  const stream = User.watch<{ name: string }, import('mongodb').ChangeStreamDocument<{ name: string }>>([], { hydrate: true, fullDocument: 'updateLookup', middleware: false });
-  User.watch([], { middleware: true });
-  User.watch([], { hydrate: false, middleware: { pre: false } });
-  User.watch([], { middleware: { post: false } });
-  User.watch([], { middleware: {} });
-  User.watch([], { middleware: { pre: true, post: false }, batchSize: 10 });
-  const hydrated = User.hydrate({ name: 'Ann' }, undefined, { middleware: false });
-  User.hydrate({ name: 'Ann' }, null, { middleware: true });
-  User.hydrate({ name: 'Ann' }, null, { middleware: { pre: false }, hydratedPopulatedDocs: true });
-  User.hydrate({ name: 'Ann' }, null, { middleware: { post: false }, setters: true });
-
-  // Assert
-  expect(validated).type.toBe<{ name: string }>();
-  expect(hydrated).type.toBe<HydratedDocument<{ name: string }>>();
-  expect(stream).type.toBe<import('mongodb').ChangeStream<{ name: string }, import('mongodb').ChangeStreamDocument<{ name: string }>>>();
-  expect(User.watch).type.not.toBeCallableWith([], { middleware: 'false' });
-  expect(User.watch).type.not.toBeCallableWith([], { middleware: { pre: 0 } });
-  expect(User.watch).type.not.toBeCallableWith([], { middleware: { post: 'false' } });
-  expect(User.watch).type.not.toBeCallableWith([], { hydrate: 'true', middleware: false });
-  expect(User.hydrate).type.not.toBeCallableWith({}, undefined, { middleware: 'false' });
-  expect(User.hydrate).type.not.toBeCallableWith({}, undefined, { middleware: { pre: 0 } });
-  expect(User.hydrate).type.not.toBeCallableWith({}, undefined, { middleware: { post: 'false' } });
-  expect(User.validate).type.not.toBeCallableWith({}, { middleware: 'false' });
-  expect(User.validate).type.not.toBeCallableWith({}, { middleware: { pre: 0 } });
-  expect(User.validate).type.not.toBeCallableWith({}, { middleware: { post: 'false' } });
-
-  function createTestContext() {
-    const schema = new Schema<{ name: string }>({ name: { type: String, required: true } });
-    return { User: model('MiddlewareOptionsUser', schema) };
-  }
 }

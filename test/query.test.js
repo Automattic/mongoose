@@ -3140,6 +3140,140 @@ describe('Query', function() {
       then(() => assert.deepEqual(priorVals, [undefined]));
   });
 
+  describe('clone option isolation', function() {
+    it('keeps the clone independent when the original changes lean', async function() {
+      // Arrange
+      const { User } = await createTestContext();
+      const original = User.find({ name: 'Alice' }).lean();
+      const copy = original.clone();
+
+      // Act
+      original.lean(false);
+      const [[originalDoc], [copiedDoc]] = await Promise.all([original, copy]);
+
+      // Assert
+      assert.ok(originalDoc instanceof User);
+      assert.strictEqual(copiedDoc instanceof User, false);
+    });
+
+    it('copies nested lean options but preserves transform functions', async function() {
+      // Arrange
+      const { User } = await createTestContext();
+      const transform = doc => { doc.name = 'Original'; };
+      const original = User.findOne({ name: 'Alice' }).lean({ transform });
+      const copy = original.clone();
+      assert.strictEqual(copy.mongooseOptions().lean.transform, transform);
+
+      // Act
+      copy.mongooseOptions().lean.transform = doc => { doc.name = 'Copy'; };
+      const [originalDoc, copiedDoc] = await Promise.all([original, copy]);
+
+      // Assert
+      assert.strictEqual(originalDoc.name, 'Original');
+      assert.strictEqual(copiedDoc.name, 'Copy');
+    });
+
+    it('copies parent and nested populate selections', async function() {
+      // Arrange
+      const { User } = await createTestContext();
+      const original = User.findOne({ name: 'Alice' }).populate({
+        path: 'team', select: 'name owner', populate: { path: 'owner' }
+      });
+      const copy = original.clone();
+
+      // Act
+      copy.mongooseOptions().populate.team.select = 'owner';
+      copy.mongooseOptions().populate.team.populate[0].select = 'name -_id';
+      const [originalDoc, copiedDoc] = await Promise.all([original, copy]);
+
+      // Assert
+      assert.strictEqual(originalDoc.team.name, 'Editors');
+      assert.ok(originalDoc.team.owner._id instanceof mongoose.Types.ObjectId);
+      assert.strictEqual(copiedDoc.team.name, undefined);
+      assert.strictEqual(copiedDoc.team.owner.name, 'Bob');
+      assert.strictEqual(copiedDoc.team.owner._id, undefined);
+    });
+
+    it('keeps populate lean state independent when the clone executes first', async function() {
+      // Arrange
+      const { User, Team } = await createTestContext();
+      const original = User.findOne({ name: 'Alice' }).populate('team');
+      const copy = original.clone().lean();
+
+      // Act
+      const copiedDoc = await copy;
+      const originalDoc = await original;
+
+      // Assert
+      assert.ok(originalDoc instanceof User);
+      assert.ok(originalDoc.team instanceof Team);
+      assert.strictEqual(copiedDoc instanceof User, false);
+      assert.strictEqual(copiedDoc.team instanceof Team, false);
+      assert.strictEqual(copiedDoc.team.name, 'Editors');
+    });
+
+    it('preserves model, connection, session, and callback identity in populate options', async function() {
+      // Arrange
+      const { User, Team } = await createTestContext();
+      const session = await db.startSession();
+      const transform = doc => doc;
+      const original = User.findOne({ name: 'Alice' }).session(session).populate({
+        path: 'team', model: Team, connection: db, options: { session }, transform
+      });
+
+      try {
+        // Act
+        const copy = original.clone();
+        const doc = await copy;
+
+        // Assert
+        const options = copy.mongooseOptions().populate.team;
+        assert.strictEqual(copy.getOptions().session, session);
+        assert.strictEqual(options.model, Team);
+        assert.strictEqual(options.connection, db);
+        assert.strictEqual(options.options.session, session);
+        assert.strictEqual(options.transform, transform);
+        assert.ok(doc.team instanceof Team);
+        assert.strictEqual(doc.$session(), session);
+        assert.strictEqual(doc.team.$session(), session);
+      } finally {
+        await session.endSession();
+      }
+    });
+
+    it('keeps toConstructor instances independent', async function() {
+      // Arrange
+      const { User } = await createTestContext();
+      const CustomQuery = User.findOne({ name: 'Alice' }).lean().toConstructor();
+      const original = new CustomQuery();
+      const copy = original.clone().lean(false);
+
+      // Act
+      const [originalDoc, copiedDoc, laterDoc] = await Promise.all([original, copy, new CustomQuery()]);
+
+      // Assert
+      assert.strictEqual(originalDoc instanceof User, false);
+      assert.ok(copiedDoc instanceof User);
+      assert.strictEqual(laterDoc instanceof User, false);
+    });
+
+    async function createTestContext() {
+      const userSchema = new Schema({ name: String, team: { type: Schema.Types.ObjectId, ref: 'CloneTeam' } });
+      const User = db.model('CloneUser', userSchema);
+      const Team = db.model('CloneTeam', new Schema({
+        name: String, owner: { type: Schema.Types.ObjectId, ref: 'CloneUser' }
+      }));
+      const ownerId = new mongoose.Types.ObjectId();
+      const teamId = new mongoose.Types.ObjectId();
+      await Team.collection.insertOne({ _id: teamId, name: 'Editors', owner: ownerId });
+      await User.collection.insertMany([
+        { name: 'Alice', team: teamId },
+        { _id: ownerId, name: 'Bob' }
+      ]);
+      return { User, Team };
+    }
+  });
+
   describe('clone', function() {
     let Model;
 

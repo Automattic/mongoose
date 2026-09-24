@@ -967,6 +967,23 @@ describe('connections:', function() {
 
       await db.close();
     });
+
+    it('builds indexes for models compiled while connection is stale (gh-16524)', async function() {
+      const db = await mongoose.createConnection(start.uri).asPromise();
+
+      db._lastHeartbeatAt = 1;
+      assert.equal(db.readyState, STATES.disconnected);
+
+      const Test = db.model('gh16524', new Schema({ name: { type: String, unique: true } }));
+
+      db.client.emit('serverHeartbeatSucceeded');
+
+      await Test.init();
+      const indexes = await Test.listIndexes();
+      assert.deepStrictEqual(indexes.map(index => index.name), ['_id_', 'name_1']);
+
+      await db.close();
+    });
   });
 
   describe('shouldAuthenticate()', function() {

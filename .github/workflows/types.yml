@@ -4,12 +4,14 @@ on:
     paths:
       - '.github/workflows/types.yml'
       - 'package.json'
+      - 'tstyche*.json'
       - 'types/**'
       - 'test/types/**'
   push:
     paths:
       - '.github/workflows/types.yml'
       - 'package.json'
+      - 'tstyche*.json'
       - 'types/**'
       - 'test/types/**'
 permissions:
@@ -36,7 +38,12 @@ jobs:
     needs:
       - lint
     runs-on: ubuntu-latest
-    name: Test Typescript Types
+    name: Test Typescript Types (TypeScript ${{ matrix.typescript }}, skipLibCheck=${{ matrix.skip_lib_check }})
+    strategy:
+      fail-fast: false
+      matrix:
+        typescript: ['5.9.3', '7.0.2']
+        skip_lib_check: [true, false]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -48,4 +55,18 @@ jobs:
       - run: npm install
 
       - name: Typings
-        run: npm run test:types
+        # TSTyche 7.2.5 does not support the TypeScript 7 compiler API. The
+        # TypeScript 7 jobs compile the complete suite with tsc below.
+        if: matrix.typescript == '5.9.3'
+        run: >-
+          npm run test:types -- --config tstyche.matrix.json
+          --target ${{ matrix.typescript }} --tsconfig
+          '{"extends":"./test/types/tsconfig.json","compilerOptions":{"strict":true,"skipLibCheck":${{ matrix.skip_lib_check }},"exactOptionalPropertyTypes":true}}'
+
+      - name: Compile Typescript Tests
+        run: >-
+          npx --yes --package typescript@${{ matrix.typescript }} --
+          tsc --project test/types/tsconfig.json --noEmit
+          --strict true
+          --skipLibCheck ${{ matrix.skip_lib_check }}
+          --exactOptionalPropertyTypes true

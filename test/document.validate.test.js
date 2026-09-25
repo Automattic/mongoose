@@ -1881,4 +1881,31 @@ describe('document validation', function() {
       };
     }
   });
+
+  it('runs array-level validator on map of document arrays', async function() {
+    const personSchema = new Schema({ age: Number });
+    const companySchema = new Schema({
+      teams: {
+        type: Map,
+        of: {
+          type: [personSchema],
+          // Every person's age must be at least 18.
+          validate: people => people.every(person => person.age >= 18)
+        }
+      }
+    });
+    const Company = db.model('MapArrayRepro', companySchema);
+    const company = await Company.create({
+      teams: { support: [{ age: 30 }] }
+    });
+
+    company.set('teams.support.0.age', 15);
+    let err = await company.validate().then(() => null, err => err);
+    assert.ok(err);
+    assert.ok(err.errors['teams.support']);
+
+    err = company.validateSync();
+    assert.ok(err);
+    assert.ok(err.errors['teams.support']);
+  });
 });

@@ -16129,6 +16129,24 @@ describe('document', function() {
     user.requiresEmail = true;
     await assert.rejects(() => user.save(), /invalid email/);
   });
+
+  it('keeps a nested value read off of the document itself when setting an ancestor path (gh-16530)', function() {
+    const Doc = db.model('Test', new Schema({ a: { b: { x: Number } } }));
+    const doc = Doc.hydrate({ _id: new mongoose.Types.ObjectId(), a: { b: { x: 1 } } });
+
+    doc.set('a', { b: doc.a.b });
+
+    assert.deepEqual(doc.a.b.toObject(), { x: 1 });
+    assert.ifError(doc.validateSync());
+
+    // Same thing, but with the reused value nested one level deeper.
+    const Doc2 = db.model('Test2', new Schema({ a: { b: { c: { y: Number } } } }));
+    const doc2 = Doc2.hydrate({ _id: new mongoose.Types.ObjectId(), a: { b: { c: { y: 5 } } } });
+
+    doc2.set('a', { b: { c: doc2.a.b.c } });
+
+    assert.deepEqual(doc2.a.b.c.toObject(), { y: 5 });
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

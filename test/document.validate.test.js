@@ -1908,4 +1908,184 @@ describe('document validation', function() {
     assert.ok(err);
     assert.ok(err.errors['teams.support']);
   });
+
+  describe('container validators after modifying child paths', function() {
+    it('runs primitive array element validators but not the array validator', async function() {
+      const calls = { array: 0, element: 0 };
+      const Model = db.model('PrimitiveArrayValidatorPaths', new Schema({
+        values: {
+          type: [{ type: Number, validate: () => ++calls.element }],
+          validate: () => ++calls.array
+        }
+      }));
+      const doc = await Model.create({ values: [1] });
+
+      doc.set('values.0', 2);
+      calls.array = 0;
+      calls.element = 0;
+      await doc.validate();
+      assert.deepEqual(calls, { array: 0, element: 1 });
+
+      calls.array = 0;
+      calls.element = 0;
+      assert.ifError(doc.validateSync());
+      assert.deepEqual(calls, { array: 0, element: 1 });
+    });
+
+    it('runs document array, element, and subpath validators', async function() {
+      const calls = { array: 0, element: 0, subpath: 0 };
+      const childSchema = new Schema({
+        name: { type: String, validate: () => ++calls.subpath }
+      });
+      const Model = db.model('DocumentArrayValidatorPaths', new Schema({
+        values: {
+          type: [{ type: childSchema, validate: () => ++calls.element }],
+          validate: () => ++calls.array
+        }
+      }));
+
+      let doc = await Model.create({ values: [{ name: 'before' }] });
+      doc.set('values.0', { name: 'after' });
+      calls.array = 0;
+      calls.element = 0;
+      calls.subpath = 0;
+      await doc.validate();
+      assert.deepEqual(calls, { array: 1, element: 0, subpath: 1 });
+
+      calls.array = 0;
+      calls.element = 0;
+      calls.subpath = 0;
+      assert.ifError(doc.validateSync());
+      assert.deepEqual(calls, { array: 1, element: 0, subpath: 1 });
+
+      doc = await Model.create({ values: [{ name: 'before' }] });
+      doc.set('values.0.name', 'after');
+      calls.array = 0;
+      calls.element = 0;
+      calls.subpath = 0;
+      await doc.validate();
+      assert.deepEqual(calls, { array: 1, element: 0, subpath: 1 });
+
+      calls.array = 0;
+      calls.element = 0;
+      calls.subpath = 0;
+      assert.ifError(doc.validateSync());
+      assert.deepEqual(calls, { array: 1, element: 0, subpath: 1 });
+    });
+
+    it('runs map element validators but not the map validator for primitive values', async function() {
+      const calls = { map: 0, element: 0 };
+      const Model = db.model('PrimitiveMapValidatorPaths', new Schema({
+        values: {
+          type: Map,
+          of: { type: Number, validate: () => ++calls.element },
+          validate: () => ++calls.map
+        }
+      }));
+      const doc = await Model.create({ values: { key: 1 } });
+
+      doc.set('values.key', 2);
+      calls.map = 0;
+      calls.element = 0;
+      await doc.validate();
+      assert.deepEqual(calls, { map: 0, element: 1 });
+
+      calls.map = 0;
+      calls.element = 0;
+      assert.ifError(doc.validateSync());
+      assert.deepEqual(calls, { map: 0, element: 1 });
+    });
+
+    it('handles map, element, and subpath validators for subdocument values', async function() {
+      const calls = { map: 0, element: 0, subpath: 0 };
+      const childSchema = new Schema({
+        name: { type: String, validate: () => ++calls.subpath }
+      });
+      const Model = db.model('SubdocumentMapValidatorPaths', new Schema({
+        values: {
+          type: Map,
+          of: { type: childSchema, validate: () => ++calls.element },
+          validate: () => ++calls.map
+        }
+      }));
+
+      let doc = await Model.create({ values: { key: { name: 'before' } } });
+      doc.set('values.key', { name: 'after' });
+      calls.map = 0;
+      calls.element = 0;
+      calls.subpath = 0;
+      await doc.validate();
+      assert.deepEqual(calls, { map: 0, element: 1, subpath: 1 });
+
+      calls.map = 0;
+      calls.element = 0;
+      calls.subpath = 0;
+      assert.ifError(doc.validateSync());
+      assert.deepEqual(calls, { map: 0, element: 1, subpath: 1 });
+
+      doc = await Model.create({ values: { key: { name: 'before' } } });
+      doc.set('values.key.name', 'after');
+      calls.map = 0;
+      calls.element = 0;
+      calls.subpath = 0;
+      await doc.validate();
+      assert.deepEqual(calls, { map: 0, element: 0, subpath: 1 });
+
+      calls.map = 0;
+      calls.element = 0;
+      calls.subpath = 0;
+      assert.ifError(doc.validateSync());
+      assert.deepEqual(calls, { map: 0, element: 0, subpath: 1 });
+    });
+
+    it('handles map, array, element, and subpath validators for document array values', async function() {
+      const calls = { map: 0, array: 0, element: 0, subpath: 0 };
+      const childSchema = new Schema({
+        name: { type: String, validate: () => ++calls.subpath }
+      });
+      const Model = db.model('DocumentArrayMapValidatorPaths', new Schema({
+        values: {
+          type: Map,
+          of: {
+            type: [{ type: childSchema, validate: () => ++calls.element }],
+            validate: () => ++calls.array
+          },
+          validate: () => ++calls.map
+        }
+      }));
+
+      let doc = await Model.create({ values: { key: [{ name: 'before' }] } });
+      doc.set('values.key.0', { name: 'after' });
+      calls.map = 0;
+      calls.array = 0;
+      calls.element = 0;
+      calls.subpath = 0;
+      await doc.validate();
+      assert.deepEqual(calls, { map: 0, array: 1, element: 1, subpath: 1 });
+
+      calls.map = 0;
+      calls.array = 0;
+      calls.element = 0;
+      calls.subpath = 0;
+      assert.ifError(doc.validateSync());
+      assert.deepEqual(calls, { map: 0, array: 1, element: 1, subpath: 1 });
+
+      doc = await Model.create({ values: { key: [{ name: 'before' }] } });
+      doc.set('values.key.0.name', 'after');
+      calls.map = 0;
+      calls.array = 0;
+      calls.element = 0;
+      calls.subpath = 0;
+      await doc.validate();
+      assert.deepEqual(calls, { map: 0, array: 1, element: 0, subpath: 1 });
+
+      calls.map = 0;
+      calls.array = 0;
+      calls.element = 0;
+      calls.subpath = 0;
+      assert.ifError(doc.validateSync());
+      assert.deepEqual(calls, { map: 0, array: 1, element: 0, subpath: 1 });
+    });
+
+  });
 });

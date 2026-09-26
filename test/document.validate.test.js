@@ -2190,4 +2190,40 @@ describe('document validation', function() {
     await company.validate({ pathsToSkip: ['groups'] });
     assert.ifError(company.validateSync({ pathsToSkip: ['groups'] }));
   });
+
+  it('does not reject valid data under mixed', async function() {
+    const validatedProfiles = [];
+    const userSchema = new Schema({
+      profile: {
+        type: Schema.Types.Mixed,
+        // The profile object's age must be at least 18.
+        validate: profile => {
+          validatedProfiles.push(profile);
+          return profile.age >= 18;
+        }
+      }
+    });
+    const User = db.model('MixedParentRepro', userSchema);
+    const user = await User.create({ profile: { age: 30 } });
+
+    user.set('profile.age', 31);
+    validatedProfiles.length = 0;
+    let error = await user.validate(['profile']).then(() => null, err => err);
+    assert.ifError(error);
+    assert.deepEqual(validatedProfiles, []);
+
+    validatedProfiles.length = 0;
+    error = user.validateSync(['profile']);
+    assert.ifError(error);
+    assert.deepEqual(validatedProfiles, []);
+
+    validatedProfiles.length = 0;
+    error = await user.validate().then(() => null, err => err);
+    assert.ifError(error);
+    assert.deepEqual(validatedProfiles, []);
+
+    error = user.validateSync();
+    assert.ifError(error);
+    assert.deepEqual(validatedProfiles, []);
+  });
 });

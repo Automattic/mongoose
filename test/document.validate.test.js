@@ -1973,6 +1973,91 @@ describe('document validation', function() {
       assert.deepEqual(calls, { array: 1, element: 0, subpath: 1 });
     });
 
+    it('runs nested document array container, element, and subpath validators', async function() {
+      const calls = {
+        parentArray: 0,
+        parentElement: 0,
+        childArray: 0,
+        childElement: 0,
+        subpath: 0
+      };
+      const personSchema = new Schema({
+        age: { type: Number, validate: () => ++calls.subpath }
+      });
+      const groupSchema = new Schema({
+        people: {
+          type: [{ type: personSchema, validate: () => ++calls.childElement }],
+          validate: () => ++calls.childArray
+        }
+      });
+      const Model = db.model('NestedDocumentArrayValidatorPaths', new Schema({
+        groups: {
+          type: [{ type: groupSchema, validate: () => ++calls.parentElement }],
+          validate: () => ++calls.parentArray
+        }
+      }));
+
+      let doc = await Model.create({ groups: [{ people: [{ age: 30 }] }] });
+      doc.set('groups.0.people.0', { age: 31 });
+      calls.parentArray = 0;
+      calls.parentElement = 0;
+      calls.childArray = 0;
+      calls.childElement = 0;
+      calls.subpath = 0;
+      await doc.validate();
+      assert.deepEqual(calls, {
+        parentArray: 1,
+        parentElement: 0,
+        childArray: 1,
+        childElement: 0,
+        subpath: 1
+      });
+
+      calls.parentArray = 0;
+      calls.parentElement = 0;
+      calls.childArray = 0;
+      calls.childElement = 0;
+      calls.subpath = 0;
+      assert.ifError(doc.validateSync());
+      assert.deepEqual(calls, {
+        parentArray: 1,
+        parentElement: 0,
+        childArray: 1,
+        childElement: 0,
+        subpath: 1
+      });
+
+      doc = await Model.create({ groups: [{ people: [{ age: 30 }] }] });
+      doc.set('groups.0.people.0.age', 31);
+      calls.parentArray = 0;
+      calls.parentElement = 0;
+      calls.childArray = 0;
+      calls.childElement = 0;
+      calls.subpath = 0;
+      await doc.validate();
+      assert.deepEqual(calls, {
+        parentArray: 1,
+        parentElement: 0,
+        childArray: 1,
+        childElement: 0,
+        subpath: 1
+      });
+
+      calls.parentArray = 0;
+      calls.parentElement = 0;
+      calls.childArray = 0;
+      calls.childElement = 0;
+      calls.subpath = 0;
+      assert.ifError(doc.validateSync());
+      assert.deepEqual(calls, {
+        parentArray: 1,
+        parentElement: 0,
+        childArray: 1,
+        childElement: 0,
+        subpath: 1
+      });
+    });
+
     it('runs map element validators but not the map validator for primitive values', async function() {
       const calls = { map: 0, element: 0 };
       const Model = db.model('PrimitiveMapValidatorPaths', new Schema({
@@ -2087,5 +2172,22 @@ describe('document validation', function() {
       assert.deepEqual(calls, { map: 0, array: 1, element: 0, subpath: 1 });
     });
 
+  });
+
+  it('skips nested document array validation if parent document array is skipped', async function() {
+    const companySchema = new Schema({
+      groups: [{
+        // Age must be at least 18 when this path is validated.
+        people: [{ age: { type: Number, min: 18 } }]
+      }]
+    });
+    const Company = db.model('SkipOuterArrayRepro', companySchema);
+    const company = new Company({
+      groups: [{ people: [{ age: 30 }] }]
+    });
+
+    company.set('groups.0.people.0.age', 15);
+    await company.validate({ pathsToSkip: ['groups'] });
+    assert.ifError(company.validateSync({ pathsToSkip: ['groups'] }));
   });
 });

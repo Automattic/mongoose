@@ -266,6 +266,38 @@ describe('middleware hydration', function() {
     }
   });
 
+  describe('embedded child clone hydration', function() {
+    for (const selection of selections) {
+      it(`preserves cloned children with ${selection.name} middleware`, function() {
+        const { Team, source, calls } = createTestContext();
+
+        const team = Team.hydrate({ children: [source.children[0]] }, null, selection.options);
+
+        const child = team.children[0];
+        assert.notStrictEqual(child, source.children[0]);
+        assert.ok(child instanceof mongoose.Document);
+        assert.strictEqual(child.name, 'Maya');
+        assert.ok(child._id.equals(source.children[0]._id));
+        assert.strictEqual(child.ownerDocument(), team);
+        assert.strictEqual(source.children[0].ownerDocument(), source);
+        assert.strictEqual(child.isNew, false);
+        assert.strictEqual(child.isModified(), false);
+        assert.deepStrictEqual(calls, { pre: selection.pre, post: selection.post });
+      });
+    }
+
+    function createTestContext() {
+      const calls = { pre: 0, post: 0 };
+      const child = new Schema({ name: String });
+      child.pre('init', function() { ++calls.pre; });
+      child.post('init', function() { ++calls.post; });
+      const Team = db.model('Team', new Schema({ children: [child] }));
+      const source = Team.hydrate({ children: [{ name: 'Maya' }] });
+      calls.pre = calls.post = 0;
+      return { Team, source, calls };
+    }
+  });
+
   describe('default child hydration', function() {
     for (const [middleware, expected] of [[{ pre: false }, { pre: 0, post: 4 }], [{ post: false }, { pre: 4, post: 0 }]]) {
       it(`forwards ${JSON.stringify(middleware)} through literal, function, and dotted defaults`, function() {

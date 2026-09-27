@@ -1,5 +1,81 @@
 # Populate with TypeScript
 
+## Inferring populated types from a model
+
+When you pass a model to `Query#populate()` with a literal `path`, Mongoose
+infers the populated document type without an explicit generic parameter:
+
+```typescript
+import { model, Schema, Types } from 'mongoose';
+
+interface Parent {
+  child: Types.ObjectId;
+}
+interface Child {
+  name: string;
+  age: number;
+}
+
+const ParentModel = model<Parent>('Parent', new Schema<Parent>({
+  child: { type: Schema.Types.ObjectId, ref: 'Child' }
+}));
+const ChildModel = model<Child>('Child', new Schema<Child>({
+  name: String,
+  age: Number
+}));
+
+const parent = await ParentModel.findOne().populate({
+  path: 'child',
+  model: ChildModel,
+  select: 'name'
+}).lean();
+
+parent?.child?.name; // string | undefined
+// parent?.child?.age; // TypeScript error: age was not selected
+```
+
+Single references include `null` because the referenced document might not
+exist, even when the reference path is required. Array references remain
+arrays. Without `lean()`, populated documents have document methods; with
+`lean()` before or after `populate()`, they are plain objects. A population's
+explicit `options: { lean: false }` keeps that reference hydrated, even when
+the parent query is lean. Calling `lean(false)` on the query also preserves
+inference for hydrated populated references.
+
+Inference also supports dotted paths, nested `populate` options, literal
+arrays of options, `justOne`, `retainNullValues`, and populate-level lean
+options. For example:
+
+```typescript
+const order = await Order.findOne().populate({
+  path: 'route',
+  model: Route,
+  populate: [{ path: 'from.currency', model: Currency, select: 'symbol' }]
+}).lean();
+
+order?.route?.from.currency?.symbol; // string | undefined
+```
+
+Literal inclusion and exclusion selections support dotted fields and the
+default inclusion of `_id`. With the default `selectPopulatedPaths: true`,
+nested populated paths are included in a parent's inclusion projection unless
+explicitly excluded. Dynamic selection strings and `+field` selections do not
+narrow the referenced model's fields. Keep separately declared options literal
+using `as const` when you want inference.
+
+Inference requires the actual model, rather than a model name or a schema's
+string `ref`. Widened paths, runtime-sized arrays of populate options, and
+space-separated populate paths keep the existing result type. Nested
+population inference is bounded to 10 levels to limit compiler work. For
+virtual paths absent from the document interface, map wildcard paths (`$*`),
+schema-level projection overrides such as `selectPopulatedPaths: false`, or
+other population options that change the result beyond these rules, use an
+explicit `Paths` generic as described below. Document interfaces must accurately
+describe the stored fields; inference does not validate the relationship
+between a path and the model passed at runtime.
+
+## Explicit populated types
+
 [Mongoose's TypeScript bindings](https://thecodebarbarian.com/working-with-mongoose-in-typescript.html) add a generic parameter `Paths` to the `populate()`:
 
 ```typescript

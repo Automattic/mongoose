@@ -741,6 +741,21 @@ declare module 'mongoose' {
     polygon(...coordinatePairs: number[][]): this;
 
     /** Specifies paths which should be populated with other documents. */
+    // Two required type parameters keep explicit populate<Paths>() calls on
+    // the existing overloads, including Paths types with a `path` property.
+    populate<
+      const Options extends InferredPopulateOptions | readonly (InferredPopulateOptions | string)[],
+      PopulatedRaw extends PopulateInferredType<RawDocType, Options, true>
+    >(
+      options: Options
+    ): QueryWithHelpers<
+      QueryOp extends QueryOpThatReturnsDocument ? PopulateInferredQueryResult<ResultType, RawDocType, Options> : ResultType,
+      PopulateInferredQueryResult<DocType, RawDocType, Options>,
+      THelpers,
+      PopulatedRaw,
+      QueryOp,
+      TDocOverrides
+    >;
     populate(
       path: string | string[],
       select?: string | any,

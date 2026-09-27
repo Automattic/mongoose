@@ -7725,6 +7725,36 @@ describe('Model', function() {
       }]);
       assert.deepStrictEqual(timelessObj, timelessDoc.toObject());
     });
+
+    it('should not modify the update object passed to updateMany (gh-14164)', async function() {
+      const timeSchema = new Schema({
+        name: String,
+        properties: { type: Schema.Types.Mixed, default: {} }
+      }, { timestamps: true });
+      const Time = db.model('Time', timeSchema);
+
+      const timeDoc = await Time.create({ name: 'Time Test' });
+      timeDoc.properties.color = 'Red';
+      const beforeSet = {};
+      Object.assign(beforeSet, timeDoc.toObject());
+      await Time.bulkWrite([{
+        updateMany: {
+          filter: { _id: timeDoc._id },
+          update: { $set: timeDoc }
+        }
+      }]);
+      assert.deepStrictEqual(beforeSet, timeDoc.toObject());
+
+      // A plain update object must come back untouched as well: no
+      // timestamps, defaults or version key written into the caller's object.
+      const update = { $set: { name: 'Renamed' } };
+      await Time.bulkWrite([{ updateMany: { filter: {}, update } }]);
+      assert.deepStrictEqual(update, { $set: { name: 'Renamed' } });
+
+      const fromDb = await Time.findById(timeDoc._id);
+      assert.strictEqual(fromDb.name, 'Renamed');
+      assert.ok(fromDb.updatedAt.valueOf() >= timeDoc.updatedAt.valueOf());
+    });
   });
 
   describe('bulkSave() (gh-9673)', function() {

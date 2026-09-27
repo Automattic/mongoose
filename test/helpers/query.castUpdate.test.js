@@ -114,4 +114,53 @@ describe('castUpdate', function() {
     // Assert
     assert.deepEqual(castedUpdate, { $set: { $in: { count: '42' } } });
   });
+
+  it('aggregates cast errors from $rename', function() {
+    const schema = new Schema({ name: String, email: String });
+    const update = { $rename: { name: null, email: null } };
+    const context = { options: { multipleCastError: true } };
+
+    assert.throws(
+      () => castUpdate(schema, update, {}, context),
+      error => error.name === 'ValidationError' &&
+        error.errors.name?.name === 'CastError' &&
+        error.errors.email?.name === 'CastError'
+    );
+  });
+
+  it('aggregates cast errors from $pull', function() {
+    const schema = new Schema({
+      items: [{
+        count: {
+          type: Number,
+          cast: '{VALUE} is not a valid count for model {MODEL}'
+        }
+      }],
+      otherItems: [{
+        count: {
+          type: Number,
+          cast: '{VALUE} is not a valid count for model {MODEL}'
+        }
+      }]
+    });
+    const update = {
+      $pull: {
+        items: { count: 'not a number' },
+        otherItems: { count: 'also not a number' }
+      }
+    };
+    const context = {
+      model: { modelName: 'PullModel' },
+      options: { multipleCastError: true }
+    };
+
+    assert.throws(
+      () => castUpdate(schema, update, {}, context),
+      error => error.name === 'ValidationError' &&
+        error.errors.items?.message ===
+          '"not a number" is not a valid count for model PullModel' &&
+        error.errors.otherItems?.message ===
+          '"also not a number" is not a valid count for model PullModel'
+    );
+  });
 });

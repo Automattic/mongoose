@@ -173,5 +173,8 @@ describe('castexpr', function() {
         default: '$score'
       }
     });
+
+    const res2 = cast$expr({ $switch: { branches: [{ case: { $gte: ['$age', '18'] }, then: undefined }] } }, testSchema);
+    assert.deepStrictEqual(res2, { $switch: { branches: [{ case: { $gte: ['$age', 18] } }] } });
   });
 });

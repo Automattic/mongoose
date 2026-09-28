@@ -661,6 +661,26 @@ await doc.save({ middleware: { pre: false } });
 await Model.find({}, null, { middleware: { post: false } });
 ```
 
+### Middleware During Population
+
+Population inherits the query's `middleware` option, including nested population.
+Set `options.middleware` on a population path to override that selection.
+A phase object replaces the inherited selection; Mongoose does not merge its phases.
+
+```javascript
+// Skip user hooks on the main query and its populated queries and documents.
+await Person.find({}, null, { middleware: false }).populate('city');
+
+// Enable user hooks for city population while suppressing the main query's hooks.
+await Person.find({}, null, { middleware: false }).populate({
+  path: 'city',
+  options: { middleware: true }
+});
+```
+
+The selection also applies to temporary hydration when population uses local-field getters.
+Later independent `doc.populate()` calls use their own selection.
+
 ### Skip Middleware for Custom Statics and Methods {#skip-custom-statics-and-methods}
 
 Custom statics and methods support the `middleware` option as well, but require an explicit opt-in: set `supportsMiddlewareOption = true` on the function.

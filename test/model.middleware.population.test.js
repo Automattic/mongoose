@@ -52,11 +52,32 @@ describe('population middleware selection', function() {
       assert.deepStrictEqual(calls, []);
     });
 
-    async function createTestContext() {
+    it('preserves schema-path middleware defaults after an explicit override', async function() {
+      const { Person, calls } = await createTestContext({ schemaMiddleware: { post: false } });
+
+      const [person] = await Person.find().lean().populate({
+        path: 'city', options: { getters: true, middleware: { pre: false } }
+      });
+
+      assert.strictEqual(person.city.name, 'Amsterdam');
+      assert.deepStrictEqual(calls, ['post']);
+
+      calls.length = 0;
+      const later = await Person.populate({ city: 'ref:amsterdam' }, {
+        path: 'city', options: { getters: true }
+      });
+      assert.strictEqual(later.city.name, 'Amsterdam');
+      assert.deepStrictEqual(calls, ['pre']);
+    });
+
+    async function createTestContext({ schemaMiddleware } = {}) {
       const calls = [];
       const City = db.model('City', new Schema({ _id: String, name: String }));
       const schema = new Schema({
-        city: { type: String, ref: 'City', get: value => value.replace(/^ref:/, '') }
+        city: {
+          type: String, ref: 'City', get: value => value.replace(/^ref:/, ''),
+          populate: { middleware: schemaMiddleware }
+        }
       });
       schema.pre('init', function() { calls.push('pre'); });
       schema.post('init', function() { calls.push('post'); });

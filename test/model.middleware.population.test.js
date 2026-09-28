@@ -76,7 +76,7 @@ describe('population middleware selection', function() {
       const schema = new Schema({
         city: {
           type: String, ref: 'City', get: value => value.replace(/^ref:/, ''),
-          populate: { middleware: schemaMiddleware }
+          ...(schemaMiddleware === undefined ? {} : { populate: { middleware: schemaMiddleware } })
         }
       });
       schema.pre('init', function() { calls.push('pre'); });

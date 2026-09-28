@@ -664,7 +664,8 @@ await Model.find({}, null, { middleware: { post: false } });
 ### Middleware During Population
 
 Population inherits the query's `middleware` option, including nested population.
-Set `options.middleware` on a population path to override that selection.
+Schema population defaults take precedence over the inherited selection.
+Set `options.middleware` on a population path to override either selection.
 A phase object replaces the inherited selection; Mongoose does not merge its phases.
 
 ```javascript

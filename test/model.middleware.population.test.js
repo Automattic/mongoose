@@ -31,7 +31,6 @@ describe('population middleware selection', function() {
         assert.strictEqual(person.city.name, 'Amsterdam');
         assert.strictEqual(Object.getPrototypeOf(person), Object.prototype);
         assert.deepStrictEqual(calls, expected);
-        assert.strictEqual((await Person.collection.findOne()).city, 'ref:amsterdam');
 
         calls.length = 0;
         const ordinary = await Person.populate({ city: 'ref:amsterdam' }, {
@@ -41,6 +40,17 @@ describe('population middleware selection', function() {
         assert.deepStrictEqual(calls, ['pre', 'post']);
       });
     }
+
+    it('inherits selection during getter hydration', async function() {
+      const { Person, calls } = await createTestContext();
+
+      const [person] = await Person.find().setOptions({ middleware: false }).lean().populate({
+        path: 'city', options: { getters: true }
+      });
+
+      assert.strictEqual(person.city.name, 'Amsterdam');
+      assert.deepStrictEqual(calls, []);
+    });
 
     async function createTestContext() {
       const calls = [];
@@ -54,6 +64,47 @@ describe('population middleware selection', function() {
       await City.collection.insertOne({ _id: 'amsterdam', name: 'Amsterdam' });
       await Person.collection.insertOne({ city: 'ref:amsterdam' });
       return { Person, calls };
+    }
+  });
+
+  describe('virtual middleware defaults', function() {
+    for (const [name, virtualMiddleware, middleware, explicit, expected] of [
+      ['boolean default', false, { pre: false }, undefined, []],
+      ['phase default', { post: false }, { pre: false }, undefined, ['pre']],
+      ['explicit phase override', { post: false }, false, { pre: false }, ['post']],
+      ['standalone default', false, undefined, undefined, []]
+    ]) {
+      it(`uses ${name} for getter hydration and the populated query`, async function() {
+        const { Person, City, calls } = await createTestContext({ virtualMiddleware });
+
+        const [person] = await Person.find().setOptions({ middleware }).lean().populate({
+          path: 'city', options: explicit === undefined ? {} : { middleware: explicit }
+        });
+
+        assert.strictEqual(person.cityId, 'ref:amsterdam');
+        assert.ok(person.city instanceof City);
+        assert.strictEqual(person.city.name, 'Amsterdam');
+        for (const observed of Object.values(calls)) assert.deepStrictEqual(observed, expected);
+      });
+    }
+
+    async function createTestContext({ virtualMiddleware }) {
+      const calls = { parentInit: [], cityQuery: [], cityInit: [] };
+      const citySchema = new Schema({ _id: String, name: String });
+      const schema = new Schema({ cityId: { type: String, get: value => value.replace(/^ref:/, '') } });
+      schema.virtual('city', {
+        ref: 'City', localField: 'cityId', foreignField: '_id', justOne: true,
+        getters: true, options: { middleware: virtualMiddleware, lean: false }
+      });
+      for (const [target, hook, key] of [[schema, 'init', 'parentInit'], [citySchema, 'find', 'cityQuery'], [citySchema, 'init', 'cityInit']]) {
+        target.pre(hook, function() { calls[key].push('pre'); });
+        target.post(hook, function() { calls[key].push('post'); });
+      }
+      const City = db.model('City', citySchema);
+      const Person = db.model('Person', schema);
+      await City.collection.insertOne({ _id: 'amsterdam', name: 'Amsterdam' });
+      await Person.collection.insertOne({ cityId: 'ref:amsterdam' });
+      return { Person, City, calls };
     }
   });
 

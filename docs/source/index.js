@@ -16,6 +16,8 @@ const api = require('./api');
  * @typedef {Object} DocsOptions
  * @property {String} title Title of the page
  * @property {Boolean} [api] Indicate that the page is for API
+ * @property {Boolean} [apiMarkdown] Indicate that the page is generated API Markdown
+ * @property {String} [markdownSource] Generated Markdown source for API docs
  * @property {Boolean} [acquit] Enable test parsing and insertion
  * @property {Boolean} [markdown] Enable markdown processing
  * @property {Boolean} [guide] Indicate the page is a guide
@@ -35,6 +37,7 @@ const docs = {
 
 for (const apidoc of api.docs.values()) {
   docs[`docs/api/${apidoc.fileName}.html`] = { ...apidoc, api: true };
+  docs[`docs/api/${apidoc.fileName}.md`] = { ...apidoc, api: true, apiMarkdown: true };
 }
 
 docs['index.pug'] = require('./home');

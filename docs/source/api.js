@@ -103,6 +103,7 @@ parseAllFiles();
  * @typedef {Object} TagObject
  * @property {String} name The Processed name of the Tag (already includes all processing)
  * @property {String} description The Description of this Tag
+ * @property {String} [descriptionMarkdown] The raw markdown description for markdown output
  * @property {Boolean} optional Defines wheter the Tag is optional or not (already included in `name`)
  * @property {Boolean} nullable Defines wheter the Tag is nullable (dox does not add "null" by default)
  * @property {Boolean} nonNullable Unknown (invert of `nullable`?)
@@ -132,6 +133,7 @@ parseAllFiles();
  * @property {string} [string] Defines the full string the property will be listed as
  * @property {string} [anchorId] Defines the Anchor ID to be used for linking
  * @property {string} [description] Defines the Description the property will be listed with
+ * @property {string} [descriptionMarkdown] Defines the raw markdown description for markdown output
  * @property {string} [deprecated] Defines wheter the current Property is signaled as deprecated
  * @property {SeeObject[]} [see] Defines all "@see" references
  * @property {TagObject[]} [param] Defines all "@param" references
@@ -153,6 +155,7 @@ parseAllFiles();
  * @property {PropContext[]} props All the functions and values
  * @property {string} file The original file (relative to the root of the repository)
  * @property {string} editLink The link used for edits
+ * @property {string} markdownSource The raw markdown docs for this API page
  * @property {boolean} [hideFromNav] Indicate that the entry should not be listed in the navigation
  */
 
@@ -221,6 +224,122 @@ function convertTypesToString(types, typesDescription) {
     return typesDescription.replace(/<\/?code>/g, '');
   }
   return result;
+}
+
+/**
+ * Convert API doc HTML links in a string to their equivalent Markdown file paths.
+ * @param {String} [str] The string containing API documentation links to convert
+ * @returns {String|undefined}
+ */
+function apiLinksToMarkdown(str) {
+  if (!str) {
+    return str;
+  }
+  return str.
+    replace(/https:\/\/mongoosejs\.com\/docs\/api\/\S+\.html/g, url => url.replace(/\.html$/, '.md')).
+    replace(/^([^/#]+)\.html(#.*)?$/, '$1.md$2');
+}
+
+/**
+ * Clean a dox description for Markdown output.
+ * @param {String} [description] The raw dox description
+ * @returns {String}
+ */
+function normalizeMarkdownDescription(description) {
+  return apiLinksToMarkdown((description || '').
+    replace(/<br \/>/ig, '\n').
+    replace(/&gt;/ig, '>')).
+    trim();
+}
+
+/**
+ * Clean a dox description for HTML output.
+ * @param {String} [description] The raw dox description
+ * @returns {String}
+ */
+function normalizeHtmlDescription(description) {
+  return (description || '').
+    replace(/<br \/>/ig, ' ').
+    replace(/&gt;/ig, '>');
+}
+
+/**
+ * Format an API type string for Markdown output.
+ * @param {String} [types] The API type string to format
+ * @returns {String}
+ */
+function formatApiType(types) {
+  return types ? `\\<${types}\\> ` : '';
+}
+
+/**
+ * Build the Markdown source for a parsed API page.
+ * @param {DocsObj} data The parsed API page data
+ * @returns {String}
+ */
+function buildMarkdown(data) {
+  const lines = [
+    `# ${data.title}`,
+    '',
+    ...data.props.map(prop => `- [\`${prop.string}\`](#${prop.anchorId})`),
+    ''
+  ];
+
+  for (const prop of data.props) {
+    lines.push(`## \`${prop.string}\``);
+    lines.push('');
+
+    if (prop.deprecated) {
+      lines.push('Deprecated.');
+      lines.push('');
+    }
+
+    if (prop.param != null) {
+      lines.push('### Parameters');
+      lines.push('');
+      for (const param of prop.param) {
+        lines.push(`- \`${param.name}\` ${formatApiType(param.types)}${param.descriptionMarkdown || ''}`.trim());
+      }
+      lines.push('');
+    }
+
+    if (prop.return != null) {
+      lines.push('### Returns');
+      lines.push('');
+      lines.push(`- ${formatApiType(prop.return.types)}${prop.return.descriptionMarkdown || ''}`.trim());
+      lines.push('');
+    }
+
+    if (prop.type != null && prop.type !== 'method' && prop.type !== 'function') {
+      lines.push('### Type');
+      lines.push('');
+      lines.push(`- ${formatApiType(prop.type)}`.trim());
+      lines.push('');
+    }
+
+    if (prop.inherits != null) {
+      lines.push('### Inherits');
+      lines.push('');
+      lines.push(`- [${prop.inherits.text}](${apiLinksToMarkdown(prop.inherits.url)})`);
+      lines.push('');
+    }
+
+    if (prop.see != null && prop.see.length > 0) {
+      lines.push('### See');
+      lines.push('');
+      for (const see of prop.see) {
+        lines.push(`- [${see.text}](${apiLinksToMarkdown(see.url)})`);
+      }
+      lines.push('');
+    }
+
+    if (prop.descriptionMarkdown) {
+      lines.push(prop.descriptionMarkdown);
+      lines.push('');
+    }
+  }
+
+  return `${lines.join('\n').trim()}\n`;
 }
 
 /**
@@ -327,6 +446,7 @@ function processFile(props) {
           ctx.isFunction = true;
           break;
         case 'return':
+          tag.descriptionMarkdown = normalizeMarkdownDescription(tag.description);
           tag.description = tag.description ?
             md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>\n?$/, '') :
             '';
@@ -382,6 +502,7 @@ function processFile(props) {
               tag.name = '...' + tag.name;
             }
           }
+          tag.descriptionMarkdown = normalizeMarkdownDescription(tag.description);
           tag.description = tag.description ?
             md.parse(tag.description).replace(/^<p>/, '').replace(/<\/p>$/, '') :
             '';
@@ -434,10 +555,8 @@ function processFile(props) {
 
     ctx.anchorId = ctx.string;
 
-    ctx.description = prop.description.full.
-      replace(/<br \/>/ig, ' ').
-      replace(/&gt;/ig, '>');
-    ctx.description = md.parse(ctx.description);
+    ctx.descriptionMarkdown = normalizeMarkdownDescription(prop.description.full);
+    ctx.description = md.parse(normalizeHtmlDescription(prop.description.full));
 
     data.props.push(ctx);
   }
@@ -455,8 +574,9 @@ function processFile(props) {
   }
 
   data.file = props.file;
-  data.editLink = 'https://github.com/Automattic/mongoose/blob/master/' +
+  data.editLink = 'https://github.com/Automattic/mongoose/edit/master/' +
       props.file;
+  data.markdownSource = buildMarkdown(data);
 
   out.set(data.file, data);
 }

@@ -1994,7 +1994,8 @@ describe('schema', function() {
           required: ['_id'],
           properties: {
             _id: {
-              type: 'string'
+              type: 'string',
+              pattern: '^[A-Fa-f0-9]{24}$'
             },
             name: {
               type: 'string'
@@ -2013,7 +2014,8 @@ describe('schema', function() {
           required: ['_id'],
           properties: {
             _id: {
-              type: 'string'
+              type: 'string',
+              pattern: '^[A-Fa-f0-9]{24}$'
             },
             name: {
               type: ['string', 'null']
@@ -3520,7 +3522,8 @@ describe('schema', function() {
         required: ['name', '_id'],
         properties: {
           _id: {
-            type: 'string'
+            type: 'string',
+            pattern: '^[A-Fa-f0-9]{24}$'
           },
           name: {
             type: 'string'
@@ -3572,10 +3575,10 @@ describe('schema', function() {
       const ajv = new Ajv();
       const validate = ajv.compile(schema.toJSONSchema());
 
-      assert.ok(validate({ _id: 'test', name: 'Taco' }));
-      assert.ok(validate({ _id: 'test', name: 'Billy', age: null, ageSource: null }));
-      assert.ok(validate({ _id: 'test', name: 'John', age: 30, ageSource: 'document' }));
-      assert.ok(!validate({ _id: 'test', name: 'Foobar', age: null, ageSource: 'something else' }));
+      assert.ok(validate({ _id: '0'.repeat(24), name: 'Taco' }));
+      assert.ok(validate({ _id: '0'.repeat(24), name: 'Billy', age: null, ageSource: null }));
+      assert.ok(validate({ _id: '0'.repeat(24), name: 'John', age: 30, ageSource: 'document' }));
+      assert.ok(!validate({ _id: '0'.repeat(24), name: 'Foobar', age: null, ageSource: 'something else' }));
       assert.ok(!validate({}));
     });
 
@@ -3605,7 +3608,8 @@ describe('schema', function() {
         required: ['_id'],
         properties: {
           _id: {
-            type: 'string'
+            type: 'string',
+            pattern: '^[A-Fa-f0-9]{24}$'
           },
           name: {
             type: 'string'
@@ -3691,7 +3695,8 @@ describe('schema', function() {
             type: ['string', 'null']
           },
           id: {
-            type: ['string', 'null']
+            type: ['string', 'null'],
+            pattern: '^[A-Fa-f0-9]{24}$'
           },
           decimal: {
             type: ['string', 'null']
@@ -3712,7 +3717,8 @@ describe('schema', function() {
             type: ['number', 'null']
           },
           _id: {
-            type: 'string'
+            type: 'string',
+            pattern: '^[A-Fa-f0-9]{24}$'
           }
         }
       });
@@ -3771,8 +3777,8 @@ describe('schema', function() {
       const ajv = new Ajv();
       const validate = ajv.compile(schema.toJSONSchema());
 
-      assert.ok(validate({ _id: 'test', tags: ['javascript'], coordinates: [[0, 0]], docArr: [{ field: '2023-07-16' }] }));
-      assert.ok(validate({ _id: 'test', tags: ['javascript'], coordinates: [[0, 0]], docArr: [{}] }));
+      assert.ok(validate({ _id: '0'.repeat(24), tags: ['javascript'], coordinates: [[0, 0]], docArr: [{ field: '2023-07-16' }] }));
+      assert.ok(validate({ _id: '0'.repeat(24), tags: ['javascript'], coordinates: [[0, 0]], docArr: [{}] }));
     });
 
     it('handles nested paths and subdocuments', async function() {
@@ -3829,7 +3835,7 @@ describe('schema', function() {
               }
             }
           },
-          _id: { type: 'string' }
+          _id: { type: 'string', pattern: '^[A-Fa-f0-9]{24}$' }
         }
       });
 
@@ -3846,8 +3852,8 @@ describe('schema', function() {
       const ajv = new Ajv();
       const validate = ajv.compile(schema.toJSONSchema());
 
-      assert.ok(validate({ _id: 'test', name: { last: 'James' }, subdoc: {} }));
-      assert.ok(validate({ _id: 'test', name: { first: 'Mike', last: 'James' }, subdoc: { prop: 42 } }));
+      assert.ok(validate({ _id: '0'.repeat(24), name: { last: 'James' }, subdoc: {} }));
+      assert.ok(validate({ _id: '0'.repeat(24), name: { first: 'Mike', last: 'James' }, subdoc: { prop: 42 } }));
     });
 
     it('handles maps', async function() {
@@ -3980,7 +3986,7 @@ describe('schema', function() {
       const validate = ajv.compile(schema.toJSONSchema());
 
       assert.ok(validate({
-        _id: 'test',
+        _id: '0'.repeat(24),
         props: { someKey: 'someValue' },
         subdocs: {
           captain: {
@@ -4049,7 +4055,8 @@ describe('schema', function() {
             }
           },
           _id: {
-            type: 'string'
+            type: 'string',
+            pattern: '^[A-Fa-f0-9]{24}$'
           }
         }
       });
@@ -4072,6 +4079,47 @@ describe('schema', function() {
           }
         }
       });
+    });
+
+    it('includes ObjectId regex pattern in JSON schema (gh-16334)', function() {
+      const blogPostSchema = new Schema({
+        author: { type: Schema.Types.ObjectId, ref: 'Author' }
+      });
+
+      assert.deepStrictEqual(blogPostSchema.toJSONSchema(), {
+        type: 'object',
+        required: ['_id'],
+        properties: {
+          author: {
+            type: ['string', 'null'],
+            pattern: '^[A-Fa-f0-9]{24}$'
+          },
+          _id: {
+            type: 'string',
+            pattern: '^[A-Fa-f0-9]{24}$'
+          }
+        }
+      });
+
+      // `useBsonType` already validates via `bsonType: 'objectId'`, so no pattern there
+      assert.deepStrictEqual(blogPostSchema.toJSONSchema({ useBsonType: true }), {
+        required: ['_id'],
+        properties: {
+          author: {
+            bsonType: ['objectId', 'null']
+          },
+          _id: {
+            bsonType: 'objectId'
+          }
+        }
+      });
+
+      const ajv = new Ajv();
+      const validate = ajv.compile(blogPostSchema.toJSONSchema());
+
+      assert.ok(validate({ _id: '0'.repeat(24), author: 'a'.repeat(24) }));
+      assert.ok(!validate({ _id: 'not-an-objectid' }));
+      assert.ok(!validate({ _id: '0'.repeat(24), author: 'not-an-objectid' }));
     });
   });
 

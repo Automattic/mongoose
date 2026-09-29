@@ -66,6 +66,7 @@ void async function run() {
   test.validateSync({ pathsToSkip: 'name age', blub: 1 });
   expect(test.save()).type.toBeAssignableTo<Promise<ITest & { _id: any; }>>();
   expect(test.save({})).type.toBeAssignableTo<Promise<ITest & { _id: any; }>>();
+  expect(test.save({ pathsToSave: ['name', 'age'] })).type.toBeAssignableTo<Promise<ITest & { _id: any; }>>();
 })();
 
 function gh10526<U extends ITest>(arg1: Model<U>) {

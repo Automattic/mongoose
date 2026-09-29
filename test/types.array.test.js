@@ -1958,4 +1958,15 @@ describe('types array', function() {
     assert.deepStrictEqual(doc.intArr, [3, 2]);
     assert.equal(called, 2);
   });
+
+  it('does not mutate SchemaArray setters order when casting an array-valued query filter (gh-16372)', function() {
+    const schema = new Schema({ nums: { type: [Number], set: v => v } });
+    schema.path('nums').set(v => v);
+    const originalOrder = schema.path('nums').setters.slice();
+    const M = db.model('Test', schema);
+
+    M.find({ nums: [1, 2, 3] }).cast(M);
+
+    assert.deepStrictEqual(schema.path('nums').setters, originalOrder);
+  });
 });

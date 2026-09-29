@@ -49,7 +49,7 @@ const kittySchema = new mongoose.Schema({
 });
 ```
 
-So far so good. We've got a schema with one property, `name`, which will be a  `String`. The next step is compiling our schema into a [Model](models.html).
+So far so good. We've got a schema with one property, `name`, which will be a `String`. The next step is compiling our schema into a [Model](models.html).
 
 ```javascript
 const Kitten = mongoose.model('Kitten', kittySchema);
@@ -104,7 +104,7 @@ console.log(kittens);
 ```
 
 We just logged all of the kittens in our db to the console.
-If we want to filter our kittens by name, Mongoose supports MongoDBs rich [querying](queries.html) syntax.
+If we want to filter our kittens by name, Mongoose supports MongoDB's rich [querying](queries.html) syntax.
 
 ```javascript
 await Kitten.find({ name: /^fluff/ });

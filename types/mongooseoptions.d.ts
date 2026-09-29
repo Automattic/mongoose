@@ -193,6 +193,14 @@ declare module 'mongoose' {
     strictQuery?: boolean | 'throw';
 
     /**
+     * Sets the default [strictRead](https://mongoosejs.com/docs/guide.html#strictRead) mode for schemas.
+     * May be `false`, `true`, or `'throw'`.
+     *
+     * @default false
+     */
+    strictRead?: boolean | 'throw';
+
+    /**
      * Overwrites default objects to `toJSON()`, for determining how Mongoose
      * documents get serialized by `JSON.stringify()`
      *

@@ -191,11 +191,13 @@ declare module 'mongoose' {
         Document<unknown, TQueryHelpers, RawDocType, TVirtuals, TSchemaOptions> & Default__v<Require_id<HydratedDocPathsType>, TSchemaOptions>,
         Document<unknown, TQueryHelpers, RawDocType, TVirtuals, TSchemaOptions> & MergeType<
           Default__v<Require_id<HydratedDocPathsType>, TSchemaOptions>,
-          IfEquals<
-            TOverrides,
-            {},
-            TOverrides,
-            TOverrides & AddDefaultId<HydratedDocPathsType, TVirtuals, TSchemaOptions>
+          HydratedDocumentOverrides<
+            IfEquals<
+              TOverrides,
+              {},
+              TOverrides,
+              TOverrides & AddDefaultId<HydratedDocPathsType, TVirtuals, TSchemaOptions>
+            >
           >
         >
       >

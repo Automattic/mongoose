@@ -11120,6 +11120,36 @@ describe('document', function() {
 
         assert.equal(user.get, 12);
       });
+
+      it('does not access special properties with noDottedPath', () => {
+        const userSchema = new Schema({ name: String });
+        const User = db.model('DocGetNoDottedSpecialProperties', userSchema);
+        const user = new User({ name: 'test' });
+
+        assert.equal(user.get('__proto__', null, { noDottedPath: true }), void 0);
+        assert.equal(user.get('constructor', null, { noDottedPath: true }), void 0);
+        assert.equal(user.get('prototype', null, { noDottedPath: true }), void 0);
+      });
+
+      it('does not access special properties when applying virtuals to nested paths', () => {
+        const userSchema = new Schema({ name: String });
+        const User = db.model('DocGetNestedSpecialProperties', userSchema);
+        const user = new User({ name: 'test' });
+
+        assert.equal(user.get('__proto__', null, { virtuals: true }), void 0);
+        assert.equal(user.get('constructor', null, { virtuals: true }), void 0);
+        assert.equal(user.get('prototype', null, { virtuals: true }), void 0);
+      });
+
+      it('does not traverse through special properties', () => {
+        const userSchema = new Schema({ name: String });
+        const User = db.model('DocGetSpecialPropertyPaths', userSchema);
+        const user = new User({ name: 'test' });
+
+        assert.equal(user.get('__proto__.constructor'), void 0);
+        assert.equal(user.get('constructor.prototype'), void 0);
+        assert.equal(user.get('name.__proto__'), void 0);
+      });
     });
   });
 

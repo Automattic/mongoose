@@ -241,7 +241,8 @@ describe('Union', function() {
           ]
         },
         _id: {
-          type: 'string'
+          type: 'string',
+          pattern: '^[A-Fa-f0-9]{24}$'
         }
       }
     });
@@ -271,10 +272,10 @@ describe('Union', function() {
     const ajv = new Ajv();
     const validate = ajv.compile(schema.toJSONSchema());
 
-    assert.ok(validate({ _id: 'test', test: null, requiredTest: true }));
-    assert.ok(validate({ _id: 'test', test: 42, requiredTest: true }));
-    assert.ok(validate({ _id: 'test', test: 'answer', requiredTest: '2025-06-01T00:00:00.000Z' }));
-    assert.ok(!validate({ _id: 'test', test: {}, requiredTest: true }));
+    assert.ok(validate({ _id: '0'.repeat(24), test: null, requiredTest: true }));
+    assert.ok(validate({ _id: '0'.repeat(24), test: 42, requiredTest: true }));
+    assert.ok(validate({ _id: '0'.repeat(24), test: 'answer', requiredTest: '2025-06-01T00:00:00.000Z' }));
+    assert.ok(!validate({ _id: '0'.repeat(24), test: {}, requiredTest: true }));
 
     const overlappingSchema = new Schema({
       test: {
@@ -284,6 +285,6 @@ describe('Union', function() {
     });
     const overlappingValidate = ajv.compile(overlappingSchema.toJSONSchema());
 
-    assert.ok(overlappingValidate({ _id: 'test', test: 42 }));
+    assert.ok(overlappingValidate({ _id: '0'.repeat(24), test: 42 }));
   });
 });

@@ -2210,6 +2210,7 @@ function gh16046() {
     { placeholder: String },
     {
       timestamps: true,
+      versionKey: '_v',
       virtuals: {
         votes: {
           options: {
@@ -2222,6 +2223,7 @@ function gh16046() {
       methods: {
         myMethod: function() {
           ExpectType<string | null | undefined>(this.placeholder);
+          return this.placeholder;
         }
       },
       statics: {
@@ -2234,7 +2236,8 @@ function gh16046() {
   );
 
   const IssueTwo = model('IssueTwo', issueTwoSchema);
-  (new IssueTwo()).myMethod();
+  const doc = new IssueTwo();
+  ExpectType<string | null | undefined>(doc.myMethod());
   IssueTwo.myStaticMethod();
 }
 

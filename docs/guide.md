@@ -1,7 +1,7 @@
 # Schemas
 
 If you haven't yet done so, please take a minute to read the [quickstart](index.html) to get an idea of how Mongoose works.
-If you are migrating from 7.x to 8.x please take a moment to read the [migration guide](migrating_to_8.html).
+If you are migrating from 8.x to 9.x please take a moment to read the [migration guide](migrating_to_9.html).
 
 <ul class="toc">
   <li><a href="#definition">Defining your schema</a></li>
@@ -949,9 +949,9 @@ Mongoose supports a separate `strictQuery` option to avoid strict mode for query
 This is because empty query filters cause Mongoose to return all documents in the model, which can cause issues.
 
 ```javascript
-const mySchema = new Schema({ field: Number }, { strict: true });
+const mySchema = new Schema({ field: Number }, { strictQuery: true });
 const MyModel = mongoose.model('Test', mySchema);
-// Mongoose will filter out `notInSchema: 1` because `strict: true`, meaning this query will return
+// Mongoose will filter out `notInSchema: 1` because `strictQuery: true`, meaning this query will return
 // _all_ documents in the 'tests' collection
 MyModel.find({ notInSchema: 1 });
 ```
@@ -975,6 +975,24 @@ const mySchema = new Schema({ field: Number }, {
 const MyModel = mongoose.model('Test', mySchema);
 // Mongoose will not strip out `notInSchema: 1` because `strictQuery` is false
 MyModel.find({ notInSchema: 1 });
+```
+
+Note the difference between the two settings for filter paths that aren't in the schema.
+With `strictQuery: false`, Mongoose leaves the path in the filter as-is and does **not** cast the value.
+The server will only return documents where `notInSchema` is stored as `1`, so the query typically matches no documents.
+With `strictQuery: true`, Mongoose silently removes the path from the filter, so the query may match more documents than intended.
+With `strictQuery: 'throw'`, Mongoose throws a `StrictModeError` instead.
+
+```javascript
+await MyModel.create({ field: 42 });
+
+// Matches 0 documents with `strictQuery: false`, the default: Mongoose sends
+// `{ notInSchema: 1 }` to the server as-is, and no document has that property.
+await MyModel.find({ notInSchema: 1 });
+
+// Matches _all_ documents with `strictQuery: true`: Mongoose strips out
+// `notInSchema: 1`, leaving an empty filter `{}`.
+await MyModel.find({ notInSchema: 1 }).setOptions({ strictQuery: true });
 ```
 
 In general, we do **not** recommend passing user-defined objects as query filters:

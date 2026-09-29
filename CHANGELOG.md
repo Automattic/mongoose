@@ -1,3 +1,11 @@
+9.10.3 / 2026-09-29
+===================
+ * fix(model): preserve unsaved documents after ordered bulkSave errors #16533 #16532 [IbrahimHafez1](https://github.com/IbrahimHafez1)
+ * fix(model): don't mutate the caller's update object in bulkWrite updateMany #16526 [fadiroot](https://github.com/fadiroot)
+ * fix(schema): run setters declared on the union path itself #16528 [giaBaoJS](https://github.com/giaBaoJS)
+ * fix(collection): open collection if connection was already opened #16527 #16525 #16524
+ * fix(query+model): replace {MODEL} in cast error messages from update and bulkWrite casting #16529 #16502 #16480
+
 9.10.2 / 2026-09-22
 ===================
  * fix(schema): drop subpaths and singleNestedPaths when a path is removed #16521 #16520 [luantaraschi](https://github.com/luantaraschi)

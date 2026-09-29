@@ -1,4 +1,44 @@
 declare module 'mongoose' {
+  type IsNonDefiningProjection<Value, Key, Projection> = Value extends { $slice: any } | { $meta: any }
+    ? true
+    : Key extends '_id'
+      ? Value extends 0 | false
+        ? false
+        // Including `_id` only defines inclusion when it is the sole projected field.
+        : Exclude<keyof Projection, '_id'> extends never ? false : true
+      : false;
+  type ProjectionPath<Key> = Key extends `${infer Parent}.$` ? Parent : Key;
+  type DefiningProjectionKeys<Projection> = {
+    [Key in keyof Projection]-?: Key extends string
+      ? IsNonDefiningProjection<Projection[Key], Key, Projection> extends true ? never : ProjectionPath<Key>
+      : never
+  }[keyof Projection];
+  type DefiningProjectionValues<Projection> = {
+    [Key in keyof Projection]-?: IsNonDefiningProjection<Projection[Key], Key, Projection> extends true ? never : Projection[Key]
+  }[keyof Projection];
+
+  export type ApplyProjection<T, Projection> = Projection extends string
+    ? T
+    : Projection extends AnyObject
+      ? [DefiningProjectionKeys<Projection>] extends [never]
+        ? T
+        : Exclude<DefiningProjectionValues<Projection>, 0 | false | undefined> extends never
+          ? Omit<T, Extract<DefiningProjectionKeys<Projection>, keyof T>>
+          : Pick<T, Extract<DefiningProjectionKeys<Projection>, keyof T>> &
+            (Projection extends { _id?: infer Id }
+              ? Id extends 0 | false
+                ? unknown
+                : Pick<T, Extract<'_id', keyof T>>
+              : Pick<T, Extract<'_id', keyof T>>)
+      : T;
+
+  export type ProjectedHydratedDocument<RawDocType, Projection, TInstanceMethods = {}, TQueryHelpers = {}, TVirtuals = {}> =
+    Projection extends { _id?: infer Id }
+      ? Id extends 0 | false
+        ? Omit<HydratedDocument<ApplyProjection<RawDocType, Projection>, TInstanceMethods, TQueryHelpers, TVirtuals>, '_id'>
+        : HydratedDocument<ApplyProjection<RawDocType, Projection>, TInstanceMethods, TQueryHelpers, TVirtuals>
+      : HydratedDocument<ApplyProjection<RawDocType, Projection>, TInstanceMethods, TQueryHelpers, TVirtuals>;
+
   type IfAny<IFTYPE, THENTYPE, ELSETYPE = IFTYPE> = 0 extends 1 & IFTYPE
     ? THENTYPE
     : ELSETYPE;

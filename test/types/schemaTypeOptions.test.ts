@@ -47,17 +47,17 @@ function index() {
   new SchemaTypeOptions<string>().index = 'descending';
   new SchemaTypeOptions<string>().index = 'desc';
 
-  // @ts-expect-error  Type '""' is not assignable to type 'boolean | IndexDirection | IndexOptions | undefined'.
+  // @ts-expect-error  Type '""' is not assignable to type 'boolean | IndexDirection | IndexOptions'.
   new SchemaTypeOptions<string>().index = '';
-  // @ts-expect-error  Type '"invalid"' is not assignable to type 'boolean | IndexDirection | IndexOptions | undefined'.
+  // @ts-expect-error  Type '"invalid"' is not assignable to type 'boolean | IndexDirection | IndexOptions'.
   new SchemaTypeOptions<string>().index = 'invalid';
-  // @ts-expect-error  Type '0' is not assignable to type 'boolean | IndexDirection | IndexOptions | undefined'.
+  // @ts-expect-error  Type '0' is not assignable to type 'boolean | IndexDirection | IndexOptions'.
   new SchemaTypeOptions<string>().index = 0;
-  // @ts-expect-error  Type '2' is not assignable to type 'boolean | IndexDirection | IndexOptions | undefined'.
+  // @ts-expect-error  Type '2' is not assignable to type 'boolean | IndexDirection | IndexOptions'.
   new SchemaTypeOptions<string>().index = 2;
-  // @ts-expect-error  Type '-2' is not assignable to type 'boolean | IndexDirection | IndexOptions | undefined'.
+  // @ts-expect-error  Type '-2' is not assignable to type 'boolean | IndexDirection | IndexOptions'.
   new SchemaTypeOptions<string>().index = -2;
-  // @ts-expect-error  Type 'Date' is not assignable to type 'boolean | IndexDirection | IndexOptions | undefined'.
+  // @ts-expect-error  Type 'Date' is not assignable to type 'boolean | IndexDirection | IndexOptions'.
   new SchemaTypeOptions<string>().index = new Date();
 }
 
@@ -94,13 +94,13 @@ function encrypt() {
   // qe + valid queries
   new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, queries: 'equality' };
   new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, queries: 'range' };
-  new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid, queries: undefined };
+  new SchemaTypeOptions<string>()['encrypt'] = { keyId: uuid };
 
-  // @ts-expect-error  Type '{}' is not assignable to type 'EncryptSchemaTypeOptions | undefined'.
+  // @ts-expect-error  Type '{}' is not assignable to type 'EncryptSchemaTypeOptions'.
   new SchemaTypeOptions<string>()['encrypt'] = {};
 
   new SchemaTypeOptions<string>()['encrypt'] = {
-    // @ts-expect-error  Type 'string' is not assignable to type '[Binary]'.
+    // @ts-expect-error  Type 'string' is not assignable to type 'Binary | [Binary]'.
     keyId: 'fakeId'
   };
 
@@ -112,7 +112,6 @@ function encrypt() {
   };
 
   new SchemaTypeOptions<string>()['encrypt'] = {
-    // @ts-expect-error  Type 'UUID' is not assignable to type '[Binary]'.
     keyId: uuid,
     // @ts-expect-error  Type '"SHA_FAKE_ALG"' is not assignable to type '"AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic" | "AEAD_AES_256_CBC_HMAC_SHA_512-Random"'.
     algorithm: 'SHA_FAKE_ALG'
@@ -125,8 +124,8 @@ function encrypt() {
   };
 
   new SchemaTypeOptions<string>()['encrypt'] = {
-    // @ts-expect-error  Type 'UUID' is not assignable to type '[Binary]'.
     keyId: uuid,
+    // @ts-expect-error  Object literal may only specify known properties, and 'invalidKey' does not exist in type 'EncryptSchemaTypeOptions'.
     invalidKey: 'fakeKeyOption'
   };
 }

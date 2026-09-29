@@ -45,12 +45,28 @@ declare module 'mongoose' {
   type RawDocTypeHint<T> = IsAny<T> extends true ? never
     : T extends { __rawDocTypeHint: infer U } ? U: never;
 
+  type DiscriminatorRawKey<TBaseSchema extends Schema> =
+    ObtainSchemaGeneric<TBaseSchema, 'TSchemaOptions'> extends infer TSchemaOptions ?
+      'discriminatorKey' extends keyof TSchemaOptions ?
+        TSchemaOptions['discriminatorKey'] extends string ? TSchemaOptions['discriminatorKey'] : '__t'
+      : '__t'
+    : '__t';
+
+  type DiscriminatorRawBaseType<TBaseSchema extends Schema> =
+    InferRawDocTypeFromSchema<TBaseSchema> extends Record<DiscriminatorRawKey<TBaseSchema>, any> ?
+      InferRawDocTypeFromSchema<TBaseSchema>
+    : MergeType<InferRawDocTypeFromSchema<TBaseSchema>, { [K in DiscriminatorRawKey<TBaseSchema>]?: null }>;
+
   type ResolveDiscriminatorRawPathType<TBaseSchema extends Schema, TDiscriminators> =
     IsAny<TDiscriminators> extends true ? never
     : TDiscriminators extends Record<string, any> ?
-      TDiscriminators[keyof TDiscriminators] extends Schema ?
-        MergeType<InferRawDocTypeFromSchema<TBaseSchema>, InferRawDocTypeFromSchema<TDiscriminators[keyof TDiscriminators]>>
-      : never
+      DiscriminatorRawBaseType<TBaseSchema> |
+      {
+        [K in keyof TDiscriminators]: TDiscriminators[K] extends Schema ?
+          MergeType<InferRawDocTypeFromSchema<TBaseSchema>, InferRawDocTypeFromSchema<TDiscriminators[K]>> &
+          { [KDiscriminatorKey in DiscriminatorRawKey<TBaseSchema>]: K }
+        : never
+      }[keyof TDiscriminators]
     : never;
 
   type RawDiscriminatorEnumType<T> = string extends keyof T ? never

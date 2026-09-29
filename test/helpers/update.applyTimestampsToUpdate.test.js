@@ -12,4 +12,17 @@ describe('applyTimestampsToUpdate', function() {
     assert.equal(res.length, 2);
     assert.equal(res[1].$set.updated_at.valueOf(), now.valueOf());
   });
+
+  it('does not set createdAt unless upsert is enabled', function() {
+    const update = { $set: { title: 'mongoose' } };
+    const now = new Date('2016-01-01');
+    const res = applyTimestampsToUpdate(now, 'created_at', 'updated_at', update, {});
+
+    assert.deepEqual(res, {
+      $set: {
+        title: 'mongoose',
+        updated_at: now
+      }
+    });
+  });
 });

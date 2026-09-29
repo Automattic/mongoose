@@ -136,6 +136,101 @@ describe('Union', function() {
     assert.strictEqual(doc2FromDb.test, 'bbb');
   });
 
+  it('should handle setters declared on the union path itself', async function() {
+    const schema = new Schema({
+      test: {
+        type: 'Union',
+        of: [
+          Number,
+          {
+            type: String,
+            trim: true
+          }
+        ],
+        set: v => typeof v === 'string' ? v.replace(/^prefix:/, '') : v * 2
+      }
+    });
+    const TestModel = db.model('Test', schema);
+
+    const doc1 = new TestModel({ test: 21 });
+    assert.strictEqual(doc1.test, 42);
+
+    // The union's setter runs before the setters of the type it resolves to,
+    // so `trim` sees the value the union setter returned.
+    const doc2 = new TestModel({ test: 'prefix:  bbb  ' });
+    assert.strictEqual(doc2.test, 'bbb');
+    await doc2.save();
+
+    const doc2FromDb = await TestModel.collection.findOne({ _id: doc2._id });
+    assert.strictEqual(doc2FromDb.test, 'bbb');
+
+    const res = await TestModel.findOne({ test: 'prefix:  bbb  ' });
+    assert.strictEqual(res.test, 'bbb');
+  });
+
+  it('should support immutable on union paths', async function() {
+    const schema = new Schema({
+      test: {
+        type: 'Union',
+        of: [Number, String],
+        immutable: true
+      }
+    }, { strict: 'throw' });
+    const TestModel = db.model('Test', schema);
+
+    const doc = await TestModel.create({ test: 'first' });
+    doc.test = 'second';
+    assert.strictEqual(doc.test, 'first');
+
+    doc.set({ test: 'third' });
+    const err = await doc.save().then(() => null, err => err);
+    assert.ok(err);
+    assert.strictEqual(err.errors['test'].name, 'StrictModeError');
+  });
+
+  it('passes prior value and set options to setters on union paths', function() {
+    const args = [];
+    const schema = new Schema({
+      test: {
+        type: 'Union',
+        of: [Number, String],
+        set: function(v, priorVal, schematype, options) {
+          args.push([v, priorVal, schematype, options]);
+          return v;
+        }
+      }
+    });
+    const TestModel = db.model('Test', schema);
+
+    const doc = new TestModel({ test: 'first' });
+    doc.test = 'second';
+
+    assert.strictEqual(args.length, 2);
+    const [value, priorVal, schematype, setOptions] = args[1];
+    assert.strictEqual(value, 'second');
+    assert.strictEqual(priorVal, 'first');
+    assert.strictEqual(schematype.instance, 'Union');
+    assert.strictEqual(setOptions.path, 'test');
+  });
+
+  it('does not apply union setters when hydrating from the database', async function() {
+    const schema = new Schema({
+      arr: [{
+        type: 'Union',
+        of: [Number, String],
+        set: v => typeof v === 'number' ? v * 2 : v
+      }]
+    });
+    const TestModel = db.model('Test', schema);
+
+    const doc = new TestModel({ arr: [21] });
+    assert.strictEqual(doc.arr[0], 42);
+    await doc.save();
+
+    const docFromDb = await TestModel.findById(doc._id);
+    assert.strictEqual(docFromDb.arr[0], 42);
+  });
+
   it('handles arrays of unions (gh-15718)', async function() {
     const schema = new Schema({
       arr: [{

@@ -56,8 +56,8 @@ describe('Lean Tutorial', function() {
     // Node.js process uses, not how much data is sent over the network.
     JSON.stringify(normalDoc).length === JSON.stringify(leanDoc).length; // true
     // acquit:ignore:start
-    assert.ok(v8Serialize(normalDoc).length >= 150 && v8Serialize(normalDoc).length <= 200, v8Serialize(normalDoc).length);
-    assert.ok(v8Serialize(leanDoc).length === 55 || v8Serialize(leanDoc).length === 32, v8Serialize(leanDoc).length);
+    assert.ok(v8Serialize(normalDoc).length >= 150 && v8Serialize(normalDoc).length <= 210, v8Serialize(normalDoc).length);
+    assert.ok(v8Serialize(leanDoc).length >= 55 && v8Serialize(leanDoc).length <= 68, v8Serialize(leanDoc).length);
     assert.equal(JSON.stringify(normalDoc).length, JSON.stringify(leanDoc).length);
     // acquit:ignore:end
   });

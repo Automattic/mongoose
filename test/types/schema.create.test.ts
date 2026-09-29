@@ -161,7 +161,7 @@ async function gh9857() {
   type UserModel = Model<UserDocument>;
 
   const u: UserSchemaDefinition = {
-    // @ts-expect-error  Type '{ type: StringConstructor; }' is not assignable to type 'SchemaDefinitionProperty<number, any, any> | undefined'.
+    // @ts-expect-error  Type '{ type: StringConstructor; }' is not assignable to type 'SchemaDefinitionProperty<number, any, any>'.
     name: { type: String },
     active: { type: Boolean },
     points: Number
@@ -607,11 +607,11 @@ batchSchema2.discriminator('event', eventSchema2);
 function encryptionType() {
   const keyId = new BSON.UUID();
   Schema.create({ name: { type: String, encrypt: { keyId } } },
-    // @ts-expect-error  Type '"newFakeEncryptionType"' is not assignable to type '"csfle" | "queryableEncryption" | undefined'.
+    // @ts-expect-error  Type '"newFakeEncryptionType"' is not assignable to type '"csfle" | "queryableEncryption"'.
     { encryptionType: 'newFakeEncryptionType' }
   );
   Schema.create({ name: { type: String, encrypt: { keyId } } },
-    // @ts-expect-error  Type 'number' is not assignable to type '"csfle" | "queryableEncryption" | undefined'.
+    // @ts-expect-error  Type 'number' is not assignable to type '"csfle" | "queryableEncryption"'.
     { encryptionType: 1 }
   );
 

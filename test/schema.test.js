@@ -1766,6 +1766,47 @@ describe('schema', function() {
 
     });
 
+    it('removes a map that lives under a nested path', function() {
+      const schema = new Schema({
+        n: { m: { type: Map, of: Number } },
+        other: String
+      }, { autoCreate: false, autoIndex: false });
+
+      // Used to throw, because the map values subpath has no branch of its own
+      // in the tree and its parent had already been deleted in the same pass
+      assert.doesNotThrow(() => schema.remove('n'));
+
+      assert.strictEqual(schema.path('n.m'), undefined);
+      assert.strictEqual(schema.path('n.m.$*'), undefined);
+      assert.equal(schema.pathType('n.m'), 'adhocOrUndefined');
+      assert.equal(schema.pathType('n.m.key'), 'adhocOrUndefined');
+      assert.ok(schema.path('other'));
+    });
+
+    it('removes the subpaths of a document array and of a subdocument (gh-16520)', function() {
+      const schema = new Schema({
+        child: new Schema({ name: String, nested: { x: Number } }, { _id: false }),
+        arr: [{ v: Number }],
+        tags: [String],
+        other: String
+      }, { autoCreate: false, autoIndex: false });
+      // Positional lookups register the element paths lazily
+      assert.ok(schema.path('arr.0.v'));
+      assert.ok(schema.path('tags.$'));
+
+      schema.remove(['child', 'arr', 'tags']);
+
+      assert.deepStrictEqual(Object.keys(schema.singleNestedPaths), []);
+      assert.deepStrictEqual(Object.keys(schema.subpaths), []);
+      assert.strictEqual(schema.path('child.name'), undefined);
+      assert.strictEqual(schema.path('arr.0.v'), undefined);
+      assert.strictEqual(schema.path('tags.$'), undefined);
+      assert.equal(schema.pathType('child.name'), 'adhocOrUndefined');
+      assert.equal(schema.pathType('child.nested.x'), 'adhocOrUndefined');
+      assert.equal(schema.pathType('arr.0.v'), 'adhocOrUndefined');
+      assert.ok(schema.path('other'));
+    });
+
     it('removes an array of paths', function() {
       this.schema.remove(['e', 'f', 'g']);
       assert.strictEqual(this.schema.path('e'), undefined);
@@ -1830,8 +1871,70 @@ describe('schema', function() {
       assert.equal(casted.toString(), '6.2E+23');
 
     });
-
     describe('clone()', function() {
+      it('works with an array of document arrays (gh-16462)', function() {
+        const schema = new Schema({ a: [[{ x: Number }]] });
+
+        const clone = schema.clone();
+        assert.deepStrictEqual(Object.keys(clone.paths).sort(), ['_id', 'a']);
+        assert.deepStrictEqual(Object.keys(clone.subpaths).sort(), ['a.$', 'a.$.$']);
+        assert.equal(clone.subpaths['a.$.$'].instance, 'DocumentArrayElement');
+        assert.ok(clone.subpaths['a.$.$'].$parentSchemaType);
+      });
+
+      it('carries the document array element over to the copy (gh-16462)', function() {
+        const schema = new Schema({ a: [[{ x: { type: Number, default: 3 } }]] });
+
+        const clone = schema.clone();
+        const original = schema.subpaths['a.$.$'];
+        const copy = clone.subpaths['a.$.$'];
+        assert.notStrictEqual(copy, original);
+        assert.strictEqual(copy.schema, original.schema);
+        assert.strictEqual(copy.Constructor, original.Constructor);
+        assert.ok(copy.$parentSchemaType);
+
+        const M = mongoose.model('gh16462', clone);
+        const doc = new M({ a: [[{}, { x: 7 }]] });
+        assert.equal(doc.a[0][0].x, 3);
+        assert.equal(doc.a[0][1].x, 7);
+      });
+
+      it('keeps the map value schematype a single object in the copy', function() {
+        const schema = new Schema({ m: { type: Map, of: Number } });
+        const clone = schema.clone();
+
+        assert.strictEqual(clone.paths['m.$*'], clone.paths['m'].$__schemaType);
+        assert.strictEqual(clone.paths['m.$*'], clone.path('m').getEmbeddedSchemaType());
+        assert.deepStrictEqual(clone.mapPaths, [clone.paths['m.$*']]);
+      });
+
+      it('does not hand back the source schema map value schematype', function() {
+        const schema = new Schema({ m: { type: Map, of: Number } });
+        const clone = schema.clone();
+
+        assert.notStrictEqual(clone.paths['m.$*'], schema.paths['m.$*']);
+        assert.notStrictEqual(clone.path('m.someKey'), schema.path('m.someKey'));
+        assert.strictEqual(schema.mapPaths.includes(clone.mapPaths[0]), false);
+      });
+
+      it('applies a setter added to a map value on the copy', function() {
+        const schema = new Schema({ m: { type: Map, of: Number } }).clone();
+        schema.path('m.$*').set(v => v * 2);
+
+        const M = mongoose.model('gh-clone-map-setter', schema);
+        assert.equal(new M({ m: { k: 3 } }).get('m').get('k'), 6);
+      });
+
+      it('applies a validator added to a map value on the copy', function() {
+        const schema = new Schema({ m: { type: Map, of: Number } }).clone();
+        schema.path('m.$*').validate(v => v < 10, 'too big');
+
+        const M = mongoose.model('gh-clone-map-validator', schema);
+        const err = new M({ m: { k: 50 } }).validateSync();
+        assert.ok(err);
+        assert.deepStrictEqual(Object.keys(err.errors), ['m.k']);
+      });
+
       it('copies methods, statics, and query helpers (gh-5752)', function() {
         const schema = new Schema({});
 
@@ -1844,6 +1947,18 @@ describe('schema', function() {
         assert.equal(clone.statics.fakeStatic, schema.statics.fakeStatic);
         assert.equal(clone.query.fakeQueryHelper, schema.query.fakeQueryHelper);
 
+      });
+
+      it('adds query helpers with queryHelper()', function() {
+        const schema = new Schema({ name: String });
+        const helper = function(name) {
+          return this.where({ name });
+        };
+
+        assert.strictEqual(schema.queryHelper('byName', helper), schema);
+        assert.strictEqual(schema.query.byName, helper);
+        assert.throws(() => schema.queryHelper(42, helper), /First param to `schema.queryHelper\(\)` must be a string/);
+        assert.throws(() => schema.queryHelper('byName', 'not a function'), /Second param to `schema.queryHelper\(\)` must be a function/);
       });
 
       it('copies validators declared with validate() (gh-5607)', function() {
@@ -2436,6 +2551,36 @@ describe('schema', function() {
   });
 
   describe('omit() (gh-12931)', function() {
+    it('removes the values subpath of a map', function() {
+      const schema = new Schema({
+        m: { type: Map, of: Number },
+        other: String
+      }, { autoCreate: false, autoIndex: false });
+
+      const newSchema = schema.omit(['m']);
+
+      assert.ok(!newSchema.path('m'));
+      assert.ok(!newSchema.path('m.$*'));
+      assert.equal(newSchema.pathType('m.k'), 'adhocOrUndefined');
+    });
+
+    it('removes the paths of an omitted subdocument (gh-16520)', function() {
+      const schema = new Schema({
+        child: new Schema({ name: String, nested: { x: Number } }, { _id: false }),
+        other: String
+      }, { autoCreate: false, autoIndex: false });
+
+      const newSchema = schema.omit(['child']);
+
+      assert.ok(!newSchema.path('child'));
+      assert.ok(!newSchema.path('child.name'));
+      assert.deepStrictEqual(Object.keys(newSchema.singleNestedPaths), []);
+      assert.equal(newSchema.pathType('child.name'), 'adhocOrUndefined');
+      // The original schema is untouched
+      assert.ok(schema.path('child.name'));
+      assert.equal(schema.pathType('child.nested.x'), 'real');
+    });
+
     it('works with nested paths', function() {
       const schema = Schema({
         name: {
@@ -2586,6 +2731,135 @@ describe('schema', function() {
       }
       assert.ok(threw);
     });
+
+    it('replaces {MODEL} with model name on document validation', function() {
+      const schema = Schema({
+        age: {
+          type: Number,
+          cast: '{VALUE} is not a valid number for model {MODEL}'
+        }
+      });
+      const Test = db.model('gh8300', schema);
+
+      const doc = new Test({ age: 'twenty' });
+      const err = doc.validateSync();
+      assert.ok(err);
+      assert.equal(err.errors['age'].name, 'CastError');
+      assert.equal(
+        err.errors['age'].message,
+        '"twenty" is not a valid number for model gh8300'
+      );
+    });
+
+    it('replaces {MODEL} with model name on single nested subdocument validation', function() {
+      const schema = Schema({
+        nested: {
+          age: {
+            type: Number,
+            cast: '{VALUE} is not a valid number for model {MODEL}'
+          }
+        }
+      });
+      const Test = db.model('gh8300_nested', schema);
+
+      const doc = new Test({ nested: { age: 'twenty' } });
+      const err = doc.validateSync();
+      assert.ok(err);
+      assert.equal(err.errors['nested.age'].name, 'CastError');
+      assert.equal(
+        err.errors['nested.age'].message,
+        '"twenty" is not a valid number for model gh8300_nested'
+      );
+    });
+
+    it('passes model to function cast error format on document validation', function() {
+      const schema = Schema({
+        age: {
+          type: Number,
+          cast: [null, (value, path, model) => `${value} is not a number for model ${model ? model.modelName : 'unknown'}`]
+        }
+      });
+      const Test = db.model('gh8300_fn', schema);
+
+      const doc = new Test({ age: 'twenty' });
+      const err = doc.validateSync();
+      assert.ok(err);
+      assert.equal(err.errors['age'].name, 'CastError');
+      assert.equal(err.errors['age'].message, 'twenty is not a number for model gh8300_fn');
+    });
+
+    it('replaces {MODEL} with model name in castObject() errors', function() {
+      const schema = Schema({
+        age: {
+          type: Number,
+          cast: '{VALUE} is not a valid number for model {MODEL}'
+        },
+        nested: {
+          age: {
+            type: Number,
+            cast: '{VALUE} is not a valid number for model {MODEL}'
+          }
+        },
+        subdoc: Schema({
+          age: {
+            type: Number,
+            cast: '{VALUE} is not a valid number for model {MODEL}'
+          }
+        })
+      });
+      const Test = db.model('gh8300_castObject', schema);
+
+      assert.throws(
+        () => Test.castObject({ age: 'twenty' }),
+        err => err.errors['age'].message ===
+          '"twenty" is not a valid number for model gh8300_castObject'
+      );
+
+      assert.throws(
+        () => Test.castObject({ nested: { age: 'twenty' } }),
+        err => err.errors['nested.age'].message ===
+          '"twenty" is not a valid number for model gh8300_castObject'
+      );
+
+      assert.throws(
+        () => Test.castObject({ subdoc: { age: 'twenty' } }),
+        err => err.errors['subdoc.age'].message ===
+          '"twenty" is not a valid number for model gh8300_castObject'
+      );
+    });
+
+    it('replaces {MODEL} with model name in update and bulkWrite() cast errors', async function() {
+      const schema = Schema({
+        age: {
+          type: Number,
+          cast: '{VALUE} is not a valid number for model {MODEL}'
+        }
+      });
+      const Test = db.model('gh8300_update', schema);
+      const message = '"twenty" is not a valid number for model gh8300_update';
+
+      const isCastError = err => err.name === 'CastError' && err.message === message;
+
+      await assert.rejects(() => Test.updateOne({}, { age: 'twenty' }), isCastError);
+      await assert.rejects(() => Test.updateMany({}, { $set: { age: 'twenty' } }), isCastError);
+      await assert.rejects(() => Test.findOneAndUpdate({}, { age: 'twenty' }), isCastError);
+
+      await assert.rejects(
+        () => Test.updateOne({}, { age: 'twenty' }, { multipleCastError: true }),
+        err => err.name === 'ValidationError' &&
+          err.errors['age'].message === message &&
+          err.message === 'Validation failed: age: ' + message
+      );
+
+      await assert.rejects(
+        () => Test.bulkWrite([{ updateOne: { filter: {}, update: { age: 'twenty' } } }]),
+        isCastError
+      );
+      await assert.rejects(
+        () => Test.bulkWrite([{ deleteOne: { filter: { age: 'twenty' } } }]),
+        isCastError
+      );
+    });
   });
 
   it('copies `.add()`-ed paths when calling `.add()` with a schema argument (gh-8429)', function() {
@@ -2716,6 +2990,22 @@ describe('schema', function() {
 
     const casted = schema.path('ids').cast([[]]);
     assert.equal(casted[0].$path(), 'ids.0');
+  });
+
+  it('preserves the array path index when applying nested array defaults', function() {
+    const schema = new Schema({
+      ids: [[String]],
+      otherIds: [[String]]
+    });
+    schema.path('ids').embeddedSchemaType.default(() => ['default']);
+
+    const casted = schema.path('ids').cast([undefined]);
+    assert.deepEqual(Array.from(casted[0]), ['default']);
+    assert.equal(casted[0].$path(), 'ids.0');
+
+    const casted2 = schema.path('otherIds').cast([['default']]);
+    assert.deepEqual(Array.from(casted2[0]), ['default']);
+    assert.equal(casted2[0].$path(), 'otherIds.0');
   });
 
   describe('cast option (gh-8407)', function() {
@@ -3469,6 +3759,10 @@ describe('schema', function() {
         message.includes('for model "gh15056"'),
         'Warning should include model name'
       );
+      assert.ok(
+        message.includes('MongoDB will not create the duplicate index and options on the duplicate definition'),
+        'Warning should mention duplicate index is not created and options not applied (gh-16476)'
+      );
     } finally {
       sinon.restore();
     }
@@ -3619,6 +3913,58 @@ describe('schema', function() {
           }
         }
       });
+    });
+
+    it('does not repeat null in enum when the enum already lists null', async function() {
+      const schema = new Schema({
+        status: { type: String, enum: ['active', 'inactive', null] },
+        rating: { type: Number, enum: [1, 2, null] },
+        tags: { type: [String], enum: ['a', null] }
+      }, { autoCreate: false, autoIndex: false });
+
+      assert.deepStrictEqual(schema.toJSONSchema({ useBsonType: true }), {
+        required: ['_id'],
+        properties: {
+          _id: {
+            bsonType: 'objectId'
+          },
+          status: {
+            bsonType: ['string', 'null'],
+            enum: ['active', 'inactive', null]
+          },
+          rating: {
+            bsonType: ['number', 'null'],
+            enum: [1, 2, null]
+          },
+          tags: {
+            bsonType: ['array', 'null'],
+            items: {
+              bsonType: ['string', 'null'],
+              enum: ['a', null]
+            }
+          }
+        }
+      });
+
+      // MongoDB rejects a `$jsonSchema` whose `enum` repeats a value, so the
+      // collection cannot be created at all when `null` is listed twice.
+      await db.createCollection(collectionName, {
+        validator: {
+          $jsonSchema: schema.toJSONSchema({ useBsonType: true })
+        }
+      });
+      const Test = db.model('Test', schema, collectionName);
+
+      const doc = await Test.create({ status: 'active', rating: 1, tags: ['a'] });
+      assert.equal(doc.status, 'active');
+      assert.equal(doc.rating, 1);
+
+      const ajv = new Ajv();
+      const validate = ajv.compile(schema.toJSONSchema());
+
+      assert.ok(validate({ _id: '0'.repeat(24), status: 'active', rating: 1, tags: ['a'] }));
+      assert.ok(validate({ _id: '0'.repeat(24), status: null, rating: null, tags: null }));
+      assert.ok(!validate({ _id: '0'.repeat(24), status: 'archived' }));
     });
 
     it('handles all primitive data types', async function() {
@@ -4120,6 +4466,104 @@ describe('schema', function() {
       assert.ok(validate({ _id: '0'.repeat(24), author: 'a'.repeat(24) }));
       assert.ok(!validate({ _id: 'not-an-objectid' }));
       assert.ok(!validate({ _id: '0'.repeat(24), author: 'not-an-objectid' }));
+    });
+
+    it('puts enums on array elements rather than on the array (gh-16443)', async function() {
+      const schema = new Schema({
+        tags: { type: [String], enum: ['funny', 'sad'] },
+        scores: [{ type: Number, enum: [1, 2] }]
+      }, { autoCreate: false, autoIndex: false });
+
+      assert.deepStrictEqual(schema.toJSONSchema({ useBsonType: true }), {
+        required: ['_id'],
+        properties: {
+          tags: {
+            bsonType: ['array', 'null'],
+            items: {
+              bsonType: ['string', 'null'],
+              enum: ['funny', 'sad', null]
+            }
+          },
+          scores: {
+            bsonType: ['array', 'null'],
+            items: {
+              bsonType: ['number', 'null'],
+              enum: [1, 2, null]
+            }
+          },
+          _id: {
+            bsonType: 'objectId'
+          }
+        }
+      });
+
+      await db.createCollection(collectionName, {
+        validator: {
+          $jsonSchema: schema.toJSONSchema({ useBsonType: true })
+        }
+      });
+      const Test = db.model('Test', schema, collectionName);
+
+      const doc = await Test.create({ tags: ['funny'], scores: [1, 2] });
+      assert.deepStrictEqual(doc.toObject().tags, ['funny']);
+
+      // Neither path is required, so `null` is a valid element: it's in `items.enum`
+      // and `'null'` is in `items.bsonType`.
+      const withNulls = await Test.create({ tags: [null], scores: [null] });
+      assert.deepStrictEqual(withNulls.toObject().tags, [null]);
+      assert.deepStrictEqual(withNulls.toObject().scores, [null]);
+
+      await assert.rejects(
+        Test.create([{ tags: ['funny', 'something else'] }], { validateBeforeSave: false }),
+        /MongoServerError: Document failed validation/
+      );
+
+      const ajv = new Ajv();
+      const validate = ajv.compile(schema.toJSONSchema());
+
+      assert.ok(validate({ _id: '0'.repeat(24), tags: ['funny', 'sad'], scores: [1] }));
+      assert.ok(validate({ _id: '0'.repeat(24), tags: [null], scores: [null] }));
+      assert.ok(!validate({ _id: '0'.repeat(24), tags: ['funny', 'something else'] }));
+      assert.ok(!validate({ _id: '0'.repeat(24), scores: [3] }));
+    });
+
+    it('supports enums declared as an object or set with enum() (gh-16443)', function() {
+      const schema = new Schema({
+        status: { type: String, enum: { values: ['on', 'off'], message: '{VALUE} is not supported' } },
+        level: { type: Number, required: true, enum: { values: [1, 2], message: 'invalid' } },
+        color: String
+      }, { autoCreate: false, autoIndex: false });
+      schema.path('color').enum('red', 'green');
+
+      assert.deepStrictEqual(schema.toJSONSchema(), {
+        type: 'object',
+        required: ['level', '_id'],
+        properties: {
+          status: {
+            type: ['string', 'null'],
+            enum: ['on', 'off', null]
+          },
+          level: {
+            type: 'number',
+            enum: [1, 2]
+          },
+          color: {
+            type: ['string', 'null'],
+            enum: ['red', 'green', null]
+          },
+          _id: {
+            type: 'string',
+            pattern: '^[A-Fa-f0-9]{24}$'
+          }
+        }
+      });
+
+      const ajv = new Ajv();
+      const validate = ajv.compile(schema.toJSONSchema());
+
+      assert.ok(validate({ _id: '0'.repeat(24), level: 1, status: null, color: 'red' }));
+      assert.ok(!validate({ _id: '0'.repeat(24), level: 1, status: 'maybe' }));
+      assert.ok(!validate({ _id: '0'.repeat(24), level: 3 }));
     });
   });
 

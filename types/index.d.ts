@@ -150,6 +150,8 @@ declare module 'mongoose' {
     ? IfAny<U, T & { _id: Types.ObjectId }, T & Required<{ _id: U }>>
     : T & { _id: Types.ObjectId };
 
+  export type Default_id<T, TSchemaOptions = {}> = TSchemaOptions extends { _id: false } ? T : Require_id<T>;
+
   export type Default__v<T, TSchemaOptions = {}> = TSchemaOptions extends { versionKey: false }
     ? T
     : TSchemaOptions extends { versionKey: infer VK }
@@ -491,6 +493,24 @@ declare module 'mongoose' {
     method<Context = THydratedDocumentType>(name: string, fn: (this: Context, ...args: any[]) => any, opts?: any): this;
     method(obj: Partial<TInstanceMethods>): this;
 
+    /** Adds a query helper to this schema. */
+    queryHelper<Name extends string, Fn extends (this: QueryWithHelpers<any, DocType, TQueryHelpers, RawDocType>, ...args: any[]) => any>(
+      name: Name,
+      fn: Fn
+    ): Schema<
+      RawDocType,
+      TModelType,
+      TInstanceMethods,
+      TQueryHelpers & { [K in Name]: Fn },
+      TVirtuals,
+      TStaticMethods,
+      TSchemaOptions,
+      DocType,
+      THydratedDocumentType,
+      TSchemaDefinition,
+      LeanResultType
+    >;
+
     /** Object of currently defined methods on this schema. */
     methods: AddThisParameter<TInstanceMethods, THydratedDocumentType> & AnyObject;
 
@@ -665,12 +685,41 @@ declare module 'mongoose' {
 
     /** Adds static "class" methods to Models compiled from this schema. */
     static<K extends keyof TStaticMethods>(name: K, fn: TStaticMethods[K]): this;
-    static(obj: Partial<TStaticMethods> & { [name: string]: (this: TModelType, ...args: any[]) => any }): this;
-    static(name: string, fn: (this: TModelType, ...args: any[]) => any): this;
+    static<Fns extends Partial<TStaticMethods> & { [name: string]: (this: TModelType, ...args: any[]) => any }>(
+      obj: Fns
+    ): Schema<
+      RawDocType,
+      TModelType,
+      TInstanceMethods,
+      TQueryHelpers,
+      TVirtuals,
+      TStaticMethods & Fns,
+      TSchemaOptions,
+      DocType,
+      THydratedDocumentType,
+      TSchemaDefinition,
+      LeanResultType
+    >;
+    static<Name extends string, Fn extends (this: TModelType, ...args: any[]) => any>(
+      name: Name,
+      fn: Fn
+    ): Schema<
+      RawDocType,
+      TModelType,
+      TInstanceMethods,
+      TQueryHelpers,
+      TVirtuals,
+      TStaticMethods & { [K in Name]: Fn },
+      TSchemaOptions,
+      DocType,
+      THydratedDocumentType,
+      TSchemaDefinition,
+      LeanResultType
+    >;
 
     /** Object of currently defined statics on this schema. */
     statics: { [F in keyof TStaticMethods]: TStaticMethods[F] } &
-    { [name: string]: (this: TModelType, ...args: any[]) => unknown };
+    { [name: string]: ((this: TModelType, ...args: any[]) => unknown) & SupportsMiddlewareOption };
 
     toJSONSchema(options?: { useBsonType?: boolean }): Record<string, any>;
 
@@ -823,6 +872,7 @@ declare module 'mongoose' {
   export type ReturnsNewDoc = { new: true } | { returnOriginal: false } | { returnDocument: 'after' };
 
   export type ArrayProjectionOperators = { $slice: number | [number, number]; $elemMatch?: never } | { $elemMatch: Record<string, any>; $slice?: never };
+  export type ProjectionOperators = { $meta: string };
   /**
    * This Type Assigns `Element | undefined` recursively to the `T` type.
    * if it is an array it will do this to the element of the array, if it is an object it will do this for the properties of the object.
@@ -840,14 +890,14 @@ declare module 'mongoose' {
     }
   */
   export type Projector<T, Element> = T extends Array<infer U>
-    ? Projector<U, Element> | ArrayProjectionOperators
+    ? Projector<U, Element> | ArrayProjectionOperators | ProjectionOperators
     : T extends TreatAsPrimitives
-      ? Element
+      ? Element | ProjectionOperators
       : T extends Record<string, any>
         ? {
-          [K in keyof T]?: T[K] extends Record<string, any> ? Projector<T[K], Element> | Element : Element;
+          [K in keyof T]?: T[K] extends Record<string, any> ? Projector<T[K], Element> | Element | ProjectionOperators : Element | ProjectionOperators;
         }
-        : Element;
+        : Element | ProjectionOperators;
   type _IDType = { _id?: boolean | number };
   export type InclusionProjection<T> = IsItRecordAndNotAny<T> extends true
     ? Omit<Projector<WithLevel1NestedPaths<T>, boolean | number>, '_id'> & _IDType
@@ -1121,6 +1171,31 @@ declare module 'mongoose' {
     : T;
 
   /**
+   * Extracts the `toObject` or `toJSON` options declared in the schema options.
+   * The runtime applies these as defaults when the corresponding method is
+   * called without arguments.
+   */
+  export type SchemaDeclaredToObjectOptions<TSchemaOptions, Key extends 'toObject' | 'toJSON'> =
+    Key extends keyof TSchemaOptions
+      ? NonNullable<TSchemaOptions[Key]> extends infer O extends ToObjectOptions
+        ? O
+        : {}
+      : {};
+
+  /**
+   * Computes the return type of toObject/toJSON when called without arguments,
+   * applying the options declared in the schema like the runtime does. When the
+   * schema declares no options for the method, the plain document shape is
+   * returned without running it through the option transforms.
+   */
+  export type DefaultToObjectReturnType<DocType, TVirtuals, TSchemaOptions, Key extends 'toObject' | 'toJSON'> =
+    SchemaDeclaredToObjectOptions<TSchemaOptions, Key> extends infer O extends ToObjectOptions
+      ? keyof O extends never
+        ? Default__v<Require_id<DocType>, TSchemaOptions>
+        : ToObjectReturnType<DocType, TVirtuals, O, TSchemaOptions>
+      : Default__v<Require_id<DocType>, TSchemaOptions>;
+
+  /**
    * Computes the return type of toObject/toJSON based on the provided options.
    * Uses a single-pass transform for flatten operations to correctly handle all combinations.
    */
@@ -1154,7 +1229,7 @@ declare module 'mongoose' {
   /* for ts-mongoose */
   export class mquery { }
 
-  export function overwriteMiddlewareResult(val: any): Kareem.OverwriteMiddlewareResult;
+  export function overwriteMiddlewareResult(val: any): Kareem.OverwriteResult;
 
   export function skipMiddlewareFunction(val: any): Kareem.SkipWrappedFunction;
 

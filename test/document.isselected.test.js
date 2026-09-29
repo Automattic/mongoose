@@ -370,4 +370,54 @@ describe('document', function() {
     assert.ok(doc.isDirectSelected(['nested.deep', 'nested']));
     assert.ok(!doc.isDirectSelected(['nested.cool', 'nested']));
   });
+
+  describe('flat projections (gh-16373)', function() {
+    it('inclusive projection with no nested keys', function() {
+      const doc = new TestDocument(undefined, { test: 1, numbers: 1 });
+
+      assert.ok(doc.isSelected('test'));
+      assert.ok(doc.isSelected('numbers'));
+      assert.ok(doc.isSelected('_id'));
+      // `nested` is not projected, so neither it nor its children are selected
+      assert.ok(!doc.isSelected('nested'));
+      assert.ok(!doc.isSelected('nested.age'));
+      assert.ok(!doc.isSelected('nested.deep.x'));
+      assert.ok(!doc.isSelected('date'));
+    });
+
+    it('exclusive projection with no nested keys', function() {
+      const doc = new TestDocument(undefined, { nested: 0 });
+
+      assert.ok(doc.isSelected('test'));
+      assert.ok(doc.isSelected('date'));
+      // `nested` is excluded, so its children are excluded too
+      assert.ok(!doc.isSelected('nested'));
+      assert.ok(!doc.isSelected('nested.age'));
+      assert.ok(!doc.isSelected('nested.deep.x'));
+    });
+
+    it('projecting a parent selects its children', function() {
+      const doc = new TestDocument(undefined, { nested: 1 });
+
+      assert.ok(doc.isSelected('nested'));
+      assert.ok(doc.isSelected('nested.age'));
+      assert.ok(doc.isSelected('nested.deep.x'));
+      assert.ok(!doc.isSelected('test'));
+    });
+
+    it('agrees with nested projections that select the same paths', function() {
+      // A flat projection takes the optimized path, a projection containing a
+      // nested key takes the general path. Both must agree on shared paths.
+      const flat = new TestDocument(undefined, { nested: 1 });
+      const nested = new TestDocument(undefined, { nested: 1, 'nested2.yup': 1 });
+
+      for (const path of ['nested', 'nested.age', 'nested.deep.x', 'test', 'date']) {
+        assert.equal(
+          flat.isSelected(path),
+          nested.isSelected(path),
+          `disagreement on ${path}`
+        );
+      }
+    });
+  });
 });

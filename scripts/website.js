@@ -34,11 +34,6 @@ const CustomIdRegex = /{#([a-zA-Z0-9_-]+)}(?: *)$/;
 
 const isMain = require.main === module;
 
-let jobs = [];
-try {
-  jobs = require('../docs/data/jobs.json');
-} catch {}
-
 let opencollectiveSponsors = [];
 try {
   opencollectiveSponsors = require('../docs/data/opencollective.json');
@@ -570,7 +565,6 @@ async function renderFile(filename, options, isReload = false) {
   }
 
   options.outputUrl = newfile.replace(cwd, '');
-  options.jobs = jobs;
   options.versions = versionObj;
   options.affiliateAd = options.affiliateAd || null;
 

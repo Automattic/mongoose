@@ -933,7 +933,7 @@ hr {
 
 
 /* ----------------------------------------------------------------
-   Right sidebar — TOC + ads + jobs
+   Right sidebar — TOC + ads
 ---------------------------------------------------------------- */
 .right-sidebar {
   grid-column: 3;
@@ -1018,7 +1018,7 @@ hr {
   font-weight: 500;
 }
 
-/* Ads + jobs live under the TOC */
+/* Ads live under the TOC */
 .right-sidebar-aside {
   display: flex;
   flex-direction: column;
@@ -1048,96 +1048,6 @@ hr {
     display: none;
   }
 }
-
-/* Jobs block, inlined into the right sidebar (no longer fixed-position) */
-.jobs {
-  font-size: 12px;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  overflow: hidden;
-  background-color: var(--bg-primary);
-}
-
-.jobs-title {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-primary);
-  margin: 0;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--border-color-soft);
-  background-color: var(--bg-secondary);
-}
-
-.job-listing {
-  display: grid;
-  grid-template-columns: 32px 1fr;
-  gap: 10px;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--border-color-soft);
-  color: var(--text-primary);
-  text-decoration: none;
-  transition: background-color 0.15s ease;
-}
-
-.job-listing:last-child {
-  border-bottom: none;
-}
-
-.job-listing:hover {
-  background-color: var(--bg-secondary);
-}
-
-.job-listing .company-logo {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.job-listing .company-logo img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border: 0;
-}
-
-.job-listing .company {
-  font-weight: 600;
-  font-size: 12px;
-  color: var(--text-primary);
-}
-
-.job-listing .title {
-  font-size: 11px;
-  color: var(--text-secondary);
-  margin-top: 2px;
-}
-
-.job-listing .location {
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-top: 2px;
-}
-
-.jobs-view-more {
-  padding: 8px 12px;
-  text-align: center;
-  font-size: 12px;
-  background-color: var(--bg-secondary);
-}
-
-.jobs-view-more a {
-  color: var(--accent);
-  font-weight: 500;
-}
-
-.jobs-view-more a:hover {
-  color: var(--accent-hover);
-}
-
 
 /* ----------------------------------------------------------------
    Assistant

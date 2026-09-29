@@ -283,6 +283,7 @@ declare module 'mongoose' {
     typeKey: 'type';
     id: true;
     _id: true;
+    discriminatorKey: '__t';
     timestamps: false;
     versionKey: '__v'
   }

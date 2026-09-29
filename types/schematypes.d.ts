@@ -1,4 +1,4 @@
-import * as BSON from 'bson';
+import { BSON } from 'mongodb';
 
 declare module 'mongoose' {
   /** The Mongoose Date [SchemaType](/docs/schematypes.html). */
@@ -115,12 +115,12 @@ declare module 'mongoose' {
      * The default value for this path. If a function, Mongoose executes the function
      * and uses the return value as the default.
      */
-    default?: DefaultType<T> | ((this: THydratedDocumentType, doc: THydratedDocumentType) => DefaultType<T> | null | undefined) | null;
+    default?: DefaultType<T> | ((this: THydratedDocumentType, doc: THydratedDocumentType) => DefaultType<T> | null | undefined) | null | undefined;
 
     /**
      * The model that `populate()` should use if populating this path.
      */
-    ref?: string | Model<any> | ((this: any, doc: any) => string | Model<any>);
+    ref?: string | Model<any, any, any, any> | ((this: any, doc: any) => string | Model<any, any, any, any>);
 
     /**
      * The path in the document that `populate()` should use to find the model
@@ -354,7 +354,7 @@ declare module 'mongoose' {
      * Set the model that this path refers to. This is the option that [populate](https://mongoosejs.com/docs/populate.html)
      * looks at to determine the foreign collection it should query.
      */
-    ref(ref: string | boolean | Model<any>): this;
+    ref(ref: string | boolean | Model<any, any, any, any>): this;
 
     /**
      * Adds a required validator to this SchemaType. The validator gets added

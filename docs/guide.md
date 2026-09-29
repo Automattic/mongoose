@@ -1526,15 +1526,41 @@ Similar to [`autoIndex`](#autoIndex), except for automatically creates any [Atla
 Unlike `autoIndex`, this option defaults to false.
 <!-- markdownlint-enable MD051 -->
 
+Mongoose supports both text search and vector search indexes.
+For text search, use `mappings` to define which fields to index.
+For vector search, set `type: 'vectorSearch'` and define vector fields.
+
 ```javascript
-const schema = new Schema({ name: String }, { autoSearchIndex: true });
+// Text search index
+const schema = new Schema({ name: String, description: String }, { autoSearchIndex: true });
 schema.searchIndex({
-  name: 'my-index',
+  name: 'text-search-index',
   definition: { mappings: { dynamic: true } }
 });
-// Will automatically attempt to create the `my-index` search index.
-const Test = mongoose.model('Test', schema);
+
+// Vector search index for semantic search
+const movieSchema = new Schema({
+  title: String,
+  plot_embedding: [Number]  // Vector embeddings
+}, { autoSearchIndex: true });
+
+movieSchema.searchIndex({
+  name: 'vector-search-index',
+  type: 'vectorSearch',
+  definition: {
+    fields: [{
+      type: 'vector',
+      path: 'plot_embedding',
+      numDimensions: 1536,  // Match your embedding model dimensions
+      similarity: 'cosine'
+    }]
+  }
+});
+// Will automatically attempt to create both search indexes.
+const Movie = mongoose.model('Movie', movieSchema);
 ```
+
+For more information, see our [Atlas Search](atlas-search.html) and [Atlas Vector Search](atlas-vector-search.html) guides.
 
 ## option: readConcern {#readConcern}
 

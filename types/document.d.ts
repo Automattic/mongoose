@@ -96,7 +96,7 @@ declare module 'mongoose' {
 
     /** Returns the model with the given name on this document's associated connection. */
     $model<ModelType extends Model<unknown>>(name: string): ModelType;
-    $model<ModelType extends Model<DocType>>(): ModelType;
+    $model<ModelType extends Model<DocType, any, any, any>>(): ModelType;
 
     /**
      * A string containing the current operation that Mongoose is executing
@@ -232,7 +232,7 @@ declare module 'mongoose' {
 
     /** Returns the model with the given name on this document's associated connection. */
     model<ModelType extends Model<unknown>>(name: string): ModelType;
-    model<ModelType extends Model<DocType>>(): ModelType;
+    model<ModelType extends Model<DocType, any, any, any>>(): ModelType;
 
     /** Returns the list of paths that have been modified. */
     modifiedPaths(options?: { includeChildren?: boolean }): Array<string>;
@@ -252,7 +252,7 @@ declare module 'mongoose' {
 
     /** Populates document references. */
     populate<Paths = {}>(path: string | PopulateOptions | (string | PopulateOptions)[]): Promise<PopulateDocumentResult<this, Paths, PopulatedPathsDocumentType<DocType, Paths>, DocType>>;
-    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<any>, match?: AnyObject, options?: PopulateOptions): Promise<PopulateDocumentResult<this, Paths, PopulatedPathsDocumentType<DocType, Paths>, DocType>>;
+    populate<Paths = {}>(path: string, select?: string | AnyObject, model?: Model<any, any, any, any>, match?: AnyObject, options?: PopulateOptions): Promise<PopulateDocumentResult<this, Paths, PopulatedPathsDocumentType<DocType, Paths>, DocType>>;
 
     /** Gets _id(s) used during population of the given `path`. If the path was not populated, returns `undefined`. */
     populated(path: string): any;
@@ -289,9 +289,9 @@ declare module 'mongoose' {
     ): ToObjectReturnType<PopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
     toJSON<PopulatedRawDocType>(
       this: PopulatedDocumentMarker<PopulatedRawDocType, any>
-    ): Default__v<Require_id<PopulatedRawDocType>, TSchemaOptions>;
+    ): DefaultToObjectReturnType<PopulatedRawDocType, TVirtuals, TSchemaOptions, 'toJSON'>;
     toJSON<O extends ToObjectOptions>(options: O): ToObjectReturnType<DocType, TVirtuals, O, TSchemaOptions>;
-    toJSON(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;
+    toJSON(options?: ToObjectOptions): DefaultToObjectReturnType<DocType, TVirtuals, TSchemaOptions, 'toJSON'>;
     toJSON<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
 
     /** Converts this document into a plain-old JavaScript object ([POJO](https://masteringjs.io/tutorials/fundamentals/pojo)). */
@@ -309,9 +309,9 @@ declare module 'mongoose' {
     ): ToObjectReturnType<PopulatedRawDocType, TVirtuals, O, TSchemaOptions>;
     toObject<PopulatedRawDocType>(
       this: PopulatedDocumentMarker<PopulatedRawDocType, any>
-    ): Default__v<Require_id<PopulatedRawDocType>, TSchemaOptions>;
+    ): DefaultToObjectReturnType<PopulatedRawDocType, TVirtuals, TSchemaOptions, 'toObject'>;
     toObject<O extends ToObjectOptions>(options: O): ToObjectReturnType<DocType, TVirtuals, O, TSchemaOptions>;
-    toObject(options?: ToObjectOptions): Default__v<Require_id<DocType>, TSchemaOptions>;
+    toObject(options?: ToObjectOptions): DefaultToObjectReturnType<DocType, TVirtuals, TSchemaOptions, 'toObject'>;
     toObject<T>(options?: ToObjectOptions): Default__v<Require_id<T>, ResolveSchemaOptions<TSchemaOptions>>;
 
     /** Clears the modified state on the specified path. */

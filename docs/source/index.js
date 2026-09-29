@@ -5,11 +5,6 @@ let sponsors = [];
 try {
   sponsors = require('../data/sponsors.json');
 } catch {}
-let jobs = [];
-try {
-  jobs = require('../data/jobs.json');
-} catch {}
-
 const api = require('./api');
 
 /**
@@ -22,7 +17,6 @@ const api = require('./api');
  * @property {Boolean} [markdown] Enable markdown processing
  * @property {Boolean} [guide] Indicate the page is a guide
  * @property {Boolean} [schema]
- * @property {*}  [jobs] Overwrite which jobs should be listed in the page (applied automatically)
  * @property {{image: String, href: String}} [affiliateAd] Optional affiliate ad rendered under the right-sidebar ToC. Falsy `image` hides the ad.
  */
 
@@ -111,11 +105,9 @@ docs['docs/sponsors.pug'] = {
   sponsors
 };
 docs['docs/async-await.md'] = { title: 'Using Async/Await with Mongoose', markdown: true };
-docs['docs/jobs.pug'] = {
-  title: 'Mongoose MongoDB Jobs',
-  jobs
-};
 docs['docs/change-streams.md'] = { title: 'MongoDB Change Streams in NodeJS with Mongoose', markdown: true };
+docs['docs/atlas-search.md'] = { guide: true, title: 'Atlas Search', markdown: true };
+docs['docs/atlas-vector-search.md'] = { guide: true, title: 'Atlas Vector Search', markdown: true };
 docs['docs/lodash.md'] = { title: 'Using Mongoose with Lodash', markdown: true };
 docs['docs/incompatible_packages.md'] = { title: 'Known Incompatible npm Packages', markdown: true };
 docs['docs/check-version.md'] = { title: 'How to Check Your Mongoose Version', markdown: true };
@@ -125,10 +117,6 @@ docs['docs/tutorials/ssl.md'] = {
   ...docs['docs/tutorials/ssl.md'],
   affiliateAd: { image: '/docs/css/railway-ad-4.jpg', href: 'https://railway.com?referralCode=CD4_kV' }
 };
-
-for (const props of Object.values(docs)) {
-  props.jobs = jobs;
-}
 
 module.exports.fileMap = docs;
 /** Re-export for nav without extra filtering */

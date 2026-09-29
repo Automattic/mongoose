@@ -38,6 +38,8 @@ async function run() {
 
   const numIterations = 500;
   const c = FooModel.collection;
+  let totalDriverInsertTime = 0;
+  let totalMongooseSaveTime = 0;
   for (let i = 0; i < 15000; ++i) {
     // Warm up
     await c.insertOne({
@@ -96,13 +98,16 @@ async function run() {
     }
     const mongooseSaveEnd = Date.now();
 
-    const results = {
-      'Average mongoose save time ms': +((mongooseSaveEnd - mongooseSaveStart) / numIterations).toFixed(2),
-      'Average driver insertOne time ms': +((driverInsertEnd - driverInsertStart) / numIterations).toFixed(2)
-    };
-
-    console.log(JSON.stringify(results, null, '  '));
+    totalDriverInsertTime += driverInsertEnd - driverInsertStart;
+    totalMongooseSaveTime += mongooseSaveEnd - mongooseSaveStart;
   }
+
+  const results = {
+    'Average mongoose save time ms': +(totalMongooseSaveTime / (3 * numIterations)).toFixed(2),
+    'Average driver insertOne time ms': +(totalDriverInsertTime / (3 * numIterations)).toFixed(2)
+  };
+
+  console.log(JSON.stringify(results, null, '  '));
 
 
   await client.close();

@@ -1,9 +1,7 @@
 # Queries
 
-Mongoose [models](models.html) provide several static helper functions
-for [CRUD operations](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete).
-Each of these functions returns a
-[mongoose `Query` object](api/query.html#Query).
+Mongoose [models](models.html) provide several static helper functions for [CRUD operations](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete).
+Each of these functions returns a [mongoose `Query` object](api/query.html#Query).
 
 * [`Model.deleteMany()`](api.html#model_Model-deleteMany)
 * [`Model.deleteOne()`](api.html#model_Model-deleteOne)
@@ -106,6 +104,53 @@ await q.then(() => console.log('Update 2'));
 // Throws "Query was already executed: Test.updateMany({}, { isDeleted: true })"
 await q.then(() => console.log('Update 3'));
 ```
+
+## Pagination
+
+There are two common approaches to pagination: skip/limit pagination and
+cursor-based pagination.
+
+Skip/limit pagination, also called offset pagination, uses `sort()`, `skip()`,
+and `limit()` to retrieve a page at a particular offset.
+If the UI needs the exact total number of matching documents, run `find()` and `countDocuments()` separately:
+
+```javascript
+const filter = { active: true };
+const options = { sort: { createdAt: -1 }, skip: 20, limit: 20 };
+
+const [documents, total] = await Promise.all([
+  User.find(filter, null, options),
+  User.countDocuments(filter)
+]);
+```
+
+This pattern is sufficiently common that Mongoose provides a convenience wrapper `Model.findAndCount()` around these two operations:
+
+```javascript
+// The following...
+const [documents, total] = await User.findAndCount(filter, null, options);
+
+// is equivalent to:
+const [documents, total] = await Promise.all([
+  User.find(filter, null, options),
+  User.countDocuments(filter)
+]);
+```
+
+For large result sets, `skip()` can be inefficient, particularly when frequently calling `skip()` with large values.
+`skip()` has to loop through the documents to skip - `.limit(20).skip(100)` means MongoDB needs to iterate through 120 documents.
+Performance degrades linearly as `skip()` size grows.
+
+Instead of an offset, use a value from the last document on the previous page,
+such as `_id` or a timestamp, in the next filter.
+For example, with a descending `_id` sort:
+
+```javascript
+const filter = lastSeenId == null ? {} : { _id: { $lt: lastSeenId } };
+const documents = await User.find(filter).sort({ _id: -1 }).limit(20);
+```
+
+Presuming you filter by an indexed field (MongoDB collections always have an index on `_id`), cursor-based pagination provides consistent performance as the number of documents to skip grows.
 
 ## References to other documents {#refs}
 

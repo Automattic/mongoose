@@ -56,7 +56,7 @@ describe('BigInt', function() {
     assert.equal(err.errors['bigint'].name, 'CastError');
     assert.equal(
       err.errors['bigint'].message,
-      'Cast to BigInt failed for value "foo bar" (type string) at path "bigint" because of "SyntaxError"'
+      'Cast to BigInt failed for value "foo bar" (type string) at path "bigint" for model "Test" because of "SyntaxError"'
     );
   });
 

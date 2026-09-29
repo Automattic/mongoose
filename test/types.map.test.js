@@ -893,6 +893,29 @@ describe('Map', function() {
     assert.equal(doc.get('books.casino-royale'), 'Casino Royale, by Ian Fleming');
   });
 
+  it('runs setters declared on the map path', function() {
+    const schema = mongoose.Schema({
+      books: {
+        type: Map,
+        of: String,
+        set: v => {
+          const res = {};
+          for (const key of Object.keys(v)) {
+            res[key.toLowerCase()] = v[key];
+          }
+          return res;
+        }
+      }
+    });
+    const Model = db.model('Test', schema);
+
+    const doc = new Model({ books: { 'Casino-Royale': 'Casino Royale' } });
+    assert.deepStrictEqual(Array.from(doc.books.keys()), ['casino-royale']);
+
+    doc.books = { 'Live-And-Let-Die': 'Live and Let Die' };
+    assert.deepStrictEqual(Array.from(doc.books.keys()), ['live-and-let-die']);
+  });
+
   it('handles validation of document array with maps and nested paths (gh-8767)', function() {
     const subSchema = Schema({
       _id: Number,

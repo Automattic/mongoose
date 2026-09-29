@@ -119,6 +119,16 @@ describe('castexpr', function() {
     assert.deepStrictEqual(res, { $eq: [{ $round: ['$value'] }, 2] });
   });
 
+  it('casts nested expressions on the right-hand side of a comparison', function() {
+    const testSchema = new Schema({ isActive: Boolean, count: Number, nums: [Number] });
+
+    let res = cast$expr({ $eq: ['$isActive', { $gt: ['$count', '5'] }] }, testSchema);
+    assert.deepStrictEqual(res, { $eq: ['$isActive', { $gt: ['$count', 5] }] });
+
+    res = cast$expr({ $eq: ['$isActive', { $in: ['42', '$nums'] }] }, testSchema);
+    assert.deepStrictEqual(res, { $eq: ['$isActive', { $in: [42, '$nums'] }] });
+  });
+
   it('casts $switch (gh-14751)', function() {
     const testSchema = new Schema({
       name: String,

@@ -1155,15 +1155,15 @@ describe('model: updateOne:', function() {
       const Model = db.model('Test', schema);
 
       let err = await Model.updateOne({}, { $rename: { foo: { prop: 'baz' } } }).then(() => null, err => err);
-      assert.equal(err.name, 'CastError');
+      assert.equal(err.name, 'CastError', String(err));
       assert.ok(err.message.includes('foo.$rename'));
 
       err = await Model.updateOne({}, { $rename: { foo: null } }).then(() => null, err => err);
-      assert.equal(err.name, 'CastError');
+      assert.equal(err.name, 'CastError', String(err));
       assert.ok(err.message.includes('foo.$rename'));
 
       err = await Model.updateOne({}, { $rename: { foo: undefined } }).then(() => null, err => err);
-      assert.equal(err.name, 'CastError');
+      assert.equal(err.name, 'CastError', String(err));
       assert.ok(err.message.includes('foo.$rename'));
     });
 

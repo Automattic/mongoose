@@ -1,3 +1,19 @@
+9.10.3 / 2026-09-29
+===================
+ * fix(model): preserve unsaved documents after ordered bulkSave errors #16533 #16532 [IbrahimHafez1](https://github.com/IbrahimHafez1)
+ * fix(model): don't mutate the caller's update object in bulkWrite updateMany #16526 [fadiroot](https://github.com/fadiroot)
+ * fix(schema): run setters declared on the union path itself #16528 [giaBaoJS](https://github.com/giaBaoJS)
+ * fix(collection): open collection if connection was already opened #16527 #16525 #16524
+ * fix(query+model): replace {MODEL} in cast error messages from update and bulkWrite casting #16529 #16502 #16480
+
+9.10.2 / 2026-09-22
+===================
+ * fix(schema): drop subpaths and singleNestedPaths when a path is removed #16521 #16520 [luantaraschi](https://github.com/luantaraschi)
+ * fix(schema): register path-level setters on Map paths #16518 [giaBaoJS](https://github.com/giaBaoJS)
+ * fix(model): replace {MODEL} in castObject() cast error messages #16502 #16480 [dylanpulver](https://github.com/dylanpulver)
+ * fix: preserve circular arrays when cloning with a seen map #16514 [Shubham-Padkonde](https://github.com/Shubham-Padkonde)
+ * docs(async-await): fix broken link to Mongoose API docs #16517 [joshuablac](https://github.com/joshuablac)
+
 9.10.1 / 2026-09-14
 ===================
  * types: relax populate Model generics to allow typed virtuals to be passed to populate in TypeScript 7 with skipLibCheck #16503

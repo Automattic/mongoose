@@ -836,6 +836,29 @@ describe('connections:', function() {
       return db.close();
     });
 
+    it('supports connection-level maxTimeMS on a useDb() connection', async function() {
+      const db = await mongoose.createConnection(start.uri).asPromise();
+
+      try {
+        const db2 = db.useDb(start.databases[1]);
+        db2.set('maxTimeMS', 1000);
+
+        const schema = new Schema({ name: String });
+        const ParentModel = db.model('Parent', schema);
+        const ChildModel = db2.model('Child', schema);
+
+        const childQuery = ChildModel.findOne();
+        await childQuery;
+        assert.strictEqual(childQuery.getOptions().maxTimeMS, 1000);
+
+        const parentQuery = ParentModel.findOne();
+        await parentQuery;
+        assert.strictEqual(parentQuery.getOptions().maxTimeMS, undefined);
+      } finally {
+        await db.close();
+      }
+    });
+
     it('supports removing db (gh-11821)', async function() {
       const db = await mongoose.createConnection(start.uri).asPromise();
 
@@ -1946,5 +1969,22 @@ describe('connections:', function() {
       { _id: { min: 5, max: 10 }, count: 1 },
       { _id: { min: 10, max: 10 }, count: 1 }
     ]);
+  });
+
+  it('builds indexes for models compiled while connection is stale (gh-16524)', async function() {
+    const db = await mongoose.createConnection(start.uri).asPromise();
+
+    db._lastHeartbeatAt = 1;
+    assert.equal(db.readyState, STATES.disconnected);
+
+    const Test = db.model('gh16524', new Schema({ name: { type: String, unique: true } }));
+
+    db.client.emit('serverHeartbeatSucceeded');
+
+    await Test.init();
+    const indexes = await Test.listIndexes();
+    assert.deepStrictEqual(indexes.map(index => index.name), ['_id_', 'name_1']);
+
+    await db.close();
   });
 });

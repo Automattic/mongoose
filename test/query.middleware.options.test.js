@@ -15,6 +15,52 @@ describe('middleware query', function() {
   afterEach(() => require('./util').clearTestData(db));
   afterEach(() => require('./util').stopRemainingOps(db));
 
+  describe('delegated document writes', function() {
+    for (const operation of ['updateOne', 'deleteOne']) {
+      for (const middleware of [undefined, false]) {
+        it(`${operation} retains the shard key with middleware ${middleware}`, async function() {
+          const { User, user } = await createTestContext({ operation });
+          const write = sinon.spy(User.collection.collection, operation);
+
+          let result;
+          try {
+            result = operation === 'updateOne' ?
+              await user.updateOne({ name: 'Beth' }, { middleware }) :
+              await user.deleteOne({ middleware });
+          } finally {
+            write.restore();
+          }
+
+          assert.strictEqual(write.callCount, 1);
+          assert.deepStrictEqual(write.firstCall.args[0], { _id: user._id, tenantId: 'north' });
+          const stored = await User.collection.findOne({ _id: user._id });
+          if (operation === 'updateOne') {
+            assert.strictEqual(result.modifiedCount, 1);
+            assert.strictEqual(stored.name, 'Beth');
+          } else {
+            assert.strictEqual(result.deletedCount, 1);
+            assert.strictEqual(stored, null);
+          }
+        });
+      }
+    }
+
+    async function createTestContext({ operation }) {
+      const schema = new Schema({ tenantId: String, name: String }, {
+        shardKey: { tenantId: 1 }, suppressReservedKeysWarning: true
+      });
+      schema.methods[operation] = operation === 'updateOne' ? function(update, options) {
+        return mongoose.Document.prototype.updateOne.call(this, update, options);
+      } : function(options) {
+        return mongoose.Model.prototype.deleteOne.call(this, options);
+      };
+      const User = db.model('User', schema);
+      const raw = { _id: new mongoose.Types.ObjectId(), tenantId: 'north', name: 'Ann' };
+      await User.collection.insertOne(raw);
+      return { User, user: User.hydrate(raw) };
+    }
+  });
+
   describe('query instance middleware', function() {
     const selections = [
       { name: 'no middleware option', options: {}, pre: 1, post: 1 },

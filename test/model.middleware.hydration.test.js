@@ -266,6 +266,33 @@ describe('middleware hydration', function() {
     }
   });
 
+  describe('scalar nested-array hydration', function() {
+    for (const selection of selections) {
+      it(`retains ${selection.name} middleware when wrapping a scalar`, function() {
+        const { Team, calls } = createTestContext();
+
+        const team = Team.hydrate({ groups: { name: 'Maya' } }, null, selection.options);
+
+        const child = team.groups[0][0];
+        assert.ok(child instanceof mongoose.Document);
+        assert.strictEqual(child.name, 'Maya');
+        assert.strictEqual(child.ownerDocument(), team);
+        assert.strictEqual(child.isNew, false);
+        assert.strictEqual(team.isNew, false);
+        assert.deepStrictEqual(team.modifiedPaths(), ['groups']);
+        assert.deepStrictEqual(calls, { pre: selection.pre, post: selection.post });
+      });
+    }
+
+    function createTestContext() {
+      const calls = { pre: 0, post: 0 };
+      const child = new Schema({ name: String });
+      child.pre('init', function() { ++calls.pre; });
+      child.post('init', function() { ++calls.post; });
+      return { Team: db.model('Team', new Schema({ groups: [[child]] })), calls };
+    }
+  });
+
   describe('embedded child clone hydration', function() {
     for (const selection of selections) {
       it(`preserves cloned children with ${selection.name} middleware`, function() {

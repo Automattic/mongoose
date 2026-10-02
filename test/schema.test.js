@@ -2827,6 +2827,39 @@ describe('schema', function() {
           '"twenty" is not a valid number for model gh8300_castObject'
       );
     });
+
+    it('replaces {MODEL} with model name in update and bulkWrite() cast errors', async function() {
+      const schema = Schema({
+        age: {
+          type: Number,
+          cast: '{VALUE} is not a valid number for model {MODEL}'
+        }
+      });
+      const Test = db.model('gh8300_update', schema);
+      const message = '"twenty" is not a valid number for model gh8300_update';
+
+      const isCastError = err => err.name === 'CastError' && err.message === message;
+
+      await assert.rejects(() => Test.updateOne({}, { age: 'twenty' }), isCastError);
+      await assert.rejects(() => Test.updateMany({}, { $set: { age: 'twenty' } }), isCastError);
+      await assert.rejects(() => Test.findOneAndUpdate({}, { age: 'twenty' }), isCastError);
+
+      await assert.rejects(
+        () => Test.updateOne({}, { age: 'twenty' }, { multipleCastError: true }),
+        err => err.name === 'ValidationError' &&
+          err.errors['age'].message === message &&
+          err.message === 'Validation failed: age: ' + message
+      );
+
+      await assert.rejects(
+        () => Test.bulkWrite([{ updateOne: { filter: {}, update: { age: 'twenty' } } }]),
+        isCastError
+      );
+      await assert.rejects(
+        () => Test.bulkWrite([{ deleteOne: { filter: { age: 'twenty' } } }]),
+        isCastError
+      );
+    });
   });
 
   it('copies `.add()`-ed paths when calling `.add()` with a schema argument (gh-8429)', function() {

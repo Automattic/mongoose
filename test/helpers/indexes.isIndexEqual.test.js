@@ -57,19 +57,26 @@ describe('isIndexEqual', function() {
     assert.ok(!isIndexEqual(key, options, dbIndex));
   });
 
-  it('treats MongoDB simple collation as an omitted collation', function() {
-    const options = {};
-    const dbIndex = {
+  it('treats simple collation as equivalent to an omitted collation', function() {
+    const withSimple = {
       key: { username: 1 },
       name: 'username_1',
       collation: { locale: 'simple' }
     };
-
-    assert.ok(isIndexEqual({ username: 1 }, options, dbIndex));
-    assert.ok(!isIndexEqual({ email: 1 }, options, dbIndex));
-    assert.ok(!isIndexEqual({ username: 1 }, { collation: { locale: 'simple' } }, {
+    const withoutCollation = {
       key: { username: 1 },
       name: 'username_1'
+    };
+    const simpleOptions = { collation: { locale: 'simple' } };
+
+    assert.ok(isIndexEqual({ username: 1 }, {}, withSimple));
+    assert.ok(!isIndexEqual({ email: 1 }, {}, withSimple));
+    assert.ok(isIndexEqual({ username: 1 }, simpleOptions, withoutCollation));
+    assert.ok(isIndexEqual({ username: 1 }, simpleOptions, withSimple));
+    assert.ok(!isIndexEqual({ username: 1 }, { collation: { locale: 'en' } }, withoutCollation));
+    assert.ok(!isIndexEqual({ username: 1 }, simpleOptions, {
+      ...withoutCollation,
+      collation: { locale: 'en', strength: 2 }
     }));
   });
 

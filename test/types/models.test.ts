@@ -11,6 +11,7 @@ import mongoose, {
   ModifyResult,
   Query,
   Schema,
+  SkipMiddlewareOptions,
   SearchIndexInfo,
   SearchIndexStatus,
   SearchIndexStatusDetail,
@@ -577,6 +578,21 @@ function schemaInstanceMethodsAndQueryHelpers() {
   });
 
   const TestModel = model<User, UserModel, UserQueryHelpers>('User', userSchema);
+}
+
+function syncIndexesMiddlewareOptions(middleware: boolean | SkipMiddlewareOptions) {
+  const User = model('SyncIndexUser', new Schema({ name: { type: String, index: true } }));
+
+  expect(User.syncIndexes({ autoCreate: true, middleware, continueOnError: true, hideIndexes: false, sparse: true })).type.toBe<Promise<string[]>>();
+  expect(connection.syncIndexes({ autoCreate: false, middleware, continueOnError: true })).type.toBe<Promise<mongoose.ConnectionSyncIndexesResult>>();
+  expect(mongoose.syncIndexes({ autoCreate: true, middleware, sparse: true })).type.toBe<Promise<mongoose.ConnectionSyncIndexesResult>>();
+
+  expect(User.syncIndexes).type.not.toBeCallableWith({ autoCreate: 'true', middleware: false });
+  expect(User.syncIndexes).type.not.toBeCallableWith({ middleware: 'false' });
+  expect(User.syncIndexes).type.not.toBeCallableWith({ middleware: { pre: 'false' } });
+  expect(User.syncIndexes).type.not.toBeCallableWith({ middleware: { post: 0 } });
+  expect(User.syncIndexes).type.not.toBeCallableWith({ middleware: false, hideIndexes: 'true' });
+  expect(User.syncIndexes).type.not.toBeCallableWith({ middleware: false, continueOnError: 'true' });
 }
 
 function gh12100() {

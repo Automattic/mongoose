@@ -83,11 +83,11 @@ declare module 'mongoose' {
 
     bulkWrite<TSchemaMap extends Record<string, AnyObject>>(
       ops: Array<ConnectionBulkWriteModel<TSchemaMap>>,
-      options: mongodb.ClientBulkWriteOptions & { ordered: false }
+      options: mongodb.ClientBulkWriteOptions & { ordered: false; middleware?: boolean | SkipMiddlewareOptions }
     ): Promise<mongodb.ClientBulkWriteResult & { mongoose?: { validationErrors: Error[], results: Array<Error | mongodb.WriteError | null> } }>;
     bulkWrite<TSchemaMap extends Record<string, AnyObject>>(
       ops: Array<ConnectionBulkWriteModel<TSchemaMap>>,
-      options?: mongodb.ClientBulkWriteOptions
+      options?: mongodb.ClientBulkWriteOptions & { middleware?: boolean | SkipMiddlewareOptions }
     ): Promise<mongodb.ClientBulkWriteResult>;
 
     /** Closes the connection */
@@ -118,7 +118,7 @@ declare module 'mongoose' {
     /**
      * https://mongoosejs.com/docs/api/connection.html#Connection.prototype.createCollections()
      */
-    createCollections(continueOnError?: boolean): Promise<Record<string, Error | mongodb.Collection<any>>>;
+    createCollections(options?: { continueOnError?: boolean; middleware?: boolean | SkipMiddlewareOptions }): Promise<Record<string, Error | mongodb.Collection<any>>>;
 
     /**
      * Removes the model named `name` from this connection, if it exists. You can

@@ -8842,7 +8842,18 @@ describe('Model', function() {
     let indexes = await Test.collection.listIndexes().toArray();
     assert.strictEqual(indexes.length, 2);
     assert.deepEqual(indexes[1].key, { name: 1 });
-    assert.equal(indexes[1].collation, undefined);
+    // `indexes[1].collation` will be `undefined` in MongoDB server 8.x
+    // but will be `{ locale: 'simple' }` in MongoDB server 9.x.
+    // This test does not switch on the MongoDB server version because
+    // `{ locale: 'simple' }` is the default collation behavior in all
+    // supported versions of MongoDB server, so even if the server starts
+    // reporting `{ locale: 'simple' }` in MongoDB server 8, that
+    // is still correct for the purposes of this test.
+    if (indexes[1].collation) {
+      assert.deepEqual(indexes[1].collation, { locale: 'simple' });
+    } else {
+      assert.equal(indexes[1].collation, undefined);
+    }
 
     db.deleteModel(/Test/);
     testSchema = new Schema(

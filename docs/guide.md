@@ -848,18 +848,11 @@ The alias of each pref is also permitted so instead of having to type out
 The read option also allows us to specify *tag sets*. These tell the
 [driver](https://github.com/mongodb/node-mongodb-native/) from which members
 of the replica-set it should attempt to read. Read more about tag sets
-in the [MongoDB documentation on replica set tag sets](http://www.mongodb.com/docs/manual/applications/replication/#tag-sets) and
+in the [MongoDB documentation on replica set tag sets]([https://www.mongodb.com/docs/manual/core/read-preference-tags/#std-label-replica-set-read-preference-tag-sets) and
 in the [MongoDB core documentation on read preference](https://www.mongodb.com/docs/manual/core/read-preference).
 
-*NOTE: you may also specify the driver read preference [strategy](https://www.mongodb.com/docs/manual/core/read-preference/#read-preference-modes)
-option when connecting:*
-
 ```javascript
-// pings the replset members periodically to track network latency
-const options = { replset: { strategy: 'ping' } };
-mongoose.connect(uri, options);
-
-const schema = new Schema({ /* ... */ }, { read: ['nearest', { disk: 'ssd' }] });
+const schema = new Schema({ /* ... */ }, { read: ['nearest', [{ disk: 'ssd' }]] });
 mongoose.model('JellyBean', schema);
 ```
 

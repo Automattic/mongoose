@@ -114,6 +114,21 @@ describe('types array', function() {
       assert.equal(user.pets.indexOf(loki._id), 1);
       assert.equal(user.pets.indexOf(jane._id), 2);
     });
+
+    it('matches dates by value', function() {
+      const Test = db.model('Test', new Schema({ dates: [Date], mixed: [] }));
+      const doc = new Test({
+        dates: [new Date('2026-01-01'), new Date('2026-02-01')],
+        mixed: [new Date('2026-01-01').valueOf()]
+      });
+
+      assert.equal(doc.dates.indexOf(new Date('2026-01-01')), 0);
+      assert.equal(doc.dates.indexOf(new Date('2026-02-01')), 1);
+      assert.equal(doc.dates.indexOf(new Date('2026-03-01')), -1);
+      assert.equal(doc.dates.indexOf(new Date('2026-01-01'), 1), -1);
+      assert.equal(doc.dates.includes(new Date('2026-02-01')), true);
+      assert.equal(doc.mixed.indexOf(new Date('2026-01-01')), -1);
+    });
   });
 
   describe('includes()', function() {
@@ -598,6 +613,28 @@ describe('types array', function() {
       assert.equal(doc.a.length, 0);
 
       assert.ok(doc.getChanges().$pullAll.a);
+    });
+
+    it('removes dates that are equal but not the same instance', async function() {
+      const Test = db.model('Test', new Schema({ dates: [Date] }));
+      const { _id } = await Test.create({
+        dates: [new Date('2026-01-01'), new Date('2026-02-01')]
+      });
+
+      const doc = await Test.findById(_id);
+      doc.dates.pull(new Date('2026-01-01'));
+      assert.deepStrictEqual(doc.dates.map(d => d.toISOString()), ['2026-02-01T00:00:00.000Z']);
+
+      // Mixing pull() and push() saves the whole array with $set, so a date
+      // that pull() left behind would be written back.
+      doc.dates.push(new Date('2026-03-01'));
+      await doc.save();
+
+      const { dates } = await Test.findById(_id).lean();
+      assert.deepStrictEqual(dates.map(d => d.toISOString()), [
+        '2026-02-01T00:00:00.000Z',
+        '2026-03-01T00:00:00.000Z'
+      ]);
     });
 
     it('registers $pull atomic if pulling from middle (gh-14502)', async function() {

@@ -1255,6 +1255,52 @@ describe('Map', function() {
     assert.deepEqual(Array.from(fromDb.map.get('key')), [1, 2, 3]);
   });
 
+  it('saves the replaced array when set() is followed by push(), pull() or addToSet() on a map of arrays (gh-16539)', async function() {
+    const Test = db.model('Test', new Schema({
+      arrays: { type: Map, of: [Number] }
+    }));
+
+    const cases = [
+      { method: 'push', arg: 8, initial: [1], replacement: [7], expected: [7, 8] },
+      { method: 'pull', arg: 1, initial: [1, 2], replacement: [7, 1], expected: [7] },
+      { method: 'addToSet', arg: 8, initial: [1], replacement: [7], expected: [7, 8] }
+    ];
+
+    for (const { method, arg, initial, replacement, expected } of cases) {
+      const { _id } = await Test.create({ arrays: { x: initial } });
+
+      const doc = await Test.findById(_id);
+      doc.arrays.set('x', replacement);
+      doc.arrays.get('x')[method](arg);
+      const changes = doc.$getChanges();
+      await doc.save();
+      assert.deepStrictEqual(doc.arrays.get('x').toObject(), expected, method);
+
+      const raw = await Test.collection.findOne({ _id });
+      assert.deepStrictEqual(raw.arrays.x, expected, method);
+      assert.deepStrictEqual(changes.$set, { 'arrays.x': expected }, method);
+      assert.strictEqual(changes.$push, undefined, method);
+      assert.strictEqual(changes.$pullAll, undefined, method);
+      assert.strictEqual(changes.$addToSet, undefined, method);
+    }
+  });
+
+  it('saves the replaced document array when set() is followed by push() on a map of document arrays', async function() {
+    const Test = db.model('Test', new Schema({
+      arrays: { type: Map, of: [new Schema({ n: Number }, { _id: false })] }
+    }));
+
+    const { _id } = await Test.create({ arrays: { x: [{ n: 1 }] } });
+
+    const doc = await Test.findById(_id);
+    doc.arrays.set('x', [{ n: 7 }]);
+    doc.arrays.get('x').push({ n: 8 });
+    await doc.save();
+
+    const raw = await Test.collection.findOne({ _id });
+    assert.deepStrictEqual(raw.arrays.x, [{ n: 7 }, { n: 8 }]);
+  });
+
   it('handles maps of maps of numbers (gh-15350)', async function() {
     const DocSchema = new mongoose.Schema({
       map: {

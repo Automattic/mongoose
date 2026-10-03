@@ -57,6 +57,22 @@ describe('isIndexEqual', function() {
     assert.ok(!isIndexEqual(key, options, dbIndex));
   });
 
+  it('treats MongoDB simple collation as an omitted collation', function() {
+    const options = {};
+    const dbIndex = {
+      key: { username: 1 },
+      name: 'username_1',
+      collation: { locale: 'simple' }
+    };
+
+    assert.ok(isIndexEqual({ username: 1 }, options, dbIndex));
+    assert.ok(!isIndexEqual({ email: 1 }, options, dbIndex));
+    assert.ok(!isIndexEqual({ username: 1 }, { collation: { locale: 'simple' } }, {
+      key: { username: 1 },
+      name: 'username_1'
+    }));
+  });
+
   it('handles text indexes (gh-9225)', function() {
     const key = { name: 'text' };
     const options = {};

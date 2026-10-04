@@ -1528,3 +1528,66 @@ async function gh16485() {
   expect(indexes[0].type).type.toBe<'search' | 'vectorSearch' | undefined>();
   expect(indexes[0].statusDetail).type.toBe<SearchIndexStatusDetail[] | undefined>();
 }
+
+async function gh16545() {
+  const schema = new Schema({
+    key: { type: String, required: true },
+    refs: {
+      type: [
+        {
+          key: { type: String, required: true }
+        }
+      ]
+    }
+  });
+
+  const TestModel = model('Test16545', schema);
+
+  await TestModel.updateOne(
+    { key: 'foo' },
+    {
+      $setOnInsert: {
+        key: 'foo'
+      },
+      $push: {
+        refs: {
+          $each: [{ key: 'foo#1' }]
+        }
+      }
+    }
+  );
+
+  await TestModel.bulkWrite([
+    {
+      updateOne: {
+        filter: { key: 'foo' },
+        update: {
+          $setOnInsert: { key: 'foo' },
+          $push: {
+            refs: {
+              $each: [{ key: 'foo#1' }]
+            }
+          }
+        },
+        upsert: true
+      }
+    }
+  ]);
+
+  await TestModel.bulkWrite([
+    {
+      updateMany: {
+        filter: { key: 'foo' },
+        update: {
+          $setOnInsert: { key: 'foo' },
+          $push: {
+            refs: {
+              $each: [{ key: 'foo#1' }]
+            }
+          }
+        },
+        upsert: true
+      }
+    }
+  ]);
+}

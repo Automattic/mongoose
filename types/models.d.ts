@@ -158,13 +158,19 @@ declare module 'mongoose' {
     MongooseBulkUpdatePerOperationOptions;
 
   export type UpdateOneModel<TSchema extends mongodb.Document = mongodb.Document> =
-    Omit<mongodb.UpdateOneModel<TSchema>, 'filter'> &
-    { filter: QueryFilter<TSchema> } &
+    Omit<mongodb.UpdateOneModel<TSchema>, 'filter' | 'update'> &
+    {
+      filter: QueryFilter<TSchema>;
+      update: UpdateQuery<TSchema> | UpdateWithAggregationPipeline;
+    } &
     MongooseBulkUpdatePerOperationOptions;
 
   export type UpdateManyModel<TSchema extends mongodb.Document = mongodb.Document> =
-    Omit<mongodb.UpdateManyModel<TSchema>, 'filter'> &
-    { filter: QueryFilter<TSchema> } &
+    Omit<mongodb.UpdateManyModel<TSchema>, 'filter' | 'update'> &
+    {
+      filter: QueryFilter<TSchema>;
+      update: UpdateQuery<TSchema> | UpdateWithAggregationPipeline;
+    } &
     MongooseBulkUpdatePerOperationOptions;
 
   export type DeleteOneModel<TSchema extends mongodb.Document = mongodb.Document> =

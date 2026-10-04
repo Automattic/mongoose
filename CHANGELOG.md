@@ -1,3 +1,8 @@
+8.24.5 / 2026-10-04
+===================
+ * fix: handle MongoDB server 9.x returning collation: { locale: 'simple' } on all indexes #16557
+ * fix(documentarray): reindex subdocs after addToSet() skips a duplicate #16507 [giaBaoJS](https://github.com/giaBaoJS)
+
 8.24.4 / 2026-08-21
 ===================
  * fix(discriminator): prevent indexes and callQueue duplication with shared nested schemas #16467 #16466 #15966 (8.x backport) [AbinMadathil-Celigo](https://github.com/AbinMadathil-Celigo)

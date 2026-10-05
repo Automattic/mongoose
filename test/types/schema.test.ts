@@ -2435,3 +2435,31 @@ function staticReturnsSchemaWithStaticAdded() {
   // @ts-expect-error Argument of type 'number' is not assignable to parameter of type 'string'.
   ModelWithStaticsObj.countByName(42);
 }
+
+async function gh16564() {
+  interface Data {
+    priority: number;
+  }
+  new Schema<Data>({
+    priority: { type: Schema.Types.Int32, required: true }
+  });
+
+  const schema = new Schema({
+    priority: { type: Schema.Types.Int32, required: true },
+    count: Schema.Types.Int32,
+    total: 'Int32'
+  });
+  const TestModel = model('Test', schema);
+
+  const doc = await TestModel.findOne().orFail();
+  ExpectType<number>(doc.priority);
+  ExpectType<number | null | undefined>(doc.count);
+  ExpectType<number | null | undefined>(doc.total);
+
+  const leanDoc = await TestModel.findOne().lean().orFail();
+  ExpectType<number>(leanDoc.priority);
+  ExpectType<number | null | undefined>(leanDoc.count);
+
+  type RawDocType = InferRawDocType<{ priority: { type: typeof Schema.Types.Int32, required: true } }>;
+  ExpectType<number>({} as RawDocType['priority']);
+}

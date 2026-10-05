@@ -1,3 +1,12 @@
+9.10.4 / 2026-10-02
+===================
+ * fix: handle MongoDB server 9.x returning collation: { locale: 'simple' } on all indexes #16557
+ * fix(populate): resolve dotted parent path when collecting deferred sub-populate children #16538 [jfits](https://github.com/jfits)
+ * fix(array): compare dates by value in indexOf() so pull() removes them #16535 [giaBaoJS](https://github.com/giaBaoJS)
+ * fix(map): register $set when Map#set() replaces an array #16540 #16539 [luantaraschi](https://github.com/luantaraschi)
+ * fix(query): cast case and then expressions in $expr $switch branches #16534 [kwy404](https://github.com/kwy404)
+ * docs(guide): fix read preference tag set example #16541 [NotAFlightRisk](https://github.com/NotAFlightRisk)
+
 9.10.3 / 2026-09-29
 ===================
  * fix(model): preserve unsaved documents after ordered bulkSave errors #16533 #16532 [IbrahimHafez1](https://github.com/IbrahimHafez1)

@@ -1,3 +1,12 @@
+9.11.0 / 2026-10-05
+===================
+ * feat: use MongoDB Node.js driver 7.7.x #16550
+ * feat(query): add Query.prototype.findAndCount() for composable paginated queries #16508 #16504 [lokeshllkumar](https://github.com/lokeshllkumar)
+ * fix: avoid double-calling validators on document arrays underneath nested paths #16484 #16291 #5411
+ * types: pass TLeanResultType into query for type narrowing support with lean() #16523 #16519
+ * docs(guide): use async/await instead of removed callbacks #16566 [joi-agent](https://github.com/joi-agent)
+ * test: run TypeScript tests on typescript 5+7 with combinations of exactOptionalPropertyTypes, skipLibCheck, strict #16510 #16506
+
 9.10.4 / 2026-10-02
 ===================
  * fix: handle MongoDB server 9.x returning collation: { locale: 'simple' } on all indexes #16557

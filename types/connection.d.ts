@@ -203,7 +203,7 @@ declare module 'mongoose' {
           ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>
         >,
       TSchema,
-      ObtainSchemaGeneric<TSchema, 'TLeanResultType'>
+      Default__v<Require_id<ObtainSchemaGeneric<TSchema, 'TLeanResultType'>>>
     > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
     model<T, U, TQueryHelpers = {}>(
       name: string,

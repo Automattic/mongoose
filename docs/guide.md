@@ -180,15 +180,15 @@ const animalSchema = new Schema({ name: String, type: String },
   // Assign a function to the "methods" object of our animalSchema through schema options.
   // By following this approach, there is no need to create a separate TS type to define the type of the instance functions.
     methods: {
-      findSimilarTypes(cb) {
-        return mongoose.model('Animal').find({ type: this.type }, cb);
+      findSimilarTypes() {
+        return mongoose.model('Animal').find({ type: this.type });
       }
     }
   });
 
 // Or, assign a function to the "methods" object of our animalSchema
-animalSchema.methods.findSimilarTypes = function(cb) {
-  return mongoose.model('Animal').find({ type: this.type }, cb);
+animalSchema.methods.findSimilarTypes = function() {
+  return mongoose.model('Animal').find({ type: this.type });
 };
 ```
 
@@ -199,9 +199,8 @@ to them.
 const Animal = mongoose.model('Animal', animalSchema);
 const dog = new Animal({ type: 'dog' });
 
-dog.findSimilarTypes((err, dogs) => {
-  console.log(dogs); // woof
-});
+const dogs = await dog.findSimilarTypes();
+console.log(dogs); // woof
 ```
 
 * Overwriting a default mongoose document method may lead to unpredictable results. See [this](api/schema.html#schema_Schema-reserved) for more details.
@@ -270,13 +269,11 @@ animalSchema.query.byName = function(name) {
 
 const Animal = mongoose.model('Animal', animalSchema);
 
-Animal.find().byName('fido').exec((err, animals) => {
-  console.log(animals);
-});
+const animals = await Animal.find().byName('fido').exec();
+console.log(animals);
 
-Animal.findOne().byName('fido').exec((err, animal) => {
-  console.log(animal);
-});
+const animal = await Animal.findOne().byName('fido').exec();
+console.log(animal);
 ```
 
 ## Indexes {#indexes}
@@ -593,7 +590,7 @@ carefully in production, you can set `autoIndex` to false.
 ```javascript
 const schema = new Schema({ /* ... */ }, { autoIndex: false });
 const Clock = mongoose.model('Clock', schema);
-Clock.ensureIndexes(callback);
+await Clock.ensureIndexes();
 ```
 
 The `autoIndex` option is set to `true` by default. You can change this
@@ -777,9 +774,8 @@ const parentSchema = new Schema({ children: [childSchema] });
 
 const Model = mongoose.model('Model', parentSchema);
 
-Model.create({ children: [{ name: 'Luke' }] }, (error, doc) => {
-  // doc.children[0]._id will be undefined
-});
+const doc = await Model.create({ children: [{ name: 'Luke' }] });
+// doc.children[0]._id will be undefined
 ```
 
 ## option: minimize {#minimize}

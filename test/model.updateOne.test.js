@@ -2701,6 +2701,37 @@ describe('model: updateOne: ', function() {
     assert.equal(updatedDoc.slides[0].commonField, 'newValue2');
   });
 
+  it('update embedded discriminator path if key in filter uses $eq or $in', async function() {
+    const eventSchema = new Schema({ message: String }, { discriminatorKey: 'kind', _id: false });
+    const schema = new Schema({ events: [eventSchema] });
+    schema.path('events').discriminator('Clicked', new Schema({ element: String }, { _id: false }));
+    schema.path('events').discriminator('Purchased', new Schema({ quantity: Number }, { _id: false }));
+    const MyModel = db.model('Test', schema);
+
+    const filters = [
+      [{ 'events.kind': { $eq: 'Purchased' } }, { 'events.quantity': '3' }],
+      [{ 'events.kind': { $in: ['Purchased'] } }, { 'events.quantity': '3' }],
+      [
+        { events: { $elemMatch: { kind: { $eq: 'Purchased' } } } },
+        { events: { $elemMatch: { kind: { $eq: 'Purchased' }, quantity: '3' } } }
+      ]
+    ];
+    for (const [filter, findFilter] of filters) {
+      const doc = await MyModel.create({
+        events: [{ kind: 'Clicked', element: 'button' }, { kind: 'Purchased', quantity: 1 }]
+      });
+
+      const res = await MyModel.updateOne({ _id: doc._id, ...filter }, { $inc: { 'events.$.quantity': '2' } });
+      assert.strictEqual(res.modifiedCount, 1);
+
+      const updatedDoc = await MyModel.findById(doc._id).lean();
+      assert.strictEqual(updatedDoc.events[1].quantity, 3);
+
+      const found = await MyModel.find({ _id: doc._id, ...filter, ...findFilter });
+      assert.strictEqual(found.length, 1);
+    }
+  });
+
   it('moves $set of immutable properties to $setOnInsert (gh-8467) (gh-9537)', async function() {
     const childSchema = Schema({ name: String });
     const Model = db.model('Test', Schema({

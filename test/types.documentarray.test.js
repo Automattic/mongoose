@@ -847,6 +847,41 @@ describe('types.documentarray', function() {
     );
   });
 
+  it('tracks changes to arrays inside subdocs of doubly nested doc arrays after init', async function() {
+    const cellSchema = new mongoose.Schema({
+      name: String,
+      tags: [String],
+      children: [new mongoose.Schema({ v: Number }, { _id: false })]
+    }, { _id: false });
+    const Test = db.model('Test', new mongoose.Schema({ grid: [[cellSchema]] }));
+
+    const { _id } = await Test.create({
+      grid: [
+        [{ name: 'a', tags: ['a1'], children: [] }, { name: 'b', tags: ['b1'], children: [] }],
+        [{ name: 'c', tags: ['c1', 'c2'], children: [{ v: 1 }, { v: 2 }] }]
+      ]
+    });
+
+    const doc = await Test.findById(_id).orFail();
+    doc.grid[0][1].tags.push('b2');
+    doc.grid[1][0].tags.push('c3');
+    doc.grid[1][0].children[1].v = 3;
+    assert.deepStrictEqual(doc.$getChanges(), {
+      $push: {
+        'grid.0.1.tags': { $each: ['b2'] },
+        'grid.1.0.tags': { $each: ['c3'] }
+      },
+      $set: { 'grid.1.0.children.1.v': 3 },
+      $inc: { __v: 1 }
+    });
+    await doc.save();
+
+    const fromDb = await Test.findById(_id).lean().orFail();
+    assert.deepStrictEqual(fromDb.grid[0][1].tags, ['b1', 'b2']);
+    assert.deepStrictEqual(fromDb.grid[1][0].tags, ['c1', 'c2', 'c3']);
+    assert.deepStrictEqual(fromDb.grid[1][0].children, [{ v: 1 }, { v: 3 }]);
+  });
+
   it('stores all schematype options in the embedded schematype', function() {
     const schema = new mongoose.Schema({
       docArr: [{

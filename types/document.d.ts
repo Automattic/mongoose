@@ -141,7 +141,9 @@ declare module 'mongoose' {
       this,
       TQueryHelpers,
       DocType,
-      'deleteOne'
+      'deleteOne',
+      Record<string, never>,
+      Default__v<Require_id<DocType>>
     >;
 
     /**

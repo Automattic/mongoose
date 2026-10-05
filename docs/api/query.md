@@ -29,6 +29,7 @@
 - [`Query.prototype.explain()`](#Query.prototype.explain())
 - [`Query.prototype.finally()`](#Query.prototype.finally())
 - [`Query.prototype.find()`](#Query.prototype.find())
+- [`Query.prototype.findAndCount()`](#Query.prototype.findAndCount())
 - [`Query.prototype.findById()`](#Query.prototype.findById())
 - [`Query.prototype.findByIdAndDelete()`](#Query.prototype.findByIdAndDelete())
 - [`Query.prototype.findByIdAndUpdate()`](#Query.prototype.findByIdAndUpdate())
@@ -852,6 +853,21 @@ If there are too many documents in the result to fit in memory, use
 #### Example:
 
     const arr = await Movie.find({ year: { $gte: 1980, $lte: 1989 } });
+
+## `Query.prototype.findAndCount()`
+
+### Returns
+
+- \<Promise<Array>\> a promise that resolves to `[documents, total]`
+
+Executes the query as a `find()` and also runs a `countDocuments()` query
+on the same filter, returning `[documents, count]`. The count ignores
+`skip` and `limit` so that it returns the total number of matching documents.
+
+#### Example:
+
+    const query = Adventure.find({ type: 'animal' }).sort({ name: 1 }).limit(10);
+    const [adventures, total] = await query.findAndCount();
 
 ## `Query.prototype.findById()`
 

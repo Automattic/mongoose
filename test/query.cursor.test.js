@@ -8,6 +8,7 @@ const { once } = require('events');
 const start = require('./common');
 
 const assert = require('assert');
+const sinon = require('sinon');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -977,6 +978,51 @@ describe('QueryCursor', function() {
     await once(stream.cursor, 'close');
     assert.ok(stream.destroyed);
     assert.ok(stream.cursor.closed);
+  });
+
+  it('waits for the driver cursor to close before emitting close on destroy()', async function() {
+    const cursor = Model.find().cursor();
+    const driverCursor = await cursor.getDriverCursor();
+    let finishClose;
+    const closeStub = sinon.stub(driverCursor, 'close').callsFake(() => new Promise(resolve => {
+      finishClose = resolve;
+    }));
+    let closed = false;
+    cursor.once('close', () => { closed = true; });
+    const closePromise = once(cursor, 'close');
+
+    try {
+      cursor.destroy();
+      await new Promise(resolve => setImmediate(resolve));
+      assert.equal(closeStub.callCount, 1);
+      assert.equal(closed, false);
+      assert.equal(cursor._closed, false);
+    } finally {
+      finishClose();
+      await closePromise;
+      closeStub.restore();
+      await driverCursor.close();
+    }
+
+    assert.equal(closed, true);
+    assert.equal(cursor._closed, true);
+  });
+
+  it('emits driver cursor close errors on destroy()', async function() {
+    const cursor = Model.find().cursor();
+    const driverCursor = await cursor.getDriverCursor();
+    const closeError = new Error('driver cursor close failed');
+    const closeStub = sinon.stub(driverCursor, 'close').rejects(closeError);
+    const closePromise = once(cursor, 'close');
+
+    try {
+      cursor.destroy();
+      await assert.rejects(closePromise, error => error === closeError);
+      assert.equal(cursor._closed, false);
+    } finally {
+      closeStub.restore();
+      await driverCursor.close();
+    }
   });
 
   it('handles destroy() before cursor is created (gh-14966)', async function() {

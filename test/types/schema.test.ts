@@ -2447,7 +2447,8 @@ async function gh16564() {
   const schema = new Schema({
     priority: { type: Schema.Types.Int32, required: true },
     count: Schema.Types.Int32,
-    total: 'Int32'
+    total: 'Int32',
+    lowercaseTotal: 'int32'
   });
   const TestModel = model('Test', schema);
 
@@ -2455,6 +2456,7 @@ async function gh16564() {
   ExpectType<number>(doc.priority);
   ExpectType<number | null | undefined>(doc.count);
   ExpectType<number | null | undefined>(doc.total);
+  ExpectType<number | null | undefined>(doc.lowercaseTotal);
 
   const leanDoc = await TestModel.findOne().lean().orFail();
   ExpectType<number>(leanDoc.priority);

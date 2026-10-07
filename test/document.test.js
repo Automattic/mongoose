@@ -15459,6 +15459,23 @@ describe('document', function() {
     user.requiresEmail = true;
     await assert.rejects(() => user.save(), /invalid email/);
   });
+
+  it('keeps nested paths read from the same document when setting their parent (gh-16530)', async function() {
+    const Test = db.model('Test', new Schema({
+      a: { b: { x: Number }, c: { d: { y: Number } }, z: Number }
+    }));
+    const doc = await Test.create({ a: { b: { x: 1 }, c: { d: { y: 2 } }, z: 3 } });
+
+    doc.set('a', { b: doc.a.b, c: { d: doc.a.c.d }, z: 4 });
+    assert.deepStrictEqual(doc.toObject().a, { b: { x: 1 }, c: { d: { y: 2 } }, z: 4 });
+
+    doc.a = { b: doc.a.b, z: 5 };
+    assert.deepStrictEqual(doc.toObject().a, { b: { x: 1 }, z: 5 });
+
+    await doc.save();
+    const fromDb = await Test.findById(doc._id).lean();
+    assert.deepStrictEqual(fromDb.a, { b: { x: 1 }, z: 5 });
+  });
 });
 
 describe('Check if instance function that is supplied in schema option is available', function() {

@@ -9961,6 +9961,19 @@ describe('document', function() {
     assert.strictEqual(objB.prop.prop, 1);
   });
 
+  it('handles setting a circular POJO containing a nested path document (gh-16530)', function() {
+    const Model = db.model('Test', new Schema({ a: { b: { x: Number } } }));
+    const doc = Model.hydrate({ a: { b: { x: 1 } } });
+    const value = { b: doc.a.b };
+    value.circular = value;
+
+    doc.set('a', value);
+
+    assert.deepStrictEqual(doc.a.b.toObject(), { x: 1 });
+    assert.ifError(doc.validateSync());
+    assert.strictEqual(value.circular, value);
+  });
+
   it('sets fields after an undefined field (gh-9585)', function() {
     const personSchema = new Schema({
       items: { type: Array },

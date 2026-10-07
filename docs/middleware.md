@@ -640,8 +640,8 @@ await Model.find().cursor({ middleware: false }).eachAsync(doc => {
 });
 
 // Skip all user middleware on aggregation
-await Model.aggregate([]).option({ middleware: false });
-await Model.aggregate([]).cursor({ middleware: false }).eachAsync(doc => {
+await Model.aggregate([{ $match: {} }]).option({ middleware: false });
+await Model.aggregate([{ $match: {} }]).cursor({ middleware: false }).eachAsync(doc => {
   // process doc
 });
 ```
@@ -660,6 +660,27 @@ await doc.save({ middleware: { pre: false } });
 // Skip only post hooks, pre hooks still run
 await Model.find({}, null, { middleware: { post: false } });
 ```
+
+### Middleware During Population
+
+Population inherits the query's `middleware` option, including nested population.
+Schema population defaults take precedence over the inherited selection.
+Set `options.middleware` on a population path to override either selection.
+A phase object replaces the inherited selection; Mongoose does not merge its phases.
+
+```javascript
+// Skip user hooks on the main query and its populated queries and documents.
+await Person.find({}, null, { middleware: false }).populate('city');
+
+// Enable user hooks for city population while suppressing the main query's hooks.
+await Person.find({}, null, { middleware: false }).populate({
+  path: 'city',
+  options: { middleware: true }
+});
+```
+
+The selection also applies to temporary hydration when population uses local-field getters.
+Later independent `doc.populate()` calls use their own selection.
 
 ### Skip Middleware for Custom Statics and Methods {#skip-custom-statics-and-methods}
 
@@ -688,7 +709,8 @@ Because custom statics and methods can have arbitrary signatures, Mongoose only 
 This avoids conflicts with statics and methods whose last argument has an unrelated `middleware` property.
 **Tip:** reserve the last parameter for an options object and default it to an empty object (`options = {}`) as in the example above. That way there is always an options object, and a data argument with its own `middleware` property is never the last argument.
 
-**Note:** Built-in Mongoose middleware (timestamps, validation, etc.) always runs regardless of this option. Only user-defined middleware registered via `schema.pre()` and `schema.post()` is skipped.
+**Note:** Built-in middleware, such as timestamps and schema validators, runs regardless of this option.
+User-defined hooks registered with `schema.pre()`, `schema.post()`, `query.pre()`, and `query.post()` respect the middleware selection.
 
 ## Next Up {#next}
 

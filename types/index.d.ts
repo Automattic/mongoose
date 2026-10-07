@@ -512,7 +512,7 @@ declare module 'mongoose' {
     >;
 
     /** Object of currently defined methods on this schema. */
-    methods: AddThisParameter<TInstanceMethods, THydratedDocumentType> & AnyObject;
+    methods: AddThisParameter<AddMiddlewareOption<TInstanceMethods>, THydratedDocumentType> & AnyObject;
 
     /** The original object passed to the schema constructor */
     obj: SchemaDefinition<SchemaDefinitionType<RawDocType>, RawDocType>;
@@ -597,6 +597,8 @@ declare module 'mongoose' {
     post(method: 'bulkWrite' | 'createCollection' | 'insertMany' | RegExp, options: SchemaPostOptions, fn: ErrorHandlingMiddlewareFunction<TModelType>): this;
 
     /** Defines a pre hook for the model. */
+    // Construction hooks receive uncast input before a document exists.
+    pre<T = unknown>(method: 'createModel', fn: (this: T) => void): this;
     // this = never since it never happens
     pre<T = never>(method: 'save', options: SchemaPreOptions & { document: false, query: boolean }, fn: PreSaveMiddlewareFunction<T>): this;
     pre<T = never>(method: MongooseQueryOrDocumentMiddleware | MongooseQueryOrDocumentMiddleware[] | RegExp, options: SchemaPreOptions & { document: false, query: false }, fn: PreMiddlewareFunction<T>): this;
@@ -718,7 +720,7 @@ declare module 'mongoose' {
     >;
 
     /** Object of currently defined statics on this schema. */
-    statics: { [F in keyof TStaticMethods]: TStaticMethods[F] } &
+    statics: AddMiddlewareOption<TStaticMethods> &
     { [name: string]: ((this: TModelType, ...args: any[]) => unknown) & SupportsMiddlewareOption };
 
     toJSONSchema(options?: { useBsonType?: boolean }): Record<string, any>;

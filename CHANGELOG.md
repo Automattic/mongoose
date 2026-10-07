@@ -1,3 +1,16 @@
+9.11.1 / 2026-10-07
+===================
+ * fix(document): call recursive toObject() when setting a path to a nested object #16571
+ * fix(update): keep casting array filters after a path not in the schema #16558 [giaBaoJS](https://github.com/giaBaoJS)
+ * fix(document): apply flattenDecimals when toObject() takes the shallow fast path #16569 #16568 [jeremyml](https://github.com/jeremyml)
+ * fix(query): cast operators under $not inside $elemMatch on primitive arrays #16542 #13880 [breken-ai](https://github.com/breken-ai)
+ * fix(query): use embedded discriminator schema when filter selects the key with $eq or $in #16543 [breken-ai](https://github.com/breken-ai)
+ * fix(documentarray): don't pass arrayPathIndex to subdocuments when initializing nested document arrays #16546 [Mohamed-Elshesheny](https://github.com/Mohamed-Elshesheny)
+ * fix(cursor): await driver cleanup when destroying query cursors #16562 #16560 [IbrahimHafez1](https://github.com/IbrahimHafez1)
+ * fix(cursor): reject getDriverCursor after initialization errors #16563 #16561 [IbrahimHafez1](https://github.com/IbrahimHafez1)
+ * types(schema): treat Int32 paths as number #16565 #16564 [lazerg](https://github.com/lazerg)
+ * types(models): align UpdateOneModel and UpdateManyModel update typing with UpdateQuery #16559 #16545 [aipd506](https://github.com/aipd506)
+
 9.11.0 / 2026-10-05
 ===================
  * feat: use MongoDB Node.js driver 7.7.x #16550

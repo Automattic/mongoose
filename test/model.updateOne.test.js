@@ -3480,6 +3480,28 @@ describe('model: updateOne: ', function() {
     assert.equal(r2.testArray[0].field2, field2update);
   });
 
+  it('casts array filters that come after a path not in the schema with strictQuery: false', async function() {
+    const schema = new Schema({
+      items: [{ name: String, owner: 'ObjectId' }]
+    }, { strictQuery: false });
+    const Test = db.model('Test', schema);
+
+    const owner = new mongoose.Types.ObjectId();
+    const { _id } = await Test.create({
+      items: [{ name: 'a', owner: new mongoose.Types.ObjectId() }, { name: 'b', owner }]
+    });
+    await Test.collection.updateOne({ _id }, { $set: { 'items.0.legacy': true } });
+
+    await Test.updateOne(
+      { _id },
+      { $set: { 'items.$[legacy].name': 'legacy', 'items.$[owned].name': 'owned' } },
+      { arrayFilters: [{ 'legacy.legacy': true }, { 'owned.owner': owner.toHexString() }] }
+    );
+
+    const doc = await Test.findById(_id).lean();
+    assert.deepStrictEqual(doc.items.map(item => item.name), ['legacy', 'owned']);
+  });
+
   it('only calls validators under single nested subdocs once (gh-15436)', async function() {
     let validateDetailsCalls = 0;
     let validateNameCalls = 0;

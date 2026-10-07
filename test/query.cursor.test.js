@@ -965,6 +965,26 @@ describe('QueryCursor', function() {
     assert.equal(driverCursor, cursor.cursor);
   });
 
+  for (const waitForError of [false, true]) {
+    it(`rejects getDriverCursor() called ${waitForError ? 'after' : 'before'} a pre-find error`, async function() {
+      const hookError = new Error('pre-find failed');
+      const schema = new Schema({ name: String });
+      schema.pre('find', async function() {
+        throw hookError;
+      });
+      const TestModel = db.model('FailingCursor', schema);
+      const cursor = TestModel.find().cursor();
+      const errorPromise = once(cursor, 'error');
+
+      if (waitForError) {
+        await errorPromise;
+      }
+
+      await assert.rejects(cursor.getDriverCursor(), error => error === hookError);
+      await errorPromise;
+    });
+  }
+
   it('handles destroy() (gh-14966)', async function() {
     db.deleteModel(/Test/);
     const TestModel = db.model('Test', mongoose.Schema({ name: String }));

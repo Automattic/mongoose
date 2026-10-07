@@ -15472,9 +15472,12 @@ describe('document', function() {
     doc.a = { b: doc.a.b, z: 5 };
     assert.deepStrictEqual(doc.toObject().a, { b: { x: 1 }, z: 5 });
 
+    doc.overwrite({ a: { b: doc.a.b, z: 6 } });
+    assert.deepStrictEqual(doc.toObject().a, { b: { x: 1 }, z: 6 });
+
     await doc.save();
     const fromDb = await Test.findById(doc._id).lean();
-    assert.deepStrictEqual(fromDb.a, { b: { x: 1 }, z: 5 });
+    assert.deepStrictEqual(fromDb.a, { b: { x: 1 }, z: 6 });
   });
 });
 

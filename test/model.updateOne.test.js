@@ -2701,6 +2701,37 @@ describe('model: updateOne: ', function() {
     assert.equal(updatedDoc.slides[0].commonField, 'newValue2');
   });
 
+  it('update embedded discriminator path if key in filter uses $eq or $in', async function() {
+    const eventSchema = new Schema({ message: String }, { discriminatorKey: 'kind', _id: false });
+    const schema = new Schema({ events: [eventSchema] });
+    schema.path('events').discriminator('Clicked', new Schema({ element: String }, { _id: false }));
+    schema.path('events').discriminator('Purchased', new Schema({ quantity: Number }, { _id: false }));
+    const MyModel = db.model('Test', schema);
+
+    const filters = [
+      [{ 'events.kind': { $eq: 'Purchased' } }, { 'events.quantity': '3' }],
+      [{ 'events.kind': { $in: ['Purchased'] } }, { 'events.quantity': '3' }],
+      [
+        { events: { $elemMatch: { kind: { $eq: 'Purchased' } } } },
+        { events: { $elemMatch: { kind: { $eq: 'Purchased' }, quantity: '3' } } }
+      ]
+    ];
+    for (const [filter, findFilter] of filters) {
+      const doc = await MyModel.create({
+        events: [{ kind: 'Clicked', element: 'button' }, { kind: 'Purchased', quantity: 1 }]
+      });
+
+      const res = await MyModel.updateOne({ _id: doc._id, ...filter }, { $inc: { 'events.$.quantity': '2' } });
+      assert.strictEqual(res.modifiedCount, 1);
+
+      const updatedDoc = await MyModel.findById(doc._id).lean();
+      assert.strictEqual(updatedDoc.events[1].quantity, 3);
+
+      const found = await MyModel.find({ _id: doc._id, ...filter, ...findFilter });
+      assert.strictEqual(found.length, 1);
+    }
+  });
+
   it('moves $set of immutable properties to $setOnInsert (gh-8467) (gh-9537)', async function() {
     const childSchema = Schema({ name: String });
     const Model = db.model('Test', Schema({
@@ -3447,6 +3478,28 @@ describe('model: updateOne: ', function() {
     const r2 = await TestModel.findById(test._id);
     assert.equal(r2.testArray[0].key, 'Type2');
     assert.equal(r2.testArray[0].field2, field2update);
+  });
+
+  it('casts array filters that come after a path not in the schema with strictQuery: false', async function() {
+    const schema = new Schema({
+      items: [{ name: String, owner: 'ObjectId' }]
+    }, { strictQuery: false });
+    const Test = db.model('Test', schema);
+
+    const owner = new mongoose.Types.ObjectId();
+    const { _id } = await Test.create({
+      items: [{ name: 'a', owner: new mongoose.Types.ObjectId() }, { name: 'b', owner }]
+    });
+    await Test.collection.updateOne({ _id }, { $set: { 'items.0.legacy': true } });
+
+    await Test.updateOne(
+      { _id },
+      { $set: { 'items.$[legacy].name': 'legacy', 'items.$[owned].name': 'owned' } },
+      { arrayFilters: [{ 'legacy.legacy': true }, { 'owned.owner': owner.toHexString() }] }
+    );
+
+    const doc = await Test.findById(_id).lean();
+    assert.deepStrictEqual(doc.items.map(item => item.name), ['legacy', 'owned']);
   });
 
   it('only calls validators under single nested subdocs once (gh-15436)', async function() {

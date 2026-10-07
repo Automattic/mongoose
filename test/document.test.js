@@ -7100,6 +7100,43 @@ describe('document', function() {
     });
   });
 
+  it('flattenDecimals option flattens documents and subdocuments with only primitive values (gh-16568)', function() {
+    const flatSchema = new Schema({ price: 'Decimal128' }, { versionKey: false });
+    const Flat = db.model('Test', flatSchema);
+    const flat = new Flat({
+      _id: new mongoose.Types.ObjectId('0'.repeat(24)),
+      price: '2.72'
+    });
+    assert.deepStrictEqual(flat.toObject({ flattenDecimals: true }), {
+      _id: new mongoose.Types.ObjectId('0'.repeat(24)),
+      price: { $numberDecimal: '2.72' }
+    });
+    assert.deepStrictEqual(flat.toJSON({ flattenDecimals: true }), {
+      _id: new mongoose.Types.ObjectId('0'.repeat(24)),
+      price: { $numberDecimal: '2.72' }
+    });
+
+    const tieredSchema = new Schema({
+      price: 'Decimal128',
+      tiers: [new Schema({ rate: 'Decimal128' }, { _id: false })]
+    }, { versionKey: false });
+    const Tiered = db.model('Test2', tieredSchema);
+    const tiered = new Tiered({
+      _id: new mongoose.Types.ObjectId('1'.repeat(24)),
+      price: '2.72',
+      tiers: [{ rate: '0.3' }]
+    });
+    assert.deepStrictEqual(tiered.toObject({ flattenDecimals: true }), {
+      _id: new mongoose.Types.ObjectId('1'.repeat(24)),
+      price: { $numberDecimal: '2.72' },
+      tiers: [{ rate: { $numberDecimal: '0.3' } }]
+    });
+
+    // Without the option, Decimal128 instances are returned as before
+    assert.ok(flat.toObject().price instanceof mongoose.Types.Decimal128);
+    assert.ok(tiered.toObject().tiers[0].rate instanceof mongoose.Types.Decimal128);
+  });
+
   describe('`flattenUUIDs` option (gh-15021)', function() {
     it('converts UUIDs to strings in toObject()', function() {
       // Arrange
@@ -9922,6 +9959,19 @@ describe('document', function() {
     objB.prop = objA.propX.nested1;
 
     assert.strictEqual(objB.prop.prop, 1);
+  });
+
+  it('handles setting a circular POJO containing a nested path document (gh-16530)', function() {
+    const Model = db.model('Test', new Schema({ a: { b: { x: Number } } }));
+    const doc = Model.hydrate({ a: { b: { x: 1 } } });
+    const value = { b: doc.a.b };
+    value.circular = value;
+
+    doc.set('a', value);
+
+    assert.deepStrictEqual(doc.a.b.toObject(), { x: 1 });
+    assert.ifError(doc.validateSync());
+    assert.strictEqual(value.circular, value);
   });
 
   it('sets fields after an undefined field (gh-9585)', function() {

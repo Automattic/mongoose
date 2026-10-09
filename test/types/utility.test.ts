@@ -12,6 +12,12 @@ expect<MergeType<A, B>['a']>().type.toBe<number>();
 expect<MergeType<A, B>['b']>().type.toBe<string>();
 expect<MergeType<A, B>['c']>().type.toBe<number>();
 
+expect<MergeType<A, {}>>().type.toBe<A>();
+expect<MergeType<A, { a: never }>['a']>().type.toBe<never>();
+
+type DisjointOverrides = { b: boolean } | { d: Date };
+expect<MergeType<A, DisjointOverrides>>().type.toBe<A & DisjointOverrides>();
+
 type C = WithTimestamps<{ a: string; b: string }>;
 expect<C['a']>().type.toBe<string>();
 expect<C['b']>().type.toBe<string>();

@@ -23,7 +23,9 @@ declare module 'mongoose' {
             ? { [K in keyof T]: PopulatePathToRawDocType<T[K]> }
             : T;
 
-  type PopulatedPathsDocumentType<RawDocType, Paths> = UnpackedIntersection<RawDocType, PopulatePathToRawDocType<Paths>>;
+  type PopulatedPathsDocumentType<RawDocType, Paths> = Paths extends Record<string, never>
+    ? RawDocType
+    : UnpackedIntersection<RawDocType, PopulatePathToRawDocType<Paths>>;
 
   type PopulatedDocumentMarker<
     PopulatedRawDocType,

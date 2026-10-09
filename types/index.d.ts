@@ -105,7 +105,7 @@ declare module 'mongoose' {
         ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>
       >,
     TSchema,
-    ObtainSchemaGeneric<TSchema, 'TLeanResultType'>
+    Default__v<Require_id<ObtainSchemaGeneric<TSchema, 'TLeanResultType'>>>
   > & ObtainSchemaGeneric<TSchema, 'TStaticMethods'>;
 
   export function model<T>(name: string, schema?: Schema<T, any, any> | Schema<T & Document, any, any>, collection?: string, options?: CompileModelOptions): Model<T>;
@@ -739,7 +739,7 @@ declare module 'mongoose' {
     static ObjectId: typeof Schema.Types.ObjectId;
   }
 
-  export type NumberSchemaDefinition = typeof Number | 'number' | 'Number' | typeof Schema.Types.Number | Schema.Types.Number;
+  export type NumberSchemaDefinition = typeof Number | 'number' | 'Number' | typeof Schema.Types.Number | Schema.Types.Number | 'int32' | 'Int32' | typeof Schema.Types.Int32 | Schema.Types.Int32;
   export type StringSchemaDefinition = typeof String | 'string' | 'String' | typeof Schema.Types.String | Schema.Types.String;
   export type BooleanSchemaDefinition = typeof Boolean | 'boolean' | 'Boolean' | typeof Schema.Types.Boolean | Schema.Types.Boolean;
   export type DateSchemaDefinition = DateConstructor | 'date' | 'Date' | typeof Schema.Types.Date | Schema.Types.Date;

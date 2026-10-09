@@ -158,13 +158,19 @@ declare module 'mongoose' {
     MongooseBulkUpdatePerOperationOptions;
 
   export type UpdateOneModel<TSchema extends mongodb.Document = mongodb.Document> =
-    Omit<mongodb.UpdateOneModel<TSchema>, 'filter'> &
-    { filter: QueryFilter<TSchema> } &
+    Omit<mongodb.UpdateOneModel<TSchema>, 'filter' | 'update'> &
+    {
+      filter: QueryFilter<TSchema>;
+      update: UpdateQuery<TSchema> | UpdateWithAggregationPipeline;
+    } &
     MongooseBulkUpdatePerOperationOptions;
 
   export type UpdateManyModel<TSchema extends mongodb.Document = mongodb.Document> =
-    Omit<mongodb.UpdateManyModel<TSchema>, 'filter'> &
-    { filter: QueryFilter<TSchema> } &
+    Omit<mongodb.UpdateManyModel<TSchema>, 'filter' | 'update'> &
+    {
+      filter: QueryFilter<TSchema>;
+      update: UpdateQuery<TSchema> | UpdateWithAggregationPipeline;
+    } &
     MongooseBulkUpdatePerOperationOptions;
 
   export type DeleteOneModel<TSchema extends mongodb.Document = mongodb.Document> =
@@ -228,7 +234,7 @@ declare module 'mongoose' {
     TVirtuals = {},
     THydratedDocumentType = HydratedDocument<TRawDocType, TVirtuals & TInstanceMethods, TQueryHelpers, TVirtuals>,
     TSchema = any,
-    TLeanResultType = TRawDocType> extends
+    TLeanResultType = Default__v<Require_id<TRawDocType>>> extends
     NodeJS.EventEmitter,
     IndexManager,
     SessionStarter {
@@ -455,7 +461,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'findOne',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     findById<ResultDoc = THydratedDocumentType>(
       id: any,
@@ -505,7 +512,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'findOne',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     findOne<const Projection extends ProjectionType<TRawDocType>>(
       filter: QueryFilter<TRawDocType>,
@@ -517,7 +525,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'findOne',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     findOne<const Projection extends ProjectionType<TRawDocType>>(
       filter: QueryFilter<TRawDocType>,
@@ -529,7 +538,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'findOne',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     findOne<const Projection extends ProjectionType<TRawDocType>>(
       filter: QueryFilter<TRawDocType>,
@@ -541,7 +551,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'findOne',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     findOne<ResultDoc = THydratedDocumentType>(
       filter: QueryFilter<TRawDocType>,
@@ -850,7 +861,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'find',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     find<const Projection extends ProjectionType<TRawDocType>>(
       filter: QueryFilter<TRawDocType>,
@@ -862,7 +874,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'find',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     find<const Projection extends ProjectionType<TRawDocType>>(
       filter: QueryFilter<TRawDocType>,
@@ -874,7 +887,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'find',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     find<const Projection extends ProjectionType<TRawDocType>>(
       filter: QueryFilter<TRawDocType>,
@@ -886,14 +900,15 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'find',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     find<ResultDoc = THydratedDocumentType>(
       filter: QueryFilter<TRawDocType>,
       projection: ProjectionType<TRawDocType> | null | undefined,
       options: QueryOptions<TRawDocType> & { lean: true } & mongodb.Abortable
     ): QueryWithHelpers<
-      GetLeanResultType<TRawDocType, TRawDocType[], 'find'>,
+      GetLeanResultType<TLeanResultType, TRawDocType[], 'find'>,
       ResultDoc,
       TQueryHelpers,
       TLeanResultType,
@@ -905,7 +920,7 @@ declare module 'mongoose' {
       projection: ProjectionType<TRawDocType> | null | undefined,
       options: QueryOptions<TRawDocType> & { lean: true } & mongodb.Abortable
     ): QueryWithHelpers<
-      GetLeanResultType<TRawDocType, TRawDocType[], 'find'>,
+      GetLeanResultType<TLeanResultType, TRawDocType[], 'find'>,
       THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,
@@ -959,7 +974,7 @@ declare module 'mongoose' {
       filter: QueryFilter<TRawDocType>,
       projection: ProjectionType<TRawDocType> | null | undefined,
       options: QueryOptions<TRawDocType> & { sort: any; limit: number; lean: true } & mongodb.Abortable
-    ): Promise<[GetLeanResultType<TRawDocType, TRawDocType[], 'find'>, number]>;
+    ): Promise<[GetLeanResultType<TLeanResultType, TRawDocType[], 'find'>, number]>;
     findAndCount<ResultDoc = THydratedDocumentType>(
       filter: QueryFilter<TRawDocType>,
       projection: ProjectionType<TRawDocType> | null | undefined,
@@ -981,7 +996,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'findOneAndDelete',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     findByIdAndDelete<const Projection extends ProjectionType<TRawDocType>>(
       id: mongodb.ObjectId | any,
@@ -992,7 +1008,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'findOneAndDelete',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     findByIdAndDelete<ResultDoc = THydratedDocumentType>(
       id: mongodb.ObjectId | any,
@@ -1062,7 +1079,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'findOneAndUpdate',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     findByIdAndUpdate<const Projection extends ProjectionType<TRawDocType>>(
       id: mongodb.ObjectId | any,
@@ -1074,7 +1092,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'findOneAndUpdate',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     findByIdAndUpdate<ResultDoc = THydratedDocumentType>(
       filter: QueryFilter<TRawDocType>,
@@ -1171,7 +1190,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'findOneAndDelete',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     findOneAndDelete<const Projection extends ProjectionType<TRawDocType>>(
       filter: QueryFilter<TRawDocType>,
@@ -1182,7 +1202,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'findOneAndDelete',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     findOneAndDelete<const Projection extends ProjectionType<TRawDocType>>(
       filter: QueryFilter<TRawDocType>,
@@ -1193,7 +1214,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'findOneAndDelete',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     findOneAndDelete<const Projection extends ProjectionType<TRawDocType>>(
       filter: QueryFilter<TRawDocType>,
@@ -1204,7 +1226,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'findOneAndDelete',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     findOneAndDelete<ResultDoc = THydratedDocumentType>(
       filter: QueryFilter<TRawDocType>,
@@ -1306,7 +1329,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'findOneAndReplace',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     findOneAndReplace<const Projection extends ProjectionType<TRawDocType>>(
       filter: QueryFilter<TRawDocType>,
@@ -1318,7 +1342,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'findOneAndReplace',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     findOneAndReplace<const Projection extends ProjectionType<TRawDocType>>(
       filter: QueryFilter<TRawDocType>,
@@ -1330,7 +1355,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'findOneAndReplace',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     findOneAndReplace<const Projection extends ProjectionType<TRawDocType>>(
       filter: QueryFilter<TRawDocType>,
@@ -1342,7 +1368,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'findOneAndReplace',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     findOneAndReplace<ResultDoc = THydratedDocumentType>(
       filter: QueryFilter<TRawDocType>,
@@ -1476,7 +1503,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'findOneAndUpdate',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     findOneAndUpdate<const Projection extends ProjectionType<TRawDocType>>(
       filter: QueryFilter<TRawDocType>,
@@ -1488,7 +1516,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'findOneAndUpdate',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     findOneAndUpdate<const Projection extends ProjectionType<TRawDocType>>(
       filter: QueryFilter<TRawDocType>,
@@ -1500,7 +1529,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'findOneAndUpdate',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     findOneAndUpdate<const Projection extends ProjectionType<TRawDocType>>(
       filter: QueryFilter<TRawDocType>,
@@ -1512,7 +1542,8 @@ declare module 'mongoose' {
       TQueryHelpers,
       TLeanResultType,
       'findOneAndUpdate',
-      TInstanceMethods & TVirtuals
+      TInstanceMethods & TVirtuals,
+      ApplyProjection<TLeanResultType, Projection>
     >;
     findOneAndUpdate<ResultDoc = THydratedDocumentType>(
       filter: QueryFilter<TRawDocType>,
@@ -1543,7 +1574,7 @@ declare module 'mongoose' {
       update: UpdateQuery<TRawDocType>,
       options: QueryOptions<TRawDocType> & { lean: true }
     ): QueryWithHelpers<
-      GetLeanResultType<TRawDocType, TRawDocType, 'findOneAndUpdate'> | null,
+      GetLeanResultType<TLeanResultType, TRawDocType, 'findOneAndUpdate'> | null,
       ResultDoc,
       TQueryHelpers,
       TLeanResultType,
@@ -1555,7 +1586,7 @@ declare module 'mongoose' {
       update: UpdateQuery<TRawDocType>,
       options: QueryOptions<TRawDocType> & { lean: true }
     ): QueryWithHelpers<
-      GetLeanResultType<TRawDocType, TRawDocType, 'findOneAndUpdate'> | null,
+      GetLeanResultType<TLeanResultType, TRawDocType, 'findOneAndUpdate'> | null,
       THydratedDocumentType,
       TQueryHelpers,
       TLeanResultType,

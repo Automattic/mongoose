@@ -1,3 +1,50 @@
+9.11.1 / 2026-10-07
+===================
+ * fix(document): call recursive toObject() when setting a path to a nested object #16571
+ * fix(update): keep casting array filters after a path not in the schema #16558 [giaBaoJS](https://github.com/giaBaoJS)
+ * fix(document): apply flattenDecimals when toObject() takes the shallow fast path #16569 #16568 [jeremyml](https://github.com/jeremyml)
+ * fix(query): cast operators under $not inside $elemMatch on primitive arrays #16542 #13880 [breken-ai](https://github.com/breken-ai)
+ * fix(query): use embedded discriminator schema when filter selects the key with $eq or $in #16543 [breken-ai](https://github.com/breken-ai)
+ * fix(documentarray): don't pass arrayPathIndex to subdocuments when initializing nested document arrays #16546 [Mohamed-Elshesheny](https://github.com/Mohamed-Elshesheny)
+ * fix(cursor): await driver cleanup when destroying query cursors #16562 #16560 [IbrahimHafez1](https://github.com/IbrahimHafez1)
+ * fix(cursor): reject getDriverCursor after initialization errors #16563 #16561 [IbrahimHafez1](https://github.com/IbrahimHafez1)
+ * types(schema): treat Int32 paths as number #16565 #16564 [lazerg](https://github.com/lazerg)
+ * types(models): align UpdateOneModel and UpdateManyModel update typing with UpdateQuery #16559 #16545 [aipd506](https://github.com/aipd506)
+
+9.11.0 / 2026-10-05
+===================
+ * feat: use MongoDB Node.js driver 7.7.x #16550
+ * feat(query): add Query.prototype.findAndCount() for composable paginated queries #16508 #16504 [lokeshllkumar](https://github.com/lokeshllkumar)
+ * fix: avoid double-calling validators on document arrays underneath nested paths #16484 #16291 #5411
+ * types: pass TLeanResultType into query for type narrowing support with lean() #16523 #16519
+ * docs(guide): use async/await instead of removed callbacks #16566 [joi-agent](https://github.com/joi-agent)
+ * test: run TypeScript tests on typescript 5+7 with combinations of exactOptionalPropertyTypes, skipLibCheck, strict #16510 #16506
+
+9.10.4 / 2026-10-02
+===================
+ * fix: handle MongoDB server 9.x returning collation: { locale: 'simple' } on all indexes #16557
+ * fix(populate): resolve dotted parent path when collecting deferred sub-populate children #16538 [jfits](https://github.com/jfits)
+ * fix(array): compare dates by value in indexOf() so pull() removes them #16535 [giaBaoJS](https://github.com/giaBaoJS)
+ * fix(map): register $set when Map#set() replaces an array #16540 #16539 [luantaraschi](https://github.com/luantaraschi)
+ * fix(query): cast case and then expressions in $expr $switch branches #16534 [kwy404](https://github.com/kwy404)
+ * docs(guide): fix read preference tag set example #16541 [NotAFlightRisk](https://github.com/NotAFlightRisk)
+
+9.10.3 / 2026-09-29
+===================
+ * fix(model): preserve unsaved documents after ordered bulkSave errors #16533 #16532 [IbrahimHafez1](https://github.com/IbrahimHafez1)
+ * fix(model): don't mutate the caller's update object in bulkWrite updateMany #16526 [fadiroot](https://github.com/fadiroot)
+ * fix(schema): run setters declared on the union path itself #16528 [giaBaoJS](https://github.com/giaBaoJS)
+ * fix(collection): open collection if connection was already opened #16527 #16525 #16524
+ * fix(query+model): replace {MODEL} in cast error messages from update and bulkWrite casting #16529 #16502 #16480
+
+9.10.2 / 2026-09-22
+===================
+ * fix(schema): drop subpaths and singleNestedPaths when a path is removed #16521 #16520 [luantaraschi](https://github.com/luantaraschi)
+ * fix(schema): register path-level setters on Map paths #16518 [giaBaoJS](https://github.com/giaBaoJS)
+ * fix(model): replace {MODEL} in castObject() cast error messages #16502 #16480 [dylanpulver](https://github.com/dylanpulver)
+ * fix: preserve circular arrays when cloning with a seen map #16514 [Shubham-Padkonde](https://github.com/Shubham-Padkonde)
+ * docs(async-await): fix broken link to Mongoose API docs #16517 [joshuablac](https://github.com/joshuablac)
+
 9.10.1 / 2026-09-14
 ===================
  * types: relax populate Model generics to allow typed virtuals to be passed to populate in TypeScript 7 with skipLibCheck #16503

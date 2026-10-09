@@ -893,6 +893,29 @@ describe('Map', function() {
     assert.equal(doc.get('books.casino-royale'), 'Casino Royale, by Ian Fleming');
   });
 
+  it('runs setters declared on the map path', function() {
+    const schema = mongoose.Schema({
+      books: {
+        type: Map,
+        of: String,
+        set: v => {
+          const res = {};
+          for (const key of Object.keys(v)) {
+            res[key.toLowerCase()] = v[key];
+          }
+          return res;
+        }
+      }
+    });
+    const Model = db.model('Test', schema);
+
+    const doc = new Model({ books: { 'Casino-Royale': 'Casino Royale' } });
+    assert.deepStrictEqual(Array.from(doc.books.keys()), ['casino-royale']);
+
+    doc.books = { 'Live-And-Let-Die': 'Live and Let Die' };
+    assert.deepStrictEqual(Array.from(doc.books.keys()), ['live-and-let-die']);
+  });
+
   it('handles validation of document array with maps and nested paths (gh-8767)', function() {
     const subSchema = Schema({
       _id: Number,
@@ -1230,6 +1253,52 @@ describe('Map', function() {
 
     const fromDb = await Doc.findById(doc._id);
     assert.deepEqual(Array.from(fromDb.map.get('key')), [1, 2, 3]);
+  });
+
+  it('saves the replaced array when set() is followed by push(), pull() or addToSet() on a map of arrays (gh-16539)', async function() {
+    const Test = db.model('Test', new Schema({
+      arrays: { type: Map, of: [Number] }
+    }));
+
+    const cases = [
+      { method: 'push', arg: 8, initial: [1], replacement: [7], expected: [7, 8] },
+      { method: 'pull', arg: 1, initial: [1, 2], replacement: [7, 1], expected: [7] },
+      { method: 'addToSet', arg: 8, initial: [1], replacement: [7], expected: [7, 8] }
+    ];
+
+    for (const { method, arg, initial, replacement, expected } of cases) {
+      const { _id } = await Test.create({ arrays: { x: initial } });
+
+      const doc = await Test.findById(_id);
+      doc.arrays.set('x', replacement);
+      doc.arrays.get('x')[method](arg);
+      const changes = doc.$getChanges();
+      await doc.save();
+      assert.deepStrictEqual(doc.arrays.get('x').toObject(), expected, method);
+
+      const raw = await Test.collection.findOne({ _id });
+      assert.deepStrictEqual(raw.arrays.x, expected, method);
+      assert.deepStrictEqual(changes.$set, { 'arrays.x': expected }, method);
+      assert.strictEqual(changes.$push, undefined, method);
+      assert.strictEqual(changes.$pullAll, undefined, method);
+      assert.strictEqual(changes.$addToSet, undefined, method);
+    }
+  });
+
+  it('saves the replaced document array when set() is followed by push() on a map of document arrays', async function() {
+    const Test = db.model('Test', new Schema({
+      arrays: { type: Map, of: [new Schema({ n: Number }, { _id: false })] }
+    }));
+
+    const { _id } = await Test.create({ arrays: { x: [{ n: 1 }] } });
+
+    const doc = await Test.findById(_id);
+    doc.arrays.set('x', [{ n: 7 }]);
+    doc.arrays.get('x').push({ n: 8 });
+    await doc.save();
+
+    const raw = await Test.collection.findOne({ _id });
+    assert.deepStrictEqual(raw.arrays.x, [{ n: 7 }, { n: 8 }]);
   });
 
   it('handles maps of maps of numbers (gh-15350)', async function() {

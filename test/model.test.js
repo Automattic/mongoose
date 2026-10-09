@@ -7725,6 +7725,36 @@ describe('Model', function() {
       }]);
       assert.deepStrictEqual(timelessObj, timelessDoc.toObject());
     });
+
+    it('should not modify the update object passed to updateMany (gh-14164)', async function() {
+      const timeSchema = new Schema({
+        name: String,
+        properties: { type: Schema.Types.Mixed, default: {} }
+      }, { timestamps: true });
+      const Time = db.model('Time', timeSchema);
+
+      const timeDoc = await Time.create({ name: 'Time Test' });
+      timeDoc.properties.color = 'Red';
+      const beforeSet = {};
+      Object.assign(beforeSet, timeDoc.toObject());
+      await Time.bulkWrite([{
+        updateMany: {
+          filter: { _id: timeDoc._id },
+          update: { $set: timeDoc }
+        }
+      }]);
+      assert.deepStrictEqual(beforeSet, timeDoc.toObject());
+
+      // A plain update object must come back untouched as well: no
+      // timestamps, defaults or version key written into the caller's object.
+      const update = { $set: { name: 'Renamed' } };
+      await Time.bulkWrite([{ updateMany: { filter: {}, update } }]);
+      assert.deepStrictEqual(update, { $set: { name: 'Renamed' } });
+
+      const fromDb = await Time.findById(timeDoc._id);
+      assert.strictEqual(fromDb.name, 'Renamed');
+      assert.ok(fromDb.updatedAt.valueOf() >= timeDoc.updatedAt.valueOf());
+    });
   });
 
   describe('bulkSave() (gh-9673)', function() {
@@ -8177,6 +8207,158 @@ describe('Model', function() {
       assert.deepEqual(user2.getChanges(), { $set: { age: 27, name: 'Sam' } });
 
     });
+    it('preserves unattempted inserts after an ordered bulkSave error', async() => {
+      const userSchema = new Schema({ name: { type: String, unique: true } });
+      const savedNames = [];
+      userSchema.post('save', function() {
+        savedNames.push(this.name);
+      });
+      const User = db.model('User', userSchema);
+      await User.init();
+
+      const users = [
+        new User({ name: 'duplicate' }),
+        new User({ name: 'duplicate' }),
+        new User({ name: 'last' })
+      ];
+      await assert.rejects(User.bulkSave(users), { name: 'MongoBulkWriteError', code: 11000 });
+
+      assert.equal(await User.countDocuments(), 1);
+      assert.deepStrictEqual(users.map(user => user.isNew), [false, true, true]);
+      assert.deepStrictEqual(users.map(user => user.isModified('name')), [false, true, true]);
+      assert.deepStrictEqual(savedNames, ['duplicate']);
+
+      users[1].name = 'recovered';
+      await User.bulkSave(users.slice(1));
+      assert.equal(await User.countDocuments(), users.length);
+      assert.ok(users.every(user => !user.isNew && !user.isModified()));
+    });
+
+    it('preserves unattempted inserts after an ordered bulkSave error with 25 documents', async() => {
+      const userSchema = new Schema({ name: { type: String, unique: true } });
+      const savedNames = [];
+      userSchema.post('save', function() {
+        savedNames.push(this.name);
+      });
+      const User = db.model('User', userSchema);
+      await User.init();
+
+      const documentCount = 25;
+      const users = Array.from({ length: documentCount }, (_, index) => new User({
+        name: index < 2 ? 'duplicate' : `user-${index}`
+      }));
+      await assert.rejects(User.bulkSave(users), { name: 'MongoBulkWriteError', code: 11000 });
+
+      assert.equal(await User.countDocuments(), 1);
+      assert.deepStrictEqual(users.map(user => user.isNew), [false, ...Array(documentCount - 1).fill(true)]);
+      assert.deepStrictEqual(users.map(user => user.isModified('name')), [false, ...Array(documentCount - 1).fill(true)]);
+      assert.deepStrictEqual(savedNames, ['duplicate']);
+
+      users[1].name = 'recovered';
+      await User.bulkSave(users.slice(1));
+      assert.equal(await User.countDocuments(), documentCount);
+      assert.ok(users.every(user => !user.isNew && !user.isModified()));
+    });
+
+    it('preserves unattempted updates after an ordered bulkSave error with an unchanged document', async() => {
+      const userSchema = new Schema({ name: { type: String, unique: true } });
+      const savedNames = [];
+      userSchema.post('save', function() {
+        savedNames.push(this.name);
+      });
+      const User = db.model('User', userSchema);
+      await User.init();
+      const users = await User.insertMany([
+        { name: 'unchanged' },
+        { name: 'first' },
+        { name: 'second' },
+        { name: 'third' }
+      ]);
+
+      users[1].name = 'duplicate';
+      users[2].name = 'duplicate';
+      users[3].name = 'pending';
+      await assert.rejects(User.bulkSave(users, { ordered: true }), { name: 'MongoBulkWriteError', code: 11000 });
+
+      assert.equal((await User.findById(users[1]._id)).name, 'duplicate');
+      assert.equal((await User.findById(users[3]._id)).name, 'third');
+      assert.deepStrictEqual(users.map(user => user.isModified('name')), [false, false, true, true]);
+      assert.deepStrictEqual(savedNames, ['unchanged', 'duplicate']);
+
+      users[2].name = 'recovered';
+      await User.bulkSave(users.slice(2));
+      assert.equal((await User.findById(users[2]._id)).name, 'recovered');
+      assert.equal((await User.findById(users[3]._id)).name, 'pending');
+    });
+
+    it('uses operation order when an ordered bulkSave fails on a duplicate _id', async() => {
+      const User = db.model('User', new Schema({ name: String }));
+      const sharedId = new mongoose.Types.ObjectId();
+      const users = [
+        new User({ _id: sharedId, name: 'first' }),
+        new User({ name: 'second' }),
+        new User({ _id: sharedId, name: 'duplicate' }),
+        new User({ name: 'unattempted' })
+      ];
+
+      await assert.rejects(User.bulkSave(users), { name: 'MongoBulkWriteError', code: 11000 });
+
+      assert.equal(await User.countDocuments(), 2);
+      assert.deepStrictEqual(users.map(user => user.isNew), [false, false, true, true]);
+      assert.deepStrictEqual(users.map(user => user.isModified('name')), [false, false, true, true]);
+    });
+
+    it('preserves unattempted writes when ordered bulkSave mixes inserts and updates', async() => {
+      const User = db.model('User', new Schema({ name: { type: String, unique: true } }));
+      await User.init();
+      const existing = await User.insertMany([{ name: 'unchanged' }, { name: 'original' }]);
+      existing[1].name = 'pending';
+      const inserted = new User({ name: 'new' });
+      const duplicate = new User({ name: 'new' });
+      const unattempted = new User({ name: 'last' });
+
+      await assert.rejects(User.bulkSave([existing[0], inserted, duplicate, existing[1], unattempted]), {
+        name: 'MongoBulkWriteError', code: 11000
+      });
+
+      assert.equal(inserted.isNew, false);
+      assert.equal(duplicate.isNew, true);
+      assert.equal(existing[1].isModified('name'), true);
+      assert.equal(unattempted.isNew, true);
+      await User.bulkSave([existing[1], unattempted]);
+      assert.equal((await User.findById(existing[1]._id)).name, 'pending');
+      assert.ok(await User.exists({ _id: unattempted._id }));
+    });
+
+    it('preserves unordered failures while saving later documents with a repeated _id', async() => {
+      const savedNames = [];
+      const userSchema = new Schema({ name: String });
+      userSchema.post('save', function() {
+        savedNames.push(this.name);
+      });
+      const User = db.model('User', userSchema);
+      const existing = await User.create({ name: 'existing' });
+      savedNames.length = 0;
+      const sharedId = new mongoose.Types.ObjectId();
+      const users = [
+        existing,
+        new User({ _id: sharedId, name: 'first' }),
+        new User({ _id: sharedId, name: 'duplicate' }),
+        new User({ name: 'last' })
+      ];
+
+      await assert.rejects(User.bulkSave(users, { ordered: false }), { name: 'MongoBulkWriteError', code: 11000 });
+
+      assert.equal(await User.countDocuments(), 3);
+      assert.deepStrictEqual(users.map(user => user.isNew), [false, false, true, false]);
+      assert.deepStrictEqual(users.map(user => user.isModified('name')), [false, false, true, false]);
+      assert.deepStrictEqual(savedNames, ['existing', 'first', 'last']);
+
+      users[2]._id = new mongoose.Types.ObjectId();
+      await User.bulkSave([users[2]], { ordered: false });
+      assert.equal(await User.countDocuments(), users.length);
+    });
+
     it('updates successful document state with multiple unordered write errors and 25 documents', async() => {
       const userSchema = new Schema({
         name: { type: String, unique: true }
@@ -8660,7 +8842,18 @@ describe('Model', function() {
     let indexes = await Test.collection.listIndexes().toArray();
     assert.strictEqual(indexes.length, 2);
     assert.deepEqual(indexes[1].key, { name: 1 });
-    assert.equal(indexes[1].collation, undefined);
+    // `indexes[1].collation` will be `undefined` in MongoDB server 8.x
+    // but will be `{ locale: 'simple' }` in MongoDB server 9.x.
+    // This test does not switch on the MongoDB server version because
+    // `{ locale: 'simple' }` is the default collation behavior in all
+    // supported versions of MongoDB server, so even if the server starts
+    // reporting `{ locale: 'simple' }` in MongoDB server 8, that
+    // is still correct for the purposes of this test.
+    if (indexes[1].collation) {
+      assert.deepEqual(indexes[1].collation, { locale: 'simple' });
+    } else {
+      assert.equal(indexes[1].collation, undefined);
+    }
 
     db.deleteModel(/Test/);
     testSchema = new Schema(

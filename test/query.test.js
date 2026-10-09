@@ -2935,14 +2935,14 @@ describe('Query', function() {
   it('maxTimeMS() (gh-7254)', async function() {
     const Model = db.model('Test', new Schema({}));
 
-
     await Model.create({});
 
-    const res = await Model.find({ $where: 'sleep(1000) || true' }).
+    const err = await Model.find({ $where: 'sleep(1000) || true' }).
       maxTimeMS(10).
       then(() => null, err => err);
-    assert.ok(res);
-    assert.ok(res.message.indexOf('time limit') !== -1, res.message);
+    assert.ok(err);
+    assert.equal(err.code, 50);
+    assert.equal(err.codeName, 'MaxTimeMSExpired');
   });
 
   it('connection-level maxTimeMS() (gh-4066)', async function() {

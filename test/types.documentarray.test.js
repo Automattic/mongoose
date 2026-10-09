@@ -454,7 +454,7 @@ describe('types.documentarray', function() {
 
     });
 
-    it('in arr', function() {
+    it('in arr', async function() {
       const calls = [];
       const schema = new Schema({
         docs: [{
@@ -468,7 +468,7 @@ describe('types.documentarray', function() {
 
       mongoose.deleteModel(/Test/);
       const T = mongoose.model('Test', schema);
-      const t = new T({});
+      let t = new T({});
       t.docs.push(null);
       t.docs.push({ name: 'test2' });
 
@@ -477,6 +477,61 @@ describe('types.documentarray', function() {
       assert.ok(err);
       assert.ok(err.errors['docs.0']);
 
+      t = new T({});
+      t.docs.push(null);
+      t.docs.push({ name: 'test2' });
+      const asyncErr = await t.validate().then(() => null, err => err);
+      assert.equal(calls.length, 4);
+      assert.ok(asyncErr);
+      assert.ok(asyncErr.errors['docs.0']);
+    });
+  });
+
+  describe('avoids double validating document array elements', function() {
+    it('when an element is modified before the array itself (gh-16522)', async function() {
+      const calls = [];
+      const schema = new Schema({
+        arr: [new Schema({ n: { type: String, validate(v) { calls.push(v); return true; } } })]
+      });
+      mongoose.deleteModel(/Test/);
+      const T = mongoose.model('Test', schema);
+
+      const raw = new T({ arr: [{ n: 'a' }, { n: 'b' }] }).toObject();
+      raw._id = raw._id || new mongoose.Types.ObjectId();
+      const doc = T.hydrate(raw);
+
+      // `arr.0` lands in `activePaths` before `arr` does, so the element path
+      // and the array path both end up describing the same work.
+      doc.arr[0] = { n: 'z' };
+      doc.arr.push({ n: 'c' });
+
+      calls.length = 0;
+      await doc.validate();
+      assert.deepStrictEqual(calls, ['z', 'b', 'c']);
+
+      calls.length = 0;
+      doc.validateSync();
+      assert.deepStrictEqual(calls, ['z', 'b', 'c']);
+    });
+
+    it('validates each element once with validateAllPaths (gh-16522)', async function() {
+      const calls = [];
+      const schema = new Schema({
+        arr: [new Schema({ n: { type: String, validate(v) { calls.push(v); return true; } } })]
+      });
+      mongoose.deleteModel(/Test/);
+      const T = mongoose.model('Test', schema);
+
+      // `validateAllPaths` lists the array and every element, but validating a
+      // document array already validates each element, so listing both would
+      // run every subdocument's validators twice.
+      calls.length = 0;
+      new T({ arr: [{ n: 'p' }, { n: 'q' }] }).validateSync(undefined, { validateAllPaths: true });
+      assert.deepStrictEqual(calls, ['p', 'q']);
+
+      calls.length = 0;
+      await new T({ arr: [{ n: 'p' }, { n: 'q' }] }).validate({ validateAllPaths: true });
+      assert.deepStrictEqual(calls, ['p', 'q']);
     });
   });
 
@@ -790,6 +845,41 @@ describe('types.documentarray', function() {
       Test.create({ name: 'test', options: [[{ val: null }]] }),
       /options.0.0.val: Path `val` is required./
     );
+  });
+
+  it('tracks changes to arrays inside subdocs of doubly nested doc arrays after init', async function() {
+    const cellSchema = new mongoose.Schema({
+      name: String,
+      tags: [String],
+      children: [new mongoose.Schema({ v: Number }, { _id: false })]
+    }, { _id: false });
+    const Test = db.model('Test', new mongoose.Schema({ grid: [[cellSchema]] }));
+
+    const { _id } = await Test.create({
+      grid: [
+        [{ name: 'a', tags: ['a1'], children: [] }, { name: 'b', tags: ['b1'], children: [] }],
+        [{ name: 'c', tags: ['c1', 'c2'], children: [{ v: 1 }, { v: 2 }] }]
+      ]
+    });
+
+    const doc = await Test.findById(_id).orFail();
+    doc.grid[0][1].tags.push('b2');
+    doc.grid[1][0].tags.push('c3');
+    doc.grid[1][0].children[1].v = 3;
+    assert.deepStrictEqual(doc.$getChanges(), {
+      $push: {
+        'grid.0.1.tags': { $each: ['b2'] },
+        'grid.1.0.tags': { $each: ['c3'] }
+      },
+      $set: { 'grid.1.0.children.1.v': 3 },
+      $inc: { __v: 1 }
+    });
+    await doc.save();
+
+    const fromDb = await Test.findById(_id).lean().orFail();
+    assert.deepStrictEqual(fromDb.grid[0][1].tags, ['b1', 'b2']);
+    assert.deepStrictEqual(fromDb.grid[1][0].tags, ['c1', 'c2', 'c3']);
+    assert.deepStrictEqual(fromDb.grid[1][0].children, [{ v: 1 }, { v: 3 }]);
   });
 
   it('stores all schematype options in the embedded schematype', function() {

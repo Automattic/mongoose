@@ -2339,13 +2339,56 @@ describe('model: findOneAndUpdate:', function() {
       {},
       {
         $set: {
-          'accessories.0.additionals.0.k': ['test']
+          'accessories.0.additionals.0.k': { foo: 'bar' }
         }
       }
     ).then(() => null, err => err);
     assert.ok(err);
     assert.equal(err.name, 'CastError');
     assert.equal(err.path, 'accessories.0.additionals.0.k');
+  });
+
+  describe('single-element arrays for scalar paths', function() {
+    it('casts a single-element array in $set', async function() {
+      // Arrange
+      const { User } = createTestContext();
+      const user = await User.create({ name: 'before' });
+
+      // Act
+      const updatedUser = await User.findOneAndUpdate(
+        { _id: user._id },
+        { $set: { name: ['after'] } },
+        { returnDocument: 'after' }
+      );
+
+      // Assert
+      assert.strictEqual(updatedUser.name, 'after');
+    });
+
+    it('rejects empty and multi-element arrays in $set', async function() {
+      // Arrange
+      const { User } = createTestContext();
+      const invalidValues = [[], ['first', 'second']];
+
+      for (const value of invalidValues) {
+        // Act
+        const error = await User.findOneAndUpdate(
+          {},
+          { $set: { name: value } }
+        ).then(() => null, error => error);
+
+        // Assert
+        assert.ok(error);
+        assert.strictEqual(error.name, 'CastError');
+        assert.strictEqual(error.path, 'name');
+      }
+    });
+
+    function createTestContext() {
+      const userSchema = new Schema({ name: String });
+      const User = db.model('User', userSchema);
+      return { User };
+    }
   });
 
   describe('deprecation warnings for `new` and `returnOriginal` options (gh-15972)', function() {

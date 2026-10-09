@@ -961,7 +961,7 @@ describe('schema', function() {
       assert.equal(validateCalls, 1);
     });
 
-    it('doesnt do double validation on document arrays underneath nested (gh-5411)', function(done) {
+    it('doesnt do double validation on document arrays underneath nested (gh-5411)', async function() {
       const callScope = [];
 
       function myValidator() {
@@ -1001,10 +1001,13 @@ describe('schema', function() {
         }
       };
 
-      testInstance.validateSync();
+      await testInstance.validate();
       assert.equal(callScope.length, 1);
       assert.strictEqual(callScope[0], testInstance.nest1.nest2.nestarr[0]);
-      done();
+
+      testInstance.validateSync();
+      assert.equal(callScope.length, 2);
+      assert.strictEqual(callScope[1], testInstance.nest1.nest2.nestarr[0]);
     });
 
     it('no double validation on set nested docarray (gh-4145)', async() => {

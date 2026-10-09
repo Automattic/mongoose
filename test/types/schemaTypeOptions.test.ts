@@ -112,7 +112,7 @@ function encrypt() {
   };
 
   new SchemaTypeOptions<string>()['encrypt'] = {
-    keyId: uuid,
+    keyId: [uuid],
     // @ts-expect-error  Type '"SHA_FAKE_ALG"' is not assignable to type '"AEAD_AES_256_CBC_HMAC_SHA_512-Deterministic" | "AEAD_AES_256_CBC_HMAC_SHA_512-Random"'.
     algorithm: 'SHA_FAKE_ALG'
   };
@@ -125,6 +125,7 @@ function encrypt() {
 
   new SchemaTypeOptions<string>()['encrypt'] = {
     keyId: uuid,
+    queries: 'equality',
     // @ts-expect-error  Object literal may only specify known properties, and 'invalidKey' does not exist in type 'EncryptSchemaTypeOptions'.
     invalidKey: 'fakeKeyOption'
   };

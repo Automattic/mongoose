@@ -451,4 +451,29 @@ describe('castArrayFilters', function() {
     castArrayFilters(q3);
     assert.strictEqual(q3.options.arrayFilters[0]['item._id'], 42);
   });
+
+  it('casts the remaining array filters after a path that is not in the schema with `strictQuery: false`', function() {
+    const schema = new Schema({
+      arr: [{ id: Number, date: Date }]
+    }, { strictQuery: false });
+    const q = new Query();
+    q.schema = schema;
+
+    const update = { $set: { 'arr.$[x].id': 1, 'arr.$[y].id': 2, 'arr.$[z].id': 3 } };
+    q.updateOne({}, update, {
+      arrayFilters: [
+        { 'x.notInSchema': '1', 'x.id': '1' },
+        { 'y.date': { $gte: '2018-01-01' } },
+        { $or: [{ 'z.notInSchema': '3' }, { 'z.id': '3' }] }
+      ]
+    });
+    castArrayFilters(q);
+
+    const arrayFilters = q.options.arrayFilters;
+    assert.strictEqual(arrayFilters[0]['x.notInSchema'], '1');
+    assert.strictEqual(arrayFilters[0]['x.id'], 1);
+    assert.ok(arrayFilters[1]['y.date'].$gte instanceof Date);
+    assert.strictEqual(arrayFilters[2].$or[0]['z.notInSchema'], '3');
+    assert.strictEqual(arrayFilters[2].$or[1]['z.id'], 3);
+  });
 });

@@ -330,7 +330,7 @@ describe('schema', function() {
       assert.ok(Loki.path('birth_date').cast(1294525628301) instanceof Date);
       assert.ok(Loki.path('birth_date').cast('8/24/2000') instanceof Date);
       assert.ok(Loki.path('birth_date').cast(new Date()) instanceof Date);
-      assert.ok(Loki.path('birth_date').cast('') === null);
+      assert.throws(() => Loki.path('birth_date').cast(''), /CastError/);
       assert.ok(Loki.path('birth_date').cast(null) === null);
 
     });
@@ -1783,6 +1783,30 @@ describe('schema', function() {
       assert.ok(schema.path('other'));
     });
 
+    it('removes the subpaths of a document array and of a subdocument (gh-16520)', function() {
+      const schema = new Schema({
+        child: new Schema({ name: String, nested: { x: Number } }, { _id: false }),
+        arr: [{ v: Number }],
+        tags: [String],
+        other: String
+      }, { autoCreate: false, autoIndex: false });
+      // Positional lookups register the element paths lazily
+      assert.ok(schema.path('arr.0.v'));
+      assert.ok(schema.path('tags.$'));
+
+      schema.remove(['child', 'arr', 'tags']);
+
+      assert.deepStrictEqual(Object.keys(schema.singleNestedPaths), []);
+      assert.deepStrictEqual(Object.keys(schema.subpaths), []);
+      assert.strictEqual(schema.path('child.name'), undefined);
+      assert.strictEqual(schema.path('arr.0.v'), undefined);
+      assert.strictEqual(schema.path('tags.$'), undefined);
+      assert.equal(schema.pathType('child.name'), 'adhocOrUndefined');
+      assert.equal(schema.pathType('child.nested.x'), 'adhocOrUndefined');
+      assert.equal(schema.pathType('arr.0.v'), 'adhocOrUndefined');
+      assert.ok(schema.path('other'));
+    });
+
     it('removes an array of paths', function() {
       this.schema.remove(['e', 'f', 'g']);
       assert.strictEqual(this.schema.path('e'), undefined);
@@ -2541,6 +2565,23 @@ describe('schema', function() {
       assert.equal(newSchema.pathType('m.k'), 'adhocOrUndefined');
     });
 
+    it('removes the paths of an omitted subdocument (gh-16520)', function() {
+      const schema = new Schema({
+        child: new Schema({ name: String, nested: { x: Number } }, { _id: false }),
+        other: String
+      }, { autoCreate: false, autoIndex: false });
+
+      const newSchema = schema.omit(['child']);
+
+      assert.ok(!newSchema.path('child'));
+      assert.ok(!newSchema.path('child.name'));
+      assert.deepStrictEqual(Object.keys(newSchema.singleNestedPaths), []);
+      assert.equal(newSchema.pathType('child.name'), 'adhocOrUndefined');
+      // The original schema is untouched
+      assert.ok(schema.path('child.name'));
+      assert.equal(schema.pathType('child.nested.x'), 'real');
+    });
+
     it('works with nested paths', function() {
       const schema = Schema({
         name: {
@@ -2785,6 +2826,39 @@ describe('schema', function() {
         () => Test.castObject({ subdoc: { age: 'twenty' } }),
         err => err.errors['subdoc.age'].message ===
           '"twenty" is not a valid number for model gh8300_castObject'
+      );
+    });
+
+    it('replaces {MODEL} with model name in update and bulkWrite() cast errors', async function() {
+      const schema = Schema({
+        age: {
+          type: Number,
+          cast: '{VALUE} is not a valid number for model {MODEL}'
+        }
+      });
+      const Test = db.model('gh8300_update', schema);
+      const message = '"twenty" is not a valid number for model gh8300_update';
+
+      const isCastError = err => err.name === 'CastError' && err.message === message;
+
+      await assert.rejects(() => Test.updateOne({}, { age: 'twenty' }), isCastError);
+      await assert.rejects(() => Test.updateMany({}, { $set: { age: 'twenty' } }), isCastError);
+      await assert.rejects(() => Test.findOneAndUpdate({}, { age: 'twenty' }), isCastError);
+
+      await assert.rejects(
+        () => Test.updateOne({}, { age: 'twenty' }, { multipleCastError: true }),
+        err => err.name === 'ValidationError' &&
+          err.errors['age'].message === message &&
+          err.message === 'Validation failed: age: ' + message
+      );
+
+      await assert.rejects(
+        () => Test.bulkWrite([{ updateOne: { filter: {}, update: { age: 'twenty' } } }]),
+        isCastError
+      );
+      await assert.rejects(
+        () => Test.bulkWrite([{ deleteOne: { filter: { age: 'twenty' } } }]),
+        isCastError
       );
     });
   });

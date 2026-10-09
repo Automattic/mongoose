@@ -12253,6 +12253,49 @@ describe('model: populate:', function() {
     assert.equal(doc.children[0].category.name, 'Test Category');
   });
 
+  it('deferred sub-populate resolves dotted parent paths on lean queries', async function() {
+    // A function `match` makes mongoose defer the nested sub-populate. The deferred pass
+    // collects its children from the parent docs, and on a lean result that lookup could
+    // not resolve a dotted path like 'children.child' - it asked for a property literally
+    // named that, got undefined, collected nothing, and the sub-populate silently never
+    // ran, leaving `grandchild` as a bare ObjectId.
+    //
+    // The match returns {} so nothing is filtered out: the only thing under test is
+    // whether the sub-populate ran at all.
+    const grandchildSchema = new Schema({ name: String });
+    const Grandchild = db.model('Grandchild', grandchildSchema);
+
+    const childSchema = new Schema({
+      name: String,
+      grandchild: { type: Schema.Types.ObjectId, ref: 'Grandchild' }
+    });
+    const Child = db.model('Child', childSchema);
+
+    const parentSchema = new Schema({
+      children: [{
+        kind: String,
+        child: { type: Schema.Types.ObjectId, ref: 'Child' },
+        _id: false
+      }]
+    });
+    const Parent = db.model('Parent', parentSchema);
+
+    const grandchild = await Grandchild.create({ name: 'Grandchild 1' });
+    const child = await Child.create({ name: 'Child 1', grandchild: grandchild._id });
+    const parent = await Parent.create({ children: [{ kind: 'test', child: child._id }] });
+
+    const doc = await Parent.findById(parent._id).populate({
+      path: 'children.child',
+      match: () => ({}),
+      populate: {
+        path: 'grandchild'
+      }
+    }).lean();
+
+    assert.equal(doc.children[0].child.name, 'Child 1');
+    assert.equal(doc.children[0].child.grandchild.name, 'Grandchild 1');
+  });
+
   describe('function refPath (gh-16028)', function() {
     describe('top-level doc', function() {
       it('should populate with function refPath', async function() {

@@ -255,7 +255,7 @@ describe('Int32', function() {
       assert.strictEqual(doc.myInt, 0);
     });
 
-    it('casts empty string to null', function() {
+    it('throws a cast error for empty string', function() {
       const schema = new Schema({
         myInt: Schema.Types.Int32
       });
@@ -264,7 +264,8 @@ describe('Int32', function() {
       const doc = new Test({
         myInt: ''
       });
-      assert.strictEqual(doc.myInt, null);
+      assert.ok(doc.myInt === undefined);
+      assert.ok(doc.validateSync().errors.myInt);
     });
 
     it('supports valueOf() function ', function() {
@@ -399,11 +400,15 @@ describe('Int32', function() {
     });
 
     describe('when an array is provided to an Int32 field', () => {
-      it('throws a CastError upon validation, even for a single-element or empty array', async() => {
-        for (const value of [[5], [], [5, 6]]) {
-          const doc = new Test({ myInt: value });
+      it('casts a single-element array and rejects empty or multi-element arrays', async() => {
+        const single = new Test({ myInt: ['5'] });
+        assert.strictEqual(single.myInt, 5);
+        assert.ifError(single.validateSync());
 
+        for (const value of [[], [5, 6]]) {
+          const doc = new Test({ myInt: value });
           assert.strictEqual(doc.myInt, undefined);
+
           const err = await doc.validate().catch(e => e);
           assert.ok(err);
           assert.ok(err.errors['myInt']);

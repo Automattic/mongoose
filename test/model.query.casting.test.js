@@ -769,6 +769,41 @@ describe('model query casting', function() {
     assert(res);
     assert(res[0].arr);
   });
+  it('casts operators under $not inside $elemMatch on primitive arrays', async function() {
+    const testSchema = new Schema({
+      name: String,
+      scores: [Number],
+      tags: [Schema.Types.ObjectId]
+    });
+    const Test = db.model('Test', testSchema);
+    const tagId = new mongoose.Types.ObjectId();
+    await Test.create([
+      { name: 'low', scores: [1, 2], tags: [tagId] },
+      { name: 'high', scores: [50, 60], tags: [new mongoose.Types.ObjectId()] }
+    ]);
+
+    const filter = Test.find({
+      scores: { $elemMatch: { $not: { $lt: '10' }, $gt: '0' } },
+      tags: { $elemMatch: { $not: { $eq: tagId.toString() } } }
+    }).cast();
+    assert.strictEqual(filter.scores.$elemMatch.$not.$lt, 10);
+    assert.strictEqual(filter.scores.$elemMatch.$gt, 0);
+    assert.ok(filter.tags.$elemMatch.$not.$eq instanceof mongoose.Types.ObjectId);
+
+    let res = await Test.find({ scores: { $elemMatch: { $not: { $lt: '10' } } } });
+    assert.deepStrictEqual(res.map(doc => doc.name), ['high']);
+
+    res = await Test.find({ tags: { $elemMatch: { $not: { $eq: tagId.toString() } } } });
+    assert.deepStrictEqual(res.map(doc => doc.name), ['high']);
+
+    for (const strictQuery of [true, 'throw']) {
+      res = await Test.find({ scores: { $elemMatch: { $not: { $lt: 10 } } } }).setOptions({ strictQuery });
+      assert.deepStrictEqual(res.map(doc => doc.name), ['high']);
+    }
+
+    res = await Test.find({ scores: { $elemMatch: { $not: /abc/ } } });
+    assert.deepStrictEqual(res.map(doc => doc.name).sort(), ['high', 'low']);
+  });
   it('should not throw a cast error when dealing with an array of objects in combination with $elemMatch (gh-13974)', async function() {
     const testSchema = new Schema({
       arr: [Object]

@@ -193,18 +193,18 @@ declare module 'mongoose' {
     min?:
       | number
       | NativeDate
-      | [number, string]
+      | [number, string | ValidatorMessageFn]
       | [NativeDate, string]
-      | readonly [number, string]
+      | readonly [number, string | ValidatorMessageFn]
       | readonly [NativeDate, string];
 
     /** The maximum value allowed for this path. Only allowed for numbers and dates. */
     max?:
       | number
       | NativeDate
-      | [number, string]
+      | [number, string | ValidatorMessageFn]
       | [NativeDate, string]
-      | readonly [number, string]
+      | readonly [number, string | ValidatorMessageFn]
       | readonly [NativeDate, string];
 
     /** Set to false to disable minimizing empty single nested subdocuments by default */
@@ -241,8 +241,8 @@ declare module 'mongoose' {
     uppercase?: boolean;
 
     /** If set, Mongoose will add a custom validator that ensures the given string's `length` is at least the given number. */
-    minlength?: number | [number, string] | readonly [number, string];
-    minLength?: number | [number, string] | readonly [number, string];
+    minlength?: number | [number, string | ValidatorMessageFn] | readonly [number, string | ValidatorMessageFn];
+    minLength?: number | [number, string | ValidatorMessageFn] | readonly [number, string | ValidatorMessageFn];
 
     /** If set, Mongoose will add a custom validator that ensures the given string's `length` is at most the given number. */
     maxlength?: number | [number, string] | readonly [number, string];
@@ -562,10 +562,10 @@ declare module 'mongoose' {
         enum(vals: number[]): this;
 
         /** Sets a maximum number validator. */
-        max(value: number, message?: string): this;
+        max(value: number, message?: string | ValidatorMessageFn): this;
 
         /** Sets a minimum number validator. */
-        min(value: number, message?: string): this;
+        min(value: number, message?: string | ValidatorMessageFn): this;
 
         /** Default options for this SchemaType */
         static defaultOptions: Record<string, any>;
@@ -635,7 +635,7 @@ declare module 'mongoose' {
         maxlength(value: number, message: string): this;
 
         /** Sets a minimum length validator. */
-        minlength(value: number, message: string): this;
+        minlength(value: number, message: string | ValidatorMessageFn): this;
 
         /** Adds a trim [setter](http://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-set). */
         trim(shouldTrim?: boolean): this;

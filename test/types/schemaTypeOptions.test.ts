@@ -5,6 +5,7 @@ import {
   SchemaDefinition,
   SchemaType,
   SchemaTypeOptions,
+  ValidatorProps,
   Types,
   ObjectId,
   Unpacked,
@@ -32,6 +33,28 @@ expect(new SchemaTypeOptions<string[]>().type).type.toBe<AnyArray<StringSchemaDe
 expect(new SchemaTypeOptions<number[]>().type).type.toBe<AnyArray<NumberSchemaDefinition> | AnyArray<SchemaTypeOptions<number>> | undefined>();
 expect(new SchemaTypeOptions<boolean[]>().type).type.toBe<AnyArray<BooleanSchemaDefinition> | AnyArray<SchemaTypeOptions<boolean>> | undefined>();
 expect(new SchemaTypeOptions<Function>().type).type.toBe<Function | typeof SchemaType | Schema<any, any, any> | SchemaDefinition<Function> | Function | AnyArray<Function> | undefined>();
+
+function validatorMessageFunctions() {
+  const message = (props: { path: string }) => `Invalid ${props.path}`;
+
+  new Schema({
+    age: {
+      type: Number,
+      min: [0, (props: ValidatorProps) => `Invalid ${props.path}`],
+      max: [10, (props: ValidatorProps) => `Invalid ${props.path}`]
+    },
+    name: { type: String, minlength: [3, (props: ValidatorProps) => `Invalid ${props.path}`] },
+    nickname: { type: String, minLength: [3, (props: ValidatorProps) => `Invalid ${props.path}`] }
+  });
+
+  new SchemaTypeOptions<number>().min = [0, message];
+  new SchemaTypeOptions<number>().max = [10, message];
+  new SchemaTypeOptions<string>().minlength = [3, message];
+  new SchemaTypeOptions<string>().minLength = [3, message];
+
+  new Schema.Types.Number('age').min(0, message).max(10, message);
+  new Schema.Types.String('name').minlength(3, message);
+}
 
 function index() {
   new SchemaTypeOptions<string>().index = true;

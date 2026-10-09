@@ -61,7 +61,7 @@ describe('schematype', function() {
   });
 
   describe('checkRequired()', function() {
-    it('with inherits (gh-7486)', function() {
+    it('with inherits (gh-7486)', async function() {
       const m = new mongoose.Mongoose();
 
       function CustomNumber(path, options) {
@@ -92,7 +92,7 @@ describe('schematype', function() {
       });
       const M = m.model('Test', s);
       const doc = new M({ foo: 1, bar: '2', baz: new mongoose.Types.ObjectId() });
-      const err = doc.validateSync();
+      const err = await doc.validate().then(() => null, err => err);
       assert.ifError(err);
     });
   });

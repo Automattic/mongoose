@@ -28,7 +28,7 @@ describe('schemaTypes', function() {
    * and add the corresponding property to `mongoose.Schema.Types`. The one
    * method you need to implement is the `cast()` method.
    */
-  it('Creating a Basic Custom Schema Type', function() {
+  it('Creating a Basic Custom Schema Type', async function() {
     class Int8 extends mongoose.SchemaType {
       constructor(key, options) {
         super(key, options, 'Int8');
@@ -59,11 +59,11 @@ describe('schemaTypes', function() {
 
     const t = new Test();
     t.test = 'abc';
-    assert.ok(t.validateSync());
-    assert.equal(t.validateSync().errors['test'].name, 'CastError');
-    assert.equal(t.validateSync().errors['test'].message,
+    assert.ok((await t.validate().then(() => null, err => err)));
+    assert.equal((await t.validate().then(() => null, err => err)).errors['test'].name, 'CastError');
+    assert.equal((await t.validate().then(() => null, err => err)).errors['test'].message,
       'Cast to Int8 failed for value "abc" (type string) at path "test" for model "CustomTypeExample"');
-    assert.equal(t.validateSync().errors['test'].reason.message,
+    assert.equal((await t.validate().then(() => null, err => err)).errors['test'].reason.message,
       'Int8: abc is not a number');
   });
 });

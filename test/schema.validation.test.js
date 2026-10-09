@@ -681,7 +681,7 @@ describe('schema', function() {
           assert.equal(err.errors.url.properties.value, value);
         });
 
-        it('passes full string value to custom validator message functions on validateSync()', function() {
+        it('passes full string value to custom validator message functions on validate()', async function() {
           const value = 'long-long-long.short-enough.com';
           const schema = new Schema({
             url: {
@@ -698,7 +698,7 @@ describe('schema', function() {
           const M = mongoose.model('gh-15571-sync', schema);
           const m = new M({ url: value });
 
-          const err = m.validateSync();
+          const err = (await m.validate().then(() => null, err => err));
           assert.equal(err.errors.url.message, `${value} is not a valid url`);
           assert.equal(err.errors.url.value, value);
           assert.equal(err.errors.url.properties.value, value);
@@ -1005,7 +1005,7 @@ describe('schema', function() {
       assert.equal(callScope.length, 1);
       assert.strictEqual(callScope[0], testInstance.nest1.nest2.nestarr[0]);
 
-      testInstance.validateSync();
+      await testInstance.validate();
       assert.equal(callScope.length, 2);
       assert.strictEqual(callScope[1], testInstance.nest1.nest2.nestarr[0]);
     });
@@ -1153,20 +1153,19 @@ describe('schema', function() {
       }
     });
 
-    it('doesnt execute other validators if required fails (gh-3025)', function(done) {
+    it('doesnt execute other validators if required fails (gh-3025)', async function() {
       const breakfast = new Schema({ description: { type: String, required: true, maxlength: 50 } });
 
       const Breakfast = mongoose.model('gh3025', breakfast, 'gh3025');
       const bad = new Breakfast({});
-      const error = bad.validateSync();
+      const error = (await bad.validate().then(() => null, err => err));
 
       assert.ok(error);
       const errorMessage = 'ValidationError: description: Path `description` is required.';
       assert.equal(errorMessage, error.toString());
-      done();
     });
 
-    it('validateSync allows you to filter paths (gh-3153)', function(done) {
+    it('validate allows you to filter paths (gh-3153)', async function() {
       const breakfast = new Schema({
         description: { type: String, required: true, maxlength: 50 },
         other: { type: String, required: true }
@@ -1174,16 +1173,15 @@ describe('schema', function() {
 
       const Breakfast = mongoose.model('gh3153', breakfast, 'gh3153');
       const bad = new Breakfast({});
-      const error = bad.validateSync('other');
+      const error = (await bad.validate('other').then(() => null, err => err));
 
       assert.ok(error);
       assert.equal(Object.keys(error.errors).length, 1);
       assert.ok(error.errors.other);
       assert.ok(!error.errors.description);
-      done();
     });
 
-    it('validateSync validates array elements when setting pathsToValidate (gh-13159)', function() {
+    it('validate validates array elements when setting pathsToValidate (gh-13159)', async function() {
       const schema = new Schema({
         permissions: [{ type: String, enum: ['users', 'anotherPermission'] }]
       });
@@ -1194,7 +1192,7 @@ describe('schema', function() {
         permissions: ['avocado']
       });
 
-      const error = doc.validateSync('permissions');
+      const error = (await doc.validate('permissions').then(() => null, err => err));
       assert.ok(error);
       assert.equal(Object.keys(error.errors).length, 1);
       assert.ok(error.errors['permissions.0']);
@@ -1341,7 +1339,7 @@ describe('schema', function() {
       assert.ifError(error);
     });
 
-    it('handles function for date min/max (gh-7600)', function() {
+    it('handles function for date min/max (gh-7600)', async function() {
       const s = mongoose.Schema({
         minDate: String,
         date: {
@@ -1352,12 +1350,12 @@ describe('schema', function() {
       const M = mongoose.model('gh7600', s);
 
       let m = new M({ minDate: '2018-06-01', date: '2018-05-01' });
-      let err = m.validateSync();
+      let err = (await m.validate().then(() => null, err => err));
       assert.ok(err);
       assert.ok(err.errors['date']);
 
       m = new M({ minDate: '2018-06-01', date: '2018-07-01' });
-      err = m.validateSync();
+      err = (await m.validate().then(() => null, err => err));
       assert.ifError(err);
     });
 
@@ -1439,7 +1437,7 @@ describe('schema', function() {
     });
 
     describe('`enum` accepts an object to support TypeScript enums (gh-9546) (gh-9535) (gh-15913)', function() {
-      it('strings', function() {
+      it('strings', async function() {
         // Arrange
         const userSchema = new Schema({
           name: {
@@ -1455,13 +1453,13 @@ describe('schema', function() {
 
         // Act
         const user = new User({ name: 'Ameen' });
-        const err = user.validateSync();
+        const err = (await user.validate().then(() => null, err => err));
 
         // Assert
         assert.equal(err.message, 'User_gh9546_1 validation failed: name: `Ameen` is not a valid enum value for path `name`.');
       });
 
-      it('numbers', function() {
+      it('numbers', async function() {
         // Arrange
         const userSchema = new Schema({
           status: {
@@ -1477,13 +1475,13 @@ describe('schema', function() {
 
         // Act
         const user = new User({ status: 2 });
-        const err = user.validateSync();
+        const err = (await user.validate().then(() => null, err => err));
 
         // Assert
         assert.equal(err.message, 'User_gh9546_2 validation failed: status: `2` is not a valid enum value for path `status`.');
       });
 
-      it('arrays', function() {
+      it('arrays', async function() {
         // Arrange
         const userSchema = new Schema({
           favoriteNumbers: {
@@ -1496,13 +1494,13 @@ describe('schema', function() {
 
         // Act
         const user = new User({ favoriteNumbers: [1, 10, 2, 20] });
-        const err = user.validateSync();
+        const err = (await user.validate().then(() => null, err => err));
 
         // Assert
         assert.equal(err.message, 'User_gh9546_3 validation failed: favoriteNumbers.1: `10` is not a valid enum value for path `favoriteNumbers.1`., favoriteNumbers.3: `20` is not a valid enum value for path `favoriteNumbers.3`.');
       });
 
-      it('passes when using valid data', function() {
+      it('passes when using valid data', async function() {
         // Arrange
         const userSchema = new Schema({
           name: {
@@ -1529,13 +1527,13 @@ describe('schema', function() {
 
         // Act
         const user = new User({ name: 'Hafez', status: 1, favoriteNumbers: [1, 2, 2, 2] });
-        const err = user.validateSync();
+        const err = (await user.validate().then(() => null, err => err));
 
         // Assert
         assert.ifError(err);
       });
 
-      it('supports TypeScript-style enums (numeric reverse-mapping and string enums)', function() {
+      it('supports TypeScript-style enums (numeric reverse-mapping and string enums)', async function() {
         const tsNumericEnum = {
           0: 'Zero',
           1: 'One',
@@ -1563,17 +1561,17 @@ describe('schema', function() {
 
         // invalid numeric and string values should fail
         const badUser = new User({ status: 2, kind: 'GAMMA' });
-        const err = badUser.validateSync();
+        const err = (await badUser.validate().then(() => null, err => err));
         assert.ok(err);
         assert.ok(err.errors.status);
 
         // valid values should pass
         const goodUser = new User({ status: 1, kind: 'BETA' });
-        assert.ifError(goodUser.validateSync());
+        assert.ifError((await goodUser.validate().then(() => null, err => err)));
       });
     });
 
-    it('should validate required UUID fields correctly (gh-12991)', function() {
+    it('should validate required UUID fields correctly (gh-12991)', async function() {
       const uuidSchema = new mongoose.Schema({
         _id: { type: mongoose.Schema.Types.UUID, required: true },
         name: { type: mongoose.Schema.Types.String, required: true }
@@ -1592,7 +1590,7 @@ describe('schema', function() {
       const UUIDRefModel = mongoose.model('UUIDRefModel', uuidRefSchema, 'uuidRefs');
 
       const uuid = new UUIDModel({ _id: uuidv4(), name: 'uuidName' });
-      assert.ifError(uuid.validateSync());
+      assert.ifError((await uuid.validate().then(() => null, err => err)));
 
       const uuidRef = new UUIDRefModel({
         _id: uuidv4(),
@@ -1601,7 +1599,7 @@ describe('schema', function() {
         uuidRefNonRequired: uuidv4(),
         name: 'uuidRefName'
       });
-      assert.ifError(uuidRef.validateSync());
+      assert.ifError((await uuidRef.validate().then(() => null, err => err)));
 
       const uuidRef2 = new UUIDRefModel({
         _id: uuidv4(),
@@ -1610,7 +1608,7 @@ describe('schema', function() {
         name: 'uuidRefName'
       });
 
-      const err2 = uuidRef2.validateSync();
+      const err2 = (await uuidRef2.validate().then(() => null, err => err));
       assert.ok(err2);
       assert.ok(err2.errors['uuidRef']);
 
@@ -1621,7 +1619,7 @@ describe('schema', function() {
         name: 'uuidRefName'
       });
 
-      const err3 = uuidRef3.validateSync();
+      const err3 = (await uuidRef3.validate().then(() => null, err => err));
       assert.ok(err3);
       assert.ok(err3.errors['uuidNonRef']);
 
@@ -1632,7 +1630,7 @@ describe('schema', function() {
         name: 'uuidRefName'
       });
 
-      assert.ifError(uuidRef4.validateSync());
+      assert.ifError((await uuidRef4.validate().then(() => null, err => err)));
     });
   });
 });

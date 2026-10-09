@@ -33,7 +33,8 @@ const user = new User({
   lastActiveAt: 'not a date'
 });
 user.lastActiveAt instanceof Date; // false
-user.validateSync().errors['lastActiveAt']; // CastError
+const err = await user.validate().catch(err => err);
+err.errors['lastActiveAt']; // CastError
 ```
 
 ## Validators
@@ -59,7 +60,7 @@ const ok = new Episode({
   title: 'Encounter at Farpoint',
   airedAt: '1987-09-28'
 });
-ok.validateSync(); // No error
+await ok.validate(); // No error
 
 const bad = new Episode({
   title: 'What You Leave Behind',
@@ -69,7 +70,7 @@ bad.airedAt; // "1999-06-02T00:00:00.000Z"
 
 // Path `airedAt` (Tue Jun 01 1999 20:00:00 GMT-0400 (EDT)) is after
 // maximum allowed value (Sun May 22 1994 20:00:00 GMT-0400 (EDT)).
-bad.validateSync();
+await bad.validate();
 ```
 
 ## Querying

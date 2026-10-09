@@ -32,7 +32,7 @@ const contentSchema = new mongoose.Schema({
 contentSchema.index({ title: 'text', body: 'text' });
 const Content = mongoose.model('Content', contentSchema, 'Content');
 
-function generateContents() {
+async function generateContents() {
   const contents = [];
 
   for (const [filename, file] of Object.entries(docsFilemap.fileMap)) {
@@ -43,11 +43,6 @@ function generateContents() {
           body: prop.description,
           url: `${filename}#${prop.anchorId}`
         });
-        const err = content.validateSync();
-        if (err != null) {
-          console.error(content);
-          throw err;
-        }
         contents.push(content);
       }
     } else if (file.markdown) {
@@ -59,8 +54,6 @@ function generateContents() {
         body: text,
         url: filename.replace('.md', '.html').replace(/^docs/, '')
       });
-
-      content.validateSync();
 
       const $ = cheerio.load(text);
       contents.push(content);
@@ -82,7 +75,6 @@ function generateContents() {
           url: id ? `${baseUrl}#${id}` : baseUrl
         });
 
-        content.validateSync();
         contents.push(content);
       });
 
@@ -96,8 +88,6 @@ function generateContents() {
         body: text,
         url: filename.replace('.pug', '.html').replace(/^docs/, '')
       });
-
-      content.validateSync();
 
       const $ = cheerio.load(text);
       contents.push(content);
@@ -119,12 +109,12 @@ function generateContents() {
           url: id ? `${baseUrl}#${id}` : baseUrl
         });
 
-        content.validateSync();
         contents.push(content);
       });
     }
   }
 
+  await Promise.all(contents.map(content => content.validate()));
   return contents;
 }
 
@@ -140,7 +130,7 @@ async function generateSearch(config) {
   await Content.deleteMany({ version });
   console.log('Deleted content for version', version);
 
-  const contents = generateContents();
+  const contents = await generateContents();
 
   const promises = [];
   let lastPrint = 0;

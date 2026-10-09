@@ -3,8 +3,6 @@
 const assert = require('assert');
 const start = require('./common');
 const util = require('./util');
-const sinon = require('sinon');
-const utils = require('../lib/utils');
 
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
@@ -49,7 +47,7 @@ describe('document validation', function() {
       ]
     });
 
-    assert.ifError(doc.validateSync());
+    await doc.validate();
     assert.equal(called, 1);
 
     await doc.validate();
@@ -76,7 +74,7 @@ describe('document validation', function() {
     const doc = new Model({ name: 'bob' });
     doc.level1 = { level2: { a: 'one', b: 'two', c: 'three' } };
 
-    assert.ifError(doc.validateSync());
+    await doc.validate();
     assert.equal(called.length, 1);
     assert.deepEqual(called[0], { a: 'one', b: 'two', c: 'three' });
 
@@ -114,7 +112,7 @@ describe('document validation', function() {
     doc.docArr = [{ subprop: '' }];
     await doc.save({ validateBeforeSave: false });
 
-    assert.ifError(doc.validateSync());
+    await doc.validate();
     await doc.validate();
 
     const assertValidationError = error => {
@@ -141,7 +139,7 @@ describe('document validation', function() {
       );
     };
 
-    assertValidationError(doc.validateSync({ validateAllPaths: true }));
+    assertValidationError((await doc.validate({ validateAllPaths: true }).then(() => null, err => err)));
     assertValidationError(await doc.validate({ validateAllPaths: true }).then(() => null, error => error));
   });
 
@@ -153,7 +151,7 @@ describe('document validation', function() {
     }));
     const doc = new User({ profile: { age: 15 } });
 
-    const syncError = doc.validateSync(['profile']);
+    const syncError = (await doc.validate(['profile']).then(() => null, err => err));
     assert.ok(syncError?.errors['profile.age'], syncError);
 
     await assert.rejects(
@@ -187,15 +185,10 @@ describe('document validation', function() {
       }));
       const doc = new Model({ nest: { arr: [{ name: 'a' }, { name: 'b' }] } });
 
-      const syncError = doc.validateSync();
-      assert.ok(syncError?.errors['nest.arr']);
-      assert.equal(arrayValidatorCalledCount, 1);
-      assert.equal(arrayElementPathValidatorCalledCount, 2);
-
       const error = await doc.validate().then(() => null, error => error);
       assert.ok(error?.errors['nest.arr']);
-      assert.equal(arrayValidatorCalledCount, 2);
-      assert.equal(arrayElementPathValidatorCalledCount, 4);
+      assert.equal(arrayValidatorCalledCount, 1);
+      assert.equal(arrayElementPathValidatorCalledCount, 2);
     });
 
     it('does not double validate document arrays with passing array validators under nested paths', async function() {
@@ -222,7 +215,7 @@ describe('document validation', function() {
       }));
       const doc = new Model({ nest: { arr: [{ name: 'a' }] } });
 
-      assert.ifError(doc.validateSync());
+      await doc.validate();
       assert.equal(arrayValidatorCalledCount, 1);
       assert.equal(arrayElementPathValidatorCalledCount, 1);
 
@@ -258,7 +251,7 @@ describe('document validation', function() {
       const doc = new Model({ other: 'test' });
       doc.nest = { arr: [{ name: 'a' }, { name: 'b' }] };
 
-      assert.ifError(doc.validateSync());
+      await doc.validate();
       assert.equal(arrayValidatorCalledCount, 1);
       assert.equal(arrayElementPathValidatorCalledCount, 2);
 
@@ -276,9 +269,6 @@ describe('document validation', function() {
       }));
       const doc = new Model({ arr: [] });
 
-      const syncError = doc.validateSync();
-      assert.ok(syncError?.errors['arr']);
-
       const error = await doc.validate().then(() => null, error => error);
       assert.ok(error?.errors['arr']);
     });
@@ -290,7 +280,7 @@ describe('document validation', function() {
       }));
       const doc = new Team({ people: [null] });
 
-      const syncError = doc.validateSync({ validateAllPaths: true });
+      const syncError = (await doc.validate({ validateAllPaths: true }).then(() => null, err => err));
       assert.ok(syncError?.errors['people.0'], syncError);
 
       const error = await doc.validate({ validateAllPaths: true }).then(() => null, error => error);
@@ -312,7 +302,7 @@ describe('document validation', function() {
         groups: [{ people: { one: { age: 15 } } }]
       });
 
-      const syncError = doc.validateSync({ validateAllPaths: true });
+      const syncError = (await doc.validate({ validateAllPaths: true }).then(() => null, err => err));
       assert.ok(syncError?.errors['groups.0.people.one.age'], syncError);
 
       const error = await doc.validate({ validateAllPaths: true }).then(() => null, error => error);
@@ -330,9 +320,6 @@ describe('document validation', function() {
         teams: { support: { people: [{ age: 30 }] } }
       });
       doc.teams.get('support').people[0].age = 15;
-
-      const syncError = doc.validateSync();
-      assert.ok(syncError?.errors['teams.support.people.0.age'], syncError);
 
       await assert.rejects(
         () => doc.validate(),
@@ -360,7 +347,7 @@ describe('document validation', function() {
       await doc.save({ validateBeforeSave: false });
       doc.work[0].age = 31;
 
-      assert.ifError(doc.validateSync());
+      await doc.validate();
       await doc.validate();
       await doc.save();
 
@@ -376,15 +363,11 @@ describe('document validation', function() {
         }));
         const doc = new Model({ arr: [{ name: 'good' }, { name: 'bad' }] });
 
-        const syncError = doc.validateSync();
-        assert.ok(syncError?.errors['arr.1'], syncError);
-        assert.ok(!syncError.errors['arr.0'], syncError);
-
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['arr.1'], error);
         assert.ok(!error.errors['arr.0'], error);
 
-        const allPathsSyncError = doc.validateSync({ validateAllPaths: true });
+        const allPathsSyncError = (await doc.validate({ validateAllPaths: true }).then(() => null, err => err));
         assert.ok(allPathsSyncError?.errors['arr.1'], allPathsSyncError);
 
         const allPathsError = await doc.validate({ validateAllPaths: true }).then(() => null, error => error);
@@ -401,14 +384,8 @@ describe('document validation', function() {
         const doc = await Model.create({ arr: [{ name: 'good' }] });
         doc.arr[0].name = 'bad';
 
-        const syncError = doc.validateSync();
-        assert.ok(syncError?.errors['arr.0'], syncError);
-
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['arr.0'], error);
-
-        const allPathsSyncError = doc.validateSync({ validateAllPaths: true });
-        assert.ok(allPathsSyncError?.errors['arr.0'], allPathsSyncError);
 
         const allPathsError = await doc.validate({ validateAllPaths: true }).then(() => null, error => error);
         assert.ok(allPathsError?.errors['arr.0'], allPathsError);
@@ -439,7 +416,7 @@ describe('document validation', function() {
         }));
         const doc = new Model({ arr: [{ name: 'a' }, { name: 'b' }] });
 
-        assert.ifError(doc.validateSync());
+        await doc.validate();
         assert.equal(elementValidatorCalls, 2);
         assert.equal(childValidatorCalls, 2);
 
@@ -451,7 +428,7 @@ describe('document validation', function() {
 
         elementValidatorCalls = 0;
         childValidatorCalls = 0;
-        assert.ifError(doc.validateSync({ validateAllPaths: true }));
+        assert.ifError((await doc.validate({ validateAllPaths: true }).then(() => null, err => err)));
         assert.equal(elementValidatorCalls, 2);
         assert.equal(childValidatorCalls, 2);
 
@@ -484,7 +461,7 @@ describe('document validation', function() {
         }));
         const doc = new Model({ arr: [{ name: 'a' }, { name: 'b' }] });
 
-        assert.ifError(doc.validateSync());
+        await doc.validate();
         assert.equal(childValidatorCalls, 2);
 
         childValidatorCalls = 0;
@@ -492,7 +469,7 @@ describe('document validation', function() {
         assert.equal(childValidatorCalls, 2);
 
         childValidatorCalls = 0;
-        assert.ifError(doc.validateSync({ validateAllPaths: true }));
+        assert.ifError((await doc.validate({ validateAllPaths: true }).then(() => null, err => err)));
         assert.equal(childValidatorCalls, 2);
 
         childValidatorCalls = 0;
@@ -519,15 +496,11 @@ describe('document validation', function() {
           single: { arr: [{ name: 'bad' }] }
         });
 
-        const syncError = doc.validateSync();
-        assert.ok(syncError?.errors['nested.arr.0'], syncError);
-        assert.ok(syncError?.errors['single.arr.0'], syncError);
-
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['nested.arr.0'], error);
         assert.ok(error?.errors['single.arr.0'], error);
 
-        const allPathsSyncError = doc.validateSync({ validateAllPaths: true });
+        const allPathsSyncError = (await doc.validate({ validateAllPaths: true }).then(() => null, err => err));
         assert.ok(allPathsSyncError?.errors['nested.arr.0'], allPathsSyncError);
         assert.ok(allPathsSyncError?.errors['single.arr.0'], allPathsSyncError);
 
@@ -548,14 +521,8 @@ describe('document validation', function() {
         assert.ok(!doc.$isNew);
         assert.ok(!doc.$isModified('arr'));
 
-        const syncError = doc.validateSync();
-        assert.ok(syncError?.errors['arr.0'], syncError);
-
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['arr.0'], error);
-
-        const allPathsSyncError = doc.validateSync({ validateAllPaths: true });
-        assert.ok(allPathsSyncError?.errors['arr.0'], allPathsSyncError);
 
         const allPathsError = await doc.validate({ validateAllPaths: true }).then(() => null, error => error);
         assert.ok(allPathsError?.errors['arr.0'], allPathsError);
@@ -572,14 +539,11 @@ describe('document validation', function() {
         const doc = await Model.findOne().orFail();
         assert.ok(!doc.$isModified('arr'));
 
-        const syncError = doc.validateSync();
+        const syncError = await doc.validate().then(() => null, err => err);
         assert.ok(syncError?.errors['arr.0'], syncError);
 
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['arr.0'], error);
-
-        const allPathsSyncError = doc.validateSync({ validateAllPaths: true });
-        assert.ok(allPathsSyncError?.errors['arr.0'], allPathsSyncError);
 
         const allPathsError = await doc.validate({ validateAllPaths: true }).then(() => null, error => error);
         assert.ok(allPathsError?.errors['arr.0'], allPathsError);
@@ -595,14 +559,8 @@ describe('document validation', function() {
         const doc = await Model.findOne().orFail();
         doc.other = 'b';
 
-        const syncError = doc.validateSync();
-        assert.ok(syncError?.errors['arr.0'], syncError);
-
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['arr.0'], error);
-
-        const allPathsSyncError = doc.validateSync({ validateAllPaths: true });
-        assert.ok(allPathsSyncError?.errors['arr.0'], allPathsSyncError);
 
         const allPathsError = await doc.validate({ validateAllPaths: true }).then(() => null, error => error);
         assert.ok(allPathsError?.errors['arr.0'], allPathsError);
@@ -632,7 +590,7 @@ describe('document validation', function() {
         await Model.collection.insertOne({ arr: [{ name: 'a' }, { name: 'b' }] });
         const doc = await Model.findOne().orFail();
 
-        assert.ifError(doc.validateSync());
+        await doc.validate();
         assert.equal(elementValidatorCalls, 2);
         assert.equal(childValidatorCalls, 2);
 
@@ -644,7 +602,7 @@ describe('document validation', function() {
 
         elementValidatorCalls = 0;
         childValidatorCalls = 0;
-        assert.ifError(doc.validateSync({ validateAllPaths: true }));
+        assert.ifError((await doc.validate({ validateAllPaths: true }).then(() => null, err => err)));
         assert.equal(elementValidatorCalls, 2);
         assert.equal(childValidatorCalls, 2);
 
@@ -667,10 +625,6 @@ describe('document validation', function() {
         }));
         const doc = new Model({ arr: [{ prop: 'good' }, { prop: 'bad' }] });
 
-        const syncError = doc.validateSync();
-        assert.ok(syncError?.errors['arr.1.prop'], syncError);
-        assert.ok(!syncError.errors['arr.0.prop'], syncError);
-
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['arr.1.prop'], error);
         assert.ok(!error.errors['arr.0.prop'], error);
@@ -685,13 +639,10 @@ describe('document validation', function() {
         }));
         const doc = new Model({ arr: [{ prop: 'good' }, null] });
 
-        const syncError = doc.validateSync();
-        assert.ok(syncError?.errors['arr.1'], syncError);
-
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['arr.1'], error);
 
-        const allPathsError = doc.validateSync({ validateAllPaths: true });
+        const allPathsError = (await doc.validate({ validateAllPaths: true }).then(() => null, err => err));
         assert.ok(allPathsError?.errors['arr.1'], allPathsError);
 
         await assert.rejects(() => doc.save(), /ValidationError/);
@@ -720,7 +671,7 @@ describe('document validation', function() {
         }));
         const doc = new Model({ arr: [{ prop: 'good' }, { prop: 'good' }] });
 
-        assert.ifError(doc.validateSync());
+        await doc.validate();
         assert.equal(elementValidatorCalls, 2);
         assert.equal(arrayValidatorCalls, 1);
 
@@ -750,10 +701,6 @@ describe('document validation', function() {
         }));
         const doc = new Model({ nested: { arr: [{ prop: 'good' }, { prop: 'bad' }] } });
 
-        const syncError = doc.validateSync();
-        assert.ok(syncError?.errors['nested.arr.1.prop'], syncError);
-        assert.ok(!syncError.errors['nested.arr.0.prop'], syncError);
-
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['nested.arr.1.prop'], error);
         assert.ok(!error.errors['nested.arr.0.prop'], error);
@@ -770,13 +717,10 @@ describe('document validation', function() {
         }));
         const doc = new Model({ nested: { arr: [{ prop: 'good' }, null] } });
 
-        const syncError = doc.validateSync();
-        assert.ok(syncError?.errors['nested.arr.1'], syncError);
-
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['nested.arr.1'], error);
 
-        const allPathsError = doc.validateSync({ validateAllPaths: true });
+        const allPathsError = (await doc.validate({ validateAllPaths: true }).then(() => null, err => err));
         assert.ok(allPathsError?.errors['nested.arr.1'], allPathsError);
 
         await assert.rejects(() => doc.save(), /ValidationError/);
@@ -807,7 +751,7 @@ describe('document validation', function() {
         }));
         const doc = new Model({ nested: { arr: [{ prop: 'good' }, { prop: 'good' }] } });
 
-        assert.ifError(doc.validateSync());
+        await doc.validate();
         assert.equal(elementValidatorCalls, 2);
         assert.equal(arrayValidatorCalls, 1);
 
@@ -839,10 +783,6 @@ describe('document validation', function() {
         }));
         const doc = new Model({ outer: { inner: { arr: [{ prop: 'good' }, { prop: 'bad' }] } } });
 
-        const syncError = doc.validateSync();
-        assert.ok(syncError?.errors['outer.inner.arr.1.prop'], syncError);
-        assert.ok(!syncError.errors['outer.inner.arr.0.prop'], syncError);
-
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['outer.inner.arr.1.prop'], error);
         assert.ok(!error.errors['outer.inner.arr.0.prop'], error);
@@ -861,13 +801,10 @@ describe('document validation', function() {
         }));
         const doc = new Model({ outer: { inner: { arr: [{ prop: 'good' }, null] } } });
 
-        const syncError = doc.validateSync();
-        assert.ok(syncError?.errors['outer.inner.arr.1'], syncError);
-
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['outer.inner.arr.1'], error);
 
-        const allPathsError = doc.validateSync({ validateAllPaths: true });
+        const allPathsError = (await doc.validate({ validateAllPaths: true }).then(() => null, err => err));
         assert.ok(allPathsError?.errors['outer.inner.arr.1'], allPathsError);
 
         await assert.rejects(() => doc.save(), /ValidationError/);
@@ -900,7 +837,7 @@ describe('document validation', function() {
         }));
         const doc = new Model({ outer: { inner: { arr: [{ prop: 'good' }, { prop: 'good' }] } } });
 
-        assert.ifError(doc.validateSync());
+        await doc.validate();
         assert.equal(elementValidatorCalls, 2);
         assert.equal(arrayValidatorCalls, 1);
 
@@ -933,10 +870,6 @@ describe('document validation', function() {
         }));
         const doc = new Model({ map: { team: { arr: [{ prop: 'good' }, { prop: 'bad' }] } } });
 
-        const syncError = doc.validateSync();
-        assert.ok(syncError?.errors['map.team.arr.1.prop'], syncError);
-        assert.ok(!syncError.errors['map.team.arr.0.prop'], syncError);
-
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['map.team.arr.1.prop'], error);
         assert.ok(!error.errors['map.team.arr.0.prop'], error);
@@ -956,13 +889,10 @@ describe('document validation', function() {
         }));
         const doc = new Model({ map: { team: { arr: [{ prop: 'good' }, null] } } });
 
-        const syncError = doc.validateSync();
-        assert.ok(syncError?.errors['map.team.arr.1'], syncError);
-
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['map.team.arr.1'], error);
 
-        const allPathsError = doc.validateSync({ validateAllPaths: true });
+        const allPathsError = (await doc.validate({ validateAllPaths: true }).then(() => null, err => err));
         assert.ok(allPathsError?.errors['map.team.arr.1'], allPathsError);
 
         await assert.rejects(() => doc.save(), /ValidationError/);
@@ -996,7 +926,7 @@ describe('document validation', function() {
         }));
         const doc = new Model({ map: { team: { arr: [{ prop: 'good' }, { prop: 'good' }] } } });
 
-        assert.ifError(doc.validateSync());
+        await doc.validate();
         assert.equal(elementValidatorCalls, 2);
         assert.equal(arrayValidatorCalls, 1);
 
@@ -1026,10 +956,6 @@ describe('document validation', function() {
         }));
         const doc = new Model({ single: { arr: [{ prop: 'good' }, { prop: 'bad' }] } });
 
-        const syncError = doc.validateSync();
-        assert.ok(syncError?.errors['single.arr.1.prop'], syncError);
-        assert.ok(!syncError.errors['single.arr.0.prop'], syncError);
-
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['single.arr.1.prop'], error);
         assert.ok(!error.errors['single.arr.0.prop'], error);
@@ -1046,13 +972,10 @@ describe('document validation', function() {
         }));
         const doc = new Model({ single: { arr: [{ prop: 'good' }, null] } });
 
-        const syncError = doc.validateSync();
-        assert.ok(syncError?.errors['single.arr.1'], syncError);
-
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['single.arr.1'], error);
 
-        const allPathsError = doc.validateSync({ validateAllPaths: true });
+        const allPathsError = (await doc.validate({ validateAllPaths: true }).then(() => null, err => err));
         assert.ok(allPathsError?.errors['single.arr.1'], allPathsError);
 
         await assert.rejects(() => doc.save(), /ValidationError/);
@@ -1083,7 +1006,7 @@ describe('document validation', function() {
         }));
         const doc = new Model({ single: { arr: [{ prop: 'good' }, { prop: 'good' }] } });
 
-        assert.ifError(doc.validateSync());
+        await doc.validate();
         assert.equal(elementValidatorCalls, 2);
         assert.equal(arrayValidatorCalls, 1);
 
@@ -1115,10 +1038,6 @@ describe('document validation', function() {
         }));
         const doc = new Model({ nested: { single: { arr: [{ prop: 'good' }, { prop: 'bad' }] } } });
 
-        const syncError = doc.validateSync();
-        assert.ok(syncError?.errors['nested.single.arr.1.prop'], syncError);
-        assert.ok(!syncError.errors['nested.single.arr.0.prop'], syncError);
-
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['nested.single.arr.1.prop'], error);
         assert.ok(!error.errors['nested.single.arr.0.prop'], error);
@@ -1137,13 +1056,10 @@ describe('document validation', function() {
         }));
         const doc = new Model({ nested: { single: { arr: [{ prop: 'good' }, null] } } });
 
-        const syncError = doc.validateSync();
-        assert.ok(syncError?.errors['nested.single.arr.1'], syncError);
-
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['nested.single.arr.1'], error);
 
-        const allPathsError = doc.validateSync({ validateAllPaths: true });
+        const allPathsError = (await doc.validate({ validateAllPaths: true }).then(() => null, err => err));
         assert.ok(allPathsError?.errors['nested.single.arr.1'], allPathsError);
 
         await assert.rejects(() => doc.save(), /ValidationError/);
@@ -1176,7 +1092,7 @@ describe('document validation', function() {
         }));
         const doc = new Model({ nested: { single: { arr: [{ prop: 'good' }, { prop: 'good' }] } } });
 
-        assert.ifError(doc.validateSync());
+        await doc.validate();
         assert.equal(elementValidatorCalls, 2);
         assert.equal(arrayValidatorCalls, 1);
 
@@ -1206,10 +1122,6 @@ describe('document validation', function() {
         }));
         const doc = new Model({ outer: [{ arr: [{ prop: 'good' }, { prop: 'bad' }] }] });
 
-        const syncError = doc.validateSync();
-        assert.ok(syncError?.errors['outer.0.arr.1.prop'], syncError);
-        assert.ok(!syncError.errors['outer.0.arr.0.prop'], syncError);
-
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['outer.0.arr.1.prop'], error);
         assert.ok(!error.errors['outer.0.arr.0.prop'], error);
@@ -1226,13 +1138,10 @@ describe('document validation', function() {
         }));
         const doc = new Model({ outer: [{ arr: [{ prop: 'good' }, null] }] });
 
-        const syncError = doc.validateSync();
-        assert.ok(syncError?.errors['outer.0.arr.1'], syncError);
-
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['outer.0.arr.1'], error);
 
-        const allPathsError = doc.validateSync({ validateAllPaths: true });
+        const allPathsError = (await doc.validate({ validateAllPaths: true }).then(() => null, err => err));
         assert.ok(allPathsError?.errors['outer.0.arr.1'], allPathsError);
 
         await assert.rejects(() => doc.save(), /ValidationError/);
@@ -1263,7 +1172,7 @@ describe('document validation', function() {
         }));
         const doc = new Model({ outer: [{ arr: [{ prop: 'good' }, { prop: 'good' }] }] });
 
-        assert.ifError(doc.validateSync());
+        await doc.validate();
         assert.equal(elementValidatorCalls, 2);
         assert.equal(arrayValidatorCalls, 1);
 
@@ -1291,10 +1200,6 @@ describe('document validation', function() {
         }));
         const doc = new Model({ arr: [{ prop: { level: 'good' } }, { prop: { level: 'bad' } }] });
 
-        const syncError = doc.validateSync();
-        assert.ok(syncError?.errors['arr.1.prop'], syncError);
-        assert.ok(!syncError.errors['arr.0.prop'], syncError);
-
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['arr.1.prop'], error);
         assert.ok(!error.errors['arr.0.prop'], error);
@@ -1309,13 +1214,10 @@ describe('document validation', function() {
         }));
         const doc = new Model({ arr: [{ prop: { level: 'good' } }, null] });
 
-        const syncError = doc.validateSync();
-        assert.ok(syncError?.errors['arr.1'], syncError);
-
         const error = await doc.validate().then(() => null, error => error);
         assert.ok(error?.errors['arr.1'], error);
 
-        const allPathsError = doc.validateSync({ validateAllPaths: true });
+        const allPathsError = (await doc.validate({ validateAllPaths: true }).then(() => null, err => err));
         assert.ok(allPathsError?.errors['arr.1'], allPathsError);
 
         await assert.rejects(() => doc.save(), /ValidationError/);
@@ -1344,7 +1246,7 @@ describe('document validation', function() {
         }));
         const doc = new Model({ arr: [{ prop: { level: 'good' } }, { prop: { level: 'good' } }] });
 
-        assert.ifError(doc.validateSync());
+        await doc.validate();
         assert.equal(elementValidatorCalls, 2);
         assert.equal(arrayValidatorCalls, 1);
 
@@ -1380,7 +1282,7 @@ describe('document validation', function() {
       const M = db.model('Test', schema);
       const m = new M({ prop: 'gh891', nick: 'validation test' });
 
-      assert.ifError(m.validateSync());
+      assert.ifError((await m.validate().then(() => null, err => err)));
       assert.equal(called, true);
       called = false;
 
@@ -1396,7 +1298,7 @@ describe('document validation', function() {
       const m2 = await M.findById(m, 'nick');
       m2.nick = 'gh-891';
 
-      assert.ifError(m2.validateSync());
+      assert.ifError((await m2.validate().then(() => null, err => err)));
       assert.equal(called, false);
 
       await m2.validate();
@@ -1420,10 +1322,10 @@ describe('document validation', function() {
       const m = new M({ prop: 'gh891', nick: 'validation test' });
       const mBad = new M({ prop: 'other' });
 
-      assert.ifError(m.validateSync());
+      assert.ifError((await m.validate().then(() => null, err => err)));
       await m.validate().then(res => res);
 
-      assert.ok(mBad.validateSync());
+      assert.ok((await mBad.validate().then(() => null, err => err)));
       const err = await mBad.validate().then(() => null, err => err);
       assert.ok(err);
     });
@@ -1434,11 +1336,11 @@ describe('document validation', function() {
 
       const m = new M({ _id: 'this is not a valid _id' });
       assert.ok(!m.$isValid('_id'));
-      assert.ok(m.validateSync().errors['_id'].name, 'CastError');
+      assert.ok((await m.validate().then(() => null, err => err)).errors['_id'].name, 'CastError');
 
       m._id = '000000000000000000000001';
       assert.ok(m.$isValid('_id'));
-      assert.ifError(m.validateSync());
+      assert.ifError((await m.validate().then(() => null, err => err)));
       await m.validate();
     });
 
@@ -1457,8 +1359,8 @@ describe('document validation', function() {
       assert.ok(error2);
       assert.equal(error2.errors['_id'].name, 'CastError');
 
-      const err1 = m.validateSync();
-      const err2 = m.validateSync();
+      const err1 = (await m.validate().then(() => null, err => err));
+      const err2 = (await m.validate().then(() => null, err => err));
       assert.equal(err1.errors['_id'].name, 'CastError');
       assert.equal(err2.errors['_id'].name, 'CastError');
     });
@@ -1469,7 +1371,7 @@ describe('document validation', function() {
       const M = db.model('Test', schema);
       const m = new M();
 
-      assert.ifError(m.validateSync());
+      assert.ifError((await m.validate().then(() => null, err => err)));
 
       const promise = m.validate();
       assert.equal(typeof promise.then, 'function');
@@ -1485,18 +1387,18 @@ describe('document validation', function() {
         const M = db.model('Test', schema);
         const m = new M({ name: 'gh1109-1', arr: null });
 
-        assert.ok(/Path `arr` is required/.test(m.validateSync()));
+        assert.ok(/Path `arr` is required/.test((await m.validate().then(() => null, err => err))));
         await assert.rejects(() => m.validate(), /Path `arr` is required/);
         await assert.rejects(() => m.save(), /Path `arr` is required/);
 
         m.arr = null;
-        assert.ok(/Path `arr` is required/.test(m.validateSync()));
+        assert.ok(/Path `arr` is required/.test((await m.validate().then(() => null, err => err))));
         await assert.rejects(() => m.validate(), /Path `arr` is required/);
         await assert.rejects(() => m.save(), /Path `arr` is required/);
 
         m.arr = [];
         m.arr.push('works');
-        assert.ifError(m.validateSync());
+        assert.ifError((await m.validate().then(() => null, err => err)));
         await m.validate();
         await m.save();
       });
@@ -1519,7 +1421,7 @@ describe('document validation', function() {
         const m = new M({ name: 'gh1109-2', arr: [1] });
         assert.equal(called, false);
 
-        assert.equal(String(m.validateSync()), 'ValidationError: arr: BAM');
+        assert.equal(String((await m.validate().then(() => null, err => err))), 'ValidationError: arr: BAM');
         assert.equal(called, true);
         called = false;
 
@@ -1534,7 +1436,7 @@ describe('document validation', function() {
         m.arr.push(2);
 
         called = false;
-        assert.ifError(m.validateSync());
+        assert.ifError((await m.validate().then(() => null, err => err)));
         assert.equal(called, true);
 
         called = false;
@@ -1560,7 +1462,7 @@ describe('document validation', function() {
         const M = db.model('Test', schema);
         const m = new M({ name: 'gh1109-3', arr: null });
 
-        assert.equal(m.validateSync().errors.arr.message, 'Path `arr` is required.');
+        assert.equal((await m.validate().then(() => null, err => err)).errors.arr.message, 'Path `arr` is required.');
 
         let err = await m.validate().then(() => null, err => err);
         assert.equal(err.errors.arr.message, 'Path `arr` is required.');
@@ -1570,7 +1472,7 @@ describe('document validation', function() {
 
         m.arr = [{ nice: true }];
 
-        assert.equal(String(m.validateSync()), 'ValidationError: arr: BAM');
+        assert.equal(String((await m.validate().then(() => null, err => err))), 'ValidationError: arr: BAM');
 
         err = await m.validate().then(() => null, err => err);
         assert.equal(String(err), 'ValidationError: arr: BAM');
@@ -1578,7 +1480,7 @@ describe('document validation', function() {
         await assert.rejects(() => m.save(), /ValidationError: arr: BAM/);
 
         m.arr.push(95);
-        assert.ifError(m.validateSync());
+        assert.ifError((await m.validate().then(() => null, err => err)));
         await m.validate();
         await m.save();
       });
@@ -1608,7 +1510,7 @@ describe('document validation', function() {
         }]
       });
 
-      assert.ifError(post.validateSync());
+      assert.ifError((await post.validate().then(() => null, err => err)));
       assert.equal(count, 1);
 
       count = 0;
@@ -1645,7 +1547,7 @@ describe('document validation', function() {
         ]
       });
 
-      assert.ifError(post.validateSync());
+      assert.ifError((await post.validate().then(() => null, err => err)));
       assert.equal(count, post.controls.length);
 
       count = 0;
@@ -1682,7 +1584,7 @@ describe('document validation', function() {
     // consumes it, so re-invalidate before checking the next entry point.
     assertInvalidateError(invalidate());
 
-    assertInvalidateError(post.validateSync());
+    assertInvalidateError((await post.validate().then(() => null, err => err)));
 
     invalidate();
     assertInvalidateError(await post.validate().then(() => null, err => err));
@@ -1693,7 +1595,7 @@ describe('document validation', function() {
     await post.save();
   });
 
-  it('support `pathsToValidate` option for `validate()` and `validateSync()` (gh-7587)', async function() {
+  it('support `pathsToValidate` option for `validate()` and `validate()` (gh-7587)', async function() {
     const schema = Schema({
       name: {
         type: String,
@@ -1709,8 +1611,8 @@ describe('document validation', function() {
 
     const doc = new Model({});
 
-    assert.deepEqual(Object.keys(doc.validateSync(['name', 'rank']).errors), ['name']);
-    assert.deepEqual(Object.keys(doc.validateSync(['age', 'rank']).errors), ['age']);
+    assert.deepEqual(Object.keys((await doc.validate(['name', 'rank']).then(() => null, err => err)).errors), ['name']);
+    assert.deepEqual(Object.keys((await doc.validate(['age', 'rank']).then(() => null, err => err)).errors), ['age']);
 
     let err = await doc.validate(['name', 'rank']).catch(err => err);
     assert.deepEqual(Object.keys(err.errors), ['name']);
@@ -1730,7 +1632,7 @@ describe('document validation', function() {
 
     const doc = new Model({ nested: { name: 'a', age: 9001 } });
 
-    const syncError = doc.validateSync(['nested.name']);
+    const syncError = (await doc.validate(['nested.name']).then(() => null, err => err));
     assert.ok(syncError.errors['nested.name']);
     assert.ok(!syncError.errors['nested.age']);
 
@@ -1740,12 +1642,12 @@ describe('document validation', function() {
   });
 
   describe('validation `pathsToSkip` (gh-10230)', () => {
-    it('support `pathsToSkip` option for `Document#validate()` and `Document#validateSync()`', async function() {
+    it('support `pathsToSkip` option for `Document#validate()` and `Document#validate()`', async function() {
       const User = getUserModel();
       const user = new User();
 
-      assert.deepEqual(Object.keys(user.validateSync({ pathsToSkip: ['age'] }).errors), ['name']);
-      assert.deepEqual(Object.keys(user.validateSync({ pathsToSkip: ['name'] }).errors), ['age']);
+      assert.deepEqual(Object.keys((await user.validate({ pathsToSkip: ['age'] }).then(() => null, err => err)).errors), ['name']);
+      assert.deepEqual(Object.keys((await user.validate({ pathsToSkip: ['name'] }).then(() => null, err => err)).errors), ['age']);
 
       const err1 = await user.validate({ pathsToSkip: ['age'] }).then(() => null, err => err);
       assert.deepEqual(Object.keys(err1.errors), ['name']);
@@ -1775,7 +1677,7 @@ describe('document validation', function() {
 
       const user = new User({ name: 'Sam', age: 26 });
 
-      const err1 = user.validateSync({ pathsToSkip: 'country rank' });
+      const err1 = (await user.validate({ pathsToSkip: 'country rank' }).then(() => null, err => err));
       assert.ok(err1 == null);
 
       const err2 = await user.validate({ pathsToSkip: 'country rank' }).then(() => null, err => err);
@@ -1791,94 +1693,6 @@ describe('document validation', function() {
 
       const User = db.model('User', userSchema);
       return User;
-    }
-  });
-
-  describe('validateSync()', () => {
-    afterEach(() => sinon.restore());
-
-    it('emits a deprecation warning', async function() {
-      // Arrange
-      const { User, getWarningCalls } = createTestContext();
-      const user = new User({ name: 'Sam' });
-
-      // Act
-      user.validateSync();
-
-      // Assert
-      const calls = getWarningCalls();
-      assert.strictEqual(calls.length, 1);
-      assert.ok(calls[0].args[0].includes('`Document.prototype.validateSync()` is deprecated'));
-
-      // `validate()` is the non-deprecated equivalent, so it must stay silent
-      await user.validate();
-      assert.strictEqual(getWarningCalls().length, 1);
-    });
-
-    it('does not emit a deprecation warning for internal bulkSave() validation', async() => {
-      // Arrange
-      const { User, getWarningCalls } = createTestContext();
-      const user = new User();
-
-      // Act
-      const err = await User.bulkSave([user]).then(() => null, err => err);
-
-      // Assert
-      assert.ok(err);
-      assert.strictEqual(err.name, 'ValidationError');
-      assert.strictEqual(getWarningCalls().length, 0);
-    });
-
-    it('emits one deprecation warning when validating subdocuments and unions', async function() {
-      // Arrange
-      const { User, getWarningCalls } = createTestContext();
-      const user = new User({
-        name: 'Sam',
-        address: {},
-        offices: [{}, {}],
-        preference: {}
-      });
-
-      // Act
-      const err = user.validateSync();
-
-      // Assert
-      assert.ok(err);
-      assert.ok(err.errors['address.city']);
-      assert.ok(err.errors['offices.0.city']);
-      assert.ok(err.errors['offices.1.city']);
-      assert.ok(err.errors['preference.score']);
-      assert.strictEqual(getWarningCalls().length, 1);
-
-      // `validate()` reports the same errors without adding another warning
-      const asyncError = await user.validate().then(() => null, err => err);
-      assert.ok(asyncError);
-      assert.ok(asyncError.errors['address.city']);
-      assert.ok(asyncError.errors['offices.0.city']);
-      assert.ok(asyncError.errors['offices.1.city']);
-      assert.ok(asyncError.errors['preference.score']);
-      assert.strictEqual(getWarningCalls().length, 1);
-    });
-
-    function createTestContext() {
-      sinon.stub(utils, 'warn');
-      const addressSchema = Schema({ city: { type: String, required: true } });
-      const officeSchema = Schema({ city: { type: String, required: true } });
-      const preferenceSchema = Schema({ score: { type: Number, required: true } });
-      const User = db.model('ValidateSyncWarning', Schema({
-        name: { type: String, required: true },
-        address: addressSchema,
-        offices: [officeSchema],
-        preference: {
-          type: 'Union',
-          of: [preferenceSchema, Number]
-        }
-      }));
-
-      return {
-        User,
-        getWarningCalls: () => utils.warn.getCalls()
-      };
     }
   });
 
@@ -1904,7 +1718,7 @@ describe('document validation', function() {
     assert.ok(err);
     assert.ok(err.errors['teams.support']);
 
-    err = company.validateSync();
+    err = (await company.validate().then(() => null, err => err));
     assert.ok(err);
     assert.ok(err.errors['teams.support']);
   });
@@ -1928,7 +1742,7 @@ describe('document validation', function() {
 
       calls.array = 0;
       calls.element = 0;
-      assert.ifError(doc.validateSync());
+      await doc.validate();
       assert.deepEqual(calls, { array: 0, element: 1 });
     });
 
@@ -1955,7 +1769,7 @@ describe('document validation', function() {
       calls.array = 0;
       calls.element = 0;
       calls.subpath = 0;
-      assert.ifError(doc.validateSync());
+      await doc.validate();
       assert.deepEqual(calls, { array: 1, element: 0, subpath: 1 });
 
       doc = await Model.create({ values: [{ name: 'before' }] });
@@ -1969,7 +1783,7 @@ describe('document validation', function() {
       calls.array = 0;
       calls.element = 0;
       calls.subpath = 0;
-      assert.ifError(doc.validateSync());
+      await doc.validate();
       assert.deepEqual(calls, { array: 1, element: 0, subpath: 1 });
     });
 
@@ -2018,7 +1832,7 @@ describe('document validation', function() {
       calls.childArray = 0;
       calls.childElement = 0;
       calls.subpath = 0;
-      assert.ifError(doc.validateSync());
+      await doc.validate();
       assert.deepEqual(calls, {
         parentArray: 1,
         parentElement: 0,
@@ -2048,7 +1862,7 @@ describe('document validation', function() {
       calls.childArray = 0;
       calls.childElement = 0;
       calls.subpath = 0;
-      assert.ifError(doc.validateSync());
+      await doc.validate();
       assert.deepEqual(calls, {
         parentArray: 1,
         parentElement: 0,
@@ -2077,7 +1891,7 @@ describe('document validation', function() {
 
       calls.map = 0;
       calls.element = 0;
-      assert.ifError(doc.validateSync());
+      await doc.validate();
       assert.deepEqual(calls, { map: 0, element: 1 });
     });
 
@@ -2105,7 +1919,7 @@ describe('document validation', function() {
       calls.map = 0;
       calls.element = 0;
       calls.subpath = 0;
-      assert.ifError(doc.validateSync());
+      await doc.validate();
       assert.deepEqual(calls, { map: 0, element: 1, subpath: 1 });
 
       doc = await Model.create({ values: { key: { name: 'before' } } });
@@ -2119,7 +1933,7 @@ describe('document validation', function() {
       calls.map = 0;
       calls.element = 0;
       calls.subpath = 0;
-      assert.ifError(doc.validateSync());
+      await doc.validate();
       assert.deepEqual(calls, { map: 0, element: 0, subpath: 1 });
     });
 
@@ -2152,7 +1966,7 @@ describe('document validation', function() {
       calls.array = 0;
       calls.element = 0;
       calls.subpath = 0;
-      assert.ifError(doc.validateSync());
+      await doc.validate();
       assert.deepEqual(calls, { map: 0, array: 1, element: 1, subpath: 1 });
 
       doc = await Model.create({ values: { key: [{ name: 'before' }] } });
@@ -2168,7 +1982,7 @@ describe('document validation', function() {
       calls.array = 0;
       calls.element = 0;
       calls.subpath = 0;
-      assert.ifError(doc.validateSync());
+      await doc.validate();
       assert.deepEqual(calls, { map: 0, array: 1, element: 0, subpath: 1 });
     });
 
@@ -2188,7 +2002,7 @@ describe('document validation', function() {
 
     company.set('groups.0.people.0.age', 15);
     await company.validate({ pathsToSkip: ['groups'] });
-    assert.ifError(company.validateSync({ pathsToSkip: ['groups'] }));
+    assert.ifError((await company.validate({ pathsToSkip: ['groups'] }).then(() => null, err => err)));
   });
 
   it('does not reject valid data under mixed', async function() {
@@ -2213,7 +2027,7 @@ describe('document validation', function() {
     assert.deepEqual(validatedProfiles, []);
 
     validatedProfiles.length = 0;
-    error = user.validateSync(['profile']);
+    error = (await user.validate(['profile']).then(() => null, err => err));
     assert.ifError(error);
     assert.deepEqual(validatedProfiles, []);
 
@@ -2222,7 +2036,7 @@ describe('document validation', function() {
     assert.ifError(error);
     assert.deepEqual(validatedProfiles, []);
 
-    error = user.validateSync();
+    error = (await user.validate().then(() => null, err => err));
     assert.ifError(error);
     assert.deepEqual(validatedProfiles, []);
   });

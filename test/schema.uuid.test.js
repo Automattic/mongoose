@@ -35,7 +35,7 @@ describe('SchemaUUID', function() {
 
   it('basic functionality should work', async function() {
     const doc = new Model({ x: '09190f70-3d30-11e5-8814-0f4df9a59c41' });
-    assert.ifError(doc.validateSync());
+    await doc.validate();
     assert.ok(doc.x instanceof mongoose.Types.UUID);
     assert.strictEqual(doc.x.toString(), '09190f70-3d30-11e5-8814-0f4df9a59c41');
     await doc.save();
@@ -44,7 +44,7 @@ describe('SchemaUUID', function() {
     assert.ok(typeof query._conditions.x === 'string');
 
     const res = await query;
-    assert.ifError(res.validateSync());
+    assert.ifError((await res.validate().then(() => null, err => err)));
     assert.ok(res.x instanceof mongoose.Types.UUID);
     assert.strictEqual(res.x.toString(), '09190f70-3d30-11e5-8814-0f4df9a59c41');
 
@@ -61,9 +61,9 @@ describe('SchemaUUID', function() {
     assert.strictEqual(rawDoc2.x.sub_type, 4);
   });
 
-  it('should throw error in case of invalid string', function() {
+  it('should throw error in case of invalid string', async function() {
     const doc = new Model({ x: 'invalid' });
-    const res = doc.validateSync();
+    const res = await doc.validate().then(() => null, err => err);
     assert.ok(res !== null && res !== undefined);
     const errors = res.errors;
     assert.strictEqual(Object.keys(errors).length, 1);

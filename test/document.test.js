@@ -125,13 +125,13 @@ describe('document', function() {
   afterEach(() => util.stopRemainingOps(db));
 
   describe('constructor', function() {
-    it('supports passing in schema directly (gh-8237)', function() {
+    it('supports passing in schema directly (gh-8237)', async function() {
       const myUserDoc = new Document({}, { name: String });
       assert.ok(!myUserDoc.name);
       myUserDoc.name = 123;
       assert.strictEqual(myUserDoc.name, '123');
 
-      assert.ifError(myUserDoc.validateSync());
+      await myUserDoc.validate();
     });
   });
 
@@ -1988,7 +1988,7 @@ describe('document', function() {
       assert.ok(doc2);
     });
 
-    it('single embedded schemas with validation (gh-2689)', function() {
+    it('single embedded schemas with validation (gh-2689)', async function() {
       const userSchema = new mongoose.Schema({
         name: String,
         email: { type: String, required: true, match: /.+@.+/ }
@@ -2002,13 +2002,13 @@ describe('document', function() {
       const Event = db.model('Event', eventSchema);
 
       const e = new Event({ name: 'test', user: {} });
-      let error = e.validateSync();
+      let error = (await e.validate().then(() => null, err => err));
       assert.ok(error);
       assert.ok(error.errors['user.email']);
       assert.equal(error.errors['user.email'].kind, 'required');
 
       e.user.email = 'val';
-      error = e.validateSync();
+      error = (await e.validate().then(() => null, err => err));
 
       assert.ok(error);
       assert.ok(error.errors['user.email']);
@@ -2175,7 +2175,7 @@ describe('document', function() {
 
       const doc = docs[0];
       doc.other = 'something';
-      assert.ok(doc.validateSync().errors);
+      assert.ok((await doc.validate().then(() => null, err => err)).errors);
       const error = await doc.save().then(() => null, err => err);
       assert.ok(error.errors);
     });
@@ -2197,9 +2197,9 @@ describe('document', function() {
       const doc = docs[0];
       doc.other = 'something';
       doc.subdocs[1].name = 'test2';
-      assert.equal(doc.validateSync({ validateModifiedOnly: true }), null);
-      assert.equal(doc.validateSync('other'), null);
-      assert.ok(doc.validateSync('other title').errors['title']);
+      assert.equal((await doc.validate({ validateModifiedOnly: true }).then(() => null, err => err)), null);
+      assert.equal((await doc.validate('other').then(() => null, err => err)), null);
+      assert.ok((await doc.validate('other title').then(() => null, err => err)).errors['title']);
 
       // Does not throw
       await doc.save({ validateModifiedOnly: true });
@@ -2214,7 +2214,7 @@ describe('document', function() {
 
       const doc = docs[0];
       doc.title = '';
-      assert.ok(doc.validateSync({ validateModifiedOnly: true }).errors);
+      assert.ok((await doc.validate({ validateModifiedOnly: true }).then(() => null, err => err)).errors);
       const error = await doc.save({ validateModifiedOnly: true }).then(() => null, err => err);
 
       assert.ok(error.errors);
@@ -2246,7 +2246,7 @@ describe('document', function() {
 
       const doc = docs[0];
       doc.other = 'hello world';
-      assert.equal(doc.validateSync(), undefined);
+      assert.equal(await doc.validate().then(() => null, err => err), undefined);
       const error = await doc.save().then(() => null, err => err);
       assert.equal(error, null);
     });
@@ -2639,7 +2639,7 @@ describe('document', function() {
       await alice.save();
     });
 
-    it('handles conflicting names (gh-3867)', function() {
+    it('handles conflicting names (gh-3867)', async function() {
       const testSchema = new Schema({
         name: {
           type: String,
@@ -2659,7 +2659,7 @@ describe('document', function() {
         things: [{}]
       });
 
-      const fields = Object.keys(doc.validateSync().errors).sort();
+      const fields = Object.keys((await doc.validate().then(() => null, err => err)).errors).sort();
       assert.deepEqual(fields, ['name', 'things.0.name']);
     });
 
@@ -3136,7 +3136,7 @@ describe('document', function() {
         exec();
     });
 
-    it('skip validation if required returns false (gh-4094)', function() {
+    it('skip validation if required returns false (gh-4094)', async function() {
       const schema = new Schema({
         div: {
           type: Number,
@@ -3146,7 +3146,7 @@ describe('document', function() {
       });
       const Model = db.model('Test', schema);
       const m = new Model();
-      assert.ifError(m.validateSync());
+      assert.ifError((await m.validate().then(() => null, err => err)));
     });
 
     it('ability to overwrite array default (gh-4109)', async function() {
@@ -3218,7 +3218,7 @@ describe('document', function() {
       await foundDoc.save();
     });
 
-    it('validateSync works when setting array index nested (gh-5389)', async function() {
+    it('validate works when setting array index nested (gh-5389)', async function() {
       const childSchema = new mongoose.Schema({
         _id: false,
         name: String,
@@ -3242,7 +3242,7 @@ describe('document', function() {
       const foundDoc = await Model.findById(doc._id);
 
       foundDoc.children[0] = { name: 'updated-child', age: 53 };
-      const errors = foundDoc.validateSync();
+      const errors = (await foundDoc.validate().then(() => null, err => err));
       assert.ok(!errors);
     });
 
@@ -3720,7 +3720,7 @@ describe('document', function() {
         catch(done);
     });
 
-    it('validateSync with undefined and conditional required (gh-4607)', function() {
+    it('validate with undefined and conditional required (gh-4607)', function() {
       const schema = new mongoose.Schema({
         type: mongoose.SchemaTypes.Number,
         conditional: {
@@ -3734,15 +3734,15 @@ describe('document', function() {
 
       const Model = db.model('Test', schema);
 
-      assert.doesNotThrow(function() {
-        new Model({
+      assert.doesNotThrow(async function() {
+        await new Model({
           type: 2,
           conditional: void 0
-        }).validateSync();
+        }).validate();
       });
     });
 
-    it('conditional required on single nested (gh-4663)', function() {
+    it('conditional required on single nested (gh-4663)', async function() {
       const childSchema = new Schema({
         name: String
       });
@@ -3757,7 +3757,7 @@ describe('document', function() {
 
       const M = db.model('Test', schema);
 
-      const err = new M({ child: { name: 'test' } }).validateSync();
+      const err = (await new M({ child: { name: 'test' } }).validate().then(() => null, err => err));
       assert.ifError(err);
     });
 
@@ -4126,7 +4126,7 @@ describe('document', function() {
       assert.deepEqual(user.toObject().arr, []);
     });
 
-    it('handles mark valid in subdocs correctly (gh-4778)', function() {
+    it('handles mark valid in subdocs correctly (gh-4778)', async function() {
       const SubSchema = new mongoose.Schema({
         field: {
           nestedField: {
@@ -4150,7 +4150,7 @@ describe('document', function() {
 
       doc.sub.field.nestedField = { };
       doc.sub.field.nestedField = '574b69d0d9daf106aaa62974';
-      assert.ok(!doc.validateSync());
+      assert.ok(!await doc.validate().then(() => null, err => err));
     });
 
     it('timestamps set to false works (gh-7074)', async function() {
@@ -4403,7 +4403,7 @@ describe('document', function() {
       assert.equal(validateCalls, 0);
     });
 
-    it('runs schema type validator on single nested if parent has default (gh-7493)', function() {
+    it('runs schema type validator on single nested if parent has default (gh-7493)', async function() {
       const childSchema = new Schema({
         test: String
       });
@@ -4420,7 +4420,7 @@ describe('document', function() {
 
       parentDoc.child.test = 'foo';
 
-      const err = parentDoc.validateSync();
+      const err = (await parentDoc.validate().then(() => null, err => err));
       assert.ok(err);
       assert.ok(err.errors['child']);
       return Promise.resolve();
@@ -4613,7 +4613,7 @@ describe('document', function() {
 
       const M = db.model('Test', schema);
 
-      const error = (new M({ name: 'test' })).validateSync();
+      const error = (await new M({ name: 'test' }).validate().then(() => null, err => err));
       assert.ok(error);
       assert.equal(error.errors['name'].reason.message, 'woops!');
 
@@ -5859,10 +5859,10 @@ describe('document', function() {
         then(function(author) { return Book.create({ author: author._id }); }).
         then(function() { return Book.findOne(); }).
         then(function(doc) { return doc.populate('author'); }).
-        then(function(doc) {
+        then(async function(doc) {
           doc.author = {};
           assert.ok(!doc.author.name);
-          assert.ifError(doc.validateSync());
+          await doc.validate();
         });
     });
 
@@ -6621,7 +6621,7 @@ describe('document', function() {
     assert.equal(found.items.length, 2);
   });
 
-  it('validateSync() on embedded doc (gh-6931)', async function() {
+  it('validate() on embedded doc (gh-6931)', async function() {
     const innerSchema = new mongoose.Schema({
       innerField: {
         type: mongoose.Schema.Types.ObjectId,
@@ -6647,7 +6647,7 @@ describe('document', function() {
     });
     doc2.inner[0].innerField = '';
 
-    let err = doc2.inner[0].validateSync();
+    let err = (await doc2.inner[0].validate().then(() => null, err => err));
     assert.ok(err);
     assert.ok(err.errors['innerField']);
 
@@ -6720,7 +6720,7 @@ describe('document', function() {
     assert.ok(fromDb.error.errors.name);
   });
 
-  it('handles mixed arrays with all syntaxes (gh-7109)', function() {
+  it('handles mixed arrays with all syntaxes (gh-7109)', async function() {
     const schema = new Schema({
       arr1: [Schema.Types.Mixed],
       arr2: [{}],
@@ -6735,7 +6735,7 @@ describe('document', function() {
       arr3: ['test3', { four: 'five' }, [6, 'seven', 8]]
     });
 
-    assert.ok(test.validateSync() == null, test.validateSync());
+    assert.ok((await test.validate().then(() => null, err => err)) == null, (await test.validate().then(() => null, err => err)));
 
     return Promise.resolve();
   });
@@ -6754,7 +6754,7 @@ describe('document', function() {
     const Test = db.model('Test', schema);
 
     const doc = new Test({ name: 'foo' });
-    const syncValidationError = doc.validateSync();
+    const syncValidationError = await doc.validate().then(() => null, err => err);
     assert.ok(syncValidationError == null, syncValidationError);
 
 
@@ -7284,7 +7284,7 @@ describe('document', function() {
     assert.equal(doc.toObject().collection, 'bar');
   });
 
-  it('should validateSync() all elements in doc array (gh-6746)', function() {
+  it('should validate() all elements in doc array (gh-6746)', async function() {
     const Model = db.model('Test', new Schema({
       colors: [{
         name: { type: String, required: true },
@@ -7299,7 +7299,7 @@ describe('document', function() {
       ]
     });
 
-    const errors = model.validateSync().errors;
+    const errors = (await model.validate().then(() => null, err => err)).errors;
     const keys = Object.keys(errors).sort();
     assert.deepEqual(keys, ['colors.0.hex', 'colors.1.name']);
   });
@@ -7367,7 +7367,7 @@ describe('document', function() {
 
     const doc = await TestModel.findOne();
     assert.ok(!doc.name);
-    const err = doc.validateSync();
+    const err = await doc.validate().then(() => null, err => err);
     assert.ok(err);
     assert.ok(err.errors['name']);
   });
@@ -7733,7 +7733,7 @@ describe('document', function() {
     return Promise.resolve();
   });
 
-  it('push() onto discriminator doc array (gh-7704)', function() {
+  it('push() onto discriminator doc array (gh-7704)', async function() {
     const opts = {
       minimize: false, // So empty objects are returned
       strict: true,
@@ -7759,7 +7759,7 @@ describe('document', function() {
     const doc = new IssueModel({ _id: 'foo', text: 'text', type: 'gh7704_sub' });
     doc.checklist.push({ completed: true });
 
-    assert.ifError(doc.validateSync());
+    await doc.validate();
 
     return Promise.resolve();
   });
@@ -7781,7 +7781,7 @@ describe('document', function() {
     return k.save().then(() => assert.equal(called, 0));
   });
 
-  it('skips malformed validators property (gh-7720)', function() {
+  it('skips malformed validators property (gh-7720)', async function() {
     const NewSchema = new Schema({
       object: {
         type: 'string',
@@ -7793,7 +7793,7 @@ describe('document', function() {
     const instance = new TestModel();
     instance.object = 'value';
 
-    assert.ifError(instance.validateSync());
+    assert.ifError((await instance.validate().then(() => null, err => err)));
 
     return instance.validate();
   });
@@ -8525,7 +8525,7 @@ describe('document', function() {
     assert.strictEqual(p.child.toJSON().field, true);
   });
 
-  it('enum validator for number (gh-8139)', function() {
+  it('enum validator for number (gh-8139)', async function() {
     const schema = Schema({
       num: {
         type: Number,
@@ -8535,20 +8535,20 @@ describe('document', function() {
     const Model = db.model('Test', schema);
 
     let doc = new Model({});
-    let err = doc.validateSync();
+    let err = await doc.validate().then(() => null, err => err);
     assert.ifError(err);
 
     doc = new Model({ num: 4 });
-    err = doc.validateSync();
+    err = await doc.validate().then(() => null, err => err);
     assert.ok(err);
     assert.equal(err.errors['num'].name, 'ValidatorError');
 
     doc = new Model({ num: 2 });
-    err = doc.validateSync();
+    err = await doc.validate().then(() => null, err => err);
     assert.ifError(err);
   });
 
-  it('enum object syntax for number (gh-10648) (gh-8139)', function() {
+  it('enum object syntax for number (gh-10648) (gh-8139)', async function() {
     const schema = Schema({
       num: {
         type: Number,
@@ -8561,17 +8561,17 @@ describe('document', function() {
     const Model = db.model('Test', schema);
 
     let doc = new Model({});
-    let err = doc.validateSync();
+    let err = await doc.validate().then(() => null, err => err);
     assert.ifError(err);
 
     doc = new Model({ num: 4 });
-    err = doc.validateSync();
+    err = await doc.validate().then(() => null, err => err);
     assert.ok(err);
     assert.equal(err.errors['num'].name, 'ValidatorError');
     assert.equal(err.errors['num'].message, 'Invalid number');
 
     doc = new Model({ num: 2 });
-    err = doc.validateSync();
+    err = await doc.validate().then(() => null, err => err);
     assert.ifError(err);
   });
 
@@ -8717,7 +8717,7 @@ describe('document', function() {
     assert.equal(raw.foo.bar.baz.num, 1);
   });
 
-  it('supports function for date min/max validator error (gh-8512)', function() {
+  it('supports function for date min/max validator error (gh-8512)', async function() {
     const schema = Schema({
       startDate: {
         type: Date,
@@ -8730,7 +8730,7 @@ describe('document', function() {
     const Model = db.model('Test', schema);
     const doc = new Model({ startDate: new Date('2019-06-01') });
 
-    const err = doc.validateSync();
+    const err = await doc.validate().then(() => null, err => err);
     assert.ok(err.errors['startDate']);
     assert.equal(err.errors['startDate'].message, 'test');
   });
@@ -9088,13 +9088,13 @@ describe('document', function() {
     });
   });
 
-  it('reports array cast error with index (gh-8888)', function() {
+  it('reports array cast error with index (gh-8888)', async function() {
     const schema = Schema({ test: [Number] },
       { autoIndex: false, autoCreate: false });
     const Test = db.model('test', schema);
 
     const t = new Test({ test: [1, 'world'] });
-    const err = t.validateSync();
+    const err = (await t.validate().then(() => null, err => err));
     assert.ok(err);
     assert.ok(err.errors);
     assert.ok(err.errors['test.1']);
@@ -9117,14 +9117,14 @@ describe('document', function() {
       then(doc => assert.equal(doc.item.name, 'Default Name'));
   });
 
-  it('clears cast errors when setting an array subpath (gh-9080)', function() {
+  it('clears cast errors when setting an array subpath (gh-9080)', async function() {
     const userSchema = new Schema({ tags: [Schema.ObjectId] });
     const User = db.model('User', userSchema);
 
     const user = new User({ tags: ['hey'] });
     user.tags = [];
 
-    const err = user.validateSync();
+    const err = (await user.validate().then(() => null, err => err));
     assert.ifError(err);
   });
 
@@ -9712,7 +9712,7 @@ describe('document', function() {
     assert.equal(doc.subJob[0].shippingAt.valueOf(), date.valueOf());
   });
 
-  it('passes document as an argument for `required` function in schema definition (gh-9433)', function() {
+  it('passes document as an argument for `required` function in schema definition (gh-9433)', async function() {
     let docFromValidation;
 
     const userSchema = new Schema({
@@ -9728,13 +9728,13 @@ describe('document', function() {
 
     const User = db.model('User', userSchema);
     const user = new User({ age: 26 });
-    const err = user.validateSync();
+    const err = (await user.validate().then(() => null, err => err));
     assert.ok(err);
 
     assert.ok(docFromValidation === user);
   });
 
-  it('works with path named isSelected (gh-9438)', function() {
+  it('works with path named isSelected (gh-9438)', async function() {
     const categorySchema = new Schema({
       name: String,
       categoryUrl: { type: String, required: true }, // Makes test fail
@@ -9749,11 +9749,11 @@ describe('document', function() {
         { name: 'A', categoryUrl: 'B', isSelected: false, isModified: false }
       ]
     });
-    const err = test.validateSync();
+    const err = (await test.validate().then(() => null, err => err));
     assert.ifError(err);
   });
 
-  it('init tracks cast error reason (gh-9448)', function() {
+  it('init tracks cast error reason (gh-9448)', async function() {
     const Test = db.model('Test', Schema({
       num: Number
     }));
@@ -9761,7 +9761,7 @@ describe('document', function() {
     const doc = new Test();
     doc.init({ num: 'not a number' });
 
-    const err = doc.validateSync();
+    const err = await doc.validate().then(() => null, err => err);
     assert.ok(err.errors['num'].reason);
   });
 
@@ -9968,7 +9968,7 @@ describe('document', function() {
     assert.strictEqual(objB.prop.prop, 1);
   });
 
-  it('handles setting a circular POJO containing a nested path document (gh-16530)', function() {
+  it('handles setting a circular POJO containing a nested path document (gh-16530)', async function() {
     const Model = db.model('Test', new Schema({ a: { b: { x: Number } } }));
     const doc = Model.hydrate({ a: { b: { x: 1 } } });
     const value = { b: doc.a.b };
@@ -9977,7 +9977,7 @@ describe('document', function() {
     doc.set('a', value);
 
     assert.deepStrictEqual(doc.a.b.toObject(), { x: 1 });
-    assert.ifError(doc.validateSync());
+    await doc.validate();
     assert.strictEqual(value.circular, value);
   });
 
@@ -10691,11 +10691,11 @@ describe('document', function() {
         const User = db.model('User', userSchema);
 
         const user = new User();
-        user.validateSync();
+        await user.validate().catch(() => {});
 
         assert.ok(user.$errors.name.kind === 'required');
       });
-      it('can be used as a property in documents', () => {
+      it('can be used as a property in documents', async() => {
         const userSchema = new Schema({
           name: { type: String, required: true },
           errors: Number
@@ -10703,7 +10703,7 @@ describe('document', function() {
 
         const User = db.model('User', userSchema);
         const user = new User({ errors: 12 });
-        user.validateSync();
+        await user.validate().catch(() => {});
 
         assert.equal(user.errors, 12);
 

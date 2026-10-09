@@ -8,6 +8,7 @@ declare module 'mongoose' {
         : Exclude<keyof Projection, '_id'> extends never ? false : true
       : false;
   type ProjectionPath<Key> = Key extends `${infer Parent}.$` ? Parent : Key;
+  type ProjectionRoot<Key> = Key extends `${infer Root}.${string}` ? Root : Key;
   type DefiningProjectionKeys<Projection> = {
     [Key in keyof Projection]-?: Key extends string
       ? IsNonDefiningProjection<Projection[Key], Key, Projection> extends true ? never : ProjectionPath<Key>
@@ -24,7 +25,7 @@ declare module 'mongoose' {
         ? T
         : Exclude<DefiningProjectionValues<Projection>, 0 | false | undefined> extends never
           ? Omit<T, Extract<DefiningProjectionKeys<Projection>, keyof T>>
-          : Pick<T, Extract<DefiningProjectionKeys<Projection>, keyof T>> &
+          : Pick<T, Extract<ProjectionRoot<DefiningProjectionKeys<Projection>>, keyof T>> &
             (Projection extends { _id?: infer Id }
               ? Id extends 0 | false
                 ? unknown

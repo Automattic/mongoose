@@ -23,7 +23,9 @@ declare module 'mongoose' {
             ? { [K in keyof T]: PopulatePathToRawDocType<T[K]> }
             : T;
 
-  type PopulatedPathsDocumentType<RawDocType, Paths> = UnpackedIntersection<RawDocType, PopulatePathToRawDocType<Paths>>;
+  type PopulatedPathsDocumentType<RawDocType, Paths> = Paths extends Record<string, never>
+    ? RawDocType
+    : UnpackedIntersection<RawDocType, PopulatePathToRawDocType<Paths>>;
 
   type PopulatedDocumentMarker<
     PopulatedRawDocType,
@@ -50,7 +52,8 @@ declare module 'mongoose' {
     Paths,
     PopulatedRawDocType,
     DepopulatedRawDocType = PopulatedRawDocType
-  > = MergeType<Doc, Paths> & PopulatedDocumentMarker<PopulatedRawDocType, DepopulatedRawDocType>;
+  > = (Paths extends Record<string, never> ? Doc : MergeType<Doc, Paths>) &
+    PopulatedDocumentMarker<PopulatedRawDocType, DepopulatedRawDocType>;
 
   interface PopulateOptions {
     /** space delimited path(s) to populate */

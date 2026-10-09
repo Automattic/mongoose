@@ -336,10 +336,6 @@ declare module 'mongoose' {
       criteria?: QueryFilter<RawDocType>,
       options?: QueryOptions<RawDocType>
     ): QueryWithHelpers<number, DocType, THelpers, RawDocType, 'countDocuments', TDocOverrides, TLeanResultType>;
-    countDocuments(
-      criteria?: Query<any, any>,
-      options?: QueryOptions<RawDocType>
-    ): QueryWithHelpers<number, DocType, THelpers, RawDocType, 'countDocuments', TDocOverrides, TLeanResultType>;
 
     /**
      * Returns a wrapper around a [mongodb driver cursor](https://mongodb.github.io/node-mongodb-native/7.0/classes/FindCursor.html).
@@ -356,29 +352,6 @@ declare module 'mongoose' {
       filter?: QueryFilter<RawDocType>,
       options?: QueryOptions<RawDocType>
     ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteMany', TDocOverrides, TLeanResultType>;
-    deleteMany(
-      filter?: Query<any, any>,
-      options?: QueryOptions<RawDocType>
-    ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteMany', TDocOverrides, TLeanResultType>;
-    deleteMany(filter: QueryFilter<RawDocType>): QueryWithHelpers<
-      any,
-      DocType,
-      THelpers,
-      RawDocType,
-      'deleteMany',
-      TDocOverrides,
-      TLeanResultType
-    >;
-    deleteMany(filter: Query<any, any>): QueryWithHelpers<
-      any,
-      DocType,
-      THelpers,
-      RawDocType,
-      'deleteMany',
-      TDocOverrides,
-      TLeanResultType
-    >;
-    deleteMany(): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteMany', TDocOverrides, TLeanResultType>;
 
     /**
      * Declare and/or execute this query as a `deleteOne()` operation. Works like
@@ -389,51 +362,11 @@ declare module 'mongoose' {
       filter?: QueryFilter<RawDocType>,
       options?: QueryOptions<RawDocType>
     ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteOne', TDocOverrides, TLeanResultType>;
-    deleteOne(
-      filter?: Query<any, any>,
-      options?: QueryOptions<RawDocType>
-    ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteOne', TDocOverrides, TLeanResultType>;
-    deleteOne(filter: QueryFilter<RawDocType>): QueryWithHelpers<
-      any,
-      DocType,
-      THelpers,
-      RawDocType,
-      'deleteOne',
-      TDocOverrides,
-      TLeanResultType
-    >;
-    deleteOne(filter: Query<any, any>): QueryWithHelpers<
-      any,
-      DocType,
-      THelpers,
-      RawDocType,
-      'deleteOne',
-      TDocOverrides,
-      TLeanResultType
-    >;
-    deleteOne(): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteOne', TDocOverrides, TLeanResultType>;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
     distinct<DocKey extends string, ResultType = unknown>(
       field: DocKey,
       filter?: QueryFilter<RawDocType>,
-      options?: QueryOptions<RawDocType>
-    ): QueryWithHelpers<
-      Array<
-        DocKey extends keyof WithLevel1NestedPaths<DocType>
-          ? WithoutUndefined<Unpacked<WithLevel1NestedPaths<DocType>[DocKey]>>
-          : ResultType
-      >,
-      DocType,
-      THelpers,
-      RawDocType,
-      'distinct',
-      TDocOverrides,
-      TLeanResultType
-    >;
-    distinct<DocKey extends string, ResultType = unknown>(
-      field: DocKey,
-      filter?: Query<any, any>,
       options?: QueryOptions<RawDocType>
     ): QueryWithHelpers<
       Array<
@@ -492,11 +425,6 @@ declare module 'mongoose' {
       projection?: ProjectionType<RawDocType> | null,
       options?: QueryOptions<RawDocType> | null
     ): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find', TDocOverrides, TLeanResultType>;
-    find(
-      filter?: Query<any, any>,
-      projection?: ProjectionType<RawDocType> | null,
-      options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find', TDocOverrides, TLeanResultType>;
 
     /** Executes the query as a find and also runs countDocuments, returning [documents, count]. Also requires sort and limit to be set. */
     findAndCount(): Promise<[ResultType, number]>;
@@ -507,19 +435,10 @@ declare module 'mongoose' {
       projection?: ProjectionType<RawDocType> | null,
       options?: QueryOptions<RawDocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TDocOverrides, TLeanResultType>;
-    findOne(
-      filter?: Query<any, any>,
-      projection?: ProjectionType<RawDocType> | null,
-      options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOne', TDocOverrides, TLeanResultType>;
 
     /** Creates a `findOneAndDelete` query: atomically finds the given document, deletes it, and returns the document as it was before deletion. */
     findOneAndDelete(
       filter?: QueryFilter<RawDocType>,
-      options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndDelete', TDocOverrides, TLeanResultType>;
-    findOneAndDelete(
-      filter?: Query<any, any>,
       options?: QueryOptions<RawDocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndDelete', TDocOverrides, TLeanResultType>;
 
@@ -530,27 +449,12 @@ declare module 'mongoose' {
       options: QueryOptions<RawDocType> & { includeResultMetadata: true }
     ): QueryWithHelpers<ModifyResult<DocType>, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides, TLeanResultType>;
     findOneAndUpdate(
-      filter: Query<any, any>,
-      update: UpdateQuery<RawDocType>,
-      options: QueryOptions<RawDocType> & { includeResultMetadata: true }
-    ): QueryWithHelpers<ModifyResult<DocType>, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides, TLeanResultType>;
-    findOneAndUpdate(
       filter: QueryFilter<RawDocType>,
       update: UpdateQuery<RawDocType>,
       options: QueryOptions<RawDocType> & { upsert: true } & ReturnsNewDoc
     ): QueryWithHelpers<DocType, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides, TLeanResultType>;
     findOneAndUpdate(
-      filter: Query<any, any>,
-      update: UpdateQuery<RawDocType>,
-      options: QueryOptions<RawDocType> & { upsert: true } & ReturnsNewDoc
-    ): QueryWithHelpers<DocType, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides, TLeanResultType>;
-    findOneAndUpdate(
       filter?: QueryFilter<RawDocType>,
-      update?: UpdateQuery<RawDocType>,
-      options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides, TLeanResultType>;
-    findOneAndUpdate(
-      filter?: Query<any, any>,
       update?: UpdateQuery<RawDocType>,
       options?: QueryOptions<RawDocType> | null
     ): QueryWithHelpers<DocType | null, DocType, THelpers, RawDocType, 'findOneAndUpdate', TDocOverrides, TLeanResultType>;
@@ -869,11 +773,6 @@ declare module 'mongoose' {
       replacement?: DocType | AnyObject,
       options?: QueryOptions<RawDocType> | null
     ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'replaceOne', TDocOverrides, TLeanResultType>;
-    replaceOne(
-      filter?: Query<any, any>,
-      replacement?: DocType | AnyObject,
-      options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'replaceOne', TDocOverrides, TLeanResultType>;
 
     /**
      * Sets this query's `sanitizeProjection` option. With `sanitizeProjection()`, you can pass potentially untrusted user data to `.select()`.
@@ -988,11 +887,6 @@ declare module 'mongoose' {
       update: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline,
       options?: QueryOptions<RawDocType> | null
     ): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType, 'updateMany', TDocOverrides, TLeanResultType>;
-    updateMany(
-      filter: Query<any, any>,
-      update: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline,
-      options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType, 'updateMany', TDocOverrides, TLeanResultType>;
 
     /**
      * Declare and/or execute this query as an updateOne() operation. Same as
@@ -1000,11 +894,6 @@ declare module 'mongoose' {
      */
     updateOne(
       filter: QueryFilter<RawDocType>,
-      update: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline,
-      options?: QueryOptions<RawDocType> | null
-    ): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType, 'updateOne', TDocOverrides, TLeanResultType>;
-    updateOne(
-      filter: Query<any, any>,
       update: UpdateQuery<RawDocType> | UpdateWithAggregationPipeline,
       options?: QueryOptions<RawDocType> | null
     ): QueryWithHelpers<UpdateWriteOpResult, DocType, THelpers, RawDocType, 'updateOne', TDocOverrides, TLeanResultType>;

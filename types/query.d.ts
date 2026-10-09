@@ -84,7 +84,9 @@ declare module 'mongoose' {
     QueryOp = 'find',
     TDocOverrides = Record<string, never>,
     TLeanResultType = RawDocType
-  > = Query<ResultType, DocType, THelpers, RawDocType, QueryOp, TDocOverrides, TLeanResultType> & THelpers;
+  > = THelpers extends Record<string, never> ?
+    Query<ResultType, DocType, THelpers, RawDocType, QueryOp, TDocOverrides, TLeanResultType> :
+    Query<ResultType, DocType, THelpers, RawDocType, QueryOp, TDocOverrides, TLeanResultType> & THelpers;
 
   interface QueryTimestampsConfig {
     createdAt?: boolean;
@@ -253,7 +255,7 @@ declare module 'mongoose' {
           : MergeType<ResultType, Paths>
     : MergeType<ResultType, Paths>;
 
-  class Query<ResultType, DocType, THelpers = {}, RawDocType = unknown, QueryOp = 'find', TDocOverrides = Record<string, never>, TLeanResultType = RawDocType> implements SessionOperation {
+  class Query<ResultType, DocType, out THelpers = {}, RawDocType = unknown, QueryOp = 'find', TDocOverrides = Record<string, never>, TLeanResultType = RawDocType> implements SessionOperation {
     _mongooseOptions: QueryOptions<RawDocType>;
 
     /**
@@ -300,7 +302,7 @@ declare module 'mongoose' {
      * @param {Object} [obj] If not set, defaults to this query's conditions
      * @return {Object} the casted `obj`
      */
-    cast(model?: Model<any, THelpers> | null, obj?: any): any;
+    cast(model?: Model<any, any> | null, obj?: any): any;
 
     /**
      * Executes the query returning a `Promise` which will be
@@ -694,7 +696,7 @@ declare module 'mongoose' {
     populate(
       path: string | string[],
       select?: string | any,
-      model?: string | Model<any, THelpers>,
+      model?: string | Model<any, any>,
       match?: any
     ): QueryWithHelpers<
       ResultType,
@@ -719,7 +721,7 @@ declare module 'mongoose' {
     populate<Paths>(
       path: string | string[],
       select?: string | any,
-      model?: string | Model<any, THelpers>,
+      model?: string | Model<any, any>,
       match?: any
     ): QueryWithHelpers<
       MergePopulatePaths<RawDocType, ResultType, QueryOp, Paths, THelpers, TDocOverrides>,

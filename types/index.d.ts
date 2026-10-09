@@ -73,7 +73,7 @@ declare module 'mongoose' {
 
   export function omitUndefined<T extends Record<string, any>>(val: T): T;
 
-  export type HydratedDocFromModel<M extends Model<any>> = ReturnType<M['hydrate']>;
+  export type HydratedDocFromModel<M extends Model<any, any, any, any, any, any, any>> = ReturnType<M['hydrate']>;
   export type VirtualsForModel<ModelType extends Model<any, any, any, any>> = ModelType extends Model<any, any, any, infer TVirtuals> ? TVirtuals : never;
 
   /* ! ignore */

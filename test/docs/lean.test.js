@@ -27,9 +27,6 @@ describe('Lean Tutorial', function() {
 
   it('compare sizes lean vs not lean', async function() {
     // acquit:ignore:start
-    if (typeof Deno !== 'undefined') {
-      return this.skip(); // Deno does not support v8.serialize()
-    }
     const v8Serialize = require('v8').serialize;
     // acquit:ignore:end
     const schema = new mongoose.Schema({ name: String });

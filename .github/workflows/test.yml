@@ -77,35 +77,6 @@ jobs:
         run: npm run test-coverage:ci
         if: matrix.coverage == true
 
-  test-deno:
-    runs-on: ubuntu-22.04
-    name: Deno tests
-    env:
-      MONGOMS_VERSION: 6.0.15
-      MONGOMS_PREFER_GLOBAL_PATH: 1
-      MONGOMS_DOWNLOAD_DIR: /home/runner/.cache/mongodb-binaries
-      FORCE_COLOR: true
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Setup node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: 22
-      - name: Load MongoDB binary cache
-        id: cache-mongodb-binaries
-        uses: actions/cache@v6
-        with:
-          path: ~/.cache/mongodb-binaries
-          key: deno-${{ env.MONGOMS_VERSION }}
-      - name: Setup Deno
-        uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
-        with:
-          deno-version: v2.6.x
-      - run: deno --version
-      - run: npm install
-      - name: Run Deno tests
-        run: npm run test-deno:ci
-
   test-atlas-cli:
     runs-on: ubuntu-22.04
     name: Atlas CLI tests

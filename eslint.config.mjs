@@ -161,7 +161,6 @@ export default defineConfig([
   // test specific options (including type tests)
   {
     files: ['test/**/*.js', 'test/**/*.ts'],
-    ignores: ['deno*.mjs'],
     plugins: {
       'mocha-no-only': mochaNoOnly
     },
@@ -171,16 +170,6 @@ export default defineConfig([
     rules: {
       'no-self-assign': 'off',
       'mocha-no-only/mocha-no-only': ['error']
-    }
-  },
-  // deno specific options
-  {
-    files: ['**/deno*.mjs'],
-    languageOptions: {
-      globals: {
-        // "globals" currently has no definition for deno
-        Deno: 'readonly'
-      }
     }
   },
   // general options for module files

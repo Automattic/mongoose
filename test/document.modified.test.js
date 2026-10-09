@@ -475,7 +475,7 @@ describe('document modified', function() {
           child.set({ name: 'Maryanne' });
         });
 
-        assert.equal(family.validateSync(), undefined);
+        assert.equal((await family.validate().then(() => null, err => err)), undefined);
       });
     });
 

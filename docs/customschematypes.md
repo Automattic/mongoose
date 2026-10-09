@@ -45,10 +45,11 @@ const Test = mongoose.model('CustomTypeExample', testSchema);
 
 const t = new Test();
 t.test = 'abc';
-assert.ok(t.validateSync());
-assert.equal(t.validateSync().errors['test'].name, 'CastError');
-assert.equal(t.validateSync().errors['test'].message,
+const err = await t.validate().catch(err => err);
+assert.ok(err);
+assert.equal(err.errors['test'].name, 'CastError');
+assert.equal(err.errors['test'].message,
   'Cast to Int8 failed for value "abc" (type string) at path "test"');
-assert.equal(t.validateSync().errors['test'].reason.message,
+assert.equal(err.errors['test'].reason.message,
   'Int8: abc is not a number');
 ```

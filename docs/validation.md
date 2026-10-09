@@ -6,7 +6,7 @@ Before we get into the specifics of validation syntax, please keep the following
 * Validation is [middleware](middleware.html). Mongoose registers validation as a `pre('save')` hook on every schema by default.
 * Validation always runs as the **first** `pre('save')` hook. This means that validation doesn't run on any changes you make in `pre('save')` hooks.
 * You can disable automatic validation before save by setting the [validateBeforeSave](guide.html#validateBeforeSave) option
-* You can manually run validation using `doc.validate()` or `doc.validateSync()`
+* You can manually run validation using `doc.validate()`
 * You can manually mark a field as invalid (causing validation to fail) by using [`doc.invalidate(...)`](api/document.html#document_Document-invalidate)
 * Validators are not run on undefined values. The only exception is the [`required` validator](api/schematype.html#schematype_SchemaType-required).
 * When you call [Model#save](api/model.html#model_Model-save), Mongoose also runs subdocument validation. If an error occurs, your [Model#save](api/model.html#model_Model-save) promise rejects
@@ -34,7 +34,7 @@ try {
 assert.equal(error.errors['name'].message,
   'Path `name` is required.');
 
-error = cat.validateSync();
+error = await cat.validate().catch(err => err);
 assert.equal(error.errors['name'].message,
   'Path `name` is required.');
 ```
@@ -89,7 +89,7 @@ const badBreakfast = new Breakfast({
   bacon: 0,
   drink: 'Milk'
 });
-let error = badBreakfast.validateSync();
+let error = await badBreakfast.validate().catch(err => err);
 assert.equal(error.errors['eggs'].message,
   'Too few eggs');
 assert.ok(!error.errors['bacon']);
@@ -99,11 +99,11 @@ assert.equal(error.errors['drink'].message,
 badBreakfast.bacon = 5;
 badBreakfast.drink = null;
 
-error = badBreakfast.validateSync();
+error = await badBreakfast.validate().catch(err => err);
 assert.equal(error.errors['drink'].message, 'Path `drink` is required.');
 
 badBreakfast.bacon = null;
-error = badBreakfast.validateSync();
+error = await badBreakfast.validate().catch(err => err);
 assert.equal(error.errors['bacon'].message, 'Why no bacon?');
 ```
 
@@ -139,7 +139,7 @@ const badBreakfast = new Breakfast({
   eggs: 2,
   drink: 'Milk'
 });
-const error = badBreakfast.validateSync();
+const error = await badBreakfast.validate().catch(err => err);
 assert.equal(error.errors['eggs'].message,
   'Must be at least 6, got 2');
 assert.equal(error.errors['drink'].message, 'Milk is not supported');
@@ -213,19 +213,19 @@ const user = new User();
 let error;
 
 user.phone = '555.0123';
-error = user.validateSync();
+error = await user.validate().catch(err => err);
 assert.equal(error.errors['phone'].message,
   '555.0123 is not a valid phone number!');
 
 user.phone = '';
-error = user.validateSync();
+error = await user.validate().catch(err => err);
 assert.equal(error.errors['phone'].message,
   'User phone number required');
 
 user.phone = '201-555-0123';
 // Validation succeeds! Phone number is defined
 // and fits `DDD-DDD-DDDD`
-error = user.validateSync();
+error = await user.validate().catch(err => err);
 assert.equal(error, null);
 ```
 
@@ -347,7 +347,7 @@ const vehicleSchema = new mongoose.Schema({
 const Vehicle = db.model('Vehicle', vehicleSchema);
 
 const doc = new Vehicle({ numWheels: 'not a number' });
-const err = doc.validateSync();
+const err = await doc.validate().catch(err => err);
 
 err.errors['numWheels'].name; // 'CastError'
 // 'Cast to Number failed for value "not a number" at path "numWheels"'
@@ -367,7 +367,7 @@ const vehicleSchema = new mongoose.Schema({
 const Vehicle = db.model('Vehicle', vehicleSchema);
 
 const doc = new Vehicle({ numWheels: 'pie' });
-const err = doc.validateSync();
+const err = await doc.validate().catch(err => err);
 
 err.errors['numWheels'].name; // 'CastError'
 // "pie" is not a number
@@ -393,7 +393,7 @@ const vehicleSchema = new mongoose.Schema({
 const Vehicle = db.model('Vehicle', vehicleSchema);
 
 const doc = new Vehicle({ numWheels: 'pie' });
-const err = doc.validateSync();
+const err = await doc.validate().catch(err => err);
 
 err.errors['numWheels'].name; // 'CastError'
 // "pie" is not a number
@@ -456,7 +456,7 @@ personSchema = new Schema({
 const Person = db.model('Person', personSchema);
 
 const person = new Person();
-const error = person.validateSync();
+const error = await person.validate().catch(err => err);
 assert.ok(error.errors['name']);
 ```
 
@@ -513,7 +513,7 @@ const toySchema = new Schema({
 });
 
 toySchema.path('color').validate(function(value) {
-  // When running in `validate()` or `validateSync()`, the
+  // When running in `validate()`, the
   // validator can access the document using `this`.
   // When running with update validators, `this` is the Query,
   // **not** the document being updated!
@@ -529,7 +529,7 @@ const Toy = db.model('ActionFigure', toySchema);
 
 const toy = new Toy({ color: 'green', name: 'Red Power Ranger' });
 // Validation failed: color: Validator failed for path `color` with value `green`
-let error = toy.validateSync();
+let error = await toy.validate().catch(err => err);
 assert.ok(error.errors['color']);
 
 const update = { color: 'green', name: 'Red Power Ranger' };

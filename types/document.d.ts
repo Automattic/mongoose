@@ -11,12 +11,6 @@ declare module 'mongoose' {
     middleware?: boolean | SkipMiddlewareOptions;
   }
 
-  interface ValidateSyncOptions extends Omit<ValidateOptions, 'middleware'> {
-    /** `validateSync()` does not run middleware. Use `validate()` if you need middleware. */
-    middleware?: never;
-    [k: string]: any;
-  }
-
   interface DocumentSetOptions {
     merge?: boolean;
 
@@ -325,21 +319,5 @@ declare module 'mongoose' {
     validate<T extends keyof DocType>(pathsToValidate?: T | T[], options?: Omit<ValidateOptions, 'pathsToSkip'> & AnyObject): Promise<void>;
     validate(pathsToValidate?: pathsToValidate, options?: Omit<ValidateOptions, 'pathsToSkip'> & AnyObject): Promise<void>;
     validate(options: ValidateOptions): Promise<void>;
-
-    /**
-     * Executes registered validation rules (skipping asynchronous validators) for this document.
-     * @deprecated Use `validate()` instead. `validateSync()` does not run middleware and will be removed in Mongoose 10.
-     */
-    validateSync(options: ValidateSyncOptions): Error.ValidationError | null;
-    /**
-     * Executes registered validation rules (skipping asynchronous validators) for this document.
-     * @deprecated Use `validate()` instead. `validateSync()` does not run middleware and will be removed in Mongoose 10.
-     */
-    validateSync<T extends keyof DocType>(pathsToValidate?: T | T[], options?: Omit<ValidateSyncOptions, 'pathsToSkip'>): Error.ValidationError | null;
-    /**
-     * Executes registered validation rules (skipping asynchronous validators) for this document.
-     * @deprecated Use `validate()` instead. `validateSync()` does not run middleware and will be removed in Mongoose 10.
-     */
-    validateSync(pathsToValidate?: pathsToValidate, options?: Omit<ValidateSyncOptions, 'pathsToSkip'>): Error.ValidationError | null;
   }
 }

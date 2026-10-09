@@ -10,6 +10,20 @@ There are several backwards-breaking changes you should be aware of when migrati
 
 If you're still on Mongoose 8.x or earlier, please read the [Mongoose 8.x to 9.x migration guide](migrating_to_9.html) and upgrade to Mongoose 9.x first before upgrading to Mongoose 10.
 
+## Removed `validateSync()`
+
+Mongoose 10 removes `Document.prototype.validateSync()`. Use the asynchronous `Document.prototype.validate()` method instead.
+
+```javascript
+// Mongoose 9
+const validationError = doc.validateSync();
+
+// Mongoose 10
+await doc.validate();
+```
+
+Unlike `validateSync()`, `validate()` runs validation middleware and asynchronous validators.
+
 ## Empty strings throw a cast error for scalar schema types
 
 In Mongoose 10, empty strings throw a cast error for all scalar schema types other than `String`. In Mongoose 9, this behavior varied between schema types. If you need to preserve an empty string, use a `String` schema type or a custom setter or caster.

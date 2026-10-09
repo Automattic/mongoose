@@ -26,7 +26,7 @@ describe('validation docs', function() {
    * - Validation is defined in the [SchemaType](./schematypes.html)
    * - Validation is [middleware](./middleware.html). Mongoose registers validation as a `pre('save')` hook on every schema by default.
    * - You can disable automatic validation before save by setting the [validateBeforeSave](./guide.html#validateBeforeSave) option
-   * - You can manually run validation using `doc.validate(callback)` or `doc.validateSync()`
+   * - You can manually run validation using `doc.validate(callback)` or `doc.validate()`
    * - You can manually mark a field as invalid (causing validation to fail) by using [`doc.invalidate(...)`](./api/document.html#document_Document-invalidate)
    * - Validators are not run on undefined values. The only exception is the [`required` validator](./api/schematype.html#schematype_SchemaType-required).
    * - Validation is asynchronously recursive; when you call [Model#save](./api/model.html#model_Model-save), sub-document validation is executed as well. If an error occurs, your [Model#save](./api/model.html#model_Model-save) callback receives it
@@ -55,7 +55,7 @@ describe('validation docs', function() {
     assert.equal(error.errors['name'].message,
       'Path `name` is required.');
 
-    error = cat.validateSync();
+    error = await cat.validate().then(() => null, err => err);
     assert.equal(error.errors['name'].message,
       'Path `name` is required.');
   });
@@ -70,7 +70,7 @@ describe('validation docs', function() {
    * Each of the validator links above provide more information about how to enable them and customize their error messages.
    */
 
-  it('Built-in Validators', function() {
+  it('Built-in Validators', async function() {
     const breakfastSchema = new Schema({
       eggs: {
         type: Number,
@@ -96,7 +96,7 @@ describe('validation docs', function() {
       bacon: 0,
       drink: 'Milk'
     });
-    let error = badBreakfast.validateSync();
+    let error = await badBreakfast.validate().then(() => null, err => err);
     assert.equal(error.errors['eggs'].message,
       'Too few eggs');
     assert.ok(!error.errors['bacon']);
@@ -106,11 +106,11 @@ describe('validation docs', function() {
     badBreakfast.bacon = 5;
     badBreakfast.drink = null;
 
-    error = badBreakfast.validateSync();
+    error = await badBreakfast.validate().then(() => null, err => err);
     assert.equal(error.errors['drink'].message, 'Path `drink` is required.');
 
     badBreakfast.bacon = null;
-    error = badBreakfast.validateSync();
+    error = await badBreakfast.validate().then(() => null, err => err);
     assert.equal(error.errors['bacon'].message, 'Why no bacon?');
   });
 
@@ -125,7 +125,7 @@ describe('validation docs', function() {
    * Mongoose replaces `{VALUE}` with the value being validated.
    */
 
-  it('Custom Error Messages', function() {
+  it('Custom Error Messages', async function() {
     const breakfastSchema = new Schema({
       eggs: {
         type: Number,
@@ -149,7 +149,7 @@ describe('validation docs', function() {
       eggs: 2,
       drink: 'Milk'
     });
-    const error = badBreakfast.validateSync();
+    const error = await badBreakfast.validate().then(() => null, err => err);
     assert.equal(error.errors['eggs'].message,
       'Must be at least 6, got 2');
     assert.equal(error.errors['drink'].message, 'Milk is not supported');
@@ -206,7 +206,7 @@ describe('validation docs', function() {
    * You can find detailed instructions on how to do this in the
    * [`SchemaType#validate()` API docs](./api/schematype.html#schematype_SchemaType-validate).
    */
-  it('Custom Validators', function() {
+  it('Custom Validators', async function() {
     const userSchema = new Schema({
       phone: {
         type: String,
@@ -225,19 +225,19 @@ describe('validation docs', function() {
     let error;
 
     user.phone = '555.0123';
-    error = user.validateSync();
+    error = await user.validate().then(() => null, err => err);
     assert.equal(error.errors['phone'].message,
       '555.0123 is not a valid phone number!');
 
     user.phone = '';
-    error = user.validateSync();
+    error = await user.validate().then(() => null, err => err);
     assert.equal(error.errors['phone'].message,
       'User phone number required');
 
     user.phone = '201-555-0123';
     // Validation succeeds! Phone number is defined
     // and fits `DDD-DDD-DDDD`
-    error = user.validateSync();
+    error = await user.validate().then(() => null, err => err);
     assert.equal(error, null);
   });
 
@@ -354,14 +354,14 @@ describe('validation docs', function() {
    * `undefined`, or an instance of the type specified in your schema.
    */
 
-  it('Cast Errors', function() {
+  it('Cast Errors', async function() {
     const vehicleSchema = new mongoose.Schema({
       numWheels: { type: Number, max: 18 }
     });
     const Vehicle = db.model('Vehicle', vehicleSchema);
 
     const doc = new Vehicle({ numWheels: 'not a number' });
-    const err = doc.validateSync();
+    const err = await doc.validate().then(() => null, err => err);
 
     err.errors['numWheels'].name; // 'CastError'
     // 'Cast to Number failed for value "not a number" at path "numWheels"'
@@ -375,7 +375,7 @@ describe('validation docs', function() {
     // acquit:ignore:end
   });
 
-  it('Cast Error Message Overwrite', function() {
+  it('Cast Error Message Overwrite', async function() {
     const vehicleSchema = new mongoose.Schema({
       numWheels: {
         type: Number,
@@ -385,7 +385,7 @@ describe('validation docs', function() {
     const Vehicle = db.model('Vehicle', vehicleSchema);
 
     const doc = new Vehicle({ numWheels: 'pie' });
-    const err = doc.validateSync();
+    const err = await doc.validate().then(() => null, err => err);
 
     err.errors['numWheels'].name; // 'CastError'
     // "pie" is not a number
@@ -399,7 +399,7 @@ describe('validation docs', function() {
   });
 
   /* eslint-disable no-unused-vars */
-  it('Cast Error Message Function Overwrite', function() {
+  it('Cast Error Message Function Overwrite', async function() {
     const vehicleSchema = new mongoose.Schema({
       numWheels: {
         type: Number,
@@ -409,7 +409,7 @@ describe('validation docs', function() {
     const Vehicle = db.model('Vehicle', vehicleSchema);
 
     const doc = new Vehicle({ numWheels: 'pie' });
-    const err = doc.validateSync();
+    const err = await doc.validate().then(() => null, err => err);
 
     err.errors['numWheels'].name; // 'CastError'
     // "pie" is not a number
@@ -454,7 +454,7 @@ describe('validation docs', function() {
    * nested objects are not fully fledged paths.
    */
 
-  it('Required Validators On Nested Objects', function() {
+  it('Required Validators On Nested Objects', async function() {
     let personSchema = new Schema({
       name: {
         first: String,
@@ -483,7 +483,7 @@ describe('validation docs', function() {
     const Person = db.model('Person', personSchema);
 
     const person = new Person();
-    const error = person.validateSync();
+    const error = await person.validate().then(() => null, err => err);
     assert.ok(error.errors['name']);
   });
 
@@ -541,7 +541,7 @@ describe('validation docs', function() {
     });
 
     toySchema.path('color').validate(function(value) {
-      // When running in `validate()` or `validateSync()`, the
+      // When running in `validate()` or `validate()`, the
       // validator can access the document using `this`.
       // When running with update validators, `this` is the Query,
       // **not** the document being updated!
@@ -557,7 +557,7 @@ describe('validation docs', function() {
 
     const toy = new Toy({ color: 'green', name: 'Red Power Ranger' });
     // Validation failed: color: Validator failed for path `color` with value `green`
-    let error = toy.validateSync();
+    let error = await toy.validate().then(() => null, err => err);
     assert.ok(error.errors['color']);
 
     const update = { color: 'green', name: 'Red Power Ranger' };

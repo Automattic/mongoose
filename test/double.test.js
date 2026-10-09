@@ -235,7 +235,7 @@ describe('Double', function() {
       assert.deepStrictEqual(doc.myDouble, new BSON.Double(0));
     });
 
-    it('throws a cast error for empty string', function() {
+    it('throws a cast error for empty string', async function() {
       const schema = new Schema({
         myDouble: Schema.Types.Double
       });
@@ -245,7 +245,8 @@ describe('Double', function() {
         myDouble: ''
       });
       assert.strictEqual(doc.myDouble, undefined);
-      assert.ok(doc.validateSync().errors.myDouble);
+      const err = await doc.validate().then(() => null, err => err);
+      assert.ok(err.errors.myDouble);
     });
 
     it('supports valueOf() function ', function() {
@@ -293,7 +294,7 @@ describe('Double', function() {
       it('casts a single-element array and rejects empty or multi-element arrays', async() => {
         const single = new Test({ myDouble: ['5'] });
         assert.strictEqual(single.myDouble.valueOf(), 5);
-        assert.ifError(single.validateSync());
+        assert.ifError((await single.validate().then(() => null, err => err)));
 
         for (const value of [[], [5, 6]]) {
           const doc = new Test({ myDouble: value });

@@ -1088,19 +1088,20 @@ describe('types array', function() {
       mongoose.Schema.Types.DocumentArray.options = docArrOptions;
     });
 
-    it('castNonArrays (gh-7371) (gh-7479)', function() {
+    it('castNonArrays (gh-7371) (gh-7479)', async function() {
       const schema = new Schema({ arr: [String], docArr: [{ name: String }] });
       const Model = db.model('Test', schema);
 
       let doc = new Model({ arr: 'fail', docArr: { name: 'fail' } });
-      assert.ok(doc.validateSync().errors);
-      assert.equal(doc.validateSync().errors['arr'].name, 'CastError');
-      assert.equal(doc.validateSync().errors['docArr'].name, 'CastError');
+      const err = await doc.validate().then(() => null, err => err);
+      assert.ok(err.errors);
+      assert.equal(err.errors['arr'].name, 'CastError');
+      assert.equal(err.errors['docArr'].name, 'CastError');
 
       doc = new Model({ arr: ['good'] });
-      assert.ifError(doc.validateSync());
+      await doc.validate();
       doc.arr.push('foo');
-      assert.ifError(doc.validateSync());
+      await doc.validate();
       assert.deepEqual(doc.arr.toObject(), ['good', 'foo']);
 
       // test also having the property option set
@@ -1109,12 +1110,12 @@ describe('types array', function() {
       const bothSchema = new Schema({ arr: { castNonArrays: true, type: [String] }, docArr: { castNonArrays: true, type: [{ name: String }] } });
       const bothModel = db.model('Test2', bothSchema);
       let bothdoc = new bothModel({ arr: 'fail', docArr: { name: 'fail' } });
-      assert.ifError(doc.validateSync());
+      await doc.validate();
 
       bothdoc = new bothModel({ arr: ['good'] });
-      assert.ifError(bothdoc.validateSync());
+      assert.ifError((await bothdoc.validate().then(() => null, err => err)));
       bothdoc.arr.push('foo');
-      assert.ifError(bothdoc.validateSync());
+      assert.ifError((await bothdoc.validate().then(() => null, err => err)));
       assert.deepEqual(bothdoc.arr.toObject(), ['good', 'foo']);
 
       return Promise.resolve();
@@ -1915,33 +1916,33 @@ describe('types array', function() {
     assert.strictEqual(arr[0], 42);
   });
 
-  it('test "castNonArrays" property option', function() {
+  it('test "castNonArrays" property option', async function() {
     const Model = db.model('Test', new Schema({ x1: { castNonArrays: false, type: [String] }, x2: { castNonArrays: true, type: [String] }, x3: { type: [String] } }));
 
     const string = 'hello';
 
     // error testing
     let doc = new Model({ x1: string });
-    const validateErrors = doc.validateSync().errors;
+    const validateErrors = await doc.validate().then(() => null, err => err.errors);
     assert.ok(validateErrors);
     assert.equal(validateErrors['x1'].name, 'CastError');
 
     // good testing
     doc = new Model({ x2: string });
-    assert.ifError(doc.validateSync());
+    await doc.validate();
     doc.x2.push('foo');
-    assert.ifError(doc.validateSync());
+    await doc.validate();
     assert.deepEqual(doc.x2.toObject(), ['hello', 'foo']);
 
     // without option (default)
     doc = new Model({ x3: string });
-    assert.ifError(doc.validateSync());
+    await doc.validate();
     doc.x3.push('foo');
-    assert.ifError(doc.validateSync());
+    await doc.validate();
     assert.deepEqual(doc.x3.toObject(), ['hello', 'foo']);
   });
 
-  it('`castNonArrays` on specific paths takes precedence over global option', function() {
+  it('`castNonArrays` on specific paths takes precedence over global option', async function() {
     // Arrange
     const m = new mongoose.Mongoose();
     m.Schema.Types.Array.options.castNonArrays = false;
@@ -1953,7 +1954,7 @@ describe('types array', function() {
     const user = new User({ friendsNames: 'Sam' });
 
     // Assert
-    assert.ifError(user.validateSync());
+    assert.ifError((await user.validate().then(() => null, err => err)));
 
     m.Schema.Types.Array.options.castNonArrays = true;
   });

@@ -2,8 +2,6 @@
 
 const start = require('./common');
 
-const assert = require('assert');
-
 const mongoose = start.mongoose;
 const Schema = mongoose.Schema;
 
@@ -16,10 +14,10 @@ describe('SchemaString', function() {
     M = mongoose.model('Test', schema);
   });
 
-  it('works when RegExp has global flag set (gh-9287)', function() {
+  it('works when RegExp has global flag set (gh-9287)', async function() {
     const doc = new M({ x: 'abc' });
-    assert.ifError(doc.validateSync());
-    assert.ifError(doc.validateSync());
+    await doc.validate();
+    await doc.validate();
   });
 
   it('regex validator works with validate() (gh-15380)', async function() {

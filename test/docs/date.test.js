@@ -34,20 +34,20 @@ describe('Date Tutorial', function() {
     // acquit:ignore:end
   });
 
-  it('Example 1.3: cast error', function() {
+  it('Example 1.3: cast error', async function() {
     const user = new User({
       name: 'Jean-Luc Picard',
       lastActiveAt: 'not a date'
     });
     user.lastActiveAt instanceof Date; // false
-    user.validateSync().errors['lastActiveAt']; // CastError
+    (await user.validate().then(() => null, err => err)).errors['lastActiveAt']; // CastError
     // acquit:ignore:start
     assert.ok(!(user.lastActiveAt instanceof Date));
-    assert.equal(user.validateSync().errors['lastActiveAt'].name, 'CastError');
+    assert.equal((await user.validate().then(() => null, err => err)).errors['lastActiveAt'].name, 'CastError');
     // acquit:ignore:end
   });
 
-  it('Example 1.2.1: min, max', function() {
+  it('Example 1.2.1: min, max', async function() {
     const episodeSchema = new mongoose.Schema({
       title: String,
       airedAt: {
@@ -64,9 +64,9 @@ describe('Date Tutorial', function() {
       title: 'Encounter at Farpoint',
       airedAt: '1987-09-28'
     });
-    ok.validateSync(); // No error
+    await ok.validate(); // No error
     // acquit:ignore:start
-    assert.ifError(ok.validateSync());
+    assert.ifError((await ok.validate().then(() => null, err => err)));
     // acquit:ignore:end
 
     const bad = new Episode({
@@ -77,10 +77,10 @@ describe('Date Tutorial', function() {
 
     // Path `airedAt` (Tue Jun 01 1999 20:00:00 GMT-0400 (EDT)) is after
     // maximum allowed value (Sun May 22 1994 20:00:00 GMT-0400 (EDT)).
-    bad.validateSync();
+    await bad.validate().catch(() => {});
     // acquit:ignore:start
     assert.ok(bad.airedAt instanceof Date);
-    assert.ok(bad.validateSync().toString().includes('after maximum'));
+    assert.ok((await bad.validate().then(() => null, err => err)).toString().includes('after maximum'));
     // acquit:ignore:end
   });
 

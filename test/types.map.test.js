@@ -725,7 +725,7 @@ describe('Map', function() {
     assert.equal(goodsInfo.get('describe.brand.en'), 'Hermes');
   });
 
-  it('get full path in validator with `propsParameter` (gh-7447)', function() {
+  it('get full path in validator with `propsParameter` (gh-7447)', async function() {
     const calls = [];
     const schema = new mongoose.Schema({
       myMap: {
@@ -747,7 +747,7 @@ describe('Map', function() {
     const doc = new Model({ myMap: { foo: 'bar' } });
     assert.equal(calls.length, 0);
 
-    assert.ifError(doc.validateSync());
+    await doc.validate();
     assert.deepEqual(calls, ['myMap.foo']);
 
     return doc.validate().
@@ -756,7 +756,7 @@ describe('Map', function() {
       });
   });
 
-  it('treats `of` as a schema if typeKey is not set (gh-7859)', function() {
+  it('treats `of` as a schema if typeKey is not set (gh-7859)', async function() {
     const schema = new mongoose.Schema({
       myMap: {
         type: Map,
@@ -769,13 +769,13 @@ describe('Map', function() {
 
     const doc = new Model({ myMap: { foo: {} } });
 
-    const err = doc.validateSync();
+    const err = await doc.validate().then(() => null, err => err);
     assert.ok(err);
     assert.ok(err.errors['myMap.foo.test'].message.indexOf('required') !== -1,
       err.errors['myMap.foo.test'].message);
   });
 
-  it('works with clone() (gh-8357)', function() {
+  it('works with clone() (gh-8357)', async function() {
     const childSchema = mongoose.Schema({ name: String });
     const schema = mongoose.Schema({
       myMap: {
@@ -787,7 +787,7 @@ describe('Map', function() {
 
     const doc = new Model({ myMap: { foo: { name: 'bar' } } });
 
-    const err = doc.validateSync();
+    const err = await doc.validate().then(() => null, err => err);
     assert.ifError(err);
   });
 
@@ -980,7 +980,7 @@ describe('Map', function() {
 
     assert.deepEqual(doc.messages.get('prop1').toObject(), { text: 'test' });
     assert.strictEqual(doc.messages.get('prop2'), null);
-    assert.ifError(doc.validateSync());
+    await doc.validate();
   });
 
   it('tracks changes correctly (gh-9811)', async function() {
@@ -1912,12 +1912,12 @@ describe('Map', function() {
       assert.strictEqual(error, null);
     });
 
-    it('works with validateSync() (gh-15957)', function() {
+    it('works with validate() (gh-15957)', async function() {
       // Arrange
       const { company } = createTestContext({ employeeNameMinLength: 2, employeeName: 'X' });
 
       // Act
-      const error = company.validateSync();
+      const error = (await company.validate().then(() => null, err => err));
 
       // Assert
       assert.ok(error);

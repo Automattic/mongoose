@@ -340,7 +340,7 @@ describe('model', function() {
         assert.equal(gender.options.default, 'F');
       });
 
-      it('allows discriminator schema to override required true with required false and allowNull false', function() {
+      it('allows discriminator schema to override required true with required false and allowNull false', async function() {
         const baseSchema = new Schema({
           name: { type: String, required: true }
         });
@@ -354,15 +354,15 @@ describe('model', function() {
         assert.equal(Child.schema.path('name').validators.length, 1);
         assert.equal(Child.schema.path('name').validators[0].type, 'allowNull');
 
-        assert.ifError(new Child({}).validateSync());
+        assert.ifError((await new Child({}).validate().then(() => null, err => err)));
 
-        const err = new Child({ name: null }).validateSync();
+        const err = (await new Child({ name: null }).validate().then(() => null, err => err));
         assert.ok(err);
         assert.ok(err.errors['name']);
         assert.equal(err.errors['name'].kind, 'allowNull');
       });
 
-      it('allows discriminator schema to override allowNull false with allowNull true', function() {
+      it('allows discriminator schema to override allowNull false with allowNull true', async function() {
         const baseSchema = new Schema({
           name: { type: String, allowNull: false }
         });
@@ -375,7 +375,7 @@ describe('model', function() {
         assert.equal(Base.schema.path('name').validators[0].type, 'allowNull');
         assert.equal(Child.schema.path('name').validators.length, 0);
 
-        assert.ifError(new Child({ name: null }).validateSync());
+        assert.ifError((await new Child({ name: null }).validate().then(() => null, err => err)));
       });
 
       it('inherits methods', function() {
@@ -792,7 +792,7 @@ describe('model', function() {
         assert.equal(doc2.things[0].name, 'test');
       });
 
-      it('overwrites nested paths in parent schema (gh-6076)', function() {
+      it('overwrites nested paths in parent schema (gh-6076)', async function() {
         const schema = mongoose.Schema({
           account: {
             type: Object
@@ -820,7 +820,7 @@ describe('model', function() {
           info: 'AAAAAAAAAAAAAAAAAAAAAAAA'
         });
 
-        assert.ifError(d1.validateSync());
+        assert.ifError((await d1.validate().then(() => null, err => err)));
       });
 
       it('nested discriminator key with projecting in parent (gh-5775)', async() => {
@@ -1669,7 +1669,7 @@ describe('model', function() {
     assert.ok(SuperUser.schema.path('ability'));
   });
 
-  it('removes paths underneath mixed type if discriminator schema sets path to mixed (gh-9042)', function() {
+  it('removes paths underneath mixed type if discriminator schema sets path to mixed (gh-9042)', async function() {
     const TestSchema = Schema({ name: String });
     const MainSchema = Schema({ run: { tab: TestSchema } }, {
       discriminatorKey: 'type'
@@ -1682,10 +1682,10 @@ describe('model', function() {
     assert.ok(!D.schema.paths['run.tab']);
 
     const doc = new D({ run: { tab: { id: 42 } } });
-    assert.ifError(doc.validateSync());
+    await doc.validate();
   });
 
-  it('doesnt remove paths at the same level (gh-9362)', function() {
+  it('doesnt remove paths at the same level (gh-9362)', async function() {
     const StepSchema = new Schema({
       view: {
         url: {
@@ -1713,7 +1713,7 @@ describe('model', function() {
     assert.ok(D.schema.paths['view.url']);
 
     const doc = new D({ view: { url: 'google.com' } });
-    assert.ifError(doc.validateSync());
+    await doc.validate();
 
     assert.equal(doc.view.url, 'google.com');
     assert.equal(doc.view.clickCount, 1);
@@ -1865,7 +1865,7 @@ describe('model', function() {
     });
   });
 
-  it('takes discriminator schema\'s single nested over base schema\'s (gh-10157)', function() {
+  it('takes discriminator schema\'s single nested over base schema\'s (gh-10157)', async function() {
     const personSchema = new Schema({
       name: Schema({ firstName: String, lastName: String }),
       kind: { type: 'String', enum: ['normal', 'vip'], required: true }
@@ -1882,12 +1882,12 @@ describe('model', function() {
     const Vip = Person.discriminator('vip', vipSchema);
 
     const doc1 = new Vip({ name: { firstName: 'John' } });
-    let err = doc1.validateSync();
+    let err = (await doc1.validate().then(() => null, err => err));
     assert.ok(err);
     assert.ok(err.errors['name.title']);
 
     const doc2 = new Vip({ name: { title: 'Dr' } });
-    err = doc2.validateSync();
+    err = (await doc2.validate().then(() => null, err => err));
     assert.ok(err);
     assert.ok(err.errors['name.firstName']);
   });

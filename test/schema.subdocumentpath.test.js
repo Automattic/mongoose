@@ -163,7 +163,7 @@ describe('SubdocumentPath', function() {
       clone.path('author').validators[0].validator);
   });
 
-  it('supports `set()` (gh-8883)', function() {
+  it('supports `set()` (gh-8883)', async function() {
     mongoose.deleteModel(/Test/);
     mongoose.Schema.Types.Subdocument.set('required', true);
 
@@ -175,7 +175,7 @@ describe('SubdocumentPath', function() {
 
     const doc = new Model({});
 
-    const err = doc.validateSync();
+    const err = await doc.validate().then(() => null, err => err);
     assert.ok(err);
     assert.ok(err.errors['nested']);
 

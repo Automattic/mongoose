@@ -1626,7 +1626,7 @@ describe('schema', function() {
     });
   });
 
-  it('required() with doc arrays (gh-3199)', function() {
+  it('required() with doc arrays (gh-3199)', async function() {
     const schema = new Schema({
       test: [{ x: String }]
     });
@@ -1635,11 +1635,11 @@ describe('schema', function() {
     const M = mongoose.model('gh3199', schema);
     const m = new M({ test: [{}] });
 
-    assert.equal(m.validateSync().errors['test.0.x'].kind, 'required');
+    assert.equal((await m.validate().then(() => null, err => err)).errors['test.0.x'].kind, 'required');
 
   });
 
-  it('custom typeKey in doc arrays (gh-3560)', function() {
+  it('custom typeKey in doc arrays (gh-3560)', async function() {
     const schema = new Schema({
       test: [{
         name: { $type: String }
@@ -1650,12 +1650,12 @@ describe('schema', function() {
     const M = mongoose.model('gh3560', schema);
     const m = new M({ test: [{ name: 'Val' }] });
 
-    assert.ifError(m.validateSync());
+    assert.ifError((await m.validate().then(() => null, err => err)));
     assert.equal(m.test[0].name, 'Val');
 
   });
 
-  it('required for single nested schemas (gh-3562)', function() {
+  it('required for single nested schemas (gh-3562)', async function() {
     const personSchema = new Schema({
       name: { type: String, required: true }
     });
@@ -1668,15 +1668,15 @@ describe('schema', function() {
     const Band = mongoose.model('gh3562', bandSchema);
     const band = new Band({ name: 'Guns N\' Roses' });
 
-    assert.ok(band.validateSync());
-    assert.ok(band.validateSync().errors.guitarist);
+    assert.ok((await band.validate().then(() => null, err => err)));
+    assert.ok((await band.validate().then(() => null, err => err)).errors.guitarist);
     band.guitarist = { name: 'Slash' };
-    assert.ifError(band.validateSync());
+    assert.ifError((await band.validate().then(() => null, err => err)));
 
 
   });
 
-  it('booleans cause cast error for date (gh-3935)', function() {
+  it('booleans cause cast error for date (gh-3935)', async function() {
     const testSchema = new Schema({
       test: Date
     });
@@ -1684,8 +1684,8 @@ describe('schema', function() {
     const Test = mongoose.model('gh3935', testSchema);
     const test = new Test({ test: true });
 
-    assert.ok(test.validateSync());
-    assert.equal(test.validateSync().errors.test.name, 'CastError');
+    assert.ok((await test.validate().then(() => null, err => err)));
+    assert.equal((await test.validate().then(() => null, err => err)).errors.test.name, 'CastError');
 
 
   });
@@ -1926,12 +1926,12 @@ describe('schema', function() {
         assert.equal(new M({ m: { k: 3 } }).get('m').get('k'), 6);
       });
 
-      it('applies a validator added to a map value on the copy', function() {
+      it('applies a validator added to a map value on the copy', async function() {
         const schema = new Schema({ m: { type: Map, of: Number } }).clone();
         schema.path('m.$*').validate(v => v < 10, 'too big');
 
         const M = mongoose.model('gh-clone-map-validator', schema);
-        const err = new M({ m: { k: 50 } }).validateSync();
+        const err = (await new M({ m: { k: 50 } }).validate().then(() => null, err => err));
         assert.ok(err);
         assert.deepStrictEqual(Object.keys(err.errors), ['m.k']);
       });
@@ -2072,7 +2072,7 @@ describe('schema', function() {
         assert.equal(schema.path('name').validators.length, 0);
       });
 
-      it('clones allowNull validators', function() {
+      it('clones allowNull validators', async function() {
         const schema = new Schema({ name: { type: String, allowNull: false } });
         const otherSchema = schema.clone();
         const Model = db.model('Test', otherSchema);
@@ -2081,7 +2081,7 @@ describe('schema', function() {
         assert.equal(otherSchema.path('name').validators[0].type, 'allowNull');
 
         const doc = new Model({ name: null });
-        const err = doc.validateSync();
+        const err = await doc.validate().then(() => null, err => err);
 
         assert.ok(err);
         assert.ok(err.errors['name']);
@@ -2733,7 +2733,7 @@ describe('schema', function() {
       assert.ok(threw);
     });
 
-    it('replaces {MODEL} with model name on document validation', function() {
+    it('replaces {MODEL} with model name on document validation', async function() {
       const schema = Schema({
         age: {
           type: Number,
@@ -2743,7 +2743,7 @@ describe('schema', function() {
       const Test = db.model('gh8300', schema);
 
       const doc = new Test({ age: 'twenty' });
-      const err = doc.validateSync();
+      const err = await doc.validate().then(() => null, err => err);
       assert.ok(err);
       assert.equal(err.errors['age'].name, 'CastError');
       assert.equal(
@@ -2752,7 +2752,7 @@ describe('schema', function() {
       );
     });
 
-    it('replaces {MODEL} with model name on single nested subdocument validation', function() {
+    it('replaces {MODEL} with model name on single nested subdocument validation', async function() {
       const schema = Schema({
         nested: {
           age: {
@@ -2764,7 +2764,7 @@ describe('schema', function() {
       const Test = db.model('gh8300_nested', schema);
 
       const doc = new Test({ nested: { age: 'twenty' } });
-      const err = doc.validateSync();
+      const err = await doc.validate().then(() => null, err => err);
       assert.ok(err);
       assert.equal(err.errors['nested.age'].name, 'CastError');
       assert.equal(
@@ -2773,7 +2773,7 @@ describe('schema', function() {
       );
     });
 
-    it('passes model to function cast error format on document validation', function() {
+    it('passes model to function cast error format on document validation', async function() {
       const schema = Schema({
         age: {
           type: Number,
@@ -2783,7 +2783,7 @@ describe('schema', function() {
       const Test = db.model('gh8300_fn', schema);
 
       const doc = new Test({ age: 'twenty' });
-      const err = doc.validateSync();
+      const err = await doc.validate().then(() => null, err => err);
       assert.ok(err);
       assert.equal(err.errors['age'].name, 'CastError');
       assert.equal(err.errors['age'].message, 'twenty is not a number for model gh8300_fn');

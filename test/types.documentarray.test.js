@@ -355,7 +355,7 @@ describe('types.documentarray', function() {
 
     });
 
-    it('corrects #ownerDocument() if value was created with array.create() and set() (gh-7504)', function() {
+    it('corrects #ownerDocument() if value was created with array.create() and set() (gh-7504)', async function() {
       const M = db.model('Test', {
         docs: [{ name: { type: String, validate: () => false } }]
       });
@@ -365,11 +365,11 @@ describe('types.documentarray', function() {
       assert.equal(doc.ownerDocument()._id.toString(), String(m._id));
       assert.strictEqual(doc.__index, 0);
 
-      assert.ok(m.validateSync().errors['docs.0.name']);
+      assert.ok((await m.validate().then(() => null, err => err)).errors['docs.0.name']);
 
     });
 
-    it('reports validation errors with correct index path (gh-7724)', function() {
+    it('reports validation errors with correct index path (gh-7724)', async function() {
       const parentSchema = new Schema({
         name: String,
         children: [{
@@ -391,7 +391,7 @@ describe('types.documentarray', function() {
       p.children.push({ name: 'Bran Stark', gender: 'M' });
       p.children.push({ name: 'Jon Snow' });
 
-      const error = p.validateSync();
+      const error = (await p.validate().then(() => null, err => err));
       assert.ok(error);
       assert.ok(error.errors);
       assert.deepStrictEqual(
@@ -431,7 +431,7 @@ describe('types.documentarray', function() {
   });
 
   describe('required (gh-6364)', function() {
-    it('on top level', function() {
+    it('on top level', async function() {
       const calls = [];
       const schema = new Schema({
         docs: {
@@ -449,7 +449,7 @@ describe('types.documentarray', function() {
       t.docs.push({ name: 'test1' });
       t.docs.push({ name: 'test2' });
 
-      t.validateSync();
+      await t.validate();
       assert.equal(calls.length, 1);
 
     });
@@ -472,7 +472,7 @@ describe('types.documentarray', function() {
       t.docs.push(null);
       t.docs.push({ name: 'test2' });
 
-      const err = t.validateSync();
+      const err = (await t.validate().then(() => null, err => err));
       assert.equal(calls.length, 2);
       assert.ok(err);
       assert.ok(err.errors['docs.0']);
@@ -510,7 +510,7 @@ describe('types.documentarray', function() {
       assert.deepStrictEqual(calls, ['z', 'b', 'c']);
 
       calls.length = 0;
-      doc.validateSync();
+      await doc.validate();
       assert.deepStrictEqual(calls, ['z', 'b', 'c']);
     });
 
@@ -526,7 +526,7 @@ describe('types.documentarray', function() {
       // document array already validates each element, so listing both would
       // run every subdocument's validators twice.
       calls.length = 0;
-      new T({ arr: [{ n: 'p' }, { n: 'q' }] }).validateSync(undefined, { validateAllPaths: true });
+      await new T({ arr: [{ n: 'p' }, { n: 'q' }] }).validate(undefined, { validateAllPaths: true });
       assert.deepStrictEqual(calls, ['p', 'q']);
 
       calls.length = 0;
@@ -1319,7 +1319,7 @@ describe('types.documentarray', function() {
       );
 
       // Act
-      const err = user.validateSync();
+      const err = (await user.validate().then(() => null, err => err));
 
       // Assert
       assert.deepStrictEqual(Object.keys(err.errors), ['addresses.3.street']);
@@ -1573,7 +1573,7 @@ describe('types.documentarray', function() {
       );
 
       // Act
-      const err = user.validateSync();
+      const err = (await user.validate().then(() => null, err => err));
 
       // Assert
       assert.deepStrictEqual(Object.keys(err.errors), ['addresses.3.street']);

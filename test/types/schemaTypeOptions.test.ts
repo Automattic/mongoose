@@ -44,16 +44,20 @@ function validatorMessageFunctions() {
       max: [10, (props: ValidatorProps) => `Invalid ${props.path}`]
     },
     name: { type: String, minlength: [3, (props: ValidatorProps) => `Invalid ${props.path}`] },
-    nickname: { type: String, minLength: [3, (props: ValidatorProps) => `Invalid ${props.path}`] }
+    nickname: { type: String, minLength: [3, (props: ValidatorProps) => `Invalid ${props.path}`] },
+    title: { type: String, maxlength: [50, (props: ValidatorProps) => `Invalid ${props.path}`] },
+    bio: { type: String, maxLength: [100, (props: ValidatorProps) => `Invalid ${props.path}`] }
   });
 
   new SchemaTypeOptions<number>().min = [0, message];
   new SchemaTypeOptions<number>().max = [10, message];
   new SchemaTypeOptions<string>().minlength = [3, message];
   new SchemaTypeOptions<string>().minLength = [3, message];
+  new SchemaTypeOptions<string>().maxlength = [50, message];
+  new SchemaTypeOptions<string>().maxLength = [50, message];
 
   new Schema.Types.Number('age').min(0, message).max(10, message);
-  new Schema.Types.String('name').minlength(3, message);
+  new Schema.Types.String('name').minlength(3, message).maxlength(50, message);
 }
 
 function index() {

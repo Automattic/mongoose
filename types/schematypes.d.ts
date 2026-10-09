@@ -245,8 +245,8 @@ declare module 'mongoose' {
     minLength?: number | [number, string | ValidatorMessageFn] | readonly [number, string | ValidatorMessageFn];
 
     /** If set, Mongoose will add a custom validator that ensures the given string's `length` is at most the given number. */
-    maxlength?: number | [number, string] | readonly [number, string];
-    maxLength?: number | [number, string] | readonly [number, string];
+    maxlength?: number | [number, string | ValidatorMessageFn] | readonly [number, string | ValidatorMessageFn];
+    maxLength?: number | [number, string | ValidatorMessageFn] | readonly [number, string | ValidatorMessageFn];
 
     [other: string]: any;
 
@@ -632,7 +632,7 @@ declare module 'mongoose' {
         match(value: RegExp, message: string): this;
 
         /** Sets a maximum length validator. */
-        maxlength(value: number, message: string): this;
+        maxlength(value: number, message: string | ValidatorMessageFn): this;
 
         /** Sets a minimum length validator. */
         minlength(value: number, message: string | ValidatorMessageFn): this;

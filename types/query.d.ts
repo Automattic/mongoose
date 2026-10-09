@@ -352,16 +352,6 @@ declare module 'mongoose' {
       filter?: QueryFilter<RawDocType>,
       options?: QueryOptions<RawDocType>
     ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteMany', TDocOverrides, TLeanResultType>;
-    deleteMany(filter: QueryFilter<RawDocType>): QueryWithHelpers<
-      any,
-      DocType,
-      THelpers,
-      RawDocType,
-      'deleteMany',
-      TDocOverrides,
-      TLeanResultType
-    >;
-    deleteMany(): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteMany', TDocOverrides, TLeanResultType>;
 
     /**
      * Declare and/or execute this query as a `deleteOne()` operation. Works like
@@ -372,16 +362,6 @@ declare module 'mongoose' {
       filter?: QueryFilter<RawDocType>,
       options?: QueryOptions<RawDocType>
     ): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteOne', TDocOverrides, TLeanResultType>;
-    deleteOne(filter: QueryFilter<RawDocType>): QueryWithHelpers<
-      any,
-      DocType,
-      THelpers,
-      RawDocType,
-      'deleteOne',
-      TDocOverrides,
-      TLeanResultType
-    >;
-    deleteOne(): QueryWithHelpers<any, DocType, THelpers, RawDocType, 'deleteOne', TDocOverrides, TLeanResultType>;
 
     /** Creates a `distinct` query: returns the distinct values of the given `field` that match `filter`. */
     distinct<DocKey extends string, ResultType = unknown>(

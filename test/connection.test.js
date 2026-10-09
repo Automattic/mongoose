@@ -1911,6 +1911,39 @@ describe('connections:', function() {
     assert.ok(res.mongoose.results[1].message.includes('not a number'));
   });
 
+  it('connection bulkWrite() casts array filters', async function() {
+    const db = start();
+
+    const version = await start.mongodVersion();
+    if (version[0] < 8) {
+      this.skip();
+      return;
+    }
+    const Test = db.model('Test', new Schema({ items: [{ qty: Number }] }));
+
+    await Test.deleteMany({});
+    const doc = await Test.create({ items: [{ qty: 1 }, { qty: 2 }] });
+    const res = await db.bulkWrite([
+      {
+        model: 'Test',
+        name: 'updateOne',
+        filter: { _id: doc._id },
+        update: { $set: { 'items.$[item].qty': 10 } },
+        arrayFilters: [{ 'item._id': doc.items[0]._id.toHexString() }]
+      },
+      {
+        model: Test,
+        name: 'updateMany',
+        filter: { _id: doc._id },
+        update: { $set: { 'items.$[item].qty': 20 } },
+        arrayFilters: [{ 'item.qty': '2' }]
+      }
+    ]);
+    assert.equal(res.modifiedCount, 2);
+    const fromDb = await Test.findById(doc._id).lean();
+    assert.deepStrictEqual(fromDb.items.map(item => item.qty), [10, 20]);
+  });
+
   it('buffers connection helpers', async function() {
     const m = new mongoose.Mongoose();
 

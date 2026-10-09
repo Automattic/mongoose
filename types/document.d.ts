@@ -149,7 +149,7 @@ declare module 'mongoose' {
      * Takes a populated field and returns it to its unpopulated state. If called with
      * no arguments, then all populated fields are returned to their unpopulated state.
      */
-    depopulate<Paths = {}>(path?: string | string[]): Paths extends Record<string, never> ? this : MergeType<this, Paths>;
+    depopulate<Paths = {}>(path?: string | string[]): MergeType<this, Paths>;
 
     /**
      * Returns the list of paths that have been directly modified. A direct

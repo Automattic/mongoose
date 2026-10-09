@@ -52,8 +52,7 @@ declare module 'mongoose' {
     Paths,
     PopulatedRawDocType,
     DepopulatedRawDocType = PopulatedRawDocType
-  > = (Paths extends Record<string, never> ? Doc : MergeType<Doc, Paths>) &
-    PopulatedDocumentMarker<PopulatedRawDocType, DepopulatedRawDocType>;
+  > = MergeType<Doc, Paths> & PopulatedDocumentMarker<PopulatedRawDocType, DepopulatedRawDocType>;
 
   interface PopulateOptions {
     /** space delimited path(s) to populate */

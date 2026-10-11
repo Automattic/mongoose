@@ -4759,6 +4759,67 @@ describe('Model', function() {
         assert.strictEqual(r2.testArray[0].nonexistentProp, undefined);
       });
 
+      it('casts arrayFilters in updateOne and updateMany (gh-16573)', async function() {
+        const orderSchema = new mongoose.Schema({
+          items: [{ name: String, qty: Number, shippedAt: Date }]
+        });
+        const Order = db.model('gh16573_Order', orderSchema);
+
+        const order = await Order.create({
+          items: [
+            { name: 'apple', qty: 1, shippedAt: new Date('2026-01-10') },
+            { name: 'banana', qty: 2, shippedAt: new Date('2026-01-20') }
+          ]
+        });
+        const itemId = order.items[0]._id.toString();
+
+        // 1. updateOne casting: _id as string, number as string, and Date string
+        const updateOneRes = await Order.bulkWrite([{
+          updateOne: {
+            filter: { _id: order._id },
+            update: { $set: { 'items.$[item].name': 'pear' } },
+            arrayFilters: [
+              {
+                'item._id': itemId,
+                'item.qty': '1',
+                'item.shippedAt': { $gte: '2026-01-01' }
+              }
+            ]
+          }
+        }]);
+        assert.equal(updateOneRes.modifiedCount, 1);
+
+        let doc = await Order.findById(order._id).lean();
+        assert.equal(doc.items[0].name, 'pear');
+        assert.equal(doc.items[1].name, 'banana');
+
+        // 2. updateMany casting: Number string and Date string across multiple documents
+        const order2 = await Order.create({
+          items: [
+            { name: 'orange', qty: 2, shippedAt: new Date('2026-01-15') }
+          ]
+        });
+
+        const updateManyRes = await Order.bulkWrite([{
+          updateMany: {
+            filter: { _id: { $in: [order._id, order2._id] } },
+            update: { $set: { 'items.$[item].name': 'fruit-updated' } },
+            arrayFilters: [
+              {
+                'item.qty': '2',
+                'item.shippedAt': { $gte: '2026-01-01' }
+              }
+            ]
+          }
+        }]);
+        assert.equal(updateManyRes.modifiedCount, 2);
+
+        doc = await Order.findById(order._id).lean();
+        assert.equal(doc.items[1].name, 'fruit-updated');
+        const doc2 = await Order.findById(order2._id).lean();
+        assert.equal(doc2.items[0].name, 'fruit-updated');
+      });
+
       it('handles overwriteDiscriminatorKey (gh-15218) (gh-15040)', async function() {
         const dSchema1 = new mongoose.Schema({
           field1: String

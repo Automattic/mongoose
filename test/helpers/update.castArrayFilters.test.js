@@ -476,4 +476,69 @@ describe('castArrayFilters', function() {
     assert.strictEqual(arrayFilters[2].$or[0]['z.notInSchema'], '3');
     assert.strictEqual(arrayFilters[2].$or[1]['z.id'], 3);
   });
+
+  describe('castBulkWrite arrayFilters (gh-16573)', function() {
+    const castBulkWrite = require('../../lib/helpers/model/castBulkWrite');
+    const mongoose = require('../../lib');
+
+    it('casts arrayFilters in bulkWrite updateOne', function() {
+      const schema = new Schema({
+        items: [{
+          _id: { type: Schema.Types.ObjectId, default: () => new Types.ObjectId() },
+          name: String,
+          qty: Number,
+          shippedAt: Date
+        }]
+      });
+      const Model = mongoose.model('gh16573_unit_order_one', schema);
+      const itemId = new Types.ObjectId().toString();
+
+      const op = {
+        filter: { _id: new Types.ObjectId() },
+        update: { $set: { 'items.$[item].name': 'pear' } },
+        arrayFilters: [
+          { 'item._id': itemId },
+          { 'item.qty': '5' },
+          { 'item.shippedAt': { $gte: '2026-01-01' } }
+        ]
+      };
+
+      castBulkWrite.castUpdateOne(Model, op, {}, Date.now());
+
+      assert.ok(op.arrayFilters[0]['item._id'] instanceof Types.ObjectId);
+      assert.strictEqual(op.arrayFilters[0]['item._id'].toString(), itemId);
+      assert.strictEqual(op.arrayFilters[1]['item.qty'], 5);
+      assert.ok(op.arrayFilters[2]['item.shippedAt'].$gte instanceof Date);
+    });
+
+    it('casts arrayFilters in bulkWrite updateMany', function() {
+      const schema = new Schema({
+        items: [{
+          _id: { type: Schema.Types.ObjectId, default: () => new Types.ObjectId() },
+          name: String,
+          qty: Number,
+          shippedAt: Date
+        }]
+      });
+      const Model = mongoose.model('gh16573_unit_order_many', schema);
+      const itemId = new Types.ObjectId().toString();
+
+      const op = {
+        filter: { _id: { $in: [new Types.ObjectId()] } },
+        update: { $set: { 'items.$[item].name': 'updated' } },
+        arrayFilters: [
+          { 'item._id': itemId },
+          { 'item.qty': '10' },
+          { 'item.shippedAt': { $gte: '2026-06-01' } }
+        ]
+      };
+
+      castBulkWrite.castUpdateMany(Model, op, {}, Date.now());
+
+      assert.ok(op.arrayFilters[0]['item._id'] instanceof Types.ObjectId);
+      assert.strictEqual(op.arrayFilters[0]['item._id'].toString(), itemId);
+      assert.strictEqual(op.arrayFilters[1]['item.qty'], 10);
+      assert.ok(op.arrayFilters[2]['item.shippedAt'].$gte instanceof Date);
+    });
+  });
 });

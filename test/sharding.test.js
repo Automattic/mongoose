@@ -20,8 +20,15 @@ describe('plugins.sharding', function() {
   afterEach(() => require('./util').clearTestData(db));
   afterEach(() => require('./util').stopRemainingOps(db));
 
+  it('stores configured shard keys when hydrating', function() {
+    const TestModel = db.model('Test', new mongoose.Schema({ shardKey: String }, { shardKey: { shardKey: 1 } }));
+    const doc = TestModel.hydrate({ shardKey: 'test1' });
+
+    assert.deepStrictEqual(doc.$__.shardval, { shardKey: 'test1' });
+  });
+
   it('applies shard key to deleteOne (gh-15701)', async function() {
-    const TestModel = db.model('Test', new mongoose.Schema({ name: String, shardKey: String }));
+    const TestModel = db.model('Test', new mongoose.Schema({ name: String, shardKey: String }, { shardKey: { shardKey: 1 } }));
     const doc = await TestModel.create({ name: 'test', shardKey: 'test1' });
     doc.$__.shardval = { shardKey: 'test2' };
     let res = await doc.deleteOne();
@@ -36,7 +43,7 @@ describe('plugins.sharding', function() {
   });
 
   it('applies shard key to updateOne (gh-15701)', async function() {
-    const TestModel = db.model('Test', new mongoose.Schema({ name: String, shardKey: String }));
+    const TestModel = db.model('Test', new mongoose.Schema({ name: String, shardKey: String }, { shardKey: { shardKey: 1 } }));
     const doc = await TestModel.create({ name: 'test', shardKey: 'test1' });
     doc.$__.shardval = { shardKey: 'test2' };
     let res = await doc.updateOne({ $set: { name: 'test2' } });

@@ -495,6 +495,44 @@ describe('mongoose module:', function() {
     assert.ok(called.indexOf(schema) !== -1);
   });
 
+  it('does not apply sharding or saveSubdocs plugins to subdocuments', function() {
+    const m = new Mongoose();
+    const childSchema = new m.Schema({ name: String }, { shardKey: { name: 1 } });
+    const Parent = m.model('Parent', new m.Schema({ child: childSchema, children: [childSchema] }));
+    for (const path of ['child', 'children']) {
+      const middleware = Parent.schema.path(path).Constructor._middleware;
+      const saveHooks = middleware._pres.get('save') || [];
+      assert.ok(saveHooks.some(hook => hook.fn.name === 'trackTransactionPreSave'));
+      assert.ok(!saveHooks.some(hook => hook.fn.name.startsWith('saveSubdocs')));
+      assert.ok(!saveHooks.some(hook => hook.fn.name.startsWith('shardingPlugin')));
+      assert.ok(!middleware.hasHooks('init'));
+    }
+
+    const Root = m.model('Root', new m.Schema({ name: String }, { shardKey: { name: 1 } }));
+    const rootSaveHooks = Root._middleware._pres.get('save') || [];
+    assert.ok(rootSaveHooks.some(hook => hook.fn.name === 'saveSubdocsPreSave'));
+    assert.ok(rootSaveHooks.some(hook => hook.fn.name === 'shardingPluginPreSave'));
+    assert.ok(rootSaveHooks.some(hook => hook.fn.name === 'trackTransactionPreSave'));
+    assert.ok(Root._middleware.hasHooks('init'));
+  });
+
+  it('does not apply sharding or saveSubdocs to document array discriminators', function() {
+    const m = new Mongoose();
+    m.set('applyPluginsToDiscriminators', true);
+    const childSchema = new m.Schema({ kind: String }, { discriminatorKey: 'kind', shardKey: { kind: 1 } });
+    const parentSchema = new m.Schema({ children: [childSchema] });
+    parentSchema.path('children').discriminator('Special', new m.Schema({ extra: String }), { clone: false });
+
+    const Parent = m.model('Parent', parentSchema);
+    const middleware = Parent.schema.path('children').Constructor.discriminators.Special._middleware;
+
+    assert.ok(!middleware.hasHooks('init'));
+    const saveHooks = middleware._pres.get('save') || [];
+    assert.ok(saveHooks.some(hook => hook.fn.name === 'trackTransactionPreSave'));
+    assert.ok(!saveHooks.some(hook => hook.fn.name.startsWith('saveSubdocs')));
+    assert.ok(!saveHooks.some(hook => hook.fn.name.startsWith('shardingPlugin')));
+  });
+
   it('global plugins recompile schemas (gh-7572)', function() {
     function helloPlugin(schema) {
       schema.virtual('greeting').get(() => 'hello');

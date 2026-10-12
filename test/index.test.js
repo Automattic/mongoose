@@ -516,6 +516,44 @@ describe('mongoose module:', function() {
     assert.ok(Root._middleware.hasHooks('init'));
   });
 
+  for (const rootFirst of [false, true]) {
+    it(`filters root-only middleware on shared schemas when compiling ${rootFirst ? 'root first' : 'child first'}`, function() {
+      const m = new Mongoose();
+      const sharedSchema = new m.Schema({ name: String }, { shardKey: { name: 1 } });
+      const pluginCalls = [];
+      m.plugin(schema => pluginCalls.push(schema));
+
+      let Root;
+      let Parent;
+      const compileRoot = () => { Root = m.model('SharedRoot', sharedSchema); };
+      const compileParent = () => {
+        Parent = m.model('SharedParent', new m.Schema({ child: sharedSchema, children: [sharedSchema] }));
+      };
+
+      if (rootFirst) {
+        compileRoot();
+        compileParent();
+      } else {
+        compileParent();
+        compileRoot();
+      }
+
+      assert.equal(pluginCalls.filter(schema => schema === sharedSchema).length, 1);
+      const rootSaveHooks = Root._middleware._pres.get('save') || [];
+      assert.equal(rootSaveHooks.filter(hook => hook.fn.name === 'saveSubdocsPreSave').length, 1);
+      assert.equal(rootSaveHooks.filter(hook => hook.fn.name === 'shardingPluginPreSave').length, 1);
+      assert.ok(Root._middleware.hasHooks('init'));
+
+      for (const path of ['child', 'children']) {
+        const middleware = Parent.schema.path(path).Constructor._middleware;
+        const saveHooks = middleware._pres.get('save') || [];
+        assert.ok(!saveHooks.some(hook => hook.fn.name.startsWith('saveSubdocs')));
+        assert.ok(!saveHooks.some(hook => hook.fn.name.startsWith('shardingPlugin')));
+        assert.ok(!middleware.hasHooks('init'));
+      }
+    });
+  }
+
   it('does not apply sharding or saveSubdocs to document array discriminators', function() {
     const m = new Mongoose();
     m.set('applyPluginsToDiscriminators', true);

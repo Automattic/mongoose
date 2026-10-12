@@ -1650,7 +1650,7 @@ describe('schema', function() {
     const M = mongoose.model('gh3560', schema);
     const m = new M({ test: [{ name: 'Val' }] });
 
-    assert.ifError((await m.validate().then(() => null, err => err)));
+    assert.ifError(await m.validate().then(() => null, err => err));
     assert.equal(m.test[0].name, 'Val');
 
   });
@@ -1668,10 +1668,10 @@ describe('schema', function() {
     const Band = mongoose.model('gh3562', bandSchema);
     const band = new Band({ name: 'Guns N\' Roses' });
 
-    assert.ok((await band.validate().then(() => null, err => err)));
+    assert.ok(await band.validate().then(() => null, err => err));
     assert.ok((await band.validate().then(() => null, err => err)).errors.guitarist);
     band.guitarist = { name: 'Slash' };
-    assert.ifError((await band.validate().then(() => null, err => err)));
+    assert.ifError(await band.validate().then(() => null, err => err));
 
 
   });
@@ -1684,7 +1684,7 @@ describe('schema', function() {
     const Test = mongoose.model('gh3935', testSchema);
     const test = new Test({ test: true });
 
-    assert.ok((await test.validate().then(() => null, err => err)));
+    assert.ok(await test.validate().then(() => null, err => err));
     assert.equal((await test.validate().then(() => null, err => err)).errors.test.name, 'CastError');
 
 
@@ -1931,7 +1931,7 @@ describe('schema', function() {
         schema.path('m.$*').validate(v => v < 10, 'too big');
 
         const M = mongoose.model('gh-clone-map-validator', schema);
-        const err = (await new M({ m: { k: 50 } }).validate().then(() => null, err => err));
+        const err = await new M({ m: { k: 50 } }).validate().then(() => null, err => err);
         assert.ok(err);
         assert.deepStrictEqual(Object.keys(err.errors), ['m.k']);
       });

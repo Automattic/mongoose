@@ -66,7 +66,7 @@ describe('Date Tutorial', function() {
     });
     await ok.validate(); // No error
     // acquit:ignore:start
-    assert.ifError((await ok.validate().then(() => null, err => err)));
+    assert.ifError(await ok.validate().then(() => null, err => err));
     // acquit:ignore:end
 
     const bad = new Episode({

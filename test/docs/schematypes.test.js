@@ -59,11 +59,11 @@ describe('schemaTypes', function() {
 
     const t = new Test();
     t.test = 'abc';
-    assert.ok((await t.validate().then(() => null, err => err)));
-    assert.equal((await t.validate().then(() => null, err => err)).errors['test'].name, 'CastError');
-    assert.equal((await t.validate().then(() => null, err => err)).errors['test'].message,
+    const err = await t.validate().then(() => null, err => err);
+    assert.equal(err.errors['test'].name, 'CastError');
+    assert.equal(err.errors['test'].message,
       'Cast to Int8 failed for value "abc" (type string) at path "test" for model "CustomTypeExample"');
-    assert.equal((await t.validate().then(() => null, err => err)).errors['test'].reason.message,
+    assert.equal(err.errors['test'].reason.message,
       'Int8: abc is not a number');
   });
 });

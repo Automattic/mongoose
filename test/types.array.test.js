@@ -1113,9 +1113,9 @@ describe('types array', function() {
       await doc.validate();
 
       bothdoc = new bothModel({ arr: ['good'] });
-      assert.ifError((await bothdoc.validate().then(() => null, err => err)));
+      assert.ifError(await bothdoc.validate().then(() => null, err => err));
       bothdoc.arr.push('foo');
-      assert.ifError((await bothdoc.validate().then(() => null, err => err)));
+      assert.ifError(await bothdoc.validate().then(() => null, err => err));
       assert.deepEqual(bothdoc.arr.toObject(), ['good', 'foo']);
 
       return Promise.resolve();
@@ -1954,7 +1954,7 @@ describe('types array', function() {
     const user = new User({ friendsNames: 'Sam' });
 
     // Assert
-    assert.ifError((await user.validate().then(() => null, err => err)));
+    assert.ifError(await user.validate().then(() => null, err => err));
 
     m.Schema.Types.Array.options.castNonArrays = true;
   });

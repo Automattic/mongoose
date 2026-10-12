@@ -391,7 +391,7 @@ describe('types.documentarray', function() {
       p.children.push({ name: 'Bran Stark', gender: 'M' });
       p.children.push({ name: 'Jon Snow' });
 
-      const error = (await p.validate().then(() => null, err => err));
+      const error = await p.validate().then(() => null, err => err);
       assert.ok(error);
       assert.ok(error.errors);
       assert.deepStrictEqual(
@@ -472,7 +472,7 @@ describe('types.documentarray', function() {
       t.docs.push(null);
       t.docs.push({ name: 'test2' });
 
-      const err = (await t.validate().then(() => null, err => err));
+      const err = await t.validate().then(() => null, err => err);
       assert.equal(calls.length, 2);
       assert.ok(err);
       assert.ok(err.errors['docs.0']);
@@ -1319,7 +1319,7 @@ describe('types.documentarray', function() {
       );
 
       // Act
-      const err = (await user.validate().then(() => null, err => err));
+      const err = await user.validate().then(() => null, err => err);
 
       // Assert
       assert.deepStrictEqual(Object.keys(err.errors), ['addresses.3.street']);
@@ -1573,7 +1573,7 @@ describe('types.documentarray', function() {
       );
 
       // Act
-      const err = (await user.validate().then(() => null, err => err));
+      const err = await user.validate().then(() => null, err => err);
 
       // Assert
       assert.deepStrictEqual(Object.keys(err.errors), ['addresses.3.street']);

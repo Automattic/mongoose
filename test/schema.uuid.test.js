@@ -44,7 +44,7 @@ describe('SchemaUUID', function() {
     assert.ok(typeof query._conditions.x === 'string');
 
     const res = await query;
-    assert.ifError((await res.validate().then(() => null, err => err)));
+    assert.ifError(await res.validate().then(() => null, err => err));
     assert.ok(res.x instanceof mongoose.Types.UUID);
     assert.strictEqual(res.x.toString(), '09190f70-3d30-11e5-8814-0f4df9a59c41');
 

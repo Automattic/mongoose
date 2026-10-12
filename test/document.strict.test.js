@@ -433,7 +433,7 @@ describe('document: strict mode:', function() {
     const doc1 = new Model();
     doc1.nested = { someProp: true, somethingElse: false };
 
-    let err = (await doc1.validate().then(() => null, err => err));
+    let err = await doc1.validate().then(() => null, err => err);
     assert.ok(err);
     assert.ok(err.errors['nested']);
 

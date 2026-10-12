@@ -698,7 +698,7 @@ describe('schema', function() {
           const M = mongoose.model('gh-15571-sync', schema);
           const m = new M({ url: value });
 
-          const err = (await m.validate().then(() => null, err => err));
+          const err = await m.validate().then(() => null, err => err);
           assert.equal(err.errors.url.message, `${value} is not a valid url`);
           assert.equal(err.errors.url.value, value);
           assert.equal(err.errors.url.properties.value, value);
@@ -1158,7 +1158,7 @@ describe('schema', function() {
 
       const Breakfast = mongoose.model('gh3025', breakfast, 'gh3025');
       const bad = new Breakfast({});
-      const error = (await bad.validate().then(() => null, err => err));
+      const error = await bad.validate().then(() => null, err => err);
 
       assert.ok(error);
       const errorMessage = 'ValidationError: description: Path `description` is required.';
@@ -1173,7 +1173,7 @@ describe('schema', function() {
 
       const Breakfast = mongoose.model('gh3153', breakfast, 'gh3153');
       const bad = new Breakfast({});
-      const error = (await bad.validate('other').then(() => null, err => err));
+      const error = await bad.validate('other').then(() => null, err => err);
 
       assert.ok(error);
       assert.equal(Object.keys(error.errors).length, 1);
@@ -1192,7 +1192,7 @@ describe('schema', function() {
         permissions: ['avocado']
       });
 
-      const error = (await doc.validate('permissions').then(() => null, err => err));
+      const error = await doc.validate('permissions').then(() => null, err => err);
       assert.ok(error);
       assert.equal(Object.keys(error.errors).length, 1);
       assert.ok(error.errors['permissions.0']);
@@ -1350,12 +1350,12 @@ describe('schema', function() {
       const M = mongoose.model('gh7600', s);
 
       let m = new M({ minDate: '2018-06-01', date: '2018-05-01' });
-      let err = (await m.validate().then(() => null, err => err));
+      let err = await m.validate().then(() => null, err => err);
       assert.ok(err);
       assert.ok(err.errors['date']);
 
       m = new M({ minDate: '2018-06-01', date: '2018-07-01' });
-      err = (await m.validate().then(() => null, err => err));
+      err = await m.validate().then(() => null, err => err);
       assert.ifError(err);
     });
 
@@ -1469,7 +1469,7 @@ describe('schema', function() {
 
         // Act
         const user = new User({ name: 'Ameen' });
-        const err = (await user.validate().then(() => null, err => err));
+        const err = await user.validate().then(() => null, err => err);
 
         // Assert
         assert.equal(err.message, 'User_gh9546_1 validation failed: name: `Ameen` is not a valid enum value for path `name`.');
@@ -1491,7 +1491,7 @@ describe('schema', function() {
 
         // Act
         const user = new User({ status: 2 });
-        const err = (await user.validate().then(() => null, err => err));
+        const err = await user.validate().then(() => null, err => err);
 
         // Assert
         assert.equal(err.message, 'User_gh9546_2 validation failed: status: `2` is not a valid enum value for path `status`.');
@@ -1510,7 +1510,7 @@ describe('schema', function() {
 
         // Act
         const user = new User({ favoriteNumbers: [1, 10, 2, 20] });
-        const err = (await user.validate().then(() => null, err => err));
+        const err = await user.validate().then(() => null, err => err);
 
         // Assert
         assert.equal(err.message, 'User_gh9546_3 validation failed: favoriteNumbers.1: `10` is not a valid enum value for path `favoriteNumbers.1`., favoriteNumbers.3: `20` is not a valid enum value for path `favoriteNumbers.3`.');
@@ -1543,7 +1543,7 @@ describe('schema', function() {
 
         // Act
         const user = new User({ name: 'Hafez', status: 1, favoriteNumbers: [1, 2, 2, 2] });
-        const err = (await user.validate().then(() => null, err => err));
+        const err = await user.validate().then(() => null, err => err);
 
         // Assert
         assert.ifError(err);
@@ -1577,13 +1577,13 @@ describe('schema', function() {
 
         // invalid numeric and string values should fail
         const badUser = new User({ status: 2, kind: 'GAMMA' });
-        const err = (await badUser.validate().then(() => null, err => err));
+        const err = await badUser.validate().then(() => null, err => err);
         assert.ok(err);
         assert.ok(err.errors.status);
 
         // valid values should pass
         const goodUser = new User({ status: 1, kind: 'BETA' });
-        assert.ifError((await goodUser.validate().then(() => null, err => err)));
+        assert.ifError(await goodUser.validate().then(() => null, err => err));
       });
     });
 
@@ -1606,7 +1606,7 @@ describe('schema', function() {
       const UUIDRefModel = mongoose.model('UUIDRefModel', uuidRefSchema, 'uuidRefs');
 
       const uuid = new UUIDModel({ _id: uuidv4(), name: 'uuidName' });
-      assert.ifError((await uuid.validate().then(() => null, err => err)));
+      assert.ifError(await uuid.validate().then(() => null, err => err));
 
       const uuidRef = new UUIDRefModel({
         _id: uuidv4(),
@@ -1615,7 +1615,7 @@ describe('schema', function() {
         uuidRefNonRequired: uuidv4(),
         name: 'uuidRefName'
       });
-      assert.ifError((await uuidRef.validate().then(() => null, err => err)));
+      assert.ifError(await uuidRef.validate().then(() => null, err => err));
 
       const uuidRef2 = new UUIDRefModel({
         _id: uuidv4(),
@@ -1624,7 +1624,7 @@ describe('schema', function() {
         name: 'uuidRefName'
       });
 
-      const err2 = (await uuidRef2.validate().then(() => null, err => err));
+      const err2 = await uuidRef2.validate().then(() => null, err => err);
       assert.ok(err2);
       assert.ok(err2.errors['uuidRef']);
 
@@ -1635,7 +1635,7 @@ describe('schema', function() {
         name: 'uuidRefName'
       });
 
-      const err3 = (await uuidRef3.validate().then(() => null, err => err));
+      const err3 = await uuidRef3.validate().then(() => null, err => err);
       assert.ok(err3);
       assert.ok(err3.errors['uuidNonRef']);
 
@@ -1646,7 +1646,7 @@ describe('schema', function() {
         name: 'uuidRefName'
       });
 
-      assert.ifError((await uuidRef4.validate().then(() => null, err => err)));
+      assert.ifError(await uuidRef4.validate().then(() => null, err => err));
     });
   });
 });

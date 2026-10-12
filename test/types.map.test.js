@@ -1917,7 +1917,7 @@ describe('Map', function() {
       const { company } = createTestContext({ employeeNameMinLength: 2, employeeName: 'X' });
 
       // Act
-      const error = (await company.validate().then(() => null, err => err));
+      const error = await company.validate().then(() => null, err => err);
 
       // Assert
       assert.ok(error);

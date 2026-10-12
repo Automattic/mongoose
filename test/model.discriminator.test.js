@@ -354,9 +354,9 @@ describe('model', function() {
         assert.equal(Child.schema.path('name').validators.length, 1);
         assert.equal(Child.schema.path('name').validators[0].type, 'allowNull');
 
-        assert.ifError((await new Child({}).validate().then(() => null, err => err)));
+        assert.ifError(await new Child({}).validate().then(() => null, err => err));
 
-        const err = (await new Child({ name: null }).validate().then(() => null, err => err));
+        const err = await new Child({ name: null }).validate().then(() => null, err => err);
         assert.ok(err);
         assert.ok(err.errors['name']);
         assert.equal(err.errors['name'].kind, 'allowNull');
@@ -375,7 +375,7 @@ describe('model', function() {
         assert.equal(Base.schema.path('name').validators[0].type, 'allowNull');
         assert.equal(Child.schema.path('name').validators.length, 0);
 
-        assert.ifError((await new Child({ name: null }).validate().then(() => null, err => err)));
+        assert.ifError(await new Child({ name: null }).validate().then(() => null, err => err));
       });
 
       it('inherits methods', function() {
@@ -820,7 +820,7 @@ describe('model', function() {
           info: 'AAAAAAAAAAAAAAAAAAAAAAAA'
         });
 
-        assert.ifError((await d1.validate().then(() => null, err => err)));
+        assert.ifError(await d1.validate().then(() => null, err => err));
       });
 
       it('nested discriminator key with projecting in parent (gh-5775)', async() => {
@@ -1882,12 +1882,12 @@ describe('model', function() {
     const Vip = Person.discriminator('vip', vipSchema);
 
     const doc1 = new Vip({ name: { firstName: 'John' } });
-    let err = (await doc1.validate().then(() => null, err => err));
+    let err = await doc1.validate().then(() => null, err => err);
     assert.ok(err);
     assert.ok(err.errors['name.title']);
 
     const doc2 = new Vip({ name: { title: 'Dr' } });
-    err = (await doc2.validate().then(() => null, err => err));
+    err = await doc2.validate().then(() => null, err => err);
     assert.ok(err);
     assert.ok(err.errors['name.firstName']);
   });

@@ -404,7 +404,7 @@ describe('Int32', function() {
       it('casts a single-element array and rejects empty or multi-element arrays', async() => {
         const single = new Test({ myInt: ['5'] });
         assert.strictEqual(single.myInt, 5);
-        assert.ifError((await single.validate().then(() => null, err => err)));
+        assert.ifError(await single.validate().then(() => null, err => err));
 
         for (const value of [[], [5, 6]]) {
           const doc = new Test({ myInt: value });

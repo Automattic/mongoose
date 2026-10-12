@@ -2002,13 +2002,13 @@ describe('document', function() {
       const Event = db.model('Event', eventSchema);
 
       const e = new Event({ name: 'test', user: {} });
-      let error = (await e.validate().then(() => null, err => err));
+      let error = await e.validate().then(() => null, err => err);
       assert.ok(error);
       assert.ok(error.errors['user.email']);
       assert.equal(error.errors['user.email'].kind, 'required');
 
       e.user.email = 'val';
-      error = (await e.validate().then(() => null, err => err));
+      error = await e.validate().then(() => null, err => err);
 
       assert.ok(error);
       assert.ok(error.errors['user.email']);
@@ -2175,8 +2175,9 @@ describe('document', function() {
 
       const doc = docs[0];
       doc.other = 'something';
-      assert.ok((await doc.validate().then(() => null, err => err)).errors);
-      const error = await doc.save().then(() => null, err => err);
+      let error = await doc.validate().then(() => null, err => err);
+      assert.ok(error.errors);
+      error = await doc.save().then(() => null, err => err);
       assert.ok(error.errors);
     });
 
@@ -2197,8 +2198,8 @@ describe('document', function() {
       const doc = docs[0];
       doc.other = 'something';
       doc.subdocs[1].name = 'test2';
-      assert.equal((await doc.validate({ validateModifiedOnly: true }).then(() => null, err => err)), null);
-      assert.equal((await doc.validate('other').then(() => null, err => err)), null);
+      assert.equal(await doc.validate({ validateModifiedOnly: true }).then(() => null, err => err), null);
+      assert.equal(await doc.validate('other').then(() => null, err => err), null);
       assert.ok((await doc.validate('other title').then(() => null, err => err)).errors['title']);
 
       // Does not throw
@@ -3146,7 +3147,7 @@ describe('document', function() {
       });
       const Model = db.model('Test', schema);
       const m = new Model();
-      assert.ifError((await m.validate().then(() => null, err => err)));
+      assert.ifError(await m.validate().then(() => null, err => err));
     });
 
     it('ability to overwrite array default (gh-4109)', async function() {
@@ -3242,7 +3243,7 @@ describe('document', function() {
       const foundDoc = await Model.findById(doc._id);
 
       foundDoc.children[0] = { name: 'updated-child', age: 53 };
-      const errors = (await foundDoc.validate().then(() => null, err => err));
+      const errors = await foundDoc.validate().then(() => null, err => err);
       assert.ok(!errors);
     });
 
@@ -3757,7 +3758,7 @@ describe('document', function() {
 
       const M = db.model('Test', schema);
 
-      const err = (await new M({ child: { name: 'test' } }).validate().then(() => null, err => err));
+      const err = await new M({ child: { name: 'test' } }).validate().then(() => null, err => err);
       assert.ifError(err);
     });
 
@@ -4420,7 +4421,7 @@ describe('document', function() {
 
       parentDoc.child.test = 'foo';
 
-      const err = (await parentDoc.validate().then(() => null, err => err));
+      const err = await parentDoc.validate().then(() => null, err => err);
       assert.ok(err);
       assert.ok(err.errors['child']);
       return Promise.resolve();
@@ -4613,7 +4614,7 @@ describe('document', function() {
 
       const M = db.model('Test', schema);
 
-      const error = (await new M({ name: 'test' }).validate().then(() => null, err => err));
+      const error = await new M({ name: 'test' }).validate().then(() => null, err => err);
       assert.ok(error);
       assert.equal(error.errors['name'].reason.message, 'woops!');
 
@@ -6647,7 +6648,7 @@ describe('document', function() {
     });
     doc2.inner[0].innerField = '';
 
-    let err = (await doc2.inner[0].validate().then(() => null, err => err));
+    let err = await doc2.inner[0].validate().then(() => null, err => err);
     assert.ok(err);
     assert.ok(err.errors['innerField']);
 
@@ -6735,7 +6736,8 @@ describe('document', function() {
       arr3: ['test3', { four: 'five' }, [6, 'seven', 8]]
     });
 
-    assert.ok((await test.validate().then(() => null, err => err)) == null, (await test.validate().then(() => null, err => err)));
+    const err = await test.validate().then(() => null, err => err);
+    assert.ok(err == null, err);
 
     return Promise.resolve();
   });
@@ -7299,7 +7301,7 @@ describe('document', function() {
       ]
     });
 
-    const errors = (await model.validate().then(() => null, err => err)).errors;
+    const errors = await model.validate().then(() => null, err => err.errors);
     const keys = Object.keys(errors).sort();
     assert.deepEqual(keys, ['colors.0.hex', 'colors.1.name']);
   });
@@ -7793,7 +7795,7 @@ describe('document', function() {
     const instance = new TestModel();
     instance.object = 'value';
 
-    assert.ifError((await instance.validate().then(() => null, err => err)));
+    assert.ifError(await instance.validate().then(() => null, err => err));
 
     return instance.validate();
   });
@@ -9094,7 +9096,7 @@ describe('document', function() {
     const Test = db.model('test', schema);
 
     const t = new Test({ test: [1, 'world'] });
-    const err = (await t.validate().then(() => null, err => err));
+    const err = await t.validate().then(() => null, err => err);
     assert.ok(err);
     assert.ok(err.errors);
     assert.ok(err.errors['test.1']);
@@ -9124,7 +9126,7 @@ describe('document', function() {
     const user = new User({ tags: ['hey'] });
     user.tags = [];
 
-    const err = (await user.validate().then(() => null, err => err));
+    const err = await user.validate().then(() => null, err => err);
     assert.ifError(err);
   });
 
@@ -9728,7 +9730,7 @@ describe('document', function() {
 
     const User = db.model('User', userSchema);
     const user = new User({ age: 26 });
-    const err = (await user.validate().then(() => null, err => err));
+    const err = await user.validate().then(() => null, err => err);
     assert.ok(err);
 
     assert.ok(docFromValidation === user);
@@ -9749,7 +9751,7 @@ describe('document', function() {
         { name: 'A', categoryUrl: 'B', isSelected: false, isModified: false }
       ]
     });
-    const err = (await test.validate().then(() => null, err => err));
+    const err = await test.validate().then(() => null, err => err);
     assert.ifError(err);
   });
 

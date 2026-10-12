@@ -1438,6 +1438,22 @@ describe('schema', function() {
       }
     });
 
+    it('evaluate message function for number min/max and string minlength', async function() {
+      const message = properties => 'fail ' + properties.path + ' ' + properties.type;
+      const s = mongoose.Schema({
+        low: { type: Number, min: [10, message] },
+        high: { type: Number, max: [10, message] },
+        short: { type: String, minlength: [3, message] }
+      });
+      const M = mongoose.model('message-function-min-max', s);
+      const m = new M({ low: 1, high: 20, short: 'a' });
+
+      const err = await m.validate().then(() => null, err => err);
+      assert.equal(err.errors['low'].message, 'fail low min');
+      assert.equal(err.errors['high'].message, 'fail high max');
+      assert.equal(err.errors['short'].message, 'fail short minlength');
+    });
+
     describe('`enum` accepts an object to support TypeScript enums (gh-9546) (gh-9535) (gh-15913)', function() {
       it('strings', function() {
         // Arrange

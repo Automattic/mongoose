@@ -187,7 +187,7 @@ doc.author.email; // 'test@gmail.com'
 
 ## Virtuals via schema options
 
-Virtuals can also be defined in the schema-options directly without having to use [`.virtual`](../api/schema.html#Schema.prototype.virtual):
+Virtuals can also be defined in the schema-options directly without having to use [`.virtual`](../api/schema.html#Schema.prototype.virtual()):
 
 ```javascript acquit:Virtuals.*schema-options fullName
 const userSchema = mongoose.Schema({

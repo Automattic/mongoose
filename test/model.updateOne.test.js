@@ -3189,6 +3189,28 @@ describe('model: updateOne: ', function() {
     assert.ok(!err.errors['nested']);
   });
 
+  it('update validators report errors underneath single nested subdocs with storeSubdocValidationError: false', async function() {
+    const opts = { storeSubdocValidationError: false };
+    const Model = db.model('Test', Schema({
+      nested: Schema({
+        name: { type: String, enum: ['a', 'b'] },
+        sub: Schema({ kind: { type: String, enum: ['a', 'b'] } })
+      }, opts)
+    }));
+
+    const err = await Model.updateOne(
+      {},
+      { $set: { nested: { name: 'invalid', sub: { kind: 'invalid' } } } },
+      { runValidators: true }
+    ).catch(err => err);
+
+    assert.ok(err);
+    assert.equal(err.name, 'ValidationError');
+    assert.ok(err.errors['nested.name']);
+    assert.ok(err.errors['nested.sub.kind']);
+    assert.ok(!err.errors['nested']);
+  });
+
   it('handles spread docs (gh-9518)', async function() {
     const schema = new mongoose.Schema({
       name: String,

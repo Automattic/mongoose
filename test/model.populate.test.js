@@ -2954,6 +2954,74 @@ describe('model: populate:', function() {
       assert.equal(blogPost.title, 'Test 1');
     });
 
+    it('allows populating path with space in name using array path (gh-13985)', async function() {
+      const BlogPost = db.model('BlogPost', new Schema({
+        title: String,
+        'original author': { type: ObjectId, ref: 'User' },
+        author: { type: ObjectId, ref: 'User' },
+        reviewer: { type: ObjectId, ref: 'User' }
+      }));
+      const User = db.model('User', new Schema({ name: String }));
+
+      const [fan1, fan2, fan3] = await User.create([
+        { name: 'Fan 1' },
+        { name: 'Fan 2' },
+        { name: 'Fan 3' }
+      ]);
+      await BlogPost.create({
+        title: 'Test 1',
+        'original author': fan1._id,
+        author: fan2._id,
+        reviewer: fan3._id
+      });
+
+      const singlePathDoc = await BlogPost.
+        findOne({ title: 'Test 1' }).
+        populate({ path: ['original author'] });
+
+      assert.strictEqual(singlePathDoc['original author'].name, 'Fan 1');
+      assert.strictEqual(singlePathDoc.populated('author'), undefined);
+      assert.strictEqual(singlePathDoc.title, 'Test 1');
+
+      const multiPathDoc = await BlogPost.
+        findOne({ title: 'Test 1' }).
+        populate({ path: ['original author', 'author'] });
+
+      assert.strictEqual(multiPathDoc['original author'].name, 'Fan 1');
+      assert.strictEqual(multiPathDoc.author.name, 'Fan 2');
+      assert.strictEqual(multiPathDoc.populated('reviewer'), undefined);
+
+      const spaceSeparatedDoc = await BlogPost.
+        findOne({ title: 'Test 1' }).
+        populate({ path: 'author reviewer' });
+
+      assert.strictEqual(spaceSeparatedDoc.author.name, 'Fan 2');
+      assert.strictEqual(spaceSeparatedDoc.reviewer.name, 'Fan 3');
+      assert.strictEqual(spaceSeparatedDoc.populated('original author'), undefined);
+
+      const spaceSeparatedStringDoc = await BlogPost.
+        findOne({ title: 'Test 1' }).
+        populate('author reviewer');
+
+      assert.strictEqual(spaceSeparatedStringDoc.author.name, 'Fan 2');
+      assert.strictEqual(spaceSeparatedStringDoc.reviewer.name, 'Fan 3');
+      assert.strictEqual(spaceSeparatedStringDoc.populated('original author'), undefined);
+
+      const arrayOfSpaceSeparatedObjDoc = await BlogPost.
+        findOne({ title: 'Test 1' }).
+        populate([{ path: 'author reviewer' }]);
+
+      assert.strictEqual(arrayOfSpaceSeparatedObjDoc.author.name, 'Fan 2');
+      assert.strictEqual(arrayOfSpaceSeparatedObjDoc.reviewer.name, 'Fan 3');
+      assert.strictEqual(arrayOfSpaceSeparatedObjDoc.populated('original author'), undefined);
+
+      const unpopulatedDoc = await BlogPost.findOne({ title: 'Test 1' });
+      await unpopulatedDoc.populate({ path: ['original author'] });
+
+      assert.strictEqual(unpopulatedDoc['original author'].name, 'Fan 1');
+      assert.strictEqual(unpopulatedDoc.populated('author'), undefined);
+    });
+
     it('maps results back to correct document (gh-1444)', async function() {
       const articleSchema = new Schema({
         body: String,

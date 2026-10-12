@@ -3570,6 +3570,62 @@ describe('model: updateOne: ', function() {
     assert.equal(validateNameCalls, 1);
   });
 
+  it('only calls validators under document array subdocs once', async function() {
+    let validateListCalls = 0;
+    let validateItemCalls = 0;
+    let validateTagCalls = 0;
+
+    const tagSchema = new Schema({
+      name: {
+        type: String,
+        validate: function() {
+          validateTagCalls++;
+          return true;
+        }
+      }
+    });
+    const itemSchema = new Schema({
+      name: {
+        type: String,
+        validate: function() {
+          validateItemCalls++;
+          return true;
+        }
+      },
+      tags: [tagSchema]
+    });
+    const listSchema = new Schema({
+      name: {
+        type: String,
+        validate: function() {
+          validateListCalls++;
+          return true;
+        }
+      },
+      items: [itemSchema]
+    });
+    const Test = db.model('Test', new Schema({
+      lists: [listSchema],
+      nested: new Schema({ items: [itemSchema] })
+    }));
+
+    await Test.updateOne(
+      { _id: new mongoose.Types.ObjectId() },
+      {
+        $set: {
+          'lists.0': { name: 'list', items: [{ name: 'item', tags: [{ name: 'tag' }] }] },
+          nested: { items: [{ name: 'item', tags: [{ name: 'tag' }] }] }
+        }
+      },
+      { runValidators: true }
+    );
+
+    // One list, two items (one under `lists.0`, one under `nested`) and two tags
+    assert.equal(validateListCalls, 1);
+    assert.equal(validateItemCalls, 2);
+    assert.equal(validateTagCalls, 2);
+  });
+
   it('applies allowNull validators with updateOne and runValidators', async function() {
     const schema = new Schema({
       name: { type: String, allowNull: false }

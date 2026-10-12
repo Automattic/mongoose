@@ -17,14 +17,14 @@ describe('custom casting', function() {
     mongoose.Number.cast(originalCast);
   });
 
-  it('casting error', function() {
+  it('casting error', async function() {
     const schema = new mongoose.Schema({
       age: Number
     });
     const Model = mongoose.model('Test', schema);
 
     const doc = new Model({ age: '二' });
-    const err = doc.validateSync();
+    const err = await doc.validate().then(() => null, err => err);
     // "Cast to Number failed for value "二" at path "age""
     err.message;
     // acquit:ignore:start
@@ -32,7 +32,7 @@ describe('custom casting', function() {
     // acquit:ignore:end
   });
 
-  it('casting override', function() {
+  it('casting override', async function() {
     // Calling `cast()` on a class that inherits from `SchemaType` returns the
     // current casting function.
     const originalCast = mongoose.Number.cast();
@@ -53,7 +53,7 @@ describe('custom casting', function() {
     const Model = mongoose.model('Test', schema);
 
     const doc = new Model({ age: '二' });
-    const err = doc.validateSync();
+    const err = await doc.validate().then(() => null, err => err);
     err; // null
     doc.age; // 2
     // acquit:ignore:start

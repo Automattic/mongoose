@@ -13,7 +13,7 @@ const schema = new mongoose.Schema({
 const Model = mongoose.model('Test', schema);
 
 const doc = new Model({ age: '二' });
-const err = doc.validateSync();
+const err = await doc.validate().catch(err => err);
 // "Cast to Number failed for value "二" at path "age""
 err.message;
 ```
@@ -42,7 +42,7 @@ const schema = new mongoose.Schema({
 const Model = mongoose.model('Test', schema);
 
 const doc = new Model({ age: '二' });
-const err = doc.validateSync();
-err; // null
+const err = await doc.validate().catch(err => err);
+err; // undefined
 doc.age; // 2
 ```

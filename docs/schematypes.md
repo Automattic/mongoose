@@ -115,7 +115,7 @@ m.ofBuffer.pop();
 m.ofMixed = [1, [], 'three', { four: 5 }];
 m.nested.stuff = 'good';
 m.map = new Map([['key', 'value']]);
-m.save(callback);
+await m.save();
 ```
 
 ## The `type` Key {#type-key}

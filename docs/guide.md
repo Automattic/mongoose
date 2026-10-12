@@ -1470,7 +1470,8 @@ const parentSchema = new Schema({ child: childSchema });
 const Parent = mongoose.model('Parent', parentSchema);
 
 // Will contain an error for both 'child.name' _and_ 'child'
-new Parent({ child: {} }).validateSync().errors;
+const err = await new Parent({ child: {} }).validate().catch(err => err);
+err.errors;
 ```
 
 Set the `storeSubdocValidationError` to `false` on the child schema to make
@@ -1485,7 +1486,8 @@ const parentSchema = new Schema({ child: childSchema });
 const Parent = mongoose.model('Parent', parentSchema);
 
 // Will only contain an error for 'child.name'
-new Parent({ child: {} }).validateSync().errors;
+const err = await new Parent({ child: {} }).validate().catch(err => err);
+err.errors;
 ```
 
 ## option: collectionOptions {#collectionOptions}

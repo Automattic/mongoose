@@ -2186,6 +2186,24 @@ describe('model', function() {
     await Square.create({ nested: { test: 'foo' } });
     assert.equal(subdocSaveCalls, 1);
   });
+
+  it('does not run base schema init hooks on discriminators with mergeHooks disabled', function() {
+    const calls = [];
+    const shapeSchema = Schema({ name: String }, { discriminatorKey: 'kind' });
+    shapeSchema.post('init', function() {
+      calls.push('base init');
+    });
+    const Shape = db.model('Test', shapeSchema);
+
+    const Square = Shape.discriminator('Square', Schema({ sides: Number }), { mergeHooks: false });
+
+    const square = Square.hydrate({ name: 'test', kind: 'Square', sides: 4 });
+    assert.equal(square.sides, 4);
+    assert.deepStrictEqual(calls, []);
+
+    Shape.hydrate({ name: 'test' });
+    assert.deepStrictEqual(calls, ['base init']);
+  });
   it('should not throw an error when the user is not modifying anything involving discriminators gh-12135', function() {
     const baseSchema = Schema({}, { typeKey: 'foo' });
     const Base = db.model('Base', baseSchema);

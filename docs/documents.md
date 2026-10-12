@@ -15,7 +15,7 @@ Mongoose's [Document class](https://mongoosejs.com/docs/api/document.html) has b
 
 ## What is a Document?
 
-A Mongoose [document](https://mongoosejs.com/docs/api/document.html#Document) is an instance of a [Model class](https://mongoosejs.com/docs/api/model.html#Model).
+A Mongoose [document](https://mongoosejs.com/docs/api/document.html) is an instance of a [Model class](https://mongoosejs.com/docs/api/model.html#Model()).
 `Model` and `Document` are separate classes in Mongoose: `Model` extends from `Document`.
 
 ```javascript

@@ -1,5 +1,8 @@
 import {
   Schema,
+  Model,
+  HydratedDocument,
+  SchemaOptions,
   model,
   SkipMiddlewareOptions,
   QueryOptions,
@@ -7,12 +10,15 @@ import {
   InsertManyOptions,
   MongooseBulkWriteOptions,
   MongooseBulkSaveOptions,
+  MongooseBulkWriteResult,
+  HydrateOptions,
   AggregateOptions,
   AggregateCursorOptions,
   AggregateCursorMiddlewareOptions,
   SupportsMiddlewareOption
 } from 'mongoose';
 import { expect } from 'tstyche';
+import { ChangeStream, ChangeStreamDocument } from 'mongodb';
 
 async function gh8768() {
   const addressSchema = new Schema({ city: String });
@@ -181,4 +187,239 @@ async function gh8768() {
     return this;
   };
   emailSchema.methods.markSent.supportsMiddlewareOption = true;
+}
+
+async function bulkSaveValidationOptions() {
+  // Arrange
+  const { User, user } = createTestContext();
+  const options: MongooseBulkSaveOptions = {
+    validateModifiedOnly: true,
+    skipValidation: false,
+    validateBeforeSave: true,
+    timestamps: false,
+    ordered: false,
+    middleware: { pre: false }
+  };
+
+  // Act
+  const result = await User.bulkSave([user], options);
+
+  // Assert
+  expect<typeof result>().type.toBe<MongooseBulkWriteResult>();
+  expect<MongooseBulkSaveOptions['validateModifiedOnly']>().type.toBe<boolean | undefined>();
+  expect<MongooseBulkSaveOptions['skipValidation']>().type.toBe<boolean | undefined>();
+  expect(User.bulkSave).type.not.toBeCallableWith([user], { validateModifiedOnly: 'true' });
+  expect(User.bulkSave).type.not.toBeCallableWith([user], { skipValidation: 'false' });
+}
+
+function hydrationMiddlewareOptions(middleware: boolean | SkipMiddlewareOptions) {
+  // Arrange
+  const { User, user } = createTestContext();
+  const options: HydrateOptions = { hydratedPopulatedDocs: true, setters: true, middleware };
+
+  // Act
+  const hydrated = User.hydrate({ name: 'Alice' }, null, options);
+  const withExtra = User.hydrate<{ extra: string }>({ name: 'Alice', extra: 'value' }, null, { strict: false, middleware });
+
+  // Assert
+  expect<typeof hydrated>().type.toBe<typeof user>();
+  expect(withExtra.extra).type.toBe<string>();
+  expect<HydrateOptions['middleware']>().type.toBe<boolean | SkipMiddlewareOptions | undefined>();
+  expect(User.hydrate).type.not.toBeCallableWith({ name: 'Alice' }, null, { middleware: 'false' });
+  expect(User.hydrate).type.not.toBeCallableWith({ name: 'Alice' }, null, { middleware: { pre: 'false' } });
+  expect(User.hydrate).type.not.toBeCallableWith({ name: 'Alice' }, null, { middleware: { post: 'false' } });
+}
+
+function constructionMiddlewareTypes() {
+  // Arrange
+  const { schema } = createTestContext();
+
+  // Act
+  const result = schema.pre('createModel', function() {
+    // Construction receives uncast input, or undefined during query hydration.
+    expect(this).type.toBe<unknown>();
+  });
+  schema.pre<{ name?: string } | undefined>('createModel', function() {
+    expect(this).type.toBe<{ name?: string } | undefined>();
+  });
+
+  // Assert
+  expect<typeof result>().type.toBe<typeof schema>();
+  expect(schema.pre).type.not.toBeCallableWith('createModel', (doc: { name: string }) => {});
+  expect(schema.post).type.not.toBeCallableWith('createModel', function() {});
+}
+
+function explicitCustomFunctionMiddlewareOptions() {
+  // Arrange
+  const { schema } = createTypedFunctionContext();
+
+  // Act
+  schema.methods.runTask = async function(value, attempts) {
+    expect(this).type.toBe<HydratedDocument<TaskData, TaskMethods>>();
+    expect(value).type.toBe<string>();
+    expect(attempts).type.toBe<number | undefined>();
+    return this.name + value;
+  };
+  schema.statics.findTask = async function(value) {
+    expect(value).type.toBe<string>();
+    return value;
+  };
+  schema.methods.runTask.supportsMiddlewareOption = true;
+  schema.statics.findTask.supportsMiddlewareOption = true;
+  schema.methods.runTask.supportsMiddlewareOption = false;
+  delete schema.statics.findTask.supportsMiddlewareOption;
+
+  // Assert
+  expect<(typeof schema.methods.runTask)['supportsMiddlewareOption']>().type.toBe<boolean | undefined>();
+  expect<(typeof schema.statics.findTask)['supportsMiddlewareOption']>().type.toBe<boolean | undefined>();
+  expect<Parameters<typeof schema.methods.runTask>>().type.toBe<[value: string, attempts?: number]>();
+  expect<ReturnType<typeof schema.methods.runTask>>().type.toBe<Promise<string>>();
+  expect<ThisParameterType<typeof schema.methods.runTask>>().type.toBe<HydratedDocument<TaskData, TaskMethods>>();
+  expect<Parameters<typeof schema.statics.findTask>>().type.toBe<[value: string]>();
+  expect<ReturnType<typeof schema.statics.findTask>>().type.toBe<Promise<string>>();
+  expect<ThisParameterType<typeof schema.statics.findTask>>().type.toBe<unknown>();
+  expect(schema.statics.findTask).type.not.toBeCallableWith(123);
+  // @ts-expect-error is not assignable to type
+  schema.methods.runTask.supportsMiddlewareOption = 'true';
+  // @ts-expect-error is not assignable to type
+  schema.statics.findTask.supportsMiddlewareOption = 1;
+  // @ts-expect-error is not assignable to type
+  schema.methods.runTask = async(value: number) => String(value);
+  // @ts-expect-error is not assignable to type
+  schema.statics.findTask = (value: string) => value;
+}
+
+function callerDeclaredCustomFunctionProperties() {
+  // Arrange
+  const { schema, options } = createDeclaredFunctionContext();
+
+  // Act
+  schema.methods.runTask = Object.assign(async(value: string) => value, { tag: 'task' as const });
+  schema.statics.findTask = Object.assign(async(value: string) => value, { tag: 'task' as const });
+  schema.methods.runTask.supportsMiddlewareOption = true;
+  schema.statics.findTask.supportsMiddlewareOption = true;
+  const optionMethod = options.methods!.runTask;
+
+  // Assert
+  expect<(typeof schema.methods.runTask)['supportsMiddlewareOption']>().type.toBe<true | undefined>();
+  expect<(typeof schema.statics.findTask)['supportsMiddlewareOption']>().type.toBe<true | undefined>();
+  expect<typeof schema.methods.runTask.tag>().type.toBe<'task'>();
+  expect<typeof schema.statics.findTask.tag>().type.toBe<'task'>();
+  expect<ThisParameterType<typeof schema.methods.runTask>>().type.toBe<HydratedDocument<TaskData, DeclaredTaskMethods>>();
+  expect<Parameters<typeof schema.methods.runTask>>().type.toBe<[value: string]>();
+  expect<ReturnType<typeof schema.methods.runTask>>().type.toBe<Promise<string>>();
+  expect<typeof optionMethod.tag>().type.toBe<'task'>();
+  expect<typeof optionMethod.supportsMiddlewareOption>().type.toBe<true | undefined>();
+  expect<Parameters<typeof optionMethod>>().type.toBe<[value: string]>();
+  expect<ReturnType<typeof optionMethod>>().type.toBe<Promise<string>>();
+  expect<ThisParameterType<typeof optionMethod>>().type.toBe<HydratedDocument<TaskData, DeclaredTaskMethods>>();
+  // @ts-expect-error is not assignable to type
+  schema.methods.runTask.supportsMiddlewareOption = false;
+  // @ts-expect-error is not assignable to type
+  schema.methods.runTask.tag = 'other';
+}
+
+function explicitCustomFunctionReceivers() {
+  // Arrange
+  const { schema } = createReceiverFunctionContext();
+
+  // Act
+  schema.methods.runTask = async function(value) {
+    expect(this).type.toBe<TaskReceiver>();
+    return this.prefix + value;
+  };
+  schema.statics.findTask = async function(value) {
+    expect(this).type.toBe<TaskReceiver>();
+    return this.prefix + value;
+  };
+  schema.methods.runTask.supportsMiddlewareOption = true;
+  schema.statics.findTask.supportsMiddlewareOption = true;
+
+  // Assert
+  expect<ThisParameterType<typeof schema.methods.runTask>>().type.toBe<TaskReceiver>();
+  expect<ThisParameterType<typeof schema.statics.findTask>>().type.toBe<TaskReceiver>();
+  expect<Parameters<typeof schema.methods.runTask>>().type.toBe<[value: string]>();
+  expect<ReturnType<typeof schema.statics.findTask>>().type.toBe<Promise<string>>();
+  // @ts-expect-error is not assignable to
+  schema.methods.runTask.call({ prefix: 123 }, 'Alice');
+  // @ts-expect-error is not assignable to
+  schema.statics.findTask.call({}, 'Alice');
+}
+
+async function staticValidationAndWatchMiddleware(middleware: boolean | SkipMiddlewareOptions) {
+  // Arrange
+  const { User } = createTestContext();
+  type Change = ChangeStreamDocument<{ name: string }>;
+
+  // Act
+  const validated = await User.validate({ name: 'Alice' }, { middleware, pathsToSkip: ['name'] });
+  const stream = User.watch<{ name: string }, Change>([], { hydrate: true, fullDocument: 'updateLookup', middleware });
+
+  // Assert
+  expect(validated).type.toBe<{ name: string }>();
+  expect(stream).type.toBe<ChangeStream<{ name: string }, Change>>();
+  expect(User.watch).type.not.toBeCallableWith([], { middleware: 'false' });
+  expect(User.watch).type.not.toBeCallableWith([], { middleware: { pre: 0 } });
+  expect(User.watch).type.not.toBeCallableWith([], { middleware: { post: 'false' } });
+  expect(User.watch).type.not.toBeCallableWith([], { hydrate: 'true', middleware: false });
+  expect(User.validate).type.not.toBeCallableWith({}, { middleware: 'false' });
+  expect(User.validate).type.not.toBeCallableWith({}, { middleware: { pre: 0 } });
+  expect(User.validate).type.not.toBeCallableWith({}, { middleware: { post: 'false' } });
+}
+
+interface TaskData {
+  name: string;
+}
+interface TaskMethods {
+  runTask(value: string, attempts?: number): Promise<string>;
+}
+interface TaskStatics {
+  findTask(value: string): Promise<string>;
+}
+interface DeclaredTaskFunction {
+  (value: string): Promise<string>;
+  supportsMiddlewareOption?: true;
+  tag: 'task';
+}
+interface DeclaredTaskMethods {
+  runTask: DeclaredTaskFunction;
+}
+interface DeclaredTaskStatics {
+  findTask: DeclaredTaskFunction;
+}
+interface TaskReceiver {
+  prefix: string;
+}
+interface ReceiverTaskMethods {
+  runTask(this: TaskReceiver, value: string): Promise<string>;
+}
+interface ReceiverTaskStatics {
+  findTask(this: TaskReceiver, value: string): Promise<string>;
+}
+
+function createTestContext() {
+  const schema = new Schema<{ name: string }>({ name: { type: String, required: true } });
+  const User = model('MiddlewareOptionUser', schema);
+  return { schema, User, user: new User({ name: 'Alice' }) };
+}
+
+function createTypedFunctionContext() {
+  type TaskModel = Model<TaskData, {}, TaskMethods> & TaskStatics;
+  const schema = new Schema<TaskData, TaskModel, TaskMethods, {}, {}, TaskStatics>({ name: String });
+  return { schema };
+}
+
+function createDeclaredFunctionContext() {
+  type TaskModel = Model<TaskData, {}, DeclaredTaskMethods> & DeclaredTaskStatics;
+  const schema = new Schema<TaskData, TaskModel, DeclaredTaskMethods, {}, {}, DeclaredTaskStatics>({ name: String });
+  const options: SchemaOptions<TaskData, DeclaredTaskMethods, {}, {}, {}, HydratedDocument<TaskData, DeclaredTaskMethods>> = {
+    methods: { runTask: Object.assign(async(value: string) => value, { tag: 'task' as const }) }
+  };
+  return { schema, options };
+}
+
+function createReceiverFunctionContext() {
+  type TaskModel = Model<TaskData, {}, ReceiverTaskMethods> & ReceiverTaskStatics;
+  const schema = new Schema<TaskData, TaskModel, ReceiverTaskMethods, {}, {}, ReceiverTaskStatics>({ name: String });
+  return { schema };
 }

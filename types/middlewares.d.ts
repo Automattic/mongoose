@@ -50,6 +50,12 @@ declare module 'mongoose' {
     supportsMiddlewareOption?: boolean;
   }
 
+  type AddMiddlewareOption<T> = {
+    [K in keyof T]: T[K] extends (...args: any[]) => any
+      ? T[K] & SupportsMiddlewareOption
+      : T[K];
+  };
+
   type PreMiddlewareFunction<ThisType = any> = (
     this: ThisType,
     opts?: Record<string, any>

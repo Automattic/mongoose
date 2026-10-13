@@ -203,8 +203,8 @@ expect<mongoose.ApplyProjection<ProjectionDoc, { _id: 0; age: 0 }>>().type.toBe<
 expect<mongoose.ApplyProjection<ProjectionDoc, { _id: false }>>().type.toBe<{ name: string; age: number }>();
 
 type NestedProjectionDoc = { _id: string; name: string; meta: { title: string; hidden: boolean } };
-expect<mongoose.ApplyProjection<NestedProjectionDoc, { name: 1; 'meta.title': 1 }>>().type.toBe<NestedProjectionDoc>();
-expect<mongoose.ApplyProjection<NestedProjectionDoc, { 'meta.title': 1 }>>().type.toBe<{ _id: string; meta: { title: string; hidden: boolean } }>();
+expect<mongoose.ApplyProjection<NestedProjectionDoc, { name: 1; 'meta.title': 1 }>>().type.toBe<{ _id: string; name: string; meta: { title: string } }>();
+expect<mongoose.ApplyProjection<NestedProjectionDoc, { 'meta.title': 1 }>>().type.toBe<{ _id: string; meta: { title: string } }>();
 expect<mongoose.ApplyProjection<NestedProjectionDoc, { 'meta.hidden': 0 }>>().type.toBe<NestedProjectionDoc>();
 
 Test.findOneAndUpdate({}, {}, { projection: { name: 1 } }).then(doc => {

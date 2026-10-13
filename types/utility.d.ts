@@ -9,6 +9,17 @@ declare module 'mongoose' {
       : false;
   type ProjectionPath<Key> = Key extends `${infer Parent}.$` ? Parent : Key;
   type ProjectionRoot<Key> = Key extends `${infer Root}.${string}` ? Root : Key;
+  type ProjectionSubpath<Key, Root extends string> = Key extends `${Root}.${infer Rest}` ? Rest : never;
+  type PickProjectedPaths<T, Keys> = {
+    [K in keyof T as K extends ProjectionRoot<Keys> ? K : never]: K extends Keys
+      ? T[K]
+      : PickNestedProjectedPaths<T[K], ProjectionSubpath<Keys, K & string>>
+  };
+  type PickNestedProjectedPaths<T, Keys> = T extends Array<infer Item>
+    ? PickNestedProjectedPaths<Item, Keys>[]
+    : T extends AnyObject
+      ? Extract<ProjectionRoot<Keys>, keyof T> extends never ? T : PickProjectedPaths<T, Keys>
+      : T;
   type DefiningProjectionKeys<Projection> = {
     [Key in keyof Projection]-?: Key extends string
       ? IsNonDefiningProjection<Projection[Key], Key, Projection> extends true ? never : ProjectionPath<Key>
@@ -25,7 +36,7 @@ declare module 'mongoose' {
         ? T
         : Exclude<DefiningProjectionValues<Projection>, 0 | false | undefined> extends never
           ? Omit<T, Extract<DefiningProjectionKeys<Projection>, keyof T>>
-          : Pick<T, Extract<ProjectionRoot<DefiningProjectionKeys<Projection>>, keyof T>> &
+          : PickProjectedPaths<T, DefiningProjectionKeys<Projection>> &
             (Projection extends { _id?: infer Id }
               ? Id extends 0 | false
                 ? unknown

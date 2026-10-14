@@ -322,10 +322,10 @@ returns `undefined`.
 
 ### See
 
-- [isNew](https://mongoosejs.com/docs/api/document.md#Document.prototype.isNew())
+- [isNew](https://mongoosejs.com/docs/api/document.md#Document.prototype.isNew)
 
 Defines this path as immutable. Mongoose prevents you from changing
-immutable paths unless the parent document has [`isNew: true`](https://mongoosejs.com/docs/api/document.md#Document.prototype.isNew()).
+immutable paths unless the parent document has [`isNew: true`](https://mongoosejs.com/docs/api/document.md#Document.prototype.isNew).
 
 #### Example:
 
@@ -462,7 +462,7 @@ looks at to determine the foreign collection it should query.
 - [SchemaBoolean#checkRequired](https://mongoosejs.com/docs/api/schemaboolean.md#SchemaBoolean.prototype.checkRequired())
 - [SchemaBuffer#checkRequired](https://mongoosejs.com/docs/api/schemabuffer.md#SchemaBuffer.prototype.checkRequired())
 - [SchemaNumber#checkRequired](https://mongoosejs.com/docs/api/schemanumber.md#SchemaNumber.prototype.checkRequired())
-- [SchemaObjectId#checkRequired](https://mongoosejs.com/docs/api/schemaobjectid.md#ObjectId.prototype.checkRequired())
+- [SchemaObjectId#checkRequired](https://mongoosejs.com/docs/api/schemaobjectid.md#SchemaObjectId.prototype.checkRequired())
 - [SchemaString#checkRequired](https://mongoosejs.com/docs/api/schemastring.md#SchemaString.prototype.checkRequired())
 
 Adds a required validator to this SchemaType. The validator gets added

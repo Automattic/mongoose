@@ -1009,7 +1009,7 @@ Sends a replaceOne command with this document `_id` as the query selector.
 
 - [middleware](https://mongoosejs.com/docs/middleware.html)
 
-Saves this document by inserting a new document into the database if [document.isNew](https://mongoosejs.com/docs/api/document.md#Document.prototype.isNew()) is `true`,
+Saves this document by inserting a new document into the database if [document.isNew](https://mongoosejs.com/docs/api/document.md#Document.prototype.isNew) is `true`,
 or sends an [updateOne](https://mongoosejs.com/docs/api/document.md#Document.prototype.updateOne()) operation **only** with the modifications to the database, it does not replace the whole document in the latter case.
 
 #### Example:
@@ -1299,7 +1299,7 @@ Clears the modified state on the specified path.
 
 ### See
 
-- [Model.updateOne](https://mongoosejs.com/docs/api/model.md#Model.updateOne)
+- [Model.updateOne](https://mongoosejs.com/docs/api/model.md#Model.updateOne())
 
 Sends an updateOne command with this document `_id` as the query selector.
 
@@ -1309,7 +1309,7 @@ Sends an updateOne command with this document `_id` as the query selector.
 
 #### Valid options:
 
- - same as in [Model.updateOne](https://mongoosejs.com/docs/api/model.md#Model.updateOne)
+ - same as in [Model.updateOne](https://mongoosejs.com/docs/api/model.md#Model.updateOne())
 
 ## `Document.prototype.validate()`
 

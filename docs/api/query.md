@@ -2131,7 +2131,7 @@ When called with one argument, the most recent path passed to `where()` is used.
 
 ### See
 
-- [Model.update](https://mongoosejs.com/docs/api/model.md#Model.update())
+- [Model.replaceOne](https://mongoosejs.com/docs/api/model.md#Model.replaceOne())
 - [Query docs](https://mongoosejs.com/docs/queries.html)
 - [update](https://www.mongodb.com/docs/manual/reference/method/db.collection.update/)
 - [UpdateResult](https://mongodb.github.io/node-mongodb-native/7.0/interfaces/UpdateResult.html)
@@ -2720,7 +2720,7 @@ Any functions you pass to `transform()` will run **after** any post hooks.
 
 ### See
 
-- [Model.update](https://mongoosejs.com/docs/api/model.md#Model.update())
+- [Model.updateMany](https://mongoosejs.com/docs/api/model.md#Model.updateMany())
 - [Query docs](https://mongoosejs.com/docs/queries.html)
 - [update](https://www.mongodb.com/docs/manual/reference/method/db.collection.update/)
 - [UpdateResult](https://mongodb.github.io/node-mongodb-native/7.0/interfaces/UpdateResult.html)
@@ -2770,7 +2770,7 @@ This function triggers the following middleware.
 
 ### See
 
-- [Model.update](https://mongoosejs.com/docs/api/model.md#Model.update())
+- [Model.updateOne](https://mongoosejs.com/docs/api/model.md#Model.updateOne())
 - [Query docs](https://mongoosejs.com/docs/queries.html)
 - [update](https://www.mongodb.com/docs/manual/reference/method/db.collection.update/)
 - [UpdateResult](https://mongodb.github.io/node-mongodb-native/7.0/interfaces/UpdateResult.html)
@@ -2902,7 +2902,7 @@ Defines a `$within` or `$geoWithin` argument for geo-spatial queries.
 
 #### Note:
 
-As of Mongoose 3.7, `$geoWithin` is always used for queries. To change this behavior, see [Query.use$geoWithin](https://mongoosejs.com/docs/api/query.md#Query.prototype.use$geoWithin).
+As of Mongoose 3.7, `$geoWithin` is always used for queries. To change this behavior, see [Query.use$geoWithin](https://mongoosejs.com/docs/api/query.md#Query.use$geoWithin).
 
 #### Note:
 

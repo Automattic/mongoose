@@ -142,7 +142,7 @@ instead.
 
 ## `Mongoose.prototype.Document()`
 
-The Mongoose [Document](https://mongoosejs.com/docs/api/document.md#Document()) constructor.
+The Mongoose [Document](https://mongoosejs.com/docs/api/document.md) constructor.
 
 ## `Mongoose.prototype.Error()`
 
@@ -767,7 +767,7 @@ Currently supported options are:
 - `selectPopulatedPaths`: `true` by default. Set to false to opt out of Mongoose adding all fields that you `populate()` to your `select()`. The schema-level option `selectPopulatedPaths` overwrites this one.
 - `strictQuery`: `false` by default. May be `false`, `true`, or `'throw'`. Sets the default [strictQuery](https://mongoosejs.com/docs/guide.html#strictQuery) mode for schemas.
 - `strict`: `true` by default, may be `false`, `true`, or `'throw'`. Sets the default strict mode for schemas.
-- `timestamps.createdAt.immutable`: `true` by default. If `false`, it will change the `createdAt` field to be [`immutable: false`](https://mongoosejs.com/docs/api/schematype.md#SchemaType.prototype.immutable) which means you can update the `createdAt`
+- `timestamps.createdAt.immutable`: `true` by default. If `false`, it will change the `createdAt` field to be [`immutable: false`](https://mongoosejs.com/docs/api/schematype.md#SchemaType.prototype.immutable()) which means you can update the `createdAt`
 - `toJSON`: `{ transform: true, flattenDecimals: true }` by default. Overwrites default objects to [`toJSON()`](https://mongoosejs.com/docs/api/document.md#Document.prototype.toJSON()), for determining how Mongoose documents get serialized by `JSON.stringify()`
 - `toObject`: `{ transform: true, flattenDecimals: true }` by default. Overwrites default objects to [`toObject()`](https://mongoosejs.com/docs/api/document.md#Document.prototype.toObject())
 - `transactionAsyncLocalStorage`: `false` by default. If `true`, Mongoose will automatically pass the `session` to any operation executing within a transaction executor function. See [transaction AsyncLocalStorage documentation](https://mongoosejs.com/docs/transactions.html#asynclocalstorage)

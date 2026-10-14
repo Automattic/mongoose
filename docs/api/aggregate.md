@@ -161,7 +161,7 @@ Appends new operators to this aggregate pipeline
 
 Executes the aggregation returning a `Promise` which will be
 resolved with either the doc(s) or rejected with the error.
-Like [`.then()`](https://mongoosejs.com/docs/api/query.md#Query.prototype.then), but only takes a rejection handler.
+Like [`.then()`](https://mongoosejs.com/docs/api/query.md#Query.prototype.then()), but only takes a rejection handler.
 Compatible with `await`.
 
 ## `Aggregate.prototype.collation()`

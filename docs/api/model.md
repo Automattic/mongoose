@@ -121,7 +121,7 @@ create subclasses of `mongoose.Model` as shown below.
 
 ### See
 
-- [Query.$where](https://mongoosejs.com/docs/api/query.md#Query.prototype.$where)
+- [Query.$where](https://mongoosejs.com/docs/api/query.md#Query.prototype.$where())
 
 Creates a `Query` and specifies a `$where` condition.
 
@@ -1581,7 +1581,7 @@ The name of the model
 ### Parameters
 
 - `[options]` \<object\> options optional options
-- `[options.session=null]` \<Session\> the [session](https://www.mongodb.com/docs/manual/reference/server-sessions/) associated with this save operation. If not specified, defaults to the [document's associated session](https://mongoosejs.com/docs/api/document.md#Document.prototype.session()).
+- `[options.session=null]` \<Session\> the [session](https://www.mongodb.com/docs/manual/reference/server-sessions/) associated with this save operation. If not specified, defaults to the [document's associated session](https://mongoosejs.com/docs/api/document.md#Document.prototype.$session()).
 - `[options.safe]` \<object\> (DEPRECATED) overrides [schema's safe option](https://mongoosejs.com/docs/guide.html#safe). Use the `w` option instead.
 - `[options.validateBeforeSave]` \<boolean\> set to false to save without validating.
 - `[options.validateModifiedOnly=false]` \<boolean\> if `true`, Mongoose will only validate modified paths, as opposed to modified paths and `required` paths.

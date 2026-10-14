@@ -4759,6 +4759,36 @@ describe('Model', function() {
         assert.strictEqual(r2.testArray[0].nonexistentProp, undefined);
       });
 
+      it('casts array filters in updateOne and updateMany', async function() {
+        const Test = db.model('Test', new mongoose.Schema({
+          items: [{ qty: Number, at: Date }]
+        }));
+        const doc = await Test.create({
+          items: [{ qty: 1, at: new Date('2020-06-01') }, { qty: 2, at: new Date('2021-06-01') }]
+        });
+
+        const res = await Test.bulkWrite([
+          {
+            updateOne: {
+              filter: { _id: doc._id },
+              update: { $set: { 'items.$[item].qty': 10 } },
+              arrayFilters: [{ 'item._id': doc.items[0]._id.toHexString() }]
+            }
+          },
+          {
+            updateMany: {
+              filter: { _id: doc._id },
+              update: { $inc: { 'items.$[item].qty': 5 } },
+              arrayFilters: [{ 'item.qty': '2', 'item.at': { $gte: '2021-01-01' } }]
+            }
+          }
+        ]);
+
+        assert.equal(res.modifiedCount, 2);
+        const fromDb = await Test.findById(doc._id).lean();
+        assert.deepStrictEqual(fromDb.items.map(item => item.qty), [10, 7]);
+      });
+
       it('handles overwriteDiscriminatorKey (gh-15218) (gh-15040)', async function() {
         const dSchema1 = new mongoose.Schema({
           field1: String

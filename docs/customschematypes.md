@@ -7,7 +7,7 @@ reach for a custom type, however, know that a custom type is overkill
 for most use cases. You can do most basic tasks with
 [custom getters/setters](https://mongoosejs.com/docs/2.7.x/docs/getters-setters.html),
 [virtuals](https://mongoosejs.com/docs/guide.html#virtuals), and
-[single embedded docs](https://mongoosejs.com/docs/subdocs.html#single-embedded).
+[single embedded docs](https://mongoosejs.com/docs/subdocs.html#subdocuments-versus-nested-paths).
 
 Let's take a look at an example of a basic schema type: a 1-byte integer.
 To create a new schema type, you need to inherit from `mongoose.SchemaType`

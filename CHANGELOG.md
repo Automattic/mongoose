@@ -1,3 +1,12 @@
+9.11.2 / 2026-10-12
+===================
+ * perf: avoid applying saveSubdocs and sharding plugins to subdocuments #16585
+ * perf: upgrade to kareem@3.4.1 for mongoosejs/kareem#47 #16588
+ * fix(model): cast array filter values in bulkWrite() #16574 #16573 [OmBhandwaldar](https://github.com/OmBhandwaldar)
+ * fix(schema): allow function messages for number min/max and string minlength #16579 #16572 #8512 [NotAFlightRisk](https://github.com/NotAFlightRisk)
+ * types: make MergeType more efficiently handle MergeType<A, {}> #16581 #16580
+ * docs: fix broken API anchors and a malformed link #16583 [SatvikMishra08](https://github.com/SatvikMishra08)
+
 9.11.1 / 2026-10-07
 ===================
  * fix(document): call recursive toObject() when setting a path to a nested object #16571

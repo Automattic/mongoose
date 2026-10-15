@@ -4606,4 +4606,20 @@ describe('schema', function() {
     assert.deepStrictEqual(firstCall, [[{ content: 'text' }, {}]]);
     assert.deepStrictEqual(secondCall, [[{ content: 'text' }, {}]]);
   });
+
+  it('applies defaults for subdocument paths added or removed before the model is compiled', function() {
+    const childSchema = new Schema({ kind: String }, { _id: false });
+    const schema = new Schema({ children: [childSchema] });
+    // Creating the document array compiles the child schema, so add and remove paths
+    // afterwards like a global plugin would when compiling the model
+    const compiledChildSchema = schema.path('children').schema;
+    compiledChildSchema.add({ status: { type: String, default: 'active' }, notes: { type: String, default: 'none' } });
+    compiledChildSchema.remove('notes');
+    const Test = db.model('Test', schema);
+
+    const doc = Test.hydrate({ _id: new mongoose.Types.ObjectId(), children: [{}] });
+    assert.strictEqual(doc.children[0].status, 'active');
+    assert.strictEqual(doc.children[0].get('notes'), undefined);
+    assert.strictEqual(new Test({ children: [{}] }).children[0].status, 'active');
+  });
 });

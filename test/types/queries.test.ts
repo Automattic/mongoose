@@ -205,7 +205,9 @@ expect<mongoose.ApplyProjection<ProjectionDoc, { _id: false }>>().type.toBe<{ na
 type NestedProjectionDoc = { _id: string; name: string; meta: { title: string; hidden: boolean } };
 expect<mongoose.ApplyProjection<NestedProjectionDoc, { name: 1; 'meta.title': 1 }>>().type.toBe<{ _id: string; name: string; meta: { title: string } }>();
 expect<mongoose.ApplyProjection<NestedProjectionDoc, { 'meta.title': 1 }>>().type.toBe<{ _id: string; meta: { title: string } }>();
-expect<mongoose.ApplyProjection<NestedProjectionDoc, { 'meta.hidden': 0 }>>().type.toBe<NestedProjectionDoc>();
+expect<mongoose.ApplyProjection<NestedProjectionDoc, { 'meta.hidden': 0 }>>().type.toBe<{ _id: string; name: string; meta: { title: string } }>();
+expect<mongoose.ApplyProjection<{ _id: string; meta: any }, { 'meta.title': 1 }>>().type.toBe<{ _id: string; meta: any }>();
+expect<mongoose.ApplyProjection<any, { name: 1; 'meta.title': 1 }>>().type.toBe<{ _id: any; name: any; meta: any }>();
 
 Test.findOneAndUpdate({}, {}, { projection: { name: 1 } }).then(doc => {
   expect(doc!).type.toHaveProperty('name');

@@ -8,6 +8,44 @@ declare module 'mongoose' {
         : Exclude<keyof Projection, '_id'> extends never ? false : true
       : false;
   type ProjectionPath<Key> = Key extends `${infer Parent}.$` ? Parent : Key;
+  type ProjectionRoot<Key> = Key extends `${infer Root}.${string}` ? Root : Key;
+  type ProjectionSubpath<Key, Root extends string> = Key extends `${Root}.${infer Rest}` ? Rest : never;
+  type PickProjectedPaths<T, Keys> = IfAny<
+    T,
+    { [K in ProjectionRoot<Keys> & string]: any },
+    {
+      [K in keyof T as K extends ProjectionRoot<Keys> ? K : never]: K extends Keys
+        ? T[K]
+        : PickNestedProjectedPaths<T[K], ProjectionSubpath<Keys, K & string>>
+    }
+  >;
+  type PickNestedProjectedPaths<T, Keys> = IfAny<
+    T,
+    T,
+    T extends Array<infer Item>
+      ? PickNestedProjectedPaths<Item, Keys>[]
+      : T extends AnyObject
+        ? Extract<ProjectionRoot<Keys>, keyof T> extends never ? T : PickProjectedPaths<T, Keys>
+        : T
+  >;
+  type OmitProjectedPaths<T, Keys> = IfAny<
+    T,
+    Omit<T, Extract<Keys, keyof T>>,
+    {
+      [K in keyof T as K extends Keys ? never : K]: K extends ProjectionRoot<Keys>
+        ? OmitNestedProjectedPaths<T[K], ProjectionSubpath<Keys, K & string>>
+        : T[K]
+    }
+  >;
+  type OmitNestedProjectedPaths<T, Keys> = IfAny<
+    T,
+    T,
+    T extends Array<infer Item>
+      ? OmitNestedProjectedPaths<Item, Keys>[]
+      : T extends AnyObject
+        ? Extract<ProjectionRoot<Keys>, keyof T> extends never ? T : OmitProjectedPaths<T, Keys>
+        : T
+  >;
   type DefiningProjectionKeys<Projection> = {
     [Key in keyof Projection]-?: Key extends string
       ? IsNonDefiningProjection<Projection[Key], Key, Projection> extends true ? never : ProjectionPath<Key>
@@ -23,8 +61,8 @@ declare module 'mongoose' {
       ? [DefiningProjectionKeys<Projection>] extends [never]
         ? T
         : Exclude<DefiningProjectionValues<Projection>, 0 | false | undefined> extends never
-          ? Omit<T, Extract<DefiningProjectionKeys<Projection>, keyof T>>
-          : Pick<T, Extract<DefiningProjectionKeys<Projection>, keyof T>> &
+          ? OmitProjectedPaths<T, DefiningProjectionKeys<Projection>>
+          : PickProjectedPaths<T, DefiningProjectionKeys<Projection>> &
             (Projection extends { _id?: infer Id }
               ? Id extends 0 | false
                 ? unknown

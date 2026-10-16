@@ -5173,5 +5173,33 @@ describe('Query', function() {
       query._applyPaths();
       assert.deepStrictEqual(query._fields, { 'events.message': 1, 'events.kind': 1 });
     });
+
+    it('projects in nested embedded discriminator keys added after the schema is created', function() {
+      const eventSchema = new Schema({ message: String }, { discriminatorKey: 'kind', _id: false });
+      const shapeSchema = new Schema({ name: String }, { discriminatorKey: 'kind', _id: false });
+      const testSchema = new Schema({
+        outer: new Schema({ events: [eventSchema], shape: shapeSchema }, { _id: false })
+      });
+      testSchema.path('outer').schema.path('events').discriminator('Clicked', new Schema({ element: String }, { _id: false }));
+      testSchema.path('outer').schema.path('shape').discriminator('Circle', new Schema({ radius: Number }, { _id: false }));
+
+      const Test = db.model('Test', testSchema);
+      let query = Test.find().select({ 'outer.events.message': 1, 'outer.shape.name': 1 });
+      query._applyPaths();
+      assert.deepStrictEqual(query._fields, {
+        'outer.events.message': 1,
+        'outer.shape.name': 1,
+        'outer.events.kind': 1,
+        'outer.shape.kind': 1
+      });
+
+      query = Test.find().select({ 'outer.events.message': 1 });
+      query._applyPaths();
+      assert.deepStrictEqual(query._fields, { 'outer.events.message': 1, 'outer.events.kind': 1 });
+
+      query = Test.find().select({ 'outer.shape.name': 1 });
+      query._applyPaths();
+      assert.deepStrictEqual(query._fields, { 'outer.shape.name': 1, 'outer.shape.kind': 1 });
+    });
   });
 });

@@ -180,6 +180,7 @@ declare module 'mongoose' {
        : PathValueType extends BigintSchemaDefinition ? bigint
        : PathValueType extends UuidSchemaDefinition ? Types.UUID
        : PathValueType extends MapSchemaDefinition ? Record<string, ObtainRawDocumentPathType<Options['of'], TypeKey, TTransformOptions>>
+       : PathValueType extends SetSchemaDefinition ? ObtainRawDocumentPathType<Options['of'], TypeKey, TTransformOptions>[]
        : PathValueType extends DoubleSchemaDefinition ? Types.Double
        : PathValueType extends UnionSchemaDefinition ?
          ResolveRawPathType<Options['of'] extends ReadonlyArray<infer Item> ? Item : never>

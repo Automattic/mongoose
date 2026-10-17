@@ -43,6 +43,7 @@ const files = [
   'lib/types/buffer.js',
   'lib/types/decimal128.js',
   'lib/types/map.js',
+  'lib/types/set.js',
   'lib/types/array/methods/index.js',
   'lib/types/uuid.js'
 ];

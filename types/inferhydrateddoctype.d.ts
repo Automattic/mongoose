@@ -143,6 +143,7 @@ declare module 'mongoose' {
     : PathValueType extends DoubleSchemaDefinition ? Types.Double
     : PathValueType extends typeof Schema.Types.Mixed ? any
     : PathValueType extends MapSchemaDefinition ? Map<string, ObtainHydratedDocumentPathType<Options['of']>>
+    : PathValueType extends SetSchemaDefinition ? Set<ObtainHydratedDocumentPathType<Options['of']>>
     : IfEquals<PathValueType, ObjectConstructor> extends true ? any
     : PathValueType extends typeof SchemaType ? PathValueType['prototype']
     : PathValueType extends ArrayConstructor ? Types.Array<any>

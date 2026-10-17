@@ -53,6 +53,7 @@ Check out [Mongoose's plugins search](http://plugins.mongoosejs.io) to find plug
 * [Array](#arrays)
 * [Decimal128](api/mongoose.html#mongoose_Mongoose-Decimal128)
 * [Map](#maps)
+* [Set](#sets)
 * [Schema](#schemas)
 * [UUID](#uuid)
 * [BigInt](#bigint)
@@ -616,6 +617,50 @@ on `socialMediaHandles.$*.oauth`:
 ```javascript
 const user = await User.findOne().populate('socialMediaHandles.$*.oauth');
 ```
+
+### Sets {#sets}
+
+A `MongooseSet` is a subclass of [JavaScript's `Set` class](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set).
+Sets are useful for lists of values that should not contain duplicates, like tags.
+You specify the type of the set's values using `of`.
+
+```javascript
+const postSchema = new Schema({
+  tags: {
+    type: Set,
+    of: String
+  }
+});
+
+const Post = mongoose.model('Post', postSchema);
+const post = new Post({ tags: ['mongodb', 'nodejs', 'mongodb'] });
+// Set(2) { 'mongodb', 'nodejs' }
+console.log(post.tags);
+
+post.tags.add('mongoose');
+post.tags.add('nodejs'); // no-op, 'nodejs' is already in the set
+post.tags.delete('mongodb');
+// Set(2) { 'nodejs', 'mongoose' }
+console.log(post.tags);
+```
+
+Mongoose casts values before adding them, so `add()`, `has()`, and `delete()` compare ObjectIds, dates, and other non-primitive values by value rather than by reference.
+
+```javascript
+const userSchema = new Schema({
+  friends: { type: Set, of: 'ObjectId' }
+});
+const User = mongoose.model('User', userSchema);
+
+const id = new mongoose.Types.ObjectId();
+const user = new User({ friends: [id, id.toHexString()] });
+user.friends.size; // 1
+user.friends.has(id.toHexString()); // true
+```
+
+Sets are stored as arrays in MongoDB, and `toObject()`, `toJSON()`, and `lean()` return arrays.
+Queries on sets work like queries on arrays: `{ tags: 'nodejs' }` matches documents whose `tags` contain `'nodejs'`.
+Sets of subdocuments, arrays, and maps are not supported.
 
 ### UUID {#uuid}
 

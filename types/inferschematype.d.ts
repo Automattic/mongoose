@@ -20,6 +20,7 @@ import {
   Schema,
   SchemaType,
   SchemaTypeOptions,
+  SetSchemaDefinition,
   StringSchemaDefinition,
   Types,
   UnionSchemaDefinition,
@@ -366,6 +367,7 @@ type ResolvePathType<
   : PathValueType extends BigintSchemaDefinition ? bigint
   : PathValueType extends DoubleSchemaDefinition ? Types.Double
   : PathValueType extends MapSchemaDefinition ? Map<string, ObtainDocumentPathType<Options['of']>>
+  : PathValueType extends SetSchemaDefinition ? Set<ObtainDocumentPathType<Options['of']>>
   : PathValueType extends UnionSchemaDefinition ?
     Options['of'] extends AnyArray<infer U> ? ResolvePathType<U>
     : never

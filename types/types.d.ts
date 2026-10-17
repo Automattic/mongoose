@@ -84,6 +84,14 @@ declare module 'mongoose' {
     class ObjectId extends mongodb.ObjectId {
     }
 
+    class Set<V> extends global.Set<V> {
+      /** Converts a Mongoose set into an array, which is how sets are stored in MongoDB. */
+      toObject(options?: ToObjectOptions): V[];
+      toJSON(options?: ToObjectOptions): V[];
+      toBSON(): V[];
+      $isMongooseSet: true;
+    }
+
     class Subdocument<IdType = any, TQueryHelpers = any, DocType = any, TVirtuals = {}, TSchemaOptions = {}> extends Document<IdType, TQueryHelpers, DocType, TVirtuals, TSchemaOptions> {
       $isSingleNested: true;
 

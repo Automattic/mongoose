@@ -61,6 +61,7 @@ declare module 'mongoose' {
     : T extends boolean ? BooleanSchemaDefinition
     : T extends NativeDate ? DateSchemaDefinition
     : T extends Map<any, any> ? SchemaDefinition<typeof Map>
+    : T extends Set<any> ? SchemaDefinition<typeof Set>
     : T extends Buffer ? SchemaDefinition<typeof Buffer>
     : T extends Types.ObjectId ? ObjectIdSchemaDefinition
     : T extends Types.ObjectId[] ?
@@ -222,7 +223,7 @@ declare module 'mongoose' {
     /** Embedded discriminators for this path. Only allowed for subdocuments and subdocument arrays. */
     discriminators?: Record<string, Schema<unknown>>;
 
-    /** If set, specifies the type of this map's values. Mongoose will cast this map's values to the given type. */
+    /** If set, specifies the type of this map's or set's values. Mongoose will cast these values to the given type. */
     of?: Function | SchemaDefinitionProperty<any> | (Function | SchemaDefinitionProperty<any>)[];
 
     /** If true, uses Mongoose's default `_id` settings. Only allowed for ObjectIds */
@@ -441,10 +442,10 @@ declare module 'mongoose' {
         readonly schemaName: 'Boolean';
 
         /** Configure which values get casted to `true`. */
-        static convertToTrue: Set<any>;
+        static convertToTrue: globalThis.Set<any>;
 
         /** Configure which values get casted to `false`. */
-        static convertToFalse: Set<any>;
+        static convertToFalse: globalThis.Set<any>;
 
         /** Default options for this SchemaType */
         static defaultOptions: Record<string, any>;
@@ -539,6 +540,15 @@ declare module 'mongoose' {
         /** This schema type's name, to defend against minifiers that mangle function names. */
         static schemaName: 'Map';
         readonly schemaName: 'Map';
+
+        /** Default options for this SchemaType */
+        static defaultOptions: Record<string, any>;
+      }
+
+      class Set extends SchemaType {
+        /** This schema type's name, to defend against minifiers that mangle function names. */
+        static schemaName: 'Set';
+        readonly schemaName: 'Set';
 
         /** Default options for this SchemaType */
         static defaultOptions: Record<string, any>;

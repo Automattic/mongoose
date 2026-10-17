@@ -748,6 +748,7 @@ declare module 'mongoose' {
   export type BigintSchemaDefinition = 'bigint' | 'BigInt' | typeof Schema.Types.BigInt | Schema.Types.BigInt | typeof BigInt | BigInt;
   export type UuidSchemaDefinition = 'uuid' | 'UUID' | typeof Schema.Types.UUID | Schema.Types.UUID;
   export type MapSchemaDefinition = MapConstructor | 'Map' | typeof Schema.Types.Map;
+  export type SetSchemaDefinition = SetConstructor | 'Set' | typeof Schema.Types.Set;
   export type UnionSchemaDefinition = 'Union' | 'union' | typeof Schema.Types.Union | Schema.Types.Union;
   export type DoubleSchemaDefinition = 'double' | 'Double' | typeof Schema.Types.Double | Schema.Types.Double;
 
@@ -1217,7 +1218,8 @@ declare module 'mongoose' {
    * https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#distributive-conditional-types
    */
   type FlattenProperty<T> = T extends Map<any, infer V>
-      ? Record<string, V> : T extends TreatAsPrimitives
+      ? Record<string, V> : T extends Set<infer V>
+      ? V[] : T extends TreatAsPrimitives
       ? T : T extends Document ? T : T extends Types.DocumentArray<infer ItemType>
         ? Types.DocumentArray<FlattenMaps<ItemType>> : FlattenMaps<T>;
 

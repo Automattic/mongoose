@@ -553,6 +553,31 @@ describe('insertMany()', function() {
     assert.ok(!err.mongoose.validationErrors[1].errors['name']);
   });
 
+  it('insertMany() keeps WriteError instances in writeErrors with ordered false', async function() {
+    const schema = new Schema({
+      name: { type: String, required: true, unique: true }
+    });
+    const Movie = db.model('Movie', schema);
+    await Movie.init();
+
+    const arr = [
+      { foo: 'The Phantom Menace' },
+      { name: 'The Empire Strikes Back' },
+      { name: 'The Empire Strikes Back' }
+    ];
+    const err = await Movie.insertMany(arr, { ordered: false }).then(() => null, err => err);
+
+    assert.ok(err);
+    assert.equal(err.writeErrors.length, 1);
+    const writeError = err.writeErrors[0];
+    assert.equal(writeError.constructor.name, 'WriteError');
+    assert.equal(writeError.code, 11000);
+    assert.equal(writeError.index, 2);
+    assert.ok(writeError.errmsg.includes('duplicate key'));
+    assert.equal(writeError.getOperation().name, 'The Empire Strikes Back');
+    assert.strictEqual(err.results[2], writeError);
+  });
+
   it('insertMany() validation errors include index property with ordered false and rawResult', async function() {
     const schema = new Schema({
       title: { type: String, required: true },

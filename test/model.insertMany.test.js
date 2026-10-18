@@ -553,7 +553,7 @@ describe('insertMany()', function() {
     assert.ok(!err.mongoose.validationErrors[1].errors['name']);
   });
 
-  it('insertMany() keeps WriteError instances in writeErrors with ordered false', async function() {
+  it('insertMany() keeps WriteError instances in writeErrors with ordered false (gh-16607)', async function() {
     const schema = new Schema({
       name: { type: String, required: true, unique: true }
     });

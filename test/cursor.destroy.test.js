@@ -2,6 +2,8 @@
 
 const assert = require('assert');
 const { once } = require('events');
+const { Writable } = require('stream');
+const { pipeline } = require('stream/promises');
 const sinon = require('sinon');
 const start = require('./common');
 const mongoose = start.mongoose;
@@ -24,11 +26,64 @@ describe('cursor destroy errors', function() {
   afterEach(() => require('./util').clearTestData(db));
   afterEach(() => require('./util').stopRemainingOps(db));
 
+  it('emits an error observed through next() but not previously emitted by the cursor', async function() {
+    const cursor = Model.find({ _id: 'invalid-object-id' }).cursor();
+    await once(cursor, 'cursor');
+    const castError = await cursor.next().catch(error => error);
+    assert.ok(castError instanceof mongoose.Error.CastError);
+    const errors = [];
+    cursor.on('error', error => errors.push(error));
+    const closed = new Promise(resolve => cursor.once('close', resolve));
+    cursor.destroy(castError);
+    await closed;
+    assert.deepStrictEqual(errors, [castError]);
+  });
+
   for (const kind of ['query', 'aggregate']) {
     function createCursor(model = Model) {
       return kind === 'query' ? model.find().cursor({ batchSize: 1 }) :
         model.aggregate([{ $match: {} }]).cursor({ batchSize: 1 });
     }
+
+    it(`does not re-emit a ${kind} read error when pipeline destroys the cursor`, async function() {
+      const cursor = createCursor();
+      await cursor.next();
+      const readError = new Error('driver read failed');
+      const nextStub = sinon.stub(cursor.cursor, 'next').rejects(readError);
+      const errors = [];
+      cursor.on('error', error => errors.push(error));
+      const closed = new Promise(resolve => cursor.once('close', resolve));
+      try {
+        await assert.rejects(pipeline(cursor, new Writable({
+          objectMode: true,
+          write(document, encoding, callback) { callback(); }
+        })), error => error === readError);
+        await closed;
+        assert.deepStrictEqual(errors, [readError]);
+        assert.strictEqual(cursor.cursor.closed, true);
+      } finally {
+        nextStub.restore();
+      }
+    });
+
+    it(`preserves a distinct ${kind} destroy error with the same message as an emitted error`, async function() {
+      const cursor = createCursor();
+      await cursor.next();
+      const readError = new Error('operation failed');
+      const destroyError = new Error('operation failed');
+      const nextStub = sinon.stub(cursor.cursor, 'next').rejects(readError);
+      const errors = [];
+      cursor.on('error', error => errors.push(error));
+      cursor.once('error', () => cursor.destroy(destroyError));
+      const closed = new Promise(resolve => cursor.once('close', resolve));
+      try {
+        cursor.resume();
+        await closed;
+        assert.deepStrictEqual(errors, [readError, destroyError]);
+      } finally {
+        nextStub.restore();
+      }
+    });
 
     it(`emits the supplied destroy error after closing a ${kind} cursor`, async function() {
       const cursor = createCursor();

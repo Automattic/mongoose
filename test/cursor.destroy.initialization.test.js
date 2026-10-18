@@ -4,6 +4,7 @@ const assert = require('assert');
 const { once } = require('events');
 const { Writable } = require('stream');
 const { pipeline } = require('stream/promises');
+const sinon = require('sinon');
 const start = require('./common');
 const mongoose = start.mongoose;
 
@@ -40,6 +41,42 @@ describe('cursor destruction without a driver cursor', function() {
       return kind === 'query' ? Model.find(filter).cursor() :
         Model.aggregate([{ $match: {} }]).cursor();
     }
+
+    it(`finishes ${kind} destruction when driver cursor creation throws`, async function() {
+      const creationError = new Error('cursor creation failed');
+      const cursor = createCursor(async function() {});
+      const collection = db.model('Test').collection;
+      const createStub = sinon.stub(collection, kind === 'query' ? 'find' : 'aggregate').throws(creationError);
+      const errors = [];
+      cursor.on('error', error => errors.push(error));
+      const closed = new Promise(resolve => cursor.once('close', resolve));
+      try {
+        cursor.destroy();
+        await closed;
+        assert.strictEqual(cursor.cursor, null);
+        assert.strictEqual(cursor.closed, true);
+        assert.deepStrictEqual(errors, [creationError]);
+        assert.strictEqual(cursor.listenerCount('cursor'), 0);
+        assert.strictEqual(cursor.listenerCount('error'), 1);
+      } finally {
+        createStub.restore();
+      }
+    });
+
+    it(`does not repeat a ${kind} hook error passed to destroy by an error listener`, async function() {
+      const hookError = new Error('pre hook failed');
+      const cursor = createCursor(async function() { throw hookError; });
+      const errors = [];
+      cursor.on('error', error => {
+        errors.push(error);
+        cursor.destroy(error);
+      });
+      await new Promise(resolve => cursor.once('close', resolve));
+      assert.strictEqual(cursor.closed, true);
+      assert.deepStrictEqual(errors, [hookError]);
+      assert.strictEqual(cursor.listenerCount('cursor'), 0);
+      assert.strictEqual(cursor.listenerCount('error'), 1);
+    });
 
     if (kind === 'query') {
       it('keeps waiting when a casting error is emitted before initialization completes', async function() {

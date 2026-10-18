@@ -68,10 +68,54 @@ describe('cursor destroy errors', function() {
     }
   });
 
+  it('does not repeat a pending casting error when cleanup completes immediately', async function() {
+    const cursor = Model.find({ _id: 'invalid-object-id' }).cursor();
+    await once(cursor, 'cursor');
+    const castError = await cursor.next().catch(error => error);
+    assert.ok(castError instanceof mongoose.Error.CastError);
+    const errors = [];
+    cursor.on('error', error => errors.push(error));
+    const closed = new Promise(resolve => cursor.once('close', resolve));
+    cursor.read(0);
+    cursor.destroy(castError);
+    await closed;
+    await new Promise(resolve => setImmediate(resolve));
+    assert.deepStrictEqual(errors, [castError]);
+  });
+
   for (const kind of ['query', 'aggregate']) {
     function createCursor(model = Model) {
       return kind === 'query' ? model.find().cursor({ batchSize: 1 }) :
         model.aggregate([{ $match: {} }]).cursor({ batchSize: 1 });
+    }
+
+    for (const repeatCleanupError of [false, true]) {
+      it(`preserves distinct late ${kind} errors after cleanup fails, repeat cleanup error: ${repeatCleanupError}`, async function() {
+        const cursor = createCursor();
+        await cursor.next();
+        const readError = new Error('driver read failed');
+        const closeError = new Error('driver close failed');
+        let rejectRead;
+        const nextStub = sinon.stub(cursor.cursor, 'next').callsFake(() => new Promise((resolve, reject) => {
+          rejectRead = reject;
+        }));
+        const closeStub = sinon.stub(cursor.cursor, 'close').rejects(closeError);
+        const errors = [];
+        cursor.on('error', error => errors.push(error));
+        const closed = new Promise(resolve => cursor.once('close', resolve));
+        try {
+          cursor.read(0);
+          cursor.destroy(readError);
+          await closed;
+          rejectRead(repeatCleanupError ? closeError : readError);
+          await new Promise(resolve => setImmediate(resolve));
+          assert.deepStrictEqual(errors, repeatCleanupError ? [closeError] : [closeError, readError]);
+        } finally {
+          nextStub.restore();
+          closeStub.restore();
+          await cursor.cursor.close();
+        }
+      });
     }
 
     it(`does not re-emit a ${kind} read error when pipeline destroys the cursor`, async function() {

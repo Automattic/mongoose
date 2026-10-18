@@ -61,6 +61,17 @@ describe('model: validate: ', function() {
     assert.strictEqual(obj.age, 42);
   });
 
+  it('Model.validate() with missing deeply nested objects', async function() {
+    const Model = mongoose.model('Test', new Schema({
+      name: String,
+      profile: { address: { city: { type: String, required: true } } }
+    }));
+
+    const err = await Model.validate({ name: 'test' }).then(() => null, err => err);
+    assert.equal(err.name, 'ValidationError');
+    assert.deepEqual(Object.keys(err.errors), ['profile.address.city']);
+  });
+
   it('Model["~standard"].validate() validates using standard schema result format', async function() {
     const User = mongoose.model('User', new Schema({
       name: {

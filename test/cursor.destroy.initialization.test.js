@@ -23,6 +23,15 @@ describe('cursor destruction without a driver cursor', function() {
   afterEach(() => require('./util').clearTestData(db));
   afterEach(() => require('./util').stopRemainingOps(db));
 
+  it('closes a connection-level aggregation cursor after its readiness event', async function() {
+    const cursor = db.aggregate([{ $listCollections: {} }]).cursor();
+    await once(cursor, 'cursor');
+    cursor.destroy();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.strictEqual(cursor.closed, true);
+    assert.strictEqual(cursor.cursor.closed, true);
+  });
+
   for (const kind of ['query', 'aggregate']) {
     function createCursor(hook, filter = {}) {
       const schema = new mongoose.Schema({ name: String });
@@ -33,6 +42,31 @@ describe('cursor destruction without a driver cursor', function() {
     }
 
     if (kind === 'query') {
+      it('keeps waiting when a casting error is emitted before initialization completes', async function() {
+        let finishHook;
+        const hook = new Promise(resolve => { finishHook = resolve; });
+        const cursor = createCursor(() => hook, { _id: 'not-an-object-id' });
+        const ready = new Promise(resolve => cursor.once('cursor', resolve));
+        const closed = new Promise(resolve => cursor.once('close', resolve));
+        const failed = once(cursor, 'error');
+        try {
+          cursor.read(0);
+          cursor.destroy();
+          await failed;
+          await new Promise(resolve => setImmediate(resolve));
+          assert.strictEqual(cursor.closed, false);
+          finishHook();
+          await ready;
+          await closed;
+          assert.strictEqual(cursor.cursor.closed, true);
+          assert.strictEqual(cursor.listenerCount('error'), 0);
+        } finally {
+          finishHook();
+          await ready;
+          await cursor.cursor.close();
+        }
+      });
+
       it('waits for pending initialization despite an earlier query casting error', async function() {
         let finishHook;
         const hook = new Promise(resolve => { finishHook = resolve; });
@@ -85,6 +119,7 @@ describe('cursor destruction without a driver cursor', function() {
         assert.strictEqual(closeCount, 1);
         assert.deepStrictEqual(errors, [hookError]);
         assert.strictEqual(cursor.listenerCount('cursor'), 0);
+        assert.strictEqual(cursor.listenerCount('error'), 1);
       });
 
       for (const skipValue of [undefined, null, []]) {
@@ -115,6 +150,7 @@ describe('cursor destruction without a driver cursor', function() {
           assert.strictEqual(closeCount, 1);
           assert.deepStrictEqual(errors, []);
           assert.strictEqual(cursor.listenerCount('cursor'), 0);
+          assert.strictEqual(cursor.listenerCount('error'), 1);
         });
       }
     }

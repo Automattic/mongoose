@@ -39,6 +39,35 @@ describe('cursor destroy errors', function() {
     assert.deepStrictEqual(errors, [castError]);
   });
 
+  it('does not repeat a casting error emitted while destruction is waiting for cleanup', async function() {
+    const cursor = Model.find({ _id: 'invalid-object-id' }).cursor();
+    await once(cursor, 'cursor');
+    const castError = await cursor.next().catch(error => error);
+    assert.ok(castError instanceof mongoose.Error.CastError);
+    let finishClose;
+    const closeStub = sinon.stub(cursor.cursor, 'close').callsFake(() => new Promise(resolve => {
+      finishClose = resolve;
+    }));
+    const errors = [];
+    cursor.on('error', error => errors.push(error));
+    const closed = new Promise(resolve => cursor.once('close', resolve));
+    try {
+      cursor.read(0);
+      cursor.destroy(castError);
+      await new Promise(resolve => setImmediate(resolve));
+      assert.deepStrictEqual(errors, [castError]);
+      finishClose();
+      await closed;
+      assert.deepStrictEqual(errors, [castError]);
+    } finally {
+      if (finishClose) {
+        finishClose();
+      }
+      closeStub.restore();
+      await cursor.cursor.close();
+    }
+  });
+
   for (const kind of ['query', 'aggregate']) {
     function createCursor(model = Model) {
       return kind === 'query' ? model.find().cursor({ batchSize: 1 }) :
@@ -63,6 +92,33 @@ describe('cursor destroy errors', function() {
         assert.strictEqual(cursor.cursor.closed, true);
       } finally {
         nextStub.restore();
+      }
+    });
+
+    it(`does not re-emit an earlier ${kind} read error after a close error`, async function() {
+      const cursor = createCursor();
+      await cursor.next();
+      const readError = new Error('driver read failed');
+      const closeError = new Error('driver close failed');
+      const nextStub = sinon.stub(cursor.cursor, 'next').rejects(readError);
+      const closeStub = sinon.stub(cursor.cursor, 'close').rejects(closeError);
+      const errors = [];
+      cursor.on('error', error => errors.push(error));
+      const failed = once(cursor, 'error');
+      const closed = new Promise(resolve => cursor.once('close', resolve));
+      try {
+        cursor.resume();
+        await failed;
+        await assert.rejects(cursor.close(), error => error === closeError);
+        closeStub.restore();
+        cursor.destroy(readError);
+        await closed;
+        assert.deepStrictEqual(errors, [readError, closeError]);
+        assert.strictEqual(cursor.cursor.closed, true);
+      } finally {
+        nextStub.restore();
+        closeStub.restore();
+        await cursor.cursor.close();
       }
     });
 

@@ -7524,6 +7524,25 @@ describe('document', function() {
     assert.equal(doc.get('photos.0.foo'), 'bar');
   });
 
+  it('set() underneath alias marks the aliased path modified', async function() {
+    const schema = new Schema({
+      sub: { type: new Schema({ x: String }, { _id: false }), alias: 's' },
+      mixed: { type: Schema.Types.Mixed, alias: 'm' }
+    });
+    const Test = db.model('Test', schema);
+
+    const { _id } = await Test.create({ sub: { x: 'a' }, mixed: { y: 1 } });
+    const doc = await Test.findById(_id);
+    doc.set('s.x', 'b');
+    doc.set('m.y', 2);
+    assert.deepStrictEqual(doc.modifiedPaths().sort(), ['mixed', 'mixed.y', 'sub', 'sub.x']);
+    await doc.save();
+
+    const rawDoc = await Test.collection.findOne({ _id });
+    assert.deepStrictEqual(rawDoc.sub, { x: 'b' });
+    assert.deepStrictEqual(rawDoc.mixed, { y: 2 });
+  });
+
   it('get() with getters: false (gh-7233)', function() {
     const testSchema = new Schema({
       foo: { type: String, get: v => v.toLowerCase() }

@@ -7543,6 +7543,29 @@ describe('document', function() {
     assert.deepStrictEqual(rawDoc.mixed, { y: 2 });
   });
 
+  it('set() marks a null ancestor modified if it can\'t create the ancestor', async function() {
+    const Test = db.model('Test', new Schema({ name: String }));
+
+    const { insertedId } = await Test.collection.insertOne({ adhoc: { a: null } });
+    const doc = await Test.findById(insertedId);
+    // `set()` can't create `adhoc.a` because `adhoc.a` isn't in the schema, so
+    // `save()` needs to overwrite `adhoc.a` rather than set `adhoc.a.b`
+    doc.set('adhoc.a.b', 1, { strict: false });
+    assert.deepStrictEqual(doc.modifiedPaths(), ['adhoc', 'adhoc.a']);
+    await doc.save();
+
+    const rawDoc = await Test.collection.findOne({ _id: insertedId });
+    assert.deepStrictEqual(rawDoc.adhoc, { a: { b: 1 } });
+  });
+
+  it('set(null, path) sets path to null', function() {
+    const Test = db.model('Test', new Schema({ name: String }));
+
+    const doc = new Test({ name: 'test' });
+    doc.set(null, 'name');
+    assert.strictEqual(doc.name, null);
+  });
+
   it('get() with getters: false (gh-7233)', function() {
     const testSchema = new Schema({
       foo: { type: String, get: v => v.toLowerCase() }

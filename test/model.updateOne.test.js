@@ -3626,6 +3626,29 @@ describe('model: updateOne: ', function() {
     assert.equal(validateTagCalls, 2);
   });
 
+  it('update validators report the same errors as doc.validate() when a single nested validator fails', async function() {
+    const Test = db.model('Test', new Schema({
+      nested: {
+        type: new Schema({ items: [{ name: { type: String, enum: ['a', 'b'] } }] }),
+        validate: () => false
+      }
+    }));
+
+    const err = await Test.updateOne(
+      {},
+      { $set: { nested: { items: [{ name: 'invalid' }] } } },
+      { runValidators: true }
+    ).then(() => null, err => err);
+    const docErr = await new Test({ nested: { items: [{ name: 'invalid' }] } }).validate().then(() => null, err => err);
+
+    assert.ok(err);
+    assert.equal(err.name, 'ValidationError');
+    // `nested` failing stops validation before the subdoc validates its own paths,
+    // so `nested.items.0.name` is not reported, same as with `doc.validate()`
+    assert.deepStrictEqual(Object.keys(err.errors), ['nested']);
+    assert.deepStrictEqual(Object.keys(err.errors), Object.keys(docErr.errors));
+  });
+
   it('applies allowNull validators with updateOne and runValidators', async function() {
     const schema = new Schema({
       name: { type: String, allowNull: false }

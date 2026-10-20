@@ -1,3 +1,11 @@
+8.24.6 / 2026-10-20
+===================
+ * fix(array): compare dates by value in indexOf() so pull() removes them #16590 #16535 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix: preserve circular arrays when cloning with a seen map #16598 #16514 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix(cast): reject arrays when casting to Int32 or Double #16597 #16446 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix(query): avoid path collision when excluding subdocument with select: false child #16604 #16409 #12798 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix(query): pass schema through when casting a nested \ comparison #16605 #16496 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+
 8.24.5 / 2026-10-04
 ===================
  * fix: handle MongoDB server 9.x returning collation: { locale: 'simple' } on all indexes #16557

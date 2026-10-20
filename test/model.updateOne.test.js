@@ -2777,6 +2777,88 @@ describe('model: updateOne: ', function() {
   });
 
   describe('bulkWrite overwriteImmutable option (gh-15781)', function() {
+    describe('matched upserts', function() {
+      for (const operation of ['updateOne', 'updateMany']) {
+        for (const useSet of [false, true]) {
+          for (const timestamps of [false, true]) {
+            it(`${operation} overwrites immutable fields with ${useSet ? '$set' : 'plain updates'} and timestamps: ${timestamps}`, async function() {
+              // Arrange
+              const { User } = createTestContext();
+              const originalCreatedAt = new Date('2020-01-01');
+              const user = await User.create({ name: 'John', ssn: '123-45-6789', createdAt: originalCreatedAt });
+              const createdAt = new Date('2021-01-01');
+              const values = { name: 'Updated John', ssn: '999-99-9999', createdAt };
+
+              // Act
+              const result = await User.bulkWrite([{
+                [operation]: {
+                  filter: { _id: user._id },
+                  update: useSet ? { $set: values } : values,
+                  upsert: true,
+                  overwriteImmutable: true,
+                  timestamps
+                }
+              }]);
+
+              // Assert
+              assert.strictEqual(result.matchedCount, 1);
+              assert.strictEqual(result.upsertedCount, 0);
+              const stored = await User.findById(user._id).lean();
+              assert.strictEqual(stored.name, 'Updated John');
+              assert.strictEqual(stored.ssn, '999-99-9999');
+              assert.strictEqual(stored.createdAt.valueOf(), createdAt.valueOf());
+            });
+          }
+        }
+      }
+
+      for (const overwriteImmutable of [false, undefined]) {
+        it(`preserves immutable fields with overwriteImmutable: ${overwriteImmutable}`, async function() {
+          // Arrange
+          const { User } = createTestContext();
+          const createdAt = new Date('2020-01-01');
+          const user = await User.create({ name: 'John', ssn: '123-45-6789', createdAt });
+
+          // Act
+          await User.bulkWrite([{
+            updateOne: {
+              filter: { _id: user._id },
+              update: { $set: { name: 'Updated John', ssn: '999-99-9999', createdAt: new Date('2021-01-01') } },
+              upsert: true,
+              overwriteImmutable
+            }
+          }]);
+
+          // Assert
+          const stored = await User.findById(user._id).lean();
+          assert.strictEqual(stored.name, 'Updated John');
+          assert.strictEqual(stored.ssn, '123-45-6789');
+          assert.strictEqual(stored.createdAt.valueOf(), createdAt.valueOf());
+        });
+      }
+
+      it('honors overwriteImmutable in direct updateOne upserts', async function() {
+        // Arrange
+        const { User } = createTestContext();
+        const user = await User.create({ name: 'John', ssn: '123-45-6789' });
+        const createdAt = new Date('2021-01-01');
+
+        // Act
+        const result = await User.updateOne(
+          { _id: user._id },
+          { $set: { ssn: '999-99-9999', createdAt } },
+          { upsert: true, overwriteImmutable: true }
+        );
+
+        // Assert
+        assert.strictEqual(result.matchedCount, 1);
+        assert.strictEqual(result.upsertedCount, 0);
+        const stored = await User.findById(user._id).lean();
+        assert.strictEqual(stored.ssn, '999-99-9999');
+        assert.strictEqual(stored.createdAt.valueOf(), createdAt.valueOf());
+      });
+    });
+
     it('updateOne can update immutable field with overwriteImmutable: true', async function() {
       // Arrange
       const { User } = createTestContext();

@@ -22,11 +22,13 @@ declare module 'mongoose' {
   type PickNestedProjectedPaths<T, Keys> = IfAny<
     T,
     T,
-    T extends Array<infer Item>
-      ? PickNestedProjectedPaths<Item, Keys>[]
-      : T extends AnyObject
-        ? Extract<ProjectionRoot<Keys>, keyof T> extends never ? T : PickProjectedPaths<T, Keys>
-        : T
+    T extends Types.DocumentArray<any, any>
+      ? T
+      : T extends Array<infer Item>
+        ? PickNestedProjectedPaths<Item, Keys>[]
+        : T extends AnyObject
+          ? Extract<ProjectionRoot<Keys>, keyof T> extends never ? T : PickProjectedPaths<T, Keys>
+          : T
   >;
   type OmitProjectedPaths<T, Keys> = IfAny<
     T,
@@ -40,11 +42,13 @@ declare module 'mongoose' {
   type OmitNestedProjectedPaths<T, Keys> = IfAny<
     T,
     T,
-    T extends Array<infer Item>
-      ? OmitNestedProjectedPaths<Item, Keys>[]
-      : T extends AnyObject
-        ? Extract<ProjectionRoot<Keys>, keyof T> extends never ? T : OmitProjectedPaths<T, Keys>
-        : T
+    T extends Types.DocumentArray<any, any>
+      ? T
+      : T extends Array<infer Item>
+        ? OmitNestedProjectedPaths<Item, Keys>[]
+        : T extends AnyObject
+          ? Extract<ProjectionRoot<Keys>, keyof T> extends never ? T : OmitProjectedPaths<T, Keys>
+          : T
   >;
   type DefiningProjectionKeys<Projection> = {
     [Key in keyof Projection]-?: Key extends string

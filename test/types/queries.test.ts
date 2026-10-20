@@ -1143,3 +1143,17 @@ async function gh16062() {
   expect(Test.findOne).type.not.toBeCallableWith({ runtime: { $wrong: 100 } });
   expect(Test.findOne).type.not.toBeCallableWith({ $and: [{ runtime: { $wrong: 100 } }] });
 }
+
+async function nestedProjectionOnArraysAndSubdocs() {
+  const NestedProjectionModel = model('NestedProjection', new Schema({
+    arr: [{ a: String, b: Number }],
+    sub: new Schema({ a: String, b: Number })
+  }));
+
+  const projectedArr = await NestedProjectionModel.findOne({}, { 'arr.a': 1 }).orFail();
+  expect(projectedArr.arr[0]).type.toHaveProperty('a');
+  expect(projectedArr.arr[0]).type.toHaveProperty('ownerDocument');
+
+  const projectedSub = await NestedProjectionModel.findOne({}, { 'sub.a': 1 }).orFail();
+  expect(projectedSub.sub!).type.toHaveProperty('a');
+}

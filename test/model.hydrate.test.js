@@ -66,6 +66,23 @@ describe('model', function() {
       assert.equal(hydrated.isModified('title'), false);
     });
 
+    it('runs init middleware on array subdocuments', function() {
+      const calls = [];
+      const childSchema = new Schema({ name: String });
+      childSchema.pre('init', function(raw) {
+        calls.push(`pre: ${raw.name}`);
+      });
+      childSchema.post('init', function() {
+        calls.push(`post: ${this.name}`);
+      });
+
+      const Model = db.model('InitArraySubdocument', new Schema({ children: [childSchema] }));
+      const doc = Model.hydrate({ children: [{ name: 'child' }] });
+
+      assert.equal(doc.children[0].name, 'child');
+      assert.deepStrictEqual(calls, ['pre: child', 'post: child']);
+    });
+
     it('runs validators', async function() {
       const hydrated = Breakfast.hydrate({
         _id: '000000000000000000000001',

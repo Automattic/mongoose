@@ -556,7 +556,7 @@ Even if the error handling middleware succeeds, the function call will still err
 ## Aggregation Hooks {#aggregate}
 
 You can also define hooks for the [`Model.aggregate()` function](api/model.html#model_Model-aggregate).
-In aggregation middleware functions, `this` refers to the [Mongoose `Aggregate` object](api/aggregate.html#Aggregate).
+In aggregation middleware functions, `this` refers to the [Mongoose `Aggregate` object](api/aggregate.html#Aggregate()).
 For example, suppose you're implementing soft deletes on a `Customer` model
 by adding an `isDeleted` property. To make sure `aggregate()` calls only look
 at customers that aren't soft deleted, you can use the below middleware to

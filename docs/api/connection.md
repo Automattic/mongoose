@@ -644,7 +644,7 @@ reuse it.
 
 - \<Promise<ClientSession>\> promise that resolves to a MongoDB driver `ClientSession`
 
-_Requires MongoDB >= 3.6.0._ Starts a [MongoDB session](https://www.mongodb.com/docs/manual/release-notes/3.6/#client-sessions)
+Starts a [MongoDB session](https://www.mongodb.com/docs/manual/reference/server-sessions/)
 for benefits like causal consistency, [retryable writes](https://www.mongodb.com/docs/manual/core/retryable-writes/),
 and [transactions](https://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html).
 
@@ -683,7 +683,7 @@ Syncs all the indexes for the models registered with this connection.
 
 - \<Promise<any>\> promise that is fulfilled if Mongoose successfully committed the transaction, or rejects if the transaction was aborted or if Mongoose failed to commit the transaction. If fulfilled, the promise resolves to a MongoDB command result.
 
-_Requires MongoDB >= 3.6.0._ Executes the wrapped async function
+Executes the wrapped async function
 in a transaction. Mongoose will commit the transaction if the
 async function executes successfully and attempt to retry if
 there was a retriable error.

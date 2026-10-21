@@ -93,7 +93,6 @@ instantiate this class directly, use [Model.aggregate()](https://mongoosejs.com/
 - [$addFields](https://www.mongodb.com/docs/manual/reference/operator/aggregation/addFields/)
 
 Appends a new $addFields operator to this aggregate pipeline.
-Requires MongoDB v3.4+ to work
 
 #### Example:
 

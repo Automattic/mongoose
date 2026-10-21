@@ -198,9 +198,6 @@ Sets the [`allowDiskUse` option](https://www.mongodb.com/docs/manual/reference/m
 which allows the MongoDB server to use more than 100 MB for this query's `sort()`. This option can
 let you work around `QueryExceededMemoryLimitNoDiskUseAllowed` errors from the MongoDB server.
 
-Note that this option requires MongoDB server >= 4.4. Setting this option is a no-op for MongoDB 4.2
-and earlier.
-
 Calling `query.allowDiskUse(v)` is equivalent to `query.setOptions({ allowDiskUse: v })`
 
 #### Example:
@@ -407,7 +404,7 @@ Make a copy of this query so you can re-execute it.
 
 - [MongoDB docs](https://www.mongodb.com/docs/manual/reference/method/cursor.collation/#cursor.collation)
 
-Adds a collation to this op (MongoDB 3.4 and up)
+Adds a collation to this op.
 
 ## `Query.prototype.comment()`
 
@@ -1030,7 +1027,7 @@ This function triggers the following middleware.
 #### Available options
 
 - `sort`: if multiple docs are found by the conditions, sets the sort order to choose which doc to update
-- `maxTimeMS`: puts a time limit on the query - requires mongodb >= 2.6.0
+- `maxTimeMS`: puts a time limit on the query
 - `requireFilter`: bool - if true, throws an error if the filter is empty (`{}`). Defaults to false.
 
 #### Example:
@@ -1075,7 +1072,7 @@ This function triggers the following middleware.
 #### Available options
 
 - `sort`: if multiple docs are found by the conditions, sets the sort order to choose which doc to update
-- `maxTimeMS`: puts a time limit on the query - requires mongodb >= 2.6.0
+- `maxTimeMS`: puts a time limit on the query
 - `includeResultMetadata`: if true, returns the full [ModifyResult from the MongoDB driver](https://mongodb.github.io/node-mongodb-native/7.0/interfaces/ModifyResult.html) rather than just the document
 - `requireFilter`: bool - if true, throws an error if the filter is empty (`{}`). Defaults to false.
 
@@ -1133,7 +1130,7 @@ This function triggers the following middleware.
 - `upsert`: bool - creates the object if it doesn't exist. defaults to false.
 - `fields`: {Object|String} - Field selection. Equivalent to `.select(fields).findOneAndUpdate()`
 - `sort`: if multiple docs are found by the filter, sets the sort order to choose which doc to update
-- `maxTimeMS`: puts a time limit on the query - requires mongodb >= 2.6.0
+- `maxTimeMS`: puts a time limit on the query
 - `runValidators`: if true, runs [update validators](https://mongoosejs.com/docs/validation.html#update-validators) on this command. Update validators validate the update operation against the model's schema.
 - `setDefaultsOnInsert`: `true` by default. If `setDefaultsOnInsert` and `upsert` are true, mongoose will apply the [defaults](https://mongoosejs.com/docs/defaults.html) specified in the model's schema if a new document is created.
 - `requireFilter`: bool - if true, throws an error if the filter is empty (`{}`). Defaults to false.
@@ -1159,7 +1156,6 @@ This function triggers the following middleware.
 ### See
 
 - [$geometry](https://www.mongodb.com/docs/manual/reference/operator/geometry/)
-- [Geospatial Support Enhancements](https://www.mongodb.com/docs/manual/release-notes/2.4/#geospatial-support-enhancements)
 - [MongoDB Geospatial Indexing](https://www.mongodb.com/docs/manual/core/geospatial-indexes/)
 
 Specifies a `$geometry` condition
@@ -2075,11 +2071,11 @@ Sets the readConcern option for the query.
 #### Read Concern Level:
 
 ```
-local         MongoDB 3.2+ The query returns from the instance with no guarantee guarantee that the data has been written to a majority of the replica set members (i.e. may be rolled back).
-available     MongoDB 3.6+ The query returns from the instance with no guarantee guarantee that the data has been written to a majority of the replica set members (i.e. may be rolled back).
-majority      MongoDB 3.2+ The query returns the data that has been acknowledged by a majority of the replica set members. The documents returned by the read operation are durable, even in the event of failure.
-linearizable  MongoDB 3.4+ The query returns data that reflects all successful majority-acknowledged writes that completed prior to the start of the read operation. The query may wait for concurrently executing writes to propagate to a majority of replica set members before returning results.
-snapshot      MongoDB 4.0+ Only available for operations within multi-document transactions. Upon transaction commit with write concern "majority", the transaction operations are guaranteed to have read from a snapshot of majority-committed data.
+local         The query returns from the instance with no guarantee that the data has been written to a majority of the replica set members (i.e. may be rolled back).
+available     The query returns from the instance with no guarantee that the data has been written to a majority of the replica set members (i.e. may be rolled back).
+majority      The query returns the data that has been acknowledged by a majority of the replica set members. The documents returned by the read operation are durable, even in the event of failure.
+linearizable  The query returns data that reflects all successful majority-acknowledged writes that completed prior to the start of the read operation. The query may wait for concurrently executing writes to propagate to a majority of replica set members before returning results.
+snapshot      Only available for operations within multi-document transactions. Upon transaction commit with write concern "majority", the transaction operations are guaranteed to have read from a snapshot of majority-committed data.
 ```
 
 Aliases
@@ -3030,8 +3026,6 @@ Flag to opt out of using `$geoWithin`.
 ```javascript
 mongoose.Query.use$geoWithin = false;
 ```
-
-MongoDB 2.4 deprecated the use of `$within`, replacing it with `$geoWithin`. Mongoose uses `$geoWithin` by default (which is 100% backward compatible with `$within`). If you are running an older version of MongoDB, set this flag to `false` so your `within()` queries continue to work.
 
 ## `canMerge()`
 

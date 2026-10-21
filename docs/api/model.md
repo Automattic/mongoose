@@ -395,7 +395,7 @@ Cast the given POJO to the model's schema
 
 - `[options]` \<object\>
 - `[options.toDrop]` \<Array[string]\> if specified, contains a list of index names to drop
-- `[options.hideIndexes=false]` \<boolean\> set to `true` to hide indexes instead of dropping. Requires MongoDB server 4.4 or higher
+- `[options.hideIndexes=false]` \<boolean\> set to `true` to hide indexes instead of dropping
 
 ### Returns
 
@@ -1048,7 +1048,7 @@ an arbitrary document. If you're querying by `_id`, use `findById()` instead.
 - `[options.includeResultMetadata]` \<boolean\> if true, returns the full [ModifyResult from the MongoDB driver](https://mongodb.github.io/node-mongodb-native/7.0/interfaces/ModifyResult.html) rather than just the document
 - `[options.sort]` \<object|string\> if multiple docs are found by the conditions, sets the sort order to choose which doc to update.
 - `[options.select]` \<object|string\> sets the document fields to return.
-- `[options.maxTimeMS]` \<number\> puts a time limit on the query - requires mongodb >= 2.6.0
+- `[options.maxTimeMS]` \<number\> puts a time limit on the query
 - `[options.translateAliases=null]` \<boolean\> If set to `true`, translates any schema-defined aliases in `filter`, `projection`, `update`, and `distinct`. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.
 
 ### Returns
@@ -1095,7 +1095,7 @@ retrieving the document.
 - `[options.sort]` \<object|string\> if multiple docs are found by the conditions, sets the sort order to choose which doc to update.
 - `[options.includeResultMetadata]` \<boolean\> if true, returns the full [ModifyResult from the MongoDB driver](https://mongodb.github.io/node-mongodb-native/7.0/interfaces/ModifyResult.html) rather than just the document
 - `[options.select]` \<object|string\> sets the document fields to return.
-- `[options.maxTimeMS]` \<number\> puts a time limit on the query - requires mongodb >= 2.6.0
+- `[options.maxTimeMS]` \<number\> puts a time limit on the query
 - `[options.translateAliases=null]` \<boolean\> If set to `true`, translates any schema-defined aliases in `filter`, `projection`, `update`, and `distinct`. Throws an error if there are any conflicts where both alias and raw property are defined on the same object.
 
 ### Returns
@@ -1132,7 +1132,7 @@ This function triggers the following query middleware.
 - `[options.projection=null]` \<object|string|Array[string]\> optional fields to return, see [`Query.prototype.select()`](https://mongoosejs.com/docs/api/query.md#Query.prototype.select())
 - `[options.new=false]` \<boolean\> if true, return the modified document rather than the original
 - `[options.fields]` \<object|string\> Field selection. Equivalent to `.select(fields).findOneAndUpdate()`
-- `[options.maxTimeMS]` \<number\> puts a time limit on the query - requires mongodb >= 2.6.0
+- `[options.maxTimeMS]` \<number\> puts a time limit on the query
 - `[options.sort]` \<object|string\> if multiple docs are found by the conditions, sets the sort order to choose which doc to update.
 - `[options.runValidators]` \<boolean\> if true, runs [update validators](https://mongoosejs.com/docs/validation.html#update-validators) on this command. Update validators validate the update operation against the model's schema
 - `[options.setDefaultsOnInsert=true]` \<boolean\> If `setDefaultsOnInsert` and `upsert` are true, mongoose will apply the [defaults](https://mongoosejs.com/docs/defaults.html) specified in the model's schema if a new document is created
@@ -1698,7 +1698,7 @@ Schema the model uses.
 
 - \<Promise<ClientSession>\> promise that resolves to a MongoDB driver `ClientSession`
 
-_Requires MongoDB >= 3.6.0._ Starts a [MongoDB session](https://www.mongodb.com/docs/manual/release-notes/3.6/#client-sessions)
+Starts a [MongoDB session](https://www.mongodb.com/docs/manual/reference/server-sessions/)
 for benefits like causal consistency, [retryable writes](https://www.mongodb.com/docs/manual/core/retryable-writes/),
 and [transactions](https://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html).
 
@@ -1722,7 +1722,7 @@ This function does not trigger any middleware.
 ### Parameters
 
 - `[options]` \<object\> options to pass to `ensureIndexes()`
-- `[options.hideIndexes=false]` \<boolean\> set to `true` to hide indexes instead of dropping. Requires MongoDB server 4.4 or higher
+- `[options.hideIndexes=false]` \<boolean\> set to `true` to hide indexes instead of dropping
 
 ### Returns
 
@@ -1980,8 +1980,7 @@ schema-specified type. Remove any paths you do not want to cast.
 
 - \<ChangeStream\> mongoose-specific change stream wrapper, inherits from EventEmitter
 
-_Requires a replica set running MongoDB >= 3.6.0._ Watches the
-underlying collection for changes using
+Watches the underlying collection for changes using
 [MongoDB change streams](https://www.mongodb.com/docs/manual/changeStreams/).
 
 This function does **not** trigger any middleware. In particular, it

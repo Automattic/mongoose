@@ -5189,10 +5189,10 @@ describe('Query', function() {
     });
   });
 
-  describe('lean virtuals', function() {
-    it('applies top-level virtuals before query transforms', async function() {
+  describe('lean virtuals', function () {
+    it('applies top-level virtuals before query transforms', async function () {
       const schema = new Schema({ name: String });
-      schema.virtual('lower').get(function() {
+      schema.virtual('lower').get(function () {
         return this.name.toLowerCase();
       });
       const Model = db.model('Test', schema);
@@ -5212,9 +5212,9 @@ describe('Query', function() {
       assert.deepStrictEqual(docs, { JANE: 'jane', JOHN: 'john' });
     });
 
-    it('supports lean subdocument virtuals accessing their parent', async function() {
+    it('supports lean subdocument virtuals accessing their parent', async function () {
       const childSchema = new Schema({ firstName: String });
-      childSchema.virtual('fullName').get(function() {
+      childSchema.virtual('fullName').get(function () {
         const parent = this instanceof mongoose.Document ? this.parent() : mongoose.parent(this);
         return `${this.firstName} ${parent.lastName}`;
       });
@@ -5239,16 +5239,16 @@ describe('Query', function() {
       assert.strictEqual(doc.children[1], null);
     });
 
-    it('supports selecting a subset of lean virtuals', async function() {
+    it('supports selecting a subset of lean virtuals', async function () {
       const schema = new Schema({
         nested: {
           name: String
         }
       });
-      schema.virtual('topLevel').get(function() {
+      schema.virtual('topLevel').get(function () {
         return this.nested.name.toUpperCase();
       });
-      schema.virtual('nested.lower').get(function() {
+      schema.virtual('nested.lower').get(function () {
         return this.nested.name.toLowerCase();
       });
       const Model = db.model('Test', schema);
@@ -5261,7 +5261,7 @@ describe('Query', function() {
       assert.strictEqual(doc.nested.lower, 'bill');
     });
 
-    it('matches toObject() for unpopulated virtuals', async function() {
+    it('matches toObject() for unpopulated virtuals', async function () {
       const schema = new Schema({
         friendId: Schema.Types.ObjectId
       });
@@ -5279,6 +5279,59 @@ describe('Query', function() {
 
       assert.strictEqual(hydrated.toObject({ virtuals: true }).friend, undefined);
       assert.strictEqual(lean.friend, undefined);
+    });
+  });
+
+  describe('schema-level select with nested schemas', function() {
+    it('applies select options from nested schemas', function() {
+      const childSchema = new Schema({ name: String, secret: { type: String, select: false } }, { _id: false });
+      const Test = db.model('Test', new Schema({ title: String, children: [childSchema] }));
+
+      const query = Test.find();
+      query._applyPaths();
+      assert.deepStrictEqual(query._fields, { 'children.secret': 0 });
+    });
+
+    it('projects in embedded discriminator keys added after the model is compiled', function() {
+      const eventSchema = new Schema({ message: String }, { discriminatorKey: 'kind', _id: false });
+      const Test = db.model('Test', new Schema({ name: String, events: [eventSchema] }));
+      let query = Test.find().select({ 'events.message': 1 });
+      query._applyPaths();
+      assert.deepStrictEqual(query._fields, { 'events.message': 1 });
+
+      Test.schema.path('events').discriminator('Clicked', new Schema({ element: String }, { _id: false }));
+
+      query = Test.find().select({ 'events.message': 1 });
+      query._applyPaths();
+      assert.deepStrictEqual(query._fields, { 'events.message': 1, 'events.kind': 1 });
+    });
+
+    it('projects in nested embedded discriminator keys added after the schema is created', function() {
+      const eventSchema = new Schema({ message: String }, { discriminatorKey: 'kind', _id: false });
+      const shapeSchema = new Schema({ name: String }, { discriminatorKey: 'kind', _id: false });
+      const testSchema = new Schema({
+        outer: new Schema({ events: [eventSchema], shape: shapeSchema }, { _id: false })
+      });
+      testSchema.path('outer').schema.path('events').discriminator('Clicked', new Schema({ element: String }, { _id: false }));
+      testSchema.path('outer').schema.path('shape').discriminator('Circle', new Schema({ radius: Number }, { _id: false }));
+
+      const Test = db.model('Test', testSchema);
+      let query = Test.find().select({ 'outer.events.message': 1, 'outer.shape.name': 1 });
+      query._applyPaths();
+      assert.deepStrictEqual(query._fields, {
+        'outer.events.message': 1,
+        'outer.shape.name': 1,
+        'outer.events.kind': 1,
+        'outer.shape.kind': 1
+      });
+
+      query = Test.find().select({ 'outer.events.message': 1 });
+      query._applyPaths();
+      assert.deepStrictEqual(query._fields, { 'outer.events.message': 1, 'outer.events.kind': 1 });
+
+      query = Test.find().select({ 'outer.shape.name': 1 });
+      query._applyPaths();
+      assert.deepStrictEqual(query._fields, { 'outer.shape.name': 1, 'outer.shape.kind': 1 });
     });
   });
 });

@@ -382,4 +382,25 @@ describe('Union', function() {
 
     assert.ok(overlappingValidate({ _id: '0'.repeat(24), test: 42 }));
   });
+
+  it('clears array atomics on union paths after save', async function() {
+    const schema = new Schema({
+      test: {
+        type: 'Union',
+        of: [[String], Number]
+      }
+    });
+    const TestModel = db.model('Test', schema);
+
+    const doc = await TestModel.create({ test: ['a'] });
+    doc.test.push('b');
+    await doc.save();
+
+    doc.test.push('c');
+    assert.deepStrictEqual(doc.$__delta()[1].$push, { test: { $each: ['c'] } });
+    await doc.save();
+
+    const fromDb = await TestModel.collection.findOne({ _id: doc._id });
+    assert.deepStrictEqual(fromDb.test, ['a', 'b', 'c']);
+  });
 });

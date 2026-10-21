@@ -1,6 +1,8 @@
 # Indexes
 
-Indexes are important for keeping queries fast as your data grows.
+Indexes are critical for keeping queries fast as your data grows.
+With only a few hundred documents in your local database, every query is fast, with or without indexes.
+With 100 million documents in a collection, a query that has to scan the entire collection can take seconds or minutes, and slow down other queries by tying up CPU and memory.
 This guide explains what indexes are, when you should and should not add them, how to define indexes in Mongoose, and how to manage and inspect indexes in production.
 
 ## What is an Index?

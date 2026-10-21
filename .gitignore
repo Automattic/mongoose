@@ -48,6 +48,7 @@ package-lock.json
 docs/*.html
 docs/tutorials/*.html
 docs/typescript/*.html
+docs/production/*.html
 docs/api/*.html
 docs/api/*.md
 docs/vendor/

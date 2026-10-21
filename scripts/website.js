@@ -132,6 +132,7 @@ function deleteAllHtmlFiles() {
     path.join('.', versionObj.versionedPath, 'docs'),
     path.join('.', versionObj.versionedPath, 'docs', 'tutorials'),
     path.join('.', versionObj.versionedPath, 'docs', 'typescript'),
+    path.join('.', versionObj.versionedPath, 'docs', 'production'),
     path.join('.', versionObj.versionedPath, 'docs', 'api'),
     path.join('.', versionObj.versionedPath, 'docs', 'source', '_docs'),
     './tmp'

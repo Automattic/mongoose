@@ -1,3 +1,10 @@
+9.11.3 / 2026-10-21
+===================
+ * fix(update): honor overwriteImmutable in upserts and nested timestamps #16614 #15781 #8619 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(model): stop Model.validate() crashing on missing nested objects #16600 [NotAFlightRisk](https://github.com/NotAFlightRisk)
+ * fix(connection): don't disable autoIndex/autoCreate for a primary ReadPreference instance #16592 [NgoQuocViet2001](https://github.com/NgoQuocViet2001)
+ * docs: remove references to MongoDB versions older than 6.x #16593
+
 8.24.6 / 2026-10-20
 ===================
  * fix(array): compare dates by value in indexOf() so pull() removes them #16590 #16535 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)

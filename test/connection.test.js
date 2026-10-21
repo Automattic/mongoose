@@ -1945,6 +1945,35 @@ describe('connections:', function() {
     assert.ok(res.mongoose.results[1].message.includes('not a number'));
   });
 
+  it('connection bulkWrite() throws validation errors when all unordered operations are invalid', async function() {
+    const db = await start().asPromise();
+
+    try {
+      const Test = db.model('Test', new Schema({ name: { type: String, required: true }, num: Number }));
+
+      await assert.rejects(
+        () => db.bulkWrite([
+          { model: Test, name: 'insertOne', document: { num: 42 } },
+          { model: Test, name: 'updateOne', filter: {}, update: { $set: { num: 'not a number' } } }
+        ], { ordered: false, throwOnValidationError: true }),
+        err => {
+          assert.equal(err.name, 'MongooseBulkWriteError');
+          assert.equal(err.operation, 'bulkWrite');
+          assert.strictEqual(err.rawResult, null);
+          assert.equal(err.validationErrors.length, 2);
+          assert.ok(err.validationErrors[0] instanceof mongoose.Error.ValidationError);
+          assert.equal(err.validationErrors[0].errors.name.kind, 'required');
+          assert.ok(err.validationErrors[1] instanceof CastError);
+          assert.equal(err.validationErrors[1].path, 'num');
+          assert.deepStrictEqual(err.results, err.validationErrors);
+          return true;
+        }
+      );
+    } finally {
+      await db.close();
+    }
+  });
+
   it('connection bulkWrite() casts array filters', async function() {
     const db = start();
 
@@ -1976,6 +2005,64 @@ describe('connections:', function() {
     assert.equal(res.modifiedCount, 2);
     const fromDb = await Test.findById(doc._id).lean();
     assert.deepStrictEqual(fromDb.items.map(item => item.qty), [10, 20]);
+  });
+
+  it('connection bulkWrite() unordered throws write errors (gh-16601)', async function() {
+    const db = start();
+
+    const version = await start.mongodVersion();
+    if (version[0] < 8) {
+      this.skip();
+      return;
+    }
+    const Test = db.model('Test', new Schema({ _id: Number, name: String }));
+
+    await Test.deleteMany({});
+    await Test.create({ _id: 1, name: 'existing' });
+    await assert.rejects(
+      () => db.bulkWrite([
+        { model: Test, name: 'insertOne', document: { _id: 2, name: 'new' } },
+        { model: Test, name: 'insertOne', document: { _id: 1, name: 'duplicate' } }
+      ], { ordered: false }),
+      err => {
+        assert.equal(err.name, 'MongoClientBulkWriteError');
+        assert.equal(err.writeErrors.get(1).code, 11000);
+        return true;
+      }
+    );
+    assert.ok(await Test.exists({ _id: 2 }));
+  });
+
+  it('connection bulkWrite() unordered puts write errors and validation errors in error.mongoose.results (gh-16601)', async function() {
+    const db = start();
+
+    const version = await start.mongodVersion();
+    if (version[0] < 8) {
+      this.skip();
+      return;
+    }
+    const Test = db.model('Test', new Schema({ _id: Number, name: String }));
+
+    await Test.deleteMany({});
+    await Test.create({ _id: 1, name: 'existing' });
+    await assert.rejects(
+      () => db.bulkWrite([
+        { model: Test, name: 'insertOne', document: { _id: 'not a number' } },
+        { model: Test, name: 'insertOne', document: { _id: 1, name: 'duplicate' } },
+        { model: Test, name: 'insertOne', document: { _id: 3, name: 'new' } }
+      ], { ordered: false }),
+      err => {
+        assert.equal(err.name, 'MongoClientBulkWriteError');
+        assert.equal(err.mongoose.validationErrors.length, 1);
+        assert.ok(err.mongoose.validationErrors[0].message.includes('not a number'));
+        assert.equal(err.mongoose.results.length, 3);
+        assert.strictEqual(err.mongoose.results[0], err.mongoose.validationErrors[0]);
+        assert.equal(err.mongoose.results[1].code, 11000);
+        assert.strictEqual(err.mongoose.results[2], null);
+        return true;
+      }
+    );
+    assert.ok(await Test.exists({ _id: 3 }));
   });
 
   it('buffers connection helpers', async function() {

@@ -1,3 +1,18 @@
+9.11.3 / 2026-10-21
+===================
+ * fix(update): honor overwriteImmutable in upserts and nested timestamps #16614 #15781 #8619 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)
+ * fix(model): stop Model.validate() crashing on missing nested objects #16600 [NotAFlightRisk](https://github.com/NotAFlightRisk)
+ * fix(connection): don't disable autoIndex/autoCreate for a primary ReadPreference instance #16592 [NgoQuocViet2001](https://github.com/NgoQuocViet2001)
+ * docs: remove references to MongoDB versions older than 6.x #16593
+
+8.24.6 / 2026-10-20
+===================
+ * fix(array): compare dates by value in indexOf() so pull() removes them #16590 #16535 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix: preserve circular arrays when cloning with a seen map #16598 #16514 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix(cast): reject arrays when casting to Int32 or Double #16597 #16446 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix(query): avoid path collision when excluding subdocument with select: false child #16604 #16409 #12798 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix(query): pass schema through when casting a nested \ comparison #16605 #16496 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+
 9.11.2 / 2026-10-12
 ===================
  * perf: avoid applying saveSubdocs and sharding plugins to subdocuments #16585
@@ -28,6 +43,11 @@
  * types: pass TLeanResultType into query for type narrowing support with lean() #16523 #16519
  * docs(guide): use async/await instead of removed callbacks #16566 [joi-agent](https://github.com/joi-agent)
  * test: run TypeScript tests on typescript 5+7 with combinations of exactOptionalPropertyTypes, skipLibCheck, strict #16510 #16506
+
+8.24.5 / 2026-10-04
+===================
+ * fix: handle MongoDB server 9.x returning collation: { locale: 'simple' } on all indexes #16557
+ * fix(documentarray): reindex subdocs after addToSet() skips a duplicate #16507 [giaBaoJS](https://github.com/giaBaoJS)
 
 9.10.4 / 2026-10-02
 ===================

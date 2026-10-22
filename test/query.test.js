@@ -2638,6 +2638,32 @@ describe('Query', function() {
     });
   });
 
+  describe('merging updates', function() {
+    it('does not modify inherited properties like toString (findOneAndReplace, chained updates)', function() {
+      const Test = db.model('Test', new Schema({ name: String }));
+
+      try {
+        const q1 = Test.findOneAndReplace({}, JSON.parse('{"toString":{"call":1,"polluted":"yes"}}'));
+        assert.strictEqual(typeof Object.prototype.toString.call, 'function');
+        assert.strictEqual(Object.prototype.toString.polluted, undefined);
+        assert.ok(!Object.hasOwn(q1.getUpdate(), 'toString'));
+
+        Test.updateOne({}, { name: 'test' }).updateOne({}, JSON.parse('{"valueOf":{"call":{"polluted":"yes"}}}'));
+        assert.strictEqual(Function.prototype.call.polluted, undefined);
+
+        const source = Test.updateOne({}, JSON.parse('{"toString":{"polluted":"yes"}}'));
+        Test.updateOne({}, { name: 'test' }).merge(source);
+        assert.strictEqual(Object.prototype.toString.polluted, undefined);
+      } finally {
+        // Clean up so a failure here doesn't break subsequent tests
+        for (const fn of [Object.prototype.toString, Object.prototype.valueOf, Function.prototype.call, Array.prototype.push]) {
+          delete fn.call;
+          delete fn.polluted;
+        }
+      }
+    });
+  });
+
   describe('setUpdate', function() {
     it('replaces existing update doc with new value', function() {
       const q = new Query({});

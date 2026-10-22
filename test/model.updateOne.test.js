@@ -2857,35 +2857,58 @@ describe('model: updateOne: ', function() {
       });
     }
 
-    for (const parent of ['meta', 'meta.audit']) {
-      it(`preserves an explicit null createdAt through ${parent} in an ordinary bulk update`, async function() {
-        // Arrange
-        const { User } = createTestContext({
-          timestamps: { createdAt: `${parent}.createdAt`, updatedAt: `${parent}.updatedAt` }
-        });
-        const originalDate = new Date('2020-01-01');
-        const { insertedId } = await User.collection.insertOne({
-          name: 'Alice',
-          meta: parent === 'meta' ? { createdAt: originalDate, updatedAt: originalDate } : { audit: { createdAt: originalDate, updatedAt: originalDate } }
-        });
-        const createdAt = null;
-
-        // Act
-        await User.bulkWrite([{
-          updateOne: {
-            filter: { _id: insertedId },
-            update: { $set: { [parent]: { createdAt } } },
-            overwriteImmutable: true
-          }
-        }]);
-
-        // Assert
-        const stored = await User.collection.findOne({ _id: insertedId });
-        const timestamps = parent === 'meta' ? stored.meta : stored.meta.audit;
-        assert.strictEqual(timestamps.createdAt, null);
-        assert.ok(timestamps.updatedAt > originalDate);
+    it('preserves an explicit nested null createdAt in an ordinary bulk update', async function() {
+      // Arrange
+      const { User } = createTestContext({
+        timestamps: { createdAt: 'meta.createdAt', updatedAt: 'meta.updatedAt' }
       });
-    }
+      const originalDate = new Date('2020-01-01');
+      const { insertedId } = await User.collection.insertOne({
+        name: 'Alice',
+        meta: { createdAt: originalDate, updatedAt: originalDate }
+      });
+      const createdAt = null;
+
+      // Act
+      await User.bulkWrite([{
+        updateOne: {
+          filter: { _id: insertedId },
+          update: { $set: { meta: { createdAt } } },
+          overwriteImmutable: true
+        }
+      }]);
+
+      // Assert
+      const stored = await User.findById(insertedId).lean();
+      assert.strictEqual(stored.meta.createdAt, null);
+      assert.ok(stored.meta.updatedAt > originalDate);
+    });
+
+    it('preserves an explicit null createdAt beneath a dotted parent in a bulk update', async function() {
+      // Arrange
+      const { User } = createTestContext({
+        timestamps: { createdAt: 'meta.audit.createdAt', updatedAt: 'meta.audit.updatedAt' }
+      });
+      const originalDate = new Date('2020-01-01');
+      const { insertedId } = await User.collection.insertOne({
+        name: 'Alice',
+        meta: { audit: { createdAt: originalDate, updatedAt: originalDate } }
+      });
+
+      // Act
+      await User.bulkWrite([{
+        updateOne: {
+          filter: { _id: insertedId },
+          update: { $set: { 'meta.audit': { createdAt: null } } },
+          overwriteImmutable: true
+        }
+      }]);
+
+      // Assert
+      const stored = await User.collection.findOne({ _id: insertedId });
+      assert.strictEqual(stored.meta.audit.createdAt, null);
+      assert.ok(stored.meta.audit.updatedAt > originalDate);
+    });
 
     it('updateOne can update immutable field with overwriteImmutable: true', async function() {
       // Arrange

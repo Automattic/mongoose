@@ -159,6 +159,16 @@ describe('Query', function() {
         query.where();
       });
     });
+    it('throws on special property paths to avoid prototype pollution', function() {
+      for (const path of ['__proto__', 'constructor', 'prototype']) {
+        const query = new Query({});
+        assert.throws(() => query.where(path).gt(1), /as a query path/);
+        assert.throws(() => query.where(path, { $gt: 1 }), /as a query path/);
+        assert.deepStrictEqual(query._conditions, {});
+      }
+      assert.strictEqual({}.$gt, undefined);
+      assert.strictEqual(Object.$gt, undefined);
+    });
   });
 
   describe('equals', function() {
@@ -332,6 +342,22 @@ describe('Query', function() {
       query.where('age').mod(5, 2);
       assert.deepEqual(query._conditions, { age: { $mod: [5, 2] } });
 
+    });
+    it('throws on special property paths to avoid prototype pollution', function() {
+      for (const path of ['__proto__', 'constructor', 'prototype', ['__proto__']]) {
+        const query = new Query({});
+        assert.throws(() => query.mod(path, [2, 1]), /as a query path/);
+        assert.throws(() => query.mod(path, 2, 1), /as a query path/);
+        assert.deepStrictEqual(Object.keys(query._conditions), []);
+      }
+      assert.strictEqual({}.$mod, undefined);
+      assert.strictEqual(Object.$mod, undefined);
+    });
+    it('does not reuse inherited properties like toString', function() {
+      const query = new Query({});
+      query.mod('toString', [2, 1]);
+      assert.deepStrictEqual(query._conditions.toString, { $mod: [2, 1] });
+      assert.strictEqual(Object.prototype.toString.$mod, undefined);
     });
   });
 

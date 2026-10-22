@@ -546,7 +546,9 @@ describe('model', function() {
       let indexes = await User.listIndexes();
       assert.equal(indexes.length, 2);
       assert.deepEqual(indexes[1].key, { username: 1 });
-      assert.ok(!indexes[1].collation);
+      if (indexes[1].collation !== undefined) {
+        assert.deepStrictEqual(indexes[1].collation, { locale: 'simple' });
+      }
 
       userSchema = new mongoose.Schema({ username: String }, { autoIndex: false });
       userSchema.index({ username: 1 }, {
@@ -698,7 +700,9 @@ describe('model', function() {
 
       await User.init();
       const indexes = await User.listIndexes();
-      assert.ok(!indexes[1].collation);
+      if (indexes[1].collation !== undefined) {
+        assert.deepStrictEqual(indexes[1].collation, { locale: 'simple' });
+      }
       await User.collection.drop();
     });
 

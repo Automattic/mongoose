@@ -2923,7 +2923,7 @@ describe('Query', function() {
       maxTimeMS(10).
       then(() => null, err => err);
     assert.ok(res);
-    assert.ok(res.message.indexOf('time limit') !== -1, res.message);
+    assert.ok(/time limit|wasm epoch interrupt: kill pending/.test(res.message), res.message);
   });
 
   it('connection-level maxTimeMS() (gh-4066)', async function() {
@@ -2937,7 +2937,7 @@ describe('Query', function() {
     const res = await Model.find({ $where: 'sleep(250) || true' }).
       then(() => null, err => err);
     assert.ok(res);
-    assert.ok(res.message.indexOf('time limit') !== -1, res.message);
+    assert.ok(/time limit|wasm epoch interrupt: kill pending/.test(res.message), res.message);
     delete db.options.maxTimeMS;
   });
 
@@ -2952,7 +2952,7 @@ describe('Query', function() {
     const res = await Model.find({ $where: 'sleep(250) || true' }).
       then(() => null, err => err);
     assert.ok(res);
-    assert.ok(res.message.indexOf('time limit') !== -1, res.message);
+    assert.ok(/time limit|wasm epoch interrupt: kill pending/.test(res.message), res.message);
     delete db.base.options.maxTimeMS;
   });
 

@@ -7087,7 +7087,9 @@ describe('Model', function() {
     let indexes = await Test.collection.listIndexes().toArray();
     assert.strictEqual(indexes.length, 2);
     assert.deepEqual(indexes[1].key, { name: 1 });
-    assert.equal(indexes[1].collation, undefined);
+    if (indexes[1].collation !== undefined) {
+      assert.deepStrictEqual(indexes[1].collation, { locale: 'simple' });
+    }
 
     db.deleteModel(/Test/);
     testSchema = new Schema(

@@ -3913,6 +3913,85 @@ describe('Query', function() {
     assert.ifError(q.error());
     assert.deepEqual(q._conditions, { username: 'val', pwd: { $gt: null } });
   });
+
+  it('applies the sanitizeFilter connection option to query operations', async function() {
+    const conn = await start({ sanitizeFilter: true }).asPromise();
+    try {
+      const Test = conn.model('SanitizeFilterConnection', new Schema({ username: String, pwd: String }));
+      await Test.create({ username: 'val', pwd: 'my secret' });
+      assert.strictEqual(conn.get('sanitizeFilter'), true);
+
+      const operations = {
+        find: filter => Test.find(filter),
+        findOne: filter => Test.findOne(filter).lean(),
+        count: filter => Test.count(filter),
+        countDocuments: filter => Test.countDocuments(filter),
+        distinct: filter => Test.distinct('username', filter),
+        updateOne: filter => Test.updateOne(filter, { pwd: 'changed' }),
+        updateMany: filter => Test.updateMany(filter, { pwd: 'changed' }),
+        replaceOne: filter => Test.replaceOne(filter, { username: 'changed' }),
+        findOneAndUpdate: filter => Test.findOneAndUpdate(filter, { pwd: 'changed' }),
+        findOneAndReplace: filter => Test.findOneAndReplace(filter, { username: 'changed' }),
+        findOneAndDelete: filter => Test.findOneAndDelete(filter),
+        findOneAndRemove: filter => Test.findOneAndRemove(filter),
+        deleteOne: filter => Test.deleteOne(filter),
+        deleteMany: filter => Test.deleteMany(filter),
+        remove: filter => Test.remove(filter),
+        cursor: filter => Test.find(filter).cursor().next()
+      };
+
+      for (const [name, operation] of Object.entries(operations)) {
+        for (const pwd of [{ $ne: null }, ['my secret']]) {
+          await assert.rejects(
+            async() => operation({ username: 'val', pwd }),
+            { name: 'CastError', path: 'pwd' },
+            name
+          );
+        }
+        await assert.rejects(
+          async() => operation({ $expr: { $eq: [1, 1] } }),
+          /\$expr is not allowed with sanitizeFilter/,
+          name
+        );
+      }
+
+      const doc = await Test.findOne({ username: 'val', pwd: mongoose.trusted({ $ne: null }) });
+      assert.strictEqual(doc.pwd, 'my secret');
+
+      // A useDb() connection inherits the connection's sanitization config.
+      const child = conn.useDb(conn.name);
+      const ChildTest = child.model('SanitizeFilterConnection', Test.schema);
+      await assert.rejects(ChildTest.findOne({ pwd: { $ne: null } }), { name: 'CastError' });
+
+      conn.set('sanitizeFilter', false);
+      assert.ok(await Test.findOne({ pwd: { $ne: null } }));
+      conn.set('sanitizeFilter', true);
+      await assert.rejects(
+        Test.findOne({ pwd: { $ne: null } }).setOptions({ sanitizeFilter: false }),
+        { name: 'CastError' }
+      );
+    } finally {
+      await conn.close();
+    }
+  });
+
+  it('sanitizeFilter respects an explicit false connection option over global and query options', async function() {
+    const m = new mongoose.Mongoose();
+    m.set('sanitizeFilter', true);
+    const conn = await m.createConnection(start.uri, { sanitizeFilter: false }).asPromise();
+    try {
+      const Test = conn.model('Test', new Schema({ name: String }));
+      for (const name of [{ $ne: null }, ['foobar']]) {
+        const q = Test.find({ name }).setOptions({ sanitizeFilter: true });
+        q._castConditions();
+        assert.ifError(q.error());
+        assert.deepEqual(q.getFilter(), { name: Array.isArray(name) ? { $in: name } : name });
+      }
+    } finally {
+      await conn.close();
+    }
+  });
+
   it('should not error when $not is used with $size (gh-10716)', async function() {
     const barSchema = Schema({
       bar: String

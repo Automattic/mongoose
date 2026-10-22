@@ -3095,6 +3095,19 @@ describe('schema', function() {
     assert.ok({}.toString());
   });
 
+  it('disallows setting special properties with `virtual()` or constructor options', function() {
+    const schema = new Schema({});
+    for (const name of ['__proto__.polluted', 'constructor.prototype.polluted', 'hasOwnProperty.__proto__.polluted']) {
+      assert.throws(() => schema.virtual(name), /Cannot set special property/);
+    }
+
+    const options = JSON.parse('{"virtuals":{"__proto__.polluted":{}}}');
+    assert.throws(() => new Schema({}, options), /Cannot set special property/);
+
+    assert.equal(Object.prototype.hasOwnProperty('polluted'), false);
+    assert.equal(Function.prototype.hasOwnProperty('polluted'), false);
+  });
+
   it('enable defining virtual paths by using schema constructor (gh-11908)', async function() {
     function get() {return this.email.slice(this.email.indexOf('@') + 1);}
     function set(v) { this.email = [this.email.slice(0, this.email.indexOf('@')), v].join('@');}

@@ -2827,32 +2827,35 @@ describe('model: updateOne: ', function() {
       });
     });
 
-    it('preserves a nested createdAt supplied through a parent object', async function() {
-      // Arrange
-      const { User } = createTestContext({
-        timestamps: { createdAt: 'meta.createdAt', updatedAt: 'meta.updatedAt' }
-      });
-      const originalDate = new Date('2020-01-01');
-      const { insertedId } = await User.collection.insertOne({
-        name: 'Alice',
-        meta: { createdAt: originalDate, updatedAt: originalDate }
-      });
-      const createdAt = new Date('2021-01-01');
+    for (const parent of ['meta', 'meta.audit']) {
+      it(`preserves a nested createdAt supplied through ${parent}`, async function() {
+        // Arrange
+        const { User } = createTestContext({
+          timestamps: { createdAt: `${parent}.createdAt`, updatedAt: `${parent}.updatedAt` }
+        });
+        const originalDate = new Date('2020-01-01');
+        const { insertedId } = await User.collection.insertOne({
+          name: 'Alice',
+          meta: parent === 'meta' ? { createdAt: originalDate, updatedAt: originalDate } : { audit: { createdAt: originalDate, updatedAt: originalDate } }
+        });
+        const createdAt = new Date('2021-01-01');
 
-      // Act
-      await User.bulkWrite([{
-        updateOne: {
-          filter: { _id: insertedId },
-          update: { $set: { meta: { createdAt } } },
-          overwriteImmutable: true
-        }
-      }]);
+        // Act
+        await User.bulkWrite([{
+          updateOne: {
+            filter: { _id: insertedId },
+            update: { $set: { [parent]: { createdAt } } },
+            overwriteImmutable: true
+          }
+        }]);
 
-      // Assert
-      const stored = await User.findById(insertedId).lean();
-      assert.strictEqual(stored.meta.createdAt.valueOf(), createdAt.valueOf());
-      assert.ok(stored.meta.updatedAt > originalDate);
-    });
+        // Assert
+        const stored = await User.collection.findOne({ _id: insertedId });
+        const timestamps = parent === 'meta' ? stored.meta : stored.meta.audit;
+        assert.strictEqual(timestamps.createdAt.valueOf(), createdAt.valueOf());
+        assert.ok(timestamps.updatedAt > originalDate);
+      });
+    }
 
     it('updateOne can update immutable field with overwriteImmutable: true', async function() {
       // Arrange

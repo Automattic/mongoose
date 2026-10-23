@@ -280,6 +280,28 @@ describe('utils', function() {
 
       assert.ok(to.val instanceof Date);
     });
+
+    it('does not merge into inherited properties like toString', function() {
+      const from = JSON.parse('{"toString":{"call":1,"polluted":"yes"},"valueOf":{"call":{"polluted":"yes"}}}');
+      const to = {};
+
+      try {
+        utils.mergeClone(to, from);
+
+        assert.strictEqual(typeof Object.prototype.toString.call, 'function');
+        assert.strictEqual(Object.prototype.toString.polluted, undefined);
+        assert.strictEqual(Function.prototype.call.polluted, undefined);
+        // Keys that would shadow inherited properties are ignored
+        assert.ok(!Object.hasOwn(to, 'toString'));
+        assert.ok(!Object.hasOwn(to, 'valueOf'));
+      } finally {
+      // Clean up so a failure here doesn't break subsequent tests
+        for (const fn of [Object.prototype.toString, Object.prototype.valueOf, Function.prototype.call, Array.prototype.push]) {
+          delete fn.call;
+          delete fn.polluted;
+        }
+      }
+    });
   });
   describe('errorToPOJO(...)', () => {
     it('converts an error to a POJO', () => {

@@ -169,6 +169,16 @@ describe('Query', function() {
       });
       done();
     });
+    it('throws on special property paths to avoid prototype pollution', function() {
+      for (const path of ['__proto__', 'constructor', 'prototype']) {
+        const query = new Query({});
+        assert.throws(() => query.where(path).gt(1), /as a query path/);
+        assert.throws(() => query.where(path, { $gt: 1 }), /as a query path/);
+        assert.deepStrictEqual(query._conditions, {});
+      }
+      assert.strictEqual({}.$gt, undefined);
+      assert.strictEqual(Object.$gt, undefined);
+    });
   });
 
   describe('equals', function() {
@@ -355,6 +365,22 @@ describe('Query', function() {
       query.where('age').mod(5, 2);
       assert.deepEqual(query._conditions, { age: { $mod: [5, 2] } });
       done();
+    });
+    it('throws on special property paths to avoid prototype pollution', function() {
+      for (const path of ['__proto__', 'constructor', 'prototype', ['__proto__']]) {
+        const query = new Query({});
+        assert.throws(() => query.mod(path, [2, 1]), /as a query path/);
+        assert.throws(() => query.mod(path, 2, 1), /as a query path/);
+        assert.deepStrictEqual(Object.keys(query._conditions), []);
+      }
+      assert.strictEqual({}.$mod, undefined);
+      assert.strictEqual(Object.$mod, undefined);
+    });
+    it('does not reuse inherited properties like toString', function() {
+      const query = new Query({});
+      query.mod('toString', [2, 1]);
+      assert.deepStrictEqual(query._conditions.toString, { $mod: [2, 1] });
+      assert.strictEqual(Object.prototype.toString.$mod, undefined);
     });
   });
 
@@ -3033,6 +3059,32 @@ describe('Query', function() {
 
       assert.deepEqual(query.getPopulatedPaths(),
         ['level1', 'level1.level2', 'level1.level2.level3']);
+    });
+  });
+
+  describe('merging updates', function() {
+    it('does not modify inherited properties like toString (findOneAndReplace, chained updates)', function() {
+      const Test = db.model('Test', new Schema({ name: String }));
+
+      try {
+        const q1 = Test.findOneAndReplace({}, JSON.parse('{"toString":{"call":1,"polluted":"yes"}}'));
+        assert.strictEqual(typeof Object.prototype.toString.call, 'function');
+        assert.strictEqual(Object.prototype.toString.polluted, undefined);
+        assert.ok(!Object.prototype.hasOwnProperty.call(q1.getUpdate(), 'toString'));
+
+        Test.updateOne({}, { name: 'test' }).updateOne({}, JSON.parse('{"valueOf":{"call":{"polluted":"yes"}}}'));
+        assert.strictEqual(Function.prototype.call.polluted, undefined);
+
+        const source = Test.updateOne({}, JSON.parse('{"toString":{"polluted":"yes"}}'));
+        Test.updateOne({}, { name: 'test' }).merge(source);
+        assert.strictEqual(Object.prototype.toString.polluted, undefined);
+      } finally {
+        // Clean up so a failure here doesn't break subsequent tests
+        for (const fn of [Object.prototype.toString, Object.prototype.valueOf, Function.prototype.call, Array.prototype.push]) {
+          delete fn.call;
+          delete fn.polluted;
+        }
+      }
     });
   });
 

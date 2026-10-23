@@ -46,4 +46,23 @@ describe('setDottedPath', function() {
       nonExistentField: 'I should not be present'
     });
   });
+  it('does not set values underneath inherited properties like toString', function() {
+    const obj = { nested: {} };
+
+    try {
+      setDottedPath(obj, 'toString.call', 1);
+      setDottedPath(obj, 'nested.valueOf.polluted', 'yes');
+
+      assert.strictEqual(typeof Object.prototype.toString.call, 'function');
+      assert.strictEqual(Object.prototype.valueOf.polluted, undefined);
+      assert.deepStrictEqual(obj, { nested: {} });
+
+      setDottedPath(obj, 'nested.a.b', 'test');
+      assert.deepStrictEqual(obj, { nested: { a: { b: 'test' } } });
+    } finally {
+      // Clean up so a failure here doesn't break subsequent tests
+      delete Object.prototype.toString.call;
+      delete Object.prototype.valueOf.polluted;
+    }
+  });
 });

@@ -12408,6 +12408,100 @@ describe('document', function() {
     assert.strictEqual(Object.prototype.polluted, undefined);
   });
 
+  it('avoids modifying inherited properties like toString on init', async function() {
+    const Example = db.model('Example', new Schema({ hello: String, nested: { name: String } }));
+
+    await Example.collection.insertOne({
+      hello: 'world!',
+      toString: { call: 1, polluted: 'yes' },
+      valueOf: { call: { polluted: 'yes' } },
+      nested: { name: 'test', toString: { polluted: 'yes' } }
+    });
+
+    try {
+      const doc = await Example.findOne();
+
+      assert.strictEqual(typeof Object.prototype.toString.call, 'function');
+      assert.strictEqual(Object.prototype.toString.polluted, undefined);
+      assert.strictEqual(Function.prototype.call.polluted, undefined);
+      // Fields that would shadow inherited functions are ignored
+      assert.strictEqual(doc.hello, 'world!');
+      assert.strictEqual(doc.nested.name, 'test');
+      assert.ok(!Object.prototype.hasOwnProperty.call(doc._doc, 'toString'));
+      assert.ok(!Object.prototype.hasOwnProperty.call(doc._doc, 'valueOf'));
+      assert.ok(!Object.prototype.hasOwnProperty.call(doc._doc.nested, 'toString'));
+
+      Example.hydrate({ hello: 'world!', toString: { polluted: 'yes' } });
+      assert.strictEqual(Object.prototype.toString.polluted, undefined);
+    } finally {
+      // Clean up so a failure here doesn't break subsequent tests
+      for (const fn of [Object.prototype.toString, Object.prototype.valueOf, Function.prototype.call]) {
+        delete fn.call;
+        delete fn.polluted;
+      }
+    }
+  });
+
+  it('avoids modifying inherited properties like toString when setting dotted paths', async function() {
+    const Strict = db.model('Test', new Schema({ name: String, mixed: {} }));
+    const Loose = db.model('Test2', new Schema({ name: String }, { strict: false }));
+
+    try {
+      const doc = new Strict(JSON.parse('{"mixed.toString.call":1,"mixed.valueOf.call.polluted":"yes"}'));
+      assert.strictEqual(typeof Object.prototype.toString.call, 'function');
+      assert.strictEqual(Function.prototype.call.polluted, undefined);
+      // Setting paths underneath inherited functions is a no-op
+      assert.ok(!Object.prototype.hasOwnProperty.call(doc.mixed, 'toString'));
+      assert.ok(!Object.prototype.hasOwnProperty.call(doc.mixed, 'valueOf'));
+
+      doc.set({ 'mixed.toString.polluted': 'yes' });
+      assert.strictEqual(Object.prototype.toString.polluted, undefined);
+      assert.ok(!Object.prototype.hasOwnProperty.call(doc.mixed, 'toString'));
+
+      doc.set('mixed.list', [1]);
+      doc.set('mixed.list.push.polluted', 'yes');
+      assert.strictEqual(Array.prototype.push.polluted, undefined);
+      assert.strictEqual(typeof doc.mixed.list.push, 'function');
+
+      const loose = new Loose({});
+      loose.set('toString.polluted', 'yes');
+      assert.strictEqual(Object.prototype.toString.polluted, undefined);
+      assert.ok(!Object.prototype.hasOwnProperty.call(loose._doc, 'toString'));
+
+      const LooseSubdoc = db.model('Test3', new Schema({
+        sub: new Schema({ name: String }, { strict: false })
+      }));
+      const withSubdoc = new LooseSubdoc({ sub: { name: 'test' } });
+      withSubdoc.set('sub.toObject.polluted', 'yes');
+      withSubdoc.set('sub.toJSON.polluted', 'yes');
+      assert.strictEqual(mongoose.Document.prototype.toObject.polluted, undefined);
+      assert.strictEqual(mongoose.Document.prototype.toJSON.polluted, undefined);
+      assert.strictEqual(typeof withSubdoc.sub.toObject, 'function');
+      assert.strictEqual(typeof withSubdoc.sub.toJSON, 'function');
+      assert.strictEqual(withSubdoc.toObject().sub.name, 'test');
+
+      // Setting paths underneath document internals like `$__schema` is a no-op
+      const UserWithProfile = db.model('Test4', new Schema({
+        profile: new Schema({ email: { type: String, required: true } }, { strict: false })
+      }));
+      const user = new UserWithProfile({ profile: { email: 'test@example.com' } });
+      user.set('profile.$__schema.paths.email.validators', []);
+      user.set('profile.$__schema.options.polluted', 'yes');
+      const other = new UserWithProfile({ profile: {} });
+      await assert.rejects(other.validate(), /Path `email` is required/);
+      assert.strictEqual(other.profile.$__schema.options.polluted, undefined);
+      assert.strictEqual(withSubdoc.toJSON().sub.name, 'test');
+    } finally {
+      // Clean up so a failure here doesn't break subsequent tests
+      delete mongoose.Document.prototype.toObject.polluted;
+      delete mongoose.Document.prototype.toJSON.polluted;
+      for (const fn of [Object.prototype.toString, Object.prototype.valueOf, Function.prototype.call, Array.prototype.push]) {
+        delete fn.call;
+        delete fn.polluted;
+      }
+    }
+  });
+
   it('sets defaults on subdocs with subdoc projection (gh-13720)', async function() {
     const subSchema = new mongoose.Schema({
       propertyA: { type: String, default: 'A' },

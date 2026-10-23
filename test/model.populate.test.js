@@ -5664,6 +5664,30 @@ describe('model: populate:', function() {
           }
         }
 
+        for (const firstExecution of ['original', 'clone']) {
+          for (const explicit of [false, true]) {
+            it(`keeps ${explicit ? 'explicit' : 'inherited'} preferences separate when ${firstExecution} executes first`, async function() {
+              const { Article, calls } = await createTestContext();
+              const original = Article.find().populate({
+                path: 'author', options: explicit ? { readPreference: 'primary' } : {}
+              }).read('secondaryPreferred');
+              const cloned = original.clone().read('primaryPreferred');
+              const queries = firstExecution === 'original' ? [original, cloned] : [cloned, original];
+              const expected = firstExecution === 'original' ?
+                ['secondaryPreferred', 'primaryPreferred'] : ['primaryPreferred', 'secondaryPreferred'];
+
+              const results = [];
+              for (const query of queries) {
+                results.push(await query);
+              }
+
+              assert.deepStrictEqual(results.map(articles => articles[0].author.name), ['Alice', 'Alice']);
+              assert.deepStrictEqual(calls.map(options => typeof options.readPreference === 'string' ?
+                options.readPreference : options.readPreference?.mode), explicit ? ['primary', 'primary'] : expected);
+            });
+          }
+        }
+
         async function createTestContext() {
           const Author = db.model('Author', new Schema({ name: String }));
           const Article = db.model('Article', new Schema({ author: { type: ObjectId, ref: 'Author' } }));

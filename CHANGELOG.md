@@ -1,3 +1,12 @@
+6.13.12 / 2026-10-23
+====================
+ * fix: avoid walking into inherited properties like `toString` when hydrating documents, setting dotted paths, and merging updates
+ * fix: only use own properties when looking up discriminators by key
+ * fix(schema): disallow setting special properties via virtual()
+ * fix(query): respect connection-level sanitizeFilter in queries
+ * fix(query): disallow special properties like `__proto__` as paths in where() and mod()
+ * fix(deps): upgrade mquery -> 4.0.4 to avoid prototype pollution with query helpers like gt() and in()
+
 6.13.11 / 2026-08-10
 ====================
  * fix(query): apply sanitizeFilter in countDocuments and cursor

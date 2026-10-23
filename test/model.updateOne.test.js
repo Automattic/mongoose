@@ -2967,6 +2967,25 @@ describe('model: updateOne: ', function() {
       assert.strictEqual(doc.createdAt.valueOf(), userCreatedAt.valueOf());
     });
 
+    for (const operation of ['updateOne', 'updateMany']) {
+      it(`${operation} upsert preserves an explicit null $setOnInsert.createdAt`, async function() {
+        const Model = db.model('Test', new Schema({ name: String }, { timestamps: true }));
+
+        const result = await Model.bulkWrite([{
+          [operation]: {
+            filter: { name: 'Alice' },
+            update: { $setOnInsert: { createdAt: null } },
+            upsert: true,
+            overwriteImmutable: true
+          }
+        }]);
+
+        const doc = await Model.collection.findOne({ name: 'Alice' });
+        assert.strictEqual(result.upsertedCount, 1);
+        assert.strictEqual(doc.createdAt, null);
+      });
+    }
+
     for (const timestamps of [true, false, null, undefined]) {
       it(`overwriting immutable createdAt with bulkWrite (gh-15781) when \`timestamps\` is \`${timestamps}\``, async function() {
         // Arrange

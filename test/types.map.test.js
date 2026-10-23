@@ -1888,6 +1888,34 @@ describe('Map', function() {
     });
   });
 
+  it('does not apply map value defaults when setting the map\'s nested parent', async function() {
+    const schema = new Schema({
+      nested: {
+        counts: { type: Map, of: { type: Number, default: 5 } },
+        tags: { type: Map, of: [String] },
+        other: Number
+      }
+    });
+    const M = db.model('Test', schema);
+
+    const doc = new M({ nested: { other: 1 } });
+    assert.strictEqual(doc.nested.counts, undefined);
+    assert.strictEqual(doc.nested.tags, undefined);
+    await doc.save();
+
+    const empty = await M.create({ nested: {} });
+    const emptyFromDb = await M.findById(empty._id).lean();
+    assert.strictEqual(emptyFromDb.nested?.counts, undefined);
+    assert.strictEqual(emptyFromDb.nested?.tags, undefined);
+
+    doc.set('nested.counts.a', 1);
+    doc.set('nested.tags.b', ['x']);
+    await doc.save();
+
+    const fromDb = await M.findById(doc._id).lean();
+    assert.deepStrictEqual(fromDb.nested, { other: 1, counts: { a: 1 }, tags: { b: ['x'] } });
+  });
+
   describe('nested map subdocuments loaded via init() (gh-15957) (gh-15969)', function() {
     it('fails validation for invalid data (gh-15957)', async function() {
       // Arrange

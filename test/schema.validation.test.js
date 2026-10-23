@@ -147,6 +147,33 @@ describe('schema', function() {
       await Test.path('status').doValidate(2);
     });
 
+    it('enum(false) clears enumValues so they are not reused', async function() {
+      const Test = new Schema({
+        state: { type: String, enum: ['a', 'b'] },
+        status: { type: Number, enum: [1, 2] }
+      });
+
+      Test.path('state').enum(false);
+      Test.path('status').enum(false);
+
+      assert.deepStrictEqual(Test.path('state').enumValues, []);
+      assert.deepStrictEqual(Test.path('status').enumValues, []);
+      assert.equal(Test.path('state').validators.length, 0);
+      assert.equal(Test.path('status').validators.length, 0);
+      assert.deepStrictEqual(Test.toJSONSchema().properties.state, { type: ['string', 'null'] });
+      assert.deepStrictEqual(Test.toJSONSchema().properties.status, { type: ['number', 'null'] });
+
+      Test.path('state').enum('c');
+      Test.path('status').enum(3);
+
+      assert.deepStrictEqual(Test.path('state').enumValues, ['c']);
+      assert.deepStrictEqual(Test.path('status').enumValues, [3]);
+      await assert.rejects(Test.path('state').doValidate('a'), ValidatorError);
+      await assert.rejects(Test.path('status').doValidate(1), ValidatorError);
+      await Test.path('state').doValidate('c');
+      await Test.path('status').doValidate(3);
+    });
+
     it('string regexp', async function() {
       const Test = new Schema({
         simple: { type: String, match: /[a-z]/ }

@@ -5623,14 +5623,18 @@ describe('model: populate:', function() {
         });
 
         const Model = db.model('Test1', schema);
-        const writeOptions = { w: process.env.START_REPLICA_SET ? 3 : 1 };
-        const ref = await new Ref({ name: 'Alice' }).save(writeOptions);
-        await new Model({ ref: ref._id }).save(writeOptions);
+        const ref = await Ref.create({ name: 'Alice' });
+        await Model.create({ ref: ref._id });
         const calls = [];
+        // Record Mongoose options, then read fixtures from primary to avoid replication lag.
         const find = Ref.collection.find;
         Ref.collection.find = function(filter, options) {
           calls.push(options);
-          return find.apply(this, arguments);
+          return find.call(this, filter, { ...options, readPreference: 'primary' });
+        };
+        const findModel = Model.collection.find;
+        Model.collection.find = function(filter, options) {
+          return findModel.call(this, filter, { ...options, readPreference: 'primary' });
         };
 
         const q = Model.find().read('secondaryPreferred').populate('ref');
@@ -5663,14 +5667,18 @@ describe('model: populate:', function() {
         async function createTestContext() {
           const Author = db.model('Author', new Schema({ name: String }));
           const Article = db.model('Article', new Schema({ author: { type: ObjectId, ref: 'Author' } }));
-          const writeOptions = { w: process.env.START_REPLICA_SET ? 3 : 1 };
-          const author = await new Author({ name: 'Alice' }).save(writeOptions);
-          await new Article({ author: author._id }).save(writeOptions);
+          const author = await Author.create({ name: 'Alice' });
+          await Article.create({ author: author._id });
           const calls = [];
+          // Record Mongoose options, then read fixtures from primary to avoid replication lag.
           const find = Author.collection.find;
           Author.collection.find = function(filter, options) {
             calls.push(options);
-            return find.apply(this, arguments);
+            return find.call(this, filter, { ...options, readPreference: 'primary' });
+          };
+          const findArticle = Article.collection.find;
+          Article.collection.find = function(filter, options) {
+            return findArticle.call(this, filter, { ...options, readPreference: 'primary' });
           };
           return { Article, calls };
         }

@@ -4668,14 +4668,18 @@ describe('Query', function() {
   async function createPopulateReadContext() {
     const Friend = db.model('Friend', new Schema({ name: String }));
     const Person = db.model('Person', new Schema({ friends: [{ type: 'ObjectId', ref: 'Friend' }] }));
-    const writeOptions = { w: process.env.START_REPLICA_SET ? 3 : 1 };
-    const friend = await new Friend({ name: 'Alice' }).save(writeOptions);
-    await new Person({ friends: [friend._id] }).save(writeOptions);
+    const friend = await Friend.create({ name: 'Alice' });
+    await Person.create({ friends: [friend._id] });
     const calls = [];
+    // Record Mongoose options, then read fixtures from primary to avoid replication lag.
     const find = Friend.collection.find;
     Friend.collection.find = function(filter, options) {
       calls.push(options);
-      return find.apply(this, arguments);
+      return find.call(this, filter, { ...options, readPreference: 'primary' });
+    };
+    const findPerson = Person.collection.find;
+    Person.collection.find = function(filter, options) {
+      return findPerson.call(this, filter, { ...options, readPreference: 'primary' });
     };
     return { Person, calls };
   }

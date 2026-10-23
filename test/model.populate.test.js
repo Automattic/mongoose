@@ -5643,6 +5643,47 @@ describe('model: populate:', function() {
         assert.equal(calls[0].readPreference.mode, 'secondaryPreferred');
       });
 
+      describe('null populate read options (gh-15553)', function() {
+        for (const [option, value, expected] of [
+          ['readPreference', 'primaryPreferred', 'primaryPreferred'],
+          ['readConcern', { level: 'majority' }, 'majority']
+        ]) {
+          for (const order of ['before', 'after']) {
+            it(`inherits ${option} when null is populated ${order} setting the parent option`, async function() {
+              const { Article, calls } = await createTestContext();
+              const query = Article.find();
+              if (order === 'after') {
+                query.setOptions({ [option]: value });
+              }
+              query.populate({ path: 'author', options: { [option]: null } });
+              if (order === 'before') {
+                query.setOptions({ [option]: value });
+              }
+
+              const articles = await query;
+
+              assert.strictEqual(articles[0].author.name, 'Alice');
+              assert.deepStrictEqual(calls.map(options => options[option]), [expected]);
+            });
+          }
+        }
+
+        async function createTestContext() {
+          const Author = db.model('Author', new Schema({ name: String }));
+          const Article = db.model('Article', new Schema({ author: { type: ObjectId, ref: 'Author' } }));
+          const author = await Author.create({ name: 'Alice' });
+          await Article.create({ author: author._id });
+          const calls = [];
+          const find = Author.collection.find;
+          Author.collection.find = function(filter, options) {
+            const cursor = find.call(this, filter, options);
+            calls.push({ readPreference: cursor.readPreference.mode, readConcern: cursor.readConcern?.level });
+            return cursor;
+          };
+          return { Article, calls };
+        }
+      });
+
       describe('cloned populate read options', function() {
         for (const [option, initial, updated] of [
           ['readPreference', 'primary', 'secondaryPreferred'],

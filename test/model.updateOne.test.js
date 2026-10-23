@@ -1208,6 +1208,39 @@ describe('model: updateOne:', function() {
 
     });
 
+    it('replaceOne throws cast errors instead of removing the path', async function() {
+      const schema = mongoose.Schema({ name: String, age: Number }, {
+        versionKey: false
+      });
+      const Model = db.model('Test', schema);
+
+      const m = await Model.create({ name: 'abc', age: 1 });
+      const err = await Model.replaceOne({ _id: m._id }, { name: 'test', age: 'not a number' }).
+        then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.name, 'ValidationError');
+      assert.equal(err.errors['age'].name, 'CastError');
+
+      const doc = await Model.findById(m._id).lean();
+      assert.deepStrictEqual(doc, { _id: m._id, name: 'abc', age: 1 });
+    });
+
+    it('replaceOne respects query-level strict option', async function() {
+      const schema = mongoose.Schema({ name: String }, { versionKey: false });
+      const Model = db.model('Test', schema);
+
+      const m = await Model.create({ name: 'abc' });
+      const err = await Model.replaceOne({ _id: m._id }, { name: 'test', notInSchema: 'foo' }, { strict: 'throw' }).
+        then(() => null, err => err);
+      assert.ok(err);
+      assert.equal(err.name, 'StrictModeError');
+      assert.equal(err.path, 'notInSchema');
+
+      await Model.replaceOne({ _id: m._id }, { name: 'test', notInSchema: 'foo' }, { strict: false });
+      const doc = await Model.findById(m._id).lean();
+      assert.deepStrictEqual(doc, { _id: m._id, name: 'test', notInSchema: 'foo' });
+    });
+
     it('mixed nested type casting (gh-3337)', async function() {
       const Schema = mongoose.Schema({ attributes: {} }, { strict: true });
       const Model = db.model('Test', Schema);

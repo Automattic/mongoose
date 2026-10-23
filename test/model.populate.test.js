@@ -5616,18 +5616,137 @@ describe('model: populate:', function() {
           name: String
         });
 
-        db.model('Test', refSchema);
+        const Ref = db.model('Test', refSchema);
 
         const schema = new mongoose.Schema({
           ref: { type: mongoose.Schema.Types.ObjectId, ref: 'Test' }
         });
 
         const Model = db.model('Test1', schema);
+        const ref = await Ref.create({ name: 'Alice' });
+        await Model.create({ ref: ref._id });
+        const calls = [];
+        // Record Mongoose options, then read fixtures from primary to avoid replication lag.
+        const find = Ref.collection.find;
+        Ref.collection.find = function(filter, options) {
+          calls.push(options);
+          return find.call(this, filter, { ...options, readPreference: 'primary' });
+        };
+        const findModel = Model.collection.find;
+        Model.collection.find = function(filter, options) {
+          return findModel.call(this, filter, { ...options, readPreference: 'primary' });
+        };
 
         const q = Model.find().read('secondaryPreferred').populate('ref');
-        await q.exec();
-        assert.equal(q._mongooseOptions.populate['ref'].options.readPreference.mode,
-          'secondaryPreferred');
+        const docs = await q.exec();
+        assert.equal(docs[0].ref.name, 'Alice');
+        assert.equal(calls[0].readPreference.mode, 'secondaryPreferred');
+      });
+
+      describe('null populate read options (gh-15553)', function() {
+        for (const [option, value, expected] of [
+          ['readPreference', 'primaryPreferred', 'primaryPreferred'],
+          ['readConcern', { level: 'majority' }, 'majority']
+        ]) {
+          for (const order of ['before', 'after']) {
+            it(`inherits ${option} when null is populated ${order} setting the parent option`, async function() {
+              const { Article, calls } = await createTestContext();
+              const query = Article.find();
+              if (order === 'after') {
+                query.setOptions({ [option]: value });
+              }
+              query.populate({ path: 'author', options: { [option]: null } });
+              if (order === 'before') {
+                query.setOptions({ [option]: value });
+              }
+
+              const articles = await query;
+
+              assert.strictEqual(articles[0].author.name, 'Alice');
+              assert.deepStrictEqual(calls.map(options => options[option]), [expected]);
+            });
+          }
+        }
+
+        async function createTestContext() {
+          const Author = db.model('Author', new Schema({ name: String }));
+          const Article = db.model('Article', new Schema({ author: { type: ObjectId, ref: 'Author' } }));
+          const author = await Author.create({ name: 'Alice' });
+          await Article.create({ author: author._id });
+          const calls = [];
+          const find = Author.collection.find;
+          Author.collection.find = function(filter, options) {
+            const cursor = find.call(this, filter, options);
+            calls.push({ readPreference: cursor.readPreference.mode, readConcern: cursor.readConcern?.level });
+            return cursor;
+          };
+          return { Article, calls };
+        }
+      });
+
+      describe('cloned populate read options', function() {
+        for (const [option, initial, updated] of [
+          ['readPreference', 'primary', 'secondaryPreferred'],
+          ['readConcern', { level: 'local' }, { level: 'majority' }]
+        ]) {
+          for (const explicit of [false, true]) {
+            it(`uses ${explicit ? 'explicit' : 'updated inherited'} ${option} on an executed clone`, async function() {
+              const { Article, calls } = await createTestContext();
+              const query = Article.find().setOptions({ [option]: initial }).populate({
+                path: 'author', options: explicit ? { [option]: initial } : {}
+              });
+              await query;
+
+              const articles = await query.clone().setOptions({ [option]: updated });
+
+              assert.strictEqual(articles[0].author.name, 'Alice');
+              assert.deepStrictEqual(calls.map(options => options[option]), [initial, explicit ? initial : updated]);
+            });
+          }
+        }
+
+        for (const firstExecution of ['original', 'clone']) {
+          for (const explicit of [false, true]) {
+            it(`keeps ${explicit ? 'explicit' : 'inherited'} preferences separate when ${firstExecution} executes first`, async function() {
+              const { Article, calls } = await createTestContext();
+              const original = Article.find().populate({
+                path: 'author', options: explicit ? { readPreference: 'primary' } : {}
+              }).read('secondaryPreferred');
+              const cloned = original.clone().read('primaryPreferred');
+              const queries = firstExecution === 'original' ? [original, cloned] : [cloned, original];
+              const expected = firstExecution === 'original' ?
+                ['secondaryPreferred', 'primaryPreferred'] : ['primaryPreferred', 'secondaryPreferred'];
+
+              const results = [];
+              for (const query of queries) {
+                results.push(await query);
+              }
+
+              assert.deepStrictEqual(results.map(articles => articles[0].author.name), ['Alice', 'Alice']);
+              assert.deepStrictEqual(calls.map(options => typeof options.readPreference === 'string' ?
+                options.readPreference : options.readPreference?.mode), explicit ? ['primary', 'primary'] : expected);
+            });
+          }
+        }
+
+        async function createTestContext() {
+          const Author = db.model('Author', new Schema({ name: String }));
+          const Article = db.model('Article', new Schema({ author: { type: ObjectId, ref: 'Author' } }));
+          const author = await Author.create({ name: 'Alice' });
+          await Article.create({ author: author._id });
+          const calls = [];
+          // Record Mongoose options, then read fixtures from primary to avoid replication lag.
+          const find = Author.collection.find;
+          Author.collection.find = function(filter, options) {
+            calls.push(options);
+            return find.call(this, filter, { ...options, readPreference: 'primary' });
+          };
+          const findArticle = Article.collection.find;
+          Article.collection.find = function(filter, options) {
+            return findArticle.call(this, filter, { ...options, readPreference: 'primary' });
+          };
+          return { Article, calls };
+        }
       });
 
       it('array underneath non-existent array (gh-6245)', async function() {

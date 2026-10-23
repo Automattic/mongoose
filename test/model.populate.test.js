@@ -5611,16 +5611,34 @@ describe('model: populate:', function() {
         assert.equal(error.name, 'MissingSchemaError');
       });
 
-      describe('populate read options', function() {
-        it('inherits the query read preference (gh-5460)', async function() {
-          const { Article, calls } = await createTestContext();
-
-          const articles = await Article.find().read('secondaryPreferred').populate('author');
-
-          assert.strictEqual(articles[0].author.name, 'Alice');
-          assert.strictEqual(calls[0].readPreference.mode, 'secondaryPreferred');
+      it('populate with missing schema (gh-5460)', async function() {
+        const refSchema = new mongoose.Schema({
+          name: String
         });
 
+        const Ref = db.model('Test', refSchema);
+
+        const schema = new mongoose.Schema({
+          ref: { type: mongoose.Schema.Types.ObjectId, ref: 'Test' }
+        });
+
+        const Model = db.model('Test1', schema);
+        const ref = await Ref.create({ name: 'Alice' });
+        await Model.create({ ref: ref._id });
+        const calls = [];
+        const find = Ref.collection.find;
+        Ref.collection.find = function(filter, options) {
+          calls.push(options);
+          return find.apply(this, arguments);
+        };
+
+        const q = Model.find().read('secondaryPreferred').populate('ref');
+        const docs = await q.exec();
+        assert.equal(docs[0].ref.name, 'Alice');
+        assert.equal(calls[0].readPreference.mode, 'secondaryPreferred');
+      });
+
+      describe('cloned populate read options', function() {
         for (const [option, initial, updated] of [
           ['readPreference', 'primary', 'secondaryPreferred'],
           ['readConcern', { level: 'local' }, { level: 'majority' }]

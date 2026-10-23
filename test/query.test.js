@@ -4668,8 +4668,9 @@ describe('Query', function() {
   async function createPopulateReadContext() {
     const Friend = db.model('Friend', new Schema({ name: String }));
     const Person = db.model('Person', new Schema({ friends: [{ type: 'ObjectId', ref: 'Friend' }] }));
-    const friend = await Friend.create({ name: 'Alice' });
-    await Person.create({ friends: [friend._id] });
+    const writeOptions = { w: process.env.START_REPLICA_SET ? 3 : 1 };
+    const friend = await new Friend({ name: 'Alice' }).save(writeOptions);
+    await new Person({ friends: [friend._id] }).save(writeOptions);
     const calls = [];
     const find = Friend.collection.find;
     Friend.collection.find = function(filter, options) {

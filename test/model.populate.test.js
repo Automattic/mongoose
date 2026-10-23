@@ -5623,8 +5623,9 @@ describe('model: populate:', function() {
         });
 
         const Model = db.model('Test1', schema);
-        const ref = await Ref.create({ name: 'Alice' });
-        await Model.create({ ref: ref._id });
+        const writeOptions = { w: process.env.START_REPLICA_SET ? 3 : 1 };
+        const ref = await new Ref({ name: 'Alice' }).save(writeOptions);
+        await new Model({ ref: ref._id }).save(writeOptions);
         const calls = [];
         const find = Ref.collection.find;
         Ref.collection.find = function(filter, options) {
@@ -5662,8 +5663,9 @@ describe('model: populate:', function() {
         async function createTestContext() {
           const Author = db.model('Author', new Schema({ name: String }));
           const Article = db.model('Article', new Schema({ author: { type: ObjectId, ref: 'Author' } }));
-          const author = await Author.create({ name: 'Alice' });
-          await Article.create({ author: author._id });
+          const writeOptions = { w: process.env.START_REPLICA_SET ? 3 : 1 };
+          const author = await new Author({ name: 'Alice' }).save(writeOptions);
+          await new Article({ author: author._id }).save(writeOptions);
           const calls = [];
           const find = Author.collection.find;
           Author.collection.find = function(filter, options) {

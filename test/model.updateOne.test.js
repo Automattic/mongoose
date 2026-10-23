@@ -2827,59 +2827,79 @@ describe('model: updateOne: ', function() {
       });
     });
 
-    for (const createdAt of [null, new Date('2021-01-01')]) {
-      it(`preserves ${createdAt === null ? 'null' : 'a Date'} beneath a nested parent in a bulk update`, async function() {
-        // Arrange
-        const { User } = createTestContext({
-          timestamps: { createdAt: 'meta.createdAt', updatedAt: 'meta.updatedAt' }
-        });
-        const originalDate = new Date('2020-01-01');
-        const { insertedId } = await User.collection.insertOne({
-          name: 'Alice',
-          meta: { createdAt: originalDate, updatedAt: originalDate }
-        });
-
-        // Act
-        await User.bulkWrite([{
-          updateOne: {
-            filter: { _id: insertedId },
-            update: { $set: { meta: { createdAt } } },
-            overwriteImmutable: true
-          }
-        }]);
-
-        // Assert
-        const stored = await User.collection.findOne({ _id: insertedId });
-        assert.deepStrictEqual(stored.meta.createdAt, createdAt);
-        assert.ok(stored.meta.updatedAt > originalDate);
+    it('preserves null and Date values beneath a nested parent in a bulk update', async function() {
+      // Arrange
+      const { User } = createTestContext({
+        timestamps: { createdAt: 'meta.createdAt', updatedAt: 'meta.updatedAt' }
       });
+      const originalDate = new Date('2020-01-01');
+      const createdAt = new Date('2021-01-01');
+      await User.collection.insertMany([
+        { name: 'Alice', meta: { createdAt: originalDate, updatedAt: originalDate } },
+        { name: 'Bob', meta: { createdAt: originalDate, updatedAt: originalDate } }
+      ]);
 
-      it(`preserves ${createdAt === null ? 'null' : 'a Date'} beneath a dotted parent in a bulk update`, async function() {
-        // Arrange
-        const { User } = createTestContext({
-          timestamps: { createdAt: 'meta.audit.createdAt', updatedAt: 'meta.audit.updatedAt' }
-        });
-        const originalDate = new Date('2020-01-01');
-        const { insertedId } = await User.collection.insertOne({
-          name: 'Alice',
-          meta: { audit: { createdAt: originalDate, updatedAt: originalDate } }
-        });
+      // Act
+      await User.bulkWrite([{
+        updateOne: {
+          filter: { name: 'Alice' },
+          update: { $set: { meta: { createdAt: null } } },
+          overwriteImmutable: true
+        }
+      }, {
+        updateOne: {
+          filter: { name: 'Bob' },
+          update: { $set: { meta: { createdAt } } },
+          overwriteImmutable: true
+        }
+      }]);
 
-        // Act
-        await User.bulkWrite([{
-          updateOne: {
-            filter: { _id: insertedId },
-            update: { $set: { 'meta.audit': { createdAt } } },
-            overwriteImmutable: true
-          }
-        }]);
+      // Assert
+      const docs = await User.collection.find().sort({ name: 1 }).toArray();
+      assert.deepStrictEqual(docs.map(doc => ({ name: doc.name, createdAt: doc.meta.createdAt })), [
+        { name: 'Alice', createdAt: null },
+        { name: 'Bob', createdAt }
+      ]);
+      assert.ok(docs[0].meta.updatedAt > originalDate);
+      assert.ok(docs[1].meta.updatedAt > originalDate);
+    });
 
-        // Assert
-        const stored = await User.collection.findOne({ _id: insertedId });
-        assert.deepStrictEqual(stored.meta.audit.createdAt, createdAt);
-        assert.ok(stored.meta.audit.updatedAt > originalDate);
+    it('preserves null and Date values beneath a dotted parent in a bulk update', async function() {
+      // Arrange
+      const { User } = createTestContext({
+        timestamps: { createdAt: 'meta.audit.createdAt', updatedAt: 'meta.audit.updatedAt' }
       });
-    }
+      const originalDate = new Date('2020-01-01');
+      const createdAt = new Date('2021-01-01');
+      await User.collection.insertMany([
+        { name: 'Alice', meta: { audit: { createdAt: originalDate, updatedAt: originalDate } } },
+        { name: 'Bob', meta: { audit: { createdAt: originalDate, updatedAt: originalDate } } }
+      ]);
+
+      // Act
+      await User.bulkWrite([{
+        updateOne: {
+          filter: { name: 'Alice' },
+          update: { $set: { 'meta.audit': { createdAt: null } } },
+          overwriteImmutable: true
+        }
+      }, {
+        updateOne: {
+          filter: { name: 'Bob' },
+          update: { $set: { 'meta.audit': { createdAt } } },
+          overwriteImmutable: true
+        }
+      }]);
+
+      // Assert
+      const docs = await User.collection.find().sort({ name: 1 }).toArray();
+      assert.deepStrictEqual(docs.map(doc => ({ name: doc.name, createdAt: doc.meta.audit.createdAt })), [
+        { name: 'Alice', createdAt: null },
+        { name: 'Bob', createdAt }
+      ]);
+      assert.ok(docs[0].meta.audit.updatedAt > originalDate);
+      assert.ok(docs[1].meta.audit.updatedAt > originalDate);
+    });
 
     it('updateOne can update immutable field with overwriteImmutable: true', async function() {
       // Arrange
@@ -2967,24 +2987,32 @@ describe('model: updateOne: ', function() {
       assert.strictEqual(doc.createdAt.valueOf(), userCreatedAt.valueOf());
     });
 
-    for (const operation of ['updateOne', 'updateMany']) {
-      it(`${operation} upsert preserves an explicit null $setOnInsert.createdAt`, async function() {
-        const Model = db.model('Test', new Schema({ name: String }, { timestamps: true }));
+    it('bulkWrite upserts preserve an explicit null $setOnInsert.createdAt', async function() {
+      const Model = db.model('Test', new Schema({ name: String }, { timestamps: true }));
 
-        const result = await Model.bulkWrite([{
-          [operation]: {
-            filter: { name: 'Alice' },
-            update: { $setOnInsert: { createdAt: null } },
-            upsert: true,
-            overwriteImmutable: true
-          }
-        }]);
+      const result = await Model.bulkWrite([{
+        updateOne: {
+          filter: { name: 'Alice' },
+          update: { $setOnInsert: { createdAt: null } },
+          upsert: true,
+          overwriteImmutable: true
+        }
+      }, {
+        updateMany: {
+          filter: { name: 'Bob' },
+          update: { $setOnInsert: { createdAt: null } },
+          upsert: true,
+          overwriteImmutable: true
+        }
+      }]);
 
-        const doc = await Model.collection.findOne({ name: 'Alice' });
-        assert.strictEqual(result.upsertedCount, 1);
-        assert.strictEqual(doc.createdAt, null);
-      });
-    }
+      const docs = await Model.collection.find().sort({ name: 1 }).toArray();
+      assert.strictEqual(result.upsertedCount, 2);
+      assert.deepStrictEqual(docs.map(doc => ({ name: doc.name, createdAt: doc.createdAt })), [
+        { name: 'Alice', createdAt: null },
+        { name: 'Bob', createdAt: null }
+      ]);
+    });
 
     for (const timestamps of [true, false, null, undefined]) {
       it(`overwriting immutable createdAt with bulkWrite (gh-15781) when \`timestamps\` is \`${timestamps}\``, async function() {

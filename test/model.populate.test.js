@@ -5611,23 +5611,49 @@ describe('model: populate:', function() {
         assert.equal(error.name, 'MissingSchemaError');
       });
 
-      it('populate with missing schema (gh-5460)', async function() {
-        const refSchema = new mongoose.Schema({
-          name: String
+      describe('populate read options', function() {
+        it('inherits the query read preference (gh-5460)', async function() {
+          const { Article, calls } = await createTestContext();
+
+          const articles = await Article.find().read('secondaryPreferred').populate('author');
+
+          assert.strictEqual(articles[0].author.name, 'Alice');
+          assert.strictEqual(calls[0].readPreference.mode, 'secondaryPreferred');
         });
 
-        db.model('Test', refSchema);
+        for (const [option, initial, updated] of [
+          ['readPreference', 'primary', 'secondaryPreferred'],
+          ['readConcern', { level: 'local' }, { level: 'majority' }]
+        ]) {
+          for (const explicit of [false, true]) {
+            it(`uses ${explicit ? 'explicit' : 'updated inherited'} ${option} on an executed clone`, async function() {
+              const { Article, calls } = await createTestContext();
+              const query = Article.find().setOptions({ [option]: initial }).populate({
+                path: 'author', options: explicit ? { [option]: initial } : {}
+              });
+              await query;
 
-        const schema = new mongoose.Schema({
-          ref: { type: mongoose.Schema.Types.ObjectId, ref: 'Test' }
-        });
+              const articles = await query.clone().setOptions({ [option]: updated });
 
-        const Model = db.model('Test1', schema);
+              assert.strictEqual(articles[0].author.name, 'Alice');
+              assert.deepStrictEqual(calls.map(options => options[option]), [initial, explicit ? initial : updated]);
+            });
+          }
+        }
 
-        const q = Model.find().read('secondaryPreferred').populate('ref');
-        await q.exec();
-        assert.equal(q._mongooseOptions.populate['ref'].options.readPreference.mode,
-          'secondaryPreferred');
+        async function createTestContext() {
+          const Author = db.model('Author', new Schema({ name: String }));
+          const Article = db.model('Article', new Schema({ author: { type: ObjectId, ref: 'Author' } }));
+          const author = await Author.create({ name: 'Alice' });
+          await Article.create({ author: author._id });
+          const calls = [];
+          const find = Author.collection.find;
+          Author.collection.find = function(filter, options) {
+            calls.push(options);
+            return find.apply(this, arguments);
+          };
+          return { Article, calls };
+        }
       });
 
       it('array underneath non-existent array (gh-6245)', async function() {

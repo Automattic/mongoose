@@ -1,3 +1,12 @@
+8.24.7 / 2026-10-23
+===================
+ * fix: avoid walking into inherited properties like `toString` when hydrating documents, setting dotted paths, and merging updates
+ * fix: only use own properties when looking up discriminators by key
+ * fix(schema): disallow setting special properties via virtual()
+ * fix(query): respect connection-level sanitizeFilter in queries
+ * fix(query): disallow special properties like `__proto__` as paths in where() and mod()
+ * fix(deps): upgrade mquery -> 4.0.4 to avoid prototype pollution with query helpers like gt() and in()
+
 8.24.6 / 2026-10-20
 ===================
  * fix(array): compare dates by value in indexOf() so pull() removes them #16590 #16535 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)

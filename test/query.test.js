@@ -2034,6 +2034,11 @@ describe('Query', function() {
 
       let res = await Model.find().explain('queryPlanner');
       assert.ok(res.queryPlanner);
+      assert.strictEqual(res.executionStats, undefined);
+
+      res = await Model.find().explain('executionStats');
+      assert.ok(res.executionStats);
+      assert.strictEqual(res.executionStats.allPlansExecution, undefined);
 
       res = await Model.find().explain();
       assert.ok(res.queryPlanner);

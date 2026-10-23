@@ -2646,7 +2646,7 @@ describe('Query', function() {
         const q1 = Test.findOneAndReplace({}, JSON.parse('{"toString":{"call":1,"polluted":"yes"}}'));
         assert.strictEqual(typeof Object.prototype.toString.call, 'function');
         assert.strictEqual(Object.prototype.toString.polluted, undefined);
-        assert.ok(!Object.hasOwn(q1.getUpdate(), 'toString'));
+        assert.ok(!Object.prototype.hasOwnProperty.call(q1.getUpdate(), 'toString'));
 
         Test.updateOne({}, { name: 'test' }).updateOne({}, JSON.parse('{"valueOf":{"call":{"polluted":"yes"}}}'));
         assert.strictEqual(Function.prototype.call.polluted, undefined);

@@ -12486,9 +12486,9 @@ describe('document', function() {
       // Fields that would shadow inherited functions are ignored
       assert.strictEqual(doc.hello, 'world!');
       assert.strictEqual(doc.nested.name, 'test');
-      assert.ok(!Object.hasOwn(doc._doc, 'toString'));
-      assert.ok(!Object.hasOwn(doc._doc, 'valueOf'));
-      assert.ok(!Object.hasOwn(doc._doc.nested, 'toString'));
+      assert.ok(!Object.prototype.hasOwnProperty.call(doc._doc, 'toString'));
+      assert.ok(!Object.prototype.hasOwnProperty.call(doc._doc, 'valueOf'));
+      assert.ok(!Object.prototype.hasOwnProperty.call(doc._doc.nested, 'toString'));
 
       Example.hydrate({ hello: 'world!', toString: { polluted: 'yes' } });
       assert.strictEqual(Object.prototype.toString.polluted, undefined);
@@ -12510,12 +12510,12 @@ describe('document', function() {
       assert.strictEqual(typeof Object.prototype.toString.call, 'function');
       assert.strictEqual(Function.prototype.call.polluted, undefined);
       // Setting paths underneath inherited functions is a no-op
-      assert.ok(!Object.hasOwn(doc.mixed, 'toString'));
-      assert.ok(!Object.hasOwn(doc.mixed, 'valueOf'));
+      assert.ok(!Object.prototype.hasOwnProperty.call(doc.mixed, 'toString'));
+      assert.ok(!Object.prototype.hasOwnProperty.call(doc.mixed, 'valueOf'));
 
       doc.set({ 'mixed.toString.polluted': 'yes' });
       assert.strictEqual(Object.prototype.toString.polluted, undefined);
-      assert.ok(!Object.hasOwn(doc.mixed, 'toString'));
+      assert.ok(!Object.prototype.hasOwnProperty.call(doc.mixed, 'toString'));
 
       doc.set('mixed.list', [1]);
       doc.set('mixed.list.push.polluted', 'yes');
@@ -12525,7 +12525,7 @@ describe('document', function() {
       const loose = new Loose({});
       loose.set('toString.polluted', 'yes');
       assert.strictEqual(Object.prototype.toString.polluted, undefined);
-      assert.ok(!Object.hasOwn(loose._doc, 'toString'));
+      assert.ok(!Object.prototype.hasOwnProperty.call(loose._doc, 'toString'));
 
       const LooseSubdoc = db.model('Test3', new Schema({
         sub: new Schema({ name: String }, { strict: false })

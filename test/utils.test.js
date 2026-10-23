@@ -322,8 +322,8 @@ describe('utils', function() {
         assert.strictEqual(Object.prototype.toString.polluted, undefined);
         assert.strictEqual(Function.prototype.call.polluted, undefined);
         // Keys that would shadow inherited properties are ignored
-        assert.ok(!Object.hasOwn(to, 'toString'));
-        assert.ok(!Object.hasOwn(to, 'valueOf'));
+        assert.ok(!Object.prototype.hasOwnProperty.call(to, 'toString'));
+        assert.ok(!Object.prototype.hasOwnProperty.call(to, 'valueOf'));
       } finally {
       // Clean up so a failure here doesn't break subsequent tests
         for (const fn of [Object.prototype.toString, Object.prototype.valueOf, Function.prototype.call, Array.prototype.push]) {

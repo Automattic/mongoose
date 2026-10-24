@@ -13292,6 +13292,60 @@ describe('document', function() {
     }
   });
 
+  it('treats document internals like `$__` and `_doc` in stored data as plain data', async function() {
+    const Strict = db.model('Test', new Schema({ name: String, nested: { name: String }, mixed: {} }));
+    const Loose = db.model('Test2', new Schema({ name: String }, { strict: false }), Strict.collection.collectionName);
+
+    await Strict.collection.insertOne({
+      name: 'test',
+      nested: { name: 'nested', $__: 1 },
+      mixed: { $__: 1, _doc: { name: 'inner' } },
+      other: { $__: 1 },
+      $__: { strictMode: false },
+      $isNew: true,
+      isNew: true
+    });
+
+    const doc = await Strict.findOne();
+    assert.strictEqual(doc.name, 'test');
+    assert.strictEqual(doc.nested.name, 'nested');
+    assert.strictEqual(doc.$isNew, false);
+    assert.deepStrictEqual(doc.toObject().mixed, { $__: 1, _doc: { name: 'inner' } });
+
+    const looseDoc = await Loose.findOne();
+    assert.strictEqual(looseDoc.name, 'test');
+    assert.strictEqual(looseDoc.$isNew, false);
+    assert.strictEqual(looseDoc.isNew, false);
+    assert.strictEqual(looseDoc.$__.strictMode, false);
+    assert.ok(looseDoc.$__.activePaths);
+    const obj = looseDoc.toObject();
+    assert.deepStrictEqual(obj.other, { $__: 1 });
+    assert.deepStrictEqual(obj.$__, { strictMode: false });
+
+    const newDoc = new Loose(JSON.parse('{"name":"test","_doc":{"name":"fake"},"isNew":false}'));
+    assert.strictEqual(newDoc.name, 'test');
+    assert.strictEqual(newDoc.$isNew, true);
+    assert.deepStrictEqual(newDoc.toObject()._doc, { name: 'fake' });
+  });
+
+  it('casts values that contain Mongoose markers like `$__` rather than trusting them', async function() {
+    const Test = db.model('Test', new Schema({ age: Number, isAdmin: Boolean, buf: Buffer, mixed: {} }));
+
+    const doc = Test.hydrate(JSON.parse('{"age":{"$__":{"wasPopulated":{"value":1}}},"isAdmin":{"$__":{"wasPopulated":true}}}'));
+    assert.strictEqual(doc.age, undefined);
+    assert.strictEqual(doc.isAdmin, undefined);
+    assert.ok(doc.$__.validationError.errors['age']);
+    assert.ok(doc.$__.validationError.errors['isAdmin']);
+
+    const doc2 = new Test({
+      buf: JSON.parse('{"isMongooseBuffer":true}'),
+      mixed: JSON.parse('{"$__":1,"_doc":{"name":"test"},"map":{"$isMongooseMap":true}}')
+    });
+    const err = await doc2.validate().then(() => null, err => err);
+    assert.ok(err.errors['buf']);
+    assert.deepStrictEqual(doc2.toObject().mixed, { $__: 1, _doc: { name: 'test' }, map: { $isMongooseMap: true } });
+  });
+
   it('does not modify array when calling getters (gh-13748)', async function() {
     // create simple setter to add a sufix
     const addSufix = (name) => {

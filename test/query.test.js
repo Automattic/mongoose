@@ -2665,6 +2665,44 @@ describe('Query', function() {
         }
       }
     });
+
+    it('treats `$__` in filters and updates as plain data', function() {
+      const Test = db.model('Test', new Schema({ name: String, mixed: {} }));
+
+      const q1 = Test.find().merge(JSON.parse('{"$__":1,"name":"test"}'));
+      assert.deepStrictEqual(q1.getFilter(), { $__: 1, name: 'test' });
+
+      const q2 = Test.updateOne({}, JSON.parse('{"$set":{"mixed":{"$__":1}}}'));
+      q2._castUpdate(q2._update);
+      assert.deepStrictEqual(q2.getUpdate(), { $set: { mixed: { $__: 1 } } });
+    });
+  });
+
+  describe('inherited properties', function() {
+    it('does not use inherited properties like valueOf as query operators', function() {
+      const Test = db.model('Test', new Schema({ name: String, age: Number, tags: [String] }));
+
+      for (const filter of [
+        '{"name":{"$eq":"test","valueOf":1}}',
+        '{"name":{"$in":["test"],"toString":1}}',
+        '{"age":{"$gt":1,"hasOwnProperty":"x"}}',
+        '{"tags":{"$all":["test"],"valueOf":1}}'
+      ]) {
+        const q = Test.find(JSON.parse(filter));
+        q._castConditions();
+        assert.ok(q.error(), filter);
+        assert.ok(/Can't use (valueOf|toString|hasOwnProperty)/.test(q.error().message), q.error().message);
+      }
+    });
+
+    it('throws on inherited properties like toString with strict: throw', async function() {
+      const Test = db.model('Test', new Schema({ name: String }));
+
+      await assert.rejects(
+        Test.updateOne({}, JSON.parse('{"toString":1}'), { strict: 'throw' }),
+        /Field `toString` is not in schema/
+      );
+    });
   });
 
   describe('setUpdate', function() {

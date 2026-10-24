@@ -3,12 +3,15 @@
 const assert = require('assert');
 
 require('../common'); // required for side-effect setup (so that the default driver is set-up)
+const InternalCache = require('../../lib/internal');
 const isMongooseObject = require('../../lib/helpers/isMongooseObject');
 const MongooseArray = require('../../lib/types/array');
+const MongooseBuffer = require('../../lib/types/buffer');
+const MongooseMap = require('../../lib/types/map');
 
 describe('isMongooseObject', () => {
-  it('is when value.$__ != null', () => {
-    assert.ok(isMongooseObject({ $__: !null }));
+  it('is when value.$__ is an InternalCache', () => {
+    assert.ok(isMongooseObject({ $__: new InternalCache() }));
   });
 
   it('is when value is a MongooseArray', () => {
@@ -16,12 +19,21 @@ describe('isMongooseObject', () => {
     assert.ok(isMongooseObject(mongooseArray));
   });
 
-  it('is when value.isMongooseBuffer is truthy', () => {
-    assert.ok(isMongooseObject({ isMongooseBuffer: true }));
+  it('is when value is a MongooseBuffer', () => {
+    assert.ok(isMongooseObject(new MongooseBuffer([1, 2])));
   });
 
-  it('is when value.$isMongooseMap is truthy', () => {
-    assert.ok(isMongooseObject({ $isMongooseMap: true }));
+  it('is when value is a MongooseMap', () => {
+    assert.ok(isMongooseObject(new MongooseMap({})));
+  });
+
+  it('is not when value is user data with Mongoose markers', () => {
+    assert.ok(!isMongooseObject({ $__: !null }));
+    assert.ok(!isMongooseObject({ $__: { strictMode: true } }));
+    assert.ok(!isMongooseObject(JSON.parse('{"$__":{"constructor":{"prototype":{"strictMode":true}}}}')));
+    assert.ok(!isMongooseObject({ isMongooseBuffer: true }));
+    assert.ok(!isMongooseObject({ $isMongooseMap: true }));
+    assert.ok(!isMongooseObject(JSON.parse('{"constructor":{"prototype":{"$isMongooseMap":true}}}')));
   });
 
   it('is not when anything else', () => {

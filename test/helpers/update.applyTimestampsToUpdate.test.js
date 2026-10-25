@@ -13,6 +13,39 @@ describe('applyTimestampsToUpdate', function() {
     assert.equal(res[1].$set.updated_at.valueOf(), now.valueOf());
   });
 
+  it('respects updatedAt: false for update pipelines', function() {
+    const update = [{ $set: { title: 'mongoose' } }];
+    const now = new Date('2016-01-01');
+    const res = applyTimestampsToUpdate(now, 'createdAt', 'updatedAt', update, {
+      timestamps: { updatedAt: false }
+    });
+
+    assert.deepStrictEqual(res, [{ $set: { title: 'mongoose' } }]);
+  });
+
+  it('still updates pipeline timestamps when only createdAt is disabled', function() {
+    const update = [{ $set: { title: 'mongoose' } }];
+    const now = new Date('2016-01-01');
+    const res = applyTimestampsToUpdate(now, 'createdAt', 'updatedAt', update, {
+      timestamps: { createdAt: false }
+    });
+
+    assert.deepStrictEqual(res, [
+      { $set: { title: 'mongoose' } },
+      { $set: { updatedAt: now } }
+    ]);
+  });
+
+  it('does not add pipeline timestamps when timestamps are disabled', function() {
+    const update = [{ $set: { title: 'mongoose' } }];
+    const now = new Date('2016-01-01');
+    const res = applyTimestampsToUpdate(now, 'createdAt', 'updatedAt', update, {
+      timestamps: false
+    });
+
+    assert.deepStrictEqual(res, [{ $set: { title: 'mongoose' } }]);
+  });
+
   it('does not set createdAt unless upsert is enabled', function() {
     const update = { $set: { title: 'mongoose' } };
     const now = new Date('2016-01-01');

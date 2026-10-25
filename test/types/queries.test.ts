@@ -202,6 +202,13 @@ expect<mongoose.ApplyProjection<ProjectionDoc, { _id: 1; age: 0 }>>().type.toBe<
 expect<mongoose.ApplyProjection<ProjectionDoc, { _id: 0; age: 0 }>>().type.toBe<{ name: string }>();
 expect<mongoose.ApplyProjection<ProjectionDoc, { _id: false }>>().type.toBe<{ name: string; age: number }>();
 
+type NestedProjectionDoc = { _id: string; name: string; meta: { title: string; hidden: boolean } };
+expect<mongoose.ApplyProjection<NestedProjectionDoc, { name: 1; 'meta.title': 1 }>>().type.toBe<{ _id: string; name: string; meta: { title: string } }>();
+expect<mongoose.ApplyProjection<NestedProjectionDoc, { 'meta.title': 1 }>>().type.toBe<{ _id: string; meta: { title: string } }>();
+expect<mongoose.ApplyProjection<NestedProjectionDoc, { 'meta.hidden': 0 }>>().type.toBe<{ _id: string; name: string; meta: { title: string } }>();
+expect<mongoose.ApplyProjection<{ _id: string; meta: any }, { 'meta.title': 1 }>>().type.toBe<{ _id: string; meta: any }>();
+expect<mongoose.ApplyProjection<any, { name: 1; 'meta.title': 1 }>>().type.toBe<{ _id: any; name: any; meta: any }>();
+
 Test.findOneAndUpdate({}, {}, { projection: { name: 1 } }).then(doc => {
   expect(doc!).type.toHaveProperty('name');
   expect(doc!).type.not.toHaveProperty('age');
@@ -1135,4 +1142,18 @@ async function gh16062() {
   const Test = model('Test', new Schema({ runtime: Number }));
   expect(Test.findOne).type.not.toBeCallableWith({ runtime: { $wrong: 100 } });
   expect(Test.findOne).type.not.toBeCallableWith({ $and: [{ runtime: { $wrong: 100 } }] });
+}
+
+async function nestedProjectionOnArraysAndSubdocs() {
+  const NestedProjectionModel = model('NestedProjection', new Schema({
+    arr: [{ a: String, b: Number }],
+    sub: new Schema({ a: String, b: Number })
+  }));
+
+  const projectedArr = await NestedProjectionModel.findOne({}, { 'arr.a': 1 }).orFail();
+  expect(projectedArr.arr[0]).type.toHaveProperty('a');
+  expect(projectedArr.arr[0]).type.toHaveProperty('ownerDocument');
+
+  const projectedSub = await NestedProjectionModel.findOne({}, { 'sub.a': 1 }).orFail();
+  expect(projectedSub.sub!).type.toHaveProperty('a');
 }

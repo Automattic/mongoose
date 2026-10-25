@@ -5685,9 +5685,9 @@ describe('model: populate:', function() {
       });
 
       describe('populate model read defaults', function() {
-        for (const [option, schemaOption, parentDefault, childDefault, driverDefault] of [
-          ['readPreference', 'read', 'primaryPreferred', 'primary', 'primary'],
-          ['readConcern', 'readConcern', { level: 'majority' }, { level: 'local' }, undefined]
+        for (const [option, schemaOption, parentDefault, childDefault, driverDefault, explicitValue] of [
+          ['readPreference', 'read', 'secondaryPreferred', 'primaryPreferred', 'primary', 'primary'],
+          ['readConcern', 'readConcern', { level: 'majority' }, { level: 'local' }, undefined, { level: 'available' }]
         ]) {
           it(`keeps ${option} schema defaults local to each model`, async function() {
             const { Article, calls } = await createTestContext({ schemaOption, parentDefault, childDefault });
@@ -5702,12 +5702,12 @@ describe('model: populate:', function() {
           it(`inherits explicit query ${option} through nested population`, async function() {
             const { Article, calls } = await createTestContext({ schemaOption, parentDefault, childDefault });
 
-            const articles = await Article.find().setOptions({ [option]: parentDefault }).
+            const articles = await Article.find().setOptions({ [option]: explicitValue }).
               populate({ path: 'author', populate: { path: 'publisher' } });
 
             assert.strictEqual(articles[0].author.publisher.name, 'Acme Books');
             assert.deepStrictEqual(calls.map(call => call[option]),
-              [parentDefault, parentDefault, parentDefault]);
+              [explicitValue, explicitValue, explicitValue]);
           });
 
           for (const overridePublisher of [false, true]) {
@@ -5719,13 +5719,13 @@ describe('model: populate:', function() {
                 options: { [option]: childDefault },
                 populate: {
                   path: 'publisher',
-                  options: overridePublisher ? { [option]: parentDefault } : {}
+                  options: overridePublisher ? { [option]: explicitValue } : {}
                 }
               });
 
               assert.strictEqual(articles[0].author.publisher.name, 'Acme Books');
               assert.deepStrictEqual(calls.map(call => call[option]),
-                [parentDefault, childDefault, overridePublisher ? parentDefault : childDefault]);
+                [parentDefault, childDefault, overridePublisher ? explicitValue : childDefault]);
             });
           }
         }
@@ -5750,7 +5750,8 @@ describe('model: populate:', function() {
                 readPreference: cursor.readPreference.mode,
                 readConcern: cursor.readConcern && { level: cursor.readConcern.level }
               });
-              return cursor;
+              // Record effective settings, then read from primary to avoid replication lag.
+              return cursor.withReadPreference('primary');
             };
           }
           return { Article, calls };

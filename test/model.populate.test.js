@@ -5684,6 +5684,79 @@ describe('model: populate:', function() {
         }
       });
 
+      describe('populate model read defaults', function() {
+        for (const [option, schemaOption, parentDefault, childDefault, driverDefault] of [
+          ['readPreference', 'read', 'primaryPreferred', 'primary', 'primary'],
+          ['readConcern', 'readConcern', { level: 'majority' }, { level: 'local' }, undefined]
+        ]) {
+          it(`keeps ${option} schema defaults local to each model`, async function() {
+            const { Article, calls } = await createTestContext({ schemaOption, parentDefault, childDefault });
+
+            const articles = await Article.find().populate({ path: 'author', populate: { path: 'publisher' } });
+
+            assert.strictEqual(articles[0].author.publisher.name, 'Acme Books');
+            assert.deepStrictEqual(calls.map(call => call[option]),
+              [parentDefault, childDefault, driverDefault]);
+          });
+
+          it(`inherits explicit query ${option} through nested population`, async function() {
+            const { Article, calls } = await createTestContext({ schemaOption, parentDefault, childDefault });
+
+            const articles = await Article.find().setOptions({ [option]: parentDefault }).
+              populate({ path: 'author', populate: { path: 'publisher' } });
+
+            assert.strictEqual(articles[0].author.publisher.name, 'Acme Books');
+            assert.deepStrictEqual(calls.map(call => call[option]),
+              [parentDefault, parentDefault, parentDefault]);
+          });
+
+          for (const overridePublisher of [false, true]) {
+            it(`inherits populate ${option} until ${overridePublisher ? 'overridden again' : 'the last child'}`, async function() {
+              const { Article, calls } = await createTestContext({ schemaOption, parentDefault, childDefault });
+
+              const articles = await Article.find().setOptions({ [option]: parentDefault }).populate({
+                path: 'author',
+                options: { [option]: childDefault },
+                populate: {
+                  path: 'publisher',
+                  options: overridePublisher ? { [option]: parentDefault } : {}
+                }
+              });
+
+              assert.strictEqual(articles[0].author.publisher.name, 'Acme Books');
+              assert.deepStrictEqual(calls.map(call => call[option]),
+                [parentDefault, childDefault, overridePublisher ? parentDefault : childDefault]);
+            });
+          }
+        }
+
+        async function createTestContext({ schemaOption, parentDefault, childDefault }) {
+          const Publisher = db.model('Publisher', new Schema({ name: String }));
+          const Author = db.model('Author', new Schema({
+            name: String, publisher: { type: ObjectId, ref: 'Publisher' }
+          }, { [schemaOption]: childDefault }));
+          const Article = db.model('Article', new Schema({
+            author: { type: ObjectId, ref: 'Author' }
+          }, { [schemaOption]: parentDefault }));
+          const publisher = await Publisher.create({ name: 'Acme Books' });
+          const author = await Author.create({ name: 'Alice', publisher: publisher._id });
+          await Article.create({ author: author._id });
+          const calls = [];
+          for (const Model of [Article, Author, Publisher]) {
+            const find = Model.collection.find;
+            Model.collection.find = function(filter, options) {
+              const cursor = find.call(this, filter, options);
+              calls.push({
+                readPreference: cursor.readPreference.mode,
+                readConcern: cursor.readConcern && { level: cursor.readConcern.level }
+              });
+              return cursor;
+            };
+          }
+          return { Article, calls };
+        }
+      });
+
       describe('cloned populate read options', function() {
         for (const [option, initial, updated] of [
           ['readPreference', 'primary', 'secondaryPreferred'],

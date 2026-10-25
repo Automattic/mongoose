@@ -3266,6 +3266,28 @@ describe('model: updateOne: ', function() {
     assert.ok(!err.errors['nested']);
   });
 
+  it('update validators report errors underneath single nested subdocs with storeSubdocValidationError: false', async function() {
+    const opts = { storeSubdocValidationError: false };
+    const Model = db.model('Test', Schema({
+      nested: Schema({
+        name: { type: String, enum: ['a', 'b'] },
+        sub: Schema({ kind: { type: String, enum: ['a', 'b'] } })
+      }, opts)
+    }));
+
+    const err = await Model.updateOne(
+      {},
+      { $set: { nested: { name: 'invalid', sub: { kind: 'invalid' } } } },
+      { runValidators: true }
+    ).catch(err => err);
+
+    assert.ok(err);
+    assert.equal(err.name, 'ValidationError');
+    assert.ok(err.errors['nested.name']);
+    assert.ok(err.errors['nested.sub.kind']);
+    assert.ok(!err.errors['nested']);
+  });
+
   it('handles spread docs (gh-9518)', async function() {
     const schema = new mongoose.Schema({
       name: String,
@@ -3623,6 +3645,85 @@ describe('model: updateOne: ', function() {
     // Assert that each validator was only called once
     assert.equal(validateDetailsCalls, 1);
     assert.equal(validateNameCalls, 1);
+  });
+
+  it('only calls validators under document array subdocs once', async function() {
+    let validateListCalls = 0;
+    let validateItemCalls = 0;
+    let validateTagCalls = 0;
+
+    const tagSchema = new Schema({
+      name: {
+        type: String,
+        validate: function() {
+          validateTagCalls++;
+          return true;
+        }
+      }
+    });
+    const itemSchema = new Schema({
+      name: {
+        type: String,
+        validate: function() {
+          validateItemCalls++;
+          return true;
+        }
+      },
+      tags: [tagSchema]
+    });
+    const listSchema = new Schema({
+      name: {
+        type: String,
+        validate: function() {
+          validateListCalls++;
+          return true;
+        }
+      },
+      items: [itemSchema]
+    });
+    const Test = db.model('Test', new Schema({
+      lists: [listSchema],
+      nested: new Schema({ items: [itemSchema] })
+    }));
+
+    await Test.updateOne(
+      { _id: new mongoose.Types.ObjectId() },
+      {
+        $set: {
+          'lists.0': { name: 'list', items: [{ name: 'item', tags: [{ name: 'tag' }] }] },
+          nested: { items: [{ name: 'item', tags: [{ name: 'tag' }] }] }
+        }
+      },
+      { runValidators: true }
+    );
+
+    // One list, two items (one under `lists.0`, one under `nested`) and two tags
+    assert.equal(validateListCalls, 1);
+    assert.equal(validateItemCalls, 2);
+    assert.equal(validateTagCalls, 2);
+  });
+
+  it('update validators report the same errors as doc.validate() when a single nested validator fails', async function() {
+    const Test = db.model('Test', new Schema({
+      nested: {
+        type: new Schema({ items: [{ name: { type: String, enum: ['a', 'b'] } }] }),
+        validate: () => false
+      }
+    }));
+
+    const err = await Test.updateOne(
+      {},
+      { $set: { nested: { items: [{ name: 'invalid' }] } } },
+      { runValidators: true }
+    ).then(() => null, err => err);
+    const docErr = await new Test({ nested: { items: [{ name: 'invalid' }] } }).validate().then(() => null, err => err);
+
+    assert.ok(err);
+    assert.equal(err.name, 'ValidationError');
+    // `nested` failing stops validation before the subdoc validates its own paths,
+    // so `nested.items.0.name` is not reported, same as with `doc.validate()`
+    assert.deepStrictEqual(Object.keys(err.errors), ['nested']);
+    assert.deepStrictEqual(Object.keys(err.errors), Object.keys(docErr.errors));
   });
 
   it('applies allowNull validators with updateOne and runValidators', async function() {

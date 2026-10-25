@@ -488,7 +488,7 @@ describe('transactions', function() {
     assert.equal(docs[0].name, 'test');
   });
 
-  describe('transaction() when commitTransaction() fails', function() {
+  describe('transaction() when commitTransaction() fails (gh-16639)', function() {
     let originalStartSession;
 
     // Make the first `commitTransaction()` abort the transaction and fail with the given error,

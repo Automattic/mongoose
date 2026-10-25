@@ -3601,6 +3601,214 @@ describe('model: populate:', function() {
 
     });
 
+    describe('null populate read options (gh-15553)', function() {
+      for (const [option, value, expected] of [
+        ['readPreference', 'primaryPreferred', 'primaryPreferred'],
+        ['readConcern', { level: 'majority' }, 'majority']
+      ]) {
+        it(`inherits ${option} when populate sets it to null`, async function() {
+          const { Article, calls } = await createTestContext();
+
+          const articles = await Article.find().populate({ path: 'author', options: { [option]: null } }).
+            setOptions({ [option]: value });
+
+          assert.strictEqual(articles[0].author.name, 'Alice');
+          assert.deepStrictEqual(calls.map(options => options[option]), [expected]);
+        });
+      }
+
+      async function createTestContext() {
+        const Author = db.model('Author', new Schema({ name: String }));
+        const Article = db.model('Article', new Schema({ author: { type: ObjectId, ref: 'Author' } }));
+        const author = await Author.create({ name: 'Alice' });
+        await Article.create({ author: author._id });
+        const calls = [];
+        const find = Author.collection.find;
+        Author.collection.find = function(filter, options) {
+          const cursor = find.call(this, filter, options);
+          calls.push({ readPreference: cursor.readPreference.mode, readConcern: cursor.readConcern?.level });
+          return cursor;
+        };
+        return { Article, calls };
+      }
+    });
+
+    describe('populate model read defaults', function() {
+      for (const [option, schemaOption, parentDefault, childDefault, driverDefault, explicitValue] of [
+        ['readPreference', 'read', 'secondaryPreferred', 'primaryPreferred', 'primary', 'nearest'],
+        ['readConcern', 'readConcern', { level: 'majority' }, { level: 'local' }, undefined, { level: 'available' }]
+      ]) {
+        it(`keeps ${option} schema defaults local to each model`, async function() {
+          const { Article, calls } = await createTestContext({ schemaOption, parentDefault, childDefault });
+
+          const articles = await Article.find().populate({ path: 'author', populate: { path: 'publisher' } });
+
+          assert.strictEqual(articles[0].author.publisher.name, 'Acme Books');
+          assert.deepStrictEqual(calls.map(call => call[option]),
+            [parentDefault, childDefault, driverDefault]);
+        });
+
+        it(`inherits explicit query ${option} through nested population`, async function() {
+          const { Article, calls } = await createTestContext({ schemaOption, parentDefault, childDefault });
+
+          const articles = await Article.find().setOptions({ [option]: explicitValue }).
+            populate({ path: 'author', populate: { path: 'publisher' } });
+
+          assert.strictEqual(articles[0].author.publisher.name, 'Acme Books');
+          assert.deepStrictEqual(calls.map(call => call[option]),
+            [explicitValue, explicitValue, explicitValue]);
+        });
+
+        it(`keeps ${option} schema defaults local with a deferred populate`, async function() {
+          const { Article, calls } = await createTestContext({ schemaOption, parentDefault, childDefault });
+
+          const articles = await Article.find().populate({
+            path: 'author', match: () => ({}), populate: { path: 'publisher' }
+          });
+
+          assert.strictEqual(articles[0].author.publisher.name, 'Acme Books');
+          assert.deepStrictEqual(calls.map(call => call[option]), [parentDefault, childDefault, driverDefault]);
+        });
+
+        it(`uses updated ${option} when cloning an executed deferred populate`, async function() {
+          const { Article, calls } = await createTestContext({ schemaOption, parentDefault, childDefault });
+          const query = Article.find().setOptions({ [option]: parentDefault }).populate({
+            path: 'author', match: () => ({}), populate: { path: 'publisher' }
+          });
+          await query;
+
+          const articles = await query.clone().setOptions({ [option]: childDefault });
+
+          assert.strictEqual(articles[0].author.publisher.name, 'Acme Books');
+          assert.deepStrictEqual(calls.map(call => call[option]),
+            [parentDefault, parentDefault, parentDefault, childDefault, childDefault, childDefault]);
+        });
+
+        for (const [scenario, authorOption, publisherOption, expected] of [
+          ['inherited query setting', undefined, undefined, [parentDefault, parentDefault, parentDefault]],
+          ['null child setting', undefined, null, [parentDefault, parentDefault, parentDefault]],
+          ['author override', explicitValue, undefined, [parentDefault, explicitValue, explicitValue]],
+          ['publisher override', childDefault, explicitValue, [parentDefault, childDefault, explicitValue]]
+        ]) {
+          it(`uses ${option} with ${scenario} in a deferred populate`, async function() {
+            const { Article, calls } = await createTestContext({ schemaOption, parentDefault, childDefault });
+
+            const articles = await Article.find().setOptions({ [option]: parentDefault }).populate({
+              path: 'author',
+              match: () => ({ name: 'Alice' }),
+              options: { [option]: authorOption },
+              populate: [{ path: 'publisher', options: { [option]: publisherOption } }]
+            });
+
+            assert.strictEqual(articles[0].author.publisher.name, 'Acme Books');
+            assert.deepStrictEqual(calls.map(call => call[option]), expected);
+          });
+        }
+
+        for (const overridePublisher of [false, true]) {
+          it(`inherits populate ${option} until ${overridePublisher ? 'overridden again' : 'the last child'}`, async function() {
+            const { Article, calls } = await createTestContext({ schemaOption, parentDefault, childDefault });
+
+            const articles = await Article.find().setOptions({ [option]: parentDefault }).populate({
+              path: 'author',
+              options: { [option]: explicitValue },
+              populate: {
+                path: 'publisher',
+                options: overridePublisher ? { [option]: childDefault } : {}
+              }
+            });
+
+            assert.strictEqual(articles[0].author.publisher.name, 'Acme Books');
+            assert.deepStrictEqual(calls.map(call => call[option]),
+              [parentDefault, explicitValue, overridePublisher ? childDefault : explicitValue]);
+          });
+        }
+      }
+
+      async function createTestContext({ schemaOption, parentDefault, childDefault }) {
+        const Publisher = db.model('Publisher', new Schema({ name: String }));
+        const Author = db.model('Author', new Schema({
+          name: String, publisher: { type: ObjectId, ref: 'Publisher' }
+        }, { [schemaOption]: childDefault }));
+        const Article = db.model('Article', new Schema({
+          author: { type: ObjectId, ref: 'Author' }
+        }, { [schemaOption]: parentDefault }));
+        const publisher = await Publisher.create({ name: 'Acme Books' });
+        const author = await Author.create({ name: 'Alice', publisher: publisher._id });
+        await Article.create({ author: author._id });
+        const calls = [];
+        for (const Model of [Article, Author, Publisher]) {
+          const find = Model.collection.find;
+          Model.collection.find = function(filter, options) {
+            const cursor = find.call(this, filter, options);
+            calls.push({
+              readPreference: cursor.readPreference.mode,
+              readConcern: cursor.readConcern && { level: cursor.readConcern.level }
+            });
+            // Record effective settings, then read from primary to avoid replication lag.
+            return cursor.withReadPreference('primary');
+          };
+        }
+        return { Article, calls };
+      }
+    });
+
+    describe('cloned populate read options', function() {
+      it('uses the updated read preference when cloning plain-object populate options', async function() {
+        // Arrange
+        const { Article, calls } = await createTestContext();
+        const query = Article.find().read('primary');
+        query.mongooseOptions({ populate: { author: { path: 'author', options: {} } } });
+
+        // Act
+        const articles = await query;
+        const clonedArticles = await query.clone().read('secondaryPreferred');
+
+        // Assert
+        assert.deepStrictEqual([articles[0].author.name, clonedArticles[0].author.name], ['Alice', 'Alice']);
+        assert.deepStrictEqual(calls.map(options => options.readPreference), ['primary', 'secondaryPreferred']);
+      });
+
+      for (const [option, initial, updated] of [
+        ['readPreference', 'primary', 'secondaryPreferred'],
+        ['readConcern', { level: 'local' }, { level: 'majority' }]
+      ]) {
+        it(`uses updated inherited ${option} on an executed clone`, async function() {
+          const { Article, calls } = await createTestContext();
+          const query = Article.find().setOptions({ [option]: initial }).populate('author');
+          await query;
+
+          const articles = await query.clone().setOptions({ [option]: updated });
+
+          assert.strictEqual(articles[0].author.name, 'Alice');
+          assert.deepStrictEqual(calls.map(options => options[option]), [initial, updated]);
+        });
+      }
+
+      async function createTestContext() {
+        const Author = db.model('Author', new Schema({ name: String }));
+        const Article = db.model('Article', new Schema({ author: { type: ObjectId, ref: 'Author' } }));
+        const author = await Author.create({ name: 'Alice' });
+        await Article.create({ author: author._id });
+        const calls = [];
+        // Record effective settings, then read from primary to avoid replication lag.
+        const find = Author.collection.find;
+        Author.collection.find = function(filter, options) {
+          const cursor = find.call(this, filter, options);
+          calls.push({
+            readPreference: cursor.readPreference.mode,
+            readConcern: cursor.readConcern && { level: cursor.readConcern.level }
+          });
+          return cursor.withReadPreference('primary');
+        };
+        const findArticle = Article.collection.find;
+        Article.collection.find = function(filter, options) {
+          return findArticle.call(this, filter, { ...options, readPreference: 'primary' });
+        };
+        return { Article, calls };
+      }
+    });
+
     describe('populate virtuals (gh-2562)', function() {
       it('basic populate virtuals', async function() {
         const PersonSchema = new Schema({
@@ -5641,186 +5849,6 @@ describe('model: populate:', function() {
         const docs = await q.exec();
         assert.equal(docs[0].ref.name, 'Alice');
         assert.equal(calls[0].readPreference.mode, 'secondaryPreferred');
-      });
-
-      describe('null populate read options (gh-15553)', function() {
-        for (const [option, value, expected] of [
-          ['readPreference', 'primaryPreferred', 'primaryPreferred'],
-          ['readConcern', { level: 'majority' }, 'majority']
-        ]) {
-          for (const order of ['before', 'after']) {
-            it(`inherits ${option} when null is populated ${order} setting the parent option`, async function() {
-              const { Article, calls } = await createTestContext();
-              const query = Article.find();
-              if (order === 'after') {
-                query.setOptions({ [option]: value });
-              }
-              query.populate({ path: 'author', options: { [option]: null } });
-              if (order === 'before') {
-                query.setOptions({ [option]: value });
-              }
-
-              const articles = await query;
-
-              assert.strictEqual(articles[0].author.name, 'Alice');
-              assert.deepStrictEqual(calls.map(options => options[option]), [expected]);
-            });
-          }
-        }
-
-        async function createTestContext() {
-          const Author = db.model('Author', new Schema({ name: String }));
-          const Article = db.model('Article', new Schema({ author: { type: ObjectId, ref: 'Author' } }));
-          const author = await Author.create({ name: 'Alice' });
-          await Article.create({ author: author._id });
-          const calls = [];
-          const find = Author.collection.find;
-          Author.collection.find = function(filter, options) {
-            const cursor = find.call(this, filter, options);
-            calls.push({ readPreference: cursor.readPreference.mode, readConcern: cursor.readConcern?.level });
-            return cursor;
-          };
-          return { Article, calls };
-        }
-      });
-
-      describe('populate model read defaults', function() {
-        for (const [option, schemaOption, parentDefault, childDefault, driverDefault, explicitValue] of [
-          ['readPreference', 'read', 'secondaryPreferred', 'primaryPreferred', 'primary', 'primary'],
-          ['readConcern', 'readConcern', { level: 'majority' }, { level: 'local' }, undefined, { level: 'available' }]
-        ]) {
-          it(`keeps ${option} schema defaults local to each model`, async function() {
-            const { Article, calls } = await createTestContext({ schemaOption, parentDefault, childDefault });
-
-            const articles = await Article.find().populate({ path: 'author', populate: { path: 'publisher' } });
-
-            assert.strictEqual(articles[0].author.publisher.name, 'Acme Books');
-            assert.deepStrictEqual(calls.map(call => call[option]),
-              [parentDefault, childDefault, driverDefault]);
-          });
-
-          it(`inherits explicit query ${option} through nested population`, async function() {
-            const { Article, calls } = await createTestContext({ schemaOption, parentDefault, childDefault });
-
-            const articles = await Article.find().setOptions({ [option]: explicitValue }).
-              populate({ path: 'author', populate: { path: 'publisher' } });
-
-            assert.strictEqual(articles[0].author.publisher.name, 'Acme Books');
-            assert.deepStrictEqual(calls.map(call => call[option]),
-              [explicitValue, explicitValue, explicitValue]);
-          });
-
-          for (const overridePublisher of [false, true]) {
-            it(`inherits populate ${option} until ${overridePublisher ? 'overridden again' : 'the last child'}`, async function() {
-              const { Article, calls } = await createTestContext({ schemaOption, parentDefault, childDefault });
-
-              const articles = await Article.find().setOptions({ [option]: parentDefault }).populate({
-                path: 'author',
-                options: { [option]: childDefault },
-                populate: {
-                  path: 'publisher',
-                  options: overridePublisher ? { [option]: explicitValue } : {}
-                }
-              });
-
-              assert.strictEqual(articles[0].author.publisher.name, 'Acme Books');
-              assert.deepStrictEqual(calls.map(call => call[option]),
-                [parentDefault, childDefault, overridePublisher ? explicitValue : childDefault]);
-            });
-          }
-        }
-
-        async function createTestContext({ schemaOption, parentDefault, childDefault }) {
-          const Publisher = db.model('Publisher', new Schema({ name: String }));
-          const Author = db.model('Author', new Schema({
-            name: String, publisher: { type: ObjectId, ref: 'Publisher' }
-          }, { [schemaOption]: childDefault }));
-          const Article = db.model('Article', new Schema({
-            author: { type: ObjectId, ref: 'Author' }
-          }, { [schemaOption]: parentDefault }));
-          const publisher = await Publisher.create({ name: 'Acme Books' });
-          const author = await Author.create({ name: 'Alice', publisher: publisher._id });
-          await Article.create({ author: author._id });
-          const calls = [];
-          for (const Model of [Article, Author, Publisher]) {
-            const find = Model.collection.find;
-            Model.collection.find = function(filter, options) {
-              const cursor = find.call(this, filter, options);
-              calls.push({
-                readPreference: cursor.readPreference.mode,
-                readConcern: cursor.readConcern && { level: cursor.readConcern.level }
-              });
-              // Record effective settings, then read from primary to avoid replication lag.
-              return cursor.withReadPreference('primary');
-            };
-          }
-          return { Article, calls };
-        }
-      });
-
-      describe('cloned populate read options', function() {
-        for (const [option, initial, updated] of [
-          ['readPreference', 'primary', 'secondaryPreferred'],
-          ['readConcern', { level: 'local' }, { level: 'majority' }]
-        ]) {
-          for (const explicit of [false, true]) {
-            it(`uses ${explicit ? 'explicit' : 'updated inherited'} ${option} on an executed clone`, async function() {
-              const { Article, calls } = await createTestContext();
-              const query = Article.find().setOptions({ [option]: initial }).populate({
-                path: 'author', options: explicit ? { [option]: initial } : {}
-              });
-              await query;
-
-              const articles = await query.clone().setOptions({ [option]: updated });
-
-              assert.strictEqual(articles[0].author.name, 'Alice');
-              assert.deepStrictEqual(calls.map(options => options[option]), [initial, explicit ? initial : updated]);
-            });
-          }
-        }
-
-        for (const firstExecution of ['original', 'clone']) {
-          for (const explicit of [false, true]) {
-            it(`keeps ${explicit ? 'explicit' : 'inherited'} preferences separate when ${firstExecution} executes first`, async function() {
-              const { Article, calls } = await createTestContext();
-              const original = Article.find().populate({
-                path: 'author', options: explicit ? { readPreference: 'primary' } : {}
-              }).read('secondaryPreferred');
-              const cloned = original.clone().read('primaryPreferred');
-              const queries = firstExecution === 'original' ? [original, cloned] : [cloned, original];
-              const expected = firstExecution === 'original' ?
-                ['secondaryPreferred', 'primaryPreferred'] : ['primaryPreferred', 'secondaryPreferred'];
-
-              const results = [];
-              for (const query of queries) {
-                results.push(await query);
-              }
-
-              assert.deepStrictEqual(results.map(articles => articles[0].author.name), ['Alice', 'Alice']);
-              assert.deepStrictEqual(calls.map(options => typeof options.readPreference === 'string' ?
-                options.readPreference : options.readPreference?.mode), explicit ? ['primary', 'primary'] : expected);
-            });
-          }
-        }
-
-        async function createTestContext() {
-          const Author = db.model('Author', new Schema({ name: String }));
-          const Article = db.model('Article', new Schema({ author: { type: ObjectId, ref: 'Author' } }));
-          const author = await Author.create({ name: 'Alice' });
-          await Article.create({ author: author._id });
-          const calls = [];
-          // Record Mongoose options, then read fixtures from primary to avoid replication lag.
-          const find = Author.collection.find;
-          Author.collection.find = function(filter, options) {
-            calls.push(options);
-            return find.call(this, filter, { ...options, readPreference: 'primary' });
-          };
-          const findArticle = Article.collection.find;
-          Article.collection.find = function(filter, options) {
-            return findArticle.call(this, filter, { ...options, readPreference: 'primary' });
-          };
-          return { Article, calls };
-        }
       });
 
       it('array underneath non-existent array (gh-6245)', async function() {

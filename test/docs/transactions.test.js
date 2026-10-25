@@ -488,6 +488,91 @@ describe('transactions', function() {
     assert.equal(docs[0].name, 'test');
   });
 
+  describe('transaction() when commitTransaction() fails', function() {
+    let originalStartSession;
+
+    // Make the first `commitTransaction()` abort the transaction and fail with the given error,
+    // as the driver does when the primary steps down before the commit. The driver retries
+    // the whole callback when the error is transient.
+    function failFirstCommit(createError) {
+      originalStartSession = db.startSession;
+      let failed = false;
+      db.startSession = async function() {
+        const session = await originalStartSession.apply(this, arguments);
+        const commitTransaction = session.commitTransaction.bind(session);
+        session.commitTransaction = async function() {
+          if (!failed) {
+            failed = true;
+            await session.abortTransaction();
+            throw createError();
+          }
+          return commitTransaction();
+        };
+        return session;
+      };
+    }
+
+    afterEach(function() {
+      if (originalStartSession != null) {
+        db.startSession = originalStartSession;
+        originalStartSession = null;
+      }
+    });
+
+    it('re-saves modified documents when the driver retries after a transient commit error', async function() {
+      db.deleteModel(/Test/);
+      const Test = db.model('Test', Schema({ name: String }));
+
+      await Test.createCollection();
+      await Test.deleteMany({});
+
+      const { _id } = await Test.create({ name: 'initial' });
+      const doc = await Test.findById(_id).orFail();
+
+      failFirstCommit(() => new mongoose.mongo.MongoServerError({
+        message: 'test',
+        errorLabels: ['TransientTransactionError']
+      }));
+
+      let attempts = 0;
+      await db.transaction(async(session) => {
+        ++attempts;
+        doc.name = 'updated';
+        await doc.save({ session });
+      });
+
+      const fromDb = await Test.findById(_id).orFail();
+      assert.strictEqual(attempts, 2);
+      assert.strictEqual(fromDb.name, 'updated');
+    });
+
+    it('re-inserts new documents when the driver retries after a transient commit error', async function() {
+      db.deleteModel(/Test/);
+      const Test = db.model('Test', Schema({ name: String }));
+
+      await Test.createCollection();
+      await Test.deleteMany({});
+
+      failFirstCommit(() => new mongoose.mongo.MongoServerError({
+        message: 'test',
+        errorLabels: ['TransientTransactionError']
+      }));
+
+      const doc = new Test({ name: 'test' });
+      let attempts = 0;
+      await db.transaction(async(session) => {
+        ++attempts;
+        await doc.save({ session });
+      });
+
+      const docs = await Test.find();
+      assert.strictEqual(attempts, 2);
+      assert.strictEqual(docs.length, 1);
+      assert.strictEqual(docs[0].name, 'test');
+      assert.ok(!doc.$isNew);
+    });
+  });
+
   it('transaction() resets $isDeleted between retries', async function() {
     db.deleteModel(/Test/);
     const Test = db.model('Test', Schema({ name: String }));

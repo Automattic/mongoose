@@ -1220,6 +1220,40 @@ describe('connections:', function() {
         await conn.close();
       });
 
+      it('handles read preference passed as a ReadPreference instance', async function() {
+        const { ReadPreference } = mongoose.mongo;
+        const conn = mongoose.createConnection(start.uri, { readPreference: ReadPreference.primary });
+
+        assert.strictEqual(conn.get('autoIndex'), undefined);
+        assert.strictEqual(conn.get('autoCreate'), undefined);
+
+        const conn2 = mongoose.createConnection(start.uri, { readPreference: new ReadPreference('secondaryPreferred') });
+
+        assert.strictEqual(conn2.get('autoIndex'), false);
+        assert.strictEqual(conn2.get('autoCreate'), false);
+        await conn.close();
+        await conn2.close();
+      });
+
+      it('throws if options try to set autoIndex to true with a secondary ReadPreference instance', function() {
+        const { ReadPreference } = mongoose.mongo;
+        const opts = {
+          readPreference: new ReadPreference('secondary'),
+          autoIndex: true
+        };
+        const err = new MongooseError(
+          'MongoDB prohibits index creation on connections that read from ' +
+                        'non-primary replicas.  Connections that set "readPreference" to "secondary" or ' +
+                        '"secondaryPreferred" may not opt-in to the following connection options: ' +
+                        'autoCreate, autoIndex'
+        );
+        const m = new mongoose.Mongoose();
+        return assert.rejects(
+          () => m.createConnection(start.uri, opts).asPromise(),
+          err
+        );
+      });
+
       it('throws if options try to set autoIndex to true', function() {
         const opts = {
           readPreference: 'secondary',

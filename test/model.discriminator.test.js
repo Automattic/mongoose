@@ -2588,4 +2588,74 @@ describe('model', function() {
     );
     assert.strictEqual(testMethodCalls.length, 1);
   });
+
+  describe('discriminator keys that match inherited properties', function() {
+    function createModel() {
+      const eventSchema = new Schema({ message: String });
+      const schema = new Schema({
+        name: String,
+        events: [eventSchema],
+        nested: new Schema({ message: String })
+      });
+      schema.path('events').discriminator('Clicked', new Schema({ element: String }));
+      schema.path('nested').discriminator('Clicked', new Schema({ element: String }));
+
+      const Base = db.model('Test', schema);
+      Base.discriminator('Child', new Schema({ extra: String }));
+      return Base;
+    }
+
+    for (const value of ['constructor', 'toString', 'hasOwnProperty']) {
+      it(`uses the base model when discriminator key is "${value}"`, async function() {
+        const Base = createModel();
+
+        const doc = new Base({ name: 'test', __t: value });
+        assert.ok(doc instanceof Base);
+        await doc.validate();
+
+        const hydrated = Base.hydrate({ _id: new mongoose.Types.ObjectId(), name: 'test', __t: value });
+        assert.ok(hydrated instanceof Base);
+
+        // Same behavior as any other unknown discriminator value
+        await assert.rejects(
+          Base.create([{ name: 'test', __t: value }]),
+          new RegExp(`Discriminator "${value}" not found for model "Test"`)
+        );
+        const [inserted] = await Base.insertMany([{ name: 'test', __t: value }]);
+        assert.ok(inserted instanceof Base);
+
+        await Base.bulkWrite([{
+          insertOne: { document: { name: 'bulkWrite', notInSchema: true, __t: value } }
+        }], { skipValidation: true });
+        const rawBulkWrite = await Base.collection.findOne({ name: 'bulkWrite' });
+        assert.strictEqual(rawBulkWrite.notInSchema, undefined);
+
+        await Base.collection.insertOne({ name: 'fromDb', __t: value });
+        const fromDb = await Base.findOne({ name: 'fromDb' });
+        assert.ok(fromDb instanceof Base);
+        assert.strictEqual(fromDb.name, 'fromDb');
+      });
+
+      it(`uses the base schema when embedded discriminator key is "${value}"`, async function() {
+        const Base = createModel();
+
+        const doc = new Base({ name: 'test', events: [{ message: 'a', __t: value }], nested: { message: 'b', __t: value } });
+        doc.events.push({ message: 'c', __t: value });
+        const created = doc.events.create({ message: 'd', __t: value });
+        assert.strictEqual(created.message, 'd');
+        assert.deepStrictEqual(doc.events.map(ev => ev.message), ['a', 'c']);
+        assert.strictEqual(doc.nested.message, 'b');
+        await doc.validate();
+
+        const query = Base.find({ 'events.__t': value, 'events.message': 'a' });
+        query._castConditions();
+        assert.ifError(query.error());
+
+        const update = Base.updateOne({ __t: value }, { name: 'updated' });
+        update._castConditions();
+        update._castUpdate(update._update);
+        assert.ifError(update.error());
+      });
+    }
+  });
 });

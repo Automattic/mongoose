@@ -8862,6 +8862,30 @@ describe('Model', function() {
   });
 
   describe('hydrate virtual input and option regressions', function() {
+    it('ignores inherited properties when hydrating virtuals', function() {
+      // Arrange
+      const { Customer } = createTestContext();
+      const raw = JSON.parse('{"__proto__":{"polluted":"yes"},"constructor":{"prototype":{"polluted":"yes"}},"toString":{"polluted":"yes"},"valueOf":{"call":{"polluted":"yes"}}}');
+      raw.contact = { ...raw, label: 'Work' };
+      raw.displayName = { first: 'Ada', last: 'Lovelace' };
+
+      // Act
+      const customer = Customer.hydrate(raw, null, { virtuals: true });
+
+      // Assert
+      assert.strictEqual(customer.displayName, 'Ada Lovelace');
+      assert.strictEqual(customer.contact.label, 'Work');
+      for (const owner of [customer, customer.contact]) {
+        const serialized = owner.toObject();
+        for (const key of ['__proto__', 'constructor', 'toString', 'valueOf']) {
+          assert.strictEqual(Object.hasOwn(serialized, key), false, key);
+        }
+      }
+      assert.strictEqual(Object.prototype.polluted, undefined);
+      assert.strictEqual(Object.prototype.toString.polluted, undefined);
+      assert.strictEqual(Function.prototype.call.polluted, undefined);
+    });
+
     it('passes complete objects to root and embedded virtual setters', function() {
       // Arrange
       const { Customer } = createTestContext();

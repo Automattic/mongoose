@@ -8890,6 +8890,41 @@ describe('Model', function() {
       assert.deepStrictEqual([customer.contact.label, customer.contacts[0].label, customer.directory.get('work').label], ['Work', 'Work', 'Work']);
     });
 
+    for (const embedded of [false, true]) {
+      it(`preserves virtual payloads with colliding keys, embedded=${embedded}`, function() {
+        // Arrange
+        const { Customer } = createTestContext();
+        const address = { address: '12 Oak Street', city: 'Amsterdam' };
+        const raw = { city: 'Paris', address };
+
+        // Act
+        const customer = Customer.hydrate(embedded ? { contact: raw } : raw, null, { virtuals: true });
+        const owner = embedded ? customer.contact : customer;
+
+        // Assert
+        assert.deepStrictEqual(owner.address, address);
+        assert.strictEqual(owner.city, 'Paris');
+      });
+
+      it(`does not set virtuals from ordinary nested keys, embedded=${embedded}`, function() {
+        // Arrange
+        const { Customer } = createTestContext();
+        const raw = { billing: { reference: 'INV-1', address: '12 Oak Street', city: 'Amsterdam' } };
+
+        // Act
+        const customer = Customer.hydrate(embedded ? { contact: raw } : raw, null, { virtuals: true });
+        const owner = embedded ? customer.contact : customer;
+
+        // Assert
+        assert.strictEqual(owner.address, undefined);
+        assert.strictEqual(owner.city, undefined);
+        assert.deepStrictEqual(
+          [owner.billing.reference, owner.get('billing.address'), owner.get('billing.city')],
+          ['INV-1', '12 Oak Street', 'Amsterdam']
+        );
+      });
+    }
+
     for (const justOne of [true, false]) {
       it(`hydrates embedded populated virtuals with justOne=${justOne}`, function() {
         // Arrange
@@ -8980,6 +9015,16 @@ describe('Model', function() {
         this.$locals.displayName = `${value.first} ${value.last}`;
       });
       customerSchema.virtual('matches', { ref: 'Contact', localField: '_id', foreignField: '_id', justOne });
+      for (const schema of [contactSchema, customerSchema]) {
+        schema.add({ billing: { reference: String } });
+        for (const path of ['address', 'city']) {
+          schema.virtual(path).get(function() {
+            return this.$locals[path];
+          }).set(function(value) {
+            this.$locals[path] = value;
+          });
+        }
+      }
       return { Customer: db.model('Customer', customerSchema), Contact: db.model('Contact', contactSchema) };
     }
   });

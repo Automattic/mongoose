@@ -8891,6 +8891,25 @@ describe('Model', function() {
     });
 
     for (const justOne of [true, false]) {
+      it(`hydrates embedded populated virtuals with justOne=${justOne}`, function() {
+        // Arrange
+        const { Customer, Contact } = createTestContext({ justOne });
+        const contact = { _id: new mongoose.Types.ObjectId(), name: 'Ada', label: 'Work' };
+
+        // Act
+        const customer = Customer.hydrate({ contact: { matches: justOne ? contact : [contact] } }, null, {
+          virtuals: true, hydratedPopulatedDocs: true
+        });
+        const populated = justOne ? customer.contact.matches : customer.contact.matches[0];
+
+        // Assert
+        assert.ok(populated instanceof Contact);
+        assert.deepStrictEqual(
+          { _id: populated._id, name: populated.name, label: populated.label },
+          contact
+        );
+      });
+
       it(`forwards hydration options to populated virtuals with justOne=${justOne}`, function() {
         // Arrange
         const { Customer, Contact } = createTestContext({ justOne });
@@ -8924,6 +8943,7 @@ describe('Model', function() {
     function createTestContext({ justOne = true } = {}) {
       const contactSchema = new Schema({ name: String });
       contactSchema.virtual('label');
+      contactSchema.virtual('matches', { ref: 'Contact', localField: '_id', foreignField: '_id', justOne });
       contactSchema.virtual('displayName').get(function() {
         return this.$locals.displayName;
       }).set(function(value) {

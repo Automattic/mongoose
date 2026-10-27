@@ -8862,6 +8862,20 @@ describe('Model', function() {
   });
 
   describe('hydrate virtual input and option regressions', function() {
+    it('preserves virtuals when wrapping an object in nested arrays', function() {
+      // Arrange
+      const { Customer } = createTestContext();
+
+      // Act
+      const customer = Customer.hydrate({ contactGroups: { age: '12', label: 'Family' } }, null, { virtuals: true });
+
+      // Assert
+      assert.ifError(customer.validateSync());
+      assert.deepStrictEqual(customer.contactGroups.map(group => group.map(contact => ({
+        age: contact.age, label: contact.label
+      }))), [[{ age: 12, label: 'Family' }]]);
+    });
+
     it('ignores inherited properties when hydrating virtuals', function() {
       // Arrange
       const { Customer } = createTestContext();
@@ -9020,7 +9034,7 @@ describe('Model', function() {
     }
 
     function createTestContext({ justOne = true } = {}) {
-      const contactSchema = new Schema({ name: String });
+      const contactSchema = new Schema({ name: String, age: Number });
       contactSchema.virtual('label');
       contactSchema.virtual('matches', { ref: 'Contact', localField: '_id', foreignField: '_id', justOne });
       contactSchema.virtual('displayName').get(function() {
@@ -9031,6 +9045,7 @@ describe('Model', function() {
       const customerSchema = new Schema({
         contact: contactSchema,
         contacts: [contactSchema],
+        contactGroups: [[contactSchema]],
         directory: { type: Map, of: contactSchema }
       });
       customerSchema.virtual('displayName').get(function() {

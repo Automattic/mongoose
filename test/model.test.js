@@ -8940,6 +8940,26 @@ describe('Model', function() {
       });
     }
 
+    for (const virtuals of [false, true]) {
+      it(`preserves null entries in populated virtual arrays with virtuals=${virtuals}`, function() {
+        // Arrange
+        const { Customer, Contact } = createTestContext({ justOne: false });
+        const contact = { _id: new mongoose.Types.ObjectId(), name: 'Ada', label: 'Work' };
+
+        // Act
+        const customer = Customer.hydrate({ matches: [null, contact, null] }, null, {
+          virtuals, hydratedPopulatedDocs: true
+        });
+
+        // Assert
+        assert.strictEqual(customer.matches.length, 3);
+        assert.deepStrictEqual([customer.matches[0], customer.matches[2]], [null, null]);
+        assert.ok(customer.matches[1] instanceof Contact);
+        assert.strictEqual(customer.matches[1].name, 'Ada');
+        assert.strictEqual(customer.matches[1].label, virtuals ? 'Work' : undefined);
+      });
+    }
+
     function createTestContext({ justOne = true } = {}) {
       const contactSchema = new Schema({ name: String });
       contactSchema.virtual('label');

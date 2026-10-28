@@ -8861,6 +8861,97 @@ describe('Model', function() {
     );
   });
 
+  describe('Direct reference Maps after hydration', function() {
+    for (const array of [false, true]) {
+      for (const nativeMap of [false, true]) {
+        for (const virtuals of [false, true]) {
+          it(`depopulates Map entries, array=${array}, nativeMap=${nativeMap}, virtuals=${virtuals}`, function() {
+            // Arrange
+            const { Customer, Contact, rawCustomer, ids } = createTestContext({ array, nativeMap });
+
+            // Act
+            const customer = Customer.hydrate(rawCustomer, null, { virtuals, hydratedPopulatedDocs: true });
+
+            // Assert
+            const contacts = customer.contacts.get('work');
+            for (const contact of array ? contacts : [contacts]) {
+              assert.ok(contact instanceof Contact);
+              assert.strictEqual(contact.label, virtuals ? 'Work' : undefined);
+            }
+            assert.deepStrictEqual(customer.populated('contacts.work'), ids);
+            customer.depopulate('contacts.work');
+            const depopulated = customer.contacts.get('work');
+            assert.deepStrictEqual(array ? Array.from(depopulated) : depopulated, ids);
+            assert.strictEqual(customer.populated('contacts.work'), undefined);
+          });
+        }
+      }
+    }
+
+    function createTestContext({ array, nativeMap }) {
+      const contactSchema = new Schema({ name: String });
+      contactSchema.virtual('label');
+      const Contact = db.model('Contact', contactSchema);
+      const reference = { type: Schema.Types.ObjectId, ref: 'Contact' };
+      const Customer = db.model('Customer', new Schema({ contacts: { type: Map, of: array ? [reference] : reference } }));
+      const contacts = ['Ada', 'Grace'].map(name => ({ _id: new mongoose.Types.ObjectId(), name, label: 'Work' }));
+      const entries = { work: array ? contacts : contacts[0] };
+      return {
+        Customer,
+        Contact,
+        rawCustomer: { contacts: nativeMap ? new Map(Object.entries(entries)) : entries },
+        ids: array ? contacts.map(contact => contact._id) : contacts[0]._id
+      };
+    }
+  });
+
+  describe('Map container mutations after hydration', function() {
+    for (const virtuals of [undefined, false, true]) {
+      it(`saves container mutations after hydration with virtuals=${virtuals}`, async function() {
+        // Arrange
+        const { Customer, rawCustomer } = createTestContext();
+        await Customer.collection.insertOne(rawCustomer);
+        const customer = virtuals === undefined ?
+          await Customer.findById(rawCustomer._id) :
+          Customer.hydrate(rawCustomer, null, { virtuals });
+
+        // Act
+        const contact = customer.contacts.get('home');
+        contact.names.push('Grace');
+        contact.people.push({ name: 'Grace' });
+        contact.labels.set('work', 'Work');
+        await customer.save();
+
+        // Assert
+        const saved = await Customer.findById(rawCustomer._id).lean();
+        assert.deepStrictEqual(saved.contacts, {
+          home: {
+            names: ['Ada', 'Grace'],
+            people: [{ name: 'Ada' }, { name: 'Grace' }],
+            labels: { home: 'Home', work: 'Work' }
+          }
+        });
+      });
+    }
+
+    function createTestContext() {
+      const personSchema = new Schema({ name: String }, { _id: false });
+      const contactSchema = new Schema({
+        names: [String],
+        people: [personSchema],
+        labels: { type: Map, of: String }
+      }, { _id: false });
+      const Customer = db.model('Customer', new Schema({ contacts: { type: Map, of: contactSchema } }));
+      const rawCustomer = {
+        _id: new mongoose.Types.ObjectId(),
+        contacts: {
+          home: { names: ['Ada'], people: [{ name: 'Ada' }], labels: { home: 'Home' } }
+        }
+      };
+      return { Customer, rawCustomer };
+    }
+  });
+
   describe('hydrate virtual input and option regressions', function() {
     it('preserves virtuals when wrapping an object in nested arrays', function() {
       // Arrange

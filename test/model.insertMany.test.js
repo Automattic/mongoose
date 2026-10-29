@@ -662,6 +662,81 @@ describe('insertMany()', function() {
 
   });
 
+  for (const ordered of [true, false]) {
+    it(`preserves confirmed inserts after a write concern error with ordered=${ordered}`, async function() {
+      await db.asPromise();
+      const { hosts } = await db.db.admin().command({ hello: 1 });
+      if (hosts == null) {
+        return this.skip();
+      }
+      const Test = db.model('Test', new Schema({ name: String }));
+      const docs = [new Test({ name: 'first' }), new Test({ name: 'second' })];
+      await Test.init();
+      const error = await Test.insertMany(docs, {
+        ordered,
+        writeConcern: { w: hosts.length + 1, wtimeoutMS: 100 }
+      }).then(() => null, error => error);
+
+      assert.ok(error);
+      assert.strictEqual(error.name, 'MongoBulkWriteError');
+      assert.strictEqual(error.writeErrors.length, 0);
+      assert.strictEqual(error.result.insertedCount, docs.length);
+      assert.strictEqual(await Test.countDocuments(), docs.length);
+      assert.deepStrictEqual(error.insertedDocs, docs);
+      for (const doc of docs) {
+        assert.strictEqual(doc.isNew, false);
+        assert.strictEqual(doc.isModified('name'), false);
+      }
+    });
+
+    for (const rawResult of [false, true]) {
+      it(`preserves pending documents after a command error with ordered=${ordered}, rawResult=${rawResult}`, async function() {
+        const schema = new Schema({ name: String, children: [{ name: String }] });
+        const Test = db.model('Test', schema);
+        const docs = [
+          new Test({ name: 'first', children: [{ name: 'child' }] }),
+          new Test({ name: 'second', children: [{ name: 'child' }] })
+        ];
+        await Test.init();
+
+        const error = await Test.insertMany(docs, {
+          ordered,
+          rawResult,
+          writeConcern: { w: -1 }
+        }).then(() => null, error => error);
+
+        assert.ok(error);
+        assert.strictEqual(error.name, 'MongoBulkWriteError');
+        assert.strictEqual(error.writeErrors.length, 0);
+        assert.strictEqual(await Test.countDocuments(), 0);
+        assert.deepStrictEqual(error.insertedDocs, []);
+        for (const doc of docs) {
+          assert.strictEqual(doc.isNew, true);
+          assert.strictEqual(doc.isModified('name'), true);
+          assert.strictEqual(doc.children[0].isNew, true);
+          await doc.save();
+        }
+        assert.strictEqual(await Test.countDocuments(), docs.length);
+      });
+    }
+  }
+
+  it('does not report lean documents as inserted after a command error', async function() {
+    const Test = db.model('Test', new Schema({ name: String }));
+    await Test.init();
+    const error = await Test.insertMany([{ name: 'pending' }], {
+      lean: true,
+      ordered: false,
+      writeConcern: { w: -1 }
+    }).then(() => null, error => error);
+
+    assert.ok(error);
+    assert.strictEqual(error.name, 'MongoBulkWriteError');
+    assert.strictEqual(error.writeErrors.length, 0);
+    assert.strictEqual(await Test.countDocuments(), 0);
+    assert.deepStrictEqual(error.insertedDocs, []);
+  });
+
   it('insertMany() returns only inserted docs with `ordered = true`', async function() {
     const schema = new Schema({
       name: { type: String, required: true, unique: true }

@@ -1043,7 +1043,7 @@ describe('timestamps', function() {
     assert(check.toString().includes('updateCounter: 1'));
   });
 
-  it('clone() keeps $timestamps set by a child schema with timestamps', async function() {
+  it('clone() keeps $timestamps set by a child schema with timestamps (gh-16650)', async function() {
     const childSchema = new Schema({ name: String }, { timestamps: true });
     const parentSchema = new Schema({ child: childSchema });
 

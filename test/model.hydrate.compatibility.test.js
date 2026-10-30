@@ -159,4 +159,38 @@ describe('Model hydration compatibility', function() {
       };
     }
   });
+
+  describe('Mixed reference arrays in Maps retain bare IDs', function() {
+    for (const virtuals of [undefined, false, true]) {
+      for (const named of [false, true]) {
+        it(`preserves bare IDs after ${named ? 'named' : 'root'} depopulation, virtuals=${virtuals}`, function() {
+          // Arrange
+          const { Customer } = createTestContext();
+          const customer = Customer.hydrate({ contacts: {
+            home: [{ _id: 'ada', name: 'Ada' }, 'grace']
+          } }, null, { hydratedPopulatedDocs: true, virtuals });
+
+          // Act
+          if (named) {
+            customer.depopulate('contacts.home');
+          } else {
+            customer.depopulate();
+          }
+
+          // Assert
+          assert.ok(customer.contacts instanceof Map);
+          assert.deepStrictEqual(Array.from(customer.contacts), [['home', ['ada', 'grace']]]);
+        });
+      }
+    }
+
+    function createTestContext() {
+      const m = new mongoose.Mongoose();
+      m.model('Contact', new Schema({ _id: String, name: String }));
+      const Customer = m.model('Customer', new Schema({
+        contacts: { type: Map, of: [{ type: String, ref: 'Contact' }] }
+      }));
+      return { Customer };
+    }
+  });
 });

@@ -564,4 +564,101 @@ describe('model', function() {
       assert.equal(doc4.get('extraField'), 'uses schema default');
     });
   });
+
+  describe('Root depopulation restores hydrated embedded references', function() {
+    for (const placement of ['single', 'array', 'map']) {
+      for (const virtuals of [undefined, true]) {
+        it(`restores reference IDs in ${placement} subdocuments with virtuals=${virtuals}`, function() {
+          // Arrange
+          const { Customer, Contact, raw, getOwner, ids } = createTestContext({ placement });
+          const doc = Customer.hydrate(raw, null, { hydratedPopulatedDocs: true, virtuals });
+          const owner = getOwner(doc);
+          assert.ok(owner.contact instanceof Contact);
+          assert.ok(owner.contacts.every(contact => contact instanceof Contact));
+          assert.deepStrictEqual([owner.populated('contact'), owner.populated('contacts')], [ids[0], ids]);
+
+          // Act
+          doc.depopulate();
+
+          // Assert
+          assert.deepStrictEqual(owner.toObject(), { contact: ids[0], contacts: ids });
+          assert.deepStrictEqual([owner.populated('contact'), owner.populated('contacts')], [undefined, undefined]);
+          assert.deepStrictEqual(doc.modifiedPaths(), []);
+          doc.depopulate();
+          assert.deepStrictEqual(owner.toObject(), { contact: ids[0], contacts: ids });
+        });
+      }
+    }
+
+    it('keeps embedded references populated when only a root path is selected', function() {
+      // Arrange
+      const { Customer, Contact, raw, getOwner, ids } = createTestContext({ placement: 'single' });
+      const doc = Customer.hydrate(raw, null, { hydratedPopulatedDocs: true, virtuals: true });
+
+      // Act
+      doc.depopulate('lead');
+
+      // Assert
+      const owner = getOwner(doc);
+      assert.deepStrictEqual(doc.lead, ids[0]);
+      assert.ok(owner.contact instanceof Contact);
+      assert.ok(owner.contacts.every(contact => contact instanceof Contact));
+      assert.deepStrictEqual([owner.populated('contact'), owner.populated('contacts')], [ids[0], ids]);
+    });
+
+    function createTestContext({ placement }) {
+      const m = new mongoose.Mongoose();
+      const Contact = m.model('Contact', new Schema({ name: String }));
+      const ref = { type: Schema.Types.ObjectId, ref: 'Contact' };
+      const group = new Schema({ contact: ref, contacts: [ref] }, { _id: false });
+      const field = placement === 'single' ? group : placement === 'array' ? [group] : { type: Map, of: group };
+      const Customer = m.model('Customer', new Schema({ lead: ref, team: field }));
+      const contacts = ['Ada', 'Grace'].map(name => ({ _id: new mongoose.Types.ObjectId(), name }));
+      const value = { contact: contacts[0], contacts };
+      return {
+        Customer,
+        Contact,
+        raw: { lead: contacts[0], team: placement === 'single' ? value : placement === 'array' ? [value] : { home: value } },
+        getOwner: doc => placement === 'single' ? doc.team : placement === 'array' ? doc.team[0] : doc.team.get('home'),
+        ids: contacts.map(contact => contact._id)
+      };
+    }
+  });
+
+  describe('populated virtuals in isolated nested document arrays', function() {
+    for (const justOne of [true, false]) {
+      for (const virtuals of [false, true]) {
+        it(`hydrates referenced models with justOne=${justOne}, virtuals=${virtuals}`, function() {
+          // Arrange
+          const { Customer, Contact, raw } = createTestContext({ justOne });
+
+          // Act
+          const doc = Customer.hydrate(raw, null, { virtuals, hydratedPopulatedDocs: true });
+          const contact = justOne ? doc.groups[0][0].contact : doc.groups[0][0].contact?.[0];
+
+          // Assert
+          assert.ok(contact instanceof Contact);
+          assert.deepStrictEqual(
+            { name: contact.name, age: contact.age, label: contact.label },
+            { name: 'Ada', age: 32, label: virtuals ? 'On call' : undefined }
+          );
+          assert.deepStrictEqual(doc.modifiedPaths(), []);
+        });
+      }
+    }
+
+    function createTestContext({ justOne }) {
+      const m = new mongoose.Mongoose();
+      const contactSchema = new Schema({ name: String, age: Number });
+      contactSchema.virtual('label');
+      const Contact = m.model('Contact', contactSchema);
+      const groupSchema = new Schema({});
+      groupSchema.virtual('contact', {
+        ref: 'Contact', localField: '_id', foreignField: '_id', justOne
+      });
+      const Customer = m.model('Customer', new Schema({ groups: [[groupSchema]] }));
+      const contact = { _id: new mongoose.Types.ObjectId(), name: 'Ada', age: '32', label: 'On call' };
+      return { Customer, Contact, raw: { groups: [[{ contact: justOne ? contact : [contact] }]] } };
+    }
+  });
 });

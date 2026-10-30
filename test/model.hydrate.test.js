@@ -624,4 +624,41 @@ describe('model', function() {
       };
     }
   });
+
+  describe('populated virtuals in isolated nested document arrays', function() {
+    for (const justOne of [true, false]) {
+      for (const virtuals of [false, true]) {
+        it(`hydrates referenced models with justOne=${justOne}, virtuals=${virtuals}`, function() {
+          // Arrange
+          const { Customer, Contact, raw } = createTestContext({ justOne });
+
+          // Act
+          const doc = Customer.hydrate(raw, null, { virtuals, hydratedPopulatedDocs: true });
+          const contact = justOne ? doc.groups[0][0].contact : doc.groups[0][0].contact?.[0];
+
+          // Assert
+          assert.ok(contact instanceof Contact);
+          assert.deepStrictEqual(
+            { name: contact.name, age: contact.age, label: contact.label },
+            { name: 'Ada', age: 32, label: virtuals ? 'On call' : undefined }
+          );
+          assert.deepStrictEqual(doc.modifiedPaths(), []);
+        });
+      }
+    }
+
+    function createTestContext({ justOne }) {
+      const m = new mongoose.Mongoose();
+      const contactSchema = new Schema({ name: String, age: Number });
+      contactSchema.virtual('label');
+      const Contact = m.model('Contact', contactSchema);
+      const groupSchema = new Schema({});
+      groupSchema.virtual('contact', {
+        ref: 'Contact', localField: '_id', foreignField: '_id', justOne
+      });
+      const Customer = m.model('Customer', new Schema({ groups: [[groupSchema]] }));
+      const contact = { _id: new mongoose.Types.ObjectId(), name: 'Ada', age: '32', label: 'On call' };
+      return { Customer, Contact, raw: { groups: [[{ contact: justOne ? contact : [contact] }]] } };
+    }
+  });
 });

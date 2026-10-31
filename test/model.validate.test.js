@@ -72,6 +72,16 @@ describe('model: validate: ', function() {
     assert.deepEqual(Object.keys(err.errors), ['profile.address.city']);
   });
 
+  it('Model.validate() validates paths underneath a nested path in the paths list', async function() {
+    const Model = mongoose.model('Test', new Schema({
+      profile: { address: { city: { type: String, required: true } } }
+    }));
+
+    const err = await Model.validate({}, ['profile.address']).then(() => null, err => err);
+    assert.ok(err);
+    assert.deepEqual(Object.keys(err.errors), ['profile.address.city']);
+  });
+
   it('Model["~standard"].validate() validates using standard schema result format', async function() {
     const User = mongoose.model('User', new Schema({
       name: {

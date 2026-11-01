@@ -42,8 +42,9 @@ await User.findOne({ email: 'hermione@hogwarts.edu' });
 The `1` in `{ email: 1 }` means the index is sorted in ascending order, and `-1` means descending order.
 For a single-field index, the direction does not matter, because MongoDB can traverse the index in either direction.
 
-MongoDB automatically creates a unique index on `_id` for every collection, so queries by `_id`, like `findById()`, always use an index.
+MongoDB automatically creates a unique index on `_id` for every normal collection, so queries by `_id`, like `findById()`, always use an index.
 You cannot drop the `_id` index.
+The exception is [timeseries collections](https://www.mongodb.com/docs/manual/core/timeseries-collections/), which do not have an `_id` index.
 
 ### Compound Indexes {#compound-indexes}
 
@@ -479,8 +480,8 @@ const orderSchema = new mongoose.Schema({
 orderSchema.index({ customerId: 1, status: 1 });
 const Order = mongoose.model('Order', orderSchema);
 
-// Wait for Mongoose to finish building the `{ customerId: 1, status: 1 }` index
-await Order.init();
+// Explicitly build the `{ customerId: 1, status: 1 }` index, even with `autoIndex` disabled
+await Order.createIndexes();
 
 // Insert 10 orders: 6 orders for `customerId`, and 4 orders for `otherCustomerId`
 const customerId = new mongoose.Types.ObjectId();

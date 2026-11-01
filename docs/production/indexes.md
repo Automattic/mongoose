@@ -229,9 +229,16 @@ Every unnecessary index competes for cache space with the indexes and documents 
 You can check the size of a collection's indexes using the [`$collStats` aggregation stage](https://www.mongodb.com/docs/manual/reference/operator/aggregation/collStats/).
 
 ```javascript
-const [{ storageStats }] = await Order.aggregate([{ $collStats: { storageStats: {} } }]);
-storageStats.totalIndexSize; // Total size of all indexes on the collection, in bytes
-storageStats.indexSizes; // { _id_: 34000, 'customerId_1_createdAt_-1': 52000, ... }
+const stats = await Order.aggregate([{ $collStats: { storageStats: {} } }]);
+const totalIndexSize = stats.reduce((total, { storageStats }) => total + storageStats.totalIndexSize, 0);
+const indexSizes = {};
+for (const { storageStats } of stats) {
+  for (const [name, size] of Object.entries(storageStats.indexSizes)) {
+    indexSizes[name] = (indexSizes[name] || 0) + size;
+  }
+}
+totalIndexSize; // Total size of all indexes across all returned shards, in bytes
+indexSizes; // Total size of each index across all returned shards
 ```
 
 <img src="https://res.cloudinary.com/drfhhq8wu/image/upload/w_768/v1793566062/Indexes_Keep_Key_Data_in_RAM_jzvy8o.webp">

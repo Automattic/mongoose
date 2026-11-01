@@ -174,6 +174,25 @@ describe('schema', function() {
       await Test.path('status').doValidate(3);
     });
 
+    it('enum(false) stays cleared after clone()', async function() {
+      const Test = new Schema({
+        state: { type: String, enum: ['a', 'b'] },
+        status: { type: Number, enum: [1, 2] }
+      });
+
+      Test.path('state').enum(false);
+      Test.path('status').enum(false);
+
+      const Clone = Test.clone();
+
+      assert.deepStrictEqual(Clone.path('state').enumValues, []);
+      assert.deepStrictEqual(Clone.path('status').enumValues, []);
+      assert.deepStrictEqual(Clone.toJSONSchema().properties.state, { type: ['string', 'null'] });
+      assert.deepStrictEqual(Clone.toJSONSchema().properties.status, { type: ['number', 'null'] });
+      await Clone.path('state').doValidate('zzz');
+      await Clone.path('status').doValidate(42);
+    });
+
     it('string regexp', async function() {
       const Test = new Schema({
         simple: { type: String, match: /[a-z]/ }

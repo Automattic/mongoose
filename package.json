@@ -72,10 +72,10 @@
   },
   "scripts": {
     "docs:clean": "npm run docs:clean:stable",
-    "docs:clean:stable": "rm -rf index.html && rm -rf ./docs/*.html  && rm -rf ./docs/api && rm -rf ./docs/tutorials/*.html && rm -rf ./docs/typescript/*.html && rm -rf ./docs/*.html && rm -rf ./docs/source/_docs && rm -rf ./tmp",
+    "docs:clean:stable": "rm -rf index.html && rm -rf ./docs/*.html  && rm -rf ./docs/api && rm -rf ./docs/tutorials/*.html && rm -rf ./docs/typescript/*.html && rm -rf ./docs/production/*.html && rm -rf ./docs/*.html && rm -rf ./docs/source/_docs && rm -rf ./tmp",
     "docs:clean:5x": "rm -rf index.html && rm -rf ./docs/5.x && rm -rf ./docs/source/_docs && rm -rf ./tmp",
     "docs:clean:6x": "rm -rf index.html && rm -rf ./docs/6.x && rm -rf ./docs/source/_docs && rm -rf ./tmp",
-    "docs:copy:tmp": "mkdirp ./tmp/docs/css && mkdirp ./tmp/docs/js && mkdirp ./tmp/docs/images && mkdirp ./tmp/docs/tutorials && mkdirp ./tmp/docs/typescript && mkdirp ./tmp/docs/api && ncp ./docs/css ./tmp/docs/css --filter=.css$ && ncp ./docs/js ./tmp/docs/js --filter=.js$ && ncp ./docs/images ./tmp/docs/images && ncp ./docs/tutorials ./tmp/docs/tutorials && ncp ./docs/typescript ./tmp/docs/typescript && ncp ./docs/api ./tmp/docs/api && cp index.html ./tmp && cp docs/*.html ./tmp/docs/",
+    "docs:copy:tmp": "mkdirp ./tmp/docs/css && mkdirp ./tmp/docs/js && mkdirp ./tmp/docs/images && mkdirp ./tmp/docs/tutorials && mkdirp ./tmp/docs/typescript && mkdirp ./tmp/docs/production && mkdirp ./tmp/docs/api && ncp ./docs/css ./tmp/docs/css --filter=.css$ && ncp ./docs/js ./tmp/docs/js --filter=.js$ && ncp ./docs/images ./tmp/docs/images && ncp ./docs/tutorials ./tmp/docs/tutorials && ncp ./docs/typescript ./tmp/docs/typescript && ncp ./docs/production ./tmp/docs/production && ncp ./docs/api ./tmp/docs/api && cp index.html ./tmp && cp docs/*.html ./tmp/docs/",
     "docs:copy:tmp:5x": "rm -rf ./docs/5.x && ncp ./tmp ./docs/5.x",
     "docs:copy:tmp:6x": "rm -rf ./docs/6.x && ncp ./tmp ./docs/6.x",
     "docs:generate": "node ./scripts/website.js",

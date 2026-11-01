@@ -5,7 +5,20 @@ With only a few hundred documents in your local database, every query is fast, w
 With 100 million documents in a collection, a query that has to scan the entire collection can take seconds or minutes, and slow down other queries by tying up CPU and memory.
 This guide explains what indexes are, when you should and should not add them, how to define indexes in Mongoose, and how to manage and inspect indexes in production.
 
-## What is an Index?
+* [What is an Index?](#what-is-an-index)
+  * [Compound Indexes](#compound-indexes)
+  * [Unique Indexes](#unique-indexes)
+* [When to Add Indexes](#when-to-add-indexes)
+* [When Not to Add Indexes](#when-not-to-add-indexes)
+  * [Recommendations by Collection Size](#recommendations-by-collection-size)
+* [Defining Indexes in Mongoose Schemas](#defining-indexes-in-mongoose-schemas)
+* [The `autoIndex` Option](#the-autoindex-option)
+  * [Detecting `autoIndex` Errors](#detecting-autoindex-errors)
+* [Creating Indexes](#creating-indexes)
+* [Syncing Indexes](#syncing-indexes)
+* [Using `explain()` and `hint()`](#using-explain-and-hint)
+
+## What is an Index? {#what-is-an-index}
 
 An index is a data structure that stores the values of one or more fields in sorted order, along with a pointer to the document each value came from.
 Without an index, MongoDB must perform a *collection scan*: read every document in the collection to find the ones that match your query.
@@ -32,7 +45,7 @@ For a single-field index, the direction does not matter, because MongoDB can tra
 MongoDB automatically creates a unique index on `_id` for every collection, so queries by `_id`, like `findById()`, always use an index.
 You cannot drop the `_id` index.
 
-### Compound Indexes
+### Compound Indexes {#compound-indexes}
 
 A [compound index](https://www.mongodb.com/docs/manual/core/indexes/index-types/index-compound/) is an index on multiple fields.
 Consider an `Order` model for an online store, where the most common query is "show a customer's most recent orders."
@@ -69,7 +82,86 @@ await Order.find({ customerId, createdAt: { $gte: lastWeek } });
 await Order.find({ createdAt: { $gte: lastWeek } });
 ```
 
-## When to Add Indexes
+### Unique Indexes {#unique-indexes}
+
+A [unique index](https://www.mongodb.com/docs/manual/core/index-unique/) is an index which also ensures there are no duplicate values within the index.
+For example, MongoDB collections always have a unique index on `_id`.
+Trying to insert two documents with the same `_id` property throws an error with `err.code === 11000`.
+
+```javascript
+const _id = new mongoose.Types.ObjectId();
+
+await Order.create({ _id });
+
+const err = await Order.create({ _id }).then(() => null, err => err);
+err.code; // 11000, MongoDB's error code for a duplicate key error
+err.name; // "MongoServerError"
+err.message; // "E11000 duplicate key error..."
+```
+
+`unique` is an index option.
+When defining an index, pass `unique: true` to indicate the index should be unique.
+
+```javascript
+userSchema.index({ email: 1 }, { unique: true });
+```
+
+If you build a unique index on a collection which already has duplicate emails, the index build will fail.
+For example, if there are already two users with email `bill@microsoft.com`, the above index will fail to build with an `E11000 duplicate key error`.
+
+You cannot have a unique and a non-unique index on the same fields.
+If you already have a non-unique index on `{ email: 1 }`, building an index with `{ email: 1 }` and `unique: true` will fail with an `IndexKeySpecsConflict` error.
+
+Unique indexes count missing and `null` fields as a distinct value by default.
+In other words, if you have a unique index on `email`, you will get a duplicate key error if you try to insert 2 users with no email or `email: null`.
+
+```javascript
+// Create a user with no email
+await User.create({});
+
+// Throws duplicate key error for `email`
+await User.create({});
+
+// Also duplicate key error for `email`: missing and `null` are considered
+// equivalent for unique indexes.
+await User.create({ email: null });
+```
+
+To work around this, you should create a _partial_ unique index.
+Indexes have a `partialFilterExpression` option which limits the documents the index applies to.
+For example, the following index indicates that `email` should be unique only if the email property is set and not `null`.
+
+```javascript
+userSchema.index(
+  { email: 1 },
+  {
+    unique: true,
+    // Unique index only applies to documents that have an `email` property.
+    partialFilterExpression: {
+      email: { $exists: true, $ne: null }
+    }
+  }
+);
+```
+
+A unique [compound index](#compound-indexes) enforces uniqueness on the combination of its fields, not on each field individually.
+For example, a unique index on `{ email: 1, workspace: 1 }` allows multiple users with the same `email`, as long as each of those users has a different `workspace`.
+
+```javascript
+userSchema.index({ email: 1, workspace: 1 }, { unique: true });
+
+await User.create({ email: 'hermione@hogwarts.edu', workspace: 'gryffindor' });
+// OK: same `email`, different `workspace`
+await User.create({ email: 'hermione@hogwarts.edu', workspace: 'ravenclaw' });
+// OK: same `workspace`, different `email`
+await User.create({ email: 'ron@hogwarts.edu', workspace: 'gryffindor' });
+// Throws duplicate key error: same `email` and `workspace`
+await User.create({ email: 'hermione@hogwarts.edu', workspace: 'gryffindor' });
+```
+
+The order of fields in a unique compound index (or order of fields in the document) does not affect which documents count as duplicates.
+
+## When to Add Indexes {#when-to-add-indexes}
 
 You do not need an index for every query from day one.
 Collection scans are cheap on small collections: scanning a few thousand documents typically takes a few milliseconds.
@@ -92,6 +184,8 @@ The number of documents examined, not the number of documents returned, is what 
 Both versions of the above query return the same 3 orders, but without an index, MongoDB has to examine every order in the collection to find them.
 A good index keeps the number of documents examined small relative to the size of the collection: examining 25 documents to return 3 is typically fine, examining 5 million documents to return 3 is not.
 
+<img src="https://res.cloudinary.com/drfhhq8wu/image/upload/w_768/v1793565595/MongoDB_Index_Selectivity_Comparison_jgqzmq.webp">
+
 Now consider an index on `isGift` in the `Order` model.
 If roughly half of all orders are gifts, then the number of documents that match any given value of `isGift` is not meaningfully smaller than the number of documents in the whole collection.
 A query for `{ isGift: true }` still has to examine half the collection, and loading half the collection's documents through an index can even be slower than a collection scan.
@@ -112,12 +206,12 @@ That's because compound indexes can only support queries on a [prefix](#compound
 Because `customerId` comes first, `{ customerId: 1, isGift: 1 }` also supports queries on `customerId` alone, like loading all of a customer's orders, so it can replace a `{ customerId: 1 }` index entirely.
 On the other hand, the prefix of `{ isGift: 1, customerId: 1 }` is `{ isGift: 1 }`, which is not useful on its own.
 
-## When Not to Add Indexes
+## When Not to Add Indexes {#when-not-to-add-indexes}
 
 If indexes make queries faster, why not index everything?
-Indexes come with overhead, so each index should earn its place.
+Each index comes with overhead for writes, and if indexes take up more space than available memory they become significantly slower.
 
-**Write overhead.**
+**Write overhead**
 Every index is a separate data structure that MongoDB must keep in sync with your documents.
 When you insert or delete a document, MongoDB must update every index on the collection.
 When you update a document, MongoDB must update every index that includes a modified field.
@@ -125,9 +219,10 @@ If you only have a few indexes, the overhead is negligible.
 But the overhead adds up if you have an extremely write-heavy collection with dozens of indexes.
 MongoDB also has a [hard limit](https://www.mongodb.com/docs/manual/reference/limits/) of 64 indexes per collection.
 
-**Memory.**
+**Memory**
 
 Indexes are most effective when they fit in RAM.
+The idea is that, for larger collections, the entire collection may be too large to fit into RAM, but a subsection of commonly queried small fields may still fit into RAM.
 MongoDB's storage engine keeps frequently used indexes and documents in an in-memory cache; if your indexes do not fit, MongoDB has to read index data from disk, and indexed queries become significantly slower.
 Every unnecessary index competes for cache space with the indexes and documents your application actually uses.
 You can check the size of a collection's indexes using the [`$collStats` aggregation stage](https://www.mongodb.com/docs/manual/reference/operator/aggregation/collStats/).
@@ -138,7 +233,9 @@ storageStats.totalIndexSize; // Total size of all indexes on the collection, in 
 storageStats.indexSizes; // { _id_: 34000, 'customerId_1_createdAt_-1': 52000, ... }
 ```
 
-**Overlapping indexes.**
+<img src="https://res.cloudinary.com/drfhhq8wu/image/upload/w_768/v1793566062/Indexes_Keep_Key_Data_in_RAM_jzvy8o.webp">
+
+**Overlapping indexes**
 
 Multiple indexes that each cover part of a query make it harder for MongoDB to answer that query efficiently.
 Suppose you have separate `{ customerId: 1 }` and `{ status: 1 }` indexes, and you query for `{ customerId, status: 'shipped' }`.
@@ -149,12 +246,12 @@ Similarly, an index that is a prefix of another index is typically redundant.
 If you have a `{ customerId: 1, createdAt: -1 }` index, you do not need a separate `{ customerId: 1 }` index.
 MongoDB can use the `{ customerId: 1, createdAt: -1 }` index for queries on `customerId` that do not use `createdAt`.
 
-### Recommendations by Collection Size
+### Recommendations by Collection Size {#recommendations-by-collection-size}
 
 Below are some rough heuristics we use when thinking about what indexes a collection needs based on collection size.
-Index needs depend heavily on workload, application structure, and business needs, so treat these heuristics as a "finger in the wind" rather than exact evidence-based boundaries.
+Index needs depend heavily on workload, document size, application structure, and business needs, so treat these heuristics as a "finger in the wind" rather than exact evidence-based boundaries.
 
-* **Tiny collections (fewer than 10,000 documents):** Don't worry too much about indexes. Collection scans on tiny collections are fast.
+* **Tiny collections (fewer than 10,000 documents):** Don't worry too much about indexes. Collection scans on tiny collections are fast because there are few documents and tiny collections often fit into available RAM.
 * **Small collections (10,000 to 1 million documents):** Add indexes to cover your common queries is important but not critical - you can get away with infrequent collection scans. The risk of having too many indexes is low, so overindexing is not a major concern.
 * **Large collections (1 million to 100 million documents):** Ensuring index coverage for common queries is critical. Frequent collection scans or even scans over insufficiently selective indexes can overload the database. The risk of having too many indexes is moderate, so be careful about overindexing, but it is more important to avoid index misses.
 * **Extra large collections (100 million documents or more):** Ensuring index coverage for common queries is critical. Even occasional collection scans can cause significant performance degradation. The risk of overindexing is also high: indexes on XL collections take a lot of RAM, and XL collections are typically write-heavy. Make heavy use of the `_id` index, because that index exists regardless.
@@ -178,7 +275,7 @@ await Order.
   sort({ _id: -1 });
 ```
 
-## Defining Indexes in Mongoose Schemas
+## Defining Indexes in Mongoose Schemas {#defining-indexes-in-mongoose-schemas}
 
 Mongoose lets you define indexes at the path level using schema type options like [`index`](../api/schematype.html#SchemaType.prototype.index()), [`unique`](../api/schematype.html#SchemaType.prototype.unique()), and [`sparse`](../api/schematype.html#SchemaType.prototype.sparse()).
 
@@ -190,8 +287,9 @@ const userSchema = new Schema({
 });
 ```
 
+**Best Practice:**
+We recommend defining all indexes explicitly using [`Schema.prototype.index()`](../api/schema.html#Schema.prototype.index()) rather than path-level `index` options.
 Path-level options can be convenient for small schemas and examples, but they don't allow defining compound indexes, and they scatter your index definitions throughout your schema.
-We recommend defining all indexes explicitly using [`Schema.prototype.index()`](../api/schema.html#Schema.prototype.index()) instead.
 
 ```javascript
 const userSchema = new Schema({
@@ -209,12 +307,13 @@ Putting all indexes in the same place makes it easy to see every index on a coll
 It also helps with spotting overlapping or redundant indexes, like the `{ username: 1 }` index above, which is a prefix of `{ username: 1, lastLoginAt: -1 }`.
 Compound indexes must be defined using `Schema.prototype.index()`, so using `index()` for all indexes is also more consistent.
 
+**Best Practice:**
 We recommend defining every index in your Mongoose schemas and using Mongoose to manage your indexes in production.
 Even if you do not use Mongoose to build indexes, we still recommend listing your indexes in your schemas.
 Defining indexes in your schemas gives your codebase a record of which indexes are available, without needing to connect to the database.
 This is extremely valuable context for both humans and coding agents: a developer reviewing a pull request, or a coding agent writing a new query, can verify whether the query misses an index by reading the code.
 
-## The `autoIndex` Option
+## The `autoIndex` Option {#the-autoindex-option}
 
 By default, when you create a model using `mongoose.model()` or `Connection.prototype.model()`, Mongoose calls [`Model.init()`](../api/model.html#Model.init()), which calls [`createIndex()`](https://www.mongodb.com/docs/manual/reference/method/db.collection.createIndex/) for every index defined in your schema.
 This behavior is controlled by the [`autoIndex` option](../guide.html#autoIndex).
@@ -226,8 +325,9 @@ There are a few important details about how `autoIndex` works:
 3. If building an index fails, such as adding a unique index on a field with duplicate values or building an index that conflicts with an existing index, Mongoose emits an `'index'` event on the model with the error. Your application keeps running without that index.
 4. Mongoose does not wait for `autoIndex` to complete before allowing database operations. `autoIndex` is meant to run in the background: your application can still execute queries while Mongoose is building indexes. You can call [`Model.init()`](https://mongoosejs.com/docs/api/model.html#Model.init()) to wait for the index build to finish.
 
+**Best Practice:**
 We recommend enabling `autoIndex` in development and disabling it in production.
-This recommendation is particularly important for large and extra large collections (1M)
+This recommendation is particularly important for large and extra large collections (1M).
 
 ```javascript
 mongoose.set('autoIndex', process.env.NODE_ENV !== 'production');
@@ -242,24 +342,107 @@ However, there are risks when using `autoIndex` with larger collections:
 
 Instead of relying on `autoIndex`, we recommend either building indexes from one-off scripts or through a GUI like [Mongoose Studio](#syncing-indexes) or MongoDB Atlas.
 
-## Syncing Indexes
+### Detecting `autoIndex` Errors {#detecting-autoindex-errors}
 
-Mongoose has a [`Model.syncIndexes()`](../api/model.html#Model.syncIndexes()) function that makes the indexes in MongoDB match the indexes in your schema.
-Unlike `autoIndex`, `syncIndexes()` both creates indexes that are missing from MongoDB **and drops** indexes that are not in your schema (except the `_id` index).
+Because `autoIndex` runs in the background, index build errors do not show up in your application's normal error handling.
+If you use `autoIndex`, there are two ways to find out whether an index build failed: `await Model.init()` and the `'index'` event.
+
+`Model.init()` returns a promise that resolves when Mongoose has finished initializing the model, and rejects if initializing the model failed.
+If `autoIndex` is set, automatic index builds are part of the model initialization process.
+Calling `init()` does **not** trigger an index build: Mongoose already called `init()` when you created the model, so `init()` returns the existing promise.
+Calling `Model.init()` multiple times returns the exact same promise instance (`Model.init() === Model.init()` is true).
+
+```javascript
+const userSchema = new Schema({ email: String, username: String });
+userSchema.index({ email: 1 }, { unique: true });
+userSchema.index({ username: 1 });
+const User = mongoose.model('User', userSchema);
+
+try {
+  await User.init();
+} catch (err) {
+  // If the `users` collection has duplicate emails, `err.code` is 11000 and
+  // `err.message` is "Index build failed: ... E11000 duplicate key error ..."
+}
+```
+
+Mongoose also emits an `'index'` event on the model when it has finished building indexes.
+Mongoose does **not** emit an `'index'` event on models if `autoIndex` is disabled, unless `Model.createIndexes()` or `Model.ensureIndexes()` is called.
+If an index build failed, the event handler receives the error.
+Make sure you register the event handler immediately after creating the model: if you register it after Mongoose has finished building indexes, the handler never runs.
+
+```javascript
+const User = mongoose.model('User', userSchema);
+
+User.on('index', err => {
+  if (err != null) {
+    console.error('Failed to build indexes for User', err);
+  }
+});
+```
+
+One failed index build does not stop Mongoose from building the remaining indexes.
+In the above example, if the `{ email: 1 }` index fails to build, Mongoose still builds the `{ username: 1 }` index.
+However, `init()` and the `'index'` event only report the first error.
+
+To track each index build individually, use the `'index-single-start'` and `'index-single-done'` events.
+Mongoose builds indexes one at a time, and emits `'index-single-start'` before calling `createIndex()` and `'index-single-done'` after `createIndex()` succeeds or fails.
+These events are useful for logging every failed index build, and for logging how long each index takes to build.
+
+```javascript
+let startTime = null;
+User.on('index-single-start', fields => {
+  startTime = Date.now();
+  console.log('Building index', fields);
+});
+User.on('index-single-done', (err, fields, options, name) => {
+  const elapsedMS = Date.now() - startTime;
+  if (err != null) {
+    console.error('Failed to build index', fields, options, 'after', elapsedMS, 'ms', err);
+  } else {
+    console.log('Built index', name, 'in', elapsedMS, 'ms');
+  }
+});
+```
+
+Mongoose emits all of the above events when you call [`Model.createIndexes()`](../api/model.html#Model.createIndexes()) or [`Model.syncIndexes()`](../api/model.html#Model.syncIndexes()) yourself, not just with `autoIndex`, so you can also use these events to log progress in one-off index build scripts.
+
+## Creating Indexes {#creating-indexes}
+
+[`Model.createIndexes()`](../api/model.html#Model.createIndexes()) calls `createIndex()` for every index defined in the model's schema.
+`createIndexes()` uses the same logic as `autoIndex`: when `autoIndex` is enabled, `Model.init()` builds indexes the same way `createIndexes()` does.
+So the details from [the `autoIndex` section](#the-autoindex-option) also apply to `createIndexes()`:
+
+1. `createIndexes()` is a no-op for indexes that already exist with the same options.
+2. `createIndexes()` only creates indexes, it never drops them.
+3. `createIndexes()` builds indexes one at a time. If one index fails to build, `createIndexes()` still builds the remaining indexes.
+
+The difference is that `createIndexes()` only runs when you call it, and it builds indexes even if `autoIndex` is disabled.
+`createIndexes()` returns a promise that resolves when every index has been built, or rejects with the first error if any index build failed.
+
+`createIndexes()` never drops indexes, which has tradeoffs.
+On one hand, it can never unintentionally drop an index that your application relies on.
+However, `createIndexes()` also never removes indexes you no longer need, or rebuilds indexes whose options changed: if an index with the same name already exists with different options, that index build fails with an error.
+To handle these cases, use `syncIndexes()`.
+
+## Syncing Indexes {#syncing-indexes}
+
+Mongoose also has a [`Model.syncIndexes()`](../api/model.html#Model.syncIndexes()) function that makes the indexes in MongoDB match the indexes in your schema.
+Unlike `createIndexes()`, `syncIndexes()` both creates indexes that are missing from MongoDB **and drops** indexes that are not in your schema (except the `_id` index).
 You can also call [`Connection.prototype.syncIndexes()`](../api/connection.html#Connection.prototype.syncIndexes()) to sync indexes for every model on a connection.
 
-|                    | `autoIndex`                  | `syncIndexes()`          |
-| ------------------ | ---------------------------- | ------------------------ |
-| Creates indexes    | Yes                          | Yes                      |
-| Drops indexes      | No                           | Yes                      |
-| When it runs       | Automatically on `init()`    | Only when you call it    |
+|                    | `autoIndex`                  | `createIndexes()`        | `syncIndexes()`          |
+| ------------------ | ---------------------------- | ------------------------ | ------------------------ |
+| Creates indexes    | Yes                          | Yes                      | Yes                      |
+| Drops indexes      | No                           | No                       | Yes                      |
+| When it runs       | Automatically on `init()`    | Only when you call it    | Only when you call it    |
 
 Dropping indexes makes `syncIndexes()` significantly riskier than `autoIndex`.
 If `syncIndexes()` drops an index that a common query depends on, that query falls back to a collection scan.
 
+**Best Practice:**
 Because of the risk of dropping an index is so high, we strongly recommend you do **not** run `syncIndexes()` without human review.
 In particular, we recommend against running `syncIndexes()` application start in production.
-
 Instead, use [`Model.diffIndexes()`](../api/model.html#Model.diffIndexes()) to do a dry run, and have a human review the result before calling `syncIndexes()`.
 
 ```javascript
@@ -280,7 +463,7 @@ await Order.syncIndexes({ hideIndexes: true });
 
 [Mongoose Studio](https://mongoosestudio.app), the Mongoose team's open source MongoDB GUI, provides a convenient GUI around `syncIndexes()` that lets you review which indexes will be created and dropped before applying changes.
 
-## Using `explain()` and `hint()`
+## Using `explain()` and `hint()` {#using-explain-and-hint}
 
 To check which index a query uses, call [`Query.prototype.explain()`](../api/query.html#Query.prototype.explain()).
 Passing `'executionStats'` tells MongoDB to execute the query and report how much work it did.

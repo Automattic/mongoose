@@ -10,6 +10,9 @@ This guide explains what indexes are, when you should and should not add them, h
   * [Unique Indexes](#unique-indexes)
 * [When to Add Indexes](#when-to-add-indexes)
 * [When Not to Add Indexes](#when-not-to-add-indexes)
+  * [Write Overhead](#write-overhead)
+  * [Memory](#memory)
+  * [Overlapping Indexes](#overlapping-indexes)
   * [Recommendations by Collection Size](#recommendations-by-collection-size)
 * [Defining Indexes in Mongoose Schemas](#defining-indexes-in-mongoose-schemas)
 * [The `autoIndex` Option](#the-autoindex-option)
@@ -128,7 +131,7 @@ await User.create({});
 await User.create({ email: null });
 ```
 
-To work around this, you should create a _partial_ unique index.
+To work around this, you should create a *partial* unique index.
 Indexes have a `partialFilterExpression` option which limits the documents the index applies to.
 For example, the following index indicates that `email` should be unique only if the email property is set and not `null`.
 
@@ -185,7 +188,7 @@ The number of documents examined, not the number of documents returned, is what 
 Both versions of the above query return the same 3 orders, but without an index, MongoDB has to examine every order in the collection to find them.
 A good index keeps the number of documents examined small relative to the size of the collection: examining 25 documents to return 3 is typically fine, examining 5 million documents to return 3 is not.
 
-<img src="https://res.cloudinary.com/drfhhq8wu/image/upload/w_768/v1793565595/MongoDB_Index_Selectivity_Comparison_jgqzmq.webp">
+<img src="https://res.cloudinary.com/drfhhq8wu/image/upload/w_768/v1793565595/MongoDB_Index_Selectivity_Comparison_jgqzmq.webp" alt="Index selectivity: a query on { isGift: true } matches 80 of 100 documents (low selectivity), while a query on { customerId: 1234 } matches 1 of 100 documents (high selectivity)">
 
 Now consider an index on `isGift` in the `Order` model.
 If roughly half of all orders are gifts, then the number of documents that match any given value of `isGift` is not meaningfully smaller than the number of documents in the whole collection.
@@ -212,7 +215,8 @@ On the other hand, the prefix of `{ isGift: 1, customerId: 1 }` is `{ isGift: 1 
 If indexes make queries faster, why not index everything?
 Each index comes with overhead for writes, and if indexes take up more space than available memory they become significantly slower.
 
-**Write overhead**
+### Write Overhead {#write-overhead}
+
 Every index is a separate data structure that MongoDB must keep in sync with your documents.
 When you insert or delete a document, MongoDB must update every index on the collection.
 When you update a document, MongoDB must update every index that includes a modified field.
@@ -220,7 +224,7 @@ If you only have a few indexes, the overhead is negligible.
 But the overhead adds up if you have an extremely write-heavy collection with dozens of indexes.
 MongoDB also has a [hard limit](https://www.mongodb.com/docs/manual/reference/limits/) of 64 indexes per collection.
 
-**Memory**
+### Memory {#memory}
 
 Indexes are most effective when they fit in RAM.
 The idea is that, for larger collections, the entire collection may be too large to fit into RAM, but a subsection of commonly queried small fields may still fit into RAM.
@@ -241,9 +245,9 @@ totalIndexSize; // Total size of all indexes across all returned shards, in byte
 indexSizes; // Total size of each index across all returned shards
 ```
 
-<img src="https://res.cloudinary.com/drfhhq8wu/image/upload/w_768/v1793566062/Indexes_Keep_Key_Data_in_RAM_jzvy8o.webp">
+<img src="https://res.cloudinary.com/drfhhq8wu/image/upload/w_768/v1793566062/Indexes_Keep_Key_Data_in_RAM_jzvy8o.webp" alt="Large documents with fields like profilePicture and bio stay on disk, while a compact index that stores only customerId keys fits in RAM">
 
-**Overlapping indexes**
+### Overlapping Indexes {#overlapping-indexes}
 
 Multiple indexes that each cover part of a query make it harder for MongoDB to answer that query efficiently.
 Suppose you have separate `{ customerId: 1 }` and `{ status: 1 }` indexes, and you query for `{ customerId, status: 'shipped' }`.

@@ -85,3 +85,18 @@ function gh13755() {
   const doc = new TestModel();
   expect(doc.instance).type.toBe<Map<string, string> | undefined | null>();
 }
+
+function mongooseMapObjectIdKeys() {
+  const votes = new Types.Map<number>();
+  const userId = new Types.ObjectId();
+
+  expect(votes.set(userId, 1)).type.toBe<Types.Map<number>>();
+  expect(votes.get(userId)).type.toBe<number | undefined>();
+  expect(votes.get(userId, { getters: false })).type.toBe<number | undefined>();
+  expect(votes.has(userId)).type.toBe<boolean>();
+  expect(votes.delete(userId)).type.toBe<boolean>();
+  expect(votes.has('test')).type.toBe<boolean>();
+
+  expect(votes.has).type.not.toBeCallableWith(42);
+  expect(votes.set).type.not.toBeCallableWith({ obj: 42 }, 1);
+}

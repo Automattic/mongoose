@@ -1945,6 +1945,35 @@ describe('connections:', function() {
     assert.ok(res.mongoose.results[1].message.includes('not a number'));
   });
 
+  it('connection bulkWrite() throws validation errors when all unordered operations are invalid', async function() {
+    const db = await start().asPromise();
+
+    try {
+      const Test = db.model('Test', new Schema({ name: { type: String, required: true }, num: Number }));
+
+      await assert.rejects(
+        () => db.bulkWrite([
+          { model: Test, name: 'insertOne', document: { num: 42 } },
+          { model: Test, name: 'updateOne', filter: {}, update: { $set: { num: 'not a number' } } }
+        ], { ordered: false, throwOnValidationError: true }),
+        err => {
+          assert.equal(err.name, 'MongooseBulkWriteError');
+          assert.equal(err.operation, 'bulkWrite');
+          assert.strictEqual(err.rawResult, null);
+          assert.equal(err.validationErrors.length, 2);
+          assert.ok(err.validationErrors[0] instanceof mongoose.Error.ValidationError);
+          assert.equal(err.validationErrors[0].errors.name.kind, 'required');
+          assert.ok(err.validationErrors[1] instanceof CastError);
+          assert.equal(err.validationErrors[1].path, 'num');
+          assert.deepStrictEqual(err.results, err.validationErrors);
+          return true;
+        }
+      );
+    } finally {
+      await db.close();
+    }
+  });
+
   it('connection bulkWrite() casts array filters', async function() {
     const db = start();
 

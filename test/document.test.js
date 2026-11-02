@@ -7524,6 +7524,48 @@ describe('document', function() {
     assert.equal(doc.get('photos.0.foo'), 'bar');
   });
 
+  it('set() underneath alias marks the aliased path modified', async function() {
+    const schema = new Schema({
+      sub: { type: new Schema({ x: String }, { _id: false }), alias: 's' },
+      mixed: { type: Schema.Types.Mixed, alias: 'm' }
+    });
+    const Test = db.model('Test', schema);
+
+    const { _id } = await Test.create({ sub: { x: 'a' }, mixed: { y: 1 } });
+    const doc = await Test.findById(_id);
+    doc.set('s.x', 'b');
+    doc.set('m.y', 2);
+    assert.deepStrictEqual(doc.modifiedPaths().sort(), ['mixed', 'mixed.y', 'sub', 'sub.x']);
+    await doc.save();
+
+    const rawDoc = await Test.collection.findOne({ _id });
+    assert.deepStrictEqual(rawDoc.sub, { x: 'b' });
+    assert.deepStrictEqual(rawDoc.mixed, { y: 2 });
+  });
+
+  it('set() marks a null ancestor modified if it can\'t create the ancestor', async function() {
+    const Test = db.model('Test', new Schema({ name: String }));
+
+    const { insertedId } = await Test.collection.insertOne({ adhoc: { a: null } });
+    const doc = await Test.findById(insertedId);
+    // `set()` can't create `adhoc.a` because `adhoc.a` isn't in the schema, so
+    // `save()` needs to overwrite `adhoc.a` rather than set `adhoc.a.b`
+    doc.set('adhoc.a.b', 1, { strict: false });
+    assert.deepStrictEqual(doc.modifiedPaths(), ['adhoc', 'adhoc.a']);
+    await doc.save();
+
+    const rawDoc = await Test.collection.findOne({ _id: insertedId });
+    assert.deepStrictEqual(rawDoc.adhoc, { a: { b: 1 } });
+  });
+
+  it('set(null, path) sets path to null', function() {
+    const Test = db.model('Test', new Schema({ name: String }));
+
+    const doc = new Test({ name: 'test' });
+    doc.set(null, 'name');
+    assert.strictEqual(doc.name, null);
+  });
+
   it('get() with getters: false (gh-7233)', function() {
     const testSchema = new Schema({
       foo: { type: String, get: v => v.toLowerCase() }

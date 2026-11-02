@@ -157,4 +157,21 @@ describe('castexpr', function() {
       ]
     });
   });
+
+  it('casts case and then expressions in $switch branches', function() {
+    const testSchema = new Schema({ age: Number, score: Number });
+
+    const res = cast$expr({
+      $switch: {
+        branches: [{ case: { $gte: ['$age', '18'] }, then: { $multiply: ['$score', '2'] } }],
+        default: '$score'
+      }
+    }, testSchema);
+    assert.deepStrictEqual(res, {
+      $switch: {
+        branches: [{ case: { $gte: ['$age', 18] }, then: { $multiply: ['$score', 2] } }],
+        default: '$score'
+      }
+    });
+  });
 });

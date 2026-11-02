@@ -49,7 +49,7 @@
     "linkinator": "8.x",
     "lodash.isequal": "4.5.0",
     "lodash.isequalwith": "4.4.0",
-    "markdownlint-cli2": "0.23.3",
+    "markdownlint-cli2": "0.24.0",
     "marked": "18.1.2",
     "mkdirp": "^3.0.1",
     "mocha": "12.0.3",

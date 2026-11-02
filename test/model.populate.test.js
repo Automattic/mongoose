@@ -3601,6 +3601,125 @@ describe('model: populate:', function() {
 
     });
 
+    describe('inherited read preference and read concern (gh-15553)', function() {
+      it('inherits schema-level read preference and read concern in nested populate', async function() {
+        const Publisher = db.model('Publisher', new Schema({ name: String }));
+        const Author = db.model('Author', new Schema({ name: String, publisher: { type: ObjectId, ref: 'Publisher' } }));
+        const Article = db.model('Article', new Schema({
+          author: { type: ObjectId, ref: 'Author' }
+        }, { read: 'secondaryPreferred', readConcern: { level: 'majority' } }));
+        const publisher = await Publisher.create({ name: 'Acme Books' });
+        const author = await Author.create({ name: 'Alice', publisher: publisher._id });
+        await Article.create({ author: author._id });
+        const calls = recordFindReadOptions(Article, Author, Publisher);
+
+        await Article.find().populate({ path: 'author', populate: { path: 'publisher' } });
+
+        assert.deepStrictEqual(calls, [
+          { readPreference: 'secondaryPreferred', readConcern: 'majority' },
+          { readPreference: 'secondaryPreferred', readConcern: 'majority' },
+          { readPreference: 'secondaryPreferred', readConcern: 'majority' }
+        ]);
+      });
+
+      it('uses updated read preference and read concern when cloning an executed query with deferred populate', async function() {
+        const Publisher = db.model('Publisher', new Schema({ name: String }));
+        const Author = db.model('Author', new Schema({ name: String, publisher: { type: ObjectId, ref: 'Publisher' } }));
+        const Article = db.model('Article', new Schema({ author: { type: ObjectId, ref: 'Author' } }));
+        const publisher = await Publisher.create({ name: 'Acme Books' });
+        const author = await Author.create({ name: 'Alice', publisher: publisher._id });
+        await Article.create({ author: author._id });
+        const calls = recordFindReadOptions(Article, Author, Publisher);
+        // `match` function means Mongoose defers populating `publisher` until after filtering authors
+        const query = Article.find().read('primary').readConcern('local').
+          populate({ path: 'author', match: () => ({}), populate: { path: 'publisher' } });
+
+        await query;
+        await query.clone().read('secondaryPreferred').readConcern('majority');
+
+        assert.deepStrictEqual(calls, [
+          { readPreference: 'primary', readConcern: 'local' },
+          { readPreference: 'primary', readConcern: 'local' },
+          { readPreference: 'primary', readConcern: 'local' },
+          { readPreference: 'secondaryPreferred', readConcern: 'majority' },
+          { readPreference: 'secondaryPreferred', readConcern: 'majority' },
+          { readPreference: 'secondaryPreferred', readConcern: 'majority' }
+        ]);
+      });
+
+      it('uses updated read preference when cloning an executed query with plain object populate options', async function() {
+        const Author = db.model('Author', new Schema({ name: String }));
+        const Article = db.model('Article', new Schema({ author: { type: ObjectId, ref: 'Author' } }));
+        const author = await Author.create({ name: 'Alice' });
+        await Article.create({ author: author._id });
+        const calls = recordFindReadOptions(Article, Author);
+        const query = Article.find().read('primary');
+        query.mongooseOptions({ populate: { author: { path: 'author' } } });
+
+        await query;
+        await query.clone().read('secondaryPreferred');
+
+        assert.deepStrictEqual(calls.map(call => call.readPreference),
+          ['primary', 'primary', 'secondaryPreferred', 'secondaryPreferred']);
+      });
+
+      for (const deferred of [false, true]) {
+        it(`preserves explicit nested read options across clones and constructors (deferred: ${deferred})`, async function() {
+          const Publisher = db.model('Publisher', new Schema({ name: String }));
+          const Author = db.model('Author', new Schema({ publisher: { type: ObjectId, ref: 'Publisher' } }));
+          const Article = db.model('Article', new Schema({ author: { type: ObjectId, ref: 'Author' } }));
+          const publisher = await Publisher.create({ name: 'Acme Books' });
+          const author = await Author.create({ publisher: publisher._id });
+          await Article.create({ author: author._id });
+          const calls = recordFindReadOptions(Article, Author, Publisher);
+          const query = Article.find().read('primary').readConcern('local').populate({
+            path: 'author',
+            match: deferred ? () => ({}) : undefined,
+            populate: {
+              path: 'publisher',
+              options: { readPreference: 'primaryPreferred', readConcern: { level: 'local' } }
+            }
+          });
+
+          await query;
+          const cloned = query.clone().read('secondaryPreferred').readConcern('majority');
+          await cloned;
+          const ArticleQuery = cloned.toConstructor();
+          await ArticleQuery().read('nearest').readConcern('available');
+          await cloned.clone().read('primary').readConcern('local');
+
+          assert.deepStrictEqual(calls, [
+            { readPreference: 'primary', readConcern: 'local' },
+            { readPreference: 'primary', readConcern: 'local' },
+            { readPreference: 'primaryPreferred', readConcern: 'local' },
+            { readPreference: 'secondaryPreferred', readConcern: 'majority' },
+            { readPreference: 'secondaryPreferred', readConcern: 'majority' },
+            { readPreference: 'primaryPreferred', readConcern: 'local' },
+            { readPreference: 'nearest', readConcern: 'available' },
+            { readPreference: 'nearest', readConcern: 'available' },
+            { readPreference: 'primaryPreferred', readConcern: 'local' },
+            { readPreference: 'primary', readConcern: 'local' },
+            { readPreference: 'primary', readConcern: 'local' },
+            { readPreference: 'primaryPreferred', readConcern: 'local' }
+          ]);
+        });
+      }
+
+      function recordFindReadOptions(...models) {
+        const calls = [];
+        for (const Model of models) {
+          const find = Model.collection.find;
+          Model.collection.find = function() {
+            const cursor = find.apply(this, arguments);
+            calls.push({ readPreference: cursor.readPreference.mode, readConcern: cursor.readConcern?.level });
+            // Read from primary to avoid replication lag when testing against a replica set
+            return cursor.withReadPreference('primary');
+          };
+        }
+        return calls;
+      }
+    });
+
     describe('populate virtuals (gh-2562)', function() {
       it('basic populate virtuals', async function() {
         const PersonSchema = new Schema({
@@ -5616,18 +5735,30 @@ describe('model: populate:', function() {
           name: String
         });
 
-        db.model('Test', refSchema);
+        const Ref = db.model('Test', refSchema);
 
         const schema = new mongoose.Schema({
           ref: { type: mongoose.Schema.Types.ObjectId, ref: 'Test' }
         });
 
         const Model = db.model('Test1', schema);
+        const ref = await Ref.create({ name: 'Alice' });
+        await Model.create({ ref: ref._id });
+        const calls = [];
+        // Record Mongoose options, then read fixtures from primary to avoid replication lag.
+        const find = Ref.collection.find;
+        Ref.collection.find = function(filter, options) {
+          calls.push(options);
+          return find.call(this, filter, { ...options, readPreference: 'primary' });
+        };
+        const findModel = Model.collection.find;
+        Model.collection.find = function(filter, options) {
+          return findModel.call(this, filter, { ...options, readPreference: 'primary' });
+        };
 
         const q = Model.find().read('secondaryPreferred').populate('ref');
         await q.exec();
-        assert.equal(q._mongooseOptions.populate['ref'].options.readPreference.mode,
-          'secondaryPreferred');
+        assert.equal(calls[0].readPreference.mode, 'secondaryPreferred');
       });
 
       it('array underneath non-existent array (gh-6245)', async function() {

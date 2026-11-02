@@ -193,6 +193,23 @@ describe('schema', function() {
       await Clone.path('status').doValidate(42);
     });
 
+    it('enum(null) removes the enum validator like enum(false)', async function() {
+      const Test = new Schema({
+        state: { type: String, enum: ['a', 'b'] },
+        status: { type: Number, enum: [1, 2] }
+      });
+
+      Test.path('state').enum(null);
+      Test.path('status').enum(null);
+
+      assert.deepStrictEqual(Test.path('state').enumValues, []);
+      assert.deepStrictEqual(Test.path('status').enumValues, []);
+      assert.equal(Test.path('state').validators.length, 0);
+      assert.equal(Test.path('status').validators.length, 0);
+      await Test.path('state').doValidate('zzz');
+      await Test.path('status').doValidate(42);
+    });
+
     it('string regexp', async function() {
       const Test = new Schema({
         simple: { type: String, match: /[a-z]/ }

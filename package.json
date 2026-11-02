@@ -42,7 +42,7 @@
     "dox": "1.0.0",
     "eslint": "10.13.0",
     "eslint-plugin-mocha-no-only": "1.2.0",
-    "express": "5.2.1",
+    "express": "5.3.0",
     "fs-extra": "~11.4.0",
     "globals": "^17.4.0",
     "highlight.js": "11.12.0",

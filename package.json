@@ -63,7 +63,7 @@
     "tstyche": "^7.0.0",
     "typescript": "5.9.3",
     "typescript-eslint": "^8.31.1",
-    "uuid": "14.0.2",
+    "uuid": "14.0.3",
     "xss": "1.0.17"
   },
   "directories": {

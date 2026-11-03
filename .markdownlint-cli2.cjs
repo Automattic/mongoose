@@ -4,6 +4,8 @@
 // use aliases instead of "MD000" naming
 
 module.exports = {
+  // skip files ignored by git, like the "docs/api/*.md" files that "npm run docs:generate" generates from JSDoc comments
+  gitignore: true,
   ignores: [
     // the following are ignored because they are just redirects
     'History.md',

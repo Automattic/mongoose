@@ -47,6 +47,7 @@ package-lock.json
 # Compiled docs allowed in gh-pages
 #docs/*.html
 #docs/tutorials/*.html
+#docs/production/*.html
 #docs/typescript/*.html
 #docs/api/*.html
 #docs/api/*.md

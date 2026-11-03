@@ -2563,6 +2563,10 @@ describe('schema', function() {
       assert.ok(!newSchema.path('m'));
       assert.ok(!newSchema.path('m.$*'));
       assert.equal(newSchema.pathType('m.k'), 'adhocOrUndefined');
+
+      // The removed map used to keep casting queries on its keys
+      const Test = mongoose.model('OmitMapTest', newSchema);
+      assert.deepStrictEqual(Test.find({ 'm.k': '42' }).cast(Test), { 'm.k': '42' });
     });
 
     it('removes the paths of an omitted subdocument (gh-16520)', function() {

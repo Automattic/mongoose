@@ -11,6 +11,7 @@ const ArraySubdocument = require('../lib/types/arraySubdocument');
 const assert = require('assert');
 const idGetter = require('../lib/helpers/schema/idGetter');
 const setValue = require('../lib/utils').setValue;
+const deepEqual = require('../lib/utils').deepEqual;
 
 const mongoose = require('./common').mongoose;
 const Schema = mongoose.Schema;
@@ -2048,5 +2049,113 @@ describe('types.documentarray', function() {
     function getPopulatedLocationIds(trip) {
       return trip.populated('stops.location').map(id => id.toString());
     }
+  });
+
+  describe('assigning a plain array over an existing document array', function() {
+    const toObjectOptions = { transform: false, virtuals: false };
+
+    function countIdCalls(arr) {
+      const counter = { calls: 0 };
+      const original = arr.id;
+      arr.id = function() {
+        ++counter.calls;
+        return original.apply(this, arguments);
+      };
+      return counter;
+    }
+
+    // What `prev.id()` + `deepEqual()` pick for each incoming element, checked before assigning
+    function expectedSubdocs(prev, incoming) {
+      return incoming.map(row => {
+        const found = prev.id(row && row._id);
+        return found && deepEqual(found.toObject(toObjectOptions), row) ? found : null;
+      });
+    }
+
+    function assertSameAsId(doc, incoming) {
+      const prev = doc.arr;
+      const prevSubdocs = new Set(prev);
+      const expected = expectedSubdocs(prev, incoming);
+      doc.arr = incoming;
+      assert.strictEqual(doc.arr.length, incoming.length);
+      let reused = 0;
+      for (let i = 0; i < incoming.length; ++i) {
+        if (expected[i]) {
+          ++reused;
+          assert.ok(doc.arr[i] === expected[i], `element ${i} should reuse the existing subdocument`);
+        } else {
+          assert.ok(!prevSubdocs.has(doc.arr[i]), `element ${i} should be a new subdocument`);
+        }
+      }
+      return reused;
+    }
+
+    it('reuses the same subdocuments `id()` would, without calling `id()` per element', function() {
+      const Test = db.model('Test', new Schema({ arr: [{ name: String, n: Number }] }));
+      const rows = [];
+      for (let i = 0; i < 50; ++i) {
+        rows.push({ _id: new mongoose.Types.ObjectId(), name: 'row ' + i, n: i });
+      }
+      const doc = Test.hydrate({ _id: new mongoose.Types.ObjectId(), arr: rows });
+      const incoming = doc.arr.map(subdoc => subdoc.toObject(toObjectOptions));
+      incoming[7].n = 999; // same _id, changed data
+      incoming.reverse(); // moved
+
+      const counter = countIdCalls(doc.arr);
+      const expected = expectedSubdocs(doc.arr, incoming);
+      counter.calls = 0;
+      doc.arr = incoming;
+      assert.strictEqual(counter.calls, 0);
+      assert.strictEqual(expected.filter(Boolean).length, 49);
+      for (let i = 0; i < incoming.length; ++i) {
+        if (expected[i]) {
+          assert.ok(doc.arr[i] === expected[i]);
+        }
+      }
+    });
+
+    it('matches `id()` for ids given as strings, ObjectIds, missing, null, unknown and uncastable', function() {
+      const Test = db.model('Test', new Schema({ arr: [{ name: String }] }));
+      const rows = [];
+      for (let i = 0; i < 10; ++i) {
+        rows.push({ _id: new mongoose.Types.ObjectId(), name: 'row ' + i });
+      }
+      const doc = Test.hydrate({ _id: new mongoose.Types.ObjectId(), arr: rows });
+      const stored = doc.arr.map(subdoc => subdoc.toObject(toObjectOptions));
+      const incoming = [
+        { ...stored[0], _id: stored[0]._id.toString() },
+        stored[1],
+        { name: 'no _id' },
+        { _id: null, name: 'null _id' },
+        { _id: new mongoose.Types.ObjectId(), name: 'unknown' },
+        { _id: 'not an ObjectId', name: 'uncastable' },
+        { ...stored[2], _id: stored[2]._id.toString().toUpperCase() },
+        stored[3]
+      ];
+      assert.strictEqual(assertSameAsId(doc, incoming), 2);
+    });
+
+    it('resolves a duplicated `_id` in the previous array to the first element, like `id()`', function() {
+      const Test = db.model('Test', new Schema({ arr: [{ name: String }] }));
+      const _id = new mongoose.Types.ObjectId();
+      const doc = Test.hydrate({ _id: new mongoose.Types.ObjectId(), arr: [{ _id, name: 'a' }, { _id, name: 'a' }] });
+      const first = doc.arr[0];
+      doc.arr = [{ _id, name: 'a' }];
+      assert.ok(doc.arr[0] === first);
+    });
+
+    it('falls back to `id()` when `_id` is not an ObjectId', function() {
+      const Test = db.model('Test', new Schema({ arr: [new Schema({ _id: Number, name: String })] }));
+      const doc = Test.hydrate({ _id: new mongoose.Types.ObjectId(), arr: [{ _id: 1, name: 'a' }, { _id: 2, name: 'b' }, { _id: 3, name: 'c' }] });
+      const incoming = [{ _id: 3, name: 'c' }, { _id: 2, name: 'changed' }, { _id: 9, name: 'new' }];
+      assert.strictEqual(assertSameAsId(doc, incoming), 1);
+    });
+
+    it('handles assigning an empty array, and assigning over an empty array', function() {
+      const Test = db.model('Test', new Schema({ arr: [{ name: String }] }));
+      const doc = Test.hydrate({ _id: new mongoose.Types.ObjectId(), arr: [{ _id: new mongoose.Types.ObjectId(), name: 'a' }] });
+      assertSameAsId(doc, []);
+      assertSameAsId(doc, [{ _id: new mongoose.Types.ObjectId(), name: 'b' }]);
+    });
   });
 });

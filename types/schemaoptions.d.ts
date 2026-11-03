@@ -68,6 +68,13 @@ declare module 'mongoose' {
     /** Default lean options for queries */
     lean?: boolean | LeanOptions;
 
+    /**
+     * The sort to use for `find()`, `findOne()`, `findOneAndUpdate()`, `findOneAndReplace()`, `findOneAndDelete()`,
+     * `updateOne()`, and `replaceOne()` queries that don't specify a sort. Call `sort(null)` or `sort({})` to run an
+     * individual query with no sort.
+     */
+    defaultSort?: string | Record<string, SortOrder | { $meta: any }> | [string, SortOrder][] | Map<string, SortOrder | { $meta: any }> | false;
+
     /** The timeseries option to use when creating the model's collection. */
     timeseries?: mongodb.TimeSeriesCollectionOptions;
 

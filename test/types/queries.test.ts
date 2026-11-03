@@ -1136,3 +1136,30 @@ async function gh16062() {
   expect(Test.findOne).type.not.toBeCallableWith({ runtime: { $wrong: 100 } });
   expect(Test.findOne).type.not.toBeCallableWith({ $and: [{ runtime: { $wrong: 100 } }] });
 }
+
+async function defaultSortFindAndCount() {
+  const Sorted = model('DefaultSort', new Schema({ name: String }, { defaultSort: { name: 1 } }));
+  const [docs, total] = await Sorted.findAndCount({}, null, { limit: 10 });
+  expect(docs[0].name).type.toBe<string | null | undefined>();
+  expect(total).type.toBe<number>();
+  await Sorted.findAndCount({}, null, { sort: { _id: 1 }, limit: 10 });
+  await Sorted.find().sort(null);
+  await Sorted.find().sort({});
+
+  const StringSorted = model('DefaultSort2', new Schema({ name: String }, { defaultSort: '-name _id' }));
+  await StringSorted.findAndCount({}, null, { limit: 10 });
+
+  const Unsorted = model('NoDefaultSort', new Schema({ name: String }));
+  // @ts-expect-error  Property 'sort' is missing
+  await Unsorted.findAndCount({}, null, { limit: 10 });
+
+  const Disabled = model('DisabledDefaultSort', new Schema({ name: String }, { defaultSort: false }));
+  // @ts-expect-error  Property 'sort' is missing
+  await Disabled.findAndCount({}, null, { limit: 10 });
+
+  // @ts-expect-error  Property 'limit' is missing
+  await Sorted.findAndCount({}, null, {});
+
+  // @ts-expect-error  Type '2' is not assignable to type
+  new Schema({ name: String }, { defaultSort: { name: 2 } });
+}

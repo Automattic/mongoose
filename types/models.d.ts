@@ -222,6 +222,13 @@ declare module 'mongoose' {
       ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>['lean'] :
     false;
 
+  type HasDefaultSortOption<TSchema> = ObtainSchemaGeneric<TSchema, 'TSchemaOptions'> extends { defaultSort: infer DefaultSort } ?
+    [DefaultSort] extends [false | null | undefined] ? false : true :
+    false;
+
+  /** `Model.findAndCount()` requires `sort` unless the schema sets `defaultSort`. */
+  type FindAndCountSortOption<TSchema> = HasDefaultSortOption<TSchema> extends true ? { sort?: any } : { sort: any };
+
   /**
    * Models are fancy constructors compiled from `Schema` definitions.
    * An instance of a model is called a document.
@@ -968,22 +975,22 @@ declare module 'mongoose' {
     findAndCount<const Projection extends ProjectionType<TRawDocType>>(
       filter: QueryFilter<TRawDocType>,
       projection: Projection,
-      options: QueryOptions<TRawDocType> & { sort: any; limit: number; lean: true } & mongodb.Abortable
+      options: QueryOptions<TRawDocType> & FindAndCountSortOption<TSchema> & { limit: number; lean: true } & mongodb.Abortable
     ): Promise<[ApplyProjection<TRawDocType, Projection>[], number]>;
     findAndCount<ResultDoc = THydratedDocumentType>(
       filter: QueryFilter<TRawDocType>,
       projection: ProjectionType<TRawDocType> | null | undefined,
-      options: QueryOptions<TRawDocType> & { sort: any; limit: number; lean: true } & mongodb.Abortable
+      options: QueryOptions<TRawDocType> & FindAndCountSortOption<TSchema> & { limit: number; lean: true } & mongodb.Abortable
     ): Promise<[GetLeanResultType<TLeanResultType, TRawDocType[], 'find'>, number]>;
     findAndCount<ResultDoc = THydratedDocumentType>(
       filter: QueryFilter<TRawDocType>,
       projection: ProjectionType<TRawDocType> | null | undefined,
-      options: QueryOptions<TRawDocType> & { sort: any; limit: number; lean: false } & mongodb.Abortable
+      options: QueryOptions<TRawDocType> & FindAndCountSortOption<TSchema> & { limit: number; lean: false } & mongodb.Abortable
     ): Promise<[ResultDoc[], number]>;
     findAndCount<ResultDoc = THydratedDocumentType>(
       filter: QueryFilter<TRawDocType>,
       projection: ProjectionType<TRawDocType> | null | undefined,
-      options: QueryOptions<TRawDocType> & { sort: any; limit: number } & mongodb.Abortable
+      options: QueryOptions<TRawDocType> & FindAndCountSortOption<TSchema> & { limit: number } & mongodb.Abortable
     ): Promise<[HasLeanOption<TSchema> extends true ? TLeanResultType[] : ResultDoc[], number]>;
 
     /** Creates a `findByIdAndDelete` query, filtering by the given `_id`. */

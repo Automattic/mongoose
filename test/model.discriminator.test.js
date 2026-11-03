@@ -2217,7 +2217,7 @@ describe('model', function() {
     const childSchema = new Schema({}, { typeKey: 'bar' });
     assert.throws(() => {
       Base.discriminator('model-discriminator-custom1', childSchema);
-    }, { message: 'Can\'t customize discriminator option typeKey (can only modify toJSON, toObject, _id, id, virtuals, methods, statics)' });
+    }, { message: 'Can\'t customize discriminator option typeKey (can only modify toJSON, toObject, _id, id, virtuals, methods, statics, defaultSort)' });
   });
   it('handles customizable discriminator options gh-12135', function() {
     const baseSchema = Schema({}, { toJSON: { virtuals: true } });

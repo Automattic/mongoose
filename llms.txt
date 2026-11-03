@@ -34,6 +34,10 @@ Mongoose provides schema-based modeling, validation, casting, middleware, query 
 - [Transactions](https://mongoosejs.com/docs/transactions.md)
 - [Using TypeScript with Mongoose](https://mongoosejs.com/docs/typescript.md)
 
+## Production
+
+- [Indexes](https://mongoosejs.com/docs/production/indexes.md)
+
 ## API Reference
 
 - [Aggregate](https://mongoosejs.com/docs/api/aggregate.md)

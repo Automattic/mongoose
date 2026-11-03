@@ -1,0 +1,601 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Indexes - Mongoose v9.11.5</title><script>(function() {
+  var theme = localStorage.getItem('mongoose-theme');
+  if (theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+  }
+})();</script><link rel="apple-touch-icon" sizes="57x57" href="/docs/images/favicon/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="/docs/images/favicon/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="/docs/images/favicon/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="/docs/images/favicon/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="/docs/images/favicon/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="/docs/images/favicon/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="/docs/images/favicon/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="/docs/images/favicon/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="/docs/images/favicon/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="/docs/images/favicon/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="/docs/images/favicon/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="/docs/images/favicon/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="/docs/images/favicon/favicon-16x16.png"><link rel="manifest" href="/docs/images/favicon/manifest.json"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:wght@400;500;600;700&amp;display=swap"><link rel="stylesheet" href="/docs/css/mongoose9.css?v=1793740205716"><link rel="stylesheet" href="/docs/css/github.css?v=1793740205716"><link rel="stylesheet" href="/docs/css/carbonads.css"><link rel="stylesheet" href="/docs/css/copy-code.css"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="/docs/images/favicon/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"></head><body><header class="site-header"><div class="site-header-inner"><button class="mobile-menu-toggle" id="menuLink" aria-label="Toggle navigation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button><a class="site-logo" href="/"><div class="site-logo-inner"><span class="site-logo-mark" role="img" aria-label="Mongoose logo"></span><span class="site-logo-text">mongoose</span></div></a><div class="site-search"><input id="search-input-nav" type="text" placeholder="Search" aria-label="Search"><button class="site-search-button" id="search-button-nav" aria-label="Search"><img src="/docs/images/search.svg"></button></div><nav class="top-navbar" aria-label="Primary"><a class="top-navbar-link active" href="/docs/index.html">Docs</a><a class="top-navbar-link" href="/docs/api/mongoose.html">API</a><a class="top-navbar-link" href="/docs/migrating_to_9.html">Migration</a><a class="top-navbar-link" href="/docs/faq.html">FAQ</a></nav><div class="site-actions"><button class="icon-button" id="theme-toggle-btn" aria-label="Toggle dark mode" title="Toggle dark/light theme"><svg id="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+<svg id="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button><a class="icon-link" href="https://github.com/Automattic/mongoose" target="_blank" rel="noopener" aria-label="GitHub repository"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.55v-2c-3.2.7-3.87-1.37-3.87-1.37-.52-1.32-1.28-1.67-1.28-1.67-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.52-1.47.11-3.06 0 0 .97-.31 3.18 1.18a11.04 11.04 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.77.12 3.06.74.81 1.18 1.84 1.18 3.1 0 4.44-2.7 5.4-5.27 5.69.41.35.77 1.05.77 2.12v3.14c0 .31.2.66.8.55A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg></a><button class="icon-button mobile-toc-toggle" id="tocLink" aria-label="Toggle table of contents" aria-controls="toc-sidebar" title="Table of contents"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg></button></div></div></header><div class="site-body" id="layout"><aside class="left-sidebar" id="menu"><div class="version-picker" id="version-picker"><div class="version-picker-label">Version</div><button class="version-picker-button" type="button" aria-haspopup="true" aria-expanded="false"><span class="version-picker-current">v9.11.5</span><svg class="version-picker-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button><ul class="version-picker-menu" role="menu"><li><a class="version-picker-item" role="menuitem" href="/docs/8.x/index.html">v8.24.8</a></li><li><a class="version-picker-item" role="menuitem" href="/docs/7.x/index.html">v7.8.13</a></li><li><a class="version-picker-item" role="menuitem" href="/docs/6.x/index.html">v6.13.12</a></li></ul></div><nav class="sidebar-nav" aria-label="Docs navigation"><div class="sidebar-section sidebar-section-collapsible" id="sidebar-section-getting-started"><h3 class="sidebar-section-title sidebar-section-toggle" role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-getting-started"><span>Getting Started</span><svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></h3><ul class="sidebar-list" id="sidebar-list-getting-started"><li class="sidebar-item"><a class="sidebar-link" href="/docs/index.html">Quick Start</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/guides.html">All Guides</a></li></ul></div><div class="sidebar-section sidebar-section-collapsible" id="sidebar-section-guides"><h3 class="sidebar-section-title sidebar-section-toggle" role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-guides"><span>Guides</span><svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></h3><ul class="sidebar-list" id="sidebar-list-guides"><li class="sidebar-item"><a class="sidebar-link" href="/docs/guide.html">Schemas</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/schematypes.html">SchemaTypes</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/connections.html">Connections</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/models.html">Models</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/documents.html">Documents</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/subdocs.html">Subdocuments</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/queries.html">Queries</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/validation.html">Validation</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/middleware.html">Middleware</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/populate.html">Populate</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/discriminators.html">Discriminators</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/plugins.html">Plugins</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/timestamps.html">Timestamps</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/transactions.html">Transactions</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/atlas-search.html">Atlas Search</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/typescript.html">TypeScript</a></li></ul></div><div class="sidebar-section sidebar-section-collapsible" id="sidebar-section-production"><h3 class="sidebar-section-title sidebar-section-toggle" role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-production"><span>Production</span><svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></h3><ul class="sidebar-list" id="sidebar-list-production"><li class="sidebar-item"><a class="sidebar-link active" href="/docs/production/indexes.html">Indexes</a></li></ul></div><div class="sidebar-section sidebar-section-collapsible" id="sidebar-section-api-reference"><h3 class="sidebar-section-title sidebar-section-toggle" role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-api-reference"><span>API Reference</span><svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></h3><ul class="sidebar-list" id="sidebar-list-api-reference"><li class="sidebar-item"><a class="sidebar-link" href="/docs/api/mongoose.html">Mongoose</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/api/schema.html">Schema</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/api/connection.html">Connection</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/api/document.html">Document</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/api/model.html">Model</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/api/query.html">Query</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/api/aggregate.html">Aggregate</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/api/schematype.html">SchemaType</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/api/virtualtype.html">VirtualType</a></li></ul></div><div class="sidebar-section sidebar-section-collapsible" id="sidebar-section-reference"><h3 class="sidebar-section-title sidebar-section-toggle" role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-reference"><span>Reference</span><svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></h3><ul class="sidebar-list" id="sidebar-list-reference"><li class="sidebar-item"><a class="sidebar-link" href="/docs/migrating_to_9.html">Migration Guide</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/compatibility.html">Version Compatibility</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/version-support.html">Version Support</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/faq.html">FAQ</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/further_reading.html">Further Reading</a></li></ul></div><div class="sidebar-section sidebar-section-collapsible" id="sidebar-section-community"><h3 class="sidebar-section-title sidebar-section-toggle" role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-community"><span>Community</span><svg class="sidebar-section-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></h3><ul class="sidebar-list" id="sidebar-list-community"><li class="sidebar-item"><a class="sidebar-link" href="/docs/enterprise.html">For Enterprise</a></li><li class="sidebar-item"><a class="sidebar-link" href="/docs/sponsors.html">Sponsors</a></li></ul></div></nav></aside><main class="site-main"><article class="article" id="content"><div class="article-header"><h1 id="indexes">
+        <a href="#indexes">
+          Indexes
+        </a>
+      </h1>
+<div class="doc-links">
+<a class="edit-docs-link" href="https://github.com/Automattic/mongoose/edit/master/docs/production/indexes.md" target="_blank">
+<img src="/docs/images/pencil.svg" />
+</a>
+<button class="copy-markdown-link" data-md-url="/docs/production/indexes.md" title="Copy page as Markdown" aria-label="Copy page as Markdown">
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+</button>
+</div></div><script>(function() {
+  const copyMarkdownButton = document.querySelector('.copy-markdown-link');
+  if (copyMarkdownButton == null) {
+    return;
+  }
+
+  copyMarkdownButton.addEventListener('click', async function() {
+    const response = await fetch(copyMarkdownButton.dataset.mdUrl);
+    const markdown = await response.text();
+    await navigator.clipboard.writeText(markdown);
+    copyMarkdownButton.classList.add('copied');
+    setTimeout(() => copyMarkdownButton.classList.remove('copied'), 2000);
+  });
+})();</script><div class="sponsored-ad">
+  <a href="https://localizejs.com/?utm_campaign=Mongoose&utm_source=mongoose&utm_medium=banner">
+    <img src="https://res.cloudinary.com/drfhhq8wu/image/upload/v1770464125/localize2_acgiup.webp">
+  </a>
+</div><p>Indexes are critical for keeping queries fast as your data grows.
+With only a few hundred documents in your local database, every query is fast, with or without indexes.
+With 100 million documents in a collection, a query that has to scan the entire collection can take seconds or minutes, and slow down other queries by tying up CPU and memory.
+This guide explains what indexes are, when you should and should not add them, how to define indexes in Mongoose, and how to manage and inspect indexes in production.</p>
+<ul>
+<li><a href="#what-is-an-index">What is an Index?</a><ul>
+<li><a href="#compound-indexes">Compound Indexes</a></li>
+<li><a href="#unique-indexes">Unique Indexes</a></li>
+</ul>
+</li>
+<li><a href="#when-to-add-indexes">When to Add Indexes</a></li>
+<li><a href="#when-not-to-add-indexes">When Not to Add Indexes</a><ul>
+<li><a href="#write-overhead">Write Overhead</a></li>
+<li><a href="#memory">Memory</a></li>
+<li><a href="#overlapping-indexes">Overlapping Indexes</a></li>
+<li><a href="#recommendations-by-collection-size">Recommendations by Collection Size</a></li>
+</ul>
+</li>
+<li><a href="#defining-indexes-in-mongoose-schemas">Defining Indexes in Mongoose Schemas</a></li>
+<li><a href="#the-autoindex-option">The <code>autoIndex</code> Option</a><ul>
+<li><a href="#detecting-autoindex-errors">Detecting <code>autoIndex</code> Errors</a></li>
+</ul>
+</li>
+<li><a href="#creating-indexes">Creating Indexes</a></li>
+<li><a href="#syncing-indexes">Syncing Indexes</a></li>
+<li><a href="#using-explain-and-hint">Using <code>explain()</code> and <code>hint()</code></a></li>
+</ul>
+<h2 id="what-is-an-index">
+        <a href="#what-is-an-index">
+          What is an Index? 
+        </a>
+      </h2>
+<p>An index is a data structure that stores the values of one or more fields in sorted order, along with a pointer to the document each value came from.
+Without an index, MongoDB must perform a <em>collection scan</em>: read every document in the collection to find the ones that match your query.
+With an index, MongoDB can jump directly to the matching values, like how you would use the index at the back of a textbook rather than reading every page.
+You can think of an index as precomputing the result of a particular query.</p>
+<p>For example, suppose you have a <code>User</code> model and you frequently look up users by email.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">name</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">email</span>: <span class="hljs-title class_">String</span>
+});
+userSchema.<span class="hljs-title function_">index</span>({ <span class="hljs-attr">email</span>: <span class="hljs-number">1</span> });
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">User</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, userSchema);
+
+<span class="hljs-comment">// With the `email` index, MongoDB finds this user without scanning every document</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">User</span>.<span class="hljs-title function_">findOne</span>({ <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;hermione@hogwarts.edu&#x27;</span> });</code></pre><p>The <code>1</code> in <code>{ email: 1 }</code> means the index is sorted in ascending order, and <code>-1</code> means descending order.
+For a single-field index, the direction does not matter, because MongoDB can traverse the index in either direction.</p>
+<p>MongoDB automatically creates a unique index on <code>_id</code> for every normal collection, so queries by <code>_id</code>, like <code>findById()</code>, always use an index.
+You cannot drop the <code>_id</code> index.
+The exception is <a href="https://www.mongodb.com/docs/manual/core/timeseries-collections/">timeseries collections</a>, which do not have an <code>_id</code> index.</p>
+<h3 id="compound-indexes">
+        <a href="#compound-indexes">
+          Compound Indexes 
+        </a>
+      </h3>
+<p>A <a href="https://www.mongodb.com/docs/manual/core/indexes/index-types/index-compound/">compound index</a> is an index on multiple fields.
+Consider an <code>Order</code> model for an online store, where the most common query is &quot;show a customer&#39;s most recent orders.&quot;</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> orderSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">customerId</span>: mongoose.<span class="hljs-property">ObjectId</span>,
+  <span class="hljs-attr">status</span>: <span class="hljs-title class_">String</span>, <span class="hljs-comment">// &#x27;pending&#x27;, &#x27;shipped&#x27;, &#x27;delivered&#x27;, or &#x27;cancelled&#x27;</span>
+  <span class="hljs-attr">isGift</span>: <span class="hljs-title class_">Boolean</span>,
+  <span class="hljs-attr">total</span>: <span class="hljs-title class_">Number</span>,
+  <span class="hljs-attr">createdAt</span>: <span class="hljs-title class_">Date</span>
+});
+orderSchema.<span class="hljs-title function_">index</span>({ <span class="hljs-attr">customerId</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">createdAt</span>: -<span class="hljs-number">1</span> });
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Order</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Order&#x27;</span>, orderSchema);
+
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Order</span>.<span class="hljs-title function_">find</span>({ customerId }).<span class="hljs-title function_">sort</span>({ <span class="hljs-attr">createdAt</span>: -<span class="hljs-number">1</span> }).<span class="hljs-title function_">limit</span>(<span class="hljs-number">10</span>);</code></pre><p>A compound index sorts by the first field, then by the second field within each value of the first field, and so on.
+So the <code>{ customerId: 1, createdAt: -1 }</code> index groups all of a customer&#39;s orders together, already sorted from newest to oldest.
+MongoDB can answer the above query by reading the first 10 index entries for that customer, without sorting any documents in memory.</p>
+<p>Field order matters in compound indexes.
+A compound index can support queries on any <em>prefix</em> of its fields.
+The <code>{ customerId: 1, createdAt: -1 }</code> index supports queries on <code>customerId</code> alone, and on <code>customerId</code> and <code>createdAt</code> together, but not queries on <code>createdAt</code> alone.</p>
+<pre><code lang="javascript"><span class="hljs-comment">// Can use the `{ customerId: 1, createdAt: -1 }` index</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Order</span>.<span class="hljs-title function_">find</span>({ customerId });
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Order</span>.<span class="hljs-title function_">find</span>({ customerId, <span class="hljs-attr">createdAt</span>: { <span class="hljs-attr">$gte</span>: lastWeek } });
+
+<span class="hljs-comment">// Cannot use the `{ customerId: 1, createdAt: -1 }` index efficiently,</span>
+<span class="hljs-comment">// because `createdAt` is not a prefix of the index</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Order</span>.<span class="hljs-title function_">find</span>({ <span class="hljs-attr">createdAt</span>: { <span class="hljs-attr">$gte</span>: lastWeek } });</code></pre><h3 id="unique-indexes">
+        <a href="#unique-indexes">
+          Unique Indexes 
+        </a>
+      </h3>
+<p>A <a href="https://www.mongodb.com/docs/manual/core/index-unique/">unique index</a> is an index which also ensures there are no duplicate values within the index.
+For example, MongoDB collections always have a unique index on <code>_id</code>.
+Trying to insert two documents with the same <code>_id</code> property throws an error with <code>err.code === 11000</code>.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> _id = <span class="hljs-keyword">new</span> mongoose.<span class="hljs-property">Types</span>.<span class="hljs-title class_">ObjectId</span>();
+
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Order</span>.<span class="hljs-title function_">create</span>({ _id });
+
+<span class="hljs-keyword">const</span> err = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Order</span>.<span class="hljs-title function_">create</span>({ _id }).<span class="hljs-title function_">then</span>(<span class="hljs-function">() =&gt;</span> <span class="hljs-literal">null</span>, <span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> err);
+err.<span class="hljs-property">code</span>; <span class="hljs-comment">// 11000, MongoDB&#x27;s error code for a duplicate key error</span>
+err.<span class="hljs-property">name</span>; <span class="hljs-comment">// &quot;MongoServerError&quot;</span>
+err.<span class="hljs-property">message</span>; <span class="hljs-comment">// &quot;E11000 duplicate key error...&quot;</span></code></pre><p><code>unique</code> is an index option.
+When defining an index, pass <code>unique: true</code> to indicate the index should be unique.</p>
+<pre><code lang="javascript">userSchema.<span class="hljs-title function_">index</span>({ <span class="hljs-attr">email</span>: <span class="hljs-number">1</span> }, { <span class="hljs-attr">unique</span>: <span class="hljs-literal">true</span> });</code></pre><p>If you build a unique index on a collection which already has duplicate emails, the index build will fail.
+For example, if there are already two users with email <code>bill@microsoft.com</code>, the above index will fail to build with an <code>E11000 duplicate key error</code>.</p>
+<p>You cannot have a unique and a non-unique index on the same fields.
+If you already have a non-unique index on <code>{ email: 1 }</code>, building an index with <code>{ email: 1 }</code> and <code>unique: true</code> will fail with an <code>IndexKeySpecsConflict</code> error.</p>
+<p>Unique indexes count missing and <code>null</code> fields as a distinct value by default.
+In other words, if you have a unique index on <code>email</code>, you will get a duplicate key error if you try to insert 2 users with no email or <code>email: null</code>.</p>
+<pre><code lang="javascript"><span class="hljs-comment">// Create a user with no email</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">User</span>.<span class="hljs-title function_">create</span>({});
+
+<span class="hljs-comment">// Throws duplicate key error for `email`</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">User</span>.<span class="hljs-title function_">create</span>({});
+
+<span class="hljs-comment">// Also duplicate key error for `email`: missing and `null` are considered</span>
+<span class="hljs-comment">// equivalent for unique indexes.</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">User</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">email</span>: <span class="hljs-literal">null</span> });</code></pre><p>To work around this, you should create a <em>partial</em> unique index.
+Indexes have a <code>partialFilterExpression</code> option which limits the documents the index applies to.
+For example, the following index indicates that <code>email</code> should be unique only if the email property is set and not <code>null</code>.</p>
+<pre><code lang="javascript">userSchema.<span class="hljs-title function_">index</span>(
+  { <span class="hljs-attr">email</span>: <span class="hljs-number">1</span> },
+  {
+    <span class="hljs-attr">unique</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-comment">// Unique index only applies to documents that have an `email` property.</span>
+    <span class="hljs-attr">partialFilterExpression</span>: {
+      <span class="hljs-attr">email</span>: { <span class="hljs-attr">$exists</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">$ne</span>: <span class="hljs-literal">null</span> }
+    }
+  }
+);</code></pre><p>A unique <a href="#compound-indexes">compound index</a> enforces uniqueness on the combination of its fields, not on each field individually.
+For example, a unique index on <code>{ email: 1, workspace: 1 }</code> allows multiple users with the same <code>email</code>, as long as each of those users has a different <code>workspace</code>.</p>
+<pre><code lang="javascript">userSchema.<span class="hljs-title function_">index</span>({ <span class="hljs-attr">email</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">workspace</span>: <span class="hljs-number">1</span> }, { <span class="hljs-attr">unique</span>: <span class="hljs-literal">true</span> });
+
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">User</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;hermione@hogwarts.edu&#x27;</span>, <span class="hljs-attr">workspace</span>: <span class="hljs-string">&#x27;gryffindor&#x27;</span> });
+<span class="hljs-comment">// OK: same `email`, different `workspace`</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">User</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;hermione@hogwarts.edu&#x27;</span>, <span class="hljs-attr">workspace</span>: <span class="hljs-string">&#x27;ravenclaw&#x27;</span> });
+<span class="hljs-comment">// OK: same `workspace`, different `email`</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">User</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;ron@hogwarts.edu&#x27;</span>, <span class="hljs-attr">workspace</span>: <span class="hljs-string">&#x27;gryffindor&#x27;</span> });
+<span class="hljs-comment">// Throws duplicate key error: same `email` and `workspace`</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">User</span>.<span class="hljs-title function_">create</span>({ <span class="hljs-attr">email</span>: <span class="hljs-string">&#x27;hermione@hogwarts.edu&#x27;</span>, <span class="hljs-attr">workspace</span>: <span class="hljs-string">&#x27;gryffindor&#x27;</span> });</code></pre><p>The order of fields in a unique compound index (or order of fields in the document) does not affect which documents count as duplicates.</p>
+<h2 id="when-to-add-indexes">
+        <a href="#when-to-add-indexes">
+          When to Add Indexes 
+        </a>
+      </h2>
+<p>You do not need an index for every query from day one.
+Collection scans are cheap on small collections: scanning a few thousand documents typically takes a few milliseconds.
+As a rule of thumb, by the time a collection grows to 10,000 documents, you should have indexes for your most common queries.</p>
+<p>Not every index is a good index.
+The value of an index depends on its <em>selectivity</em>: how much the index narrows down the set of documents MongoDB needs to examine.
+For example, if you have a <code>{ customerId: 1 }</code> index on the <code>Order</code> model, and you run a query for <code>Order.find({ customerId, isGift: true })</code>, MongoDB would use the index to find every order that belongs to <code>customerId</code>.
+The index only contains <code>customerId</code>, so MongoDB then has to load each of those orders from the collection and check whether <code>isGift</code> is <code>true</code>.
+The documents MongoDB loads and checks against your query filter are the <em>documents examined</em> (sometimes called <em>documents scanned</em>).</p>
+<pre><code lang="javascript"><span class="hljs-comment">// Suppose this customer has 25 orders, 3 of which are gifts.</span>
+<span class="hljs-comment">// With a `{ customerId: 1 }` index, MongoDB examines 25 documents and returns 3.</span>
+<span class="hljs-comment">// Without any index, MongoDB examines every document in the collection and returns 3.</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Order</span>.<span class="hljs-title function_">find</span>({ customerId, <span class="hljs-attr">isGift</span>: <span class="hljs-literal">true</span> });</code></pre><p>The number of documents examined, not the number of documents returned, is what determines how much work a query does.
+Both versions of the above query return the same 3 orders, but without an index, MongoDB has to examine every order in the collection to find them.
+A good index keeps the number of documents examined small relative to the size of the collection: examining 25 documents to return 3 is typically fine, examining 5 million documents to return 3 is not.</p>
+<img src="https://res.cloudinary.com/drfhhq8wu/image/upload/w_768/v1793565595/MongoDB_Index_Selectivity_Comparison_jgqzmq.webp" alt="Index selectivity: a query on { isGift: true } matches 80 of 100 documents (low selectivity), while a query on { customerId: 1234 } matches 1 of 100 documents (high selectivity)"><p>Now consider an index on <code>isGift</code> in the <code>Order</code> model.
+If roughly half of all orders are gifts, then the number of documents that match any given value of <code>isGift</code> is not meaningfully smaller than the number of documents in the whole collection.
+A query for <code>{ isGift: true }</code> still has to examine half the collection, and loading half the collection&#39;s documents through an index can even be slower than a collection scan.
+That means an index on <code>isGift</code> is a bad index.</p>
+<p>In contrast, <code>customerId</code> is highly selective.
+If your store has 5 million orders from 200,000 customers, the average customer has 25 orders, so a query on <code>customerId</code> examines on average 25 documents instead of 5 million.</p>
+<table>
+<thead>
+<tr>
+<th>Index</th>
+<th>Example Query</th>
+<th>Documents Examined (of 5M)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>None</td>
+<td><code>{ customerId }</code></td>
+<td>~5,000,000</td>
+</tr>
+<tr>
+<td><code>{ isGift: 1 }</code></td>
+<td><code>{ isGift: true }</code></td>
+<td>~2,500,000</td>
+</tr>
+<tr>
+<td><code>{ customerId: 1 }</code></td>
+<td><code>{ customerId }</code></td>
+<td>~25</td>
+</tr>
+</tbody></table>
+<p>Low-selectivity fields are not useless; they just should not be indexed on their own.
+A low-selectivity field can still be helpful as part of a compound index, although put low-selectivity fields later in the compound index. A <code>{ customerId: 1, isGift: 1 }</code> index is also better than an <code>{ isGift: 1, customerId: 1 }</code> index, even though both examine the same 3 documents for a query on <code>{ customerId, isGift }</code>.
+That&#39;s because compound indexes can only support queries on a <a href="#compound-indexes">prefix</a> of its fields.
+Because <code>customerId</code> comes first, <code>{ customerId: 1, isGift: 1 }</code> also supports queries on <code>customerId</code> alone, like loading all of a customer&#39;s orders, so it can replace a <code>{ customerId: 1 }</code> index entirely.
+On the other hand, the prefix of <code>{ isGift: 1, customerId: 1 }</code> is <code>{ isGift: 1 }</code>, which is not useful on its own.</p>
+<h2 id="when-not-to-add-indexes">
+        <a href="#when-not-to-add-indexes">
+          When Not to Add Indexes 
+        </a>
+      </h2>
+<p>If indexes make queries faster, why not index everything?
+Each index comes with overhead for writes, and if indexes take up more space than available memory they become significantly slower.</p>
+<h3 id="write-overhead">
+        <a href="#write-overhead">
+          Write Overhead 
+        </a>
+      </h3>
+<p>Every index is a separate data structure that MongoDB must keep in sync with your documents.
+When you insert or delete a document, MongoDB must update every index on the collection.
+When you update a document, MongoDB must update every index that includes a modified field.
+If you only have a few indexes, the overhead is negligible.
+But the overhead adds up if you have an extremely write-heavy collection with dozens of indexes.
+MongoDB also has a <a href="https://www.mongodb.com/docs/manual/reference/limits/">hard limit</a> of 64 indexes per collection.</p>
+<h3 id="memory">
+        <a href="#memory">
+          Memory 
+        </a>
+      </h3>
+<p>Indexes are most effective when they fit in RAM.
+The idea is that, for larger collections, the entire collection may be too large to fit into RAM, but a subsection of commonly queried small fields may still fit into RAM.
+MongoDB&#39;s storage engine keeps frequently used indexes and documents in an in-memory cache; if your indexes do not fit, MongoDB has to read index data from disk, and indexed queries become significantly slower.
+Every unnecessary index competes for cache space with the indexes and documents your application actually uses.
+You can check the size of a collection&#39;s indexes using the <a href="https://www.mongodb.com/docs/manual/reference/operator/aggregation/collStats/"><code>$collStats</code> aggregation stage</a>.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> stats = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Order</span>.<span class="hljs-title function_">aggregate</span>([{ <span class="hljs-attr">$collStats</span>: { <span class="hljs-attr">storageStats</span>: {} } }]);
+<span class="hljs-keyword">const</span> totalIndexSize = stats.<span class="hljs-title function_">reduce</span>(<span class="hljs-function">(<span class="hljs-params">total, { storageStats }</span>) =&gt;</span> total + storageStats.<span class="hljs-property">totalIndexSize</span>, <span class="hljs-number">0</span>);
+<span class="hljs-keyword">const</span> indexSizes = {};
+<span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> { storageStats } <span class="hljs-keyword">of</span> stats) {
+  <span class="hljs-keyword">for</span> (<span class="hljs-keyword">const</span> [name, size] <span class="hljs-keyword">of</span> <span class="hljs-title class_">Object</span>.<span class="hljs-title function_">entries</span>(storageStats.<span class="hljs-property">indexSizes</span>)) {
+    indexSizes[name] = (indexSizes[name] || <span class="hljs-number">0</span>) + size;
+  }
+}
+totalIndexSize; <span class="hljs-comment">// Total size of all indexes across all returned shards, in bytes</span>
+indexSizes; <span class="hljs-comment">// Total size of each index across all returned shards</span></code></pre><img src="https://res.cloudinary.com/drfhhq8wu/image/upload/w_768/v1793566062/Indexes_Keep_Key_Data_in_RAM_jzvy8o.webp" alt="Large documents with fields like profilePicture and bio stay on disk, while a compact index that stores only customerId keys fits in RAM"><h3 id="overlapping-indexes">
+        <a href="#overlapping-indexes">
+          Overlapping Indexes 
+        </a>
+      </h3>
+<p>Multiple indexes that each cover part of a query make it harder for MongoDB to answer that query efficiently.
+Suppose you have separate <code>{ customerId: 1 }</code> and <code>{ status: 1 }</code> indexes, and you query for <code>{ customerId, status: &#39;shipped&#39; }</code>.
+No single index covers both fields, so it&#39;s up to MongoDB to choose which index to use.
+While MongoDB is smart about selecting the right index, overlapping indexes often mean you&#39;re better off with a compound index - in the above example, you&#39;re better off having an index on <code>{ customerId, status }</code> than separate <code>customerId</code> and <code>status</code> indexes.</p>
+<p>Similarly, an index that is a prefix of another index is typically redundant.
+If you have a <code>{ customerId: 1, createdAt: -1 }</code> index, you do not need a separate <code>{ customerId: 1 }</code> index.
+MongoDB can use the <code>{ customerId: 1, createdAt: -1 }</code> index for queries on <code>customerId</code> that do not use <code>createdAt</code>.</p>
+<h3 id="recommendations-by-collection-size">
+        <a href="#recommendations-by-collection-size">
+          Recommendations by Collection Size 
+        </a>
+      </h3>
+<p>Below are some rough heuristics we use when thinking about what indexes a collection needs based on collection size.
+Index needs depend heavily on workload, document size, application structure, and business needs, so treat these heuristics as a &quot;finger in the wind&quot; rather than exact evidence-based boundaries.</p>
+<ul>
+<li><strong>Tiny collections (fewer than 10,000 documents):</strong> Don&#39;t worry too much about indexes. Collection scans on tiny collections are fast because there are few documents and tiny collections often fit into available RAM.</li>
+<li><strong>Small collections (10,000 to 1 million documents):</strong> Add indexes to cover your common queries is important but not critical - you can get away with infrequent collection scans. The risk of having too many indexes is low, so overindexing is not a major concern.</li>
+<li><strong>Large collections (1 million to 100 million documents):</strong> Ensuring index coverage for common queries is critical. Frequent collection scans or even scans over insufficiently selective indexes can overload the database. The risk of having too many indexes is moderate, so be careful about overindexing, but it is more important to avoid index misses.</li>
+<li><strong>Extra large collections (100 million documents or more):</strong> Ensuring index coverage for common queries is critical. Even occasional collection scans can cause significant performance degradation. The risk of overindexing is also high: indexes on XL collections take a lot of RAM, and XL collections are typically write-heavy. Make heavy use of the <code>_id</code> index, because that index exists regardless.</li>
+</ul>
+<p>For example, the default <code>_id</code> is an <a href="../schematypes.html#objectids">ObjectId</a>, and when you create a <code>new ObjectId()</code> with no parameters, the resulting ObjectId encodes the time the ObjectId was created.
+You can query and sort by <code>_id</code> instead of adding a separate index on <code>createdAt</code>, presuming you use the default ObjectId constructor.
+This is a helpful trick for large and extra large collections, or cases where you&#39;re building a generic tool that does not know the collection size.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> objectId = <span class="hljs-keyword">new</span> mongoose.<span class="hljs-property">Types</span>.<span class="hljs-title class_">ObjectId</span>();
+<span class="hljs-comment">// time when `new ObjectId()` was called as a native JS Date.</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(objectId.<span class="hljs-title function_">getTimestamp</span>());
+
+<span class="hljs-comment">// Find all orders created in the last 24 hours using the `_id` index</span>
+<span class="hljs-comment">// Keep in mind that `ObjectId.createFromTime()` takes _seconds_ since the</span>
+<span class="hljs-comment">// UNIX epoch as a parameter, whereas `Date.now()` returns _milliseconds_</span>
+<span class="hljs-comment">// since the UNIX epoch. Make sure to divide by 1000!</span>
+<span class="hljs-keyword">const</span> oneDayAgo = <span class="hljs-title class_">Math</span>.<span class="hljs-title function_">floor</span>(<span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>() / <span class="hljs-number">1000</span>) - <span class="hljs-number">24</span> * <span class="hljs-number">60</span> * <span class="hljs-number">60</span>;
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Order</span>.
+  <span class="hljs-title function_">find</span>({ <span class="hljs-attr">_id</span>: { <span class="hljs-attr">$gte</span>: mongoose.<span class="hljs-property">Types</span>.<span class="hljs-property">ObjectId</span>.<span class="hljs-title function_">createFromTime</span>(oneDayAgo) } }).
+  <span class="hljs-title function_">sort</span>({ <span class="hljs-attr">_id</span>: -<span class="hljs-number">1</span> });</code></pre><h2 id="defining-indexes-in-mongoose-schemas">
+        <a href="#defining-indexes-in-mongoose-schemas">
+          Defining Indexes in Mongoose Schemas 
+        </a>
+      </h2>
+<p>Mongoose lets you define indexes at the path level using schema type options like <a href="../api/schematype.html#SchemaType.prototype.index()"><code>index</code></a>, <a href="../api/schematype.html#SchemaType.prototype.unique()"><code>unique</code></a>, and <a href="../api/schematype.html#SchemaType.prototype.sparse()"><code>sparse</code></a>.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">email</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">unique</span>: <span class="hljs-literal">true</span> }, <span class="hljs-comment">// Unique index on `email`</span>
+  <span class="hljs-attr">username</span>: { <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">index</span>: <span class="hljs-literal">true</span> }, <span class="hljs-comment">// Non-unique index on `username`</span>
+  <span class="hljs-attr">lastLoginAt</span>: <span class="hljs-title class_">Date</span>
+});</code></pre><p><strong>Best Practice:</strong>
+We recommend defining all indexes explicitly using <a href="../api/schema.html#Schema.prototype.index()"><code>Schema.prototype.index()</code></a> rather than path-level <code>index</code> options.
+Path-level options can be convenient for small schemas and examples, but they don&#39;t allow defining compound indexes, and they scatter your index definitions throughout your schema.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">email</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">username</span>: <span class="hljs-title class_">String</span>,
+  <span class="hljs-attr">lastLoginAt</span>: <span class="hljs-title class_">Date</span>
+});
+
+userSchema.<span class="hljs-title function_">index</span>({ <span class="hljs-attr">email</span>: <span class="hljs-number">1</span> }, { <span class="hljs-attr">unique</span>: <span class="hljs-literal">true</span> });
+userSchema.<span class="hljs-title function_">index</span>({ <span class="hljs-attr">username</span>: <span class="hljs-number">1</span> });
+userSchema.<span class="hljs-title function_">index</span>({ <span class="hljs-attr">username</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">lastLoginAt</span>: -<span class="hljs-number">1</span> });</code></pre><p>Putting all indexes in the same place makes it easy to see every index on a collection at a glance.
+It also helps with spotting overlapping or redundant indexes, like the <code>{ username: 1 }</code> index above, which is a prefix of <code>{ username: 1, lastLoginAt: -1 }</code>.
+Compound indexes must be defined using <code>Schema.prototype.index()</code>, so using <code>index()</code> for all indexes is also more consistent.</p>
+<p><strong>Best Practice:</strong>
+We recommend defining every index in your Mongoose schemas and using Mongoose to manage your indexes in production.
+Even if you do not use Mongoose to build indexes, we still recommend listing your indexes in your schemas.
+Defining indexes in your schemas gives your codebase a record of which indexes are available, without needing to connect to the database.
+This is extremely valuable context for both humans and coding agents: a developer reviewing a pull request, or a coding agent writing a new query, can verify whether the query misses an index by reading the code.</p>
+<h2 id="the-autoindex-option">
+        <a href="#the-autoindex-option">
+          The <code>autoIndex</code> Option 
+        </a>
+      </h2>
+<p>By default, when you create a model using <code>mongoose.model()</code> or <code>Connection.prototype.model()</code>, Mongoose calls <a href="../api/model.html#Model.init()"><code>Model.init()</code></a>, which calls <a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.createIndex/"><code>createIndex()</code></a> for every index defined in your schema.
+This behavior is controlled by the <a href="../guide.html#autoIndex"><code>autoIndex</code> option</a>.</p>
+<p>There are a few important details about how <code>autoIndex</code> works:</p>
+<ol>
+<li><code>createIndex()</code> is a no-op if an identical index already exists, so restarting your application does not rebuild existing indexes.</li>
+<li><code>autoIndex</code> only creates indexes, it never drops them. Removing an index from your schema does <strong>not</strong> remove the index from MongoDB.</li>
+<li>If building an index fails, such as adding a unique index on a field with duplicate values or building an index that conflicts with an existing index, Mongoose emits an <code>&#39;index&#39;</code> event on the model with the error. Your application keeps running without that index.</li>
+<li>Mongoose does not wait for <code>autoIndex</code> to complete before allowing database operations. <code>autoIndex</code> is meant to run in the background: your application can still execute queries while Mongoose is building indexes. You can call <a href="/docs/api/model.html#Model.init()"><code>Model.init()</code></a> to wait for the index build to finish.</li>
+</ol>
+<p><strong>Best Practice:</strong>
+We recommend enabling <code>autoIndex</code> in development and disabling it in production.
+This recommendation is particularly important for large and extra large collections (1M).</p>
+<pre><code lang="javascript">mongoose.<span class="hljs-title function_">set</span>(<span class="hljs-string">&#x27;autoIndex&#x27;</span>, process.<span class="hljs-property">env</span>.<span class="hljs-property">NODE_ENV</span> !== <span class="hljs-string">&#x27;production&#x27;</span>);</code></pre><p>The risk of using <code>autoIndex</code> in production is minimal for small collections (under 1M documents).
+However, there are risks when using <code>autoIndex</code> with larger collections:</p>
+<ol>
+<li>Building an index on a large collection can take minutes or even hours, and can consume large amounts of CPU and disk I/O.</li>
+<li>Mongoose does not throw an error by default if an <code>autoIndex</code> index build fails. If you ship a new feature that relies on a new index, and <code>autoIndex</code> fails to build that index, you may cause serious performance issues.</li>
+<li>Mongoose models are typically created when your application starts, so every time your application starts, Mongoose sends a <code>createIndex()</code> command for every index in your schemas. Creating an index that already exists is a fast no-op, but the commands add up: if you have many indexes and many application servers restarting at once, for example during a deployment or a crash loop, your application can send thousands of <code>createIndex()</code> commands to MongoDB in rapid succession and degrade database performance.</li>
+</ol>
+<p>Instead of relying on <code>autoIndex</code>, we recommend either building indexes from one-off scripts or through a GUI like <a href="#syncing-indexes">Mongoose Studio</a> or MongoDB Atlas.</p>
+<h3 id="detecting-autoindex-errors">
+        <a href="#detecting-autoindex-errors">
+          Detecting <code>autoIndex</code> Errors 
+        </a>
+      </h3>
+<p>Because <code>autoIndex</code> runs in the background, index build errors do not show up in your application&#39;s normal error handling.
+If you use <code>autoIndex</code>, there are two ways to find out whether an index build failed: <code>await Model.init()</code> and the <code>&#39;index&#39;</code> event.</p>
+<p><code>Model.init()</code> returns a promise that resolves when Mongoose has finished initializing the model, and rejects if initializing the model failed.
+If <code>autoIndex</code> is set, automatic index builds are part of the model initialization process.
+Calling <code>init()</code> does <strong>not</strong> trigger an index build: Mongoose already called <code>init()</code> when you created the model, so <code>init()</code> returns the existing promise.
+Calling <code>Model.init()</code> multiple times returns the exact same promise instance (<code>Model.init() === Model.init()</code> is true).</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> userSchema = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Schema</span>({ <span class="hljs-attr">email</span>: <span class="hljs-title class_">String</span>, <span class="hljs-attr">username</span>: <span class="hljs-title class_">String</span> });
+userSchema.<span class="hljs-title function_">index</span>({ <span class="hljs-attr">email</span>: <span class="hljs-number">1</span> }, { <span class="hljs-attr">unique</span>: <span class="hljs-literal">true</span> });
+userSchema.<span class="hljs-title function_">index</span>({ <span class="hljs-attr">username</span>: <span class="hljs-number">1</span> });
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">User</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, userSchema);
+
+<span class="hljs-keyword">try</span> {
+  <span class="hljs-keyword">await</span> <span class="hljs-title class_">User</span>.<span class="hljs-title function_">init</span>();
+} <span class="hljs-keyword">catch</span> (err) {
+  <span class="hljs-comment">// If the `users` collection has duplicate emails, `err.code` is 11000 and</span>
+  <span class="hljs-comment">// `err.message` is &quot;Index build failed: ... E11000 duplicate key error ...&quot;</span>
+}</code></pre><p>Mongoose also emits an <code>&#39;index&#39;</code> event on the model when it has finished building indexes.
+Mongoose does <strong>not</strong> emit an <code>&#39;index&#39;</code> event on models if <code>autoIndex</code> is disabled, unless <code>Model.createIndexes()</code> or <code>Model.ensureIndexes()</code> is called.
+If an index build failed, the event handler receives the error.
+Make sure you register the event handler immediately after creating the model: if you register it after Mongoose has finished building indexes, the handler never runs.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> <span class="hljs-title class_">User</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;User&#x27;</span>, userSchema);
+
+<span class="hljs-title class_">User</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;index&#x27;</span>, <span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> {
+  <span class="hljs-keyword">if</span> (err != <span class="hljs-literal">null</span>) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;Failed to build indexes for User&#x27;</span>, err);
+  }
+});</code></pre><p>One failed index build does not stop Mongoose from building the remaining indexes.
+In the above example, if the <code>{ email: 1 }</code> index fails to build, Mongoose still builds the <code>{ username: 1 }</code> index.
+However, <code>init()</code> and the <code>&#39;index&#39;</code> event only report the first error.</p>
+<p>To track each index build individually, use the <code>&#39;index-single-start&#39;</code> and <code>&#39;index-single-done&#39;</code> events.
+Mongoose builds indexes one at a time, and emits <code>&#39;index-single-start&#39;</code> before calling <code>createIndex()</code> and <code>&#39;index-single-done&#39;</code> after <code>createIndex()</code> succeeds or fails.
+These events are useful for logging every failed index build, and for logging how long each index takes to build.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">let</span> startTime = <span class="hljs-literal">null</span>;
+<span class="hljs-title class_">User</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;index-single-start&#x27;</span>, <span class="hljs-function"><span class="hljs-params">fields</span> =&gt;</span> {
+  startTime = <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>();
+  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Building index&#x27;</span>, fields);
+});
+<span class="hljs-title class_">User</span>.<span class="hljs-title function_">on</span>(<span class="hljs-string">&#x27;index-single-done&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">err, fields, options, name</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> elapsedMS = <span class="hljs-title class_">Date</span>.<span class="hljs-title function_">now</span>() - startTime;
+  <span class="hljs-keyword">if</span> (err != <span class="hljs-literal">null</span>) {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;Failed to build index&#x27;</span>, fields, options, <span class="hljs-string">&#x27;after&#x27;</span>, elapsedMS, <span class="hljs-string">&#x27;ms&#x27;</span>, err);
+  } <span class="hljs-keyword">else</span> {
+    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;Built index&#x27;</span>, name, <span class="hljs-string">&#x27;in&#x27;</span>, elapsedMS, <span class="hljs-string">&#x27;ms&#x27;</span>);
+  }
+});</code></pre><p>Mongoose emits all of the above events when you call <a href="../api/model.html#Model.createIndexes()"><code>Model.createIndexes()</code></a> or <a href="../api/model.html#Model.syncIndexes()"><code>Model.syncIndexes()</code></a> yourself, not just with <code>autoIndex</code>, so you can also use these events to log progress in one-off index build scripts.</p>
+<h2 id="creating-indexes">
+        <a href="#creating-indexes">
+          Creating Indexes 
+        </a>
+      </h2>
+<p><a href="../api/model.html#Model.createIndexes()"><code>Model.createIndexes()</code></a> calls <code>createIndex()</code> for every index defined in the model&#39;s schema.
+<code>createIndexes()</code> uses the same logic as <code>autoIndex</code>: when <code>autoIndex</code> is enabled, <code>Model.init()</code> builds indexes the same way <code>createIndexes()</code> does.
+So the details from <a href="#the-autoindex-option">the <code>autoIndex</code> section</a> also apply to <code>createIndexes()</code>:</p>
+<ol>
+<li><code>createIndexes()</code> is a no-op for indexes that already exist with the same options.</li>
+<li><code>createIndexes()</code> only creates indexes, it never drops them.</li>
+<li><code>createIndexes()</code> builds indexes one at a time. If one index fails to build, <code>createIndexes()</code> still builds the remaining indexes.</li>
+</ol>
+<p>The difference is that <code>createIndexes()</code> only runs when you call it, and it builds indexes even if <code>autoIndex</code> is disabled.
+<code>createIndexes()</code> returns a promise that resolves when every index has been built, or rejects with the first error if any index build failed.</p>
+<p><code>createIndexes()</code> never drops indexes, which has tradeoffs.
+On one hand, it can never unintentionally drop an index that your application relies on.
+However, <code>createIndexes()</code> also never removes indexes you no longer need, or rebuilds indexes whose options changed: if an index with the same name already exists with different options, that index build fails with an error.
+To handle these cases, use <code>syncIndexes()</code>.</p>
+<h2 id="syncing-indexes">
+        <a href="#syncing-indexes">
+          Syncing Indexes 
+        </a>
+      </h2>
+<p>Mongoose also has a <a href="../api/model.html#Model.syncIndexes()"><code>Model.syncIndexes()</code></a> function that makes the indexes in MongoDB match the indexes in your schema.
+Unlike <code>createIndexes()</code>, <code>syncIndexes()</code> both creates indexes that are missing from MongoDB <strong>and drops</strong> indexes that are not in your schema (except the <code>_id</code> index).
+You can also call <a href="../api/connection.html#Connection.prototype.syncIndexes()"><code>Connection.prototype.syncIndexes()</code></a> to sync indexes for every model on a connection.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th><code>autoIndex</code></th>
+<th><code>createIndexes()</code></th>
+<th><code>syncIndexes()</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Creates indexes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Drops indexes</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>When it runs</td>
+<td>Automatically on <code>init()</code></td>
+<td>Only when you call it</td>
+<td>Only when you call it</td>
+</tr>
+</tbody></table>
+<p>Dropping indexes makes <code>syncIndexes()</code> significantly riskier than <code>autoIndex</code>.
+If <code>syncIndexes()</code> drops an index that a common query depends on, that query falls back to a collection scan.</p>
+<p><strong>Best Practice:</strong>
+Because of the risk of dropping an index is so high, we strongly recommend you do <strong>not</strong> run <code>syncIndexes()</code> without human review.
+In particular, we recommend against running <code>syncIndexes()</code> application start in production.
+Instead, use <a href="../api/model.html#Model.diffIndexes()"><code>Model.diffIndexes()</code></a> to do a dry run, and have a human review the result before calling <code>syncIndexes()</code>.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> { toDrop, toCreate } = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Order</span>.<span class="hljs-title function_">diffIndexes</span>();
+toDrop; <span class="hljs-comment">// [ &#x27;isGift_1&#x27; ]</span>
+toCreate; <span class="hljs-comment">// [ { status: 1, createdAt: -1 } ]</span>
+
+<span class="hljs-comment">// After reviewing `toDrop` and `toCreate`</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Order</span>.<span class="hljs-title function_">syncIndexes</span>();</code></pre><p>If you are unsure whether an index is still needed, you can pass the <code>hideIndexes</code> option to hide indexes rather than dropping them.
+MongoDB keeps <a href="https://www.mongodb.com/docs/manual/core/index-hidden/">hidden indexes</a> up to date but does not use them for queries, so you can quickly unhide an index if performance regresses.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">await</span> <span class="hljs-title class_">Order</span>.<span class="hljs-title function_">syncIndexes</span>({ <span class="hljs-attr">hideIndexes</span>: <span class="hljs-literal">true</span> });</code></pre><p><a href="https://mongoosestudio.app">Mongoose Studio</a>, the Mongoose team&#39;s open source MongoDB GUI, provides a convenient GUI around <code>syncIndexes()</code> that lets you review which indexes will be created and dropped before applying changes.</p>
+<h2 id="using-explain-and-hint">
+        <a href="#using-explain-and-hint">
+          Using <code>explain()</code> and <code>hint()</code> 
+        </a>
+      </h2>
+<p>To check which index a query uses, call <a href="../api/query.html#Query.prototype.explain()"><code>Query.prototype.explain()</code></a>.
+Passing <code>&#39;executionStats&#39;</code> tells MongoDB to execute the query and report how much work it did.</p>
+<p>The following example inserts 10 orders into a collection with a <code>{ customerId: 1, status: 1 }</code> index, and then explains a query for one customer&#39;s shipped orders.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">const</span> orderSchema = <span class="hljs-keyword">new</span> mongoose.<span class="hljs-title class_">Schema</span>({
+  <span class="hljs-attr">customerId</span>: mongoose.<span class="hljs-property">ObjectId</span>,
+  <span class="hljs-attr">status</span>: <span class="hljs-title class_">String</span>, <span class="hljs-comment">// &#x27;pending&#x27;, &#x27;shipped&#x27;, &#x27;delivered&#x27;, or &#x27;cancelled&#x27;</span>
+  <span class="hljs-attr">isGift</span>: <span class="hljs-title class_">Boolean</span>
+});
+orderSchema.<span class="hljs-title function_">index</span>({ <span class="hljs-attr">customerId</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">status</span>: <span class="hljs-number">1</span> });
+<span class="hljs-keyword">const</span> <span class="hljs-title class_">Order</span> = mongoose.<span class="hljs-title function_">model</span>(<span class="hljs-string">&#x27;Order&#x27;</span>, orderSchema);
+
+<span class="hljs-comment">// Explicitly build the `{ customerId: 1, status: 1 }` index, even with `autoIndex` disabled</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Order</span>.<span class="hljs-title function_">createIndexes</span>();
+
+<span class="hljs-comment">// Insert 10 orders: 6 orders for `customerId`, and 4 orders for `otherCustomerId`</span>
+<span class="hljs-keyword">const</span> customerId = <span class="hljs-keyword">new</span> mongoose.<span class="hljs-property">Types</span>.<span class="hljs-title class_">ObjectId</span>();
+<span class="hljs-keyword">const</span> otherCustomerId = <span class="hljs-keyword">new</span> mongoose.<span class="hljs-property">Types</span>.<span class="hljs-title class_">ObjectId</span>();
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Order</span>.<span class="hljs-title function_">insertMany</span>([
+  { customerId, <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;shipped&#x27;</span>, <span class="hljs-attr">isGift</span>: <span class="hljs-literal">true</span> },
+  { customerId, <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;shipped&#x27;</span>, <span class="hljs-attr">isGift</span>: <span class="hljs-literal">false</span> },
+  { customerId, <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;pending&#x27;</span>, <span class="hljs-attr">isGift</span>: <span class="hljs-literal">true</span> },
+  { customerId, <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;delivered&#x27;</span>, <span class="hljs-attr">isGift</span>: <span class="hljs-literal">false</span> },
+  { customerId, <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;delivered&#x27;</span>, <span class="hljs-attr">isGift</span>: <span class="hljs-literal">true</span> },
+  { customerId, <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;cancelled&#x27;</span>, <span class="hljs-attr">isGift</span>: <span class="hljs-literal">false</span> },
+  { <span class="hljs-attr">customerId</span>: otherCustomerId, <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;shipped&#x27;</span>, <span class="hljs-attr">isGift</span>: <span class="hljs-literal">true</span> },
+  { <span class="hljs-attr">customerId</span>: otherCustomerId, <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;pending&#x27;</span>, <span class="hljs-attr">isGift</span>: <span class="hljs-literal">false</span> },
+  { <span class="hljs-attr">customerId</span>: otherCustomerId, <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;delivered&#x27;</span>, <span class="hljs-attr">isGift</span>: <span class="hljs-literal">false</span> },
+  { <span class="hljs-attr">customerId</span>: otherCustomerId, <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;shipped&#x27;</span>, <span class="hljs-attr">isGift</span>: <span class="hljs-literal">false</span> }
+]);
+
+<span class="hljs-keyword">const</span> explain = <span class="hljs-keyword">await</span> <span class="hljs-title class_">Order</span>.
+  <span class="hljs-title function_">find</span>({ customerId, <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;shipped&#x27;</span> }).
+  <span class="hljs-title function_">explain</span>(<span class="hljs-string">&#x27;executionStats&#x27;</span>);
+
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(explain.<span class="hljs-property">queryPlanner</span>.<span class="hljs-property">winningPlan</span>);
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>({
+  <span class="hljs-attr">nReturned</span>: explain.<span class="hljs-property">executionStats</span>.<span class="hljs-property">nReturned</span>,
+  <span class="hljs-attr">totalKeysExamined</span>: explain.<span class="hljs-property">executionStats</span>.<span class="hljs-property">totalKeysExamined</span>,
+  <span class="hljs-attr">totalDocsExamined</span>: explain.<span class="hljs-property">executionStats</span>.<span class="hljs-property">totalDocsExamined</span>,
+  <span class="hljs-attr">executionTimeMillis</span>: explain.<span class="hljs-property">executionStats</span>.<span class="hljs-property">executionTimeMillis</span>
+});</code></pre><p>The above example prints output similar to the following.</p>
+<pre><code lang="javascript">{
+  <span class="hljs-attr">stage</span>: <span class="hljs-string">&#x27;FETCH&#x27;</span>,
+  <span class="hljs-attr">inputStage</span>: {
+    <span class="hljs-attr">stage</span>: <span class="hljs-string">&#x27;IXSCAN&#x27;</span>,
+    <span class="hljs-attr">keyPattern</span>: { <span class="hljs-attr">customerId</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">status</span>: <span class="hljs-number">1</span> },
+    <span class="hljs-attr">indexName</span>: <span class="hljs-string">&#x27;customerId_1_status_1&#x27;</span>,
+    <span class="hljs-comment">// ...</span>
+  }
+  <span class="hljs-comment">// ...</span>
+}
+{
+  <span class="hljs-attr">nReturned</span>: <span class="hljs-number">2</span>,
+  <span class="hljs-attr">totalKeysExamined</span>: <span class="hljs-number">2</span>,
+  <span class="hljs-attr">totalDocsExamined</span>: <span class="hljs-number">2</span>,
+  <span class="hljs-attr">executionTimeMillis</span>: <span class="hljs-number">0</span>
+}</code></pre><p><code>queryPlanner.winningPlan</code> describes the plan MongoDB chose to execute the query, as a tree of stages.
+Read the tree from the innermost stage outward: MongoDB first runs an <code>IXSCAN</code> (index scan) on the <code>customerId_1_status_1</code> index to find matching index entries, then a <code>FETCH</code> stage loads the corresponding documents.
+If MongoDB had not used an index, the winning plan would instead contain a <code>COLLSCAN</code> (collection scan) stage.</p>
+<p><code>executionStats</code> describes how much work MongoDB did to execute the plan:</p>
+<ul>
+<li><code>nReturned</code>: the number of documents the query returned. This customer has 2 shipped orders.</li>
+<li><code>totalKeysExamined</code>: the number of index entries MongoDB read. Because the <code>{ customerId: 1, status: 1 }</code> index contains both fields in the query, MongoDB only read the 2 index entries that match.</li>
+<li><code>totalDocsExamined</code>: the number of <a href="#when-to-add-indexes">documents examined</a>, that is, the number of documents MongoDB loaded and checked against the query filter.</li>
+<li><code>executionTimeMillis</code>: how long the query took to execute on the server, in milliseconds.</li>
+</ul>
+<p>This query is ideal: <code>nReturned</code>, <code>totalKeysExamined</code>, and <code>totalDocsExamined</code> are all equal, which means MongoDB did not read any index entries or documents that it did not return.
+For comparison, the following table shows the execution stats for a few other queries against the same collection.</p>
+<table>
+<thead>
+<tr>
+<th>Query</th>
+<th>Winning Plan</th>
+<th><code>totalKeysExamined</code></th>
+<th><code>totalDocsExamined</code></th>
+<th><code>nReturned</code></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>{ customerId, status: &#39;shipped&#39; }</code></td>
+<td><code>IXSCAN</code> + <code>FETCH</code></td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>{ customerId, isGift: true }</code></td>
+<td><code>IXSCAN</code> + <code>FETCH</code></td>
+<td>6</td>
+<td>6</td>
+<td>3</td>
+</tr>
+<tr>
+<td><code>{ isGift: true }</code></td>
+<td><code>COLLSCAN</code></td>
+<td>0</td>
+<td>10</td>
+<td>4</td>
+</tr>
+</tbody></table>
+<p>The <code>{ customerId, isGift: true }</code> query can use the <code>{ customerId: 1, status: 1 }</code> index to find the customer&#39;s 6 orders, but <code>isGift</code> is not in the index, so MongoDB has to load all 6 orders and filter out the 3 that are not gifts.
+That is still reasonably efficient, because the index narrowed the collection down to just this customer&#39;s orders.
+The <code>{ isGift: true }</code> query cannot use the index at all, because <code>isGift</code> is not a prefix of the index, so MongoDB examines every document in the collection.</p>
+<p>In general, there are a few things to look for in <a href="https://www.mongodb.com/docs/manual/reference/explain-results/">explain output</a>:</p>
+<ol>
+<li>A <code>COLLSCAN</code> stage on a large collection usually means your query needs an index.</li>
+<li>Compare <code>totalDocsExamined</code> to <code>nReturned</code>. If MongoDB examined 6 documents to return 3, the index is doing its job. If MongoDB examined 100,000 documents to return 3, the query needs a more selective index.</li>
+<li>A <code>SORT</code> stage means MongoDB had to sort results in memory, which suggests your index does not match your query&#39;s sort order.</li>
+</ol>
+<p>The exact structure of explain output varies between MongoDB versions, so you may need to look for these stages in nested properties like <code>winningPlan.queryPlan</code>.</p>
+<p>MongoDB&#39;s query planner usually picks the right index on its own.
+In cases where it does not, you can use <a href="../api/query.html#Query.prototype.hint()"><code>Query.prototype.hint()</code></a> to explicitly tell MongoDB which index to use, either by key pattern or by index name.</p>
+<pre><code lang="javascript"><span class="hljs-keyword">await</span> <span class="hljs-title class_">Order</span>.
+  <span class="hljs-title function_">find</span>({ customerId, <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;shipped&#x27;</span> }).
+  <span class="hljs-title function_">hint</span>({ <span class="hljs-attr">customerId</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">status</span>: <span class="hljs-number">1</span> });
+
+<span class="hljs-comment">// Equivalent</span>
+<span class="hljs-keyword">await</span> <span class="hljs-title class_">Order</span>.
+  <span class="hljs-title function_">find</span>({ customerId, <span class="hljs-attr">status</span>: <span class="hljs-string">&#x27;shipped&#x27;</span> }).
+  <span class="hljs-title function_">hint</span>(<span class="hljs-string">&#x27;customerId_1_status_1&#x27;</span>);</code></pre><p><code>hint()</code> is typically not necessary.
+It is most helpful when you have overlapping indexes.
+For example, if the <code>Order</code> model had both a <code>{ customerId: 1, status: 1 }</code> index and a <code>{ status: 1, createdAt: -1 }</code> index, both indexes could support the above query.
+Overlapping indexes are often a sign of index design that could be improved, but they may be valid in some cases, for example when different queries depend on each index.
+Keep in mind that <code>hint()</code> overrides the query planner: if you <code>hint()</code> an index that does not exist, MongoDB throws an error rather than falling back to another plan.</p>
+</article></main><aside class="right-sidebar" id="toc-sidebar"><nav class="toc" id="toc" aria-label="On this page"><h2 class="toc-title">On This Page</h2><ul class="toc-list" id="toc-list"></ul></nav><div class="right-sidebar-aside"><div class="cpc-ad"><script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=mongoosejscom" id="_carbonads_js"></script></div></div></aside></div><div class="assistant-panel" id="assistant-panel" aria-label="Mongoose docs assistant" aria-hidden="true"><div class="assistant-panel-resize" id="assistant-panel-resize" role="separator" aria-orientation="vertical" aria-label="Resize assistant"></div><div class="assistant-panel-header"><div class="assistant-panel-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l1.7 5.1L19 10l-5.3 1.9L12 17l-1.7-5.1L5 10l5.3-1.9L12 3z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z"/></svg><span>Assistant</span></div><button class="assistant-panel-close" id="assistant-panel-close" type="button" aria-label="Close assistant"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div><div class="assistant-thread" id="assistant-thread" aria-live="polite"></div><form class="assistant-panel-form" id="assistant-panel-form"><textarea class="assistant-panel-input" id="assistant-panel-input" rows="3" placeholder="Ask a question..." aria-label="Ask the assistant"></textarea><button class="assistant-panel-submit" id="assistant-panel-submit" type="submit" aria-label="Send question"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg></button></form></div><form class="assistant-floating-form" id="assistant-floating-form"><textarea class="assistant-floating-input" id="assistant-floating-input" rows="1" placeholder="Ask a question..." aria-label="Ask a question about Mongoose"></textarea><span class="assistant-floating-shortcut">Ctrl+I</span><button class="assistant-floating-submit" id="assistant-floating-submit" type="submit" aria-label="Ask"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg></button></form><script type="text/javascript" src="/docs/js/navbar-search.js"></script><script type="text/javascript" src="/docs/js/mobile-navbar-toggle.js"></script><script type="text/javascript" src="/docs/js/theme-toggle.js"></script><script type="text/javascript" src="/docs/js/copy-code.js"></script><script type="text/javascript" src="/docs/js/version-picker.js"></script><script type="text/javascript" src="/docs/js/sidebar-collapse.js"></script><script type="text/javascript" src="/docs/js/toc.js"></script><script type="text/javascript" src="/docs/js/ask-ai.js"></script></body></html>

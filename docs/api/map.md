@@ -4,6 +4,7 @@
 - [`MongooseMap.prototype.clear()`](#MongooseMap.prototype.clear())
 - [`MongooseMap.prototype.delete()`](#MongooseMap.prototype.delete())
 - [`MongooseMap.prototype.get()`](#MongooseMap.prototype.get())
+- [`MongooseMap.prototype.has()`](#MongooseMap.prototype.has())
 - [`MongooseMap.prototype.set()`](#MongooseMap.prototype.set())
 - [`MongooseMap.prototype.toBSON()`](#MongooseMap.prototype.toBSON())
 - [`MongooseMap.prototype.toJSON()`](#MongooseMap.prototype.toJSON())
@@ -27,6 +28,10 @@ Overwrites native Map's `delete()` function to support change tracking.
 ## `MongooseMap.prototype.get()`
 
 Overwrites native Map's `get()` function to support Mongoose getters.
+
+## `MongooseMap.prototype.has()`
+
+Overwrites native Map's `has()` function to support ObjectIds as keys.
 
 ## `MongooseMap.prototype.set()`
 

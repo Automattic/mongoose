@@ -1,3 +1,15 @@
+9.11.5 / 2026-11-03
+===================
+ * fix(query): pass explain verbosity to the driver cursor in find() #16635 [jasontd92](https://github.com/jasontd92)
+ * fix(map): support ObjectId keys in MongooseMap#has() [NgoQuocViet2001](https://github.com/NgoQuocViet2001)
+ * fix(schema): clear enumValues when enum validator is removed with enum(false) #16631 [Enesuygurs](https://github.com/Enesuygurs)
+ * fix: respect disabled updatedAt in pipeline updates #16642 #16641 [ItsM0rty](https://github.com/ItsM0rty)
+ * fix: make schema clone() copy $timestamps #16651 #16650 [Oleksii-Pavliuk](https://github.com/Oleksii-Pavliuk)
+ * fix(model): preserve WriteError instances in insertMany() writeErrors #16608 #16607 [Majny](https://github.com/Majny)
+ * fix: bump sift -> 17.1.4 [rishabhnehra](https://github.com/rishabhnehra)
+ * docs(production): add production indexes guide #16627
+ * docs(ask-ai): send session cookie and continue stored conversations #16652 [nlarew](https://github.com/nlarew)
+
 8.24.8 / 2026-11-02
 ===================
  * fix(schema): remove map paths cleanly, including maps under nested paths (backport to 8.x) #16625 #16461 #16457 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)

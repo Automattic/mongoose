@@ -18,6 +18,7 @@
   const resizeHandle = document.getElementById('assistant-panel-resize');
 
   let hasAskedQuestion = false;
+  let previousResponseId = null;
   let markdownDependenciesPromise = null;
   let resizeStartX = 0;
   let resizeStartWidth = 0;
@@ -82,16 +83,15 @@
 
     try {
       const markdownDependencies = loadMarkdownDependencies();
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'mongodb-chat-latest',
-          stream: true,
-          store: true,
-          input: question
-        })
-      });
+      let response = await requestResponse(question, previousResponseId);
+
+      // Stored conversations are owned by the anonymous session cookie. If the
+      // cookie was cleared or blocked, the server reports the conversation as
+      // not found, so start a new conversation instead of retrying the old one.
+      if (response.status === 404 && previousResponseId != null) {
+        previousResponseId = null;
+        response = await requestResponse(question, null);
+      }
 
       if (!response.ok || response.body == null) {
         throw new Error(`MongoDB Knowledge API request failed with ${response.status}`);
@@ -100,8 +100,11 @@
       await markdownDependencies;
       reply.body.textContent = '';
 
+      let responseId = null;
       await readEventStream(response.body, event => {
-        if (event.type === 'response.output_text.delta') {
+        if (event.type === 'response.created' || event.type === 'response.completed') {
+          responseId = event.response?.id || responseId;
+        } else if (event.type === 'response.output_text.delta') {
           reply.markdown += event.delta;
           renderMarkdown(reply.body, reply.markdown);
           scrollThreadToBottom();
@@ -110,6 +113,9 @@
         }
       });
 
+      if (responseId != null) {
+        previousResponseId = responseId;
+      }
       renderSources(reply.message, sources);
     } catch (error) {
       console.error(error);
@@ -119,6 +125,27 @@
       panelInput.focus();
       scrollThreadToBottom();
     }
+  }
+
+  function requestResponse(question, previousId) {
+    const body = {
+      model: 'mongodb-chat-latest',
+      stream: true,
+      store: true,
+      input: question
+    };
+    if (previousId != null) {
+      body.previous_response_id = previousId;
+    }
+
+    // mongoosejs.com is cross-site to knowledge.mongodb.com, so the session
+    // cookie is only sent on credentialed requests.
+    return fetch(endpoint, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
   }
 
   function openPanel() {

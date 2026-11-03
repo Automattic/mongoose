@@ -1,3 +1,42 @@
+9.11.5 / 2026-11-03
+===================
+ * fix(query): pass explain verbosity to the driver cursor in find() #16635 [jasontd92](https://github.com/jasontd92)
+ * fix(map): support ObjectId keys in MongooseMap#has() [NgoQuocViet2001](https://github.com/NgoQuocViet2001)
+ * fix(schema): clear enumValues when enum validator is removed with enum(false) #16631 [Enesuygurs](https://github.com/Enesuygurs)
+ * fix: respect disabled updatedAt in pipeline updates #16642 #16641 [ItsM0rty](https://github.com/ItsM0rty)
+ * fix: make schema clone() copy $timestamps #16651 #16650 [Oleksii-Pavliuk](https://github.com/Oleksii-Pavliuk)
+ * fix(model): preserve WriteError instances in insertMany() writeErrors #16608 #16607 [Majny](https://github.com/Majny)
+ * fix: bump sift -> 17.1.4 [rishabhnehra](https://github.com/rishabhnehra)
+ * docs(production): add production indexes guide #16627
+ * docs(ask-ai): send session cookie and continue stored conversations #16652 [nlarew](https://github.com/nlarew)
+
+8.24.8 / 2026-11-02
+===================
+ * fix(schema): remove map paths cleanly, including maps under nested paths (backport to 8.x) #16625 #16461 #16457 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix(schema): keep the map value schematype a single object when cloning (backport to 8.x) #16624 #16473 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix(map): support ObjectId keys in MongooseMap#has() (backport to 8.x #16634 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix(hydration): use the doc model for looking up a ref (backport to 8.x) #16623 #16453 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix(document): replace {MODEL} in custom cast error messages from document validation (backport to 8.x) #16622 #16480 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix(schema): run setters declared on the union path itself (backport to 8.x) #16621 #16528 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+
+9.11.4 / 2026-10-23
+===================
+ * fix: avoid walking into inherited properties like `toString` when hydrating documents, setting dotted paths, and merging updates
+ * fix: only use own properties when looking up discriminators by key
+ * fix(schema): disallow setting special properties via virtual()
+ * fix(query): respect connection-level sanitizeFilter in queries
+ * fix(query): disallow special properties like `__proto__` as paths in where() and mod()
+ * fix(deps): upgrade mquery -> 6.0.1 to avoid prototype pollution with query helpers like gt() and in()
+
+8.24.7 / 2026-10-23
+===================
+* fix: avoid walking into inherited properties like `toString` when hydrating documents, setting dotted paths, and merging updates
+* fix: only use own properties when looking up discriminators by key
+* fix(schema): disallow setting special properties via virtual()
+* fix(query): respect connection-level sanitizeFilter in queries
+* fix(query): disallow special properties like `__proto__` as paths in where() and mod()
+* fix(deps): upgrade mquery -> 4.0.4 to avoid prototype pollution with query helpers like gt() and in()
+
 9.11.3 / 2026-10-21
 ===================
  * fix(update): honor overwriteImmutable in upserts and nested timestamps #16614 #15781 #8619 [AbdelrahmanHafez](https://github.com/AbdelrahmanHafez)

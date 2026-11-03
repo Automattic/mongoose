@@ -2563,6 +2563,10 @@ describe('schema', function() {
       assert.ok(!newSchema.path('m'));
       assert.ok(!newSchema.path('m.$*'));
       assert.equal(newSchema.pathType('m.k'), 'adhocOrUndefined');
+
+      // The removed map used to keep casting queries on its keys
+      const Test = mongoose.model('OmitMapTest', newSchema);
+      assert.deepStrictEqual(Test.find({ 'm.k': '42' }).cast(Test), { 'm.k': '42' });
     });
 
     it('removes the paths of an omitted subdocument (gh-16520)', function() {
@@ -3390,6 +3394,19 @@ describe('schema', function() {
     }, /__proto__/);
 
     assert.ok({}.toString());
+  });
+
+  it('disallows setting special properties with `virtual()` or constructor options', function() {
+    const schema = new Schema({});
+    for (const name of ['__proto__.polluted', 'constructor.prototype.polluted', 'hasOwnProperty.__proto__.polluted']) {
+      assert.throws(() => schema.virtual(name), /Cannot set special property/);
+    }
+
+    const options = JSON.parse('{"virtuals":{"__proto__.polluted":{}}}');
+    assert.throws(() => new Schema({}, options), /Cannot set special property/);
+
+    assert.equal(Object.prototype.hasOwnProperty('polluted'), false);
+    assert.equal(Function.prototype.hasOwnProperty('polluted'), false);
   });
 
   it('enable defining virtual paths by using schema constructor (gh-11908)', async function() {

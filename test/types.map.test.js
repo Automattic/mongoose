@@ -166,6 +166,30 @@ describe('Map', function() {
     assert.strictEqual(queryPerson.fact.get('killer'), undefined);
   });
 
+  it('supports ObjectId keys in has()', function() {
+    const Test = db.model('Test', new mongoose.Schema({
+      votes: {
+        type: Map,
+        of: Number
+      }
+    }));
+
+    const userId = new mongoose.Types.ObjectId();
+    const otherId = new mongoose.Types.ObjectId();
+    const doc = new Test({ votes: { [userId.toString()]: 1 } });
+
+    assert.strictEqual(doc.votes.get(userId), 1);
+    assert.strictEqual(doc.votes.has(userId), true);
+    assert.strictEqual(doc.votes.has(userId.toString()), true);
+    assert.strictEqual(doc.votes.has(new mongoose.Types.ObjectId()), false);
+
+    doc.votes.set(otherId, 2);
+    assert.strictEqual(doc.votes.has(otherId), true);
+
+    doc.votes.delete(userId);
+    assert.strictEqual(doc.votes.has(userId), false);
+  });
+
   it('query casting', async function() {
     const TestSchema = new mongoose.Schema({
       v: {

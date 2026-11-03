@@ -1,3 +1,12 @@
+8.24.8 / 2026-11-02
+===================
+ * fix(schema): remove map paths cleanly, including maps under nested paths (backport to 8.x) #16625 #16461 #16457 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix(schema): keep the map value schematype a single object when cloning (backport to 8.x) #16624 #16473 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix(map): support ObjectId keys in MongooseMap#has() (backport to 8.x #16634 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix(hydration): use the doc model for looking up a ref (backport to 8.x) #16623 #16453 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix(document): replace {MODEL} in custom cast error messages from document validation (backport to 8.x) #16622 #16480 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix(schema): run setters declared on the union path itself (backport to 8.x) #16621 #16528 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+
 9.11.4 / 2026-10-23
 ===================
  * fix: avoid walking into inherited properties like `toString` when hydrating documents, setting dotted paths, and merging updates
@@ -6,6 +15,15 @@
  * fix(query): respect connection-level sanitizeFilter in queries
  * fix(query): disallow special properties like `__proto__` as paths in where() and mod()
  * fix(deps): upgrade mquery -> 6.0.1 to avoid prototype pollution with query helpers like gt() and in()
+
+8.24.7 / 2026-10-23
+===================
+* fix: avoid walking into inherited properties like `toString` when hydrating documents, setting dotted paths, and merging updates
+* fix: only use own properties when looking up discriminators by key
+* fix(schema): disallow setting special properties via virtual()
+* fix(query): respect connection-level sanitizeFilter in queries
+* fix(query): disallow special properties like `__proto__` as paths in where() and mod()
+* fix(deps): upgrade mquery -> 4.0.4 to avoid prototype pollution with query helpers like gt() and in()
 
 9.11.3 / 2026-10-21
 ===================

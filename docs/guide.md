@@ -575,6 +575,7 @@ Valid options:
 * [query](#query-helpers)
 * [autoSearchIndex](#autoSearchIndex)
 * [readConcern](#readConcern)
+* [defaultSort](#defaultSort)
 <!-- markdownlint-enable MD051 -->
 
 ## option: autoIndex {#autoIndex}
@@ -1566,6 +1567,45 @@ const eventSchema = new mongoose.Schema(
   }
 );
 ```
+
+## option: defaultSort {#defaultSort}
+
+Sets the sort order for queries that don't specify a sort, so you can define a model's usual ordering once.
+`defaultSort` accepts anything that [`Query.prototype.sort()`](api/query.html#Query.prototype.sort()) accepts.
+
+```javascript
+const schema = new Schema({ name: String }, {
+  timestamps: true,
+  defaultSort: { createdAt: -1, _id: -1 }
+});
+const Item = mongoose.model('Item', schema);
+
+// Sorted by `{ createdAt: -1, _id: -1 }`
+await Item.find({ name: 'test' });
+
+// An explicit sort replaces `defaultSort` entirely, Mongoose does **not** append
+// the default as a tie-breaker. Sorted by `{ name: 1 }`.
+await Item.find().sort({ name: 1 });
+
+// Satisfies `findAndCount()`'s `sort` requirement. `limit` is still required.
+const [items, total] = await Item.findAndCount({}, null, { limit: 20 });
+
+// Call `sort(null)` or `sort({})` to run an individual query with no sort.
+await Item.find().sort(null);
+await Item.find({}, null, { sort: null });
+```
+
+`defaultSort` applies to `find()`, `findOne()`, `findOneAndUpdate()`, `findOneAndReplace()`, `findOneAndDelete()`, `updateOne()`, and `replaceOne()`, including the queries that [`populate()`](populate.html) executes.
+It does not apply to `countDocuments()`, `estimatedDocumentCount()`, `distinct()`, `deleteOne()`, `deleteMany()`, `updateMany()`, `exists()`, `bulkWrite()`, or aggregations.
+Mongoose applies `defaultSort` after pre middleware, so middleware that calls `sort()` overrides `defaultSort`.
+You can also use `defaultSort` on a discriminator schema to override, or disable with `false`, the base schema's `defaultSort`.
+
+Mongoose skips `defaultSort` for [tailable cursors](https://www.mongodb.com/docs/manual/core/tailable-cursors/), because MongoDB does not support sorting tailable cursors.
+
+There are a few caveats to keep in mind when using `defaultSort`:
+
+* MongoDB only supports sort for `updateOne()` and `replaceOne()` starting in MongoDB 8.0. This includes `Document.prototype.updateOne()` and `Document.prototype.replaceOne()`. If you use `defaultSort` with an older version of MongoDB, you must call `sort(null)` on `updateOne()` and `replaceOne()` queries, or pass `{ sort: null }` in the options. Otherwise MongoDB will throw an error.
+* `defaultSort` overrides the distance ordering of [`$near` and `$nearSphere`](https://www.mongodb.com/docs/manual/reference/operator/query/near/), so call `sort(null)` on those queries.
 
 ## With ES6 Classes {#es6-classes}
 

@@ -137,6 +137,8 @@ const [documents, total] = await Promise.all([
 ]);
 ```
 
+`findAndCount()` requires `limit` and `sort`. If most of your queries use the same order, you can set the [`defaultSort` schema option](guide.html#defaultSort) instead of passing `sort` every time.
+
 For large result sets, `skip()` can be inefficient, particularly when frequently calling `skip()` with large values.
 `skip()` has to loop through the documents to skip - `.limit(20).skip(100)` means MongoDB needs to iterate through 120 documents.
 Performance degrades linearly as `skip()` size grows.

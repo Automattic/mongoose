@@ -9374,6 +9374,53 @@ describe('Model', function() {
     assert.equal(doc.toObject().myVirtual, 'Hello from myVirtual');
   });
 
+  it('applies changes to defaults, transforms, and select when recompiling', function() {
+    const childSchema = new Schema({ status: String });
+    const schema = new Schema({ name: String, secret: String, children: [childSchema] });
+    const TestModel = db.model('Test', schema);
+    new TestModel({ children: [{}] }).toObject();
+
+    schema.path('name').default('test');
+    schema.path('name').transform(v => v.toUpperCase());
+    schema.path('secret').select(false);
+    childSchema.path('status').default('active');
+    TestModel.recompileSchema();
+
+    const doc = new TestModel({ children: [{}] });
+    assert.strictEqual(doc.name, 'test');
+    assert.strictEqual(doc.toObject().name, 'TEST');
+    assert.strictEqual(doc.children[0].status, 'active');
+
+    const query = TestModel.find();
+    query._applyPaths();
+    assert.deepStrictEqual(query._fields, { secret: 0 });
+  });
+
+  it('removing a path with a transform and recompiling does not crash toObject()', function() {
+    const schema = new Schema({ name: { type: String, transform: v => v.toUpperCase() }, age: Number });
+    const TestModel = db.model('Test', schema);
+    new TestModel({ name: 'test' }).toObject();
+
+    schema.remove('name');
+    TestModel.recompileSchema();
+
+    assert.strictEqual(new TestModel({ age: 30 }).toObject().age, 30);
+  });
+
+  it('projects nested discriminator key after recompiling with a new embedded discriminator', function() {
+    const eventSchema = new Schema({ message: String }, { discriminatorKey: 'kind', _id: false });
+    const TestModel = db.model('Test', new Schema({
+      outer: new Schema({ events: [eventSchema] })
+    }));
+
+    eventSchema.discriminator('Clicked', new Schema({ element: String }, { _id: false }));
+    TestModel.recompileSchema();
+
+    const query = TestModel.find().select({ 'outer.events.message': 1 });
+    query._applyPaths();
+    assert.deepStrictEqual(query._fields, { 'outer.events.message': 1, 'outer.events.kind': 1 });
+  });
+
   it('supports recompiling model with new discriminators (gh-14444) (gh-14296)', function() {
     // Define discriminated schema
     const decoratorSchema = new Schema({

@@ -40,6 +40,8 @@ declare module 'mongoose' {
     timestamps?: boolean;
     /** set to `false` to skip all user-defined middleware, or `{ pre: false }` / `{ post: false }` to skip only pre or post hooks */
     middleware?: boolean | SkipMiddlewareOptions;
+    /** If truthy, sanitize every filter in `writes` before sending to MongoDB. */
+    sanitizeFilter?: boolean;
   }
 
   interface MongooseBulkSaveOptions extends mongodb.BulkWriteOptions {

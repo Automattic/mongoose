@@ -129,6 +129,19 @@ describe('types array', function() {
       assert.equal(doc.dates.includes(new Date('2026-02-01')), true);
       assert.equal(doc.mixed.indexOf(new Date('2026-01-01')), -1);
     });
+
+    it('matches UUIDs by value', function() {
+      const Test = db.model('Test', new Schema({ ids: ['UUID'] }));
+      const uuid1 = '0a1b2c3d-0000-4000-8000-000000000001';
+      const uuid2 = '0a1b2c3d-0000-4000-8000-000000000002';
+      const doc = new Test({ ids: [uuid1, uuid2] });
+
+      assert.equal(doc.ids.indexOf(new mongoose.Types.UUID(uuid1)), 0);
+      assert.equal(doc.ids.indexOf(new mongoose.Types.UUID(uuid2)), 1);
+      assert.equal(doc.ids.indexOf(new mongoose.Types.UUID(uuid1), 1), -1);
+      assert.equal(doc.ids.indexOf(uuid2), 1);
+      assert.equal(doc.ids.includes(new mongoose.Types.UUID(uuid2)), true);
+    });
   });
 
   describe('includes()', function() {
@@ -637,6 +650,26 @@ describe('types array', function() {
       ]);
     });
 
+    it('removes UUIDs that are equal but not the same instance', async function() {
+      const Test = db.model('Test', new Schema({ ids: ['UUID'] }));
+      const uuid1 = '0a1b2c3d-0000-4000-8000-000000000001';
+      const uuid2 = '0a1b2c3d-0000-4000-8000-000000000002';
+      const uuid3 = '0a1b2c3d-0000-4000-8000-000000000003';
+      const { _id } = await Test.create({ ids: [uuid1, uuid2] });
+
+      const doc = await Test.findById(_id);
+      doc.ids.pull(uuid1);
+      assert.deepStrictEqual(doc.ids.map(id => id.toString()), [uuid2]);
+
+      // Mixing pull() and push() saves the whole array with $set, so a UUID
+      // that pull() left behind would be written back.
+      doc.ids.push(uuid3);
+      await doc.save();
+
+      const { ids } = await Test.findById(_id);
+      assert.deepStrictEqual(ids.map(id => id.toString()), [uuid2, uuid3]);
+    });
+
     it('registers $pull atomic if pulling from middle (gh-14502)', async function() {
       const schema = new Schema({
         a: [{ type: Schema.ObjectId, ref: 'Cat' }]
@@ -1068,6 +1101,18 @@ describe('types array', function() {
       assert.strictEqual('one', doc.arr[0]);
       assert.strictEqual('two', doc.arr[1]);
       assert.strictEqual('three', doc.arr[2]);
+    });
+
+    it('skips UUIDs that are already in the array', function() {
+      const Test = db.model('Test', new Schema({ ids: ['UUID'] }));
+      const uuid1 = '0a1b2c3d-0000-4000-8000-000000000001';
+      const uuid2 = '0a1b2c3d-0000-4000-8000-000000000002';
+      const uuid3 = '0a1b2c3d-0000-4000-8000-000000000003';
+      const doc = new Test({ ids: [uuid1, uuid2] });
+
+      const added = doc.ids.addToSet(uuid1, new mongoose.Types.UUID(uuid2), uuid3);
+      assert.deepStrictEqual(added.map(id => id.toString()), [uuid3]);
+      assert.deepStrictEqual(doc.ids.map(id => id.toString()), [uuid1, uuid2, uuid3]);
     });
   });
 

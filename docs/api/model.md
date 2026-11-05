@@ -1627,7 +1627,7 @@ saved.
 
 Apply changes made to this model's schema after this model was compiled.
 By default, adding virtuals and other properties to a schema after the model is compiled does nothing.
-Call this function to apply virtuals and properties that were added later.
+Call this function to apply virtuals, properties, defaults, transforms, and `select` options that were added later.
 
 #### Example:
 

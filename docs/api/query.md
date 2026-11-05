@@ -105,7 +105,6 @@
 - [`Query.prototype.wtimeout()`](#Query.prototype.wtimeout())
 - [`Query.prototype[Symbol.asyncIterator]()`](#Query.prototype[Symbol.asyncIterator]())
 - [`Query.prototype[Symbol.toStringTag]()`](#Query.prototype[Symbol.toStringTag]())
-- [`Query.use$geoWithin`](#Query.use$geoWithin)
 - [`canMerge()`](#canMerge())
 
 ## `Query()`
@@ -2896,14 +2895,6 @@ Defines a `$within` or `$geoWithin` argument for geo-spatial queries.
 
 **MUST** be used after `where()`.
 
-#### Note:
-
-As of Mongoose 3.7, `$geoWithin` is always used for queries. To change this behavior, see [Query.use$geoWithin](https://mongoosejs.com/docs/api/query.md#Query.use$geoWithin).
-
-#### Note:
-
-In Mongoose 3.7, `within` changed from a getter to a function. If you need the old syntax, use [this](https://github.com/ebensing/mongoose-within).
-
 ## `Query.prototype.writeConcern()`
 
 ### Parameters
@@ -3010,22 +3001,6 @@ More about [`toString()` in JavaScript](https://masteringjs.io/tutorials/fundame
 #### Example:
     const q = Model.find();
     console.log(q); // Prints "Query { find }"
-
-## `Query.use$geoWithin`
-
-### Type
-
-- \<property\>
-
-### See
-
-- [geoWithin](https://www.mongodb.com/docs/manual/reference/operator/geoWithin/)
-
-Flag to opt out of using `$geoWithin`.
-
-```javascript
-mongoose.Query.use$geoWithin = false;
-```
 
 ## `canMerge()`
 

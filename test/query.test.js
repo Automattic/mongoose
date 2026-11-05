@@ -4745,50 +4745,75 @@ describe('Query', function() {
   });
 
   it('propagates readPreference to populate options if read() is called after populate() (gh-15553)', async function() {
-    const schema = new Schema({ name: String, age: Number, friends: [{ type: 'ObjectId', ref: 'Person' }] });
-    const Person = db.model('Person', schema);
+    const { Person, calls } = await createPopulateReadContext();
 
     let query = Person.find({}).populate('friends');
     query.read('secondaryPreferred');
-    await query.exec();
-    assert.strictEqual(query._mongooseOptions.populate.friends.options.readPreference.mode, 'secondaryPreferred');
+    let people = await query.exec();
+    assert.strictEqual(people[0].friends[0].name, 'Alice');
+    assert.strictEqual(calls.pop().readPreference.mode, 'secondaryPreferred');
 
     query = Person.find({}).read('secondary').populate('friends');
     query.read('secondaryPreferred');
-    await query.exec();
-    assert.strictEqual(query._mongooseOptions.populate.friends.options.readPreference.mode, 'secondaryPreferred');
+    people = await query.exec();
+    assert.strictEqual(people[0].friends[0].name, 'Alice');
+    assert.strictEqual(calls.pop().readPreference.mode, 'secondaryPreferred');
 
     query = Person.find({}).read('secondaryPreferred').populate('friends');
-    await query.exec();
-    assert.strictEqual(query._mongooseOptions.populate.friends.options.readPreference.mode, 'secondaryPreferred');
+    people = await query.exec();
+    assert.strictEqual(people[0].friends[0].name, 'Alice');
+    assert.strictEqual(calls.pop().readPreference.mode, 'secondaryPreferred');
 
     query = Person.find({}).read('primaryPreferred').populate({ path: 'friends', options: { readPreference: 'secondaryPreferred' } });
-    await query.exec();
-    assert.strictEqual(query._mongooseOptions.populate.friends.options.readPreference, 'secondaryPreferred');
+    people = await query.exec();
+    assert.strictEqual(people[0].friends[0].name, 'Alice');
+    assert.strictEqual(calls.pop().readPreference, 'secondaryPreferred');
   });
 
   it('propagates readConcern to populate options if readConcern() is called after populate() (gh-15553)', async function() {
-    const schema = new Schema({ name: String, age: Number, friends: [{ type: 'ObjectId', ref: 'Person' }] });
-    const Person = db.model('Person', schema);
+    const { Person, calls } = await createPopulateReadContext();
 
     let query = Person.find({}).populate('friends');
     query.readConcern('majority');
-    await query.exec();
-    assert.strictEqual(query._mongooseOptions.populate.friends.options.readConcern.level, 'majority');
+    let people = await query.exec();
+    assert.strictEqual(people[0].friends[0].name, 'Alice');
+    assert.strictEqual(calls.pop().readConcern.level, 'majority');
 
     query = Person.find({}).readConcern('local').populate('friends');
     query.readConcern('majority');
-    await query.exec();
-    assert.strictEqual(query._mongooseOptions.populate.friends.options.readConcern.level, 'majority');
+    people = await query.exec();
+    assert.strictEqual(people[0].friends[0].name, 'Alice');
+    assert.strictEqual(calls.pop().readConcern.level, 'majority');
 
     query = Person.find({}).readConcern('majority').populate('friends');
-    await query.exec();
-    assert.strictEqual(query._mongooseOptions.populate.friends.options.readConcern.level, 'majority');
+    people = await query.exec();
+    assert.strictEqual(people[0].friends[0].name, 'Alice');
+    assert.strictEqual(calls.pop().readConcern.level, 'majority');
 
     query = Person.find({}).readConcern('majority').populate({ path: 'friends', options: { readConcern: 'local' } });
-    await query.exec();
-    assert.strictEqual(query._mongooseOptions.populate.friends.options.readConcern, 'local');
+    people = await query.exec();
+    assert.strictEqual(people[0].friends[0].name, 'Alice');
+    assert.strictEqual(calls.pop().readConcern, 'local');
   });
+
+  async function createPopulateReadContext() {
+    const Friend = db.model('Friend', new Schema({ name: String }));
+    const Person = db.model('Person', new Schema({ friends: [{ type: 'ObjectId', ref: 'Friend' }] }));
+    const friend = await Friend.create({ name: 'Alice' });
+    await Person.create({ friends: [friend._id] });
+    const calls = [];
+    // Record Mongoose options, then read fixtures from primary to avoid replication lag.
+    const find = Friend.collection.find;
+    Friend.collection.find = function(filter, options) {
+      calls.push(options);
+      return find.call(this, filter, { ...options, readPreference: 'primary' });
+    };
+    const findPerson = Person.collection.find;
+    Person.collection.find = function(filter, options) {
+      return findPerson.call(this, filter, { ...options, readPreference: 'primary' });
+    };
+    return { Person, calls };
+  }
 
   it('does not error out if strict "throw" and db document has extra fields', async function() {
     const schema = new Schema({

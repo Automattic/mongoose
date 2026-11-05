@@ -252,6 +252,34 @@ describe('transactions', function() {
         then(article => assert.equal(article.author.name, 'Val'));
     });
 
+    for (const plainOptions of [false, true]) {
+      it(`uses the cloned query's session with ${plainOptions ? 'plain-object' : 'normalized'} populate options`, async function() {
+        const author = await Author.create({ name: 'Alice' });
+        const article = await Article.create({ author: author._id });
+        const query = Article.findById(article._id).session(session);
+        if (plainOptions) {
+          query.mongooseOptions({ populate: { author: { path: 'author', options: {} } } });
+        } else {
+          query.populate('author');
+        }
+        const original = await query;
+        assert.strictEqual(original.author.name, 'Alice');
+
+        const nextSession = await db.startSession();
+        try {
+          await nextSession.withTransaction(async() => {
+            await Author.updateOne({ _id: author._id }, { name: 'Bob' }, { session: nextSession });
+            const cloned = await query.clone().session(nextSession);
+            assert.strictEqual(cloned.author.name, 'Bob');
+          });
+          const withoutSession = await query.clone().session(null);
+          assert.strictEqual(withoutSession.author.name, 'Bob');
+        } finally {
+          await nextSession.endSession();
+        }
+      });
+    }
+
     it('can override `populate()` session', function() {
       return Author.create([{ name: 'Val' }], { session: session }).
         // Article created _outside_ the transaction

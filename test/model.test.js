@@ -7812,6 +7812,137 @@ describe('Model', function() {
       );
     });
 
+    for (const ordered of [true, false]) {
+      it(`preserves document state after a bulk command failure with ordered: ${ordered} (gh-16646)`, async function() {
+        const savedDocuments = [];
+        const userSchema = new Schema({ name: String });
+        userSchema.post('save', function(doc) {
+          savedDocuments.push(doc);
+        });
+        const User = db.model('User', userSchema);
+        const existingUser = await User.create({ name: 'before' });
+        savedDocuments.length = 0;
+
+        const newUser = new User({ name: 'new' });
+        existingUser.name = 'after';
+        const users = [newUser, existingUser];
+        const error = await User.bulkSave(users, { ordered, writeConcern: { w: -1 } }).then(
+          () => null,
+          error => error
+        );
+
+        assert.ok(error);
+        assert.equal(error.name, 'MongoBulkWriteError');
+        assert.deepEqual(error.writeErrors, []);
+        assert.equal(await User.countDocuments(), 1);
+        assert.equal((await User.findById(existingUser._id)).name, 'before');
+        assert.equal(newUser.isNew, true);
+        assert.equal(newUser.isModified('name'), true);
+        assert.equal(existingUser.isNew, false);
+        assert.equal(existingUser.isModified('name'), true);
+        assert.deepEqual(savedDocuments, []);
+
+        await User.bulkSave(users, { ordered });
+        assert.deepEqual((await User.find().sort('name')).map(doc => doc.name), ['after', 'new']);
+        assert.equal(newUser.isNew, false);
+        assert.equal(newUser.isModified(), false);
+        assert.equal(existingUser.isModified(), false);
+        assert.equal(savedDocuments.length, 2);
+      });
+    }
+
+    describe('write concern errors', function() {
+      let writeConcern;
+
+      before(async function() {
+        await db.asPromise();
+        const { hosts } = await db.db.admin().command({ hello: 1 });
+        if (hosts == null) {
+          return this.skip();
+        }
+        writeConcern = { w: hosts.length + 1, wtimeoutMS: 100 };
+      });
+
+      for (const ordered of [true, false]) {
+        it(`clears confirmed inserts and rethrows the original error with ordered: ${ordered}`, async function() {
+          const savedDocuments = [];
+          let originalError;
+          const userSchema = new Schema({ name: String });
+          userSchema.post('save', function(doc) {
+            savedDocuments.push(doc);
+          });
+          userSchema.post('bulkWrite', function(error, result, next) {
+            originalError = error;
+            next(error);
+          });
+          const User = db.model('User', userSchema);
+          await User.init();
+          const users = [new User({ name: 'first' }), new User({ name: 'second' })];
+          const error = await User.bulkSave(users, { ordered, writeConcern }).then(() => null, error => error);
+
+          assert.ok(error);
+          assert.strictEqual(error, originalError);
+          assert.strictEqual(error.name, 'MongoBulkWriteError');
+          assert.deepStrictEqual(error.writeErrors, []);
+          assert.strictEqual(error.result.insertedCount, users.length);
+          assert.strictEqual(await User.countDocuments(), users.length);
+          assert.ok(users.every(user => !user.isNew && !user.isModified()));
+          assert.deepStrictEqual(savedDocuments, users);
+        });
+
+        it(`clears confirmed increments with unchanged input documents and ordered: ${ordered}`, async function() {
+          const savedDocuments = [];
+          const userSchema = new Schema({ name: String, count: Number });
+          userSchema.post('save', function(doc) {
+            savedDocuments.push(doc);
+          });
+          const User = db.model('User', userSchema);
+          const users = await User.insertMany([
+            { name: 'unchanged', count: 0 },
+            { name: 'incremented', count: 0 }
+          ]);
+          users[1].$inc('count', 1);
+          const error = await User.bulkSave(users, { ordered, writeConcern }).then(() => null, error => error);
+
+          assert.ok(error);
+          assert.strictEqual(error.name, 'MongoBulkWriteError');
+          assert.deepStrictEqual(error.writeErrors, []);
+          assert.strictEqual(error.result.matchedCount, 1);
+          assert.strictEqual((await User.findById(users[1]._id)).count, 1);
+          assert.ok(users.every(user => !user.isModified()));
+          assert.deepStrictEqual(savedDocuments, users);
+
+          await User.bulkSave(users, { ordered });
+          assert.strictEqual((await User.findById(users[1]._id)).count, 1);
+        });
+
+        it(`preserves pending state when only part of the bulk is confirmed with ordered: ${ordered}`, async function() {
+          const savedDocuments = [];
+          const userSchema = new Schema({ name: String, count: Number });
+          userSchema.post('save', function(doc) {
+            savedDocuments.push(doc);
+          });
+          const User = db.model('User', userSchema);
+          const existingUser = await User.create({ name: 'existing', count: 0 });
+          savedDocuments.length = 0;
+          const newUser = new User({ name: 'new', count: 0 });
+          existingUser.$inc('count', 1);
+          const error = await User.bulkSave([newUser, existingUser], { ordered, writeConcern }).then(() => null, error => error);
+
+          assert.ok(error);
+          assert.strictEqual(error.name, 'MongoBulkWriteError');
+          assert.deepStrictEqual(error.writeErrors, []);
+          assert.strictEqual(error.result.insertedCount, 1);
+          assert.strictEqual(error.result.matchedCount, 0);
+          assert.strictEqual(await User.countDocuments(), 2);
+          assert.strictEqual((await User.findById(existingUser._id)).count, 0);
+          assert.strictEqual(newUser.isNew, true);
+          assert.strictEqual(existingUser.isModified('count'), true);
+          assert.deepStrictEqual(savedDocuments, []);
+        });
+      }
+    });
+
     it('increments version key on successful save (gh-15800)', async function() {
       // Arrange
       const userSchema = new Schema({

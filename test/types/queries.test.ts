@@ -202,6 +202,102 @@ expect<mongoose.ApplyProjection<ProjectionDoc, { _id: 1; age: 0 }>>().type.toBe<
 expect<mongoose.ApplyProjection<ProjectionDoc, { _id: 0; age: 0 }>>().type.toBe<{ name: string }>();
 expect<mongoose.ApplyProjection<ProjectionDoc, { _id: false }>>().type.toBe<{ name: string; age: number }>();
 
+type ProjectionSliceDoc = { _id: string; name: string; tags: string[]; meta: { title: string; list: number[] } };
+type NestedProjectionDoc = { _id: string; name: string; meta: { title: string; hidden: boolean } };
+expect<mongoose.ApplyProjection<NestedProjectionDoc, { name: 1; 'meta.title': 1 }>>().type.toBe<{ _id: string; name: string; meta: { title: string } }>();
+expect<mongoose.ApplyProjection<NestedProjectionDoc, { 'meta.title': 1 }>>().type.toBe<{ _id: string; meta: { title: string } }>();
+expect<mongoose.ApplyProjection<NestedProjectionDoc, { 'meta.hidden': 0 }>>().type.toBe<{ _id: string; name: string; meta: { title: string } }>();
+expect<mongoose.ApplyProjection<{ _id: string; meta: any }, { 'meta.title': 1 }>>().type.toBe<{ _id: string; meta: any }>();
+expect<mongoose.ApplyProjection<any, { name: 1; 'meta.title': 1 }>>().type.toBe<{ _id: any; name: any; meta: any }>();
+
+expect<mongoose.ApplyProjection<ProjectionDoc, Record<string, 0>>>().type.toBe<ProjectionDoc>();
+expect<mongoose.ApplyProjection<ProjectionDoc, Record<string, 1>>>().type.toBe<ProjectionDoc>();
+
+expect<mongoose.ApplyProjection<Record<string, any>, { name: 1 }>['name']>().type.toBe<any>();
+expect<mongoose.ApplyProjection<{ _id: string; meta: Record<string, string> }, { 'meta.foo': 1 }>>().type.toBe<{ _id: string; meta: { foo: string } }>();
+expect<mongoose.ApplyProjection<{ _id: string; meta: Record<string, { a: string; b: number }> }, { 'meta.foo.a': 1 }>>().type.toBe<{ _id: string; meta: { foo: { a: string } } }>();
+
+type MongooseArrayDoc = { _id: string; arr: Types.Array<{ a: string; b: number }> };
+expect<mongoose.ApplyProjection<MongooseArrayDoc, { 'arr.b': 1 }>>().type.toBe<MongooseArrayDoc>();
+expect<mongoose.ApplyProjection<MongooseArrayDoc, { 'arr.b': 0 }>>().type.toBe<MongooseArrayDoc>();
+
+type LeafDoc = {
+  _id: string;
+  links: Map<string, string>;
+  hydratedLinks: Types.Map<string>;
+  at: Date;
+  ref: Types.ObjectId;
+  price: Types.Decimal128;
+  uuid: Types.UUID;
+};
+// `size` is a valid map key
+expect<mongoose.ApplyProjection<LeafDoc, { 'links.size': 1 }>['links']>().type.toBe<Map<string, string>>();
+expect<mongoose.ApplyProjection<LeafDoc, { 'links.size': 0 }>['links']>().type.toBe<Map<string, string>>();
+expect<mongoose.ApplyProjection<LeafDoc, { 'hydratedLinks.size': 1 }>['hydratedLinks']>().type.toBe<Types.Map<string>>();
+// Exclusive projection underneath a scalar does not exclude the scalar property
+expect<mongoose.ApplyProjection<LeafDoc, { 'ref.id': 0 }>['ref']>().type.toBe<Types.ObjectId>();
+expect<mongoose.ApplyProjection<LeafDoc, { 'uuid.buffer': 0 }>['uuid']>().type.toBe<Types.UUID>();
+// Inclusive projection underneath scalar excludes the scalar property
+expect<mongoose.ApplyProjection<LeafDoc, { 'at.getTime': 1 }>>().type.not.toHaveProperty('at');
+expect<mongoose.ApplyProjection<LeafDoc, { 'ref.id': 1 }>>().type.not.toHaveProperty('ref');
+expect<mongoose.ApplyProjection<LeafDoc, { 'price.bytes': 1 }>>().type.not.toHaveProperty('price');
+expect<
+  mongoose.ApplyProjection<
+    { _id: string; note: string | null },
+    { 'note.x': 1 }
+  >
+>().type.toBe<{ _id: string }>();
+expect<
+  mongoose.ApplyProjection<
+    { _id: string; meta: { title: string } },
+    { 'meta.typo': 1 }
+  >
+>().type.toBe<{ _id: string; meta: Record<string, never> }>();
+expect<
+  mongoose.ApplyProjection<
+    { _id: string; meta: { note: string; title: string } },
+    { 'meta.note.x': 1 }
+  >
+>().type.toBe<{ _id: string; meta: Record<string, never> }>();
+expect<mongoose.ApplyProjection<{ _id: string; items: { a: string }[] }, { 'items.typo': 1 }>>().type.toBe<{ _id: string; items: Record<string, never>[] }>();
+expect<mongoose.ApplyProjection<ProjectionDoc, { typo: 1 }>>().type.toBe<{ _id: string }>();
+
+// Inclusive projection underneath array of scalars makes an array of nevers - `never[]`
+// means an array that must always be empty. That matches the MongoDB server - `tags.x: 1`
+// always returns empty array below.
+expect<mongoose.ApplyProjection<{ _id: string; tags: string[] }, { 'tags.x': 1 }>>().type.toBe<{ _id: string; tags: never[] }>();
+expect<mongoose.ApplyProjection<{ _id: string; tags: string[][] }, { 'tags.x': 1 }>>().type.toBe<{ _id: string; tags: never[][] }>();
+// If there's a union, projection should drill into the union
+expect<
+  mongoose.ApplyProjection<
+    { _id: string; items: Array<string | { a: string; b: number } | null> },
+    { 'items.a': 1 }
+  >
+>().type.toBe<{ _id: string; items: { a: string }[] }>();
+expect<mongoose.ApplyProjection<{ _id: string; sub: { a: string; b: number } | null }, { 'sub.a': 1 }>>().type.toBe<{ _id: string; sub: { a: string } | undefined }>();
+expect<mongoose.ApplyProjection<{ _id: string; sub: string | { a: string; b: number } }, { 'sub.a': 1 }>>().type.toBe<{ _id: string; sub: { a: string } | undefined }>();
+
+type ErrorShapedDoc = { _id: string; err: { name: string; message: string; code: number } };
+expect<mongoose.ApplyProjection<ErrorShapedDoc, { 'err.code': 1 }>>().type.toBe<{ _id: string; err: { code: number } }>();
+expect<mongoose.ApplyProjection<ErrorShapedDoc, { 'err.code': 0 }>>().type.toBe<{ _id: string; err: { name: string; message: string } }>();
+
+expect<mongoose.ApplyProjection<ProjectionSliceDoc, { name: 1; tags: { $slice: 1 } }>>().type.toBe<{ _id: string; name: string; tags: string[] }>();
+expect<mongoose.ApplyProjection<ProjectionSliceDoc, { _id: 1; tags: { $slice: 1 } }>>().type.toBe<{ _id: string; tags: string[] }>();
+expect<mongoose.ApplyProjection<ProjectionSliceDoc, { 'meta.title': 1; 'meta.list': { $slice: 1 } }>>().type.toBe<{ _id: string; meta: { title: string; list: number[] } }>();
+expect<mongoose.ApplyProjection<ProjectionSliceDoc, { name: 1; 'meta.list': { $slice: 1 } }>>().type.toBe<{ _id: string; name: string; meta: { list: number[] } }>();
+expect<mongoose.ApplyProjection<ProjectionSliceDoc, { tags: { $slice: 1 } }>>().type.toBe<ProjectionSliceDoc>();
+expect<mongoose.ApplyProjection<ProjectionSliceDoc, { name: 0; tags: { $slice: 1 } }>>().type.toBe<Omit<ProjectionSliceDoc, 'name'>>();
+expect<mongoose.ApplyProjection<ProjectionSliceDoc, { _id: 1; name: 0 }>>().type.toBe<Omit<ProjectionSliceDoc, 'name'>>();
+
+type SubdocProjectionDoc = {
+  _id: string;
+  sub: mongoose.HydratedSingleSubdocument<{ a: string; b: number }>;
+  author: mongoose.HydratedDocument<{ name: string; age: number }>;
+};
+expect<mongoose.ApplyProjection<SubdocProjectionDoc, { 'sub.a': 1 }>['sub']>().type.toBe<SubdocProjectionDoc['sub']>();
+expect<mongoose.ApplyProjection<SubdocProjectionDoc, { 'sub.a': 0 }>['sub']>().type.toBe<SubdocProjectionDoc['sub']>();
+expect<mongoose.ApplyProjection<SubdocProjectionDoc, { 'author.name': 1 }>['author']>().type.toBe<SubdocProjectionDoc['author']>();
+
 Test.findOneAndUpdate({}, {}, { projection: { name: 1 } }).then(doc => {
   expect(doc!).type.toHaveProperty('name');
   expect(doc!).type.not.toHaveProperty('age');
@@ -1135,4 +1231,94 @@ async function gh16062() {
   const Test = model('Test', new Schema({ runtime: Number }));
   expect(Test.findOne).type.not.toBeCallableWith({ runtime: { $wrong: 100 } });
   expect(Test.findOne).type.not.toBeCallableWith({ $and: [{ runtime: { $wrong: 100 } }] });
+}
+
+async function nestedProjectionOnDocumentArrayWithMethods() {
+  type Item = { a: string; b: number };
+  type ItemDoc = Types.Subdocument<Types.ObjectId, unknown, Item> & Item & { itemMethod(): string };
+  type Parent = { _id: string; items: Types.DocumentArray<Item, ItemDoc> };
+
+  const included: mongoose.ApplyProjection<Parent, { 'items.a': 1 }> = {} as any;
+  expect(included.items[0]).type.toHaveProperty('a');
+  expect(included.items[0]).type.not.toHaveProperty('b');
+  expect(included.items[0]).type.toHaveProperty('itemMethod');
+  expect(included.items.id('0')!).type.toHaveProperty('itemMethod');
+
+  const excluded: mongoose.ApplyProjection<Parent, { 'items.a': 0 }> = {} as any;
+  expect(excluded.items[0]).type.not.toHaveProperty('a');
+  expect(excluded.items[0]).type.toHaveProperty('b');
+  expect(excluded.items[0]).type.toHaveProperty('itemMethod');
+}
+
+async function threeLevelNestedProjection() {
+  const NestedPathModel = model('ThreeLevelNested', new Schema({
+    a: { b: { c: String, d: Number }, e: String }
+  }));
+  const included = await NestedPathModel.findOne({}, { 'a.b.c': 1 }).orFail();
+  expect(included.a!.b!).type.toHaveProperty('c');
+  expect(included.a!.b!).type.not.toHaveProperty('d');
+  expect(included.a!).type.not.toHaveProperty('e');
+
+  const excluded = await NestedPathModel.findOne({}, { 'a.b.c': 0 }).orFail();
+  expect(excluded.a!.b!).type.not.toHaveProperty('c');
+  expect(excluded.a!.b!).type.toHaveProperty('d');
+  expect(excluded.a!).type.toHaveProperty('e');
+
+  const SubdocModel = model('ThreeLevelSubdoc', new Schema({
+    a: new Schema({ b: new Schema({ c: String, d: Number }), e: String })
+  }));
+  const includedSubdoc = await SubdocModel.findOne({}, { 'a.b.c': 1 }).orFail();
+  expect(includedSubdoc.a!.b!).type.toHaveProperty('c');
+  expect(includedSubdoc.a!.b!).type.not.toHaveProperty('d');
+  expect(includedSubdoc.a!).type.not.toHaveProperty('e');
+
+  const DocumentArrayModel = model('ThreeLevelDocumentArray', new Schema({
+    a: [{ b: [{ c: String, d: Number }], e: String }]
+  }));
+  const includedArr = await DocumentArrayModel.findOne({}, { 'a.b.c': 1 }).orFail();
+  expect(includedArr.a[0].b[0]).type.toHaveProperty('c');
+  expect(includedArr.a[0].b[0]).type.not.toHaveProperty('d');
+  expect(includedArr.a[0].b[0]).type.toHaveProperty('ownerDocument');
+  expect(includedArr.a[0]).type.not.toHaveProperty('e');
+  expect(includedArr.a[0]).type.toHaveProperty('ownerDocument');
+
+  const excludedArr = await DocumentArrayModel.findOne({}, { 'a.b.c': 0 }).orFail();
+  expect(excludedArr.a[0].b[0]).type.not.toHaveProperty('c');
+  expect(excludedArr.a[0].b[0]).type.toHaveProperty('d');
+  expect(excludedArr.a[0]).type.toHaveProperty('e');
+}
+
+async function nestedProjectionOnArraysAndSubdocs() {
+  const NestedProjectionModel = model('NestedProjection', new Schema({
+    arr: [{ a: String, b: Number }],
+    sub: new Schema({ a: String, b: Number })
+  }));
+
+  const projectedArr = await NestedProjectionModel.findOne({}, { 'arr.a': 1 }).orFail();
+  expect(projectedArr.arr[0]).type.toHaveProperty('a');
+  expect(projectedArr.arr[0]).type.toHaveProperty('ownerDocument');
+
+  const projectedSub = await NestedProjectionModel.findOne({}, { 'sub.a': 1 }).orFail();
+  expect(projectedSub.sub!).type.toHaveProperty('a');
+
+  expect(projectedArr.arr[0]).type.not.toHaveProperty('b');
+  expect(projectedArr.arr.addToSet).type.toBeCallableWith({ a: 'test' });
+
+  const leanArr = await NestedProjectionModel.findOne({}, { 'arr.a': 1 }).orFail().lean();
+  expect(leanArr.arr[0]).type.toHaveProperty('a');
+  expect(leanArr.arr[0]).type.not.toHaveProperty('b');
+
+  const excludedArr = await NestedProjectionModel.findOne({}, { 'arr.b': 0 }).orFail();
+  expect(excludedArr.arr[0]).type.toHaveProperty('a');
+  expect(excludedArr.arr[0]).type.not.toHaveProperty('b');
+  expect(excludedArr.arr[0]).type.toHaveProperty('ownerDocument');
+
+  const noMatchArr = await NestedProjectionModel.findOne({}, { 'arr.typo': 1 }).orFail();
+  expect(noMatchArr.arr[0]).type.not.toHaveProperty('a');
+  expect(noMatchArr.arr[0].save).type.not.toBe<never>();
+
+  const dynamicPath = 'sub.a' as string;
+  const excludedDynamicPath = await NestedProjectionModel.findOne({}, { [dynamicPath]: 0 as const }).orFail();
+  expect(excludedDynamicPath).type.toHaveProperty('arr');
+  expect(excludedDynamicPath).type.toHaveProperty('sub');
 }

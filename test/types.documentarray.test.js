@@ -1601,6 +1601,25 @@ describe('types.documentarray', function() {
       const fetched = await Test.findById(doc._id).orFail().lean();
       assert.deepStrictEqual(fetched.items.map(item => item.tags.length), [0, 0]);
     });
+
+    it('leaves existing subdocs untouched when casting the new array fails', async function() {
+      const schema = new mongoose.Schema({
+        items: [new mongoose.Schema({ name: String, qty: Number }, { strict: 'throw' })]
+      });
+      const Test = db.model('Test', schema);
+      const doc = await Test.create({ items: [{ name: 'apple', qty: 1 }, { name: 'pear', qty: 2 }] });
+      const items = doc.items;
+
+      // `bogus` is not in the schema, so casting the second element throws
+      doc.items = [doc.items[1].toObject(), { name: 'fig', bogus: true }];
+      assert.ok(doc.validateSync().errors['items']);
+
+      assert.ok(doc.items === items);
+      assert.deepStrictEqual(doc.items.map(item => item.__index), [0, 1]);
+      assert.ok(doc.items[1].parentArray() === items);
+      doc.items[1].qty = 20;
+      assert.deepStrictEqual(doc.$getChanges().$set, { 'items.1.qty': 20 });
+    });
   });
 
   it('clones subdoc when same subdoc reference appears multiple times in array (gh-15973)', async function() {

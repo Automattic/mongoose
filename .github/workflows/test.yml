@@ -6,6 +6,7 @@ on:
       - "package.json"
       - "index.js"
       - "lib/**"
+      - "scripts/checkLibCharset.js"
       - "test/**.js"
   push:
     paths:
@@ -13,6 +14,7 @@ on:
       - "package.json"
       - "index.js"
       - "lib/**"
+      - "scripts/checkLibCharset.js"
       - "test/**.js"
 permissions:
   contents: read
@@ -33,6 +35,9 @@ jobs:
 
       - name: Lint JS-Files
         run: npm run lint-js
+
+      - name: Check lib charset
+        run: npm run checkLibCharset
 
   test:
     runs-on: ${{ matrix.os }}

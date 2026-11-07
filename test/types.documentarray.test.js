@@ -2092,17 +2092,18 @@ describe('types.documentarray', function() {
           { _id: new mongoose.Types.ObjectId(), name: 'c', qty: 3 }
         ]
       });
+      const prevItems = doc.items;
       const [a, b, c] = doc.items;
 
       doc.items = doc.toObject().items;
 
+      assert.strictEqual(doc.items, prevItems);
       assert.strictEqual(doc.items[0], a);
       assert.strictEqual(doc.items[1], b);
       assert.strictEqual(doc.items[2], c);
       assert.deepStrictEqual(doc.modifiedPaths(), []);
       assert.deepStrictEqual(doc.$getChanges(), {});
 
-      // Reused subdocs should belong to the new array, not the one that was overwritten
       assert.strictEqual(a.parentArray(), doc.items);
       a.deleteOne();
       assert.deepStrictEqual(doc.items.map(item => item.name), ['b', 'c']);
@@ -2112,7 +2113,7 @@ describe('types.documentarray', function() {
       });
     });
 
-    it('creates new subdocs for elements whose data changed', function() {
+    it('creates a new array when some elements\' data changed', function() {
       const doc = Test.hydrate({
         _id: new mongoose.Types.ObjectId(),
         items: [
@@ -2121,6 +2122,7 @@ describe('types.documentarray', function() {
           { _id: new mongoose.Types.ObjectId(), name: 'c', qty: 3 }
         ]
       });
+      const prevItems = doc.items;
       const [a, b, c] = doc.items;
 
       const items = doc.toObject().items;
@@ -2128,13 +2130,22 @@ describe('types.documentarray', function() {
       delete items[2].name;
       doc.items = items;
 
-      assert.strictEqual(doc.items[0], a);
-      assert.notStrictEqual(doc.items[1], b);
+      assert.notStrictEqual(doc.items, prevItems);
       assert.strictEqual(doc.items[1].qty, 20);
       // Overwriting shouldn't keep fields from the old subdoc, see gh-5523
-      assert.notStrictEqual(doc.items[2], c);
       assert.strictEqual(doc.items[2].name, undefined);
       assert.strictEqual(doc.items[2].qty, 3);
+
+      // Subdocs shouldn't be shared between the old and new arrays: each subdoc can only
+      // have one parent array, so sharing would leave one of the arrays inconsistent
+      for (const item of doc.items) {
+        assert.ok(!prevItems.includes(item));
+        assert.strictEqual(item.parentArray(), doc.items);
+      }
+      assert.deepStrictEqual(prevItems.map(item => item.name), ['a', 'b', 'c']);
+      for (const item of [a, b, c]) {
+        assert.strictEqual(item.parentArray(), prevItems);
+      }
 
       assert.deepStrictEqual(doc.$getChanges(), {
         $set: {

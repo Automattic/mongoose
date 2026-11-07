@@ -1042,6 +1042,22 @@ describe('timestamps', function() {
     const check = await Test.findOne();
     assert(check.toString().includes('updateCounter: 1'));
   });
+
+  it('clone() keeps $timestamps set by a child schema with timestamps (gh-16650)', async function() {
+    const childSchema = new Schema({ name: String }, { timestamps: true });
+    const parentSchema = new Schema({ child: childSchema });
+
+    assert.deepStrictEqual(parentSchema.clone().$timestamps, parentSchema.$timestamps);
+
+    // Embedded discriminators clone the schema, so saving used to throw in timestampsPreSave
+    const baseSchema = new Schema({ kind: String }, { discriminatorKey: 'kind' });
+    const testSchema = new Schema({ items: [baseSchema] });
+    testSchema.path('items').discriminator('WithChild', new Schema({ child: childSchema }));
+    const Test = db.model('Test', testSchema);
+
+    const doc = await Test.create({ items: [{ kind: 'WithChild', child: { name: 'foo' } }] });
+    assert.ok(doc.items[0].child.createdAt);
+  });
 });
 
 async function delay(ms) {

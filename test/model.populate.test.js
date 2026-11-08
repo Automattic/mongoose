@@ -3602,9 +3602,12 @@ describe('model: populate:', function() {
     });
 
     describe('inherited read preference and read concern (gh-15553)', function() {
-      it('inherits schema-level read preference and read concern in nested populate', async function() {
+      it('does not inherit schema-level read preference and read concern in nested populate', async function() {
         const Publisher = db.model('Publisher', new Schema({ name: String }));
-        const Author = db.model('Author', new Schema({ name: String, publisher: { type: ObjectId, ref: 'Publisher' } }));
+        const Author = db.model('Author', new Schema({
+          name: String,
+          publisher: { type: ObjectId, ref: 'Publisher' }
+        }, { read: 'nearest', readConcern: { level: 'local' } }));
         const Article = db.model('Article', new Schema({
           author: { type: ObjectId, ref: 'Author' }
         }, { read: 'secondaryPreferred', readConcern: { level: 'majority' } }));
@@ -3617,8 +3620,8 @@ describe('model: populate:', function() {
 
         assert.deepStrictEqual(calls, [
           { readPreference: 'secondaryPreferred', readConcern: 'majority' },
-          { readPreference: 'secondaryPreferred', readConcern: 'majority' },
-          { readPreference: 'secondaryPreferred', readConcern: 'majority' }
+          { readPreference: 'nearest', readConcern: 'local' },
+          { readPreference: 'primary', readConcern: undefined }
         ]);
       });
 

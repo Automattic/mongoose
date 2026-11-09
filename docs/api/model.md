@@ -1771,7 +1771,7 @@ Translate any aliases fields/conditions so the final query or document object is
 #### Example:
 
     await Character.find(Character.translateAliases({
-       '名': 'Eddard Stark' // Alias for 'name'
+       nombre: 'Eddard Stark' // Alias for 'name'
     });
 
 By default, `translateAliases()` overwrites raw fields with aliased fields.

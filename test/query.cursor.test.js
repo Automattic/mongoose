@@ -1075,6 +1075,20 @@ describe('QueryCursor', function() {
     assert.deepStrictEqual(errors, [readError]);
   });
 
+  it('does not throw when destroy() gets an error and there are no error listeners (gh-16609)', async function() {
+    const cursor = Model.find().cursor();
+    const driverCursor = await cursor.getDriverCursor();
+    const destroyError = new Error('consumer stopped reading');
+    // Not `once(cursor, 'close')`, because that adds an error listener
+    const closed = new Promise(resolve => cursor.once('close', resolve));
+
+    cursor.destroy(destroyError);
+    await closed;
+
+    assert.strictEqual(cursor.errored, destroyError);
+    assert.ok(driverCursor.closed);
+  });
+
   it('handles destroy() before cursor is created (gh-14966)', async function() {
     db.deleteModel(/Test/);
     const schema = mongoose.Schema({ name: String });

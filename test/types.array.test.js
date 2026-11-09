@@ -2003,6 +2003,28 @@ describe('types array', function() {
     m.Schema.Types.Array.options.castNonArrays = true;
   });
 
+  it('supports `castNonArrays` property option on document arrays', async function() {
+    const Model = db.model('Test', new Schema({
+      docArr: { castNonArrays: false, type: [{ name: String }] }
+    }));
+
+    const doc = new Model({ docArr: { name: 'fail' } });
+    const err = await doc.validate().then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.errors['docArr'].name, 'CastError');
+
+    const m = new mongoose.Mongoose();
+    m.Schema.Types.DocumentArray.options.castNonArrays = false;
+    const Model2 = m.model('Test', new m.Schema({
+      docArr: { castNonArrays: true, type: [{ name: String }] }
+    }));
+
+    const doc2 = new Model2({ docArr: { name: 'good' } });
+    m.Schema.Types.DocumentArray.options.castNonArrays = true;
+    await doc2.validate();
+    assert.deepStrictEqual(doc2.docArr.map(d => d.name), ['good']);
+  });
+
   it('supports setting nested arrays directly (gh-13372)', function() {
     const Test = db.model('Test', new Schema({ intArr: [[Number]] }));
 

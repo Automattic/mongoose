@@ -1,3 +1,15 @@
+9.12.1 / 2026-11-09
+===================
+ * perf(update): avoid quadratic ancestor lookup in update validators and validate nested array subdocs once #16586 [https://github.com/Re-cool](https://github.com/Re-cool)
+ * perf: keep lib/ source within Latin-1 #16681 [orgads](https://github.com/orgads)
+ * perf(map): avoid quadratic concat() when creating a MongooseMap from an object #16677 [ptweezy](https://github.com/ptweezy)
+ * fix(array): keep earlier pushed values when push() is called again with $each #16619 #16618 [maxymlyskov](https://github.com/maxymlyskov)
+ * fix(model+query): handle inherited read preference and read concern on cloned queries #16668 #16632
+ * fix(timestamps): set timestamps on subdocs pushed via array filters #16615 #8809 [vaidehi-snk](https://github.com/vaidehi-snk)
+ * fix(model): validate paths under a nested path passed to Model.validate() #16653 [NotAFlightRisk](https://github.com/NotAFlightRisk)
+ * fix(update): skip array-level validators for $pull with $in #16666 [AnkitKumar61](https://github.com/AnkitKumar61)
+ * fix(cursor): finish destruction after terminal initialization #16612 [IbrahimHafez1](https://github.com/IbrahimHafez1)
+
 9.12.0 / 2026-11-04
 ===================
  * feat: upgrade to mongodb driver 7.8 #16772 #16667

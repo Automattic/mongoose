@@ -2101,6 +2101,30 @@ describe('model: updateOne:', function() {
 
     });
 
+    it('skips the array validator when $pull uses $in (gh-6960)', async function() {
+      let arrayValidatorCalls = 0;
+      const schema = new Schema({
+        tags: {
+          type: [String],
+          validate: function(tags) {
+            ++arrayValidatorCalls;
+            return Array.isArray(tags) && tags.length > 0;
+          }
+        }
+      });
+      const Model = db.model('Test', schema);
+      const doc = await Model.create({ tags: ['red', 'blue', 'green'] });
+      arrayValidatorCalls = 0;
+
+      await Model.updateOne({ _id: doc._id }, {
+        $pull: { tags: { $in: ['red', 'blue'] } }
+      }, { runValidators: true });
+
+      assert.strictEqual(arrayValidatorCalls, 0);
+      const updated = await Model.findById(doc._id).lean();
+      assert.deepStrictEqual(updated.tags, ['green']);
+    });
+
     it('$pull with updateValidators and required array (gh-6341)', function() {
       const RecordingSchema = new Schema({ name: String });
 

@@ -205,6 +205,31 @@ expect<mongoose.ApplyProjection<ProjectionDoc, { _id: false }>>().type.toBe<{ na
 type ProjectionSliceDoc = { _id: string; name: string; tags: string[]; meta: { title: string; list: number[] } };
 type NestedProjectionDoc = { _id: string; name: string; meta: { title: string; hidden: boolean } };
 expect<mongoose.ApplyProjection<NestedProjectionDoc, { name: 1; 'meta.title': 1 }>>().type.toBe<{ _id: string; name: string; meta: { title: string } }>();
+expect<mongoose.ApplyProjection<NestedProjectionDoc, { score: { $meta: 'textScore' } }>>()
+  .type.toBe<NestedProjectionDoc & { score?: number }>();
+expect<mongoose.ApplyProjection<NestedProjectionDoc, { age: 0, textScore: { $meta: 'textScore' } }>>()
+  .type.toBe<NestedProjectionDoc & { textScore?: number }>();
+expect<mongoose.ApplyProjection<NestedProjectionDoc, { name: 1, score: { $meta: 'textScore' } }>>()
+  .type.toBe<{ _id: string; name: string; score?: number }>();
+expect<mongoose.ApplyProjection<NestedProjectionDoc, { _id: 1, key: { $meta: 'indexKey' } }>>()
+  .type.toBe<{ _id: string; key?: any }>();
+// MongoDB overwrites `name` with the score, but hydrated documents cast it back to a string
+expect<mongoose.ApplyProjection<NestedProjectionDoc, { name: { $meta: 'textScore' } }>>().type.toBe<NestedProjectionDoc>();
+expect<mongoose.ApplyProjection<NestedProjectionDoc, { _id: 1, name: { $meta: 'textScore' } }>>().type.toBe<{ _id: string; name: string }>();
+expect<mongoose.ApplyProjection<NestedProjectionDoc, { 'name.score': { $meta: 'textScore' } }>>().type.toBe<NestedProjectionDoc>();
+expect<mongoose.ApplyProjection<NestedProjectionDoc, { 'meta.score': { $meta: 'textScore' } }>>()
+  .type.toBe<{ _id: string; name: string; meta: { title: string; hidden: boolean; score?: number } }>();
+expect<mongoose.ApplyProjection<NestedProjectionDoc, { name: 1, 'meta.score': { $meta: 'textScore' } }>>()
+  .type.toBe<{ _id: string; name: string; meta: { score?: number } }>();
+expect<mongoose.ApplyProjection<NestedProjectionDoc, { 'meta.hidden': 0, 'meta.score': { $meta: 'textScore' } }>>()
+  .type.toBe<{ _id: string; name: string; meta: { title: string; score?: number } }>();
+expect<mongoose.ApplyProjection<NestedProjectionDoc, { 'foo.bar.score': { $meta: 'textScore' } }>>()
+  .type.toBe<NestedProjectionDoc & { foo?: { bar?: { score?: number } } }>();
+// Inclusion projections add `| undefined` to optional parents, same as `{ 'meta.title': 1 }` with an optional `meta`
+expect<mongoose.ApplyProjection<NestedProjectionDoc, { name: 1, 'foo.bar.score': { $meta: 'textScore' } }>>()
+  .type.toBe<{ _id: string; name: string; foo?: { bar?: { score?: number } | undefined } | undefined }>();
+expect<mongoose.ApplyProjection<{ _id: string; arr: { a: number }[] }, { 'arr.score': { $meta: 'textScore' } }>>()
+  .type.toBe<{ _id: string; arr: { a: number; score?: number }[] }>();
 expect<mongoose.ApplyProjection<NestedProjectionDoc, { 'meta.title': 1 }>>().type.toBe<{ _id: string; meta: { title: string } }>();
 expect<mongoose.ApplyProjection<NestedProjectionDoc, { 'meta.hidden': 0 }>>().type.toBe<{ _id: string; name: string; meta: { title: string } }>();
 expect<mongoose.ApplyProjection<{ _id: string; meta: any }, { 'meta.title': 1 }>>().type.toBe<{ _id: string; meta: any }>();
@@ -1248,6 +1273,12 @@ async function nestedProjectionOnDocumentArrayWithMethods() {
   expect(excluded.items[0]).type.not.toHaveProperty('a');
   expect(excluded.items[0]).type.toHaveProperty('b');
   expect(excluded.items[0]).type.toHaveProperty('itemMethod');
+
+  const meta: mongoose.ApplyProjection<Parent, { 'items.a': 1, 'items.score': { $meta: 'textScore' } }> = {} as any;
+  expect(meta.items[0].score).type.toBe<number | undefined>();
+  expect(meta.items[0]).type.toHaveProperty('a');
+  expect(meta.items[0]).type.not.toHaveProperty('b');
+  expect(meta.items[0]).type.toHaveProperty('itemMethod');
 }
 
 async function threeLevelNestedProjection() {

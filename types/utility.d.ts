@@ -81,12 +81,50 @@ declare module 'mongoose' {
       ? IsNonDefiningProjection<Projection[Key], Key, Projection> extends true ? never : ProjectionPath<Key>
       : never
   }[keyof Projection];
-  // `$slice` doesn't set the mode, but in an inclusion projection the sliced path is part of the result.
-  type SliceProjectionKeys<Projection> = {
+  // `$slice` and `$meta` don't set the mode, but in an inclusion projection their paths are part of the result.
+  type SliceAndMetaProjectionKeys<Projection> = {
     [Key in keyof Projection]-?: Key extends string
-      ? Projection[Key] extends { $slice: any } ? ProjectionPath<Key> : never
+      ? Projection[Key] extends { $slice: any } | { $meta: any } ? ProjectionPath<Key> : never
       : never
   }[keyof Projection];
+  // `$meta` adds a path without setting the mode, creating any missing parent objects. Paths already in `T` keep their
+  // type: MongoDB overwrites them with the metadata, but hydrated documents cast it back to the schema type. Added paths
+  // are optional because hydrated documents only expose them through `get()` and `toObject()`, and MongoDB leaves the
+  // metadata out when it isn't available, like `indexKey` on a collection scan. `Prefix` is the path to `T`.
+  type AddMetaProjectionPaths<T, Projection, Prefix extends string = '', Keys = {
+    [Key in keyof Projection]-?: IfAny<
+      Projection[Key],
+      never,
+      Projection[Key] extends { $meta: any } ? Key extends `${Prefix}${infer Rest}` ? Rest : never : never
+    >
+  }[keyof Projection]> = IfAny<
+    T,
+    T,
+    [Keys] extends [never]
+      ? T
+      : {
+        [K in keyof T]: K extends Exclude<ProjectionRoot<Keys>, Keys>
+          ? AddNestedMetaProjectionPaths<T[K], Projection, `${Prefix}${K & string}.`>
+          : T[K]
+      } & {
+        [K in Exclude<ProjectionRoot<Keys>, keyof T> & string]?: K extends Keys
+          ? Projection[`${Prefix}${K}` & keyof Projection] extends { $meta: 'textScore' } ? number : any
+          : AddMetaProjectionPaths<{}, Projection, `${Prefix}${K}.`>
+      }
+  >;
+  type AddNestedMetaProjectionPaths<T, Projection, Prefix extends string> = IfAny<
+    T,
+    T,
+    T extends Types.DocumentArray<infer Raw, infer Hydrated>
+      ? IfAny<Raw, T, ProjectedDocumentArray<Raw, Hydrated, AddMetaProjectionPaths<Raw, Projection, Prefix>>>
+      : T extends ProjectionScalar | ProjectionOpaque
+        ? T
+        : T extends Array<infer Item>
+          ? AddNestedMetaProjectionPaths<Item, Projection, Prefix>[]
+          : T extends AnyObject
+            ? AddMetaProjectionPaths<T, Projection, Prefix>
+            : T
+  >;
   type DefiningProjectionValues<Projection> = {
     [Key in keyof Projection]-?: IsNonDefiningProjection<Projection[Key], Key, Projection> extends true ? never : Projection[Key]
   }[keyof Projection];
@@ -95,10 +133,10 @@ declare module 'mongoose' {
     ? T
     : Projection extends AnyObject
       ? [DefiningProjectionKeys<Projection>] extends [never]
-        ? T
+        ? AddMetaProjectionPaths<T, Projection>
         : Exclude<DefiningProjectionValues<Projection>, 0 | false | undefined> extends never
-          ? OmitProjectedPaths<T, DefiningProjectionKeys<Projection>>
-          : PickProjectedPaths<T, DefiningProjectionKeys<Projection> | SliceProjectionKeys<Projection>> &
+          ? OmitProjectedPaths<AddMetaProjectionPaths<T, Projection>, DefiningProjectionKeys<Projection>>
+          : PickProjectedPaths<AddMetaProjectionPaths<T, Projection>, DefiningProjectionKeys<Projection> | SliceAndMetaProjectionKeys<Projection>> &
             (Projection extends { _id?: infer Id }
               ? Id extends 0 | false
                 ? unknown

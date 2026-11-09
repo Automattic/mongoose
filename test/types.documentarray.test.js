@@ -2092,12 +2092,10 @@ describe('types.documentarray', function() {
           { _id: new mongoose.Types.ObjectId(), name: 'c', qty: 3 }
         ]
       });
-      const prevItems = doc.items;
       const [a, b, c] = doc.items;
 
       doc.items = doc.toObject().items;
 
-      assert.strictEqual(doc.items, prevItems);
       assert.strictEqual(doc.items[0], a);
       assert.strictEqual(doc.items[1], b);
       assert.strictEqual(doc.items[2], c);
@@ -2113,7 +2111,7 @@ describe('types.documentarray', function() {
       });
     });
 
-    it('creates a new array when some elements\' data changed', function() {
+    it('moves unchanged subdocs at the same index to the new array when some elements\' data changed', function() {
       const doc = Test.hydrate({
         _id: new mongoose.Types.ObjectId(),
         items: [
@@ -2122,7 +2120,6 @@ describe('types.documentarray', function() {
           { _id: new mongoose.Types.ObjectId(), name: 'c', qty: 3 }
         ]
       });
-      const prevItems = doc.items;
       const [a, b, c] = doc.items;
 
       const items = doc.toObject().items;
@@ -2130,33 +2127,43 @@ describe('types.documentarray', function() {
       delete items[2].name;
       doc.items = items;
 
-      assert.notStrictEqual(doc.items, prevItems);
+      assert.strictEqual(doc.items[0], a);
+      assert.strictEqual(a.parentArray(), doc.items);
+      assert.notStrictEqual(doc.items[1], b);
       assert.strictEqual(doc.items[1].qty, 20);
       // Overwriting shouldn't keep fields from the old subdoc, see gh-5523
+      assert.notStrictEqual(doc.items[2], c);
       assert.strictEqual(doc.items[2].name, undefined);
       assert.strictEqual(doc.items[2].qty, 3);
+    });
 
-      // Subdocs shouldn't be shared between the old and new arrays: each subdoc can only
-      // have one parent array, so sharing would leave one of the arrays inconsistent
-      for (const item of doc.items) {
-        assert.ok(!prevItems.includes(item));
-        assert.strictEqual(item.parentArray(), doc.items);
-      }
-      assert.deepStrictEqual(prevItems.map(item => item.name), ['a', 'b', 'c']);
-      for (const item of [a, b, c]) {
-        assert.strictEqual(item.parentArray(), prevItems);
-      }
+    it('does not reuse subdocs that moved to a different index', async function() {
+      const doc = await Test.create({ items: [{ name: 'a', qty: 1 }, { name: 'b', qty: 2 }] });
 
-      assert.deepStrictEqual(doc.$getChanges(), {
-        $set: {
-          items: [
-            { _id: a._id, name: 'a', qty: 1 },
-            { _id: b._id, name: 'b', qty: 20 },
-            { _id: c._id, qty: 3 }
-          ]
-        },
-        $inc: { __v: 1 }
+      doc.items = [{ name: 'z', qty: 0 }, ...doc.toObject().items];
+      await doc.save();
+      doc.items[1].qty = 100;
+      await doc.save();
+
+      const fromDb = await Test.findById(doc._id).lean().orFail();
+      assert.deepStrictEqual(fromDb.items.map(item => item.qty), [0, 100, 2]);
+    });
+
+    it('leaves existing subdocs in the existing array if casting a later element fails', function() {
+      const Test1 = db.model('Test1', new Schema({
+        items: [new Schema({ name: String }, { strict: 'throw' })]
+      }));
+      const doc = Test1.hydrate({
+        _id: new mongoose.Types.ObjectId(),
+        items: [{ _id: new mongoose.Types.ObjectId(), name: 'a' }]
       });
+      const prevItems = doc.items;
+      const [a] = doc.items;
+
+      doc.items = [{ _id: a._id, name: 'a' }, { notInSchema: 1 }];
+
+      assert.strictEqual(doc.items, prevItems);
+      assert.strictEqual(a.parentArray(), prevItems);
     });
   });
 });

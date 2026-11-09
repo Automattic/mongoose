@@ -2357,6 +2357,53 @@ describe('model: findOneAndUpdate:', function() {
     assert.equal(err.path, 'accessories.0.additionals.0.k');
   });
 
+  it('only skips update validators for paths underneath an already validated subdocument', async function() {
+    let validateNameCalls = 0;
+    let validateSubCalls = 0;
+
+    const subSchema = new Schema({
+      v: {
+        type: String,
+        validate: function() {
+          validateSubCalls++;
+          return true;
+        }
+      }
+    });
+    const listSchema = new Schema({
+      name: {
+        type: String,
+        validate: function() {
+          validateNameCalls++;
+          return true;
+        }
+      },
+      kind: { type: String, enum: ['a', 'b'] },
+      sub: subSchema,
+      items: [{ kind: { type: String, enum: ['a', 'b'] } }]
+    });
+    const Test = db.model('Test', new Schema({ lists: [listSchema] }));
+
+    const $set = {};
+    for (let i = 0; i < 10; ++i) {
+      $set['lists.' + i] = { name: 'list ' + i, kind: 'a', sub: { v: 'v' }, items: [{ kind: i === 1 ? 'invalid' : 'a' }] };
+    }
+    // `lists.10.kind` is not underneath `lists.1`, so it must still be validated
+    $set['lists.10.kind'] = 'invalid';
+
+    const err = await Test.findOneAndUpdate(
+      { _id: new mongoose.Types.ObjectId() },
+      { $set },
+      { runValidators: true }
+    ).then(() => null, err => err);
+
+    assert.equal(validateNameCalls, 10);
+    assert.equal(validateSubCalls, 10);
+    assert.ok(err);
+    assert.equal(err.name, 'ValidationError');
+    assert.deepStrictEqual(Object.keys(err.errors).sort(), ['lists.1.items.0.kind', 'lists.10.kind']);
+  });
+
   describe('deprecation warnings for `new` and `returnOriginal` options (gh-15972)', function() {
     afterEach(function() {
       sinon.restore();

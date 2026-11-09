@@ -3281,6 +3281,21 @@ describe('Query', function() {
       assert.equal(res.length, 2);
       assert.deepEqual(res.map(doc => doc.name).sort(), ['Jean-Luc Picard', 'Will Riker']);
     });
+
+    it('does not share mongoose options or nested populate options with the original', async function() {
+      const Publisher = db.model('Publisher', new Schema({ name: String }));
+      const Author = db.model('Author', new Schema({ name: String, publisher: { type: 'ObjectId', ref: 'Publisher' } }));
+      const Article = db.model('Article', new Schema({ author: { type: 'ObjectId', ref: 'Author' } }));
+      const publisher = await Publisher.create({ name: 'Acme Books' });
+      const author = await Author.create({ name: 'Alice', publisher: publisher._id });
+      await Article.create({ author: author._id });
+      const query = Article.find().populate({ path: 'author', populate: { path: 'publisher' } });
+
+      await query.clone().lean();
+      const articles = await query;
+
+      assert.ok(articles[0].author.publisher instanceof mongoose.Document);
+    });
   });
 
   it('casts filter according to discriminator schema if in filter (gh-8881)', async function() {
@@ -4745,50 +4760,67 @@ describe('Query', function() {
   });
 
   it('propagates readPreference to populate options if read() is called after populate() (gh-15553)', async function() {
-    const schema = new Schema({ name: String, age: Number, friends: [{ type: 'ObjectId', ref: 'Person' }] });
-    const Person = db.model('Person', schema);
+    const { Person, calls } = await createPopulateReadContext();
 
     let query = Person.find({}).populate('friends');
     query.read('secondaryPreferred');
     await query.exec();
-    assert.strictEqual(query._mongooseOptions.populate.friends.options.readPreference.mode, 'secondaryPreferred');
+    assert.strictEqual(calls.pop().readPreference.mode, 'secondaryPreferred');
 
     query = Person.find({}).read('secondary').populate('friends');
     query.read('secondaryPreferred');
     await query.exec();
-    assert.strictEqual(query._mongooseOptions.populate.friends.options.readPreference.mode, 'secondaryPreferred');
+    assert.strictEqual(calls.pop().readPreference.mode, 'secondaryPreferred');
 
     query = Person.find({}).read('secondaryPreferred').populate('friends');
     await query.exec();
-    assert.strictEqual(query._mongooseOptions.populate.friends.options.readPreference.mode, 'secondaryPreferred');
+    assert.strictEqual(calls.pop().readPreference.mode, 'secondaryPreferred');
 
     query = Person.find({}).read('primaryPreferred').populate({ path: 'friends', options: { readPreference: 'secondaryPreferred' } });
     await query.exec();
-    assert.strictEqual(query._mongooseOptions.populate.friends.options.readPreference, 'secondaryPreferred');
+    assert.strictEqual(calls.pop().readPreference, 'secondaryPreferred');
   });
 
   it('propagates readConcern to populate options if readConcern() is called after populate() (gh-15553)', async function() {
-    const schema = new Schema({ name: String, age: Number, friends: [{ type: 'ObjectId', ref: 'Person' }] });
-    const Person = db.model('Person', schema);
+    const { Person, calls } = await createPopulateReadContext();
 
     let query = Person.find({}).populate('friends');
     query.readConcern('majority');
     await query.exec();
-    assert.strictEqual(query._mongooseOptions.populate.friends.options.readConcern.level, 'majority');
+    assert.strictEqual(calls.pop().readConcern.level, 'majority');
 
     query = Person.find({}).readConcern('local').populate('friends');
     query.readConcern('majority');
     await query.exec();
-    assert.strictEqual(query._mongooseOptions.populate.friends.options.readConcern.level, 'majority');
+    assert.strictEqual(calls.pop().readConcern.level, 'majority');
 
     query = Person.find({}).readConcern('majority').populate('friends');
     await query.exec();
-    assert.strictEqual(query._mongooseOptions.populate.friends.options.readConcern.level, 'majority');
+    assert.strictEqual(calls.pop().readConcern.level, 'majority');
 
     query = Person.find({}).readConcern('majority').populate({ path: 'friends', options: { readConcern: 'local' } });
     await query.exec();
-    assert.strictEqual(query._mongooseOptions.populate.friends.options.readConcern, 'local');
+    assert.strictEqual(calls.pop().readConcern, 'local');
   });
+
+  async function createPopulateReadContext() {
+    const Friend = db.model('Friend', new Schema({ name: String }));
+    const Person = db.model('Person', new Schema({ friends: [{ type: 'ObjectId', ref: 'Friend' }] }));
+    const friend = await Friend.create({ name: 'Alice' });
+    await Person.create({ friends: [friend._id] });
+    const calls = [];
+    // Record Mongoose options, then read fixtures from primary to avoid replication lag.
+    const find = Friend.collection.find;
+    Friend.collection.find = function(filter, options) {
+      calls.push(options);
+      return find.call(this, filter, { ...options, readPreference: 'primary' });
+    };
+    const findPerson = Person.collection.find;
+    Person.collection.find = function(filter, options) {
+      return findPerson.call(this, filter, { ...options, readPreference: 'primary' });
+    };
+    return { Person, calls };
+  }
 
   it('does not error out if strict "throw" and db document has extra fields', async function() {
     const schema = new Schema({
@@ -5278,6 +5310,59 @@ describe('Query', function() {
         const count = await Person.countDocuments();
         assert.strictEqual(count, 0);
       });
+    });
+  });
+
+  describe('schema-level select with nested schemas', function() {
+    it('applies select options from nested schemas', function() {
+      const childSchema = new Schema({ name: String, secret: { type: String, select: false } }, { _id: false });
+      const Test = db.model('Test', new Schema({ title: String, children: [childSchema] }));
+
+      const query = Test.find();
+      query._applyPaths();
+      assert.deepStrictEqual(query._fields, { 'children.secret': 0 });
+    });
+
+    it('projects in embedded discriminator keys added after the model is compiled', function() {
+      const eventSchema = new Schema({ message: String }, { discriminatorKey: 'kind', _id: false });
+      const Test = db.model('Test', new Schema({ name: String, events: [eventSchema] }));
+      let query = Test.find().select({ 'events.message': 1 });
+      query._applyPaths();
+      assert.deepStrictEqual(query._fields, { 'events.message': 1 });
+
+      Test.schema.path('events').discriminator('Clicked', new Schema({ element: String }, { _id: false }));
+
+      query = Test.find().select({ 'events.message': 1 });
+      query._applyPaths();
+      assert.deepStrictEqual(query._fields, { 'events.message': 1, 'events.kind': 1 });
+    });
+
+    it('projects in nested embedded discriminator keys added after the schema is created', function() {
+      const eventSchema = new Schema({ message: String }, { discriminatorKey: 'kind', _id: false });
+      const shapeSchema = new Schema({ name: String }, { discriminatorKey: 'kind', _id: false });
+      const testSchema = new Schema({
+        outer: new Schema({ events: [eventSchema], shape: shapeSchema }, { _id: false })
+      });
+      testSchema.path('outer').schema.path('events').discriminator('Clicked', new Schema({ element: String }, { _id: false }));
+      testSchema.path('outer').schema.path('shape').discriminator('Circle', new Schema({ radius: Number }, { _id: false }));
+
+      const Test = db.model('Test', testSchema);
+      let query = Test.find().select({ 'outer.events.message': 1, 'outer.shape.name': 1 });
+      query._applyPaths();
+      assert.deepStrictEqual(query._fields, {
+        'outer.events.message': 1,
+        'outer.shape.name': 1,
+        'outer.events.kind': 1,
+        'outer.shape.kind': 1
+      });
+
+      query = Test.find().select({ 'outer.events.message': 1 });
+      query._applyPaths();
+      assert.deepStrictEqual(query._fields, { 'outer.events.message': 1, 'outer.events.kind': 1 });
+
+      query = Test.find().select({ 'outer.shape.name': 1 });
+      query._applyPaths();
+      assert.deepStrictEqual(query._fields, { 'outer.shape.name': 1, 'outer.shape.kind': 1 });
     });
   });
 });

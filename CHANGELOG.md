@@ -1,3 +1,11 @@
+9.12.0 / 2026-11-04
+===================
+ * feat: upgrade to mongodb driver 7.8 #16772 #16667
+ * perf: improve for document arrays: cache paths with defaults and schemas with select paths; avoid unnecessary $isModified() lookup #16595
+ * fix: make recompileSchema recompute derived caches and delay _preCompile() until an actual model is compiled (not subdocs or doc arrays) #16595
+ * fix(array): compare UUIDs by value in indexOf() so pull() and addToSet() work #16606 [luantaraschi](https://github.com/luantaraschi)
+ * docs(query): remove unused use$geoWithin docs and property #16589 #16583
+
 9.11.5 / 2026-11-03
 ===================
  * fix(query): pass explain verbosity to the driver cursor in find() #16635 [jasontd92](https://github.com/jasontd92)

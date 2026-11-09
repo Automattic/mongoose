@@ -5,6 +5,8 @@
 'use strict';
 
 const { once } = require('events');
+const { Writable } = require('stream');
+const { pipeline } = require('stream/promises');
 const start = require('./common');
 
 const assert = require('assert');
@@ -1043,6 +1045,34 @@ describe('QueryCursor', function() {
       closeStub.restore();
       await driverCursor.close();
     }
+  });
+
+  it('emits the error passed to destroy() (gh-16609)', async function() {
+    const cursor = Model.find().cursor();
+    const driverCursor = await cursor.getDriverCursor();
+    const destroyError = new Error('consumer stopped reading');
+
+    cursor.destroy(destroyError);
+
+    const [error] = await once(cursor, 'error');
+    assert.strictEqual(error, destroyError);
+    assert.ok(driverCursor.closed);
+  });
+
+  it('does not re-emit a read error when pipeline() destroys the cursor (gh-16609)', async function() {
+    const cursor = Model.find().cursor();
+    const driverCursor = await cursor.getDriverCursor();
+    const readError = new Error('driver read failed');
+    sinon.stub(driverCursor, 'next').rejects(readError);
+    const errors = [];
+    cursor.on('error', error => errors.push(error));
+    const closed = new Promise(resolve => cursor.once('close', resolve));
+
+    const sink = new Writable({ objectMode: true, write(doc, encoding, callback) { callback(); } });
+    await assert.rejects(pipeline(cursor, sink), error => error === readError);
+    await closed;
+
+    assert.deepStrictEqual(errors, [readError]);
   });
 
   it('handles destroy() before cursor is created (gh-14966)', async function() {

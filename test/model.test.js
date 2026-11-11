@@ -4612,6 +4612,40 @@ describe('Model', function() {
         assert.strictEqual(doc.str, '1');
         assert.strictEqual(doc.num, 2);
       });
+      
+      it('applies sanitizeFilter (gh-XXXXX)', async function() {
+        const schema = new Schema({ name: String });
+        const M = db.model('Test', schema);
+        await M.create({ name: 'test' });
+
+        // Test updateOne
+        const err1 = await M.bulkWrite([
+          { updateOne: { filter: { name: { $ne: null } }, update: { $set: { name: 'hacked' } } } }
+        ], { sanitizeFilter: true }).then(() => null, err => err);
+        assert.ok(err1);
+        assert.ok(err1.name === 'CastError' || err1.name === 'MongooseBulkWriteError');
+
+        // Test updateMany
+        const err2 = await M.bulkWrite([
+          { updateMany: { filter: { name: { $ne: null } }, update: { $set: { name: 'hacked' } } } }
+        ], { sanitizeFilter: true }).then(() => null, err => err);
+        assert.ok(err2);
+        assert.ok(err2.name === 'CastError' || err2.name === 'MongooseBulkWriteError');
+
+        // Test deleteMany
+        const err3 = await M.bulkWrite([
+          { deleteMany: { filter: { name: { $ne: null } } } }
+        ], { sanitizeFilter: true }).then(() => null, err => err);
+        assert.ok(err3);
+        assert.ok(err3.name === 'CastError' || err3.name === 'MongooseBulkWriteError');
+
+        // Test replaceOne
+        const err4 = await M.bulkWrite([
+          { replaceOne: { filter: { name: { $ne: null } }, replacement: { name: 'hacked' } } }
+        ], { sanitizeFilter: true }).then(() => null, err => err);
+        assert.ok(err4);
+        assert.ok(err4.name === 'CastError' || err4.name === 'MongooseBulkWriteError');
+      });
 
       it('setDefaultsOnInsert (gh-5708)', async function() {
         const schema = new Schema({

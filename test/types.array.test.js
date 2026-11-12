@@ -1169,6 +1169,19 @@ describe('types array', function() {
       assert.deepStrictEqual(added.map(id => id.toString()), [uuid3]);
       assert.deepStrictEqual(doc.ids.map(id => id.toString()), [uuid1, uuid2, uuid3]);
     });
+
+    it('works with BigInts', async function() {
+      const Test = db.model('Test', new Schema({ nums: [BigInt] }));
+      const doc = await Test.create({ nums: [1n, 2n] });
+
+      const added = doc.nums.addToSet(2n, 3n);
+      assert.deepStrictEqual(added, [3n]);
+      assert.deepStrictEqual(doc.nums.toObject(), [1n, 2n, 3n]);
+
+      await doc.save();
+      const fromDb = await Test.findById(doc._id).orFail();
+      assert.deepStrictEqual(fromDb.nums.toObject(), [1n, 2n, 3n]);
+    });
   });
 
   describe('options', function() {

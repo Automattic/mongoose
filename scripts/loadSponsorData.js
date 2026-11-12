@@ -60,7 +60,11 @@ async function run() {
 
   const opencollectiveSponsors = await fetch('https://opencollective.com/mongoose/members.json')
     .then(res => res.json())
-    .then(res => res.filter(result => result.tier === 'sponsor' && result.isActive));
+    .then(res => res.filter(result => {
+      // Preserve the rates for sponsors who joined before June 2026.
+      return result.tier === 'sponsor' && result.isActive &&
+        (result.createdAt < '2026-06-01' || result.lastTransactionAmount >= 375);
+    }));
 
   for (const sponsor of opencollectiveSponsors) {
     const override = await OpenCollectiveSponsor.findOne({ openCollectiveId: sponsor['MemberId'] });

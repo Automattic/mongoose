@@ -1,3 +1,8 @@
+8.24.9 / 2026-11-12
+===================
+ * fix(document): allow setting dotted paths 3+ levels deep underneath single nested subdocuments #16691 [RagedPanda](https://github.com/RagedPanda)
+ * fix(connection): don't disable autoIndex/autoCreate for a primary ReadPreference instance [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+
 9.12.1 / 2026-11-09
 ===================
  * perf(update): avoid quadratic ancestor lookup in update validators and validate nested array subdocs once #16586 [https://github.com/Re-cool](https://github.com/Re-cool)

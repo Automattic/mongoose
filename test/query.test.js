@@ -3607,6 +3607,36 @@ describe('Query', function() {
     assert.deepEqual(q._conditions, { username: 'val', pwd: { $gt: null } });
   });
 
+  it('sanitizeFilter rejects top-level operators like $_internalSchemaXor and $comment', async function() {
+    const Test = db.model('Test', Schema({ username: String, pwd: String }));
+    await Test.create({ username: 'val', pwd: 'my secret' });
+
+    await assert.rejects(
+      Test.findOne({
+        username: 'val',
+        $_internalSchemaXor: [{ pwd: { $regex: '^my' } }, { $alwaysFalse: 1 }]
+      }).setOptions({ sanitizeFilter: true }),
+      /\$_internalSchemaXor is not allowed with sanitizeFilter/
+    );
+    await assert.rejects(
+      Test.findOne({
+        $or: [{ $_internalSchemaXor: [{ pwd: { $regex: '^my' } }, { $alwaysFalse: 1 }] }]
+      }).setOptions({ sanitizeFilter: true }),
+      /\$_internalSchemaXor is not allowed with sanitizeFilter/
+    );
+
+    await assert.rejects(
+      Test.findOne({ username: 'val', $comment: 'test' }).setOptions({ sanitizeFilter: true }),
+      /\$comment is not allowed with sanitizeFilter/
+    );
+
+    // `comment()` sets the comment outside of the filter, so `sanitizeFilter` allows it
+    const doc = await Test.findOne({ $or: [{ username: 'val' }] }).
+      comment('test').
+      setOptions({ sanitizeFilter: true });
+    assert.equal(doc.pwd, 'my secret');
+  });
+
   it('sanitizeFilter disables implicit $in (gh-14657)', function() {
     const schema = new mongoose.Schema({
       name: {
@@ -5129,6 +5159,32 @@ describe('Query', function() {
           Person.deleteMany({ $nor: [{}] }, { requireFilter: true }),
           /Empty or invalid filter not allowed with requireFilter enabled/
         );
+      });
+
+      it('throws error for filters that match every document when requireFilter is true', async function() {
+        await assert.rejects(
+          Person.deleteMany({ $comment: 'test' }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+        await assert.rejects(
+          Person.deleteMany({ $alwaysTrue: 1 }, { requireFilter: true }).setOptions({ strictQuery: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+        await assert.rejects(
+          Person.deleteMany({ $and: [{ $comment: 'test' }] }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+        await assert.rejects(
+          Person.deleteMany({ $or: [{ name: 'Alice' }, { $alwaysTrue: 1 }] }, { requireFilter: true }),
+          /Empty or invalid filter not allowed with requireFilter enabled/
+        );
+        assert.strictEqual(await Person.countDocuments(), 2);
+      });
+
+      it('deletes with field filter and empty $and when requireFilter is true', async function() {
+        const result = await Person.deleteMany({ name: 'Alice', $and: [{}] }, { requireFilter: true });
+        assert.strictEqual(result.deletedCount, 1);
+        assert.strictEqual(await Person.countDocuments(), 1);
       });
 
       it('deletes with non-empty filter when requireFilter is true', async function() {

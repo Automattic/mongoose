@@ -1253,6 +1253,37 @@ describe('model: findOneAndUpdate:', function() {
         then(() => assert.equal(called, 0));
     });
 
+    it('validators run on mixed paths in subdocuments (gh-16707)', async function() {
+      let called = [];
+      const childSchema = new Schema({
+        name: String,
+        mixed: {
+          type: 'Mixed',
+          validate: v => { called.push(v); return false; }
+        }
+      }, { _id: false });
+      const Test = db.model('Test', new Schema({ single: childSchema, arr: [childSchema] }));
+
+      const _id = new mongoose.Types.ObjectId();
+      await Test.collection.insertOne({ _id, arr: [{ name: 'test' }] });
+      const opts = { runValidators: true };
+
+      for (const path of ['single.mixed', 'arr.0.mixed', 'arr.$.mixed']) {
+        called = [];
+        const err = await Test.findOneAndUpdate({ _id, 'arr.name': 'test' }, { $set: { [path]: { key: 'value' } } }, opts).
+          then(() => null, err => err);
+        assert.ok(err, path);
+        assert.equal(err.name, 'ValidationError', path);
+        assert.deepStrictEqual(called, [{ key: 'value' }], path);
+      }
+
+      for (const path of ['single.mixed.key', 'arr.0.mixed.key', 'arr.$.mixed.mixed']) {
+        called = [];
+        await Test.findOneAndUpdate({ _id, 'arr.name': 'test' }, { $set: { [path]: 'value' } }, opts);
+        assert.deepStrictEqual(called, [], path);
+      }
+    });
+
     it('should work with arrays (gh-3035)', async function() {
       const testSchema = new mongoose.Schema({
         id: String,

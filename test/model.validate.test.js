@@ -280,6 +280,17 @@ describe('model: validate: ', function() {
     }, { message: 'Validation failed: name: Validator failed for path `name` with value `1`' });
   });
 
+  it('Model.validate() pathsToSkip string only skips exact paths', async function() {
+    const Model = mongoose.model('Test', new Schema({
+      name: { type: String, required: true },
+      username: { type: String, required: true }
+    }));
+
+    const err = await Model.validate({}, { pathsToSkip: 'username' }).then(() => null, err => err);
+    assert.ok(err);
+    assert.deepEqual(Object.keys(err.errors), ['name']);
+  });
+
   it('runs validation on casted paths even if cast error happened', async function() {
     const Model = mongoose.model('Test', new Schema({
       invalid1: {

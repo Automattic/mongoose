@@ -61,6 +61,11 @@ function gh15756() {
   mongoose.set('updatePipeline', true);
 }
 
+function setForceRepopulateAndAutoSearchIndex() {
+  mongoose.set('forceRepopulate', false);
+  mongoose.set('autoSearchIndex', true);
+}
+
 function gh15972() {
   mongoose.set('returnDocument', 'before');
   mongoose.set('returnDocument', 'after');

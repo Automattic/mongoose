@@ -41,6 +41,13 @@ declare module 'mongoose' {
     autoIndex?: boolean;
 
     /**
+     * Set to `true` to automatically create Atlas search indexes defined in your schemas.
+     *
+     * @default false
+     */
+    autoSearchIndex?: boolean;
+
+    /**
      * enable/disable mongoose's buffering mechanism for all connections and models.
      *
      * @default true
@@ -85,6 +92,13 @@ declare module 'mongoose' {
     | { color?: boolean; shell?: boolean; timestamp?: boolean; }
     | stream.Writable
     | ((collectionName: string, methodName: string, ...methodArgs: any[]) => void);
+
+    /**
+     * Set to `false` to prevent Mongoose from repopulating paths that are already populated.
+     *
+     * @default true
+     */
+    forceRepopulate?: boolean;
 
     /**
      * If `true`, adds a `id` virtual to all schemas unless overwritten on a per-schema basis.

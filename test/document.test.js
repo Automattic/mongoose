@@ -13337,6 +13337,24 @@ describe('document', function() {
     }
   });
 
+  it('sets dotted paths through a document array element into nested paths (gh-16698)', function() {
+    const itemSchema = new Schema({ name: String, a: { b: { c: { d: Number } } } });
+    const Test = db.model('Test', new Schema({ items: [itemSchema] }));
+    const hydrated = () => Test.hydrate({
+      _id: new mongoose.Types.ObjectId(),
+      items: [{ _id: new mongoose.Types.ObjectId(), name: 'x', a: { b: { c: { d: 1 } } } }]
+    });
+
+    const leaf = hydrated();
+    leaf.set('items.0.a.b.c.d', 2);
+    assert.ok(leaf.isModified('items.0.a.b.c.d'));
+    assert.deepStrictEqual(leaf.toObject().items[0].a, { b: { c: { d: 2 } } });
+
+    const nested = hydrated();
+    nested.set('items.0.a.b.c', { d: 2 });
+    assert.deepStrictEqual(nested.toObject().items[0].a, { b: { c: { d: 2 } } });
+  });
+
   it('sets dotted paths 3+ levels deep underneath a single nested subdocument (gh-16690)', async function() {
     const settingsSchema = new Schema({
       plan: String,

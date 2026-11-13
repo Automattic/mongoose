@@ -420,4 +420,99 @@ describe('document', function() {
       }
     });
   });
+
+  describe('nested projections (gh-16373)', function() {
+    it('distinguishes path prefixes from ancestors and descendants', function() {
+      const doc = new TestDocument(undefined, { 'nested.deep': 1, 'nested2.yup.nested': 1 });
+
+      for (const path of ['nested', 'nested.deep', 'nested.deep.x', 'nested2', 'nested2.yup']) {
+        assert.strictEqual(doc.isSelected(path), true, path);
+      }
+      for (const path of ['nest', 'nested.dee', 'nested.deeply', 'nested.age', 'nested2.yup.other']) {
+        assert.strictEqual(doc.isSelected(path), false, path);
+      }
+      assert.strictEqual(doc.isDirectSelected('nested'), false);
+      assert.strictEqual(doc.isDirectSelected('nested.deep'), true);
+    });
+
+    it('keeps parents and siblings selected when nested leaves are excluded', function() {
+      const doc = new TestDocument(undefined, { 'nested.deep.x': 0, 'nested2.yup.nested': 0 });
+
+      for (const path of ['nested', 'nested.deep', 'nested.deep.y', 'nested2', 'nested2.yup', 'test']) {
+        assert.strictEqual(doc.isSelected(path), true, path);
+      }
+      for (const path of ['nested.deep.x', 'nested.deep.x.child', 'nested2.yup.nested']) {
+        assert.strictEqual(doc.isSelected(path), false, path);
+      }
+    });
+
+    it('preserves projection order when both an ancestor and a descendant match', function() {
+      const ancestorFirst = new TestDocument(undefined, { a: 0, 'a.b.c': 0 });
+      const descendantFirst = new TestDocument(undefined, { 'a.b.c': 0, a: 0 });
+
+      assert.strictEqual(ancestorFirst.isSelected('a.b'), false);
+      assert.strictEqual(descendantFirst.isSelected('a.b'), true);
+      assert.strictEqual(ancestorFirst.isSelected('a.b.c.d'), false);
+      assert.strictEqual(descendantFirst.isSelected('a.b.c.d'), false);
+    });
+
+    it('preserves selection of paths containing empty segments', function() {
+      const doc = new TestDocument(undefined, { 'a.b.': 0, 'a..c': 0 });
+
+      assert.strictEqual(doc.isSelected('a'), true);
+      assert.strictEqual(doc.isSelected('a.b'), false);
+      assert.strictEqual(doc.isSelected('a.b.child'), true);
+      assert.strictEqual(doc.isSelected('a.b..child'), false);
+      assert.strictEqual(doc.isSelected('a.'), true);
+      assert.strictEqual(doc.isSelected('a..c.child'), false);
+    });
+
+    it('keeps _id handling separate from nested path selection', function() {
+      const doc = new TestDocument(undefined, { _id: 0, 'nested.deep': 1 });
+
+      assert.strictEqual(doc.isSelected('_id'), false);
+      assert.strictEqual(doc.isSelected('_id.child'), false);
+      assert.strictEqual(doc.isSelected('nested.deep.x'), true);
+      assert.strictEqual(doc.isSelected(['test', 'nested.deep.x']), true);
+      assert.strictEqual(doc.isSelected('test nested.age'), false);
+    });
+
+    it('applies getters only to selected nested fields on hydrated documents', function() {
+      const getterCalls = [];
+      const schema = new Schema({
+        nested: {
+          selected: {
+            type: String,
+            get: value => {
+              getterCalls.push('selected');
+              return value.toUpperCase();
+            }
+          },
+          excluded: {
+            type: String,
+            get: () => {
+              getterCalls.push('excluded');
+              return 'unexpected';
+            }
+          }
+        },
+        other: {
+          type: String,
+          get: () => {
+            getterCalls.push('other');
+            return 'unexpected';
+          }
+        }
+      });
+      const Model = mongoose.model('NestedProjectionGetters', schema);
+      try {
+        const doc = Model.hydrate({ nested: { selected: 'value' } }, { 'nested.selected': 1 });
+
+        assert.deepStrictEqual(doc.toObject({ getters: true, virtuals: false }), { nested: { selected: 'VALUE' } });
+        assert.deepStrictEqual(getterCalls, ['selected']);
+      } finally {
+        mongoose.deleteModel('NestedProjectionGetters');
+      }
+    });
+  });
 });

@@ -1,6 +1,7 @@
 'use strict';
 
-const { Schema } = require('../common').mongoose;
+const mongoose = require('../common').mongoose;
+const { Schema } = mongoose;
 const assert = require('assert');
 const cast$expr = require('../../lib/helpers/query/cast$expr');
 
@@ -100,6 +101,28 @@ describe('castexpr', function() {
     res = cast$expr({ $in: [{ prop: '42' }, '$docs'] }, testSchema);
     res.$in[0] = res.$in[0].toBSON(); // So `deepStrictEqual()` doesn't complain about subdoc internals
     assert.deepStrictEqual(res, { $in: [{ prop: 42 }, '$docs'] });
+  });
+
+  it('casts $in when the search value is an expression', function() {
+    const testSchema = new Schema({ num: Number, nums: [Number], owner: 'ObjectId', ids: ['ObjectId'] });
+
+    let res = cast$expr({ $in: ['$num', '$nums'] }, testSchema);
+    assert.deepStrictEqual(res, { $in: ['$num', '$nums'] });
+
+    res = cast$expr({ $in: ['$owner', '$ids'] }, testSchema);
+    assert.deepStrictEqual(res, { $in: ['$owner', '$ids'] });
+
+    res = cast$expr({ $in: [{ $multiply: ['$num', '2'] }, '$nums'] }, testSchema);
+    assert.deepStrictEqual(res, { $in: [{ $multiply: ['$num', 2] }, '$nums'] });
+
+    res = cast$expr({ $in: [{ $literal: '42' }, '$nums'] }, testSchema);
+    assert.deepStrictEqual(res, { $in: [{ $literal: 42 }, '$nums'] });
+
+    const Test = mongoose.model('CastExprInDocument', new Schema({ name: String }));
+    const doc = new Test({ name: 'test' });
+    res = cast$expr({ $in: [doc, '$ids'] }, testSchema);
+    assert.ok(res.$in[0] instanceof mongoose.Types.ObjectId);
+    assert.strictEqual(res.$in[0].toHexString(), doc._id.toHexString());
   });
 
   it('casts $not (gh-11689)', function() {

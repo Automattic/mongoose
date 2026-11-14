@@ -102,6 +102,22 @@ describe('castexpr', function() {
     assert.deepStrictEqual(res, { $in: [{ prop: 42 }, '$docs'] });
   });
 
+  it('casts $in when the search value is an expression', function() {
+    const testSchema = new Schema({ num: Number, nums: [Number], owner: 'ObjectId', ids: ['ObjectId'] });
+
+    let res = cast$expr({ $in: ['$num', '$nums'] }, testSchema);
+    assert.deepStrictEqual(res, { $in: ['$num', '$nums'] });
+
+    res = cast$expr({ $in: ['$owner', '$ids'] }, testSchema);
+    assert.deepStrictEqual(res, { $in: ['$owner', '$ids'] });
+
+    res = cast$expr({ $in: [{ $multiply: ['$num', '2'] }, '$nums'] }, testSchema);
+    assert.deepStrictEqual(res, { $in: [{ $multiply: ['$num', 2] }, '$nums'] });
+
+    res = cast$expr({ $in: [{ $literal: '42' }, '$nums'] }, testSchema);
+    assert.deepStrictEqual(res, { $in: [{ $literal: 42 }, '$nums'] });
+  });
+
   it('casts $not (gh-11689)', function() {
     const testSchema = new Schema({ nums: [Number], docs: [new Schema({ prop: Number }, { _id: false })] });
 

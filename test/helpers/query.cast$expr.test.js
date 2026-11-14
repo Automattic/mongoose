@@ -1,6 +1,7 @@
 'use strict';
 
-const { Schema } = require('../common').mongoose;
+const mongoose = require('../common').mongoose;
+const { Schema } = mongoose;
 const assert = require('assert');
 const cast$expr = require('../../lib/helpers/query/cast$expr');
 
@@ -116,6 +117,12 @@ describe('castexpr', function() {
 
     res = cast$expr({ $in: [{ $literal: '42' }, '$nums'] }, testSchema);
     assert.deepStrictEqual(res, { $in: [{ $literal: 42 }, '$nums'] });
+
+    const Test = mongoose.model('CastExprInDocument', new Schema({ name: String }));
+    const doc = new Test({ name: 'test' });
+    res = cast$expr({ $in: [doc, '$ids'] }, testSchema);
+    assert.ok(res.$in[0] instanceof mongoose.Types.ObjectId);
+    assert.strictEqual(res.$in[0].toHexString(), doc._id.toHexString());
   });
 
   it('casts $not (gh-11689)', function() {

@@ -3535,6 +3535,36 @@ describe('Query', function() {
     assert.deepEqual(q._conditions, { username: 'val', pwd: { $gt: null } });
   });
 
+  it('sanitizeFilter rejects top-level operators like $_internalSchemaXor and $comment', async function() {
+    const Test = db.model('Test', Schema({ username: String, pwd: String }));
+    await Test.create({ username: 'val', pwd: 'my secret' });
+
+    await assert.rejects(
+      Test.findOne({
+        username: 'val',
+        $_internalSchemaXor: [{ pwd: { $regex: '^my' } }, { $alwaysFalse: 1 }]
+      }).setOptions({ sanitizeFilter: true }),
+      /\$_internalSchemaXor is not allowed with sanitizeFilter/
+    );
+    await assert.rejects(
+      Test.findOne({
+        $or: [{ $_internalSchemaXor: [{ pwd: { $regex: '^my' } }, { $alwaysFalse: 1 }] }]
+      }).setOptions({ sanitizeFilter: true }),
+      /\$_internalSchemaXor is not allowed with sanitizeFilter/
+    );
+
+    await assert.rejects(
+      Test.findOne({ username: 'val', $comment: 'test' }).setOptions({ sanitizeFilter: true }),
+      /\$comment is not allowed with sanitizeFilter/
+    );
+
+    // `comment()` sets the comment outside of the filter, so `sanitizeFilter` allows it
+    const doc = await Test.findOne({ $or: [{ username: 'val' }] }).
+      comment('test').
+      setOptions({ sanitizeFilter: true });
+    assert.equal(doc.pwd, 'my secret');
+  });
+
   it('applies the sanitizeFilter connection option to query operations', async function() {
     const conn = await start({ sanitizeFilter: true }).asPromise();
     try {

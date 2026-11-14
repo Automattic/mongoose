@@ -206,6 +206,20 @@ describe('cast: ', function() {
     });
   });
 
+  it('does not strip top-level operators like $jsonSchema with strictQuery', function() {
+    const schema = new Schema({ name: String });
+    const filter = {
+      name: 'foo',
+      $jsonSchema: { required: ['name'] },
+      $and: [{ $alwaysFalse: 1 }],
+      $sampleRate: 0.5
+    };
+
+    assert.deepEqual(cast(schema, { ...filter, $and: [{ $alwaysFalse: 1 }] }, { strictQuery: true }), filter);
+    assert.deepEqual(cast(schema, { ...filter, $and: [{ $alwaysFalse: 1 }] }, { strictQuery: 'throw' }), filter);
+    assert.deepEqual(cast(schema, { ...filter, $and: [{ $alwaysFalse: 1 }] }, { upsert: true, strict: true }), filter);
+  });
+
   it('uses schema-level strictQuery over schema-level strict (gh-12508)', function() {
     const schema = new Schema({}, {
       strict: 'throw',

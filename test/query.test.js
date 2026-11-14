@@ -3966,6 +3966,50 @@ describe('Query', function() {
     assert.deepEqual(q._conditions, { username: 'val', pwd: { $gt: null } });
   });
 
+  it('sanitizeFilter rejects top-level operators like $_internalSchemaXor and $comment', async function() {
+    const Test = db.model('Test', Schema({ username: String, pwd: String }));
+    await Test.create({ username: 'val', pwd: 'my secret' });
+
+    await assert.rejects(
+      Test.findOne({
+        username: 'val',
+        $_internalSchemaXor: [{ pwd: { $regex: '^my' } }, { $alwaysFalse: 1 }]
+      }).setOptions({ sanitizeFilter: true }),
+      /\$_internalSchemaXor is not allowed with sanitizeFilter/
+    );
+    await assert.rejects(
+      Test.findOne({
+        $or: [{ $_internalSchemaXor: [{ pwd: { $regex: '^my' } }, { $alwaysFalse: 1 }] }]
+      }).setOptions({ sanitizeFilter: true }),
+      /\$_internalSchemaXor is not allowed with sanitizeFilter/
+    );
+
+    await assert.rejects(
+      Test.findOne({ username: 'val', $comment: 'test' }).setOptions({ sanitizeFilter: true }),
+      /\$comment is not allowed with sanitizeFilter/
+    );
+
+    // `comment()` sets the comment outside of the filter, so `sanitizeFilter` allows it
+    const doc = await Test.findOne({ $or: [{ username: 'val' }] }).
+      comment('test').
+      setOptions({ sanitizeFilter: true });
+    assert.equal(doc.pwd, 'my secret');
+  });
+
+  it('sanitizeFilter disables implicit $in (gh-14657)', function() {
+    const schema = new mongoose.Schema({
+      name: {
+        type: String
+      }
+    });
+    const Test = db.model('Test', schema);
+
+    const q = Test.find({ name: ['foobar'] }).setOptions({ sanitizeFilter: true });
+    q._castConditions();
+    assert.ok(q.error());
+    assert.equal(q.error().name, 'CastError');
+  });
+
   it('applies the sanitizeFilter connection option to query operations', async function() {
     const conn = await start({ sanitizeFilter: true }).asPromise();
     try {

@@ -1,0 +1,12 @@
+{
+  "command": [
+    "npm",
+    "run",
+    "checkLibCharset"
+  ],
+  "shell_command": "npm run checkLibCharset",
+  "cwd": "/workspace/mongoose",
+  "started_at": "2026-11-15T22:31:19.650739+00:00",
+  "seconds": 0.339,
+  "exit_code": 0
+}

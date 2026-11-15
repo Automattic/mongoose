@@ -1,0 +1,175 @@
+{
+  "checks": [
+    {
+      "label": "observations",
+      "command": [
+        "env",
+        "-u",
+        "MONGOOSE_TEST_URI",
+        "-u",
+        "MONGOOSE_REPLSET_URI",
+        "-u",
+        "START_REPLICA_SET",
+        "MONGOMS_VERSION=8.2.0",
+        "MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries",
+        "./node_modules/.bin/mocha",
+        "--exit",
+        "scripts/repro/gh-16713/probes/observations.test.js"
+      ],
+      "shell_command": "env -u MONGOOSE_TEST_URI -u MONGOOSE_REPLSET_URI -u START_REPLICA_SET MONGOMS_VERSION=8.2.0 MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries ./node_modules/.bin/mocha --exit scripts/repro/gh-16713/probes/observations.test.js",
+      "cwd": "/workspace/mongoose",
+      "started_at": "2026-11-15T23:52:42.530349+00:00",
+      "seconds": 1.514,
+      "exit_code": 0,
+      "tests": {
+        "passing": 15,
+        "pending": 0,
+        "failing": 0
+      },
+      "classification": "passed"
+    },
+    {
+      "label": "deep-observations",
+      "command": [
+        "env",
+        "-u",
+        "MONGOOSE_TEST_URI",
+        "-u",
+        "MONGOOSE_REPLSET_URI",
+        "START_REPLICA_SET=1",
+        "MONGOMS_VERSION=8.2.0",
+        "MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries",
+        "./node_modules/.bin/mocha",
+        "--exit",
+        "scripts/repro/gh-16713/probes/deep-observations.test.js"
+      ],
+      "shell_command": "env -u MONGOOSE_TEST_URI -u MONGOOSE_REPLSET_URI START_REPLICA_SET=1 MONGOMS_VERSION=8.2.0 MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries ./node_modules/.bin/mocha --exit scripts/repro/gh-16713/probes/deep-observations.test.js",
+      "cwd": "/workspace/mongoose",
+      "started_at": "2026-11-15T23:52:42.474962+00:00",
+      "seconds": 9.305,
+      "exit_code": 0,
+      "tests": {
+        "passing": 13,
+        "pending": 0,
+        "failing": 0
+      },
+      "classification": "passed"
+    },
+    {
+      "label": "read-cost",
+      "command": [
+        "env",
+        "-u",
+        "MONGOOSE_TEST_URI",
+        "-u",
+        "MONGOOSE_REPLSET_URI",
+        "-u",
+        "START_REPLICA_SET",
+        "MONGOMS_VERSION=8.2.0",
+        "MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries",
+        "./node_modules/.bin/mocha",
+        "--exit",
+        "scripts/repro/gh-16713/probes/read-cost.test.js"
+      ],
+      "shell_command": "env -u MONGOOSE_TEST_URI -u MONGOOSE_REPLSET_URI -u START_REPLICA_SET MONGOMS_VERSION=8.2.0 MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries ./node_modules/.bin/mocha --exit scripts/repro/gh-16713/probes/read-cost.test.js",
+      "cwd": "/workspace/mongoose",
+      "started_at": "2026-11-15T23:52:42.705615+00:00",
+      "seconds": 1.528,
+      "exit_code": 0,
+      "tests": {
+        "passing": 1,
+        "pending": 0,
+        "failing": 0
+      },
+      "classification": "passed"
+    },
+    {
+      "label": "focused",
+      "command": [
+        "env",
+        "-u",
+        "MONGOOSE_TEST_URI",
+        "-u",
+        "MONGOOSE_REPLSET_URI",
+        "-u",
+        "START_REPLICA_SET",
+        "MONGOMS_VERSION=8.2.0",
+        "MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries",
+        "npm",
+        "test",
+        "--",
+        "--grep",
+        "bulkSave|saving a document with no changes"
+      ],
+      "shell_command": "env -u MONGOOSE_TEST_URI -u MONGOOSE_REPLSET_URI -u START_REPLICA_SET MONGOMS_VERSION=8.2.0 MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries npm test -- --grep 'bulkSave|saving a document with no changes'",
+      "cwd": "/workspace/mongoose",
+      "started_at": "2026-11-15T23:52:12.883492+00:00",
+      "seconds": 2.758,
+      "exit_code": 3,
+      "tests": {
+        "passing": 46,
+        "pending": 2,
+        "failing": 3
+      },
+      "classification": "expected regression failures"
+    },
+    {
+      "label": "lint-js",
+      "command": [
+        "npm",
+        "run",
+        "lint-js"
+      ],
+      "shell_command": "npm run lint-js",
+      "cwd": "/workspace/mongoose",
+      "started_at": "2026-11-15T23:52:39.442311+00:00",
+      "seconds": 13.244,
+      "exit_code": 0,
+      "classification": "passed"
+    },
+    {
+      "label": "markdown",
+      "command": [
+        "./node_modules/.bin/markdownlint-cli2",
+        "scripts/repro/gh-16713/README.md"
+      ],
+      "shell_command": "./node_modules/.bin/markdownlint-cli2 scripts/repro/gh-16713/README.md",
+      "cwd": "/workspace/mongoose",
+      "started_at": "2026-11-15T23:51:39.187317+00:00",
+      "seconds": 0.68,
+      "exit_code": 0,
+      "classification": "passed"
+    },
+    {
+      "label": "charset",
+      "command": [
+        "npm",
+        "run",
+        "checkLibCharset"
+      ],
+      "shell_command": "npm run checkLibCharset",
+      "cwd": "/workspace/mongoose",
+      "started_at": "2026-11-15T23:51:39.213962+00:00",
+      "seconds": 0.674,
+      "exit_code": 0,
+      "classification": "passed"
+    },
+    {
+      "label": "diff-check",
+      "command": [
+        "git",
+        "diff",
+        "--cached",
+        "--check"
+      ],
+      "shell_command": "git diff --cached --check",
+      "cwd": "/workspace/mongoose",
+      "started_at": "2026-11-15T23:55:43.628187+00:00",
+      "seconds": 0.003,
+      "exit_code": 0,
+      "classification": "passed"
+    }
+  ],
+  "production_behavior_changed": false,
+  "merge_ready": false
+}

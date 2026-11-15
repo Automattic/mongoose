@@ -1,0 +1,41 @@
+$ env -u MONGOOSE_TEST_URI -u MONGOOSE_REPLSET_URI -u START_REPLICA_SET MONGOMS_VERSION=8.2.0 MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries ./node_modules/.bin/mocha --exit scripts/repro/gh-16713/probes/observations.test.js
+
+
+  gh-16713 upstream observations (not a proposed public contract)
+VERSIONS {"node":"v24.22.1","mongoose":"9.12.1","driver":"7.8.0","mongodb":"8.2.0"}
+OBSERVATION {"label":"save; missing=false","outcome":"fulfilled","error":null,"commands":[{"name":"find","collection":"BulkSave16713Probe"}],"persisted":true,"postSaveHooks":["unchanged"],"isModified":false}
+    ✔ observes save with an unchanged existing document
+OBSERVATION {"label":"save; missing=true","outcome":"rejected","error":{"name":"DocumentNotFoundError","message":"No document found for query \"{ _id: new ObjectId('6afa45cb59b027b0ab2e7657') }\" on model \"BulkSave16713Probe\""},"commands":[{"name":"find","collection":"BulkSave16713Probe"}],"persisted":false,"postSaveHooks":[],"isModified":true}
+    ✔ observes save with an unchanged missing document
+OBSERVATION {"label":"bulkSave default; missing=false","outcome":"fulfilled","error":null,"result":{"insertedCount":0,"matchedCount":0,"modifiedCount":0},"commands":[],"persisted":true,"postSaveHooks":["unchanged"],"isModified":false}
+    ✔ observes bulkSave default with an unchanged existing document
+OBSERVATION {"label":"bulkSave default; missing=true","outcome":"fulfilled","error":null,"result":{"insertedCount":0,"matchedCount":0,"modifiedCount":0},"commands":[],"persisted":false,"postSaveHooks":["unchanged"],"isModified":false}
+    ✔ observes bulkSave default with an unchanged missing document
+OBSERVATION {"label":"bulkSave ordered true; missing=false","outcome":"fulfilled","error":null,"result":{"insertedCount":0,"matchedCount":0,"modifiedCount":0},"commands":[],"persisted":true,"postSaveHooks":["unchanged"],"isModified":false}
+    ✔ observes bulkSave ordered true with an unchanged existing document
+OBSERVATION {"label":"bulkSave ordered true; missing=true","outcome":"fulfilled","error":null,"result":{"insertedCount":0,"matchedCount":0,"modifiedCount":0},"commands":[],"persisted":false,"postSaveHooks":["unchanged"],"isModified":false}
+    ✔ observes bulkSave ordered true with an unchanged missing document
+OBSERVATION {"label":"bulkSave ordered false; missing=false","outcome":"fulfilled","error":null,"result":{"insertedCount":0,"matchedCount":0,"modifiedCount":0},"commands":[],"persisted":true,"postSaveHooks":["unchanged"],"isModified":false}
+    ✔ observes bulkSave ordered false with an unchanged existing document
+OBSERVATION {"label":"bulkSave ordered false; missing=true","outcome":"fulfilled","error":null,"result":{"insertedCount":0,"matchedCount":0,"modifiedCount":0},"commands":[],"persisted":false,"postSaveHooks":["unchanged"],"isModified":false}
+    ✔ observes bulkSave ordered false with an unchanged missing document
+OBSERVATION {"label":"mixed batch; ordered=default","outcome":"fulfilled","error":null,"result":{"insertedCount":2,"matchedCount":2,"modifiedCount":2},"commands":[{"name":"update","collection":"BulkSave16713Probe","ordered":true,"operations":1},{"name":"insert","collection":"BulkSave16713Probe","ordered":true,"operations":1},{"name":"update","collection":"BulkSave16713Probe","ordered":true,"operations":1},{"name":"insert","collection":"BulkSave16713Probe","ordered":true,"operations":1}],"persistedNames":["before-updated","before-inserted",null,"after-updated","after-inserted"],"postSaveHooks":["before-updated","before-inserted","missing","after-updated","after-inserted"],"isNew":[false,false,false,false,false],"isModified":[false,false,false,false,false]}
+    ✔ observes writes before and after a missing unchanged input with ordered=default
+OBSERVATION {"label":"updates only; ordered=default","outcome":"fulfilled","error":null,"result":{"insertedCount":0,"matchedCount":2,"modifiedCount":2},"commands":[{"name":"update","collection":"BulkSave16713Probe","ordered":true,"operations":2}]}
+    ✔ observes one update command with unchanged inputs and ordered=default
+OBSERVATION {"label":"mixed batch; ordered=true","outcome":"fulfilled","error":null,"result":{"insertedCount":2,"matchedCount":2,"modifiedCount":2},"commands":[{"name":"update","collection":"BulkSave16713Probe","ordered":true,"operations":1},{"name":"insert","collection":"BulkSave16713Probe","ordered":true,"operations":1},{"name":"update","collection":"BulkSave16713Probe","ordered":true,"operations":1},{"name":"insert","collection":"BulkSave16713Probe","ordered":true,"operations":1}],"persistedNames":["before-updated","before-inserted",null,"after-updated","after-inserted"],"postSaveHooks":["before-updated","before-inserted","missing","after-updated","after-inserted"],"isNew":[false,false,false,false,false],"isModified":[false,false,false,false,false]}
+    ✔ observes writes before and after a missing unchanged input with ordered=true
+OBSERVATION {"label":"updates only; ordered=true","outcome":"fulfilled","error":null,"result":{"insertedCount":0,"matchedCount":2,"modifiedCount":2},"commands":[{"name":"update","collection":"BulkSave16713Probe","ordered":true,"operations":2}]}
+    ✔ observes one update command with unchanged inputs and ordered=true
+OBSERVATION {"label":"mixed batch; ordered=false","outcome":"fulfilled","error":null,"result":{"insertedCount":2,"matchedCount":2,"modifiedCount":2},"commands":[{"name":"insert","collection":"BulkSave16713Probe","ordered":false,"operations":2},{"name":"update","collection":"BulkSave16713Probe","ordered":false,"operations":2}],"persistedNames":["before-updated","before-inserted",null,"after-updated","after-inserted"],"postSaveHooks":["before-updated","before-inserted","missing","after-updated","after-inserted"],"isNew":[false,false,false,false,false],"isModified":[false,false,false,false,false]}
+    ✔ observes writes before and after a missing unchanged input with ordered=false
+OBSERVATION {"label":"updates only; ordered=false","outcome":"fulfilled","error":null,"result":{"insertedCount":0,"matchedCount":2,"modifiedCount":2},"commands":[{"name":"update","collection":"BulkSave16713Probe","ordered":false,"operations":2}]}
+    ✔ observes one update command with unchanged inputs and ordered=false
+OBSERVATION {"label":"standalone batched existence query (no patch)","outcome":"fulfilled","error":null,"commands":[{"name":"find","collection":"BulkSave16713Probe"}],"foundCount":2}
+    ✔ measures the proposed batched existence read separately from bulkSave
+
+
+  15 passing (286ms)
+
+
+EXIT_CODE=0

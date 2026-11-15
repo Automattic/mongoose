@@ -1,0 +1,11 @@
+{
+  "command": [
+    "./node_modules/.bin/markdownlint-cli2",
+    "scripts/repro/gh-16713/README.md"
+  ],
+  "shell_command": "./node_modules/.bin/markdownlint-cli2 scripts/repro/gh-16713/README.md",
+  "cwd": "/workspace/mongoose",
+  "started_at": "2026-11-15T23:51:39.187317+00:00",
+  "seconds": 0.68,
+  "exit_code": 0
+}

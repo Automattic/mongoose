@@ -1,0 +1,74 @@
+{
+  "issue": {
+    "url": "https://github.com/Automattic/mongoose/issues/14763",
+    "title": "bulkSave doesn't throw an error even if one of the submitted documents was not updated ",
+    "issue_number": 14763,
+    "body": "### Prerequisites\n\n- [X] I have written a descriptive issue title\n\n### Mongoose version\n\n8.x.x\n\n### Node.js version\n\n20.11\n\n### MongoDB version\n\n7.0\n\n### Operating system\n\nNone\n\n### Operating system version (i.e. 20.04, 11.3, 10)\n\n_No response_\n\n### Issue\n\nHi all,\r\n\r\nWhile troubleshooting we ran into some unexpected behavior of the `bulkSave` function. \r\nIf one of the submitted documents is outdated (has a lower version than the copy on the DB), this operation will not throw any error, even though the document won't be updated. \r\nWe expected it to behave similarly to the `save` function, which throws a `VersionError` in these cases. \r\n\r\nRepro:\r\n```js\r\n    public async foo() {\r\n        const fooSchema = new mongoose.Schema({\r\n            bar: { type: Number },\r\n        });\r\n        const model = mongoose.model(\"foo\", fooSchema);\r\n        await model.deleteMany();\r\n\r\n        const foo = await model.create({\r\n            bar: 0\r\n        });\r\n\r\n        // update 1\r\n        foo.bar = 1;\r\n        await foo.save();\r\n\r\n        // parallel update\r\n        const fooCopy = await model.findById(foo._id);\r\n        fooCopy.bar = 99;\r\n        await fooCopy.save();\r\n\r\n        // update 2 - this should throw a version error\r\n        foo.bar = 2;\r\n        // await foo.save(); // throws a VersionError\r\n        await model.bulkSave([foo]) // no error thrown, but update not applied\r\n\r\n        // log result\r\n        console.log(`bar: ${(await model.findById(foo._id)).bar}`); // logs 99\r\n    }\r\n```\r\n\r\nIs this the expected behavior of `bulkSave`? Is there any possibility of making it fail if one of the documents has been already replaced by a newer version instead of returning silently? \r\n\r\n",
+    "state": "closed",
+    "user": {
+      "login": "ksyd9821",
+      "name": "ksyd9821",
+      "email": null,
+      "avatar_url": "https://avatars.githubusercontent.com/u/147424724?v=4",
+      "id": 147424724
+    },
+    "assignees": null,
+    "labels": [
+      {
+        "name": "docs",
+        "color": "444444",
+        "description": "This issue is due to a mistake or omission in the mongoosejs.com documentation"
+      },
+      {
+        "name": "enhancement",
+        "color": "02d7e1",
+        "description": "This issue is a user-facing general improvement that doesn't fix a bug or add a new feature"
+      }
+    ],
+    "milestone": 656,
+    "state_reason": "completed",
+    "comments": 7,
+    "created_at": "2024-07-26T16:02:23Z",
+    "updated_at": "2024-09-19T14:47:31Z",
+    "closed_at": "2024-09-19T14:47:30Z",
+    "display_url": "https://github.com/Automattic/mongoose/issues/14763",
+    "display_title": "bulkSave doesn't throw an error even if one of the submitted documents was not updated "
+  },
+  "comments": [
+    {
+      "url": "https://github.com/Automattic/mongoose/issues/14763#issuecomment-2278903239",
+      "author": "github-actions[bot]",
+      "body": "This issue is stale because it has been open 14 days with no activity. Remove stale label or comment or this will be closed in 5 days"
+    },
+    {
+      "url": "https://github.com/Automattic/mongoose/issues/14763#issuecomment-2291628531",
+      "author": "vkarpov15",
+      "body": "As written, neither `await foo.save()` nor `await model.bulkSave([foo])` throw a VersionError, and the final result is `2` not `99`. In general, versioning in Mongoose only applies to array fields by default. However, the following script demonstrates the issue you're seeing (optimistic concurrency enabled)\r\n\r\n```javascript\r\nconst mongoose = require('mongoose');\r\n\r\nrequire('util').inspect.defaultOptions.depth = 10;\r\n\r\nmongoose.connect('mongodb://127.0.0.1:27017/mongoose_test');\r\n\r\nvoid async function main() {\r\n        const fooSchema = new mongoose.Schema({\r\n            bar: { type: Number },\r\n        }, { optimisticConcurrency: true });\r\n        const model = mongoose.model(\"foo\", fooSchema);\r\n        await model.deleteMany();\r\n\r\n        const foo = await model.create({\r\n            bar: 0\r\n        });\r\n\r\n        // update 1\r\n        foo.bar = 1;\r\n        await foo.save();\r\n\r\n        // parallel update\r\n        const fooCopy = await model.findById(foo._id);\r\n        fooCopy.bar = 99;\r\n        await fooCopy.save();\r\n\r\n        // update 2 - this should throw a version error\r\n        foo.bar = 2;\r\n        // await foo.save(); // throws a VersionError\r\n        await model.bulkSave([foo]) // no error thrown, but update not applied\r\n\r\n        // log result\r\n        console.log(`bar: ${(await model.findById(foo._id)).bar}`); // logs 99\r\n}();\r\n\r\n```"
+    },
+    {
+      "url": "https://github.com/Automattic/mongoose/issues/14763#issuecomment-2291722799",
+      "author": "vkarpov15",
+      "body": "So long story short, there's no way for `bulkSave()` to know which documents failed to save due to concurrency issues. MongoDB `bulkWrite()` doesn't return how many documents each update operation updated. So if you `bulkSave()` 3 docs, and MongoDB server tells us that 2 docs matched, there's no way for Mongoose to know which 2 docs matched and which one didn't. All we get back from `bulkWrite()` is `matchedCount`, which contains the total number of documents matched by _all_ the update operations.\r\n\r\n@AbdelrahmanHafez @hasezoey what do you think about this one? There's a couple of options:\r\n\r\n1. Make `bulkSave()` throw an error if `matchedCount` is 0: that way we know all documents failed to update\r\n2. Make `bulkSave()` throw an error if `matchedCount` isn't equal to the number of documents being saved. In that case, we know at least one document wasn't found.\r\n3. Keep the current behavior: `bulkSave()` never throws a `DocumentNotFoundError` or `VersionError`, but we should make a note in the docs that `bulkSave()` is unable to report versioning errors"
+    },
+    {
+      "url": "https://github.com/Automattic/mongoose/issues/14763#issuecomment-2293416128",
+      "author": "ksyd9821",
+      "body": "@vkarpov15 yes, you are right. I forgot to mention that we have optimistic concurrency enabled by default on all schemas through a plugin. \r\n\r\nNot sure if this can help, but as a workaround we went with option 2 combined with a transaction. So if  `matchedCount` doesn't match the number of submitted documents, we rollback the transaction and throw a `VersionError`.\r\n"
+    },
+    {
+      "url": "https://github.com/Automattic/mongoose/issues/14763#issuecomment-2295220679",
+      "author": "hasezoey",
+      "body": "> @AbdelrahmanHafez @hasezoey what do you think about this one? There's a couple of options:\r\n\r\ni dont fully know how `bulkSave` is meant to work, so option 1 sound good to me, as long as update and *new* document operations are taken into account (are they both taken into account in `matchedCount`?).\r\nas for option 2, it also sounds good, but i think that would be better to be put as a option to get the old behavior, along the lines of `throwOnCountMismatch`?\r\n\r\n> So if you bulkSave() 3 docs, and MongoDB server tells us that 2 docs matched, there's no way for Mongoose to know which 2 docs matched and which one didn't.\r\n\r\ndoes this returns some kind of error in `bulkSave` (like [WriteError](https://mongodb.github.io/node-mongodb-native/6.7/classes/WriteError.html) via [`BulkSaveResult.getWriteErrors`](https://mongodb.github.io/node-mongodb-native/6.7/classes/BulkWriteResult.html#getWriteErrors)) or are those mismatches silent in the mongodb driver?"
+    },
+    {
+      "url": "https://github.com/Automattic/mongoose/issues/14763#issuecomment-2305220612",
+      "author": "AbdelrahmanHafez",
+      "body": "@hasezoey\r\n`bulkSave` is just a good old `bulkWrite` under the hood, so MongoDB doesn't return this as an error, `{ filter: { _id: 'A', __v: 1 } }` just a filter that, in this scenario, doesn't match anything as far as mongo is concerned.\r\n\r\nI'm a bit sad that none of the solutions are robust enough to provide the id(s) of the failing documents, and there's no way we can handle that from mongoose side.\r\n\r\nI'm leaning towards a combination of the second and third options. We make a note in the docs about this behavior, and have a global option/bulkSave option `throwOnCountMismatch` like @hasezoey suggests.\r\n\r\nWhat do you think?"
+    },
+    {
+      "url": "https://github.com/Automattic/mongoose/issues/14763#issuecomment-2315834655",
+      "author": "vkarpov15",
+      "body": "I put in a PR for option (1) since that is the least brittle - in that case, we know all documents failed so we shouldn't update any `$isNew` or run any normal post('save') hooks (although we should actually execute post save error middleware for bulkSave()).\r\n\r\nRight now I'm thinking a combination of option (1) and option (2). In the option (1) case we know all documents failed, so we know we can handle that correctly. In the case where we have a mismatch, we don't know which documents were updated, so we don't know which documents to update or run middleware on, so we should throw an error. Likely a different class of error than `DocumentNotFound` though.\r\n\r\nI'm not necessarily a fan of the `throwOnCountMismatch` option, I don't like adding too many extra one-off options, but I'm not sure I have a good alternative other than not adding any option at all. None of our existing options line up well."
+    }
+  ]
+}

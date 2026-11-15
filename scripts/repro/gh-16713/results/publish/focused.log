@@ -1,0 +1,123 @@
+$ env -u MONGOOSE_TEST_URI -u MONGOOSE_REPLSET_URI -u START_REPLICA_SET MONGOMS_VERSION=8.2.0 MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries npm test -- --grep 'bulkSave|saving a document with no changes'
+
+> mongoose@9.12.1 test
+> mocha --exit --ignore "test/encryption/**/*.test.js" "./test/**/*.test.js" --grep bulkSave|saving a document with no changes
+
+[31m
+You're not testing shards!
+Please set the MONGOOSE_SHARD_TEST_URI env variable.
+e.g: `mongodb://127.0.0.1:27017/database
+Sharding must already be enabled on your database
+[39m
+
+
+  transactions
+    - transaction() resets $isNew between retries with bulkSave() (gh-16432)
+    - transaction() restores modified paths between retries with bulkSave() (gh-16432)
+
+  document
+    ✔ bulkSave() picks up changes in pre("save") middleware (gh-13799)
+    ✔ bulkSave() allows skipping validation with validateBeforeSave (gh-15156)
+    gh-8371
+      ✔ saving a document with no changes, throws an error when document is not found
+    async stack traces (gh-15317)
+      ✔ works with async pre save errors with bulkSave()
+
+  document validation
+    validateSync()
+      ✔ does not emit a deprecation warning for internal bulkSave() validation
+
+  middleware option to skip hooks (gh-8768)
+    Model and Query operations
+      bulkSave()
+        ✔ skips pre/post hooks when middleware: false
+        ✔ skips only pre hooks when middleware: { pre: false }
+        ✔ skips only post hooks when middleware: { post: false }
+    Built-in middleware still runs when user middleware is skipped
+      ✔ bulkSave() sets timestamps when middleware: false
+
+  Model
+    hooks
+      post
+        ✔ callback should receive parameter of type document after bulkSave (gh-13026)
+    buildBulkWriteOperations() (gh-9673)
+      ✔ saves changes in discriminators if calling `bulkSave()` on base model (gh-13907) (48ms)
+    bulkSave() (gh-9673)
+      ✔ saves new documents
+      ✔ increments version key on successful save (gh-15800)
+      ✔ does not lose updates after increment() on a new document (gh-15800)
+      ✔ persists the version key when inserting new documents (gh-15800)
+      ✔ saves new documents with ordered: false (gh-15495)
+      ✔ updates documents
+      ✔ updates documents with ordered: false (gh-15495)
+      ✔ saves documents with embedded discriminators (gh-15410)
+      ✔ insertMany should throw an error if there were operations that failed validation, but all operations that passed validation succeeded (gh-14572) (gh-13256)
+      ✔ insertMany should return both write errors and validation errors in error.results (gh-15265)
+      ✔ insertMany should return both write errors and validation errors in error.results with rawResult (gh-15265)
+      ✔ returns writeResult on success
+      ✔ throws an error on failure
+      ✔ changes document state from `isNew` `false` to `true`
+      ✔ sets `isNew` to false when a document succeeds and `isNew` does not change when some fail
+      ✔ changes documents state for successful writes
+      ✔ preserves unattempted inserts after an ordered bulkSave error
+      ✔ preserves unattempted inserts after an ordered bulkSave error with 25 documents
+      ✔ preserves unattempted updates after an ordered bulkSave error with an unchanged document
+      ✔ uses operation order when an ordered bulkSave fails on a duplicate _id
+      ✔ preserves unattempted writes when ordered bulkSave mixes inserts and updates
+      ✔ preserves unordered failures while saving later documents with a repeated _id
+      ✔ updates successful document state with multiple unordered write errors and 25 documents
+      ✔ triggers pre/post-save hooks
+      ✔ calls pre-save before actually saving
+      ✔ works if some document is not modified (gh-10437)
+      ✔ should error if no documents were inserted or updated (gh-14763)
+      ✔ should error if not all documents were inserted or updated (gh-14763)
+      ✔ should error if there is a validation error
+      ✔ Using bulkSave should not trigger an error (gh-11071)
+      ✔ accepts `timestamps: false` (gh-12059)
+      ✔ accepts `timestamps: true` (gh-12059)
+      ✔ `timestamps` has `undefined` as default value (gh-12059)
+      ✔ respects `$timestamps()` (gh-12117)
+      unchanged documents (gh-16713)
+        ✔ saves unchanged documents that still exist
+        1) rejects a missing unchanged document (default)
+        2) rejects a missing unchanged document (ordered: true)
+        3) rejects a missing unchanged document (ordered: false)
+
+
+  46 passing (1s)
+  2 pending
+  3 failing
+
+  1) Model
+       bulkSave() (gh-9673)
+         unchanged documents (gh-16713)
+           rejects a missing unchanged document (default):
+     AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Context.<anonymous> (test/model.test.js:8512:11)
+
+  2) Model
+       bulkSave() (gh-9673)
+         unchanged documents (gh-16713)
+           rejects a missing unchanged document (ordered: true):
+     AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Context.<anonymous> (test/model.test.js:8512:11)
+
+  3) Model
+       bulkSave() (gh-9673)
+         unchanged documents (gh-16713)
+           rejects a missing unchanged document (ordered: false):
+     AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Context.<anonymous> (test/model.test.js:8512:11)
+
+
+
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice
+
+EXIT_CODE=3

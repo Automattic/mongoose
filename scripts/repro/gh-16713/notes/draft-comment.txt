@@ -1,0 +1,14 @@
+ARCHIVED INVESTIGATION SNAPSHOT — written before PR preparation.
+Commands and workspace paths below are historical execution evidence.
+For portable commands and current publication status, see ../README.md.
+Statements about remaining local or no PR existing describe that earlier state.
+
+Reproduced on master ab4e3637a (Mongoose 9.12.1, Node 24.22.1, MongoDB 8.2.0), using independent unchanged document instances. After deleting the stored record, save() rejects with DocumentNotFoundError, but bulkSave() resolves in default, ordered: true, and ordered: false modes and runs the missing document's post-save hook. Existing-document controls pass.
+
+For [update A, insert B, missing unchanged C, update D, insert E], all four writes persist in both modes. Before implementing, could you confirm:
+
+1. Which error type and missing-document/index details should be exposed? How should a missing-document error combine with an existing bulk write error/result?
+2. For ordered: true, should A/B persist before rejecting at C, with D/E unattempted? For ordered: false, should all valid writes complete before rejecting?
+3. Is an additional batched existence read acceptable, including for unchanged-only batches that currently send no database command? The read and writes would still be separate operations.
+
+I have a local test-only reproduction: the existing-document control passes and three missing-document regressions fail with "Missing expected rejection." No production behavior has been changed.

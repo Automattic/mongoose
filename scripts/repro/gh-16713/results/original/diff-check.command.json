@@ -1,0 +1,12 @@
+{
+  "command": [
+    "git",
+    "diff",
+    "--check"
+  ],
+  "shell_command": "git diff --check",
+  "cwd": "/workspace/mongoose",
+  "started_at": "2026-11-15T22:31:19.622500+00:00",
+  "seconds": 0.008,
+  "exit_code": 0
+}

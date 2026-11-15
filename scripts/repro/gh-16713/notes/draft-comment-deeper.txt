@@ -1,0 +1,14 @@
+ARCHIVED INVESTIGATION SNAPSHOT — written before PR preparation.
+Commands and workspace paths below are historical execution evidence.
+For portable commands and current publication status, see ../README.md.
+Statements about remaining local or no PR existing describe that earlier state.
+
+I reproduced the gap on master ab4e3637a and checked the proposed batched read more closely. There is an ordering choice beyond the extra read:
+
+If a retained unchanged document was deleted, [new replacement with the same _id, retained document] succeeds with sequential saves and current ordered bulkSave. A preflight find reports the second input missing before the first insert recreates it. Earlier updates can similarly reverse whether a later document's $where filter matches. These cases require no concurrent client.
+
+Also, ordered bulkSave currently lets later writes persist when a modified document matches zero records, then throws MongooseBulkSaveIncompleteError. Should missing unchanged inputs follow that aggregate behavior, or introduce stopping at their input position?
+
+Could we first agree whether existence means before the batch or at each input's ordered position? That determines whether one preflight query is sufficient or writes/checks need interleaving. An _id-only check also needs care with $where, duplicate input IDs, and sessions. At 10,000 inputs I measured find + getMore, versus zero commands for unchanged-only bulkSave.
+
+I have 13 passing local design probes plus a passing command-cost probe; production behavior remains unchanged.

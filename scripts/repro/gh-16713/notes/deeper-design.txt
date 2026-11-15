@@ -1,0 +1,210 @@
+ARCHIVED INVESTIGATION SNAPSHOT — written before PR preparation.
+Commands and workspace paths below are historical execution evidence.
+For portable commands and current publication status, see ../README.md.
+Statements about remaining local or no PR existing describe that earlier state.
+
+Mongoose #16713 — deeper design findings
+Checked: 2026-11-15 23:03:07 UTC
+
+MAIN FINDING
+
+A single batched existence read is not generally equivalent to saving each input
+in order. The discrepancy occurs with deterministic dependencies inside the
+batch, even with no competing client. The remaining question is when existence
+must hold: before the batch, at the input's position, or after submitted writes.
+
+The original repository diff remains exactly 40 added test lines in
+test/model.test.js. All work in this follow-up is under this evidence directory.
+No production behavior, public error type, ordering, or read policy was selected.
+
+NEW EXECUTION EVIDENCE
+
+13 deeper characterization tests PASSED, exit 0, on a disposable MongoDB 8.2.0
+replica set named testset, Node v24.22.1, Mongoose 9.12.1.
+Command (from /workspace/mongoose):
+  python3 /workspace/scratch/mongoose-16713/run.py deep-observations env -u MONGOOSE_TEST_URI -u MONGOOSE_REPLSET_URI START_REPLICA_SET=1 MONGOMS_VERSION=8.2.0 MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries ./node_modules/.bin/mocha --exit /workspace/scratch/mongoose-16713/deep-observations.test.js
+
+1 scale/read-cost test PASSED, exit 0, using the normal disposable standalone
+fixture and the same Node/Mongoose/MongoDB versions:
+  python3 /workspace/scratch/mongoose-16713/run.py read-cost env -u MONGOOSE_TEST_URI -u MONGOOSE_REPLSET_URI -u START_REPLICA_SET MONGOMS_VERSION=8.2.0 MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries ./node_modules/.bin/mocha --exit /workspace/scratch/mongoose-16713/read-cost.test.js
+
+Logs and full command metadata: deep-observations.log/.command.json and read-cost.log/.command.json.
+Raw results: deep-observations.json and read-cost.json.
+The standalone and replica-set fixtures shut their servers down after execution.
+These passes verify observations about current upstream, not a production fix.
+The original three regression failures remain deliberate; the tracked diff did
+not change, so the original lint/charset/diff results remain applicable.
+
+1. AN EARLIER INSERT CAN REPAIR A PREFLIGHT 'MISSING' INPUT
+
+Setup:
+- Create and retain an unchanged document; remove its stored record.
+- Construct a new document with the same _id.
+- Submit [new replacement, retained unchanged document].
+
+Before writes, an existence check reports the retained document missing.
+Sequential replacement.save(); retained.save() succeeds, because the first save
+recreates the record. Current ordered bulkSave also succeeds and inserts the
+replacement.
+
+Therefore, a read-before-write implementation that reports this input missing
+can reject an operation whose record exists by the time its ordered position is
+reached. This counterexample needs no race with another client.
+
+Existing upstream tests already support distinct input instances sharing an _id;
+treating that situation as unsupported would itself need a compatibility decision.
+
+2. EXISTENCE BY _id IS WEAKER THAN MATCHING save()'s FILTER
+
+Two unchanged instances with the same _id but $where={enabled:true} and
+$where={enabled:false} produced different save outcomes against an enabled record:
+- matching filter: fulfilled;
+- mismatching filter: DocumentNotFoundError;
+- current unchanged bulkSave with the mismatching filter: fulfilled.
+
+An _id $in read returns one existing ID in both cases. Even a projected _id-only
+find over the OR of both filters returns one ID and does not identify which
+original input/filter matched. The implementation needs per-input matching
+semantics, rather than marking every instance with a returned ID present.
+
+This behavior is documented as Document.$where, including the soft-delete filter
+use case in lib/document.js. It is not a MongoDB JavaScript $where query.
+
+3. EARLIER UPDATES CAN REVERSE A LATER FILTER'S ANSWER
+
+The record initially has enabled=true. An earlier input changes enabled=false.
+A later unchanged instance of the same record has its own $where:
+- enabled=true: preflight matches, but sequential save rejects after the update.
+- enabled=false: preflight misses, but sequential save succeeds after the update.
+
+A snapshot check can therefore generate false positives AND false negatives
+relative to the ordered existence-check sequence.
+
+4. A Model.find() CHECK CAN ADD UNRELATED QUERY MIDDLEWARE
+
+A model with pre('find') middleware filtering enabled=false:
+- Model.find(_id $in ...) returned 0 records for the enabled document;
+- the raw collection find returned 1;
+- the unchanged document.save() succeeded.
+
+Normal save uses a raw collection read, not Model.find(). A naive Model.find()
+implementation would introduce query middleware behavior not present in save.
+
+5. ORDERED DOES NOT CURRENTLY STOP ON A MODIFIED DOCUMENT MATCHING ZERO RECORDS
+
+Test input:
+  [unchanged existing A, modified missing B, modified existing C]
+
+For ordered:true AND ordered:false, C's update persisted. bulkSave then threw
+MongooseBulkSaveIncompleteError from the aggregate matched count.
+Only one generated update failed to match.
+
+This matters because adding a strict stop-at-missing rule for unchanged inputs
+would be stronger than the current rule for modified missing inputs. Input-order
+parity cannot be inferred from the ordered option alone.
+
+Related observation, NOT FIXED: the existing incomplete error reported
+numDocumentsNotUpdated=2, despite only 1 failed generated update. Its arithmetic
+counts A (an unchanged existing input) in documents.length. Blind reuse of this
+error's current accounting would carry misleading metadata into the new case.
+
+6. DRIVER ERRORS CREATE A PRECEDENCE AND CLEANUP QUESTION
+
+Four cases tested ordered true/false and a duplicate-key input before/after the
+missing unchanged input:
+- All returned MongoBulkWriteError with code 11000; the missing record was absent.
+- Ordered: the prefix insert persisted and the later insert did not.
+- Unordered: both valid inserts persisted.
+- The driver's failed operation index was 1 in every case, while the original
+  failing input index was either 1 or 2 because the unchanged input was omitted.
+- If missing preceded the ordered duplicate failure, its post-save success hook
+  ran. It also ran in both unordered cases.
+
+A future patch must decide how to expose both causes while preserving original
+driver error information and translating operation indexes to original input
+indexes. An error for a missing tail input should not accidentally replace an
+earlier ordered write error without an explicit contract.
+
+7. CLASSIFICATION MUST FOLLOW PRE-SAVE HOOKS
+
+An input was unchanged before bulkSave. Its pre-save hook changed a field.
+For the deleted record, current bulkSave generated an update and rejected with
+MongooseBulkSaveIncompleteError, rather than following the unchanged-input path.
+
+Gathering unchanged inputs before the existing hook phase would classify this
+case incorrectly. This is an implementation constraint independent of the policy
+maintainers eventually choose.
+
+8. THE READ MUST SHARE THE OPERATION'S SESSION
+
+A document inserted inside an active transaction was isNew=false and unmodified.
+It was:
+- invisible to an existence read without that session;
+- visible to a read using that session;
+- accepted by current unchanged bulkSave({session}).
+
+The probe explicitly tested session forwarding and aborted the transaction.
+It is not a claim that all transaction retry or AsyncLocalStorage scenarios were
+tested. A new read must carry the operation's effective session/read semantics.
+
+9. MEASURED COMMAND COST AT SCALE
+
+Only operation commands were captured, after collection/data setup. No timing
+or latency benchmark is claimed.
+
+Inputs | Current unchanged bulkSave | Projected _id $in read
+1      | 0 commands                 | find
+100    | 0 commands                 | find
+10000  | 0 commands                 | find + getMore
+
+So at the documented large-batch use case, one logical existence query can
+already mean two wire commands. These commands would be additional to any
+generated write commands; the original mixed-batch probe separately measured
+4 commands for alternating ordered inserts/updates and 2 for unordered writes.
+
+HISTORICAL MAINTAINER CONTEXT
+
+Read the complete earlier issue #14763 and its seven comments:
+  https://github.com/Automattic/mongoose/issues/14763
+
+vkarpov15 explained that bulkWrite gives aggregate matched counts, making it
+impossible to identify individual failed updates from those results alone:
+  https://github.com/Automattic/mongoose/issues/14763#issuecomment-2291722799
+
+He later argued that partial mismatches should throw, likely with a class
+different from DocumentNotFound, because success-state/hook attribution is unknown:
+  https://github.com/Automattic/mongoose/issues/14763#issuecomment-2315834655
+
+Current MongooseBulkSaveIncompleteError reflects that aggregate-error approach.
+This historical discussion supports preserving existing bulk-result semantics;
+it does not constitute agreement on the new unchanged-input read or ordering.
+Historical sources are saved as historical-design.json. Issue #16713 still had
+no comments when rechecked for this follow-up.
+
+CONCRETE IMPLEMENTATION CHOICES FOR REVIEW, NOT SELECTED CONTRACTS
+
+A. Read all unchanged inputs before writes; reject before any write.
+   Smallest control flow, but skips valid prefix writes requested by #16713.
+   Also interprets existence at the preflight snapshot, not at input position.
+
+B. Read first; for ordered input, write only the prefix before the first miss.
+   Matches the proposal for independent inputs, but can misclassify the same-batch
+   insert/update dependencies demonstrated above. Error precedence still matters.
+
+C. Submit writes; then check unchanged inputs and reject for missing records.
+   Allows valid writes to complete, but cannot satisfy a stop-at-missing ordered
+   rule. The read reports post-write state and must combine with write errors.
+
+D. Interleave ordered write segments and existence checks.
+   A straightforward way to account for preceding writes before each check.
+   Adds reads and fragments bulk writes; more network work as inputs alternate.
+   It still retains bulkSave's existing all-input pre-save phase, so it is not
+   full sequential document.save() middleware/validation equivalence.
+
+The decision to request first is whether the feature means snapshot detection of
+missing inputs or existence checks at their logical ordered position. Once that
+is settled, the error class, aggregation/precedence, cleanup, and read budget can
+be specified and implemented without silently changing the promised behavior.
+
+Additional draft for the issue: draft-comment-deeper.txt.
+No production patch, commit, push, posted comment, or PR was created.

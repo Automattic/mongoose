@@ -1,0 +1,14 @@
+$ env npm_config_cache=/tmp/mongoose-16713-npm-cache npm install
+npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
+npm warn deprecated whatwg-encoding@3.1.1: Use @exodus/bytes instead for a more spec-conformant and faster implementation
+npm warn deprecated mongodb-runner@6.11.1: This package is not maintained anymore. Please use @mongodb-js/mongodb-runner instead
+npm warn deprecated lodash.isequal@4.5.0: This package is deprecated. Use require('node:util').isDeepStrictEqual instead.
+
+added 696 packages in 34s
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice
+
+EXIT_CODE=0

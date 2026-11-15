@@ -1,0 +1,7 @@
+$ npm run checkLibCharset
+
+> mongoose@9.12.1 checkLibCharset
+> node ./scripts/checkLibCharset.js
+
+
+EXIT_CODE=0

@@ -1,0 +1,23 @@
+{
+  "command": [
+    "env",
+    "-u",
+    "MONGOOSE_TEST_URI",
+    "-u",
+    "MONGOOSE_REPLSET_URI",
+    "-u",
+    "START_REPLICA_SET",
+    "MONGOMS_VERSION=8.2.0",
+    "MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries",
+    "npm",
+    "test",
+    "--",
+    "--grep",
+    "gh-16713"
+  ],
+  "shell_command": "env -u MONGOOSE_TEST_URI -u MONGOOSE_REPLSET_URI -u START_REPLICA_SET MONGOMS_VERSION=8.2.0 MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries npm test -- --grep gh-16713",
+  "cwd": "/workspace/mongoose",
+  "started_at": "2026-11-15T22:31:04.420664+00:00",
+  "seconds": 1.816,
+  "exit_code": 3
+}

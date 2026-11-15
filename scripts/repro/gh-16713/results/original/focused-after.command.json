@@ -1,0 +1,23 @@
+{
+  "command": [
+    "env",
+    "-u",
+    "MONGOOSE_TEST_URI",
+    "-u",
+    "MONGOOSE_REPLSET_URI",
+    "-u",
+    "START_REPLICA_SET",
+    "MONGOMS_VERSION=8.2.0",
+    "MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries",
+    "npm",
+    "test",
+    "--",
+    "--grep",
+    "bulkSave|saving a document with no changes"
+  ],
+  "shell_command": "env -u MONGOOSE_TEST_URI -u MONGOOSE_REPLSET_URI -u START_REPLICA_SET MONGOMS_VERSION=8.2.0 MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries npm test -- --grep 'bulkSave|saving a document with no changes'",
+  "cwd": "/workspace/mongoose",
+  "started_at": "2026-11-15T22:31:22.691628+00:00",
+  "seconds": 2.414,
+  "exit_code": 3
+}

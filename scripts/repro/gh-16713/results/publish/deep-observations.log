@@ -1,0 +1,40 @@
+$ env -u MONGOOSE_TEST_URI -u MONGOOSE_REPLSET_URI START_REPLICA_SET=1 MONGOMS_VERSION=8.2.0 MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries ./node_modules/.bin/mocha --exit scripts/repro/gh-16713/probes/deep-observations.test.js
+
+
+  gh-16713 deeper design observations (current upstream, no patch)
+VERSIONS {"node":"v24.22.1","mongoose":"9.12.1","mongodb":"8.2.0","replicaSet":"testset"}
+DEEP_OBSERVATION {"label":"same id, matching $where, save","outcome":"fulfilled","error":null}
+DEEP_OBSERVATION {"label":"same id, mismatching $where, save","outcome":"rejected","error":{"name":"DocumentNotFoundError","message":"No document found for query \"{ _id: new ObjectId('6afa45d28aec09517e202824'), enabled: false }\" on model \"BulkSave16713Deep\""},"result":{"matchedCount":0}}
+DEEP_OBSERVATION {"label":"same id, mismatching $where, bulkSave","outcome":"fulfilled","error":null,"result":{"insertedCount":0,"matchedCount":0,"modifiedCount":0},"idOnlyFindCount":1,"projectedOrFindCount":1}
+    ✔ distinguishes save filters for independent unchanged instances with the same _id
+DEEP_OBSERVATION {"label":"query middleware versus save collection read","outcome":"fulfilled","error":null,"modelFindCount":0,"collectionFindCount":1}
+    ✔ shows why a Model.find existence check differs from the raw collection read used by save
+DEEP_OBSERVATION {"label":"insert then unchanged save, same id, sequential","outcome":"fulfilled","error":null,"preflightWouldReportMissing":true,"persistedName":"replacement"}
+DEEP_OBSERVATION {"label":"insert then unchanged save, same id, bulkSave","outcome":"fulfilled","error":null,"result":{"insertedCount":1,"matchedCount":0,"modifiedCount":0},"preflightWouldReportMissing":true,"persistedName":"replacement"}
+    ✔ shows an earlier insert can make a supposedly missing unchanged input exist (70ms)
+DEEP_OBSERVATION {"label":"ordered sequential writes reverse predicate enabled=true","outcome":"rejected","error":{"name":"DocumentNotFoundError","message":"No document found for query \"{ _id: new ObjectId('6afa45d28aec09517e20282a'), enabled: true }\" on model \"BulkSave16713Deep\""},"result":{"matchedCount":0},"matchedBeforeWrites":true,"storedEnabledAfterWrites":false}
+    ✔ shows an earlier write reverses the preflight answer for enabled=true
+DEEP_OBSERVATION {"label":"ordered sequential writes reverse predicate enabled=false","outcome":"fulfilled","error":null,"matchedBeforeWrites":false,"storedEnabledAfterWrites":false}
+    ✔ shows an earlier write reverses the preflight answer for enabled=false
+DEEP_OBSERVATION {"label":"driver error; ordered=true; duplicateBeforeMissing=true","outcome":"rejected","error":{"name":"MongoBulkWriteError","code":11000,"message":"E11000 duplicate key error collection: mongoose_test.BulkSave16713Deep index: _id_ dup key: { _id: ObjectId('6afa45d28aec09517e20282c') }","writeErrors":[{"index":1,"code":11000}]},"result":{"insertedCount":1,"matchedCount":0,"modifiedCount":0},"missingInputIndex":2,"failedInputIndex":1,"beforePersisted":true,"afterPersisted":false,"missingPersisted":false,"postSaveHooks":["before"]}
+    ✔ observes driver errors with ordered=true, duplicateBeforeMissing=true
+DEEP_OBSERVATION {"label":"driver error; ordered=true; duplicateBeforeMissing=false","outcome":"rejected","error":{"name":"MongoBulkWriteError","code":11000,"message":"E11000 duplicate key error collection: mongoose_test.BulkSave16713Deep index: _id_ dup key: { _id: ObjectId('6afa45d28aec09517e202831') }","writeErrors":[{"index":1,"code":11000}]},"result":{"insertedCount":1,"matchedCount":0,"modifiedCount":0},"missingInputIndex":1,"failedInputIndex":2,"beforePersisted":true,"afterPersisted":false,"missingPersisted":false,"postSaveHooks":["before","missing"]}
+    ✔ observes driver errors with ordered=true, duplicateBeforeMissing=false
+DEEP_OBSERVATION {"label":"incomplete result with an existing unchanged input; ordered=true","outcome":"rejected","error":{"name":"MongooseBulkSaveIncompleteError","message":"BulkSave16713Deep.bulkSave() was not able to update 2 of the given documents due to incorrect version or optimistic concurrency, document ids: 6afa45d28aec09517e202836, 6afa45d28aec09517e202837, 6afa45d28aec09517e202838","numDocumentsNotUpdated":2,"documents":3},"result":{"insertedCount":0,"matchedCount":1,"modifiedCount":1},"unchangedExists":true,"laterStoredName":"later-updated","postSaveHooks":[]}
+    ✔ observes incomplete-result counts and later writes with ordered=true
+DEEP_OBSERVATION {"label":"driver error; ordered=false; duplicateBeforeMissing=true","outcome":"rejected","error":{"name":"MongoBulkWriteError","code":11000,"message":"E11000 duplicate key error collection: mongoose_test.BulkSave16713Deep index: _id_ dup key: { _id: ObjectId('6afa45d28aec09517e202839') }","writeErrors":[{"index":1,"code":11000}]},"result":{"insertedCount":2,"matchedCount":0,"modifiedCount":0},"missingInputIndex":2,"failedInputIndex":1,"beforePersisted":true,"afterPersisted":true,"missingPersisted":false,"postSaveHooks":["before","missing","after"]}
+    ✔ observes driver errors with ordered=false, duplicateBeforeMissing=true (42ms)
+DEEP_OBSERVATION {"label":"driver error; ordered=false; duplicateBeforeMissing=false","outcome":"rejected","error":{"name":"MongoBulkWriteError","code":11000,"message":"E11000 duplicate key error collection: mongoose_test.BulkSave16713Deep index: _id_ dup key: { _id: ObjectId('6afa45d28aec09517e20283e') }","writeErrors":[{"index":1,"code":11000}]},"result":{"insertedCount":2,"matchedCount":0,"modifiedCount":0},"missingInputIndex":1,"failedInputIndex":2,"beforePersisted":true,"afterPersisted":true,"missingPersisted":false,"postSaveHooks":["before","missing","after"]}
+    ✔ observes driver errors with ordered=false, duplicateBeforeMissing=false
+DEEP_OBSERVATION {"label":"incomplete result with an existing unchanged input; ordered=false","outcome":"rejected","error":{"name":"MongooseBulkSaveIncompleteError","message":"BulkSave16713Deep.bulkSave() was not able to update 2 of the given documents due to incorrect version or optimistic concurrency, document ids: 6afa45d28aec09517e202843, 6afa45d28aec09517e202844, 6afa45d28aec09517e202845","numDocumentsNotUpdated":2,"documents":3},"result":{"insertedCount":0,"matchedCount":1,"modifiedCount":1},"unchangedExists":true,"laterStoredName":"later-updated","postSaveHooks":[]}
+    ✔ observes incomplete-result counts and later writes with ordered=false
+DEEP_OBSERVATION {"label":"initially unchanged input modified by pre-save hook","outcome":"rejected","error":{"name":"MongooseBulkSaveIncompleteError","message":"BulkSave16713PreHook.bulkSave() was not able to update 1 of the given documents due to incorrect version or optimistic concurrency, document ids: 6afa45d28aec09517e202846","numDocumentsNotUpdated":1,"documents":1},"result":{"insertedCount":0,"matchedCount":0,"modifiedCount":0},"isModifiedAfterHook":true}
+    ✔ classifies the document after pre-save hooks have made it modified
+DEEP_OBSERVATION {"label":"unchanged bulkSave inside a transaction","outcome":"fulfilled","error":null,"result":{"insertedCount":0,"matchedCount":0,"modifiedCount":0},"visibleWithoutSession":false,"visibleWithSession":true}
+    ✔ requires the existence read to share the session to see an uncommitted saved record
+
+
+  13 passing (1s)
+
+
+EXIT_CODE=0

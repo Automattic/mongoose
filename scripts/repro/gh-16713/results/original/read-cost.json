@@ -1,0 +1,27 @@
+[
+  {
+    "size": 1,
+    "bulkCommands": [],
+    "readCommands": [
+      "find"
+    ],
+    "foundCount": 1
+  },
+  {
+    "size": 100,
+    "bulkCommands": [],
+    "readCommands": [
+      "find"
+    ],
+    "foundCount": 100
+  },
+  {
+    "size": 10000,
+    "bulkCommands": [],
+    "readCommands": [
+      "find",
+      "getMore"
+    ],
+    "foundCount": 10000
+  }
+]

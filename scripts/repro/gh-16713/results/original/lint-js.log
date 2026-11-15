@@ -1,0 +1,7 @@
+$ npm run lint-js
+
+> mongoose@9.12.1 lint-js
+> eslint . --ext .js --ext .cjs
+
+
+EXIT_CODE=0

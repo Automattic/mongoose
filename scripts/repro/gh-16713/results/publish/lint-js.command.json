@@ -1,0 +1,12 @@
+{
+  "command": [
+    "npm",
+    "run",
+    "lint-js"
+  ],
+  "shell_command": "npm run lint-js",
+  "cwd": "/workspace/mongoose",
+  "started_at": "2026-11-15T23:52:39.442311+00:00",
+  "seconds": 13.244,
+  "exit_code": 0
+}

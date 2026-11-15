@@ -1,0 +1,385 @@
+{
+  "metadata": {
+    "node": "v24.22.1",
+    "mongoose": "9.12.1",
+    "driver": "7.8.0",
+    "mongodb": "8.2.0"
+  },
+  "observations": [
+    {
+      "label": "save; missing=false",
+      "outcome": "fulfilled",
+      "error": null,
+      "commands": [
+        {
+          "name": "find",
+          "collection": "BulkSave16713Probe"
+        }
+      ],
+      "persisted": true,
+      "postSaveHooks": [
+        "unchanged"
+      ],
+      "isModified": false
+    },
+    {
+      "label": "save; missing=true",
+      "outcome": "rejected",
+      "error": {
+        "name": "DocumentNotFoundError",
+        "message": "No document found for query \"{ _id: new ObjectId('6afa45cb59b027b0ab2e7657') }\" on model \"BulkSave16713Probe\""
+      },
+      "commands": [
+        {
+          "name": "find",
+          "collection": "BulkSave16713Probe"
+        }
+      ],
+      "persisted": false,
+      "postSaveHooks": [],
+      "isModified": true
+    },
+    {
+      "label": "bulkSave default; missing=false",
+      "outcome": "fulfilled",
+      "error": null,
+      "result": {
+        "insertedCount": 0,
+        "matchedCount": 0,
+        "modifiedCount": 0
+      },
+      "commands": [],
+      "persisted": true,
+      "postSaveHooks": [
+        "unchanged"
+      ],
+      "isModified": false
+    },
+    {
+      "label": "bulkSave default; missing=true",
+      "outcome": "fulfilled",
+      "error": null,
+      "result": {
+        "insertedCount": 0,
+        "matchedCount": 0,
+        "modifiedCount": 0
+      },
+      "commands": [],
+      "persisted": false,
+      "postSaveHooks": [
+        "unchanged"
+      ],
+      "isModified": false
+    },
+    {
+      "label": "bulkSave ordered true; missing=false",
+      "outcome": "fulfilled",
+      "error": null,
+      "result": {
+        "insertedCount": 0,
+        "matchedCount": 0,
+        "modifiedCount": 0
+      },
+      "commands": [],
+      "persisted": true,
+      "postSaveHooks": [
+        "unchanged"
+      ],
+      "isModified": false
+    },
+    {
+      "label": "bulkSave ordered true; missing=true",
+      "outcome": "fulfilled",
+      "error": null,
+      "result": {
+        "insertedCount": 0,
+        "matchedCount": 0,
+        "modifiedCount": 0
+      },
+      "commands": [],
+      "persisted": false,
+      "postSaveHooks": [
+        "unchanged"
+      ],
+      "isModified": false
+    },
+    {
+      "label": "bulkSave ordered false; missing=false",
+      "outcome": "fulfilled",
+      "error": null,
+      "result": {
+        "insertedCount": 0,
+        "matchedCount": 0,
+        "modifiedCount": 0
+      },
+      "commands": [],
+      "persisted": true,
+      "postSaveHooks": [
+        "unchanged"
+      ],
+      "isModified": false
+    },
+    {
+      "label": "bulkSave ordered false; missing=true",
+      "outcome": "fulfilled",
+      "error": null,
+      "result": {
+        "insertedCount": 0,
+        "matchedCount": 0,
+        "modifiedCount": 0
+      },
+      "commands": [],
+      "persisted": false,
+      "postSaveHooks": [
+        "unchanged"
+      ],
+      "isModified": false
+    },
+    {
+      "label": "mixed batch; ordered=default",
+      "outcome": "fulfilled",
+      "error": null,
+      "result": {
+        "insertedCount": 2,
+        "matchedCount": 2,
+        "modifiedCount": 2
+      },
+      "commands": [
+        {
+          "name": "update",
+          "collection": "BulkSave16713Probe",
+          "ordered": true,
+          "operations": 1
+        },
+        {
+          "name": "insert",
+          "collection": "BulkSave16713Probe",
+          "ordered": true,
+          "operations": 1
+        },
+        {
+          "name": "update",
+          "collection": "BulkSave16713Probe",
+          "ordered": true,
+          "operations": 1
+        },
+        {
+          "name": "insert",
+          "collection": "BulkSave16713Probe",
+          "ordered": true,
+          "operations": 1
+        }
+      ],
+      "persistedNames": [
+        "before-updated",
+        "before-inserted",
+        null,
+        "after-updated",
+        "after-inserted"
+      ],
+      "postSaveHooks": [
+        "before-updated",
+        "before-inserted",
+        "missing",
+        "after-updated",
+        "after-inserted"
+      ],
+      "isNew": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "isModified": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "updates only; ordered=default",
+      "outcome": "fulfilled",
+      "error": null,
+      "result": {
+        "insertedCount": 0,
+        "matchedCount": 2,
+        "modifiedCount": 2
+      },
+      "commands": [
+        {
+          "name": "update",
+          "collection": "BulkSave16713Probe",
+          "ordered": true,
+          "operations": 2
+        }
+      ]
+    },
+    {
+      "label": "mixed batch; ordered=true",
+      "outcome": "fulfilled",
+      "error": null,
+      "result": {
+        "insertedCount": 2,
+        "matchedCount": 2,
+        "modifiedCount": 2
+      },
+      "commands": [
+        {
+          "name": "update",
+          "collection": "BulkSave16713Probe",
+          "ordered": true,
+          "operations": 1
+        },
+        {
+          "name": "insert",
+          "collection": "BulkSave16713Probe",
+          "ordered": true,
+          "operations": 1
+        },
+        {
+          "name": "update",
+          "collection": "BulkSave16713Probe",
+          "ordered": true,
+          "operations": 1
+        },
+        {
+          "name": "insert",
+          "collection": "BulkSave16713Probe",
+          "ordered": true,
+          "operations": 1
+        }
+      ],
+      "persistedNames": [
+        "before-updated",
+        "before-inserted",
+        null,
+        "after-updated",
+        "after-inserted"
+      ],
+      "postSaveHooks": [
+        "before-updated",
+        "before-inserted",
+        "missing",
+        "after-updated",
+        "after-inserted"
+      ],
+      "isNew": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "isModified": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "updates only; ordered=true",
+      "outcome": "fulfilled",
+      "error": null,
+      "result": {
+        "insertedCount": 0,
+        "matchedCount": 2,
+        "modifiedCount": 2
+      },
+      "commands": [
+        {
+          "name": "update",
+          "collection": "BulkSave16713Probe",
+          "ordered": true,
+          "operations": 2
+        }
+      ]
+    },
+    {
+      "label": "mixed batch; ordered=false",
+      "outcome": "fulfilled",
+      "error": null,
+      "result": {
+        "insertedCount": 2,
+        "matchedCount": 2,
+        "modifiedCount": 2
+      },
+      "commands": [
+        {
+          "name": "insert",
+          "collection": "BulkSave16713Probe",
+          "ordered": false,
+          "operations": 2
+        },
+        {
+          "name": "update",
+          "collection": "BulkSave16713Probe",
+          "ordered": false,
+          "operations": 2
+        }
+      ],
+      "persistedNames": [
+        "before-updated",
+        "before-inserted",
+        null,
+        "after-updated",
+        "after-inserted"
+      ],
+      "postSaveHooks": [
+        "before-updated",
+        "before-inserted",
+        "missing",
+        "after-updated",
+        "after-inserted"
+      ],
+      "isNew": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "isModified": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "label": "updates only; ordered=false",
+      "outcome": "fulfilled",
+      "error": null,
+      "result": {
+        "insertedCount": 0,
+        "matchedCount": 2,
+        "modifiedCount": 2
+      },
+      "commands": [
+        {
+          "name": "update",
+          "collection": "BulkSave16713Probe",
+          "ordered": false,
+          "operations": 2
+        }
+      ]
+    },
+    {
+      "label": "standalone batched existence query (no patch)",
+      "outcome": "fulfilled",
+      "error": null,
+      "commands": [
+        {
+          "name": "find",
+          "collection": "BulkSave16713Probe"
+        }
+      ],
+      "foundCount": 2
+    }
+  ]
+}

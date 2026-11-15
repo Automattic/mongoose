@@ -1,0 +1,107 @@
+{
+  "checked_at": "2026-11-15 22:32:33 UTC",
+  "commit": "ab4e3637a5a65f875e385abd4f3b77f457e66d78",
+  "issue": {
+    "issue": {
+      "url": "https://github.com/Automattic/mongoose/issues/16713",
+      "title": "`bulkSave()` should throw error when a document doesn't exist in DB matching `save()`",
+      "issue_number": 16713,
+      "body": "Currently `save()` throws a `DocumentNotFoundError` when a document has no changes and doesn't exist in DB, while `bulkSave()` doesn't handle this scenario.\nGiven that my intent of `bulkSave()` was to replace multiple `save()`s with a single DB call, I expect it to strictly behave the same way.\n\nShould we `find()` all the documents that have no changes, and throw an error if one of them doesn't exist in `ordered: true` (run all operations all the way until the first non-existent doc), and for `ordered: false`, throw an error after? WDYT? @vkarpov15 @hasezoey",
+      "state": "open",
+      "user": {
+        "login": "AbdelrahmanHafez",
+        "name": "AbdelrahmanHafez",
+        "email": null,
+        "avatar_url": "https://avatars.githubusercontent.com/u/19984935?v=4",
+        "id": 19984935
+      },
+      "assignees": null,
+      "labels": null,
+      "milestone": null,
+      "state_reason": null,
+      "comments": 0,
+      "created_at": "2026-11-15T20:23:12Z",
+      "updated_at": "2026-11-15T20:23:12Z",
+      "closed_at": null,
+      "display_url": "https://github.com/Automattic/mongoose/issues/16713",
+      "display_title": "`bulkSave()` should throw error when a document doesn't exist in DB matching `save()`"
+    },
+    "url": "https://github.com/Automattic/mongoose/issues/16713",
+    "title": "`bulkSave()` should throw error when a document doesn't exist in DB matching `save()`",
+    "display_url": "https://github.com/Automattic/mongoose/issues/16713",
+    "display_title": "`bulkSave()` should throw error when a document doesn't exist in DB matching `save()`"
+  },
+  "pr:16512": {
+    "number": 16512,
+    "title": "fix: preserve middleware through validation, hydration, and query options",
+    "url": "https://github.com/Automattic/mongoose/pull/16512",
+    "state": "open",
+    "merged": false,
+    "updated_at": "2026-09-29T21:40:20Z",
+    "closed_at": null
+  },
+  "pr:16533": {
+    "number": 16533,
+    "title": "fix(model): preserve unsaved documents after ordered bulkSave errors",
+    "url": "https://github.com/Automattic/mongoose/pull/16533",
+    "state": "closed",
+    "merged": true,
+    "updated_at": "2026-09-28T19:45:52Z",
+    "closed_at": "2026-09-28T19:45:52Z"
+  },
+  "pr:16474": {
+    "number": 16474,
+    "title": "perf(model): index bulkSave write errors by document id",
+    "url": "https://github.com/Automattic/mongoose/pull/16474",
+    "state": "closed",
+    "merged": true,
+    "updated_at": "2026-08-25T15:43:45Z",
+    "closed_at": "2026-08-25T15:43:45Z"
+  },
+  "pr:16649": {
+    "number": 16649,
+    "title": "fix(model): preserve pending inserts after command errors",
+    "url": "https://github.com/Automattic/mongoose/pull/16649",
+    "state": "open",
+    "merged": false,
+    "updated_at": "2026-10-29T12:38:18Z",
+    "closed_at": null
+  },
+  "comments": {
+    "comments": [],
+    "url": "https://github.com/Automattic/mongoose/issues/16713",
+    "title": "Automattic/mongoose Issue #16713 comments",
+    "display_url": "https://github.com/Automattic/mongoose/issues/16713",
+    "display_title": "Automattic/mongoose Issue #16713 comments"
+  },
+  "pr:16647": {
+    "number": 16647,
+    "title": "fix(model): preserve bulkSave document state on command failures",
+    "url": "https://github.com/Automattic/mongoose/pull/16647",
+    "state": "open",
+    "merged": false,
+    "updated_at": "2026-10-29T12:44:30Z",
+    "closed_at": null
+  },
+  "pr:16700": {
+    "number": 16700,
+    "title": "docs(model): remove incorrect w and j defaults from bulkWrite() and bulkSave()",
+    "url": "https://github.com/Automattic/mongoose/pull/16700",
+    "state": "open",
+    "merged": false,
+    "updated_at": "2026-11-13T03:07:30Z",
+    "closed_at": null
+  },
+  "closed_prs": [
+    {
+      "number": 16533,
+      "title": "fix(model): preserve unsaved documents after ordered bulkSave errors",
+      "url": "https://github.com/Automattic/mongoose/pull/16533"
+    },
+    {
+      "number": 16474,
+      "title": "perf(model): index bulkSave write errors by document id",
+      "url": "https://github.com/Automattic/mongoose/pull/16474"
+    }
+  ]
+}

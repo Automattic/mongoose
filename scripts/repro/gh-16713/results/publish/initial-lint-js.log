@@ -1,0 +1,39 @@
+$ npm run lint-js
+
+> mongoose@9.12.1 lint-js
+> eslint . --ext .js --ext .cjs
+
+
+/workspace/mongoose/scripts/repro/gh-16713/probes/deep-observations.test.js
+   47:1  error  'describe' is not defined    no-undef
+   53:3  error  'before' is not defined      no-undef
+   66:3  error  'beforeEach' is not defined  no-undef
+   71:3  error  'after' is not defined       no-undef
+   76:3  error  'it' is not defined          no-undef
+  102:3  error  'it' is not defined          no-undef
+  118:3  error  'it' is not defined          no-undef
+  146:5  error  'it' is not defined          no-undef
+  173:7  error  'it' is not defined          no-undef
+  200:5  error  'it' is not defined          no-undef
+  222:3  error  'it' is not defined          no-undef
+  240:3  error  'it' is not defined          no-undef
+
+/workspace/mongoose/scripts/repro/gh-16713/probes/observations.test.js
+   42:1  error  'describe' is not defined    no-undef
+   47:3  error  'before' is not defined      no-undef
+   74:3  error  'beforeEach' is not defined  no-undef
+   79:3  error  'after' is not defined       no-undef
+   93:7  error  'it' is not defined          no-undef
+  121:5  error  'it' is not defined          no-undef
+  145:5  error  'it' is not defined          no-undef
+  160:3  error  'it' is not defined          no-undef
+
+/workspace/mongoose/scripts/repro/gh-16713/probes/read-cost.test.js
+  11:1  error  'describe' is not defined  no-undef
+  15:3  error  'after' is not defined     no-undef
+  20:3  error  'it' is not defined        no-undef
+
+✖ 23 problems (23 errors, 0 warnings)
+
+
+EXIT_CODE=1

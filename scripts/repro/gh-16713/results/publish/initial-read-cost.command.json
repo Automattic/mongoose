@@ -1,0 +1,22 @@
+{
+  "command": [
+    "env",
+    "-u",
+    "MONGOOSE_TEST_URI",
+    "-u",
+    "MONGOOSE_REPLSET_URI",
+    "-u",
+    "START_REPLICA_SET",
+    "MONGOOSE_16713_OUTPUT_DIR=/workspace/mongoose/scripts/repro/gh-16713/results/publish",
+    "MONGOMS_VERSION=8.2.0",
+    "MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries",
+    "./node_modules/.bin/mocha",
+    "--exit",
+    "scripts/repro/gh-16713/probes/read-cost.test.js"
+  ],
+  "shell_command": "env -u MONGOOSE_TEST_URI -u MONGOOSE_REPLSET_URI -u START_REPLICA_SET MONGOOSE_16713_OUTPUT_DIR=/workspace/mongoose/scripts/repro/gh-16713/results/publish MONGOMS_VERSION=8.2.0 MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries ./node_modules/.bin/mocha --exit scripts/repro/gh-16713/probes/read-cost.test.js",
+  "cwd": "/workspace/mongoose",
+  "started_at": "2026-11-15T23:51:42.679958+00:00",
+  "seconds": 1.865,
+  "exit_code": 0
+}

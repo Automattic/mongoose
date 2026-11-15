@@ -1,0 +1,7 @@
+$ ./node_modules/.bin/markdownlint-cli2 scripts/repro/gh-16713/README.md
+markdownlint-cli2 v0.24.0 (markdownlint v0.42.0)
+Finding: scripts/repro/gh-16713/README.md !History.md !SECURITY.md !migrating_to_5.md !.github/PULL_REQUEST_TEMPLATE.md !CHANGELOG.md !node_modules
+Linting: 1 file
+Summary: 0 issues in 0 files
+
+EXIT_CODE=0

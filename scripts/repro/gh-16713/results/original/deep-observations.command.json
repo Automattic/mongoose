@@ -1,0 +1,20 @@
+{
+  "command": [
+    "env",
+    "-u",
+    "MONGOOSE_TEST_URI",
+    "-u",
+    "MONGOOSE_REPLSET_URI",
+    "START_REPLICA_SET=1",
+    "MONGOMS_VERSION=8.2.0",
+    "MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries",
+    "./node_modules/.bin/mocha",
+    "--exit",
+    "/workspace/scratch/mongoose-16713/deep-observations.test.js"
+  ],
+  "shell_command": "env -u MONGOOSE_TEST_URI -u MONGOOSE_REPLSET_URI START_REPLICA_SET=1 MONGOMS_VERSION=8.2.0 MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries ./node_modules/.bin/mocha --exit /workspace/scratch/mongoose-16713/deep-observations.test.js",
+  "cwd": "/workspace/mongoose",
+  "started_at": "2026-11-15T22:58:35.115811+00:00",
+  "seconds": 8.951,
+  "exit_code": 0
+}

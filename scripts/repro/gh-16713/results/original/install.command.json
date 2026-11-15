@@ -1,0 +1,13 @@
+{
+  "command": [
+    "env",
+    "npm_config_cache=/tmp/mongoose-16713-npm-cache",
+    "npm",
+    "install"
+  ],
+  "shell_command": "env npm_config_cache=/tmp/mongoose-16713-npm-cache npm install",
+  "cwd": "/workspace/mongoose",
+  "started_at": "2026-11-15T22:27:51.220811+00:00",
+  "seconds": 34.581,
+  "exit_code": 0
+}

@@ -1,0 +1,14 @@
+$ env -u MONGOOSE_TEST_URI -u MONGOOSE_REPLSET_URI -u START_REPLICA_SET MONGOMS_VERSION=8.2.0 MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries ./node_modules/.bin/mocha --exit /workspace/scratch/mongoose-16713/read-cost.test.js
+
+
+  gh-16713 projected existence-read command cost
+READ_COST {"size":1,"bulkCommands":[],"readCommands":["find"],"foundCount":1}
+READ_COST {"size":100,"bulkCommands":[],"readCommands":["find"],"foundCount":100}
+READ_COST {"size":10000,"bulkCommands":[],"readCommands":["find","getMore"],"foundCount":10000}
+    ✔ compares unchanged bulkSave with a projected batched read at 1, 100, and 10000 inputs (408ms)
+
+
+  1 passing (504ms)
+
+
+EXIT_CODE=0

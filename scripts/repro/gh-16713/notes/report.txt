@@ -1,0 +1,240 @@
+ARCHIVED INVESTIGATION SNAPSHOT — written before PR preparation.
+Commands and workspace paths below are historical execution evidence.
+For portable commands and current publication status, see ../README.md.
+Statements about remaining local or no PR existing describe that earlier state.
+
+Mongoose #16713 — local evidence and design gate
+Checked: 2026-11-15 22:32:33 UTC
+
+PROBLEM / FIX / TESTS / EVIDENCE
+
+Problem: An unchanged individual save detects a deleted stored record, while
+bulkSave silently succeeds. A developer batching saves can mistake that success
+for evidence that every input still has a stored record. In the reproduction,
+bulkSave even runs the absent document's post-save success hook.
+
+Fix: Stopped at regression coverage because the issue still requests design
+feedback. No production code, public errors, ordering, or read behavior changed.
+The local test diff deliberately remains red until the design is agreed.
+
+Tests: Existing focused tests passed before edits (45 passing, 2 pending).
+After adding four cases, the focused run has 46 passing, 2 pending, 3 failing.
+All three new failures are "Missing expected rejection." The separate observation
+probe has 15 passing cases. Lint, charset, and diff checks pass.
+
+Evidence: Full logs, exact child commands, exit codes, driver command observations,
+and the issue/PR snapshot are stored alongside this report. See the inventory below.
+
+UPSTREAM AND OVERLAP
+
+Repository: https://github.com/Automattic/mongoose
+Branch/commit: master / ab4e3637a5a65f875e385abd4f3b77f457e66d78
+Issue: https://github.com/Automattic/mongoose/issues/16713
+Status at the check above: open; zero comments; no recorded agreement on the
+error contract, write ordering, or added read.
+
+Related open PRs:
+- #16647: preserve bulkSave document state on command failures. Its patch
+  classifies failed command acknowledgements; it does not add existence checks.
+- #16512: validation and middleware changes, including bulkSave validation.
+  Its bulkSave patch does not add existence checks.
+- #16649: preserve pending insertMany inserts after command errors; a different API.
+- #16700: correct documented w/j defaults; documentation only.
+
+Related recently closed PRs:
+- #16533: merged 2026-09-28; preserve unattempted document state after ordered
+  bulkSave write errors, using operation-to-input indexes.
+- #16474: merged 2026-08-25; optimize bulkSave write-error bookkeeping.
+
+No covering fix found. Inspected the bulkSave-related patches in #16647 and
+#16512 and current upstream coverage from #16533. Searched PRs for 16713,
+bulkSave, bulkSave DocumentNotFoundError, bulkSave unchanged, bulkSave "no changes",
+and bulkSave missing document; also searched closed bulkSave PRs since
+2026-08-15. The 16713 text hit was an unrelated Dependabot changelog reference.
+github-status.json contains the final issue/comment/PR status snapshot.
+
+SETUP AND ISOLATION
+
+Workspace originally had no Mongoose checkout. Created /workspace/mongoose with:
+  git clone --depth 1 --branch master https://github.com/Automattic/mongoose.git /workspace/mongoose
+
+The initial network-restricted attempt exited 128 (proxy connection failure);
+the same command with network access enabled succeeded. Initial git status was
+clean, so no pre-existing working-tree edits were touched.
+
+Read CONTRIBUTING.md and the actual Mocha/MongoDB fixtures. No AGENTS.md was found.
+Installed with:
+  env npm_config_cache=/tmp/mongoose-16713-npm-cache npm install
+Result: exit 0; 696 packages added. The repo disables package-lock generation.
+
+Runtime verified by the probe:
+  Node v24.22.1; npm 11.9.0
+  Mongoose 9.12.1; MongoDB Node driver 7.8.0; MongoDB server 8.2.0
+
+All database runs used the repo's normal global Mocha fixture and test/common.js.
+The URI overrides and START_REPLICA_SET were explicitly unset. The fixture started
+a disposable, real wiredTiger mongod and stopped it after each run. No shared or
+existing database was used. Binaries were cached under /tmp, not in the checkout.
+
+EXACT TEST COMMANDS AND ACTUAL RESULTS
+
+All commands below ran from /workspace/mongoose. Each was invoked through:
+  python3 /workspace/scratch/mongoose-16713/run.py <label> <command below>
+The wrapper records the exact child argument list, working directory, timestamp,
+duration, output, and actual exit code in <label>.command.json and <label>.log.
+
+1. Baseline, BEFORE editing test/model.test.js (label: baseline):
+  env -u MONGOOSE_TEST_URI -u MONGOOSE_REPLSET_URI -u START_REPLICA_SET MONGOMS_VERSION=8.2.0 MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries npm test -- --grep 'bulkSave|saving a document with no changes'
+  Result: exit 0; 45 passing, 2 pending, 0 failing.
+  Includes the existing unchanged missing save regression at
+  test/document.test.js:1735, existing unchanged bulkSave control, validation,
+  middleware, versioning, incomplete-save errors, and ordered/unordered failures.
+  The 2 pending cases require replica-set transaction retries; this run was standalone.
+
+2. Upstream observation probe (label: observations):
+  env -u MONGOOSE_TEST_URI -u MONGOOSE_REPLSET_URI -u START_REPLICA_SET MONGOMS_VERSION=8.2.0 MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries ./node_modules/.bin/mocha --exit /workspace/scratch/mongoose-16713/observations.test.js
+  Result: exit 0; 15 passing, 0 pending, 0 failing.
+  Uses the same repository Mocha configuration/global MongoDB fixture.
+  observations.json records errors, persistence, hooks, and actual driver commands.
+  These assertions characterize CURRENT behavior; they are outside the repo and
+  are not a proposed future ordering contract.
+
+3. New local regression cases only (label: regression):
+  env -u MONGOOSE_TEST_URI -u MONGOOSE_REPLSET_URI -u START_REPLICA_SET MONGOMS_VERSION=8.2.0 MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries npm test -- --grep 'gh-16713'
+  Result: exit 3; 1 passing, 0 pending, 3 failing.
+  Passing: existing unchanged documents work with save(), default bulkSave(),
+  ordered bulkSave(), and unordered bulkSave().
+  Failing: missing unchanged document should reject in default, ordered: true,
+  and ordered: false modes. Each fails at test/model.test.js:8512 with:
+    AssertionError [ERR_ASSERTION]: Missing expected rejection.
+  Rejection is asserted without choosing an error class, message, or metadata.
+
+4. Combined focused suite after the edit (label: focused-after):
+  env -u MONGOOSE_TEST_URI -u MONGOOSE_REPLSET_URI -u START_REPLICA_SET MONGOMS_VERSION=8.2.0 MONGOMS_DOWNLOAD_DIR=/tmp/mongoose-16713-mongodb-binaries npm test -- --grep 'bulkSave|saving a document with no changes'
+  Result: exit 3; 46 passing, 2 pending, 3 failing.
+  The only failures are the three deliberate missing-document regressions above.
+
+5. Relevant checks:
+  npm run lint-js             -> exit 0 (label: lint-js)
+  npm run checkLibCharset     -> exit 0 (label: charset)
+  git diff --check            -> exit 0 (label: diff-check)
+
+No full-suite, replica-set, sharding, or TypeScript test pass is claimed.
+
+OBSERVED BEHAVIOR AND WHICH WRITES PERSISTED
+
+Unchanged document still exists:
+- save(): fulfilled; one find command; stored record remains.
+- bulkSave(), default/true/false: fulfilled; zero database commands;
+  stored record remains; result insertedCount=matchedCount=modifiedCount=0.
+
+Unchanged document is deleted:
+- save(): rejected with DocumentNotFoundError; one find command;
+  stored record remains absent; no post-save success hook.
+- bulkSave(), default/true/false: fulfilled; zero database commands;
+  stored record remains absent; the document's post-save success hook runs.
+  Result insertedCount=matchedCount=modifiedCount=0.
+
+The comparisons use independent cases. Reusing the document after its failing
+individual save can change the case: the observed save error path leaves that
+instance modified, so a later bulkSave may generate an update rather than a no-op.
+
+Mixed batch input:
+  [update A, insert B, missing unchanged C, update D, insert E]
+
+For default, ordered: true, AND ordered: false:
+- A and D were updated to their new names.
+- B and E were inserted.
+- C remained absent.
+- bulkSave fulfilled, reporting matchedCount=2, modifiedCount=2, insertedCount=2.
+- All five documents received post-save success hooks, including C.
+- All five ended with isNew=false and no modified paths.
+
+Recorded persisted names, in input order:
+  ["before-updated", "before-inserted", null, "after-updated", "after-inserted"]
+
+TRACE OF THE CURRENT IMPLEMENTATION
+
+lib/model.js:490-499:
+An unchanged individual save builds its normal where filter (including custom
+conditions/version handling), applies read concern, then findOne()s with an _id
+projection. A missing result becomes matchedCount=0.
+
+lib/model.js:508-551:
+The acknowledged save path checks affected counts and dispatches
+DocumentNotFoundError through save error hooks. Versioned update failures can
+instead produce VersionError; the scalar unchanged reproduction does not use that path.
+
+lib/model.js:3682-3689 and 3992-4054:
+bulkSave runs all pre-save hooks before building the batch. The builder validates
+documents, emits inserts/updates, and filters out null operations for unchanged
+documents. Classification therefore occurs after pre-save hooks/timestamps.
+There is no existence read for the omitted inputs.
+
+lib/model.js:3507-3514:
+An empty operation list returns a synthetic BulkWriteResult without contacting MongoDB.
+
+lib/model.js:3691-3703:
+Non-MongoBulkWriteError failures propagate immediately. With no driver error,
+matchedCount+insertedCount below the GENERATED operation count throws
+MongooseBulkSaveIncompleteError. Unchanged inputs are absent from that comparison.
+This error is an aggregate result check AFTER submitted writes, not rollback or
+a server-side ordered stopping condition. Its existing document-count metadata
+also uses the entire document array, so reusing it is a public-contract decision.
+
+lib/model.js:3706-3727:
+For per-operation driver errors, ordered batches map the first failing operation
+back to its original input index and only handle preceding documents as successful.
+Unordered batches exclude individually failed inputs and handle the rest, then
+rethrow the bulk write error. If no error exists, all input documents go through
+successful-write cleanup and post-save hooks, even skipped/missing unchanged inputs.
+
+Ordered means stop at a server WRITE ERROR. A successful update matching zero
+records is not itself a driver write error, and an omitted unchanged document
+cannot produce one. Pre-save hooks have already run for all inputs in either mode.
+
+READ / ROUND-TRIP COST AND UNRESOLVED DECISIONS
+
+Measured commands AFTER collection initialization and data setup, restricted to
+the operation being observed (monitorCommands=true):
+- One unchanged save: 1 find.
+- Unchanged-only bulkSave: 0 commands, whether the record exists or is absent.
+- [update A, missing unchanged C, update D]: 1 update command carrying 2 operations,
+  for default/true/false.
+- Alternating mixed input [update A, insert B, C, update D, insert E]:
+  default/ordered: 4 commands (update, insert, update, insert), each with 1 operation.
+  unordered: 2 commands (one insert with 2 operations, one update with 2).
+  Thus one bulkSave API call is not always one wire round trip.
+- A separate experimental projected find over three unchanged IDs, one absent:
+  1 find command; 2 IDs returned. This probe does not modify bulkSave.
+
+A batched existence check adds one logical read (at least one find command for
+the small cases measured), even when the current batch performs no database I/O.
+Larger reads may need getMore commands. No timing benchmark or atomicity improvement
+is claimed. Records can change between the check and writes.
+
+The issue's proposed ordered behavior would require writing only the prefix
+before the first missing input, then rejecting; simply preflighting and rejecting
+everything would also skip valid prefix writes. Checking only after the entire
+bulkWrite would allow later writes to persist. That choice is unresolved.
+Unordered error aggregation and precedence with existing driver/incomplete-save
+errors are also unresolved. The extra-read decision remains unresolved.
+
+STOP POINT AND FILE INVENTORY
+
+Only repo-tracked change:
+  /workspace/mongoose/test/model.test.js:8476
+  40 added lines: one existing-document control plus three generic rejection
+  regressions (default, ordered true, ordered false).
+Production code and normal save paths have no diff. Tests are deliberately ungreen.
+No commit, push, issue/PR comment, or PR was created. No PR-ready patch exists.
+
+External local evidence under /workspace/scratch/mongoose-16713:
+- report.txt: this report.
+- draft-comment.txt: concise decision request, not posted.
+- github-status.json: final source snapshots/statuses.
+- observations.test.js / observations.json: reproducible current-behavior and
+  command-count probe plus machine-readable observations.
+- run.py: command/output/exit-code recorder.
+- install, baseline, observations, regression, focused-after, lint-js, charset,
+  and diff-check: .log and .command.json files with actual execution evidence.

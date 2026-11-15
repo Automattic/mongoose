@@ -8473,6 +8473,46 @@ describe('Model', function() {
       assert.ok(err == null);
 
     });
+    describe('unchanged documents (gh-16713)', function() {
+      it('saves unchanged documents that still exist', async function() {
+        const User = db.model('User', new Schema({ name: String }));
+        const users = await User.insertMany([
+          { name: 'individual' },
+          { name: 'default' },
+          { name: 'ordered' },
+          { name: 'unordered' }
+        ]);
+        assert.ok(users.every(user => !user.isNew && !user.isModified()));
+
+        await users[0].save();
+        await User.bulkSave([users[1]]);
+        await User.bulkSave([users[2]], { ordered: true });
+        await User.bulkSave([users[3]], { ordered: false });
+
+        assert.ok(users.every(user => !user.isNew && !user.isModified()));
+        assert.strictEqual(await User.countDocuments({ _id: { $in: users.map(user => user._id) } }), 4);
+      });
+
+      for (const ordered of [undefined, true, false]) {
+        const mode = ordered === undefined ? 'default' : `ordered: ${ordered}`;
+
+        it(`rejects a missing unchanged document (${mode})`, async function() {
+          const User = db.model('User', new Schema({ name: String }));
+          const user = await User.create({ name: 'missing' });
+          assert.strictEqual(user.isNew, false);
+          assert.strictEqual(user.isModified(), false);
+
+          const result = await User.deleteOne({ _id: user._id });
+          assert.strictEqual(result.deletedCount, 1);
+          assert.strictEqual(await User.findById(user._id), null);
+          assert.strictEqual(user.isModified(), false);
+
+          // Error shape and mixed-batch ordering are still under discussion in gh-16713.
+          const options = ordered === undefined ? {} : { ordered };
+          await assert.rejects(() => User.bulkSave([user], options));
+        });
+      }
+    });
     it('should error if no documents were inserted or updated (gh-14763)', async function() {
       const fooSchema = new mongoose.Schema({
         bar: { type: Number }

@@ -107,6 +107,12 @@ describe('Query sanitizeProjection', function() {
   });
 
   it('applies select: false exclusions when the projection is a nested exclusion object', async function() {
+    // MongoDB 4.x doesn't support nested sub-projections or expressions in find projections
+    const version = await start.mongodVersion();
+    if (version[0] < 5) {
+      this.skip();
+    }
+
     const doc = await User.findOne().select({ profile: { bio: 0 } }).lean();
 
     assert.strictEqual(doc.profile.bio, undefined);
@@ -116,6 +122,12 @@ describe('Query sanitizeProjection', function() {
   });
 
   it('treats nested objects with `$` keys as inclusive expressions', async function() {
+    // MongoDB 4.x doesn't support nested sub-projections or expressions in find projections
+    const version = await start.mongodVersion();
+    if (version[0] < 5) {
+      this.skip();
+    }
+
     const doc = await User.findOne().select({ profile: { $toString: '$name' } }).lean();
 
     assert.strictEqual(doc.profile, 'test');

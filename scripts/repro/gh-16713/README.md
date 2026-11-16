@@ -4,6 +4,10 @@ This package supports the design discussion in [issue #16713](https://github.com
 It contains regression coverage, runnable probes, investigation notes, source snapshots, and execution evidence.
 It does not change production behavior or define a new error or ordering contract.
 
+The prepared upstream draft PR title is `test(model): investigate missing unchanged documents in bulkSave (gh-16713)`.
+Its [full description](PR_DESCRIPTION.md) is included for review and reuse. The authenticated integration could push
+this branch to the fork, but GitHub rejected upstream PR creation with `Resource not accessible by integration`.
+
 ## Reproduced behavior
 
 On upstream `ab4e3637a5a65f875e385abd4f3b77f457e66d78`, an unchanged document's `save()` rejects with

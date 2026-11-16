@@ -1115,7 +1115,7 @@ describe('model: populate:', function() {
       ]
     });
 
-    // non-existant subprop
+    // non-existent subprop
     await BlogPost.findById(post._id).populate({
       path: 'comments._idontexist',
       select: 'email',

@@ -1,3 +1,8 @@
+7.8.14 / 2026-11-16
+====================
+ * fix(query): make sanitizeFilter catch any fields that start with $ in top-level filter to avoid bypass using $_internalSchemaXor and other MongoDB internal expressions
+ * fix(query): hardening for sanitizeProjection
+
 7.8.13 / 2026-10-13
 ===================
  * fix: avoid walking into inherited properties like `toString` when hydrating documents, setting dotted paths, and merging updates

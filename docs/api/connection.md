@@ -473,7 +473,7 @@ Listen to a event once in the Connection
 - `[options.autoIndex=true]` \<boolean\> Mongoose-specific option. Set to false to disable automatic index creation for all models associated with this connection.
 - `[options.socketTimeoutMS=0]` \<number\> How long the MongoDB driver will wait before killing a socket due to inactivity _after initial connection_. A socket may be inactive because of either no activity or a long-running operation. `socketTimeoutMS` defaults to 0, which means Node.js will not time out the socket due to inactivity. This option is passed to [Node.js `socket#setTimeout()` function](https://nodejs.org/api/net.html#net_socket_settimeout_timeout_callback) after the MongoDB driver successfully completes.
 - `[options.family=0]` \<number\> Passed transparently to [Node.js' `dns.lookup()`](https://nodejs.org/api/dns.html#dns_dns_lookup_hostname_options_callback) function. May be either `0`, `4`, or `6`. `4` means use IPv4 only, `6` means use IPv6 only, `0` means try both.
-- `[options.autoCreate=false]` \<boolean\> Set to `true` to make Mongoose automatically call `createCollection()` on every model created on this connection.
+- `[options.autoCreate=true]` \<boolean\> Set to `false` to disable Mongoose automatically calling `createCollection()` on every model created on this connection. Mongoose sets this option to `false` when `readPreference` is `secondary`, `secondaryPreferred`, or `nearest`. Setting `autoCreate: true` with `secondary` or `secondaryPreferred` throws an error.
 
 Opens the connection with a URI using `MongoClient.connect()`.
 

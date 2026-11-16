@@ -69,6 +69,20 @@ function gh15972() {
   expect(mongoose.set).type.not.toBeCallableWith('returnDocument', true);
 }
 
+function setAutoSearchIndex() {
+  mongoose.set('autoSearchIndex', true);
+  mongoose.set({ autoSearchIndex: false });
+
+  expect(mongoose.set).type.not.toBeCallableWith('autoSearchIndex', 'yes');
+}
+
+function setForceRepopulate() {
+  mongoose.set('forceRepopulate', false);
+  mongoose.set({ forceRepopulate: true });
+
+  expect(mongoose.set).type.not.toBeCallableWith('forceRepopulate', 'no');
+}
+
 function gh12100() {
   mongoose.syncIndexes({ continueOnError: true, sparse: true });
   mongoose.syncIndexes({ continueOnError: false, sparse: true });

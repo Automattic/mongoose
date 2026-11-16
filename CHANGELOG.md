@@ -1,3 +1,63 @@
+9.12.2 / 2026-11-16
+===================
+ * fix(query): make sanitizeFilter catch any fields that start with $ in top-level filter to avoid bypass using $_internalSchemaXor and other MongoDB internal expressions
+ * fix(query): hardening for sanitizeProjection
+ * fix(array): avoid converting BigInts to numbers in addToSet() #16693 [luantaraschi](https://github.com/luantaraschi)
+ * fix(cursor): propagate error passed to destroy() without re-emitting if error already emitted #16686 #16610 #16609 [IbrahimHafez1](https://github.com/IbrahimHafez1)
+ * fix(query): throw cast errors and respect strict option in replaceOne() #16629 #16628 [OmBhandwaldar](https://github.com/OmBhandwaldar)
+ * fix(castArrayFilters): cast $and/$or/$nor wherever they appear in an array filter #16638 #16637 [mtechcave1](https://github.com/mtechcave1)
+ * fix(document): allow setting dotted paths 3+ levels deep underneath single nested subdocuments #16691 [RagedPanda](https://github.com/RagedPanda)
+ * fix(connection): reset document state before retrying after a transient commit error #16640 #16639 [IbrahimHafez1](https://github.com/IbrahimHafez1)
+ * fix(array): avoid converting BigInts to numbers in addToSet() #16693 [luantaraschi](https://github.com/luantaraschi)
+ * docs: add EOL date for Mongoose 7 #16719
+ * docs(mongoose): document missing options for set() #16703 [ragib-mrb](https://github.com/ragib-mrb)
+
+8.24.9 / 2026-11-12
+===================
+ * fix(document): allow setting dotted paths 3+ levels deep underneath single nested subdocuments #16691 [RagedPanda](https://github.com/RagedPanda)
+ * fix(connection): don't disable autoIndex/autoCreate for a primary ReadPreference instance [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+
+9.12.1 / 2026-11-09
+===================
+ * perf(update): avoid quadratic ancestor lookup in update validators and validate nested array subdocs once #16586 [https://github.com/Re-cool](https://github.com/Re-cool)
+ * perf: keep lib/ source within Latin-1 #16681 [orgads](https://github.com/orgads)
+ * perf(map): avoid quadratic concat() when creating a MongooseMap from an object #16677 [ptweezy](https://github.com/ptweezy)
+ * fix(array): keep earlier pushed values when push() is called again with $each #16619 #16618 [maxymlyskov](https://github.com/maxymlyskov)
+ * fix(model+query): handle inherited read preference and read concern on cloned queries #16668 #16632
+ * fix(timestamps): set timestamps on subdocs pushed via array filters #16615 #8809 [vaidehi-snk](https://github.com/vaidehi-snk)
+ * fix(model): validate paths under a nested path passed to Model.validate() #16653 [NotAFlightRisk](https://github.com/NotAFlightRisk)
+ * fix(update): skip array-level validators for $pull with $in #16666 [AnkitKumar61](https://github.com/AnkitKumar61)
+ * fix(cursor): finish destruction after terminal initialization #16612 [IbrahimHafez1](https://github.com/IbrahimHafez1)
+
+9.12.0 / 2026-11-04
+===================
+ * feat: upgrade to mongodb driver 7.8 #16772 #16667
+ * perf: improve for document arrays: cache paths with defaults and schemas with select paths; avoid unnecessary $isModified() lookup #16595
+ * fix: make recompileSchema recompute derived caches and delay _preCompile() until an actual model is compiled (not subdocs or doc arrays) #16595
+ * fix(array): compare UUIDs by value in indexOf() so pull() and addToSet() work #16606 [luantaraschi](https://github.com/luantaraschi)
+ * docs(query): remove unused use$geoWithin docs and property #16589 #16583
+
+9.11.5 / 2026-11-03
+===================
+ * fix(query): pass explain verbosity to the driver cursor in find() #16635 [jasontd92](https://github.com/jasontd92)
+ * fix(map): support ObjectId keys in MongooseMap#has() [NgoQuocViet2001](https://github.com/NgoQuocViet2001)
+ * fix(schema): clear enumValues when enum validator is removed with enum(false) #16631 [Enesuygurs](https://github.com/Enesuygurs)
+ * fix: respect disabled updatedAt in pipeline updates #16642 #16641 [ItsM0rty](https://github.com/ItsM0rty)
+ * fix: make schema clone() copy $timestamps #16651 #16650 [Oleksii-Pavliuk](https://github.com/Oleksii-Pavliuk)
+ * fix(model): preserve WriteError instances in insertMany() writeErrors #16608 #16607 [Majny](https://github.com/Majny)
+ * fix: bump sift -> 17.1.4 [rishabhnehra](https://github.com/rishabhnehra)
+ * docs(production): add production indexes guide #16627
+ * docs(ask-ai): send session cookie and continue stored conversations #16652 [nlarew](https://github.com/nlarew)
+
+8.24.8 / 2026-11-02
+===================
+ * fix(schema): remove map paths cleanly, including maps under nested paths (backport to 8.x) #16625 #16461 #16457 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix(schema): keep the map value schematype a single object when cloning (backport to 8.x) #16624 #16473 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix(map): support ObjectId keys in MongooseMap#has() (backport to 8.x #16634 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix(hydration): use the doc model for looking up a ref (backport to 8.x) #16623 #16453 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix(document): replace {MODEL} in custom cast error messages from document validation (backport to 8.x) #16622 #16480 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+ * fix(schema): run setters declared on the union path itself (backport to 8.x) #16621 #16528 [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+
 9.11.4 / 2026-10-23
 ===================
  * fix: avoid walking into inherited properties like `toString` when hydrating documents, setting dotted paths, and merging updates
@@ -6,6 +66,15 @@
  * fix(query): respect connection-level sanitizeFilter in queries
  * fix(query): disallow special properties like `__proto__` as paths in where() and mod()
  * fix(deps): upgrade mquery -> 6.0.1 to avoid prototype pollution with query helpers like gt() and in()
+
+8.24.7 / 2026-10-23
+===================
+* fix: avoid walking into inherited properties like `toString` when hydrating documents, setting dotted paths, and merging updates
+* fix: only use own properties when looking up discriminators by key
+* fix(schema): disallow setting special properties via virtual()
+* fix(query): respect connection-level sanitizeFilter in queries
+* fix(query): disallow special properties like `__proto__` as paths in where() and mod()
+* fix(deps): upgrade mquery -> 4.0.4 to avoid prototype pollution with query helpers like gt() and in()
 
 9.11.3 / 2026-10-21
 ===================

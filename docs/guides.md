@@ -31,6 +31,10 @@ integrating Mongoose with external tools and frameworks.
 * [Advanced Schemas](advanced_schemas.html)
 * [Sharing Schemas Between Mongoose Projects](shared-schemas.html)
 
+## Production
+
+* [Indexes](production/indexes.html)
+
 ## Integrations
 
 * [Promises](promises.html)

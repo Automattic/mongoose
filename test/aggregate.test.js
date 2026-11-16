@@ -7,6 +7,7 @@
 const start = require('./common');
 
 const assert = require('assert');
+const { once } = require('events');
 const stream = require('stream');
 
 const Aggregate = require('../lib/aggregate');
@@ -1276,6 +1277,20 @@ describe('aggregate: ', function() {
       pipe(otherStream);
     const streamValue = await waitForStream;
     assert.ok(streamValue.includes('"name":"Apple"'), streamValue);
+  });
+
+  it('cursor() emits the error passed to destroy() (gh-16609)', async function() {
+    const Test = db.model('Test', new Schema({ name: String }));
+    await Test.create({ name: 'test1' });
+    const cursor = Test.aggregate([{ $match: {} }]).cursor();
+    const [driverCursor] = await once(cursor, 'cursor');
+    const destroyError = new Error('consumer stopped reading');
+
+    cursor.destroy(destroyError);
+
+    const [error] = await once(cursor, 'error');
+    assert.strictEqual(error, destroyError);
+    assert.ok(driverCursor.closed);
   });
 
   describe('Mongo 3.6 options', function() {

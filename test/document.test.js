@@ -7524,6 +7524,48 @@ describe('document', function() {
     assert.equal(doc.get('photos.0.foo'), 'bar');
   });
 
+  it('set() underneath alias marks the aliased path modified', async function() {
+    const schema = new Schema({
+      sub: { type: new Schema({ x: String }, { _id: false }), alias: 's' },
+      mixed: { type: Schema.Types.Mixed, alias: 'm' }
+    });
+    const Test = db.model('Test', schema);
+
+    const { _id } = await Test.create({ sub: { x: 'a' }, mixed: { y: 1 } });
+    const doc = await Test.findById(_id);
+    doc.set('s.x', 'b');
+    doc.set('m.y', 2);
+    assert.deepStrictEqual(doc.modifiedPaths().sort(), ['mixed', 'mixed.y', 'sub', 'sub.x']);
+    await doc.save();
+
+    const rawDoc = await Test.collection.findOne({ _id });
+    assert.deepStrictEqual(rawDoc.sub, { x: 'b' });
+    assert.deepStrictEqual(rawDoc.mixed, { y: 2 });
+  });
+
+  it('set() marks a null ancestor modified if it can\'t create the ancestor', async function() {
+    const Test = db.model('Test', new Schema({ name: String }));
+
+    const { insertedId } = await Test.collection.insertOne({ adhoc: { a: null } });
+    const doc = await Test.findById(insertedId);
+    // `set()` can't create `adhoc.a` because `adhoc.a` isn't in the schema, so
+    // `save()` needs to overwrite `adhoc.a` rather than set `adhoc.a.b`
+    doc.set('adhoc.a.b', 1, { strict: false });
+    assert.deepStrictEqual(doc.modifiedPaths(), ['adhoc', 'adhoc.a']);
+    await doc.save();
+
+    const rawDoc = await Test.collection.findOne({ _id: insertedId });
+    assert.deepStrictEqual(rawDoc.adhoc, { a: { b: 1 } });
+  });
+
+  it('set(null, path) sets path to null', function() {
+    const Test = db.model('Test', new Schema({ name: String }));
+
+    const doc = new Test({ name: 'test' });
+    doc.set(null, 'name');
+    assert.strictEqual(doc.name, null);
+  });
+
   it('get() with getters: false (gh-7233)', function() {
     const testSchema = new Schema({
       foo: { type: String, get: v => v.toLowerCase() }
@@ -13344,6 +13386,60 @@ describe('document', function() {
     const err = await doc2.validate().then(() => null, err => err);
     assert.ok(err.errors['buf']);
     assert.deepStrictEqual(doc2.toObject().mixed, { $__: 1, _doc: { name: 'test' }, map: { $isMongooseMap: true } });
+  });
+
+  it('does not copy nested keys onto the top-level document with strict: false', function() {
+    const Loose = db.model('Test', new Schema({ name: String }, { strict: false }));
+
+    const doc = Loose.hydrate({ name: 'test', other: { save: { x: 1 }, inner: { y: 2 } } });
+    assert.strictEqual(typeof doc.save, 'function');
+    assert.strictEqual(doc.inner, undefined);
+    assert.deepStrictEqual(doc.toObject().other, { save: { x: 1 }, inner: { y: 2 } });
+  });
+
+  it('sets dotted paths underneath objects that contain `$__`', function() {
+    const Test = db.model('Test', new Schema({ mixed: {} }));
+
+    const doc = Test.hydrate({ mixed: { $__: 1, foo: { a: 1 } } });
+    doc.set('mixed.foo.b', 2);
+    assert.deepStrictEqual(doc.toObject().mixed, { $__: 1, foo: { a: 1, b: 2 } });
+  });
+
+  it('sets dotted paths 3+ levels deep underneath a single nested subdocument (gh-16690)', async function() {
+    const settingsSchema = new Schema({
+      plan: String,
+      byoc: { telegram: { bot_token: String } }
+    }, { _id: false });
+    const Test = db.model('Test', new Schema({
+      settings: { type: settingsSchema, default: () => ({ plan: 'free', byoc: {} }) },
+      items: [settingsSchema]
+    }));
+
+    const doc = new Test({});
+    doc.set('settings.byoc.telegram.bot_token', 'new');
+    assert.strictEqual(doc.settings.byoc.telegram.bot_token, 'new');
+    assert.deepStrictEqual(doc.toObject().settings, { plan: 'free', byoc: { telegram: { bot_token: 'new' } } });
+
+    doc.set('items', [{ plan: 'free' }]);
+    doc.set('items.0.byoc.telegram.bot_token', 'item');
+    assert.strictEqual(doc.items[0].byoc.telegram.bot_token, 'item');
+
+    await doc.save();
+    const { _id } = doc;
+    const fromDb = await Test.findById(_id);
+    fromDb.set('settings.byoc.telegram.bot_token', 'updated');
+    assert.ok(fromDb.isModified('settings.byoc.telegram.bot_token'));
+    await fromDb.save();
+
+    const stored = await Test.findById(_id).lean();
+    assert.strictEqual(stored.settings.byoc.telegram.bot_token, 'updated');
+    assert.strictEqual(stored.items[0].byoc.telegram.bot_token, 'item');
+
+    // Inherited properties underneath nested paths are still skipped
+    fromDb.set('settings.byoc.toObject.polluted', 'yes');
+    fromDb.set('settings.byoc.$__schema.polluted', 'yes');
+    assert.strictEqual(mongoose.Document.prototype.toObject.polluted, undefined);
+    assert.strictEqual(settingsSchema.polluted, undefined);
   });
 
   it('does not modify array when calling getters (gh-13748)', async function() {

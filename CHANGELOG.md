@@ -1,3 +1,8 @@
+8.24.10 / 2026-11-16
+====================
+ * fix(query): make sanitizeFilter catch any fields that start with $ in top-level filter to avoid bypass using $_internalSchemaXor and other MongoDB internal expressions
+ * fix(query): hardening for sanitizeProjection
+
 8.24.9 / 2026-11-12
 ===================
  * fix(document): allow setting dotted paths 3+ levels deep underneath single nested subdocuments #16691 [RagedPanda](https://github.com/RagedPanda)

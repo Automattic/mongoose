@@ -18,7 +18,7 @@ All new features, improvements, and bug fixes are still delivered to 8.x until a
 
 ## Mongoose 7 (Legacy)
 
-Mongoose 7.x was released on **February 27, 2023** and now only receives **security patches** and **requested bug fixes**. 
+Mongoose 7.x was released on **February 27, 2023** and now only receives **security patches** and **requested bug fixes**.
 If you find an issue that needs to be backported, you can open a request on GitHub.
 
 * **Latest release:** [7.8.12](https://mongoosejs.com/docs/7.x/docs/guide.html)  

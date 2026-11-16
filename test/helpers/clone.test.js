@@ -3,7 +3,6 @@
 const assert = require('assert');
 
 require('../common'); // required for side-effect setup (so that the default driver is set-up)
-const InternalCache = require('../../lib/internal');
 const clone = require('../../lib/helpers/clone');
 const symbols = require('../../lib/helpers/symbols');
 const ObjectId = require('../../lib/types/objectid');
@@ -51,14 +50,16 @@ describe('clone', () => {
   });
 
   describe('mongoose object', () => {
+    // Stand-in for `Document.prototype`, so these objects count as documents
+    const documentPrototype = { $isMongooseDocumentPrototype: true };
+
     it('use toObject', () => {
-      const base = {
-        $__: new InternalCache(),
+      const base = Object.assign(Object.create(documentPrototype), {
         myAttr: 'myAttrVal',
         toObject() {
           return { myAttr: base.myAttr };
         }
-      };
+      });
       const cloned = clone(base);
       assert.deepStrictEqual(cloned, { myAttr: 'myAttrVal' });
       cloned.myAttr = 'otherAttrVal';
@@ -67,11 +68,10 @@ describe('clone', () => {
     });
 
     it('use toJSON', () => {
-      const base = {
-        $__: new InternalCache(),
+      const base = Object.assign(Object.create(documentPrototype), {
         myAttr: 'myAttrVal',
         toJSON: () => JSON.stringify({ myAttr: 'myAttrVal' })
-      };
+      });
       const cloned = JSON.parse(clone(base, { json: true }));
       assert.equal(cloned.myAttr, 'myAttrVal');
       cloned.myAttr = 'otherAttrVal';
@@ -81,8 +81,7 @@ describe('clone', () => {
 
     it('skipSingleNestedGetters', () => {
       const baseOpts = { _skipSingleNestedGetters: true, $isSingleNested: true };
-      const base = {
-        $__: new InternalCache(),
+      const base = Object.assign(Object.create(documentPrototype), {
         myAttr: 'myAttrVal',
         $isSingleNested: true,
         toObject(cloneOpts) {
@@ -92,7 +91,7 @@ describe('clone', () => {
           );
           return { myAttr: base.myAttr, $isSingleNested: true };
         }
-      };
+      });
       const cloned = clone(base, baseOpts);
       assert.deepStrictEqual(cloned, { myAttr: 'myAttrVal', $isSingleNested: true });
       cloned.myAttr = 'otherAttrVal';
@@ -107,7 +106,7 @@ describe('clone', () => {
     assert.deepStrictEqual(cloned, { $__: 1, _doc: { name: 'test' }, other: 2 });
     assert.notStrictEqual(cloned._doc, base._doc);
 
-    assert.deepStrictEqual(clone({ $__: { strictMode: true } }), { $__: { strictMode: true } });
+    assert.deepStrictEqual(clone({ $__: { strictMode: true }, _doc: {} }), { $__: { strictMode: true }, _doc: {} });
   });
 
   describe('global objects', () => {

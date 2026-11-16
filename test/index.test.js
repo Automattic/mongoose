@@ -778,6 +778,10 @@ describe('mongoose module:', function() {
     assert.ok(!mongoose.isValidObjectId({ test: 42 }));
   });
 
+  it('isObjectIdOrHexString returns false for plain objects with forged ObjectID _bsontype', function() {
+    assert.ok(!mongoose.isObjectIdOrHexString(JSON.parse('{"_bsontype":"ObjectID","id":""}')));
+  });
+
   it('global `strictPopulate` works when false (gh-10694)', async function() {
     const mongoose = new Mongoose();
     mongoose.set('strictPopulate', false);

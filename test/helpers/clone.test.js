@@ -185,10 +185,8 @@ describe('clone', () => {
 
   describe('bson', () => {
     it('Decimal128', () => {
-      const base = {
-        _bsontype: 'Decimal128',
-        toString() { return '128'; }
-      };
+      const base = Object.create({ _bsontype: 'Decimal128' });
+      base.toString = () => '128';
       base.constructor = undefined;
       const cloned = clone(base);
       const expected = Decimal.fromString(base.toString());
@@ -196,10 +194,8 @@ describe('clone', () => {
     });
 
     it('Decimal128 (flatternDecimal)', () => {
-      const base = {
-        _bsontype: 'Decimal128',
-        toJSON() { return 128; }
-      };
+      const base = Object.create({ _bsontype: 'Decimal128' });
+      base.toJSON = () => 128;
       base.constructor = undefined;
       const cloned = clone(base, { flattenDecimals: true });
       assert.deepStrictEqual(cloned, base.toJSON());

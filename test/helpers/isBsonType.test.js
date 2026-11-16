@@ -7,8 +7,12 @@ const Decimal128 = require('mongodb').Decimal128;
 const ObjectId = require('mongodb').ObjectId;
 
 describe('isBsonType', () => {
-  it('true for any object with _bsontype property equal typename', () => {
-    assert.ok(isBsonType({ _bsontype: 'MyType' }, 'MyType'));
+  it('true for any object with inherited _bsontype property equal typename', () => {
+    assert.ok(isBsonType(Object.create({ _bsontype: 'MyType' }), 'MyType'));
+  });
+
+  it('false for any object with own _bsontype property equal typename', () => {
+    assert.ok(!isBsonType({ _bsontype: 'MyType' }, 'MyType'));
   });
 
   it('true for any object without _bsontype property and undefined typename', () => {

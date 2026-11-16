@@ -1,3 +1,9 @@
+6.13.13 / 2026-11-16
+====================
+ * fix(isBsonType): ignore user-specified _bsontype property
+ * fix(query): hardening for sanitizeProjection
+ * fix(query): make sanitizeFilter catch any fields that start with $ in top-level filter to avoid bypass using $_internalSchemaXor and other MongoDB internal expressions
+
 6.13.12 / 2026-10-23
 ====================
  * fix: avoid walking into inherited properties like `toString` when hydrating documents, setting dotted paths, and merging updates

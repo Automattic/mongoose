@@ -1,3 +1,17 @@
+9.12.2 / 2026-11-16
+===================
+ * fix(query): make sanitizeFilter catch any fields that start with $ in top-level filter to avoid bypass using $_internalSchemaXor and other MongoDB internal expressions
+ * fix(query): hardening for sanitizeProjection
+ * fix(array): avoid converting BigInts to numbers in addToSet() #16693 [luantaraschi](https://github.com/luantaraschi)
+ * fix(cursor): propagate error passed to destroy() without re-emitting if error already emitted #16686 #16610 #16609 [IbrahimHafez1](https://github.com/IbrahimHafez1)
+ * fix(query): throw cast errors and respect strict option in replaceOne() #16629 #16628 [OmBhandwaldar](https://github.com/OmBhandwaldar)
+ * fix(castArrayFilters): cast $and/$or/$nor wherever they appear in an array filter #16638 #16637 [mtechcave1](https://github.com/mtechcave1)
+ * fix(document): allow setting dotted paths 3+ levels deep underneath single nested subdocuments #16691 [RagedPanda](https://github.com/RagedPanda)
+ * fix(connection): reset document state before retrying after a transient commit error #16640 #16639 [IbrahimHafez1](https://github.com/IbrahimHafez1)
+ * fix(array): avoid converting BigInts to numbers in addToSet() #16693 [luantaraschi](https://github.com/luantaraschi)
+ * docs: add EOL date for Mongoose 7 #16719
+ * docs(mongoose): document missing options for set() #16703 [ragib-mrb](https://github.com/ragib-mrb)
+
 8.24.9 / 2026-11-12
 ===================
  * fix(document): allow setting dotted paths 3+ levels deep underneath single nested subdocuments #16691 [RagedPanda](https://github.com/RagedPanda)

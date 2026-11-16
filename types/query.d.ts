@@ -146,7 +146,15 @@ declare module 'mongoose' {
      * (https://mongoosejs.com/docs/validation.html#update-validators). Defaults to false.
      */
     runValidators?: boolean;
-    /* Set to `true` to automatically sanitize potentially unsafe user-generated query projections */
+    /**
+     * Set to `true` to automatically sanitize potentially unsafe user-generated query projections.
+     * Converts projection values that aren't numbers or booleans to `1`, including strings like `'$password'`
+     * and expressions like `{ $concat: ['$password'] }`, so projections can't copy one field's value into another.
+     * The only projection operators that are allowed are `$elemMatch`, `$slice` with numbers, and `$meta: 'textScore'`.
+     *
+     * In Mongoose 7, `sanitizeProjection` does **not** prevent projecting in fields that the schema deselects
+     * with `select: false`: `select('+password')` and `select({ password: 1 })` still include `password`.
+     */
     sanitizeProjection?: boolean;
     /**
      * Set to `true` to automatically sanitize potentially unsafe query filters by stripping out query selectors that

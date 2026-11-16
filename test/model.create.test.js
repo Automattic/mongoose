@@ -71,6 +71,21 @@ describe('model', function() {
       assert.equal(docs.length, 1);
     });
 
+    it('rejects plain objects with forged ObjectID _bsontype on ObjectId paths', async function() {
+      const Comment = db.model('Comment', Schema({ text: String, post: 'ObjectId' }));
+
+      // `id: ''` makes bson 4.x store whatever bytes the previous command left in its buffer
+      await B.updateOne({ title: 'victim@example.com' }, { $set: { title: 'reset code 123456' } });
+      await assert.rejects(
+        Comment.create({ text: 'test', post: JSON.parse('{"_bsontype":"ObjectID","id":""}') }),
+        { name: 'ValidationError' }
+      );
+      await assert.rejects(
+        Comment.create({ text: 'test', post: JSON.parse('{"_id":{"_bsontype":"ObjectID","id":""}}') }),
+        { name: 'ValidationError' }
+      );
+    });
+
     it('returns a promise', function() {
       const p = B.create({ title: 'returns promise' });
       assert.ok(p instanceof mongoose.Promise);

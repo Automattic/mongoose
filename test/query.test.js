@@ -4071,6 +4071,38 @@ describe('Query', function() {
     }
   });
 
+  it('sanitizeFilter rejects plain objects with forged ObjectID _bsontype in queries by id', async function() {
+    const Test = db.model('Test', Schema({ name: String }));
+    const [alice, bob] = await Test.create([{ name: 'alice' }, { name: 'bob' }]);
+
+    // `id: ''` makes bson 4.x serialize whatever bytes the previous command left in its buffer
+    await Test.findById(alice._id);
+    await assert.rejects(
+      Test.findById(JSON.parse('{"_bsontype":"ObjectID","id":""}')).setOptions({ sanitizeFilter: true }),
+      { name: 'CastError', path: '_id' }
+    );
+
+    await Test.findByIdAndUpdate(bob._id, { name: 'bob2' });
+    await assert.rejects(
+      Test.findByIdAndDelete(JSON.parse('{"_bsontype":"ObjectID","id":""}')).setOptions({ sanitizeFilter: true }),
+      { name: 'CastError', path: '_id' }
+    );
+    assert.ok(await Test.exists({ _id: bob._id }));
+  });
+
+  it('sanitizeFilter rejects plain objects with forged BSONRegExp _bsontype on string paths', async function() {
+    const Test = db.model('Test', Schema({ email: String, pwd: String }));
+    await Test.create({ email: 'alice@example.com', pwd: 'S3cret' });
+
+    await assert.rejects(
+      Test.findOne({
+        email: 'alice@example.com',
+        pwd: JSON.parse('{"_bsontype":"BSONRegExp","pattern":"^S3","options":""}')
+      }).setOptions({ sanitizeFilter: true }),
+      { name: 'CastError', path: 'pwd' }
+    );
+  });
+
   it('sanitizeFilter respects an explicit false connection option over global and query options', async function() {
     const m = new mongoose.Mongoose();
     m.set('sanitizeFilter', true);

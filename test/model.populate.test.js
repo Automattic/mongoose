@@ -2424,6 +2424,23 @@ describe('model: populate:', function() {
         });
     });
 
+    it('refPath values that are Object.prototype properties do not break populate', async function() {
+      db.deleteModel(/Test/);
+      const User = db.model('Test1', new Schema({ name: String }));
+      const Post = db.model('Test', new Schema({ kind: String, author: { type: ObjectId, refPath: 'kind' } }));
+      const user = await User.create({ name: 'alice' });
+      await Post.create([{ kind: 'Test1', author: user._id }, { kind: 'constructor' }]);
+
+      const posts = await Post.find().sort({ _id: 1 }).populate('author');
+
+      assert.equal(posts[0].author.name, 'alice');
+      assert.strictEqual(posts[1].author, undefined);
+
+      await Post.create({ kind: 'constructor', author: user._id });
+
+      await assert.rejects(Post.find().populate('author'), /Schema hasn't been registered for model "constructor"/);
+    });
+
     it('array with empty refPath (gh-5377)', async function() {
       db.deleteModel(/Test/);
       const modelASchema = new mongoose.Schema({

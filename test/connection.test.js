@@ -384,6 +384,17 @@ describe('connections:', function() {
       }, /Schema hasn't been registered/);
     });
 
+    it('does not treat Object.prototype properties as models', function() {
+      assert.throws(() => db.model('constructor'), /Schema hasn't been registered for model "constructor"/);
+      assert.throws(() => db.model('toString'), /Schema hasn't been registered for model "toString"/);
+      assert.throws(() => db.model('__proto__'), /Schema hasn't been registered for model "__proto__"/);
+
+      const Model = db.model('constructor', new Schema({ name: String }));
+
+      assert.strictEqual(db.model('constructor'), Model);
+      db.deleteModel('constructor');
+    });
+
     describe('passing collection name', function() {
       describe('when model name already exists', function() {
         it('returns a new uncached model', function() {

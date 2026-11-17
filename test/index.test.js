@@ -807,6 +807,12 @@ describe('mongoose module:', function() {
       }, /Schema hasn't been registered/);
     });
 
+    it('does not treat Object.prototype properties as models', function() {
+      assert.throws(() => mongoose.model('constructor'), /Schema hasn't been registered for model "constructor"/);
+      assert.throws(() => mongoose.model('toString'), /Schema hasn't been registered for model "toString"/);
+      assert.throws(() => mongoose.model('__proto__'), /Schema hasn't been registered for model "__proto__"/);
+    });
+
     describe('passing collection name', function() {
       describe('when model name already exists', function() {
         it('returns a new uncached model', function() {

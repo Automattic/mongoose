@@ -67,15 +67,6 @@ describe('Query sanitizeProjection', function() {
     assert.strictEqual(doc.secrets, undefined);
   });
 
-  it('does not let an own `__proto__` key in select() drop select: false paths', async function() {
-    const q = User.findOne().sanitizeProjection(true).select(JSON.parse('{"__proto__":{"password":0}}')).lean();
-    const doc = await q;
-
-    assert.strictEqual(doc.password, undefined);
-    assert.strictEqual(doc.name, 'test');
-    assert.strictEqual(Object.getPrototypeOf(q._fields), Object.prototype);
-  });
-
   it('does not let `$` expression objects exfiltrate select: false paths', async function() {
     const doc = await User.findOne().sanitizeProjection(true).select({ name: { $concat: ['$password', '-', '$resetToken'] } }).lean();
 

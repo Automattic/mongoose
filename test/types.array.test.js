@@ -163,6 +163,33 @@ describe('types array', function() {
       assert.equal(doc.buffers.indexOf(Buffer.from([2])), 1);
       assert.equal(doc.buffers.includes(Buffer.from([3])), false);
     });
+
+    it('matches NaN in Double arrays', function() {
+      const Test = db.model('Test', new Schema({ doubles: [Schema.Types.Double] }));
+      const doc = new Test({ doubles: [1.5, NaN] });
+
+      assert.equal(doc.doubles.indexOf(doc.doubles[1]), 1);
+      assert.equal(doc.doubles.indexOf(new mongoose.Types.Double(NaN)), 1);
+      assert.equal(doc.doubles.indexOf(NaN), 1);
+
+      doc.doubles.pull(NaN);
+      assert.deepStrictEqual(doc.doubles.map(v => v.valueOf()), [1.5]);
+    });
+
+    it('does not match Buffers with the same bytes but a different subtype', function() {
+      const Test = db.model('Test', new Schema({
+        uuids: [{ type: Buffer, subtype: 4 }],
+        buffers: [Buffer]
+      }));
+      const doc = new Test({ uuids: [Buffer.from([1])], buffers: [Buffer.from([1])] });
+      const other = new Test({ uuids: [Buffer.from([1])] });
+
+      assert.equal(doc.uuids.indexOf(doc.buffers[0]), -1);
+      assert.equal(doc.uuids.indexOf(Buffer.from([1])), -1);
+      assert.equal(doc.buffers.indexOf(doc.uuids[0]), -1);
+      assert.equal(doc.uuids.indexOf(other.uuids[0]), 0);
+      assert.equal(doc.buffers.indexOf(Buffer.from([1])), 0);
+    });
   });
 
   describe('includes()', function() {

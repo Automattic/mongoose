@@ -1,3 +1,34 @@
+9.12.2 / 2026-11-16
+===================
+ * fix(query): make sanitizeFilter catch any fields that start with $ in top-level filter to avoid bypass using $_internalSchemaXor and other MongoDB internal expressions
+ * fix(query): hardening for sanitizeProjection
+ * fix(array): avoid converting BigInts to numbers in addToSet() #16693 [luantaraschi](https://github.com/luantaraschi)
+ * fix(cursor): propagate error passed to destroy() without re-emitting if error already emitted #16686 #16610 #16609 [IbrahimHafez1](https://github.com/IbrahimHafez1)
+ * fix(query): throw cast errors and respect strict option in replaceOne() #16629 #16628 [OmBhandwaldar](https://github.com/OmBhandwaldar)
+ * fix(castArrayFilters): cast $and/$or/$nor wherever they appear in an array filter #16638 #16637 [mtechcave1](https://github.com/mtechcave1)
+ * fix(document): allow setting dotted paths 3+ levels deep underneath single nested subdocuments #16691 [RagedPanda](https://github.com/RagedPanda)
+ * fix(connection): reset document state before retrying after a transient commit error #16640 #16639 [IbrahimHafez1](https://github.com/IbrahimHafez1)
+ * fix(array): avoid converting BigInts to numbers in addToSet() #16693 [luantaraschi](https://github.com/luantaraschi)
+ * docs: add EOL date for Mongoose 7 #16719
+ * docs(mongoose): document missing options for set() #16703 [ragib-mrb](https://github.com/ragib-mrb)
+
+8.24.9 / 2026-11-12
+===================
+ * fix(document): allow setting dotted paths 3+ levels deep underneath single nested subdocuments #16691 [RagedPanda](https://github.com/RagedPanda)
+ * fix(connection): don't disable autoIndex/autoCreate for a primary ReadPreference instance [mrityunjay-pandey](https://github.com/mrityunjay-pandey)
+
+9.12.1 / 2026-11-09
+===================
+ * perf(update): avoid quadratic ancestor lookup in update validators and validate nested array subdocs once #16586 [https://github.com/Re-cool](https://github.com/Re-cool)
+ * perf: keep lib/ source within Latin-1 #16681 [orgads](https://github.com/orgads)
+ * perf(map): avoid quadratic concat() when creating a MongooseMap from an object #16677 [ptweezy](https://github.com/ptweezy)
+ * fix(array): keep earlier pushed values when push() is called again with $each #16619 #16618 [maxymlyskov](https://github.com/maxymlyskov)
+ * fix(model+query): handle inherited read preference and read concern on cloned queries #16668 #16632
+ * fix(timestamps): set timestamps on subdocs pushed via array filters #16615 #8809 [vaidehi-snk](https://github.com/vaidehi-snk)
+ * fix(model): validate paths under a nested path passed to Model.validate() #16653 [NotAFlightRisk](https://github.com/NotAFlightRisk)
+ * fix(update): skip array-level validators for $pull with $in #16666 [AnkitKumar61](https://github.com/AnkitKumar61)
+ * fix(cursor): finish destruction after terminal initialization #16612 [IbrahimHafez1](https://github.com/IbrahimHafez1)
+
 9.12.0 / 2026-11-04
 ===================
  * feat: upgrade to mongodb driver 7.8 #16772 #16667

@@ -677,6 +677,9 @@ declare module 'mongoose' {
     /** Removes index by name or index spec */
     removeIndex(index: string | AnyObject): this;
 
+    /** Removes the given virtual or virtuals from this schema. Throws if a virtual does not exist. */
+    removeVirtual(path: string | string[]): this;
+
     /** Returns an Array of path strings that are required by this schema. */
     requiredPaths(invalidate?: boolean): string[];
 

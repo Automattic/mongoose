@@ -310,6 +310,61 @@ describe('types array', function() {
       assert.strictEqual('three', doc.arr[2]);
 
     });
+
+    it('keeps earlier pushed values when push() is called again with $each (gh-16618)', async function() {
+      const Test = db.model('Test', Schema({ nums: [Number] }));
+
+      const doc = await Test.create({ nums: [1, 2] });
+      doc.nums.push(3);
+      doc.nums.push({ $each: [4] });
+      doc.nums.push({ $each: [5, 6] });
+      assert.deepStrictEqual(doc.nums.$__getAtomics(), [['$push', { $each: [3, 4, 5, 6] }]]);
+      await doc.save();
+
+      const raw = await Test.collection.findOne({ _id: doc._id });
+      assert.deepStrictEqual(raw.nums, [1, 2, 3, 4, 5, 6]);
+    });
+
+    it('keeps earlier pushed subdocs when push() is called again with $each (gh-16618)', async function() {
+      const Test = db.model('Test', Schema({ docs: [{ n: Number }] }));
+
+      const doc = await Test.create({ docs: [{ n: 1 }, { n: 2 }] });
+      doc.docs.push({ n: 3 });
+      doc.docs.push({ $each: [{ n: 4 }] });
+      await doc.save();
+
+      const raw = await Test.collection.findOne({ _id: doc._id });
+      assert.deepStrictEqual(raw.docs.map(d => d.n), [1, 2, 3, 4]);
+    });
+
+    it('saves the whole array when two pushes cannot share one $push (gh-16618)', async function() {
+      const Test = db.model('Test', Schema({ nums: [Number] }));
+
+      const doc = await Test.create({ nums: [1, 2] });
+      doc.nums.push({ $each: [-1], $position: 0 });
+      doc.nums.push({ $each: [0], $position: 0 });
+      assert.deepStrictEqual(doc.nums.$__getAtomics(), [['$set', [0, -1, 1, 2]]]);
+      await doc.save();
+
+      let raw = await Test.collection.findOne({ _id: doc._id });
+      assert.deepStrictEqual(raw.nums, [0, -1, 1, 2]);
+
+      doc.nums.push({ $each: [-2], $position: 0 });
+      doc.nums.push(3);
+      assert.deepStrictEqual(doc.nums.$__getAtomics(), [['$set', [-2, 0, -1, 1, 2, 3]]]);
+      await doc.save();
+
+      raw = await Test.collection.findOne({ _id: doc._id });
+      assert.deepStrictEqual(raw.nums, [-2, 0, -1, 1, 2, 3]);
+
+      doc.nums.push(4);
+      doc.nums.push({ $each: [5], $slice: 10 });
+      assert.deepStrictEqual(doc.nums.$__getAtomics(), [['$set', [-2, 0, -1, 1, 2, 3, 4, 5]]]);
+      await doc.save();
+
+      raw = await Test.collection.findOne({ _id: doc._id });
+      assert.deepStrictEqual(raw.nums, [-2, 0, -1, 1, 2, 3, 4, 5]);
+    });
   });
 
   describe('splice()', function() {
@@ -1113,6 +1168,19 @@ describe('types array', function() {
       const added = doc.ids.addToSet(uuid1, new mongoose.Types.UUID(uuid2), uuid3);
       assert.deepStrictEqual(added.map(id => id.toString()), [uuid3]);
       assert.deepStrictEqual(doc.ids.map(id => id.toString()), [uuid1, uuid2, uuid3]);
+    });
+
+    it('works with BigInts', async function() {
+      const Test = db.model('Test', new Schema({ nums: [BigInt] }));
+      const doc = await Test.create({ nums: [1n, 2n] });
+
+      const added = doc.nums.addToSet(2n, 3n);
+      assert.deepStrictEqual(added, [3n]);
+      assert.deepStrictEqual(doc.nums.toObject(), [1n, 2n, 3n]);
+
+      await doc.save();
+      const fromDb = await Test.findById(doc._id).orFail();
+      assert.deepStrictEqual(fromDb.nums.toObject(), [1n, 2n, 3n]);
     });
   });
 

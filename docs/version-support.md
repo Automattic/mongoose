@@ -18,11 +18,14 @@ All new features, improvements, and bug fixes are still delivered to 8.x until a
 
 ## Mongoose 7 (Legacy)
 
-Mongoose 7.x was released on **February 27, 2023** and is now in **legacy support**.  
-It still receives important fixes when needed, but it’s no longer the primary development focus.
+Mongoose 7.x was released on **February 27, 2023** and now only receives **security patches** and **requested bug fixes**.
+If you find an issue that needs to be backported, you can open a request on GitHub.
 
 * **Latest release:** [7.8.12](https://mongoosejs.com/docs/7.x/docs/guide.html)  
 * **Docs:** https://mongoosejs.com/docs/7.x/
+
+**End of Life:** November 1, 2027
+After this date, Mongoose 7 will no longer receive any updates—not even security fixes.
 
 ## Mongoose 6 (Limited Maintenance)
 

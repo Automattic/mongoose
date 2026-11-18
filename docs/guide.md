@@ -558,6 +558,7 @@ Valid options:
 * [statics](#statics)
 * [strict](#strict)
 * [strictQuery](#strictQuery)
+* [strictRead](#strictRead)
 * [toJSON](#toJSON)
 * [toObject](#toObject)
 * [typeKey](#typeKey)
@@ -1000,6 +1001,49 @@ However, you can override this behavior globally:
 ```javascript
 // Set `strictQuery` to `true` to omit unknown fields in queries.
 mongoose.set('strictQuery', true);
+```
+
+## option: strictRead {#strictRead}
+
+The `strict` option controls what Mongoose does with fields that aren't in your schema when you write.
+The `strictRead` option controls what Mongoose does with those fields when it hydrates a document from MongoDB.
+
+By default, `strictRead` is `false`, so Mongoose keeps fields that are in MongoDB but not in your schema.
+
+```javascript
+const userSchema = new Schema({ name: String });
+const User = mongoose.model('User', userSchema);
+
+// Suppose the stored document is `{ name: 'Val', legacyRole: 'admin' }`
+const user = await User.findOne({ name: 'Val' });
+user.get('legacyRole'); // 'admin'
+```
+
+Set `strictRead` to `true` to make Mongoose strip fields that aren't in your schema.
+
+```javascript
+const userSchema = new Schema({ name: String }, { strictRead: true });
+const User = mongoose.model('User', userSchema);
+
+const user = await User.findOne({ name: 'Val' });
+user.get('legacyRole'); // undefined
+```
+
+Set `strictRead` to `'throw'` to make Mongoose throw a `StrictModeError` instead.
+
+```javascript
+const userSchema = new Schema({ name: String }, { strictRead: 'throw' });
+const User = mongoose.model('User', userSchema);
+
+// Throws "StrictModeError: Field `legacyRole` is not in schema and strictRead is set to throw."
+await User.findOne({ name: 'Val' });
+```
+
+You can also set the default `strictRead` mode for all schemas.
+The schema-level option overrides the global option.
+
+```javascript
+mongoose.set('strictRead', true);
 ```
 
 ## option: toJSON {#toJSON}

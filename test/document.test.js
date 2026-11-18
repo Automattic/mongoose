@@ -13334,6 +13334,43 @@ describe('document', function() {
     }
   });
 
+  it('sets dotted paths 3+ levels deep underneath a single nested subdocument (gh-16690)', async function() {
+    const settingsSchema = new Schema({
+      plan: String,
+      byoc: { telegram: { bot_token: String } }
+    }, { _id: false });
+    const Test = db.model('Test', new Schema({
+      settings: { type: settingsSchema, default: () => ({ plan: 'free', byoc: {} }) },
+      items: [settingsSchema]
+    }));
+
+    const doc = new Test({});
+    doc.set('settings.byoc.telegram.bot_token', 'new');
+    assert.strictEqual(doc.settings.byoc.telegram.bot_token, 'new');
+    assert.deepStrictEqual(doc.toObject().settings, { plan: 'free', byoc: { telegram: { bot_token: 'new' } } });
+
+    doc.set('items', [{ plan: 'free' }]);
+    doc.set('items.0.byoc.telegram.bot_token', 'item');
+    assert.strictEqual(doc.items[0].byoc.telegram.bot_token, 'item');
+
+    await doc.save();
+    const { _id } = doc;
+    const fromDb = await Test.findById(_id);
+    fromDb.set('settings.byoc.telegram.bot_token', 'updated');
+    assert.ok(fromDb.isModified('settings.byoc.telegram.bot_token'));
+    await fromDb.save();
+
+    const stored = await Test.findById(_id).lean();
+    assert.strictEqual(stored.settings.byoc.telegram.bot_token, 'updated');
+    assert.strictEqual(stored.items[0].byoc.telegram.bot_token, 'item');
+
+    // Inherited properties underneath nested paths are still skipped
+    fromDb.set('settings.byoc.toObject.polluted', 'yes');
+    fromDb.set('settings.byoc.$__schema.polluted', 'yes');
+    assert.strictEqual(mongoose.Document.prototype.toObject.polluted, undefined);
+    assert.strictEqual(settingsSchema.polluted, undefined);
+  });
+
   it('does not modify array when calling getters (gh-13748)', async function() {
     // create simple setter to add a sufix
     const addSufix = (name) => {

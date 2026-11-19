@@ -155,14 +155,14 @@ describe('schema defaultSort option', function() {
     assert.deepStrictEqual(docs.map(doc => doc.value), [1, 3, 2]);
   });
 
-  it('is not skipped with `sort(undefined)`', async function() {
+  it('is skipped with `sort(undefined)`, same as `sort(null)`', async function() {
     const Test = await createModel();
 
     let docs = await Test.find().sort(undefined);
-    assert.deepStrictEqual(docs.map(doc => doc.value), [3, 2, 1]);
+    assert.deepStrictEqual(docs.map(doc => doc.value), [1, 3, 2]);
 
     docs = await Test.find({}, null, { sort: undefined });
-    assert.deepStrictEqual(docs.map(doc => doc.value), [3, 2, 1]);
+    assert.deepStrictEqual(docs.map(doc => doc.value), [1, 3, 2]);
   });
 
   it('skips sorting tailable cursors, which MongoDB does not allow', async function() {
@@ -263,14 +263,19 @@ describe('schema defaultSort option', function() {
       assert.deepStrictEqual(sorts.map(sort => Object.keys(sort)), [['name', 'value'], ['name', 'value']]);
     });
 
-    it('runs with no sort after `sort(null)`', async function() {
+    it('rejects an explicitly empty sort for Query.prototype.findAndCount()', async function() {
       const Test = await createModel();
 
-      let [docs] = await Test.find().sort(null).limit(1).findAndCount();
-      assert.deepStrictEqual(docs.map(doc => doc.value), [1]);
+      await assert.rejects(Test.find().sort(null).limit(1).findAndCount(), /does not allow an empty sort/);
+      await assert.rejects(Test.find().sort(undefined).limit(1).findAndCount(), /does not allow an empty sort/);
+      await assert.rejects(Test.find({}, null, { sort: undefined }).limit(1).findAndCount(), /does not allow an empty sort/);
+    });
 
-      [docs] = await Test.findAndCount({}, null, { sort: null, limit: 1 });
-      assert.deepStrictEqual(docs.map(doc => doc.value), [1]);
+    it('rejects an explicitly empty `options.sort` for Model.findAndCount()', async function() {
+      const Test = await createModel();
+
+      await assert.rejects(Test.findAndCount({}, null, { sort: null, limit: 1 }), /does not allow an empty `options\.sort`/);
+      await assert.rejects(Test.findAndCount({}, null, { sort: undefined, limit: 1 }), /does not allow an empty `options\.sort`/);
     });
 
     it('still requires limit', async function() {

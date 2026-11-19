@@ -1639,6 +1639,10 @@ await Item.find().sort(null);
 await Item.find({}, null, { sort: null });
 ```
 
+Like `sort(null)`, `sort(undefined)` and `{ sort: undefined }` run the query with no sort.
+If you pass an optional sort to a query, like `{ sort: req.query.sort }`, omit the `sort` key when there is no sort to use the `defaultSort`.
+`findAndCount()` throws an error if `sort` is explicitly empty, like `{ sort: undefined }`, because pagination without a sort can return inconsistent results.
+
 `defaultSort` applies to `find()`, `findOne()`, `findOneAndUpdate()`, `findOneAndReplace()`, and `findOneAndDelete()`, including the queries that [`populate()`](populate.html) executes.
 It does not apply to `countDocuments()`, `estimatedDocumentCount()`, `distinct()`, `deleteOne()`, `deleteMany()`, `updateOne()`, `replaceOne()`, `updateMany()`, `exists()`, `bulkWrite()`, or aggregations.
 `updateOne()` and `replaceOne()` are explicitly excluded for MongoDB server compatibility: MongoDB only supports `sort` for `updateOne()` and `replaceOne()` starting in MongoDB 8.0, and older versions throw an error if `sort` is set.

@@ -70,7 +70,7 @@ app.get(function(req, res) {
 });
 ```
 
-To skip getters on a one-off basis, use [`user.get()` with the `getters` option set to `false`](../api/document.html#document_Document-get) as shown below.
+To skip getters on a one-off basis, use [`user.get()` with the `getters` option set to `false`](../api/document.html#Document.prototype.get()) as shown below.
 
 ```javascript acquit:getters/setters.*getters.*skip
 user.get('email', null, { getters: false }); // 'ab@gmail.com'
@@ -102,7 +102,7 @@ user.set({ email: 'NEW@gmail.com' });
 user.email; // 'new@gmail.com'
 ```
 
-Mongoose also runs setters on update operations, like [`updateOne()`](../api/query.html#query_Query-updateOne). Mongoose will
+Mongoose also runs setters on update operations, like [`updateOne()`](../api/query.html#Query.prototype.updateOne()). Mongoose will
 [upsert a document](https://masteringjs.io/tutorials/mongoose/upsert) with a
 lowercased `email` in the below example.
 

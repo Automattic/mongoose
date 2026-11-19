@@ -145,7 +145,7 @@ return City.create({ name: 'Denver', location: denver }).
   then(doc => assert.equal(doc.name, 'Denver'));
 ```
 
-Mongoose also has a [`within()` helper](api/query.html#query_Query-within)
+Mongoose also has a [`within()` helper](api/query.html#Query.prototype.within())
 that's a shorthand for `$geoWithin`.
 
 ```javascript acquit:geojson.*within helper
@@ -176,7 +176,7 @@ return City.create({ name: 'Denver', location: denver }).
   then(doc => assert.equal(doc.name, 'Denver'));
 ```
 
-You can also define a geospatial index using the [`Schema#index()` function](api/schema.html#schema_Schema-index)
+You can also define a geospatial index using the [`Schema#index()` function](api/schema.html#Schema.prototype.index())
 as shown below.
 
 ```javascript

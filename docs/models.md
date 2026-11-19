@@ -70,7 +70,7 @@ const Tank = connection.model('Tank', yourSchema);
 ## Querying
 
 Finding documents is easy with Mongoose, which supports the [rich](https://www.mongodb.com/docs/manual/reference/method/js-cursor/) query syntax of MongoDB.
-Documents can be retrieved using a `model`'s [find](api/model.html#model_Model-find), [findById](api/model.html#model_Model-findById), [findOne](api/model.html#model_Model-findOne), or [where](api/model.html#model_Model-where) static functions.
+Documents can be retrieved using a `model`'s [find](api/model.html#Model.find()), [findById](api/model.html#Model.findById()), [findOne](api/model.html#Model.findOne()), or [where](api/model.html#Model.where()) static functions.
 
 ```javascript
 await Tank.find({ size: 'small' }).where('createdDate').gt(oneYearAgo).exec();
@@ -91,7 +91,7 @@ await Tank.deleteOne({ size: 'large' });
 
 Each `model` has its own `update` method for modifying documents in the
 database without returning them to your application. See the
-[API](api/model.html#model_Model-updateOne) docs for more detail.
+[API](api/model.html#Model.updateOne()) docs for more detail.
 
 ```javascript
 // Updated at most one doc, `res.nModified` contains the number
@@ -100,7 +100,7 @@ await Tank.updateOne({ size: 'large' }, { name: 'T-90' });
 ```
 
 *If you want to update a single document in the db and return it to your
-application, use [findOneAndUpdate](api/model.html#model_Model-findOneAndUpdate)
+application, use [findOneAndUpdate](api/model.html#Model.findOneAndUpdate())
 instead.*
 
 ## Change Streams
@@ -147,7 +147,7 @@ You can read more about [change streams in mongoose in this blog post](http://th
 
 [MongoDB Views](https://www.mongodb.com/docs/manual/core/views) are essentially read-only collections that contain data computed from other collections using [aggregations](api/aggregate.html).
 In Mongoose, you should define a separate Model for each of your Views.
-You can also create a View using [`createCollection()`](api/model.html#model_Model-createCollection).
+You can also create a View using [`createCollection()`](api/model.html#Model.createCollection()).
 
 The following example shows how you can create a new `RedactedUser` View on a `User` Model that hides potentially sensitive information, like name and email.
 
@@ -193,7 +193,7 @@ If you attempt to `save()` a document from a View, you will get an error from th
 
 ## Yet more
 
-The [API docs](api/model.html#model_Model) cover many additional methods available like [countDocuments](api/model.html#model_Model-countDocuments), [aggregate](api/model.html#model_Model-aggregate), and more.
+The [API docs](api/model.html#Model()) cover many additional methods available like [countDocuments](api/model.html#Model.countDocuments()), [aggregate](api/model.html#Model.aggregate()), and more.
 
 ## Next Up
 

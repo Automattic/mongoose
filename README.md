@@ -143,9 +143,9 @@ const BlogPost = new Schema({
 Aside from defining the structure of your documents and the types of data you're storing, a Schema handles the definition of:
 
 * [Validators](https://mongoosejs.com/docs/validation.html) (async and sync)
-* [Defaults](https://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-default)
-* [Getters](https://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-get)
-* [Setters](https://mongoosejs.com/docs/api/schematype.html#schematype_SchemaType-set)
+* [Defaults](https://mongoosejs.com/docs/api/schematype.html#SchemaType.prototype.default())
+* [Getters](https://mongoosejs.com/docs/api/schematype.html#SchemaType.prototype.get())
+* [Setters](https://mongoosejs.com/docs/api/schematype.html#SchemaType.prototype.set())
 * [Indexes](https://mongoosejs.com/docs/guide.html#indexes)
 * [Middleware](https://mongoosejs.com/docs/middleware.html)
 * [Methods](https://mongoosejs.com/docs/guide.html#methods) definition
@@ -196,7 +196,7 @@ The first argument is the *singular* name of the collection your model is for. *
 const MyModel = mongoose.model('Ticket', mySchema);
 ```
 
-Then `MyModel` will use the **tickets** collection, not the **ticket** collection. For more details read the [model docs](https://mongoosejs.com/docs/api/mongoose.html#mongoose_Mongoose-model).
+Then `MyModel` will use the **tickets** collection, not the **ticket** collection. For more details read the [model docs](https://mongoosejs.com/docs/api/mongoose.html#Mongoose.prototype.model()).
 
 Once we have our model, we can then instantiate it, and save it:
 

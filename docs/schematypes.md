@@ -1,11 +1,11 @@
 # SchemaTypes
 
 SchemaTypes handle definition of path
-[defaults](api/schematype.html#schematype_SchemaType-default),
-[validation](api/schematype.html#schematype_SchemaType-validate),
+[defaults](api/schematype.html#SchemaType.prototype.default()),
+[validation](api/schematype.html#SchemaType.prototype.validate()),
 [getters](#getters),
-[setters](api/schematype.html#schematype_SchemaType-set),
-[field selection defaults](api/schematype.html#schematype_SchemaType-select) for
+[setters](api/schematype.html#SchemaType.prototype.set()),
+[field selection defaults](api/schematype.html#SchemaType.prototype.select()) for
 [queries](api/query.html),
 and other general characteristics for Mongoose document properties.
 
@@ -51,7 +51,7 @@ Check out [Mongoose's plugins search](http://plugins.mongoosejs.io) to find plug
 * [Union](#union)
 * [ObjectId](#objectids)
 * [Array](#arrays)
-* [Decimal128](api/mongoose.html#mongoose_Mongoose-Decimal128)
+* [Decimal128](api/mongoose.html#Mongoose.prototype.Decimal128)
 * [Map](#maps)
 * [Schema](#schemas)
 * [UUID](#uuid)
@@ -217,7 +217,7 @@ types.
 * `set`: function, defines a custom setter for this property using [`Object.defineProperty()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty).
 * `alias`: string, mongoose >= 4.10.0 only. Defines a [virtual](guide.html#virtuals) with the given name that gets/sets this path.
 * `immutable`: boolean, defines path as immutable. Mongoose prevents you from changing immutable paths unless the parent document has `isNew: true`.
-* `transform`: function, Mongoose calls this function when you call [`Document#toJSON()`](api/document.html#document_Document-toJSON) function, including when you [`JSON.stringify()`](https://thecodebarbarian.com/the-80-20-guide-to-json-stringify-in-javascript) a document.
+* `transform`: function, Mongoose calls this function when you call [`Document#toJSON()`](api/document.html#Document.prototype.toJSON()) function, including when you [`JSON.stringify()`](https://thecodebarbarian.com/the-80-20-guide-to-json-stringify-in-javascript) a document.
 
 ```javascript
 const numberSchema = new Schema({
@@ -467,7 +467,7 @@ console.log(new M({ b: 'nay' }).b); // false
 
 ### Arrays {#arrays}
 
-Mongoose supports arrays of [SchemaTypes](api/schema.html#schema_Schema-Types)
+Mongoose supports arrays of [SchemaTypes](api/schema.html#Schema.Types)
 and arrays of [subdocuments](subdocs.html). Arrays of SchemaTypes are
 also called *primitive arrays*, and arrays of subdocuments are also called
 *document arrays*.

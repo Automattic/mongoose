@@ -3,20 +3,19 @@
 Mongoose [models](models.html) provide several static helper functions for [CRUD operations](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete).
 Each of these functions returns a [mongoose `Query` object](api/query.html#Query()).
 
-* [`Model.deleteMany()`](api.html#model_Model-deleteMany)
-* [`Model.deleteOne()`](api.html#model_Model-deleteOne)
-* [`Model.find()`](api.html#model_Model-find)
-* [`Model.findById()`](api.html#model_Model-findById)
-* [`Model.findByIdAndDelete()`](api.html#model_Model-findByIdAndDelete)
-* [`Model.findByIdAndRemove()`](api.html#model_Model-findByIdAndRemove)
-* [`Model.findByIdAndUpdate()`](api.html#model_Model-findByIdAndUpdate)
-* [`Model.findOne()`](api.html#model_Model-findOne)
-* [`Model.findOneAndDelete()`](api.html#model_Model-findOneAndDelete)
-* [`Model.findOneAndReplace()`](api.html#model_Model-findOneAndReplace)
-* [`Model.findOneAndUpdate()`](api.html#model_Model-findOneAndUpdate)
-* [`Model.replaceOne()`](api.html#model_Model-replaceOne)
-* [`Model.updateMany()`](api.html#model_Model-updateMany)
-* [`Model.updateOne()`](api.html#model_Model-updateOne)
+* [`Model.deleteMany()`](api/model.html#Model.deleteMany())
+* [`Model.deleteOne()`](api/model.html#Model.deleteOne())
+* [`Model.find()`](api/model.html#Model.find())
+* [`Model.findById()`](api/model.html#Model.findById())
+* [`Model.findByIdAndDelete()`](api/model.html#Model.findByIdAndDelete())
+* [`Model.findByIdAndUpdate()`](api/model.html#Model.findByIdAndUpdate())
+* [`Model.findOne()`](api/model.html#Model.findOne())
+* [`Model.findOneAndDelete()`](api/model.html#Model.findOneAndDelete())
+* [`Model.findOneAndReplace()`](api/model.html#Model.findOneAndReplace())
+* [`Model.findOneAndUpdate()`](api/model.html#Model.findOneAndUpdate())
+* [`Model.replaceOne()`](api/model.html#Model.replaceOne())
+* [`Model.updateMany()`](api/model.html#Model.updateMany())
+* [`Model.updateOne()`](api/model.html#Model.updateOne())
 
 Mongoose queries can be executed by using `await`, or by using `.then()` to handle the promise returned by the query.
 
@@ -41,7 +40,7 @@ const person = await Person.findOne({ 'name.last': 'Ghost' }, 'name occupation')
 console.log('%s %s is a %s.', person.name.first, person.name.last, person.occupation);
 ```
 
-What `person` is depends on the operation: For `findOne()` it is a [potentially-null single document](api/model.html#model_Model-findOne), `find()` a [list of documents](api/model.html#model_Model-find), `countDocuments()` [the number of documents](api/model.html#model_Model-countDocuments), `updateOne()` the [number of documents affected](api/model.html#model_Model-updateOne), etc.
+What `person` is depends on the operation: For `findOne()` it is a [potentially-null single document](api/model.html#Model.findOne()), `find()` a [list of documents](api/model.html#Model.find()), `countDocuments()` [the number of documents](api/model.html#Model.countDocuments()), `updateOne()` the [number of documents affected](api/model.html#Model.updateOne()), etc.
 The [API docs for Models](api/model.html) provide more details.
 
 Now let's look at what happens when no `await` is used:
@@ -156,13 +155,13 @@ Presuming you filter by an indexed field (MongoDB collections always have an ind
 
 There are no joins in MongoDB but sometimes we still want references to documents in other collections.
 This is where [population](populate.html) comes in.
-Read more about how to include documents from other collections in your query results in the [population documentation](api/query.html#query_Query-populate).
+Read more about how to include documents from other collections in your query results in the [population documentation](api/query.html#Query.prototype.populate()).
 
 ## Streaming {#streaming}
 
 You can [stream](http://nodejs.org/api/stream.html) query results from
 MongoDB. You need to call the
-[Query#cursor()](api/query.html#query_Query-cursor) function to return an instance of [QueryCursor](api/query.html#query_Query-cursor).
+[Query#cursor()](api/query.html#Query.prototype.cursor()) function to return an instance of [QueryCursor](api/query.html#Query.prototype.cursor()).
 
 ```javascript
 const cursor = Person.find({ occupation: /host/ }).cursor();
@@ -197,7 +196,7 @@ of inactivity. You can read more about working around session idle timeouts in t
 
 ## Versus Aggregation {#versus-aggregation}
 
-[Aggregation](api/aggregate.html#aggregate_Aggregate) can
+[Aggregation](api/aggregate.html#Aggregate()) can
 do many of the same things that queries can. For example, below is
 how you can use `aggregate()` to find docs where `name.last = 'Ghost'`:
 
@@ -209,7 +208,7 @@ However, just because you can use `aggregate()` doesn't mean you should.
 In general, you should use queries where possible, and only use `aggregate()`
 when you absolutely need to.
 
-Unlike query results, Mongoose does **not** [`hydrate()`](api/model.html#model_Model-hydrate)
+Unlike query results, Mongoose does **not** [`hydrate()`](api/model.html#Model.hydrate())
 aggregation results. Aggregation results are always POJOs, not Mongoose
 documents.
 
@@ -239,7 +238,7 @@ const aggRes = await Person.aggregate([{ $match: { _id: idString } }]);
 
 ## Sorting {#sorting}
 
-[Sorting](api/query.html#query_Query-sort) is how you can ensure your query results come back in the desired order.
+[Sorting](api/query.html#Query.prototype.sort()) is how you can ensure your query results come back in the desired order.
 
 ```javascript
 const personSchema = new mongoose.Schema({

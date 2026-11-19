@@ -1,6 +1,6 @@
 # Query Casting
 
-The first parameter to [`Model.find()`](../api/model.html#model_Model-find), [`Query#find()`](../api/query.html#query_Query-find), [`Model.findOne()`](../api/model.html#model_Model-findOne), etc. is called `filter`.
+The first parameter to [`Model.find()`](../api/model.html#Model.find()), [`Query#find()`](../api/query.html#Query.prototype.find()), [`Model.findOne()`](../api/model.html#Model.findOne()), etc. is called `filter`.
 In older content this parameter is sometimes called `query` or `conditions`. For example:
 
 ```javascript acquit:Cast Tutorial.*get and set
@@ -12,7 +12,7 @@ query.find({ age: { $gt: 50 } });
 query.getFilter(); // `{ name: 'Jean-Luc Picard', age: { $gt: 50 } }`
 ```
 
-When you execute the query using [`Query#exec()`](../api/query.html#query_Query-exec) or [`Query#then()`](../api/query.html#query_Query-then), Mongoose *casts* the filter to match your schema.
+When you execute the query using [`Query#exec()`](../api/query.html#Query.prototype.exec()) or [`Query#then()`](../api/query.html#Query.prototype.then()), Mongoose *casts* the filter to match your schema.
 
 ```javascript acquit:Cast Tutorial.*cast values
 // Note that `_id` and `age` are strings. Mongoose will cast `_id` to

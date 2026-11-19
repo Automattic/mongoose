@@ -320,5 +320,5 @@ The `filter` field accepts standard MongoDB query operators. For best performanc
 * [MongoDB Vector Search $vectorSearch Stage](https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-stage/)
 * [Atlas Automated Embeddings](https://www.mongodb.com/docs/vector-search/crud-embeddings/automated-embedding/overview/)
 * [Atlas Search](https://mongoosejs.com/docs/atlas-search.html) for text search and hybrid search
-* [Model Search Index Methods](https://mongoosejs.com/docs/api/model.html#model_Model-createSearchIndex)
-* [Schema searchIndex() Method](https://mongoosejs.com/docs/api/schema.html#schema_Schema-searchIndex)
+* [Model Search Index Methods](https://mongoosejs.com/docs/api/model.html#Model.createSearchIndex())
+* [Schema searchIndex() Method](https://mongoosejs.com/docs/api/schema.html#Schema.prototype.searchIndex())

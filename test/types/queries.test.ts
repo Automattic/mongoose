@@ -1278,6 +1278,13 @@ async function defaultSortFindAndCount() {
   // @ts-expect-error  Property 'sort' is missing
   await Disabled.findAndCount({}, null, { limit: 10 });
 
+  const MaybeSorted = model('MaybeDefaultSort', new Schema({ name: String }, { defaultSort: Math.random() > 0.5 ? { name: 1 } : undefined }));
+  // @ts-expect-error  Property 'sort' is missing
+  await MaybeSorted.findAndCount({}, null, { limit: 10 });
+
+  const SortedEitherWay = model('EitherDefaultSort', new Schema({ name: String }, { defaultSort: Math.random() > 0.5 ? { name: 1 } : '-name' }));
+  await SortedEitherWay.findAndCount({}, null, { limit: 10 });
+
   // @ts-expect-error  Property 'limit' is missing
   await Sorted.findAndCount({}, null, {});
 

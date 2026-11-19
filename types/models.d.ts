@@ -222,8 +222,9 @@ declare module 'mongoose' {
       ObtainSchemaGeneric<TSchema, 'TSchemaOptions'>['lean'] :
     false;
 
+  /** True only if every member of the `defaultSort` union is set, so a union like `{ name: 1 } | undefined` is false */
   type HasDefaultSortOption<TSchema> = ObtainSchemaGeneric<TSchema, 'TSchemaOptions'> extends { defaultSort: infer DefaultSort } ?
-    [DefaultSort] extends [false | null | undefined] ? false : true :
+    [Extract<DefaultSort, false | null | undefined | ''>] extends [never] ? true : false :
     false;
 
   /** `Model.findAndCount()` requires `sort` unless the schema sets `defaultSort`. */

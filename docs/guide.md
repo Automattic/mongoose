@@ -1650,6 +1650,12 @@ If you need `updateOne()` or `replaceOne()` to respect a sort order on MongoDB 8
 Mongoose applies `defaultSort` after pre middleware, so middleware that calls `sort()` overrides `defaultSort`.
 You can also use `defaultSort` on a discriminator schema to override, or disable with `false`, the base schema's `defaultSort`.
 
+The ref model's `defaultSort` affects `populate()` as follows:
+
+* Populated arrays of refs, like `children: [{ type: ObjectId, ref: 'Child' }]`, keep the order of the ids stored in the array. Pass explicit `options: { sort }` to `populate()` to reorder them.
+* [Populated virtuals](populate.html#populate-virtuals) are sorted by `defaultSort`.
+* `defaultSort` determines which documents MongoDB returns when you use populate's `limit` or `perDocumentLimit` options.
+
 Mongoose skips `defaultSort` for [tailable cursors](https://www.mongodb.com/docs/manual/core/tailable-cursors/), because MongoDB does not support sorting tailable cursors.
 Mongoose also skips `defaultSort` for queries with [`$near` or `$nearSphere`](https://www.mongodb.com/docs/manual/reference/operator/query/near/) conditions, so those queries return results sorted by distance.
 

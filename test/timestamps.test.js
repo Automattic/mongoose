@@ -885,6 +885,41 @@ describe('timestamps', function() {
     assert.ok(church.events[0].users[1].createdAt);
   });
 
+  it('sets timestamps when using $push/$addToSet with array filters on deeply nested arrays (gh-8809)', async function() {
+    const sceneSchema = new Schema({ narration: String }, { timestamps: true });
+    const pointSchema = new Schema({ scenes: [sceneSchema] }, { timestamps: true });
+    const lessonSchema = new Schema({ points: [pointSchema] }, { timestamps: true });
+    const moduleSchema = new Schema({ lessons: [lessonSchema] });
+    const courseSchema = new Schema({ modules: [moduleSchema] }, { timestamps: true });
+
+    const Course = db.model('Test', courseSchema);
+
+    const course = await Course.create({
+      modules: [{ lessons: [{ points: [{ scenes: [] }] }] }]
+    });
+    const pointId = course.modules[0].lessons[0].points[0]._id;
+
+    const afterPush = await Course.findOneAndUpdate(
+      { _id: course._id },
+      { $push: { 'modules.$[].lessons.$[].points.$[point].scenes': { $each: [{ narration: 'intro' }] } } },
+      { arrayFilters: [{ 'point._id': pointId }], new: true }
+    );
+    const scene = afterPush.modules[0].lessons[0].points[0].scenes[0];
+    assert.equal(scene.narration, 'intro');
+    assert.ok(scene.createdAt);
+    assert.ok(scene.updatedAt);
+
+    const lessonId = course.modules[0].lessons[0]._id;
+    const afterAddToSet = await Course.findOneAndUpdate(
+      { _id: course._id },
+      { $addToSet: { 'modules.$[].lessons.$[lesson].points': { scenes: [] } } },
+      { arrayFilters: [{ 'lesson._id': lessonId }], new: true }
+    );
+    const point = afterAddToSet.modules[0].lessons[0].points[1];
+    assert.ok(point.createdAt);
+    assert.ok(point.updatedAt);
+  });
+
   it('sets createdAt when creating new single nested subdoc (gh-11603)', async function() {
     const childSchema = new mongoose.Schema(
       { name: String },

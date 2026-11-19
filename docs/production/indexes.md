@@ -475,6 +475,8 @@ await Order.syncIndexes({ hideIndexes: true });
 
 [Mongoose Studio](https://mongoosestudio.app), the Mongoose team's open source MongoDB GUI, provides a convenient GUI around `syncIndexes()` that lets you review which indexes will be created and dropped before applying changes.
 
+<video src="https://assets.meanit.stream/sync-indexes-demo.mp4" controls preload="metadata" style="width: 100%" aria-label="Demo of using syncIndexes() in Mongoose Studio"></video>
+
 ## Using `explain()` and `hint()` {#using-explain-and-hint}
 
 To check which index a query uses, call [`Query.prototype.explain()`](../api/query.html#Query.prototype.explain()).

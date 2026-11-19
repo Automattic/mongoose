@@ -1253,6 +1253,37 @@ describe('model: findOneAndUpdate:', function() {
         then(() => assert.equal(called, 0));
     });
 
+    it('validators run on mixed paths in subdocuments (gh-16707)', async function() {
+      let called = [];
+      const childSchema = new Schema({
+        name: String,
+        mixed: {
+          type: 'Mixed',
+          validate: v => { called.push(v); return false; }
+        }
+      }, { _id: false });
+      const Test = db.model('Test', new Schema({ single: childSchema, arr: [childSchema] }));
+
+      const _id = new mongoose.Types.ObjectId();
+      await Test.collection.insertOne({ _id, arr: [{ name: 'test' }] });
+      const opts = { runValidators: true };
+
+      for (const path of ['single.mixed', 'arr.0.mixed', 'arr.$.mixed']) {
+        called = [];
+        const err = await Test.findOneAndUpdate({ _id, 'arr.name': 'test' }, { $set: { [path]: { key: 'value' } } }, opts).
+          then(() => null, err => err);
+        assert.ok(err, path);
+        assert.equal(err.name, 'ValidationError', path);
+        assert.deepStrictEqual(called, [{ key: 'value' }], path);
+      }
+
+      for (const path of ['single.mixed.key', 'arr.0.mixed.key', 'arr.$.mixed.mixed']) {
+        called = [];
+        await Test.findOneAndUpdate({ _id, 'arr.name': 'test' }, { $set: { [path]: 'value' } }, opts);
+        assert.deepStrictEqual(called, [], path);
+      }
+    });
+
     it('should work with arrays (gh-3035)', async function() {
       const testSchema = new mongoose.Schema({
         id: String,
@@ -2355,6 +2386,53 @@ describe('model: findOneAndUpdate:', function() {
     assert.ok(err);
     assert.equal(err.name, 'CastError');
     assert.equal(err.path, 'accessories.0.additionals.0.k');
+  });
+
+  it('only skips update validators for paths underneath an already validated subdocument', async function() {
+    let validateNameCalls = 0;
+    let validateSubCalls = 0;
+
+    const subSchema = new Schema({
+      v: {
+        type: String,
+        validate: function() {
+          validateSubCalls++;
+          return true;
+        }
+      }
+    });
+    const listSchema = new Schema({
+      name: {
+        type: String,
+        validate: function() {
+          validateNameCalls++;
+          return true;
+        }
+      },
+      kind: { type: String, enum: ['a', 'b'] },
+      sub: subSchema,
+      items: [{ kind: { type: String, enum: ['a', 'b'] } }]
+    });
+    const Test = db.model('Test', new Schema({ lists: [listSchema] }));
+
+    const $set = {};
+    for (let i = 0; i < 10; ++i) {
+      $set['lists.' + i] = { name: 'list ' + i, kind: 'a', sub: { v: 'v' }, items: [{ kind: i === 1 ? 'invalid' : 'a' }] };
+    }
+    // `lists.10.kind` is not underneath `lists.1`, so it must still be validated
+    $set['lists.10.kind'] = 'invalid';
+
+    const err = await Test.findOneAndUpdate(
+      { _id: new mongoose.Types.ObjectId() },
+      { $set },
+      { runValidators: true }
+    ).then(() => null, err => err);
+
+    assert.equal(validateNameCalls, 10);
+    assert.equal(validateSubCalls, 10);
+    assert.ok(err);
+    assert.equal(err.name, 'ValidationError');
+    assert.deepStrictEqual(Object.keys(err.errors).sort(), ['lists.1.items.0.kind', 'lists.10.kind']);
   });
 
   describe('deprecation warnings for `new` and `returnOriginal` options (gh-15972)', function() {

@@ -114,4 +114,49 @@ describe('sanitizeFilter', function() {
     sanitizeFilter(obj);
     assert.deepEqual(obj, { $text: { $search: 'test' } });
   });
+
+  it('throws on unrecognized top-level operators, including inside $and, $or, $nor', function() {
+    const xor = { $_internalSchemaXor: [{ pwd: { $regex: '^s' } }, { $alwaysFalse: 1 }] };
+    assert.throws(
+      () => sanitizeFilter({ username: 'val', ...xor }),
+      /\$_internalSchemaXor is not allowed with sanitizeFilter/
+    );
+    assert.throws(
+      () => sanitizeFilter({ $and: [xor] }),
+      /\$_internalSchemaXor is not allowed with sanitizeFilter/
+    );
+    assert.throws(
+      () => sanitizeFilter({ $or: [{ username: 'val' }, xor] }),
+      /\$_internalSchemaXor is not allowed with sanitizeFilter/
+    );
+    assert.throws(
+      () => sanitizeFilter({ $nor: [xor] }),
+      /\$_internalSchemaXor is not allowed with sanitizeFilter/
+    );
+    assert.throws(
+      () => sanitizeFilter({ $_internalSchemaCond: [{ $alwaysTrue: 1 }, { pwd: { $regex: '^s' } }, { $alwaysFalse: 1 }] }),
+      /\$_internalSchemaCond is not allowed with sanitizeFilter/
+    );
+    assert.throws(
+      () => sanitizeFilter({ username: 'val', $sampleRate: 1 }),
+      /\$sampleRate is not allowed with sanitizeFilter/
+    );
+  });
+
+  it('throws on $comment', function() {
+    assert.throws(
+      () => sanitizeFilter({ username: 'val', $comment: 'test' }),
+      /\$comment is not allowed with sanitizeFilter/
+    );
+    assert.throws(
+      () => sanitizeFilter({ $or: [{ username: 'val', $comment: 'test' }] }),
+      /\$comment is not allowed with sanitizeFilter/
+    );
+  });
+
+  it('allows trusted top-level operators', function() {
+    const obj = { $_internalSchemaXor: trusted([{ username: 'val' }, { $alwaysFalse: 1 }]) };
+    sanitizeFilter(obj);
+    assert.deepEqual(obj, { $_internalSchemaXor: [{ username: 'val' }, { $alwaysFalse: 1 }] });
+  });
 });

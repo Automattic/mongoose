@@ -75,7 +75,7 @@ sinon.stub(time, 'setTimeout');
 
 Do **not** use `globalSetup` to call `mongoose.connect()` or
 `mongoose.createConnection()`. Jest runs `globalSetup` in
-a [separate environment](https://github.com/facebook/jest/issues/7184),
+a [separate environment](https://github.com/jestjs/jest/issues/7184),
 so you cannot use any connections you create in `globalSetup`
 in your tests.
 

@@ -19,4 +19,8 @@ describe('cleanPositionalOperators', function() {
   it('replaces interior elemMatch', function() {
     assert.equal(cleanPositionalOperators('questions.$.$.test'), 'questions.0.0.test');
   });
+
+  it('replaces interior and trailing positional operators in the same path', function() {
+    assert.equal(cleanPositionalOperators('questions.$[q].answers.$.votes.$[v]'), 'questions.0.answers.0.votes.0');
+  });
 });

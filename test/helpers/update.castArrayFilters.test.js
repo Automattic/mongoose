@@ -476,4 +476,60 @@ describe('castArrayFilters', function() {
     assert.strictEqual(arrayFilters[2].$or[0]['z.notInSchema'], '3');
     assert.strictEqual(arrayFilters[2].$or[1]['z.id'], 3);
   });
+
+  it('casts `$or` and `$and` that come after a field key in the same filter (gh-16637)', function() {
+    const schema = new Schema({
+      arr: [{ id: Number, deleted: Boolean }]
+    });
+    const q = new Query();
+    q.schema = schema;
+
+    q.updateOne({}, { $set: { 'arr.$[el].id': 1 } }, {
+      arrayFilters: [
+        { 'el.deleted': 'false', $or: [{ 'el.id': '12' }, { 'el.id': { $exists: false } }] },
+        { 'el.deleted': 'true', $and: [{ 'el.id': { $gte: '3' } }] }
+      ]
+    });
+    castArrayFilters(q);
+
+    const arrayFilters = q.options.arrayFilters;
+    assert.deepStrictEqual(arrayFilters[0], {
+      'el.deleted': false,
+      $or: [{ 'el.id': 12 }, { 'el.id': { $exists: false } }]
+    });
+    assert.deepStrictEqual(arrayFilters[1], {
+      'el.deleted': true,
+      $and: [{ 'el.id': { $gte: 3 } }]
+    });
+  });
+
+  it('casts field keys that come after a leading `$or` (gh-16637)', function() {
+    const schema = new Schema({
+      arr: [{ id: Number, deleted: Boolean }]
+    });
+    const q = new Query();
+    q.schema = schema;
+
+    q.updateOne({}, { $set: { 'arr.$[el].id': 1 } }, {
+      arrayFilters: [{ $or: [{ 'el.id': '12' }], 'el.deleted': 'true' }]
+    });
+    castArrayFilters(q);
+
+    assert.deepStrictEqual(q.options.arrayFilters[0], { $or: [{ 'el.id': 12 }], 'el.deleted': true });
+  });
+
+  it('casts `$nor` (gh-16637)', function() {
+    const schema = new Schema({
+      arr: [{ id: Number }]
+    });
+    const q = new Query();
+    q.schema = schema;
+
+    q.updateOne({}, { $set: { 'arr.$[el].id': 1 } }, {
+      arrayFilters: [{ $nor: [{ 'el.id': '12' }] }]
+    });
+    castArrayFilters(q);
+
+    assert.strictEqual(q.options.arrayFilters[0].$nor[0]['el.id'], 12);
+  });
 });

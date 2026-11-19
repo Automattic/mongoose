@@ -1115,7 +1115,7 @@ describe('model: populate:', function() {
       ]
     });
 
-    // non-existant subprop
+    // non-existent subprop
     await BlogPost.findById(post._id).populate({
       path: 'comments._idontexist',
       select: 'email',
@@ -8976,6 +8976,20 @@ describe('model: populate:', function() {
       assert.equal(docs[1]._id.toString(), p2._id.toString());
       assert.deepEqual(docs[0].children.map(c => c._id), [1]);
       assert.deepEqual(docs[1].children.map(c => c._id), [4]);
+    });
+
+    it('keeps the stored order of an array of refs when the ref model has a `defaultSort`', async function() {
+      const Child = db.model('Child', Schema({ name: String }, { defaultSort: { name: 1 } }));
+      const Parent = db.model('Parent', Schema({ children: [{ type: 'ObjectId', ref: 'Child' }] }));
+      const [c, a, b] = await Child.insertMany([{ name: 'c' }, { name: 'a' }, { name: 'b' }]);
+      await Parent.create({ children: [b._id, c._id, a._id] });
+
+      let parent = await Parent.findOne().populate('children');
+      assert.deepStrictEqual(parent.children.map(child => child.name), ['b', 'c', 'a']);
+
+      // `defaultSort` determines which documents `perDocumentLimit` returns
+      parent = await Parent.findOne().populate({ path: 'children', perDocumentLimit: 1 });
+      assert.deepStrictEqual(parent.children.map(child => child.name), ['a']);
     });
 
     describe('splitting populate queries whose `$in` filter would have too many elements (gh-5890)', function() {

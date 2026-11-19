@@ -87,6 +87,17 @@ function gh11543() {
   expect(personSchema.virtuals).type.toBe<PetVirtuals>();
 }
 
+function removeVirtual() {
+  const schema = new Schema({ firstName: String, lastName: String });
+  schema.virtual('fullName').get(function() {
+    return `${this.firstName} ${this.lastName}`;
+  });
+
+  expect(schema.removeVirtual('fullName')).type.toBe<typeof schema>();
+  expect(schema.removeVirtual(['fullName'])).type.toBe<typeof schema>();
+  expect(schema.removeVirtual).type.not.toBeCallableWith(42);
+}
+
 async function autoTypedVirtuals() {
   type AutoTypedSchemaType = InferSchemaType<typeof testSchema>;
   type VirtualsType = { domain: string } & { id: string };

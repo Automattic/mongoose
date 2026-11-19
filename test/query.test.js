@@ -729,6 +729,17 @@ describe('Query', function() {
       assert.equal(e.message, 'sort() takes at most 2 arguments');
 
     });
+
+    it('only reads own `$meta` properties', function() {
+      const query = new Query({});
+      query.sort({ score: { $meta: 'textScore' } });
+      assert.deepStrictEqual(query.options.sort, { score: { $meta: 'textScore' } });
+
+      assert.throws(
+        () => new Query({}).sort({ score: Object.create({ $meta: 'textScore' }) }),
+        /Invalid sort value: \{ score: \[object Object\] \}/
+      );
+    });
   });
 
   describe('or', function() {

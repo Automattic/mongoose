@@ -1439,7 +1439,7 @@ describe('schema', function() {
       assert.equal(ss.obj, ele.id);
     });
 
-    it('array of of schemas and objects (gh-7218)', function() {
+    it('array of schemas and objects (gh-7218)', function() {
       const baseSchema = new Schema({ created: Date }, { id: true });
       const s = new Schema([baseSchema, { name: String }], { id: false });
 

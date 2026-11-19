@@ -106,7 +106,7 @@ is replaced with the mongoose document returned from the database by
 performing a separate query before returning the results.
 
 Arrays of refs work the same way. Just call the
-[populate](api/query.html#query_Query-populate) method on the query and an
+[populate](api/query.html#Query.prototype.populate()) method on the query and an
 array of documents will be returned *in place* of the original `_id`s.
 
 ## Setting Populated Fields {#setting-populated-fields}
@@ -161,7 +161,7 @@ story.populated('author'); // undefined
 ```
 
 A common reason for checking whether a path is populated is getting the `author`
-id. However, for your convenience, Mongoose adds a [`_id` getter to ObjectId instances](api/mongoose.html#mongoose_Mongoose-set)
+id. However, for your convenience, Mongoose adds a [`_id` getter to ObjectId instances](api/mongoose.html#Mongoose.prototype.set())
 so you can use `story.author._id` regardless of whether `author` is populated.
 
 ```javascript
@@ -208,7 +208,7 @@ story.authors; // `[]`
 
 What if we only want a few specific fields returned for the populated
 documents? This can be accomplished by passing the usual
-[field name syntax](api/query.html#query_Query-select) as the second argument
+[field name syntax](api/query.html#Query.prototype.select()) as the second argument
 to the populate method:
 
 ```javascript
@@ -409,9 +409,9 @@ console.log('The stories are an array: ', stories);
 ```
 
 The documents returned from
-[query population](api/query.html#query_Query-populate) become fully
+[query population](api/query.html#Query.prototype.populate()) become fully
 functional, `remove`able, `save`able documents unless the
-[lean](api/query.html#query_Query-lean) option is specified. Do not confuse
+[lean](api/query.html#Query.prototype.lean()) option is specified. Do not confuse
 them with [sub docs](subdocs.html). Take caution when calling its
 remove method because you'll be removing it from the database, not just
 the array.
@@ -420,7 +420,7 @@ the array.
 
 If you have an existing mongoose document and want to populate some of its
 paths, you can use the
-[Document#populate()](api/document.html#document_Document-populate) method.
+[Document#populate()](api/document.html#Document.prototype.populate()) method.
 
 ```javascript
 const person = await Person.findOne({ name: 'Ian Fleming' });
@@ -445,8 +445,8 @@ person.populated('fans'); // Array of ObjectIds
 ## Populating multiple existing documents {#populate_multiple_documents}
 
 If we have one or many mongoose documents or even plain objects
-(*for example, results from an [aggregation](api/model.html#model_Model-aggregate) query*), we may
-populate them using the [Model.populate()](api/model.html#model_Model-populate)
+(*for example, results from an [aggregation](api/model.html#Model.aggregate()) query*), we may
+populate them using the [Model.populate()](api/model.html#Model.populate())
 method. This is what `Document#populate()`
 and `Query#populate()` use to populate documents.
 
@@ -513,7 +513,7 @@ This is known as a "cross-database populate," because it enables you to
 populate across MongoDB databases and even across MongoDB instances.
 
 If you don't have access to the model instance when defining your `eventSchema`,
-you can also pass [the model instance as an option to `populate()`](api/model.html#model_Model-populate).
+you can also pass [the model instance as an option to `populate()`](api/model.html#Model.populate()).
 
 ```javascript
 const events = await Event.

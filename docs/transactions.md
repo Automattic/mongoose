@@ -11,8 +11,8 @@ If you haven't already, import mongoose:
 import mongoose from 'mongoose';
 ```
 
-To create a transaction, you first need to create a session using [`Mongoose#startSession`](api/mongoose.html#mongoose_Mongoose-startSession)
-or [`Connection#startSession()`](api/connection.html#connection_Connection-startSession).
+To create a transaction, you first need to create a session using [`Mongoose#startSession`](api/mongoose.html#Mongoose.prototype.startSession())
+or [`Connection#startSession()`](api/connection.html#Connection.prototype.startSession()).
 
 ```javascript
 // Using Mongoose's default connection
@@ -95,11 +95,11 @@ await db.transaction(async function setRank(session) {
 
 ## With Mongoose Documents and `save()` {#with-mongoose-documents-and-save}
 
-If you get a [Mongoose document](documents.html) from [`findOne()`](api/model.html#model_Model-findOne)
-or [`find()`](api/model.html#model_Model-find) using a session, the document will
-keep a reference to the session and use that session for [`save()`](api/document.html#document_Document-save).
+If you get a [Mongoose document](documents.html) from [`findOne()`](api/model.html#Model.findOne())
+or [`find()`](api/model.html#Model.find()) using a session, the document will
+keep a reference to the session and use that session for [`save()`](api/document.html#Document.prototype.save()).
 
-To get/set the session associated with a given document, use [`doc.$session()`](api/document.html#document_Document-$session).
+To get/set the session associated with a given document, use [`doc.$session()`](api/document.html#Document.prototype.$session()).
 
 ```javascript acquit:transactions.*save
 const User = db.model('User', new Schema({ name: String }));
@@ -134,8 +134,8 @@ return User.createCollection().
 ## With the Aggregation Framework {#with-the-aggregation-framework}
 
 The `Model.aggregate()` function also supports transactions. Mongoose
-aggregations have a [`session()` helper](api/aggregate.html#aggregate_Aggregate-session)
-that sets the [`session` option](api/aggregate.html#aggregate_Aggregate-option).
+aggregations have a [`session()` helper](api/aggregate.html#Aggregate.prototype.session())
+that sets the [`session` option](api/aggregate.html#Aggregate.prototype.option()).
 Below is an example of executing an aggregation within a transaction.
 
 ```javascript acquit:transactions.*aggregate

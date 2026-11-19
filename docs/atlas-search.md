@@ -333,6 +333,6 @@ Disable [`autoSearchIndex`](https://mongoosejs.com/docs/guide.html#autoSearchInd
 * [Vector Search](https://mongoosejs.com/docs/atlas-vector-search.html) for semantic search with embeddings
 * [MongoDB Atlas Search Documentation](https://www.mongodb.com/docs/search/)
 * [Atlas Search Analyzers](https://www.mongodb.com/docs/search/index/analyzers/overview/)
-* [Model Search Index Methods](https://mongoosejs.com/docs/api/model.html#model_Model-createSearchIndex)
-* [Schema searchIndex() Method](https://mongoosejs.com/docs/api/schema.html#schema_Schema-searchIndex)
+* [Model Search Index Methods](https://mongoosejs.com/docs/api/model.html#Model.createSearchIndex())
+* [Schema searchIndex() Method](https://mongoosejs.com/docs/api/schema.html#Schema.prototype.searchIndex())
 * [Aggregation](https://mongoosejs.com/docs/api/aggregate.html) for building complex pipelines

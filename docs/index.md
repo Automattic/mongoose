@@ -88,7 +88,7 @@ fluffy.speak(); // "Meow name is fluffy"
 ```
 
 We have talking kittens! But we still haven't saved anything to MongoDB.
-Each document can be saved to the database by calling its [save](api/model.html#model_Model-save) method.
+Each document can be saved to the database by calling its [save](api/model.html#Model.prototype.save()) method.
 
 ```javascript
 await fluffy.save();

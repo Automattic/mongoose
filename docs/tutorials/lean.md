@@ -1,7 +1,7 @@
 # Faster Mongoose Queries With Lean
 
-The [lean option](../api/query.html#query_Query-lean) tells Mongoose to skip
-[hydrating](../api/model.html#model_Model-hydrate) the result documents. This
+The [lean option](../api/query.html#Query.prototype.lean()) tells Mongoose to skip
+[hydrating](../api/model.html#Model.hydrate()) the result documents. This
 makes queries faster and less memory intensive, but the result documents are
 plain old JavaScript objects (POJOs), **not** [Mongoose documents](../documents.html).
 In this tutorial, you'll learn more about the tradeoffs of using `lean()`.
@@ -187,9 +187,9 @@ group.members[1] instanceof mongoose.Document; // false
 If you're executing a query and sending the results without modification to,
 say, an [Express response](http://expressjs.com/en/4x/api.html#res), you should
 use lean. In general, if you do not modify the query results and do not use
-[custom getters](../api/schematype.html#schematype_SchemaType-get), you should use
+[custom getters](../api/schematype.html#SchemaType.prototype.get()), you should use
 `lean()`. If you modify the query results or rely on features like getters
-or [transforms](../api/document.html#document_Document-toObject), you should not
+or [transforms](../api/document.html#Document.prototype.toObject()), you should not
 use `lean()`.
 
 Below is an example of an [Express route](http://expressjs.com/en/guide/routing.html)
@@ -232,7 +232,7 @@ to add virtuals to your lean query results.
 ## Plugins
 
 Using `lean()` bypasses all Mongoose features, including [virtuals](virtuals.html), [getters/setters](getters-setters.html),
-and [defaults](../api/schematype.html#schematype_SchemaType-default). If you want to
+and [defaults](../api/schematype.html#SchemaType.prototype.default()). If you want to
 use these features with `lean()`, you need to use the corresponding plugin:
 
 * [mongoose-lean-virtuals](https://plugins.mongoosejs.io/plugins/lean-virtuals)

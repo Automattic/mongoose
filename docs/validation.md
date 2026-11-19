@@ -7,9 +7,9 @@ Before we get into the specifics of validation syntax, please keep the following
 * Validation always runs as the **first** `pre('save')` hook. This means that validation doesn't run on any changes you make in `pre('save')` hooks.
 * You can disable automatic validation before save by setting the [validateBeforeSave](guide.html#validateBeforeSave) option
 * You can manually run validation using `doc.validate()` or `doc.validateSync()`
-* You can manually mark a field as invalid (causing validation to fail) by using [`doc.invalidate(...)`](api/document.html#document_Document-invalidate)
-* Validators are not run on undefined values. The only exception is the [`required` validator](api/schematype.html#schematype_SchemaType-required).
-* When you call [Model#save](api/model.html#model_Model-save), Mongoose also runs subdocument validation. If an error occurs, your [Model#save](api/model.html#model_Model-save) promise rejects
+* You can manually mark a field as invalid (causing validation to fail) by using [`doc.invalidate(...)`](api/document.html#Document.prototype.invalidate())
+* Validators are not run on undefined values. The only exception is the [`required` validator](api/schematype.html#SchemaType.prototype.required()).
+* When you call [Model#save](api/model.html#Model.prototype.save()), Mongoose also runs subdocument validation. If an error occurs, your [Model#save](api/model.html#Model.prototype.save()) promise rejects
 * Validation is customizable
 
 ```javascript acquit:Validation$
@@ -57,7 +57,7 @@ assert.equal(error.errors['name'].message,
 
 Mongoose has several built-in validators.
 
-* All [SchemaTypes](schematypes.html) have the built-in [required](api/schematype.html#schematype_SchemaType-required) validator. The required validator uses the [SchemaType's `checkRequired()` function](api/schematype.html#schematype_SchemaType-checkRequired) to determine if the value satisfies the required validator.
+* All [SchemaTypes](schematypes.html) have the built-in [required](api/schematype.html#SchemaType.prototype.required()) validator. The required validator uses the [SchemaType's `checkRequired()` function](api/schematype.html#SchemaType.checkRequired()) to determine if the value satisfies the required validator.
 * [Numbers](schematypes.html#numbers) have [`min` and `max`](schematypes.html#number-validators) validators.
 * [Strings](schematypes.html#strings) have [`enum`, `match`, `minLength`, and `maxLength`](schematypes.html#string-validators) validators.
 
@@ -192,7 +192,7 @@ to suit your needs.
 
 Custom validation is declared by passing a validation function.
 You can find detailed instructions on how to do this in the
-[`SchemaType#validate()` API docs](api/schematype.html#schematype_SchemaType-validate).
+[`SchemaType#validate()` API docs](api/schematype.html#SchemaType.prototype.validate()).
 
 ```javascript acquit:Custom Validators
 const userSchema = new Schema({
@@ -276,7 +276,7 @@ assert.equal(error.errors['email'].message, 'Email validation failed');
 
 Errors returned after failed validation contain an `errors` object
 whose values are `ValidatorError` objects. Each
-[ValidatorError](api/error.html#error_Error-ValidatorError) has `kind`, `path`,
+[ValidatorError](api/error.html#Error.ValidatorError) has `kind`, `path`,
 `value`, and `message` properties.
 A ValidatorError also may have a `reason` property. If an error was
 thrown in the validator, this property will contain the error that was
@@ -463,9 +463,9 @@ assert.ok(error.errors['name']);
 ## Update Validators
 
 In the above examples, you learned about document validation. Mongoose also
-supports validation for [`updateOne()`](api/query.html#query_Query-updateOne),
-[`updateMany()`](api/query.html#query_Query-updateMany),
-and [`findOneAndUpdate()`](api/query.html#query_Query-findOneAndUpdate) operations.
+supports validation for [`updateOne()`](api/query.html#Query.prototype.updateOne()),
+[`updateMany()`](api/query.html#Query.prototype.updateMany()),
+and [`findOneAndUpdate()`](api/query.html#Query.prototype.findOneAndUpdate()) operations.
 Update validators are off by default - you need to specify
 the `runValidators` option.
 

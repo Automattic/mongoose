@@ -19,7 +19,7 @@ class Query<
 
 ## Using `lean()` in TypeScript
 
-The [`lean()` method](../tutorials/lean.html) tells Mongoose to skip [hydrating](../api/model.html#model_Model-hydrate) the result documents, making queries faster and more memory efficient.
+The [`lean()` method](../tutorials/lean.html) tells Mongoose to skip [hydrating](../api/model.html#Model.hydrate()) the result documents, making queries faster and more memory efficient.
 `lean()` comes with some caveats in TypeScript when working with the query `transform()` function.
 In general, we recommend calling `lean()` before using the `transform()` function to ensure accurate types.
 

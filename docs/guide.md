@@ -1615,7 +1615,10 @@ const eventSchema = new mongoose.Schema(
 ## option: defaultSort {#defaultSort}
 
 Sets the sort order for queries that don't specify a sort, so you can define a model's usual ordering once.
-`defaultSort` accepts anything that [`Query.prototype.sort()`](api/query.html#Query.prototype.sort()) accepts, except `$meta` sorts like `{ score: { $meta: 'textScore' } }`, because MongoDB throws an error on `$meta` sorts for queries that don't use `$text`.
+`defaultSort` accepts anything that [`Query.prototype.sort()`](api/query.html#Query.prototype.sort()) accepts, except:
+
+1. `$meta` sorts like `{ score: { $meta: 'textScore' } }`, because MongoDB throws an error on `$meta` sorts for queries that don't use `$text`.
+2. Empty sorts: `{}`, `[]`, `new Map()`, whitespace-only strings, because those would translate to no sort. `defaultSort: null` or `false` is allowed to disable default sort for discriminators.
 
 ```javascript
 const schema = new Schema({ name: String }, {
@@ -1648,7 +1651,7 @@ It does not apply to `countDocuments()`, `estimatedDocumentCount()`, `distinct()
 `updateOne()` and `replaceOne()` are explicitly excluded for MongoDB server compatibility: MongoDB only supports `sort` for `updateOne()` and `replaceOne()` starting in MongoDB 8.0, and older versions throw an error if `sort` is set.
 If you need `updateOne()` or `replaceOne()` to respect a sort order on MongoDB 8.0 or later, call `sort()` explicitly.
 Mongoose applies `defaultSort` after pre middleware, so middleware that calls `sort()` overrides `defaultSort`.
-You can also use `defaultSort` on a discriminator schema to override, or disable with `false`, the base schema's `defaultSort`.
+You can also use `defaultSort` on a discriminator schema to override, or disable with `false` or `null`, the base schema's `defaultSort`.
 
 The ref model's `defaultSort` affects `populate()` as follows:
 

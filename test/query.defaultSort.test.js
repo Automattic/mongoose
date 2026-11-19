@@ -35,7 +35,14 @@ describe('schema defaultSort option', function() {
     assert.throws(() => new Schema({}, { defaultSort: true }), /`defaultSort` must be falsy, string, object, array, or Map, got `boolean`/);
     assert.throws(() => new Schema({}, { defaultSort: { score: { $meta: 'textScore' } } }), /`defaultSort` does not support `\$meta` sorts, got `\$meta` for `score`/);
     assert.throws(() => new Schema({}, { defaultSort: new Map([['score', { $meta: 'textScore' }]]) }), /`defaultSort` does not support `\$meta` sorts, got `\$meta` for `score`/);
+    assert.throws(() => new Schema({}, { defaultSort: ['name', 1] }), /`defaultSort` array must be an array of \[key, value\] arrays/);
+    assert.throws(() => new Schema({}, { defaultSort: [['name', 1], 'age'] }), /`defaultSort` array must be an array of \[key, value\] arrays/);
+    assert.throws(() => new Schema({}, { defaultSort: {} }), /`defaultSort` must not be empty/);
+    assert.throws(() => new Schema({}, { defaultSort: [] }), /`defaultSort` must not be empty/);
+    assert.throws(() => new Schema({}, { defaultSort: new Map() }), /`defaultSort` must not be empty/);
+    assert.throws(() => new Schema({}, { defaultSort: ' ' }), /`defaultSort` must not be empty/);
 
+    assert.strictEqual(new Schema({}, { defaultSort: null }).options.defaultSort, null);
     assert.strictEqual(new Schema({}, { defaultSort: false }).options.defaultSort, false);
     assert.strictEqual(new Schema({}, { defaultSort: 'foobar' }).options.defaultSort, 'foobar');
   });

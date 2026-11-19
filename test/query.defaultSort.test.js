@@ -30,6 +30,21 @@ describe('schema defaultSort option', function() {
     return Test;
   }
 
+  it('throws on invalid `defaultSort` values when creating the schema', function() {
+    assert.throws(() => new Schema({}, { defaultSort: 42 }), /`defaultSort` must be falsy, string, object, array, or Map, got `number`/);
+    assert.throws(() => new Schema({}, { defaultSort: true }), /`defaultSort` must be falsy, string, object, array, or Map, got `boolean`/);
+
+    assert.strictEqual(new Schema({}, { defaultSort: false }).options.defaultSort, false);
+    assert.strictEqual(new Schema({}, { defaultSort: 'foobar' }).options.defaultSort, 'foobar');
+  });
+
+  it('throws on invalid `defaultSort` values set after creating the schema when compiling a model', function() {
+    const schema = new Schema({ name: String });
+    schema.options.defaultSort = 42;
+
+    assert.throws(() => db.model('Test', schema), /`defaultSort` must be falsy, string, object, array, or Map, got `number`/);
+  });
+
   it('applies to find(), findOne(), and cursors', async function() {
     const Test = await createModel();
 
@@ -56,19 +71,15 @@ describe('schema defaultSort option', function() {
     assert.strictEqual(deleted.value, 1);
   });
 
-  it('applies to updateOne() and replaceOne() (requires MongoDB 8.0)', async function() {
-    const [major] = await start.mongodVersion();
-    if (major < 8) {
-      return this.skip();
-    }
+  it('does not apply to updateOne() and replaceOne() because MongoDB < 8.0 does not support sort for them', async function() {
     const Test = await createModel();
 
     await Test.updateOne({}, { name: 'updated' });
-    assert.strictEqual((await Test.findOne({ name: 'updated' })).value, 3);
+    assert.strictEqual((await Test.findOne({ name: 'updated' })).value, 1);
 
-    await Test.replaceOne({ value: { $lt: 3 } }, { name: 'replaced', value: 2 });
-    assert.strictEqual(await Test.countDocuments({ name: 'replaced', value: 2 }), 1);
-    assert.strictEqual(await Test.countDocuments({ name: 'c' }), 0);
+    await Test.replaceOne({ value: { $lt: 3 } }, { name: 'replaced', value: 1 });
+    assert.strictEqual(await Test.countDocuments({ name: 'replaced' }), 1);
+    assert.strictEqual(await Test.countDocuments({ name: 'c' }), 1);
   });
 
   it('does not apply to operations that do not support sort', async function() {
@@ -144,16 +155,6 @@ describe('schema defaultSort option', function() {
     assert.deepStrictEqual(docs.map(doc => doc.value), [1, 3, 2]);
   });
 
-  it('lets `updateOne()` and `replaceOne()` skip the default on any MongoDB version', async function() {
-    const Test = await createModel();
-
-    await Test.updateOne({}, { name: 'updated' }).sort(null);
-    assert.strictEqual((await Test.findOne({ name: 'updated' })).value, 1);
-
-    await Test.replaceOne({ value: 3 }, { name: 'replaced', value: 3 }, { sort: null });
-    assert.strictEqual(await Test.countDocuments({ name: 'replaced' }), 1);
-  });
-
   it('is not skipped with `sort(undefined)`', async function() {
     const Test = await createModel();
 
@@ -168,6 +169,25 @@ describe('schema defaultSort option', function() {
     const Test = await createModel();
 
     assert.strictEqual(Test.find().tailable()._optionsForExec().sort, undefined);
+  });
+
+  it('skips sorting queries with `$near` or `$nearSphere`, which sort by distance', async function() {
+    const schema = new Schema({ name: String, loc: { type: [Number], index: '2d' } }, { defaultSort: { name: 1 } });
+    const Test = db.model('Test', schema);
+    await Test.init();
+    await Test.create([{ name: 'a', loc: [2, 2] }, { name: 'b', loc: [1, 1] }]);
+
+    let docs = await Test.find({ loc: { $near: [0, 0] } });
+    assert.deepStrictEqual(docs.map(doc => doc.name), ['b', 'a']);
+
+    docs = await Test.find().where('loc').near({ center: [0, 0] });
+    assert.deepStrictEqual(docs.map(doc => doc.name), ['b', 'a']);
+
+    docs = await Test.find({ $and: [{ name: { $exists: true } }, { $or: [{ loc: { $nearSphere: [0, 0] } }] }] });
+    assert.deepStrictEqual(docs.map(doc => doc.name), ['b', 'a']);
+
+    docs = await Test.find({ loc: { $near: [0, 0] } }).sort({ name: 1 });
+    assert.deepStrictEqual(docs.map(doc => doc.name), ['a', 'b']);
   });
 
   it('skips sorting in `Model.exists()` unless the sort is explicit', async function() {

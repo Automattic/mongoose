@@ -365,6 +365,82 @@ describe('types array', function() {
       raw = await Test.collection.findOne({ _id: doc._id });
       assert.deepStrictEqual(raw.nums, [-2, 0, -1, 1, 2, 3, 4, 5]);
     });
+
+    it('applies $sort to the in-memory array when pushing with $each (gh-16687)', async function() {
+      const Test = db.model('Test', Schema({ nums: [Number] }));
+
+      const doc = await Test.create({ nums: [3, 1, 2] });
+      doc.nums.push({ $each: [0], $sort: 1 });
+      assert.deepStrictEqual(doc.nums.toObject(), [0, 1, 2, 3]);
+      await doc.save();
+
+      const raw = await Test.collection.findOne({ _id: doc._id });
+      assert.deepStrictEqual(raw.nums, [0, 1, 2, 3]);
+    });
+
+    it('applies $slice to the in-memory array when pushing with $each (gh-16687)', async function() {
+      const Test = db.model('Test', Schema({ nums: [Number] }));
+
+      const doc = await Test.create({ nums: [1, 2, 3] });
+      doc.nums.push({ $each: [4], $slice: 2 });
+      assert.deepStrictEqual(doc.nums.toObject(), [1, 2]);
+      await doc.save();
+
+      let raw = await Test.collection.findOne({ _id: doc._id });
+      assert.deepStrictEqual(raw.nums, [1, 2]);
+
+      doc.nums.push({ $each: [3], $slice: -2 });
+      assert.deepStrictEqual(doc.nums.toObject(), [2, 3]);
+      await doc.save();
+
+      raw = await Test.collection.findOne({ _id: doc._id });
+      assert.deepStrictEqual(raw.nums, [2, 3]);
+    });
+
+    it('saves the whole array when push() follows a push with $sort or $slice (gh-16687)', async function() {
+      const Test = db.model('Test', Schema({ nums: [Number] }));
+
+      const doc = await Test.create({ nums: [3, 1, 2] });
+      doc.nums.push({ $each: [0], $sort: 1 });
+      doc.nums.push(9);
+      assert.deepStrictEqual(doc.nums.$__getAtomics(), [['$set', [0, 1, 2, 3, 9]]]);
+      await doc.save();
+
+      let raw = await Test.collection.findOne({ _id: doc._id });
+      assert.deepStrictEqual(raw.nums, [0, 1, 2, 3, 9]);
+
+      doc.nums.push({ $each: [8], $slice: 3 });
+      doc.nums.push(7);
+      assert.deepStrictEqual(doc.nums.$__getAtomics(), [['$set', [0, 1, 2, 7]]]);
+      await doc.save();
+
+      raw = await Test.collection.findOne({ _id: doc._id });
+      assert.deepStrictEqual(raw.nums, [0, 1, 2, 7]);
+    });
+
+    it('applies $sort and $slice together when pushing with $each (gh-16687)', async function() {
+      const Test = db.model('Test', Schema({ nums: [Number] }));
+
+      const doc = await Test.create({ nums: [5, 4, 3] });
+      doc.nums.push({ $each: [2, 1], $sort: 1, $slice: 3 });
+      assert.deepStrictEqual(doc.nums.toObject(), [1, 2, 3]);
+      await doc.save();
+
+      const raw = await Test.collection.findOne({ _id: doc._id });
+      assert.deepStrictEqual(raw.nums, [1, 2, 3]);
+    });
+
+    it('applies $sort by subfield to a document array when pushing with $each (gh-16687)', async function() {
+      const Test = db.model('Test', Schema({ docs: [{ n: Number }] }));
+
+      const doc = await Test.create({ docs: [{ n: 2 }, { n: 3 }] });
+      doc.docs.push({ $each: [{ n: 1 }], $sort: { n: 1 } });
+      assert.deepStrictEqual(doc.docs.map(d => d.n), [1, 2, 3]);
+      await doc.save();
+
+      const raw = await Test.collection.findOne({ _id: doc._id });
+      assert.deepStrictEqual(raw.docs.map(d => d.n), [1, 2, 3]);
+    });
   });
 
   describe('splice()', function() {

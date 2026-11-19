@@ -1290,6 +1290,9 @@ async function defaultSortFindAndCount() {
 
   // @ts-expect-error  Type '2' is not assignable to type
   new Schema({ name: String }, { defaultSort: { name: 2 } });
+
+  // @ts-expect-error  Type '{ $meta: string; }' is not assignable to type
+  new Schema({ name: String }, { defaultSort: { score: { $meta: 'textScore' } } });
 }
 
 async function nestedProjectionOnDocumentArrayWithMethods() {

@@ -33,6 +33,8 @@ describe('schema defaultSort option', function() {
   it('throws on invalid `defaultSort` values when creating the schema', function() {
     assert.throws(() => new Schema({}, { defaultSort: 42 }), /`defaultSort` must be falsy, string, object, array, or Map, got `number`/);
     assert.throws(() => new Schema({}, { defaultSort: true }), /`defaultSort` must be falsy, string, object, array, or Map, got `boolean`/);
+    assert.throws(() => new Schema({}, { defaultSort: { score: { $meta: 'textScore' } } }), /`defaultSort` does not support `\$meta` sorts, got `\$meta` for `score`/);
+    assert.throws(() => new Schema({}, { defaultSort: new Map([['score', { $meta: 'textScore' }]]) }), /`defaultSort` does not support `\$meta` sorts, got `\$meta` for `score`/);
 
     assert.strictEqual(new Schema({}, { defaultSort: false }).options.defaultSort, false);
     assert.strictEqual(new Schema({}, { defaultSort: 'foobar' }).options.defaultSort, 'foobar');
@@ -228,6 +230,29 @@ describe('schema defaultSort option', function() {
 
     const unsorted = await Parent.findOne().populate({ path: 'children', options: { sort: null } });
     assert.deepStrictEqual(unsorted.children.map(child => child.value), [1, 3, 2]);
+  });
+
+  it('skips sorting populate `count` virtuals, because sort does not affect the count', async function() {
+    const childSchema = new Schema({ parent: 'ObjectId', value: Number }, { defaultSort: { value: -1 } });
+    const parentSchema = new Schema({ name: String });
+    parentSchema.virtual('numChildren', { ref: 'Child', localField: '_id', foreignField: 'parent', count: true });
+    const Child = db.model('Child', childSchema);
+    const Parent = db.model('Parent', parentSchema);
+
+    const parent = await Parent.create({ name: 'p' });
+    await Child.insertMany([{ parent, value: 1 }, { parent, value: 3 }]);
+
+    const sorts = [];
+    const find = Child.collection.find;
+    Child.collection.find = function(filter, options) {
+      sorts.push(options.sort);
+      return find.apply(this, arguments);
+    };
+    const doc = await Parent.findOne().populate('numChildren');
+    delete Child.collection.find;
+
+    assert.strictEqual(doc.numChildren, 2);
+    assert.deepStrictEqual(sorts, [undefined]);
   });
 
   describe('findAndCount()', function() {

@@ -1615,7 +1615,7 @@ const eventSchema = new mongoose.Schema(
 ## option: defaultSort {#defaultSort}
 
 Sets the sort order for queries that don't specify a sort, so you can define a model's usual ordering once.
-`defaultSort` accepts anything that [`Query.prototype.sort()`](api/query.html#Query.prototype.sort()) accepts.
+`defaultSort` accepts anything that [`Query.prototype.sort()`](api/query.html#Query.prototype.sort()) accepts, except `$meta` sorts like `{ score: { $meta: 'textScore' } }`, because MongoDB throws an error on `$meta` sorts for queries that don't use `$text`.
 
 ```javascript
 const schema = new Schema({ name: String }, {

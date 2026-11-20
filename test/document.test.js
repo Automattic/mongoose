@@ -6453,6 +6453,48 @@ describe('document', function() {
     });
   });
 
+  describe('applying defaults when setting a nested path', function() {
+    it('reports the full path when a default function throws', async function() {
+      const schema = new Schema({
+        nested: {
+          a: { type: Number, default: () => { throw new Error('Oops'); } },
+          b: Number
+        }
+      });
+      const Test = db.model('Test', schema);
+
+      const doc = new Test({ nested: { b: 1 } });
+      const err = await doc.validate().then(() => null, err => err);
+
+      assert.deepStrictEqual(Object.keys(err.errors), ['nested.a']);
+      assert.equal(err.errors['nested.a'].message, 'Oops');
+    });
+
+    it('does not overwrite falsy primitives at intermediate nested paths', function() {
+      const schema = new Schema({
+        nested: { inner: { x: { type: Number, default: 1 } } }
+      });
+      const Test = db.model('Test', schema);
+
+      const doc = new Test({ nested: { inner: 0 } });
+
+      assert.deepStrictEqual(doc.toObject({ depopulate: true }).nested, { inner: 0 });
+    });
+
+    it('marks applied defaults as default when setting nested path on existing doc', function() {
+      const schema = new Schema({
+        nested: { flag: { type: Boolean, default: true }, other: Number }
+      });
+      const Test = db.model('Test', schema);
+      const doc = Test.hydrate({ _id: new DocumentObjectId(), nested: { flag: false, other: 1 } });
+
+      doc.set({ nested: { other: 2 } });
+
+      assert.strictEqual(doc.nested.flag, true);
+      assert.strictEqual(doc.$isDefault('nested.flag'), true);
+    });
+  });
+
   describe('clobbered Array.prototype', function() {
     beforeEach(() => db.deleteModel(/.*/));
 

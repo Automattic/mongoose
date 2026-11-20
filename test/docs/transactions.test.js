@@ -458,6 +458,31 @@ describe('transactions', function() {
       // Assert
       assert.equal(err?.name, 'DocumentNotFoundError');
     });
+
+    it('bulkSave() uses the transaction session while the connection buffers (gh-16713)', async function() {
+      // Arrange
+      m.deleteModel(/Test/);
+      const schema = m.Schema({ name: String });
+      const Test = m.model('Test', schema);
+      await Test.createCollection();
+      await Test.deleteMany({});
+      const [doc] = await Test.insertMany([{ name: 'deleted in the transaction' }]);
+      const bufferingConnection = m.createConnection();
+      const BufferingTest = bufferingConnection.model('Test', schema);
+
+      // Act
+      const err = await m.connection.transaction(async() => {
+        await Test.deleteOne({ _id: doc._id });
+        const buffered = new Promise(resolve => bufferingConnection.once('buffer', resolve));
+        const bulkSave = BufferingTest.bulkSave([doc]);
+        await buffered;
+        bufferingConnection.setClient(m.connection.client);
+        await bulkSave;
+      }).then(() => null, err => err);
+
+      // Assert
+      assert.equal(err?.name, 'DocumentNotFoundError');
+    });
   });
 
   it('transaction() resets $isNew on error', async function() {
@@ -762,6 +787,30 @@ describe('transactions', function() {
     const err = await db.transaction(async(session) => {
       const [doc] = await Test.insertMany([{ name: 'created in the transaction' }], { session });
       await Test.bulkSave([doc]);
+    }).then(() => null, err => err);
+
+    // Assert
+    assert.strictEqual(err, null);
+  });
+
+  it('bulkSave() uses the session of the document while the connection buffers (gh-16713)', async function() {
+    // Arrange
+    db.deleteModel(/Test/);
+    const schema = Schema({ name: String });
+    const Test = db.model('Test', schema);
+    await Test.createCollection();
+    await Test.deleteMany({});
+    const bufferingConnection = mongoose.createConnection();
+    const BufferingTest = bufferingConnection.model('Test', schema);
+
+    // Act
+    const err = await db.transaction(async(session) => {
+      const [doc] = await Test.insertMany([{ name: 'created in the transaction' }], { session });
+      const buffered = new Promise(resolve => bufferingConnection.once('buffer', resolve));
+      const bulkSave = BufferingTest.bulkSave([doc]);
+      await buffered;
+      bufferingConnection.setClient(db.client);
+      await bulkSave;
     }).then(() => null, err => err);
 
     // Assert

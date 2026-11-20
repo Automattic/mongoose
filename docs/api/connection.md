@@ -575,7 +575,7 @@ Each state change emits its associated event name.
 
 - \<Connection\> this
 
-Removes the database connection with the given name created with with `useDb()`.
+Removes the database connection with the given name created with `useDb()`.
 
 Throws an error if the database connection was not found.
 

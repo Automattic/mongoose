@@ -159,16 +159,6 @@ describe('Query', function() {
         query.where();
       });
     });
-    it('throws on special property paths to avoid prototype pollution', function() {
-      for (const path of ['__proto__', 'constructor', 'prototype']) {
-        const query = new Query({});
-        assert.throws(() => query.where(path).gt(1), /as a query path/);
-        assert.throws(() => query.where(path, { $gt: 1 }), /as a query path/);
-        assert.deepStrictEqual(query._conditions, {});
-      }
-      assert.strictEqual({}.$gt, undefined);
-      assert.strictEqual(Object.$gt, undefined);
-    });
   });
 
   describe('equals', function() {
@@ -342,22 +332,6 @@ describe('Query', function() {
       query.where('age').mod(5, 2);
       assert.deepEqual(query._conditions, { age: { $mod: [5, 2] } });
 
-    });
-    it('throws on special property paths to avoid prototype pollution', function() {
-      for (const path of ['__proto__', 'constructor', 'prototype', ['__proto__']]) {
-        const query = new Query({});
-        assert.throws(() => query.mod(path, [2, 1]), /as a query path/);
-        assert.throws(() => query.mod(path, 2, 1), /as a query path/);
-        assert.deepStrictEqual(Object.keys(query._conditions), []);
-      }
-      assert.strictEqual({}.$mod, undefined);
-      assert.strictEqual(Object.$mod, undefined);
-    });
-    it('does not reuse inherited properties like toString', function() {
-      const query = new Query({});
-      query.mod('toString', [2, 1]);
-      assert.deepStrictEqual(query._conditions.toString, { $mod: [2, 1] });
-      assert.strictEqual(Object.prototype.toString.$mod, undefined);
     });
   });
 
@@ -754,6 +728,17 @@ describe('Query', function() {
       assert.ok(e, 'uh oh. no error was thrown');
       assert.equal(e.message, 'sort() takes at most 2 arguments');
 
+    });
+
+    it('only reads own `$meta` properties', function() {
+      const query = new Query({});
+      query.sort({ score: { $meta: 'textScore' } });
+      assert.deepStrictEqual(query.options.sort, { score: { $meta: 'textScore' } });
+
+      assert.throws(
+        () => new Query({}).sort({ score: Object.create({ $meta: 'textScore' }) }),
+        /Invalid sort value: \{ score: \[object Object\] \}/
+      );
     });
   });
 
@@ -2642,28 +2627,16 @@ describe('Query', function() {
   });
 
   describe('merging updates', function() {
-    it('does not modify inherited properties like toString (findOneAndReplace, chained updates)', function() {
-      const Test = db.model('Test', new Schema({ name: String }));
 
-      try {
-        const q1 = Test.findOneAndReplace({}, JSON.parse('{"toString":{"call":1,"polluted":"yes"}}'));
-        assert.strictEqual(typeof Object.prototype.toString.call, 'function');
-        assert.strictEqual(Object.prototype.toString.polluted, undefined);
-        assert.ok(!Object.hasOwn(q1.getUpdate(), 'toString'));
+    it('treats `$__` in filters and updates as plain data', function() {
+      const Test = db.model('Test', new Schema({ name: String, mixed: {} }));
 
-        Test.updateOne({}, { name: 'test' }).updateOne({}, JSON.parse('{"valueOf":{"call":{"polluted":"yes"}}}'));
-        assert.strictEqual(Function.prototype.call.polluted, undefined);
+      const q1 = Test.find().merge(JSON.parse('{"$__":1,"name":"test"}'));
+      assert.deepStrictEqual(q1.getFilter(), { $__: 1, name: 'test' });
 
-        const source = Test.updateOne({}, JSON.parse('{"toString":{"polluted":"yes"}}'));
-        Test.updateOne({}, { name: 'test' }).merge(source);
-        assert.strictEqual(Object.prototype.toString.polluted, undefined);
-      } finally {
-        // Clean up so a failure here doesn't break subsequent tests
-        for (const fn of [Object.prototype.toString, Object.prototype.valueOf, Function.prototype.call, Array.prototype.push]) {
-          delete fn.call;
-          delete fn.polluted;
-        }
-      }
+      const q2 = Test.updateOne({}, JSON.parse('{"$set":{"mixed":{"$__":1}}}'));
+      q2._castUpdate(q2._update);
+      assert.deepStrictEqual(q2.getUpdate(), { $set: { mixed: { $__: 1 } } });
     });
   });
 

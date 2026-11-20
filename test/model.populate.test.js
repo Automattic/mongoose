@@ -2424,6 +2424,23 @@ describe('model: populate:', function() {
         });
     });
 
+    it('refPath values that are Object.prototype properties do not break populate', async function() {
+      db.deleteModel(/Test/);
+      const User = db.model('Test1', new Schema({ name: String }));
+      const Post = db.model('Test', new Schema({ kind: String, author: { type: ObjectId, refPath: 'kind' } }));
+      const user = await User.create({ name: 'alice' });
+      await Post.create([{ kind: 'Test1', author: user._id }, { kind: 'constructor' }]);
+
+      const posts = await Post.find().sort({ _id: 1 }).populate('author');
+
+      assert.equal(posts[0].author.name, 'alice');
+      assert.strictEqual(posts[1].author, undefined);
+
+      await Post.create({ kind: 'constructor', author: user._id });
+
+      await assert.rejects(Post.find().populate('author'), /Schema hasn't been registered for model "constructor"/);
+    });
+
     it('array with empty refPath (gh-5377)', async function() {
       db.deleteModel(/Test/);
       const modelASchema = new mongoose.Schema({
@@ -8961,6 +8978,20 @@ describe('model: populate:', function() {
       assert.deepEqual(docs[1].children.map(c => c._id), [4]);
     });
 
+    it('keeps the stored order of an array of refs when the ref model has a `defaultSort`', async function() {
+      const Child = db.model('Child', Schema({ name: String }, { defaultSort: { name: 1 } }));
+      const Parent = db.model('Parent', Schema({ children: [{ type: 'ObjectId', ref: 'Child' }] }));
+      const [c, a, b] = await Child.insertMany([{ name: 'c' }, { name: 'a' }, { name: 'b' }]);
+      await Parent.create({ children: [b._id, c._id, a._id] });
+
+      let parent = await Parent.findOne().populate('children');
+      assert.deepStrictEqual(parent.children.map(child => child.name), ['b', 'c', 'a']);
+
+      // `defaultSort` determines which documents `perDocumentLimit` returns
+      parent = await Parent.findOne().populate({ path: 'children', perDocumentLimit: 1 });
+      assert.deepStrictEqual(parent.children.map(child => child.name), ['a']);
+    });
+
     describe('splitting populate queries whose `$in` filter would have too many elements (gh-5890)', function() {
       let maxInFilterLength;
 
@@ -12385,6 +12416,19 @@ describe('model: populate:', function() {
 
     assert.equal(doc.children.length, 1);
     assert.equal(doc.children[0].category.name, 'Test Category');
+  });
+
+  it('populates lean documents that contain a `$__` property', async function() {
+    const User = db.model('User', new Schema({ name: String }));
+    const Post = db.model('Post', new Schema({ user: { type: 'ObjectId', ref: 'User' } }));
+
+    const user = await User.create({ name: 'test' });
+    await Post.collection.insertOne({ user: user._id, $__: { x: 1 } });
+
+    const posts = await Post.find().lean().populate('user');
+    assert.strictEqual(posts.length, 1);
+    assert.strictEqual(posts[0].user.name, 'test');
+    assert.deepStrictEqual(posts[0].$__, { x: 1 });
   });
 
   it('deferred sub-populate resolves dotted parent paths on lean queries', async function() {

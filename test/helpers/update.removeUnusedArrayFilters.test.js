@@ -16,4 +16,13 @@ describe('removeUnusedArrayFilters', function() {
     removeUnusedArrayFilters(update, options);
     assert.deepEqual(options.arrayFilters, [{ $or: [{ 'i.no': 1 }] }]);
   });
+
+  it('keeps empty array filters so MongoDB reports the error', function() {
+    const update = { $set: { 'arr.$[el].name': 'x' } };
+    const options = { arrayFilters: [{}, { 'el.name': 'y' }] };
+
+    removeUnusedArrayFilters(update, options);
+
+    assert.deepStrictEqual(options.arrayFilters, [{}, { 'el.name': 'y' }]);
+  });
 });

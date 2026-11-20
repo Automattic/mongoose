@@ -14,4 +14,11 @@ function gh12537() {
   doc._id = new mongodb.ObjectId('somehex');
 }
 
+function gh16710() {
+  expect(mongoose.mongo).type.toBe<typeof mongodb>();
+  const m = new mongoose.Mongoose();
+  expect(m.mongo).type.toBe<typeof mongodb>();
+}
+
 gh12537();
+gh16710();

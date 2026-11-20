@@ -50,29 +50,28 @@ describe('clone', () => {
   });
 
   describe('mongoose object', () => {
+    // Stand-in for `Document.prototype`, so these objects count as documents
+    const documentPrototype = { $isMongooseDocumentPrototype: true };
+
     it('use toObject', () => {
-      const base = {
-        $__: true,
+      const base = Object.assign(Object.create(documentPrototype), {
         myAttr: 'myAttrVal',
         toObject() {
-          const obj = JSON.parse(JSON.stringify(base));
-          obj.toObject = base.toObject;
-          return obj;
+          return { myAttr: base.myAttr };
         }
-      };
+      });
       const cloned = clone(base);
-      assert.deepStrictEqual(cloned, base);
+      assert.deepStrictEqual(cloned, { myAttr: 'myAttrVal' });
       cloned.myAttr = 'otherAttrVal';
       assert.equal(base.myAttr, 'myAttrVal');
       assert.equal(cloned.myAttr, 'otherAttrVal');
     });
 
     it('use toJSON', () => {
-      const base = {
-        $__: true,
+      const base = Object.assign(Object.create(documentPrototype), {
         myAttr: 'myAttrVal',
-        toJSON: () => JSON.stringify({ $__: true, myAttr: 'myAttrVal' })
-      };
+        toJSON: () => JSON.stringify({ myAttr: 'myAttrVal' })
+      });
       const cloned = JSON.parse(clone(base, { json: true }));
       assert.equal(cloned.myAttr, 'myAttrVal');
       cloned.myAttr = 'otherAttrVal';
@@ -82,8 +81,7 @@ describe('clone', () => {
 
     it('skipSingleNestedGetters', () => {
       const baseOpts = { _skipSingleNestedGetters: true, $isSingleNested: true };
-      const base = {
-        $__: true,
+      const base = Object.assign(Object.create(documentPrototype), {
         myAttr: 'myAttrVal',
         $isSingleNested: true,
         toObject(cloneOpts) {
@@ -91,17 +89,24 @@ describe('clone', () => {
             Object.assign({}, baseOpts),
             cloneOpts
           );
-          const obj = JSON.parse(JSON.stringify(base));
-          obj.toObject = base.toObject;
-          return obj;
+          return { myAttr: base.myAttr, $isSingleNested: true };
         }
-      };
+      });
       const cloned = clone(base, baseOpts);
-      assert.deepStrictEqual(cloned, base);
+      assert.deepStrictEqual(cloned, { myAttr: 'myAttrVal', $isSingleNested: true });
       cloned.myAttr = 'otherAttrVal';
       assert.equal(base.myAttr, 'myAttrVal');
       assert.equal(cloned.myAttr, 'otherAttrVal');
     });
+  });
+
+  it('does not treat user data with a `$__` key as a document', () => {
+    const base = JSON.parse('{"$__":1,"_doc":{"name":"test"},"other":2}');
+    const cloned = clone(base);
+    assert.deepStrictEqual(cloned, { $__: 1, _doc: { name: 'test' }, other: 2 });
+    assert.notStrictEqual(cloned._doc, base._doc);
+
+    assert.deepStrictEqual(clone({ $__: { strictMode: true }, _doc: {} }), { $__: { strictMode: true }, _doc: {} });
   });
 
   describe('global objects', () => {

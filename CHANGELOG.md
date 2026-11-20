@@ -1,3 +1,13 @@
+9.12.3 / 2026-11-20
+===================
+ * fix(model): match pathsToSkip string paths exactly in Model.validate() #16706 [NotAFlightRisk](https://github.com/NotAFlightRisk)
+ * fix(query): avoid casting $expr $in search value when it is an expression #16709 [kwy404](https://github.com/kwy404)
+ * fix(update): run update validators on mixed paths in subdocuments #16708 #16707 [lazerg](https://github.com/lazerg)
+ * fix(documentarray): respect castNonArrays path option on document arrays #16685 [yxshee](https://github.com/yxshee)
+ * types(schema): add removeVirtual() to Schema #16722 [farisbasha](https://github.com/farisbasha)
+ * docs(document): correct checkKeys default for save() #16716 [phatstraws](https://github.com/phatstraws)
+ * docs: fix typos in comments, tests, and typings #16714 [ninglinLiu](https://github.com/ninglinLiu)
+
 9.12.2 / 2026-11-16
 ===================
  * fix(query): make sanitizeFilter catch any fields that start with $ in top-level filter to avoid bypass using $_internalSchemaXor and other MongoDB internal expressions

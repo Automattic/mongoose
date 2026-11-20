@@ -440,6 +440,44 @@ describe('transactions', function() {
       exists = await Test.exists({ _id: doc._id });
       assert.ok(exists);
     });
+
+    it('ignores write concern options in transactions', async function() {
+      m.deleteModel(/Test/);
+      const Test = m.model('Test', m.Schema({ name: String }));
+      const WithSchemaWC = m.model('Test2', m.Schema({ name: String }, { writeConcern: { w: 'majority' } }));
+      await Test.createCollection();
+      await WithSchemaWC.createCollection();
+      await Test.deleteMany({});
+      await WithSchemaWC.deleteMany({});
+      await Test.create({ name: 'a' });
+      await WithSchemaWC.create({ name: 'a' });
+
+      await m.connection.transaction(async() => {
+        await Test.findOneAndUpdate({}, { name: 'b' }, { w: 1, j: true });
+        await WithSchemaWC.findOneAndUpdate({}, { name: 'b' });
+      });
+
+      assert.equal((await Test.findOne()).name, 'b');
+      assert.equal((await WithSchemaWC.findOne()).name, 'b');
+    });
+  });
+
+  it('ignores top-level write concern options in transactions', async function() {
+    db.deleteModel(/Test/);
+    const Test = db.model('Test', new Schema({ name: String }));
+    await Test.createCollection();
+    await Test.deleteMany({});
+    await Test.create({ name: 'a' });
+    const options = { w: 1, j: true };
+
+    await db.transaction(async(session) => {
+      await Test.findOneAndUpdate({}, { name: 'b' }, { session, ...options });
+      await new Test({ name: 'c' }).save({ session, ...options });
+      await Test.insertMany([{ name: 'd' }], { session, ...options });
+      await Test.bulkWrite([{ insertOne: { document: { name: 'e' } } }], { session, ...options });
+    });
+
+    assert.deepStrictEqual((await Test.find().sort({ name: 1 })).map(doc => doc.name), ['b', 'c', 'd', 'e']);
   });
 
   it('transaction() resets $isNew on error', async function() {

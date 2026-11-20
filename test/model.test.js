@@ -8844,6 +8844,21 @@ describe('Model', function() {
         assert.deepStrictEqual(savedNames, ['existing']);
       });
 
+      it('ignores the session of a document that another client loaded', async function() {
+        // Arrange
+        const { Account } = createTestContext();
+        const { Account: OtherAccount } = createTestContext({ connectionOptions: {} });
+        const session = await OtherAccount.startSession();
+        const [existing] = await OtherAccount.insertMany([{ name: 'existing' }], { session });
+        const inserted = new Account({ name: 'inserted' });
+
+        // Act
+        await Account.bulkSave([existing, inserted]);
+
+        // Assert
+        assert.strictEqual(inserted.isNew, false);
+      });
+
       it('checks documents whose _id values do not fit in one command', async function() {
         // Arrange
         const { Account, savedNames } = createTestContext({ idType: String });

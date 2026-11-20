@@ -751,6 +751,23 @@ describe('transactions', function() {
     assert.equal(err?.name, 'DocumentNotFoundError');
   });
 
+  it('bulkSave() finds a document with no changes through the session of the document (gh-16713)', async function() {
+    // Arrange
+    db.deleteModel(/Test/);
+    const Test = db.model('Test', Schema({ name: String }));
+    await Test.createCollection();
+    await Test.deleteMany({});
+
+    // Act
+    const err = await db.transaction(async(session) => {
+      const [doc] = await Test.insertMany([{ name: 'created in the transaction' }], { session });
+      await Test.bulkSave([doc]);
+    }).then(() => null, err => err);
+
+    // Assert
+    assert.strictEqual(err, null);
+  });
+
   it('transaction() retains modified status for documents created outside of the transaction then modified inside the transaction (gh-13973)', async function() {
     db.deleteModel(/Test/);
     const Test = db.model('Test', Schema({ status: String }));

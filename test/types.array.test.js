@@ -2194,4 +2194,3 @@ describe('types array', function() {
     assert.deepStrictEqual(schema.path('nums').setters, originalOrder);
   });
 });
-

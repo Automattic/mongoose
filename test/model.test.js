@@ -8659,6 +8659,239 @@ describe('Model', function() {
       assert.ok(!newUser2.createdAt);
       assert.ok(!newUser2.updatedAt);
     });
+
+    describe('documents with no changes that are not in the database (gh-16713)', function() {
+      const operationListeners = [];
+
+      afterEach(function() {
+        for (const listener of operationListeners.splice(0)) {
+          db.off('operation-start', listener);
+        }
+      });
+
+      it('rejects when the only document is not in the database', async function() {
+        // Arrange
+        const { Account } = createTestContext();
+        const [deleted] = await Account.insertMany([{ name: 'deleted' }]);
+        await Account.collection.deleteOne({ _id: deleted._id });
+
+        // Act
+        const err = await Account.bulkSave([deleted]).then(() => null, err => err);
+
+        // Assert
+        assert.equal(err?.name, 'DocumentNotFoundError');
+        assert.deepStrictEqual(err.filter, { _id: deleted._id });
+        assert.strictEqual(err.numAffected, 0);
+      });
+
+      it('stops an ordered bulkSave at the first document that is not in the database', async function() {
+        // Arrange
+        const { Account, savedNames } = createTestContext();
+        const [unchanged, deleted, renamed] = await Account.insertMany([
+          { name: 'unchanged' },
+          { name: 'deleted' },
+          { name: 'original' }
+        ]);
+        await Account.collection.deleteOne({ _id: deleted._id });
+        renamed.name = 'renamed';
+        const inserted = new Account({ name: 'inserted' });
+        const unattempted = new Account({ name: 'unattempted' });
+
+        // Act
+        const err = await Account.bulkSave([unchanged, inserted, deleted, renamed, unattempted]).then(() => null, err => err);
+
+        // Assert
+        assert.equal(err?.name, 'DocumentNotFoundError');
+        assert.deepStrictEqual(err.filter, { _id: deleted._id });
+        const storedNames = (await Account.find().sort({ name: 1 })).map(account => account.name);
+        assert.deepStrictEqual(storedNames, ['inserted', 'original', 'unchanged']);
+        assert.deepStrictEqual([inserted.isNew, unattempted.isNew], [false, true]);
+        assert.strictEqual(renamed.isModified('name'), true);
+        assert.deepStrictEqual(savedNames, ['unchanged', 'inserted']);
+      });
+
+      it('runs every write of an unordered bulkSave before it rejects', async function() {
+        // Arrange
+        const { Account, savedNames } = createTestContext();
+        const [deleted, counter] = await Account.insertMany([{ name: 'deleted' }, { name: 'counter' }]);
+        await Account.collection.deleteOne({ _id: deleted._id });
+        counter.$inc('visits', 1);
+        const inserted = new Account({ name: 'inserted' });
+
+        // Act
+        const err = await Account.bulkSave([deleted, counter, inserted], { ordered: false }).then(() => null, err => err);
+
+        // Assert
+        assert.equal(err?.name, 'DocumentNotFoundError');
+        assert.deepStrictEqual(err.filter, { _id: deleted._id });
+        assert.strictEqual((await Account.findById(counter._id)).visits, 1);
+        assert.ok(await Account.exists({ _id: inserted._id }));
+        assert.strictEqual(counter.isModified(), false);
+        assert.strictEqual(inserted.isNew, false);
+        assert.deepStrictEqual(savedNames, ['counter', 'inserted']);
+      });
+
+      it('rejects with the first missing document of an unordered bulkSave with 25 documents', async function() {
+        // Arrange
+        const { Account, savedNames } = createTestContext();
+        const [firstDeleted, secondDeleted] = await Account.insertMany([{ name: 'first deleted' }, { name: 'second deleted' }]);
+        await Account.collection.deleteMany({});
+        const inserted = Array.from({ length: 23 }, (_, i) => new Account({ name: `inserted-${i}` }));
+        const accounts = [inserted[0], firstDeleted, ...inserted.slice(1), secondDeleted];
+
+        // Act
+        const err = await Account.bulkSave(accounts, { ordered: false }).then(() => null, err => err);
+
+        // Assert
+        assert.equal(err?.name, 'DocumentNotFoundError');
+        assert.deepStrictEqual(err.filter, { _id: firstDeleted._id });
+        assert.strictEqual(await Account.countDocuments(), inserted.length);
+        assert.ok(inserted.every(account => !account.isNew));
+        assert.deepStrictEqual(savedNames, inserted.map(account => account.name));
+      });
+
+      it('keeps the write error of an unordered bulkSave and skips the missing document', async function() {
+        // Arrange
+        const { Account, savedNames } = createTestContext();
+        const [existing, deleted] = await Account.insertMany([{ name: 'existing' }, { name: 'deleted' }]);
+        await Account.collection.deleteOne({ _id: deleted._id });
+        const duplicate = new Account({ _id: existing._id, name: 'duplicate' });
+        const inserted = new Account({ name: 'inserted' });
+
+        // Act
+        const err = await Account.bulkSave([duplicate, deleted, inserted], { ordered: false }).then(() => null, err => err);
+
+        // Assert
+        assert.equal(err?.name, 'MongoBulkWriteError');
+        assert.deepStrictEqual([duplicate.isNew, inserted.isNew], [true, false]);
+        assert.deepStrictEqual(savedNames, ['inserted']);
+      });
+
+      it('applies `$where` to a document with no changes', async function() {
+        // Arrange
+        const { Account } = createTestContext();
+        const [active, archived] = await Account.insertMany([
+          { name: 'active', status: 'active' },
+          { name: 'archived', status: 'archived' }
+        ]);
+        active.$where = { status: 'active' };
+        archived.$where = { status: 'active' };
+
+        // Act
+        const err = await Account.bulkSave([active, archived]).then(() => null, err => err);
+
+        // Assert
+        assert.equal(err?.name, 'DocumentNotFoundError');
+        assert.deepStrictEqual(err.filter, { _id: archived._id, status: 'active' });
+      });
+
+      const distinctIdCases = [
+        { description: 'a string _id and a number _id that print the same', existingId: 1, deletedId: '1' },
+        { description: 'two object _id values', existingId: { tenant: 1 }, deletedId: { tenant: 2 } }
+      ];
+      for (const { description, existingId, deletedId } of distinctIdCases) {
+        it(`tells apart ${description}`, async function() {
+          // Arrange
+          const { Account } = createTestContext({ idType: Schema.Types.Mixed });
+          const [existing, deleted] = await Account.insertMany([
+            { _id: existingId, name: 'existing' },
+            { _id: deletedId, name: 'deleted' }
+          ]);
+          await Account.collection.deleteOne({ _id: deletedId });
+
+          // Act
+          const err = await Account.bulkSave([existing, deleted]).then(() => null, err => err);
+
+          // Assert
+          assert.equal(err?.name, 'DocumentNotFoundError');
+          assert.deepStrictEqual(err.filter, { _id: deletedId });
+        });
+      }
+
+      const sharedReadCases = [
+        { description: 'ObjectId', idType: Schema.Types.ObjectId, createId: () => new mongoose.Types.ObjectId() },
+        { description: 'String', idType: String, createId: i => `account-${i}` },
+        { description: 'Number', idType: Number, createId: i => i },
+        { description: 'UUID', idType: Schema.Types.UUID, createId: () => new mongoose.Types.UUID() },
+        { description: 'Buffer', idType: Buffer, createId: i => Buffer.from(`account-${i}`) }
+      ];
+      for (const { description, idType, createId } of sharedReadCases) {
+        it(`checks the documents with no changes in one read when _id is ${description}`, async function() {
+          // Arrange
+          const { Account, recordReads } = createTestContext({ idType });
+          const accounts = await Account.insertMany(Array.from({ length: 3 }, (_, i) => ({ _id: createId(i), name: `account-${i}` })));
+          const reads = recordReads();
+
+          // Act
+          await Account.bulkSave(accounts);
+
+          // Assert
+          assert.deepStrictEqual(reads, ['find']);
+        });
+      }
+
+      it('reads a document with `$where` on its own and the other documents in one read', async function() {
+        // Arrange
+        const { Account, recordReads } = createTestContext();
+        const accounts = await Account.insertMany([
+          { name: 'first' },
+          { name: 'active', status: 'active' },
+          { name: 'last' }
+        ]);
+        accounts[1].$where = { status: 'active' };
+        const reads = recordReads();
+
+        // Act
+        await Account.bulkSave(accounts);
+
+        // Assert
+        assert.deepStrictEqual(reads.sort(), ['find', 'findOne']);
+      });
+
+      it('sends no read when each document has a write', async function() {
+        // Arrange
+        const { Account, recordReads } = createTestContext();
+        const [renamed] = await Account.insertMany([{ name: 'original' }]);
+        renamed.name = 'renamed';
+        const reads = recordReads();
+
+        // Act
+        await Account.bulkSave([renamed, new Account({ name: 'inserted' })]);
+
+        // Assert
+        assert.deepStrictEqual(reads, []);
+      });
+
+      function createTestContext({ idType } = {}) {
+        const savedNames = [];
+        const accountSchema = new Schema({
+          name: String,
+          status: String,
+          visits: { type: Number, default: 0 }
+        });
+        if (idType != null) {
+          accountSchema.add({ _id: idType });
+        }
+        accountSchema.post('save', function() {
+          savedNames.push(this.name);
+        });
+        const Account = db.model('Account', accountSchema);
+
+        return { Account, savedNames, recordReads };
+
+        function recordReads() {
+          const reads = [];
+          const listener = ({ collectionName, method }) => {
+            if (collectionName === Account.collection.name && (method === 'find' || method === 'findOne')) {
+              reads.push(method);
+            }
+          };
+          operationListeners.push(listener);
+          db.on('operation-start', listener);
+          return reads;
+        }
+      }
+    });
   });
 
   describe('Setting the explain flag', function() {

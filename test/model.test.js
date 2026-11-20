@@ -7812,6 +7812,48 @@ describe('Model', function() {
       );
     });
 
+    it('throws DocumentNotFoundError when an unchanged document no longer exists (gh-16713)', async function() {
+      const userSchema = new Schema({
+        name: { type: String }
+      });
+
+      const User = db.model('User', userSchema);
+
+      const created = await User.create({ name: 'Hafez1_gh-16713' });
+      const user = await User.findById(created._id);
+      await User.collection.deleteOne({ _id: created._id });
+
+      // `save()` throws in this case, so `bulkSave()` should as well
+      await assert.rejects(
+        () => user.save(),
+        err => err.name === 'DocumentNotFoundError'
+      );
+      await assert.rejects(
+        () => User.bulkSave([user]),
+        err => err.name === 'DocumentNotFoundError'
+      );
+      await assert.rejects(
+        () => User.bulkSave([user], { ordered: false }),
+        err => err.name === 'DocumentNotFoundError'
+      );
+    });
+
+    it('does not throw for unchanged documents that still exist (gh-16713)', async function() {
+      const userSchema = new Schema({
+        name: { type: String }
+      });
+
+      const User = db.model('User', userSchema);
+
+      const created = await User.create({ name: 'Hafez2_gh-16713' });
+      const user = await User.findById(created._id);
+
+      await User.bulkSave([user]);
+
+      const found = await User.findById(created._id);
+      assert.equal(found.name, 'Hafez2_gh-16713');
+    });
+
     it('increments version key on successful save (gh-15800)', async function() {
       // Arrange
       const userSchema = new Schema({

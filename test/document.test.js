@@ -3366,7 +3366,7 @@ describe('document', function() {
       doc.object.nested = {};
       await doc.save();
       doc = await MyModel.collection.findOne({ _id: doc._id });
-      assert.deepEqual(doc.object.nested, {});
+      assert.deepEqual(doc.object.nested, { field1: 1 });
     });
 
     it('setting path to object with strict and no paths in the schema (gh-6436) (gh-4218)', async function() {
@@ -3385,7 +3385,7 @@ describe('document', function() {
       doc.object.nested = { field2: 'foo' }; // `field2` not in the schema
       await doc.save();
       doc = await MyModel.collection.findOne({ _id: doc._id });
-      assert.deepEqual(doc.object.nested, {});
+      assert.deepEqual(doc.object.nested, { field1: 1 });
     });
 
     it('minimize + empty object (gh-4337)', function() {
@@ -9150,6 +9150,27 @@ describe('document', function() {
     return doc.save().
       then(() => Test.collection.findOne()).
       then(doc => assert.equal(doc.item.name, 'Default Name'));
+  });
+
+  it('applies defaults when setting nested path with direct assignment and $set(path, val) (gh-16695)', function() {
+    const Test = db.model('Test', new Schema({
+      nested: {
+        name: { type: String, default: 'Default Name' },
+        other: Number
+      }
+    }));
+
+    const doc1 = new Test();
+    doc1.nested = { other: 1 };
+    assert.equal(doc1.nested.name, 'Default Name');
+
+    const doc2 = new Test();
+    doc2.set('nested', { other: 1 });
+    assert.equal(doc2.nested.name, 'Default Name');
+
+    const doc3 = new Test();
+    doc3.set({ nested: { other: 1 } });
+    assert.equal(doc3.nested.name, 'Default Name');
   });
 
   it('clears cast errors when setting an array subpath (gh-9080)', function() {

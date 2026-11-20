@@ -931,7 +931,7 @@ describe('mongoose module:', function() {
     }, { message: 'Cannot populate path `favoriteGame` because it is not in your schema. Set the `strictPopulate` option to false to override.' });
     await mongoose.disconnect();
   });
-  it('allows global `strictPopulate` to be overriden on specific queries set to true (gh-10694)', async function() {
+  it('allows global `strictPopulate` to be overridden on specific queries set to true (gh-10694)', async function() {
     const mongoose = new Mongoose();
     mongoose.set('strictPopulate', false);
     const schema = new mongoose.Schema({ name: String });
@@ -947,7 +947,7 @@ describe('mongoose module:', function() {
     }, { message: 'Cannot populate path `favoriteGame` because it is not in your schema. Set the `strictPopulate` option to false to override.' });
     await mongoose.disconnect();
   });
-  it('allows global `strictPopulate` to be overriden on specific queries set to false (gh-10694)', async function() {
+  it('allows global `strictPopulate` to be overridden on specific queries set to false (gh-10694)', async function() {
     const mongoose = new Mongoose();
     mongoose.set('strictPopulate', false);
     const schema = new mongoose.Schema({ name: String });

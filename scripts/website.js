@@ -417,7 +417,7 @@ function mapURLs(block, currentUrl) {
 
   while ((match = mongooseComRegex.exec(block)) !== null) {
     // console.log("match", match);
-    // cant just use "match.index" byitself, because of the extra "href=\"" condition, which is not factored in in "match.index"
+    // cant just use "match.index" byitself, because of the extra "href=\"" condition, which is not factored in "match.index"
     const startIndex = match.index + match[0].length - match[1].length;
     out += block.slice(lastIndex, startIndex);
     lastIndex = startIndex + match[1].length;

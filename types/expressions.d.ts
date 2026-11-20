@@ -126,7 +126,7 @@ declare module 'mongoose' {
 
     export interface Round {
       /**
-       * Rounds a number to to a whole integer or to a specified decimal place.
+       * Rounds a number to a whole integer or to a specified decimal place.
        *
        * @see https://www.mongodb.com/docs/manual/reference/operator/aggregation/round/#mongodb-expression-exp.-round
        */

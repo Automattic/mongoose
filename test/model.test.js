@@ -8663,8 +8663,10 @@ describe('Model', function() {
     describe('documents with no changes that are not in the database (gh-16713)', function() {
       const operationListeners = [];
       const extraConnections = [];
+      const cacheHexString = mongoose.Types.ObjectId.cacheHexString;
 
       afterEach(async function() {
+        mongoose.Types.ObjectId.cacheHexString = cacheHexString;
         for (const { connection, listener } of operationListeners.splice(0)) {
           connection.off('operation-start', listener);
         }
@@ -8815,6 +8817,45 @@ describe('Model', function() {
           assert.deepStrictEqual(err.filter, { _id: deletedId });
         });
       }
+
+      it('finds a document through a connection that returns raw BSON', async function() {
+        // Arrange
+        const { Account, savedNames } = createTestContext({ connectionOptions: { raw: true } });
+        const accounts = await Account.insertMany([{ name: 'existing' }]);
+
+        // Act
+        await Account.bulkSave(accounts);
+
+        // Assert
+        assert.deepStrictEqual(savedNames, ['existing']);
+      });
+
+      it('finds a document whose ObjectId caches an uppercase hex string', async function() {
+        // Arrange
+        const { Account, savedNames } = createTestContext();
+        mongoose.Types.ObjectId.cacheHexString = true;
+        const _id = new mongoose.Types.ObjectId('ABCDEF0123456789ABCDEF01');
+        const accounts = await Account.insertMany([{ _id, name: 'existing' }]);
+
+        // Act
+        await Account.bulkSave(accounts);
+
+        // Assert
+        assert.deepStrictEqual(savedNames, ['existing']);
+      });
+
+      it('checks documents whose _id values do not fit in one command', async function() {
+        // Arrange
+        const { Account, savedNames } = createTestContext({ idType: String });
+        const megabyte = 'x'.repeat(1024 * 1024);
+        const accounts = await Account.insertMany(Array.from({ length: 18 }, (_, i) => ({ _id: `${megabyte}-${i}`, name: `account-${i}` })));
+
+        // Act
+        await Account.bulkSave(accounts);
+
+        // Assert
+        assert.strictEqual(savedNames.length, accounts.length);
+      });
 
       const sharedReadCases = [
         { description: 'ObjectId', idType: Schema.Types.ObjectId, createId: () => new mongoose.Types.ObjectId() },

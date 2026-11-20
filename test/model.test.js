@@ -8662,11 +8662,13 @@ describe('Model', function() {
 
     describe('documents with no changes that are not in the database (gh-16713)', function() {
       const operationListeners = [];
+      const extraConnections = [];
 
-      afterEach(function() {
-        for (const listener of operationListeners.splice(0)) {
-          db.off('operation-start', listener);
+      afterEach(async function() {
+        for (const { connection, listener } of operationListeners.splice(0)) {
+          connection.off('operation-start', listener);
         }
+        await Promise.all(extraConnections.splice(0).map(connection => connection.close()));
       });
 
       it('rejects when the only document is not in the database', async function() {
@@ -8787,12 +8789,18 @@ describe('Model', function() {
 
       const distinctIdCases = [
         { description: 'a string _id and a number _id that print the same', existingId: 1, deletedId: '1' },
-        { description: 'two object _id values', existingId: { tenant: 1 }, deletedId: { tenant: 2 } }
+        { description: 'two object _id values', existingId: { tenant: 1 }, deletedId: { tenant: 2 } },
+        {
+          description: 'two Binary _id values with different subtypes when the connection promotes buffers',
+          existingId: new mongoose.mongo.Binary(Buffer.from('account'), 128),
+          deletedId: new mongoose.mongo.Binary(Buffer.from('account'), 0),
+          connectionOptions: { promoteBuffers: true }
+        }
       ];
-      for (const { description, existingId, deletedId } of distinctIdCases) {
+      for (const { description, existingId, deletedId, connectionOptions } of distinctIdCases) {
         it(`tells apart ${description}`, async function() {
           // Arrange
-          const { Account } = createTestContext({ idType: Schema.Types.Mixed });
+          const { Account } = createTestContext({ idType: Schema.Types.Mixed, connectionOptions });
           const [existing, deleted] = await Account.insertMany([
             { _id: existingId, name: 'existing' },
             { _id: deletedId, name: 'deleted' }
@@ -8818,51 +8826,70 @@ describe('Model', function() {
       for (const { description, idType, createId } of sharedReadCases) {
         it(`checks the documents with no changes in one read when _id is ${description}`, async function() {
           // Arrange
-          const { Account, recordReads } = createTestContext({ idType });
+          const { Account, recordOperations } = createTestContext({ idType });
           const accounts = await Account.insertMany(Array.from({ length: 3 }, (_, i) => ({ _id: createId(i), name: `account-${i}` })));
-          const reads = recordReads();
+          const operations = recordOperations();
 
           // Act
           await Account.bulkSave(accounts);
 
           // Assert
-          assert.deepStrictEqual(reads, ['find']);
+          assert.strictEqual(operations.length, 1);
         });
       }
 
+      it('finds each missing document of an unordered bulkSave in one read', async function() {
+        // Arrange
+        const { Account, recordOperations } = createTestContext();
+        const accounts = await Account.insertMany([{ name: 'first' }, { name: 'second' }, { name: 'third' }]);
+        await Account.collection.deleteMany({});
+        const operations = recordOperations();
+
+        // Act
+        const err = await Account.bulkSave(accounts, { ordered: false }).then(() => null, err => err);
+
+        // Assert
+        assert.equal(err?.name, 'DocumentNotFoundError');
+        assert.strictEqual(operations.length, 1);
+      });
+
       it('reads a document with `$where` on its own and the other documents in one read', async function() {
         // Arrange
-        const { Account, recordReads } = createTestContext();
+        const { Account, recordOperations } = createTestContext();
         const accounts = await Account.insertMany([
           { name: 'first' },
           { name: 'active', status: 'active' },
           { name: 'last' }
         ]);
         accounts[1].$where = { status: 'active' };
-        const reads = recordReads();
+        const operations = recordOperations();
 
         // Act
         await Account.bulkSave(accounts);
 
         // Assert
-        assert.deepStrictEqual(reads.sort(), ['find', 'findOne']);
+        assert.strictEqual(operations.length, 2);
       });
 
       it('sends no read when each document has a write', async function() {
         // Arrange
-        const { Account, recordReads } = createTestContext();
+        const { Account, recordOperations } = createTestContext();
         const [renamed] = await Account.insertMany([{ name: 'original' }]);
         renamed.name = 'renamed';
-        const reads = recordReads();
+        const operations = recordOperations();
 
         // Act
         await Account.bulkSave([renamed, new Account({ name: 'inserted' })]);
 
         // Assert
-        assert.deepStrictEqual(reads, []);
+        assert.deepStrictEqual(operations, ['bulkWrite']);
       });
 
-      function createTestContext({ idType } = {}) {
+      function createTestContext({ idType, connectionOptions } = {}) {
+        const connection = connectionOptions == null ? db : start(connectionOptions);
+        if (connection !== db) {
+          extraConnections.push(connection);
+        }
         const savedNames = [];
         const accountSchema = new Schema({
           name: String,
@@ -8875,20 +8902,20 @@ describe('Model', function() {
         accountSchema.post('save', function() {
           savedNames.push(this.name);
         });
-        const Account = db.model('Account', accountSchema);
+        const Account = connection.model('Account', accountSchema);
 
-        return { Account, savedNames, recordReads };
+        return { Account, savedNames, recordOperations };
 
-        function recordReads() {
-          const reads = [];
+        function recordOperations() {
+          const operations = [];
           const listener = ({ collectionName, method }) => {
-            if (collectionName === Account.collection.name && (method === 'find' || method === 'findOne')) {
-              reads.push(method);
+            if (collectionName === Account.collection.name) {
+              operations.push(method);
             }
           };
-          operationListeners.push(listener);
-          db.on('operation-start', listener);
-          return reads;
+          operationListeners.push({ connection, listener });
+          connection.on('operation-start', listener);
+          return operations;
         }
       }
     });

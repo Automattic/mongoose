@@ -441,21 +441,22 @@ describe('transactions', function() {
       assert.ok(exists);
     });
 
-    it('bulkSave() finds a document with no changes that the transaction inserted (gh-16713)', async function() {
+    it('bulkSave() rejects for a document with no changes that the transaction deleted (gh-16713)', async function() {
       // Arrange
       m.deleteModel(/Test/);
       const Test = m.model('Test', m.Schema({ name: String }));
       await Test.createCollection();
       await Test.deleteMany({});
+      const [doc] = await Test.insertMany([{ name: 'deleted in the transaction' }]);
 
       // Act
-      const result = await m.connection.transaction(async() => {
-        const [doc] = await Test.insertMany([{ name: 'inserted in the transaction' }]);
-        return Test.bulkSave([doc]);
-      });
+      const err = await m.connection.transaction(async() => {
+        await Test.deleteOne({ _id: doc._id });
+        await Test.bulkSave([doc]);
+      }).then(() => null, err => err);
 
       // Assert
-      assert.ok(result);
+      assert.equal(err?.name, 'DocumentNotFoundError');
     });
   });
 
@@ -732,21 +733,22 @@ describe('transactions', function() {
     assert.equal(fromDb.name, 'updated');
   });
 
-  it('bulkSave() finds a document with no changes that the transaction inserted (gh-16713)', async function() {
+  it('bulkSave() rejects for a document with no changes that the transaction deleted (gh-16713)', async function() {
     // Arrange
     db.deleteModel(/Test/);
     const Test = db.model('Test', Schema({ name: String }));
     await Test.createCollection();
     await Test.deleteMany({});
+    const [doc] = await Test.insertMany([{ name: 'deleted in the transaction' }]);
 
     // Act
-    const result = await db.transaction(async(session) => {
-      const [doc] = await Test.insertMany([{ name: 'inserted in the transaction' }], { session });
-      return Test.bulkSave([doc], { session });
-    });
+    const err = await db.transaction(async(session) => {
+      await Test.deleteOne({ _id: doc._id }, { session });
+      await Test.bulkSave([doc], { session });
+    }).then(() => null, err => err);
 
     // Assert
-    assert.ok(result);
+    assert.equal(err?.name, 'DocumentNotFoundError');
   });
 
   it('transaction() retains modified status for documents created outside of the transaction then modified inside the transaction (gh-13973)', async function() {

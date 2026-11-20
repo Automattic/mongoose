@@ -811,6 +811,8 @@ describe('mongoose module:', function() {
       assert.throws(() => mongoose.model('constructor'), /Schema hasn't been registered for model "constructor"/);
       assert.throws(() => mongoose.model('toString'), /Schema hasn't been registered for model "toString"/);
       assert.throws(() => mongoose.model('__proto__'), /Schema hasn't been registered for model "__proto__"/);
+      assert.throws(() => mongoose.model('__proto__', new Schema({ name: String })), /Model name "__proto__" is not allowed/);
+      assert.strictEqual(Object.getPrototypeOf(mongoose.models), Object.prototype);
     });
 
     describe('passing collection name', function() {

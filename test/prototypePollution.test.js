@@ -389,6 +389,34 @@ describe('prototype pollution', function() {
     });
   });
 
+  describe('Model', function() {
+    it('discriminator() throws on `__proto__` names without changing prototypes', function() {
+      assert.throws(() => Test.discriminator('__proto__', new Schema({ x: Number })), /Discriminator name "__proto__" is not allowed/);
+      assert.throws(() => Test.schema.path('events').discriminator('__proto__', new Schema({ x: Number })), /Discriminator name "__proto__" is not allowed/);
+      assert.throws(() => Test.schema.path('event').discriminator('__proto__', new Schema({ x: Number })), /Discriminator name "__proto__" is not allowed/);
+
+      assert.strictEqual(Object.getPrototypeOf(Test.schema.discriminators), Object.prototype);
+      assert.strictEqual(Object.getPrototypeOf(Test.discriminators), Object.prototype);
+      assert.strictEqual(Object.getPrototypeOf(Test.schema.path('events').schema.discriminators), Object.prototype);
+      assert.strictEqual(Object.getPrototypeOf(Test.schema.path('event').schema.discriminators), Object.prototype);
+    });
+
+    it('discriminator() allows names that match inherited properties like `constructor`', async function() {
+      const schema = new Schema({ name: String, events: [new Schema({ message: String })] });
+      schema.path('events').discriminator('toString', new Schema({ element: String }));
+      const Shape = db.model('Shape', schema);
+      const Constructor = Shape.discriminator('constructor', new Schema({ extra: String }));
+
+      const { _id } = await Shape.create({ __t: 'constructor', extra: 'a', events: [{ __t: 'toString', element: 'b' }] });
+      const doc = await Shape.findById(_id);
+
+      assert.ok(doc instanceof Constructor);
+      assert.strictEqual(doc.extra, 'a');
+      assert.strictEqual(doc.events[0].element, 'b');
+      assert.throws(() => Shape.discriminator('constructor', new Schema({})), /Discriminator with name "constructor" already exists/);
+    });
+  });
+
   describe('discriminator keys that match inherited properties', function() {
     it('new Model() uses the base model', async function() {
       const docs = [

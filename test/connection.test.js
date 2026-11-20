@@ -388,6 +388,8 @@ describe('connections:', function() {
       assert.throws(() => db.model('constructor'), /Schema hasn't been registered for model "constructor"/);
       assert.throws(() => db.model('toString'), /Schema hasn't been registered for model "toString"/);
       assert.throws(() => db.model('__proto__'), /Schema hasn't been registered for model "__proto__"/);
+      assert.throws(() => db.model('__proto__', new Schema({ name: String }), 'items'), /Model name "__proto__" is not allowed/);
+      assert.strictEqual(Object.getPrototypeOf(db.models), Object.prototype);
 
       const Model = db.model('constructor', new Schema({ name: String }));
 

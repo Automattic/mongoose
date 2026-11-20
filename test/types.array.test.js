@@ -2093,6 +2093,58 @@ describe('types array', function() {
     assert.deepStrictEqual(doc2.docArr.map(d => d.name), ['good']);
   });
 
+  it('respects `castNonArrays` property option on nested arrays', async function() {
+    const matrixPathFalse = { castNonArrays: false, type: [[Number]] };
+    const Model = db.model('TestNestedCastNonArraysFalse', new Schema({ matrix: matrixPathFalse }));
+
+    // Path option `false` rejects non-array values even though the global default is `true`.
+    const doc = new Model({ matrix: 5 });
+    const err = await doc.validate().then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.errors['matrix'].name, 'CastError');
+
+    // Valid nested arrays are unchanged by the option.
+    const okDoc = new Model({ matrix: [[1, 2], [3]] });
+    await okDoc.validate();
+    assert.deepStrictEqual(okDoc.matrix, [[1, 2], [3]]);
+
+    // Unset path option still wraps non-array values to the array's depth (default unchanged).
+    const Model2 = db.model('TestNestedCastNonArraysDefault', new Schema({ matrix: [[Number]] }));
+    const doc2 = new Model2({ matrix: 5 });
+    await doc2.validate();
+    assert.deepStrictEqual(doc2.matrix, [[5]]);
+
+    // Global option precedence: global `false` applies when the path option is
+    // unset, and the path option overrides the global option in both directions.
+    // Schema type constructors and their static options are shared across Mongoose
+    // instances, so save and restore the global value.
+    const previousGlobal = mongoose.Schema.Types.Array.options.castNonArrays;
+    mongoose.Schema.Types.Array.options.castNonArrays = false;
+    try {
+      const GlobalFalse = db.model('TestNestedCastNonArraysGlobalFalse', new Schema({ matrix: [[Number]] }));
+      const gDoc = new GlobalFalse({ matrix: 5 });
+      const err2 = await gDoc.validate().then(() => null, err => err);
+      assert.ok(err2);
+      assert.equal(err2.errors['matrix'].name, 'CastError');
+
+      const PathTrue = db.model('TestNestedCastNonArraysPathTrue', new Schema({
+        matrix: { castNonArrays: true, type: [[Number]] }
+      }));
+      const doc3 = new PathTrue({ matrix: 5 });
+      await doc3.validate();
+      assert.deepStrictEqual(doc3.matrix, [[5]]);
+
+      const PathFalse = db.model('TestNestedCastNonArraysGlobalFalsePathFalse', new Schema({ matrix: matrixPathFalse }));
+      const pfDoc = new PathFalse({ matrix: 5 });
+      const err3 = await pfDoc.validate().then(() => null, err => err);
+      assert.ok(err3);
+      assert.equal(err3.errors['matrix'].name, 'CastError');
+    } finally {
+      mongoose.Schema.Types.Array.options.castNonArrays = previousGlobal;
+    }
+    assert.equal(mongoose.Schema.Types.Array.options.castNonArrays, true);
+  });
+
   it('supports setting nested arrays directly (gh-13372)', function() {
     const Test = db.model('Test', new Schema({ intArr: [[Number]] }));
 

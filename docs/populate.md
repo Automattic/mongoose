@@ -52,6 +52,7 @@ the `Story` model.
   <li><a href="#populate-virtuals">Populate Virtuals</a></li>
   <li><a href="#count">Populate Virtuals: The Count Option</a></li>
   <li><a href="#match">Populate Virtuals: The Match Option</a></li>
+  <li><a href="#virtual-options">Populate Virtuals: The Options Option</a></li>
   <li><a href="#populating-maps">Populating Maps</a></li>
   <li><a href="#populate-middleware">Populate in Middleware</a></li>
   <li><a href="#populating-multiple-paths-middleware">Populating Multiple Paths in Middleware</a></li>
@@ -882,6 +883,38 @@ await Author.findOne().populate({
     isDeleted: false
   })
 });
+```
+
+## Populate Virtuals: The Options Option {#virtual-options}
+
+Populate virtuals also support an `options` option, which sets default [query options](api/query.html#Query.prototype.setOptions()) like `sort` and `limit` for the query Mongoose uses to `populate()`.
+
+```javascript
+AuthorSchema.virtual('posts', {
+  ref: 'BlogPost',
+  localField: '_id',
+  foreignField: 'author',
+  options: { sort: { createdAt: -1 } }
+});
+```
+
+You can also set `options` to a function that returns the query options.
+That allows configuring the virtual's query options, including nested `populate`, based on the options passed to `populate()`.
+Mongoose calls the function with 2 parameters: the populate options and the virtual.
+Because the query options apply to the populate query as a whole, Mongoose calls the `options` function once per `populate()` call, **not** once per document being populated.
+
+```javascript
+AuthorSchema.virtual('posts', {
+  ref: 'BlogPost',
+  localField: '_id',
+  foreignField: 'author',
+  // Only populate the posts' comment authors if `populateCommentAuthors` is set
+  options: populateOptions => populateOptions.populateCommentAuthors ?
+    { sort: { createdAt: -1 }, populate: 'comments.author' } :
+    { sort: { createdAt: -1 } }
+});
+
+await Author.findOne().populate({ path: 'posts', populateCommentAuthors: true });
 ```
 
 ## Populating Maps {#populating-maps}

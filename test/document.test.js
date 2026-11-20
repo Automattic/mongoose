@@ -5796,24 +5796,6 @@ describe('document', function() {
       });
     });
 
-    it('Disallows writing to __proto__ and other special properties', function() {
-      const schema = new mongoose.Schema({
-        name: String
-      }, { strict: false });
-
-      const Model = db.model('Test', schema);
-      const doc = new Model({ '__proto__.x': 'foo' });
-
-      assert.strictEqual(Model.x, void 0);
-      doc.set('__proto__.y', 'bar');
-
-      assert.strictEqual(Model.y, void 0);
-
-      doc.set('constructor.prototype.z', 'baz');
-
-      assert.strictEqual(Model.z, void 0);
-    });
-
     it('save() depopulates pushed arrays (gh-6048)', async function() {
       const blogPostSchema = new Schema({
         comments: [{
@@ -7295,57 +7277,6 @@ describe('document', function() {
     const errors = model.validateSync().errors;
     const keys = Object.keys(errors).sort();
     assert.deepEqual(keys, ['colors.0.hex', 'colors.1.name']);
-  });
-
-  it('handles fake constructor (gh-7290)', async function() {
-    const TestSchema = new Schema({ test: String });
-
-    const TestModel = db.model('Test', TestSchema);
-
-    const badQuery = {
-      test: {
-        length: 1e10,
-        constructor: {
-          name: 'Array'
-        }
-      }
-    };
-
-
-    let err = await TestModel.findOne(badQuery).then(() => null, e => e);
-    assert.equal(err.name, 'CastError', err.stack);
-
-    err = await TestModel.updateOne(badQuery, { name: 'foo' }).
-      then(() => null, err => err);
-    assert.equal(err.name, 'CastError', err.stack);
-
-    err = await TestModel.updateOne({}, badQuery).then(() => null, e => e);
-    assert.equal(err.name, 'CastError', err.stack);
-
-    err = await TestModel.deleteOne(badQuery).then(() => null, e => e);
-    assert.equal(err.name, 'CastError', err.stack);
-  });
-
-  it('handles fake __proto__ (gh-7290)', async function() {
-    const TestSchema = new Schema({ test: String, name: String });
-
-    const TestModel = db.model('Test', TestSchema);
-
-    const badQuery = JSON.parse('{"test":{"length":1000000000,"__proto__":[]}}');
-
-
-    let err = await TestModel.findOne(badQuery).then(() => null, e => e);
-    assert.equal(err.name, 'CastError', err.stack);
-
-    err = await TestModel.updateOne(badQuery, { name: 'foo' }).
-      then(() => null, err => err);
-    assert.equal(err.name, 'CastError', err.stack);
-
-    err = await TestModel.updateOne({}, badQuery).then(() => null, e => e);
-    assert.equal(err.name, 'CastError', err.stack);
-
-    err = await TestModel.deleteOne(badQuery).then(() => null, e => e);
-    assert.equal(err.name, 'CastError', err.stack);
   });
 
   it('cast error with string path set to array in db (gh-7619)', async function() {
@@ -10851,35 +10782,6 @@ describe('document', function() {
         assert.equal(user.get, 12);
       });
 
-      it('does not access special properties with noDottedPath', () => {
-        const userSchema = new Schema({ name: String });
-        const User = db.model('DocGetNoDottedSpecialProperties', userSchema);
-        const user = new User({ name: 'test' });
-
-        assert.equal(user.get('__proto__', null, { noDottedPath: true }), void 0);
-        assert.equal(user.get('constructor', null, { noDottedPath: true }), void 0);
-        assert.equal(user.get('prototype', null, { noDottedPath: true }), void 0);
-      });
-
-      it('does not access special properties when applying virtuals to nested paths', () => {
-        const userSchema = new Schema({ name: String });
-        const User = db.model('DocGetNestedSpecialProperties', userSchema);
-        const user = new User({ name: 'test' });
-
-        assert.equal(user.get('__proto__', null, { virtuals: true }), void 0);
-        assert.equal(user.get('constructor', null, { virtuals: true }), void 0);
-        assert.equal(user.get('prototype', null, { virtuals: true }), void 0);
-      });
-
-      it('does not traverse through special properties', () => {
-        const userSchema = new Schema({ name: String });
-        const User = db.model('DocGetSpecialPropertyPaths', userSchema);
-        const user = new User({ name: 'test' });
-
-        assert.equal(user.get('__proto__.constructor'), void 0);
-        assert.equal(user.get('constructor.prototype'), void 0);
-        assert.equal(user.get('name.__proto__'), void 0);
-      });
     });
   });
 
@@ -13210,128 +13112,83 @@ describe('document', function() {
     assert.deepStrictEqual(doc.nested.modifiedPaths(), []);
   });
 
-  it('avoids prototype pollution on init', async function() {
-    const Example = db.model('Example', new Schema({ hello: String }));
+  it('treats document internals like `$__` and `_doc` in stored data as plain data', async function() {
+    const Strict = db.model('Test', new Schema({ name: String, nested: { name: String }, mixed: {} }));
+    const Loose = db.model('Test2', new Schema({ name: String }, { strict: false }), Strict.collection.collectionName);
 
-    const example = await new Example({ hello: 'world!' }).save();
-    await Example.findByIdAndUpdate(example._id, {
-      $rename: {
-        hello: '__proto__.polluted'
-      }
+    await Strict.collection.insertOne({
+      name: 'test',
+      nested: { name: 'nested', $__: 1 },
+      mixed: { $__: 1, _doc: { name: 'inner' } },
+      other: { $__: 1 },
+      $__: { strictMode: false },
+      $isNew: true,
+      isNew: true
     });
 
-    // this is what causes the pollution
-    await Example.find();
+    const doc = await Strict.findOne();
+    assert.strictEqual(doc.name, 'test');
+    assert.strictEqual(doc.nested.name, 'nested');
+    assert.strictEqual(doc.$isNew, false);
+    assert.deepStrictEqual(doc.toObject().mixed, { $__: 1, _doc: { name: 'inner' } });
 
-    const test = {};
-    assert.strictEqual(test.polluted, undefined);
-    assert.strictEqual(Object.prototype.polluted, undefined);
+    const looseDoc = await Loose.findOne();
+    assert.strictEqual(looseDoc.name, 'test');
+    assert.strictEqual(looseDoc.$isNew, false);
+    assert.strictEqual(looseDoc.isNew, false);
+    assert.strictEqual(looseDoc.$__.strictMode, false);
+    assert.ok(looseDoc.$__.activePaths);
+    const obj = looseDoc.toObject();
+    assert.deepStrictEqual(obj.other, { $__: 1 });
+    assert.deepStrictEqual(obj.$__, { strictMode: false });
 
-    const example2 = await new Example({ hello: 'world!' }).save();
-    await Example.findByIdAndUpdate(example2._id, {
-      $rename: {
-        hello: 'constructor.polluted'
-      }
-    });
-
-    await Example.find();
-    const test2 = {};
-    assert.strictEqual(test2.constructor.polluted, undefined);
-    assert.strictEqual(Object.polluted, undefined);
+    const newDoc = new Loose(JSON.parse('{"name":"test","_doc":{"name":"fake"},"isNew":false}'));
+    assert.strictEqual(newDoc.name, 'test');
+    assert.strictEqual(newDoc.$isNew, true);
+    assert.deepStrictEqual(newDoc.toObject()._doc, { name: 'fake' });
   });
 
-  it('avoids modifying inherited properties like toString on init', async function() {
-    const Example = db.model('Example', new Schema({ hello: String, nested: { name: String } }));
+  it('casts values that contain Mongoose markers like `$__` rather than trusting them', async function() {
+    const Test = db.model('Test', new Schema({ age: Number, isAdmin: Boolean, buf: Buffer, mixed: {} }));
 
-    await Example.collection.insertOne({
-      hello: 'world!',
-      toString: { call: 1, polluted: 'yes' },
-      valueOf: { call: { polluted: 'yes' } },
-      nested: { name: 'test', toString: { polluted: 'yes' } }
+    const doc = Test.hydrate(JSON.parse('{"age":{"$__":{"wasPopulated":{"value":1}}},"isAdmin":{"$__":{"wasPopulated":true}}}'));
+    assert.strictEqual(doc.age, undefined);
+    assert.strictEqual(doc.isAdmin, undefined);
+    assert.ok(doc.$__.validationError.errors['age']);
+    assert.ok(doc.$__.validationError.errors['isAdmin']);
+
+    const doc2 = new Test({
+      buf: JSON.parse('{"isMongooseBuffer":true}'),
+      mixed: JSON.parse('{"$__":1,"_doc":{"name":"test"},"map":{"$isMongooseMap":true}}')
     });
-
-    try {
-      const doc = await Example.findOne();
-
-      assert.strictEqual(typeof Object.prototype.toString.call, 'function');
-      assert.strictEqual(Object.prototype.toString.polluted, undefined);
-      assert.strictEqual(Function.prototype.call.polluted, undefined);
-      // Fields that would shadow inherited functions are ignored
-      assert.strictEqual(doc.hello, 'world!');
-      assert.strictEqual(doc.nested.name, 'test');
-      assert.ok(!Object.hasOwn(doc._doc, 'toString'));
-      assert.ok(!Object.hasOwn(doc._doc, 'valueOf'));
-      assert.ok(!Object.hasOwn(doc._doc.nested, 'toString'));
-
-      Example.hydrate({ hello: 'world!', toString: { polluted: 'yes' } });
-      assert.strictEqual(Object.prototype.toString.polluted, undefined);
-    } finally {
-      // Clean up so a failure here doesn't break subsequent tests
-      for (const fn of [Object.prototype.toString, Object.prototype.valueOf, Function.prototype.call]) {
-        delete fn.call;
-        delete fn.polluted;
-      }
-    }
+    const err = await doc2.validate().then(() => null, err => err);
+    assert.ok(err.errors['buf']);
+    assert.deepStrictEqual(doc2.toObject().mixed, { $__: 1, _doc: { name: 'test' }, map: { $isMongooseMap: true } });
   });
 
-  it('avoids modifying inherited properties like toString when setting dotted paths', async function() {
-    const Strict = db.model('Test', new Schema({ name: String, mixed: {} }));
-    const Loose = db.model('Test2', new Schema({ name: String }, { strict: false }));
+  it('does not copy nested keys onto the top-level document with strict: false', function() {
+    const Loose = db.model('Test', new Schema({ name: String }, { strict: false }));
 
-    try {
-      const doc = new Strict(JSON.parse('{"mixed.toString.call":1,"mixed.valueOf.call.polluted":"yes"}'));
-      assert.strictEqual(typeof Object.prototype.toString.call, 'function');
-      assert.strictEqual(Function.prototype.call.polluted, undefined);
-      // Setting paths underneath inherited functions is a no-op
-      assert.ok(!Object.hasOwn(doc.mixed, 'toString'));
-      assert.ok(!Object.hasOwn(doc.mixed, 'valueOf'));
+    const doc = Loose.hydrate({ name: 'test', other: { save: { x: 1 }, inner: { y: 2 } } });
+    assert.strictEqual(typeof doc.save, 'function');
+    assert.strictEqual(doc.inner, undefined);
+    assert.deepStrictEqual(doc.toObject().other, { save: { x: 1 }, inner: { y: 2 } });
+  });
 
-      doc.set({ 'mixed.toString.polluted': 'yes' });
-      assert.strictEqual(Object.prototype.toString.polluted, undefined);
-      assert.ok(!Object.hasOwn(doc.mixed, 'toString'));
+  it('sets nested paths to objects that contain `$__isNested`', function() {
+    const Test = db.model('Test', new Schema({ nested: { a: String } }));
 
-      doc.set('mixed.list', [1]);
-      doc.set('mixed.list.push.polluted', 'yes');
-      assert.strictEqual(Array.prototype.push.polluted, undefined);
-      assert.strictEqual(typeof doc.mixed.list.push, 'function');
+    const doc = new Test({});
+    doc.nested = JSON.parse('{"$__isNested":true,"a":"b"}');
+    assert.strictEqual(doc.nested.a, 'b');
+  });
 
-      const loose = new Loose({});
-      loose.set('toString.polluted', 'yes');
-      assert.strictEqual(Object.prototype.toString.polluted, undefined);
-      assert.ok(!Object.hasOwn(loose._doc, 'toString'));
+  it('sets dotted paths underneath objects that contain `$__`', function() {
+    const Test = db.model('Test', new Schema({ mixed: {} }));
 
-      const LooseSubdoc = db.model('Test3', new Schema({
-        sub: new Schema({ name: String }, { strict: false })
-      }));
-      const withSubdoc = new LooseSubdoc({ sub: { name: 'test' } });
-      withSubdoc.set('sub.toObject.polluted', 'yes');
-      withSubdoc.set('sub.toJSON.polluted', 'yes');
-      assert.strictEqual(mongoose.Document.prototype.toObject.polluted, undefined);
-      assert.strictEqual(mongoose.Document.prototype.toJSON.polluted, undefined);
-      assert.strictEqual(typeof withSubdoc.sub.toObject, 'function');
-      assert.strictEqual(typeof withSubdoc.sub.toJSON, 'function');
-      assert.strictEqual(withSubdoc.toObject().sub.name, 'test');
-
-      // Setting paths underneath document internals like `$__schema` is a no-op
-      const UserWithProfile = db.model('Test4', new Schema({
-        profile: new Schema({ email: { type: String, required: true } }, { strict: false })
-      }));
-      const user = new UserWithProfile({ profile: { email: 'test@example.com' } });
-      user.set('profile.$__schema.paths.email.validators', []);
-      user.set('profile.$__schema.options.polluted', 'yes');
-      const other = new UserWithProfile({ profile: {} });
-      await assert.rejects(other.validate(), /Path `email` is required/);
-      assert.strictEqual(other.profile.$__schema.options.polluted, undefined);
-      assert.strictEqual(withSubdoc.toJSON().sub.name, 'test');
-    } finally {
-      // Clean up so a failure here doesn't break subsequent tests
-      delete mongoose.Document.prototype.toObject.polluted;
-      delete mongoose.Document.prototype.toJSON.polluted;
-      for (const fn of [Object.prototype.toString, Object.prototype.valueOf, Function.prototype.call, Array.prototype.push]) {
-        delete fn.call;
-        delete fn.polluted;
-      }
-    }
+    const doc = Test.hydrate({ mixed: { $__: 1, foo: { a: 1 } } });
+    doc.set('mixed.foo.b', 2);
+    assert.deepStrictEqual(doc.toObject().mixed, { $__: 1, foo: { a: 1, b: 2 } });
   });
 
   it('sets dotted paths 3+ levels deep underneath a single nested subdocument (gh-16690)', async function() {

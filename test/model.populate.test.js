@@ -2377,7 +2377,7 @@ describe('model: populate:', function() {
       assert.equal(result.items[1].id.otherName, 'Val');
     });
 
-    it('with nonexistant refPath (gh-4637)', function() {
+    it('with nonexistent refPath (gh-4637)', function() {
       db.deleteModel(/Test/);
       const baseballSchema = mongoose.Schema({
         seam: String
@@ -2684,7 +2684,7 @@ describe('model: populate:', function() {
       assert.ok(doc.docArray[6].ids[0].fetched);
     });
 
-    it('with nested nonexistant refPath (gh-6457)', async function() {
+    it('with nested nonexistent refPath (gh-6457)', async function() {
       const CommentSchema = new Schema({
         text: String,
         references: {

@@ -722,7 +722,7 @@ declare module 'mongoose' {
 
     /** Object of currently defined statics on this schema. */
     statics: { [F in keyof TStaticMethods]: TStaticMethods[F] } &
-    { [name: string]: ((this: TModelType, ...args: any[]) => unknown) & SupportsMiddlewareOption };
+    { [name: string]: { bivarianceHack(this: TModelType, ...args: any[]): unknown }['bivarianceHack'] & SupportsMiddlewareOption };
 
     toJSONSchema(options?: { useBsonType?: boolean }): Record<string, any>;
 

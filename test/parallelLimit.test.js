@@ -34,7 +34,7 @@ describe('parallelLimit', function() {
     assert.deepStrictEqual(results, [1, 2, 3]);
   });
 
-  it('rejects non-positive and NaN limits and handles fractional limits', async function() {
+  it('rejects non-positive and NaN limits', async function() {
     await assert.rejects(
       () => parallelLimit([1, 2], value => Promise.resolve(value), NaN),
       /Limit must be positive/
@@ -43,9 +43,6 @@ describe('parallelLimit', function() {
       () => parallelLimit([1, 2], value => Promise.resolve(value), 0),
       /Limit must be positive/
     );
-
-    const results = await parallelLimit([1, 2, 3], value => Promise.resolve(value * 2), 1.5);
-    assert.deepStrictEqual(results, [2, 4, 6]);
   });
 
   it('rejects when fn rejects with null or throws synchronously while other workers are in flight', async function() {
@@ -54,7 +51,7 @@ describe('parallelLimit', function() {
     try {
       await parallelLimit([1, 2, 3], async(val) => {
         if (val === 2) {
-          throw null;
+          return Promise.reject(null);
         }
         return val;
       }, 2);

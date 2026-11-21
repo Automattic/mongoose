@@ -7788,6 +7788,20 @@ describe('Model', function() {
   });
 
   describe('bulkSave() (gh-9673)', function() {
+    it('preserves a bulkWrite middleware error without reading driver-specific properties', async function() {
+      const error = new Error('bulkWrite middleware failed');
+      Object.defineProperty(error, 'writeErrors', {
+        get() { throw new Error('unexpected writeErrors access'); }
+      });
+      const schema = new Schema({ name: String });
+      schema.pre('bulkWrite', function() { throw error; });
+      const User = db.model('User', schema);
+      const user = new User({ name: 'pending' });
+
+      await assert.rejects(User.bulkSave([user]), err => err === error);
+      assert.strictEqual(user.isNew, true);
+    });
+
     it('saves new documents', async function() {
       const userSchema = new Schema({
         name: { type: String }

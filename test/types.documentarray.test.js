@@ -1468,6 +1468,160 @@ describe('types.documentarray', function() {
     }
   });
 
+  describe('document array reassigned with existing subdocs', function() {
+    function getModel() {
+      const schema = new mongoose.Schema({
+        items: [{ name: String, qty: Number, tags: [{ label: String }] }]
+      });
+      return db.model('Test', schema);
+    }
+
+    async function createDoc(Test) {
+      return Test.create({
+        items: [
+          { name: 'apple', qty: 1, tags: [{ label: 'a1' }, { label: 'a2' }] },
+          { name: 'pear', qty: 2, tags: [{ label: 'p1' }] },
+          { name: 'fig', qty: 3, tags: [] }
+        ]
+      });
+    }
+
+    it('tracks changes under the new index after assigning reordered plain objects', async function() {
+      const Test = getModel();
+      const doc = await createDoc(Test);
+      const apple = doc.items[0];
+
+      doc.items = doc.items.map(item => item.toObject()).reverse();
+      await doc.save();
+
+      // existing subdocs are reused, at their new positions
+      assert.ok(doc.items[2] === apple);
+      assert.deepStrictEqual(doc.items.map(item => item.__index), [0, 1, 2]);
+
+      doc.items[2].qty = 100;
+      doc.items[0].name = 'FIG';
+      assert.deepStrictEqual(doc.$getChanges().$set, { 'items.2.qty': 100, 'items.0.name': 'FIG' });
+      await doc.save();
+
+      const fetched = await Test.findById(doc._id).orFail().lean();
+      assert.deepStrictEqual(fetched.items.map(item => `${item.name}=${item.qty}`), ['FIG=3', 'pear=2', 'apple=100']);
+    });
+
+    it('tracks changes under the new index after setting a lean() copy with an element removed', async function() {
+      const Test = getModel();
+      const doc = await createDoc(Test);
+
+      const { items } = await Test.findById(doc._id).orFail().lean();
+      doc.set({ items: items.slice(1) });
+      await doc.save();
+
+      doc.items[0].qty = 20;
+      await doc.save();
+
+      const fetched = await Test.findById(doc._id).orFail().lean();
+      assert.deepStrictEqual(fetched.items.map(item => `${item.name}=${item.qty}`), ['pear=20', 'fig=3']);
+    });
+
+    it('tracks changes under the new index for nested document arrays', async function() {
+      const Test = getModel();
+      const doc = await createDoc(Test);
+
+      doc.items = doc.items.map(item => item.toObject()).reverse();
+      doc.items[2].tags = doc.items[2].tags.map(tag => tag.toObject()).reverse();
+      await doc.save();
+
+      doc.items[2].tags[1].label = 'A1';
+      doc.items[1].tags[0].label = 'P1';
+      assert.deepStrictEqual(doc.$getChanges().$set, { 'items.2.tags.1.label': 'A1', 'items.1.tags.0.label': 'P1' });
+      await doc.save();
+
+      const fetched = await Test.findById(doc._id).orFail().lean();
+      assert.deepStrictEqual(fetched.items.map(item => item.tags.map(tag => tag.label)), [[], ['P1'], ['a2', 'A1']]);
+    });
+
+    it('does not put the same subdoc at two positions when an _id is listed twice', async function() {
+      const Test = getModel();
+      const doc = await createDoc(Test);
+
+      const pear = doc.items[1].toObject();
+      doc.items = [pear, pear];
+      assert.ok(doc.items[0] !== doc.items[1]);
+      assert.deepStrictEqual(doc.items.map(item => item.__index), [0, 1]);
+      await doc.save();
+
+      doc.items[1].qty = 200;
+      assert.strictEqual(doc.items[0].qty, 2);
+      await doc.save();
+
+      const fetched = await Test.findById(doc._id).orFail().lean();
+      assert.deepStrictEqual(fetched.items.map(item => item.qty), [2, 200]);
+    });
+
+    it('deleteOne() removes a reused subdoc from the new array', async function() {
+      const Test = getModel();
+      const doc = await createDoc(Test);
+
+      // unchanged copy, so `items` isn't modified and only the subdocs are reused
+      doc.items = doc.items.map(item => item.toObject());
+      assert.ok(doc.items[0].parentArray() === doc.items);
+      doc.items[0].deleteOne();
+      assert.deepStrictEqual(doc.items.map(item => item.name), ['pear', 'fig']);
+      await doc.save();
+
+      const fetched = await Test.findById(doc._id).orFail().lean();
+      assert.deepStrictEqual(fetched.items.map(item => item.name), ['pear', 'fig']);
+    });
+
+    it('deleteOne() removes a subdoc from the new array after assigning a copy of the subdocs', async function() {
+      const Test = getModel();
+      const doc = await createDoc(Test);
+
+      doc.items = doc.items.slice();
+      assert.ok(doc.items[0].parentArray() === doc.items);
+      doc.items[0].deleteOne();
+      assert.deepStrictEqual(doc.items.map(item => item.name), ['pear', 'fig']);
+      await doc.save();
+
+      const fetched = await Test.findById(doc._id).orFail().lean();
+      assert.deepStrictEqual(fetched.items.map(item => item.name), ['pear', 'fig']);
+    });
+
+    it('deleteOne() on a nested subdoc of a reused subdoc removes it from the current array', async function() {
+      const Test = getModel();
+      const doc = await createDoc(Test);
+
+      doc.items = doc.items.map(item => item.toObject()).slice(1);
+      await doc.save();
+
+      assert.ok(doc.items[0].tags[0].parentArray() === doc.items[0].tags);
+      doc.items[0].tags[0].deleteOne();
+      assert.strictEqual(doc.items[0].tags.length, 0);
+      await doc.save();
+
+      const fetched = await Test.findById(doc._id).orFail().lean();
+      assert.deepStrictEqual(fetched.items.map(item => item.tags.length), [0, 0]);
+    });
+
+    it('leaves existing subdocs untouched when casting the new array fails', async function() {
+      const schema = new mongoose.Schema({
+        items: [new mongoose.Schema({ name: String, qty: Number }, { strict: 'throw' })]
+      });
+      const Test = db.model('Test', schema);
+      const doc = await Test.create({ items: [{ name: 'apple', qty: 1 }, { name: 'pear', qty: 2 }] });
+      const items = doc.items;
+
+      // `bogus` is not in the schema, so casting the second element throws
+      doc.items = [doc.items[1].toObject(), { name: 'fig', bogus: true }];
+      assert.ok(doc.validateSync().errors['items']);
+
+      assert.ok(doc.items === items);
+      assert.deepStrictEqual(doc.items.map(item => item.__index), [0, 1]);
+      assert.ok(doc.items[1].parentArray() === items);
+      doc.items[1].qty = 20;
+      assert.deepStrictEqual(doc.$getChanges().$set, { 'items.1.qty': 20 });
+    });
+  });
+
   it('clones subdoc when same subdoc reference appears multiple times in array (gh-15973)', async function() {
     const childSchema = new mongoose.Schema({
       id: Number,

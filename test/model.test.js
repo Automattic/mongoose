@@ -8861,6 +8861,304 @@ describe('Model', function() {
     );
   });
 
+  describe('Direct reference Maps after hydration', function() {
+    for (const array of [false, true]) {
+      for (const nativeMap of [false, true]) {
+        for (const virtuals of [false, true]) {
+          it(`depopulates Map entries, array=${array}, nativeMap=${nativeMap}, virtuals=${virtuals}`, function() {
+            // Arrange
+            const { Customer, Contact, rawCustomer, ids } = createTestContext({ array, nativeMap });
+
+            // Act
+            const customer = Customer.hydrate(rawCustomer, null, { virtuals, hydratedPopulatedDocs: true });
+
+            // Assert
+            const contacts = customer.contacts.get('work');
+            for (const contact of array ? contacts : [contacts]) {
+              assert.ok(contact instanceof Contact);
+              assert.strictEqual(contact.label, virtuals ? 'Work' : undefined);
+            }
+            assert.deepStrictEqual(customer.populated('contacts.work'), ids);
+            customer.depopulate('contacts.work');
+            const depopulated = customer.contacts.get('work');
+            assert.deepStrictEqual(array ? Array.from(depopulated) : depopulated, ids);
+            assert.strictEqual(customer.populated('contacts.work'), undefined);
+          });
+        }
+      }
+    }
+
+    function createTestContext({ array, nativeMap }) {
+      const contactSchema = new Schema({ name: String });
+      contactSchema.virtual('label');
+      const Contact = db.model('Contact', contactSchema);
+      const reference = { type: Schema.Types.ObjectId, ref: 'Contact' };
+      const Customer = db.model('Customer', new Schema({ contacts: { type: Map, of: array ? [reference] : reference } }));
+      const contacts = ['Ada', 'Grace'].map(name => ({ _id: new mongoose.Types.ObjectId(), name, label: 'Work' }));
+      const entries = { work: array ? contacts : contacts[0] };
+      return {
+        Customer,
+        Contact,
+        rawCustomer: { contacts: nativeMap ? new Map(Object.entries(entries)) : entries },
+        ids: array ? contacts.map(contact => contact._id) : contacts[0]._id
+      };
+    }
+  });
+
+  describe('Map container mutations after hydration', function() {
+    for (const virtuals of [undefined, false, true]) {
+      it(`saves container mutations after hydration with virtuals=${virtuals}`, async function() {
+        // Arrange
+        const { Customer, rawCustomer } = createTestContext();
+        await Customer.collection.insertOne(rawCustomer);
+        const customer = virtuals === undefined ?
+          await Customer.findById(rawCustomer._id) :
+          Customer.hydrate(rawCustomer, null, { virtuals });
+
+        // Act
+        const contact = customer.contacts.get('home');
+        contact.names.push('Grace');
+        contact.people.push({ name: 'Grace' });
+        contact.labels.set('work', 'Work');
+        await customer.save();
+
+        // Assert
+        const saved = await Customer.findById(rawCustomer._id).lean();
+        assert.deepStrictEqual(saved.contacts, {
+          home: {
+            names: ['Ada', 'Grace'],
+            people: [{ name: 'Ada' }, { name: 'Grace' }],
+            labels: { home: 'Home', work: 'Work' }
+          }
+        });
+      });
+    }
+
+    function createTestContext() {
+      const personSchema = new Schema({ name: String }, { _id: false });
+      const contactSchema = new Schema({
+        names: [String],
+        people: [personSchema],
+        labels: { type: Map, of: String }
+      }, { _id: false });
+      const Customer = db.model('Customer', new Schema({ contacts: { type: Map, of: contactSchema } }));
+      const rawCustomer = {
+        _id: new mongoose.Types.ObjectId(),
+        contacts: {
+          home: { names: ['Ada'], people: [{ name: 'Ada' }], labels: { home: 'Home' } }
+        }
+      };
+      return { Customer, rawCustomer };
+    }
+  });
+
+  describe('hydrate virtual input and option regressions', function() {
+    it('preserves virtuals when wrapping an object in nested arrays', function() {
+      // Arrange
+      const { Customer } = createTestContext();
+
+      // Act
+      const customer = Customer.hydrate({ contactGroups: { age: '12', label: 'Family' } }, null, { virtuals: true });
+
+      // Assert
+      assert.ifError(customer.validateSync());
+      assert.deepStrictEqual(customer.contactGroups.map(group => group.map(contact => ({
+        age: contact.age, label: contact.label
+      }))), [[{ age: 12, label: 'Family' }]]);
+    });
+
+    it('ignores inherited properties when hydrating virtuals', function() {
+      // Arrange
+      const { Customer } = createTestContext();
+      const raw = JSON.parse('{"__proto__":{"polluted":"yes"},"constructor":{"prototype":{"polluted":"yes"}},"toString":{"polluted":"yes"},"valueOf":{"call":{"polluted":"yes"}}}');
+      raw.contact = { ...raw, label: 'Work' };
+      raw.displayName = { first: 'Ada', last: 'Lovelace' };
+
+      // Act
+      const customer = Customer.hydrate(raw, null, { virtuals: true });
+
+      // Assert
+      assert.strictEqual(customer.displayName, 'Ada Lovelace');
+      assert.strictEqual(customer.contact.label, 'Work');
+      for (const owner of [customer, customer.contact]) {
+        const serialized = owner.toObject();
+        for (const key of ['__proto__', 'constructor', 'toString', 'valueOf']) {
+          assert.strictEqual(Object.hasOwn(serialized, key), false, key);
+        }
+      }
+      assert.strictEqual(Object.prototype.polluted, undefined);
+      assert.strictEqual(Object.prototype.toString.polluted, undefined);
+      assert.strictEqual(Function.prototype.call.polluted, undefined);
+    });
+
+    it('passes complete objects to root and embedded virtual setters', function() {
+      // Arrange
+      const { Customer } = createTestContext();
+
+      // Act
+      const customer = Customer.hydrate({
+        displayName: { first: 'Ada', last: 'Lovelace' },
+        contact: { displayName: { first: 'Grace', last: 'Hopper' } }
+      }, null, { virtuals: true });
+
+      // Assert
+      assert.deepStrictEqual([customer.displayName, customer.contact.displayName], ['Ada Lovelace', 'Grace Hopper']);
+    });
+
+    it('preserves embedded virtuals with both hydration options enabled', function() {
+      // Arrange
+      const { Customer } = createTestContext();
+      const contact = { label: 'Work' };
+
+      // Act
+      const customer = Customer.hydrate({ contact, contacts: [contact], directory: { work: contact } }, null, {
+        virtuals: true, hydratedPopulatedDocs: true
+      });
+
+      // Assert
+      assert.deepStrictEqual([customer.contact.label, customer.contacts[0].label, customer.directory.get('work').label], ['Work', 'Work', 'Work']);
+    });
+
+    for (const embedded of [false, true]) {
+      it(`preserves virtual payloads with colliding keys, embedded=${embedded}`, function() {
+        // Arrange
+        const { Customer } = createTestContext();
+        const address = { address: '12 Oak Street', city: 'Amsterdam' };
+        const raw = { city: 'Paris', address };
+
+        // Act
+        const customer = Customer.hydrate(embedded ? { contact: raw } : raw, null, { virtuals: true });
+        const owner = embedded ? customer.contact : customer;
+
+        // Assert
+        assert.deepStrictEqual(owner.address, address);
+        assert.strictEqual(owner.city, 'Paris');
+      });
+
+      it(`does not set virtuals from ordinary nested keys, embedded=${embedded}`, function() {
+        // Arrange
+        const { Customer } = createTestContext();
+        const raw = { billing: { reference: 'INV-1', address: '12 Oak Street', city: 'Amsterdam' } };
+
+        // Act
+        const customer = Customer.hydrate(embedded ? { contact: raw } : raw, null, { virtuals: true });
+        const owner = embedded ? customer.contact : customer;
+
+        // Assert
+        assert.strictEqual(owner.address, undefined);
+        assert.strictEqual(owner.city, undefined);
+        assert.deepStrictEqual(
+          [owner.billing.reference, owner.get('billing.address'), owner.get('billing.city')],
+          ['INV-1', '12 Oak Street', 'Amsterdam']
+        );
+      });
+    }
+
+    for (const justOne of [true, false]) {
+      it(`hydrates embedded populated virtuals with justOne=${justOne}`, function() {
+        // Arrange
+        const { Customer, Contact } = createTestContext({ justOne });
+        const contact = { _id: new mongoose.Types.ObjectId(), name: 'Ada', label: 'Work' };
+
+        // Act
+        const customer = Customer.hydrate({ contact: { matches: justOne ? contact : [contact] } }, null, {
+          virtuals: true, hydratedPopulatedDocs: true
+        });
+        const populated = justOne ? customer.contact.matches : customer.contact.matches[0];
+
+        // Assert
+        assert.ok(populated instanceof Contact);
+        assert.deepStrictEqual(
+          { _id: populated._id, name: populated.name, label: populated.label },
+          contact
+        );
+      });
+
+      it(`forwards hydration options to populated virtuals with justOne=${justOne}`, function() {
+        // Arrange
+        const { Customer, Contact } = createTestContext({ justOne });
+        const contact = { _id: new mongoose.Types.ObjectId(), label: 'Work' };
+
+        // Act
+        const customer = Customer.hydrate({ matches: justOne ? contact : [contact] }, null, {
+          virtuals: true, hydratedPopulatedDocs: true
+        });
+        const populated = justOne ? customer.matches : customer.matches[0];
+
+        // Assert
+        assert.ok(populated instanceof Contact);
+        assert.strictEqual(populated.label, 'Work');
+      });
+
+      it(`hydrates empty populated virtuals with justOne=${justOne}`, function() {
+        // Arrange
+        const { Customer } = createTestContext({ justOne });
+
+        // Act
+        const customer = Customer.hydrate({ matches: justOne ? null : [] }, null, {
+          virtuals: true, hydratedPopulatedDocs: true
+        });
+
+        // Assert
+        assert.deepStrictEqual(customer.matches, justOne ? null : []);
+      });
+    }
+
+    for (const virtuals of [false, true]) {
+      it(`preserves null entries in populated virtual arrays with virtuals=${virtuals}`, function() {
+        // Arrange
+        const { Customer, Contact } = createTestContext({ justOne: false });
+        const contact = { _id: new mongoose.Types.ObjectId(), name: 'Ada', label: 'Work' };
+
+        // Act
+        const customer = Customer.hydrate({ matches: [null, contact, null] }, null, {
+          virtuals, hydratedPopulatedDocs: true
+        });
+
+        // Assert
+        assert.strictEqual(customer.matches.length, 3);
+        assert.deepStrictEqual([customer.matches[0], customer.matches[2]], [null, null]);
+        assert.ok(customer.matches[1] instanceof Contact);
+        assert.strictEqual(customer.matches[1].name, 'Ada');
+        assert.strictEqual(customer.matches[1].label, virtuals ? 'Work' : undefined);
+      });
+    }
+
+    function createTestContext({ justOne = true } = {}) {
+      const contactSchema = new Schema({ name: String, age: Number });
+      contactSchema.virtual('label');
+      contactSchema.virtual('matches', { ref: 'Contact', localField: '_id', foreignField: '_id', justOne });
+      contactSchema.virtual('displayName').get(function() {
+        return this.$locals.displayName;
+      }).set(function(value) {
+        this.$locals.displayName = `${value.first} ${value.last}`;
+      });
+      const customerSchema = new Schema({
+        contact: contactSchema,
+        contacts: [contactSchema],
+        contactGroups: [[contactSchema]],
+        directory: { type: Map, of: contactSchema }
+      });
+      customerSchema.virtual('displayName').get(function() {
+        return this.$locals.displayName;
+      }).set(function(value) {
+        this.$locals.displayName = `${value.first} ${value.last}`;
+      });
+      customerSchema.virtual('matches', { ref: 'Contact', localField: '_id', foreignField: '_id', justOne });
+      for (const schema of [contactSchema, customerSchema]) {
+        schema.add({ billing: { reference: String } });
+        for (const path of ['address', 'city']) {
+          schema.virtual(path).get(function() {
+            return this.$locals[path];
+          }).set(function(value) {
+            this.$locals[path] = value;
+          });
+        }
+      }
+      return { Customer: db.model('Customer', customerSchema), Contact: db.model('Contact', contactSchema) };
+    }
+  });
+
   it('sets index collation based on schema collation (gh-7621)', async function() {
     let testSchema = new Schema(
       { name: { type: String, index: true } }

@@ -813,6 +813,7 @@ declare module 'mongoose' {
     pre(fn: Function): this;
 
     /** Add post middleware to this query instance. Doesn't affect other queries. */
+    post(fn: (this: this, res: ResultType) => any): this;
     post(fn: Function): this;
 
     /** Get/set the current projection (AKA fields). Pass `null` to remove the current projection. */

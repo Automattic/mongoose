@@ -3473,6 +3473,56 @@ describe('Query', function() {
     assert.equal(called.length, 1);
   });
 
+  it('Query#post() passes query result to post hooks (gh-15899)', async function() {
+    const PostTest = db.model('Test', Schema({ answer: Number }));
+
+    await PostTest.create([{ answer: 42 }, { answer: 42 }, { answer: 100 }]);
+
+    // 1. Synchronous post hook receives result
+    const q1 = PostTest.find({ answer: 42 });
+    let syncResult;
+    q1.post(function(res) {
+      assert.strictEqual(this, q1);
+      syncResult = res;
+    });
+    const res1 = await q1.exec();
+    assert.strictEqual(syncResult, res1);
+    assert.strictEqual(res1.length, 2);
+
+    // 2. Doesn't affect subsequent queries
+    let secondRan = false;
+    await PostTest.find({ answer: 42 });
+    assert.strictEqual(secondRan, false);
+
+    // 3. deleteOne post hook receives result with deletedCount
+    const qDelete = PostTest.deleteOne({ answer: 100 });
+    let deleteResult;
+    qDelete.post(function(res) {
+      deleteResult = res;
+      assert.strictEqual(res.deletedCount, 1);
+    });
+    const deleteRes = await qDelete.exec();
+    assert.strictEqual(deleteResult, deleteRes);
+    assert.strictEqual(deleteRes.deletedCount, 1);
+
+    // 4. Async and callback-based post hooks
+    const qUpdate = PostTest.updateOne({ answer: 42 }, { answer: 43 });
+    let asyncResult;
+    let cbResult;
+    qUpdate.post(async function(res) {
+      await new Promise(resolve => setImmediate(resolve));
+      asyncResult = res;
+    });
+    qUpdate.post(function(res, next) {
+      cbResult = res;
+      next();
+    });
+    const updateRes = await qUpdate.exec();
+    assert.strictEqual(asyncResult, updateRes);
+    assert.strictEqual(cbResult, updateRes);
+    assert.strictEqual(updateRes.matchedCount, 1);
+  });
+
   it('applies schema-level `select` on arrays (gh-10029)', function() {
     const testSchema = new mongoose.Schema({
       doesntpopulate: {

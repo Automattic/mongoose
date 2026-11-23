@@ -1198,7 +1198,7 @@ retrieving the document.
 - `[options.setters=false]` \<boolean\> if true, apply schema setters when hydrating
 - `[options.hydratedPopulatedDocs=false]` \<boolean\> if true, populates the docs if passing pre-populated data
 - `[options.virtuals=false]` \<boolean\> if true, sets any virtuals present on `obj`
-- `[options.strict=false]` \<boolean | 'throw'\> configure strict mode for the hydrated document. In particular, if strict is false, fields not in the schema won't be stripped out; if strict is 'throw', `hydrate()` will throw an error if there are any fields that are not in the schema. Defaults to true (silently strip out fields not in the schema).
+- `[options.strict]` \<boolean | 'throw'\> configure strict mode for the hydrated document. In particular, if strict is false, fields not in the schema won't be stripped out; if strict is 'throw', `hydrate()` will throw an error if there are any fields that are not in the schema. Falls back to the schema's [`strict` option](https://mongoosejs.com/docs/guide.html#strict) if this option is nullish, which is true by default (silently strip out fields not in the schema).
 
 ### Returns
 

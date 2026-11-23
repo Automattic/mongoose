@@ -60,12 +60,12 @@ Converts this map to a native JavaScript Map so the MongoDB driver can serialize
 ### Parameters
 
 - `[options]` \<object\>
-- `[options.flattenMaps=false]` \<boolean\> set to `true` to convert the map to a POJO rather than a native JavaScript map
+- `[options.flattenMaps=true]` \<boolean\> set to `false` to convert the map to a native JavaScript Map rather than a POJO
 
-Converts this map to a native JavaScript Map for `JSON.stringify()`. Set
-the `flattenMaps` option to convert this map to a POJO instead.
+Converts this map to a POJO for `JSON.stringify()`. Set the `flattenMaps`
+option to `false` to convert this map to a native JavaScript Map instead.
 
 #### Example:
 
-    doc.myMap.toJSON() instanceof Map; // true
-    doc.myMap.toJSON({ flattenMaps: true }) instanceof Map; // false
+    doc.myMap.toJSON() instanceof Map; // false
+    doc.myMap.toJSON({ flattenMaps: false }) instanceof Map; // true

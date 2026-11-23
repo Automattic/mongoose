@@ -859,6 +859,8 @@ If there are too many documents in the result to fit in memory, use
 Executes the query as a `find()` and also runs a `countDocuments()` query
 on the same filter, returning `[documents, count]`. The count ignores
 `skip` and `limit` so that it returns the total number of matching documents.
+Requires `limit`, and requires `sort` unless the schema has a [`defaultSort`](https://mongoosejs.com/docs/guide.html#defaultSort).
+Throws if `sort` is empty, like `sort(null)`.
 
 #### Example:
 
@@ -2410,7 +2412,7 @@ The following options are only for all operations **except** `updateOne()`, `upd
 
 - [maxTimeMS](https://www.mongodb.com/docs/manual/reference/operator/meta/maxTimeMS/)
 
-The following options are for `find()`, `findOne()`, `findOneAndUpdate()`, `findOneAndDelete()`, `updateOne()`, and `deleteOne()`:
+The following options are for `find()`, `findOne()`, `findOneAndUpdate()`, `findOneAndDelete()`, `findOneAndReplace()`, `updateOne()`, and `replaceOne()`:
 
 - [sort](https://www.mongodb.com/docs/manual/reference/method/cursor.sort/)
 
@@ -2582,6 +2584,9 @@ which will be treated as descending.
 
     // also possible is to use a array with array key-value pairs
     query.sort([['field', 'asc']]);
+
+    // run this query with no sort, ignoring the schema's `defaultSort`
+    query.sort(null);
 
 #### Note:
 

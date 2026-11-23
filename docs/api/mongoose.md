@@ -37,6 +37,7 @@
 - [`Mongoose.prototype.isValidObjectId()`](#Mongoose.prototype.isValidObjectId())
 - [`Mongoose.prototype.model()`](#Mongoose.prototype.model())
 - [`Mongoose.prototype.modelNames()`](#Mongoose.prototype.modelNames())
+- [`Mongoose.prototype.mongo`](#Mongoose.prototype.mongo)
 - [`Mongoose.prototype.mquery`](#Mongoose.prototype.mquery)
 - [`Mongoose.prototype.now()`](#Mongoose.prototype.now())
 - [`Mongoose.prototype.omitUndefined()`](#Mongoose.prototype.omitUndefined())
@@ -592,6 +593,14 @@ Returns an array of model names created on this instance of Mongoose.
 #### Note:
 
 _Does not include names of models created using `connection.model()`._
+
+## `Mongoose.prototype.mongo`
+
+### Type
+
+- \<property\>
+
+The [node-mongodb-native](https://github.com/mongodb/node-mongodb-native) driver Mongoose uses.
 
 ## `Mongoose.prototype.mquery`
 

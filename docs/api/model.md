@@ -858,6 +858,8 @@ more information on how Mongoose casts `filter`.
 Finds documents and counts the number of documents matching the filter.
 
 This function fires both `find` and `countDocuments` middleware.
+Requires `options.limit`, and requires `options.sort` unless the schema has a [`defaultSort`](https://mongoosejs.com/docs/guide.html#defaultSort).
+Throws if `options.sort` is empty, like `sort: null`.
 
 #### Example:
 

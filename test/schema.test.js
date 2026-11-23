@@ -3534,6 +3534,58 @@ describe('schema', function() {
     assert.equal(doc.bar, undefined);
   });
 
+  it('should remove the alias mapping when deleting an alias virtual', function() {
+    const schema = new Schema({
+      name: { type: String, alias: 'n' }
+    });
+    assert.equal(schema.aliases.n, 'name');
+    assert.ok(schema.virtuals.n);
+
+    schema.removeVirtual('n');
+    assert.ok(!schema.virtuals.n);
+    assert.ok(!schema.paths.n);
+    assert.equal(schema.aliases.n, undefined);
+
+    // `translateAliases` must not keep translating the removed alias.
+    const Test = db.model('TestRemoveVirtualAlias', schema);
+    assert.deepStrictEqual(Test.translateAliases({ n: 'Test' }), { n: 'Test' });
+  });
+
+  it('should keep sibling aliases when deleting one virtual from an alias array', function() {
+    const schema = new Schema({
+      name: { type: String, alias: ['n', 'nm'] }
+    });
+    assert.deepStrictEqual(schema.aliases, { n: 'name', nm: 'name' });
+
+    schema.removeVirtual('n');
+    assert.equal(schema.aliases.n, undefined);
+    assert.equal(schema.aliases.nm, 'name');
+    assert.ok(schema.virtuals.nm);
+
+    const Test = db.model('TestRemoveVirtualAliasArray', schema);
+    const doc = new Test({ nm: 'Test' });
+    assert.equal(doc.name, 'Test');
+    assert.deepStrictEqual(Test.translateAliases({ nm: 'Test' }), { name: 'Test' });
+  });
+
+  it('should leave unrelated aliases in place when deleting a non-alias virtual', function() {
+    const schema = new Schema({
+      name: { type: String, alias: 'n' }
+    });
+    schema.virtual('display').get(function() {
+      return this.name;
+    });
+
+    schema.removeVirtual('display');
+    assert.ok(!schema.virtuals.display);
+    assert.equal(schema.aliases.n, 'name');
+    assert.ok(schema.virtuals.n);
+
+    const Test = db.model('TestRemoveVirtualNoAlias', schema);
+    const doc = new Test({ n: 'Test' });
+    assert.equal(doc.name, 'Test');
+  });
+
   it('should throw an error if attempting to delete a virtual path that does not exist gh-8397', function() {
     const schema = new Schema({
       name: String

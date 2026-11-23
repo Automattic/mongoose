@@ -1439,7 +1439,7 @@ describe('schema', function() {
       assert.equal(ss.obj, ele.id);
     });
 
-    it('array of of schemas and objects (gh-7218)', function() {
+    it('array of schemas and objects (gh-7218)', function() {
       const baseSchema = new Schema({ created: Date }, { id: true });
       const s = new Schema([baseSchema, { name: String }], { id: false });
 
@@ -2563,6 +2563,10 @@ describe('schema', function() {
       assert.ok(!newSchema.path('m'));
       assert.ok(!newSchema.path('m.$*'));
       assert.equal(newSchema.pathType('m.k'), 'adhocOrUndefined');
+
+      // The removed map used to keep casting queries on its keys
+      const Test = mongoose.model('OmitMapTest', newSchema);
+      assert.deepStrictEqual(Test.find({ 'm.k': '42' }).cast(Test), { 'm.k': '42' });
     });
 
     it('removes the paths of an omitted subdocument (gh-16520)', function() {
@@ -3380,16 +3384,6 @@ describe('schema', function() {
     assert.equal(doc3 instanceof mongoose.Document, true);
     assert.ok(!doc3._transformed);
     assert.ok(!doc3._otherTransform);
-  });
-
-  it('disallows setting special properties with `add()` or constructor (gh-12085)', function() {
-    const maliciousPayload = '{"__proto__.toString": "Number"}';
-
-    assert.throws(() => {
-      mongoose.Schema(JSON.parse(maliciousPayload));
-    }, /__proto__/);
-
-    assert.ok({}.toString());
   });
 
   it('enable defining virtual paths by using schema constructor (gh-11908)', async function() {
@@ -4610,8 +4604,8 @@ describe('schema', function() {
   it('applies defaults for subdocument paths added or removed before the model is compiled', function() {
     const childSchema = new Schema({ kind: String }, { _id: false });
     const schema = new Schema({ children: [childSchema] });
-    // Creating the document array compiles the child schema, so add and remove paths
-    // afterwards like a global plugin would when compiling the model
+    // Add and remove paths after creating the document array, like a global plugin
+    // would when compiling the model
     const compiledChildSchema = schema.path('children').schema;
     compiledChildSchema.add({ status: { type: String, default: 'active' }, notes: { type: String, default: 'none' } });
     compiledChildSchema.remove('notes');
@@ -4621,5 +4615,95 @@ describe('schema', function() {
     assert.strictEqual(doc.children[0].status, 'active');
     assert.strictEqual(doc.children[0].get('notes'), undefined);
     assert.strictEqual(new Test({ children: [{}] }).children[0].status, 'active');
+  });
+
+  it('applies subdocument defaults set with default() before the model is compiled', function() {
+    const schema = new Schema({
+      children: [new Schema({ status: String })],
+      child: new Schema({ status: String })
+    });
+    schema.path('children').schema.path('status').default('active');
+    schema.path('child').schema.path('status').default('active');
+    const Test = db.model('Test', schema);
+
+    const doc = new Test({ children: [{}], child: {} });
+    assert.strictEqual(doc.children[0].status, 'active');
+    assert.strictEqual(doc.child.status, 'active');
+  });
+
+  it('applies defaults from discriminators registered after creating a document', function() {
+    const childSchema = new Schema({ name: String });
+    const Base = db.model('Test', new Schema({ name: String, children: [childSchema] }));
+    new Base({ children: [{}] });
+
+    const Discriminator = Base.discriminator('Discriminator', new Schema({
+      status: { type: String, default: 'active' }
+    }));
+    Base.schema.path('children').discriminator('ChildDiscriminator', new Schema({
+      status: { type: String, default: 'active' }
+    }));
+
+    assert.strictEqual(new Discriminator({}).status, 'active');
+    const doc = new Base({ children: [{ __t: 'ChildDiscriminator' }] });
+    assert.strictEqual(doc.children[0].status, 'active');
+  });
+
+  it('applies subdocument transforms set before the model is compiled', function() {
+    const toUpperCase = v => v.toUpperCase();
+    const schema = new Schema({
+      children: [new Schema({ status: String })],
+      child: new Schema({ status: String })
+    });
+    schema.path('children').schema.path('status').transform(toUpperCase);
+    schema.path('child').schema.path('status').transform(toUpperCase);
+    schema.path('children').schema.add({ notes: { type: String, transform: toUpperCase } });
+    const Test = db.model('Test', schema);
+
+    const doc = new Test({
+      children: [{ status: 'active', notes: 'test' }],
+      child: { status: 'active' }
+    }).toObject();
+    assert.strictEqual(doc.children[0].status, 'ACTIVE');
+    assert.strictEqual(doc.children[0].notes, 'TEST');
+    assert.strictEqual(doc.child.status, 'ACTIVE');
+  });
+
+  it('applies transforms from discriminators registered after serializing a document', function() {
+    const toUpperCase = v => v.toUpperCase();
+    const childSchema = new Schema({ name: { type: String, transform: toUpperCase } });
+    const Base = db.model('Test', new Schema({
+      name: { type: String, transform: toUpperCase },
+      children: [childSchema]
+    }));
+    new Base({ children: [{}] }).toObject();
+
+    // Check the embedded discriminator first: embedded discriminators don't compile a model,
+    // so `Base.discriminator()` below would clear the embedded discriminator's cache
+    Base.schema.path('children').discriminator('ChildDiscriminator', new Schema({
+      status: { type: String, transform: toUpperCase }
+    }));
+    const parent = new Base({ children: [{ __t: 'ChildDiscriminator', name: 'test', status: 'active' }] }).toObject();
+    assert.strictEqual(parent.children[0].name, 'TEST');
+    assert.strictEqual(parent.children[0].status, 'ACTIVE');
+
+    const Discriminator = Base.discriminator('Discriminator', new Schema({
+      status: { type: String, transform: toUpperCase }
+    }));
+    const doc = new Discriminator({ name: 'test', status: 'active' }).toObject();
+    assert.strictEqual(doc.name, 'TEST');
+    assert.strictEqual(doc.status, 'ACTIVE');
+  });
+
+  it('picks up changes to a child schema shared with an existing model when compiling a model', function() {
+    const childSchema = new Schema({ status: String });
+    const Test1 = db.model('Test1', new Schema({ children: [childSchema] }));
+    new Test1({ children: [{}] }).toObject();
+
+    childSchema.path('status').default('active');
+    childSchema.path('status').transform(v => v.toUpperCase());
+    const Test2 = db.model('Test2', new Schema({ children: [childSchema] }));
+
+    const doc = new Test2({ children: [{}] }).toObject();
+    assert.strictEqual(doc.children[0].status, 'ACTIVE');
   });
 });

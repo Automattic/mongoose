@@ -166,6 +166,30 @@ describe('Map', function() {
     assert.strictEqual(queryPerson.fact.get('killer'), undefined);
   });
 
+  it('supports ObjectId keys in has()', function() {
+    const Test = db.model('Test', new mongoose.Schema({
+      votes: {
+        type: Map,
+        of: Number
+      }
+    }));
+
+    const userId = new mongoose.Types.ObjectId();
+    const otherId = new mongoose.Types.ObjectId();
+    const doc = new Test({ votes: { [userId.toString()]: 1 } });
+
+    assert.strictEqual(doc.votes.get(userId), 1);
+    assert.strictEqual(doc.votes.has(userId), true);
+    assert.strictEqual(doc.votes.has(userId.toString()), true);
+    assert.strictEqual(doc.votes.has(new mongoose.Types.ObjectId()), false);
+
+    doc.votes.set(otherId, 2);
+    assert.strictEqual(doc.votes.has(otherId), true);
+
+    doc.votes.delete(userId);
+    assert.strictEqual(doc.votes.has(userId), false);
+  });
+
   it('query casting', async function() {
     const TestSchema = new mongoose.Schema({
       v: {
@@ -1886,6 +1910,44 @@ describe('Map', function() {
       $set: { 'containers.c1.lists.list1': ['a', 'b'] },
       $inc: { __v: 1 }
     });
+  });
+
+  it('does not apply map value defaults when setting the map\'s nested parent', async function() {
+    const schema = new Schema({
+      nested: {
+        counts: { type: Map, of: { type: Number, default: 5 } },
+        tags: { type: Map, of: [String] },
+        mapOfMaps: { type: Map, of: { type: Map, of: { type: Number, default: 6 } } },
+        mapOfSubdocs: { type: Map, of: new Schema({ v: { type: Number, default: 7 } }) },
+        other: Number
+      }
+    });
+    const M = db.model('Test', schema);
+
+    const doc = new M({ nested: { other: 1 } });
+    assert.strictEqual(doc.nested.counts, undefined);
+    assert.strictEqual(doc.nested.tags, undefined);
+    assert.strictEqual(doc.nested.mapOfMaps, undefined);
+    assert.strictEqual(doc.nested.mapOfSubdocs, undefined);
+    await doc.save();
+
+    const loaded = await M.findById(doc._id);
+    loaded.set({ nested: { other: 2 } });
+    await loaded.save();
+    const loadedFromDb = await M.findById(doc._id).lean();
+    assert.deepStrictEqual(loadedFromDb.nested, { other: 2 });
+
+    const empty = await M.create({ nested: {} });
+    const emptyFromDb = await M.findById(empty._id).lean();
+    // `nested` is empty, so `minimize` strips it
+    assert.strictEqual(emptyFromDb.nested, undefined);
+
+    doc.set('nested.counts.a', 1);
+    doc.set('nested.tags.b', ['x']);
+    await doc.save();
+
+    const fromDb = await M.findById(doc._id).lean();
+    assert.deepStrictEqual(fromDb.nested, { other: 2, counts: { a: 1 }, tags: { b: ['x'] } });
   });
 
   describe('nested map subdocuments loaded via init() (gh-15957) (gh-15969)', function() {

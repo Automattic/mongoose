@@ -7,6 +7,7 @@
 const start = require('./common');
 
 const assert = require('assert');
+const { once } = require('events');
 const stream = require('stream');
 
 const Aggregate = require('../lib/aggregate');
@@ -172,6 +173,15 @@ describe('aggregate: ', function() {
 
       aggregate.project('a\tb -c\td');
       assert.deepEqual(aggregate._pipeline, [{ $project: { 'a\tb': 1, 'c\td': 0 } }]);
+    });
+
+    it('ignores own `__proto__` keys', function() {
+      const aggregate = new Aggregate();
+
+      aggregate.project(JSON.parse('{"__proto__":{"name":0},"age":1}'));
+
+      assert.deepStrictEqual(aggregate._pipeline, [{ $project: { age: 1 } }]);
+      assert.strictEqual(Object.getPrototypeOf(aggregate._pipeline[0].$project), Object.prototype);
     });
 
     it('("a","b","c")', function() {
@@ -1283,6 +1293,20 @@ describe('aggregate: ', function() {
       pipe(otherStream);
     const streamValue = await waitForStream;
     assert.ok(streamValue.includes('"name":"Apple"'), streamValue);
+  });
+
+  it('cursor() emits the error passed to destroy() (gh-16609)', async function() {
+    const Test = db.model('Test', new Schema({ name: String }));
+    await Test.create({ name: 'test1' });
+    const cursor = Test.aggregate([{ $match: {} }]).cursor();
+    const [driverCursor] = await once(cursor, 'cursor');
+    const destroyError = new Error('consumer stopped reading');
+
+    cursor.destroy(destroyError);
+
+    const [error] = await once(cursor, 'error');
+    assert.strictEqual(error, destroyError);
+    assert.ok(driverCursor.closed);
   });
 
   describe('Mongo 3.6 options', function() {

@@ -147,6 +147,97 @@ describe('schema', function() {
       await Test.path('status').doValidate(2);
     });
 
+    it('enum(false) clears enumValues so they are not reused', async function() {
+      const Test = new Schema({
+        state: { type: String, enum: ['a', 'b'] },
+        status: { type: Number, enum: [1, 2] }
+      });
+
+      Test.path('state').enum(false);
+      Test.path('status').enum(false);
+
+      assert.deepStrictEqual(Test.path('state').enumValues, []);
+      assert.deepStrictEqual(Test.path('status').enumValues, []);
+      assert.equal(Test.path('state').validators.length, 0);
+      assert.equal(Test.path('status').validators.length, 0);
+      assert.deepStrictEqual(Test.toJSONSchema().properties.state, { type: ['string', 'null'] });
+      assert.deepStrictEqual(Test.toJSONSchema().properties.status, { type: ['number', 'null'] });
+
+      Test.path('state').enum('c');
+      Test.path('status').enum(3);
+
+      assert.deepStrictEqual(Test.path('state').enumValues, ['c']);
+      assert.deepStrictEqual(Test.path('status').enumValues, [3]);
+      await assert.rejects(Test.path('state').doValidate('a'), ValidatorError);
+      await assert.rejects(Test.path('status').doValidate(1), ValidatorError);
+      await Test.path('state').doValidate('c');
+      await Test.path('status').doValidate(3);
+    });
+
+    it('enum(false) stays cleared after clone()', async function() {
+      const Test = new Schema({
+        state: { type: String, enum: ['a', 'b'] },
+        status: { type: Number, enum: [1, 2] }
+      });
+
+      Test.path('state').enum(false);
+      Test.path('status').enum(false);
+
+      const Clone = Test.clone();
+
+      assert.deepStrictEqual(Clone.path('state').enumValues, []);
+      assert.deepStrictEqual(Clone.path('status').enumValues, []);
+      assert.deepStrictEqual(Clone.toJSONSchema().properties.state, { type: ['string', 'null'] });
+      assert.deepStrictEqual(Clone.toJSONSchema().properties.status, { type: ['number', 'null'] });
+      await Clone.path('state').doValidate('zzz');
+      await Clone.path('status').doValidate(42);
+    });
+
+    it('min(), max(), enum(), minlength() and maxlength() replace or remove the validators of a cloned path', async function() {
+      const Test = new Schema({
+        num: { type: Number, min: 1, max: 10, enum: [1, 2, 3] },
+        date: { type: Date, min: new Date('2020-01-01'), max: new Date('2030-01-01') },
+        str: { type: String, enum: ['a', 'b'], minlength: 1, maxlength: 3 }
+      });
+
+      const Clone = Test.clone();
+      Clone.path('num').min(5);
+
+      assert.deepStrictEqual(Clone.path('num').validators.map(v => v.type), ['max', 'enum', 'min']);
+      assert.strictEqual(Clone.path('num').validators[2].min, 5);
+
+      Clone.path('num').min(null).max(null).enum(false);
+      Clone.path('date').min(null).max(null);
+      Clone.path('str').enum(false).minlength(null).maxlength(null);
+
+      assert.equal(Clone.path('num').validators.length, 0);
+      assert.equal(Clone.path('date').validators.length, 0);
+      assert.equal(Clone.path('str').validators.length, 0);
+      await Clone.path('num').doValidate(42);
+      await Clone.path('str').doValidate('zzzz');
+
+      assert.equal(Test.path('num').validators.length, 3);
+      assert.equal(Test.path('date').validators.length, 2);
+      assert.equal(Test.path('str').validators.length, 3);
+    });
+
+    it('enum(null) removes the enum validator like enum(false)', async function() {
+      const Test = new Schema({
+        state: { type: String, enum: ['a', 'b'] },
+        status: { type: Number, enum: [1, 2] }
+      });
+
+      Test.path('state').enum(null);
+      Test.path('status').enum(null);
+
+      assert.deepStrictEqual(Test.path('state').enumValues, []);
+      assert.deepStrictEqual(Test.path('status').enumValues, []);
+      assert.equal(Test.path('state').validators.length, 0);
+      assert.equal(Test.path('status').validators.length, 0);
+      await Test.path('state').doValidate('zzz');
+      await Test.path('status').doValidate(42);
+    });
+
     it('string regexp', async function() {
       const Test = new Schema({
         simple: { type: String, match: /[a-z]/ }

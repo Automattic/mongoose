@@ -146,6 +146,13 @@ html(lang='en')
                       +sidebarItem('typescript/virtuals.html', 'Virtuals')
                       +sidebarItem('typescript/subdocuments.html', 'Subdocuments')
 
+            .sidebar-section.sidebar-section-collapsible#sidebar-section-production
+              h3.sidebar-section-title.sidebar-section-toggle(role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-production")
+                span Production
+                +sidebarSectionCarat
+              ul.sidebar-list#sidebar-list-production
+                +sidebarItem('production/indexes.html', 'Indexes')
+
             .sidebar-section.sidebar-section-collapsible#sidebar-section-api-reference
               h3.sidebar-section-title.sidebar-section-toggle(role="button" tabindex="0" aria-expanded="true" aria-controls="sidebar-list-api-reference")
                 span API Reference

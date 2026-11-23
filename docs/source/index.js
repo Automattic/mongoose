@@ -26,7 +26,8 @@ const api = require('./api');
  */
 const docs = {
   ...require('./tutorials'),
-  ...require('./typescript')
+  ...require('./typescript'),
+  ...require('./production')
 };
 
 for (const apidoc of api.docs.values()) {

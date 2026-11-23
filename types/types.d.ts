@@ -77,6 +77,18 @@ declare module 'mongoose' {
     }
 
     class Map<V> extends global.Map<string, V> {
+      /** Returns the value for `key`, applying getters unless `options.getters` is `false`. ObjectId keys are converted to strings. */
+      get(key: string | ObjectId, options?: { getters?: boolean }): V | undefined;
+
+      /** Returns `true` if the map contains `key`. ObjectId keys are converted to strings. */
+      has(key: string | ObjectId): boolean;
+
+      /** Sets `key` to `value`, applying setters and change tracking. ObjectId keys are converted to strings. */
+      set(key: string | ObjectId, value: V): this;
+
+      /** Removes `key` from the map with change tracking. ObjectId keys are converted to strings. */
+      delete(key: string | ObjectId): boolean;
+
       /** Converts a Mongoose map into a vanilla JavaScript map. */
       toObject(options?: ToObjectOptions & { flattenMaps?: boolean }): any;
     }

@@ -1115,7 +1115,7 @@ describe('model: populate:', function() {
       ]
     });
 
-    // non-existant subprop
+    // non-existent subprop
     await BlogPost.findById(post._id).populate({
       path: 'comments._idontexist',
       select: 'email',
@@ -2377,7 +2377,7 @@ describe('model: populate:', function() {
       assert.equal(result.items[1].id.otherName, 'Val');
     });
 
-    it('with nonexistant refPath (gh-4637)', function() {
+    it('with nonexistent refPath (gh-4637)', function() {
       db.deleteModel(/Test/);
       const baseballSchema = mongoose.Schema({
         seam: String
@@ -2422,6 +2422,23 @@ describe('model: populate:', function() {
           assert.ok(!basket.balls[1].kind);
           assert.ok(!basket.balls[1].ball);
         });
+    });
+
+    it('refPath values that are Object.prototype properties do not break populate', async function() {
+      db.deleteModel(/Test/);
+      const User = db.model('Test1', new Schema({ name: String }));
+      const Post = db.model('Test', new Schema({ kind: String, author: { type: ObjectId, refPath: 'kind' } }));
+      const user = await User.create({ name: 'alice' });
+      await Post.create([{ kind: 'Test1', author: user._id }, { kind: 'constructor' }]);
+
+      const posts = await Post.find().sort({ _id: 1 }).populate('author');
+
+      assert.equal(posts[0].author.name, 'alice');
+      assert.strictEqual(posts[1].author, undefined);
+
+      await Post.create({ kind: 'constructor', author: user._id });
+
+      await assert.rejects(Post.find().populate('author'), /Schema hasn't been registered for model "constructor"/);
     });
 
     it('array with empty refPath (gh-5377)', async function() {
@@ -2684,7 +2701,7 @@ describe('model: populate:', function() {
       assert.ok(doc.docArray[6].ids[0].fetched);
     });
 
-    it('with nested nonexistant refPath (gh-6457)', async function() {
+    it('with nested nonexistent refPath (gh-6457)', async function() {
       const CommentSchema = new Schema({
         text: String,
         references: {
@@ -3667,6 +3684,128 @@ describe('model: populate:', function() {
       await org.save();
       assert.equal(org.groups[0].members[0], 'Jessie');
 
+    });
+
+    describe('inherited read preference and read concern (gh-15553)', function() {
+      it('does not inherit schema-level read preference and read concern in nested populate', async function() {
+        const Publisher = db.model('Publisher', new Schema({ name: String }));
+        const Author = db.model('Author', new Schema({
+          name: String,
+          publisher: { type: ObjectId, ref: 'Publisher' }
+        }, { read: 'nearest', readConcern: { level: 'local' } }));
+        const Article = db.model('Article', new Schema({
+          author: { type: ObjectId, ref: 'Author' }
+        }, { read: 'secondaryPreferred', readConcern: { level: 'majority' } }));
+        const publisher = await Publisher.create({ name: 'Acme Books' });
+        const author = await Author.create({ name: 'Alice', publisher: publisher._id });
+        await Article.create({ author: author._id });
+        const calls = recordFindReadOptions(Article, Author, Publisher);
+
+        await Article.find().populate({ path: 'author', populate: { path: 'publisher' } });
+
+        assert.deepStrictEqual(calls, [
+          { readPreference: 'secondaryPreferred', readConcern: 'majority' },
+          { readPreference: 'nearest', readConcern: 'local' },
+          { readPreference: 'primary', readConcern: undefined }
+        ]);
+      });
+
+      it('uses updated read preference and read concern when cloning an executed query with deferred populate', async function() {
+        const Publisher = db.model('Publisher', new Schema({ name: String }));
+        const Author = db.model('Author', new Schema({ name: String, publisher: { type: ObjectId, ref: 'Publisher' } }));
+        const Article = db.model('Article', new Schema({ author: { type: ObjectId, ref: 'Author' } }));
+        const publisher = await Publisher.create({ name: 'Acme Books' });
+        const author = await Author.create({ name: 'Alice', publisher: publisher._id });
+        await Article.create({ author: author._id });
+        const calls = recordFindReadOptions(Article, Author, Publisher);
+        // `match` function means Mongoose defers populating `publisher` until after filtering authors
+        const query = Article.find().read('primary').readConcern('local').
+          populate({ path: 'author', match: () => ({}), populate: { path: 'publisher' } });
+
+        await query;
+        await query.clone().read('secondaryPreferred').readConcern('majority');
+
+        assert.deepStrictEqual(calls, [
+          { readPreference: 'primary', readConcern: 'local' },
+          { readPreference: 'primary', readConcern: 'local' },
+          { readPreference: 'primary', readConcern: 'local' },
+          { readPreference: 'secondaryPreferred', readConcern: 'majority' },
+          { readPreference: 'secondaryPreferred', readConcern: 'majority' },
+          { readPreference: 'secondaryPreferred', readConcern: 'majority' }
+        ]);
+      });
+
+      it('uses updated read preference when cloning an executed query with plain object populate options', async function() {
+        const Author = db.model('Author', new Schema({ name: String }));
+        const Article = db.model('Article', new Schema({ author: { type: ObjectId, ref: 'Author' } }));
+        const author = await Author.create({ name: 'Alice' });
+        await Article.create({ author: author._id });
+        const calls = recordFindReadOptions(Article, Author);
+        const query = Article.find().read('primary');
+        query.mongooseOptions({ populate: { author: { path: 'author' } } });
+
+        await query;
+        await query.clone().read('secondaryPreferred');
+
+        assert.deepStrictEqual(calls.map(call => call.readPreference),
+          ['primary', 'primary', 'secondaryPreferred', 'secondaryPreferred']);
+      });
+
+      for (const deferred of [false, true]) {
+        it(`preserves explicit nested read options across clones and constructors (deferred: ${deferred})`, async function() {
+          const Publisher = db.model('Publisher', new Schema({ name: String }));
+          const Author = db.model('Author', new Schema({ publisher: { type: ObjectId, ref: 'Publisher' } }));
+          const Article = db.model('Article', new Schema({ author: { type: ObjectId, ref: 'Author' } }));
+          const publisher = await Publisher.create({ name: 'Acme Books' });
+          const author = await Author.create({ publisher: publisher._id });
+          await Article.create({ author: author._id });
+          const calls = recordFindReadOptions(Article, Author, Publisher);
+          const query = Article.find().read('primary').readConcern('local').populate({
+            path: 'author',
+            match: deferred ? () => ({}) : undefined,
+            populate: {
+              path: 'publisher',
+              options: { readPreference: 'primaryPreferred', readConcern: { level: 'local' } }
+            }
+          });
+
+          await query;
+          const cloned = query.clone().read('secondaryPreferred').readConcern('majority');
+          await cloned;
+          const ArticleQuery = cloned.toConstructor();
+          await ArticleQuery().read('nearest').readConcern('available');
+          await cloned.clone().read('primary').readConcern('local');
+
+          assert.deepStrictEqual(calls, [
+            { readPreference: 'primary', readConcern: 'local' },
+            { readPreference: 'primary', readConcern: 'local' },
+            { readPreference: 'primaryPreferred', readConcern: 'local' },
+            { readPreference: 'secondaryPreferred', readConcern: 'majority' },
+            { readPreference: 'secondaryPreferred', readConcern: 'majority' },
+            { readPreference: 'primaryPreferred', readConcern: 'local' },
+            { readPreference: 'nearest', readConcern: 'available' },
+            { readPreference: 'nearest', readConcern: 'available' },
+            { readPreference: 'primaryPreferred', readConcern: 'local' },
+            { readPreference: 'primary', readConcern: 'local' },
+            { readPreference: 'primary', readConcern: 'local' },
+            { readPreference: 'primaryPreferred', readConcern: 'local' }
+          ]);
+        });
+      }
+
+      function recordFindReadOptions(...models) {
+        const calls = [];
+        for (const Model of models) {
+          const find = Model.collection.find;
+          Model.collection.find = function() {
+            const cursor = find.apply(this, arguments);
+            calls.push({ readPreference: cursor.readPreference.mode, readConcern: cursor.readConcern?.level });
+            // Read from primary to avoid replication lag when testing against a replica set
+            return cursor.withReadPreference('primary');
+          };
+        }
+        return calls;
+      }
     });
 
     describe('populate virtuals (gh-2562)', function() {
@@ -5684,18 +5823,30 @@ describe('model: populate:', function() {
           name: String
         });
 
-        db.model('Test', refSchema);
+        const Ref = db.model('Test', refSchema);
 
         const schema = new mongoose.Schema({
           ref: { type: mongoose.Schema.Types.ObjectId, ref: 'Test' }
         });
 
         const Model = db.model('Test1', schema);
+        const ref = await Ref.create({ name: 'Alice' });
+        await Model.create({ ref: ref._id });
+        const calls = [];
+        // Record Mongoose options, then read fixtures from primary to avoid replication lag.
+        const find = Ref.collection.find;
+        Ref.collection.find = function(filter, options) {
+          calls.push(options);
+          return find.call(this, filter, { ...options, readPreference: 'primary' });
+        };
+        const findModel = Model.collection.find;
+        Model.collection.find = function(filter, options) {
+          return findModel.call(this, filter, { ...options, readPreference: 'primary' });
+        };
 
         const q = Model.find().read('secondaryPreferred').populate('ref');
         await q.exec();
-        assert.equal(q._mongooseOptions.populate['ref'].options.readPreference.mode,
-          'secondaryPreferred');
+        assert.equal(calls[0].readPreference.mode, 'secondaryPreferred');
       });
 
       it('array underneath non-existent array (gh-6245)', async function() {
@@ -8893,6 +9044,20 @@ describe('model: populate:', function() {
       assert.equal(docs[1]._id.toString(), p2._id.toString());
       assert.deepEqual(docs[0].children.map(c => c._id), [1]);
       assert.deepEqual(docs[1].children.map(c => c._id), [4]);
+    });
+
+    it('keeps the stored order of an array of refs when the ref model has a `defaultSort`', async function() {
+      const Child = db.model('Child', Schema({ name: String }, { defaultSort: { name: 1 } }));
+      const Parent = db.model('Parent', Schema({ children: [{ type: 'ObjectId', ref: 'Child' }] }));
+      const [c, a, b] = await Child.insertMany([{ name: 'c' }, { name: 'a' }, { name: 'b' }]);
+      await Parent.create({ children: [b._id, c._id, a._id] });
+
+      let parent = await Parent.findOne().populate('children');
+      assert.deepStrictEqual(parent.children.map(child => child.name), ['b', 'c', 'a']);
+
+      // `defaultSort` determines which documents `perDocumentLimit` returns
+      parent = await Parent.findOne().populate({ path: 'children', perDocumentLimit: 1 });
+      assert.deepStrictEqual(parent.children.map(child => child.name), ['a']);
     });
 
     describe('splitting populate queries whose `$in` filter would have too many elements (gh-5890)', function() {
@@ -12319,6 +12484,19 @@ describe('model: populate:', function() {
 
     assert.equal(doc.children.length, 1);
     assert.equal(doc.children[0].category.name, 'Test Category');
+  });
+
+  it('populates lean documents that contain a `$__` property', async function() {
+    const User = db.model('User', new Schema({ name: String }));
+    const Post = db.model('Post', new Schema({ user: { type: 'ObjectId', ref: 'User' } }));
+
+    const user = await User.create({ name: 'test' });
+    await Post.collection.insertOne({ user: user._id, $__: { x: 1 } });
+
+    const posts = await Post.find().lean().populate('user');
+    assert.strictEqual(posts.length, 1);
+    assert.strictEqual(posts[0].user.name, 'test');
+    assert.deepStrictEqual(posts[0].$__, { x: 1 });
   });
 
   it('deferred sub-populate resolves dotted parent paths on lean queries', async function() {

@@ -324,4 +324,17 @@ describe('schematype', function() {
     assert.equal(schemaType.instance, 'String');
     assert.equal(schemaType.path, 'tags');
   });
+
+  it('castForQuery() finds $conditionalHandlers inherited through the prototype chain', function() {
+    class CustomType extends mongoose.SchemaType {
+      cast(v) {
+        return String(v);
+      }
+    }
+    CustomType.prototype.$conditionalHandlers = Object.create(mongoose.SchemaType.prototype.$conditionalHandlers);
+    const schemaType = new CustomType('test');
+
+    assert.deepStrictEqual(schemaType.castForQuery('$in', [1, 2]), ['1', '2']);
+    assert.throws(() => schemaType.castForQuery('valueOf', 1), /Can't use valueOf/);
+  });
 });

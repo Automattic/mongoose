@@ -413,6 +413,26 @@ describe('model', function() {
 
         assert.ok(called);
       });
+
+      it('emits index-single-start and index-single-done with index fields and options', async function() {
+        const schema = new Schema({ name: String, email: String }, { autoIndex: false });
+        schema.index({ name: 1 });
+        schema.index({ email: 1 }, { unique: true, sparse: true });
+        const Test = db.model('Test', schema);
+
+        const events = [];
+        Test.on('index-single-start', (fields, options) => events.push(['start', fields, options]));
+        Test.on('index-single-done', (err, fields, options, name) => events.push(['done', err, fields, options, name]));
+
+        await Test.createIndexes();
+
+        assert.deepStrictEqual(events, [
+          ['start', { name: 1 }, {}],
+          ['done', null, { name: 1 }, {}, 'name_1'],
+          ['start', { email: 1 }, { unique: true, sparse: true }],
+          ['done', null, { email: 1 }, { unique: true, sparse: true }, 'email_1']
+        ]);
+      });
     });
   });
 

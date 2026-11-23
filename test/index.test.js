@@ -807,6 +807,14 @@ describe('mongoose module:', function() {
       }, /Schema hasn't been registered/);
     });
 
+    it('does not treat Object.prototype properties as models', function() {
+      assert.throws(() => mongoose.model('constructor'), /Schema hasn't been registered for model "constructor"/);
+      assert.throws(() => mongoose.model('toString'), /Schema hasn't been registered for model "toString"/);
+      assert.throws(() => mongoose.model('__proto__'), /Schema hasn't been registered for model "__proto__"/);
+      assert.throws(() => mongoose.model('__proto__', new Schema({ name: String })), /Model name "__proto__" is not allowed/);
+      assert.strictEqual(Object.getPrototypeOf(mongoose.models), Object.prototype);
+    });
+
     describe('passing collection name', function() {
       describe('when model name already exists', function() {
         it('returns a new uncached model', function() {
@@ -931,7 +939,7 @@ describe('mongoose module:', function() {
     }, { message: 'Cannot populate path `favoriteGame` because it is not in your schema. Set the `strictPopulate` option to false to override.' });
     await mongoose.disconnect();
   });
-  it('allows global `strictPopulate` to be overriden on specific queries set to true (gh-10694)', async function() {
+  it('allows global `strictPopulate` to be overridden on specific queries set to true (gh-10694)', async function() {
     const mongoose = new Mongoose();
     mongoose.set('strictPopulate', false);
     const schema = new mongoose.Schema({ name: String });
@@ -947,7 +955,7 @@ describe('mongoose module:', function() {
     }, { message: 'Cannot populate path `favoriteGame` because it is not in your schema. Set the `strictPopulate` option to false to override.' });
     await mongoose.disconnect();
   });
-  it('allows global `strictPopulate` to be overriden on specific queries set to false (gh-10694)', async function() {
+  it('allows global `strictPopulate` to be overridden on specific queries set to false (gh-10694)', async function() {
     const mongoose = new Mongoose();
     mongoose.set('strictPopulate', false);
     const schema = new mongoose.Schema({ name: String });

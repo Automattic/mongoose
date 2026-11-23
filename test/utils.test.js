@@ -326,6 +326,7 @@ describe('utils', function() {
 
       assert.ok(to.val instanceof Date);
     });
+
   });
   describe('errorToPOJO(...)', () => {
     it('converts an error to a POJO', () => {

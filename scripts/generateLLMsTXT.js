@@ -39,6 +39,12 @@ const llmsSections = [
     ]
   },
   {
+    title: 'Production',
+    files: [
+      'docs/production/indexes.md'
+    ]
+  },
+  {
     title: 'API Reference',
     api: true
   },

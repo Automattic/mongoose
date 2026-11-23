@@ -173,6 +173,23 @@ describe('Query:', function() {
       assert.strictEqual(called, 1);
     });
 
+    it('does not share populate options between instances', async function() {
+      const Publisher = db.model('Publisher', new Schema({ name: String }));
+      const Author = db.model('Author', new Schema({ name: String, publisher: { type: 'ObjectId', ref: 'Publisher' } }));
+      const Article = db.model('Article', new Schema({ author: { type: 'ObjectId', ref: 'Author' } }));
+      const publisher = await Publisher.create({ name: 'Acme Books' });
+      const author = await Author.create({ name: 'Alice', publisher: publisher._id });
+      const article = await Article.create({ author: author._id });
+      const ArticleQuery = Article.find({ _id: article._id }).
+        populate({ path: 'author', populate: { path: 'publisher' } }).
+        toConstructor();
+
+      await ArticleQuery().lean();
+      const articles = await ArticleQuery();
+
+      assert.ok(articles[0].author.publisher instanceof mongoose.Document);
+    });
+
     it('works with entries-style sort() syntax (gh-8159)', function() {
       mongoose.deleteModel(/Test/);
       const Model = mongoose.model('Test', Schema({ name: String }));

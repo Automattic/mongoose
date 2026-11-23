@@ -2049,4 +2049,121 @@ describe('types.documentarray', function() {
       return trip.populated('stops.location').map(id => id.toString());
     }
   });
+
+  describe('overwriting a document array (gh-16673)', function() {
+    let Test;
+
+    beforeEach(function() {
+      Test = db.model('Test', new Schema({ items: [{ name: String, qty: Number }] }));
+    });
+
+    it('takes linear time in the array length', function() {
+      const arraySize = 10000;
+      const rawItems = [];
+      for (let i = 0; i < arraySize; ++i) {
+        rawItems.push({ _id: new mongoose.Types.ObjectId(), name: 'n' + i, qty: i });
+      }
+      const rawDoc = { _id: new mongoose.Types.ObjectId(), items: rawItems };
+
+      const cases = {
+        'plain objects with string _ids': rawItems.map(item => ({ _id: item._id.toString(), name: item.name, qty: item.qty + 1 })),
+        'plain objects with same _ids and different data': rawItems.map(item => ({ _id: item._id, name: item.name, qty: item.qty + 1 })),
+        'plain objects with same _ids and same data': rawItems.map(item => ({ _id: item._id, name: item.name, qty: item.qty }))
+      };
+      for (const [name, items] of Object.entries(cases)) {
+        const doc = Test.hydrate(rawDoc);
+
+        const start = Date.now();
+        doc.items = items;
+        const elapsed = Date.now() - start;
+
+        assert.strictEqual(doc.items.length, arraySize);
+        assert.strictEqual(doc.items[arraySize - 1].qty, items[arraySize - 1].qty);
+        assert.ok(elapsed < 1000, `${name}: setting ${arraySize} subdocs took ${elapsed}ms`);
+      }
+    });
+
+    it('keeps existing subdocs when setting the array to the same data', function() {
+      const doc = Test.hydrate({
+        _id: new mongoose.Types.ObjectId(),
+        items: [
+          { _id: new mongoose.Types.ObjectId(), name: 'a', qty: 1 },
+          { _id: new mongoose.Types.ObjectId(), name: 'b', qty: 2 },
+          { _id: new mongoose.Types.ObjectId(), name: 'c', qty: 3 }
+        ]
+      });
+      const [a, b, c] = doc.items;
+
+      doc.items = doc.toObject().items;
+
+      assert.strictEqual(doc.items[0], a);
+      assert.strictEqual(doc.items[1], b);
+      assert.strictEqual(doc.items[2], c);
+      assert.deepStrictEqual(doc.modifiedPaths(), []);
+      assert.deepStrictEqual(doc.$getChanges(), {});
+
+      assert.strictEqual(a.parentArray(), doc.items);
+      a.deleteOne();
+      assert.deepStrictEqual(doc.items.map(item => item.name), ['b', 'c']);
+      assert.deepStrictEqual(doc.$getChanges(), {
+        $pull: { items: { _id: { $in: [a._id] } } },
+        $inc: { __v: 1 }
+      });
+    });
+
+    it('moves unchanged subdocs at the same index to the new array when some elements\' data changed', function() {
+      const doc = Test.hydrate({
+        _id: new mongoose.Types.ObjectId(),
+        items: [
+          { _id: new mongoose.Types.ObjectId(), name: 'a', qty: 1 },
+          { _id: new mongoose.Types.ObjectId(), name: 'b', qty: 2 },
+          { _id: new mongoose.Types.ObjectId(), name: 'c', qty: 3 }
+        ]
+      });
+      const [a, b, c] = doc.items;
+
+      const items = doc.toObject().items;
+      items[1].qty = 20;
+      delete items[2].name;
+      doc.items = items;
+
+      assert.strictEqual(doc.items[0], a);
+      assert.strictEqual(a.parentArray(), doc.items);
+      assert.notStrictEqual(doc.items[1], b);
+      assert.strictEqual(doc.items[1].qty, 20);
+      // Overwriting shouldn't keep fields from the old subdoc, see gh-5523
+      assert.notStrictEqual(doc.items[2], c);
+      assert.strictEqual(doc.items[2].name, undefined);
+      assert.strictEqual(doc.items[2].qty, 3);
+    });
+
+    it('does not reuse subdocs that moved to a different index', async function() {
+      const doc = await Test.create({ items: [{ name: 'a', qty: 1 }, { name: 'b', qty: 2 }] });
+
+      doc.items = [{ name: 'z', qty: 0 }, ...doc.toObject().items];
+      await doc.save();
+      doc.items[1].qty = 100;
+      await doc.save();
+
+      const fromDb = await Test.findById(doc._id).lean().orFail();
+      assert.deepStrictEqual(fromDb.items.map(item => item.qty), [0, 100, 2]);
+    });
+
+    it('leaves existing subdocs in the existing array if casting a later element fails', function() {
+      const Test1 = db.model('Test1', new Schema({
+        items: [new Schema({ name: String }, { strict: 'throw' })]
+      }));
+      const doc = Test1.hydrate({
+        _id: new mongoose.Types.ObjectId(),
+        items: [{ _id: new mongoose.Types.ObjectId(), name: 'a' }]
+      });
+      const prevItems = doc.items;
+      const [a] = doc.items;
+
+      doc.items = [{ _id: a._id, name: 'a' }, { notInSchema: 1 }];
+
+      assert.strictEqual(doc.items, prevItems);
+      assert.strictEqual(a.parentArray(), prevItems);
+    });
+  });
 });

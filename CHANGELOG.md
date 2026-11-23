@@ -1,3 +1,7 @@
+8.24.11 / 2026-11-23
+====================
+ * fix: set dotted paths through document array elements into nested paths #16691 #16704 #16698 [hassanabrar202](https://github.com/hassanabrar202)
+
 8.24.10 / 2026-11-16
 ====================
  * fix(query): make sanitizeFilter catch any fields that start with $ in top-level filter to avoid bypass using $_internalSchemaXor and other MongoDB internal expressions

@@ -848,8 +848,12 @@ declare module 'mongoose' {
      */
     perDocumentLimit?: number;
 
-    /** Additional options like `limit` and `lean`. */
-    options?: QueryOptions<DocType> & { match?: AnyObject };
+    /**
+     * Additional options like `limit` and `lean`. Can also be a function that returns the options,
+     * which Mongoose calls once per `populate()` call with the populate options and the virtual.
+     */
+    options?: (QueryOptions<DocType> & { match?: AnyObject }) |
+      ((populateOptions: PopulateOptions, virtual: VirtualType<HydratedDocType>) => (QueryOptions<DocType> & { match?: AnyObject }) | null | undefined);
 
     /** If true and the given `name` is a direct child of an array, apply the virtual to the array rather than the elements. */
     applyToArray?: boolean;

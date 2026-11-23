@@ -77,6 +77,29 @@ const Pet = model<IPet>('Pet', petSchema);
   console.log(pet.owner.fullName); // John Wick
 })();
 
+function gh8579() {
+  const schema = new Schema({ name: String });
+
+  schema.virtual('children', {
+    ref: 'Child',
+    localField: '_id',
+    foreignField: 'parentId',
+    options: (populateOptions, virtual) => {
+      expect(populateOptions).type.toBe<mongoose.PopulateOptions>();
+      expect(virtual).type.toBeAssignableTo<mongoose.VirtualType<any>>();
+      return { sort: { name: 1 }, match: { isDeleted: false } };
+    }
+  });
+
+  schema.virtual('child', {
+    ref: 'Child',
+    localField: '_id',
+    foreignField: 'parentId',
+    justOne: true,
+    options: () => null
+  });
+}
+
 function gh11543() {
   const personSchema = new Schema<IPerson, Model<IPerson, {}, {}, PetVirtuals>, {}, {}, PetVirtuals>({
     _id: { type: Number, required: true },

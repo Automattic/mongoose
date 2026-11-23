@@ -11299,6 +11299,82 @@ describe('model: populate:', function() {
     assert.deepStrictEqual(doc.children.map(c => c.name).sort(), ['Chad', 'Luke']);
   });
 
+  it('supports setting virtual populate `options` to a function (gh-8579)', async function() {
+    const calls = [];
+    const parentSchema = mongoose.Schema({ name: String });
+    parentSchema.virtual('children', {
+      ref: 'Child',
+      localField: '_id',
+      foreignField: 'parentId',
+      options: function(populateOptions, virtual) {
+        calls.push({ populateOptions, virtual });
+        const includeDeleted = !!populateOptions.includeDeleted;
+        return {
+          sort: { name: 1 },
+          match: includeDeleted ? {} : { isDeleted: false },
+          populate: { path: 'toys', includeDeleted }
+        };
+      }
+    });
+    const Parent = db.model('Parent', parentSchema);
+
+    const childSchema = mongoose.Schema({
+      name: String,
+      parentId: 'ObjectId',
+      isDeleted: Boolean
+    });
+    childSchema.virtual('toys', {
+      ref: 'Toy',
+      localField: '_id',
+      foreignField: 'childId',
+      options: populateOptions => ({
+        sort: { name: 1 },
+        match: populateOptions.includeDeleted ? {} : { isDeleted: false }
+      })
+    });
+    const Child = db.model('Child', childSchema);
+
+    const Toy = db.model('Toy', mongoose.Schema({
+      name: String,
+      childId: 'ObjectId',
+      isDeleted: Boolean
+    }));
+
+    const [vader, padme] = await Parent.create([{ name: 'Darth Vader' }, { name: 'Padme' }]);
+    const [luke] = await Child.create([
+      { name: 'Luke', parentId: vader._id, isDeleted: false },
+      { name: 'Leia', parentId: padme._id, isDeleted: false },
+      { name: 'Chad', parentId: vader._id, isDeleted: true }
+    ]);
+    await Toy.create([
+      { name: 'Lightsaber', childId: luke._id, isDeleted: false },
+      { name: 'Blaster', childId: luke._id, isDeleted: true }
+    ]);
+
+    let docs = await Parent.find().sort({ name: 1 }).populate('children');
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].populateOptions.path, 'children');
+    assert.strictEqual(calls[0].virtual, Parent.schema.virtuals.children);
+    assert.deepStrictEqual(docs.map(doc => doc.children.map(child => child.name)), [['Luke'], ['Leia']]);
+    assert.deepStrictEqual(docs[0].children[0].toys.map(toy => toy.name), ['Lightsaber']);
+
+    docs = await Parent.find().sort({ name: 1 }).populate({
+      path: 'children',
+      includeDeleted: true
+    });
+    assert.equal(calls.length, 2);
+    assert.deepStrictEqual(docs.map(doc => doc.children.map(child => child.name)), [['Chad', 'Luke'], ['Leia']]);
+    assert.deepStrictEqual(docs[0].children[1].toys.map(toy => toy.name), ['Blaster', 'Lightsaber']);
+
+    // `match` passed to `populate()` overrides the `match` returned by the `options` function
+    const doc = await Parent.findById(vader._id).populate({
+      path: 'children',
+      match: { name: 'Chad' }
+    });
+    assert.equal(calls.length, 3);
+    assert.deepStrictEqual(doc.children.map(child => child.name), ['Chad']);
+  });
+
   it('allows pushing to model populated in a query cursor (gh-13575)', async function() {
     const Company = db.model('Company', Schema({ name: String }));
     const User = db.model(

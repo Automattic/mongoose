@@ -575,6 +575,19 @@ const vectorSearchStages: PipelineStage[] = [
   }
 ];
 
+const vectorSearchAutoEmbedStages: PipelineStage[] = [
+  {
+    $vectorSearch: {
+      index: 'auto_embed_index',
+      path: 'response',
+      query: { text: 'hello' },
+      model: 'voyage-4',
+      limit: 5,
+      numCandidates: 100
+    }
+  }
+];
+
 function gh16006() {
   interface MyDoc {
     _id: string;

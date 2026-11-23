@@ -323,11 +323,13 @@ declare module 'mongoose' {
         exact?: boolean;
         index: string,
         path: string,
-        queryVector: number[],
         numCandidates?: number,
         limit: number,
         filter?: Expression,
-      }
+      } & (
+        { queryVector: number[], query?: never, model?: never } |
+        { query: { text: string }, queryVector?: never, model?: string }
+      )
     }
 
   }

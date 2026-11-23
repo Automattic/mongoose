@@ -180,6 +180,16 @@ describe('document modified', function() {
       assert.equal(post.isModified('title slug'), true);
     });
 
+    it('does not report a path as modified when only a path that is a prefix of its name changed', function() {
+      const Test = db.model('Test', new Schema({ name: String, nameNormalized: String }));
+      const doc = new Test();
+      doc.init({ name: 'foo', nameNormalized: 'foo' });
+
+      doc.set('name', 'bar');
+      assert.equal(doc.isModified('name'), true);
+      assert.equal(doc.isModified('nameNormalized'), false);
+    });
+
 
     describe('on DocumentArray', function() {
       it('work', function() {

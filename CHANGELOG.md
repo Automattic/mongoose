@@ -1,3 +1,13 @@
+9.13.0 / 2026-11-23
+===================
+ * feat: upgrade MongoDB driver to 7.9 #16724 [oscarmaia](https://github.com/oscarmaia)
+ * feat(schema+model+query): add defaultSort option to schemas, applies default sort to all queries unless sort explicitly specified #16676 #16577
+ * perf(documentArray): avoid O(n*m) id() lookup when setting a documentarray to a plain array #16683 #16673
+ * perf(subdocument): check isNew before isDirectModified() in markModified() #16743 [g4lb](https://github.com/g4lb)
+ * fix: make ducktyping more rigorous about inherited vs own properties, fix a few cases where user-specified `$__` and `$__isNested` caused confusing errors #16723
+ * types: handle nested projections in typescript #16678
+ * docs(mongoose): document the mongoose.mongo property #16712 #16710 [VaibhavBajpaij](https://github.com/VaibhavBajpaij)
+
 9.12.4 / 2026-11-23
 ===================
  * fix(document): avoid applying map value defaults to $* keys when map underneath nested #16694 #16636

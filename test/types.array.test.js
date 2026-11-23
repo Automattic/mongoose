@@ -142,6 +142,77 @@ describe('types array', function() {
       assert.equal(doc.ids.indexOf(uuid2), 1);
       assert.equal(doc.ids.includes(new mongoose.Types.UUID(uuid2)), true);
     });
+
+    it('matches Decimal128, Double and Buffer values by value', function() {
+      const Test = db.model('Test', new Schema({
+        decimals: [Schema.Types.Decimal128],
+        doubles: [Schema.Types.Double],
+        buffers: [Buffer]
+      }));
+      const doc = new Test({
+        decimals: ['1.5', '2.5'],
+        doubles: [1.5, 2.5],
+        buffers: [Buffer.from([1]), Buffer.from([2])]
+      });
+
+      assert.equal(doc.decimals.indexOf(mongoose.Types.Decimal128.fromString('2.5')), 1);
+      assert.equal(doc.decimals.indexOf(mongoose.Types.Decimal128.fromString('1.5'), 1), -1);
+      assert.equal(doc.decimals.includes(mongoose.Types.Decimal128.fromString('3.5')), false);
+      assert.equal(doc.doubles.indexOf(new mongoose.Types.Double(2.5)), 1);
+      assert.equal(doc.doubles.includes(new mongoose.Types.Double(3.5)), false);
+      assert.equal(doc.buffers.indexOf(Buffer.from([2])), 1);
+      assert.equal(doc.buffers.includes(Buffer.from([3])), false);
+    });
+
+    it('matches Decimal128 values that are numerically equal but written differently', function() {
+      const Test = db.model('Test', new Schema({ decimals: [Schema.Types.Decimal128] }));
+      const doc = new Test({ decimals: ['1.50', '-0', '1E+3', '0.1000000000000000000000000000000001', 'NaN', '0E-10'] });
+      const { Decimal128 } = mongoose.Types;
+
+      assert.equal(doc.decimals.indexOf(Decimal128.fromString('1.5')), 0);
+      assert.equal(doc.decimals.indexOf(Decimal128.fromString('0')), 1);
+      assert.equal(doc.decimals.indexOf(Decimal128.fromString('1000')), 2);
+      assert.equal(doc.decimals.indexOf(Decimal128.fromString('-0'), 2), 5);
+      assert.equal(doc.decimals.indexOf(Decimal128.fromString('0.1')), -1);
+      assert.equal(doc.decimals.indexOf(Decimal128.fromString('NaN')), 4);
+    });
+
+    it('matches Double and Decimal128 values only against the same type', function() {
+      const Test = db.model('Test', new Schema({ mixed: [] }));
+      const { Decimal128, Double } = mongoose.Types;
+      const doc = new Test({ mixed: [4.5, '4.5', new Double(4.5), Decimal128.fromString('4.5')] });
+
+      assert.equal(doc.mixed.indexOf(new Double(4.5)), 2);
+      assert.equal(doc.mixed.indexOf(Decimal128.fromString('4.50')), 3);
+      // Numbers keep using loose equality for backwards compatibility
+      assert.equal(doc.mixed.indexOf('4.5'), 0);
+    });
+
+    it('matches NaN in Double arrays', function() {
+      const Test = db.model('Test', new Schema({ doubles: [Schema.Types.Double] }));
+      const doc = new Test({ doubles: [1.5, NaN] });
+
+      assert.equal(doc.doubles.indexOf(doc.doubles[1]), 1);
+      assert.equal(doc.doubles.indexOf(new mongoose.Types.Double(NaN)), 1);
+
+      doc.doubles.pull(NaN);
+      assert.deepStrictEqual(doc.doubles.map(v => v.valueOf()), [1.5]);
+    });
+
+    it('does not match Buffers with the same bytes but a different subtype', function() {
+      const Test = db.model('Test', new Schema({
+        uuids: [{ type: Buffer, subtype: 4 }],
+        buffers: [Buffer]
+      }));
+      const doc = new Test({ uuids: [Buffer.from([1])], buffers: [Buffer.from([1])] });
+      const other = new Test({ uuids: [Buffer.from([1])] });
+
+      assert.equal(doc.uuids.indexOf(doc.buffers[0]), -1);
+      assert.equal(doc.uuids.indexOf(Buffer.from([1])), -1);
+      assert.equal(doc.buffers.indexOf(doc.uuids[0]), -1);
+      assert.equal(doc.uuids.indexOf(other.uuids[0]), 0);
+      assert.equal(doc.buffers.indexOf(Buffer.from([1])), 0);
+    });
   });
 
   describe('includes()', function() {
@@ -725,6 +796,39 @@ describe('types array', function() {
       assert.deepStrictEqual(ids.map(id => id.toString()), [uuid2, uuid3]);
     });
 
+    it('removes Decimal128, Double and Buffer values that are equal but not the same instance', async function() {
+      const Test = db.model('Test', new Schema({
+        decimals: [Schema.Types.Decimal128],
+        doubles: [Schema.Types.Double],
+        buffers: [Buffer]
+      }));
+      const { _id } = await Test.create({
+        decimals: ['1.50', '2.5'],
+        doubles: [1.5, 2.5],
+        buffers: [Buffer.from([1]), Buffer.from([2])]
+      });
+
+      const doc = await Test.findById(_id);
+      doc.decimals.pull('1.5');
+      doc.doubles.pull(1.5);
+      doc.buffers.pull(Buffer.from([1]));
+      assert.deepStrictEqual(doc.decimals.map(v => v.toString()), ['2.5']);
+      assert.deepStrictEqual(doc.doubles.map(v => v.valueOf()), [2.5]);
+      assert.deepStrictEqual(doc.buffers.map(v => v.toString('hex')), ['02']);
+
+      // Mixing pull() and push() saves the whole array with $set, so a value
+      // that pull() left behind would be written back.
+      doc.decimals.push('3.5');
+      doc.doubles.push(3.5);
+      doc.buffers.push(Buffer.from([3]));
+      await doc.save();
+
+      const saved = await Test.findById(_id);
+      assert.deepStrictEqual(saved.decimals.map(v => v.toString()), ['2.5', '3.5']);
+      assert.deepStrictEqual(saved.doubles.map(v => v.valueOf()), [2.5, 3.5]);
+      assert.deepStrictEqual(saved.buffers.map(v => v.toString('hex')), ['02', '03']);
+    });
+
     it('registers $pull atomic if pulling from middle (gh-14502)', async function() {
       const schema = new Schema({
         a: [{ type: Schema.ObjectId, ref: 'Cat' }]
@@ -1168,6 +1272,30 @@ describe('types array', function() {
       const added = doc.ids.addToSet(uuid1, new mongoose.Types.UUID(uuid2), uuid3);
       assert.deepStrictEqual(added.map(id => id.toString()), [uuid3]);
       assert.deepStrictEqual(doc.ids.map(id => id.toString()), [uuid1, uuid2, uuid3]);
+    });
+
+    it('skips Decimal128, Double and Buffer values that are already in the array', function() {
+      const Test = db.model('Test', new Schema({
+        decimals: [Schema.Types.Decimal128],
+        doubles: [Schema.Types.Double],
+        buffers: [Buffer]
+      }));
+      const doc = new Test({
+        decimals: ['1.50'],
+        doubles: [1.5],
+        buffers: [Buffer.from([1])]
+      });
+
+      const addedDecimals = doc.decimals.addToSet('1.5', mongoose.Types.Decimal128.fromString('1.5'), '2.5');
+      const addedDoubles = doc.doubles.addToSet(1.5, new mongoose.Types.Double(1.5), 2.5);
+      const addedBuffers = doc.buffers.addToSet(Buffer.from([1]), Buffer.from([2]));
+
+      assert.deepStrictEqual(addedDecimals.map(v => v.toString()), ['2.5']);
+      assert.deepStrictEqual(doc.decimals.map(v => v.toString()), ['1.50', '2.5']);
+      assert.deepStrictEqual(addedDoubles.map(v => v.valueOf()), [2.5]);
+      assert.deepStrictEqual(doc.doubles.map(v => v.valueOf()), [1.5, 2.5]);
+      assert.deepStrictEqual(addedBuffers.map(v => v.toString('hex')), ['02']);
+      assert.deepStrictEqual(doc.buffers.map(v => v.toString('hex')), ['01', '02']);
     });
 
     it('works with BigInts', async function() {
@@ -2091,6 +2219,58 @@ describe('types array', function() {
     m.Schema.Types.DocumentArray.options.castNonArrays = true;
     await doc2.validate();
     assert.deepStrictEqual(doc2.docArr.map(d => d.name), ['good']);
+  });
+
+  it('respects `castNonArrays` property option on nested arrays', async function() {
+    const matrixPathFalse = { castNonArrays: false, type: [[Number]] };
+    const Model = db.model('TestNestedCastNonArraysFalse', new Schema({ matrix: matrixPathFalse }));
+
+    // Path option `false` rejects non-array values even though the global default is `true`.
+    const doc = new Model({ matrix: 5 });
+    const err = await doc.validate().then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.errors['matrix'].name, 'CastError');
+
+    // Valid nested arrays are unchanged by the option.
+    const okDoc = new Model({ matrix: [[1, 2], [3]] });
+    await okDoc.validate();
+    assert.deepStrictEqual(okDoc.matrix, [[1, 2], [3]]);
+
+    // Unset path option still wraps non-array values to the array's depth (default unchanged).
+    const Model2 = db.model('TestNestedCastNonArraysDefault', new Schema({ matrix: [[Number]] }));
+    const doc2 = new Model2({ matrix: 5 });
+    await doc2.validate();
+    assert.deepStrictEqual(doc2.matrix, [[5]]);
+
+    // Global option precedence: global `false` applies when the path option is
+    // unset, and the path option overrides the global option in both directions.
+    // Schema type constructors and their static options are shared across Mongoose
+    // instances, so save and restore the global value.
+    const previousGlobal = mongoose.Schema.Types.Array.options.castNonArrays;
+    mongoose.Schema.Types.Array.options.castNonArrays = false;
+    try {
+      const GlobalFalse = db.model('TestNestedCastNonArraysGlobalFalse', new Schema({ matrix: [[Number]] }));
+      const gDoc = new GlobalFalse({ matrix: 5 });
+      const err2 = await gDoc.validate().then(() => null, err => err);
+      assert.ok(err2);
+      assert.equal(err2.errors['matrix'].name, 'CastError');
+
+      const PathTrue = db.model('TestNestedCastNonArraysPathTrue', new Schema({
+        matrix: { castNonArrays: true, type: [[Number]] }
+      }));
+      const doc3 = new PathTrue({ matrix: 5 });
+      await doc3.validate();
+      assert.deepStrictEqual(doc3.matrix, [[5]]);
+
+      const PathFalse = db.model('TestNestedCastNonArraysGlobalFalsePathFalse', new Schema({ matrix: matrixPathFalse }));
+      const pfDoc = new PathFalse({ matrix: 5 });
+      const err3 = await pfDoc.validate().then(() => null, err => err);
+      assert.ok(err3);
+      assert.equal(err3.errors['matrix'].name, 'CastError');
+    } finally {
+      mongoose.Schema.Types.Array.options.castNonArrays = previousGlobal;
+    }
+    assert.equal(mongoose.Schema.Types.Array.options.castNonArrays, true);
   });
 
   it('supports setting nested arrays directly (gh-13372)', function() {

@@ -1,3 +1,13 @@
+9.12.4 / 2026-11-23
+===================
+ * fix(document): avoid applying map value defaults to $* keys when map underneath nested #16694 #16636
+ * fix(array): compare Decimal128, Double and Buffer by value in indexOf() #16718 #16635 [luantaraschi](https://github.com/luantaraschi)
+ * fix(helpers): handle NaN limits, null rejections, and sync throws in parallelLimit #16744 [ragib-mrb](https://github.com/ragib-mrb)
+ * fix(schematype): let a cloned path replace or remove its min, max, enum and length validators #16741 [Vineet829](https://github.com/Vineet829)
+ * fix(array): respect castNonArrays path option on nested arrays #16732
+ * docs(mongoose): drop useUnifiedTopology condition from connect() options #16738 [phatstraws](https://github.com/phatstraws)
+ * docs(model): correct default for hydrate() strict option #16699 [ragib-mrb](https://github.com/ragib-mrb)
+
 9.12.3 / 2026-11-20
 ===================
  * fix(model): match pathsToSkip string paths exactly in Model.validate() #16706 [NotAFlightRisk](https://github.com/NotAFlightRisk)

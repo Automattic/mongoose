@@ -164,13 +164,36 @@ describe('types array', function() {
       assert.equal(doc.buffers.includes(Buffer.from([3])), false);
     });
 
+    it('matches Decimal128 values that are numerically equal but written differently', function() {
+      const Test = db.model('Test', new Schema({ decimals: [Schema.Types.Decimal128] }));
+      const doc = new Test({ decimals: ['1.50', '-0', '1E+3', '0.1000000000000000000000000000000001', 'NaN', '0E-10'] });
+      const { Decimal128 } = mongoose.Types;
+
+      assert.equal(doc.decimals.indexOf(Decimal128.fromString('1.5')), 0);
+      assert.equal(doc.decimals.indexOf(Decimal128.fromString('0')), 1);
+      assert.equal(doc.decimals.indexOf(Decimal128.fromString('1000')), 2);
+      assert.equal(doc.decimals.indexOf(Decimal128.fromString('-0'), 2), 5);
+      assert.equal(doc.decimals.indexOf(Decimal128.fromString('0.1')), -1);
+      assert.equal(doc.decimals.indexOf(Decimal128.fromString('NaN')), 4);
+    });
+
+    it('matches Double and Decimal128 values only against the same type', function() {
+      const Test = db.model('Test', new Schema({ mixed: [] }));
+      const { Decimal128, Double } = mongoose.Types;
+      const doc = new Test({ mixed: [4.5, '4.5', new Double(4.5), Decimal128.fromString('4.5')] });
+
+      assert.equal(doc.mixed.indexOf(new Double(4.5)), 2);
+      assert.equal(doc.mixed.indexOf(Decimal128.fromString('4.50')), 3);
+      // Numbers keep using loose equality for backwards compatibility
+      assert.equal(doc.mixed.indexOf('4.5'), 0);
+    });
+
     it('matches NaN in Double arrays', function() {
       const Test = db.model('Test', new Schema({ doubles: [Schema.Types.Double] }));
       const doc = new Test({ doubles: [1.5, NaN] });
 
       assert.equal(doc.doubles.indexOf(doc.doubles[1]), 1);
       assert.equal(doc.doubles.indexOf(new mongoose.Types.Double(NaN)), 1);
-      assert.equal(doc.doubles.indexOf(NaN), 1);
 
       doc.doubles.pull(NaN);
       assert.deepStrictEqual(doc.doubles.map(v => v.valueOf()), [1.5]);
@@ -780,7 +803,7 @@ describe('types array', function() {
         buffers: [Buffer]
       }));
       const { _id } = await Test.create({
-        decimals: ['1.5', '2.5'],
+        decimals: ['1.50', '2.5'],
         doubles: [1.5, 2.5],
         buffers: [Buffer.from([1]), Buffer.from([2])]
       });
@@ -1258,7 +1281,7 @@ describe('types array', function() {
         buffers: [Buffer]
       }));
       const doc = new Test({
-        decimals: ['1.5'],
+        decimals: ['1.50'],
         doubles: [1.5],
         buffers: [Buffer.from([1])]
       });
@@ -1268,7 +1291,7 @@ describe('types array', function() {
       const addedBuffers = doc.buffers.addToSet(Buffer.from([1]), Buffer.from([2]));
 
       assert.deepStrictEqual(addedDecimals.map(v => v.toString()), ['2.5']);
-      assert.deepStrictEqual(doc.decimals.map(v => v.toString()), ['1.5', '2.5']);
+      assert.deepStrictEqual(doc.decimals.map(v => v.toString()), ['1.50', '2.5']);
       assert.deepStrictEqual(addedDoubles.map(v => v.valueOf()), [2.5]);
       assert.deepStrictEqual(doc.doubles.map(v => v.valueOf()), [1.5, 2.5]);
       assert.deepStrictEqual(addedBuffers.map(v => v.toString('hex')), ['02']);
@@ -2174,6 +2197,28 @@ describe('types array', function() {
     assert.ifError(user.validateSync());
 
     m.Schema.Types.Array.options.castNonArrays = true;
+  });
+
+  it('supports `castNonArrays` property option on document arrays', async function() {
+    const Model = db.model('Test', new Schema({
+      docArr: { castNonArrays: false, type: [{ name: String }] }
+    }));
+
+    const doc = new Model({ docArr: { name: 'fail' } });
+    const err = await doc.validate().then(() => null, err => err);
+    assert.ok(err);
+    assert.equal(err.errors['docArr'].name, 'CastError');
+
+    const m = new mongoose.Mongoose();
+    m.Schema.Types.DocumentArray.options.castNonArrays = false;
+    const Model2 = m.model('Test', new m.Schema({
+      docArr: { castNonArrays: true, type: [{ name: String }] }
+    }));
+
+    const doc2 = new Model2({ docArr: { name: 'good' } });
+    m.Schema.Types.DocumentArray.options.castNonArrays = true;
+    await doc2.validate();
+    assert.deepStrictEqual(doc2.docArr.map(d => d.name), ['good']);
   });
 
   it('supports setting nested arrays directly (gh-13372)', function() {

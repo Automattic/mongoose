@@ -481,7 +481,7 @@ declare module 'mongoose' {
       options?: QueryOptions<RawDocType> | null
     ): QueryWithHelpers<Array<DocType>, DocType, THelpers, RawDocType, 'find', TDocOverrides, TLeanResultType>;
 
-    /** Executes the query as a find and also runs countDocuments, returning [documents, count]. Also requires sort and limit to be set. */
+    /** Executes the query as a find and also runs countDocuments, returning [documents, count]. Requires limit, and requires sort unless the schema has a `defaultSort`. */
     findAndCount(): Promise<[ResultType, number]>;
 
     /** Declares the query a findOne operation. When executed, returns the first found document. */

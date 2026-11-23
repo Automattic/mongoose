@@ -576,6 +576,7 @@ Valid options:
 * [query](#query-helpers)
 * [autoSearchIndex](#autoSearchIndex)
 * [readConcern](#readConcern)
+* [defaultSort](#defaultSort)
 <!-- markdownlint-enable MD051 -->
 
 ## option: autoIndex {#autoIndex}
@@ -1610,6 +1611,60 @@ const eventSchema = new mongoose.Schema(
   }
 );
 ```
+
+## option: defaultSort {#defaultSort}
+
+Sets the sort order for queries that don't specify a sort, so you can define a model's usual ordering once.
+`defaultSort` accepts anything that [`Query.prototype.sort()`](api/query.html#Query.prototype.sort()) accepts, except:
+
+1. `$meta` sorts like `{ score: { $meta: 'textScore' } }`, because MongoDB throws an error on `$meta` sorts for queries that don't use `$text`.
+2. Empty sorts: `{}`, `[]`, `new Map()`, whitespace-only strings, because those would translate to no sort. `defaultSort: null` or `false` is allowed to disable default sort for discriminators.
+
+```javascript
+const schema = new Schema({ name: String }, {
+  timestamps: true,
+  defaultSort: { createdAt: -1, _id: -1 }
+});
+const Item = mongoose.model('Item', schema);
+
+// Sorted by `{ createdAt: -1, _id: -1 }`
+await Item.find({ name: 'test' });
+
+// An explicit sort replaces `defaultSort` entirely, Mongoose does **not** append
+// the default as a tie-breaker. Sorted by `{ name: 1 }`.
+await Item.find().sort({ name: 1 });
+
+// Satisfies `findAndCount()`'s `sort` requirement. `limit` is still required.
+const [items, total] = await Item.findAndCount({}, null, { limit: 20 });
+
+// Call `sort(null)` or `sort({})` to run an individual query with no sort.
+await Item.find().sort(null);
+await Item.find({}, null, { sort: null });
+```
+
+Like `sort(null)`, `sort(undefined)` and `{ sort: undefined }` run the query with no sort.
+If you pass an optional sort to a query, like `{ sort: req.query.sort }`, omit the `sort` key when there is no sort to use the `defaultSort`.
+`findAndCount()` throws an error if `sort` is explicitly empty, like `{ sort: undefined }`, because pagination without a sort can return inconsistent results.
+
+`defaultSort` applies to `find()`, `findOne()`, `findOneAndUpdate()`, `findOneAndReplace()`, and `findOneAndDelete()`, including the queries that [`populate()`](populate.html) executes.
+It does not apply to `countDocuments()`, `estimatedDocumentCount()`, `distinct()`, `deleteOne()`, `deleteMany()`, `updateOne()`, `replaceOne()`, `updateMany()`, `exists()`, `bulkWrite()`, or aggregations.
+`updateOne()` and `replaceOne()` are explicitly excluded for MongoDB server compatibility: MongoDB only supports `sort` for `updateOne()` and `replaceOne()` starting in MongoDB 8.0, and older versions throw an error if `sort` is set.
+If you need `updateOne()` or `replaceOne()` to respect a sort order on MongoDB 8.0 or later, call `sort()` explicitly.
+Mongoose applies `defaultSort` after pre middleware, so middleware that calls `sort()` overrides `defaultSort`.
+You can also use `defaultSort` on a discriminator schema to override, or disable with `false` or `null`, the base schema's `defaultSort`.
+
+The ref model's `defaultSort` affects `populate()` as follows:
+
+* Populated arrays of refs, like `children: [{ type: ObjectId, ref: 'Child' }]`, keep the order of the ids stored in the array. Pass explicit `options: { sort }` to `populate()` to reorder them.
+* [Populated virtuals](populate.html#populate-virtuals) are sorted by `defaultSort`.
+* `defaultSort` determines which documents MongoDB returns when you use populate's `limit` or `perDocumentLimit` options.
+
+Mongoose skips `defaultSort` for [tailable cursors](https://www.mongodb.com/docs/manual/core/tailable-cursors/), because MongoDB does not support sorting tailable cursors.
+Mongoose also skips `defaultSort` for queries with [`$near` or `$nearSphere`](https://www.mongodb.com/docs/manual/reference/operator/query/near/) conditions, so those queries return results sorted by distance.
+
+`defaultSort` can cause performance issues for queries on non-selective filters.
+For example, without a `defaultSort`, `Model.findOne()` with no filter simply finds the first document in the collection.
+With a `defaultSort`, `Model.findOne()` with no filter needs to sort every document in the collection, which can be slow for large collections unless the `defaultSort` is covered by an index.
 
 ## With ES6 Classes {#es6-classes}
 

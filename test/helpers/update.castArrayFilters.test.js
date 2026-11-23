@@ -518,6 +518,19 @@ describe('castArrayFilters', function() {
     assert.deepStrictEqual(q.options.arrayFilters[0], { $or: [{ 'el.id': 12 }], 'el.deleted': true });
   });
 
+  it('skips array filters whose identifier is an Object.prototype property', function() {
+    const schema = new Schema({ arr: [{ id: Number }] });
+    const q = new Query();
+    q.schema = schema;
+
+    q.updateOne({}, { $set: { 'arr.$[el].id': 1 } }, {
+      arrayFilters: [{ 'el.id': '12' }, { toString: '1' }, { 'constructor.id': '1' }]
+    });
+    castArrayFilters(q);
+
+    assert.deepStrictEqual(q.options.arrayFilters, [{ 'el.id': 12 }, { toString: '1' }, { 'constructor.id': '1' }]);
+  });
+
   it('casts `$nor` (gh-16637)', function() {
     const schema = new Schema({
       arr: [{ id: Number }]

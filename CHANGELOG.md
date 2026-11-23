@@ -1,3 +1,33 @@
+9.13.0 / 2026-11-23
+===================
+ * feat: upgrade MongoDB driver to 7.9 #16724 [oscarmaia](https://github.com/oscarmaia)
+ * feat(schema+model+query): add defaultSort option to schemas, applies default sort to all queries unless sort explicitly specified #16676 #16577
+ * perf(documentArray): avoid O(n*m) id() lookup when setting a documentarray to a plain array #16683 #16673
+ * perf(subdocument): check isNew before isDirectModified() in markModified() #16743 [g4lb](https://github.com/g4lb)
+ * fix: make ducktyping more rigorous about inherited vs own properties, fix a few cases where user-specified `$__` and `$__isNested` caused confusing errors #16723
+ * types: handle nested projections in typescript #16678
+ * docs(mongoose): document the mongoose.mongo property #16712 #16710 [VaibhavBajpaij](https://github.com/VaibhavBajpaij)
+
+9.12.4 / 2026-11-23
+===================
+ * fix(document): avoid applying map value defaults to $* keys when map underneath nested #16694 #16636
+ * fix(array): compare Decimal128, Double and Buffer by value in indexOf() #16718 #16635 [luantaraschi](https://github.com/luantaraschi)
+ * fix(helpers): handle NaN limits, null rejections, and sync throws in parallelLimit #16744 [ragib-mrb](https://github.com/ragib-mrb)
+ * fix(schematype): let a cloned path replace or remove its min, max, enum and length validators #16741 [Vineet829](https://github.com/Vineet829)
+ * fix(array): respect castNonArrays path option on nested arrays #16732
+ * docs(mongoose): drop useUnifiedTopology condition from connect() options #16738 [phatstraws](https://github.com/phatstraws)
+ * docs(model): correct default for hydrate() strict option #16699 [ragib-mrb](https://github.com/ragib-mrb)
+
+9.12.3 / 2026-11-20
+===================
+ * fix(model): match pathsToSkip string paths exactly in Model.validate() #16706 [NotAFlightRisk](https://github.com/NotAFlightRisk)
+ * fix(query): avoid casting $expr $in search value when it is an expression #16709 [kwy404](https://github.com/kwy404)
+ * fix(update): run update validators on mixed paths in subdocuments #16708 #16707 [lazerg](https://github.com/lazerg)
+ * fix(documentarray): respect castNonArrays path option on document arrays #16685 [yxshee](https://github.com/yxshee)
+ * types(schema): add removeVirtual() to Schema #16722 [farisbasha](https://github.com/farisbasha)
+ * docs(document): correct checkKeys default for save() #16716 [phatstraws](https://github.com/phatstraws)
+ * docs: fix typos in comments, tests, and typings #16714 [ninglinLiu](https://github.com/ninglinLiu)
+
 9.12.2 / 2026-11-16
 ===================
  * fix(query): make sanitizeFilter catch any fields that start with $ in top-level filter to avoid bypass using $_internalSchemaXor and other MongoDB internal expressions

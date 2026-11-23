@@ -168,6 +168,15 @@ describe('aggregate: ', function() {
       assert.deepEqual(aggregate._pipeline, [{ $project: { a: 1, b: 1, c: 0 } }, { $project: { b: 1 } }]);
     });
 
+    it('ignores own `__proto__` keys', function() {
+      const aggregate = new Aggregate();
+
+      aggregate.project(JSON.parse('{"__proto__":{"name":0},"age":1}'));
+
+      assert.deepStrictEqual(aggregate._pipeline, [{ $project: { age: 1 } }]);
+      assert.strictEqual(Object.getPrototypeOf(aggregate._pipeline[0].$project), Object.prototype);
+    });
+
     it('("a","b","c")', function() {
       assert.throws(function() {
         const aggregate = new Aggregate();

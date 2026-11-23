@@ -64,3 +64,6 @@ valnotes.md
 
 coverage
 .nyc_output
+
+# TypeScript test configs
+tstyche.*

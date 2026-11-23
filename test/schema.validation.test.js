@@ -193,6 +193,34 @@ describe('schema', function() {
       await Clone.path('status').doValidate(42);
     });
 
+    it('min(), max(), enum(), minlength() and maxlength() replace or remove the validators of a cloned path', async function() {
+      const Test = new Schema({
+        num: { type: Number, min: 1, max: 10, enum: [1, 2, 3] },
+        date: { type: Date, min: new Date('2020-01-01'), max: new Date('2030-01-01') },
+        str: { type: String, enum: ['a', 'b'], minlength: 1, maxlength: 3 }
+      });
+
+      const Clone = Test.clone();
+      Clone.path('num').min(5);
+
+      assert.deepStrictEqual(Clone.path('num').validators.map(v => v.type), ['max', 'enum', 'min']);
+      assert.strictEqual(Clone.path('num').validators[2].min, 5);
+
+      Clone.path('num').min(null).max(null).enum(false);
+      Clone.path('date').min(null).max(null);
+      Clone.path('str').enum(false).minlength(null).maxlength(null);
+
+      assert.equal(Clone.path('num').validators.length, 0);
+      assert.equal(Clone.path('date').validators.length, 0);
+      assert.equal(Clone.path('str').validators.length, 0);
+      await Clone.path('num').doValidate(42);
+      await Clone.path('str').doValidate('zzzz');
+
+      assert.equal(Test.path('num').validators.length, 3);
+      assert.equal(Test.path('date').validators.length, 2);
+      assert.equal(Test.path('str').validators.length, 3);
+    });
+
     it('enum(null) removes the enum validator like enum(false)', async function() {
       const Test = new Schema({
         state: { type: String, enum: ['a', 'b'] },

@@ -1912,6 +1912,44 @@ describe('Map', function() {
     });
   });
 
+  it('does not apply map value defaults when setting the map\'s nested parent', async function() {
+    const schema = new Schema({
+      nested: {
+        counts: { type: Map, of: { type: Number, default: 5 } },
+        tags: { type: Map, of: [String] },
+        mapOfMaps: { type: Map, of: { type: Map, of: { type: Number, default: 6 } } },
+        mapOfSubdocs: { type: Map, of: new Schema({ v: { type: Number, default: 7 } }) },
+        other: Number
+      }
+    });
+    const M = db.model('Test', schema);
+
+    const doc = new M({ nested: { other: 1 } });
+    assert.strictEqual(doc.nested.counts, undefined);
+    assert.strictEqual(doc.nested.tags, undefined);
+    assert.strictEqual(doc.nested.mapOfMaps, undefined);
+    assert.strictEqual(doc.nested.mapOfSubdocs, undefined);
+    await doc.save();
+
+    const loaded = await M.findById(doc._id);
+    loaded.set({ nested: { other: 2 } });
+    await loaded.save();
+    const loadedFromDb = await M.findById(doc._id).lean();
+    assert.deepStrictEqual(loadedFromDb.nested, { other: 2 });
+
+    const empty = await M.create({ nested: {} });
+    const emptyFromDb = await M.findById(empty._id).lean();
+    // `nested` is empty, so `minimize` strips it
+    assert.strictEqual(emptyFromDb.nested, undefined);
+
+    doc.set('nested.counts.a', 1);
+    doc.set('nested.tags.b', ['x']);
+    await doc.save();
+
+    const fromDb = await M.findById(doc._id).lean();
+    assert.deepStrictEqual(fromDb.nested, { other: 2, counts: { a: 1 }, tags: { b: ['x'] } });
+  });
+
   describe('nested map subdocuments loaded via init() (gh-15957) (gh-15969)', function() {
     it('fails validation for invalid data (gh-15957)', async function() {
       // Arrange

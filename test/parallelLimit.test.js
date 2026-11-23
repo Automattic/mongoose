@@ -33,4 +33,51 @@ describe('parallelLimit', function() {
     assert.equal(finished, 3);
     assert.deepStrictEqual(results, [1, 2, 3]);
   });
+
+  it('rejects non-positive and NaN limits', async function() {
+    await assert.rejects(
+      () => parallelLimit([1, 2], value => Promise.resolve(value), NaN),
+      /Limit must be positive/
+    );
+    await assert.rejects(
+      () => parallelLimit([1, 2], value => Promise.resolve(value), 0),
+      /Limit must be positive/
+    );
+  });
+
+  it('rejects when fn rejects with null or throws synchronously while other workers are in flight', async function() {
+    let rejected = false;
+    let rejectionValue = 'unset';
+    try {
+      await parallelLimit([1, 2, 3], async(val) => {
+        if (val === 2) {
+          return Promise.reject(null);
+        }
+        return val;
+      }, 2);
+    } catch (err) {
+      rejected = true;
+      rejectionValue = err;
+    }
+    assert.equal(rejected, true);
+    assert.equal(rejectionValue, null);
+
+    let firstFinished = false;
+    await assert.rejects(
+      () => parallelLimit([1, 2, 3], (val) => {
+        if (val === 1) {
+          return new Promise(resolve => setTimeout(() => {
+            firstFinished = true;
+            resolve(val);
+          }, 15));
+        }
+        if (val === 2) {
+          throw new Error('sync boom');
+        }
+        return Promise.resolve(val);
+      }, 2),
+      /sync boom/
+    );
+    assert.equal(firstFinished, true);
+  });
 });

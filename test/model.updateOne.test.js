@@ -2173,6 +2173,26 @@ describe('model: updateOne:', function() {
       assert.deepStrictEqual(updated.tags, ['green']);
     });
 
+    it('reports the path of an invalid $in value of $pull', async function() {
+      const schema = new Schema({
+        comments: [{ author: { type: String, enum: ['alice', 'bob'] } }]
+      });
+      const Model = db.model('Test', schema);
+      const doc = await Model.create({ comments: [{ author: 'alice' }] });
+
+      const cases = [['zed'], ['alice', 'zed'], ['alice', 'bob', 'zed']];
+      for (const authors of cases) {
+        const err = await Model.updateOne({ _id: doc._id }, {
+          $pull: { comments: { author: { $in: authors } } }
+        }, { runValidators: true }).then(() => null, err => err);
+
+        const path = 'comments.author.$in.' + (authors.length - 1);
+        assert.ok(err);
+        assert.deepStrictEqual(Object.keys(err.errors), [path]);
+        assert.strictEqual(err.errors[path].path, path);
+      }
+    });
+
     it('$pull with updateValidators and required array (gh-6341)', function() {
       const RecordingSchema = new Schema({ name: String });
 

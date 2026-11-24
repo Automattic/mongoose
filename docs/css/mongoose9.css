@@ -797,6 +797,14 @@ hr {
   border: 1px solid var(--border-color-soft);
 }
 
+/* Long option names and URLs must wrap instead of widening the page on phones */
+.article :not(pre) > code,
+.article .method-type,
+.article p a,
+.article li a {
+  overflow-wrap: anywhere;
+}
+
 /* Code blocks (github.css handles highlighting) */
 .article pre {
   background-color: var(--code-bg);

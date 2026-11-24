@@ -163,4 +163,13 @@ describe('castUpdate', function() {
           '"also not a number" is not a valid count for model PullModel'
     );
   });
+
+  it('casts a nested primitive array element with arrayFilters after the parent path is cached (gh-16756)', function() {
+    const elementSchema = new Schema({ grid: [[Number]] });
+    const schema = new Schema({ outer: [new Schema({ elements: [elementSchema] })] });
+    schema.path('outer.0.elements.0.grid');
+
+    const res = castUpdate(schema, { $set: { 'outer.$[o].elements.$[e].grid.1.1': '3' } });
+    assert.deepStrictEqual(res, { $set: { 'outer.$[o].elements.$[e].grid.1.1': 3 } });
+  });
 });

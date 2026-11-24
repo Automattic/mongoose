@@ -1,3 +1,13 @@
+9.13.1 / 2026-11-24
+===================
+ * fix(schema): remove alias mapping in removeVirtual() #16733 [mayur-dhavan](https://github.com/mayur-dhavan)
+ * fix(schema): make remove() also remove aliases; remove aliases from SchemaType in removeVirtual() #16751 #16733
+ * fix(update): report the right path for an invalid $in value of $pull #16728 [rafay247](https://github.com/rafay247)
+ * fix(schema): allow setting castNonArrays on nested arrays #16748 #16732
+ * types: allow query.text in $vectorSearch for auto-embedding indexes #16750 #16749 [MIbtehajNasar](https://github.com/MIbtehajNasar)
+ * docs(model): remove incorrect w and j defaults from bulkWrite() and bulkSave() #16700 [ragib-mrb](https://github.com/ragib-mrb)
+ * test(document): isModified() does not match a path by name prefix #16752 [Trenyx](https://github.com/Trenyx)
+
 9.13.0 / 2026-11-23
 ===================
  * feat: upgrade MongoDB driver to 7.9 #16724 [oscarmaia](https://github.com/oscarmaia)

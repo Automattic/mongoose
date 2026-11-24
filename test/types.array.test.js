@@ -2255,8 +2255,9 @@ describe('types array', function() {
       assert.ok(err2);
       assert.equal(err2.errors['matrix'].name, 'CastError');
 
+      // `castNonArrays` doesn't propagate to nested arrays, so set it on both levels
       const PathTrue = db.model('TestNestedCastNonArraysPathTrue', new Schema({
-        matrix: { castNonArrays: true, type: [[Number]] }
+        matrix: { castNonArrays: true, type: [{ type: [Number], castNonArrays: true }] }
       }));
       const doc3 = new PathTrue({ matrix: 5 });
       await doc3.validate();
@@ -2271,6 +2272,90 @@ describe('types array', function() {
       mongoose.Schema.Types.Array.options.castNonArrays = previousGlobal;
     }
     assert.equal(mongoose.Schema.Types.Array.options.castNonArrays, true);
+  });
+
+  describe('`castNonArrays` on nested arrays', function() {
+    // Returns the path of the single CastError that `value` causes on `matrix`
+    async function getCastErrorPath(Model, value) {
+      const err = await new Model({ matrix: value }).validate().then(() => null, err => err);
+      assert.ok(err, `expected ${JSON.stringify(value)} to fail casting`);
+      const paths = Object.keys(err.errors);
+      assert.equal(paths.length, 1);
+      assert.equal(err.errors[paths[0]].name, 'CastError');
+      return paths[0];
+    }
+
+    async function castMatrix(Model, value) {
+      const doc = new Model({ matrix: value });
+      await doc.validate();
+      return doc.toObject().matrix;
+    }
+
+    it('applies only to the array it is set on', async function() {
+      // Outer array only: the inner array still wraps
+      const OuterFalse = db.model('Test', new Schema({
+        matrix: { castNonArrays: false, type: [[Number]] }
+      }));
+      assert.equal(await getCastErrorPath(OuterFalse, 5), 'matrix');
+      assert.deepStrictEqual(await castMatrix(OuterFalse, [5]), [[5]]);
+      assert.deepStrictEqual(await castMatrix(OuterFalse, [1, 2]), [[1, 2]]);
+
+      // Both arrays: options on a nested array definition are kept, not dropped
+      const bothFalseSchema = new Schema({
+        matrix: { castNonArrays: false, type: [{ type: [Number], castNonArrays: false }] }
+      });
+      assert.strictEqual(bothFalseSchema.path('matrix').embeddedSchemaType.options.castNonArrays, false);
+      const BothFalse = db.model('Test2', bothFalseSchema);
+      assert.equal(await getCastErrorPath(BothFalse, 5), 'matrix');
+      assert.equal(await getCastErrorPath(BothFalse, [5]), 'matrix.0');
+      assert.equal(await getCastErrorPath(BothFalse, [1, 2]), 'matrix.0');
+      assert.deepStrictEqual(await castMatrix(BothFalse, [[1, 2]]), [[1, 2]]);
+
+      // Inner array only: the outer array wraps a scalar, but the inner array rejects it,
+      // and the outer array's setters don't wrap `[1, 2]` past the inner array's option
+      const InnerFalse = db.model('Test3', new Schema({
+        matrix: [{ type: [Number], castNonArrays: false }]
+      }));
+      assert.equal(await getCastErrorPath(InnerFalse, 5), 'matrix.0');
+      assert.equal(await getCastErrorPath(InnerFalse, [5]), 'matrix.0');
+      assert.equal(await getCastErrorPath(InnerFalse, [1, 2]), 'matrix.0');
+      assert.deepStrictEqual(await castMatrix(InnerFalse, [[1, 2]]), [[1, 2]]);
+    });
+
+    it('each array\'s option overrides the global option for that array only', async function() {
+      const previousGlobal = mongoose.Schema.Types.Array.options.castNonArrays;
+      mongoose.Schema.Types.Array.options.castNonArrays = false;
+      try {
+        const NoOptions = db.model('Test', new Schema({ matrix: [[Number]] }));
+        assert.equal(await getCastErrorPath(NoOptions, 5), 'matrix');
+        assert.equal(await getCastErrorPath(NoOptions, [5]), 'matrix.0');
+
+        // Outer array only: the inner array uses the global `false`
+        const OuterTrue = db.model('Test2', new Schema({
+          matrix: { castNonArrays: true, type: [[Number]] }
+        }));
+        assert.equal(await getCastErrorPath(OuterTrue, 5), 'matrix.0');
+        assert.equal(await getCastErrorPath(OuterTrue, [5]), 'matrix.0');
+        assert.equal(await getCastErrorPath(OuterTrue, [1, 2]), 'matrix.0');
+
+        const BothTrue = db.model('Test3', new Schema({
+          matrix: { castNonArrays: true, type: [{ type: [Number], castNonArrays: true }] }
+        }));
+        assert.deepStrictEqual(await castMatrix(BothTrue, 5), [[5]]);
+        assert.deepStrictEqual(await castMatrix(BothTrue, [5]), [[5]]);
+        assert.deepStrictEqual(await castMatrix(BothTrue, [1, 2]), [[1, 2]]);
+
+        // Inner array only: the outer array uses the global `false`
+        const InnerTrue = db.model('Test4', new Schema({
+          matrix: [{ type: [Number], castNonArrays: true }]
+        }));
+        assert.equal(await getCastErrorPath(InnerTrue, 5), 'matrix');
+        assert.deepStrictEqual(await castMatrix(InnerTrue, [5]), [[5]]);
+        assert.deepStrictEqual(await castMatrix(InnerTrue, [1, 2]), [[1, 2]]);
+      } finally {
+        mongoose.Schema.Types.Array.options.castNonArrays = previousGlobal;
+      }
+    });
   });
 
   it('supports setting nested arrays directly (gh-13372)', function() {

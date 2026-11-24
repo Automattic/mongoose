@@ -3586,6 +3586,49 @@ describe('schema', function() {
     assert.equal(doc.name, 'Test');
   });
 
+  it('should not bring back a removed alias on schemas derived with pick(), omit(), or add()', function() {
+    const schema = new Schema({
+      name: { type: String, alias: ['n', 'nm'] },
+      nested: { name: { type: String, alias: 'nested.n' } }
+    });
+
+    schema.removeVirtual(['n', 'nested.n']);
+    assert.deepStrictEqual(schema.path('name').options.alias, ['nm']);
+
+    const picked = schema.pick(['name', 'nested.name']);
+    assert.deepStrictEqual(picked.aliases, { nm: 'name' });
+    assert.ok(!picked.virtuals.n);
+    assert.ok(!picked.virtuals['nested.n']);
+
+    const omitted = schema.omit([]);
+    assert.deepStrictEqual(omitted.aliases, { nm: 'name' });
+    assert.ok(!omitted.virtuals.n);
+    assert.ok(!omitted.virtuals['nested.n']);
+
+    const added = new Schema({}).add(schema);
+    assert.deepStrictEqual(added.aliases, { nm: 'name' });
+    assert.ok(!added.virtuals.n);
+    assert.ok(!added.virtuals['nested.n']);
+  });
+
+  it('should remove aliases pointing to a path removed with remove()', function() {
+    const schema = new Schema({
+      name: { type: String, alias: 'n' },
+      nested: { name: { type: String, alias: 'nested.n' } },
+      age: { type: Number, alias: 'a' }
+    });
+
+    schema.remove(['name', 'nested']);
+    assert.deepStrictEqual(schema.aliases, { a: 'age' });
+    assert.ok(!schema.virtuals.n);
+    assert.ok(!schema.virtuals['nested.n']);
+    assert.ok(schema.virtuals.a);
+    assert.equal(schema.omit([]).aliases.n, undefined);
+
+    const Test = db.model('TestRemovePathAlias', schema);
+    assert.deepStrictEqual(Test.translateAliases({ n: 'Test', a: 1 }), { n: 'Test', age: 1 });
+  });
+
   it('should throw an error if attempting to delete a virtual path that does not exist gh-8397', function() {
     const schema = new Schema({
       name: String

@@ -125,6 +125,37 @@ describe('castexpr', function() {
     assert.strictEqual(res.$in[0].toHexString(), doc._id.toHexString());
   });
 
+  it('casts comparisons against number-returning operators and $arrayElemAt', function() {
+    const testSchema = new Schema({ nums: [Number], name: String, names: [String] });
+
+    let res = cast$expr({ $eq: [{ $size: '$nums' }, '2'] }, testSchema);
+    assert.deepStrictEqual(res, { $eq: [{ $size: '$nums' }, 2] });
+
+    res = cast$expr({ $eq: [{ $strLenCP: '$name' }, '5'] }, testSchema);
+    assert.deepStrictEqual(res, { $eq: [{ $strLenCP: '$name' }, 5] });
+
+    res = cast$expr({ $gt: [{ $strLenBytes: '$name' }, '5'] }, testSchema);
+    assert.deepStrictEqual(res, { $gt: [{ $strLenBytes: '$name' }, 5] });
+
+    res = cast$expr({ $eq: [{ $indexOfCP: ['$name', 'x'] }, '1'] }, testSchema);
+    assert.deepStrictEqual(res, { $eq: [{ $indexOfCP: ['$name', 'x'] }, 1] });
+
+    res = cast$expr({ $eq: [{ $indexOfBytes: ['$name', 'x'] }, '1'] }, testSchema);
+    assert.deepStrictEqual(res, { $eq: [{ $indexOfBytes: ['$name', 'x'] }, 1] });
+
+    res = cast$expr({ $eq: [{ $indexOfArray: ['$nums', 2] }, '0'] }, testSchema);
+    assert.deepStrictEqual(res, { $eq: [{ $indexOfArray: ['$nums', 2] }, 0] });
+
+    res = cast$expr({ $eq: [{ $size: '$nums' }, { $literal: '2' }] }, testSchema);
+    assert.deepStrictEqual(res, { $eq: [{ $size: '$nums' }, { $literal: 2 }] });
+
+    res = cast$expr({ $eq: [{ $arrayElemAt: ['$nums', 0] }, '42'] }, testSchema);
+    assert.deepStrictEqual(res, { $eq: [{ $arrayElemAt: ['$nums', 0] }, 42] });
+
+    res = cast$expr({ $eq: [{ $arrayElemAt: ['$names', 0] }, 42] }, testSchema);
+    assert.deepStrictEqual(res, { $eq: [{ $arrayElemAt: ['$names', 0] }, '42'] });
+  });
+
   it('casts $not (gh-11689)', function() {
     const testSchema = new Schema({ nums: [Number], docs: [new Schema({ prop: Number }, { _id: false })] });
 

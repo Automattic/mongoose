@@ -730,6 +730,12 @@ describe('Query', function() {
 
     });
 
+    it('ignores extra spaces in string sorts', function() {
+      const query = new Query({});
+      query.sort(' a b   -c  ');
+      assert.deepStrictEqual(query.options.sort, { a: 1, b: 1, c: -1 });
+    });
+
     it('only reads own `$meta` properties', function() {
       const query = new Query({});
       query.sort({ score: { $meta: 'textScore' } });

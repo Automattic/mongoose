@@ -221,6 +221,26 @@ describe('schema', function() {
       assert.equal(Test.path('str').validators.length, 3);
     });
 
+    it('allowNull(true) removes the allowNull validator of a cloned array or subdocument path', async function() {
+      const subSchema = new Schema({ name: String });
+      const Test = new Schema({
+        tags: { type: [String], allowNull: false },
+        docs: { type: [subSchema], allowNull: false },
+        nested: { type: subSchema, allowNull: false }
+      });
+
+      const Clone = Test.clone();
+
+      for (const path of ['tags', 'docs', 'nested']) {
+        Clone.path(path).allowNull(true);
+
+        const allowNullValidators = Clone.path(path).validators.filter(v => v.type === 'allowNull');
+        assert.equal(allowNullValidators.length, 0, path);
+        await Clone.path(path).doValidate(null);
+        await assert.rejects(Test.path(path).doValidate(null), ValidatorError);
+      }
+    });
+
     it('enum(null) removes the enum validator like enum(false)', async function() {
       const Test = new Schema({
         state: { type: String, enum: ['a', 'b'] },

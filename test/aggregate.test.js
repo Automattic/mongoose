@@ -268,6 +268,13 @@ describe('aggregate: ', function() {
       assert.deepEqual(aggregate._pipeline, [{ $sort: { a: 1, b: 1, c: -1 } }, { $sort: { b: -1 } }]);
     });
 
+    it('(object with null prototype)', function() {
+      const aggregate = new Aggregate();
+
+      aggregate.sort(Object.assign(Object.create(null), { a: 1, b: 'desc' }));
+      assert.deepEqual(aggregate._pipeline, [{ $sort: { a: 1, b: -1 } }]);
+    });
+
     it('(string)', function() {
       const aggregate = new Aggregate();
 

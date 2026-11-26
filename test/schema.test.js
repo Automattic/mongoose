@@ -846,6 +846,16 @@ describe('schema', function() {
 
       });
 
+      it('converts `expires` in index options with a null prototype', function() {
+        const schema = new Schema({ createdAt: Date });
+
+        schema.index({ createdAt: 1 }, Object.assign(Object.create(null), { expires: '1h' }));
+
+        assert.deepEqual(schema.indexes(), [
+          [{ createdAt: 1 }, { expireAfterSeconds: 60 * 60 }]
+        ]);
+      });
+
       it('compound based on name (gh-6499)', function() {
         const testSchema = new Schema({
           prop1: { type: String, index: { name: 'test1' } },

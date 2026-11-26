@@ -1950,6 +1950,30 @@ describe('Map', function() {
     assert.deepStrictEqual(fromDb.nested, { other: 2, counts: { a: 1 }, tags: { b: ['x'] } });
   });
 
+  it('casts objects with a null prototype', async function() {
+    const schema = new Schema({
+      tags: { type: Map, of: [String] }
+    });
+    const M = db.model('Test', schema);
+
+    // `querystring.parse()` and `Object.groupBy()` return objects with a null prototype
+    const tags = require('querystring').parse('a=apple&a=avocado&b=banana');
+    assert.strictEqual(Object.getPrototypeOf(tags), null);
+
+    const doc = new M({ tags });
+    assert.ifError(doc.validateSync());
+    assert.ok(doc.tags instanceof Map);
+    assert.deepStrictEqual(doc.tags.get('a'), ['apple', 'avocado']);
+    await doc.save();
+
+    const fromDb = await M.findById(doc._id).lean();
+    assert.deepStrictEqual(fromDb.tags, { a: ['apple', 'avocado'], b: ['banana'] });
+
+    doc.tags = Object.assign(Object.create(null), { c: ['cherry'] });
+    assert.ifError(doc.validateSync());
+    assert.deepStrictEqual(doc.tags.get('c'), ['cherry']);
+  });
+
   describe('nested map subdocuments loaded via init() (gh-15957) (gh-15969)', function() {
     it('fails validation for invalid data (gh-15957)', async function() {
       // Arrange

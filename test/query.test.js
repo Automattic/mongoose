@@ -1209,6 +1209,12 @@ describe('Query', function() {
         assert.equal(query.options.tailable, true);
         assert.equal(query.options.awaitData, true);
       });
+      it('supports passing the `awaitData` option in an object with a null prototype', function() {
+        const query = new Query({});
+        query.tailable(Object.assign(Object.create(null), { awaitData: true }));
+        assert.equal(query.options.tailable, true);
+        assert.equal(query.options.awaitData, true);
+      });
     });
 
     describe('comment', function() {

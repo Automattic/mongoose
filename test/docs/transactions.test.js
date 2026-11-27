@@ -440,6 +440,31 @@ describe('transactions', function() {
       exists = await Test.exists({ _id: doc._id });
       assert.ok(exists);
     });
+
+    it('transaction() resets $isNew between retries with transactionAsyncLocalStorage (gh-16745)', async function() {
+      m.deleteModel(/Test/);
+      const Test = m.model('Test', m.Schema({ name: String }));
+
+      await Test.createCollection();
+      await Test.deleteMany({});
+
+      const doc = new Test({ name: 'test' });
+      assert.ok(doc.$isNew);
+      let retryCount = 0;
+      await m.connection.transaction(async() => {
+        assert.ok(doc.$isNew);
+        await doc.save();
+        if (++retryCount < 3) {
+          throw new m.mongo.MongoServerError({
+            errorLabels: ['TransientTransactionError']
+          });
+        }
+      });
+
+      const docs = await Test.find();
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0].name, 'test');
+    });
   });
 
   it('transaction() resets $isNew on error', async function() {

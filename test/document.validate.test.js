@@ -1361,6 +1361,74 @@ describe('document validation', function() {
         assert.equal(arrayValidatorCalls, 1);
       });
     });
+
+    describe('large values in document array elements (gh-16765)', function() {
+      // Validation cost must follow the schema, not the data: a large Buffer,
+      // primitive array or Mixed object in an element must not be expanded
+      // into one modified path per byte, element or key.
+      const maxModifiedPaths = 100;
+
+      afterEach(() => sinon.restore());
+
+      async function assertValidatesWithoutExpansion(doc) {
+        const spy = sinon.spy(mongoose.Document.prototype, 'modifiedPaths');
+
+        await doc.validate();
+        assert.ifError(doc.validateSync());
+
+        const largest = Math.max(0, ...spy.returnValues.map(paths => paths.length));
+        assert.ok(largest < maxModifiedPaths, `modifiedPaths() returned ${largest} paths`);
+      }
+
+      it('does not enumerate the bytes of a Buffer', async function() {
+        const Model = db.model('Test', new Schema({
+          attachments: [new Schema({ data: Buffer })]
+        }));
+        const doc = new Model({ attachments: [{ data: Buffer.alloc(4 * 1024 * 1024) }] });
+
+        await assertValidatesWithoutExpansion(doc);
+      });
+
+      it('does not enumerate the elements of a primitive array', async function() {
+        const Model = db.model('Test', new Schema({
+          arr: [new Schema({ values: [Number] })]
+        }));
+        const values = Array.from({ length: 100000 }, (_, i) => i);
+        const doc = new Model({ arr: [{ values }] });
+
+        await assertValidatesWithoutExpansion(doc);
+      });
+
+      it('does not enumerate the keys of a Mixed object', async function() {
+        const Model = db.model('Test', new Schema({
+          arr: [new Schema({ meta: Schema.Types.Mixed })]
+        }));
+        const meta = {};
+        for (let i = 0; i < 100000; ++i) {
+          meta['k' + i] = i;
+        }
+        const doc = new Model({ arr: [{ meta }] });
+
+        await assertValidatesWithoutExpansion(doc);
+      });
+
+      it('still reports errors on element subpaths next to a large Buffer', async function() {
+        const Model = db.model('Test', new Schema({
+          attachments: [new Schema({
+            data: Buffer,
+            name: { type: String, required: true }
+          })]
+        }));
+        const doc = new Model({
+          attachments: [{ data: Buffer.alloc(1024 * 1024), name: 'a' }, { data: Buffer.alloc(1024 * 1024) }]
+        });
+
+        const error = await doc.validate().then(() => null, error => error);
+        assert.ok(error?.errors['attachments.1.name'], error);
+        assert.ok(!error.errors['attachments.0.name'], error);
+        assert.ok(doc.validateSync()?.errors['attachments.1.name']);
+      });
+    });
   });
 
   describe('#validate', function() {

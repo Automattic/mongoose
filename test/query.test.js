@@ -2347,6 +2347,32 @@ describe('Query', function() {
     assert.strictEqual(called, 1);
   });
 
+  it('runs transforms once for findOneAndUpdate, findOneAndReplace and findOneAndDelete (gh-16770)', async function() {
+    const Model = db.model('Test', new Schema({ name: String }));
+    const doc = await Model.create({ name: 'test' });
+
+    const calls = [];
+    const transform = res => {
+      calls.push(res);
+      return res;
+    };
+
+    let res = await Model.findOneAndUpdate({ _id: doc._id }, { name: 'updated' }, { returnDocument: 'after' }).transform(transform);
+    assert.strictEqual(calls.length, 1);
+    assert.ok(calls[0] instanceof Model);
+    assert.equal(res.name, 'updated');
+
+    res = await Model.findOneAndReplace({ _id: doc._id }, { name: 'replaced' }, { returnDocument: 'after' }).transform(transform);
+    assert.strictEqual(calls.length, 2);
+    assert.ok(calls[1] instanceof Model);
+    assert.equal(res.name, 'replaced');
+
+    res = await Model.findOneAndDelete({ _id: doc._id }).transform(transform);
+    assert.strictEqual(calls.length, 3);
+    assert.ok(calls[2] instanceof Model);
+    assert.equal(res.name, 'replaced');
+  });
+
   it('transform with for/await and cursor', async function() {
     const Model = db.model('Test', new Schema({ name: String }));
 

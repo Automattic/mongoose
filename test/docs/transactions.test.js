@@ -440,6 +440,49 @@ describe('transactions', function() {
       exists = await Test.exists({ _id: doc._id });
       assert.ok(exists);
     });
+
+    it('bulkSave() rejects for a document with no changes that the transaction deleted (gh-16713)', async function() {
+      // Arrange
+      m.deleteModel(/Test/);
+      const Test = m.model('Test', m.Schema({ name: String }));
+      await Test.createCollection();
+      await Test.deleteMany({});
+      const [doc] = await Test.insertMany([{ name: 'deleted in the transaction' }]);
+
+      // Act
+      const err = await m.connection.transaction(async() => {
+        await Test.deleteOne({ _id: doc._id });
+        await Test.bulkSave([doc]);
+      }).then(() => null, err => err);
+
+      // Assert
+      assert.equal(err?.name, 'DocumentNotFoundError');
+    });
+
+    it('bulkSave() uses the transaction session while the connection buffers (gh-16713)', async function() {
+      // Arrange
+      m.deleteModel(/Test/);
+      const schema = m.Schema({ name: String });
+      const Test = m.model('Test', schema);
+      await Test.createCollection();
+      await Test.deleteMany({});
+      const [doc] = await Test.insertMany([{ name: 'deleted in the transaction' }]);
+      const bufferingConnection = m.createConnection();
+      const BufferingTest = bufferingConnection.model('Test', schema);
+
+      // Act
+      const err = await m.connection.transaction(async() => {
+        await Test.deleteOne({ _id: doc._id });
+        const buffered = new Promise(resolve => bufferingConnection.once('buffer', resolve));
+        const bulkSave = BufferingTest.bulkSave([doc]);
+        await buffered;
+        bufferingConnection.setClient(m.connection.client);
+        await bulkSave;
+      }).then(() => null, err => err);
+
+      // Assert
+      assert.equal(err?.name, 'DocumentNotFoundError');
+    });
   });
 
   it('transaction() resets $isNew on error', async function() {
@@ -713,6 +756,65 @@ describe('transactions', function() {
 
     const fromDb = await Test.findById(_id).orFail();
     assert.equal(fromDb.name, 'updated');
+  });
+
+  it('bulkSave() rejects for a document with no changes that the transaction deleted (gh-16713)', async function() {
+    // Arrange
+    db.deleteModel(/Test/);
+    const Test = db.model('Test', Schema({ name: String }));
+    await Test.createCollection();
+    await Test.deleteMany({});
+    const [doc] = await Test.insertMany([{ name: 'deleted in the transaction' }]);
+
+    // Act
+    const err = await db.transaction(async(session) => {
+      await Test.deleteOne({ _id: doc._id }, { session });
+      await Test.bulkSave([doc], { session });
+    }).then(() => null, err => err);
+
+    // Assert
+    assert.equal(err?.name, 'DocumentNotFoundError');
+  });
+
+  it('bulkSave() finds a document with no changes through the session of the document (gh-16713)', async function() {
+    // Arrange
+    db.deleteModel(/Test/);
+    const Test = db.model('Test', Schema({ name: String }));
+    await Test.createCollection();
+    await Test.deleteMany({});
+
+    // Act
+    const err = await db.transaction(async(session) => {
+      const [doc] = await Test.insertMany([{ name: 'created in the transaction' }], { session });
+      await Test.bulkSave([doc]);
+    }).then(() => null, err => err);
+
+    // Assert
+    assert.strictEqual(err, null);
+  });
+
+  it('bulkSave() uses the session of the document while the connection buffers (gh-16713)', async function() {
+    // Arrange
+    db.deleteModel(/Test/);
+    const schema = Schema({ name: String });
+    const Test = db.model('Test', schema);
+    await Test.createCollection();
+    await Test.deleteMany({});
+    const bufferingConnection = mongoose.createConnection();
+    const BufferingTest = bufferingConnection.model('Test', schema);
+
+    // Act
+    const err = await db.transaction(async(session) => {
+      const [doc] = await Test.insertMany([{ name: 'created in the transaction' }], { session });
+      const buffered = new Promise(resolve => bufferingConnection.once('buffer', resolve));
+      const bulkSave = BufferingTest.bulkSave([doc]);
+      await buffered;
+      bufferingConnection.setClient(db.client);
+      await bulkSave;
+    }).then(() => null, err => err);
+
+    // Assert
+    assert.strictEqual(err, null);
   });
 
   it('transaction() retains modified status for documents created outside of the transaction then modified inside the transaction (gh-13973)', async function() {

@@ -450,3 +450,20 @@ async function gh15583_2() {
   const testDoc10 = await TestModel2.findOneAndDelete({}).lean().orFail();
   expect(testDoc10).type.not.toHaveProperty('save');
 }
+
+async function gh16771() {
+  interface ITag { _id: Types.ObjectId, label: string }
+  interface ICustomer { _id: Types.ObjectId, name: string, tag: Types.ObjectId }
+
+  const Customer = model<ICustomer>('Customer', new Schema<ICustomer>({
+    name: String,
+    tag: { type: Schema.Types.ObjectId, ref: 'Tag' }
+  }));
+
+  expect(await Customer.find().lean<ICustomer[]>()).type.toBe<ICustomer[]>();
+  expect(await Customer.find().lean<ICustomer[]>().lean()).type.toBe<ICustomer[]>();
+  expect(await Customer.find().lean<ICustomer[]>().lean(true)).type.toBe<ICustomer[]>();
+  expect(await Customer.find().lean<ICustomer[]>().orFail().lean()).type.toBe<ICustomer[]>();
+  expect(await Customer.find().lean<ICustomer[]>().populate<{ tag: ITag }>('tag').lean()).type.toBe<(Omit<ICustomer, 'tag'> & { tag: ITag })[]>();
+  expect(await Customer.findOne().lean<ICustomer>().lean()).type.toBe<ICustomer | null>();
+}

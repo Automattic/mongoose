@@ -667,7 +667,7 @@ declare module 'mongoose' {
       RawDocType,
       QueryOp,
       TDocOverrides,
-      LeanResultType
+      ResultType extends any[] ? (LeanResultType extends (infer U)[] ? U : LeanResultType) : LeanResultType
       >;
     lean<LeanResultType = TLeanResultType>(
       val: boolean | LeanOptions
@@ -680,7 +680,7 @@ declare module 'mongoose' {
       RawDocType,
       QueryOp,
       TDocOverrides,
-      LeanResultType
+      ResultType extends any[] ? (LeanResultType extends (infer U)[] ? U : LeanResultType) : LeanResultType
       >;
 
     /** Specifies the maximum number of documents the query will return. */

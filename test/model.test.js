@@ -5504,6 +5504,37 @@ describe('Model', function() {
       }
     });
 
+    it('bulkWrite error index points to the right argument when ops fail validation with ordered: false (gh-16767)', async function() {
+      const schema = new mongoose.Schema({
+        number: { type: Number, unique: true }
+      });
+      const Model = db.model('Test', schema);
+      await Model.init();
+      await Model.create([{ number: 1 }, { number: 5 }]);
+
+      const ops = [
+        { insertOne: { document: { number: 'not a number' } } },
+        { insertOne: { document: { number: 2 } } },
+        { updateOne: { filter: { number: 2 }, update: { $set: { number: 'not a number' } } } },
+        { insertOne: { document: { number: 1 } } },
+        { insertOne: { document: { number: 3 } } },
+        { updateOne: { filter: { number: 5 }, update: { $set: { number: 1 } } } }
+      ];
+      const error = await Model.bulkWrite(ops, { ordered: false }).then(() => null, err => err);
+
+      assert.ok(error);
+      assert.equal(error.name, 'MongoBulkWriteError');
+      const writeErrorIndexes = error.writeErrors.map(writeError => writeError.index);
+      assert.deepStrictEqual([...writeErrorIndexes].sort(), [3, 5]);
+      for (const writeError of error.writeErrors) {
+        assert.strictEqual(error.mongoose.results[writeError.index], writeError);
+      }
+      assert.deepStrictEqual(
+        (await Model.find().sort({ number: 1 })).map(doc => doc.number),
+        [1, 2, 3, 5]
+      );
+    });
+
     it('alias with lean virtual (gh-6069)', async function() {
       const schema = new mongoose.Schema({
         name: {

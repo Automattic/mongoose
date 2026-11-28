@@ -576,5 +576,17 @@ describe('model', function() {
       assert.strictEqual(err.errors.field.value, value);
       assert.match(err.errors.field.message, /Cast to string failed/);
     });
+
+    it('formats {VALUE} in a validator message when the value has a non-callable toString (gh-16762)', function() {
+      const Model = db.model('Test3', new Schema({
+        field: { type: Schema.Types.Mixed, validate: { validator: () => false, message: 'Invalid value {VALUE}' } }
+      }));
+
+      const doc = Model.hydrate({ field: { toString: 1 } });
+      const err = doc.validateSync();
+
+      assert.ok(err.errors.field instanceof mongoose.Error.ValidatorError);
+      assert.strictEqual(err.errors.field.message, 'Invalid value { toString: 1 }');
+    });
   });
 });

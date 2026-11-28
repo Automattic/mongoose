@@ -510,6 +510,45 @@ describe('model query casting', function() {
 
       assert.equal(_doc._id.toString(), doc._id.toString());
     });
+
+    it('keeps $or/$and/$nor within $elemMatch on arrays without an item schema when strictQuery is set (gh-16754)', async function() {
+      const Test = db.model('Test', Schema({
+        name: String,
+        count: Number,
+        params: [Schema.Types.Mixed]
+      }, { strictQuery: true }));
+
+      await Test.create([
+        { name: 'A', params: [{ programId: 'p1', program: 'Program A', count: 'one' }] },
+        { name: 'B', params: [{ programId: 'p2', program: 'Program B', count: 'two' }] }
+      ]);
+
+      const filter = Test.find({
+        params: { $elemMatch: { $or: [{ programId: 'p1' }, { program: 'Program A' }] } }
+      }).cast(Test);
+      assert.deepStrictEqual(filter.params.$elemMatch.$or, [{ programId: 'p1' }, { program: 'Program A' }]);
+
+      let docs = await Test.find({ params: { $elemMatch: { $or: [{ programId: 'p1' }, { program: 'Program A' }] } } });
+      assert.deepStrictEqual(docs.map(doc => doc.name), ['A']);
+
+      docs = await Test.find({ params: { $elemMatch: { $and: [{ programId: 'p2' }, { program: 'Program B' }] } } });
+      assert.deepStrictEqual(docs.map(doc => doc.name), ['B']);
+
+      docs = await Test.find({ params: { $elemMatch: { $nor: [{ programId: 'p1' }] } } });
+      assert.deepStrictEqual(docs.map(doc => doc.name), ['B']);
+
+      // `count` is a number on the parent schema, but a string inside the array items
+      docs = await Test.find({ params: { $elemMatch: { $or: [{ count: 'one' }] } } });
+      assert.deepStrictEqual(docs.map(doc => doc.name), ['A']);
+
+      const res = await Test.bulkWrite([{
+        updateMany: {
+          filter: { params: { $elemMatch: { $or: [{ programId: 'p1' }] } } },
+          update: { $set: { name: 'X' } }
+        }
+      }]);
+      assert.equal(res.modifiedCount, 1);
+    });
   });
 
   it('works with $all (gh-3394)', async function() {

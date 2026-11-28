@@ -830,6 +830,40 @@ describe('model query casting', function() {
     assert.deepStrictEqual(res.map(doc => doc.arr[1].id), ['two', 'three']);
   });
 
+  it('keeps $or/$and/$nor clauses inside $elemMatch as-is for arrays without an item schema (gh-16754)', function() {
+    const Test = db.model('Test', new Schema({
+      program: Number,
+      mixedParams: [Schema.Types.Mixed],
+      stringParams: [String],
+      bareArray: Array
+    }, { strictQuery: true }));
+
+    const clauses = [
+      { programId: 'p1' },
+      { program: 'Program A' }
+    ];
+
+    for (const path of ['mixedParams', 'stringParams', 'bareArray']) {
+      for (const op of ['$or', '$and', '$nor']) {
+        const filter = Test.find({ [path]: { $elemMatch: { [op]: clauses } } }).cast();
+        assert.deepStrictEqual(filter[path].$elemMatch[op], clauses);
+      }
+    }
+  });
+
+  it('still casts logical operator clauses inside $elemMatch for document arrays (gh-16754)', function() {
+    const Test = db.model('Test', new Schema({
+      params: [new Schema({ id: mongoose.Schema.Types.ObjectId, program: String })]
+    }, { strictQuery: true }));
+
+    const filter = Test.find({
+      params: { $elemMatch: { $or: [{ id: '1'.repeat(24) }, { program: 'A' }] } }
+    }).cast();
+
+    assert.ok(filter.params.$elemMatch.$or[0].id instanceof mongoose.Types.ObjectId);
+    assert.strictEqual(filter.params.$elemMatch.$or[1].program, 'A');
+  });
+
   it('should not throw a cast error when dealing with an array of objects in combination with $elemMatch and nested $and', async function() {
     const testSchema = new Schema({
       arr: [Object]

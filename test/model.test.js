@@ -4876,6 +4876,28 @@ describe('Model', function() {
         );
       });
 
+      it('casts $or inside $elemMatch on arrays without an item schema (gh-16754)', async function() {
+        const M = db.model('Test', Schema({
+          name: String,
+          params: [Schema.Types.Mixed]
+        }, { strictQuery: true }));
+
+        await M.create([
+          { name: 'match', params: [{ programId: 'p1' }] },
+          { name: 'other', params: [{ programId: 'p2' }] }
+        ]);
+
+        await M.bulkWrite([{
+          updateOne: {
+            filter: { params: { $elemMatch: { $or: [{ programId: 'p1' }] } } },
+            update: { $set: { name: 'updated' } }
+          }
+        }]);
+
+        assert.ok(await M.exists({ name: 'updated' }));
+        assert.ok(await M.exists({ name: 'other' }));
+      });
+
       it('with timestamps and replaceOne (gh-5708)', async function() {
         const schema = new Schema({ num: Number }, { timestamps: true });
 

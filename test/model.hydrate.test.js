@@ -563,5 +563,30 @@ describe('model', function() {
       assert.equal(doc4.extraField, undefined);
       assert.equal(doc4.get('extraField'), 'uses schema default');
     });
+
+    it('records a cast error when a value has a non-callable toString (gh-16762)', function() {
+      const Model = db.model('Test2', new Schema({ field: String }));
+      const value = { toString: 1 };
+
+      const doc = Model.hydrate({ field: value });
+      const err = doc.validateSync();
+
+      assert.ok(err.errors.field instanceof mongoose.Error.ValidatorError);
+      assert.ok(err.errors.field.reason instanceof mongoose.Error.CastError);
+      assert.strictEqual(err.errors.field.value, value);
+      assert.match(err.errors.field.message, /Cast to string failed/);
+    });
+
+    it('formats {VALUE} in a validator message when the value has a non-callable toString (gh-16762)', function() {
+      const Model = db.model('Test3', new Schema({
+        field: { type: Schema.Types.Mixed, validate: { validator: () => false, message: 'Invalid value {VALUE}' } }
+      }));
+
+      const doc = Model.hydrate({ field: { toString: 1 } });
+      const err = doc.validateSync();
+
+      assert.ok(err.errors.field instanceof mongoose.Error.ValidatorError);
+      assert.strictEqual(err.errors.field.message, 'Invalid value { toString: 1 }');
+    });
   });
 });
